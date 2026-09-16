@@ -62,4 +62,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, empty_init, "DISER", "Lilith", MACHINE_IS_SKELETON )
+COMP( 1984, lilith, 0, 0, lilith, lilith, lilith_state, empty_init, "DISER", "Lilith", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

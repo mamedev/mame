@@ -51,8 +51,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// hardware versions
@@ -102,11 +102,11 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
 
-	void ti89_mem(address_map &map);
-	void ti89t_mem(address_map &map);
-	void ti92_mem(address_map &map);
-	void ti92p_mem(address_map &map);
-	void v200_mem(address_map &map);
+	void ti89_mem(address_map &map) ATTR_COLD;
+	void ti89t_mem(address_map &map) ATTR_COLD;
+	void ti92_mem(address_map &map) ATTR_COLD;
+	void ti92p_mem(address_map &map) ATTR_COLD;
+	void v200_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -412,7 +412,7 @@ static INPUT_PORTS_START (ti8x)
 
 	PORT_START("IN.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ON") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, ti68k_state, ti68k_on_key, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ON") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti68k_state::ti68k_on_key), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN.7")
@@ -515,7 +515,7 @@ static INPUT_PORTS_START (ti9x)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_F12)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ON") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, ti68k_state, ti68k_on_key, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ON") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti68k_state::ti68k_on_key), 0)
 
 	PORT_START("IN.9")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
@@ -616,7 +616,7 @@ void ti68k_state::ti89(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(ti68k_state::screen_update));
@@ -781,8 +781,8 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME          FLAGS
-COMP( 1998, ti89,  0,       0,     ti89,    ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
-COMP( 1995, ti92,  0,       0,     ti92,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
-COMP( 1999, ti92p, 0,       0,     ti92p,   ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
-COMP( 2002, v200,  0,       0,     v200,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
-COMP( 2004, ti89t, 0,       0,     ti89t,   ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )
+COMP( 1998, ti89,  0,       0,     ti89,    ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89",          MACHINE_NO_SOUND_HW )
+COMP( 1995, ti92,  0,       0,     ti92,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92",          MACHINE_NO_SOUND_HW )
+COMP( 1999, ti92p, 0,       0,     ti92p,   ti9x,  ti68k_state, empty_init, "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND_HW )
+COMP( 2002, v200,  0,       0,     v200,    ti9x,  ti68k_state, empty_init, "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND_HW )
+COMP( 2004, ti89t, 0,       0,     ti89t,   ti8x,  ti68k_state, empty_init, "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND_HW )

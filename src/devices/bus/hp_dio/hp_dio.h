@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_HPDIO_HPDIO_H
-#define MAME_BUS_HPDIO_HPDIO_H
+#ifndef MAME_BUS_HP_DIO_HP_DIO_H
+#define MAME_BUS_HP_DIO_HP_DIO_H
 
 #pragma once
 
@@ -35,12 +35,16 @@ public:
 		dio16_slot_device(mconfig, tag, owner, clock)
 	{
 		set_dio(std::forward<T>(dio_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 	}
-	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio16_slot_device(mconfig, tag, owner)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		set_options(std::forward<U>(opts), dflt, fixed);
+	}
+	dio16_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_dio(T &&dio_tag) { m_dio.set_tag(std::forward<T>(dio_tag)); }
@@ -48,10 +52,10 @@ public:
 protected:
 	dio16_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_resolve_objects() override;
+	// device_t implementation
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<dio16_device> m_dio;
@@ -62,7 +66,7 @@ class dio16_device : public device_t
 {
 public:
 	// construction/destruction
-	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_prgspace.set_tag(std::forward<T>(tag), spacenum); }
 
@@ -131,9 +135,9 @@ protected:
 	dio16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	void install_space(int spacenum, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal state
 	std::list<device_dio16_card_interface *> m_cards;
@@ -164,12 +168,10 @@ protected:
 class device_dio16_card_interface : public device_interface
 {
 	friend class dio16_device;
-	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_dio16_card_interface();
 
-	device_dio16_card_interface *next() const { return m_next; }
 	// inline configuration
 	void set_diobus(dio16_device &dio_device) {
 		m_dio_dev = &dio_device;
@@ -221,7 +223,6 @@ protected:
 
 private:
 	void set_bus(dio16_device & bus);
-	device_dio16_card_interface *m_next;
 	unsigned int m_index;
 };
 
@@ -236,16 +237,20 @@ public:
 		dio32_slot_device(mconfig, tag, owner, clock)
 	{
 		set_dio(std::forward<T>(dio_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<U>(opts), dflt, fixed);
 	}
-	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T, typename U>
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&dio_tag, U &&opts, const char *dflt, bool fixed) :
+		dio32_slot_device(mconfig, tag, owner)
+	{
+		set_dio(std::forward<T>(dio_tag));
+		set_options(std::forward<U>(opts), dflt, fixed);
+	}
+	dio32_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 };
 
 // ======================> dio32_device
@@ -253,13 +258,13 @@ class dio32_device : public dio16_device
 {
 public:
 	// construction/destruction
-	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dio32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void install16_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 };
 
 // ======================> device_dio32_card_interface
@@ -282,13 +287,14 @@ protected:
 
 } // namespace bus::hp_dio
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)
 DECLARE_DEVICE_TYPE_NS(DIO32, bus::hp_dio, dio32_device)
 DECLARE_DEVICE_TYPE_NS(DIO32_SLOT, bus::hp_dio, dio32_slot_device)
 DECLARE_DEVICE_TYPE_NS(DIO16, bus::hp_dio, dio16_device)
 
 void dio16_cards(device_slot_interface &device);
+void dio16_hp98x6_cards(device_slot_interface &device);
 void dio32_cards(device_slot_interface &device);
 
-#endif // MAME_BUS_HPDIO_HPDIO_H
+#endif // MAME_BUS_HP_DIO_HP_DIO_H

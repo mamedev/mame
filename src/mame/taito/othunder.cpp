@@ -383,20 +383,20 @@ void othunder_state::tc0310fam_w(offs_t offset, u8 data)
 	   because we are using the AY-3-8910 emulation. */
 	volr = (m_pan[0] + m_pan[2]) * 100 / (2 * 0x1f);
 	voll = (m_pan[1] + m_pan[3]) * 100 / (2 * 0x1f);
-	m_2610_0l->flt_volume_set_volume(voll / 100.0);
-	m_2610_0r->flt_volume_set_volume(volr / 100.0);
+	m_2610_0l->set_gain(voll / 100.0);
+	m_2610_0r->set_gain(volr / 100.0);
 
 	/* CH1 */
 	volr = m_pan[0] * 100 / 0x1f;
 	voll = m_pan[1] * 100 / 0x1f;
-	m_2610_1l->flt_volume_set_volume(voll / 100.0);
-	m_2610_1r->flt_volume_set_volume(volr / 100.0);
+	m_2610_1l->set_gain(voll / 100.0);
+	m_2610_1r->set_gain(volr / 100.0);
 
 	/* CH2 */
 	volr = m_pan[2] * 100 / 0x1f;
 	voll = m_pan[3] * 100 / 0x1f;
-	m_2610_2l->flt_volume_set_volume(voll / 100.0);
-	m_2610_2r->flt_volume_set_volume(volr / 100.0);
+	m_2610_2l->set_gain(voll / 100.0);
+	m_2610_2r->set_gain(volr / 100.0);
 }
 
 
@@ -410,7 +410,7 @@ void othunder_state::othunder_map(address_map &map)
 	map(0x080000, 0x08ffff).ram();
 	map(0x090000, 0x09000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 //  map(0x09000c, 0x09000d).nopw();   /* ?? (keeps writing 0x77) */
-	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
+	map(0x100000, 0x100007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));   /* palette */
 	map(0x200000, 0x20ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    /* tilemaps */
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300001, 0x300001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
@@ -525,23 +525,28 @@ static INPUT_PORTS_START( othunder )
 	PORT_CONFSETTING(    0x00, DEF_STR( Low ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( othundrj )
+static INPUT_PORTS_START( othunderj )
 	PORT_INCLUDE( othunder )
 
 	PORT_MODIFY( "DSWA" )
 	TAITO_COINAGE_JAPAN_OLD
+
+	PORT_MODIFY( "DSWB" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( othundu )
-	PORT_INCLUDE( othundrj )
+static INPUT_PORTS_START( othunderu )
+	PORT_INCLUDE( othunder )
+
+	PORT_MODIFY( "DSWA" )
+	TAITO_COINAGE_JAPAN_OLD
 
 	PORT_MODIFY( "DSWB" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Continue_Price ) )        /* see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, "Same as Start" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
 
@@ -572,8 +577,6 @@ GFXDECODE_END
 
 void othunder_state::machine_start()
 {
-	m_recoil_piston.resolve();
-
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
 	save_item(NAME(m_pan));
@@ -597,7 +600,7 @@ void othunder_state::othunder(machine_config &config)
 	adc.in_callback<2>().set_ioport("P2X");
 	adc.in_callback<3>().set_ioport("P2Y");
 
-	TC0220IOC(config, m_tc0220ioc, 0);
+	TC0220IOC(config, m_tc0220ioc);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0220ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0220ioc->read_2_callback().set_ioport("IN0");
@@ -607,45 +610,44 @@ void othunder_state::othunder(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(40*8, 32*8);
-	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(26'686'000) / 4, 424, 0, 320, 262, 16, 256); // same as taito_z.cpp
 	screen.set_screen_update(FUNC(othunder_state::screen_update));
 	screen.set_palette(m_tc0110pcr);
 	screen.screen_vblank().set(FUNC(othunder_state::vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_othunder);
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(4, 0);
 	m_tc0100scn->set_palette(m_tc0110pcr);
 
-	TC0110PCR(config, m_tc0110pcr, 0);
+	TC0110PCR(config, m_tc0110pcr);
+	m_tc0110pcr->set_shift(0);
+	m_tc0110pcr->set_color_callback(FUNC(othunder_state::color_xrgb555));
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "2610.0l", 0.25);
-	ymsnd.add_route(0, "2610.0r", 0.25);
+	ymsnd.add_route(0, "2610.0l", 0.75);
+	ymsnd.add_route(0, "2610.0r", 0.75);
 	ymsnd.add_route(1, "2610.1l", 1.0);
 	ymsnd.add_route(1, "2610.1r", 1.0);
 	ymsnd.add_route(2, "2610.2l", 1.0);
 	ymsnd.add_route(2, "2610.2r", 1.0);
 
-	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.1l").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.1r").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.1r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag(m_audiocpu);
+	TC0140SYT(config, m_tc0140syt);
+	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -767,7 +769,7 @@ ROM_START( othunderu )
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-ROM_START( othunderuo )
+ROM_START( othunderua )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 512K for 68000 code */
 	ROM_LOAD16_BYTE( "b67-20.ic63",   0x00000, 0x20000, CRC(21439ea2) SHA1(d5b5a194e9698cf43513c0d56146772e8132ab07) )
 	ROM_LOAD16_BYTE( "b67-22.ic64",   0x00001, 0x20000, CRC(0f99ad3c) SHA1(dd6c9e822470ca867ec01e642443a871e879bae5) )
@@ -881,9 +883,9 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_LOAD16_WORD( "93c46_eeprom-othunder.ic86", 0x0000, 0x0080, CRC(3729b844) SHA1(f6bb41d293d1e47214f8b2d147991404f3278ebf) )
 ROM_END
 
-GAME( 1988, othunder,    0,        othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunder,    0,        othunder, othunder,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Operation Thunderbolt (World, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othundero,   othunder, othunder, othunder,  othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Operation Thunderbolt (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderu,   othunder, othunder, othunderu, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderua,  othunder, othunder, othunderu, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito America", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderj,   othunder, othunder, othunderj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othunderj, othunder_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

@@ -157,8 +157,8 @@ private:
 	void txen_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void kbd_reset_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void dreq_w(offs_t offset, uint8_t data) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
-	void kron180_iomap(address_map &map);
-	void kron180_mem(address_map &map);
+	void kron180_iomap(address_map &map) ATTR_COLD;
+	void kron180_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_chargen;
@@ -295,7 +295,7 @@ void kron180_state::kron180(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &kron180_state::kron180_iomap);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(kron180_state::screen_update));
 	screen.set_size(80 * 10, 24 * 10);

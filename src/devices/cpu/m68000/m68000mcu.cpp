@@ -34,7 +34,7 @@ void m68000_mcu_device::execute_run()
 					m_ipc = m_pc - 2;
 					m_irdi = m_ird;
 
-					if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+					if(debugger_enabled())
 						debugger_instruction_hook(m_ipc);
 				}
 				(this->*(m_handlers_f[m_inst_state]))();

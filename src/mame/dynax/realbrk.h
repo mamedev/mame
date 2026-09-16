@@ -31,13 +31,13 @@ public:
 		m_player_io(*this, "P%u", 1U)
 	{ }
 
-	void pkgnsh(machine_config &config);
-	void dai2kaku(machine_config &config);
-	void realbrk(machine_config &config);
-	void pkgnshdx(machine_config &config);
+	void pkgnsh(machine_config &config) ATTR_COLD;
+	void dai2kaku(machine_config &config) ATTR_COLD;
+	void realbrk(machine_config &config) ATTR_COLD;
+	void pkgnshdx(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<tmp68301_device> m_maincpu;
@@ -57,9 +57,9 @@ private:
 	optional_ioport_array<2> m_paddle_io;
 	optional_ioport_array<2> m_player_io;
 
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap0;
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap1;
-	int m_disable_video = 0;
+	bitmap_ind16 m_tmpbitmap0;
+	bitmap_ind16 m_tmpbitmap1;
+	bool m_disable_video = false;
 	tilemap_t *m_tilemap[3]{};
 
 	// common
@@ -87,11 +87,12 @@ private:
 	template <bool Rotatable> void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, bitmap_ind8 &priority);
 
 	void vblank_irq(int state);
-	void base_mem(address_map &map);
-	void dai2kaku_mem(address_map &map);
-	void pkgnsh_mem(address_map &map);
-	void pkgnshdx_mem(address_map &map);
-	void realbrk_mem(address_map &map);
+
+	void base_mem(address_map &map) ATTR_COLD;
+	void dai2kaku_mem(address_map &map) ATTR_COLD;
+	void pkgnsh_mem(address_map &map) ATTR_COLD;
+	void pkgnshdx_mem(address_map &map) ATTR_COLD;
+	void realbrk_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DYNAX_REALBRK_H

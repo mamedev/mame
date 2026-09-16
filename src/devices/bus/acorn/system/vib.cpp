@@ -10,40 +10,76 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "vib.h"
 
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "machine/6522via.h"
+#include "machine/6850acia.h"
+#include "machine/i8255.h"
+#include "machine/input_merger.h"
+#include "machine/mc14411.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(ACORN_VIB, acorn_vib_device, "acorn_vib", "Acorn Versatile Interface Board")
+namespace {
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  acorn_vib_device - constructor
-//-------------------------------------------------
-
-acorn_vib_device::acorn_vib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACORN_VIB, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_ppi8255(*this, "ppi8255")
-	, m_via6522(*this, "via6522")
-	, m_acia(*this, "acia6850")
-	, m_mc14411(*this, "mc14411")
-	, m_centronics(*this, "centronics")
-	, m_rs232(*this, "rs232")
-	, m_irqs(*this, "irqs")
-	, m_txc(*this, "TXC")
-	, m_rxc(*this, "RXC")
+class acorn_vib_device : public device_t, public device_acorn_bus_interface
 {
-}
+public:
+	acorn_vib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ACORN_VIB, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_ppi8255(*this, "ppi8255")
+		, m_via6522(*this, "via6522")
+		, m_acia(*this, "acia6850")
+		, m_mc14411(*this, "mc14411")
+		, m_centronics(*this, "centronics")
+		, m_rs232(*this, "rs232")
+		, m_irqs(*this, "irqs")
+		, m_txc(*this, "TXC")
+		, m_rxc(*this, "RXC")
+	{
+	}
 
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	required_device<i8255_device> m_ppi8255;
+	required_device<via6522_device> m_via6522;
+	required_device<acia6850_device> m_acia;
+	required_device<mc14411_device> m_mc14411;
+	required_device<centronics_device> m_centronics;
+	required_device<rs232_port_device> m_rs232;
+	required_device<input_merger_device> m_irqs;
+	required_ioport m_txc;
+	required_ioport m_rxc;
+
+	template<mc14411_device::timer_id T> void write_acia_clock(int state)
+	{
+		if (T == m_txc->read())
+			m_acia->write_txc(state);
+		if (T == m_rxc->read())
+			m_acia->write_rxc(state);
+	}
+
+	void irq_w(int state)
+	{
+		m_bus->irq_w(state);
+	}
+};
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
 
 static INPUT_PORTS_START(acorn_vib)
 	PORT_START("TXC")
@@ -81,11 +117,6 @@ static INPUT_PORTS_START(acorn_vib)
 	PORT_CONFSETTING(mc14411_device::TIMER_F14, "75")
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  input_ports - return a pointer to the implicit
-//  input ports description for this device
-//-------------------------------------------------
-
 ioport_constructor acorn_vib_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(acorn_vib);
@@ -110,34 +141,15 @@ void acorn_vib_device::device_start()
 void acorn_vib_device::device_reset()
 {
 	address_space &space = m_bus->memspace();
+	uint16_t m_blk0 = m_bus->blk0() << 12;
 
-	space.install_device(0x0c00, 0x0c0f, *m_via6522, &via6522_device::map);
-	space.install_device(0x0c10, 0x0c1f, *m_via6522, &via6522_device::map);
-	space.install_readwrite_handler(0x0c20, 0x0c21, 0, 0x1e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
-	space.install_readwrite_handler(0x0c40, 0x0c43, 0, 0x1c, 0, read8sm_delegate(*m_ppi8255, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi8255, FUNC(i8255_device::write)));
+	space.install_readwrite_handler(m_blk0 | 0x0c00, m_blk0 | 0x0c0f, 0, 0x10, 0, emu::rw_delegate(*m_via6522, FUNC(via6522_device::read)), emu::rw_delegate(*m_via6522, FUNC(via6522_device::write)));
+	space.install_readwrite_handler(m_blk0 | 0x0c20, m_blk0 | 0x0c21, 0, 0x1e, 0, emu::rw_delegate(*m_acia, FUNC(acia6850_device::read)), emu::rw_delegate(*m_acia, FUNC(acia6850_device::write)));
+	space.install_readwrite_handler(m_blk0 | 0x0c40, m_blk0 | 0x0c43, 0, 0x1c, 0, emu::rw_delegate(*m_ppi8255, FUNC(i8255_device::read)), emu::rw_delegate(*m_ppi8255, FUNC(i8255_device::write)));
 
 	m_mc14411->timer_disable_all();
 	m_mc14411->timer_enable(mc14411_device::timer_id(m_txc->read()), true);
 	m_mc14411->timer_enable(mc14411_device::timer_id(m_rxc->read()), true);
-}
-
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-template<mc14411_device::timer_id T>
-void acorn_vib_device::write_acia_clock(int state)
-{
-	if (T == m_txc->read())
-		m_acia->write_txc(state);
-	if (T == m_rxc->read())
-		m_acia->write_rxc(state);
-}
-
-void acorn_vib_device::irq_w(int state)
-{
-	m_bus->irq_w(state);
 }
 
 
@@ -187,3 +199,8 @@ void acorn_vib_device::device_add_mconfig(machine_config &config)
 	m_mc14411->out_f<13>().set(FUNC(acorn_vib_device::write_acia_clock<mc14411_device::TIMER_F13>));
 	m_mc14411->out_f<14>().set(FUNC(acorn_vib_device::write_acia_clock<mc14411_device::TIMER_F14>));
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ACORN_VIB, device_acorn_bus_interface, acorn_vib_device, "acorn_vib", "Acorn Versatile Interface Board")

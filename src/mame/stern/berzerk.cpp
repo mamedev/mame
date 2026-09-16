@@ -88,16 +88,16 @@ public:
 		m_led(*this, "led0")
 	{ }
 
-	void berzerk(machine_config &config);
-	void frenzy(machine_config &config);
+	void berzerk(machine_config &config) ATTR_COLD;
+	void frenzy(machine_config &config) ATTR_COLD;
 
-	void init_moonwarp();
+	void init_moonwarp() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void sound_reset() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -144,6 +144,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	IRQ_CALLBACK_MEMBER(vector_r);
 	TIMER_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256);
@@ -153,9 +154,9 @@ private:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
-	void berzerk_io_map(address_map &map);
-	void berzerk_map(address_map &map);
-	void frenzy_map(address_map &map);
+	void berzerk_io_map(address_map &map) ATTR_COLD;
+	void berzerk_map(address_map &map) ATTR_COLD;
+	void frenzy_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -275,6 +276,10 @@ void berzerk_state::irq_enable_w(uint8_t data)
 	m_irq_enabled = data & 0x01;
 }
 
+IRQ_CALLBACK_MEMBER(berzerk_state::vector_r)
+{
+	return 0xfc; // IM 2
+}
 
 TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 {
@@ -286,7 +291,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 
 	/* set the IRQ line if enabled */
 	if (m_irq_enabled)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc); // Z80
+		m_maincpu->set_input_line(0, HOLD_LINE); // Z80
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -399,8 +404,6 @@ void berzerk_state::machine_start()
 {
 	create_irq_timer();
 	create_nmi_timer();
-
-	m_led.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_magicram_control));
@@ -602,12 +605,12 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 		case 1:
 		{
 			/* volume - 0 appears to be inaudible */
-			m_s14001a_volume->flt_volume_set_volume((data >> 3 & 7) / 7.0);
+			m_s14001a_volume->set_gain((data >> 3 & 7) / 7.0);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */
 			int clock_divisor = 16 - (data & 0x07);
-			m_s14001a->set_clock(S14001_CLOCK / clock_divisor / 8);
+			m_s14001a->set_unscaled_clock(S14001_CLOCK / clock_divisor / 8);
 			break;
 		}
 
@@ -741,7 +744,7 @@ void berzerk_state::berzerk_io_map(address_map &map)
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) ) \
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) ) \
-	PORT_DIPSETTING(    0x07, "1 Coin/10 Credits" ) \
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_10C ) ) \
 	PORT_DIPSETTING(    0x08, "1 Coin/14 Credits" )
 
 
@@ -1174,6 +1177,7 @@ void berzerk_state::berzerk(machine_config &config)
 	Z80(config, m_maincpu, MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &berzerk_state::berzerk_map);
 	m_maincpu->set_addrmap(AS_IO, &berzerk_state::berzerk_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(berzerk_state::vector_r));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1181,7 +1185,7 @@ void berzerk_state::berzerk(machine_config &config)
 	TTL74181(config, m_ls181_12c);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(berzerk_state::screen_update));
 
@@ -1192,7 +1196,7 @@ void berzerk_state::berzerk(machine_config &config)
 	m_s14001a->add_route(ALL_OUTPUTS, "s14001a_volume", 0.5);
 	FILTER_VOLUME(config, m_s14001a_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
+	EXIDY(config, m_custom).add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 
 

@@ -52,8 +52,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	inline uint8_t read_port(int port);
 	inline void write_port(int port, uint8_t data);

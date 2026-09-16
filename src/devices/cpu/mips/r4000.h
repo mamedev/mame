@@ -59,34 +59,31 @@ protected:
 	};
 	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size, unsigned m32, unsigned m64, unsigned d32, unsigned d64, bool timer_interrupt_disabled);
 
-	enum cp0_reg : int
-	{
-		CP0_Index    = 0,
-		CP0_Random   = 1,
-		CP0_EntryLo0 = 2,
-		CP0_EntryLo1 = 3,
-		CP0_Context  = 4,
-		CP0_PageMask = 5,
-		CP0_Wired    = 6,
-		CP0_BadVAddr = 8,
-		CP0_Count    = 9,
-		CP0_EntryHi  = 10,
-		CP0_Compare  = 11,
-		CP0_Status   = 12,
-		CP0_Cause    = 13,
-		CP0_EPC      = 14,
-		CP0_PRId     = 15,
-		CP0_Config   = 16,
-		CP0_LLAddr   = 17,
-		CP0_WatchLo  = 18,
-		CP0_WatchHi  = 19,
-		CP0_XContext = 20,
-		CP0_ECC      = 26,
-		CP0_CacheErr = 27,
-		CP0_TagLo    = 28,
-		CP0_TagHi    = 29,
-		CP0_ErrorEPC = 30,
-	};
+	static constexpr int CP0_Index    = 0;
+	static constexpr int CP0_Random   = 1;
+	static constexpr int CP0_EntryLo0 = 2;
+	static constexpr int CP0_EntryLo1 = 3;
+	static constexpr int CP0_Context  = 4;
+	static constexpr int CP0_PageMask = 5;
+	static constexpr int CP0_Wired    = 6;
+	static constexpr int CP0_BadVAddr = 8;
+	static constexpr int CP0_Count    = 9;
+	static constexpr int CP0_EntryHi  = 10;
+	static constexpr int CP0_Compare  = 11;
+	static constexpr int CP0_Status   = 12;
+	static constexpr int CP0_Cause    = 13;
+	static constexpr int CP0_EPC      = 14;
+	static constexpr int CP0_PRId     = 15;
+	static constexpr int CP0_Config   = 16;
+	static constexpr int CP0_LLAddr   = 17;
+	static constexpr int CP0_WatchLo  = 18;
+	static constexpr int CP0_WatchHi  = 19;
+	static constexpr int CP0_XContext = 20;
+	static constexpr int CP0_ECC      = 26;
+	static constexpr int CP0_CacheErr = 27;
+	static constexpr int CP0_TagLo    = 28;
+	static constexpr int CP0_TagHi    = 29;
+	static constexpr int CP0_ErrorEPC = 30;
 
 	enum cp0_sr_mask : u32
 	{
@@ -316,9 +313,9 @@ protected:
 	};
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -332,7 +329,6 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles + 1) / 2; }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return *std::max_element(std::begin(m_hilo_cycles), std::end(m_hilo_cycles)); }
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

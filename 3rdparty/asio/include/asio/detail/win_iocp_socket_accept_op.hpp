@@ -2,7 +2,7 @@
 // detail/win_iocp_socket_accept_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,7 +22,6 @@
 #include "asio/detail/bind_handler.hpp"
 #include "asio/detail/fenced_block.hpp"
 #include "asio/detail/handler_alloc_helpers.hpp"
-#include "asio/detail/handler_invoke_helpers.hpp"
 #include "asio/detail/handler_work.hpp"
 #include "asio/detail/memory.hpp"
 #include "asio/detail/operation.hpp"
@@ -33,6 +32,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename Socket, typename Protocol,
@@ -55,7 +55,7 @@ public:
       enable_connection_aborted_(enable_connection_aborted),
       proxy_op_(0),
       cancel_requested_(0),
-      handler_(ASIO_MOVE_CAST(Handler)(handler)),
+      handler_(static_cast<Handler&&>(handler)),
       work_(handler_, io_ex)
   {
   }
@@ -75,7 +75,7 @@ public:
     return sizeof(sockaddr_storage_type) + 16;
   }
 
-  void enable_cancellation(long* cancel_requested, operation* proxy_op)
+  void enable_cancellation(LONG* cancel_requested, operation* proxy_op)
   {
     cancel_requested_ = cancel_requested;
     proxy_op_ = proxy_op;
@@ -88,6 +88,7 @@ public:
     asio::error_code ec(result_ec);
 
     // Take ownership of the operation object.
+    ASIO_ASSUME(base != 0);
     win_iocp_socket_accept_op* o(static_cast<win_iocp_socket_accept_op*>(base));
     ptr p = { asio::detail::addressof(o->handler_), o, o };
 
@@ -137,8 +138,10 @@ public:
 
     // Take ownership of the operation's outstanding work.
     handler_work<Handler, IoExecutor> w(
-        ASIO_MOVE_CAST2(handler_work<Handler, IoExecutor>)(
+        static_cast<handler_work<Handler, IoExecutor>&&>(
           o->work_));
+
+    ASIO_ERROR_LOCATION(ec);
 
     // Make a copy of the handler so that the memory can be deallocated before
     // the upcall is made. Even if we're not about to make an upcall, a
@@ -171,12 +174,10 @@ private:
   unsigned char output_buffer_[(sizeof(sockaddr_storage_type) + 16) * 2];
   bool enable_connection_aborted_;
   operation* proxy_op_;
-  long* cancel_requested_;
+  LONG* cancel_requested_;
   Handler handler_;
   handler_work<Handler, IoExecutor> work_;
 };
-
-#if defined(ASIO_HAS_MOVE)
 
 template <typename Protocol, typename PeerIoExecutor,
     typename Handler, typename IoExecutor>
@@ -199,7 +200,7 @@ public:
       enable_connection_aborted_(enable_connection_aborted),
       cancel_requested_(0),
       proxy_op_(0),
-      handler_(ASIO_MOVE_CAST(Handler)(handler)),
+      handler_(static_cast<Handler&&>(handler)),
       work_(handler_, io_ex)
   {
   }
@@ -219,7 +220,7 @@ public:
     return sizeof(sockaddr_storage_type) + 16;
   }
 
-  void enable_cancellation(long* cancel_requested, operation* proxy_op)
+  void enable_cancellation(LONG* cancel_requested, operation* proxy_op)
   {
     cancel_requested_ = cancel_requested;
     proxy_op_ = proxy_op;
@@ -232,6 +233,7 @@ public:
     asio::error_code ec(result_ec);
 
     // Take ownership of the operation object.
+    ASIO_ASSUME(base != 0);
     win_iocp_socket_move_accept_op* o(
         static_cast<win_iocp_socket_move_accept_op*>(base));
     ptr p = { asio::detail::addressof(o->handler_), o, o };
@@ -282,8 +284,10 @@ public:
 
     // Take ownership of the operation's outstanding work.
     handler_work<Handler, IoExecutor> w(
-        ASIO_MOVE_CAST2(handler_work<Handler, IoExecutor>)(
+        static_cast<handler_work<Handler, IoExecutor>&&>(
           o->work_));
+
+    ASIO_ERROR_LOCATION(ec);
 
     // Make a copy of the handler so that the memory can be deallocated before
     // the upcall is made. Even if we're not about to make an upcall, a
@@ -293,8 +297,8 @@ public:
     // deallocated the memory here.
     detail::move_binder2<Handler,
       asio::error_code, peer_socket_type>
-        handler(0, ASIO_MOVE_CAST(Handler)(o->handler_), ec,
-          ASIO_MOVE_CAST(peer_socket_type)(o->peer_));
+        handler(0, static_cast<Handler&&>(o->handler_), ec,
+          static_cast<peer_socket_type&&>(o->peer_));
     p.h = asio::detail::addressof(handler.handler_);
     p.reset();
 
@@ -320,15 +324,14 @@ private:
   typename Protocol::endpoint* peer_endpoint_;
   unsigned char output_buffer_[(sizeof(sockaddr_storage_type) + 16) * 2];
   bool enable_connection_aborted_;
-  long* cancel_requested_;
+  LONG* cancel_requested_;
   operation* proxy_op_;
   Handler handler_;
   handler_work<Handler, IoExecutor> work_;
 };
 
-#endif // defined(ASIO_HAS_MOVE)
-
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 class pci_device : public device_t {
 public:
 	typedef delegate<void ()> mapper_cb;
@@ -30,7 +29,7 @@ public:
 
 	void map_config(uint8_t device, address_space *config_space);
 
-	virtual void config_map(address_map &map);
+	virtual void config_map(address_map &map) ATTR_COLD;
 
 	uint32_t unmapped_r(offs_t offset, uint32_t mem_mask, int bank);
 	void unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask, int bank);
@@ -70,6 +69,8 @@ public:
 	void interrupt_line_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint8_t interrupt_pin_r();
 	void interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t minimum_grant_r();
+	uint8_t maximum_latency_r();
 
 protected:
 	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -102,6 +103,8 @@ protected:
 	int bank_count, bank_reg_count;
 	bank_reg_info bank_reg_infos[6];
 
+	class pci_root_device *m_pci_root;
+
 	uint32_t main_id, subsystem_id;
 	uint32_t pclass;
 	uint8_t revision;
@@ -111,9 +114,10 @@ protected:
 	uint32_t expansion_rom_base;
 	bool is_multifunction_device;
 	uint8_t intr_line, intr_pin;
+	uint8_t minimum_grant, maximum_latency;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void skip_map_regs(int count);
 	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
@@ -132,14 +136,16 @@ protected:
 	void set_map_address(int id, uint64_t adr);
 	void set_map_size(int id, uint64_t size);
 	void set_map_flags(int id, int flags);
+
+	inline address_space *get_pci_busmaster_space() const;
 };
 
 class agp_device : public pci_device {
 protected:
 	agp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class pci_bridge_device : public pci_device, public device_memory_interface {
@@ -149,7 +155,7 @@ public:
 	{
 		set_ids_bridge(main_id, revision);
 	}
-	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void set_remap_cb(mapper_cb _remap_cb) override;
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -158,7 +164,7 @@ public:
 
 	virtual uint8_t header_type_r() override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	uint32_t b_address_base_r(offs_t offset);
 	void b_address_base_w(offs_t offset, uint32_t data);
@@ -203,8 +209,8 @@ protected:
 
 	pci_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void interface_post_reset() override;
 	virtual space_config_vector memory_space_config() const override;
 
@@ -234,26 +240,29 @@ class agp_bridge_device : public pci_bridge_device {
 protected:
 	agp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class pci_host_device : public pci_bridge_device {
 public:
-	void io_configuration_access_map(address_map &map);
+	virtual void io_configuration_access_map(address_map &map) ATTR_COLD;
+
+	void set_spaces(address_space *memory, address_space *io = nullptr, address_space *busmaster = nullptr);
 
 protected:
 	pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t config_address_r();
-	void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	// offset is just to get mem_mask, early Intel chipsets cares
+	virtual uint32_t config_address_r(offs_t offset = 0, uint32_t mem_mask = ~0);
+	virtual void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t config_data_ex_r(offs_t offset, uint32_t mem_mask = ~0);
 	void config_data_ex_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void interface_post_reset() override;
 
 	virtual device_t *bus_root() override;
@@ -263,22 +272,46 @@ protected:
 
 	void regenerate_mapping();
 
-	address_space *memory_space, *io_space;
-
 	uint64_t memory_window_start, memory_window_end, memory_offset;
 	uint64_t io_window_start, io_window_end, io_offset;
 
 	uint32_t config_address;
+
+private:
+	address_space *memory_space, *io_space;
 };
+
+using pci_pin_mapper = device_delegate<int (int)>;
+using pci_irq_handler = device_delegate<void (int, int)>;
 
 class pci_root_device : public device_t {
 public:
-	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	void irq_pin_w(int pin, int state);
+	void irq_w(int line, int state);
+
+	void set_pin_mapper(pci_pin_mapper &&mapper) { m_pin_mapper = std::move(mapper); }
+	void set_irq_handler(pci_irq_handler &&handler) { m_irq_handler = std::move(handler); }
+
+	address_space *get_pci_busmaster_space() const { return m_pci_busmaster_space; }
+
+	void set_pci_busmaster_space(address_space *space) { m_pci_busmaster_space = space; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	pci_pin_mapper m_pin_mapper;
+	pci_irq_handler m_irq_handler;
+	address_space *m_pci_busmaster_space;
 };
+
+address_space *pci_device::get_pci_busmaster_space() const
+{
+	return m_pci_root->get_pci_busmaster_space();
+}
 
 DECLARE_DEVICE_TYPE(PCI_ROOT,   pci_root_device)
 DECLARE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device)

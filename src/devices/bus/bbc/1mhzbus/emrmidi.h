@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    EMR BBC Midi Interface
+    EMR BBC MIDI Interface
 
     http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/EMR_BBCMIDI.html
 
@@ -31,10 +31,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t fred_r(offs_t offset) override;
 	virtual void fred_w(offs_t offset, uint8_t data) override;

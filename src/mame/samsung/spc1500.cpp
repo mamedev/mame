@@ -269,8 +269,8 @@ public:
 	void spc1500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 
 private:
@@ -298,8 +298,8 @@ private:
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
 
-	void spc1500_double_io(address_map &map);
-	void spc1500_mem(address_map &map);
+	void spc1500_double_io(address_map &map) ATTR_COLD;
+	void spc1500_mem(address_map &map) ATTR_COLD;
 
 	uint8_t *m_p_ram = nullptr;
 	uint8_t m_ipl = 0;
@@ -876,7 +876,7 @@ void spc1500_state::spc1500(machine_config &config)
 
 	/* video hardware */
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 400);

@@ -29,11 +29,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_aquarius_cartridge_interface overrides
 	virtual uint8_t mreq_r(offs_t offset) override;

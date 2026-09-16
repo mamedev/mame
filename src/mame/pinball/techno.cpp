@@ -52,15 +52,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void techno(machine_config &config);
+	void techno(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	void mem_map(address_map &map);
-	void audio_map(address_map &map);
-	void cpu_space_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(set_irq1);
 	TIMER_CALLBACK_MEMBER(clear_irq1);
@@ -351,9 +352,6 @@ void techno_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_digwait));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_keyrow));
@@ -369,6 +367,7 @@ void techno_state::machine_start()
 void techno_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -401,10 +400,9 @@ void techno_state::techno(machine_config &config)
 
 	// Sound
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // DAC0808
-	Y8950(config, "ym1", 3580000).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // TKY2016 - no crystal, just a random oscillator, sch says 3.58MHz
+	SPEAKER(config, "speaker", 2).front();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // DAC0808
+	Y8950(config, "ym1", 3580000).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // TKY2016 - no crystal, just a random oscillator, sch says 3.58MHz
 }
 
 ROM_START(xforce)
@@ -429,5 +427,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

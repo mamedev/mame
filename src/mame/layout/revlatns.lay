@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="led">
+		<led14segsc>
+			<color red="0.8" green="0.2" blue="0" />
+		</led14segsc>
+	</element>
+	<element name="A" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="A"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="B" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="B"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="C" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="C"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="COLLECT" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="COLLECT"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="CONTINUE" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="CONTINUE"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="*" defstate="0">
+		<rect state="0"><color red="0.4" green="0.1" blue="0" /></rect>
+		<rect state="1"><color red="0.8" green="0.2" blue="0" /></rect>
+		<text string="*"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+
+	<element name="20p" defstate="0">
+		<text state="1" string="20p"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="40p" defstate="0">
+		<text state="1" string="40p"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="£1" defstate="0">
+		<text state="1" string="£1"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="£2" defstate="0">
+		<text state="1" string="£2"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="£5" defstate="0">
+		<text state="1" string="£5"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="£10" defstate="0">
+		<text state="1" string="£10"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="£20" defstate="0">
+		<text state="1" string="£20"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+	<element name="WIN" defstate="0">
+		<text state="1" string="WIN"><color red="0.7" green="0.7" blue="0.7" /></text>
+	</element>
+
+	<view name="LED Overlay">
+		<screen index="0">
+			<bounds left="0" top="16" right="704" bottom="544" />
+		</screen>
+
+		<element name="lamp0" ref="20p">
+			<bounds x="0" y="560" width="60" height="24" />
+		</element>
+
+		<element name="lamp1" ref="40p">
+			<bounds x="0" y="590" width="60" height="24" />
+		</element>
+
+		<element name="lamp2" ref="£1">
+			<bounds x="0" y="620" width="60" height="24" />
+		</element>
+
+		<element name="lamp3" ref="£2">
+			<bounds x="0" y="650" width="60" height="24" />
+		</element>
+
+		<element name="lamp7" ref="WIN">
+			<bounds x="600" y="560" width="60" height="24" />
+		</element>
+
+		<element name="lamp4" ref="£5">
+			<bounds x="600" y="590" width="60" height="24" />
+		</element>
+
+		<element name="lamp5" ref="£10">
+			<bounds x="600" y="620" width="60" height="24" />
+		</element>
+
+		<element name="lamp6" ref="£20">
+			<bounds x="600" y="650" width="60" height="24" />
+		</element>
+
+		<element name="lamp8" ref="A" inputtag="SW0" inputmask="0x01">
+			<bounds x="148" y="560" width="120" height="24" />
+		</element>
+
+		<element name="lamp9" ref="B" inputtag="SW0" inputmask="0x80">
+			<bounds x="278" y="560" width="120" height="24" />
+		</element>
+
+		<element name="lamp11" ref="C" inputtag="SW0" inputmask="0x02">
+			<bounds x="408" y="560" width="120" height="24" />
+		</element>
+
+		<element name="lamp10" ref="COLLECT" inputtag="SW0" inputmask="0x04">
+			<bounds x="148" y="590" width="120" height="24" />
+		</element>
+
+		<element name="lamp13" ref="*" inputtag="SW1" inputmask="0x20">
+			<bounds x="278" y="590" width="120" height="24" />
+		</element>
+
+		<element name="lamp12" ref="CONTINUE" inputtag="SW0" inputmask="0x40">
+			<bounds x="408" y="590" width="120" height="24" />
+		</element>
+
+		<repeat count="16">
+			<param name="digit" start="0" increment="1" />
+			<param name="x" start="140" increment="28" />
+			<element name="digit~digit~" ref="led" blend="add" state="0">
+				<bounds x="~x~" y="630" width="28" height="28"/>
+			</element>
+		</repeat>
+	</view>
+</mamelayout>

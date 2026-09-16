@@ -37,13 +37,13 @@ namespace netlist {
 // MAME specific configuration
 
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
-	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
+	PORT_CHANGED_MEMBER(_base ":" _tag, FUNC(netlist_mame_logic_input_device::input_changed), 0)
 
 #define NETLIST_INT_PORT_CHANGED(_base, _tag)                                     \
-	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_device, input_changed, 0)
+	PORT_CHANGED_MEMBER(_base ":" _tag, FUNC(netlist_mame_logic_input_device::input_changed), 0)
 
 #define NETLIST_ANALOG_PORT_CHANGED(_base, _tag)                                    \
-	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_analog_input_device, input_changed, 0)
+	PORT_CHANGED_MEMBER(_base ":" _tag, FUNC(netlist_mame_analog_input_device::input_changed), 0)
 
 /* This macro can only be called from device member */
 
@@ -134,9 +134,9 @@ protected:
 	// device_t overrides
 	virtual void device_config_complete() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_pre_save() override;
 	//virtual void device_clock_changed() override;
@@ -198,7 +198,7 @@ protected:
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// device_execute_interface overrides
@@ -249,19 +249,24 @@ private:
 // ----------------------------------------------------------------------------------------
 // netlist_mame_sound_input_buffer
 //
-// This is a wrapper device to provide operator[] on read_stream_view.
+// This is a wrapper device to provide operator[] on an input stream.
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_sound_input_buffer : public read_stream_view
+class netlist_mame_sound_input_buffer
 {
 public:
-	netlist_mame_sound_input_buffer() :
-		read_stream_view() { }
+	std::vector<sound_stream::sample_t> m_buffer;
 
-	netlist_mame_sound_input_buffer(read_stream_view const &src) :
-		read_stream_view(src) { }
+	netlist_mame_sound_input_buffer() {}
 
-	stream_buffer::sample_t operator[](std::size_t index) { return get(index); }
+	netlist_mame_sound_input_buffer(sound_stream &stream) {
+		int samples = stream.samples();
+		m_buffer.resize(samples);
+		for (int i=0; i != samples; i++)
+			m_buffer[i] = stream.get(0, i);
+	}
+
+	sound_stream::sample_t operator[](std::size_t index) { return m_buffer[index]; }
 };
 
 // ----------------------------------------------------------------------------------------
@@ -300,11 +305,11 @@ protected:
 	virtual void nl_register_devices(netlist::nlparse_t &parser) const override;
 
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
-	//virtual void device_reset() override;
+	//virtual void device_reset() override ATTR_COLD;
 
 private:
 	std::map<int, netlist_mame_stream_output_device *> m_out;
@@ -401,7 +406,7 @@ public:
 		netlist::netlist_state_t &nlstate) const override;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -433,7 +438,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
@@ -462,7 +467,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 
@@ -502,7 +507,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -544,7 +549,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -573,7 +578,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(sync_callback);
 
@@ -602,7 +607,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 private:
 	uint32_t m_channel;
@@ -634,14 +639,14 @@ public:
 		m_buffer.clear();
 	}
 
-	void sound_update_fill(write_stream_view &target);
+	void sound_update_fill(sound_stream &stream, int output);
 
 	void set_sample_time(netlist::netlist_time t) { m_sample_time = t; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void custom_netlist_additions(netlist::nlparse_t &parser) override;
 	virtual void pre_parse_action(netlist::nlparse_t &parser) override;
 
@@ -649,7 +654,7 @@ private:
 	uint32_t                     m_channel;
 	const char *                 m_out_name;
 
-	std::vector<stream_buffer::sample_t> m_buffer;
+	std::vector<sound_stream::sample_t> m_buffer;
 	double                       m_cur;
 
 	netlist::netlist_time        m_sample_time;

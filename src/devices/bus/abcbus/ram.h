@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override { }

@@ -120,7 +120,7 @@ public:
 	/* code to adapt existing legacy fill_wave functions */
 	struct LegacyWaveFiller
 	{
-		int (*fill_wave)(int16_t *, int, uint8_t *) = nullptr;
+		int (*fill_wave)(int16_t *, int, const uint8_t *, int) = nullptr;
 		int chunk_size = 0;
 		int chunk_samples = 0;
 		int (*chunk_sample_calc)(const uint8_t *bytes, int length) = nullptr;
@@ -136,6 +136,7 @@ public:
 	uint8_t image_read_byte(uint64_t offset);
 	void image_write(const void *buffer, uint64_t offset, size_t length);
 	uint64_t image_size();
+	util::random_read_write::ptr &get_raw_cassette_image() { return m_io; }
 
 	// waveform accesses
 	error get_samples(int channel,
@@ -191,6 +192,8 @@ public:
 
 	// builtin formats
 	static const Format wavfile_format;
+	static const Format flacfile_format;
+	static const Format aiffile_format;
 
 private:
 	struct manipulation_ranges;
@@ -224,7 +227,9 @@ private:
 #define CASSETTE_FORMATLIST_START(name)     \
 	const cassette_image::Format *const name[] =    \
 	{                                       \
-		&cassette_image::wavfile_format,
+		&cassette_image::wavfile_format,    \
+		&cassette_image::flacfile_format,   \
+		&cassette_image::aiffile_format,
 #define CASSETTE_FORMAT(name)               \
 		&(name),
 #define CASSETTE_FORMATLIST_END             \

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_BANDAIHS
-#define MAME_BUS_NES_CTRL_BANDAIHS
+#ifndef MAME_BUS_NES_CTRL_BANDAIHS_H
+#define MAME_BUS_NES_CTRL_BANDAIHS_H
 
 #pragma once
 
@@ -33,9 +33,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_device<nes_zapper_sensor_device> m_sensor;
@@ -50,4 +50,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device)
 
-#endif // MAME_BUS_NES_CTRL_BANDAIHS
+#endif // MAME_BUS_NES_CTRL_BANDAIHS_H

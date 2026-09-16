@@ -31,7 +31,7 @@ public:
 protected:
 	msm6222b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	optional_region_ptr<uint8_t> m_cgrom;
 
@@ -49,10 +49,10 @@ private:
 
 class msm6222b_01_device : public msm6222b_device {
 public:
-	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MSM6222B,    msm6222b_device)

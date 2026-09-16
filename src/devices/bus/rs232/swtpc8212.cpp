@@ -14,7 +14,7 @@ swtpc8212_terminal_device::swtpc8212_terminal_device(const machine_config &mconf
 
 void swtpc8212_terminal_device::device_add_mconfig(machine_config &config)
 {
-	SWTPC8212(config, m_swtpc8212, 0);
+	SWTPC8212(config, m_swtpc8212);
 	m_swtpc8212->rs232_conn_txd_handler().set(FUNC(swtpc8212_terminal_device::output_rxd));
 	m_swtpc8212->rs232_conn_rts_handler().set(FUNC(swtpc8212_terminal_device::route_term_rts));
 	m_swtpc8212->rs232_conn_dtr_handler().set(FUNC(swtpc8212_terminal_device::route_term_dtr));
@@ -23,7 +23,7 @@ void swtpc8212_terminal_device::device_add_mconfig(machine_config &config)
 INPUT_PORTS_START(swtpc8212_terminal)
 
 	PORT_START("FLOW_CONTROL")
-	PORT_CONFNAME(0x1, 1, "Flow control") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_terminal_device, flow_control, 0)
+	PORT_CONFNAME(0x1, 1, "Flow control") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_terminal_device::flow_control), 0)
 	PORT_CONFSETTING(0x00, "None")
 	PORT_CONFSETTING(0x01, "Terminal DTR to remote CTS")
 

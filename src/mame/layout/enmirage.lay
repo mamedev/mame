@@ -103,7 +103,7 @@ copyright-holders:tim lindner
 		<element ref="button_white"><bounds x="281" y="82" width="659" height="6" /></element>
 		<element ref="button_white"><bounds x="281" y="175" width="659" height="6" /></element>
 		<element ref="button_white"><bounds x="34" y="268" width="649" height="6" /></element>
-		<element ref="button_white"><bounds x="0" y="361" width="939" height="6" /></element>11
+		<element ref="button_white"><bounds x="0" y="361" width="939" height="6" /></element>
 		<element ref="button_white"><bounds x="38" y="367" width="155" height="6" /></element>
 		<element ref="button_white"><bounds x="282" y="367" width="230" height="6" /></element>
 		<element ref="button_white"><bounds x="597" y="367" width="44" height="6" /></element>

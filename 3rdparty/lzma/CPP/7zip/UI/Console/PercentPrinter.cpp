@@ -79,7 +79,7 @@ void CPercentPrinter::GetPercents()
 
   while (size < kPercentsSize)
   {
-    _s += ' ';
+    _s.Add_Space();
     size++;
   }
 
@@ -88,6 +88,8 @@ void CPercentPrinter::GetPercents()
 
 void CPercentPrinter::Print()
 {
+  if (DisablePrint)
+    return;
   DWORD tick = 0;
   if (_tickStep != 0)
     tick = GetTickCount();
@@ -125,8 +127,8 @@ void CPercentPrinter::Print()
     char s[32];
     ConvertUInt64ToString(Files, s);
     // unsigned size = (unsigned)strlen(s);
-    // for (; size < 3; size++) _s += ' ';
-    _s += ' ';
+    // for (; size < 3; size++) _s.Add_Space();
+    _s.Add_Space();
     _s += s;
     // _s += "f";
   }
@@ -134,16 +136,16 @@ void CPercentPrinter::Print()
 
   if (!Command.IsEmpty())
   {
-    _s += ' ';
+    _s.Add_Space();
     _s += Command;
   }
 
   if (!FileName.IsEmpty() && _s.Len() < MaxLen)
   {
-    _s += ' ';
+    _s.Add_Space();
 
     _tempU = FileName;
-    _so->Normalize_UString(_tempU);
+    _so->Normalize_UString_Path(_tempU);
     _so->Convert_UString_to_AString(_tempU, _temp);
     if (_s.Len() + _temp.Len() > MaxLen)
     {
@@ -157,7 +159,7 @@ void CPercentPrinter::Print()
         _tempU = FileName;
         _tempU.Delete(len / 2, _tempU.Len() - len);
         _tempU.Insert(len / 2, L" . ");
-        _so->Normalize_UString(_tempU);
+        _so->Normalize_UString_Path(_tempU);
         _so->Convert_UString_to_AString(_tempU, _temp);
         if (_s.Len() + _temp.Len() <= MaxLen)
           break;

@@ -7,8 +7,8 @@
  *
  *****************************************************************************/
 
-#ifndef MAME_CPU_TMS9900_TMS9900DASM_H
-#define MAME_CPU_TMS9900_TMS9900DASM_H
+#ifndef MAME_CPU_TMS9900_9900DASM_H
+#define MAME_CPU_TMS9900_9900DASM_H
 
 #pragma once
 
@@ -133,4 +133,4 @@ private:
 	void print_arg (std::ostream &stream, int mode, int arg, const data_buffer &params, offs_t &PC);
 };
 
-#endif
+#endif // MAME_CPU_TMS9900_9900DASM_H

@@ -18,9 +18,12 @@
 
 #include "vsystem_gga.h"
 
+#include "bus/rs232/rs232.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
 #include "video/k051316.h"
@@ -38,10 +41,6 @@ class tail2nos_state : public driver_device
 public:
 	tail2nos_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_txvideoram(*this, "txvideoram"),
-		m_spriteram(*this, "spriteram"),
-		m_zoomram(*this, "k051316"),
-		m_soundbank(*this, "soundbank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k051316(*this, "k051316"),
@@ -49,31 +48,25 @@ public:
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_acia(*this, "acia"),
-		m_analog(*this, "AN%u", 0U)
+		m_rs232_out(*this, "com_out"),
+		m_rs232_in(*this, "com_in"),
+		m_analog(*this, "AN%u", 0U),
+		m_txvideoram(*this, "txvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_zoomram(*this, "k051316"),
+		m_soundbank(*this, "soundbank")
 	{ }
 
 	void tail2nos(machine_config &config);
 
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(analog_in_r);
+	template <int N> ioport_value analog_in_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	// memory pointers
-	required_shared_ptr<uint16_t> m_txvideoram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_zoomram;
-	required_memory_bank m_soundbank;
-
-	// video-related
-	tilemap_t   *m_tx_tilemap;
-	uint8_t     m_txbank;
-	uint8_t     m_txpalette;
-	bool        m_video_enable;
-	bool        m_flip_screen;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -82,26 +75,39 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<acia6850_device> m_acia;
+	required_device<rs232_port_device> m_rs232_out;
+	required_device<rs232_port_device> m_rs232_in;
 	required_ioport_array<2> m_analog;
+
+	// memory pointers
+	required_shared_ptr<uint16_t> m_txvideoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_zoomram;
+	required_memory_bank m_soundbank;
+
+	// variables
+	tilemap_t *m_tx_tilemap;
+	uint8_t m_txbank = 0;
+	uint8_t m_txpalette = 0;
+	bool m_video_enable = false;
+	bool m_flip_screen = false;
+	bool m_z80_sync = false;
 
 	void txvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void zoomdata_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gfxbank_w(uint8_t data);
 	void sound_bankswitch_w(uint8_t data);
 	uint8_t soundlatch_pending_r();
-	void soundlatch_pending_w(int state);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	K051316_CB_MEMBER(zoom_callback);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -127,8 +133,8 @@ TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
 
 K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 {
-	*code |= ((*color & 0x03) << 8);
-	*color = 32 + ((*color & 0x38) >> 3);
+	code |= ((color & 0x03) << 8);
+	color = 32 + ((color & 0x38) >> 3);
 }
 
 /***************************************************************************
@@ -140,14 +146,12 @@ K051316_CB_MEMBER(tail2nos_state::zoom_callback)
 void tail2nos_state::postload()
 {
 	m_tx_tilemap->mark_all_dirty();
-
 	m_k051316->gfx(0)->mark_all_dirty();
 }
 
 void tail2nos_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tail2nos_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
 	m_tx_tilemap->set_transparent_pen(15);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::postload), this));
@@ -171,6 +175,7 @@ void tail2nos_state::zoomdata_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_zoomram[offset];
 	COMBINE_DATA(&m_zoomram[offset]);
+
 	// tell the K051316 device the data changed
 	if (oldword != m_zoomram[offset])
 		m_k051316->mark_gfx_dirty(offset * 2);
@@ -236,6 +241,7 @@ void tail2nos_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 		int color = (m_spriteram[offs + 2] & 0xe000) >> 13;
 		int flipx = m_spriteram[offs + 2] & 0x1000;
 		int flipy = m_spriteram[offs + 2] & 0x0800;
+
 		if (m_flip_screen)
 		{
 			flipx = !flipx;
@@ -268,21 +274,18 @@ uint32_t tail2nos_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 uint8_t tail2nos_state::soundlatch_pending_r()
 {
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the z80 to catch up before maincpu does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
+
+		m_z80_sync = !m_z80_sync;
+	}
+
 	return m_soundlatch->pending_r();
-}
-
-void tail2nos_state::soundlatch_pending_w(int state)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-
-	// sound comms is 2-way (see soundlatch_pending_r),
-	// NMI routine is very short, so briefly set perfect_quantum to make sure that the timing is right
-	if (state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 void tail2nos_state::sound_bankswitch_w(uint8_t data)
@@ -330,7 +333,7 @@ void tail2nos_state::sound_port_map(address_map &map)
 }
 
 template <int N>
-CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
+ioport_value tail2nos_state::analog_in_r()
 {
 	int delta = m_analog[N]->read();
 
@@ -346,7 +349,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Brake (standard BD)")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Accelerate (standard BD)")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<0>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tail2nos_state::analog_in_r<0>)) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -358,7 +361,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<1>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(tail2nos_state::analog_in_r<1>)) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
 	PORT_BIT( 0xff8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -437,6 +440,14 @@ static INPUT_PORTS_START( sformula )
 	PORT_DIPSETTING(      0x8000, "Overseas" ) // "Tail to Nose"
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( linkplay )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_78125 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
 
 static const gfx_layout tail2nos_spritelayout =
 {
@@ -461,23 +472,22 @@ GFXDECODE_END
 
 void tail2nos_state::machine_start()
 {
-	uint8_t *ROM = memregion("audiocpu")->base();
-
-	m_soundbank->configure_entries(0, 2, &ROM[0x10000], 0x8000);
-	m_soundbank->set_entry(0);
+	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	m_acia->write_cts(0);
 	m_acia->write_dcd(0);
-
-	m_txbank = 0;
-	m_txpalette = 0;
-	m_video_enable = false;
-	m_flip_screen = false;
 
 	save_item(NAME(m_txbank));
 	save_item(NAME(m_txpalette));
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_flip_screen));
+	save_item(NAME(m_z80_sync));
+}
+
+void tail2nos_state::machine_reset()
+{
+	m_soundbank->set_entry(0);
+	m_z80_sync = false;
 }
 
 
@@ -490,16 +500,27 @@ void tail2nos_state::tail2nos(machine_config &config)
 
 	Z80(config, m_audiocpu, XTAL(20'000'000) / 4); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tail2nos_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map);
-								// IRQs are triggered by the YM2608
+	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map); // IRQs are triggered by the YM2608
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_3);
-	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
-	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
+	m_acia->txd_handler().set("com_out", FUNC(rs232_port_device::write_txd));
+
+	// dual DE-9 ports
+	// COM-IN (inner) and COM-OUT (outer) according to manual
+	rs232_port_device &rs232out(RS232_PORT(config, "com_out", default_rs232_devices, nullptr));
+	rs232out.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	rs232_port_device &rs232in(RS232_PORT(config, "com_in", default_rs232_devices, nullptr));
+	rs232in.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232in.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(linkplay));
+
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 20_MHz_XTAL / 16)); // 78125 baud
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -510,30 +531,29 @@ void tail2nos_state::tail2nos(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tail2nos);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	K051316(config, m_k051316, 0);
+	K051316(config, m_k051316);
 	m_k051316->set_palette(m_palette);
 	m_k051316->set_bpp(-4);
-	m_k051316->set_offsets(-89, -14);
+	m_k051316->set_offsets(7, -14);
 	m_k051316->set_wrap(1);
 	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback));
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(FUNC(tail2nos_state::soundlatch_pending_w));
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	m_soundlatch->set_separate_acknowledge(true);
 
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000))); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_b_write_callback().set(FUNC(tail2nos_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 
@@ -667,7 +687,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship / Super Formula", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // Only set that's affected by the Country dipswitch
-GAME( 1989, tail2nosa, tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship",                 MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula,  tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",                      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // For Use in Japan... warning
-GAME( 1989, sformulaa, tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",                      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship / Super Formula", MACHINE_SUPPORTS_SAVE ) // Only set that's affected by the Country dipswitch
+GAME( 1989, tail2nosa, tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",                      MACHINE_SUPPORTS_SAVE ) // For Use in Japan... warning
+GAME( 1989, sformulaa, tail2nos, tail2nos, sformula, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",                      MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

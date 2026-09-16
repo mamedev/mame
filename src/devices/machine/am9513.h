@@ -44,7 +44,7 @@ class am9513_device : public device_t
 {
 public:
 	// device type constructor
-	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	am9513_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// static configuration
 	auto out1_cb() { return m_out_cb[0].bind(); }
@@ -91,7 +91,7 @@ protected:
 	am9513_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_am9513a);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 private:

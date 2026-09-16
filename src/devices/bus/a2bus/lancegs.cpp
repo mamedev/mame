@@ -67,14 +67,15 @@ public:
 
 protected:
 	a2bus_lancegs_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<smc91c96_device> m_netinf;
@@ -106,7 +107,7 @@ a2bus_lancegs_device::a2bus_lancegs_device(const machine_config &mconfig, device
 void a2bus_lancegs_device::device_add_mconfig(machine_config &config)
 {
 	SMC91C96(config, m_netinf, 20_MHz_XTAL); // Datasheet fig 12.26, pg 122.
-	I2C_24C04(config, m_i2cmem, 0).set_address(0x80).set_e0(1);
+	I2C_24C04(config, m_i2cmem).set_address(0x80).set_e0(1);
 
 	m_netinf->irq_handler().set(FUNC(a2bus_lancegs_device::netinf_irq_w));
 }
@@ -122,6 +123,12 @@ void a2bus_lancegs_device::device_start()
 
 void a2bus_lancegs_device::device_reset()
 {
+	m_shadow = false;
+}
+
+void a2bus_lancegs_device::reset_from_bus()
+{
+	m_netinf->reset();
 	m_shadow = false;
 }
 

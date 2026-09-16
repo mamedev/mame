@@ -34,6 +34,7 @@
 #define LOG_STATUS_CHANGES (1U << 2)
 #define LOG_FRAMES_SEEN    (1U << 3)
 #define LOG_COMMANDS       (1U << 4)
+
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -104,7 +105,7 @@ ROM_END
 //-------------------------------------------------
 
 pioneer_ldv1000_device::pioneer_ldv1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: laserdisc_device(mconfig, PIONEER_LDV1000, tag, owner, clock),
+	: parallel_laserdisc_device(mconfig, PIONEER_LDV1000, tag, owner, clock),
 		m_z80_cpu(*this, "ldv1000"),
 		m_z80_ctc(*this, "ldvctc"),
 		m_multitimer(nullptr),
@@ -134,15 +135,6 @@ void pioneer_ldv1000_device::data_w(uint8_t data)
 {
 	m_command = data;
 	LOGMASKED(LOG_COMMANDS, "-> COMMAND = %02X (%s)\n", data, (m_portc1 & 0x10) ? "valid" : "invalid");
-}
-
-
-//-------------------------------------------------
-//  enter_w - set the state of the ENTER strobe
-//-------------------------------------------------
-
-void pioneer_ldv1000_device::enter_w(uint8_t data)
-{
 }
 
 

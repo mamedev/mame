@@ -147,7 +147,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* gate array */
-	e05a30_device &e05a30(E05A30(config, m_e05a30, 0));
+	e05a30_device &e05a30(E05A30(config, m_e05a30));
 	e05a30.printhead().set(FUNC(epson_lx810l_device::printhead));
 	e05a30.pf_stepper().set(FUNC(epson_lx810l_device::pf_stepper));
 	e05a30.cr_stepper().set(FUNC(epson_lx810l_device::cr_stepper));
@@ -176,7 +176,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 static INPUT_PORTS_START( epson_lx810 )
 	/* Buttons on printer */
 	PORT_START("ONLINE")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::online_sw), 0)
 	PORT_START("FORMFEED")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_7_PAD)
 	PORT_START("LINEFEED")
@@ -186,7 +186,7 @@ static INPUT_PORTS_START( epson_lx810 )
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, reset_printer, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::reset_printer), 0)
 
 	PORT_START("DIPSW1")
 	PORT_DIPNAME(0x01, 0x00, "Character spacing")             PORT_DIPLOCATION("SW 1:!1")
@@ -326,9 +326,6 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 
 void epson_lx810l_device::device_start()
 {
-	m_online_led.resolve();
-	m_ready_led.resolve();
-
 	m_cr_timer = timer_alloc(FUNC(epson_lx810l_device::cr_tick), this);
 }
 

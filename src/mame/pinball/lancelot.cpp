@@ -53,11 +53,11 @@ public:
 	void lancelot(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void audio_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 	void p3_w(u8) { }
 	void p4_w(u8) { }
 	void p6_w(u8) { }
@@ -183,14 +183,14 @@ void lancelot_state::lancelot(machine_config &config)
 	OKIM6295(config, m_oki, 1'656'000, okim6295_device::PIN7_HIGH); // pin7 is controlled by P63 from the audio cpu
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	SPEAKER(config, "lspeaker").front_left();  // YAC512 left
-	SPEAKER(config, "rspeaker").front_right();  // YAC512 right
+	SPEAKER(config, "speaker", 2).front();  // YAC512 left
+  // YAC512 right
 	ymf262_device &ymf(YMF262(config, "ymf", 14'318'180));
 	ymf.irq_handler().set_inputline("audiocpu", 2); // to P82/INT2 of the audio cpu
-	ymf.add_route(0, "lspeaker", 0.50);
-	ymf.add_route(1, "rspeaker", 0.50);
-	ymf.add_route(2, "lspeaker", 0.50);
-	ymf.add_route(3, "rspeaker", 0.50);
+	ymf.add_route(0, "speaker", 0.50, 0);
+	ymf.add_route(1, "speaker", 0.50, 1);
+	ymf.add_route(2, "speaker", 0.50, 0);
+	ymf.add_route(3, "speaker", 0.50, 1);
 }
 
 /*-------------------------------------------------------------------
@@ -214,5 +214,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1994, lancelot, 0, lancelot, lancelot, lancelot_state, empty_init, ROT0, "Peyper", "Sir Lancelot", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1994, lancelot, 0, lancelot, lancelot, lancelot_state, empty_init, ROT0, "Peyper", "Sir Lancelot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 

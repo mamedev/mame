@@ -95,7 +95,7 @@ void cxhumax_state::cx_gxa_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			if((m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)])
 				|| (m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]))
-					m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+					m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 
 			break;
 		default:
@@ -298,7 +298,7 @@ TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 
 			/* Interrupt if Timer interrupt is not masked in ITC_INTENABLE_REG */
 			if (m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)] & INT_TIMER_BIT)
-				m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+				m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	attotime period = attotime::from_hz(XTAL(54'000'000))*m_timer_regs.timer[param].timebase;
@@ -394,7 +394,7 @@ void cxhumax_state::cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 					/* If INT is enabled at INT Ctrl raise it */
 					if(m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]&INT_UART2_BIT) {
-						m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+						m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 					}
 				}
 			}
@@ -525,9 +525,9 @@ void cxhumax_state::cx_intctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	/* check if */
 	if((m_intctrl_regs[INTREG(INTGROUP2, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP2, INTENABLE)])
 		|| (m_intctrl_regs[INTREG(INTGROUP1, INTIRQ)] & m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)]))
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 
 }
 
@@ -711,7 +711,7 @@ void cxhumax_state::cx_i2c1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_intctrl_regs[INTREG(INTGROUP1, INTSTATSET)] |= 1<<7;
 			if (m_intctrl_regs[INTREG(INTGROUP1, INTENABLE)] & (1<<7)) {
 					LOG("%s: (I2C1) Int\n",  machine().describe_context());
-					m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+					m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 			}
 			break;
 		case I2C_STAT_REG:
@@ -1032,10 +1032,10 @@ void cxhumax_state::cxhumax(machine_config &config)
 
 
 	INTEL_28F320J3D(config, "flash");
-	I2C_24C64(config, "eeprom", 0); // 24LC64
+	I2C_24C64(config, "eeprom"); // 24LC64
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1920, 1080);
@@ -1044,7 +1044,7 @@ void cxhumax_state::cxhumax(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 }
 
 ROM_START( hxhdci2k )

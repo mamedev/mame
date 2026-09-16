@@ -288,8 +288,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -300,6 +300,14 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	optional_device<software_list_device> m_softlist;
 	required_ioport_array<9> m_inputs;
+
+	u32 m_cart_max_size = 0;
+	u8 *m_cart_base = nullptr;
+
+	bool m_power_on = false;
+	u32 m_r = 0;
+	u16 m_grid = 0;
+	u16 m_plate = 0;
 
 	void power_off();
 	void update_display();
@@ -312,14 +320,6 @@ private:
 	void lantrans_write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	u32 m_cart_max_size = 0;
-	u8 *m_cart_base = nullptr;
-
-	bool m_power_on = false;
-	u32 m_r = 0;
-	u16 m_grid = 0;
-	u16 m_plate = 0;
 };
 
 void snspell_state::machine_start()
@@ -407,7 +407,6 @@ void snspell_state::write_r(u32 data)
 {
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// R15: filament on
-	// other bits: MCU internal use
 	m_grid = data & 0x81ff;
 	update_display();
 
@@ -415,6 +414,7 @@ void snspell_state::write_r(u32 data)
 	if (~data & m_r & 0x2000)
 		power_off();
 
+	// other bits: MCU internal use
 	m_r = data;
 }
 
@@ -526,7 +526,7 @@ static INPUT_PORTS_START( snspell )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Secret Code")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Say It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snspell_state::power_on), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellfr ) // French button names
@@ -549,7 +549,7 @@ static INPUT_PORTS_START( snspellfr ) // French button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Code Secret")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Lettre")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Dis-le")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Epelle/Marche") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snspell_state::power_on), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellit ) // Italian button names
@@ -572,7 +572,7 @@ static INPUT_PORTS_START( snspellit ) // Italian button names
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Codice")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Alfabeto")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Ripeti")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Scrivi") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snspell_state::power_on), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabet
@@ -633,7 +633,7 @@ static INPUT_PORTS_START( snspellsp ) // Spanish button names, different alphabe
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Palabra Secreta")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Dilo")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Deletrea/On") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snspell_state::power_on), 0)
 INPUT_PORTS_END
 
 
@@ -685,7 +685,7 @@ static INPUT_PORTS_START( snmath )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Write It")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Greater/Less")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Word Problems")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_F1) PORT_NAME("Solve It/On") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snspell_state::power_on), 0)
 
 	PORT_START("IN.7")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -707,7 +707,7 @@ static INPUT_PORTS_START( snread )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("Picture Read")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("Letter Stumper")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("Hear It")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, snspell_state, power_on, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F1) PORT_NAME("Word Zap/On") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snspell_state::power_on), 0)
 INPUT_PORTS_END
 
 

@@ -23,6 +23,7 @@
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/tms7000/tms7000.h"
 #include "imagedev/floppy.h"
@@ -67,8 +68,8 @@ public:
 	void olivetti(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void dma_segment_w(offs_t offset, u8 data);
@@ -134,9 +135,10 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	static void cfg_m20_format(device_t *device);
-	void kbc_map(address_map &map);
-	void m24_io(address_map &map);
-	void m24_map(address_map &map);
+	static void cfg_no_serial_mouse(device_t *device);
+	void kbc_map(address_map &map) ATTR_COLD;
+	void m24_io(address_map &map) ATTR_COLD;
+	void m24_map(address_map &map) ATTR_COLD;
 };
 
 void m24_state::machine_start()
@@ -531,6 +533,12 @@ void m24_state::cfg_m20_format(device_t *device)
 	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
 }
 
+void m24_state::cfg_no_serial_mouse(device_t *device)
+{
+	/* Don't attach serial mouse, since there's a proprietary mouse */
+	device->subdevice<rs232_port_device>("serport0")->set_default_option(nullptr);
+}
+
 void m24_state::olivetti(machine_config &config)
 {
 	/* basic machine hardware */
@@ -591,14 +599,14 @@ void m24_state::olivetti(machine_config &config)
 	m_isabus->drq3_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(m24_state::chck_w));
 
-	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
-	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
-	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "mb1", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "cga_m24", true);
+	ISA8_SLOT(config, "mb2", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
+	ISA8_SLOT(config, "mb3", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "mb4", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, "hdc", false);
+	ISA8_SLOT(config, "isa2", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 24_MHz_XTAL / 6, m_isabus, pc_isa8_cards, nullptr, false);
 
 	// 2 banks of 16 64Kx1 or 256Kx1 DRAMs on motherboard
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
@@ -608,12 +616,12 @@ void m24_state::olivetti(machine_config &config)
 	m_kbc->in_porta().set(FUNC(m24_state::pa_r));
 	m_kbc->out_portb().set(FUNC(m24_state::pb_w));
 
-	M24_KEYBOARD(config, m_keyboard, 0);
+	M24_KEYBOARD(config, m_keyboard);
 	m_keyboard->out_data_handler().set(FUNC(m24_state::kbcin_w));
 
 	MM58174(config, "mm58174an", 32.768_kHz_XTAL);
 
-	M24_Z8000(config, m_z8000_apb, 0); // TODO: make this a slot device (uses custom bus connector)
+	M24_Z8000(config, m_z8000_apb); // TODO: make this a slot device (uses custom bus connector)
 	m_z8000_apb->halt_callback().set(FUNC(m24_state::halt_i86_w));
 
 	/* software lists */

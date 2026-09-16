@@ -46,7 +46,7 @@ void c64_namesoft_midi_cartridge_device::write_acia_clock(int state)
 
 void c64_namesoft_midi_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(c64_namesoft_midi_cartridge_device::acia_irq_w));
 

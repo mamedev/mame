@@ -85,8 +85,8 @@ public:
 	void olybossd(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(toggle_tim);
 
@@ -112,9 +112,9 @@ private:
 	void vchrram_w(offs_t offset, u8 data);
 	void vchrram85_w(offs_t offset, u8 data);
 	void ppic_w(u8 data);
-	void olyboss_io(address_map &map);
-	void olyboss_mem(address_map &map);
-	void olyboss85_io(address_map &map);
+	void olyboss_io(address_map &map) ATTR_COLD;
+	void olyboss_mem(address_map &map) ATTR_COLD;
+	void olyboss85_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8257_device> m_dma;
@@ -432,7 +432,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	/* video hardware */
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
@@ -441,7 +441,7 @@ void olyboss_state::olybossd(machine_config &config)
 
 	/* devices */
 
-	AM9519(config, m_uic, 0);
+	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline("maincpu", 0);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
@@ -472,7 +472,7 @@ void olyboss_state::olybossd(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(olyboss_state::ppic_w));
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard_put));
 }
 
@@ -499,7 +499,7 @@ void olyboss_state::bossb85(machine_config &config)
 	maincpu.out_sod_func().set(FUNC(olyboss_state::romdis_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(UPD3301_TAG, FUNC(upd3301_device::screen_update));
@@ -508,7 +508,7 @@ void olyboss_state::bossb85(machine_config &config)
 
 	/* devices */
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
@@ -535,7 +535,7 @@ void olyboss_state::bossb85(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 
 	/* keyboard */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(olyboss_state::keyboard85_put));
 }
 

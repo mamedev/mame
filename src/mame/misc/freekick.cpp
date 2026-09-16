@@ -137,9 +137,9 @@ public:
 		m_spinner(*this, "IN%u", 2U) { }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
@@ -180,8 +180,8 @@ public:
 	void freekick(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_sound_data;
@@ -197,8 +197,8 @@ private:
 	uint8_t snd_rom_r();
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 class pbillrd_state : public base_state
@@ -223,14 +223,14 @@ protected:
 
 	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
 
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 private:
 	void bankswitch_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void program_map(address_map &map);
-	void pbillrdbl_program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void pbillrdbl_program_map(address_map &map) ATTR_COLD;
 };
 
 class gigas_state : public pbillrd_state
@@ -253,10 +253,10 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gigas_io_map(address_map &map);
-	void gigas_program_map(address_map &map);
-	void omega_io_map(address_map &map);
-	void omega_program_map(address_map &map);
+	void gigas_io_map(address_map &map) ATTR_COLD;
+	void gigas_program_map(address_map &map) ATTR_COLD;
+	void omega_io_map(address_map &map) ATTR_COLD;
+	void omega_program_map(address_map &map) ATTR_COLD;
 };
 
 class oigas_state : public gigas_state
@@ -269,8 +269,8 @@ public:
 	void oigas(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_inval = 0;
@@ -281,11 +281,9 @@ private:
 	uint8_t _3_r();
 	uint8_t _2_r();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 TILE_GET_INFO_MEMBER(base_state::get_tile_info)
 {
@@ -424,8 +422,6 @@ uint32_t freekick_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -738,7 +734,7 @@ static INPUT_PORTS_START( pbillrd )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x02, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
@@ -755,7 +751,7 @@ static INPUT_PORTS_START( pbillrd )
 	PORT_DIPSETTING(    0x80, DEF_STR( 4C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
@@ -828,15 +824,15 @@ static INPUT_PORTS_START( omega )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x02, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x04, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )   PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 3C_1C ) )
@@ -845,15 +841,15 @@ static INPUT_PORTS_START( omega )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x40, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(    0x80, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_50C ) )
 
 	PORT_START("DSW3") // omega has a third dipswitch array, similar to the later freekick hw below
 	PORT_DIPNAME( 0x01, 0x01, "Hopper Status?" )        PORT_DIPLOCATION("SW3:1") // Prints "NORMAL" & "EMPTY" to title screen when set to ON ... medal/hopper status?
@@ -910,7 +906,7 @@ static INPUT_PORTS_START( freekick )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x02, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
@@ -924,15 +920,15 @@ static INPUT_PORTS_START( freekick )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x40, "1 Coin/25 Credits" )
-	PORT_DIPSETTING(    0x80, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_25C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_50C ) )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, "Manufacturer" )  PORT_DIPLOCATION("SW3:1")   // Set to "Sega" to show Japanese text on the "Continue" screen
@@ -1111,7 +1107,7 @@ void gigas_state::omega(machine_config &config)
 	m_outlatch->q_out_cb<5>().set_nop(); // ???
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(18'432'000) / 3, 768 / 2, 0, 512 / 2, 263, 0 + 16, 224 + 16); // unknown divisor
 	screen.set_screen_update(FUNC(gigas_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1144,7 +1140,7 @@ void base_state::base(machine_config &config)
 	m_outlatch->q_out_cb<4>().set(FUNC(base_state::nmi_enable_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000) / 2, 768 / 2, 0, 512 / 2, 263, 0 + 16, 224 + 16);
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(base_state::vblank_irq));

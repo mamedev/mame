@@ -76,7 +76,7 @@ public:
 	void hp1650(machine_config &config);
 
 private:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_hp16500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	[[maybe_unused]] uint32_t screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -108,10 +108,10 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	void hp16500_map(address_map &map);
-	void hp16500a_map(address_map &map);
-	void hp1650_map(address_map &map);
-	void hp1651_map(address_map &map);
+	void hp16500_map(address_map &map) ATTR_COLD;
+	void hp16500a_map(address_map &map) ATTR_COLD;
+	void hp1650_map(address_map &map) ATTR_COLD;
+	void hp1651_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_palette[256]{}, m_colors[3]{}, m_count = 0, m_clutoffs = 0;
 };
@@ -423,7 +423,7 @@ void hp16500_state::hp1650(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp1650_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -436,8 +436,7 @@ void hp16500_state::hp1650(machine_config &config)
 
 	SCN2661A(config, "epci", 5000000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void hp16500_state::hp1651(machine_config &config)
@@ -446,7 +445,7 @@ void hp16500_state::hp1651(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp1651_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -459,8 +458,7 @@ void hp16500_state::hp1651(machine_config &config)
 
 	SCN2661A(config, "epci", 5000000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void hp16500_state::hp16500a(machine_config &config)
@@ -469,7 +467,7 @@ void hp16500_state::hp16500a(machine_config &config)
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500a_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -480,8 +478,7 @@ void hp16500_state::hp16500a(machine_config &config)
 	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void hp16500_state::hp16500b(machine_config &config)
@@ -490,7 +487,7 @@ void hp16500_state::hp16500b(machine_config &config)
 	M68EC030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hp16500_state::screen_update_hp16500));
 	screen.set_size(576,384);
 	screen.set_visarea(0, 576-1, 0, 384-1);
@@ -509,8 +506,7 @@ void hp16500_state::hp16500b(machine_config &config)
 	DS1286(config, "rtc", 32768);
 	//WD37C65C(config, "fdc", 16_MHz_XTAL);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 static INPUT_PORTS_START( hp16500 )

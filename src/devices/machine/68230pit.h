@@ -72,7 +72,7 @@ class pit68230_device :  public device_t
 {
 public:
 	// construction/destruction
-	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pit68230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto pa_in_callback() { return m_pa_in_cb.bind(); }
 	auto pa_out_callback() { return m_pa_out_cb.bind(); }
@@ -275,8 +275,8 @@ protected:
 	pit68230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// Interrupt methods
 	void trigger_interrupt(int source);

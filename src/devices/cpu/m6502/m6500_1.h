@@ -77,8 +77,8 @@ protected:
 		M6500_1_LC
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override;
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override;
@@ -109,7 +109,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(set_cntr_in);
 	void toggle_cntr();
 
-	void memory_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
 
 private:
 	devcb_read8::array<4>   m_port_in_cb;

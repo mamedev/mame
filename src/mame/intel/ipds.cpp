@@ -42,9 +42,9 @@ private:
 	void kbd_put(u8 data);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data = 0U;
-	virtual void machine_reset() override;
-	void ipds_io(address_map &map);
-	void ipds_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void ipds_io(address_map &map) ATTR_COLD;
+	void ipds_mem(address_map &map) ATTR_COLD;
 };
 
 uint8_t ipds_state::ipds_b0_r()
@@ -98,15 +98,18 @@ I8275_DRAW_CHARACTER_MEMBER( ipds_state::crtc_display_pixels )
 	uint8_t *charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
-	if (vsp)
+	using namespace i8275_attributes;
+
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
@@ -143,7 +146,7 @@ void ipds_state::ipds(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ipds_state::ipds_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -156,7 +159,7 @@ void ipds_state::ipds(machine_config &config)
 	m_crtc->set_character_width(6);
 	m_crtc->set_display_callback(FUNC(ipds_state::crtc_display_pixels));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(ipds_state::kbd_put));
 }
 

@@ -35,10 +35,7 @@ public:
 	tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, int num, T &&opts, const char *dflt)
 		: tanbus_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 		set_tanbus_slot(num);
 	}
 	tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -48,7 +45,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<tanbus_device> m_tanbus;
@@ -92,8 +89,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state

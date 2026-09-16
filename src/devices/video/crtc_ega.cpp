@@ -105,7 +105,7 @@ void crtc_ega_device::register_w(uint8_t data)
 					m_vert_blank_start  = ((data & 0x08) << 5) | (m_vert_blank_start & 0x00ff);
 					m_line_compare      = ((data & 0x10) << 4) | (m_line_compare & 0x00ff);
 					break;
-		case 0x08:  m_preset_row_scan   =   data & 0x1f;
+		case 0x08:  m_preset_row_latch  =   data & 0x1f;
 					break;
 		case 0x09:  m_max_ras_addr      =   data & 0x1f;
 					break;
@@ -190,12 +190,12 @@ void crtc_ega_device::recompute_parameters(bool postload)
 		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
 			(vert_pix_total > 0) && (max_visible_y < vert_pix_total))
 		{
-			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 2) * vert_pix_total;
+			attotime refresh = attotime::from_ticks((m_horiz_char_total + 2) * vert_pix_total, m_clock);
 
 			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
 			LOG("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+				horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
@@ -272,7 +272,10 @@ void crtc_ega_device::set_vblank(int state)
 		if (!m_irq_enable)
 			m_res_out_irq_cb(m_vblank);
 		if (state)
+		{
 			m_disp_start_addr = m_start_addr_latch;
+			m_preset_row_scan = m_preset_row_latch;
+		}
 	}
 }
 

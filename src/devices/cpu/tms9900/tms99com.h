@@ -42,8 +42,10 @@
     significant changes (e.g. privileged mode, address mapper).
 */
 
-#ifndef __TMS99COMMON_H__
-#define __TMS99COMMON_H__
+#ifndef MAME_CPU_TMS9900_TMS99COM_H
+#define MAME_CPU_TMS9900_TMS99COM_H
+
+#pragma once
 
 enum
 {
@@ -80,4 +82,5 @@ enum
 	TMS99xx_BUS_DBIN = 1,
 	TMS99xx_BUS_IAQ = 2
 };
-#endif /* __TMS99COMMON_H__ */
+
+#endif // MAME_CPU_TMS9900_TMS99COM_H

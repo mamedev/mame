@@ -5,8 +5,6 @@
 
 #pragma once
 
-#define ALL_8910_CHANNELS -1
-
 /* Internal resistance at Volume level 7. */
 
 #define AY8910_INTERNAL_RESISTANCE  (356)
@@ -72,7 +70,7 @@ public:
 	};
 
 	// construction/destruction
-	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	void set_flags(int flags) { m_flags = flags; }
@@ -108,7 +106,6 @@ public:
 	// bc1=a0, bc2=a1
 	void write_bc1_bc2(offs_t offset, u8 data);
 
-	void set_volume(int channel,int volume);
 	void ay_set_clock(int clock);
 
 	struct ay_ym_param
@@ -135,12 +132,12 @@ protected:
 					u32 clock, psg_type_t psg_type, int streams, int ioports, int feature = PSG_DEFAULT);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void ay8910_write_ym(int addr, u8 data);
 	u8 ay8910_read_ym();
@@ -294,7 +291,7 @@ private:
 
 	// internal helpers
 	void set_type(psg_type_t psg_type);
-	inline stream_buffer::sample_t mix_3D();
+	inline sound_stream::sample_t mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
 	void ay8910_statesave();
@@ -308,7 +305,7 @@ private:
 	bool m_active;
 	u8 m_register_latch;
 	u8 m_regs[16 * 2];
-	s16 m_last_enable;
+	u8 m_last_enable;
 	tone_t m_tone[NUM_CHANNELS];
 	envelope_t m_envelope[NUM_CHANNELS];
 	u8 m_prescale_noise;
@@ -324,9 +321,9 @@ private:
 	u8 m_vol_enabled[NUM_CHANNELS];
 	const ay_ym_param *m_par;
 	const ay_ym_param *m_par_env;
-	stream_buffer::sample_t m_vol_table[NUM_CHANNELS][16];
-	stream_buffer::sample_t m_env_table[NUM_CHANNELS][32];
-	std::unique_ptr<stream_buffer::sample_t[]> m_vol3d_table;
+	sound_stream::sample_t m_vol_table[NUM_CHANNELS][16];
+	sound_stream::sample_t m_env_table[NUM_CHANNELS][32];
+	std::unique_ptr<sound_stream::sample_t[]> m_vol3d_table;
 	int m_flags;          // Flags
 	int m_feature;        // Chip specific features
 	int m_res_load[3];    // Load on channel in ohms
@@ -377,7 +374,7 @@ DECLARE_DEVICE_TYPE(AY8930, ay8930_device)
 class ym2149_device : public ay8910_device
 {
 public:
-	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(YM2149, ym2149_device)

@@ -13,21 +13,20 @@
 
 DECLARE_DEVICE_TYPE(AIRRAID_VIDEO, airraid_video_device)
 
-class airraid_video_device :  public device_t
-/*  public device_video_interface */
+class airraid_video_device : public device_t
 {
 public:
 	// construction/destruction
-	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	airraid_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void txram_w(offs_t offset, uint8_t data);
 	void vregs_w(offs_t offset, uint8_t data);
 	void layer_enable_w(uint8_t enable);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// devices

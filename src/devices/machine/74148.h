@@ -40,15 +40,15 @@
 
 *****************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_74148_H
-#define MAME_DEVICES_MACHINE_74148_H
+#ifndef MAME_MACHINE_74148_H
+#define MAME_MACHINE_74148_H
 
 #pragma once
 
 class ttl74148_device : public device_t
 {
 public:
-	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~ttl74148_device() {}
 
 	auto out_cb() { return m_output_cb.bind(); }
@@ -64,8 +64,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 private:
 	// internal state
 	devcb_write8 m_output_cb;

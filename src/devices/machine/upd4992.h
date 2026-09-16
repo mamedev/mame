@@ -33,7 +33,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	TIMER_CALLBACK_MEMBER(clock_tick);

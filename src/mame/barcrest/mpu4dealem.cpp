@@ -38,14 +38,14 @@ public:
 	void dealem(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_RESET(dealem_vid);
 	void dealem_palette(palette_device &palette) const;
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void dealem_memmap(address_map &map);
+	void dealem_memmap(address_map &map) ATTR_COLD;
 	TILE_GET_INFO_MEMBER(tile_info);
 
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
@@ -241,7 +241,7 @@ void mpu4dealem_state::dealem(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MPU4_MASTER_CLOCK, 440, 0, 320, 279, 0, 248); // 6.88 MHz
 	screen.set_screen_update(FUNC(mpu4dealem_state::screen_update_dealem));
 
@@ -298,7 +298,7 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Rear Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR) PORT_NAME("Rear Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x00)

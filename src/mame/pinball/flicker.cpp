@@ -47,6 +47,20 @@ The programming seems to be incomplete with some bugs and omissions.
 
 namespace {
 
+static constexpr char const *const LAMP_NAMES[][4] = {
+		{ "lamp_0.0", /* dummy */ "lamp_credit_lamp",  "lamp_flippers",        "lamp_special"            },
+		{ "lamp_a_lamp",          "lamp_b_lamp",       "lamp_c_lamp",          "lamp_d_lamp"             },
+		{ "lamp_not_a_lamp",      "lamp_not_b_lamp",   "lamp_not_c_lamp",      "lamp_not_d_lamp"         },
+		{ "lamp_left_extra_ball", "lamp_double_bonus", "lamp_shoot_again",     "lamp_right_extra_ball"   },
+		{ "lamp_00_100s",         "lamp_100",          "lamp_200",             "lamp_300"                },
+		{ "lamp_400",             "lamp_500",          "lamp_600",             "lamp_700"                },
+		{ "lamp_800",             "lamp_900",          "lamp_6.2", /* dummy */ "lamp_6.3" /* dummy */    },
+		{ "lamp_point_00",        "lamp_1000",         "lamp_2000",            "lamp_3000"               },
+		{ "lamp_4000",            "lamp_5000",         "lamp_6000",            "lamp_7000"               },
+		{ "lamp_8000",            "lamp_9000",         "lamp_10000",           "lamp_9.3" /* dummy */    },
+		{ "lamp_dummy_zero",      "lamp_game_over",    "lamp_tilt",            "lamp_same_player_shoots" },
+		{ "lamp_1_up",            "lamp_2_up",         "lamp_one_player",      "lamp_two_player"         } };
+
 class flicker_state : public genpin_class
 {
 public:
@@ -58,17 +72,18 @@ public:
 		, m_switch(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
+		, m_lamps(*this, LAMP_NAMES)
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coins_in);
+	ioport_value coins_in();
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_changed);
 
-	void flicker(machine_config &config);
+	void flicker(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void ram0_out(u8 data) { m_ram0_output = data; }
 	void rom0_out(u8 data) { m_rom0_output = data; }
@@ -78,11 +93,11 @@ private:
 	void cm_ram1_w(int state);
 	void cm_ram2_w(int state);
 
-	void flicker_memory(address_map &map);
-	void flicker_ram_ports(address_map &map);
-	void flicker_rom(address_map &map);
-	void flicker_rom_ports(address_map &map);
-	void flicker_status(address_map &map);
+	void flicker_memory(address_map &map) ATTR_COLD;
+	void flicker_ram_ports(address_map &map) ATTR_COLD;
+	void flicker_rom(address_map &map) ATTR_COLD;
+	void flicker_rom_ports(address_map &map) ATTR_COLD;
+	void flicker_status(address_map &map) ATTR_COLD;
 
 	required_device<i4004_cpu_device>   m_maincpu;
 	required_ioport                     m_testport;
@@ -90,6 +105,7 @@ private:
 	required_ioport_array<16>           m_switch;
 	output_finder<16>                   m_digits;
 	output_finder<80>                   m_io_outputs;     // 16 solenoids + 64 lamps
+	output_finder<12, 4>                m_lamps;          // named lamp outputs
 
 	bool    m_cm_ram1 = false, m_cm_ram2 = false;
 	u8      m_ram0_output = 0U, m_rom0_output = 0U, m_rom1_output = 0U;
@@ -127,24 +143,24 @@ void flicker_state::flicker_ram_ports(address_map &map)
 static INPUT_PORTS_START( flicker )
 	PORT_START("TEST")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Door Slam")     PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(flicker_state::test_changed), 0)
 	PORT_BIT(0x001c, IP_ACTIVE_HIGH, IPT_UNKNOWN)  // called "two coins", "three coins", "four coins" in patent, purpose unknown
-	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(flicker_state, coins_in)
+	PORT_BIT(0x07e0, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(FUNC(flicker_state::coins_in))
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Tilt") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")                         PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_START)    PORT_NAME("Credit Button")                         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(flicker_state::test_changed), 0)
 	PORT_BIT(0x6000, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test")  PORT_CODE(KEYCODE_0_PAD)          PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Test")  PORT_CODE(KEYCODE_0_PAD)          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(flicker_state::test_changed), 0)
 
 	// The coin slot would be connected to one of the lines via a wire jumper on a terminal strip
 	PORT_START("COIN")
-	PORT_CONFNAME(0x3f, 0x01, DEF_STR(Coinage)) PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
+	PORT_CONFNAME(0x3f, 0x01, DEF_STR(Coinage)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(flicker_state::test_changed), 0)
 	PORT_CONFSETTING(   0x01, DEF_STR(1C_1C))
 	PORT_CONFSETTING(   0x02, DEF_STR(1C_2C))
 	PORT_CONFSETTING(   0x04, DEF_STR(1C_3C))
 	PORT_CONFSETTING(   0x08, DEF_STR(1C_4C))
 	PORT_CONFSETTING(   0x10, DEF_STR(1C_5C))
 	PORT_CONFSETTING(   0x20, DEF_STR(1C_6C))
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, flicker_state, test_changed, 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(flicker_state::test_changed), 0)
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Left Lane Target")  PORT_CODE(KEYCODE_A)
@@ -291,36 +307,18 @@ u8 flicker_state::rom2_in()
 void flicker_state::cm_ram1_w(int state)
 {
 	static constexpr u8 led_digits[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
-	static constexpr char const *const lamp_matrix[][4] = {
-			{ nullptr,                "lamp_credit_lamp",  "lamp_flippers",    "lamp_special"            },
-			{ "lamp_a_lamp",          "lamp_b_lamp",       "lamp_c_lamp",      "lamp_d_lamp"             },
-			{ "lamp_not_a_lamp",      "lamp_not_b_lamp",   "lamp_not_c_lamp",  "lamp_not_d_lamp"         },
-			{ "lamp_left_extra_ball", "lamp_double_bonus", "lamp_shoot_again", "lamp_right_extra_ball"   },
-			{ "lamp_00_100s",         "lamp_100",          "lamp_200",         "lamp_300"                },
-			{ "lamp_400",             "lamp_500",          "lamp_600",         "lamp_700"                },
-			{ "lamp_800",             "lamp_900",          nullptr,            nullptr                   },
-			{ "lamp_point_00",        "lamp_1000",         "lamp_2000",        "lamp_3000"               },
-			{ "lamp_4000",            "lamp_5000",         "lamp_6000",        "lamp_7000"               },
-			{ "lamp_8000",            "lamp_9000",         "lamp_10000",       nullptr                   },
-			{ "lamp_dummy_zero",      "lamp_game_over",    "lamp_tilt",        "lamp_same_player_shoots" },
-			{ "lamp_1_up",            "lamp_2_up",         "lamp_one_player",  "lamp_two_player"         } };
 
 	if (!m_cm_ram1 && !state)
 	{
 		m_mux_col = m_ram0_output;
 		m_digits[m_mux_col] = led_digits[m_rom0_output];
-		if (std::size(lamp_matrix) > m_mux_col)
+		if (std::size(m_lamps) > m_mux_col)
 		{
-			if (lamp_matrix[m_mux_col][0])
-				output().set_value(lamp_matrix[m_mux_col][0], BIT(m_rom1_output, 0));
-			if (lamp_matrix[m_mux_col][1])
-				output().set_value(lamp_matrix[m_mux_col][1], BIT(m_rom1_output, 1));
-			if (lamp_matrix[m_mux_col][2])
-				output().set_value(lamp_matrix[m_mux_col][2], BIT(m_rom1_output, 2));
-			if (lamp_matrix[m_mux_col][3])
-				output().set_value(lamp_matrix[m_mux_col][3], BIT(m_rom1_output, 3));
 			for (u8 i = 0; i < 4; i++)
+			{
+				m_lamps[m_mux_col][i] = BIT(m_rom1_output, i);
 				m_io_outputs[16U+m_mux_col*4U+i] = BIT(m_rom1_output, i);
+			}
 		}
 		if (0x0c == m_mux_col)
 		{
@@ -379,7 +377,7 @@ void flicker_state::cm_ram2_w(int state)
 }
 
 
-CUSTOM_INPUT_MEMBER(flicker_state::coins_in)
+ioport_value flicker_state::coins_in()
 {
 	u8 const coins(m_coinport->read());
 	return BIT(coins, 7) ? (coins & 0x3f) : 0;
@@ -392,11 +390,8 @@ INPUT_CHANGED_MEMBER(flicker_state::test_changed)
 }
 
 
-void flicker_state::driver_start()
+void flicker_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_cm_ram1));
 	save_item(NAME(m_cm_ram2));
 	save_item(NAME(m_ram0_output));

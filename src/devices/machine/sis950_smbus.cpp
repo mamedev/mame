@@ -2,10 +2,10 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    SiS 950 SMBus implementation
+SiS 950 SMBus implementation
 
-    TODO:
-    - Stub, needs an smbus_interface, bare minimum to make shutms11 happy;
+TODO:
+- Stub, needs an smbus_interface, bare minimum to make shutms11 happy;
 
 **************************************************************************************************/
 #include "emu.h"
@@ -14,7 +14,7 @@
 #define LOG_CMD     (1U << 1) // log commands
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

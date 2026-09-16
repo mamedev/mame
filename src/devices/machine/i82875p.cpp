@@ -62,8 +62,7 @@ uint8_t i82875p_host_device::capptr_r()
 void i82875p_host_device::device_start()
 {
 	pci_host_device::device_start();
-	memory_space = &cpu->space(AS_PROGRAM);
-	io_space = &cpu->space(AS_IO);
+	set_spaces(&cpu->space(AS_PROGRAM), &cpu->space(AS_IO));
 
 	memory_window_start = 0;
 	memory_window_end   = 0xffffffff;

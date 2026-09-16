@@ -46,7 +46,7 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 void tc8830f_device::device_start()
 {
 	// assumes it can make an address mask with m_mem.length() - 1
-	assert(!(m_mem.length() & (m_mem.length() - 1)));
+	assert(std::has_single_bit(m_mem.length()));
 
 	// create the stream
 	m_stream = stream_alloc(0, 1, clock() / 0x10);
@@ -82,11 +82,11 @@ void tc8830f_device::device_clock_changed()
 
 
 
-void tc8830f_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tc8830f_device::sound_stream_update(sound_stream &stream)
 {
 	int32_t mix = 0;
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		if (m_playing)
 		{
@@ -128,7 +128,7 @@ void tc8830f_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			mix = m_output;
 		}
 
-		outputs[0].put_int(i, mix, 32768);
+		stream.put_int(0, i, mix, 32768);
 	}
 }
 

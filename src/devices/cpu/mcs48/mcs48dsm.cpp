@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mcs48dsm.c
-
     Simple MCS-48/UPI-41 disassembler.
     Written by Aaron Giles
 

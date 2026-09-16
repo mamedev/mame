@@ -26,7 +26,7 @@ class victor_9000_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	victor_9000_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto kbrdy_handler() { return m_kbrdy_cb.bind(); }
 	auto kbdata_handler() { return m_kbdata_cb.bind(); }
@@ -35,11 +35,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_device<i8021_device> m_maincpu;

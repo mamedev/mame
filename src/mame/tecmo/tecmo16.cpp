@@ -76,7 +76,7 @@ public:
 	void riot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -128,14 +128,12 @@ private:
 	void screen_vblank(int state);
 
 	void save_state();
-	void common_map(address_map& map);
-	void fstarfrc_map(address_map &map);
-	void ginkun_map(address_map &map);
-	void sound_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void fstarfrc_map(address_map &map) ATTR_COLD;
+	void ginkun_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // Based on sprite drivers from tehkan/wc90.cpp by Ernesto Corvi (ernesto@imagina.com)
 
@@ -336,15 +334,13 @@ void tecmo16_state::screen_vblank(int state)
 		const rectangle visarea = m_screen->visible_area();
 		// 2 frame sprite lags
 		m_sprite_bitmap.fill(0, visarea);
-		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(2), visarea, m_spriteram->buffer(), 0, 0, flip_screen(), m_sprite_bitmap);
-		else m_sprgen->gaiden_draw_sprites(*m_screen, m_gfxdecode->gfx(2), visarea, m_spriteram->buffer(), 2, 0, flip_screen(), m_sprite_bitmap);
+		if (m_game_is_riot)  m_sprgen->gaiden_draw_sprites(*m_screen, m_sprite_bitmap, visarea, m_spriteram->buffer(), 0, 0, flip_screen());
+		else m_sprgen->gaiden_draw_sprites(*m_screen, m_sprite_bitmap, visarea, m_spriteram->buffer(), 2, 0, flip_screen());
 
 		m_spriteram->copy();
 	}
 }
 
-
-// machine
 
 /******************************************************************************/
 
@@ -654,7 +650,10 @@ INPUT_PORTS_END
 static GFXDECODE_START( gfx_tecmo16 )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_msb,         1*16*16,    16 )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x100 )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb,               0, 0x100 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_tecmo16_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0, 0x100 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -676,7 +675,7 @@ void tecmo16_state::base(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.17);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000)); // not accurate
 	m_screen->set_size(32*8, 32*8);
@@ -688,9 +687,9 @@ void tecmo16_state::base(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xBGR_444, 4096);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_tecmo16_spr);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(10, 9, 4);
 	m_mixer->set_blendcols(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 );
 	m_mixer->set_regularcols( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
@@ -699,19 +698,18 @@ void tecmo16_state::base(machine_config &config)
 	m_mixer->set_bgpen(0x000 + 0x300, 0x400 + 0x300);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK/6)); // 4 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", OKI_CLOCK / 8, okim6295_device::PIN7_HIGH)); // sample rate 1 MHz / 132
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 }
 
 void tecmo16_state::ginkun(machine_config &config)
@@ -1005,10 +1003,12 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,   0,        base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (US)",           MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
-GAME( 1992, fstarfrcj,  fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcja, fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcw,  fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (World?)",       MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
-GAME( 1992, riot,       0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",      "Riot",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1992, riotw,      riot,     riot,     riot,     tecmo16_state, empty_init, ROT0,  "Woong Bi", "Riot (Woong Bi license)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,     0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo",    "Ganbare Ginkun",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,   0,        base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",           MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
+GAME( 1992, fstarfrcj,  fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcja, fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcw,  fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (World?)",       MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
+
+GAME( 1992, riot,       0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "Tecmo (NMK license)",      "Riot (NMK)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riotw,      riot,     riot,     riot,     tecmo16_state, empty_init, ROT0,  "Tecmo (Woong Bi license)", "Riot (Woong Bi)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1995, ginkun,     0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun", MACHINE_SUPPORTS_SAVE )

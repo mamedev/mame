@@ -57,13 +57,13 @@ protected:
 	decocpu_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_trigger);
 
-	void decocpu1_map(address_map &map);
+	void decocpu1_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia21;
@@ -127,13 +127,13 @@ public:
 
 	decocpu_type2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void decocpu2_map(address_map &map);
+	void decocpu2_map(address_map &map) ATTR_COLD;
 protected:
 	decocpu_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class decocpu_type3_device : public decocpu_type2_device
@@ -152,7 +152,7 @@ protected:
 	decocpu_type3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 class decocpu_type3b_device : public decocpu_type3_device
@@ -169,7 +169,7 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(DECOCPU1,  decocpu_type1_device)

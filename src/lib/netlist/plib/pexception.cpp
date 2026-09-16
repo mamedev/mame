@@ -8,7 +8,7 @@
 #include <cfloat>
 #include <iostream>
 
-#if (defined(__x86_64__) || defined(__i386__)) && defined(__linux__)
+#if (defined(__x86_64__) || defined(__i386__)) && defined(__GLIBC__)
 #define HAS_FEENABLE_EXCEPT     (1)
 #else
 #define HAS_FEENABLE_EXCEPT     (0)

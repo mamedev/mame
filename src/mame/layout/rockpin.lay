@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -17,27 +18,12 @@ license:CC0-1.0
 	<element name="disk_yellow"><disk><color red="0.9" green="0.9" blue="0.25" /></disk></element>
 	<element name="disk_red"><disk><color red="0.8" green="0.2" blue="0.2" /></disk></element>
 
-	<element name="text_l1">
-		<rect><color red="0.85" green="0.3" blue="0.15" /></rect>
-		<text string="SCORE"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_l2">
-		<rect><color red="0.85" green="0.3" blue="0.15" /></rect>
-		<text string="PLAYER BALL"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
+	<element name="text_l1"><text string="SCORE"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_l2"><text string="PLAYER BALL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="text_20">
-		<rect><color red="0.15" green="0.35" blue="0.7" /></rect>
-		<text string="20"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_10">
-		<rect><color red="0.15" green="0.35" blue="0.7" /></rect>
-		<text string="10"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_4">
-		<rect><color red="0.15" green="0.35" blue="0.7" /></rect>
-		<text string="4"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
+	<element name="text_20"><text string="20"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_10"><text string="10"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.2" green="0.04" blue="0.05" /></disk>
@@ -54,8 +40,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="2.01" right="21.99" top="10.25" bottom="49.99" />
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="disk_white"><bounds x="2" y="6" width="20" height="25" /></element>
 		<element ref="disk_orange"><bounds x="2.5" y="6.5" width="19" height="24" /></element>
 		<element ref="static_white"><bounds x="2" y="19" width="20" height="31" /></element>
@@ -106,8 +91,7 @@ license:CC0-1.0
 		<element ref="static_black"><bounds x="6.75" y="12.75" width="10" height="2.75" /></element>
 		<element ref="text_l2"><bounds x="5" y="15.5" width="14" height="2" /></element>
 
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="digit2" ref="digit"><bounds x="9.5" y="13" width="1.5" height="2.25" /></element>
 		<element name="digit1" ref="digit"><bounds x="11" y="13" width="1.5" height="2.25" /></element>
 		<element name="digit0" ref="digit"><bounds x="12.5" y="13" width="1.5" height="2.25" /></element>

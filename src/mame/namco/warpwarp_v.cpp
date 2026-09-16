@@ -151,16 +151,12 @@ void warpwarp_state::warpwarp_palette(palette_device &palette) const
 /* convert from 32x32 to 34x28 */
 TILEMAP_MAPPER_MEMBER(warpwarp_state::tilemap_scan)
 {
-	int offs;
-
 	row += 2;
 	col--;
 	if (col & 0x20)
-		offs = row + ((col & 1) << 5);
+		return row + ((col & 1) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(warpwarp_state::geebee_get_tile_info)

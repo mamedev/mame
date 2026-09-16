@@ -49,8 +49,8 @@ public:
 	void osi600(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t keyboard_r();
@@ -65,7 +65,7 @@ protected:
 
 	void osi600_video(machine_config &config);
 	void osi630_video(machine_config &config);
-	void osi600_mem(address_map &map);
+	void osi600_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_cass_data[4]{};
 	bool m_cassbit = false;
@@ -106,10 +106,10 @@ public:
 	void c1p(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void osi630_ctrl_w(uint8_t data);
 	void osi630_sound_w(uint8_t data);
-	void c1p_mem(address_map &map);
+	void c1p_mem(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
 	required_device<beep_device> m_beeper;
@@ -127,14 +127,14 @@ public:
 	void c1pmf(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t osi470_pia_pa_r();
 	void osi470_pia_pa_w(uint8_t data);
 	void osi470_pia_pb_w(uint8_t data);
 	void osi470_pia_cb2_w(int state);
 
-	void c1pmf_mem(address_map &map);
+	void c1pmf_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -154,7 +154,7 @@ protected:
 
 	void keyboard_w(uint8_t data);
 	void uk101_video(machine_config &config);
-	void uk101_mem(address_map &map);
+	void uk101_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_OSI_OSI_H

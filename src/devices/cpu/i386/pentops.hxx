@@ -2,18 +2,26 @@
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett, Samuele Zannoli
 // Pentium+ specific opcodes
 
-extern flag float32_is_nan( float32 a ); // since its not defined in softfloat.h
-extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
-
-void i386_device::MMXPROLOG()
+bool i386_device::MMXPROLOG()
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & CR0_TS)
 	{
-		i386_trap(FAULT_NM, 0, 0);
-		return;
+		i386_trap(FAULT_NM, 0);
+		return true;
 	}
-	//m_x87_sw &= ~(X87_SW_TOP_MASK << X87_SW_TOP_SHIFT); // top = 0
+	x87_set_stack_top(0);
 	m_x87_tw = 0; // tag word = 0
+	return false;
+}
+
+bool i386_device::SSEPROLOG()
+{
+	if (m_cr[0] & CR0_TS)
+	{
+		i386_trap(FAULT_NM, 0);
+		return true;
+	}
+	return false;
 }
 
 void i386_device::READMMX(uint32_t ea,MMX_REG &r)
@@ -104,7 +112,7 @@ void i386_device::pentium_rdtsc()          // Opcode 0x0f 31
 
 void i386_device::pentium_ud2()    // Opcode 0x0f 0b
 {
-	i386_trap(6, 0, 0);
+	i386_trap(6, 0);
 }
 
 void i386_device::pentium_rsm()
@@ -112,7 +120,7 @@ void i386_device::pentium_rsm()
 	if(!m_smm)
 	{
 		LOGMASKED(LOG_INVALID_OPCODE, "i386: Invalid RSM outside SMM at %08X\n", m_pc - 1);
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 		return;
 	}
 
@@ -125,7 +133,7 @@ void i386_device::pentium_rsm()
 	if(m_nmi_latched)
 	{
 		m_nmi_latched = false;
-		i386_trap(2, 1, 0);
+		i386_trap(2, 1);
 	}
 }
 
@@ -997,25 +1005,6 @@ void i386_device::pentium_movnti_m32_r32() // Opcode 0f c3
 	}
 }
 
-void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
-{
-/*
-0f 3a       BB0_RESET (set BB0 pointer = base)
-0f 3b       BB1_RESET (set BB1 pointer = base)
-0f 3c       CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
-0f 3d       CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
-*/
-
-	CYCLES(1);
-}
-
-void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
-{
-	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
-
-	CYCLES(1);
-}
-
 void i386_device::pentium_cmpxchg8b_m64()  // Opcode 0x0f c7
 {
 	uint8_t modm = FETCH();
@@ -1042,7 +1031,7 @@ void i386_device::pentium_cmpxchg8b_m64()  // Opcode 0x0f c7
 
 void i386_device::pentium_movntq_m64_r64() // Opcode 0f e7
 {
-	//MMXPROLOG(); // TODO: check if needed
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
@@ -1059,7 +1048,7 @@ void i386_device::pentium_maskmovq_r64_r64()  // Opcode 0f f7
 	int s,m,n;
 	uint8_t modm = FETCH();
 	uint32_t ea = GetEA(7, 0); // ds:di/edi/rdi register
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	s=(modm >> 3) & 7;
 	m=modm & 7;
 	for (n=0;n <= 7;n++)
@@ -1071,6 +1060,7 @@ void i386_device::sse_maskmovdqu_r128_r128()  // Opcode 66 0f f7
 {
 	int s,m,n;
 	uint8_t modm = FETCH();
+	if(SSEPROLOG()) return;
 	uint32_t ea = GetEA(7, 0); // ds:di/edi/rdi register
 	s=(modm >> 3) & 7;
 	m=modm & 7;
@@ -1175,7 +1165,7 @@ void i386_device::mmx_group_0f71()  // Opcode 0f 71
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modm >= 0xc0 ) {
 		switch ( (modm & 0x38) >> 3 )
 		{
@@ -1207,6 +1197,7 @@ void i386_device::sse_group_660f71()  // Opcode 66 0f 71
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
+	if(SSEPROLOG()) return;
 	if (modm >= 0xc0) {
 		switch ((modm & 0x38) >> 3)
 		{
@@ -1232,7 +1223,7 @@ void i386_device::mmx_group_0f72()  // Opcode 0f 72
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modm >= 0xc0 ) {
 		switch ( (modm & 0x38) >> 3 )
 		{
@@ -1258,6 +1249,7 @@ void i386_device::sse_group_660f72()  // Opcode 66 0f 72
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
+	if(SSEPROLOG()) return;
 	if (modm >= 0xc0) {
 		switch ((modm & 0x38) >> 3)
 		{
@@ -1283,7 +1275,7 @@ void i386_device::mmx_group_0f73()  // Opcode 0f 73
 {
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modm >= 0xc0 ) {
 		switch ( (modm & 0x38) >> 3 )
 		{
@@ -1304,6 +1296,7 @@ void i386_device::sse_group_660f73()  // Opcode 66 0f 73
 	uint64_t t0;
 	uint8_t modm = FETCH();
 	uint8_t imm8 = FETCH();
+	if(SSEPROLOG()) return;
 	if (modm >= 0xc0) {
 		switch ((modm & 0x38) >> 3)
 		{
@@ -1362,7 +1355,7 @@ void i386_device::sse_group_660f73()  // Opcode 66 0f 73
 
 void i386_device::mmx_psrlw_r64_rm64()  // Opcode 0f d1
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1385,7 +1378,7 @@ void i386_device::mmx_psrlw_r64_rm64()  // Opcode 0f d1
 
 void i386_device::mmx_psrld_r64_rm64()  // Opcode 0f d2
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1404,7 +1397,7 @@ void i386_device::mmx_psrld_r64_rm64()  // Opcode 0f d2
 
 void i386_device::mmx_psrlq_r64_rm64()  // Opcode 0f d3
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1421,7 +1414,7 @@ void i386_device::mmx_psrlq_r64_rm64()  // Opcode 0f d3
 
 void i386_device::mmx_paddq_r64_rm64()  // Opcode 0f d4
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q+MMX(modrm & 7).q;
@@ -1436,7 +1429,7 @@ void i386_device::mmx_paddq_r64_rm64()  // Opcode 0f d4
 
 void i386_device::mmx_pmullw_r64_rm64()  // Opcode 0f d5
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).w[0]=(uint32_t)((int32_t)MMX((modrm >> 3) & 0x7).s[0]*(int32_t)MMX(modrm & 7).s[0]) & 0xffff;
@@ -1458,7 +1451,7 @@ void i386_device::mmx_pmullw_r64_rm64()  // Opcode 0f d5
 void i386_device::mmx_psubusb_r64_rm64()  // Opcode 0f d8
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1476,7 +1469,7 @@ void i386_device::mmx_psubusb_r64_rm64()  // Opcode 0f d8
 void i386_device::mmx_psubusw_r64_rm64()  // Opcode 0f d9
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1493,7 +1486,7 @@ void i386_device::mmx_psubusw_r64_rm64()  // Opcode 0f d9
 
 void i386_device::mmx_pand_r64_rm64()  // Opcode 0f db
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q & MMX(modrm & 7).q;
@@ -1509,7 +1502,7 @@ void i386_device::mmx_pand_r64_rm64()  // Opcode 0f db
 void i386_device::mmx_paddusb_r64_rm64()  // Opcode 0f dc
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1527,7 +1520,7 @@ void i386_device::mmx_paddusb_r64_rm64()  // Opcode 0f dc
 void i386_device::mmx_paddusw_r64_rm64()  // Opcode 0f dd
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1544,7 +1537,7 @@ void i386_device::mmx_paddusw_r64_rm64()  // Opcode 0f dd
 
 void i386_device::mmx_pandn_r64_rm64()  // Opcode 0f df
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=(~MMX((modrm >> 3) & 0x7).q) & MMX(modrm & 7).q;
@@ -1559,7 +1552,7 @@ void i386_device::mmx_pandn_r64_rm64()  // Opcode 0f df
 
 void i386_device::mmx_psraw_r64_rm64()  // Opcode 0f e1
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1582,7 +1575,7 @@ void i386_device::mmx_psraw_r64_rm64()  // Opcode 0f e1
 
 void i386_device::mmx_psrad_r64_rm64()  // Opcode 0f e2
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1601,7 +1594,7 @@ void i386_device::mmx_psrad_r64_rm64()  // Opcode 0f e2
 
 void i386_device::mmx_pmulhw_r64_rm64()  // Opcode 0f e5
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).w[0]=(uint32_t)((int32_t)MMX((modrm >> 3) & 0x7).s[0]*(int32_t)MMX(modrm & 7).s[0]) >> 16;
@@ -1623,7 +1616,7 @@ void i386_device::mmx_pmulhw_r64_rm64()  // Opcode 0f e5
 void i386_device::mmx_psubsb_r64_rm64()  // Opcode 0f e8
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1641,7 +1634,7 @@ void i386_device::mmx_psubsb_r64_rm64()  // Opcode 0f e8
 void i386_device::mmx_psubsw_r64_rm64()  // Opcode 0f e9
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1658,7 +1651,7 @@ void i386_device::mmx_psubsw_r64_rm64()  // Opcode 0f e9
 
 void i386_device::mmx_por_r64_rm64()  // Opcode 0f eb
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q | MMX(modrm & 7).q;
@@ -1674,7 +1667,7 @@ void i386_device::mmx_por_r64_rm64()  // Opcode 0f eb
 void i386_device::mmx_paddsb_r64_rm64()  // Opcode 0f ec
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1692,7 +1685,7 @@ void i386_device::mmx_paddsb_r64_rm64()  // Opcode 0f ec
 void i386_device::mmx_paddsw_r64_rm64()  // Opcode 0f ed
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1709,7 +1702,7 @@ void i386_device::mmx_paddsw_r64_rm64()  // Opcode 0f ed
 
 void i386_device::mmx_pxor_r64_rm64()  // Opcode 0f ef
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q ^ MMX(modrm & 7).q;
@@ -1724,7 +1717,7 @@ void i386_device::mmx_pxor_r64_rm64()  // Opcode 0f ef
 
 void i386_device::mmx_psllw_r64_rm64()  // Opcode 0f f1
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1747,7 +1740,7 @@ void i386_device::mmx_psllw_r64_rm64()  // Opcode 0f f1
 
 void i386_device::mmx_pslld_r64_rm64()  // Opcode 0f f2
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1766,7 +1759,7 @@ void i386_device::mmx_pslld_r64_rm64()  // Opcode 0f f2
 
 void i386_device::mmx_psllq_r64_rm64()  // Opcode 0f f3
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int count=(int)MMX(modrm & 7).q;
@@ -1783,7 +1776,7 @@ void i386_device::mmx_psllq_r64_rm64()  // Opcode 0f f3
 
 void i386_device::mmx_pmaddwd_r64_rm64()  // Opcode 0f f5
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0]=(int32_t)MMX((modrm >> 3) & 0x7).s[0]*(int32_t)MMX(modrm & 7).s[0]+
@@ -1805,7 +1798,7 @@ void i386_device::mmx_pmaddwd_r64_rm64()  // Opcode 0f f5
 void i386_device::mmx_psubb_r64_rm64()  // Opcode 0f f8
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1823,7 +1816,7 @@ void i386_device::mmx_psubb_r64_rm64()  // Opcode 0f f8
 void i386_device::mmx_psubw_r64_rm64()  // Opcode 0f f9
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1841,7 +1834,7 @@ void i386_device::mmx_psubw_r64_rm64()  // Opcode 0f f9
 void i386_device::mmx_psubd_r64_rm64()  // Opcode 0f fa
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 2;n++)
@@ -1859,7 +1852,7 @@ void i386_device::mmx_psubd_r64_rm64()  // Opcode 0f fa
 void i386_device::mmx_paddb_r64_rm64()  // Opcode 0f fc
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -1877,7 +1870,7 @@ void i386_device::mmx_paddb_r64_rm64()  // Opcode 0f fc
 void i386_device::mmx_paddw_r64_rm64()  // Opcode 0f fd
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -1895,7 +1888,7 @@ void i386_device::mmx_paddw_r64_rm64()  // Opcode 0f fd
 void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 2;n++)
@@ -1912,14 +1905,37 @@ void i386_device::mmx_paddd_r64_rm64()  // Opcode 0f fe
 
 void i386_device::mmx_emms() // Opcode 0f 77
 {
-	if (m_cr[0] & 0xc)
+	if (m_cr[0] & CR0_TS)
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
+		return;
+	}
+	if (m_cr[0] & CR0_EM)
+	{
+		i386_trap(FAULT_UD, 0);
 		return;
 	}
 	m_x87_tw = 0xffff; // tag word = 0xffff
-	// TODO
 	CYCLES(1);     // TODO: correct cycle count
+}
+
+void i386_device::i386_cyrix_special()     // Opcode 0x0f 3a-3d
+{
+	/*
+	0f 3a       BB0_RESET (set BB0 pointer = base)
+	0f 3b       BB1_RESET (set BB1 pointer = base)
+	0f 3c       CPU_WRITE (write special CPU memory-mapped register, [ebx] = eax)
+	0f 3d       CPU_READ (read special CPU memory-mapped register, eax, = [ebx])
+	*/
+
+	CYCLES(1);
+}
+
+void i386_device::i386_cyrix_unknown()     // Opcode 0x0f 74
+{
+	LOGMASKED(LOG_UNEMULATED, "Unemulated 0x0f 0x74 opcode called\n");
+
+	CYCLES(1);
 }
 
 void i386_device::i386_cyrix_svdc() // Opcode 0f 78
@@ -1964,7 +1980,7 @@ void i386_device::i386_cyrix_svdc() // Opcode 0f 78
 
 			default:
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 		}
 
@@ -1981,7 +1997,7 @@ void i386_device::i386_cyrix_svdc() // Opcode 0f 78
 		WRITE8(ea + 7, m_sreg[index].base >> 24);
 		WRITE16(ea + 8, m_sreg[index].selector);
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2030,7 +2046,7 @@ void i386_device::i386_cyrix_rsdc() // Opcode 0f 79
 
 			default:
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 		}
 
@@ -2048,7 +2064,7 @@ void i386_device::i386_cyrix_rsdc() // Opcode 0f 79
 		m_sreg[index].base = base;
 		m_sreg[index].limit = limit;
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2074,10 +2090,10 @@ void i386_device::i386_cyrix_svldt() // Opcode 0f 7a
 			WRITE8(ea + 7, m_ldtr.base >> 24);
 			WRITE16(ea + 8, m_ldtr.segment);
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2110,10 +2126,10 @@ void i386_device::i386_cyrix_rsldt() // Opcode 0f 7b
 			m_ldtr.base = base;
 			m_ldtr.flags = flags;
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2139,10 +2155,10 @@ void i386_device::i386_cyrix_svts() // Opcode 0f 7c
 			WRITE8(ea + 7, m_task.base >> 24);
 			WRITE16(ea + 8, m_task.segment);
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 }
 
@@ -2170,17 +2186,17 @@ void i386_device::i386_cyrix_rsts() // Opcode 0f 7d
 			m_task.base = base;
 			m_task.flags = flags;
 		} else {
-			i386_trap(6, 0, 0);
+			i386_trap(6, 0);
 		}
 	} else {
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
 
 void i386_device::mmx_movd_r64_rm32() // Opcode 0f 6e
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).d[0]=LOAD_RM32(modrm);
@@ -2194,7 +2210,7 @@ void i386_device::mmx_movd_r64_rm32() // Opcode 0f 6e
 
 void i386_device::mmx_movq_r64_rm64() // Opcode 0f 6f
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).l=MMX(modrm & 0x7).l;
@@ -2207,7 +2223,7 @@ void i386_device::mmx_movq_r64_rm64() // Opcode 0f 6f
 
 void i386_device::mmx_movd_rm32_r64() // Opcode 0f 7e
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		STORE_RM32(modrm, MMX((modrm >> 3) & 0x7).d[0]);
@@ -2220,7 +2236,7 @@ void i386_device::mmx_movd_rm32_r64() // Opcode 0f 7e
 
 void i386_device::mmx_movq_rm64_r64() // Opcode 0f 7f
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX(modrm & 0x7)=MMX((modrm >> 3) & 0x7);
@@ -2234,7 +2250,7 @@ void i386_device::mmx_movq_rm64_r64() // Opcode 0f 7f
 void i386_device::mmx_pcmpeqb_r64_rm64() // Opcode 0f 74
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2255,7 +2271,7 @@ void i386_device::mmx_pcmpeqb_r64_rm64() // Opcode 0f 74
 
 void i386_device::mmx_pcmpeqw_r64_rm64() // Opcode 0f 75
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2280,7 +2296,7 @@ void i386_device::mmx_pcmpeqw_r64_rm64() // Opcode 0f 75
 
 void i386_device::mmx_pcmpeqd_r64_rm64() // Opcode 0f 76
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2301,7 +2317,7 @@ void i386_device::mmx_pcmpeqd_r64_rm64() // Opcode 0f 76
 
 void i386_device::mmx_pshufw_r64_rm64_i8() // Opcode 0f 70
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX_REG t;
@@ -2331,6 +2347,7 @@ void i386_device::mmx_pshufw_r64_rm64_i8() // Opcode 0f 70
 void i386_device::sse_punpcklbw_r128_rm128() // Opcode 66 0f 60
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM_REG xd,xs;
 		int s, d;
@@ -2372,6 +2389,7 @@ void i386_device::sse_punpcklbw_r128_rm128() // Opcode 66 0f 60
 void i386_device::sse_punpcklwd_r128_rm128()
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM_REG xd, xs;
 		int s, d;
@@ -2401,6 +2419,7 @@ void i386_device::sse_punpcklwd_r128_rm128()
 void i386_device::sse_punpckldq_r128_rm128()
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM_REG xd, xs;
 		int s, d;
@@ -2430,6 +2449,7 @@ void i386_device::sse_punpckldq_r128_rm128()
 void i386_device::sse_punpcklqdq_r128_rm128()
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM_REG xd, xs;
 		int s, d;
@@ -2454,119 +2474,116 @@ void i386_device::sse_punpcklqdq_r128_rm128()
 
 void i386_device::mmx_punpcklbw_r64_r64m32() // Opcode 0f 60
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		uint32_t t;
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		t=MMX(d).d[0];
-		MMX(d).b[0]=t & 0xff;
-		MMX(d).b[1]=MMX(s).b[0];
-		MMX(d).b[2]=(t >> 8) & 0xff;
-		MMX(d).b[3]=MMX(s).b[1];
-		MMX(d).b[4]=(t >> 16) & 0xff;
-		MMX(d).b[5]=MMX(s).b[2];
-		MMX(d).b[6]=(t >> 24) & 0xff;
-		MMX(d).b[7]=MMX(s).b[3];
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		MMX(d).b[7] = MMX(s).b[3];
+		MMX(d).b[6] = MMX(d).b[3];
+		MMX(d).b[5] = MMX(s).b[2];
+		MMX(d).b[4] = MMX(d).b[2];
+		MMX(d).b[3] = MMX(s).b[1];
+		MMX(d).b[2] = MMX(d).b[1];
+		MMX(d).b[1] = MMX(s).b[0];
+		MMX(d).b[0] = MMX(d).b[0];
 	} else {
-		uint32_t s,t;
-		int d=(modrm >> 3) & 0x7;
+		uint32_t s;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		s = READ32(ea);
-		t=MMX(d).d[0];
-		MMX(d).b[0]=t & 0xff;
-		MMX(d).b[1]=s & 0xff;
-		MMX(d).b[2]=(t >> 8) & 0xff;
-		MMX(d).b[3]=(s >> 8) & 0xff;
-		MMX(d).b[4]=(t >> 16) & 0xff;
-		MMX(d).b[5]=(s >> 16) & 0xff;
-		MMX(d).b[6]=(t >> 24) & 0xff;
-		MMX(d).b[7]=(s >> 24) & 0xff;
+		MMX(d).b[7] = (s >> 24) & 0xff;
+		MMX(d).b[6] = MMX(d).b[3];
+		MMX(d).b[5] = (s >> 16) & 0xff;
+		MMX(d).b[4] = MMX(d).b[2];
+		MMX(d).b[3] = (s >> 8) & 0xff;
+		MMX(d).b[2] = MMX(d).b[1];
+		MMX(d).b[1] = s & 0xff;
+		MMX(d).b[0] = MMX(d).b[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
 
 void i386_device::mmx_punpcklwd_r64_r64m32() // Opcode 0f 61
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		uint16_t t;
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		t=MMX(d).w[1];
-		MMX(d).w[0]=MMX(d).w[0];
-		MMX(d).w[1]=MMX(s).w[0];
-		MMX(d).w[2]=t;
-		MMX(d).w[3]=MMX(s).w[1];
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		MMX(d).w[3] = MMX(s).w[1];
+		MMX(d).w[2] = MMX(d).w[1];
+		MMX(d).w[1] = MMX(s).w[0];
+		MMX(d).w[0] = MMX(d).w[0];
 	} else {
 		uint32_t s;
-		uint16_t t;
-		int d=(modrm >> 3) & 0x7;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		s = READ32(ea);
-		t=MMX(d).w[1];
-		MMX(d).w[0]=MMX(d).w[0];
-		MMX(d).w[1]=s & 0xffff;
-		MMX(d).w[2]=t;
-		MMX(d).w[3]=(s >> 16) & 0xffff;
+		MMX(d).w[3] = (s >> 16) & 0xffff;
+		MMX(d).w[2] = MMX(d).w[1];
+		MMX(d).w[1] = s & 0xffff;
+		MMX(d).w[0] = MMX(d).w[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
 
 void i386_device::mmx_punpckldq_r64_r64m32() // Opcode 0f 62
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		MMX(d).d[0]=MMX(d).d[0];
-		MMX(d).d[1]=MMX(s).d[0];
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		MMX(d).d[1] = MMX(s).d[0];
+		MMX(d).d[0] = MMX(d).d[0];
 	} else {
 		uint32_t s;
-		int d=(modrm >> 3) & 0x7;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		s = READ32(ea);
-		MMX(d).d[0]=MMX(d).d[0];
-		MMX(d).d[1]=s;
+		MMX(d).d[1] = s;
+		MMX(d).d[0] = MMX(d).d[0];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
 
 void i386_device::mmx_packsswb_r64_rm64() // Opcode 0f 63
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		int s,d;
-		s=modrm & 0x7;
-		d=(modrm >> 3) & 0x7;
-		MMX(d).c[0]=SaturatedSignedWordToSignedByte(MMX(d).s[0]);
-		MMX(d).c[1]=SaturatedSignedWordToSignedByte(MMX(d).s[1]);
-		MMX(d).c[2]=SaturatedSignedWordToSignedByte(MMX(d).s[2]);
-		MMX(d).c[3]=SaturatedSignedWordToSignedByte(MMX(d).s[3]);
-		MMX(d).c[4]=SaturatedSignedWordToSignedByte(MMX(s).s[0]);
-		MMX(d).c[5]=SaturatedSignedWordToSignedByte(MMX(s).s[1]);
-		MMX(d).c[6]=SaturatedSignedWordToSignedByte(MMX(s).s[2]);
-		MMX(d).c[7]=SaturatedSignedWordToSignedByte(MMX(s).s[3]);
+		MMX_REG ds, sd;
+		int s, d;
+		s = modrm & 0x7;
+		d = (modrm >> 3) & 0x7;
+		ds.q = MMX(d).q;
+		sd.q = MMX(s).q;
+		MMX(d).c[0] = SaturatedSignedWordToSignedByte(ds.s[0]);
+		MMX(d).c[1] = SaturatedSignedWordToSignedByte(ds.s[1]);
+		MMX(d).c[2] = SaturatedSignedWordToSignedByte(ds.s[2]);
+		MMX(d).c[3] = SaturatedSignedWordToSignedByte(ds.s[3]);
+		MMX(d).c[4] = SaturatedSignedWordToSignedByte(sd.s[0]);
+		MMX(d).c[5] = SaturatedSignedWordToSignedByte(sd.s[1]);
+		MMX(d).c[6] = SaturatedSignedWordToSignedByte(sd.s[2]);
+		MMX(d).c[7] = SaturatedSignedWordToSignedByte(sd.s[3]);
 	} else {
-		MMX_REG s;
-		int d=(modrm >> 3) & 0x7;
+		MMX_REG s, t;
+		int d = (modrm >> 3) & 0x7;
 		uint32_t ea = GetEA(modrm, 0);
 		READMMX(ea, s);
-		MMX(d).c[0]=SaturatedSignedWordToSignedByte(MMX(d).s[0]);
-		MMX(d).c[1]=SaturatedSignedWordToSignedByte(MMX(d).s[1]);
-		MMX(d).c[2]=SaturatedSignedWordToSignedByte(MMX(d).s[2]);
-		MMX(d).c[3]=SaturatedSignedWordToSignedByte(MMX(d).s[3]);
-		MMX(d).c[4]=SaturatedSignedWordToSignedByte(s.s[0]);
-		MMX(d).c[5]=SaturatedSignedWordToSignedByte(s.s[1]);
-		MMX(d).c[6]=SaturatedSignedWordToSignedByte(s.s[2]);
-		MMX(d).c[7]=SaturatedSignedWordToSignedByte(s.s[3]);
+		t.q = MMX(d).q;
+		MMX(d).c[0] = SaturatedSignedWordToSignedByte(t.s[0]);
+		MMX(d).c[1] = SaturatedSignedWordToSignedByte(t.s[1]);
+		MMX(d).c[2] = SaturatedSignedWordToSignedByte(t.s[2]);
+		MMX(d).c[3] = SaturatedSignedWordToSignedByte(t.s[3]);
+		MMX(d).c[4] = SaturatedSignedWordToSignedByte(s.s[0]);
+		MMX(d).c[5] = SaturatedSignedWordToSignedByte(s.s[1]);
+		MMX(d).c[6] = SaturatedSignedWordToSignedByte(s.s[2]);
+		MMX(d).c[7] = SaturatedSignedWordToSignedByte(s.s[3]);
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -2574,7 +2591,7 @@ void i386_device::mmx_packsswb_r64_rm64() // Opcode 0f 63
 void i386_device::mmx_pcmpgtb_r64_rm64() // Opcode 0f 64
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2596,7 +2613,7 @@ void i386_device::mmx_pcmpgtb_r64_rm64() // Opcode 0f 64
 void i386_device::mmx_pcmpgtw_r64_rm64() // Opcode 0f 65
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2618,7 +2635,7 @@ void i386_device::mmx_pcmpgtw_r64_rm64() // Opcode 0f 65
 void i386_device::mmx_pcmpgtd_r64_rm64() // Opcode 0f 66
 {
 	int c;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2639,7 +2656,7 @@ void i386_device::mmx_pcmpgtd_r64_rm64() // Opcode 0f 66
 
 void i386_device::mmx_packuswb_r64_rm64() // Opcode 0f 67
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX_REG ds, sd;
@@ -2676,7 +2693,7 @@ void i386_device::mmx_packuswb_r64_rm64() // Opcode 0f 67
 
 void i386_device::mmx_punpckhbw_r64_rm64() // Opcode 0f 68
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2709,7 +2726,7 @@ void i386_device::mmx_punpckhbw_r64_rm64() // Opcode 0f 68
 
 void i386_device::mmx_punpckhwd_r64_rm64() // Opcode 0f 69
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2734,7 +2751,7 @@ void i386_device::mmx_punpckhwd_r64_rm64() // Opcode 0f 69
 
 void i386_device::mmx_punpckhdq_r64_rm64() // Opcode 0f 6a
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2755,7 +2772,7 @@ void i386_device::mmx_punpckhdq_r64_rm64() // Opcode 0f 6a
 
 void i386_device::mmx_packssdw_r64_rm64() // Opcode 0f 6b
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int s,d;
@@ -2801,14 +2818,14 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 		uint32_t ea;
 		switch ( (modm & 0x38) >> 3 )
 		{
-			case 0: // fxsave
+			case 0: // fxsave instruction
 			{
 				u8 atag = 0;
 				ea = GetEA(modm, 1);
 				WRITE16(ea + 0, m_x87_cw);
 				WRITE16(ea + 2, m_x87_sw);
 				for(int i = 0; i < 8; i++)
-					if((m_x87_tw & (3 << i)) != 3) atag |= 1 << i;
+					if (((m_x87_tw >> (i * 2)) & 3) != X87_TW_EMPTY) atag |= 1 << i;
 				WRITE16(ea + 4, atag);
 				WRITE16(ea + 6, m_x87_opcode);
 				WRITE32(ea + 8, m_x87_inst_ptr);
@@ -2819,8 +2836,8 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				WRITE32(ea + 28, 0); // mxcsr_mask
 				for(int i = 0; i < 8; i++)
 				{
-					WRITE64(ea + i*16 + 32, m_x87_reg[i].low);
-					WRITE64(ea + i*16 + 40, m_x87_reg[i].high);
+					WRITE64(ea + i*16 + 32, m_x87_reg[i].signif);
+					WRITE16(ea + i*16 + 40, m_x87_reg[i].signExp);
 				}
 				for(int i = 0; i < 8; i++)
 				{
@@ -2829,7 +2846,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				}
 				break;
 			}
-			case 1:
+			case 1: // fxrstor instruction
 			{
 				u8 atag;
 				ea = GetEA(modm, 0);
@@ -2846,13 +2863,13 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 				for(int i = 0; i < 8; i++)
 				{
 					int tag;
-					m_x87_reg[i].low = READ64(ea + i*16 + 32);
-					m_x87_reg[i].high = READ16(ea + i*16 + 40);
+					m_x87_reg[i].signif = READ64(ea + i*16 + 32);
+					m_x87_reg[i].signExp = READ16(ea + i*16 + 40);
 					if(!(atag & (1 << i)))
 						tag = X87_TW_EMPTY;
-					if(floatx80_is_zero(m_x87_reg[i]))
+					else if(floatx80_is_zero(m_x87_reg[i]))
 						tag = X87_TW_ZERO;
-					else if(floatx80_is_inf(m_x87_reg[i]) || floatx80_is_nan(m_x87_reg[i]))
+					else if(floatx80_is_inf(m_x87_reg[i]) || extFloat80_is_nan(m_x87_reg[i]))
 						tag = X87_TW_SPECIAL;
 					else
 						tag = X87_TW_VALID;
@@ -2887,6 +2904,7 @@ void i386_device::sse_group_0fae()  // Opcode 0f ae
 void i386_device::sse_cvttps2dq_r128_rm128() // Opcode f3 0f 5b
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).i[0]=(int32_t)XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).i[1]=(int32_t)XMM(modrm & 0x7).f[1];
@@ -2907,6 +2925,7 @@ void i386_device::sse_cvttps2dq_r128_rm128() // Opcode f3 0f 5b
 void i386_device::sse_cvtss2sd_r128_r128m32() // Opcode f3 0f 5a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM(modrm & 0x7).f[0];
 	} else {
@@ -2922,6 +2941,7 @@ void i386_device::sse_cvttss2si_r32_r128m32() // Opcode f3 0f 2c
 {
 	int32_t src;
 	uint8_t modrm = FETCH(); // get mordm byte
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) { // if bits 7-6 are 11 the source is a xmm register (low doubleword)
 		src = (int32_t)XMM(modrm & 0x7).f[0^NATIVE_ENDIAN_VALUE_LE_BE(0,1)];
 	} else { // otherwise is a memory address
@@ -2938,6 +2958,7 @@ void i386_device::sse_cvtss2si_r32_r128m32() // Opcode f3 0f 2d
 {
 	int32_t src;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		src = (int32_t)XMM(modrm & 0x7).f[0];
 	} else {
@@ -2953,6 +2974,7 @@ void i386_device::sse_cvtss2si_r32_r128m32() // Opcode f3 0f 2d
 void i386_device::sse_cvtsi2ss_r128_rm32() // Opcode f3 0f 2a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = (int32_t)LOAD_RM32(modrm);
 	} else {
@@ -2965,7 +2987,7 @@ void i386_device::sse_cvtsi2ss_r128_rm32() // Opcode f3 0f 2a
 void i386_device::sse_cvtpi2ps_r128_rm64() // Opcode 0f 2a
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = (float)MMX(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f[1] = (float)MMX(modrm & 0x7).i[1];
@@ -2982,7 +3004,7 @@ void i386_device::sse_cvtpi2ps_r128_rm64() // Opcode 0f 2a
 void i386_device::sse_cvttps2pi_r64_r128m64() // Opcode 0f 2c
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f[1];
@@ -2999,7 +3021,7 @@ void i386_device::sse_cvttps2pi_r64_r128m64() // Opcode 0f 2c
 void i386_device::sse_cvtps2pi_r64_r128m64() // Opcode 0f 2d
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f[1];
@@ -3016,6 +3038,7 @@ void i386_device::sse_cvtps2pi_r64_r128m64() // Opcode 0f 2d
 void i386_device::sse_cvtps2pd_r128_r128m64() // Opcode 0f 5a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = (double)XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = (double)XMM(modrm & 0x7).f[1];
@@ -3032,6 +3055,7 @@ void i386_device::sse_cvtps2pd_r128_r128m64() // Opcode 0f 5a
 void i386_device::sse_cvtdq2ps_r128_rm128() // Opcode 0f 5b
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = (float)XMM(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f[1] = (float)XMM(modrm & 0x7).i[1];
@@ -3052,6 +3076,7 @@ void i386_device::sse_cvtdq2ps_r128_rm128() // Opcode 0f 5b
 void i386_device::sse_cvtdq2pd_r128_r128m64() // Opcode f3 0f e6
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = (double)XMM(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = (double)XMM(modrm & 0x7).i[1];
@@ -3068,6 +3093,7 @@ void i386_device::sse_cvtdq2pd_r128_r128m64() // Opcode f3 0f e6
 void i386_device::sse_movss_r128_rm128() // Opcode f3 0f 10
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).d[0] = XMM(modrm & 0x7).d[0];
 	} else {
@@ -3080,6 +3106,7 @@ void i386_device::sse_movss_r128_rm128() // Opcode f3 0f 10
 void i386_device::sse_movss_rm128_r128() // Opcode f3 0f 11
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7).d[0] = XMM((modrm >> 3) & 0x7).d[0];
 	} else {
@@ -3092,6 +3119,7 @@ void i386_device::sse_movss_rm128_r128() // Opcode f3 0f 11
 void i386_device::sse_movsldup_r128_rm128() // Opcode f3 0f 12
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).d[0] = XMM(modrm & 0x7).d[0];
 		XMM((modrm >> 3) & 0x7).d[1] = XMM(modrm & 0x7).d[0];
@@ -3112,6 +3140,7 @@ void i386_device::sse_movsldup_r128_rm128() // Opcode f3 0f 12
 void i386_device::sse_movshdup_r128_rm128() // Opcode f3 0f 16
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).d[0] = XMM(modrm & 0x7).d[1];
 		XMM((modrm >> 3) & 0x7).d[1] = XMM(modrm & 0x7).d[1];
@@ -3132,6 +3161,7 @@ void i386_device::sse_movshdup_r128_rm128() // Opcode f3 0f 16
 void i386_device::sse_movaps_r128_rm128() // Opcode 0f 28
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7) = XMM(modrm & 0x7);
 	} else {
@@ -3144,6 +3174,7 @@ void i386_device::sse_movaps_r128_rm128() // Opcode 0f 28
 void i386_device::sse_movaps_rm128_r128() // Opcode 0f 29
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7) = XMM((modrm >> 3) & 0x7);
 	} else {
@@ -3156,6 +3187,7 @@ void i386_device::sse_movaps_rm128_r128() // Opcode 0f 29
 void i386_device::sse_movups_r128_rm128() // Opcode 0f 10
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7) = XMM(modrm & 0x7);
 	} else {
@@ -3168,6 +3200,7 @@ void i386_device::sse_movups_r128_rm128() // Opcode 0f 10
 void i386_device::sse_movupd_r128_rm128() // Opcode 66 0f 10
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7) = XMM(modrm & 0x7);
 	} else {
@@ -3180,6 +3213,7 @@ void i386_device::sse_movupd_r128_rm128() // Opcode 66 0f 10
 void i386_device::sse_movups_rm128_r128() // Opcode 0f 11
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7) = XMM((modrm >> 3) & 0x7);
 	} else {
@@ -3192,6 +3226,7 @@ void i386_device::sse_movups_rm128_r128() // Opcode 0f 11
 void i386_device::sse_movupd_rm128_r128() // Opcode 66 0f 11
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7) = XMM((modrm >> 3) & 0x7);
 	} else {
@@ -3204,6 +3239,7 @@ void i386_device::sse_movupd_rm128_r128() // Opcode 66 0f 11
 void i386_device::sse_movlps_r128_m64() // Opcode 0f 12
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// MOVHLPS opcode
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[1];
@@ -3219,6 +3255,7 @@ void i386_device::sse_movlps_r128_m64() // Opcode 0f 12
 void i386_device::sse_movlpd_r128_m64() // Opcode 66 0f 12
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // TODO: correct cycle count
 	} else {
@@ -3232,6 +3269,7 @@ void i386_device::sse_movlpd_r128_m64() // Opcode 66 0f 12
 void i386_device::sse_movlps_m64_r128() // Opcode 0f 13
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -3245,6 +3283,7 @@ void i386_device::sse_movlps_m64_r128() // Opcode 0f 13
 void i386_device::sse_movlpd_m64_r128() // Opcode 66 0f 13
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -3258,6 +3297,7 @@ void i386_device::sse_movlpd_m64_r128() // Opcode 66 0f 13
 void i386_device::sse_movhps_r128_m64() // Opcode 0f 16
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// MOVLHPS opcode
 		XMM((modrm >> 3) & 0x7).q[1] = XMM(modrm & 0x7).q[0];
@@ -3273,6 +3313,7 @@ void i386_device::sse_movhps_r128_m64() // Opcode 0f 16
 void i386_device::sse_movhpd_r128_m64() // Opcode 66 0f 16
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -3287,6 +3328,7 @@ void i386_device::sse_movhpd_r128_m64() // Opcode 66 0f 16
 void i386_device::sse_movhps_m64_r128() // Opcode 0f 17
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -3300,6 +3342,7 @@ void i386_device::sse_movhps_m64_r128() // Opcode 0f 17
 void i386_device::sse_movhpd_m64_r128() // Opcode 66 0f 17
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -3313,6 +3356,7 @@ void i386_device::sse_movhpd_m64_r128() // Opcode 66 0f 17
 void i386_device::sse_movntps_m128_r128() // Opcode 0f 2b
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -3327,6 +3371,7 @@ void i386_device::sse_movntps_m128_r128() // Opcode 0f 2b
 void i386_device::sse_movmskps_r16_r128() // Opcode 0f 50
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int b;
 		b=(XMM(modrm & 0x7).d[0] >> 31) & 1;
@@ -3341,6 +3386,7 @@ void i386_device::sse_movmskps_r16_r128() // Opcode 0f 50
 void i386_device::sse_movmskps_r32_r128() // Opcode 0f 50
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int b;
 		b=(XMM(modrm & 0x7).d[0] >> 31) & 1;
@@ -3355,6 +3401,7 @@ void i386_device::sse_movmskps_r32_r128() // Opcode 0f 50
 void i386_device::sse_movmskpd_r32_r128() // Opcode 66 0f 50
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int b;
 		b=(XMM(modrm & 0x7).q[0] >> 63) & 1;
@@ -3366,8 +3413,8 @@ void i386_device::sse_movmskpd_r32_r128() // Opcode 66 0f 50
 
 void i386_device::sse_movq2dq_r128_r64() // Opcode f3 0f d6
 {
-	MMXPROLOG();
 	uint8_t modrm = FETCH();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = MMX(modrm & 7).q;
 		XMM((modrm >> 3) & 0x7).q[1] = 0;
@@ -3377,8 +3424,8 @@ void i386_device::sse_movq2dq_r128_r64() // Opcode f3 0f d6
 
 void i386_device::sse_movdqu_r128_rm128() // Opcode f3 0f 6f
 {
-	MMXPROLOG();
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM(modrm & 0x7).q[1];
@@ -3391,8 +3438,8 @@ void i386_device::sse_movdqu_r128_rm128() // Opcode f3 0f 6f
 
 void i386_device::sse_movdqu_rm128_r128() // Opcode f3 0f 7f
 {
-	MMXPROLOG();
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0];
 		XMM(modrm & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1];
@@ -3406,6 +3453,7 @@ void i386_device::sse_movdqu_rm128_r128() // Opcode f3 0f 7f
 void i386_device::sse_movd_m128_rm32() // Opcode 66 0f 6e
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM((modrm >> 3) & 0x7).d[0] = LOAD_RM32(modrm);
 	}
@@ -3421,6 +3469,7 @@ void i386_device::sse_movd_m128_rm32() // Opcode 66 0f 6e
 void i386_device::sse_movdqa_m128_rm128() // Opcode 66 0f 6f
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM(modrm & 0x7).q[1];
@@ -3434,8 +3483,8 @@ void i386_device::sse_movdqa_m128_rm128() // Opcode 66 0f 6f
 
 void i386_device::sse_movq_r128_r128m64() // Opcode f3 0f 7e
 {
-	MMXPROLOG();
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = 0;
@@ -3450,6 +3499,7 @@ void i386_device::sse_movq_r128_r128m64() // Opcode f3 0f 7e
 void i386_device::sse_movd_rm32_r128() // Opcode 66 0f 7e
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		STORE_RM32(modrm, XMM((modrm >> 3) & 0x7).d[0]);
 	}
@@ -3463,6 +3513,7 @@ void i386_device::sse_movd_rm32_r128() // Opcode 66 0f 7e
 void i386_device::sse_movdqa_rm128_r128() // Opcode 66 0f 7f
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM(modrm & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0];
 		XMM(modrm & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1];
@@ -3476,7 +3527,7 @@ void i386_device::sse_movdqa_rm128_r128() // Opcode 66 0f 7f
 
 void i386_device::sse_pmovmskb_r16_r64() // Opcode 0f d7
 {
-	//MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		int b;
@@ -3495,8 +3546,8 @@ void i386_device::sse_pmovmskb_r16_r64() // Opcode 0f d7
 
 void i386_device::sse_pmovmskb_r32_r64() // Opcode 0f d7
 {
-	//MMXPROLOG();
 	uint8_t modrm = FETCH();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int b;
 		b=(MMX(modrm & 0x7).b[0] >> 7) & 1;
@@ -3515,6 +3566,7 @@ void i386_device::sse_pmovmskb_r32_r64() // Opcode 0f d7
 void i386_device::sse_pmovmskb_r32_r128() // Opcode 66 0f d7
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		uint32_t b;
 		b=(XMM(modrm & 0x7).b[0] >> 7) & 1;
@@ -3541,6 +3593,7 @@ void i386_device::sse_pmovmskb_r32_r128() // Opcode 66 0f d7
 void i386_device::sse_xorps() // Opcode 0f 57
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).d[0] = XMM((modrm >> 3) & 0x7).d[0] ^ XMM(modrm & 0x7).d[0];
 		XMM((modrm >> 3) & 0x7).d[1] = XMM((modrm >> 3) & 0x7).d[1] ^ XMM(modrm & 0x7).d[1];
@@ -3561,6 +3614,7 @@ void i386_device::sse_xorps() // Opcode 0f 57
 void i386_device::sse_xorpd_r128_rm128() // Opcode 66 0f 57
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] ^ XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] ^ XMM(modrm & 0x7).q[1];
@@ -3577,6 +3631,7 @@ void i386_device::sse_xorpd_r128_rm128() // Opcode 66 0f 57
 void i386_device::sse_addps() // Opcode 0f 58
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] + XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f[1] = XMM((modrm >> 3) & 0x7).f[1] + XMM(modrm & 0x7).f[1];
@@ -3597,6 +3652,7 @@ void i386_device::sse_addps() // Opcode 0f 58
 void i386_device::sse_sqrtps_r128_rm128() // Opcode 0f 51
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = sqrt(XMM(modrm & 0x7).f[0]);
 		XMM((modrm >> 3) & 0x7).f[1] = sqrt(XMM(modrm & 0x7).f[1]);
@@ -3617,6 +3673,7 @@ void i386_device::sse_sqrtps_r128_rm128() // Opcode 0f 51
 void i386_device::sse_rsqrtps_r128_rm128() // Opcode 0f 52
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = 1.0 / sqrt(XMM(modrm & 0x7).f[0]);
 		XMM((modrm >> 3) & 0x7).f[1] = 1.0 / sqrt(XMM(modrm & 0x7).f[1]);
@@ -3637,6 +3694,7 @@ void i386_device::sse_rsqrtps_r128_rm128() // Opcode 0f 52
 void i386_device::sse_rcpps_r128_rm128() // Opcode 0f 53
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = 1.0f / XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f[1] = 1.0f / XMM(modrm & 0x7).f[1];
@@ -3657,6 +3715,7 @@ void i386_device::sse_rcpps_r128_rm128() // Opcode 0f 53
 void i386_device::sse_andps_r128_rm128() // Opcode 0f 54
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] & XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] & XMM(modrm & 0x7).q[1];
@@ -3673,6 +3732,7 @@ void i386_device::sse_andps_r128_rm128() // Opcode 0f 54
 void i386_device::sse_andpd_r128_rm128() // Opcode 66 0f 54
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] & XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] & XMM(modrm & 0x7).q[1];
@@ -3689,6 +3749,7 @@ void i386_device::sse_andpd_r128_rm128() // Opcode 66 0f 54
 void i386_device::sse_andnps_r128_rm128() // Opcode 0f 55
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = ~(XMM((modrm >> 3) & 0x7).q[0]) & XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = ~(XMM((modrm >> 3) & 0x7).q[1]) & XMM(modrm & 0x7).q[1];
@@ -3705,6 +3766,7 @@ void i386_device::sse_andnps_r128_rm128() // Opcode 0f 55
 void i386_device::sse_andnpd_r128_rm128() // Opcode 66 0f 55
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = ~(XMM((modrm >> 3) & 0x7).q[0]) & XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = ~(XMM((modrm >> 3) & 0x7).q[1]) & XMM(modrm & 0x7).q[1];
@@ -3721,6 +3783,7 @@ void i386_device::sse_andnpd_r128_rm128() // Opcode 66 0f 55
 void i386_device::sse_orps_r128_rm128() // Opcode 0f 56
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] | XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] | XMM(modrm & 0x7).q[1];
@@ -3737,6 +3800,7 @@ void i386_device::sse_orps_r128_rm128() // Opcode 0f 56
 void i386_device::sse_orpd_r128_rm128() // Opcode 66 0f 56
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0] | XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[1] | XMM(modrm & 0x7).q[1];
@@ -3753,6 +3817,7 @@ void i386_device::sse_orpd_r128_rm128() // Opcode 66 0f 56
 void i386_device::sse_mulps() // Opcode 0f 59 ????
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] * XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f[1] = XMM((modrm >> 3) & 0x7).f[1] * XMM(modrm & 0x7).f[1];
@@ -3773,6 +3838,7 @@ void i386_device::sse_mulps() // Opcode 0f 59 ????
 void i386_device::sse_subps() // Opcode 0f 5c
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] - XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f[1] = XMM((modrm >> 3) & 0x7).f[1] - XMM(modrm & 0x7).f[1];
@@ -3819,6 +3885,7 @@ static inline double sse_min_double(double src1, double src2)
 void i386_device::sse_minps() // Opcode 0f 5d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = sse_min_single(XMM((modrm >> 3) & 0x7).f[0], XMM(modrm & 0x7).f[0]);
 		XMM((modrm >> 3) & 0x7).f[1] = sse_min_single(XMM((modrm >> 3) & 0x7).f[1], XMM(modrm & 0x7).f[1]);
@@ -3839,6 +3906,7 @@ void i386_device::sse_minps() // Opcode 0f 5d
 void i386_device::sse_divps() // Opcode 0f 5e
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] / XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f[1] = XMM((modrm >> 3) & 0x7).f[1] / XMM(modrm & 0x7).f[1];
@@ -3885,6 +3953,7 @@ static inline double sse_max_double(double src1, double src2)
 void i386_device::sse_maxps() // Opcode 0f 5f
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = sse_max_single(XMM((modrm >> 3) & 0x7).f[0], XMM(modrm & 0x7).f[0]);
 		XMM((modrm >> 3) & 0x7).f[1] = sse_max_single(XMM((modrm >> 3) & 0x7).f[1], XMM(modrm & 0x7).f[1]);
@@ -3905,6 +3974,7 @@ void i386_device::sse_maxps() // Opcode 0f 5f
 void i386_device::sse_maxss_r128_r128m32() // Opcode f3 0f 5f
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = sse_max_single(XMM((modrm >> 3) & 0x7).f[0], XMM(modrm & 0x7).f[0]);
 	} else {
@@ -3919,6 +3989,7 @@ void i386_device::sse_maxss_r128_r128m32() // Opcode f3 0f 5f
 void i386_device::sse_addss() // Opcode f3 0f 58
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] + XMM(modrm & 0x7).f[0];
 	} else {
@@ -3933,6 +4004,7 @@ void i386_device::sse_addss() // Opcode f3 0f 58
 void i386_device::sse_subss() // Opcode f3 0f 5c
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] - XMM(modrm & 0x7).f[0];
 	} else {
@@ -3947,6 +4019,7 @@ void i386_device::sse_subss() // Opcode f3 0f 5c
 void i386_device::sse_mulss() // Opcode f3 0f 5e
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] * XMM(modrm & 0x7).f[0];
 	} else {
@@ -3961,6 +4034,7 @@ void i386_device::sse_mulss() // Opcode f3 0f 5e
 void i386_device::sse_divss() // Opcode 0f 59
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] / XMM(modrm & 0x7).f[0];
 	} else {
@@ -3975,6 +4049,7 @@ void i386_device::sse_divss() // Opcode 0f 59
 void i386_device::sse_rcpss_r128_r128m32() // Opcode f3 0f 53
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = 1.0f / XMM(modrm & 0x7).f[0];
 	} else {
@@ -3989,6 +4064,7 @@ void i386_device::sse_rcpss_r128_r128m32() // Opcode f3 0f 53
 void i386_device::sse_sqrtss_r128_r128m32() // Opcode f3 0f 51
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = sqrt(XMM(modrm & 0x7).f[0]);
 	} else {
@@ -4003,6 +4079,7 @@ void i386_device::sse_sqrtss_r128_r128m32() // Opcode f3 0f 51
 void i386_device::sse_rsqrtss_r128_r128m32() // Opcode f3 0f 52
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = 1.0 / sqrt(XMM(modrm & 0x7).f[0]);
 	} else {
@@ -4017,6 +4094,7 @@ void i386_device::sse_rsqrtss_r128_r128m32() // Opcode f3 0f 52
 void i386_device::sse_minss_r128_r128m32() // Opcode f3 0f 5d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM((modrm >> 3) & 0x7).f[0] < XMM(modrm & 0x7).f[0] ? XMM((modrm >> 3) & 0x7).f[0] : XMM(modrm & 0x7).f[0];
 	} else {
@@ -4030,22 +4108,23 @@ void i386_device::sse_minss_r128_r128m32() // Opcode f3 0f 5d
 
 void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 {
-	float32 a,b;
+	float32_t a,b;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = XMM(modrm & 0x7).d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = XMM(modrm & 0x7).d[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = src.d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = src.d[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float32_is_nan(a) || float32_is_nan(b))
+	if (f32_isNaN(a) || f32_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4056,9 +4135,9 @@ void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float32_eq(a, b))
+		if (f32_eq(a, b))
 			m_ZF = 1;
-		if (float32_lt(a, b))
+		if (f32_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is either QNaN or SNaN
@@ -4067,22 +4146,23 @@ void i386_device::sse_comiss_r128_r128m32() // Opcode 0f 2f
 
 void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
 {
-	float64 a,b;
+	float64_t a,b;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = XMM(modrm & 0x7).q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = XMM(modrm & 0x7).q[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = src.q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = src.q[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float64_is_nan(a) || float64_is_nan(b))
+	if (f64_isNaN(a) || f64_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4093,9 +4173,9 @@ void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float64_eq(a, b))
+		if (f64_eq(a, b))
 			m_ZF = 1;
-		if (float64_lt(a, b))
+		if (f64_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is either QNaN or SNaN
@@ -4104,22 +4184,23 @@ void i386_device::sse_comisd_r128_r128m64() // Opcode 66 0f 2f
 
 void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 {
-	float32 a,b;
+	float32_t a,b;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = XMM(modrm & 0x7).d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = XMM(modrm & 0x7).d[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).d[0];
-		b = src.d[0];
+		a.v = XMM((modrm >> 3) & 0x7).d[0];
+		b.v = src.d[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float32_is_nan(a) || float32_is_nan(b))
+	if (f32_isNaN(a) || f32_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4130,9 +4211,9 @@ void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float32_eq(a, b))
+		if (f32_eq(a, b))
 			m_ZF = 1;
-		if (float32_lt(a, b))
+		if (f32_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is SNaN
@@ -4141,22 +4222,23 @@ void i386_device::sse_ucomiss_r128_r128m32() // Opcode 0f 2e
 
 void i386_device::sse_ucomisd_r128_r128m64() // Opcode 66 0f 2e
 {
-	float64 a,b;
+	float64_t a,b;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = XMM(modrm & 0x7).q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = XMM(modrm & 0x7).q[0];
 	} else {
 		XMM_REG src;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, src);
-		a = XMM((modrm >> 3) & 0x7).q[0];
-		b = src.q[0];
+		a.v = XMM((modrm >> 3) & 0x7).q[0];
+		b.v = src.q[0];
 	}
 	m_OF=0;
 	m_SF=0;
 	m_AF=0;
-	if (float64_is_nan(a) || float64_is_nan(b))
+	if (f64_isNaN(a) || f64_isNaN(b))
 	{
 		m_ZF = 1;
 		m_PF = 1;
@@ -4167,9 +4249,9 @@ void i386_device::sse_ucomisd_r128_r128m64() // Opcode 66 0f 2e
 		m_ZF = 0;
 		m_PF = 0;
 		m_CF = 0;
-		if (float64_eq(a, b))
+		if (f64_eq(a, b))
 			m_ZF = 1;
-		if (float64_lt(a, b))
+		if (f64_lt(a, b))
 			m_CF = 1;
 	}
 	// should generate exception when at least one of the operands is SNaN
@@ -4180,6 +4262,7 @@ void i386_device::sse_shufps() // Opcode 0f c6
 {
 	uint8_t modrm = FETCH();
 	uint8_t sel = FETCH();
+	if(SSEPROLOG()) return;
 	int m1,m2,m3,m4;
 	int s,d;
 	m1=sel & 3;
@@ -4217,6 +4300,7 @@ void i386_device::sse_shufpd_r128_rm128_i8() // Opcode 66 0f c6
 {
 	uint8_t modrm = FETCH();
 	uint8_t sel = FETCH();
+	if(SSEPROLOG()) return;
 	int m1,m2;
 	int s,d;
 	m1=sel & 1;
@@ -4244,6 +4328,7 @@ void i386_device::sse_shufpd_r128_rm128_i8() // Opcode 66 0f c6
 void i386_device::sse_unpcklps_r128_rm128() // Opcode 0f 14
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	int s,d;
 	uint32_t t1, t2, t3, t4;
 	s=modrm & 0x7;
@@ -4272,6 +4357,7 @@ void i386_device::sse_unpcklps_r128_rm128() // Opcode 0f 14
 void i386_device::sse_unpcklpd_r128_rm128() // Opcode 66 0f 14
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	int s,d;
 	s=modrm & 0x7;
 	d=(modrm >> 3) & 0x7;
@@ -4291,6 +4377,7 @@ void i386_device::sse_unpcklpd_r128_rm128() // Opcode 66 0f 14
 void i386_device::sse_unpckhps_r128_rm128() // Opcode 0f 15
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	int s,d;
 	uint32_t t1, t2, t3, t4;
 	s=modrm & 0x7;
@@ -4321,6 +4408,7 @@ void i386_device::sse_unpckhps_r128_rm128() // Opcode 0f 15
 void i386_device::sse_unpckhpd_r128_rm128() // Opcode 66 0f 15
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	int s,d;
 	s=modrm & 0x7;
 	d=(modrm >> 3) & 0x7;
@@ -4520,6 +4608,7 @@ void i386_device::sse_predicate_compare_double_scalar(uint8_t imm8, XMM_REG d, X
 void i386_device::sse_cmpps_r128_rm128_i8() // Opcode 0f c2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		uint8_t imm8 = FETCH();
@@ -4541,6 +4630,7 @@ void i386_device::sse_cmpps_r128_rm128_i8() // Opcode 0f c2
 void i386_device::sse_cmppd_r128_rm128_i8() // Opcode 66 0f c2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		uint8_t imm8 = FETCH();
@@ -4562,6 +4652,7 @@ void i386_device::sse_cmppd_r128_rm128_i8() // Opcode 66 0f c2
 void i386_device::sse_cmpss_r128_r128m32_i8() // Opcode f3 0f c2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		uint8_t imm8 = FETCH();
@@ -4582,30 +4673,37 @@ void i386_device::sse_cmpss_r128_r128m32_i8() // Opcode f3 0f c2
 
 void i386_device::sse_pinsrw_r64_r16m16_i8() // Opcode 0f c4, 16bit register
 {
-	MMXPROLOG();
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
 		uint16_t v = LOAD_RM16(modrm);
-		if (m_xmm_operand_size)
+		if (m_xmm_operand_size) {
+			if(SSEPROLOG()) return;
 			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
-		else
+		}
+		else {
+			if(MMXPROLOG()) return;
 			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		}
 	} else {
 		uint32_t ea = GetEA(modrm, 0);
 		uint8_t imm8 = FETCH();
 		uint16_t v = READ16(ea);
-		if (m_xmm_operand_size)
+		if (m_xmm_operand_size) {
+			if(SSEPROLOG()) return;
 			XMM((modrm >> 3) & 0x7).w[imm8 & 7] = v;
-		else
+		}
+		else {
+			if(MMXPROLOG()) return;
 			MMX((modrm >> 3) & 0x7).w[imm8 & 3] = v;
+		}
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
 
 void i386_device::sse_pinsrw_r64_r32m16_i8() // Opcode 0f c4, 32bit register
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
@@ -4623,6 +4721,7 @@ void i386_device::sse_pinsrw_r64_r32m16_i8() // Opcode 0f c4, 32bit register
 void i386_device::sse_pinsrw_r128_r32m16_i8() // Opcode 66 0f c4
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		uint8_t imm8 = FETCH();
 		uint16_t v = (uint16_t)LOAD_RM32(modrm);
@@ -4639,16 +4738,18 @@ void i386_device::sse_pinsrw_r128_r32m16_i8() // Opcode 66 0f c4
 
 void i386_device::sse_pextrw_r16_r64_i8() // Opcode 0f c5
 {
-	//MMXPROLOG();
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
-		if (m_xmm_operand_size)
+		if (m_xmm_operand_size) {
+			if(SSEPROLOG()) return;
 			STORE_REG16(modrm, XMM(modrm & 0x7).w[imm8 & 7]);
-		else
+		}
+		else {
+			if(MMXPROLOG()) return;
 			STORE_REG16(modrm, MMX(modrm & 0x7).w[imm8 & 3]);
+		}
 	} else {
-		//uint8_t imm8 = FETCH();
 		report_invalid_modrm("pextrw_r16_r64_i8", modrm);
 	}
 	CYCLES(1);     // TODO: correct cycle count
@@ -4656,13 +4757,12 @@ void i386_device::sse_pextrw_r16_r64_i8() // Opcode 0f c5
 
 void i386_device::sse_pextrw_r32_r64_i8() // Opcode 0f c5
 {
-	//MMXPROLOG();
 	uint8_t modrm = FETCH();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		uint8_t imm8 = FETCH();
 		STORE_REG32(modrm, MMX(modrm & 0x7).w[imm8 & 3]);
 	} else {
-		//uint8_t imm8 = FETCH();
 		report_invalid_modrm("pextrw_r32_r64_i8", modrm);
 	}
 	CYCLES(1);     // TODO: correct cycle count
@@ -4671,12 +4771,12 @@ void i386_device::sse_pextrw_r32_r64_i8() // Opcode 0f c5
 void i386_device::sse_pextrw_reg_r128_i8() // Opcode 66 0f c5
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		uint8_t imm8 = FETCH();
 		STORE_REG32(modrm, XMM(modrm & 0x7).w[imm8 & 7]);
 	}
 	else {
-		//uint8_t imm8 = FETCH();
 		report_invalid_modrm("sse_pextrw_reg_r128_i8", modrm);
 	}
 	CYCLES(1);     // TODO: correct cycle count
@@ -4685,7 +4785,7 @@ void i386_device::sse_pextrw_reg_r128_i8() // Opcode 66 0f c5
 void i386_device::sse_pminub_r64_rm64() // Opcode 0f da
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -4703,6 +4803,7 @@ void i386_device::sse_pminub_r64_rm64() // Opcode 0f da
 void i386_device::sse_pminub_r128_rm128() // Opcode 66 0f da
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n] = XMM((modrm >> 3) & 0x7).b[n] < XMM(modrm & 0x7).b[n] ? XMM((modrm >> 3) & 0x7).b[n] : XMM(modrm & 0x7).b[n];
@@ -4719,7 +4820,7 @@ void i386_device::sse_pminub_r128_rm128() // Opcode 66 0f da
 void i386_device::sse_pmaxub_r64_rm64() // Opcode 0f de
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -4737,7 +4838,7 @@ void i386_device::sse_pmaxub_r64_rm64() // Opcode 0f de
 void i386_device::sse_pavgb_r64_rm64() // Opcode 0f e0
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 8;n++)
@@ -4755,7 +4856,7 @@ void i386_device::sse_pavgb_r64_rm64() // Opcode 0f e0
 void i386_device::sse_pavgw_r64_rm64() // Opcode 0f e3
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -4772,7 +4873,7 @@ void i386_device::sse_pavgw_r64_rm64() // Opcode 0f e3
 
 void i386_device::sse_pmulhuw_r64_rm64()  // Opcode 0f e4
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).w[0]=((uint32_t)MMX((modrm >> 3) & 0x7).w[0]*(uint32_t)MMX(modrm & 7).w[0]) >> 16;
@@ -4794,7 +4895,7 @@ void i386_device::sse_pmulhuw_r64_rm64()  // Opcode 0f e4
 void i386_device::sse_pminsw_r64_rm64() // Opcode 0f ea
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -4812,7 +4913,7 @@ void i386_device::sse_pminsw_r64_rm64() // Opcode 0f ea
 void i386_device::sse_pmaxsw_r64_rm64() // Opcode 0f ee
 {
 	int n;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		for (n=0;n < 4;n++)
@@ -4829,7 +4930,7 @@ void i386_device::sse_pmaxsw_r64_rm64() // Opcode 0f ee
 
 void i386_device::sse_pmuludq_r64_rm64() // Opcode 0f f4
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q = (uint64_t)MMX((modrm >> 3) & 0x7).d[0] * (uint64_t)MMX(modrm & 0x7).d[0];
@@ -4845,6 +4946,7 @@ void i386_device::sse_pmuludq_r64_rm64() // Opcode 0f f4
 void i386_device::sse_pmuludq_r128_rm128() // Opcode 66 0f f4
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = (uint64_t)XMM((modrm >> 3) & 0x7).d[0] * (uint64_t)XMM(modrm & 0x7).d[0];
 		XMM((modrm >> 3) & 0x7).q[1] = (uint64_t)XMM((modrm >> 3) & 0x7).d[2] * (uint64_t)XMM(modrm & 0x7).d[2];
@@ -4862,7 +4964,7 @@ void i386_device::sse_psadbw_r64_rm64() // Opcode 0f f6
 {
 	int n;
 	int32_t temp;
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		temp=0;
@@ -4883,7 +4985,7 @@ void i386_device::sse_psadbw_r64_rm64() // Opcode 0f f6
 
 void i386_device::sse_psubq_r64_rm64()  // Opcode 0f fb
 {
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q=MMX((modrm >> 3) & 0x7).q - MMX(modrm & 7).q;
@@ -4899,6 +5001,7 @@ void i386_device::sse_psubq_r64_rm64()  // Opcode 0f fb
 void i386_device::sse_psubq_r128_rm128()  // Opcode 66 0f fb
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] - XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] - XMM(modrm & 7).q[1];
@@ -4915,6 +5018,7 @@ void i386_device::sse_psubq_r128_rm128()  // Opcode 66 0f fb
 void i386_device::sse_pshufd_r128_rm128_i8() // Opcode 66 0f 70
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -4944,6 +5048,7 @@ void i386_device::sse_pshufd_r128_rm128_i8() // Opcode 66 0f 70
 void i386_device::sse_pshuflw_r128_rm128_i8() // Opcode f2 0f 70
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -4974,6 +5079,7 @@ void i386_device::sse_pshuflw_r128_rm128_i8() // Opcode f2 0f 70
 void i386_device::sse_pshufhw_r128_rm128_i8() // Opcode f3 0f 70
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -5004,6 +5110,7 @@ void i386_device::sse_pshufhw_r128_rm128_i8() // Opcode f3 0f 70
 void i386_device::sse_packsswb_r128_rm128() // Opcode 66 0f 63
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM_REG t;
 		int s, d;
@@ -5032,6 +5139,7 @@ void i386_device::sse_packsswb_r128_rm128() // Opcode 66 0f 63
 void i386_device::sse_packssdw_r128_rm128() // Opcode 66 0f 6b
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if (modrm >= 0xc0) {
 		XMM_REG t;
 		int s, d;
@@ -5068,6 +5176,7 @@ void i386_device::sse_packssdw_r128_rm128() // Opcode 66 0f 6b
 void i386_device::sse_pcmpgtb_r128_rm128() // Opcode 66 0f 64
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5088,6 +5197,7 @@ void i386_device::sse_pcmpgtb_r128_rm128() // Opcode 66 0f 64
 void i386_device::sse_pcmpgtw_r128_rm128() // Opcode 66 0f 65
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5108,6 +5218,7 @@ void i386_device::sse_pcmpgtw_r128_rm128() // Opcode 66 0f 65
 void i386_device::sse_pcmpgtd_r128_rm128() // Opcode 66 0f 66
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5128,6 +5239,7 @@ void i386_device::sse_pcmpgtd_r128_rm128() // Opcode 66 0f 66
 void i386_device::sse_packuswb_r128_rm128() // Opcode 66 0f 67
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -5155,6 +5267,7 @@ void i386_device::sse_packuswb_r128_rm128() // Opcode 66 0f 67
 void i386_device::sse_punpckhbw_r128_rm128() // Opcode 66 0f 68
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -5181,6 +5294,7 @@ void i386_device::sse_punpckhbw_r128_rm128() // Opcode 66 0f 68
 void i386_device::sse_punpckhwd_r128_rm128() // Opcode 66 0f 69
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -5207,6 +5321,7 @@ void i386_device::sse_punpckhwd_r128_rm128() // Opcode 66 0f 69
 void i386_device::sse_unpckhdq_r128_rm128() // Opcode 66 0f 6a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -5233,6 +5348,7 @@ void i386_device::sse_unpckhdq_r128_rm128() // Opcode 66 0f 6a
 void i386_device::sse_punpckhqdq_r128_rm128() // Opcode 66 0f 6d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM_REG t;
 		int s,d;
@@ -5255,6 +5371,7 @@ void i386_device::sse_punpckhqdq_r128_rm128() // Opcode 66 0f 6d
 void i386_device::sse_pcmpeqb_r128_rm128() // Opcode 66 0f 74
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5275,6 +5392,7 @@ void i386_device::sse_pcmpeqb_r128_rm128() // Opcode 66 0f 74
 void i386_device::sse_pcmpeqw_r128_rm128() // Opcode 66 0f 75
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5295,6 +5413,7 @@ void i386_device::sse_pcmpeqw_r128_rm128() // Opcode 66 0f 75
 void i386_device::sse_pcmpeqd_r128_rm128() // Opcode 66 0f 76
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5315,6 +5434,7 @@ void i386_device::sse_pcmpeqd_r128_rm128() // Opcode 66 0f 76
 void i386_device::sse_paddq_r128_rm128()  // Opcode 66 0f d4
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5335,6 +5455,7 @@ void i386_device::sse_paddq_r128_rm128()  // Opcode 66 0f d4
 void i386_device::sse_pmullw_r128_rm128()  // Opcode 66 0f d5
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		s=modrm & 0x7;
@@ -5356,6 +5477,7 @@ void i386_device::sse_pmullw_r128_rm128()  // Opcode 66 0f d5
 void i386_device::sse_paddb_r128_rm128()  // Opcode 66 0f fc
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] + XMM(modrm & 7).b[n];
@@ -5372,6 +5494,7 @@ void i386_device::sse_paddb_r128_rm128()  // Opcode 66 0f fc
 void i386_device::sse_paddw_r128_rm128()  // Opcode 66 0f fd
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] + XMM(modrm & 7).w[n];
@@ -5388,6 +5511,7 @@ void i386_device::sse_paddw_r128_rm128()  // Opcode 66 0f fd
 void i386_device::sse_paddd_r128_rm128()  // Opcode 66 0f fe
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 4;n++)
 			XMM((modrm >> 3) & 0x7).d[n]=XMM((modrm >> 3) & 0x7).d[n] + XMM(modrm & 7).d[n];
@@ -5404,6 +5528,7 @@ void i386_device::sse_paddd_r128_rm128()  // Opcode 66 0f fe
 void i386_device::sse_psubusb_r128_rm128()  // Opcode 66 0f d8
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] < XMM(modrm & 7).b[n] ? 0 : XMM((modrm >> 3) & 0x7).b[n]-XMM(modrm & 7).b[n];
@@ -5420,6 +5545,7 @@ void i386_device::sse_psubusb_r128_rm128()  // Opcode 66 0f d8
 void i386_device::sse_psubusw_r128_rm128()  // Opcode 66 0f d9
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] < XMM(modrm & 7).w[n] ? 0 : XMM((modrm >> 3) & 0x7).w[n]-XMM(modrm & 7).w[n];
@@ -5436,6 +5562,7 @@ void i386_device::sse_psubusw_r128_rm128()  // Opcode 66 0f d9
 void i386_device::sse_pand_r128_rm128()  // Opcode 66 0f db
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] & XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] & XMM(modrm & 7).q[1];
@@ -5452,6 +5579,7 @@ void i386_device::sse_pand_r128_rm128()  // Opcode 66 0f db
 void i386_device::sse_pandn_r128_rm128()  // Opcode 66 0f df
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0]=(~XMM((modrm >> 3) & 0x7).q[0]) & XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1]=(~XMM((modrm >> 3) & 0x7).q[1]) & XMM(modrm & 7).q[1];
@@ -5468,6 +5596,7 @@ void i386_device::sse_pandn_r128_rm128()  // Opcode 66 0f df
 void i386_device::sse_paddusb_r128_rm128()  // Opcode 66 0f dc
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] > (0xff-XMM(modrm & 7).b[n]) ? 0xff : XMM((modrm >> 3) & 0x7).b[n]+XMM(modrm & 7).b[n];
@@ -5484,6 +5613,7 @@ void i386_device::sse_paddusb_r128_rm128()  // Opcode 66 0f dc
 void i386_device::sse_paddusw_r128_rm128()  // Opcode 66 0f dd
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] > (0xffff-XMM(modrm & 7).w[n]) ? 0xffff : XMM((modrm >> 3) & 0x7).w[n]+XMM(modrm & 7).w[n];
@@ -5500,6 +5630,7 @@ void i386_device::sse_paddusw_r128_rm128()  // Opcode 66 0f dd
 void i386_device::sse_pmaxub_r128_rm128() // Opcode 66 0f de
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n] = XMM((modrm >> 3) & 0x7).b[n] > XMM(modrm & 0x7).b[n] ? XMM((modrm >> 3) & 0x7).b[n] : XMM(modrm & 0x7).b[n];
@@ -5516,6 +5647,7 @@ void i386_device::sse_pmaxub_r128_rm128() // Opcode 66 0f de
 void i386_device::sse_pmulhuw_r128_rm128()  // Opcode 66 0f e4
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n]=((uint32_t)XMM((modrm >> 3) & 0x7).w[n]*(uint32_t)XMM(modrm & 7).w[n]) >> 16;
@@ -5532,6 +5664,7 @@ void i386_device::sse_pmulhuw_r128_rm128()  // Opcode 66 0f e4
 void i386_device::sse_pmulhw_r128_rm128()  // Opcode 66 0f e5
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n]=(uint32_t)((int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)XMM(modrm & 7).s[n]) >> 16;
@@ -5548,6 +5681,7 @@ void i386_device::sse_pmulhw_r128_rm128()  // Opcode 66 0f e5
 void i386_device::sse_psubsb_r128_rm128()  // Opcode 66 0f e8
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).c[n]=SaturatedSignedWordToSignedByte((int16_t)XMM((modrm >> 3) & 0x7).c[n] - (int16_t)XMM(modrm & 7).c[n]);
@@ -5564,6 +5698,7 @@ void i386_device::sse_psubsb_r128_rm128()  // Opcode 66 0f e8
 void i386_device::sse_psubsw_r128_rm128()  // Opcode 66 0f e9
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).s[n]=SaturatedSignedDwordToSignedWord((int32_t)XMM((modrm >> 3) & 0x7).s[n] - (int32_t)XMM(modrm & 7).s[n]);
@@ -5580,6 +5715,7 @@ void i386_device::sse_psubsw_r128_rm128()  // Opcode 66 0f e9
 void i386_device::sse_pminsw_r128_rm128() // Opcode 66 0f ea
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).s[n] = XMM((modrm >> 3) & 0x7).s[n] < XMM(modrm & 0x7).s[n] ? XMM((modrm >> 3) & 0x7).s[n] : XMM(modrm & 0x7).s[n];
@@ -5596,6 +5732,7 @@ void i386_device::sse_pminsw_r128_rm128() // Opcode 66 0f ea
 void i386_device::sse_pmaxsw_r128_rm128() // Opcode 66 0f ee
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).s[n] = XMM((modrm >> 3) & 0x7).s[n] > XMM(modrm & 0x7).s[n] ? XMM((modrm >> 3) & 0x7).s[n] : XMM(modrm & 0x7).s[n];
@@ -5612,6 +5749,7 @@ void i386_device::sse_pmaxsw_r128_rm128() // Opcode 66 0f ee
 void i386_device::sse_paddsb_r128_rm128()  // Opcode 66 0f ec
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).c[n]=SaturatedSignedWordToSignedByte((int16_t)XMM((modrm >> 3) & 0x7).c[n] + (int16_t)XMM(modrm & 7).c[n]);
@@ -5628,6 +5766,7 @@ void i386_device::sse_paddsb_r128_rm128()  // Opcode 66 0f ec
 void i386_device::sse_paddsw_r128_rm128()  // Opcode 66 0f ed
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).s[n]=SaturatedSignedDwordToSignedWord((int32_t)XMM((modrm >> 3) & 0x7).s[n] + (int32_t)XMM(modrm & 7).s[n]);
@@ -5644,6 +5783,7 @@ void i386_device::sse_paddsw_r128_rm128()  // Opcode 66 0f ed
 void i386_device::sse_por_r128_rm128()  // Opcode 66 0f eb
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] | XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] | XMM(modrm & 7).q[1];
@@ -5660,6 +5800,7 @@ void i386_device::sse_por_r128_rm128()  // Opcode 66 0f eb
 void i386_device::sse_pxor_r128_rm128()  // Opcode 66 0f ef
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] ^ XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1]=XMM((modrm >> 3) & 0x7).q[1] ^ XMM(modrm & 7).q[1];
@@ -5676,17 +5817,20 @@ void i386_device::sse_pxor_r128_rm128()  // Opcode 66 0f ef
 void i386_device::sse_pmaddwd_r128_rm128()  // Opcode 66 0f f5
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
+		int s, d;
+		s=modrm & 0x7;
+		d=(modrm >> 3) & 0x7;
 		for (int n=0;n < 4;n++)
-			XMM((modrm >> 3) & 0x7).i[n]=(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)XMM(modrm & 7).s[n]+
-										(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)XMM(modrm & 7).s[n];
+			XMM(d).i[n]=(int32_t)XMM(d).s[n << 1]*(int32_t)XMM(s).s[n << 1]+(int32_t)XMM(d).s[(n << 1) + 1]*(int32_t)XMM(s).s[(n << 1) + 1];
 	} else {
+		int d = (modrm >> 3) & 0x7;
 		XMM_REG s;
 		uint32_t ea = GetEA(modrm, 0);
 		READXMM(ea, s);
 		for (int n=0;n < 4;n++)
-			XMM((modrm >> 3) & 0x7).i[n]=(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)s.s[n]+
-										(int32_t)XMM((modrm >> 3) & 0x7).s[n]*(int32_t)s.s[n];
+			XMM(d).i[n]=(int32_t)XMM(d).s[n << 1]*(int32_t)s.s[n << 1]+(int32_t)XMM(d).s[(n << 1) + 1]*(int32_t)s.s[(n << 1) + 1];
 	}
 	CYCLES(1);     // TODO: correct cycle count
 }
@@ -5694,6 +5838,7 @@ void i386_device::sse_pmaddwd_r128_rm128()  // Opcode 66 0f f5
 void i386_device::sse_psubb_r128_rm128()  // Opcode 66 0f f8
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n]=XMM((modrm >> 3) & 0x7).b[n] - XMM(modrm & 7).b[n];
@@ -5710,6 +5855,7 @@ void i386_device::sse_psubb_r128_rm128()  // Opcode 66 0f f8
 void i386_device::sse_psubw_r128_rm128()  // Opcode 66 0f f9
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n]=XMM((modrm >> 3) & 0x7).w[n] - XMM(modrm & 7).w[n];
@@ -5726,6 +5872,7 @@ void i386_device::sse_psubw_r128_rm128()  // Opcode 66 0f f9
 void i386_device::sse_psubd_r128_rm128()  // Opcode 66 0f fa
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 4;n++)
 			XMM((modrm >> 3) & 0x7).d[n]=XMM((modrm >> 3) & 0x7).d[n] - XMM(modrm & 7).d[n];
@@ -5743,6 +5890,7 @@ void i386_device::sse_psadbw_r128_rm128() // Opcode 66 0f f6
 {
 	int32_t temp;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		temp=0;
 		for (int n=0;n < 8;n++)
@@ -5771,6 +5919,7 @@ void i386_device::sse_psadbw_r128_rm128() // Opcode 66 0f f6
 void i386_device::sse_pavgb_r128_rm128() // Opcode 66 0f e0
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 16;n++)
 			XMM((modrm >> 3) & 0x7).b[n] = ((uint16_t)XMM((modrm >> 3) & 0x7).b[n] + (uint16_t)XMM(modrm & 0x7).b[n] + 1) >> 1;
@@ -5787,6 +5936,7 @@ void i386_device::sse_pavgb_r128_rm128() // Opcode 66 0f e0
 void i386_device::sse_pavgw_r128_rm128() // Opcode 66 0f e3
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		for (int n=0;n < 8;n++)
 			XMM((modrm >> 3) & 0x7).w[n] = ((uint32_t)XMM((modrm >> 3) & 0x7).w[n] + (uint32_t)XMM(modrm & 0x7).w[n] + 1) >> 1;
@@ -5803,6 +5953,7 @@ void i386_device::sse_pavgw_r128_rm128() // Opcode 66 0f e3
 void i386_device::sse_psrlw_r128_rm128()  // Opcode 66 0f d1
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		for (int n=0; n < 8;n++)
@@ -5821,6 +5972,7 @@ void i386_device::sse_psrlw_r128_rm128()  // Opcode 66 0f d1
 void i386_device::sse_psrld_r128_rm128()  // Opcode 66 0f d2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).d[0]=XMM((modrm >> 3) & 0x7).d[0] >> count;
@@ -5843,6 +5995,7 @@ void i386_device::sse_psrld_r128_rm128()  // Opcode 66 0f d2
 void i386_device::sse_psrlq_r128_rm128()  // Opcode 66 0f d3
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] >> count;
@@ -5861,6 +6014,7 @@ void i386_device::sse_psrlq_r128_rm128()  // Opcode 66 0f d3
 void i386_device::sse_psllw_r128_rm128()  // Opcode 66 0f f1
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		for (int n=0; n < 8;n++)
@@ -5879,6 +6033,7 @@ void i386_device::sse_psllw_r128_rm128()  // Opcode 66 0f f1
 void i386_device::sse_pslld_r128_rm128()  // Opcode 66 0f f2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).d[0]=XMM((modrm >> 3) & 0x7).d[0] << count;
@@ -5901,6 +6056,7 @@ void i386_device::sse_pslld_r128_rm128()  // Opcode 66 0f f2
 void i386_device::sse_psllq_r128_rm128()  // Opcode 66 0f f3
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0] << count;
@@ -5919,6 +6075,7 @@ void i386_device::sse_psllq_r128_rm128()  // Opcode 66 0f f3
 void i386_device::sse_psraw_r128_rm128()  // Opcode 66 0f e1
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		for (int n=0; n < 8;n++)
@@ -5937,6 +6094,7 @@ void i386_device::sse_psraw_r128_rm128()  // Opcode 66 0f e1
 void i386_device::sse_psrad_r128_rm128()  // Opcode 66 0f e2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int count=(int)XMM(modrm & 7).q[0];
 		XMM((modrm >> 3) & 0x7).i[0]=XMM((modrm >> 3) & 0x7).i[0] >> count;
@@ -5959,6 +6117,7 @@ void i386_device::sse_psrad_r128_rm128()  // Opcode 66 0f e2
 void i386_device::sse_movntdq_m128_r128()  // Opcode 66 0f e7
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		CYCLES(1);     // unsupported
 	} else {
@@ -5972,6 +6131,7 @@ void i386_device::sse_movntdq_m128_r128()  // Opcode 66 0f e7
 void i386_device::sse_cvttpd2dq_r128_rm128()  // Opcode 66 0f e6
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).i[0]=(int32_t)XMM((modrm >> 3) & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).i[1]=(int32_t)XMM((modrm >> 3) & 0x7).f64[1];
@@ -5990,6 +6150,7 @@ void i386_device::sse_cvttpd2dq_r128_rm128()  // Opcode 66 0f e6
 void i386_device::sse_movq_r128m64_r128()  // Opcode 66 0f d6
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7).q[0]=XMM((modrm >> 3) & 0x7).q[0];
 		XMM(modrm & 0x7).q[1] = 0;
@@ -6003,6 +6164,7 @@ void i386_device::sse_movq_r128m64_r128()  // Opcode 66 0f d6
 void i386_device::sse_addsubpd_r128_rm128()  // Opcode 66 0f d0
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s, d;
 		s=modrm & 0x7;
@@ -6024,12 +6186,16 @@ void i386_device::sse_addsubpd_r128_rm128()  // Opcode 66 0f d0
 void i386_device::sse_haddpd_r128_rm128()  // Opcode 66 0f 7c
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
+		XMM_REG t;
 		int s, d;
 		s=modrm & 0x7;
 		d=(modrm >> 3) & 0x7;
-		XMM(d).f64[0]=XMM(d).f64[0]+XMM(d).f64[1];
-		XMM(d).f64[1]=XMM(s).f64[0]+XMM(s).f64[1];
+		t.f64[0]=XMM(d).f64[0]+XMM(d).f64[1];
+		t.f64[1]=XMM(s).f64[0]+XMM(s).f64[1];
+		XMM(d).f64[0]=t.f64[0];
+		XMM(d).f64[1]=t.f64[1];
 	} else {
 		XMM_REG src;
 		int d;
@@ -6045,12 +6211,16 @@ void i386_device::sse_haddpd_r128_rm128()  // Opcode 66 0f 7c
 void i386_device::sse_hsubpd_r128_rm128()  // Opcode 66 0f 7d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
+		XMM_REG t;
 		int s, d;
 		s=modrm & 0x7;
 		d=(modrm >> 3) & 0x7;
-		XMM(d).f64[0]=XMM(d).f64[0]-XMM(d).f64[1];
-		XMM(d).f64[1]=XMM(s).f64[0]-XMM(s).f64[1];
+		t.f64[0]=XMM(d).f64[0]-XMM(d).f64[1];
+		t.f64[1]=XMM(s).f64[0]-XMM(s).f64[1];
+		XMM(d).f64[0]=t.f64[0];
+		XMM(d).f64[1]=t.f64[1];
 	} else {
 		XMM_REG src;
 		int d;
@@ -6066,6 +6236,7 @@ void i386_device::sse_hsubpd_r128_rm128()  // Opcode 66 0f 7d
 void i386_device::sse_sqrtpd_r128_rm128()  // Opcode 66 0f 51
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s, d;
 		s=modrm & 0x7;
@@ -6088,11 +6259,12 @@ void i386_device::sse_cvtpi2pd_r128_rm64()  // Opcode 66 0f 2a
 {
 	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		MMXPROLOG();
+		if(MMXPROLOG()) return; // only when using mmx register operands
 		XMM((modrm >> 3) & 0x7).f64[0] = (double)MMX(modrm & 0x7).i[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = (double)MMX(modrm & 0x7).i[1];
 	} else {
 		MMX_REG r;
+		if(SSEPROLOG()) return;
 		uint32_t ea = GetEA(modrm, 0);
 		READMMX(ea, r);
 		XMM((modrm >> 3) & 0x7).f64[0] = (double)r.i[0];
@@ -6104,7 +6276,8 @@ void i386_device::sse_cvtpi2pd_r128_rm64()  // Opcode 66 0f 2a
 void i386_device::sse_cvttpd2pi_r64_rm128()  // Opcode 66 0f 2c
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
+	// TODO: manage inexact conversion to integer
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
@@ -6121,7 +6294,8 @@ void i386_device::sse_cvttpd2pi_r64_rm128()  // Opcode 66 0f 2c
 void i386_device::sse_cvtpd2pi_r64_rm128()  // Opcode 66 0f 2d
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
+	// TODO: manage inexact conversion to integer
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f64[0];
 		MMX((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f64[1];
@@ -6138,6 +6312,7 @@ void i386_device::sse_cvtpd2pi_r64_rm128()  // Opcode 66 0f 2d
 void i386_device::sse_cvtpd2ps_r128_rm128()  // Opcode 66 0f 5a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = (float)XMM(modrm & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).f[1] = (float)XMM(modrm & 0x7).f64[1];
@@ -6156,6 +6331,7 @@ void i386_device::sse_cvtpd2ps_r128_rm128()  // Opcode 66 0f 5a
 void i386_device::sse_cvtps2dq_r128_rm128()  // Opcode 66 0f 5b
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).i[0] = XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).i[1] = XMM(modrm & 0x7).f[1];
@@ -6176,6 +6352,7 @@ void i386_device::sse_cvtps2dq_r128_rm128()  // Opcode 66 0f 5b
 void i386_device::sse_addpd_r128_rm128()  // Opcode 66 0f 58
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] + XMM(modrm & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] + XMM(modrm & 0x7).f64[1];
@@ -6192,6 +6369,7 @@ void i386_device::sse_addpd_r128_rm128()  // Opcode 66 0f 58
 void i386_device::sse_mulpd_r128_rm128()  // Opcode 66 0f 59
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] * XMM(modrm & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] * XMM(modrm & 0x7).f64[1];
@@ -6208,6 +6386,7 @@ void i386_device::sse_mulpd_r128_rm128()  // Opcode 66 0f 59
 void i386_device::sse_subpd_r128_rm128()  // Opcode 66 0f 5c
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] - XMM(modrm & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] - XMM(modrm & 0x7).f64[1];
@@ -6224,6 +6403,7 @@ void i386_device::sse_subpd_r128_rm128()  // Opcode 66 0f 5c
 void i386_device::sse_minpd_r128_rm128()  // Opcode 66 0f 5d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
 		XMM((modrm >> 3) & 0x7).f64[1] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[1], XMM(modrm & 0x7).f64[1]);
@@ -6240,6 +6420,7 @@ void i386_device::sse_minpd_r128_rm128()  // Opcode 66 0f 5d
 void i386_device::sse_divpd_r128_rm128()  // Opcode 66 0f 5e
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] / XMM(modrm & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).f64[1] = XMM((modrm >> 3) & 0x7).f64[1] / XMM(modrm & 0x7).f64[1];
@@ -6256,6 +6437,7 @@ void i386_device::sse_divpd_r128_rm128()  // Opcode 66 0f 5e
 void i386_device::sse_maxpd_r128_rm128()  // Opcode 66 0f 5f
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
 		XMM((modrm >> 3) & 0x7).f64[1] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[1], XMM(modrm & 0x7).f64[1]);
@@ -6272,6 +6454,7 @@ void i386_device::sse_maxpd_r128_rm128()  // Opcode 66 0f 5f
 void i386_device::sse_movntpd_m128_r128()  // Opcode 66 0f 2b
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count
@@ -6286,6 +6469,7 @@ void i386_device::sse_movntpd_m128_r128()  // Opcode 66 0f 2b
 void i386_device::sse_movapd_r128_rm128()  // Opcode 66 0f 28
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7) = XMM(modrm & 0x7);
 	} else {
@@ -6298,6 +6482,7 @@ void i386_device::sse_movapd_r128_rm128()  // Opcode 66 0f 28
 void i386_device::sse_movapd_rm128_r128()  // Opcode 66 0f 29
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7) = XMM((modrm >> 3) & 0x7);
 	} else {
@@ -6310,6 +6495,7 @@ void i386_device::sse_movapd_rm128_r128()  // Opcode 66 0f 29
 void i386_device::sse_movsd_r128_r128m64() // Opcode f2 0f 10
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
 	} else {
@@ -6323,6 +6509,7 @@ void i386_device::sse_movsd_r128_r128m64() // Opcode f2 0f 10
 void i386_device::sse_movsd_r128m64_r128() // Opcode f2 0f 11
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM(modrm & 0x7).q[0] = XMM((modrm >> 3) & 0x7).q[0];
 	} else {
@@ -6335,6 +6522,7 @@ void i386_device::sse_movsd_r128m64_r128() // Opcode f2 0f 11
 void i386_device::sse_movddup_r128_r128m64() // Opcode f2 0f 12
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).q[0] = XMM(modrm & 0x7).q[0];
 		XMM((modrm >> 3) & 0x7).q[1] = XMM((modrm >> 3) & 0x7).q[0];
@@ -6349,6 +6537,7 @@ void i386_device::sse_movddup_r128_r128m64() // Opcode f2 0f 12
 void i386_device::sse_cvtsi2sd_r128_rm32() // Opcode f2 0f 2a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = (int32_t)LOAD_RM32(modrm);
 	} else {
@@ -6362,6 +6551,7 @@ void i386_device::sse_cvttsd2si_r32_r128m64() // Opcode f2 0f 2c
 {
 	int32_t src;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		src = (int32_t)XMM(modrm & 0x7).f64[0];
 	} else { // otherwise is a memory address
@@ -6378,6 +6568,7 @@ void i386_device::sse_cvtsd2si_r32_r128m64() // Opcode f2 0f 2d
 {
 	int32_t src;
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		src = (int32_t)XMM(modrm & 0x7).f64[0];
 	} else { // otherwise is a memory address
@@ -6393,6 +6584,7 @@ void i386_device::sse_cvtsd2si_r32_r128m64() // Opcode f2 0f 2d
 void i386_device::sse_sqrtsd_r128_r128m64() // Opcode f2 0f 51
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s, d;
 		s=modrm & 0x7;
@@ -6412,6 +6604,7 @@ void i386_device::sse_sqrtsd_r128_r128m64() // Opcode f2 0f 51
 void i386_device::sse_addsd_r128_r128m64() // Opcode f2 0f 58
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] + XMM(modrm & 0x7).f64[0];
 	} else {
@@ -6426,6 +6619,7 @@ void i386_device::sse_addsd_r128_r128m64() // Opcode f2 0f 58
 void i386_device::sse_mulsd_r128_r128m64() // Opcode f2 0f 59
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] * XMM(modrm & 0x7).f64[0];
 	} else {
@@ -6440,6 +6634,7 @@ void i386_device::sse_mulsd_r128_r128m64() // Opcode f2 0f 59
 void i386_device::sse_cvtsd2ss_r128_r128m64() // Opcode f2 0f 5a
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0] = XMM(modrm & 0x7).f64[0];
 	} else {
@@ -6454,6 +6649,7 @@ void i386_device::sse_cvtsd2ss_r128_r128m64() // Opcode f2 0f 5a
 void i386_device::sse_subsd_r128_r128m64() // Opcode f2 0f 5c
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] - XMM(modrm & 0x7).f64[0];
 	} else {
@@ -6468,6 +6664,7 @@ void i386_device::sse_subsd_r128_r128m64() // Opcode f2 0f 5c
 void i386_device::sse_minsd_r128_r128m64() // Opcode f2 0f 5d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = sse_min_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
 	} else {
@@ -6482,6 +6679,7 @@ void i386_device::sse_minsd_r128_r128m64() // Opcode f2 0f 5d
 void i386_device::sse_divsd_r128_r128m64() // Opcode f2 0f 5e
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = XMM((modrm >> 3) & 0x7).f64[0] / XMM(modrm & 0x7).f64[0];
 	} else {
@@ -6496,6 +6694,7 @@ void i386_device::sse_divsd_r128_r128m64() // Opcode f2 0f 5e
 void i386_device::sse_maxsd_r128_r128m64() // Opcode f2 0f 5f
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f64[0] = sse_max_double(XMM((modrm >> 3) & 0x7).f64[0], XMM(modrm & 0x7).f64[0]);
 	} else {
@@ -6510,6 +6709,7 @@ void i386_device::sse_maxsd_r128_r128m64() // Opcode f2 0f 5f
 void i386_device::sse_haddps_r128_rm128() // Opcode f2 0f 7c
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s, d;
 		float f1, f2, f3, f4;
@@ -6543,6 +6743,7 @@ void i386_device::sse_haddps_r128_rm128() // Opcode f2 0f 7c
 void i386_device::sse_hsubps_r128_rm128() // Opcode f2 0f 7d
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s, d;
 		float f1, f2, f3, f4;
@@ -6576,6 +6777,7 @@ void i386_device::sse_hsubps_r128_rm128() // Opcode f2 0f 7d
 void i386_device::sse_cmpsd_r128_r128m64_i8() // Opcode f2 0f c2
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		int s,d;
 		uint8_t imm8 = FETCH();
@@ -6597,6 +6799,7 @@ void i386_device::sse_cmpsd_r128_r128m64_i8() // Opcode f2 0f c2
 void i386_device::sse_addsubps_r128_rm128() // Opcode f2 0f d0
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).f[0]=XMM((modrm >> 3) & 0x7).f[0] - XMM(modrm & 0x7).f[0];
 		XMM((modrm >> 3) & 0x7).f[1]=XMM((modrm >> 3) & 0x7).f[1] + XMM(modrm & 0x7).f[1];
@@ -6617,7 +6820,7 @@ void i386_device::sse_addsubps_r128_rm128() // Opcode f2 0f d0
 void i386_device::sse_movdq2q_r64_r128() // Opcode f2 0f d6
 {
 	uint8_t modrm = FETCH();
-	MMXPROLOG();
+	if(MMXPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		MMX((modrm >> 3) & 0x7).q = XMM(modrm & 0x7).q[0];
 		CYCLES(1);     // TODO: correct cycle count
@@ -6630,6 +6833,7 @@ void i386_device::sse_movdq2q_r64_r128() // Opcode f2 0f d6
 void i386_device::sse_cvtpd2dq_r128_rm128() // Opcode f2 0f e6
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		XMM((modrm >> 3) & 0x7).i[0]=(int32_t)XMM((modrm >> 3) & 0x7).f64[0];
 		XMM((modrm >> 3) & 0x7).i[1]=(int32_t)XMM((modrm >> 3) & 0x7).f64[1];
@@ -6648,6 +6852,7 @@ void i386_device::sse_cvtpd2dq_r128_rm128() // Opcode f2 0f e6
 void i386_device::sse_lddqu_r128_m128() // Opcode f2 0f f0
 {
 	uint8_t modrm = FETCH();
+	if(SSEPROLOG()) return;
 	if( modrm >= 0xc0 ) {
 		// unsupported by cpu
 		CYCLES(1);     // TODO: correct cycle count

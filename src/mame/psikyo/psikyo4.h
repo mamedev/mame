@@ -30,14 +30,14 @@ public:
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen"),
 		m_system(*this, "SYSTEM"),
-		m_keys(*this, "KEY.%u", 0)
+		m_keys{ { *this, "KEY%u", 0 }, { *this, "KEY%u", 5 } }
 	{ }
 
 	void ps4big(machine_config &config);
 	void ps4small(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value system_r();
+	template <int P> ioport_value mahjong_ctrl_r();
 
 private:
 	/* memory pointers */
@@ -57,14 +57,14 @@ private:
 	double         m_oldbrt[2]{};
 
 	/* devices */
-	required_device<sh2_sh7604_device> m_maincpu;
+	required_device<sh7604_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device_array<palette_device, 2> m_palette;
 	required_device<screen_device> m_lscreen;
 	required_device<screen_device> m_rscreen;
 	optional_ioport m_system;
-	optional_ioport_array<8> m_keys;
+	optional_ioport_array<4> m_keys[2];
 
 	void paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template<int Screen> void bgpen_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -73,12 +73,12 @@ private:
 	void ymf_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void io_select_w(uint8_t data);
 	void eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	template<int Screen> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
-	void ps4_map(address_map &map);
-	void ps4_ymf_map(address_map &map);
+	void ps4_map(address_map &map) ATTR_COLD;
+	void ps4_ymf_map(address_map &map) ATTR_COLD;
 };

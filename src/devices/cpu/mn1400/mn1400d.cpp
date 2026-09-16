@@ -9,6 +9,24 @@
 #include "emu.h"
 #include "mn1400d.h"
 
+
+// common lookup tables
+
+enum mn1400_disassembler::e_mnemonics : unsigned
+{
+	mILL, mILL2,
+	mL, mLD, mLI, mLIC, mLDC, mST, mSTD, mSTIC, mSTDC,
+	mLX, mLY, mTAX, mTAY, mTYA, mTACU, mTACL, mTCAU, mTCAL,
+	mNOP, mAND, mANDI, mOR, mXOR, mA, mAI, mCPL, mC, mCI, mCY,
+	mSL, mICY, mDCY, mICM, mDCM, mSM, mRM, mTB,
+	mINA, mINB, mOTD, mOTMD, mOTE, mOTIE, mRCO, mSCO, mCCO,
+	mRC, mRP, mSC, mSP,
+	mBS0, mBS1, mBS01, mBSN0, mBSN1, mBSN01,
+	mBP, mBC, mBZ, mBPC, mBPZ, mBCZ, mBPCZ,
+	mBNP, mBNC, mBNZ, mBNPC, mBNPZ, mBNCZ, mBNPCZ,
+	mJMP, mCAL, mRET, mEC, mDC
+};
+
 const char *const mn1400_disassembler::s_mnemonics[] =
 {
 	"?", "?",
@@ -80,6 +98,8 @@ const u8 mn1400_disassembler::mn1400_mnemonic[0x100] =
 	mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE, mOTIE  // F
 };
 
+
+// disasm
 
 offs_t mn1400_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {

@@ -111,11 +111,11 @@ private:
 	uint8_t magtouch_io_r(offs_t offset);
 	void magtouch_io_w(offs_t offset, uint8_t data);
 	void dma8237_1_dack_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	static void magtouch_sb_conf(device_t *device);
-	void magtouch_io(address_map &map);
-	void magtouch_map(address_map &map);
+	void magtouch_io(address_map &map) ATTR_COLD;
+	void magtouch_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************
@@ -213,11 +213,11 @@ void magtouch_state::magtouch(machine_config &config)
 
 	/* video hardware */
 	// TODO: map to ISA bus
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
 
-	tvga9000_device &vga(TVGA9000_VGA(config, "vga", 0));
+	tvga9000_device &vga(TVGA9000_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 
@@ -233,7 +233,7 @@ void magtouch_state::magtouch(machine_config &config)
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(magtouch_state::dma8237_1_dack_w));
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir1_w));

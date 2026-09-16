@@ -318,16 +318,16 @@ INPUT_CHANGED_MEMBER(vsmile_keyboard_device::button_changed)
 
 static INPUT_PORTS_START( vsmile_keyboard_common )
 	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, joy_changed, vsmile_keyboard_device::STALE_UP_DOWN)    PORT_NAME("Joypad Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, joy_changed, vsmile_keyboard_device::STALE_UP_DOWN)    PORT_NAME("Joypad Down")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, joy_changed, vsmile_keyboard_device::STALE_LEFT_RIGHT) PORT_NAME("Joypad Left")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, joy_changed, vsmile_keyboard_device::STALE_LEFT_RIGHT) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::joy_changed), vsmile_keyboard_device::STALE_UP_DOWN)    PORT_NAME("Joypad Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::joy_changed), vsmile_keyboard_device::STALE_UP_DOWN)    PORT_NAME("Joypad Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::joy_changed), vsmile_keyboard_device::STALE_LEFT_RIGHT) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::joy_changed), vsmile_keyboard_device::STALE_LEFT_RIGHT) PORT_NAME("Joypad Right")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, button_changed, vsmile_keyboard_device::STALE_OK)   PORT_NAME("OK") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, button_changed, vsmile_keyboard_device::STALE_QUIT) PORT_NAME("Quit/Escape")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, vsmile_keyboard_device, button_changed, vsmile_keyboard_device::STALE_HELP) PORT_NAME("Help")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::button_changed), vsmile_keyboard_device::STALE_OK)   PORT_NAME("OK") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::button_changed), vsmile_keyboard_device::STALE_QUIT) PORT_NAME("Quit/Escape")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vsmile_keyboard_device::button_changed), vsmile_keyboard_device::STALE_HELP) PORT_NAME("Help")
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

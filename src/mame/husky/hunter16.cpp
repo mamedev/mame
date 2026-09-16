@@ -43,9 +43,9 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_16_map(address_map &map);
-	void io_1680_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_16_map(address_map &map) ATTR_COLD;
+	void io_1680_map(address_map &map) ATTR_COLD;
 
 	required_device<v25_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -218,7 +218,7 @@ void hunter16_state::hunter16(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &hunter16_state::io_16_map);
 	m_maincpu->pt_in_cb().set(FUNC(hunter16_state::pt_r));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(240, 128);
 	m_screen->set_visarea(0, 239, 0, 63);
@@ -237,7 +237,7 @@ void hunter16_state::hunter1680(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hunter16_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &hunter16_state::io_1680_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_raw(14.318181_MHz_XTAL, 912, 0, 640, 296, 0, 200);
 	m_screen->set_screen_update("cga", FUNC(mc6845_device::screen_update));
 
@@ -274,6 +274,6 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY                FULLNAME              FLAGS */
-COMP( 1989, hunter16,   0,        0,      hunter16,   hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16",    MACHINE_IS_SKELETON )
-COMP( 1990, hunter216,  hunter16, 0,      hunter16,   hunter2,  hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 2/16",  MACHINE_IS_SKELETON )
-COMP( 1989, hunter1680, hunter16, 0,      hunter1680, hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16/80", MACHINE_IS_SKELETON )
+COMP( 1989, hunter16,   0,        0,      hunter16,   hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1990, hunter216,  hunter16, 0,      hunter16,   hunter2,  hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 2/16",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1989, hunter1680, hunter16, 0,      hunter1680, hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16/80", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

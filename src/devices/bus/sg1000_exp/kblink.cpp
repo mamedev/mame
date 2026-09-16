@@ -113,7 +113,7 @@ void sk1100_link_cable_device::device_reset()
 
 void sk1100_link_cable_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 TIMER_CALLBACK_MEMBER(sk1100_link_cable_device::update_queue)

@@ -15,6 +15,8 @@
 
 #include <zlib.h>
 
+#include <cstring>
+
 struct cybiko_file_system
 {
 	imgtool::stream *stream;

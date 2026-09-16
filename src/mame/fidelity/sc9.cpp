@@ -5,42 +5,49 @@
 
 Fidelity SC9, Fidelity Playmatic "S"
 
+3 versions were available, the newest "B" version was ~2MHz and included the
+Budapest program. The Playmatic S was only released in Germany, it's basically
+a 'deluxe' version of SC9 with magnet sensors and came with CB9 and CB16.
+
 TODO:
-- fscc9ps module switch and led
-- verify fscc9ps XTAL (checked against sound recording, 99.97% similarity)
+- fscc9ps module switch and led (the switch simply disconnects voltage)
 
 Hardware notes:
 
-Fidelity Sensory Chess Challenger "9" (SC9) overview:
-- 8*(8+1) buttons, 8*8+1 LEDs
-- 36-pin edge connector, assume same as SC12
+Fidelity Sensory Chess Challenger "9" rev. C:
+- PCB label: 510-1046C01 2-1-82
+- R6502-13, ~1.5MHz (no XTAL, clock from RC circuit)
 - 2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
-- R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
-- PCB label 510-1046C01 2-1-82
+- 36-pin edge connector, assume same as SC12
+- 8*(8+1) buttons, 8*8+1 LEDs
 
-*: 2 other boards were measured 1.60MHz and 1.88MHz(newest serial). Online references
-suggest 3 versions of SC9(C01) total: 1.5MHz, 1.6MHz, and 1.9MHz.
+CPU frequency measurements from 4 SC9s were 1.4MHz, 1.49MHz, 1.6MHz, and 1.88MHz.
+The first three have the same R/C circuit. The higher speed one may have been a
+fluke, or it was overclock (it was not a rev. D PCB).
 
-I/O is via TTL, not further documented here
+Playmatic S is on the same PCB with some wire mods. The R/C circuit is similar,
+two 680pf capacitors where SC9 has one (340pf, effectively twice as fast). Also
+seen with what looks like a 3MHz resonator. Measurements from 3 separate Playmatics
+were 2.82MHz, 2.89MHz, and 2.93Mhz, the latter one has the resonator.
 
-3 versions were available, the newest "B" version was 2MHz and included the Budapest program.
-The Playmatic S was only released in Germany, it's basically a 'deluxe' version of SC9
-with magnet sensors and came with CB9 and CB16.
+The newest SC9 on the 510-1046D01 PCB has a 3.9MHz resonator. Older SC9 versions
+won't work on this PCB.
 
---------------------------------------------------------------------------------
+================================================================================
 
-Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant for
-extra book opening databases and recorded games.
+Starting with SC9, Fidelity added a cartridge slot to their chess computers, meant
+for extra book opening databases and recorded games.
 
 Known modules (*denotes undumped):
-- CB9: Challenger Book Openings 1
-- CB16: Challenger Book Openings 2
+- CB9: Book Openings 1
+- CB16: Book Openings 2
 - *CG64: 64 Greatest Games
-- *EOA-EOE: Challenger Book Openings: Chess Encyclopedia Volume A-E (5 modules)
-- *TDF: Challenger Book Openings: Tarrasch Defense to the Queen's Gambit
+- DVC: Sicilan Varation (prototype)
+- EOA-EOE: Chess Encyclopedia Volume A-E (5 modules, needs 7seg display)
+- *TDF: Tarrasch Defence to the Queen's Gambit
 
-The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ line.
-IRQ and write strobe are unused. Maximum known size is 16KB.
+The edge connector has D0-D7, A0-A13, 2 chip select lines, read/write lines, IRQ
+line. IRQ and write strobe aren't used by modules. Maximum known size is 16KB.
 
 *******************************************************************************/
 
@@ -64,8 +71,6 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 
 namespace {
 
-// SC9 / shared
-
 class sc9_state : public driver_device
 {
 public:
@@ -85,28 +90,27 @@ public:
 	void playmatic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
-	void sc9_map(address_map &map);
-	void sc9d_map(address_map &map);
+	void sc9_map(address_map &map) ATTR_COLD;
+	void sc9d_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	void control_w(u8 data);
 	void led_w(offs_t offset, u8 data);
 	u8 input_r();
 	u8 input_d7_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void sc9_state::machine_start()
@@ -116,56 +120,22 @@ void sc9_state::machine_start()
 	save_item(NAME(m_led_data));
 }
 
-// SC9C
-
-class sc9c_state : public sc9_state
-{
-public:
-	sc9c_state(const machine_config &mconfig, device_type type, const char *tag) :
-		sc9_state(mconfig, type, tag)
-	{ }
-
-	DECLARE_INPUT_CHANGED_MEMBER(sc9c_cpu_freq) { sc9c_set_cpu_freq(); }
-
-protected:
-	virtual void machine_reset() override;
-	void sc9c_set_cpu_freq();
-};
-
-void sc9c_state::machine_reset()
-{
-	sc9_state::machine_reset();
-	sc9c_set_cpu_freq();
-}
-
-void sc9c_state::sc9c_set_cpu_freq()
-{
-	// SC9(C01) was released with 1.5MHz, 1.6MHz, or 1.9MHz CPU
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 1900000 : ((inp & 1) ? 1600000 : 1500000));
-}
-
 
 
 /*******************************************************************************
     I/O
 *******************************************************************************/
 
-void sc9_state::update_display()
-{
-	// 8*8 chessboard leds + 1 corner led
-	m_display->matrix(1 << m_inp_mux, m_led_data);
-}
-
 void sc9_state::control_w(u8 data)
 {
 	// d0-d3: 74245 P0-P3
 	// 74245 Q0-Q8: input mux, led select
 	m_inp_mux = data & 0xf;
-	update_display();
+	u16 sel = 1 << m_inp_mux;
+	m_display->write_my(sel);
 
 	// 74245 Q9: speaker out
-	m_dac->write(BIT(1 << m_inp_mux, 9));
+	m_dac->write(BIT(sel, 9));
 
 	// d4,d5: ?
 	// d6,d7: N/C
@@ -175,14 +145,14 @@ void sc9_state::led_w(offs_t offset, u8 data)
 {
 	// a0-a2,d0: led data via NE591N
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
-	update_display();
+	m_display->write_mx(m_led_data);
 }
 
 u8 sc9_state::input_r()
 {
+	// d0-d7: multiplexed inputs (active low)
 	u8 data = 0;
 
-	// d0-d7: multiplexed inputs (active low)
 	// read chessboard sensors
 	if (m_inp_mux < 8)
 		data = m_board->read_file(m_inp_mux);
@@ -237,18 +207,8 @@ static INPUT_PORTS_START( sc9 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sc9c )
-	PORT_INCLUDE( sc9 )
-
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc9c_state, sc9c_cpu_freq, 0) // factory set
-	PORT_CONFSETTING(    0x00, "1.5MHz" )
-	PORT_CONFSETTING(    0x01, "1.6MHz" )
-	PORT_CONFSETTING(    0x02, "1.9MHz" )
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 INPUT_PORTS_END
 
 
@@ -289,7 +249,7 @@ void sc9_state::sc9b(machine_config &config)
 	sc9d(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(1500000); // from ceramic resonator "681 JSA", measured
+	m_maincpu->set_clock(1'500'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc9_state::sc9_map);
 }
 
@@ -298,7 +258,7 @@ void sc9_state::playmatic(machine_config &config)
 	sc9b(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(5.626_MHz_XTAL / 2); // advertised as double the speed of SC9
+	m_maincpu->set_clock(3_MHz_XTAL); // advertised as double the speed of SC9
 	m_board->set_type(sensorboard_device::MAGNETS);
 
 	config.set_default_layout(layout_fidel_playmatic);
@@ -328,10 +288,10 @@ ROM_START( fscc9c ) // PCB label 510-1046C01
 	ROM_LOAD("101-1034b02", 0xe000, 0x2000, CRC(cbaf97d7) SHA1(7ed8e68bb74713d9e2ff1d9c037012320b7bfcbf) ) // "
 ROM_END
 
-ROM_START( fscc9ps )
+ROM_START( fscc9ps ) // PCB label 510-1046C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("play64c1.bin", 0xc000, 0x2000, CRC(e96aa95d) SHA1(16d90cf0ef166aef579d442671290a2c43e24dfe) )
-	ROM_LOAD("play64en.bin", 0xe000, 0x2000, CRC(6fa188d2) SHA1(1b9b0209c496c89ecb7f9ec07bfd9429ff9b275e) )
+	ROM_LOAD("c_green", 0xc000, 0x2000, CRC(e96aa95d) SHA1(16d90cf0ef166aef579d442671290a2c43e24dfe) )
+	ROM_LOAD("e_green", 0xe000, 0x2000, CRC(d7a95999) SHA1(27c19bc56a15f1ac78177683441e04f27c6e48ef) )
 ROM_END
 
 } // anonymous namespace
@@ -342,8 +302,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka version "B"
-SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state,  empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9c,  sc9c_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state,  empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 9 is not between quotation marks here
+//    YEAR  NAME     PARENT  COMPAT  MACHINE    INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1982, fscc9,   0,      0,      sc9d,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. D)", MACHINE_SUPPORTS_SAVE ) // aka version "B"
+SYST( 1982, fscc9b,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, fscc9c,  fscc9,  0,      sc9b,      sc9,   sc9_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"9\" (rev. C)", MACHINE_SUPPORTS_SAVE )
+SYST( 1983, fscc9ps, fscc9,  0,      playmatic, sc9,   sc9_state, empty_init, "Fidelity Deutschland", "Sensory 9 Playmatic S", MACHINE_SUPPORTS_SAVE ) // 9 is not between quotation marks here

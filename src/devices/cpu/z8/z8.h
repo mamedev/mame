@@ -39,16 +39,15 @@ protected:
 	};
 
 	// construction/destruction
-	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed);
+	z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, uint8_t gpr_top, bool preprogrammed, bool external_bus_reset);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 6; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 27; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return true; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
@@ -65,9 +64,9 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void program_map(address_map &map);
-	void preprogrammed_map(address_map &map);
-	void register_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void preprogrammed_map(address_map &map) ATTR_COLD;
+	void register_map(address_map &map) ATTR_COLD;
 
 private:
 	address_space_config m_program_config;
@@ -84,6 +83,8 @@ private:
 	devcb_write8::array<4> m_output_cb;
 
 	uint32_t m_rom_size;
+	uint8_t m_gpr_top;
+	bool m_external_bus_reset;
 
 	// basic registers
 	uint16_t m_pc;              // program counter
@@ -428,6 +429,20 @@ protected:
 };
 
 
+class z8691_device : public z8_device
+{
+public:
+	z8691_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class z86c91_device : public z8_device
+{
+public:
+	z86c91_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class z86e02_device : public z8_device
 {
 public:
@@ -452,6 +467,12 @@ DECLARE_DEVICE_TYPE(Z8681, z8681_device)
 
 // Zilog Z8682 ROMless (boot to 0812H)
 DECLARE_DEVICE_TYPE(Z8682, z8682_device)
+
+// Zilog Z8691 ROMless
+DECLARE_DEVICE_TYPE(Z8691, z8691_device)
+
+// Zilog Z86C91 ROMless
+DECLARE_DEVICE_TYPE(Z86C91, z86c91_device)
 
 // Zilog Z86E02
 DECLARE_DEVICE_TYPE(Z86E02, z86e02_device)

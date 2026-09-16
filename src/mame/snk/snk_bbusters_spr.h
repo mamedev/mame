@@ -10,7 +10,7 @@
 class snk_bbusters_spr_device : public device_t, public device_gfx_interface
 {
 public:
-	snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snk_bbusters_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	template <typename T> void set_spriteram_tag(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
@@ -19,7 +19,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);

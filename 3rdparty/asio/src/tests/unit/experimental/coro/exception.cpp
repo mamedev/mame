@@ -2,8 +2,8 @@
 // experimental/coro/exception.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2021 Klemens D. Morgenstern
-//                    (klemens dot morgenstern at gmx dot net)
+// Copyright (c) 2021-2023 Klemens D. Morgenstern
+//                         (klemens dot morgenstern at gmx dot net)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -61,7 +61,10 @@ asio::experimental::coro<int> throwing_generator(
 
   int i = 0;
   while (i < 3)
-    co_yield last = ++i;
+  {
+    last = ++i;
+    co_yield last;
+  }
 
   throw std::runtime_error("throwing-generator");
 }
@@ -109,6 +112,8 @@ asio::experimental::coro<int(int)> throwing_stacked(
     asio::any_io_executor exec, int &val,
     bool &destroyed_inner, bool &destroyed)
 {
+  ASIO_CHECK((co_await asio::this_coro::throw_if_cancelled()));
+
   on_scope_exit x = [&]() noexcept { destroyed = true; };
   (void)x;
 

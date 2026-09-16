@@ -76,18 +76,26 @@ protected:
 
 	enum
 	{
+		SEQ_STOP = 0,
+		SEQ_ACTIVE = 1,
+		SEQ_PLAY = 2,
+		SEQ_PAUSE = 3
+	};
+
+	enum
+	{
 		OUTPUT_TO_DIRECT_DAC = 0,
 		OUTPUT_TO_VOLTAGE_FOLLOWER = 1
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
@@ -98,7 +106,7 @@ protected:
 	public:
 		okim_voice();
 		void generate_audio(device_rom_interface &rom,
-							std::vector<write_stream_view> &buffers,
+							sound_stream &stream,
 							const uint8_t global_volume,
 							const uint8_t filter_type);
 
@@ -119,6 +127,10 @@ protected:
 
 		bool    m_playing;          // playback state
 		uint32_t  m_sample;           // current sample number
+		uint32_t  m_phrase_offset;
+		int32_t   m_phrase_count;
+		int32_t   m_phrase_wait_cnt;
+		uint8_t   m_phrase_state;
 
 		uint8_t   m_channel_volume;   // volume index set with the CVOL command
 		uint8_t   m_pan_volume_left;  // volume index set with the PAN command

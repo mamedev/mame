@@ -63,6 +63,7 @@
 #define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
 #define SN74S263_TAG        "h2"
+#define ABCBUS_TAG          "bus"
 
 class abc80_state : public driver_device
 {
@@ -99,11 +100,11 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void abc80_mem(address_map &map);
-	void abc80_io(address_map &map);
+	void abc80_mem(address_map &map) ATTR_COLD;
+	void abc80_io(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(scanline_tick);
 	TIMER_CALLBACK_MEMBER(cassette_update);
@@ -114,13 +115,14 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y);
+	void update_screen();
+	void update_screen_to(int y, int sx);
+	virtual void draw_character_at(bitmap_rgb32 &bitmap, int y, int sx, bool dv);
 	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data);
+	virtual int chars_per_line() { return 64; }
 	virtual offs_t get_videoram_addr();
 	virtual u8 read_videoram(offs_t offset) { return m_video_ram[offset]; }
-
-	virtual u8 read(offs_t offset);
-	virtual void write(offs_t offset, u8 data);
+	void video_ram_w(offs_t offset, u8 data);
 
 	void vco_voltage_w(int state);
 
@@ -140,6 +142,11 @@ protected:
 		EOFA = 0xfe1e,
 		HEAD = 0xfe20
 	};
+
+	// BASIC program file layout
+	static constexpr int BAC_BLOCK_SIZE = 253;
+	static constexpr u8 BAC_END_OF_BLOCK = 0x00;
+	static constexpr u8 BAC_END_OF_PROGRAM = 0x01;
 
 	enum
 	{
@@ -180,6 +187,8 @@ protected:
 	int m_c = 0;
 	int m_r = 0;
 	bool m_mode = 0;
+	int m_render_y = 0;
+	int m_render_sx = 0;
 
 	// cassette state
 	bool m_motor;
@@ -196,6 +205,27 @@ protected:
 };
 
 
+// ======================> abc80l_state
+
+class abc80l_state : public abc80_state
+{
+public:
+	abc80l_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc80_state(mconfig, type, tag),
+		m_rom_5000(*this, "abc80l"),
+		m_ram(*this, "ram", 0x4000, ENDIANNESS_LITTLE)
+	{ }
+
+	void abc80l(machine_config &config);
+
+protected:
+	void abc80l_mem(address_map &map) ATTR_COLD;
+
+	required_memory_region m_rom_5000;
+	memory_share_creator<uint8_t> m_ram;
+};
+
+
 // ======================> tkn80_state
 
 class tkn80_state : public abc80_state
@@ -203,6 +233,8 @@ class tkn80_state : public abc80_state
 public:
 	tkn80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		abc80_state(mconfig, type, tag),
+		m_view_rom0(*this, "rom0"),
+		m_view_rom2(*this, "rom2"),
 		m_rom_e(*this, "tkn80"),
 		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
 		m_config(*this, "CONFIG"),
@@ -213,30 +245,32 @@ public:
 	void tkn80_video(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
-	virtual void draw_scanline(bitmap_rgb32 &bitmap, int y) override;
+	virtual void draw_character_at(bitmap_rgb32 &bitmap, int y, int sx, bool dv) override;
+	virtual int chars_per_line() override { return m_80 ? 128 : 64; }
 	virtual offs_t get_videoram_addr() override;
 	virtual u8 read_videoram(offs_t offset) override { return m_char_ram[offset]; };
+	void char_ram_w(offs_t offset, u8 data);
 
 	void set_screen_params(void);
-
-	virtual u8 read(offs_t offset) override;
-	virtual void write(offs_t offset, u8 data) override;
+	void set_80(bool state);
 
 	uint8_t in3_r();
 	uint8_t in4_r();
 
-	void tkn80_io(address_map &map);
+	void tkn80_mem(address_map &map) ATTR_COLD;
+	void tkn80_io(address_map &map) ATTR_COLD;
 
+	memory_view m_view_rom0;
+	memory_view m_view_rom2;
 	required_memory_region m_rom_e;
 	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_config;
 
 	bool m_80;
-	offs_t m_rom_offset;
 };
 
 

@@ -38,6 +38,8 @@
 #include "emu.h"
 #include "cc500.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -110,9 +112,9 @@ bbc_cc500_device::bbc_cc500_device(const machine_config &mconfig, const char *ta
 
 void bbc_cc500_device::device_start()
 {
-	memset(m_palette_ram, 0, sizeof(m_palette_ram));
+	std::fill(std::begin(m_palette_ram), std::end(m_palette_ram), rgb_t(0));
 
-	/* register for save states */
+	// register for save states
 	save_item(NAME(m_palette_ram));
 }
 

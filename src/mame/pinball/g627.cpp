@@ -63,10 +63,10 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void g627(machine_config &config);
+	void g627(machine_config &config) ATTR_COLD;
 
-	void init_v115();
-	void init_v117();
+	void init_v115() ATTR_COLD;
+	void init_v117() ATTR_COLD;
 
 private:
 	u8 porta_r();
@@ -74,15 +74,15 @@ private:
 	void portc_w(u8 data);
 	void disp_w(offs_t offset, u8 data);
 	void lamp_w(offs_t offset, u8 data);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 m_seg[6]{};
 	u8 m_portc = 0U;
 	u8 m_motor = 0U;
 	u8 m_last_solenoid = 0U;
 	bool m_type = false;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<7> m_io_keyboard;
 	required_ioport_array<6> m_testipt;
@@ -327,8 +327,6 @@ void g627_state::lamp_w(offs_t offset, u8 data)
 void g627_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_seg));
 	save_item(NAME(m_portc));

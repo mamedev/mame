@@ -13,7 +13,7 @@ TODO:
 - where does the interrupt come from?
 - Debut-M is an updated version? Or is it the same program as Debut with a redesigned case?
 
-********************************************************************************
+================================================================================
 
 Hardware notes:
 - КР1810ВМ86 (i8086 clone), 16200K XTAL
@@ -67,6 +67,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
+		m_digit_pwm(*this, "lcd_pwm"),
 		m_dac(*this, "dac"),
 		m_out_digit(*this, "digit%u", 0U),
 		m_inputs(*this, "IN.0")
@@ -75,45 +76,40 @@ public:
 	// assume that RESET button is tied to CPU RESET pin
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
-	// machine configs
-	void debutm(machine_config &config);
+	void debutm(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<pwm_display_device> m_digit_pwm;
+	required_device<dac_1bit_device> m_dac;
 	output_finder<4> m_out_digit;
 	required_ioport m_inputs;
 
+	u8 m_latch[5] = { };
+	u8 m_dac_data = 0;
+
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
 	u8 input_r(offs_t offset);
 	void latch_w(offs_t offset, u8 data);
 	void lcd_update_w(int state);
-
-	u8 m_latch[5] = { };
-	u8 m_dac_data = 0;
-	u8 m_lcd_update = 0;
 };
 
 void debut_state::machine_start()
 {
-	// resolve handlers
-	m_out_digit.resolve();
-
 	// register for savestates
 	save_item(NAME(m_latch));
 	save_item(NAME(m_dac_data));
-	save_item(NAME(m_lcd_update));
 }
 
 
@@ -169,15 +165,15 @@ void debut_state::latch_w(offs_t offset, u8 data)
 void debut_state::lcd_update_w(int state)
 {
 	// 8086 S5 also goes to the lcd panel
-	if (!state && m_lcd_update)
+	if (state)
 	{
-		u8 xorval = (m_latch[4] & 1) ? 0xff : 0;
+		const u8 xorval = (m_latch[4] & 1) ? 0xff : 0;
 
 		for (int i = 0; i < 4; i++)
-			m_out_digit[i] = bitswap<8>(m_latch[i+1] ^ xorval,0,7,4,3,2,1,6,5);
+			m_digit_pwm->write_row(i, bitswap<8>(m_latch[i+1] ^ xorval,0,7,4,3,2,1,6,5));
 	}
-
-	m_lcd_update = state;
+	else
+		m_digit_pwm->clear();
 }
 
 
@@ -209,14 +205,14 @@ static INPUT_PORTS_START( debutm )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME(u8"АН (Analysis)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME(u8"ХОД (Force Move)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME(u8"ИНТ (Switch 1P/2P)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"ПОЗ (Position Mode)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME(u8"ПОЗ (Position Mode)")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"ВФ (Select Piece)")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME(u8"ВП (Take Back)")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME(u8"ВП (Take Back)")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME(u8"УР (Level)")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME(u8"ВВ (Enter Position)")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, debut_state, reset_button, 0) PORT_NAME(u8"СБ (Reset)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(debut_state::reset_button), 0) PORT_NAME(u8"СБ (Reset)")
 INPUT_PORTS_END
 
 
@@ -241,6 +237,11 @@ void debut_state::debutm(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	m_display->set_bri_maximum(0.5);
+
+	PWM_DISPLAY(config, m_digit_pwm).set_size(4, 8);
+	m_digit_pwm->set_segmask(0xf, 0xff);
+	m_digit_pwm->output_digit().set([this](offs_t offset, u64 data) { m_out_digit[offset] = data; });
+
 	config.set_default_layout(layout_debutm);
 
 	// sound hardware
@@ -269,4 +270,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1994, debutm, 0,      0,      debutm,  debutm, debut_state, empty_init, "Energopribor", "Debut-M", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1994, debutm, 0,      0,      debutm,  debutm, debut_state, empty_init, "Energopribor", "Debut-M", MACHINE_SUPPORTS_SAVE )

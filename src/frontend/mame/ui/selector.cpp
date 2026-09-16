@@ -26,12 +26,12 @@ namespace ui {
 
 menu_selector::menu_selector(
 		mame_ui_manager &mui,
-		render_container &container,
+		render_target &target,
 		std::string &&title,
 		std::vector<std::string> &&sel,
 		int initial,
 		std::function<void (int)> &&handler)
-	: menu(mui, container)
+	: menu(mui, target)
 	, m_title(std::move(title))
 	, m_search()
 	, m_str_items(std::move(sel))
@@ -143,7 +143,7 @@ void menu_selector::recompute_metrics(uint32_t width, uint32_t height, float asp
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_selector::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// get the text for 'UI Select'
 	std::string const tempbuf[] = { util::string_format(_("menu-selector", "Double-click or press %1$s to select"), ui().get_general_input_setting(IPT_UI_SELECT)) };

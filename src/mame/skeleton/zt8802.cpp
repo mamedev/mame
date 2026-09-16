@@ -37,8 +37,8 @@ private:
 	u8 rtc_r();
 	void rtc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_pia;
@@ -103,4 +103,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_IS_SKELETON )
+COMP( 1994, zt8802, 0, 0, zt8802, zt8802, zt8802_state, empty_init, "Ziatech", "ZT-8802 SBC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

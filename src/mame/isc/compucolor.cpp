@@ -71,8 +71,8 @@ public:
 	required_ioport_array<16> m_y;
 	required_ioport m_y128;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -84,8 +84,8 @@ public:
 
 	uint8_t m_xo;
 	void compucolor2(machine_config &config);
-	void compucolor2_io(address_map &map);
-	void compucolor2_mem(address_map &map);
+	void compucolor2_io(address_map &map) ATTR_COLD;
+	void compucolor2_mem(address_map &map) ATTR_COLD;
 };
 
 void compucolor2_state::compucolor2_mem(address_map &map)
@@ -160,7 +160,7 @@ static INPUT_PORTS_START( compucolor2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10 X BAR XO")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad " UTF8_MULTIPLY) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Keypad ×") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y6")
@@ -408,7 +408,7 @@ void compucolor2_state::compucolor2(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(compucolor2_state::int_ack));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256);
 	screen.set_screen_update(FUNC(compucolor2_state::screen_update));
 

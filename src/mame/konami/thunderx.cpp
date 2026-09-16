@@ -49,6 +49,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "multibyte.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -164,8 +165,7 @@ private:
 	void thunderx_videobank_w(uint8_t data);
 	void thunderx_1f98_w(uint8_t data);
 
-	void run_collisions(int s0, int e0, int s1, int e1, int cm, int hm);
-	void calculate_collisions();
+	void pmc_run();
 
 	void thunderx_map(address_map &map) ATTR_COLD;
 };
@@ -181,16 +181,17 @@ static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
 
 K052109_CB_MEMBER(thunderx_state_base::tile_callback)
 {
-	*code |= ((*color & 0x1f) << 8) | (bank << 13);
-	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x1f) << 8) | (bank << 13);
+	color = layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K052109_CB_MEMBER(scontra_state::gbusters_tile_callback)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	*code |= ((*color & 0x0d) << 8) | ((*color & 0x10) << 5) | (bank << 12);
-	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x0d) << 8) | ((color & 0x10) << 5) | (bank << 12);
+	color = layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
+
 
 /***************************************************************************
 
@@ -205,15 +206,15 @@ K051960_CB_MEMBER(thunderx_state_base::sprite_callback)
 	/* Sprite priority 1 means appear behind background, used only to mask sprites */
 	/* in the foreground */
 	/* Sprite priority 3 means don't draw (not used) */
-	switch (*color & 0x30)
+	switch (color & 0x30)
 	{
-		case 0x00: *priority = 0; break;
-		case 0x10: *priority = GFX_PMASK_2 | GFX_PMASK_1; break;
-		case 0x20: *priority = GFX_PMASK_2; break;
-		case 0x30: *priority = 0xffff; break;
+		case 0x00: priority = 0; break;
+		case 0x10: priority = GFX_PMASK_2 | GFX_PMASK_1; break;
+		case 0x20: priority = GFX_PMASK_2; break;
+		case 0x30: priority = 0xffff; break;
 	}
 
-	*color = sprite_colorbase + (*color & 0x0f);
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -225,8 +226,6 @@ K051960_CB_MEMBER(thunderx_state_base::sprite_callback)
 
 uint32_t thunderx_state_base::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 
 	// The background color is always from layer 1
@@ -253,13 +252,12 @@ uint8_t thunderx_state::pmc_r(offs_t offset)
 {
 	if (pmc_bk())
 	{
-//      logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
+		//logerror("%04x read pmcram %04x\n",m_audiocpu->pc(),offset);
 		return m_pmcram[offset];
 	}
 	else
 	{
-		LOG("%04x read pmc internal ram %04x\n", m_audiocpu->pc(), offset);
-		return 0;
+		return 0; // PMC internal RAM can't be read back
 	}
 }
 
@@ -272,156 +270,87 @@ void thunderx_state::pmc_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		LOG("%04x pmc internal ram %04x = %02x\n", m_audiocpu->pc(), offset, data);
+		LOG("%04x pmc set initial PC %04x = %02x\n", m_audiocpu->pc(), offset, data);
+		// thunderx only uses one PMC program which has its entry point at address 01
 	}
 }
 
 /*
-this is the data written to internal ram on startup:
+This is the 052591 PMC code loaded at startup, it contains a collision check program.
+See https://github.com/furrtek/SiliconRE/tree/master/Konami/052591 for details
 
-    Japan version   US version
-00: e7 00 00 ad 08  e7 00 00 ad 08
-01: 5f 80 05 a0 0c  1f 80 05 a0 0c                                                      LDW ACC,RAM+05
-02:                 42 7e 00 8b 04                                                      regE
-03: df 00 e2 8b 08  df 8e 00 cb 04                                                      regE
-04: 5f 80 06 a0 0c  5f 80 07 a0 0c                                                      LDB ACC,RAM+07
-05: df 7e 00 cb 08  df 7e 00 cb 08                                                      LDB R7,[Rx]
-06: 1b 80 00 a0 0c  1b 80 00 a0 0c  LDPTR #0                                             PTR2,RAM+00
-07: df 10 00 cb 08  df 10 00 cb 08  LDB R1,[PTR] (fl)                                   LDB R1,[Rx] (flags)
-08: 5f 80 03 a0 0c  5f 80 03 a0 0c  LDB R0,[3] (cm)                                     LDB ACC,RAM+03    load collide mask
-09: 1f 20 00 cb 08  1f 20 00 cb 08  LD CMP2,R0                                          test (AND) R1 vs ACC
-0a: c4 00 00 ab 0c  c4 00 00 ab 0c  INC PTR                                             LEA Rx,[++PTR2]
-0b: df 20 00 cb 08  df 20 00 cb 08  LDB R2,[PTR] (w)                                    LDB R2,[Rx] (width)
-0c: c4 00 00 ab 0c  c4 00 00 ab 0c  INC PTR                                             LEA Rx,[++PTR2]
-0d: df 30 00 cb 08  df 30 00 cb 08  LDB R3,[PTR] (h)                                    LDB R3,[Rx] (height)
-0e: c4 00 00 ab 0c  c4 00 00 ab 0c  INC PTR                                             LEA Rx,[++PTR2]
-0f: df 40 00 cb 08  df 40 00 cb 08  LDB R4,[PTR] (x)                                    LDB R4,[Rx] (x)
-10: c4 00 00 ab 0c  c4 00 00 ab 0c  INC PTR                                             LEA Rx,[++PTR2]
-11: df 50 00 cb 08  df 50 00 cb 08  LDB R5,[PTR] (y)                                    LDB R5,[Rx] (y)
-12: 60 22 35 e9 08  60 22 36 e9 08  BANDZ CMP2,R1,36                                    R2/R1, BEQ 36
-13: 44 0e 00 ab 08  44 0e 00 ab 08  MOVE PTR,INNER                                      LEA Rx,[PTR,0]    load flags
-14: df 60 00 cb 08  df 60 00 cb 08  LDB R6,[PTR] (fl)                                   LDB R6,[Rx]
-15: 5f 80 04 a0 0c  5f 80 04 a0 0c  LDB R0,[4] (hm)                                     LDB ACC,RAM+04    load hit mask
-16: 1f 60 00 cb 08  1f 60 00 cb 08  LD CMP6,R0                                          test R6 and ACC (AND)
-17: 60 6c 31 e9 08  60 6c 32 e9 08  BANDZ CMP6,R6,32                                    R6, BEQ 32
-18: 45 8e 01 a0 0c  45 8e 01 a0 0c  LDB R0,[INNER+1]                                    LDB Ry,[PTR,1] (width)
-19: c5 64 00 cb 08  c5 64 00 cb 08  ADD ACC,R0,R2                                       R6 = ADD Ry,R2
-1a: 45 8e 03 a0 0c  45 8e 03 a0 0c  LDB R0,[INNER+3]                                    LDB Ry,[PTR,3] (x)
-1b: 67 00 00 cb 0c  67 00 00 cb 0c  MOV CMP,R0                                          ??? DEC Ry
-1c: 15 48 5d c9 0c  15 48 5e c9 0c  SUB CMP,R4 ; BGE 1E                                 SUB R4,Ry; Bcc 1E
-1d: 12 00 00 eb 0c  12 00 00 eb 0c  NEG CMP                                             ??? NEG Ry
-1e: 48 6c 71 e9 0c  48 6c 72 e9 0c  B (CMP > ACC) 32                                    R6, BLO 32
-1f: 45 8e 02 a0 0c  45 8e 02 a0 0c  LDB R0,[INNER+2]                                    LDB Ry,[PTR,2] (height)
-20: c5 66 00 cb 08  c5 66 00 cb 08  ADD ACC,R0,R3                                       R6 = ADD Ry,R3
-21: 45 8e 04 a0 0c  45 8e 04 a0 0c  LDB R0,[INNER+4]                                    LDB Ry,[PTR,4] (y)
-22: 67 00 00 cb 0c  67 00 00 cb 0c  MOV CMP,R0                                          ??? DEC Ry
-23: 15 5a 64 c9 0c  15 5a 65 c9 0c  SUB CMP,R5 ; BGE 25                                 SUB R5,Ry; Bcc 25
-24: 12 00 00 eb 0c  12 00 00 eb 0c  NEG CMP                                             ??? NEG Ry
-25: 48 6c 71 e9 0c  48 6c 72 e9 0c  B (CMP > ACC) 32                                    R6, BLO 32
-26: e5 92 9b e0 0c  e5 92 9b e0 0c                                                      AND R1,#$9B
-27: dd 92 10 e0 0c  dd 92 10 e0 0c                                                      OR R1,#$10
-28: 5c fe 00 a0 0c  5c fe 00 a0 0c                                                      ??? STB [PTR,0]
-29: df 60 00 d3 08  df 60 00 d3 08                                                      LDB R6,
-2a: e5 ec 9f e0 0c  e5 ec 9f e0 0c                                                      AND R6,#$9F
-2b: dd ec 10 00 0c  dd ec 10 00 0c                                                      OR R6,#$10
-2c: 25 ec 04 c0 0c  25 ec 04 c0 0c                                                      STB R6,[PTR2,-4]
-2d: 18 82 00 00 0c  18 82 00 00 0c
-2e: 4d 80 03 a0 0c  4d 80 03 a0 0c                                                      RAM+03
-2f: df e0 e6 e0 0c  df e0 36 e1 0c
-30: 49 60 75 f1 08  49 60 76 f1 08                                                      Jcc 36
-31: 67 00 35 cd 08  67 00 36 cd 08                                                      Jcc 36
-32: c5 fe 05 e0 0c  c5 fe 05 e0 0c  ADD R7,R7,5                                         ADD regE,#5
-33: 5f 80 02 a0 0c  5f 80 02 a0 0c  LDB R0, [2]                                         LDB ACC,RAM+02
-34: 1f 00 00 cb 08  1f 00 00 cb 08  LCMP CMP0,R0
-35: 48 6e 52 c9 0c  48 6e 53 c9 0c  BNEQ CMP0,R7, 33                                    R6/R7, BLO 13
-36: c4 00 00 ab 0c  c4 00 00 ab 0c  INC PTR                                             LEA Rx,[++PTR2]
-37: 27 00 00 ab 0c  27 00 00 ab 0c
-38: 42 00 00 8b 04  42 00 00 8b 04  MOVE PTR, OUTER
-39: 1f 00 00 cb 00  1f 00 00 cb 00   LCMP CMP0 ??                                       test PTR2 vs ACC
-3a: 48 00 43 c9 00  48 00 44 c9 00  BLT 4                                               BLT 04      next in set 0
-3b: 5f fe 00 e0 08  5f fe 00 e0 08
-3c: 5f 7e 00 ed 08  5f 7e 00 ed 08
-3d: ff 04 00 ff 06  ff 04 00 ff 06  STOP                                                STOP
-3e: 05 07 ff 02 03  05 07 ff 02 03
-3f: 01 01 e0 02 6c  01 00 60 00 a0
-    03 6c 04 40 04
+    common version  thunderxa only
+00: e7 00 00 ad 08  00: e7 00 00 ad 08  JP 00, infinite loop
+01: 5f 80 05 a0 0c  01: 1f 80 05 a0 0c  Set ext address to 5
+                    02: 42 7e 00 8b 04
+02: df 00 e2 8b 08  03: df 8e 00 cb 04  r0.b or r0.w = RAM[5]
+03: 5f 80 06 a0 0c  04: 5f 80 07 a0 0c  Set ext address to 6 or 7
+04: df 7e 00 cb 08  05: df 7e 00 cb 08  r7.b = RAM[6 or 7]
+05: 1b 80 00 a0 0c  06: 1b 80 00 a0 0c  Set ext address to r0
+06: df 10 00 cb 08  07: df 10 00 cb 08  r1.b = RAM[r0] (flags)
+07: 5f 80 03 a0 0c  08: 5f 80 03 a0 0c  Set ext address to 3
+08: 1f 20 00 cb 08  09: 1f 20 00 cb 08  acc.b = RAM[3] (collide mask)
+09: c4 00 00 ab 0c  0a: c4 00 00 ab 0c  INC r0, set ext address to r0
+0a: df 20 00 cb 08  0b: df 20 00 cb 08  r2.b = RAM[r0] (width)
+0b: c4 00 00 ab 0c  0c: c4 00 00 ab 0c  INC r0, set ext address to r0
+0c: df 30 00 cb 08  0d: df 30 00 cb 08  r3.b = RAM[r0] (height)
+0d: c4 00 00 ab 0c  0e: c4 00 00 ab 0c  INC r0, set ext address to r0
+0e: df 40 00 cb 08  0f: df 40 00 cb 08  r4.b = RAM[r0] (x)
+0f: c4 00 00 ab 0c  10: c4 00 00 ab 0c  INC r0, set ext address to r0
+10: df 50 00 cb 08  11: df 50 00 cb 08  r5.b = RAM[r0] (y)
+11: 60 22 35 e9 08  12: 60 22 36 e9 08  JP 35 or 36 if r1 AND acc == 0
+12: 44 0e 00 ab 08  13: 44 0e 00 ab 08  Set ext address to r7
+13: df 60 00 cb 08  14: df 60 00 cb 08  r6.b = RAM[r7] (flags)
+14: 5f 80 04 a0 0c  15: 5f 80 04 a0 0c  Set ext address to 4
+15: 1f 60 00 cb 08  16: 1f 60 00 cb 08  acc.b = RAM[4] (hit mask)
+16: 60 6c 31 e9 08  17: 60 6c 32 e9 08  JP 32 if r6 AND acc == 0
+17: 45 8e 01 a0 0c  18: 45 8e 01 a0 0c  Set ext address to r7 + 1
+18: c5 64 00 cb 08  19: c5 64 00 cb 08  r6.b = RAM[r7 + 1] + r2 (add widths together)
+19: 45 8e 03 a0 0c  1a: 45 8e 03 a0 0c  Set ext address to r7 + 3
+1a: 67 00 00 cb 0c  1b: 67 00 00 cb 0c  acc = RAM[r7 + 3] - r4 (x1 - x0)
+1b: 15 48 5d c9 0c  1c: 15 48 5e c9 0c  JP 1D or 1E if positive
+1c: 12 00 00 eb 0c  1d: 12 00 00 eb 0c  NEG acc
+1d: 48 6c 71 e9 0c  1e: 48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
+1e: 45 8e 02 a0 0c  1f: 45 8e 02 a0 0c  Set ext address to r7 + 2
+1f: c5 66 00 cb 08  20: c5 66 00 cb 08  r6.b = RAM[r7 + 2] + r3 (add heights together)
+20: 45 8e 04 a0 0c  21: 45 8e 04 a0 0c  Set ext address to r7 + 4
+21: 67 00 00 cb 0c  22: 67 00 00 cb 0c  acc = RAM[r7 + 4] - r5 (y1 - y0)
+22: 15 5a 64 c9 0c  23: 15 5a 65 c9 0c  JP 24 or 25 if positive
+23: 12 00 00 eb 0c  24: 12 00 00 eb 0c  NEG acc
+24: 48 6c 71 e9 0c  25: 48 6c 72 e9 0c  JP 31 or 32 if r6 < acc
+25: e5 92 9b e0 0c  26: e5 92 9b e0 0c  AND R1,#$9B
+26: dd 92 10 e0 0c  27: dd 92 10 e0 0c  OR R1,#$10
+27: 5c fe 00 a0 0c  28: 5c fe 00 a0 0c  Set ext address to r7
+28: df 60 00 d3 08  29: df 60 00 d3 08  r6.b = RAM[r7] (flags)
+29: e5 ec 9f e0 0c  2a: e5 ec 9f e0 0c  AND r6,#$9F
+2a: dd ec 10 00 0c  2b: dd ec 10 00 0c  RAM[r7] = r6 | #$10
+2b: 25 ec 04 c0 0c  2c: 25 ec 04 c0 0c  acc = r6 & 4
+2c: 18 82 00 00 0c  2d: 18 82 00 00 0c  OR acc,r1
+2d: 4d 80 03 a0 0c  2e: 4d 80 03 a0 0c  Set ext address to r7 - 4
+2e: df e0 e6 e0 0c  2f: df e0 36 e1 0c  r6 = #$E6 or #$136
+2f: 49 60 75 f1 08  30: 49 60 76 f1 08  JP 35 or 36 if r0 < r6
+30: 67 00 35 cd 08  31: 67 00 36 cd 08  Write acc to [r7 - 4], JP 35 or 36
+31: c5 fe 05 e0 0c  32: c5 fe 05 e0 0c  r7 += 5, next object in set 1
+32: 5f 80 02 a0 0c  33: 5f 80 02 a0 0c  Set ext address to 2
+33: 1f 00 00 cb 08  34: 1f 00 00 cb 08  acc.b = RAM[2]
+34: 48 6e 52 c9 0c  35: 48 6e 53 c9 0c  JP 12 or 13 if r7 < acc
+35: c4 00 00 ab 0c  36: c4 00 00 ab 0c  INC r0, next object in set 0
+36: 27 00 00 ab 0c  37: 27 00 00 ab 0c  Set ext address to 0
+37: 42 00 00 8b 04  38: 42 00 00 8b 04  acc.w = RAM[0]
+38: 1f 00 00 cb 00  39: 1f 00 00 cb 00
+39: 48 00 43 c9 00  3a: 48 00 44 c9 00  JP 3 or 4 if r0 < acc
+3a: 5f fe 00 e0 08  3b: 5f fe 00 e0 08  Set OUT0 low
+3b: 5f 7e 00 ed 08  3c: 5f 7e 00 ed 08  JP 0
+3c: ff 04 00 ff 06  3d: ff 04 00 ff 06  Garbage
+3d: 05 07 ff 02 03  3e: 05 07 ff 02 03  Garbage
+3e: 01 01 e0 02 6c  3f: 01 00 60 00 a0  Garbage
+3f: 03 6c 04 40 04                      Garbage
 */
 
-// run_collisions
-//
-// collide objects from s0 to e0 against
-// objects from s1 to e1
-//
-// only compare objects with the specified bits (cm) set in their flags
-// only set object 0's hit bit if (hm & 0x40) is true
-//
-// the data format is:
-//
-// +0 : flags
-// +1 : width (4 pixel units)
-// +2 : height (4 pixel units)
-// +3 : x (2 pixel units) of center of object
-// +4 : y (2 pixel units) of center of object
-
-void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int hm )
-{
-	uint8_t* p0;
-	uint8_t* p1;
-	int ii, jj;
-
-	p0 = &m_pmcram[16 + 5 * s0];
-	for (ii = s0; ii < e0; ii++, p0 += 5)
-	{
-		int l0, r0, b0, t0;
-
-		// check valid
-		if (!(p0[0] & cm))
-			continue;
-
-		// get area
-		l0 = p0[3] - p0[1];
-		r0 = p0[3] + p0[1];
-		t0 = p0[4] - p0[2];
-		b0 = p0[4] + p0[2];
-
-		p1 = &m_pmcram[16 + 5 * s1];
-		for (jj = s1; jj < e1; jj++,p1 += 5)
-		{
-			int l1,r1,b1,t1;
-
-			// check valid
-			if (!(p1[0] & hm))
-				continue;
-
-			// get area
-			l1 = p1[3] - p1[1];
-			r1 = p1[3] + p1[1];
-			t1 = p1[4] - p1[2];
-			b1 = p1[4] + p1[2];
-
-			// overlap check
-			if (l1 >= r0) continue;
-			if (l0 >= r1) continue;
-			if (t1 >= b0) continue;
-			if (t0 >= b1) continue;
-
-			// set flags
-			p0[0] = (p0[0] & 0x9f) | (p1[0] & 0x04) | 0x10;
-			p1[0] = (p1[0] & 0x9f) | 0x10;
-		}
-	}
-}
-
-// calculate_collisions
-//
 // emulates K052591 collision detection
 
-void thunderx_state::calculate_collisions()
+void thunderx_state::pmc_run()
 {
-	int X0,Y0;
-	int X1,Y1;
-	int CM,HM;
-
 	// the data at 0x00 to 0x06 defines the operation
 	//
 	// 0x00 : word : last byte of set 0
@@ -431,40 +360,73 @@ void thunderx_state::calculate_collisions()
 	// 0x05 : byte : first byte of set 0
 	// 0x06 : byte : first byte of set 1
 	//
-	// the USA version is slightly different:
+	// thunderxa is slightly different:
 	//
 	// 0x05 : word : first byte of set 0
 	// 0x07 : byte : first byte of set 1
 	//
 	// the operation is to intersect set 0 with set 1
-	// collide mask specifies objects to ignore
-	// hit mask is 40 to set bit on object 0 and object 1
-	// hit mask is 20 to set bit on object 1 only
+	// masks specify objects to ignore
 
-	Y0 = m_pmcram[0];
-	Y0 = (Y0 << 8) + m_pmcram[1];
-	Y0 = (Y0 - 15) / 5;
-	Y1 = (m_pmcram[2] - 15) / 5;
+	const uint16_t e0 = get_u16be(&m_pmcram[0]);
+	const uint8_t e1 = m_pmcram[2];
 
+	uint16_t s0, s1, p0_lim;
+
+	// Heuristic to determine version of program based on byte at 0x05
 	if (m_pmcram[5] < 16)
 	{
-		// US Thunder Cross uses this form
-		X0 = m_pmcram[5];
-		X0 = (X0 << 8) + m_pmcram[6];
-		X0 = (X0 - 16) / 5;
-		X1 = (m_pmcram[7] - 16) / 5;
+		// thunderxa only
+		s0 = get_u16be(&m_pmcram[5]);
+		s1 = m_pmcram[7];
+		p0_lim = 0x136;
 	}
 	else
 	{
-		// Japan Thunder Cross uses this form
-		X0 = (m_pmcram[5] - 16) / 5;
-		X1 = (m_pmcram[6] - 16) / 5;
+		// other sets
+		s0 = m_pmcram[5];
+		s1 = m_pmcram[6];
+		p0_lim = 0xe6;
 	}
 
-	CM = m_pmcram[3];
-	HM = m_pmcram[4];
+	const uint8_t cm = m_pmcram[3];
+	const uint8_t hm = m_pmcram[4];
 
-	run_collisions(X0, Y0, X1, Y1, CM, HM);
+	// collide objects from s0 to e0 against objects from s1 to e1
+	// only process objects with the specified bits (cm/hm) set in their flags
+	//
+	// the data format for each object is:
+	//
+	// +0 : flags
+	// +1 : width (4 pixel units)
+	// +2 : height (4 pixel units)
+	// +3 : x (2 pixel units) of center of object
+	// +4 : y (2 pixel units) of center of object
+	for (uint8_t *p0 = &m_pmcram[s0]; p0 < &m_pmcram[e0]; p0 += 5)
+	{
+		// check object 0 flags
+		if (!(p0[0] & cm))
+			continue;
+
+		for (uint8_t *p1 = &m_pmcram[s1]; p1 < &m_pmcram[e1]; p1 += 5)
+		{
+			// check object 1 flags
+			if (!(p1[0] & hm))
+				continue;
+
+			if (p1[1] + p0[1] < abs(p1[3] - p0[3])) continue;
+			if (p1[2] + p0[2] < abs(p1[4] - p0[4])) continue;
+
+			// set flags
+			p1[0] = (p1[0] & 0x8f) | 0x10;
+			if (&p0[4] >= &m_pmcram[p0_lim]) // This address value is hardcoded in the PMC program
+				p0[0] = (p0[0] & 0x9b) | (p1[0] & 0x04) | 0x10;
+			break;
+		}
+	}
+
+	// 100 cycle delay is arbitrary
+	m_thunderx_firq_timer->adjust(m_maincpu->cycles_to_attotime(100));
 }
 
 void thunderx_state_base::scontra_1f98_w(uint8_t data)
@@ -492,10 +454,7 @@ void thunderx_state::thunderx_1f98_w(uint8_t data)
 	// bit 2 = PMC START (do collision detection when 0->1)
 	if ((data & 4) && !(m_1f98_latch & 4))
 	{
-		calculate_collisions();
-
-		// 100 cycle delay is arbitrary
-		m_thunderx_firq_timer->adjust(m_maincpu->cycles_to_attotime(100));
+		pmc_run();
 	}
 
 	scontra_1f98_w(data);
@@ -556,7 +515,7 @@ void scontra_state::gbusters_videobank_w(uint8_t data)
 
 void thunderx_state_base::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void scontra_state::k007232_bankswitch_w(uint8_t data)
@@ -820,6 +779,13 @@ void thunderx_state_base::machine_start()
 	m_palette->set_shadow_factor(7.0/8.0);
 }
 
+void thunderx_state::machine_start()
+{
+	thunderx_state_base::machine_start();
+
+	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
+}
+
 void thunderx_state_base::machine_reset()
 {
 	m_rombank->set_entry(0);
@@ -831,33 +797,30 @@ void thunderx_state_base::machine_reset()
 void thunderx_state_base::common(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state_base::scontra_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on PCB
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thunderx_state_base::thunderx_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.17); // verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1); // verified on scontra and thunderx PCBs
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified on scontra and thunderx PCBs
 	screen.set_screen_update(FUNC(thunderx_state_base::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0); // 051961 on Super Contra and Thunder Cross schematics
+	K052109(config, m_k052109, 24_MHz_XTAL); // 051961 on Super Contra and Thunder Cross schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(thunderx_state_base::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(thunderx_state_base::sprite_callback));
@@ -867,27 +830,8 @@ void thunderx_state_base::common(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);  /* verified on pcb */
-}
-
-void scontra_state::scontra(machine_config &config)
-{
-	common(config);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
-
-	K007232(config, m_k007232, XTAL(3'579'545)); // verified on PCB
-	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
-}
-
-
-void thunderx_state::machine_start()
-{
-	thunderx_state_base::machine_start();
-
-	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); /* verified on pcb */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void thunderx_state::thunderx(machine_config &config)
@@ -900,6 +844,17 @@ void thunderx_state::thunderx(machine_config &config)
 	m_maincpu->line().set_membank(m_rombank).mask(0x0f);
 
 	m_k052109->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+void scontra_state::scontra(machine_config &config)
+{
+	common(config);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
+
+	K007232(config, m_k007232, 3.579545_MHz_XTAL); // verified on PCB
+	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.1);
 }
 
 void scontra_state::gbusters(machine_config &config)
@@ -1213,8 +1168,8 @@ ROM_END
 
 ROM_START( gbustersa )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* banked program ROMs */
-	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
-	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version leter */
+	ROM_LOAD( "878_02.k13", 0x00000, 0x10000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version letter */
+	ROM_LOAD( "878_03.k15", 0x10000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version letter */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
@@ -1264,11 +1219,13 @@ ROM_END
 
 GAME( 1988, scontra,   0,        scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, scontraa,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra - Alien no Gyakushuu (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra: Alien no Gyakushuu (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, gbusters,  0,        gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
 GAME( 1988, gbustersa, gbusters, gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
 GAME( 1988, crazycop,  gbusters, gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs

@@ -107,7 +107,7 @@ ROM_END
 class keyboard_base : public device_t, public device_mac_keyboard_interface
 {
 public:
-	CUSTOM_INPUT_MEMBER(host_data_r)
+	ioport_value host_data_r()
 	{
 		return m_host_data_in ^ 0x01;
 	}
@@ -323,7 +323,7 @@ INPUT_PORTS_START(keyboard_us)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK)                         PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_NAME("Caps Lock") PORT_TOGGLE
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)   PORT_CODE(KEYCODE_RALT)   PORT_CHAR(UCHAR_SHIFT_2)           PORT_NAME("Option")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)                                                            PORT_NAME("Command")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(keyboard_base, host_data_r)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(keyboard_base::host_data_r))
 INPUT_PORTS_END
 
 INPUT_PORTS_START(keyboard_fr)
@@ -427,7 +427,7 @@ INPUT_PORTS_START(keyboard_jp)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l')   PORT_CHAR('L')      PORT_NAME(u8"L  \u30ea")                // リ
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)          PORT_CHAR('i')   PORT_CHAR('I')      PORT_NAME(u8"I  \u30cb")                // ニ
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)          PORT_CHAR('8')   PORT_CHAR('*')      PORT_NAME(u8"8  *  \u30e6  \u30e5")     // ユ ュ
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/')   PORT_CHAR('?')      PORT_NAME(u8"/  ?  \u30e1  \u30fb")     // ム ・
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/')   PORT_CHAR('?')      PORT_NAME(u8"/  ?  \u30e1  \u30fb")     // メ ・
 
 	PORT_MODIFY("ROW7")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)          PORT_CHAR('0')   PORT_CHAR(')')      PORT_NAME(u8"0  )  \u30ef  \u30f2")     // ワ ヲ

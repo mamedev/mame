@@ -2,9 +2,10 @@
 // copyright-holders:
 
 /*
-    Mini Guay (c) 1986 Cirsa
-
-    Slot machine.
+    Cirsa 860607 hardware for slot machines.
+    Known games on this hardware:
+      -Mini Bar (c) 1989 Cirsa
+      -Mini Guay (c) 1986 Cirsa
 
     Main components:
     1 x 8085
@@ -15,6 +16,7 @@
     1 x 6.144MHz Osc
     battery backed RAM
 
+    Layout for 860607-2A PCB:
    ________________________________________________
   |C |  ________   ________                       |
   |O |  ULN2064B  |_7417N_|                       |
@@ -56,18 +58,13 @@
   ||N|    PCB 860607-2A             |
   |_________________________________|
 
-    Two different PCBs were found with same components, albeit some from different producers.
     The coin acceptor is driven by a MCU (unknown type).
-
-    The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
-    one (undumped) called "Mini Guay VR" (VR stands for "Version Rodillos") or just "Mini Guay" with
-    reels instead, with an additional PCB for reels control (8031 + 2764 EPROM).
 */
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
-//#include "machine/i8256.h"
+#include "machine/i8256.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "screen.h"
@@ -90,7 +87,7 @@ public:
 	void miniguay(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void psg_control_w(u8 data);
@@ -100,7 +97,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_psg;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_psg_control;
 	u8 m_psg_data;
@@ -136,10 +133,10 @@ void miniguay_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x87ff).ram();
-	//map(0x9400, 0x940f).rw("muart1", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x9400, 0x940f).rw("muart1", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x9900, 0x9907).rw("i8155_1", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x9d00, 0x9d07).rw("i8155_2", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	//map(0xb400, 0xb40f).rw("muart2", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0xb400, 0xb40f).rw("muart2", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0xb409, 0xb409).rw(FUNC(miniguay_state::psg_db_r), FUNC(miniguay_state::psg_db_w));
 	map(0xb900, 0xb907).rw("i8155_3", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xbd00, 0xbd07).rw("i8155_4", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
@@ -184,8 +181,8 @@ void miniguay_state::miniguay(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	//I8256(config, "muart1", 6.144_MHz_XTAL / 2);
-	//I8256(config, "muart2", 6.144_MHz_XTAL / 2);
+	I8256(config, "muart1", 6.144_MHz_XTAL / 2);
+	I8256(config, "muart2", 6.144_MHz_XTAL / 2);
 
 	I8155(config, "i8155_1", 6.144_MHz_XTAL / 2); // divider not verified
 
@@ -205,6 +202,10 @@ void miniguay_state::miniguay(machine_config &config)
 }
 
 
+/* Mini Guay - 860607-2A PCB
+   The dumped version (Mini Guay VD) uses plastic displays with light bulbs, but there's a different
+   one (undumped) called "Mini Guay VR" (VR stands for "Versión Rodillos") or just "Mini Guay" with
+   reels instead, with an additional PCB for reels control (8031 + 2764 EPROM). */
 ROM_START( miniguay )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "a21t_b-82.bin", 0x0000, 0x8000, CRC(04865da9) SHA1(78cf41d8428eb67ae40e764494ac03d45762500a) ) // Dumped from two different PCBs
@@ -213,7 +214,19 @@ ROM_START( miniguay )
 	ROM_LOAD( "pat_031_pal16r4.bin", 0x000, 0x104, NO_DUMP )
 ROM_END
 
+/* Mini Bar - 860607-3 PCB
+   This is the "regular" displays Mini Bar version. There is another one with bigger displays,
+   (labeled "Displays Grandes") but it's unknown if it uses a different ROM. */
+ROM_START( minibar )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "c_mini_bar_b-1831_v4.0.ic13", 0x0000, 0x8000, CRC(accc2dc9) SHA1(a4574c451e0dd65365a552b03ba2d1f8af1ab1cc) )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "pat_042.ic19", 0x000, 0x104, NO_DUMP )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_IS_SKELETON_MECHANICAL ) // VD stands for "Version Displays".
+GAME( 1986, miniguay, 0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Guay VD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // VD stands for "Versión Displays".
+GAME( 1989, minibar,  0, miniguay, miniguay, miniguay_state, empty_init, ROT0, "Cirsa", "Mini Bar",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

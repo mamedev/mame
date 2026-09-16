@@ -66,7 +66,6 @@
 #include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
@@ -84,8 +83,9 @@
 
     ***************** read access *******************
     range     short   description
-    0000-9FFF RAM     main memory
-    A000-BFFF RAM/ROM RAM or (banked) ROM cartridges
+    0000-7FFF RAM     main memory
+    8000-9FFF RAM/ROM RAM or (right/banked) ROM cartridges
+    A000-BFFF RAM/ROM RAM or (left/banked) ROM cartridges
     C000-CFFF ROM     unused or monitor ROM
 
     ********* GTIA    ********************************
@@ -276,6 +276,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_pia(*this, "pia")
 		, m_dac(*this, "dac")
+		, m_sio(*this, "sio")
 		, m_region_maincpu(*this, "maincpu")
 		, m_cartleft(*this, "cartleft")
 		, m_cart_rd4_view(*this, "cart_rd4_view")
@@ -290,11 +291,11 @@ protected:
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
 
-	void a400_mem(address_map &map);
+	void a400_mem(address_map &map) ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// TODO: these two should really be inside ram_device instead
 	template <unsigned StartBase> uint8_t ram_r(address_space &space, offs_t offset)
@@ -332,19 +333,20 @@ protected:
 	optional_device<ram_device> m_ram;
 	optional_device<pia6821_device> m_pia;
 	optional_device<dac_bit_interface> m_dac;
+	optional_device<a8sio_device> m_sio;
 	required_memory_region m_region_maincpu;
 	optional_device<a800_cart_slot_device> m_cartleft;
 	memory_view m_cart_rd4_view, m_cart_rd5_view;
 	optional_device_array<vcs_control_port_device, 4> m_ctrl;
 
-	void hw_iomap(address_map &map);
+	void hw_iomap(address_map &map) ATTR_COLD;
 
 	int m_cart_rd4_enabled = 0, m_cart_rd5_enabled = 0;
 	void cart_rd4_w( int state );
 	void cart_rd5_w( int state );
 
-	virtual void area_8000_map(address_map &map);
-	virtual void area_a000_map(address_map &map);
+	virtual void area_8000_map(address_map &map) ATTR_COLD;
+	virtual void area_a000_map(address_map &map) ATTR_COLD;
 };
 
 class a800_state : public a400_state
@@ -359,13 +361,13 @@ public:
 	void a800pal(machine_config &config);
 
 protected:
-//  virtual void machine_start() override;
-	virtual void machine_reset() override;
+//  virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<a800_cart_slot_device> m_cartright;
 
-	void a800_mem(address_map &map);
+	void a800_mem(address_map &map) ATTR_COLD;
 };
 
 class a1200xl_state : public a400_state
@@ -382,10 +384,10 @@ public:
 protected:
 	void atari_xl_common(machine_config &config);
 
-	void a1200xl_mem(address_map &map);
+	void a1200xl_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(xl_interrupt);
 
@@ -414,13 +416,13 @@ public:
 	void a800xlpal(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_cb(uint8_t data) override;
 
-	void a800xl_mem(address_map &map);
+	void a800xl_mem(address_map &map) ATTR_COLD;
 
-	virtual void area_a000_map(address_map &map) override;
+	virtual void area_a000_map(address_map &map) override ATTR_COLD;
 
 	memory_view m_basic_view;
 };
@@ -447,16 +449,16 @@ public:
 	void a130xe(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void a130xe_mem(address_map &map);
+	void a130xe_mem(address_map &map) ATTR_COLD;
 
 	virtual void portb_cb(uint8_t data) override;
 
 	memory_view m_ext_view;
 	required_device<address_map_bank_device> m_ext_bank;
 
-	void extram_map(address_map &map);
+	void extram_map(address_map &map) ATTR_COLD;
 
 };
 
@@ -471,14 +473,14 @@ public:
 	void xegs(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_cb(uint8_t data) override;
 
 	required_memory_bank m_bank;
 
-	void xegs_mem(address_map &map);
+	void xegs_mem(address_map &map) ATTR_COLD;
 };
 
 class a5200_state : public a400_state
@@ -493,14 +495,14 @@ public:
 	void a5200a(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<a5200_cart_slot_device> m_cart;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
-	void a5200_mem(address_map &map);
+	void a5200_mem(address_map &map) ATTR_COLD;
 };
 
 /**************************************************************
@@ -527,6 +529,7 @@ void a400_state::area_8000_map(address_map &map)
 	map(0x8000, 0x9fff).view(m_cart_rd4_view);
 	m_cart_rd4_view[0](0x8000, 0x9fff).rw(FUNC(a400_state::ram_r<0x8000>), FUNC(a400_state::ram_w<0x8000>));
 	m_cart_rd4_view[1](0x8000, 0x9fff).rw(m_cartleft, FUNC(a800_cart_slot_device::read_cart<0>), FUNC(a800_cart_slot_device::write_cart<0>));
+	// Right cartridge (a800 specific) is also mapped at 0x8000-0x9fff
 }
 
 void a400_state::area_a000_map(address_map &map)
@@ -1730,6 +1733,9 @@ void a400_state::machine_start()
 {
 	save_item(NAME(m_cart_rd4_enabled));
 	save_item(NAME(m_cart_rd5_enabled));
+
+	if (m_sio.found())
+		m_sio->ready_w(1);
 }
 
 void a1200xl_state::machine_start()
@@ -1999,7 +2005,7 @@ void a400_state::atari_common_nodac(machine_config &config)
 	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
 	m_screen->set_palette("palette");
 //  m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
@@ -2009,10 +2015,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
-	m_pokey->serin_r().set("fdc", FUNC(atari_fdc_device::serin_r));
-	m_pokey->serout_w().set("fdc", FUNC(atari_fdc_device::serout_w));
-	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
-	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
 	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2032,18 +2034,20 @@ void a400_state::atari_common(machine_config &config)
 	m_pokey->pot_r<5>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_x));
 	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
 	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
+	m_pokey->oclk_w().set(m_sio, FUNC(a8sio_device::clock_out_w));
+	m_pokey->sod_w().set(m_sio, FUNC(a8sio_device::data_out_w));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("48K");
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->read_callback().set_ioport("console");
 	m_gtia->write_callback().set(FUNC(a400_state::gtia_cb));
 	m_gtia->trigger_callback().set(FUNC(a400_state::djoy_b_r));
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	/* devices */
@@ -2052,19 +2056,16 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->writepa_handler().set(FUNC(a400_state::djoy_0_1_w));
 	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));
 	m_pia->writepb_handler().set(FUNC(a400_state::djoy_2_3_w));
-	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
-	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
-	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+	m_pia->ca2_handler().set(m_sio, FUNC(a8sio_device::motor_w));
+	m_pia->cb2_handler().set(m_sio, FUNC(a8sio_device::command_w));
 	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	a8sio_device &sio(A8SIO(config, "sio", nullptr));
+	a8sio_device &sio(A8SIO(config, m_sio, "fdc"));
 	//sio.clock_in().set(m_pokey, FUNC(pokey_device::bclk_w));
 	sio.data_in().set(m_pokey, FUNC(pokey_device::sid_w));
 	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
 	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
-
-	ATARI_FDC(config, "fdc", 0);
 
 	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
 	m_cartleft->rd4_callback().set(FUNC(a400_state::cart_rd4_w));
@@ -2245,8 +2246,8 @@ void a5200_state::a5200(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(a5200_state::a5200_interrupt), "screen", 0, 1);
 
 	// Not used but exposed via expansion port
-	m_pokey->serin_r().set_constant(0);
-	m_pokey->serout_w().set_nop();
+	//m_pokey->serin_r().set_constant(0);
+	//m_pokey->serout_w().set_nop();
 	m_pokey->pot_r<0>().set_ioport("analog_0");
 	m_pokey->pot_r<1>().set_ioport("analog_1");
 	m_pokey->pot_r<2>().set_ioport("analog_2");
@@ -2258,10 +2259,10 @@ void a5200_state::a5200(machine_config &config)
 	m_pokey->set_keyboard_callback(FUNC(a5200_state::a5200_keypads));
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	ATARI_GTIA(config, m_gtia, 0);
+	ATARI_GTIA(config, m_gtia);
 	m_gtia->trigger_callback().set_ioport("djoy_b");
 
-	ATARI_ANTIC(config, m_antic, 0);
+	ATARI_ANTIC(config, m_antic);
 	m_antic->set_gtia_tag(m_gtia);
 
 	config_ntsc_screen(config);
@@ -2282,7 +2283,7 @@ From Analog Computing Magazine, issue 16 (1984-02):
   POT7, TRIG2, TRIG3, and bit 1 of CONSOL useless. A few of the
   connector pins have been redefined. Pin 2 of the I/O expansion
   connector now carries POKEY's Audio Out signal. Three pins on the
-  cartridge connector have changed to accomodate the new 2600 adapter.
+  cartridge connector have changed to accommodate the new 2600 adapter.
   The system clock, 02, is output on pin 14, isolated through a diode.
   An alternate video input is taken from pin 24 and is also isolated
   through a diode. Pin 30 provides an alternate audio input.

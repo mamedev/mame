@@ -158,15 +158,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void osborne1_base(machine_config &config);
 
-	void osborne1_mem(address_map &map);
-	void osborne1_op(address_map &map);
-	void osborne1_io(address_map &map);
+	void osborne1_mem(address_map &map) ATTR_COLD;
+	void osborne1_op(address_map &map) ATTR_COLD;
+	void osborne1_io(address_map &map) ATTR_COLD;
 
 	u8 bank2_peripherals_r(offs_t offset);
 	void bank2_peripherals_w(offs_t offset, u8 data);
@@ -267,10 +267,10 @@ public:
 	void osborne1sp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void osborne1sp_mem(address_map &map);
+	void osborne1sp_mem(address_map &map) ATTR_COLD;
 
 	u8 bank2_peripherals_r(offs_t offset);
 	void bank2_peripherals_w(offs_t offset, u8 data);
@@ -297,7 +297,7 @@ public:
 	void osborne1nv(machine_config &config);
 
 private:
-	void osborne1nv_io(address_map &map);
+	void osborne1nv_io(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
@@ -912,7 +912,7 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("RESET")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, osborne1_state, reset_key, 0)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(osborne1_state::reset_key), 0)
 	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("CNF")
@@ -976,7 +976,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &osborne1_state::osborne1_io);
 	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_osborne1);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
@@ -994,7 +994,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_pia0->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
 	m_pia0->irqa_handler().set(FUNC(osborne1_state::ieee_pia_irq_a_func));
 
-	IEEE488(config, m_ieee, 0);
+	IEEE488(config, m_ieee);
 	m_ieee->srq_callback().set(m_pia0, FUNC(pia6821_device::ca2_w));
 
 	PIA6821(config, m_pia1);

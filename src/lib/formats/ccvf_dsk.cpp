@@ -13,6 +13,8 @@
 #include "coretmpl.h" // BIT
 #include "ioprocs.h"
 
+#include <cstring>
+
 
 ccvf_format::ccvf_format()
 {
@@ -50,8 +52,10 @@ const ccvf_format::format ccvf_format::file_formats[] = {
 int ccvf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[36];
-	size_t actual;
-	io.read_at(0, h, 36, actual);
+	auto const [err, actual] = read_at(io, 0, h, 36);
+	if (err || (36 != actual))
+		return 0;
+
 	if (!memcmp(h, "Compucolor Virtual Floppy Disk Image", 36))
 		return FIFID_SIGN;
 
@@ -96,9 +100,9 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	if (io.length(size))
 		return false;
 
-	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto [err, img, actual] = read_at(io, 0, size);
+	if (err || (actual != size))
+		return false;
 
 	std::string ccvf = std::string((const char *)&img[0], size);
 	std::vector<uint8_t> bytes(78720);
@@ -149,11 +153,6 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	image.set_variant(f.variant);
 
 	return true;
-}
-
-bool ccvf_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const ccvf_format FLOPPY_CCVF_FORMAT;

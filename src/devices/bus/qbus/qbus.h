@@ -33,10 +33,13 @@ public:
 	// Q-Bus interface
 	virtual void biaki_w(int state) { }
 	virtual void bdmgi_w(int state) { }
+	virtual void init_w() { device_reset(); }
 
 protected:
 	// construction/destruction
 	device_qbus_card_interface(const machine_config &mconfig, device_t &device);
+
+	virtual void device_reset() { }
 
 	virtual int z80daisy_irq_state() { return 0; }
 	virtual int z80daisy_irq_ack() { return -1; }
@@ -68,9 +71,14 @@ public:
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+	void set_view(memory_view::memory_view_entry &view) { m_view = &view; };
 
 	virtual space_config_vector memory_space_config() const override;
+	address_space &program_space() const { return *m_space; }
 
+	auto bus_error_callback() { return m_out_bus_error_cb.bind(); }
+
+	auto bevnt() { return m_out_bevnt_cb.bind(); }
 	auto birq4() { return m_out_birq4_cb.bind(); }
 	auto birq5() { return m_out_birq6_cb.bind(); }
 	auto birq6() { return m_out_birq6_cb.bind(); }
@@ -79,6 +87,10 @@ public:
 	void add_card(device_qbus_card_interface &card);
 	void install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask=0xffffffff);
 
+	void init_w();
+	void bus_error_w(int state) { m_out_bus_error_cb(state); }
+
+	void bevnt_w(int state) { m_out_bevnt_cb(state); }
 	void birq4_w(int state) { m_out_birq4_cb(state); }
 	void birq5_w(int state) { m_out_birq5_cb(state); }
 	void birq6_w(int state) { m_out_birq6_cb(state); }
@@ -86,12 +98,15 @@ public:
 
 	void bdmr_w(int state) { m_out_bdmr_cb(state); }
 
+	uint16_t read(offs_t offset, uint16_t mem_mask = ~0);
+	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	const address_space_config m_program_config;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
@@ -100,10 +115,14 @@ protected:
 
 	// internal state
 	required_address_space m_space;
+	memory_view::memory_view_entry *m_view;
 
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_qbus_card_interface> >;
 
+	devcb_write_line m_out_bus_error_cb;
+
+	devcb_write_line m_out_bevnt_cb;
 	devcb_write_line m_out_birq4_cb;
 	devcb_write_line m_out_birq5_cb;
 	devcb_write_line m_out_birq6_cb;
@@ -124,10 +143,7 @@ public:
 	qbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: qbus_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	qbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -137,8 +153,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line m_write_birq4;
 	devcb_write_line m_write_birq5;
@@ -153,7 +168,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(QBUS, qbus_device)
 DECLARE_DEVICE_TYPE(QBUS_SLOT, qbus_slot_device)
 

@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
+	ioport_value player_input_r();
 	int pleiads_protection_r();
 
 	void condor(machine_config &config);
@@ -36,7 +36,7 @@ public:
 	void init_oneprom_coindsw();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device>             m_maincpu;
@@ -54,7 +54,7 @@ private:
 	uint8_t m_pleiads_protection_question = 0;
 	uint8_t m_survival_protection_value = 0;
 	int m_survival_sid_value = 0;
-	uint8_t m_survival_input_latches[2];
+	uint8_t m_survival_input_latches[2] = { };
 	uint8_t m_survival_input_readc = 0;
 
 	void phoenix_videoram_w(offs_t offset, uint8_t data);
@@ -70,9 +70,9 @@ private:
 	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t survival_protection_r();
 	int survival_sid_callback();
-	void phoenix_memory_map(address_map &map);
-	void pleiads_memory_map(address_map &map);
-	void survival_memory_map(address_map &map);
+	void phoenix_memory_map(address_map &map) ATTR_COLD;
+	void pleiads_memory_map(address_map &map) ATTR_COLD;
+	void survival_memory_map(address_map &map) ATTR_COLD;
 };
 
 

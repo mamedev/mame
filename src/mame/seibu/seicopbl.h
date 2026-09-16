@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:Olivier Galibert, Angelo Salese, David Haywood, Tomasz Slanina
-#ifndef MAME_SEIBU_SEICOP_H
-#define MAME_SEIBU_SEICOP_H
+#ifndef MAME_SEIBU_SEICOPBL_H
+#define MAME_SEIBU_SEICOPBL_H
 
 #pragma once
 
@@ -38,11 +38,11 @@ public:
 	uint16_t scale_r();
 	void scale_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void seibucopbl_map(address_map &map);
+	void seibucopbl_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -63,4 +63,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device)
 
-#endif // MAME_SEIBU_SEICOP_H
+#endif // MAME_SEIBU_SEICOPBL_H

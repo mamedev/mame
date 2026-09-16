@@ -10,24 +10,14 @@
 
 #pragma once
 
-#include "cpu/tms32025/tms32025.h"
 #include "taitoio.h"
 #include "taitoio_yoke.h"
 #include "tc0080vco.h"
+
+#include "cpu/tms320c2x/tms320c2x.h"
+
 #include "emupal.h"
 #include "screen.h"
-
-enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
-
-struct taitoair_spoint {
-	s32 x = 0, y = 0;
-};
-
-struct taitoair_poly {
-	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
-	int pcount = 0;
-	u16 header = 0;
-};
 
 
 class taitoair_state : public driver_device
@@ -52,13 +42,26 @@ public:
 		, m_z80bank(*this, "z80bank")
 	{ }
 
-	void airsys(machine_config &config);
+	void airsys(machine_config &config) ATTR_COLD;
 
 private:
+	enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
+
+	struct taitoair_spoint {
+		s32 x = 0, y = 0;
+	};
+
+	struct taitoair_poly {
+		struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
+		int pcount = 0;
+		u16 header = 0;
+	};
+
+
 	/* memory pointers */
 	required_shared_ptr<u16> m_m68000_mainram;
 	required_shared_ptr<u16> m_line_ram;
-	required_shared_ptr<u16> m_dsp_ram;          // Shared 68000/TMS32025 RAM
+	required_shared_ptr<u16> m_dsp_ram;          // Shared 68000/TMS320C25 RAM
 	required_shared_ptr<u16> m_paletteram;
 	required_shared_ptr<u16> m_gradram;
 	required_shared_ptr<u16> m_tc0430grw;
@@ -72,7 +75,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<tms32025_device> m_dsp;
+	required_device<tms320c25_device> m_dsp;
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<taitoio_yoke_device> m_yoke;
@@ -133,9 +136,9 @@ private:
 	void dsp_flags_w(offs_t offset, u16 data);
 	void dma_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset);
@@ -146,10 +149,10 @@ private:
 	void fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 header, s32 x1, s32 x2, s32 sl1, s32 sl2, s32 y1, s32 y2, s32 *nx1, s32 *nx2);
 	void fill_poly(bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q);
 
-	void DSP_map_data(address_map &map);
-	void DSP_map_program(address_map &map);
-	void airsys_map(address_map &map);
-	void sound_map(address_map &map);
+	void DSP_map_data(address_map &map) ATTR_COLD;
+	void DSP_map_program(address_map &map) ATTR_COLD;
+	void airsys_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_TAITOAIR_H

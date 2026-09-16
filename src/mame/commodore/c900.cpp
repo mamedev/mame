@@ -58,11 +58,11 @@ public:
 private:
 	void sound_pb_w(u8 data);
 
-	void data_map(address_map &map);
-	void io_map(address_map &map);
-	void special_io_map(address_map &map);
-	void mem_map(address_map &map);
-	void fdc_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void special_io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void fdc_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdcpu;
@@ -173,4 +173,4 @@ ROM_END
 
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME         FLAGS */
-COMP( 1985, c900, 0,      0,      c900,    c900,  c900_state, empty_init, "Commodore", "Commodore 900", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c900, 0,      0,      c900,    c900,  c900_state, empty_init, "Commodore", "Commodore 900", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

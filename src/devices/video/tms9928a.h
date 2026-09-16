@@ -93,8 +93,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -112,7 +112,7 @@ private:
 	void update_table_masks();
 	void set_palette();
 
-	void memmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
 
 	int                 m_vram_size;    /* 4K, 8K, or 16K. This should be replaced by fetching data from an address space? */
 	devcb_write_line    m_out_int_line_cb; /* Callback is called whenever the state of the INT output changes */

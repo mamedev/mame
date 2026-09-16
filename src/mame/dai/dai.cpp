@@ -158,7 +158,7 @@ static INPUT_PORTS_START (dai)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("IN8") /* [8] */
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
 		PORT_BIT(0xcb, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -191,7 +191,7 @@ void dai_state::dai(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(dai_state::int_ack));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_sound, FUNC(dai_sound_device::set_input_ch0));
 	m_pit->set_clk<1>(2000000);
@@ -202,7 +202,7 @@ void dai_state::dai(machine_config &config)
 	I8255(config, "ppi");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1056, 542);
@@ -215,9 +215,8 @@ void dai_state::dai(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
+	SPEAKER(config, "speaker", 2).front();
+	DAI_SOUND(config, m_sound).add_route(0, "speaker", 0.50, 0).add_route(1, "speaker", 0.50, 1);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

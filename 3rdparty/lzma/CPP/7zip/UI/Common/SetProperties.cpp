@@ -18,7 +18,7 @@ using namespace NCOM;
 static void ParseNumberString(const UString &s, NCOM::CPropVariant &prop)
 {
   const wchar_t *end;
-  UInt64 result = ConvertStringToUInt64(s, &end);
+  const UInt64 result = ConvertStringToUInt64(s, &end);
   if (*end != 0 || s.IsEmpty())
     prop = s;
   else if (result <= (UInt32)0xFFFFFFFF)
@@ -46,8 +46,9 @@ HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &propert
 {
   if (properties.IsEmpty())
     return S_OK;
-  CMyComPtr<ISetProperties> setProperties;
-  unknown->QueryInterface(IID_ISetProperties, (void **)&setProperties);
+  Z7_DECL_CMyComPtr_QI_FROM(
+      ISetProperties,
+      setProperties, unknown)
   if (!setProperties)
     return S_OK;
 
@@ -64,7 +65,7 @@ HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &propert
       {
         if (!name.IsEmpty())
         {
-          wchar_t c = name.Back();
+          const wchar_t c = name.Back();
           if (c == L'-')
             propVariant = false;
           else if (c == L'+')
@@ -82,6 +83,6 @@ HRESULT SetProperties(IUnknown *unknown, const CObjectVector<CProperty> &propert
     for (i = 0; i < realNames.Size(); i++)
       names.Add((const wchar_t *)realNames[i]);
     
-    return setProperties->SetProperties(&names.Front(), values.values, names.Size());
+    return setProperties->SetProperties(names.ConstData(), values.values, names.Size());
   }
 }

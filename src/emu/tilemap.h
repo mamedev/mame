@@ -288,13 +288,18 @@
         tilemap_t::draw() with the TILEMAP_DRAW_ALPHA flag.
 
     * To configure more complex pen-to-layer mapping, use the
-        tilemap_t::map_pens_to_layer() call. This call takes a group
-        number so that you can configure 1 of the 256 groups
-        independently. It also takes a pen and a mask; the mapping is
-        updated for all pens where ((pennum & mask) == pen). To set all
-        the pens in a group to the same value, pass a mask of 0. To set
-        a single pen in a group, pass a mask of ~0. The helper function
-        tilemap_t::map_pen_to_layer() does this for you.
+        tilemap_t::map_pens_to_layer() call. This call takes a group number
+        so that you can configure 1 of the 256 groups independently. It
+        also takes a pen and a mask; the mapping is updated for all pens
+        where ((pennum & mask) == pen). To set all the pens in a group to
+        the same value, pass a mask of 0. To set a single pen in a group,
+        pass a mask of ~0. The helper function tilemap_t::map_pen_to_layer()
+        does this for you.
+
+    * If the default scrolling methods don't apply to the emulated hardware,
+        configure a blitter callback, and handle custom scrolling there.
+        The blit parameters are a source rectangle, and relative x/y scroll
+        offsets, and are passed to draw_instance().
 
 ***************************************************************************/
 
@@ -304,6 +309,7 @@
 #pragma once
 
 #include "memarray.h"
+#include <algorithm>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -315,7 +321,6 @@
 
 // maximum number of groups
 constexpr size_t TILEMAP_NUM_GROUPS = 256;
-
 
 // these flags control tilemap_t::draw() behavior
 constexpr u32 TILEMAP_DRAW_CATEGORY_MASK = 0x0f;     // specify the category to draw
@@ -343,9 +348,6 @@ constexpr u8 TILE_FORCE_LAYER2 = TILEMAP_PIXEL_LAYER2; // force all pixels to be
 // tilemap global flags, used by tilemap_t::set_flip()
 constexpr u32 TILEMAP_FLIPX = TILE_FLIPX;            // draw the tilemap horizontally flipped
 constexpr u32 TILEMAP_FLIPY = TILE_FLIPY;            // draw the tilemap vertically flipped
-
-// set this value for a scroll row/column to fully disable it
-constexpr u32 TILE_LINE_DISABLED = 0x80000000;
 
 // standard mappers
 enum tilemap_standard_mapper
@@ -398,6 +400,7 @@ struct tile_data
 // modern delegates
 typedef device_delegate<void (tilemap_t &, tile_data &, tilemap_memory_index)> tilemap_get_info_delegate;
 typedef device_delegate<tilemap_memory_index (u32, u32, u32, u32)> tilemap_mapper_delegate;
+typedef device_delegate<bool (tilemap_t &, const rectangle &, const std::vector<s32> &, const std::vector<s32> &, std::function<void(const rectangle &, s32, s32)>)> tilemap_blitter_delegate;
 
 
 // ======================> tilemap_t
@@ -453,6 +456,9 @@ public:
 	int scrolldy() const { return (m_attributes & TILEMAP_FLIPY) ? m_dy_flipped : m_dy; }
 	int scrollx(int which = 0) const { return (which < m_scrollrows) ? m_rowscroll[which] : 0; }
 	int scrolly(int which = 0) const { return (which < m_scrollcols) ? m_colscroll[which] : 0; }
+	u32 scroll_rows() const { return m_scrollrows; }
+	u32 scroll_cols() const { return m_scrollcols; }
+	u8 flip() const { return m_attributes; }
 	bitmap_ind16 &pixmap() { pixmap_update(); return m_pixmap; }
 	bitmap_ind8 &flagsmap() { pixmap_update(); return m_flagsmap; }
 	u8 *tile_flags() { pixmap_update(); return &m_tileflags[0]; }
@@ -468,11 +474,12 @@ public:
 	void set_scrolldy(int dy, int dy_flipped) { m_dy = dy; m_dy_flipped = dy_flipped; }
 	void set_scrollx(int which, int value) { if (which < m_scrollrows) m_rowscroll[which] = value; }
 	void set_scrolly(int which, int value) { if (which < m_scrollcols) m_colscroll[which] = value; }
-	void set_scrollx(int value) { set_scrollx(0, value); }
-	void set_scrolly(int value) { set_scrolly(0, value); }
-	void set_scroll_rows(u32 scroll_rows) { assert(scroll_rows <= m_height); m_scrollrows = scroll_rows; }
-	void set_scroll_cols(u32 scroll_cols) { assert(scroll_cols <= m_width); m_scrollcols = scroll_cols; }
+	void set_scrollx(int value) { std::fill_n(m_rowscroll.begin(), m_scrollrows, value); }
+	void set_scrolly(int value) { std::fill_n(m_colscroll.begin(), m_scrollcols, value); }
+	void set_scroll_rows(u32 scroll_rows) { assert(scroll_rows > 0 && scroll_rows <= m_height); m_scrollrows = scroll_rows; }
+	void set_scroll_cols(u32 scroll_cols) { assert(scroll_cols > 0 && scroll_cols <= m_width); m_scrollcols = scroll_cols; }
 	void set_flip(u32 attributes) { if (m_attributes != attributes) { m_attributes = attributes; mappings_update(); } }
+	void set_blitter(tilemap_blitter_delegate blitter) { m_blitter = blitter; }
 
 	// dirtying
 	void mark_mapping_dirty() { mappings_update(); }
@@ -600,6 +607,7 @@ private:
 	s32                         m_dx_flipped;           // global horizontal scroll offset when flipped
 	s32                         m_dy;                   // global vertical scroll offset
 	s32                         m_dy_flipped;           // global vertical scroll offset when flipped
+	tilemap_blitter_delegate    m_blitter;              // optional callback for custom scrolling
 
 	// pixel data
 	bitmap_ind16                m_pixmap;               // cached pixel data
@@ -631,7 +639,7 @@ public:
 	tilemap_t &create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows)
 	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, nullptr); }
 	template <typename T, typename U, class V>
-	std::enable_if_t<std::is_base_of<device_t, V>::value, tilemap_t &> create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, V &allocated)
+	tilemap_t &create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, V &allocated) requires std::is_base_of_v<device_t, V>
 	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, &static_cast<tilemap_t &>(allocated)); }
 
 	// tilemap list information
@@ -704,6 +712,7 @@ public:
 	void set_bytes_per_entry(int bpe) { m_bytes_per_entry = bpe; }
 
 	template <typename... T> void set_info_callback(T &&... args) { m_get_info.set(std::forward<T>(args)...); }
+	template <typename... T> void set_blitter_callback(T &&... args) { m_blitter.set(std::forward<T>(args)...); }
 
 	void set_layout(tilemap_standard_mapper mapper, u32 columns, u32 rows)
 	{
@@ -754,7 +763,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -764,6 +773,7 @@ private:
 	tilemap_get_info_delegate   m_get_info;
 	tilemap_standard_mapper     m_standard_mapper;
 	tilemap_mapper_delegate     m_mapper;
+	tilemap_blitter_delegate    m_blitter;
 	int                         m_bytes_per_entry;
 	u16                         m_tile_width;
 	u16                         m_tile_height;
@@ -789,6 +799,9 @@ private:
 
 // function definition for a get info callback
 #define TILE_GET_INFO_MEMBER(_name)     void _name(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
+
+// function definition for a blitter callback
+#define TILE_BLITTER_MEMBER(_name)      bool _name(tilemap_t &tilemap, const rectangle &cliprect, const std::vector<s32> &rowscroll, const std::vector<s32> &colscroll, std::function<void(const rectangle &, s32, s32)> blit)
 
 // function definition for a logical-to-memory mapper
 #define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(u32 col, u32 row, u32 num_cols, u32 num_rows)

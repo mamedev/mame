@@ -16,6 +16,7 @@
 #include "utilfwd.h"
 
 #include <memory>
+#include <string_view>
 #include <vector>
 
 #include <cassert>
@@ -88,12 +89,12 @@ public:
 	//! extensions the format may use.
 	virtual const char *extensions() const noexcept = 0;
 	//! @returns true if format supports saving.
-	virtual bool supports_save() const noexcept = 0;
+	virtual bool supports_save() const noexcept;
 
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.
-	bool extension_matches(const char *file_name) const;
+	bool extension_matches(std::string_view file_name) const noexcept;
 
 protected:
 	//! Input for convert_to_edge
@@ -330,7 +331,9 @@ protected:
 		int actual_size;
 		uint8_t *data;
 		bool deleted;
-		bool bad_crc;
+		bool bad_data_crc;
+		bool bad_addr_crc;
+		bool weak;
 	};
 
 	struct desc_gcr_sector
@@ -345,6 +348,7 @@ protected:
 	static void build_wd_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_1, int gap_2=22);
 	static void build_pc_track_fm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=40, int gap_1=26, int gap_2=11);
 	static void build_pc_track_mfm(int track, int head, floppy_image &image, int cell_count, int sector_count, const desc_pc_sector *sects, int gap_3, int gap_4a=80, int gap_1=50, int gap_2=22);
+	static void build_apple_16sect_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 	static void build_mac_track_gcr(int track, int head, floppy_image &image, const desc_gcr_sector *sects);
 
 	//! @brief Extract standard sectors from a regenerated bitstream.
@@ -362,6 +366,9 @@ protected:
 	//! Victor 9000 type sectors with GCR5 encoding
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_bitstream_victor_gcr5(const std::vector<bool> &bitstream);
 
+	//! Apple II type sectors with GCR6 encoding
+	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_apple_16sect_gcr6(const std::vector<bool> &bitstream, uint8_t &vl);
+
 	//! Mac type sectors with GCR6 encoding
 	static std::vector<std::vector<uint8_t>> extract_sectors_from_track_mac_gcr6(int head, int track, const floppy_image &image);
 
@@ -375,6 +382,8 @@ protected:
 
 
 	//!  Regenerate the data for a full track.
+	//!  PC-type sectors with MFM encoding and fixed-size, with explicit start and end sectors.
+	static void get_track_data_mfm_pc_sectors(int track, int head, const floppy_image &image, int cell_size, int sector_size, int start_sector, int end_sector, uint8_t *sectdata);
 	//!  PC-type sectors with MFM encoding and fixed-size.
 	static void get_track_data_mfm_pc(int track, int head, const floppy_image &image, int cell_size, int sector_size, int sector_count, uint8_t *sectdata);
 
@@ -520,22 +529,35 @@ public:
 		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
-		FF_8        = 0x20202038  //!< "8   " 8 inch disk
+		FF_8        = 0x20202038, //!< "8   " 8 inch disk
+		FF_TWIG     = 0x47495754, //!< "TWIG" 5.25 twiggy
 	};
 
 	//! Variants
 	enum {
 		SSSD   = 0x44535353, //!< "SSSD", Single-sided single-density
+		SSSD10 = 0x30315353, //!< "SS10", Single-sided single-density 10 hard sector
+		SSSD16 = 0x36315353, //!< "SS16", Single-sided single-density 16 hard sector
+		SSSD32 = 0x32335353, //!< "SS32", Single-sided single-density 32 hard sector
 		SSDD   = 0x44445353, //!< "SSDD", Single-sided double-density
+		SSDD10 = 0x30314453, //!< "SD10", Single-sided double-density 10 hard sector
 		SSDD16 = 0x36314453, //!< "SD16", Single-sided double-density 16 hard sector
+		SSDD32 = 0x32334453, //!< "SD32", Single-sided double-density 32 hard sector
 		SSQD   = 0x44515353, //!< "SSQD", Single-sided quad-density
+		SSQD10 = 0x30315153, //!< "SQ10", Single-sided quad-density 10 hard sector
 		SSQD16 = 0x36315153, //!< "SQ16", Single-sided quad-density 16 hard sector
 		DSSD   = 0x44535344, //!< "DSSD", Double-sided single-density
+		DSSD10 = 0x30315344, //!< "DS10", Double-sided single-density 10 hard sector
+		DSSD16 = 0x36315344, //!< "DS16", Double-sided single-density 16 hard sector
+		DSSD32 = 0x32335344, //!< "DS32", Double-sided single-density 32 hard sector
 		DSDD   = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
+		DSDD10 = 0x30314444, //!< "DD10", Double-sided double-density 10 hard sector
 		DSDD16 = 0x36314444, //!< "DD16", Double-sided double-density 16 hard sector (360K in 5.25)
+		DSDD32 = 0x32334444, //!< "DD32", Double-sided double-density 32 hard sector
 		DSQD   = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
+		DSQD10 = 0x30315144, //!< "DQ10", Double-sided quad-density 10 hard sector
 		DSQD16 = 0x36315144, //!< "DQ16", Double-sided quad-density 16 hard sector (720K in 5.25, means DD+80 tracks)
-		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K in 3.5, 1200K in 5.25)
 		DSED   = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 
@@ -544,6 +566,14 @@ public:
 		FM   = 0x2020464D, //!< "  FM", frequency modulation
 		MFM  = 0x204D464D, //!< " MFM", modified frequency modulation
 		M2FM = 0x4D32464D  //!< "M2FM", modified modified frequency modulation
+	};
+
+	//! Sectoring
+	enum {
+		SOFT = 0x54464F53,  //!< "SOFT", Soft-sectored
+		H10  = 0x20303148,  //!< "H10 ", Hard 10-sectored
+		H16  = 0x20363148,  //!< "H16 ", Hard 16-sectored
+		H32  = 0x20323348   //!< "H32 ", Hard 32-sectored (8 inch disk)
 	};
 
 	// construction/destruction
@@ -562,10 +592,14 @@ public:
 	uint32_t get_form_factor() const noexcept { return form_factor; }
 	//! @return the variant.
 	uint32_t get_variant() const noexcept { return variant; }
+	//! @return the disk sectoring.
+	uint32_t get_sectoring() const noexcept { return sectoring; }
 	//! @param v the variant.
 	void set_variant(uint32_t v);
 	//! @param v the variant.
 	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; set_variant(v); }
+	//! @param s the sectoring.
+	void set_sectoring(uint32_t s) { sectoring = s; }
 
 	//! Find most recent and next index hole for provided angular position.
 	//! The most recent hole may be equal to provided position. The next
@@ -623,7 +657,7 @@ public:
 private:
 	int tracks, heads;
 
-	uint32_t form_factor, variant;
+	uint32_t form_factor, variant, sectoring;
 
 	struct track_info
 	{

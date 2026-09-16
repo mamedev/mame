@@ -18,8 +18,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_74166_H
-#define MAME_DEVICES_MACHINE_74166_H
+#ifndef MAME_MACHINE_74166_H
+#define MAME_MACHINE_74166_H
 
 #pragma once
 
@@ -45,9 +45,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<timer_device> m_timer;
@@ -69,4 +69,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TTL166, ttl166_device)
 
-#endif // MAME_DEVICES_MACHINE_74166_H
+#endif // MAME_MACHINE_74166_H

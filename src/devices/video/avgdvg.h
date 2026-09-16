@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "video/vector.h"
+#include "vector.h"
 
 
 class avgdvg_device_base : public device_t
@@ -47,7 +47,7 @@ protected:
 
 	avgdvg_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual int handler_0() = 0;
 	virtual int handler_1() = 0;
@@ -118,10 +118,10 @@ private:
 class dvg_device : public avgdvg_device_base
 {
 public:
-	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual int handler_0() override;
 	virtual int handler_1() override;
@@ -144,12 +144,12 @@ private:
 class avg_device : public avgdvg_device_base
 {
 public:
-	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	avg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual int handler_0() override;
 	virtual int handler_1() override;
@@ -185,7 +185,7 @@ protected:
 class avg_tempest_device : public avg_device
 {
 public:
-	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual int handler_6() override;
@@ -200,10 +200,10 @@ private:
 class avg_mhavoc_device : public avg_device
 {
 public:
-	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual int handler_1() override;
 	virtual int handler_6() override;
@@ -226,7 +226,7 @@ private:
 class avg_starwars_device : public avg_device
 {
 public:
-	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual int handler_6() override;
@@ -238,7 +238,7 @@ protected:
 class avg_quantum_device : public avg_device
 {
 public:
-	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	virtual int handler_0() override;
@@ -260,10 +260,10 @@ private:
 class avg_bzone_device : public avg_device
 {
 public:
-	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual int handler_1() override;
 	virtual int handler_6() override;

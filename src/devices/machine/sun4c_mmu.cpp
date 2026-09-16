@@ -97,7 +97,7 @@ void sun4_mmu_base_device::device_start()
 	}
 
 	m_pagemap = std::make_unique<page_entry[]>(16384);
-	save_pointer(NAME(reinterpret_cast<uint8_t*>(m_pagemap.get())), sizeof(page_entry) * 16384);
+	save_pointer(reinterpret_cast<uint8_t*>(m_pagemap.get()), "m_pagemap", sizeof(page_entry) * 16384);
 
 	m_cachetags = std::make_unique<uint32_t[]>(16384);
 	save_pointer(NAME(m_cachetags), 16384);

@@ -32,10 +32,7 @@ public:
 	z29_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: z29_keyboard_port_device(mconfig, tag, owner, 0U)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	// callback configuration
@@ -48,7 +45,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// called from keyboard
 	void transmit_data(bool state) { m_keyin_callback(state); }
@@ -84,7 +81,7 @@ private:
 	required_device<z29_keyboard_port_device> m_port;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(Z29_KEYBOARD, z29_keyboard_port_device)
 
 // standard options

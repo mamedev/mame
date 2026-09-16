@@ -42,7 +42,7 @@ void c64_final_chesscard_device::c64_fcc_map(address_map &map)
 
 void c64_final_chesscard_device::device_add_mconfig(machine_config &config)
 {
-	M65SC02(config, m_maincpu, 5_MHz_XTAL);
+	G65SC02(config, m_maincpu, 5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_final_chesscard_device::c64_fcc_map);
 
 	GENERIC_LATCH_8(config, m_mainlatch).data_pending_callback().set(FUNC(c64_final_chesscard_device::mainlatch_int));
@@ -56,7 +56,7 @@ void c64_final_chesscard_device::device_add_mconfig(machine_config &config)
 
 static INPUT_PORTS_START( c64_fcc )
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::reset_w))
 INPUT_PORTS_END
 
 
@@ -120,6 +120,25 @@ void c64_final_chesscard_device::device_reset()
 	m_hidden = 0;
 	m_exrom = 0;
 	m_game = 0;
+}
+
+
+void c64_final_chesscard_device::nvram_default()
+{
+}
+
+
+bool c64_final_chesscard_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram.get(), 0x2000);
+	return !err && (actual == 0x2000);
+}
+
+
+bool c64_final_chesscard_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram.get(), 0x2000);
+	return !err;
 }
 
 

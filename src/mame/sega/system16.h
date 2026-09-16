@@ -25,6 +25,7 @@ public:
 		, m_tileram(*this, "tileram")
 		, m_goldnaxeb2_bgpage(*this, "gab2_bgpage")
 		, m_goldnaxeb2_fgpage(*this, "gab2_fgpage")
+		, m_maincpu_rom(*this, "maincpu")
 		, m_sprites_region(*this, "sprites")
 		, m_soundcpu_region(*this, "soundcpu")
 		, m_soundbank(*this, "soundbank")
@@ -43,54 +44,56 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void z80_ym2151(machine_config &config);
-	void z80_ym2151_upd7759(machine_config &config);
-	void datsu_ym2151_msm5205(machine_config &config);
-	void datsu_2x_ym2203_msm5205(machine_config &config);
-	void system16_base(machine_config &config);
-	void goldnaxeb_base(machine_config &config);
-	void passshtb(machine_config &config);
-	void goldnaxeb2(machine_config &config);
-	void beautyb(machine_config &config);
-	void goldnaxeb1(machine_config &config);
-	void mwalkbl(machine_config &config);
-	void eswatbl2(machine_config &config);
-	void ddcrewbl(machine_config &config);
-	void shdancbla(machine_config &config);
-	void passsht4b(machine_config &config);
-	void wb3bb(machine_config &config);
-	void wb3bble(machine_config &config);
-	void shdancbl(machine_config &config);
-	void shinobi_datsu(machine_config &config);
-	void bayrouteb1(machine_config &config);
-	void tetrisbl(machine_config &config);
-	void eswatbl(machine_config &config);
-	void dduxbl(machine_config &config);
-	void bayrouteb2(machine_config &config);
-	void tturfbl(machine_config &config);
-	void altbeastbl(machine_config &config);
-	void system18(machine_config &config);
-	void bloxeedbl(machine_config &config);
+	void z80_ym2151(machine_config &config) ATTR_COLD;
+	void z80_ym2151_upd7759(machine_config &config) ATTR_COLD;
+	void datsu_ym2151_msm5205(machine_config &config) ATTR_COLD;
+	void datsu_2x_ym2203_msm5205(machine_config &config) ATTR_COLD;
+	void system16_base(machine_config &config) ATTR_COLD;
+	void goldnaxeb_base(machine_config &config) ATTR_COLD;
+	void passshtb(machine_config &config) ATTR_COLD;
+	void goldnaxeb2(machine_config &config) ATTR_COLD;
+	void beautyb(machine_config &config) ATTR_COLD;
+	void iqpipe(machine_config &config) ATTR_COLD;
+	void goldnaxeb1(machine_config &config) ATTR_COLD;
+	void mwalkbl(machine_config &config) ATTR_COLD;
+	void eswatbl2(machine_config &config) ATTR_COLD;
+	void ddcrewbl(machine_config &config) ATTR_COLD;
+	void shdancbla(machine_config &config) ATTR_COLD;
+	void passsht4b(machine_config &config) ATTR_COLD;
+	void wb3bb(machine_config &config) ATTR_COLD;
+	void wb3bble(machine_config &config) ATTR_COLD;
+	void shdancbl(machine_config &config) ATTR_COLD;
+	void shinobi_datsu(machine_config &config) ATTR_COLD;
+	void bayrouteb1(machine_config &config) ATTR_COLD;
+	void tetrisbl(machine_config &config) ATTR_COLD;
+	void eswatbl(machine_config &config) ATTR_COLD;
+	void dduxbl(machine_config &config) ATTR_COLD;
+	void bayrouteb2(machine_config &config) ATTR_COLD;
+	void tturfbl(machine_config &config) ATTR_COLD;
+	void altbeastbl(machine_config &config) ATTR_COLD;
+	void system18(machine_config &config) ATTR_COLD;
+	void bloxeedbl(machine_config &config) ATTR_COLD;
 
-	void init_passsht();
-	void init_wb3bbl();
-	void init_wb3bble();
-	void init_fpointbl();
-	void init_eswatbl();
-	void init_sys18bl_oki();
-	void init_astormb2();
-	void init_shdancbl();
-	void init_dduxbl();
-	void init_altbeastbl();
-	void init_goldnaxeb2();
-	void init_bayrouteb1();
-	void init_beautyb();
-	void init_bayrouteb2();
-	void init_shinobl();
-	void init_tturfbl();
-	void init_goldnaxeb1();
-	void init_ddcrewbl();
-	void init_common();
+	void init_passsht() ATTR_COLD;
+	void init_wb3bbl() ATTR_COLD;
+	void init_wb3bble() ATTR_COLD;
+	void init_fpointbl() ATTR_COLD;
+	void init_eswatbl() ATTR_COLD;
+	void init_sys18bl_oki() ATTR_COLD;
+	void init_astormb2() ATTR_COLD;
+	void init_shdancbl() ATTR_COLD;
+	void init_dduxbl() ATTR_COLD;
+	void init_altbeastbl() ATTR_COLD;
+	void init_goldnaxeb2() ATTR_COLD;
+	void init_bayrouteb1() ATTR_COLD;
+	void init_beautyb() ATTR_COLD;
+	void init_bayrouteb2() ATTR_COLD;
+	void init_shinobl() ATTR_COLD;
+	void init_tturfbl() ATTR_COLD;
+	void init_goldnaxeb1() ATTR_COLD;
+	void init_bloxeedbl() ATTR_COLD;
+	void init_ddcrewbl() ATTR_COLD;
+	void init_common() ATTR_COLD;
 
 private:
 	void sound_command_nmi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -114,6 +117,9 @@ private:
 	void s16bl_fgscrolly_w(uint16_t data);
 	void s16bl_bgscrollx_w(uint16_t data);
 	void s16bl_bgscrolly_w(uint16_t data);
+	void beautyb_fgscrollx_w(uint16_t data);
+	void beautyb_bgscrollx_w(uint16_t data);
+
 	template<int Page> void datsu_page_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void goldnaxeb2_fgscrollx_w(uint16_t data);
 	void goldnaxeb2_bgscrollx_w(uint16_t data);
@@ -123,7 +129,8 @@ private:
 	void goldnaxeb2_bgpage_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void eswat_tilebank0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void altbeastbl_gfx_w(offs_t offset, uint16_t data);
-	uint16_t beautyb_unkx_r();
+	template <unsigned Base> uint16_t beautyb_prot_r(offs_t offset);
+	template <unsigned Base> uint16_t iqpipe_prot_r(offs_t offset);
 	void wb3bble_refreshenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sys18_refreshenable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sys18_tilebank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -143,6 +150,7 @@ private:
 	void upd7759_bank_w(uint8_t data);
 
 	DECLARE_MACHINE_RESET(ddcrewbl);
+	DECLARE_MACHINE_RESET(beautyb);
 	TILEMAP_MAPPER_MEMBER(sys16_bg_map);
 	TILEMAP_MAPPER_MEMBER(sys16_text_map);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -159,6 +167,9 @@ private:
 	DECLARE_VIDEO_START(s16a_bootleg_passsht);
 	DECLARE_VIDEO_START(s16a_bootleg_wb3bl);
 	DECLARE_VIDEO_START(s16a_bootleg);
+	DECLARE_VIDEO_START(beautyb);
+	DECLARE_VIDEO_START(iqpipe);
+
 	uint32_t screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -174,45 +185,45 @@ private:
 	void shdancbl_msm5205_callback(int state);
 	void sound_cause_nmi(int state);
 
-	void bayrouteb1_map(address_map &map);
-	void bayrouteb2_map(address_map &map);
-	void beautyb_map(address_map &map);
-	void bloxeedbl_map(address_map &map);
-	void ddcrewbl_map(address_map &map);
-	void dduxbl_map(address_map &map);
-	void decrypted_opcodes_map(address_map &map);
-	void eswatbl2_map(address_map &map);
-	void eswatbl_map(address_map &map);
-	void goldnaxeb1_map(address_map &map);
-	void goldnaxeb2_map(address_map &map);
-	void mwalkbl_map(address_map &map);
-	void passht4b_map(address_map &map);
-	void passshtb_map(address_map &map);
-	void pcm_map(address_map &map);
-	void shdancbl_map(address_map &map);
-	void shdancbl_sound_io_map(address_map &map);
-	void shdancbl_sound_map(address_map &map);
-	void shdancbla_map(address_map &map);
-	void shdancbla_sound_map(address_map &map);
-	void shinobi_datsu_sound_map(address_map &map);
-	void shinobib_map(address_map &map);
-	void sound_18_io_map(address_map &map);
-	void sound_18_map(address_map &map);
-	void sound_7759_io_map(address_map &map);
-	void sound_7759_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
-	void sys18bl_oki_map(address_map &map);
-	void sys18bl_sound_map(address_map &map);
-	void tetrisbl_map(address_map &map);
-	void tturfbl_map(address_map &map);
-	void tturfbl_sound_io_map(address_map &map);
-	void tturfbl_sound_map(address_map &map);
-	void wb3bbl_map(address_map &map);
-	void wb3bble_map(address_map &map);
-	void wb3bble_decrypted_opcodes_map(address_map &map);
-
-	virtual void machine_start() override { m_leds.resolve(); }
+	void bayrouteb1_map(address_map &map) ATTR_COLD;
+	void bayrouteb2_map(address_map &map) ATTR_COLD;
+	void beautyb_map(address_map &map) ATTR_COLD;
+	void beautyb_opcodes_map(address_map &map) ATTR_COLD;
+	void iqpipe_map(address_map &map) ATTR_COLD;
+	void bloxeedbl_map(address_map &map) ATTR_COLD;
+	void ddcrewbl_map(address_map &map) ATTR_COLD;
+	void dduxbl_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void eswatbl2_map(address_map &map) ATTR_COLD;
+	void eswatbl_map(address_map &map) ATTR_COLD;
+	void goldnaxeb1_map(address_map &map) ATTR_COLD;
+	void goldnaxeb2_map(address_map &map) ATTR_COLD;
+	void mwalkbl_map(address_map &map) ATTR_COLD;
+	void passht4b_map(address_map &map) ATTR_COLD;
+	void passshtb_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
+	void shdancbl_map(address_map &map) ATTR_COLD;
+	void shdancbl_sound_io_map(address_map &map) ATTR_COLD;
+	void shdancbl_sound_map(address_map &map) ATTR_COLD;
+	void shdancbla_map(address_map &map) ATTR_COLD;
+	void shdancbla_sound_map(address_map &map) ATTR_COLD;
+	void shinobi_datsu_sound_map(address_map &map) ATTR_COLD;
+	void shinobib_map(address_map &map) ATTR_COLD;
+	void sound_18_io_map(address_map &map) ATTR_COLD;
+	void sound_18_map(address_map &map) ATTR_COLD;
+	void sound_7759_io_map(address_map &map) ATTR_COLD;
+	void sound_7759_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sys18bl_oki_map(address_map &map) ATTR_COLD;
+	void sys18bl_sound_map(address_map &map) ATTR_COLD;
+	void tetrisbl_map(address_map &map) ATTR_COLD;
+	void tturfbl_map(address_map &map) ATTR_COLD;
+	void tturfbl_sound_io_map(address_map &map) ATTR_COLD;
+	void tturfbl_sound_map(address_map &map) ATTR_COLD;
+	void wb3bbl_map(address_map &map) ATTR_COLD;
+	void wb3bble_map(address_map &map) ATTR_COLD;
+	void wb3bble_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_textram;
 	optional_shared_ptr<uint16_t> m_bg0_tileram;
@@ -221,6 +232,7 @@ private:
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
 
+	required_region_ptr<uint16_t> m_maincpu_rom;
 	optional_memory_region m_sprites_region;
 	optional_memory_region m_soundcpu_region;
 	optional_memory_bank m_soundbank;
@@ -236,7 +248,7 @@ private:
 	int m_passht4b_io2_val = 0;
 	int m_passht4b_io3_val = 0;
 
-	int m_beautyb_unkx = 0;
+	uint8_t m_beautyb_prot_ctr = 0;
 
 	int m_shinobl_kludge = 0; // TODO: this never gets set, causing unreachable code in get_text_tile_info
 

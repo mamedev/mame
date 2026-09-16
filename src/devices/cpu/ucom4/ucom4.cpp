@@ -495,6 +495,6 @@ void ucom4_cpu_device::execute_run()
 				}
 				break; // 0xff
 
-		} // big switch
+		} // 0xf0
 	}
 }

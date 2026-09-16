@@ -32,10 +32,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_wangpcbus_card_interface overrides
 	virtual uint16_t wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask) override;
@@ -50,16 +50,25 @@ private:
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 
-	void upd7220_0_map(address_map &map);
-	void upd7220_1_map(address_map &map);
+	void gdc0_drq_w(int state);
+	void gdc1_drq_w(int state);
+	void update_drq();
+
+	void upd7220_0_map(address_map &map) ATTR_COLD;
+	void upd7220_1_map(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<upd7220_device> m_hgdc0;
 	required_device<upd7220_device> m_hgdc1;
+	required_shared_ptr<uint16_t> m_frame_ram;
+	required_shared_ptr<uint16_t> m_font_ram;
+	required_shared_ptr<uint16_t> m_gfx_ram;
 
 	uint8_t m_option;
 	uint8_t m_attr[16];
 	uint8_t m_underline;
+	int m_gdc0_drq;
+	int m_gdc1_drq;
 	required_device<palette_device> m_palette;
 };
 

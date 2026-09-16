@@ -24,7 +24,7 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/ymz280b.h"
-#include "video/pc_xga.h"
+#include "video/pc_vga_oak.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -44,16 +44,16 @@ public:
 	void gs471(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<oak_oti111_vga_device> m_vga;
 	required_device<ymz280b_device> m_ymz;
 
 private:
-	void gs471_main(address_map &map);
+	void gs471_main(address_map &map) ATTR_COLD;
 };
 
 void konmedal020_state::video_start()
@@ -97,22 +97,21 @@ void konmedal020_state::gs471(machine_config &config)
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(svga_device::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_3);
 
-	OTI111(config, m_vga, 0);
+	OTI111(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344 MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 0.75);
-	m_ymz->add_route(1, "rspeaker", 0.75);
+	m_ymz->add_route(0, "speaker", 0.75, 0);
+	m_ymz->add_route(1, "speaker", 0.75, 1);
 }
 
 ROM_START( gs471 )

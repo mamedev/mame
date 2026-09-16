@@ -2,7 +2,7 @@
 // bind_executor.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,11 +16,11 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#include "asio/detail/type_traits.hpp"
-#include "asio/detail/variadic_templates.hpp"
 #include "asio/associated_executor.hpp"
 #include "asio/associator.hpp"
 #include "asio/async_result.hpp"
+#include "asio/detail/initiation_base.hpp"
+#include "asio/detail/type_traits.hpp"
 #include "asio/execution/executor.hpp"
 #include "asio/execution_context.hpp"
 #include "asio/is_executor.hpp"
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 // Helper to automatically define nested typedef result_type.
@@ -41,8 +42,7 @@ protected:
 };
 
 template <typename T>
-struct executor_binder_result_type<T,
-  typename void_type<typename T::result_type>::type>
+struct executor_binder_result_type<T, void_t<typename T::result_type>>
 {
   typedef typename T::result_type result_type;
 protected:
@@ -103,8 +103,7 @@ template <typename T, typename = void>
 struct executor_binder_argument_type {};
 
 template <typename T>
-struct executor_binder_argument_type<T,
-  typename void_type<typename T::argument_type>::type>
+struct executor_binder_argument_type<T, void_t<typename T::argument_type>>
 {
   typedef typename T::argument_type argument_type;
 };
@@ -129,7 +128,7 @@ struct executor_binder_argument_types {};
 
 template <typename T>
 struct executor_binder_argument_types<T,
-  typename void_type<typename T::first_argument_type>::type>
+    void_t<typename T::first_argument_type>>
 {
   typedef typename T::first_argument_type first_argument_type;
   typedef typename T::second_argument_type second_argument_type;
@@ -160,9 +159,9 @@ class executor_binder_base<T, Executor, true>
 {
 protected:
   template <typename E, typename U>
-  executor_binder_base(ASIO_MOVE_ARG(E) e, ASIO_MOVE_ARG(U) u)
-    : executor_(ASIO_MOVE_CAST(E)(e)),
-      target_(executor_arg_t(), executor_, ASIO_MOVE_CAST(U)(u))
+  executor_binder_base(E&& e, U&& u)
+    : executor_(static_cast<E&&>(e)),
+      target_(executor_arg_t(), executor_, static_cast<U&&>(u))
   {
   }
 
@@ -175,9 +174,9 @@ class executor_binder_base<T, Executor, false>
 {
 protected:
   template <typename E, typename U>
-  executor_binder_base(ASIO_MOVE_ARG(E) e, ASIO_MOVE_ARG(U) u)
-    : executor_(ASIO_MOVE_CAST(E)(e)),
-      target_(ASIO_MOVE_CAST(U)(u))
+  executor_binder_base(E&& e, U&& u)
+    : executor_(static_cast<E&&>(e)),
+      target_(static_cast<U&&>(u))
   {
   }
 
@@ -185,25 +184,14 @@ protected:
   T target_;
 };
 
-// Helper to enable SFINAE on zero-argument operator() below.
-
-template <typename T, typename = void>
-struct executor_binder_result_of0
-{
-  typedef void type;
-};
-
-template <typename T>
-struct executor_binder_result_of0<T,
-  typename void_type<typename result_of<T()>::type>::type>
-{
-  typedef typename result_of<T()>::type type;
-};
-
 } // namespace detail
 
 /// A call wrapper type to bind an executor of type @c Executor to an object of
 /// type @c T.
+/**
+ * @sa @ref overview_associators "Associators",
+ * @ref overview_token_adapters "Completion token adapters"
+ */
 template <typename T, typename Executor>
 class executor_binder
 #if !defined(GENERATING_DOCUMENTATION)
@@ -290,8 +278,8 @@ public:
    */
   template <typename U>
   executor_binder(executor_arg_t, const executor_type& e,
-      ASIO_MOVE_ARG(U) u)
-    : base_type(e, ASIO_MOVE_CAST(U)(u))
+      U&& u)
+    : base_type(e, static_cast<U&&>(u))
   {
   }
 
@@ -315,7 +303,9 @@ public:
    * @c U.
    */
   template <typename U, typename OtherExecutor>
-  executor_binder(const executor_binder<U, OtherExecutor>& other)
+  executor_binder(const executor_binder<U, OtherExecutor>& other,
+      constraint_t<is_constructible<Executor, OtherExecutor>::value> = 0,
+      constraint_t<is_constructible<T, U>::value> = 0)
     : base_type(other.get_executor(), other.get())
   {
   }
@@ -328,32 +318,33 @@ public:
    */
   template <typename U, typename OtherExecutor>
   executor_binder(executor_arg_t, const executor_type& e,
-      const executor_binder<U, OtherExecutor>& other)
+      const executor_binder<U, OtherExecutor>& other,
+      constraint_t<is_constructible<T, U>::value> = 0)
     : base_type(e, other.get())
   {
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
-
   /// Move constructor.
   executor_binder(executor_binder&& other)
-    : base_type(ASIO_MOVE_CAST(executor_type)(other.get_executor()),
-        ASIO_MOVE_CAST(T)(other.get()))
+    : base_type(static_cast<executor_type&&>(other.get_executor()),
+        static_cast<T&&>(other.get()))
   {
   }
 
   /// Move construct the target object, but specify a different executor.
   executor_binder(executor_arg_t, const executor_type& e,
       executor_binder&& other)
-    : base_type(e, ASIO_MOVE_CAST(T)(other.get()))
+    : base_type(e, static_cast<T&&>(other.get()))
   {
   }
 
   /// Move construct from a different executor wrapper type.
   template <typename U, typename OtherExecutor>
-  executor_binder(executor_binder<U, OtherExecutor>&& other)
-    : base_type(ASIO_MOVE_CAST(OtherExecutor)(other.get_executor()),
-        ASIO_MOVE_CAST(U)(other.get()))
+  executor_binder(executor_binder<U, OtherExecutor>&& other,
+      constraint_t<is_constructible<Executor, OtherExecutor>::value> = 0,
+      constraint_t<is_constructible<T, U>::value> = 0)
+    : base_type(static_cast<OtherExecutor&&>(other.get_executor()),
+        static_cast<U&&>(other.get()))
   {
   }
 
@@ -361,12 +352,11 @@ public:
   /// different executor.
   template <typename U, typename OtherExecutor>
   executor_binder(executor_arg_t, const executor_type& e,
-      executor_binder<U, OtherExecutor>&& other)
-    : base_type(e, ASIO_MOVE_CAST(U)(other.get()))
+      executor_binder<U, OtherExecutor>&& other,
+      constraint_t<is_constructible<T, U>::value> = 0)
+    : base_type(e, static_cast<U&&>(other.get()))
   {
   }
-
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Destructor.
   ~executor_binder()
@@ -374,139 +364,129 @@ public:
   }
 
   /// Obtain a reference to the target object.
-  target_type& get() ASIO_NOEXCEPT
+  target_type& get() noexcept
   {
     return this->target_;
   }
 
   /// Obtain a reference to the target object.
-  const target_type& get() const ASIO_NOEXCEPT
+  const target_type& get() const noexcept
   {
     return this->target_;
   }
 
   /// Obtain the associated executor.
-  executor_type get_executor() const ASIO_NOEXCEPT
+  executor_type get_executor() const noexcept
   {
     return this->executor_;
   }
 
-#if defined(GENERATING_DOCUMENTATION)
-
-  template <typename... Args> auto operator()(Args&& ...);
-  template <typename... Args> auto operator()(Args&& ...) const;
-
-#elif defined(ASIO_HAS_VARIADIC_TEMPLATES)
-
   /// Forwarding function call operator.
   template <typename... Args>
-  typename result_of<T(Args...)>::type operator()(
-      ASIO_MOVE_ARG(Args)... args)
+  result_of_t<T(Args...)> operator()(Args&&... args) &
   {
-    return this->target_(ASIO_MOVE_CAST(Args)(args)...);
+    return this->target_(static_cast<Args&&>(args)...);
   }
 
   /// Forwarding function call operator.
   template <typename... Args>
-  typename result_of<T(Args...)>::type operator()(
-      ASIO_MOVE_ARG(Args)... args) const
+  result_of_t<T(Args...)> operator()(Args&&... args) &&
   {
-    return this->target_(ASIO_MOVE_CAST(Args)(args)...);
+    return static_cast<T&&>(this->target_)(static_cast<Args&&>(args)...);
   }
 
-#elif defined(ASIO_HAS_STD_TYPE_TRAITS) && !defined(_MSC_VER)
-
-  typename detail::executor_binder_result_of0<T>::type operator()()
+  /// Forwarding function call operator.
+  template <typename... Args>
+  result_of_t<T(Args...)> operator()(Args&&... args) const&
   {
-    return this->target_();
+    return this->target_(static_cast<Args&&>(args)...);
   }
-
-  typename detail::executor_binder_result_of0<T>::type operator()() const
-  {
-    return this->target_();
-  }
-
-#define ASIO_PRIVATE_BIND_EXECUTOR_CALL_DEF(n) \
-  template <ASIO_VARIADIC_TPARAMS(n)> \
-  typename result_of<T(ASIO_VARIADIC_TARGS(n))>::type operator()( \
-      ASIO_VARIADIC_MOVE_PARAMS(n)) \
-  { \
-    return this->target_(ASIO_VARIADIC_MOVE_ARGS(n)); \
-  } \
-  \
-  template <ASIO_VARIADIC_TPARAMS(n)> \
-  typename result_of<T(ASIO_VARIADIC_TARGS(n))>::type operator()( \
-      ASIO_VARIADIC_MOVE_PARAMS(n)) const \
-  { \
-    return this->target_(ASIO_VARIADIC_MOVE_ARGS(n)); \
-  } \
-  /**/
-  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_BIND_EXECUTOR_CALL_DEF)
-#undef ASIO_PRIVATE_BIND_EXECUTOR_CALL_DEF
-
-#else // defined(ASIO_HAS_STD_TYPE_TRAITS) && !defined(_MSC_VER)
-
-  typedef typename detail::executor_binder_result_type<T>::result_type_or_void
-    result_type_or_void;
-
-  result_type_or_void operator()()
-  {
-    return this->target_();
-  }
-
-  result_type_or_void operator()() const
-  {
-    return this->target_();
-  }
-
-#define ASIO_PRIVATE_BIND_EXECUTOR_CALL_DEF(n) \
-  template <ASIO_VARIADIC_TPARAMS(n)> \
-  result_type_or_void operator()( \
-      ASIO_VARIADIC_MOVE_PARAMS(n)) \
-  { \
-    return this->target_(ASIO_VARIADIC_MOVE_ARGS(n)); \
-  } \
-  \
-  template <ASIO_VARIADIC_TPARAMS(n)> \
-  result_type_or_void operator()( \
-      ASIO_VARIADIC_MOVE_PARAMS(n)) const \
-  { \
-    return this->target_(ASIO_VARIADIC_MOVE_ARGS(n)); \
-  } \
-  /**/
-  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_BIND_EXECUTOR_CALL_DEF)
-#undef ASIO_PRIVATE_BIND_EXECUTOR_CALL_DEF
-
-#endif // defined(ASIO_HAS_STD_TYPE_TRAITS) && !defined(_MSC_VER)
 
 private:
   typedef detail::executor_binder_base<T, Executor,
     uses_executor<T, Executor>::value> base_type;
 };
 
+/// A function object type that adapts a @ref completion_token to specify that
+/// the completion handler should have the supplied executor as its associated
+/// executor.
+/**
+ * May also be used directly as a completion token, in which case it adapts the
+ * asynchronous operation's default completion token (or asio::deferred
+ * if no default is available).
+ */
+template <typename Executor>
+struct partial_executor_binder
+{
+  /// Constructor that specifies associated executor.
+  explicit partial_executor_binder(const Executor& ex)
+    : executor_(ex)
+  {
+  }
+
+  /// Adapt a @ref completion_token to specify that the completion handler
+  /// should have the executor as its associated executor.
+  template <typename CompletionToken>
+  ASIO_NODISCARD inline
+  constexpr executor_binder<decay_t<CompletionToken>, Executor>
+  operator()(CompletionToken&& completion_token) const
+  {
+    return executor_binder<decay_t<CompletionToken>, Executor>(executor_arg_t(),
+        static_cast<CompletionToken&&>(completion_token), executor_);
+  }
+
+//private:
+  Executor executor_;
+};
+
+/// Create a partial completion token that associates an executor.
+template <typename Executor>
+ASIO_NODISCARD inline partial_executor_binder<Executor>
+bind_executor(const Executor& ex,
+    constraint_t<
+      is_executor<Executor>::value || execution::is_executor<Executor>::value
+    > = 0)
+{
+  return partial_executor_binder<Executor>(ex);
+}
+
 /// Associate an object of type @c T with an executor of type @c Executor.
 template <typename Executor, typename T>
-inline executor_binder<typename decay<T>::type, Executor>
-bind_executor(const Executor& ex, ASIO_MOVE_ARG(T) t,
-    typename constraint<
+ASIO_NODISCARD inline executor_binder<decay_t<T>, Executor>
+bind_executor(const Executor& ex, T&& t,
+    constraint_t<
       is_executor<Executor>::value || execution::is_executor<Executor>::value
-    >::type = 0)
+    > = 0)
 {
-  return executor_binder<typename decay<T>::type, Executor>(
-      executor_arg_t(), ex, ASIO_MOVE_CAST(T)(t));
+  return executor_binder<decay_t<T>, Executor>(
+      executor_arg_t(), ex, static_cast<T&&>(t));
+}
+
+/// Create a partial completion token that associates an execution context's
+/// executor.
+template <typename ExecutionContext>
+ASIO_NODISCARD inline partial_executor_binder<
+    typename ExecutionContext::executor_type>
+bind_executor(ExecutionContext& ctx,
+    constraint_t<
+      is_convertible<ExecutionContext&, execution_context&>::value
+    > = 0)
+{
+  return partial_executor_binder<typename ExecutionContext::executor_type>(
+      ctx.get_executor());
 }
 
 /// Associate an object of type @c T with an execution context's executor.
 template <typename ExecutionContext, typename T>
-inline executor_binder<typename decay<T>::type,
-  typename ExecutionContext::executor_type>
-bind_executor(ExecutionContext& ctx, ASIO_MOVE_ARG(T) t,
-    typename constraint<is_convertible<
-      ExecutionContext&, execution_context&>::value>::type = 0)
+ASIO_NODISCARD inline executor_binder<decay_t<T>,
+    typename ExecutionContext::executor_type>
+bind_executor(ExecutionContext& ctx, T&& t,
+    constraint_t<
+      is_convertible<ExecutionContext&, execution_context&>::value
+    > = 0)
 {
-  return executor_binder<typename decay<T>::type,
-    typename ExecutionContext::executor_type>(
-      executor_arg_t(), ctx.get_executor(), ASIO_MOVE_CAST(T)(t));
+  return executor_binder<decay_t<T>, typename ExecutionContext::executor_type>(
+      executor_arg_t(), ctx.get_executor(), static_cast<T&&>(t));
 }
 
 #if !defined(GENERATING_DOCUMENTATION)
@@ -518,20 +498,38 @@ struct uses_executor<executor_binder<T, Executor>, Executor>
 namespace detail {
 
 template <typename TargetAsyncResult, typename Executor, typename = void>
-struct executor_binder_async_result_completion_handler_type
+class executor_binder_completion_handler_async_result
 {
+public:
+  template <typename T>
+  explicit executor_binder_completion_handler_async_result(T&)
+  {
+  }
 };
 
 template <typename TargetAsyncResult, typename Executor>
-struct executor_binder_async_result_completion_handler_type<
-  TargetAsyncResult, Executor,
-  typename void_type<
-    typename TargetAsyncResult::completion_handler_type
-  >::type>
+class executor_binder_completion_handler_async_result<
+    TargetAsyncResult, Executor,
+    void_t<typename TargetAsyncResult::completion_handler_type >>
 {
+private:
+  TargetAsyncResult target_;
+
+public:
   typedef executor_binder<
     typename TargetAsyncResult::completion_handler_type, Executor>
       completion_handler_type;
+
+  explicit executor_binder_completion_handler_async_result(
+      typename TargetAsyncResult::completion_handler_type& handler)
+    : target_(handler)
+  {
+  }
+
+  auto get() -> decltype(target_.get())
+  {
+    return target_.get();
+  }
 };
 
 template <typename TargetAsyncResult, typename = void>
@@ -540,11 +538,8 @@ struct executor_binder_async_result_return_type
 };
 
 template <typename TargetAsyncResult>
-struct executor_binder_async_result_return_type<
-  TargetAsyncResult,
-  typename void_type<
-    typename TargetAsyncResult::return_type
-  >::type>
+struct executor_binder_async_result_return_type<TargetAsyncResult,
+    void_t<typename TargetAsyncResult::return_type>>
 {
   typedef typename TargetAsyncResult::return_type return_type;
 };
@@ -553,181 +548,107 @@ struct executor_binder_async_result_return_type<
 
 template <typename T, typename Executor, typename Signature>
 class async_result<executor_binder<T, Executor>, Signature> :
-  public detail::executor_binder_async_result_completion_handler_type<
-    async_result<T, Signature>, Executor>,
+  public detail::executor_binder_completion_handler_async_result<
+      async_result<T, Signature>, Executor>,
   public detail::executor_binder_async_result_return_type<
-    async_result<T, Signature> >
+      async_result<T, Signature>>
 {
 public:
   explicit async_result(executor_binder<T, Executor>& b)
-    : target_(b.get())
+    : detail::executor_binder_completion_handler_async_result<
+        async_result<T, Signature>, Executor>(b.get())
   {
-  }
-
-  typename async_result<T, Signature>::return_type get()
-  {
-    return target_.get();
   }
 
   template <typename Initiation>
-  struct init_wrapper
+  struct init_wrapper : detail::initiation_base<Initiation>
   {
-    template <typename Init>
-    init_wrapper(const Executor& ex, ASIO_MOVE_ARG(Init) init)
-      : ex_(ex),
-        initiation_(ASIO_MOVE_CAST(Init)(init))
-    {
-    }
-
-#if defined(ASIO_HAS_VARIADIC_TEMPLATES)
+    using detail::initiation_base<Initiation>::initiation_base;
 
     template <typename Handler, typename... Args>
-    void operator()(
-        ASIO_MOVE_ARG(Handler) handler,
-        ASIO_MOVE_ARG(Args)... args)
+    void operator()(Handler&& handler, const Executor& e, Args&&... args) &&
     {
-      ASIO_MOVE_CAST(Initiation)(initiation_)(
-          executor_binder<typename decay<Handler>::type, Executor>(
-            executor_arg_t(), ex_, ASIO_MOVE_CAST(Handler)(handler)),
-          ASIO_MOVE_CAST(Args)(args)...);
+      static_cast<Initiation&&>(*this)(
+          executor_binder<decay_t<Handler>, Executor>(
+            executor_arg_t(), e, static_cast<Handler&&>(handler)),
+          static_cast<Args&&>(args)...);
     }
 
     template <typename Handler, typename... Args>
-    void operator()(
-        ASIO_MOVE_ARG(Handler) handler,
-        ASIO_MOVE_ARG(Args)... args) const
+    void operator()(Handler&& handler,
+        const Executor& e, Args&&... args) const &
     {
-      initiation_(
-          executor_binder<typename decay<Handler>::type, Executor>(
-            executor_arg_t(), ex_, ASIO_MOVE_CAST(Handler)(handler)),
-          ASIO_MOVE_CAST(Args)(args)...);
+      static_cast<const Initiation&>(*this)(
+          executor_binder<decay_t<Handler>, Executor>(
+            executor_arg_t(), e, static_cast<Handler&&>(handler)),
+          static_cast<Args&&>(args)...);
     }
-
-#else // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-
-    template <typename Handler>
-    void operator()(
-        ASIO_MOVE_ARG(Handler) handler)
-    {
-      ASIO_MOVE_CAST(Initiation)(initiation_)(
-          executor_binder<typename decay<Handler>::type, Executor>(
-            executor_arg_t(), ex_, ASIO_MOVE_CAST(Handler)(handler)));
-    }
-
-    template <typename Handler>
-    void operator()(
-        ASIO_MOVE_ARG(Handler) handler) const
-    {
-      initiation_(
-          executor_binder<typename decay<Handler>::type, Executor>(
-            executor_arg_t(), ex_, ASIO_MOVE_CAST(Handler)(handler)));
-    }
-
-#define ASIO_PRIVATE_INIT_WRAPPER_DEF(n) \
-    template <typename Handler, ASIO_VARIADIC_TPARAMS(n)> \
-    void operator()( \
-        ASIO_MOVE_ARG(Handler) handler, \
-        ASIO_VARIADIC_MOVE_PARAMS(n)) \
-    { \
-      ASIO_MOVE_CAST(Initiation)(initiation_)( \
-          executor_binder<typename decay<Handler>::type, Executor>( \
-            executor_arg_t(), ex_, ASIO_MOVE_CAST(Handler)(handler)), \
-          ASIO_VARIADIC_MOVE_ARGS(n)); \
-    } \
-    \
-    template <typename Handler, ASIO_VARIADIC_TPARAMS(n)> \
-    void operator()( \
-        ASIO_MOVE_ARG(Handler) handler, \
-        ASIO_VARIADIC_MOVE_PARAMS(n)) const \
-    { \
-      initiation_( \
-          executor_binder<typename decay<Handler>::type, Executor>( \
-            executor_arg_t(), ex_, ASIO_MOVE_CAST(Handler)(handler)), \
-          ASIO_VARIADIC_MOVE_ARGS(n)); \
-    } \
-    /**/
-    ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_INIT_WRAPPER_DEF)
-#undef ASIO_PRIVATE_INIT_WRAPPER_DEF
-
-#endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-
-    Executor ex_;
-    Initiation initiation_;
   };
 
-#if defined(ASIO_HAS_VARIADIC_TEMPLATES)
-
   template <typename Initiation, typename RawCompletionToken, typename... Args>
-  static ASIO_INITFN_DEDUCED_RESULT_TYPE(T, Signature,
-    (async_result<T, Signature>::initiate(
-        declval<init_wrapper<typename decay<Initiation>::type> >(),
-        declval<T>(), declval<ASIO_MOVE_ARG(Args)>()...)))
-  initiate(
-      ASIO_MOVE_ARG(Initiation) initiation,
-      ASIO_MOVE_ARG(RawCompletionToken) token,
-      ASIO_MOVE_ARG(Args)... args)
+  static auto initiate(Initiation&& initiation,
+      RawCompletionToken&& token, Args&&... args)
+    -> decltype(
+      async_initiate<
+        conditional_t<
+          is_const<remove_reference_t<RawCompletionToken>>::value, const T, T>,
+        Signature>(
+          declval<init_wrapper<decay_t<Initiation>>>(),
+          token.get(), token.get_executor(), static_cast<Args&&>(args)...))
   {
-    return async_initiate<T, Signature>(
-        init_wrapper<typename decay<Initiation>::type>(
-          token.get_executor(), ASIO_MOVE_CAST(Initiation)(initiation)),
-        token.get(), ASIO_MOVE_CAST(Args)(args)...);
+    return async_initiate<
+      conditional_t<
+        is_const<remove_reference_t<RawCompletionToken>>::value, const T, T>,
+      Signature>(
+        init_wrapper<decay_t<Initiation>>(
+          static_cast<Initiation&&>(initiation)),
+        token.get(), token.get_executor(), static_cast<Args&&>(args)...);
   }
-
-#else // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-
-  template <typename Initiation, typename RawCompletionToken>
-  static ASIO_INITFN_DEDUCED_RESULT_TYPE(T, Signature,
-    (async_result<T, Signature>::initiate(
-        declval<init_wrapper<typename decay<Initiation>::type> >(),
-        declval<T>())))
-  initiate(
-      ASIO_MOVE_ARG(Initiation) initiation,
-      ASIO_MOVE_ARG(RawCompletionToken) token)
-  {
-    return async_initiate<T, Signature>(
-        init_wrapper<typename decay<Initiation>::type>(
-          token.get_executor(), ASIO_MOVE_CAST(Initiation)(initiation)),
-        token.get());
-  }
-
-#define ASIO_PRIVATE_INITIATE_DEF(n) \
-  template <typename Initiation, typename RawCompletionToken, \
-      ASIO_VARIADIC_TPARAMS(n)> \
-  static ASIO_INITFN_DEDUCED_RESULT_TYPE(T, Signature, \
-    (async_result<T, Signature>::initiate( \
-        declval<init_wrapper<typename decay<Initiation>::type> >(), \
-        declval<T>(), ASIO_VARIADIC_MOVE_DECLVAL(n)))) \
-  initiate( \
-      ASIO_MOVE_ARG(Initiation) initiation, \
-      ASIO_MOVE_ARG(RawCompletionToken) token, \
-      ASIO_VARIADIC_MOVE_PARAMS(n)) \
-  { \
-    return async_initiate<T, Signature>( \
-        init_wrapper<typename decay<Initiation>::type>( \
-          token.get_executor(), ASIO_MOVE_CAST(Initiation)(initiation)), \
-        token.get(), ASIO_VARIADIC_MOVE_ARGS(n)); \
-  } \
-  /**/
-  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_INITIATE_DEF)
-#undef ASIO_PRIVATE_INITIATE_DEF
-
-#endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
 
 private:
-  async_result(const async_result&) ASIO_DELETED;
-  async_result& operator=(const async_result&) ASIO_DELETED;
+  async_result(const async_result&) = delete;
+  async_result& operator=(const async_result&) = delete;
+};
 
-  async_result<T, Signature> target_;
+template <typename Executor, typename... Signatures>
+struct async_result<partial_executor_binder<Executor>, Signatures...>
+{
+  template <typename Initiation, typename RawCompletionToken, typename... Args>
+  static auto initiate(Initiation&& initiation,
+      RawCompletionToken&& token, Args&&... args)
+    -> decltype(
+      async_initiate<Signatures...>(
+        static_cast<Initiation&&>(initiation),
+        executor_binder<
+          default_completion_token_t<associated_executor_t<Initiation>>,
+          Executor>(executor_arg_t(), token.executor_,
+            default_completion_token_t<associated_executor_t<Initiation>>{}),
+        static_cast<Args&&>(args)...))
+  {
+    return async_initiate<Signatures...>(
+        static_cast<Initiation&&>(initiation),
+        executor_binder<
+          default_completion_token_t<associated_executor_t<Initiation>>,
+          Executor>(executor_arg_t(), token.executor_,
+            default_completion_token_t<associated_executor_t<Initiation>>{}),
+        static_cast<Args&&>(args)...);
+  }
 };
 
 template <template <typename, typename> class Associator,
     typename T, typename Executor, typename DefaultCandidate>
 struct associator<Associator, executor_binder<T, Executor>, DefaultCandidate>
+  : Associator<T, DefaultCandidate>
 {
-  typedef typename Associator<T, DefaultCandidate>::type type;
+  static typename Associator<T, DefaultCandidate>::type get(
+      const executor_binder<T, Executor>& b) noexcept
+  {
+    return Associator<T, DefaultCandidate>::get(b.get());
+  }
 
-  static type get(const executor_binder<T, Executor>& b,
-      const DefaultCandidate& c = DefaultCandidate()) ASIO_NOEXCEPT
+  static auto get(const executor_binder<T, Executor>& b,
+      const DefaultCandidate& c) noexcept
+    -> decltype(Associator<T, DefaultCandidate>::get(b.get(), c))
   {
     return Associator<T, DefaultCandidate>::get(b.get(), c);
   }
@@ -738,8 +659,9 @@ struct associated_executor<executor_binder<T, Executor>, Executor1>
 {
   typedef Executor type;
 
-  static type get(const executor_binder<T, Executor>& b,
-      const Executor1& = Executor1()) ASIO_NOEXCEPT
+  static auto get(const executor_binder<T, Executor>& b,
+      const Executor1& = Executor1()) noexcept
+    -> decltype(b.get_executor())
   {
     return b.get_executor();
   }
@@ -747,6 +669,7 @@ struct associated_executor<executor_binder<T, Executor>, Executor1>
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

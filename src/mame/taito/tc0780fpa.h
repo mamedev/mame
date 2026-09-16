@@ -32,8 +32,8 @@ public:
 	void swap_buffers();
 
 private:
-	std::unique_ptr<bitmap_ind16> m_fb[2];
-	std::unique_ptr<bitmap_ind16> m_zb;
+	bitmap_ind16 m_fb[2];
+	bitmap_ind16 m_zb;
 	const uint8_t *m_texture;
 
 	rectangle m_cliprect;
@@ -45,7 +45,7 @@ private:
 class tc0780fpa_device : public device_t, public device_video_interface
 {
 public:
-	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -57,21 +57,21 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<uint16_t[]> m_poly_fifo;
-	int m_poly_fifo_ptr = 0;
+	int32_t m_poly_fifo_ptr = 0;
 
 	std::unique_ptr<tc0780fpa_renderer> m_renderer;
 
 	uint16_t m_tex_address = 0;
 	uint16_t m_tex_offset = 0;
-	int m_texbase_x = 0;
-	int m_texbase_y = 0;
+	int32_t m_texbase_x = 0;
+	int32_t m_texbase_y = 0;
 };
 
 DECLARE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device)

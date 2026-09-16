@@ -9,7 +9,7 @@
 
 class lpc_rtc_device : public lpc_device {
 public:
-	lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lpc_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -18,12 +18,12 @@ public:
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
-	void extmap(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void extmap(address_map &map) ATTR_COLD;
 
 	uint8_t cur_index, cur_extindex;
 	uint8_t ram[256];

@@ -200,7 +200,7 @@
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -238,8 +238,8 @@ public:
 	int clock_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_shared_ptr_array<uint8_t, 2> m_zram;
 	required_memory_bank m_rambank;
@@ -262,7 +262,7 @@ private:
 	void dual_pokey_w(offs_t offset, uint8_t data);
 	void out_0_w(uint8_t data);
 
-	void alpha_map(address_map &map);
+	void alpha_map(address_map &map) ATTR_COLD;
 };
 
 class mhavoc_state : public alphaone_state
@@ -277,19 +277,19 @@ public:
 
 	void mhavoc(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_service_r);
+	ioport_value coin_service_r();
 	int gamma_rcvd_r();
 	int gamma_xmtd_r();
 	int alpha_rcvd_r();
 	int alpha_xmtd_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_gamma;
 
-	void gamma_map(address_map &map);
+	void gamma_map(address_map &map) ATTR_COLD;
 
 private:
 	required_ioport m_coin;
@@ -317,7 +317,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(cpu_irq_clock);
-	void alpha_map(address_map &map);
+	void alpha_map(address_map &map) ATTR_COLD;
 };
 
 class mhavocrv_state : public mhavoc_state
@@ -331,7 +331,7 @@ public:
 	void mhavocrv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms5220_device> m_tms;
@@ -341,7 +341,7 @@ private:
 	void speech_data_w(uint8_t data);
 	void speech_strobe_w(uint8_t data);
 
-	void gamma_map(address_map &map);
+	void gamma_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -401,8 +401,6 @@ void mhavoc_state::gamma_irq_ack_w(uint8_t data)
 
 void alphaone_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_alpha_irq_clock));
 	save_item(NAME(m_alpha_irq_clock_enable));
 }
@@ -486,7 +484,7 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 	m_gamma->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	// the sound CPU needs to reply in 250 microseconds (according to Neil Bradley)
-	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate());
+	machine().scheduler().perfect_quantum(attotime::from_usec(250));
 }
 
 
@@ -557,7 +555,7 @@ void alphaone_state::rom_banksel_w(uint8_t data)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::coin_service_r)
+ioport_value mhavoc_state::coin_service_r()
 {
 	return (m_player_1 ? m_service : m_coin)->read() & 0x03;
 }
@@ -858,17 +856,17 @@ void alphaone_state::alpha_map(address_map &map)
 
 static INPUT_PORTS_START( mhavoc )
 	PORT_START("IN0")   // alpha
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(mhavoc_state, clock_r)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(mhavoc_state, gamma_xmtd_r)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(mhavoc_state, gamma_rcvd_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mhavoc_state::clock_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mhavoc_state::gamma_xmtd_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mhavoc_state::gamma_rcvd_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Diagnostic Step") // mentioned in schematics, but N/C?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mhavoc_state, coin_service_r) // selected based on player_1
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mhavoc_state::coin_service_r)) // selected based on player_1
 
 	PORT_START("IN1")   // gamma
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(mhavoc_state, alpha_xmtd_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(mhavoc_state, alpha_rcvd_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mhavoc_state::alpha_xmtd_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mhavoc_state::alpha_rcvd_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) // TIRDY, this pcb does not have a TMS5200
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -938,7 +936,7 @@ static INPUT_PORTS_START( mhavocrv )
 	PORT_INCLUDE( mhavoc )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tms", tms5220_device, readyq_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tms", FUNC(tms5220_device::readyq_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mhavocp )
@@ -954,8 +952,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alphaone )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alphaone_state, clock_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(alphaone_state::clock_r))
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -1000,14 +998,11 @@ void alphaone_state::alphaone(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(50);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 580, 0, 500);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(50);
+	vector.set_visarea(0, 580, 0, 500);
 
-	avg_device &avg(AVG_MHAVOC(config, "avg", 0));
+	avg_device &avg(AVG_MHAVOC(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_alpha, AS_PROGRAM, 0x4000);
 
@@ -1033,7 +1028,7 @@ void mhavoc_state::mhavoc(machine_config &config)
 
 	subdevice<timer_device>("5k_timer")->set_callback(FUNC(mhavoc_state::cpu_irq_clock));
 
-	subdevice<screen_device>("screen")->set_visarea(0, 300, 0, 260);
+	subdevice<vector_device>("vector")->set_visarea(0, 300, 0, 260);
 
 	/* FIXME: Outputs 1,2,3 are tied together
 	 * This signal and Output 4 are processed separately.

@@ -58,8 +58,8 @@ public:
 	template<int Sel> DECLARE_INPUT_CHANGED_MEMBER(switch_prev) { if (newval) switch_change(Sel, param, false); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<rw5000_base_device> m_maincpu;
@@ -153,7 +153,8 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
   handheld game overall. Hardware design (even the MCU) and programming
   was done at Rockwell.
 
-  A European version was released as "Ski Slalom", except it's upside-down.
+  A European version was released as "Ski Slalom" (model 8290), except it's
+  upside-down.
 
 *******************************************************************************/
 
@@ -201,11 +202,11 @@ static INPUT_PORTS_START( autorace )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Start / Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::power_button), 0) PORT_NAME("Start / Reset")
 
 	PORT_START("SWITCH") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::switch_prev<0>), 0x0c) PORT_NAME("Gear Switch Down")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::switch_next<0>), 0x0c) PORT_NAME("Gear Switch Up")
 INPUT_PORTS_END
 
 // config
@@ -297,7 +298,7 @@ static INPUT_PORTS_START( misatk )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("POWER") // power switch
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Arm / Off")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_rw5000_state::power_button), 0) PORT_NAME("Arm / Off")
 INPUT_PORTS_END
 
 // config
@@ -395,7 +396,7 @@ static INPUT_PORTS_START( mfootb )
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" ) // PRO 1
 	PORT_CONFSETTING(    0x00, "2" ) // PRO 2
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score") PORT_CHANGED_MEMBER(DEVICE_SELF, mfootb_state, score_button, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mfootb_state::score_button), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
 	PORT_CONFNAME( 0x08, 0x00, "Factory Test" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -734,7 +735,7 @@ ROM_END
 /*******************************************************************************
 
   Rockwell 8R "Automatic Percent", Rockwell 18R "Memory"
-  * B5000 MCU (label B5000CC, die label B5000)
+  * B5000 MCU (label B5000CB/CC, die label B5000)
   * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by
@@ -925,8 +926,8 @@ static INPUT_PORTS_START( rw30r )
 
 	PORT_START("IN.4") // STR8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("C / MC")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME(u8"X\u2194Y / X\u2194M" /* ↔ */)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME(u8"% / u221ax" /* √ */)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME(u8"X\u2194Y / X\u2194M") // U+2194 = ↔
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME(u8"% / u221ax") // U+221A = √
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / MR")
 INPUT_PORTS_END
 
@@ -1045,7 +1046,7 @@ static INPUT_PORTS_START( rw24k )
 	PORT_START("IN.3") // STR3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("MC") // "
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221a" /* √ */) // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221a") // " - U+221A = √
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("MR") // "
 
 	PORT_START("IN.4") // STR4
@@ -1074,7 +1075,7 @@ static INPUT_PORTS_START( rw24k )
 
 	PORT_START("IN.8") // STR8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE/C")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME(u8"\u2194" /* ↔ */) // register exchange - unpopulated on 14RD/24RD
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME(u8"\u2194") // register exchange - unpopulated on 14RD/24RD - U+2194 = ↔
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END

@@ -51,12 +51,12 @@ private:
 	void rs232_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 
-	void io_map(address_map &map);
-	void evmbug_mem(address_map &map);
-	void tms9995bb_mem(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void evmbug_mem(address_map &map) ATTR_COLD;
+	void tms9995bb_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t m_term_data = 0U;
 	uint8_t m_term_out = 0U;
 	bool m_rin = 0;
@@ -155,7 +155,7 @@ void evmbug_state::evmbug(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(evmbug_state::kbd_put));
 
 	//TMS9902(config, "uart1", XTAL(12'000'000) / 4);

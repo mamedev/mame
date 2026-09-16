@@ -19,14 +19,14 @@ DEFINE_DEVICE_TYPE(HPBLP, isa8_hpblp_device, "hpblp", "HP Basic Language Coproce
 
 static INPUT_PORTS_START(hpblp)
 	PORT_START("BLPPORT")
-	PORT_DIPNAME(3, 0, "IO Address") PORT_DIPLOCATION("SW2:0,1")
+	PORT_DIPNAME(3, 0, "IO Address") PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(0, "250h-257h")
 	PORT_DIPSETTING(1, "280h-287h")
 	PORT_DIPSETTING(2, "330h-337h")
 	PORT_DIPSETTING(3, "390h-397h")
 
 	PORT_START("BLPIRQ")
-	PORT_DIPNAME(7, 3, "Interrupt") PORT_DIPLOCATION("SW3:0,1,2")
+	PORT_DIPNAME(7, 3, "Interrupt") PORT_DIPLOCATION("SW3:1,2,3")
 	PORT_DIPSETTING(0x0, "IRQ 3")
 	PORT_DIPSETTING(0x1, "IRQ 4")
 	PORT_DIPSETTING(0x2, "IRQ 5")
@@ -71,7 +71,7 @@ void isa8_hpblp_device::device_add_mconfig(machine_config &config)
 	m_tms9914->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_tms9914->int_write_cb().set(FUNC(isa8_hpblp_device::gpib_irq));
 
-	IEEE488(config, m_ieee488, 0);
+	IEEE488(config, m_ieee488);
 	m_ieee488->eoi_callback().set(m_tms9914, FUNC(tms9914_device::eoi_w));
 	m_ieee488->dav_callback().set(m_tms9914, FUNC(tms9914_device::dav_w));
 	m_ieee488->nrfd_callback().set(m_tms9914, FUNC(tms9914_device::nrfd_w));
@@ -81,11 +81,11 @@ void isa8_hpblp_device::device_add_mconfig(machine_config &config)
 	m_ieee488->atn_callback().set(m_tms9914, FUNC(tms9914_device::atn_w));
 	m_ieee488->ren_callback().set(m_tms9914, FUNC(tms9914_device::ren_w));
 
-	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0", 0));
+	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0"));
 	hp_ieee488_devices(slot0);
 	slot0.set_default_option("hp9122c");
 
-	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
+	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus"));
 	dio16.set_program_space(m_maincpu, AS_PROGRAM);
 	m_maincpu->reset_cb().set(dio16, FUNC(bus::hp_dio::dio16_device::reset_in));
 
@@ -97,8 +97,8 @@ void isa8_hpblp_device::device_add_mconfig(machine_config &config)
 	dio16.irq6_out_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	dio16.irq7_out_cb().set_inputline(m_maincpu, M68K_IRQ_7);
 
-	DIO32_SLOT(config, "sl0", 0, "diobus", dio16_cards, nullptr, false);
-	DIO32_SLOT(config, "sl1", 0, "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl0", "diobus", dio16_cards, nullptr, false);
+	DIO32_SLOT(config, "sl1", "diobus", dio16_cards, nullptr, false);
 }
 
 offs_t isa8_hpblp_device::get_bus_address(offs_t offset, uint16_t mem_mask)

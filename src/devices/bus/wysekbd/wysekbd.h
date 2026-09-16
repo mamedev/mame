@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_WYSEKBD_KEYBOARD_H
-#define MAME_BUS_WYSEKBD_KEYBOARD_H
+#ifndef MAME_BUS_WYSEKBD_WYSEKBD_H
+#define MAME_BUS_WYSEKBD_WYSEKBD_H
 
 #pragma once
 
@@ -30,10 +30,7 @@ public:
 	wyse_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: wyse_keyboard_port_device(mconfig, tag, owner, 0U)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	// line handlers
@@ -41,9 +38,9 @@ public:
 	int data_r();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// selected keyboard
@@ -65,10 +62,12 @@ protected:
 	virtual void wysekbd_write_cmd(bool state) = 0;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(WYSE_KEYBOARD, wyse_keyboard_port_device)
 
 // standard options
+extern void wy85_keyboards(device_slot_interface &slot);
+extern void wy30_keyboards(device_slot_interface &slot);
 extern void wy60_keyboards(device_slot_interface &slot);
 
 //**************************************************************************
@@ -89,4 +88,4 @@ inline int wyse_keyboard_port_device::data_r()
 		return 1;
 }
 
-#endif // MAME_BUS_WYSEKBD_KEYBOARD_H
+#endif // MAME_BUS_WYSEKBD_WYSEKBD_H

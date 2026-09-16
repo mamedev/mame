@@ -69,7 +69,7 @@ public:
 	void unichamp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cp1610_cpu_device> m_maincpu;
@@ -96,7 +96,7 @@ private:
 
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void unichamp_mem(address_map &map);
+	void unichamp_mem(address_map &map) ATTR_COLD;
 };
 
 void unichamp_state::unichamp_palette(palette_device &palette) const
@@ -247,7 +247,7 @@ void unichamp_state::unichamp(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(3'579'545),
 		gic_device::LINE_CLOCKS, gic_device::START_ACTIVE_SCAN, gic_device::END_ACTIVE_SCAN,
 		gic_device::LINES,       gic_device::START_Y,           gic_device::START_Y + gic_device::SCREEN_HEIGHT);

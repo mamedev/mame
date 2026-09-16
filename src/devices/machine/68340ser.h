@@ -17,7 +17,7 @@ public:
 	mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

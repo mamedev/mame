@@ -25,8 +25,8 @@ protected:
 	kc_m011_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0xf6; }
@@ -84,7 +84,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0x79; }
@@ -109,7 +109,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0x7a; }
@@ -156,7 +156,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0x78; }

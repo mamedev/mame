@@ -896,7 +896,8 @@ void sms_state::machine_start()
 	// turn on the Power LED
 	if (m_has_pwr_led)
 	{
-		m_led_pwr.resolve();
+		// FIXME: you can no longer avoid creation of the output by not resolving it - need a way to not create the output for systems that lack it
+		//m_led_pwr.resolve();
 		m_led_pwr = 1;
 	}
 

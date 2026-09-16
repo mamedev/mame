@@ -18,9 +18,8 @@ TODO:
 - The SRAM test fails in diagnostics; this is due to the fact that the test
   relies on executing out of the cache while it tromps over (and eventually
   restores) the instructions it is executing; this will likely never be fixed.
-- Bootup sequence (the blue color fill) is too fast, which in turn causes
-  attract mode music not to play. Maybe the main CPU is running at a lower
-  clockspeed at boot (50MHz/4 seems plausible), but then, what toggles it?
+- Verify waitstates on memory access, currently it's only added for EPROMs
+  during the blue screen boot up sequence.
 
 ****************************************************************************
 
@@ -193,6 +192,7 @@ Notes:
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -218,7 +218,7 @@ public:
 	void kinst(machine_config &config);
 	void kinst2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_status_r) { return BIT(m_dcs->control_r(), 11); }
+	ioport_value sound_status_r() { return BIT(m_dcs->control_r(), 11); }
 
 protected:
 	required_device<mips3_device> m_maincpu;
@@ -226,14 +226,14 @@ protected:
 	required_device<dcs_audio_2k_device> m_dcs;
 	required_device<palette_device> m_palette;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void kinst_map(address_map &map);
-	void kinst2_map(address_map &map);
+	void kinst_map(address_map &map) ATTR_COLD;
+	void kinst2_map(address_map &map) ATTR_COLD;
 
-	uint32_t ide_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ide_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t ide_r(offs_t offset);
+	void ide_w(offs_t offset, uint32_t data);
 
 private:
 	required_shared_ptr<uint32_t> m_rambase;
@@ -243,6 +243,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t ide_extra_r();
 	void ide_extra_w(uint32_t data);
+	uint32_t rom_r(offs_t offset);
 
 	void vram_control_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void sound_reset_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -269,9 +270,9 @@ public:
 	void kinst2uk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void kinst2uk_map(address_map &map);
+	void kinst2uk_map(address_map &map) ATTR_COLD;
 
 	uint32_t cpld_r(offs_t offset, uint32_t mem_mask);
 	void cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -299,7 +300,6 @@ void kinst_state::machine_start()
 	// configure fast RAM regions
 	m_maincpu->add_fastram(0x08000000, 0x087fffff, false, m_rambase2);
 	m_maincpu->add_fastram(0x00000000, 0x0007ffff, false, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
 	// register for savestates
 	save_item(NAME(m_vram_control));
@@ -388,27 +388,27 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
  *
  *************************************/
 
-uint32_t kinst_state::ide_r(offs_t offset, uint32_t mem_mask)
+uint32_t kinst_state::ide_r(offs_t offset)
 {
-	return m_ata->cs0_r(offset / 2, mem_mask);
+	return m_ata->cs0_r(offset / 2);
 }
 
 
-void kinst_state::ide_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void kinst_state::ide_w(offs_t offset, uint32_t data)
 {
-	m_ata->cs0_w(offset / 2, data, mem_mask);
+	m_ata->cs0_w(offset / 2, data);
 }
 
 
 uint32_t kinst_state::ide_extra_r()
 {
-	return m_ata->cs1_r(6, 0xff);
+	return m_ata->cs1_r(6);
 }
 
 
 void kinst_state::ide_extra_w(uint32_t data)
 {
-	m_ata->cs1_w(6, data, 0xff);
+	m_ata->cs1_w(6, data);
 }
 
 
@@ -425,7 +425,7 @@ uint32_t kinst2uk_state::cpld_r(offs_t offset, uint32_t mem_mask)
 	if (m_prot_sel)
 		return (m_prot_sel << 4) | (m_prot_cnt ^ m_prot_rega ^ m_prot_regb);
 	else
-		return ide_r(0x0c, mem_mask);
+		return ide_r(0x0c);
 }
 
 
@@ -450,7 +450,7 @@ void kinst2uk_state::cpld_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_prot_sel = 0; // deselect IDE slave
 	}
 
-	ide_w(0x0c, data, mem_mask);
+	ide_w(0x0c, data);
 }
 
 
@@ -501,6 +501,17 @@ void kinst_state::coin_control_w(offs_t offset, uint32_t data, uint32_t mem_mask
 }
 
 
+uint32_t kinst_state::rom_r(offs_t offset)
+{
+	// add RdRdy clocks on EPROM access
+	// bootup sequence takes approx. 6 seconds, and it's not a CPU clock divider
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-128);
+
+	return m_rombase[offset];
+}
+
+
 
 /*************************************
  *
@@ -523,7 +534,7 @@ void kinst_state::kinst_map(address_map &map)
 
 	map(0x10000100, 0x1000013f).rw(FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
 	map(0x10000170, 0x10000173).rw(FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
-	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0);
+	map(0x1fc00000, 0x1fc7ffff).r(FUNC(kinst_state::rom_r));
 }
 
 
@@ -598,7 +609,7 @@ static INPUT_PORTS_START( kinst )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kinst_state, sound_status_r)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(kinst_state::sound_status_r))
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -696,7 +707,7 @@ void kinst_state::kinst(machine_config &config)
 	m_ata->irq_handler().set_inputline(m_maincpu, 1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(50_MHz_XTAL/8, 406, 0, 320, 261, 0, 240);
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
 	screen.set_screen_update(FUNC(kinst_state::screen_update));
@@ -704,7 +715,11 @@ void kinst_state::kinst(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BGR_555);
 
 	// sound hardware
-	DCS_AUDIO_2K(config, m_dcs, 0);
+	SPEAKER(config, "mono").front_center();
+
+	DCS_AUDIO_2K(config, m_dcs);
+	m_dcs->set_maincpu_tag(m_maincpu);
+	m_dcs->add_route(0, "mono", 1.0);
 }
 
 
@@ -847,6 +862,6 @@ void kinst_state::init_kinst2()
 // versions selectable by changing bioses
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT   CLASS           INIT         SCREEN  COMPANY                  FULLNAME           FLAGS
-GAME( 1994, kinst,    0,      kinst,    kinst,  kinst_state,    init_kinst,  ROT0,   "Rare (Midway license)", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kinst2,   0,      kinst2,   kinst2, kinst_state,    init_kinst2, ROT0,   "Rare (Midway license)", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst2, ROT0,   "Rare (Midway license)", "Killer Instinct 2 (upgrade kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kinst,    0,      kinst,    kinst,  kinst_state,    init_kinst,  ROT0,   "Rare / Nintendo (Midway license)", "Killer Instinct", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kinst2,   0,      kinst2,   kinst2, kinst_state,    init_kinst2, ROT0,   "Rare / Nintendo (Midway license)", "Killer Instinct 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kinst2uk, kinst2, kinst2uk, kinst2, kinst2uk_state, init_kinst2, ROT0,   "Rare / Nintendo (Midway license)", "Killer Instinct 2 (upgrade kit)", MACHINE_SUPPORTS_SAVE )

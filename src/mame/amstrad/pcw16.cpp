@@ -995,9 +995,9 @@ void pcw16_state::machine_start()
 static INPUT_PORTS_START(pcw16)
 	PORT_START("EXTRA")
 	/* vblank */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	/* power switch - default is on */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Power Switch/Suspend") PORT_WRITE_LINE_DEVICE_MEMBER("ns16550_2", ins8250_uart_device, ri_w) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Power Switch/Suspend") PORT_WRITE_LINE_DEVICE_MEMBER("ns16550_2", FUNC(ins8250_uart_device::ri_w)) PORT_TOGGLE
 INPUT_PORTS_END
 
 static void pcw16_com(device_slot_interface &device)
@@ -1039,7 +1039,7 @@ void pcw16_state::pcw16(machine_config &config)
 	serport2.cts_handler().set(m_uart2, FUNC(ins8250_uart_device::cts_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(PCW16_SCREEN_WIDTH, PCW16_SCREEN_HEIGHT);

@@ -15,12 +15,13 @@
 #include "modules/font/font_module.h"
 #include "modules/input/input_module.h"
 #include "modules/midi/midi_module.h"
+#include "modules/netdev/netdev_module.h"
 #include "modules/monitor/monitor_module.h"
 #include "modules/netdev/netdev_module.h"
+#include "modules/output/output_module.h"
 #include "modules/render/render_module.h"
 #include "modules/sound/sound_module.h"
 
-#include "osdnet.h"
 #include "watchdog.h"
 
 #include "emu.h"
@@ -58,6 +59,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD DEBUGGING OPTIONS" },
 	{ OSDOPTION_DEBUGGER,                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_HOST,                   "localhost",      core_options::option_type::STRING,    "address to bind to for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_PORT,                   "23946",          core_options::option_type::INTEGER,   "port to use for gdbstub debugger" },
 	{ OSDOPTION_DEBUGGER_FONT ";dfont",          OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "font to use for debugger views" },
 	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",              core_options::option_type::FLOAT,     "font size to use for debugger views" },
@@ -143,29 +145,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(0-5)",           "2",              core_options::option_type::INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
-
-#ifndef NO_USE_PORTAUDIO
-	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "PORTAUDIO OPTIONS" },
-	{ OSDOPTION_PA_API,                          OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio API" },
-	{ OSDOPTION_PA_DEVICE,                       OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio device" },
-	{ OSDOPTION_PA_LATENCY "(0-0.25)",           "0",              core_options::option_type::FLOAT,     "suggested latency in seconds, 0 for default" },
-#endif
-
-#ifdef SDLMAME_MACOSX
-	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
-	{ OSDOPTION_AUDIO_OUTPUT,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
-	{ OSDOPTION_AUDIO_EFFECT "0",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 0" },
-	{ OSDOPTION_AUDIO_EFFECT "1",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 1" },
-	{ OSDOPTION_AUDIO_EFFECT "2",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 2" },
-	{ OSDOPTION_AUDIO_EFFECT "3",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 3" },
-	{ OSDOPTION_AUDIO_EFFECT "4",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 4" },
-	{ OSDOPTION_AUDIO_EFFECT "5",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 5" },
-	{ OSDOPTION_AUDIO_EFFECT "6",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 6" },
-	{ OSDOPTION_AUDIO_EFFECT "7",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 7" },
-	{ OSDOPTION_AUDIO_EFFECT "8",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 8" },
-	{ OSDOPTION_AUDIO_EFFECT "9",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 9" },
-#endif
+	{ OSDOPTION_AUDIO_LATENCY ";alat(0.0-50.0)", "0.0",            core_options::option_type::FLOAT,     "audio latency, 0 for default (increase to reduce glitches, decrease for responsiveness)" },
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD MIDI OPTIONS" },
 	{ OSDOPTION_MIDI_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "MIDI I/O method: " },
@@ -177,6 +157,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_PATH,                       "bgfx",            core_options::option_type::PATH,     "path to BGFX-related files" },
 	{ OSDOPTION_BGFX_BACKEND,                    "auto",            core_options::option_type::STRING,   "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
 	{ OSDOPTION_BGFX_DEBUG,                      "0",               core_options::option_type::BOOLEAN,  "enable BGFX debugging statistics" },
+	{ OSDOPTION_BGFX_VECTORCRT,                  "1",               core_options::option_type::BOOLEAN,  "enable BGFX vector CRT rendering" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,              "",                core_options::option_type::STRING,   "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,                "slot-mask.png",   core_options::option_type::STRING,   "shadow mask texture name" },
 	{ OSDOPTION_BGFX_LUT,                        "lut-default.png", core_options::option_type::STRING,   "LUT texture name" },
@@ -207,6 +188,7 @@ osd_common_t::osd_common_t(osd_options &options)
 	, m_sound(nullptr)
 	, m_debugger(nullptr)
 	, m_midi(nullptr)
+	, m_network(nullptr)
 	, m_keyboard_input(nullptr)
 	, m_mouse_input(nullptr)
 	, m_lightgun_input(nullptr)
@@ -235,7 +217,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_OSX);
 	REGISTER_MODULE(m_mod_man, FONT_WINDOWS);
 	REGISTER_MODULE(m_mod_man, FONT_DWRITE);
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, FONT_SDL3);
+#else
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
+#endif
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
 #if defined(SDLMAME_EMSCRIPTEN)
@@ -252,22 +238,39 @@ void osd_common_t::register_options()
 #if !defined(OSD_WINDOWS) && !defined(SDLMAME_WIN32)
 	REGISTER_MODULE(m_mod_man, RENDERER_BGFX); // try BGFX after OpenGL on other operating systems for now
 #endif
+#if defined(OSD_MAC)
+	REGISTER_MODULE(m_mod_man, RENDERER_MACSOFT);
+#endif
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, RENDERER_SDL3ACCEL);
+#if !defined(SDLMAME_EMSCRIPTEN)
+	REGISTER_MODULE(m_mod_man, RENDERER_SDL3SOFT);
+#endif
+#else
 	REGISTER_MODULE(m_mod_man, RENDERER_SDL2);
 #if !defined(SDLMAME_EMSCRIPTEN)
 	REGISTER_MODULE(m_mod_man, RENDERER_SDL1);
 #endif
+#endif
 	REGISTER_MODULE(m_mod_man, RENDERER_NONE);
 
-	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
+	REGISTER_MODULE(m_mod_man, SOUND_WASAPI);
 	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, SOUND_SDL3);
+#else
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+#endif
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
 #endif
 #ifndef NO_USE_PULSEAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
+#endif
+#ifndef NO_USE_PIPEWIRE
+	REGISTER_MODULE(m_mod_man, SOUND_PIPEWIRE);
 #endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
@@ -296,28 +299,53 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_SDL);
+#endif
+#if defined(OSD_MAC)
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_MAC);
+#endif
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
+#endif
+#if defined(OSD_MAC)
+	REGISTER_MODULE(m_mod_man, MOUSEINPUT_MAC);
+#endif
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
+#if defined(OSD_SDL)
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
+#endif
+#if defined(OSD_MAC)
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_MAC);
+#endif
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
+#if defined(OSD_SDL)
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLGAME);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
+#endif
+#if defined(OSD_MAC)
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_MACGAME);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_MACJOY);
+#endif
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
+#if !defined(OSD_SDL) && defined(USE_SDL_JOYSTICK)
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
+#endif
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
@@ -460,11 +488,9 @@ void osd_common_t::update(bool skip_redraw)
 	// irregular intervals in some circumstances (e.g., multi-screen games
 	// or games with asynchronous updates).
 	//
+	m_output->update();
 	if (m_watchdog != nullptr)
 		m_watchdog->reset();
-
-	update_slider_list();
-
 }
 
 
@@ -506,38 +532,66 @@ void osd_common_t::debugger_update()
 }
 
 
-//-------------------------------------------------
-//  update_audio_stream - update the stereo audio
-//  stream
-//-------------------------------------------------
-
-void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_frame)
+bool osd_common_t::sound_external_per_channel_volume()
 {
-	//
-	// This method is called whenever the system has new audio data to stream.
-	// It provides an array of stereo samples in L-R order which should be
-	// output at the configured sample_rate.
-	//
-	m_sound->update_audio_stream(m_machine->video().throttled(), buffer,samples_this_frame);
+	return m_sound->external_per_channel_volume();
 }
 
-
-//-------------------------------------------------
-//  set_mastervolume - set the system volume
-//-------------------------------------------------
-
-void osd_common_t::set_mastervolume(int attenuation)
+bool osd_common_t::sound_split_streams_per_source()
 {
-	//
-	// Attenuation is the attenuation in dB (a negative number).
-	// To convert from dB to a linear volume scale do the following:
-	//    volume = MAX_VOLUME;
-	//    while (attenuation++ < 0)
-	//       volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
-	//
-	if (m_sound != nullptr)
-		m_sound->set_mastervolume(attenuation);
+	return m_sound->split_streams_per_source();
 }
+
+uint32_t osd_common_t::sound_get_generation()
+{
+	return m_sound->get_generation();
+}
+
+osd::audio_info osd_common_t::sound_get_information()
+{
+	return m_sound->get_information();
+}
+
+uint32_t osd_common_t::sound_stream_sink_open(uint32_t node, std::string name, uint32_t rate)
+{
+	return m_sound->stream_sink_open(node, name, rate);
+}
+
+uint32_t osd_common_t::sound_stream_source_open(uint32_t node, std::string name, uint32_t rate)
+{
+	return m_sound->stream_source_open(node, name, rate);
+}
+
+void osd_common_t::sound_stream_set_volumes(uint32_t id, const std::vector<float> &db)
+{
+	m_sound->stream_set_volumes(id, db);
+}
+
+void osd_common_t::sound_stream_close(uint32_t id)
+{
+	m_sound->stream_close(id);
+}
+
+void osd_common_t::sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
+{
+	m_sound->stream_sink_update(id, buffer, samples_this_frame);
+}
+
+void osd_common_t::sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame)
+{
+	m_sound->stream_source_update(id, buffer, samples_this_frame);
+}
+
+void osd_common_t::sound_begin_update()
+{
+	m_sound->begin_update();
+}
+
+void osd_common_t::sound_end_update()
+{
+	m_sound->end_update();
+}
+
 
 
 //-------------------------------------------------
@@ -567,6 +621,31 @@ void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &type
 
 std::vector<ui::menu_item> osd_common_t::get_slider_list()
 {
+	// check if any window has dirty sliders
+	bool dirty = false;
+	for (const auto &window : window_list())
+	{
+		if (window->has_renderer() && window->renderer().sliders_dirty())
+		{
+			dirty = true;
+			break;
+		}
+	}
+
+	if (dirty)
+	{
+		m_sliders.clear();
+
+		for (const auto &window : osd_common_t::window_list())
+		{
+			if (window->has_renderer())
+			{
+				std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
+				m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
+			}
+		}
+	}
+
 	return m_sliders;
 }
 
@@ -591,28 +670,55 @@ bool osd_common_t::execute_command(const char *command)
 {
 	if (strcmp(command, OSDCOMMAND_LIST_NETWORK_ADAPTERS) == 0)
 	{
-		osd_module &om = select_module_options<osd_module>(OSD_NETDEV_PROVIDER);
-		osd_list_network_adapters();
-		om.exit();
+		auto &om = select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
+		auto const interfaces = om.list_devices();
+		if (interfaces.empty())
+		{
+			printf("No supported network interfaces were found\n");
+		}
+		else
+		{
+			printf("Available network interfaces:\n");
+			for (auto &entry : interfaces)
+			{
+				printf("    %.*s\n", int(entry.description.length()), entry.description.data());
+			}
+		}
+		dynamic_cast<osd_module &>(om).exit();
 
 		return true;
 	}
 	else if (strcmp(command, OSDCOMMAND_LIST_MIDI_DEVICES) == 0)
 	{
-		osd_module &om = select_module_options<osd_module>(OSD_MIDI_PROVIDER);
-		dynamic_cast<midi_module &>(om).list_midi_devices();
-		om.exit();
+		auto &om = select_module_options<midi_module>(OSD_MIDI_PROVIDER);
+		auto const ports = om.list_midi_ports();
+		if (ports.empty())
+		{
+			printf("No MIDI ports were found\n");
+		}
+		else
+		{
+			printf("MIDI input ports:\n");
+			for (auto const &port : ports)
+			{
+				if (port.input)
+					printf(port.default_input ? "%s (default)\n" : "%s\n", port.name.c_str());
+			}
+
+			printf("\nMIDI output ports:\n");
+			for (auto const &port : ports)
+			{
+				if (port.output)
+					printf(port.default_output ? "%s (default)\n" : "%s\n", port.name.c_str());
+			}
+		}
+		dynamic_cast<osd_module &>(om).exit();
 
 		return true;
 	}
 
 	return false;
 
-}
-
-static void output_notifier_callback(const char *outname, int32_t value, void *param)
-{
-	static_cast<osd_common_t*>(param)->notify(outname, value);
 }
 
 void osd_common_t::init_subsystems()
@@ -641,12 +747,19 @@ void osd_common_t::init_subsystems()
 
 	m_debugger = &select_module_options<debug_module>(OSD_DEBUG_PROVIDER);
 
-	select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
-
 	m_midi = &select_module_options<midi_module>(OSD_MIDI_PROVIDER);
 
+	m_network = &select_module_options<netdev_module>(OSD_NETDEV_PROVIDER);
+
 	m_output = &select_module_options<output_module>(OSD_OUTPUT_PROVIDER);
-	machine().output().set_global_notifier(output_notifier_callback, this);
+	machine().output().add_global_notifier(
+			[] (void *param, osd::output_item const &output, s32 seconds, s64 attoseconds)
+			{
+				reinterpret_cast<osd_common_t *>(param)->m_output->notify(output, seconds, attoseconds);
+			},
+			this);
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&output_module::pause, m_output));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&output_module::resume, m_output));
 
 	input_init();
 }
@@ -717,7 +830,27 @@ bool osd_common_t::get_font_families(std::string const &font_path, std::vector<s
 	return m_font_module->get_font_families(font_path, result);
 }
 
-std::unique_ptr<osd_midi_device> osd_common_t::create_midi_device()
+std::unique_ptr<osd::midi_input_port> osd_common_t::create_midi_input(std::string_view name)
 {
-	return m_midi->create_midi_device();
+	return m_midi->create_input(name);
+}
+
+std::unique_ptr<osd::midi_output_port> osd_common_t::create_midi_output(std::string_view name)
+{
+	return m_midi->create_output(name);
+}
+
+std::vector<osd::midi_port_info> osd_common_t::list_midi_ports()
+{
+	return m_midi->list_midi_ports();
+}
+
+std::unique_ptr<osd::network_device> osd_common_t::open_network_device(int id, osd::network_handler &handler)
+{
+	return m_network->open_device(id, handler);
+}
+
+std::vector<osd::network_device_info> osd_common_t::list_network_devices()
+{
+	return m_network->list_devices();
 }

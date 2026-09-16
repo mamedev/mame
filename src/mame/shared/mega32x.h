@@ -10,8 +10,10 @@
 #include "cpu/sh/sh7604.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 class sega_32x_device : public device_t, public device_palette_interface, public device_sound_interface, public device_video_interface
 {
@@ -54,6 +56,8 @@ public:
 	void m68k_a15104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m68k_m_commsram_r(offs_t offset);
 	void m68k_m_commsram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void sync_commsram_w(s32 param);
+
 	uint16_t pwm_r(offs_t offset);
 	void pwm_w(offs_t offset, uint16_t data);
 	void m68k_pwm_w(offs_t offset, uint16_t data);
@@ -86,37 +90,32 @@ public:
 
 	void render_videobuffer_to_screenbuffer_helper(int scanline);
 	void render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr);
-	int sh2_master_pwmint_enable = 0, sh2_slave_pwmint_enable = 0;
 
 	void check_framebuffer_swap(bool enabled);
 	void check_irqs();
 	void interrupt_cb(int scanline, int irq6);
-
-	void sh2_main_map(address_map &map);
-	void sh2_slave_map(address_map &map);
-	void sh2_common_map(address_map &map);
 
 protected:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	required_shared_ptr<uint32_t> m_sh2_shared;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return 32*32*32/**2*/; }
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
 
 	/* our main vblank handler resets this */
 	required_device<m68000_base_device> m_main_cpu;
-	required_device<sh2_sh7604_device> m_master_cpu;
-	required_device<sh2_sh7604_device> m_slave_cpu;
+	required_device<sh7604_device> m_master_cpu;
+	required_device<sh7604_device> m_slave_cpu;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<timer_device> m_scan_timer;
@@ -146,6 +145,10 @@ protected:
 
 	emu_timer *m_32x_pwm_timer = nullptr;
 
+	void sh2_main_map(address_map &map) ATTR_COLD;
+	void sh2_slave_map(address_map &map) ATTR_COLD;
+	void sh2_common_map(address_map &map) ATTR_COLD;
+
 private:
 
 	int m_32x_displaymode = 0;
@@ -160,6 +163,7 @@ private:
 	int m_sh2_master_vint_enable = 0, m_sh2_slave_vint_enable = 0;
 	int m_sh2_master_hint_enable = 0, m_sh2_slave_hint_enable = 0;
 	int m_sh2_master_cmdint_enable = 0, m_sh2_slave_cmdint_enable = 0;
+	int m_sh2_master_pwmint_enable = 0, m_sh2_slave_pwmint_enable = 0;
 	int m_sh2_hint_in_vbl = 0;
 	int m_sh2_master_vint_pending = 0;
 	int m_sh2_slave_vint_pending = 0;
@@ -188,14 +192,8 @@ private:
 	uint16_t *m_32x_display_dram = nullptr, *m_32x_access_dram = nullptr;
 	std::unique_ptr<uint16_t[]> m_32x_palette;
 
-	uint16_t m_fifo_block_a[4]{};
-	uint16_t m_fifo_block_b[4]{};
-	uint16_t* m_current_fifo_block = nullptr;
-	uint16_t* m_current_fifo_readblock = nullptr;
-	int m_current_fifo_write_pos = 0;
-	int m_current_fifo_read_pos = 0;
-	int m_fifo_block_a_full = 0;
-	int m_fifo_block_b_full = 0;
+	util::fifo<u16, 4> m_fifo[2];
+	u8 m_fifo_write_block, m_fifo_read_block;
 };
 
 
@@ -210,11 +208,7 @@ public:
 		m_scan_timer.set_tag(std::forward<U>(timer_tag));
 	}
 
-	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
+	sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class sega_32x_pal_device : public sega_32x_device
@@ -229,9 +223,6 @@ public:
 	}
 
 	sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 

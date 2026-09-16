@@ -54,7 +54,7 @@ protected:
 	using field_vector = std::vector<field_descriptor>;
 	using switch_group_vector = std::vector<switch_group_descriptor>;
 
-	menu_confswitch(mame_ui_manager &mui, render_container &container, uint32_t type);
+	menu_confswitch(mame_ui_manager &mui, render_target &target, uint32_t type);
 
 	virtual void menu_activated() override;
 	virtual void populate() override;
@@ -72,19 +72,20 @@ private:
 	switch_group_vector m_switch_groups;
 	unsigned m_active_switch_groups;
 	int const m_type;
+	bool m_changed;
 };
 
 
 class menu_settings_dip_switches : public menu_confswitch
 {
 public:
-	menu_settings_dip_switches(mame_ui_manager &mui, render_container &container);
+	menu_settings_dip_switches(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_settings_dip_switches() override;
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual bool custom_mouse_down() override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
+	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
 
 private:
 	virtual void populate() override;
@@ -101,7 +102,7 @@ private:
 class menu_settings_machine_config : public menu_confswitch
 {
 public:
-	menu_settings_machine_config(mame_ui_manager &mui, render_container &container);
+	menu_settings_machine_config(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_settings_machine_config();
 };
 

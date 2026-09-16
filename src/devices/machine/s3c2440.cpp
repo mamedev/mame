@@ -9,10 +9,8 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "machine/s3c2440.h"
+#include "s3c2440.h"
 
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "screen.h"
 
 
@@ -258,7 +256,7 @@ s3c2440_device::s3c2440_device(const machine_config &mconfig, const char *tag, d
 	memset(&m_irq, 0, sizeof(m_irq));
 	memset(m_dma, 0, sizeof(m_dma));
 	memset(&m_clkpow, 0, sizeof(m_clkpow));
-	memset(&m_lcd, 0, sizeof(m_lcd));
+	m_lcd.clear();
 	memset(&m_lcdpal, 0, sizeof(m_lcdpal));
 	memset(&m_nand, 0, sizeof(m_nand));
 	memset(&m_cam, 0, sizeof(m_cam));

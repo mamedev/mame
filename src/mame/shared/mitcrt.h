@@ -2,14 +2,14 @@
 // copyright-holders:Raphael Nabet
 /*************************************************************************
 
-    video/crt.h
+    shared/mitcrt.h
 
     CRT video emulation for TX-0 and PDP-1
 
 *************************************************************************/
 
-#ifndef MAME_SHARED_CRT_H
-#define MAME_SHARED_CRT_H
+#ifndef MAME_SHARED_MITCRT_H
+#define MAME_SHARED_MITCRT_H
 
 #pragma once
 
@@ -23,7 +23,7 @@
 class crt_device : public device_t
 {
 public:
-	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_num_levels(int levels) { m_num_intensity_levels = levels; }
 	void set_offsets(int x_offset, int y_offset)
@@ -43,7 +43,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	struct crt_point
@@ -73,4 +73,4 @@ DECLARE_DEVICE_TYPE(CRT, crt_device)
 
 
 
-#endif // MAME_SHARED_CRT_H
+#endif // MAME_SHARED_MITCRT_H

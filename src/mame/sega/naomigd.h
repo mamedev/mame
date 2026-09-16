@@ -5,27 +5,27 @@
 
 #pragma once
 
-#include "naomibd.h"
-#include "cpu/pic16c62x/pic16c62x.h"
-#include "machine/i2cmem.h"
-#include "machine/eepromser.h"
 #include "315-6154.h"
+#include "naomibd.h"
+
+#include "cpu/pic16c62x/pic16c62x.h"
+#include "machine/eepromser.h"
+#include "machine/i2cmem.h"
 #include "machine/idectrl.h"
 
-// For ide gdrom controller
+// For IDE GDROM controller
 
-class idegdrom_device : public pci_device {
+class idegdrom_device : public pci_device
+{
 public:
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char *image_tag, const char *space_tag, int space_id);
-	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	idegdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename... T> void set_bus_master_space(T &&... space) { m_ide.lookup()->set_bus_master_space(std::forward<T>(space)...); }
 	auto irq_callback() { return irq_cb.bind(); }
 
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	void map_command(address_map &map);
-	void map_control(address_map &map);
-	void map_dma(address_map &map);
+	void map_command(address_map &map) ATTR_COLD;
+	void map_control(address_map &map) ATTR_COLD;
+	void map_dma(address_map &map) ATTR_COLD;
 
 	uint32_t ide_cs0_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t ide_cs1_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -34,8 +34,9 @@ public:
 	void ide_irq(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -43,8 +44,6 @@ protected:
 private:
 	required_device<bus_master_ide_controller_device> m_ide;
 	devcb_write_line irq_cb;
-	const char *space_owner_tag;
-	int space_owner_id;
 };
 
 DECLARE_DEVICE_TYPE(IDE_GDROM, idegdrom_device)
@@ -69,15 +68,14 @@ public:
 		set_image_tag(_image_tag);
 	}
 
-	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void submap(address_map &map) override;
-	void sh4_map(address_map &map);
-	void sh4_io_map(address_map &map);
-	void pic_map(address_map &map);
-	void pci_map(address_map &map);
-	void pci_config_map(address_map &map);
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void submap(address_map &map) override ATTR_COLD;
+	void sh4_map(address_map &map) ATTR_COLD;
+	void sh4_io_map(address_map &map) ATTR_COLD;
+	void pci_map(address_map &map) ATTR_COLD;
+	void pci_config_map(address_map &map) ATTR_COLD;
 
 	void set_image_tag(const char *_image_tag)
 	{
@@ -86,7 +84,7 @@ public:
 
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data.get(); }
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void dimm_command_w(uint16_t data);     // 5f703c
 	uint16_t dimm_command_r();
@@ -125,13 +123,13 @@ public:
 	void shared_sh4_sdram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint64_t i2cmem_dimm_r();
 	void i2cmem_dimm_w(uint64_t data);
-	uint8_t pic_dimm_r(offs_t offset);
-	void pic_dimm_w(offs_t offset, uint8_t data);
+	uint8_t pic_dimm_r();
+	void pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;
@@ -141,7 +139,7 @@ private:
 	enum { FILENAME_LENGTH=24 };
 	int work_mode; // set it different from 0 to enable the cpus and full dimm board emulation
 
-	required_device<sh4_device> m_maincpu;
+	required_device<sh7091_device> m_maincpu;
 	required_device<pic16c622_device> m_securitycpu;
 	required_device<i2cmem_device> m_i2c0;
 	required_device<i2cmem_device> m_i2c1;
@@ -193,8 +191,6 @@ private:
 	inline void permutate(uint32_t &a, uint32_t &b, uint32_t m, int shift);
 	void des_generate_subkeys(const uint64_t key, uint32_t *subkeys);
 	uint64_t des_encrypt_decrypt(bool decrypt, uint64_t src, const uint32_t *des_subkeys);
-	uint64_t read_to_qword(const uint8_t *region);
-	void write_from_qword(uint8_t *region, uint64_t qword);
 };
 
 DECLARE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board)

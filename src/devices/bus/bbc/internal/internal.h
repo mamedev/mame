@@ -50,7 +50,7 @@ protected:
 	required_memory_region m_region_swr;
 	required_memory_region m_region_mos;
 
-	bbc_internal_slot_device *m_slot;
+	bbc_internal_slot_device *const m_slot;
 };
 
 // ======================> bbc_internal_slot_device
@@ -63,10 +63,7 @@ public:
 	bbc_internal_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
 		: bbc_internal_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	bbc_internal_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -94,8 +91,8 @@ public:
 	virtual void irq6502_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_nmi_handler;
@@ -106,7 +103,7 @@ protected:
 	device_bbc_internal_interface *m_card;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(BBC_INTERNAL_SLOT, bbc_internal_slot_device)
 
 void bbcb_internal_devices(device_slot_interface &device);

@@ -123,8 +123,8 @@ public:
 	void ccs2422(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	u8 port04_r();
 	u8 port34_r();
@@ -157,9 +157,9 @@ private:
 
 	void port40_w(u8 data);
 
-	void ccs2422_io(address_map &map);
-	void ccs2810_io(address_map &map);
-	void ccs2810_mem(address_map &map);
+	void ccs2422_io(address_map &map) ATTR_COLD;
+	void ccs2810_io(address_map &map) ATTR_COLD;
+	void ccs2810_mem(address_map &map) ATTR_COLD;
 
 	u8 m_power_on_status = 0U;
 };
@@ -176,12 +176,12 @@ public:
 	void ccs300(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
-	void ccs300_io(address_map &map);
-	void ccs300_mem(address_map &map);
+	void ccs300_io(address_map &map) ATTR_COLD;
+	void ccs300_mem(address_map &map) ATTR_COLD;
 	void port40_w(u8 data);
 	required_shared_ptr<u8> m_ram1;
 	required_memory_bank    m_bank1;
@@ -1133,10 +1133,10 @@ void ccs300_state::ccs300(machine_config & config)
 /* ROM definition */
 ROM_START( ccs2810 )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "ccs2810.u8",   0x0000, 0x0800, CRC(0c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
+	ROM_LOAD( "ccs2810.u8", 0x0000, 0x0800, CRC(0c3054ea) SHA1(c554b7c44a61af13decb2785f3c9b33c6fc2bfce))
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD_OPTIONAL( "5623.u9", 0x0000, 0x0100, NO_DUMP ) // actual PROM type may differ
+	ROM_LOAD( "5623.u9",    0x0000, 0x0100, NO_DUMP ) // actual PROM type may differ
 ROM_END
 
 ROM_START( ccs2422 )
@@ -1144,9 +1144,9 @@ ROM_START( ccs2422 )
 	ROM_LOAD( "2422.u24",  0x0000, 0x0800, CRC(6b47586b) SHA1(73ba779a659da4a1f0e22a3fa351a2b36d8456a0))
 
 	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD_OPTIONAL( "2422.u23",  0x0000, 0x0100, CRC(b279cada) SHA1(6cc6e00ec49ba2245c8836d6f09266b09d6e7648))
-	ROM_LOAD_OPTIONAL( "2422.u22",  0x0100, 0x0100, CRC(e41858bb) SHA1(0be53725032ebea16e32cb720f099551a357e761))
-	ROM_LOAD_OPTIONAL( "2422.u21",  0x0200, 0x0100, NO_DUMP )
+	ROM_LOAD( "2422.u23",  0x0000, 0x0100, CRC(b279cada) SHA1(6cc6e00ec49ba2245c8836d6f09266b09d6e7648))
+	ROM_LOAD( "2422.u22",  0x0100, 0x0100, CRC(e41858bb) SHA1(0be53725032ebea16e32cb720f099551a357e761))
+	ROM_LOAD( "2422.u21",  0x0200, 0x0100, NO_DUMP )
 ROM_END
 
 ROM_START( ccs300 )

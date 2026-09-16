@@ -12,7 +12,7 @@ class vrt_vt1682_alu_device : public device_t
 {
 public:
 	// construction/destruction
-	vrt_vt1682_alu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vrt_vt1682_alu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// so that we can filter logging, sound ALU gets used hundreds of times a frame, so logging it is unwise
 	void set_sound_alu() { m_is_sound_alu = true; }
@@ -35,16 +35,13 @@ public:
 
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	bool m_is_sound_alu = false;
 
-	uint8_t m_alu_oprand[4];
-	uint8_t m_alu_oprand_mult[2];
-	uint8_t m_alu_oprand_div[2];
-	uint8_t m_alu_out[6];
+	uint8_t m_alu_oprand[8];
 };
 
 #endif // MAME_NINTENDO_VT1682_ALU_H

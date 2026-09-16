@@ -2110,6 +2110,7 @@ void riscii_series_device::execute_run()
 			break;
 
 		case EXEC_IDLE:
+			debugger_wait_hook();
 			m_icount = 0;
 			return;
 		}

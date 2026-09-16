@@ -36,6 +36,7 @@
 #include <future>
 #include <locale>
 #include <queue>
+#include <sstream>
 #include <type_traits>
 #include <unordered_set>
 #include <utility>
@@ -105,6 +106,25 @@ private:
 using device_type_set = std::set<std::add_pointer_t<device_type>, device_type_compare>;
 using device_type_vector = std::vector<std::add_pointer_t<device_type> >;
 
+
+struct prepared_info
+{
+	prepared_info() = default;
+	prepared_info(const prepared_info &) = delete;
+	prepared_info(prepared_info &&) = default;
+#if defined(_CPPLIB_VER) && defined(_MSVC_STL_VERSION)
+	// MSVCPRT currently requires default-constructible std::future promise types to be assignable
+	// remove this workaround when that's fixed
+	prepared_info &operator=(const prepared_info &) = default;
+#else
+	prepared_info &operator=(const prepared_info &) = delete;
+#endif
+
+	std::string     m_xml_snippet;
+	device_type_set m_dev_set;
+};
+
+
 // internal helper
 void output_header(std::ostream &out, bool dtd);
 void output_footer(std::ostream &out);
@@ -123,15 +143,14 @@ void output_input(std::ostream &out, const ioport_list &portlist);
 void output_switches(std::ostream &out, const ioport_list &portlist, const char *root_tag, int type, const char *outertag, const char *loctag, const char *innertag);
 void output_ports(std::ostream &out, const ioport_list &portlist);
 void output_adjusters(std::ostream &out, const ioport_list &portlist);
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect);
+void output_driver(std::ostream &out, game_driver const &driver, device_t::flags_type flags, device_t::feature_type unemulated, device_t::feature_type imperfect);
 void output_features(std::ostream &out, device_type type, device_t::feature_type unemulated, device_t::feature_type imperfect);
 void output_images(std::ostream &out, device_t &device, const char *root_tag);
 void output_slots(std::ostream &out, machine_config &config, device_t &device, const char *root_tag, device_type_set *devtypes);
 void output_software_lists(std::ostream &out, device_t &root, const char *root_tag);
-void output_ramoptions(std::ostream &out, device_t &root);
 
-void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag);
-void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
+void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag, device_type_set *devtypes);
+void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set *filter);
 
 char const *get_merge_name(driver_list const &drivlist, game_driver const &driver, util::hash_collection const &romhashes);
 char const *get_merge_name(machine_config &config, device_t const &device, util::hash_collection const &romhashes);
@@ -149,7 +168,7 @@ constexpr char f_dtd_string[] =
 		"\t<!ATTLIST __XML_ROOT__ build CDATA #IMPLIED>\n"
 		"\t<!ATTLIST __XML_ROOT__ debug (yes|no) \"no\">\n"
 		"\t<!ATTLIST __XML_ROOT__ mameconfig CDATA #REQUIRED>\n"
-		"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*, ramoption*)>\n"
+		"\t<!ELEMENT __XML_TOP__ (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, feature*, device*, slot*, softwarelist*)>\n"
 		"\t\t<!ATTLIST __XML_TOP__ name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST __XML_TOP__ sourcefile CDATA #IMPLIED>\n"
 		"\t\t<!ATTLIST __XML_TOP__ isbios (yes|no) \"no\">\n"
@@ -187,6 +206,7 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 		"\t\t\t<!ATTLIST disk optional (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT device_ref EMPTY>\n"
+		"\t\t\t<!ATTLIST device_ref tag CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device_ref name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT sample EMPTY>\n"
 		"\t\t\t<!ATTLIST sample name CDATA #REQUIRED>\n"
@@ -226,7 +246,6 @@ constexpr char f_dtd_string[] =
 		"\t\t\t\t<!ATTLIST control type CDATA #REQUIRED>\n"
 		"\t\t\t\t<!ATTLIST control player CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control buttons CDATA #IMPLIED>\n"
-		"\t\t\t\t<!ATTLIST control reqbuttons CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control minimum CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control maximum CDATA #IMPLIED>\n"
 		"\t\t\t\t<!ATTLIST control sensitivity CDATA #IMPLIED>\n"
@@ -301,9 +320,6 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
-		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
-		"\t\t\t<!ATTLIST ramoption name CDATA #REQUIRED>\n"
-		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 		"]>";
 
 
@@ -458,25 +474,8 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 //  known (and filtered) machines
 //-------------------------------------------------
 
-void info_xml_creator::output(std::ostream &out, const std::function<bool(const char *shortname, bool &done)> &filter, bool include_devices)
+void info_xml_creator::output(std::ostream &out, const std::function<bool (const char *shortname, bool &done)> &filter, bool include_devices)
 {
-	struct prepared_info
-	{
-		prepared_info() = default;
-		prepared_info(const prepared_info &) = delete;
-		prepared_info(prepared_info &&) = default;
-#if defined(_CPPLIB_VER) && defined(_MSVC_STL_VERSION)
-		// MSVCPRT currently requires default-constructible std::future promise types to be assignable
-		// remove this workaround when that's fixed
-		prepared_info &operator=(const prepared_info &) = default;
-#else
-		prepared_info &operator=(const prepared_info &) = delete;
-#endif
-
-		std::string     m_xml_snippet;
-		device_type_set m_dev_set;
-	};
-
 	// prepare a driver enumerator and the queue
 	driver_enumerator drivlist(m_lookup_options);
 	device_filter devfilter(filter);
@@ -524,7 +523,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 				break;
 
 			// do the dirty work asynchronously
-			auto task_proc = [&drivlist, drivers = std::move(drivers), include_devices, &active_task_count]
+			auto task_proc = [&drivlist, drivers = std::move(drivers), collect_devices = bool(devset), &active_task_count]
 					{
 						prepared_info result;
 						std::ostringstream stream;
@@ -532,7 +531,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 
 						// output each of the drivers
 						for (const game_driver &driver : drivers)
-							output_one(stream, drivlist, driver, include_devices ? &result.m_dev_set : nullptr);
+							output_one(stream, drivlist, driver, collect_devices ? &result.m_dev_set : nullptr);
 
 						// capture the XML snippet
 						result.m_xml_snippet = std::move(stream).str();
@@ -580,7 +579,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		}
 	}
 
-	// output devices (both devices with roms and slot devices)
+	// output devices
 	if (include_devices && (!devset || !devset->empty()))
 	{
 		output_header_if_necessary(out);
@@ -696,17 +695,21 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// allocate input ports and build overall emulation status
 	ioport_list portlist;
-	std::string errors;
+	device_t::flags_type overall_flags(driver.type.emulation_flags());
 	device_t::feature_type overall_unemulated(driver.type.unemulated_features());
 	device_t::feature_type overall_imperfect(driver.type.imperfect_features());
-	for (device_t &device : iter)
 	{
-		portlist.append(device, errors);
-		overall_unemulated |= device.type().unemulated_features();
-		overall_imperfect |= device.type().imperfect_features();
+		std::ostringstream errors;
+		for (device_t &device : iter)
+		{
+			portlist.append(device, errors);
+			overall_flags |= device.type().emulation_flags() & ~device_t::flags::NOT_WORKING;
+			overall_unemulated |= device.type().unemulated_features();
+			overall_imperfect |= device.type().imperfect_features();
 
-		if (devtypes && device.owner())
-			devtypes->insert(&device.type());
+			if (devtypes && device.owner())
+				devtypes->insert(&device.type());
+		}
 	}
 
 	// renumber player numbers for controller ports
@@ -786,12 +789,11 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_switches(out, portlist, "", IPT_CONFIG, "configuration", "conflocation", "confsetting");
 	output_ports(out, portlist);
 	output_adjusters(out, portlist);
-	output_driver(out, driver, overall_unemulated, overall_imperfect);
+	output_driver(out, driver, overall_flags, overall_unemulated, overall_imperfect);
 	output_features(out, driver.type, overall_unemulated, overall_imperfect);
 	output_images(out, config.root_device(), "");
 	output_slots(out, config, config.root_device(), "", devtypes);
 	output_software_lists(out, config.root_device(), "");
-	output_ramoptions(out, config.root_device());
 
 	// close the topmost tag
 	util::stream_format(out, "\t</%s>\n", XML_TOP);
@@ -803,7 +805,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 //  a single device
 //-------------------------------------------------
 
-void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag)
+void output_one_device(std::ostream &out, machine_config &config, device_t &device, const char *devtag, device_type_set *devtypes)
 {
 	using util::xml::normalize_string;
 
@@ -815,24 +817,33 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 
 	// generate input list and build overall emulation status
 	ioport_list portlist;
-	std::string errors;
 	device_t::feature_type overall_unemulated(device.type().unemulated_features());
 	device_t::feature_type overall_imperfect(device.type().imperfect_features());
-	for (device_t &dev : device_enumerator(device))
 	{
-		portlist.append(dev, errors);
-		overall_unemulated |= dev.type().unemulated_features();
-		overall_imperfect |= dev.type().imperfect_features();
+		std::ostringstream errors;
+		for (device_t &dev : device_enumerator(device))
+		{
+			portlist.append(dev, errors);
+			overall_unemulated |= dev.type().unemulated_features();
+			overall_imperfect |= dev.type().imperfect_features();
+
+			if (devtypes)
+				devtypes->insert(&device.type());
+		}
 	}
 
 	// check if the device adds player inputs (other than dsw and configs) to the system
 	for (auto &port : portlist)
+	{
 		for (ioport_field const &field : port.second->fields())
+		{
 			if (field.type() >= IPT_START1 && field.type() < IPT_UI_FIRST)
 			{
 				has_input = true;
 				break;
 			}
+		}
+	}
 
 	// start to output info
 	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
@@ -862,7 +873,7 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 	output_adjusters(out, portlist);
 	output_features(out, device.type(), overall_unemulated, overall_imperfect);
 	output_images(out, device, devtag);
-	output_slots(out, config, device, devtag, nullptr);
+	output_slots(out, config, device, devtag, devtypes);
 	output_software_lists(out, device, devtag);
 	util::stream_format(out, "\t</%s>\n", XML_TOP);
 }
@@ -873,12 +884,13 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 //  registered device types
 //-------------------------------------------------
 
-void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter)
+void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set *filter)
 {
-	auto const action = [&lookup_options, &out] (auto &types, auto deref)
+	device_type_set catchup;
+	auto const action = [&lookup_options, &out, filter, &catchup] (auto &types, auto deref)
 			{
 				// machinery for making output order deterministic and capping outstanding tasks
-				std::queue<std::future<std::string> > tasks;
+				std::queue<std::future<prepared_info> > tasks;
 				std::atomic<unsigned int> active_task_count = 0;
 				unsigned int const maximum_active_task_count = std::thread::hardware_concurrency() + 10;
 				unsigned int const maximum_outstanding_task_count = maximum_active_task_count + 20;
@@ -900,10 +912,11 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 							break;
 
 						// do the dirty work asynchronously
-						auto task_proc = [&active_task_count, &lookup_options, batch = std::move(batch)]
+						auto task_proc = [&active_task_count, &lookup_options, batch = std::move(batch), collect_devices = bool(filter)]
 								{
 									// use a single machine configuration and stream for a batch of devices
 									machine_config config(GAME_NAME(___empty), lookup_options);
+									prepared_info result;
 									std::ostringstream stream;
 									stream.imbue(std::locale::classic());
 									for (auto type : batch)
@@ -921,14 +934,17 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 												device.config_complete();
 
 										// print details and remove it
-										output_one_device(stream, config, *dev, dev->tag());
+										output_one_device(stream, config, *dev, dev->tag(), collect_devices ? &result.m_dev_set : nullptr);
 										machine_config::token const tok(config.begin_configuration(config.root_device()));
 										config.device_remove("_tmp");
 									}
 
+									// capture the XML snippet
+									result.m_xml_snippet = std::move(stream).str();
+
 									// we're done with the task; decrement the counter and return
 									active_task_count--;
-									return std::move(stream).str();
+									return result;
 								};
 
 						// add this task to the queue
@@ -940,20 +956,44 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 					if (!tasks.empty())
 					{
 						// wait for the oldest task to complete and get the info, in the spirit of determinism
-						std::string snippet = tasks.front().get();
+						prepared_info pi = tasks.front().get();
 						tasks.pop();
 
 						// emit whatever XML we accumulated in the task
-						out << snippet;
+						out << pi.m_xml_snippet;
+
+						// recursively collect device types if necessary
+						if (filter)
+						{
+							for (const auto &x : pi.m_dev_set)
+							{
+								if (filter->find(x) == filter->end())
+									catchup.insert(x);
+							}
+						}
 					}
 				}
 			};
 
 	// run through devices
 	if (filter)
+	{
 		action(*filter, [] (auto &x) { return x; });
+
+		// repeat until no more device types are discovered
+		while (!catchup.empty())
+		{
+			for (const auto &x : catchup)
+				filter->insert(x);
+			device_type_set more = std::move(catchup);
+			catchup = device_type_set();
+			action(more, [] (auto &x) { return x; });
+		}
+	}
 	else
+	{
 		action(registered_device_types, [] (auto &x) { return &x; });
+	}
 }
 
 
@@ -966,7 +1006,7 @@ void output_device_refs(std::ostream &out, device_t &root)
 {
 	for (device_t &device : device_enumerator(root))
 		if (&device != &root)
-			util::stream_format(out, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
+			util::stream_format(out, "\t\t<device_ref tag=\"%s\" name=\"%s\"/>\n", util::xml::normalize_string(device.tag()), util::xml::normalize_string(device.shortname()));
 }
 
 
@@ -1214,7 +1254,7 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 	// iterate over sound devices
 	for (device_sound_interface &sound : sound_interface_enumerator(device))
 	{
-		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
+		if (strcmp(sound.device().tag(), device.tag()) != 0)
 		{
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -1239,23 +1279,16 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 void output_display(std::ostream &out, device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
 	// iterate over screens
-	for (const screen_device &screendev : screen_device_enumerator(device))
+	for (const device_video_output_interface &screendev : video_output_interface_enumerator(device))
 	{
-		if (strcmp(screendev.tag(), device.tag()))
+		if (strcmp(screendev.device().tag(), device.tag()))
 		{
-			std::string newtag(screendev.tag()), oldtag(":");
+			std::string newtag(screendev.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			util::stream_format(out, "\t\t<display tag=\"%s\"", util::xml::normalize_string(newtag));
 
-			switch (screendev.screen_type())
-			{
-				case SCREEN_TYPE_RASTER:    out << " type=\"raster\"";  break;
-				case SCREEN_TYPE_VECTOR:    out << " type=\"vector\"";  break;
-				case SCREEN_TYPE_LCD:       out << " type=\"lcd\"";     break;
-				case SCREEN_TYPE_SVG:       out << " type=\"svg\"";     break;
-				default:                    out << " type=\"unknown\""; break;
-			}
+			out << " type=\"" << screendev.output_type_name() << '"';
 
 			// output the orientation as a string
 			switch (screendev.orientation())
@@ -1287,7 +1320,7 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output width and height only for games that are not vector
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
+			if (!screendev.is_vector())
 			{
 				const rectangle &visarea = screendev.visible_area();
 				util::stream_format(out, " width=\"%d\"", visarea.width());
@@ -1295,21 +1328,22 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output refresh rate
-			util::stream_format(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			util::stream_format(out, " refresh=\"%f\"", screendev.frame_period().as_hz());
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
-			if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
+			const screen_device *output_as_screen = dynamic_cast<const screen_device *>(&screendev);
+			if (output_as_screen && !output_as_screen->oldstyle_vblank_supplied())
 			{
-				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
+				int pixclock = output_as_screen->width() * output_as_screen->height() * output_as_screen->frame_period().as_hz();
 
 				util::stream_format(out, " pixclock=\"%d\"", pixclock);
-				util::stream_format(out, " htotal=\"%d\"", screendev.width());
-				util::stream_format(out, " hbend=\"%d\"", screendev.visible_area().min_x);
-				util::stream_format(out, " hbstart=\"%d\"", screendev.visible_area().max_x+1);
-				util::stream_format(out, " vtotal=\"%d\"", screendev.height());
-				util::stream_format(out, " vbend=\"%d\"", screendev.visible_area().min_y);
-				util::stream_format(out, " vbstart=\"%d\"", screendev.visible_area().max_y+1);
+				util::stream_format(out, " htotal=\"%d\"", output_as_screen->width());
+				util::stream_format(out, " hbend=\"%d\"", output_as_screen->visible_area().min_x);
+				util::stream_format(out, " hbstart=\"%d\"", output_as_screen->visible_area().max_x+1);
+				util::stream_format(out, " vtotal=\"%d\"", output_as_screen->height());
+				util::stream_format(out, " vbend=\"%d\"", output_as_screen->visible_area().min_y);
+				util::stream_format(out, " vbstart=\"%d\"", output_as_screen->visible_area().max_y+1);
 			}
 			out << " />\n";
 		}
@@ -1392,26 +1426,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		CTRL_COUNT
 	};
 
-	enum
-	{
-		CTRL_P1,
-		CTRL_P2,
-		CTRL_P3,
-		CTRL_P4,
-		CTRL_P5,
-		CTRL_P6,
-		CTRL_P7,
-		CTRL_P8,
-		CTRL_P9,
-		CTRL_P10,
-		CTRL_PCOUNT
-	};
+	constexpr unsigned CTRL_PCOUNT = 10;
 
 	// directions
-	const uint8_t DIR_UP = 0x01;
-	const uint8_t DIR_DOWN = 0x02;
-	const uint8_t DIR_LEFT = 0x04;
-	const uint8_t DIR_RIGHT = 0x08;
+	constexpr uint8_t DIR_UP = 0x01;
+	constexpr uint8_t DIR_DOWN = 0x02;
+	constexpr uint8_t DIR_LEFT = 0x04;
+	constexpr uint8_t DIR_RIGHT = 0x08;
 
 	// initialize the list of control types
 	struct
@@ -1419,7 +1440,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		const char *    type;           // general type of input
 		int             player;         // player which the input belongs to
 		int             nbuttons;       // total number of buttons
-		int             reqbuttons;     // total number of non-optional buttons
 		uint32_t        maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
@@ -1642,8 +1662,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				}
 				control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons = std::max(control_info[field.player() * CTRL_COUNT + ctrl_type].maxbuttons, field.type() - IPT_BUTTON1 + 1);
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				break;
 
 			// track maximum coin index
@@ -1668,8 +1686,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keypad";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				break;
 
 			case IPT_KEYBOARD:
@@ -1677,8 +1693,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				control_info[field.player() * CTRL_COUNT + ctrl_type].type = "keyboard";
 				control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 				control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-				if (!field.optional())
-					control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				break;
 
 			// additional types
@@ -1697,8 +1711,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "mahjong";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				}
 				else if (field.type() > IPT_HANAFUDA_FIRST && field.type() < IPT_HANAFUDA_LAST)
 				{
@@ -1706,8 +1718,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "hanafuda";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				}
 				else if (field.type() > IPT_GAMBLING_FIRST && field.type() < IPT_GAMBLING_LAST)
 				{
@@ -1715,8 +1725,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					control_info[field.player() * CTRL_COUNT + ctrl_type].type = "gambling";
 					control_info[field.player() * CTRL_COUNT + ctrl_type].player = field.player() + 1;
 					control_info[field.player() * CTRL_COUNT + ctrl_type].nbuttons++;
-					if (!field.optional())
-						control_info[field.player() * CTRL_COUNT + ctrl_type].reqbuttons++;
 				}
 				break;
 			}
@@ -1741,7 +1749,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	// Clean-up those entries, if any, where buttons were defined in a separate port than the actual controller they belong to.
 	// This is quite often the case, especially for arcades where controls can be easily mapped to separate input ports on PCB.
 	// If such situation would only happen for joystick, it would be possible to work it around by initializing differently
-	// ctrl_type above, but it is quite common among analog inputs as well (for instance, this is the tipical situation
+	// ctrl_type above, but it is quite common among analog inputs as well (for instance, this is the typical situation
 	// for lightguns) and therefore we really need this separate loop.
 	for (int i = 0; i < CTRL_PCOUNT; i++)
 	{
@@ -1750,7 +1758,6 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 			if (control_info[i * CTRL_COUNT].type != nullptr && control_info[i * CTRL_COUNT + j].type != nullptr && !fix_done)
 			{
 				control_info[i * CTRL_COUNT + j].nbuttons += control_info[i * CTRL_COUNT].nbuttons;
-				control_info[i * CTRL_COUNT + j].reqbuttons += control_info[i * CTRL_COUNT].reqbuttons;
 				control_info[i * CTRL_COUNT + j].maxbuttons = std::max(control_info[i * CTRL_COUNT + j].maxbuttons, control_info[i * CTRL_COUNT].maxbuttons);
 
 				memset(&control_info[i * CTRL_COUNT], 0, sizeof(control_info[0]));
@@ -1783,11 +1790,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (nplayer > 1)
 					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
-				{
 					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
-					if (elem.reqbuttons < elem.nbuttons)
-						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
-				}
 				if (elem.min != 0 || elem.max != 0)
 					util::stream_format(out, " minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
 				if (elem.sensitivity != 0)
@@ -1809,11 +1812,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (nplayer > 1)
 					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
-				{
 					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
-					if (elem.reqbuttons < elem.nbuttons)
-						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
-				}
 				for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
 				{
 					const char *plural = (lp==2) ? "3" : (lp==1) ? "2" : "";
@@ -1955,7 +1954,12 @@ void output_adjusters(std::ostream &out, const ioport_list &portlist)
 //  output_driver - print driver status
 //-------------------------------------------------
 
-void output_driver(std::ostream &out, game_driver const &driver, device_t::feature_type unemulated, device_t::feature_type imperfect)
+void output_driver(
+		std::ostream &out,
+		game_driver const &driver,
+		device_t::flags_type flags,
+		device_t::feature_type unemulated,
+		device_t::feature_type imperfect)
 {
 	out << "\t\t<driver";
 
@@ -1968,8 +1972,9 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	emulation problems.
 	*/
 
-	u32 const flags = driver.flags;
-	bool const machine_preliminary(flags & (machine_flags::NOT_WORKING | machine_flags::MECHANICAL));
+	u32 const driver_flags = driver.flags;
+	bool const not_working(driver.type.emulation_flags() & device_t::flags::NOT_WORKING);
+	bool const machine_preliminary(not_working || (driver_flags & machine_flags::MECHANICAL));
 	bool const unemulated_preliminary(unemulated & (device_t::feature::PALETTE | device_t::feature::GRAPHICS | device_t::feature::SOUND | device_t::feature::KEYBOARD));
 	bool const imperfect_preliminary((unemulated | imperfect) & device_t::feature::PROTECTION);
 
@@ -1980,29 +1985,29 @@ void output_driver(std::ostream &out, game_driver const &driver, device_t::featu
 	else
 		out << " status=\"good\"";
 
-	if (flags & machine_flags::NOT_WORKING)
+	if (not_working)
 		out << " emulation=\"preliminary\"";
 	else
 		out << " emulation=\"good\"";
 
-	if (flags & machine_flags::NO_COCKTAIL)
+	if (driver_flags & machine_flags::NO_COCKTAIL)
 		out << " cocktail=\"preliminary\"";
 
-	if (flags & machine_flags::SUPPORTS_SAVE)
-		out << " savestate=\"supported\"";
-	else
+	if (flags & device_t::flags::SAVE_UNSUPPORTED)
 		out << " savestate=\"unsupported\"";
+	else
+		out << " savestate=\"supported\"";
 
-	if (flags & machine_flags::REQUIRES_ARTWORK)
+	if (driver_flags & machine_flags::REQUIRES_ARTWORK)
 		out << " requiresartwork=\"yes\"";
 
-	if (flags & machine_flags::UNOFFICIAL)
+	if (driver_flags & machine_flags::UNOFFICIAL)
 		out << " unofficial=\"yes\"";
 
-	if (flags & machine_flags::NO_SOUND_HW)
+	if (driver_flags & machine_flags::NO_SOUND_HW)
 		out << " nosoundhardware=\"yes\"";
 
-	if (flags & machine_flags::IS_INCOMPLETE)
+	if (driver_flags & machine_flags::IS_INCOMPLETE)
 		out << " incomplete=\"yes\"";
 
 	out << "/>\n";
@@ -2144,7 +2149,7 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 					{
 						util::stream_format(out, "\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
 						util::stream_format(out, " devname=\"%s\"", normalize_string(dev->shortname()));
-						if (slot.default_option() && !strcmp(slot.default_option(), option.second->name()))
+						if (slot.default_option() && (slot.default_option() == option.second->name()))
 							out << " default=\"yes\"";
 						out << "/>\n";
 					}
@@ -2187,40 +2192,6 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 	}
 }
 
-
-
-//-------------------------------------------------
-//  output_ramoptions - prints m_output all RAM
-//  options for this system
-//-------------------------------------------------
-
-void output_ramoptions(std::ostream &out, device_t &root)
-{
-	for (const ram_device &ram : ram_device_enumerator(root, 1))
-	{
-		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
-		{
-			uint32_t const defsize(ram.default_size());
-			bool havedefault(false);
-			for (ram_device::extra_option const &option : ram.extra_options())
-			{
-				if (defsize == option.second)
-				{
-					assert(!havedefault);
-					havedefault = true;
-					util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
-				}
-				else
-				{
-					util::stream_format(out, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first), option.second);
-				}
-			}
-			if (!havedefault)
-				util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
-			break;
-		}
-	}
-}
 
 
 //-------------------------------------------------

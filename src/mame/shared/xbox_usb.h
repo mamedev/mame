@@ -362,7 +362,7 @@ public:
 
 	void start();
 	void reset();
-	void timer(int param);
+	void timer(s32 param);
 
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);
@@ -475,17 +475,14 @@ public:
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed)
 		: ohci_usb_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ohci_usb_connector();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector)
@@ -499,14 +496,14 @@ DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
 class ohci_game_controller_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
-	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 
 protected:
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 private:
 	static const USBStandardDeviceDescriptor devdesc;
 	static const USBStandardConfigurationDescriptor condesc;

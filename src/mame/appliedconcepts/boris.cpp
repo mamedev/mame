@@ -22,6 +22,7 @@ ROM labeled 007-7027-00.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/pwm.h"
@@ -38,6 +39,7 @@ public:
 	boris_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_smi(*this, "smi"),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -47,17 +49,21 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	u8 m_io[2] = { };
+	u8 m_4042 = 0;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void update_reset(ioport_value state);
 
@@ -65,9 +71,6 @@ private:
 	void mux_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u8 m_io[2] = { };
-	u8 m_4042 = 0;
 };
 
 void boris_state::machine_start()
@@ -148,14 +151,14 @@ void boris_state::main_map(address_map &map)
 {
 	map.global_mask(0x0fff);
 	map(0x0000, 0x0bff).rom();
-	map(0x0c00, 0x0fff).ram();
+	map(0x0c00, 0x0cff).mirror(0x300).ram();
 }
 
 void boris_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(boris_state::input_r), FUNC(boris_state::mux_w));
 	map(0x01, 0x01).w(FUNC(boris_state::digit_w));
-	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -190,7 +193,7 @@ static INPUT_PORTS_START( boris )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, boris_state, reset_switch, 0) PORT_NAME("Reset Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(boris_state::reset_switch), 0) PORT_NAME("Reset Switch")
 INPUT_PORTS_END
 
 
@@ -205,10 +208,10 @@ void boris_state::boris(machine_config &config)
 	F8(config, m_maincpu, 2_MHz_XTAL); // MK3850
 	m_maincpu->set_addrmap(AS_PROGRAM, &boris_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &boris_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_smi, FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
-	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	F3853(config, m_smi, 2_MHz_XTAL);
+	m_smi->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
@@ -244,5 +247,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, boris,  0,      0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris awaits your move"
-SYST( 1978, borisa, boris,  0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK ) // "Boris plays black"
+SYST( 1978, boris,  0,      0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 01)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // "Boris awaits your move"
+SYST( 1978, borisa, boris,  0,      boris,   boris, boris_state, empty_init, "Applied Concepts", "Boris (rev. 00)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // "Boris plays black"

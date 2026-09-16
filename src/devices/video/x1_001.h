@@ -60,8 +60,8 @@ public:
 	int is_flipped() { return ((m_spritectrl[ 0 ] & 0x40) >> 6); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);

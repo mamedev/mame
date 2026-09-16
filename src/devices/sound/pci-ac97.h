@@ -17,14 +17,14 @@ public:
 	ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void native_audio_mixer_map(address_map &map);
-	void native_audio_bus_mastering_map(address_map &map);
-	void mixer_map(address_map &map);
-	void bus_mastering_map(address_map &map);
+	void native_audio_mixer_map(address_map &map) ATTR_COLD;
+	void native_audio_bus_mastering_map(address_map &map) ATTR_COLD;
+	void mixer_map(address_map &map) ATTR_COLD;
+	void bus_mastering_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(AC97, ac97_device)

@@ -10,17 +10,17 @@ class sgi_pic1_device
 	: public device_t
 {
 public:
-	sgi_pic1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	sgi_pic1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// read handlers
 	u32 cpucfg_r() { return m_cpucfg; }

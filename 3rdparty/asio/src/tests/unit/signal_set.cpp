@@ -2,7 +2,7 @@
 // signal_set.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -56,7 +56,7 @@ void test()
     signal_set set7(ioc_ex, 1, 2);
     signal_set set8(ioc_ex, 1, 2, 3);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     signal_set::executor_type ex = set1.get_executor();
     (void)ex;
@@ -65,6 +65,9 @@ void test()
 
     set1.add(1);
     set1.add(1, ec);
+
+    set1.add(1, signal_set::flags::dont_care);
+    set1.add(1, signal_set::flags::dont_care, ec);
 
     set1.remove(1);
     set1.remove(1, ec);
@@ -91,5 +94,5 @@ void test()
 ASIO_TEST_SUITE
 (
   "signal_set",
-  ASIO_TEST_CASE(signal_set_compile::test)
+  ASIO_COMPILE_TEST_CASE(signal_set_compile::test)
 )

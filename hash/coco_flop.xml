@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -22,7 +22,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="dkong" supported ="partial">
+	<software name="dkong" supported="partial">
 		<description>Donkey Kong (Sock Master's Donkey Kong Emulator for CoCo 3) (512Kb)</description>
 		<year>2007</year>
 		<publisher>Sock Master</publisher>
@@ -37,7 +37,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="dkremix" supported ="partial">
+	<software name="dkremix" supported="partial">
 		<description>Donkey Kong Remix (Sock Master's Donkey Kong Remix Emulator for CoCo 3) (512Kb)</description>
 		<year>2015</year>
 		<publisher>Sock Master</publisher>
@@ -52,7 +52,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="pacman" supported ="partial">
+	<software name="pacman" supported="partial">
 		<description>Pacman (z80 to 6809 Transcoded - v1.01) (512kb)</description>
 		<year>2017</year>
 		<publisher>Glen Hewlett</publisher>
@@ -67,7 +67,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- coco3 only requires 512Kb, run best with a 6309? - coco3h driver) -->
-	<software name="joust" supported ="partial">
+	<software name="joust" supported="partial">
 		<description>Joust (6809 Transcoded - v1.10) (512kb)</description>
 		<year>2021</year>
 		<publisher>Glen Hewlett</publisher>
@@ -1953,6 +1953,20 @@ license:CC0-1.0
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="161280">
 				<rom name="coco max ii (1985)(colorware)[m input selection][p].dsk" size="161280" crc="92725c9c" sha1="a02867e80563f243dd632e8c4e4a459b17869e50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zonx">
+		<description>Zonx (The Rainbow)</description>
+		<year>1985</year>
+		<publisher>Falsoft</publisher>
+		<info name="author" value="David Billen" />
+		<info name="usage" value="LOADM&quot;ZONX&quot;:EXEC" />
+		<sharedfeat name="compatibility" value="COCO,COCO3" />
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="161280">
+				<rom name="ZONX.DSK" size="161280" crc="da6a8b6c" sha1="fdd3ef04a6e2fcc854a467ae735f2af43c838af2" />
 			</dataarea>
 		</part>
 	</software>

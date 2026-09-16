@@ -559,8 +559,8 @@ std::string powerpc_disassembler::DecodeSigned16(uint32_t op, int do_unsigned)
 	int16_t s;
 
 	s = G_SIMM(op);
-	if (do_unsigned)    // sign extend to unsigned 32-bits
-		return util::string_format("0x%04X", (uint32_t) s);
+	if (do_unsigned)
+		return util::string_format("0x%04X", (uint16_t) s);
 	else                // print as signed 16 bits
 	{
 		if (s < 0)
@@ -868,16 +868,12 @@ offs_t powerpc_disassembler::dasm_one(std::ostream &stream, uint32_t pc, uint32_
 				break;
 
 			case F_LI:
-				disp = G_LI(op) * 4;
-				if (disp & 0x02000000)  // sign extend
-					disp |= 0xfc000000;
+				disp = util::sext(G_LI(op) * 4, 26);
 				oprs = util::string_format("0x%08X", disp + ((op & M_AA) ? 0 : pc));
 				break;
 
 			case F_BCx:
-				disp = G_BD(op) * 4;
-				if (disp & 0x00008000)
-					disp |= 0xffff0000;
+				disp = util::sext(G_BD(op) * 4, 16);
 
 				if (G_BO(op) & 0x10)    // BI is ignored (don't print CR bit)
 					oprs = util::string_format("0x%02X,%d,0x%08X", G_BO(op), G_BI(op), disp + ((op & M_AA) ? 0 : pc));

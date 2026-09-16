@@ -26,7 +26,7 @@ class orca_ovg_40c_device : public device_t, public device_gfx_interface, public
 {
 public:
 	// construction/destruction
-	orca_ovg_40c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	orca_ovg_40c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_percuss_hardware(bool percuss_hardware) { m_percuss_hardware = percuss_hardware; }
@@ -39,9 +39,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// shared memory finders

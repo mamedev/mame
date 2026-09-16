@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -54,77 +55,23 @@ license:CC0-1.0
 	<element name="text_b05b"><image file="chess/wq.svg" /></element>
 	<element name="text_b06b"><image file="chess/wk.svg" /></element>
 
-	<element name="text_b09a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="1"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b10a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="2"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b11a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="3"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b12a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="4"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b13a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="5"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b14a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="6"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b15a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="7"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b15b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="SP"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b16a">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="8"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
-	<element name="text_b16b">
-		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
-		<text string="IP"><color red="0.05" green="0.05" blue="0.05" /></text>
-	</element>
+	<element name="text_b09a"><text string="1"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b10a"><text string="2"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b11a"><text string="3"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b12a"><text string="4"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b13a"><text string="5"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b14a"><text string="6"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b15a"><text string="7"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b15b"><text string="SP"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b16a"><text string="8"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="text_b16b"><text string="IP"><color red="0.05" green="0.05" blue="0.05" /></text></element>
 
-	<element name="text_b09b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<image file="chess/bp.svg" />
-		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
-	</element>
-	<element name="text_b10b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<image file="chess/br.svg" />
-		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
-	</element>
-	<element name="text_b11b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<image file="chess/bn.svg" />
-		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
-	</element>
-	<element name="text_b12b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<image file="chess/bb.svg" />
-		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
-	</element>
-	<element name="text_b13b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<image file="chess/bq.svg" />
-		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
-	</element>
-	<element name="text_b14b">
-		<rect><color red="1" green="1" blue="1" /></rect>
-		<image file="chess/bk.svg" />
-		<rect><color red="1" green="1" blue="1" alpha="0.06" /></rect>
-	</element>
+	<element name="text_b09b"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.06" /></rect></element>
+	<element name="text_b10b"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/br.svg" /><rect><color red="1" green="1" blue="1" alpha="0.06" /></rect></element>
+	<element name="text_b11b"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.06" /></rect></element>
+	<element name="text_b12b"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bb.svg" /><rect><color red="1" green="1" blue="1" alpha="0.06" /></rect></element>
+	<element name="text_b13b"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bq.svg" /><rect><color red="1" green="1" blue="1" alpha="0.06" /></rect></element>
+	<element name="text_b14b"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.06" /></rect></element>
 
 
 <!-- build screen -->
@@ -132,8 +79,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="8.8" right="55.3" top="20" bottom="42.5" />
 
-	<!-- outer part, display -->
-
+		<!-- outer part, display -->
 		<element ref="black"><bounds x="8.7" y="22" width="46.7" height="0.7" /></element>
 		<element ref="black"><bounds x="8.7" y="23.4" width="46.7" height="0.7" /></element>
 		<element ref="black"><bounds x="8.7" y="24.8" width="46.7" height="0.7" /></element>

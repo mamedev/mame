@@ -899,6 +899,7 @@ void pic17_cpu_device::execute_run()
 				else
 				{
 					// Do nothing until time to wake up
+					debugger_wait_hook();
 					m_icount = 0;
 					m_execphase = exec_phase::Q1;
 					return;

@@ -7,7 +7,8 @@
  * Copyright (c) 2007, Sven Gothel
  * Copyright (c) 2007, MAME Team
  *
- * GPL version 2
+ * May be distributed under the terms of the GNU General Public
+ * License, version 2.0, or the 3-Clause BSD License.
  *
  * OpenGL GLSL ARB extensions:
  *

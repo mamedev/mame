@@ -96,9 +96,9 @@ public:
 	void ksayakyu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -137,12 +137,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void maincpu_map(address_map &map);
-	void soundcpu_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void soundcpu_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void ksayakyu_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -272,8 +270,6 @@ uint32_t ksayakyu_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	draw_sprites(bitmap, cliprect);
 	return 0;
 }
-
-// machine
 
 void ksayakyu_state::bank_select_w(uint8_t data)
 {
@@ -470,7 +466,7 @@ void ksayakyu_state::ksayakyu(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -539,4 +535,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu_state, empty_init, ORIENTATION_FLIP_Y, "Taito Corporation", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ksayakyu, 0, ksayakyu, ksayakyu, ksayakyu_state, empty_init, ORIENTATION_FLIP_Y, "Taito", "Kusayakyuu", MACHINE_SUPPORTS_SAVE )

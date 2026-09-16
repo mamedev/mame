@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sven Schnelle
-#ifndef MAME_DEVICES_HP_HIL_HLEMOUSE_H
-#define MAME_DEVICES_HP_HIL_HLEMOUSE_H
+#ifndef MAME_BUS_HP_HIL_HLEMOUSE_H
+#define MAME_BUS_HP_HIL_HLEMOUSE_H
 
 #pragma once
 
@@ -17,8 +17,8 @@ class hle_hp_46060b_device
 {
 public:
 	hle_hp_46060b_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual int hil_poll() override;
 	virtual void hil_idd() override;
 	enum state_mask
@@ -47,4 +47,4 @@ public:
 
 DECLARE_DEVICE_TYPE_NS(HP_46060B_MOUSE, bus::hp_hil, hle_hp_46060b_device);
 
-#endif // MAME_DEVICES_HP_HIL_HLEMOUSE_H
+#endif // MAME_BUS_HP_HIL_HLEMOUSE_H

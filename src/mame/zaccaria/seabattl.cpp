@@ -54,9 +54,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_objram(*this, "objram"),
-		m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" }),
+		m_digits(*this, "digit%u", 0U),
 		m_s2636(*this, "s2636"),
-		m_7segs(*this, "digit%u", 0U),
 		m_lamp(*this, "lamp0"),
 		m_waveenable(false),
 		m_collision(0),
@@ -69,9 +68,8 @@ public:
 	void armada(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -79,20 +77,19 @@ private:
 	void seabattl_colorram_w(offs_t offset, uint8_t data);
 	void seabattl_control_w(uint8_t data);
 	uint8_t seabattl_collision_r();
-	void seabattl_collision_clear_w(uint8_t data);
+	void seabattl_collision_clear_w(uint8_t data = 0);
 	uint8_t seabattl_collision_clear_r();
 	void sound_w(uint8_t data);
 	void sound2_w(uint8_t data);
 	void time_display_w(uint8_t data);
 	void score_display_w(uint8_t data);
 	void score2_display_w(uint8_t data);
-	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void seabattl_data_map(address_map &map);
-	void seabattl_map(address_map &map);
-	void armada_map(address_map &map);
+	void seabattl_data_map(address_map &map) ATTR_COLD;
+	void seabattl_map(address_map &map) ATTR_COLD;
+	void armada_map(address_map &map) ATTR_COLD;
 
 	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -100,7 +97,6 @@ private:
 	required_shared_ptr<uint8_t> m_objram;
 	required_device_array<dm9368_device, 6> m_digits;
 	required_device<s2636_device> m_s2636;
-	output_finder<6> m_7segs;
 	output_finder<> m_lamp;
 
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -240,7 +236,6 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 
 void seabattl_state::video_start()
 {
-	m_7segs.resolve();
 	m_screen->register_screen_bitmap(m_collision_bg);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seabattl_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -319,8 +314,8 @@ void seabattl_state::seabattl_control_w(uint8_t data)
 
 uint8_t seabattl_state::seabattl_collision_clear_r()
 {
-	m_screen->update_partial(m_screen->vpos());
-	m_collision = 0;
+	if (!machine().side_effects_disabled())
+		seabattl_collision_clear_w();
 	return 0;
 }
 
@@ -459,11 +454,8 @@ INPUT_PORTS_END
 
 void seabattl_state::machine_start()
 {
-	m_lamp.resolve();
-}
-
-void seabattl_state::machine_reset()
-{
+	save_item(NAME(m_waveenable));
+	save_item(NAME(m_collision));
 }
 
 static const gfx_layout tiles32x16x3_layout =
@@ -492,19 +484,19 @@ void seabattl_state::seabattl(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &seabattl_state::seabattl_data_map);
 	m_maincpu->sense_handler().set("screen", FUNC(screen_device::vblank));
 	m_maincpu->intack_handler().set([this]() { m_maincpu->set_input_line(0, CLEAR_LINE); return 0x03; });
-	S2636(config, m_s2636, 0);
+	S2636(config, m_s2636);
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	DM9368(config, m_digits[0], 0).update_cb().set(FUNC(seabattl_state::digit_w<0>));
-	DM9368(config, m_digits[1], 0).update_cb().set(FUNC(seabattl_state::digit_w<1>));
-	DM9368(config, m_digits[2], 0).update_cb().set(FUNC(seabattl_state::digit_w<2>));
-	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(seabattl_state::digit_w<3>));
-	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(seabattl_state::digit_w<4>));
-	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(seabattl_state::digit_w<5>));
+	DM9368(config, m_digits[0]).update_cb().set_output("digit0");
+	DM9368(config, m_digits[1]).update_cb().set_output("digit1");
+	DM9368(config, m_digits[2]).update_cb().set_output("digit2");
+	DM9368(config, m_digits[3]).update_cb().set_output("digit3");
+	DM9368(config, m_digits[4]).update_cb().set_output("digit4");
+	DM9368(config, m_digits[5]).update_cb().set_output("digit5");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

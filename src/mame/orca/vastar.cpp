@@ -144,7 +144,7 @@ public:
 	void common(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -156,9 +156,9 @@ protected:
 	void nmi_mask_w(int state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
-	void cpu2_map(address_map &map);
-	void cpu2_port_map(address_map &map);
-	void main_port_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_port_map(address_map &map) ATTR_COLD;
+	void main_port_map(address_map &map) ATTR_COLD;
 };
 
 class vastar_state : public vastar_common_state
@@ -172,12 +172,12 @@ public:
 	void vastar(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<vastar_video_device> m_vasvid;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class dogfightp_state : public vastar_common_state
@@ -190,11 +190,9 @@ public:
 	void dogfightp(machine_config &config);
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// machine
 
 void vastar_common_state::machine_start()
 {
@@ -490,13 +488,13 @@ void vastar_state::vastar(machine_config &config)
 	mainlatch.q_out_cb<1>().set(m_vasvid, FUNC(vastar_video_device::flipscreen_w));
 
 	// video hardware
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	VASTAR_VIDEO_DEVICE(config, m_vasvid, 0);
+	VASTAR_VIDEO_DEVICE(config, m_vasvid);
 	m_vasvid->set_screen("screen");
 	m_vasvid->set_bg_bases(0x800, 0x000, 0xc00);
 	m_vasvid->set_fg_bases(0x800, 0x400, 0x000);
@@ -516,9 +514,9 @@ void dogfightp_state::dogfightp(machine_config &config)
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
 	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
-	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
+	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb"));
 	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }
@@ -697,12 +695,12 @@ ROM_START( dogfightp ) // all 2732
 
 	ROM_REGION( 0x3000, "videopcb", 0 ) // on ORCA OVG-40c sub board
 	ROM_LOAD( "8.4r",      0x0000, 0x0800, CRC(c62f2ea1) SHA1(8742008225518fb6131083514484900012476681) )
-	ROM_IGNORE(0x0800) // is this used? Where?
+	ROM_IGNORE(                    0x0800 ) // the second half contains Z80 code (should be mapped in the 0x1800-0x1fff range). Leftover of something else?
 	ROM_LOAD( "9.7m",      0x0800, 0x1000, CRC(ffe05fee) SHA1(70b9d0808defd936e2c3567f8e6996a19753de81) )
 	ROM_LOAD( "10.7p",     0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
 
 	ROM_REGION( 0x0040, "videopcb:proms", 0 ) // on ORCA OVG-40c sub board
-	ROM_LOAD( "blue.2a.82s123", 0x0000, 0x0020, CRC(aa839a24) SHA1(9b8217e1c257d24e873888fd083c099fc93c7878) ) //doesn't match parent
+	ROM_LOAD( "blue.2a.82s123", 0x0000, 0x0020, CRC(aa839a24) SHA1(9b8217e1c257d24e873888fd083c099fc93c7878) ) // doesn't match parent
 	ROM_LOAD( "pink.2b.82s123", 0x0020, 0x0020, CRC(596ae457) SHA1(1c1a3130d88c5fd5c66ce9f91d97a09c0a0b535f) )
 ROM_END
 

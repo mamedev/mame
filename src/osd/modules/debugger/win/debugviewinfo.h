@@ -53,6 +53,7 @@ public:
 	bool set_source_for_visible_cpu();
 
 	HWND create_source_combobox(HWND parent, LONG_PTR userdata);
+	void recompute_source_combobox(HWND wnd);
 
 	virtual void restore_configuration_from_node(util::xml::data_node const &node);
 	virtual void save_configuration_to_node(util::xml::data_node &node);

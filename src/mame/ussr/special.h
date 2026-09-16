@@ -2,12 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
- * includes/special.h
+ * ussr/special.h
  *
  ****************************************************************************/
 
-#ifndef MAME_SPECIAL_SPECIAL_H
-#define MAME_SPECIAL_SPECIAL_H
+#ifndef MAME_USSR_SPECIAL_H
+#define MAME_USSR_SPECIAL_H
 
 #pragma once
 
@@ -101,14 +101,14 @@ private:
 	uint32_t screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fdc_drq(int state);
 	static void specimx_floppy_formats(format_registration &fr);
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
-	void erik_io(address_map &map);
-	void erik_mem(address_map &map);
-	void specialist_mem(address_map &map);
-	void specialp_mem(address_map &map);
-	void specimx_mem(address_map &map);
+	void erik_io(address_map &map) ATTR_COLD;
+	void erik_mem(address_map &map) ATTR_COLD;
+	void specialist_mem(address_map &map) ATTR_COLD;
+	void specialp_mem(address_map &map) ATTR_COLD;
+	void specimx_mem(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_specimx_colorram;
 	uint8_t m_erik_color_1 = 0;
@@ -143,4 +143,4 @@ private:
 	optional_device<timer_device> m_pit_timer; // specimx only
 };
 
-#endif // MAME_SPECIAL_SPECIAL_H
+#endif // MAME_USSR_SPECIAL_H

@@ -23,8 +23,8 @@ public:
 	uint16_t m_default_rom[2];
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_KOF98_H

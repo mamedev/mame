@@ -6,6 +6,9 @@
 
   Accelerated only in 256 color mode.
 
+  Output is 3 discrete Bt458s, similar to other SuperMac cards of
+  the time like the Thunder II and Thunder II GX.
+
   blitter info:
 
   06 = ?
@@ -23,7 +26,6 @@
 
   TODO:
   * Having no alternate oscillator installed is not emulated.
-  * Work out how active line length is configured.
   * Alternate oscillator calibration is currently failing.  Fixing this
     probably requires a complete cycle-accurate Mac II.
 
@@ -36,6 +38,8 @@
 
 #include "layout/generic.h"
 #include "screen.h"
+
+#include "endianness.h"
 
 #include <algorithm>
 
@@ -63,30 +67,30 @@ class nubus_specpdq_device :
 {
 public:
 	// construction/destruction
-	nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// palette implementation
-	virtual uint32_t palette_entries() const noexcept override;
+	virtual u32 palette_entries() const noexcept override;
 
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
 private:
-	uint32_t specpdq_r(offs_t offset, uint32_t mem_mask = ~0);
-	void specpdq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t vram_r(offs_t offset, uint32_t mem_mask = ~0);
-	void vram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 specpdq_r(offs_t offset, u32 mem_mask = ~0);
+	void specpdq_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 vram_r(offs_t offset, u32 mem_mask = ~0);
+	void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void blitter_pattern_fill();
 	void blitter_copy_forward();
@@ -94,7 +98,7 @@ private:
 
 	void update_crtc();
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_ioport m_userosc;
 	emu_timer *m_timer;
@@ -102,22 +106,22 @@ private:
 	supermac_spec_crtc m_crtc;
 	supermac_spec_shift_reg m_shiftreg;
 
-	std::vector<uint32_t> m_vram;
-	uint32_t m_mode, m_vbl_disable;
-	uint32_t m_colors[3], m_count, m_clutoffs;
+	std::vector<u32> m_vram;
+	u32 m_mode, m_vbl_disable;
+	u32 m_colors[3], m_count, m_clutoffs;
 
-	uint16_t m_stride;
-	uint16_t m_vint;
-	uint8_t m_hdelay;
-	uint8_t m_osc;
+	u16 m_stride;
+	u16 m_vint;
+	u8 m_hdelay, m_hadjust;
+	u8 m_osc;
 
-	uint16_t m_blit_stride;
-	uint32_t m_blit_src, m_blit_dst;
-	uint32_t m_blit_width, m_blit_height;
-	uint8_t m_blit_patoffs;
-	uint32_t m_blit_pat[64];
+	u16 m_blit_stride;
+	u32 m_blit_src, m_blit_dst;
+	u32 m_blit_width, m_blit_height;
+	u8 m_blit_patoffs;
+	u32 m_blit_pat[64];
 
-	uint32_t m_7xxxxx_regs[0x100000 / 4];
+	u32 m_7xxxxx_regs[0x100000 / 4];
 };
 
 
@@ -143,7 +147,7 @@ void nubus_specpdq_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_monitors);
 
-	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME));
 	screen.set_screen_update(FUNC(nubus_specpdq_device::screen_update));
 	screen.set_raw(100.000_MHz_XTAL, 1'456, 108, 1'260, 915, 39, 909);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
@@ -171,7 +175,7 @@ ioport_constructor nubus_specpdq_device::device_input_ports() const
 //  palette_entries - entries in color palette
 //-------------------------------------------------
 
-uint32_t nubus_specpdq_device::palette_entries() const noexcept
+u32 nubus_specpdq_device::palette_entries() const noexcept
 {
 	return 256;
 }
@@ -185,12 +189,12 @@ uint32_t nubus_specpdq_device::palette_entries() const noexcept
 //  nubus_specpdq_device - constructor
 //-------------------------------------------------
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_specpdq_device(mconfig, NUBUS_SPECPDQ, tag, owner, clock)
 {
 }
 
-nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_specpdq_device::nubus_specpdq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -210,10 +214,10 @@ void nubus_specpdq_device::device_start()
 {
 	install_declaration_rom(SPECPDQ_ROM_REGION);
 
-	uint32_t const slotspace = get_slotspace();
+	u32 const slotspace = get_slotspace();
 	LOG("[specpdq %p] slotspace = %x\n", this, slotspace);
 
-	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
+	m_vram.resize(VRAM_SIZE / sizeof(u32));
 	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_specpdq_device::vram_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::vram_w)));
 	nubus().install_device(slotspace+0x400000, slotspace+0xfbffff, read32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_r)), write32s_delegate(*this, FUNC(nubus_specpdq_device::specpdq_w)));
 
@@ -231,6 +235,7 @@ void nubus_specpdq_device::device_start()
 	save_item(NAME(m_stride));
 	save_item(NAME(m_vint));
 	save_item(NAME(m_hdelay));
+	save_item(NAME(m_hadjust));
 	save_item(NAME(m_osc));
 	save_item(NAME(m_blit_stride));
 	save_item(NAME(m_blit_src));
@@ -261,6 +266,7 @@ void nubus_specpdq_device::device_reset()
 	m_stride = 0;
 	m_vint = 0;
 	m_hdelay = 0;
+	m_hadjust = 0;
 	m_osc = 0;
 
 	m_blit_stride = 0;
@@ -326,22 +332,15 @@ void nubus_specpdq_device::update_crtc()
 	// for some reason you temporarily get invalid screen parameters - ignore them
 	if (m_crtc.valid(*this))
 	{
-		rectangle active(
+		// FIXME: there's still something missing in the active width calculation
+		// With the Apple RGB (640*480) monitor selected, the active width is 16 pixels
+		// too wide in black and white mode, and 16 pixels too narrow in greyscale or
+		// colour modes.
+		rectangle const active(
 				m_crtc.h_start(16) + (m_hdelay * 4),
-				m_crtc.h_end(16) - 1,
+				m_crtc.h_end(16) + (m_hdelay * 4) - m_hadjust - 1,
 				m_crtc.v_start(),
 				m_crtc.v_end() - 1);
-
-		// FIXME: work out how it actually configures the RAMDAC end-of-line
-		// this is a horrible hack
-		if (active.width() < 832)
-			active.set_width(640);
-		else if (active.width() < 1024)
-			active.set_width(832);
-		else if (active.width() < 1152)
-			active.set_width(1024);
-		else
-			active.set_width(1152);
 
 		screen().configure(
 				m_crtc.h_total(16),
@@ -353,9 +352,9 @@ void nubus_specpdq_device::update_crtc()
 	}
 }
 
-uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 0x9000;
+	auto const screenbase = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x9000;
 
 	int const hstart = m_crtc.h_start(16);
 	int const width = m_crtc.h_active(16);
@@ -368,14 +367,14 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 0: // 1 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					scanline = std::fill_n(scanline, hdelay, 0);
 					auto const rowbase = screenbase + ((y - vstart) * m_stride * 4);
 					for (int x = 0; x < ((width - hdelay + 7) / 8); x++)
 					{
-						uint8_t const pixels = rowbase[x];
+						u8 const pixels = rowbase[x];
 
 						*scanline++ = pen_color((pixels << 0) & 0x80);
 						*scanline++ = pen_color((pixels << 1) & 0x80);
@@ -397,14 +396,14 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 1: // 2 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					scanline = std::fill_n(scanline, hdelay, 0);
 					auto const rowbase = screenbase + ((y - vstart) * m_stride * 4);
 					for (int x = 0; x < ((width - hdelay) / 4); x++)
 					{
-						uint8_t const pixels = rowbase[x];
+						u8 const pixels = rowbase[x];
 
 						*scanline++ = pen_color((pixels << 0) & 0xc0);
 						*scanline++ = pen_color((pixels << 2) & 0xc0);
@@ -422,14 +421,14 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 2: // 4 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					scanline = std::fill_n(scanline, hdelay, 0);
 					auto const rowbase = screenbase + ((y - vstart) * m_stride * 4);
 					for (int x = 0; x < ((width - hdelay) / 2); x++)
 					{
-						uint8_t const pixels = rowbase[x];
+						u8 const pixels = rowbase[x];
 
 						*scanline++ = pen_color((pixels << 0) & 0xf0);
 						*scanline++ = pen_color((pixels << 4) & 0xf0);
@@ -445,14 +444,14 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 		case 3: // 8 bpp
 			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y, hstart);
+				u32 *scanline = &bitmap.pix(y, hstart);
 				if ((y >= vstart) && (y < vend))
 				{
 					scanline = std::fill_n(scanline, hdelay, 0);
 					auto const rowbase = screenbase + ((y - vstart) * m_stride * 4);
 					for (int x = 0; x < (width - hdelay); x++)
 					{
-						uint8_t const pixels = rowbase[x];
+						u8 const pixels = rowbase[x];
 						*scanline++ = pen_color(pixels);
 					}
 				}
@@ -469,7 +468,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_specpdq_device::specpdq_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (offset >= 0xc0000 && offset < 0x100000)
 	{
@@ -516,6 +515,12 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 			break;
 
 		case 0xc005e:   // not sure, interrupt related?
+			break;
+
+		case 0xc0066:
+			LOG("%s: %u to hadjust\n", machine().describe_context(), ~data & 0xff);
+			m_hadjust = ~data & 0xff;
+			update_crtc();
 			break;
 
 		case 0xc006a:
@@ -636,7 +641,7 @@ void nubus_specpdq_device::specpdq_w(offs_t offset, uint32_t data, uint32_t mem_
 	}
 }
 
-uint32_t nubus_specpdq_device::specpdq_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_specpdq_device::specpdq_r(offs_t offset, u32 mem_mask)
 {
 //  if (offset != 0xc005c && offset != 0xc005e) logerror("specpdq_r: @ %x (mask %08x  %s)\n", offset, mem_mask, machine().describe_context());
 
@@ -666,23 +671,23 @@ uint32_t nubus_specpdq_device::specpdq_r(offs_t offset, uint32_t mem_mask)
 	return 0;
 }
 
-void nubus_specpdq_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_specpdq_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	data = ~data;
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-uint32_t nubus_specpdq_device::vram_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_specpdq_device::vram_r(offs_t offset, u32 mem_mask)
 {
 	return ~m_vram[offset];
 }
 
 void nubus_specpdq_device::blitter_pattern_fill()
 {
-	auto const source = util::big_endian_cast<uint8_t const>(m_blit_pat);
-	auto const dest = util::big_endian_cast<uint8_t>(&m_vram[0]);
-	uint32_t const patofsx = m_blit_dst & 0x3;
-	uint32_t const stride = m_blit_stride * 4;
+	auto const source = util::big_endian_cast<u8 const>(m_blit_pat);
+	auto const dest = util::big_endian_cast<u8>(&m_vram[0]);
+	u32 const patofsx = m_blit_dst & 0x3;
+	u32 const stride = m_blit_stride * 4;
 	LOG("Fill rectangle with %02x %02x %02x %02x, adr %x (%d, %d) width %d height %d delta %d\n",
 			source[0], source[1], source[2], source[3],
 			m_blit_dst, m_blit_dst % (m_blit_stride * 4), m_blit_dst / (m_blit_stride * 4),
@@ -702,9 +707,9 @@ void nubus_specpdq_device::blitter_copy_forward()
 			m_blit_width, m_blit_height,
 			m_blit_dst, m_blit_dst % (m_blit_stride * 4), m_blit_dst / (m_blit_stride * 4),
 			m_blit_src, m_blit_src % (m_blit_stride * 4), m_blit_src / (m_blit_stride * 4));
-	auto const source = util::big_endian_cast<uint8_t const>(&m_vram[0]);
-	auto const dest = util::big_endian_cast<uint8_t>(&m_vram[0]);
-	uint32_t const stride = m_blit_stride * 4;
+	auto const source = util::big_endian_cast<u8 const>(&m_vram[0]);
+	auto const dest = util::big_endian_cast<u8>(&m_vram[0]);
+	u32 const stride = m_blit_stride * 4;
 	for (int y = 0; y <= m_blit_height; y++)
 	{
 		for (int x = 0; x < m_blit_width; x++)
@@ -720,9 +725,9 @@ void nubus_specpdq_device::blitter_copy_backward()
 			m_blit_width, m_blit_height,
 			m_blit_dst, m_blit_dst % (m_blit_stride * 4), m_blit_dst / (m_blit_stride * 4),
 			m_blit_src, m_blit_src % (m_blit_stride * 4), m_blit_src / (m_blit_stride * 4));
-	auto const source = util::big_endian_cast<uint8_t const>(&m_vram[0]);
-	auto const dest = util::big_endian_cast<uint8_t>(&m_vram[0]);
-	uint32_t const stride = m_blit_stride * 4;
+	auto const source = util::big_endian_cast<u8 const>(&m_vram[0]);
+	auto const dest = util::big_endian_cast<u8>(&m_vram[0]);
+	u32 const stride = m_blit_stride * 4;
 	for (int y = 0; y <= m_blit_height; y++)
 	{
 		for (int x = 0; x < m_blit_width; x++)

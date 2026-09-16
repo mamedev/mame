@@ -35,9 +35,9 @@ public:
 	void piratetr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<via6522_device, 3> m_via;
@@ -75,9 +75,9 @@ private:
 	void io_select_w(uint8_t data);
 	uint8_t io_port_r();
 
-	void audio_cmd_w_sync(int param);
-	void audio_trigger_w_sync(int param);
-	void audio_reset_w_sync(int param);
+	void audio_cmd_w_sync(int32_t param);
+	void audio_trigger_w_sync(int32_t param);
+	void audio_reset_w_sync(int32_t param);
 	void audio_cmd_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_cmd_w_sync), this), data); }
 	void audio_trigger_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_trigger_w_sync), this), state); }
 	void audio_reset_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(killcom_state::audio_reset_w_sync), this), state); }
@@ -85,8 +85,8 @@ private:
 	TIMER_CALLBACK_MEMBER(hblank_callback);
 	uint8_t leprechn_videoram_r();
 
-	void killcom_main_map(address_map &map);
-	void killcom_audio_map(address_map &map);
-	void leprechn_audio_map(address_map &map);
-	void piratetr_main_map(address_map &map);
+	void killcom_main_map(address_map &map) ATTR_COLD;
+	void killcom_audio_map(address_map &map) ATTR_COLD;
+	void leprechn_audio_map(address_map &map) ATTR_COLD;
+	void piratetr_main_map(address_map &map) ATTR_COLD;
 };

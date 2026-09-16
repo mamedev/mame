@@ -39,8 +39,8 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<mn1400_base_device> m_maincpu;
@@ -559,8 +559,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, compperf,  0,        0,      compperf,  compperf,  compperf_state,  empty_init, "Lakeside", "Computer Perfection", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, scrablexa, scrablex, 0,      scrablexa, scrablexa, scrablexa_state, empty_init, "Selchow & Righter", "Scrabble Lexor: Computer Word Game (MN1405 version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, tmbaskb,   0,        0,      tmbaskb,   tmbaskb,   tmbaskb_state,   empty_init, "Tomy", "Basketball (Tomy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, tmbaskb,   0,        0,      tmbaskb,   tmbaskb,   tmbaskb_state,   empty_init, "Tomy", "Basketball (Tomy)", MACHINE_SUPPORTS_SAVE )

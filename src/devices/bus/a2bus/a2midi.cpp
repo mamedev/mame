@@ -42,12 +42,14 @@ public:
 protected:
 	a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+
+	virtual void reset_from_bus() override;
 
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
@@ -66,11 +68,11 @@ private:
 
 void a2bus_midi_device::device_add_mconfig(machine_config &config)
 {
-	PTM6840(config, m_ptm, 1021800);
-	m_ptm->set_external_clocks(1021800.0f, 1021800.0f, 1021800.0f);
+	PTM6840(config, m_ptm, A2BUS_1M_CLOCK);
+	m_ptm->set_external_clocks(float(A2BUS_1M_CLOCK), float(A2BUS_1M_CLOCK), float(A2BUS_1M_CLOCK));
 	m_ptm->irq_callback().set(FUNC(a2bus_midi_device::ptm_irq_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(a2bus_midi_device::acia_irq_w));
 
@@ -111,6 +113,12 @@ void a2bus_midi_device::device_start()
 void a2bus_midi_device::device_reset()
 {
 	m_acia_irq = m_ptm_irq = false;
+}
+
+void a2bus_midi_device::reset_from_bus()
+{
+	m_ptm->reset();
+	// ACIA has no reset input
 }
 
 /*-------------------------------------------------

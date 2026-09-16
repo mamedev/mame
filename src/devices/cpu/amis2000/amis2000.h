@@ -32,25 +32,24 @@ public:
 	// uncustomizable, but wildfire proves to be an exception to that rule.
 	void set_7seg_table(const u8 *ptr) { m_7seg_table = ptr; } // d0=A, d1=B, etc.
 
-	void data_64x4(address_map &map);
-	void data_80x4(address_map &map);
-	void program_1_5k(address_map &map);
-	void program_1k(address_map &map);
+	void data_64x4(address_map &map) ATTR_COLD;
+	void data_80x4(address_map &map) ATTR_COLD;
+	void program_1_5k(address_map &map) ATTR_COLD;
+	void program_1k(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
 	amis2000_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 bu_bits, u8 callstack_bits, u8 callstack_depth, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); } // "
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
-	virtual u32 execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -192,8 +191,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// digital-to-frequency converter
 	u8 m_d2f_latch;

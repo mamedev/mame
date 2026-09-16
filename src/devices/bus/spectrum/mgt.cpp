@@ -171,7 +171,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_DISCIPLE, spectrum_disciple_device, "spectrum_discip
 
 INPUT_PORTS_START(plusd)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_plusd_device, snapshot_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_plusd_device::snapshot_button), 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -199,7 +199,7 @@ INPUT_PORTS_START(disciple)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_PLAYER(2) PORT_NAME("Sinclair P2 Button 1") PORT_CODE(KEYCODE_0_PAD)
 
 	PORT_START("INH")
-	PORT_CONFNAME(0x01, 0x01, "Inhibit Button") PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_disciple_device, inhibit_button, 0)
+	PORT_CONFNAME(0x01, 0x01, "Inhibit Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_disciple_device::inhibit_button), 0)
 	PORT_CONFSETTING(0x01, "Off (Disciple enabled)")
 	PORT_CONFSETTING(0x00, "On (Disciple disabled)")
 INPUT_PORTS_END
@@ -404,7 +404,7 @@ void spectrum_disciple_device::device_reset()
 //  IMPLEMENTATION  spectrum_plusd_device
 //**************************************************************************
 
-int spectrum_plusd_device::romcs()
+bool spectrum_plusd_device::romcs()
 {
 	return m_romcs;
 }
@@ -540,9 +540,9 @@ void spectrum_plusd_device::busy_w(int state)
 //  IMPLEMENTATION  spectrum_disciple_device
 //**************************************************************************
 
-int spectrum_disciple_device::romcs()
+bool spectrum_disciple_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_disciple_device::pre_opcode_fetch(offs_t offset)

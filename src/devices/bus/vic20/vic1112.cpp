@@ -111,7 +111,7 @@ void vic1112_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
 	m_via1->irq_handler().set(FUNC(vic1112_device::via1_irq_w));
 
-	IEEE488(config, m_bus, 0);
+	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
 	m_bus->srq_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 }

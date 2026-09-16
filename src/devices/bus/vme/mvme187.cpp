@@ -106,14 +106,11 @@ void vme_mvme187_card_device::device_add_mconfig(machine_config &config)
 {
 	MC88100(config, m_cpu, 50_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme187_card_device::cpu_mem);
+	m_cpu->set_cmmu_code([this](u32 const address) -> mc88200_device & { return *m_mmu[0]; });
+	m_cpu->set_cmmu_data([this](u32 const address) -> mc88200_device & { return *m_mmu[1]; });
 
-	MC88200(config, m_mmu[0], 50_MHz_XTAL / 2, 0x77);
-	m_mmu[0]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_i(m_mmu[0]);
-
-	MC88200(config, m_mmu[1], 50_MHz_XTAL / 2, 0x7f);
-	m_mmu[1]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_d(m_mmu[1]);
+	MC88200(config, m_mmu[0], 50_MHz_XTAL / 2, 0x77).set_mbus(m_cpu, AS_PROGRAM);
+	MC88200(config, m_mmu[1], 50_MHz_XTAL / 2, 0x7f).set_mbus(m_cpu, AS_PROGRAM);
 
 	DS1643(config, m_rtc);
 
@@ -124,7 +121,7 @@ void vme_mvme187_card_device::device_add_mconfig(machine_config &config)
 	RS232_PORT(config, m_serial[4], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_serial[5], default_rs232_devices, nullptr);
 
-	//NCR53C7XX(config, m_scsi, 0);
+	//NCR53C710(config, m_scsi);
 	I82596_BE32(config, m_lan, 20'000'000);
 }
 

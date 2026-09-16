@@ -291,6 +291,7 @@ void sm510_base_device::execute_run()
 			else
 			{
 				// got nothing to do
+				debugger_wait_hook();
 				m_icount = 0;
 				return;
 			}

@@ -54,10 +54,10 @@ private:
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
-	void gamate_mem(address_map &map);
+	void gamate_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	int m_card_available;
 
@@ -188,16 +188,16 @@ void gamate_state::gamate(machine_config &config)
 	M6502(config, m_maincpu, 4433000/2); // NCR 65CX02
 	m_maincpu->set_addrmap(AS_PROGRAM, &gamate_state::gamate_mem);
 
-	GAMATE_VIDEO(config, "video", 0);
+	GAMATE_VIDEO(config, "video");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front(); // Stereo headphone output
+
 	AY8910(config, m_ay, 4433000 / 4); // AY compatible, no actual AY chip present
-	m_ay->add_route(0, "lspeaker", 0.5);
-	m_ay->add_route(1, "rspeaker", 0.5);
-	m_ay->add_route(2, "lspeaker", 0.25);
-	m_ay->add_route(2, "rspeaker", 0.25);
+	m_ay->add_route(0, "speaker", 0.5, 0);
+	m_ay->add_route(1, "speaker", 0.5, 1);
+	m_ay->add_route(2, "speaker", 0.25, 0);
+	m_ay->add_route(2, "speaker", 0.25, 1);
 
 	GAMATE_CART_SLOT(config, m_cartslot, gamate_cart, nullptr);
 

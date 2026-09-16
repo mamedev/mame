@@ -121,6 +121,7 @@ public:
 	void theend_protection_w(uint8_t data);
 	uint8_t theend_protection_r();
 	template <int N> int theend_protection_alt_r();
+	uint8_t scrammr_protection_r();
 	void explorer_sound_control_w(uint8_t data);
 	uint8_t frogger_ppi8255_r(offs_t offset);
 	void frogger_ppi8255_w(offs_t offset, uint8_t data);
@@ -136,7 +137,7 @@ public:
 	void turtles_ppi8255_1_w(offs_t offset, uint8_t data);
 	uint8_t jumpbug_protection_r(offs_t offset);
 	void checkman_sound_command_w(uint8_t data);
-	uint8_t checkmaj_protection_r();
+	uint8_t checkmanj_protection_r();
 	uint8_t dingo_3000_r();
 	uint8_t dingo_3035_r();
 	uint8_t dingoe_3001_r();
@@ -150,66 +151,69 @@ public:
 	void theend_coin_counter_w(uint8_t data);
 	uint8_t explorer_sound_latch_r();
 	uint8_t frogger_sound_timer_r();
-	void init_galaxian();
-	void init_nolock();
-	void init_azurian();
-	void init_batman2();
-	void init_highroll();
-	void init_frogg();
-	void init_mooncrst();
-	void init_mooncrsu();
-	void init_mooncrgx();
-	void init_moonqsr();
-	void init_pacmanbl();
-	void init_devilfshg();
-	void init_jumpbug();
-	void init_checkman();
-	void init_checkmaj();
-	void init_dingo();
-	void init_dingoe();
-	void init_kong();
-	void init_fantastc();
-	void init_timefgtr();
-	void init_theend();
-	void init_scramble();
-	void init_explorer();
-	void init_mandinga();
-	void init_mandingaeg();
-	void init_atlantis();
-	void init_scobra();
-	void init_scobrae();
-	void init_losttomb();
-	void init_frogger();
-	void init_froggermc();
-	void init_froggers();
-	void init_quaak();
-	void init_turtles();
-	void init_ckongs();
-	void init_ckonggx();
-	void init_anteater();
-	void init_anteateruk();
-	void init_superbon();
-	void init_calipso();
-	void init_ghostmun();
-	void init_froggrs();
-	void init_warofbugg();
-	void init_jungsub();
-	void init_mimonkey();
-	void init_mimonkeyb();
-	void init_victoryc();
-	void init_bigkonggx();
+	void init_galaxian() ATTR_COLD;
+	void init_nolock() ATTR_COLD;
+	void init_azurian() ATTR_COLD;
+	void init_batman2() ATTR_COLD;
+	void init_ladybugg2() ATTR_COLD;
+	void init_highroll() ATTR_COLD;
+	void init_frogg() ATTR_COLD;
+	void init_mooncrst() ATTR_COLD;
+	void init_mooncrsu() ATTR_COLD;
+	void init_mooncrgx() ATTR_COLD;
+	void init_moonqsr() ATTR_COLD;
+	void init_pacmanbl() ATTR_COLD;
+	void init_devilfshg() ATTR_COLD;
+	void init_jumpbug() ATTR_COLD;
+	void init_jumpbugbc() ATTR_COLD;
+	void init_checkman() ATTR_COLD;
+	void init_checkmanj() ATTR_COLD;
+	void init_dingo() ATTR_COLD;
+	void init_dingoe() ATTR_COLD;
+	void init_kong() ATTR_COLD;
+	void init_fantastc() ATTR_COLD;
+	void init_timefgtr() ATTR_COLD;
+	void init_theend() ATTR_COLD;
+	void init_scramble() ATTR_COLD;
+	void init_explorer() ATTR_COLD;
+	void init_mandinga() ATTR_COLD;
+	void init_mandingaeg() ATTR_COLD;
+	void init_atlantis() ATTR_COLD;
+	void init_scobra() ATTR_COLD;
+	void init_scobrae() ATTR_COLD;
+	void init_losttomb() ATTR_COLD;
+	void init_frogger() ATTR_COLD;
+	void init_froggermc() ATTR_COLD;
+	void init_froggers() ATTR_COLD;
+	void init_quaak() ATTR_COLD;
+	void init_turtles() ATTR_COLD;
+	void init_ckongs() ATTR_COLD;
+	void init_ckonggx() ATTR_COLD;
+	void init_anteater() ATTR_COLD;
+	void init_anteateruk() ATTR_COLD;
+	void init_superbon() ATTR_COLD;
+	void init_calipso() ATTR_COLD;
+	void init_ghostmun() ATTR_COLD;
+	void init_froggrs() ATTR_COLD;
+	void init_warofbugg() ATTR_COLD;
+	void init_jungsub() ATTR_COLD;
+	void init_mimonkey() ATTR_COLD;
+	void init_mimonkeyb() ATTR_COLD;
+	void init_victoryc() ATTR_COLD;
+	void init_bigkonggx() ATTR_COLD;
+	void init_crazym() ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
 	void eagle_palette(palette_device &palette);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_interrupt_w(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
+	TIMER_DEVICE_CALLBACK_MEMBER(checkmanj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
 	void state_save_register();
-	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);
-	void bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base);
+	void sprites_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);
+	void bullets_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base);
 	void stars_init();
 	void stars_update_origin();
 	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask);
@@ -262,64 +266,68 @@ public:
 			draw_background_func draw_background,
 			extend_tile_info_func extend_tile_info,
 			extend_sprite_info_func extend_sprite_info);
-	void galaxian_base(machine_config &config);
-	void sidam_bootleg_base(machine_config &config);
-	void konami_base(machine_config &config);
-	void konami_sound_1x_ay8910(machine_config &config);
-	void konami_sound_2x_ay8910(machine_config &config);
-	void scramble_base(machine_config &config);
-	void timefgtr(machine_config &config);
-	void moonqsr(machine_config &config);
-	void frogger(machine_config &config);
-	void anteatergg(machine_config &config);
-	void ozon1(machine_config &config);
-	void theend(machine_config &config);
-	void turtles(machine_config &config);
-	void fantastc(machine_config &config);
-	void jumpbug(machine_config &config);
-	void checkmaj(machine_config &config);
-	void pacmanbl(machine_config &config);
-	void quaak(machine_config &config);
-	void galaxian(machine_config &config);
-	void highroll(machine_config &config);
-	void devilfshg(machine_config &config);
-	void froggers(machine_config &config);
-	void froggervd(machine_config &config);
-	void anteateruk(machine_config &config);
-	void anteaterg(machine_config &config);
-	void anteater(machine_config &config);
-	void turpins(machine_config &config);
-	void explorer(machine_config &config);
-	void scramble(machine_config &config);
-	void scobra(machine_config &config);
-	void froggermc(machine_config &config);
-	void froggeram(machine_config &config);
-	void spactrai(machine_config &config);
-	void takeoff(machine_config &config);
-	void mooncrst(machine_config &config);
-	void eagle(machine_config &config);
-	void ckongs(machine_config &config);
-	void frogf(machine_config &config);
-	void amigo2(machine_config &config);
-	void checkman(machine_config &config);
-	void jungsub(machine_config &config);
-	void victoryc(machine_config &config);
-	void frogg(machine_config &config);
-	void mandingarf(machine_config &config);
-	void mandinka(machine_config &config);
-	void thepitm(machine_config &config);
-	void kong(machine_config &config);
-	void bongo(machine_config &config);
-	void scorpnmc(machine_config &config);
-	void ckongg(machine_config &config);
-	void ckongmc(machine_config &config);
-	void astroamb(machine_config &config);
-	void mimonkey(machine_config &config);
-	void mimonscr(machine_config &config);
-	void galartic(machine_config &config);
-	void bigkonggx(machine_config &config);
+	void galaxian_base(machine_config &config) ATTR_COLD;
+	void sidam_bootleg_base(machine_config &config) ATTR_COLD;
+	void konami_base(machine_config &config) ATTR_COLD;
+	void konami_sound_1x_ay8910(machine_config &config) ATTR_COLD;
+	void konami_sound_2x_ay8910(machine_config &config) ATTR_COLD;
+	void scramble_base(machine_config &config) ATTR_COLD;
+	void timefgtr(machine_config &config) ATTR_COLD;
+	void moonqsr(machine_config &config) ATTR_COLD;
+	void frogger(machine_config &config) ATTR_COLD;
+	void anteatergg(machine_config &config) ATTR_COLD;
+	void ozon1(machine_config &config) ATTR_COLD;
+	void theend(machine_config &config) ATTR_COLD;
+	void turtles(machine_config &config) ATTR_COLD;
+	void fantastc(machine_config &config) ATTR_COLD;
+	void jumpbug(machine_config &config) ATTR_COLD;
+	void jumpbugbrf(machine_config &config) ATTR_COLD;
+	void checkmanj(machine_config &config) ATTR_COLD;
+	void pacmanbl(machine_config &config) ATTR_COLD;
+	void quaak(machine_config &config) ATTR_COLD;
+	void galaxian(machine_config &config) ATTR_COLD;
+	void highroll(machine_config &config) ATTR_COLD;
+	void devilfshg(machine_config &config) ATTR_COLD;
+	void froggers(machine_config &config) ATTR_COLD;
+	void froggervd(machine_config &config) ATTR_COLD;
+	void anteateruk(machine_config &config) ATTR_COLD;
+	void anteaterg(machine_config &config) ATTR_COLD;
+	void anteater(machine_config &config) ATTR_COLD;
+	void turpins(machine_config &config) ATTR_COLD;
+	void explorer(machine_config &config) ATTR_COLD;
+	void scramble(machine_config &config) ATTR_COLD;
+	void scobra(machine_config &config) ATTR_COLD;
+	void froggermc(machine_config &config) ATTR_COLD;
+	void froggeram(machine_config &config) ATTR_COLD;
+	void spactrai(machine_config &config) ATTR_COLD;
+	void takeoff(machine_config &config) ATTR_COLD;
+	void mooncrst(machine_config &config) ATTR_COLD;
+	void eagle(machine_config &config) ATTR_COLD;
+	void ckongs(machine_config &config) ATTR_COLD;
+	void frogf(machine_config &config) ATTR_COLD;
+	void amigo2(machine_config &config) ATTR_COLD;
+	void checkman(machine_config &config) ATTR_COLD;
+	void jungsub(machine_config &config) ATTR_COLD;
+	void victoryc(machine_config &config) ATTR_COLD;
+	void frogg(machine_config &config) ATTR_COLD;
+	void mandingarf(machine_config &config) ATTR_COLD;
+	void mandinka(machine_config &config) ATTR_COLD;
+	void thepitm(machine_config &config) ATTR_COLD;
+	void kong(machine_config &config) ATTR_COLD;
+	void bongo(machine_config &config) ATTR_COLD;
+	void bongog(machine_config &config) ATTR_COLD;
+	void scorpnmc(machine_config &config) ATTR_COLD;
+	void ckongg(machine_config &config) ATTR_COLD;
+	void ckongmc(machine_config &config) ATTR_COLD;
+	void astroamb(machine_config &config) ATTR_COLD;
+	void mimonkey(machine_config &config) ATTR_COLD;
+	void mimonscr(machine_config &config) ATTR_COLD;
+	void galartic(machine_config &config) ATTR_COLD;
+	void bigkonggx(machine_config &config) ATTR_COLD;
+	void scrammr(machine_config &config) ATTR_COLD;
+	void turpinnv(machine_config &config) ATTR_COLD;
 
-	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> ioport_value ckongg_coinage_r();
 	template <int Mask> int ckongs_coinage_r();
 
 protected:
@@ -329,73 +337,70 @@ protected:
 	void set_num_spritegens(int num) { m_numspritegens = num; }
 	void set_x_scale(uint8_t scale) { m_x_scale = scale; }
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
-	void set_left_sprite_clip(uint8_t clip) { m_leftspriteclip = clip; }
 
-	void amigo2_map(address_map &map);
-	void anteaterg_map(address_map &map);
-	void anteatergg_map(address_map &map);
-	void anteateruk_map(address_map &map);
-	void astroamb_map(address_map &map);
-	void bigkonggx_map(address_map &map);
-	void bongo_map(address_map &map);
-	void bongo_io_map(address_map &map);
-	void checkmaj_sound_map(address_map &map);
-	void checkman_sound_map(address_map &map);
-	void checkman_sound_portmap(address_map &map);
-	void ckongg_map(address_map &map);
-	void ckongg_map_base(address_map &map);
-	void ckongmc_map(address_map &map);
-	void ckongs_map(address_map &map);
-	void explorer_map(address_map &map);
-	void fantastc_map(address_map &map);
-	void frogf_map(address_map &map);
-	void frogg_map(address_map &map);
-	void frogger_map(address_map &map);
-	void froggervd_map(address_map &map);
-	void frogger_sound_map(address_map &map);
-	void frogger_sound_portmap(address_map &map);
-	void froggeram_map(address_map &map);
-	void froggermc_map(address_map &map);
-	void galartic_map(address_map &map);
-	void galaxian_map(address_map &map);
-	void galaxian_map_base(address_map &map);
-	void galaxian_map_discrete(address_map &map);
-	void highroll_map(address_map &map);
-	void jumpbug_map(address_map &map);
-	void jungsub_map(address_map &map);
-	void jungsub_io_map(address_map &map);
-	void konami_sound_map(address_map &map);
-	void konami_sound_portmap(address_map &map);
-	void kong_map(address_map &map);
-	void mandingarf_map(address_map &map);
-	void mandinka_map(address_map &map);
-	void mimonkey_map(address_map &map);
-	void mimonscr_map(address_map &map);
-	void mooncrst_map(address_map &map);
-	void mooncrst_map_base(address_map &map);
-	void mooncrst_map_discrete(address_map &map);
-	void moonqsr_decrypted_opcodes_map(address_map &map);
-	void ozon1_map(address_map &map);
-	void ozon1_io_map(address_map &map);
-	void scobra_map(address_map &map);
-	void scorpnmc_map(address_map &map);
-	void spactrai_map(address_map &map);
-	void takeoff_sound_map(address_map &map);
-	void takeoff_sound_portmap(address_map &map);
-	void theend_map(address_map &map);
-	void thepitm_map(address_map &map);
-	void turpins_map(address_map &map);
-	void turpins_sound_map(address_map &map);
-	void turtles_map(address_map &map);
-	void victoryc_map(address_map &map);
+	void amigo2_map(address_map &map) ATTR_COLD;
+	void anteaterg_map(address_map &map) ATTR_COLD;
+	void anteatergg_map(address_map &map) ATTR_COLD;
+	void anteateruk_map(address_map &map) ATTR_COLD;
+	void astroamb_map(address_map &map) ATTR_COLD;
+	void bigkonggx_map(address_map &map) ATTR_COLD;
+	void bongo_map(address_map &map) ATTR_COLD;
+	void bongog_map(address_map &map) ATTR_COLD;
+	void bongo_io_map(address_map &map) ATTR_COLD;
+	void checkmanj_sound_map(address_map &map) ATTR_COLD;
+	void checkman_sound_map(address_map &map) ATTR_COLD;
+	void checkman_sound_portmap(address_map &map) ATTR_COLD;
+	void ckongg_map(address_map &map) ATTR_COLD;
+	void ckongg_map_base(address_map &map) ATTR_COLD;
+	void ckongmc_map(address_map &map) ATTR_COLD;
+	void ckongs_map(address_map &map) ATTR_COLD;
+	void explorer_map(address_map &map) ATTR_COLD;
+	void fantastc_map(address_map &map) ATTR_COLD;
+	void frogf_map(address_map &map) ATTR_COLD;
+	void frogg_map(address_map &map) ATTR_COLD;
+	void frogger_map(address_map &map) ATTR_COLD;
+	void froggervd_map(address_map &map) ATTR_COLD;
+	void frogger_sound_map(address_map &map) ATTR_COLD;
+	void frogger_sound_portmap(address_map &map) ATTR_COLD;
+	void froggeram_map(address_map &map) ATTR_COLD;
+	void froggermc_map(address_map &map) ATTR_COLD;
+	void galartic_map(address_map &map) ATTR_COLD;
+	void galaxian_map(address_map &map) ATTR_COLD;
+	void galaxian_map_base(address_map &map) ATTR_COLD;
+	void galaxian_map_discrete(address_map &map) ATTR_COLD;
+	void highroll_map(address_map &map) ATTR_COLD;
+	void jumpbug_map(address_map &map) ATTR_COLD;
+	void jumpbugbrf_map(address_map &map) ATTR_COLD;
+	void jungsub_map(address_map &map) ATTR_COLD;
+	void jungsub_io_map(address_map &map) ATTR_COLD;
+	void konami_sound_map(address_map &map) ATTR_COLD;
+	void konami_sound_portmap(address_map &map) ATTR_COLD;
+	void kong_map(address_map &map) ATTR_COLD;
+	void mandingarf_map(address_map &map) ATTR_COLD;
+	void mandinka_map(address_map &map) ATTR_COLD;
+	void mimonkey_map(address_map &map) ATTR_COLD;
+	void mimonscr_map(address_map &map) ATTR_COLD;
+	void mooncrst_map(address_map &map) ATTR_COLD;
+	void mooncrst_map_base(address_map &map) ATTR_COLD;
+	void mooncrst_map_discrete(address_map &map) ATTR_COLD;
+	void moonqsr_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void ozon1_map(address_map &map) ATTR_COLD;
+	void ozon1_io_map(address_map &map) ATTR_COLD;
+	void scobra_map(address_map &map) ATTR_COLD;
+	void scorpnmc_map(address_map &map) ATTR_COLD;
+	void spactrai_map(address_map &map) ATTR_COLD;
+	void takeoff_sound_map(address_map &map) ATTR_COLD;
+	void takeoff_sound_portmap(address_map &map) ATTR_COLD;
+	void theend_map(address_map &map) ATTR_COLD;
+	void thepitm_map(address_map &map) ATTR_COLD;
+	void turpinnv_map(address_map &map) ATTR_COLD;
+	void turpins_map(address_map &map) ATTR_COLD;
+	void turpins_sound_map(address_map &map) ATTR_COLD;
+	void turtles_map(address_map &map) ATTR_COLD;
+	void victoryc_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override
-	{
-		m_lamps.resolve();
-
-		m_irq_enabled = 0;
-	}
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -448,7 +453,6 @@ protected:
 	uint8_t m_stars_blink_state = 0;
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5]{};
-	uint8_t m_leftspriteclip = 16;
 };
 
 
@@ -460,16 +464,16 @@ public:
 	{
 	}
 
-	void bagmanmc(machine_config &config);
-	void init_bagmanmc();
+	void bagmanmc(machine_config &config) ATTR_COLD;
+	void init_bagmanmc() ATTR_COLD;
 
 protected:
 	void bagmanmc_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void bagmanmc_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 private:
-	void bagmanmc_map(address_map &map);
-	void bagmanmc_io_map(address_map &map);
+	void bagmanmc_map(address_map &map) ATTR_COLD;
+	void bagmanmc_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -484,18 +488,18 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
-	void gmgalax(machine_config &config);
+	void gmgalax(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(game_changed);
-	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(port_r);
+	template <int N> ioport_value port_r();
 
-	void init_gmgalax();
+	void init_gmgalax() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void gmgalax_map(address_map &map);
+	void gmgalax_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<3> m_glin;
 	required_ioport_array<3> m_gmin;
@@ -514,20 +518,23 @@ public:
 	{
 	}
 
-	void pisces(machine_config &config);
-	void porter(machine_config &config);
-	void skybase(machine_config &config);
+	void ladybugg2(machine_config &config) ATTR_COLD;
+	void pisces(machine_config &config) ATTR_COLD;
+	void porter(machine_config &config) ATTR_COLD;
+	void skybase(machine_config &config) ATTR_COLD;
 
-	void init_pisces();
+	void init_pisces() ATTR_COLD;
+	void init_porterb() ATTR_COLD;
 
 protected:
 	void pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void pisces_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 private:
-	void pisces_map(address_map &map);
-	void skybase_map(address_map &map);
-	void porter_map(address_map &map);
+	void pisces_map(address_map &map) ATTR_COLD;
+	void skybase_map(address_map &map) ATTR_COLD;
+	void porter_map(address_map &map) ATTR_COLD;
+	void ladybugg2_opcodes_map (address_map &map) ATTR_COLD;
 };
 
 
@@ -540,12 +547,12 @@ public:
 	{
 	}
 
-	void fourplay(machine_config &config);
-	void init_fourplay();
+	void fourplay(machine_config &config) ATTR_COLD;
+	void init_fourplay() ATTR_COLD;
 
 private:
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
-	void fourplay_map(address_map &map);
+	void fourplay_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_rombank;
 };
@@ -559,13 +566,13 @@ public:
 	{
 	}
 
-	void mshuttle(machine_config &config);
+	void mshuttle(machine_config &config) ATTR_COLD;
 
-	void init_mshuttle();
-	void init_mshuttlj();
+	void init_mshuttle() ATTR_COLD;
+	void init_mshuttlj() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ay8910_cs_w(uint8_t data);
@@ -573,9 +580,9 @@ private:
 	void ay8910_data_w(uint8_t data);
 	uint8_t ay8910_data_r();
 
-	void mshuttle_map(address_map &map);
-	void mshuttle_decrypted_opcodes_map(address_map &map);
-	void mshuttle_portmap(address_map &map);
+	void mshuttle_map(address_map &map) ATTR_COLD;
+	void mshuttle_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mshuttle_portmap(address_map &map) ATTR_COLD;
 
 	void mshuttle_decode(const uint8_t convtable[8][16]);
 
@@ -596,10 +603,10 @@ public:
 	int muxbit_r();
 	int noise_r();
 
-	void kingball(machine_config &config);
+	void kingball(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void speech_dip_w(uint8_t data);
@@ -607,9 +614,9 @@ private:
 	void sound2_w(uint8_t data);
 	void dac_w(uint8_t data);
 
-	void kingball_map(address_map &map);
-	void kingball_sound_map(address_map &map);
-	void kingball_sound_portmap(address_map &map);
+	void kingball_map(address_map &map) ATTR_COLD;
+	void kingball_sound_map(address_map &map) ATTR_COLD;
+	void kingball_sound_portmap(address_map &map) ATTR_COLD;
 
 	required_device<dac_byte_interface> m_dac;
 	required_ioport m_mux_port;
@@ -628,14 +635,17 @@ public:
 	{
 	}
 
-	void namenayo(machine_config &config);
-	void init_namenayo();
+	void namenayo(machine_config &config) ATTR_COLD;
+	void init_namenayo() ATTR_COLD;
+
+protected:
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect) override { }
 
 private:
 	void namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void namenayo_map(address_map &map);
+	void namenayo_map(address_map &map) ATTR_COLD;
 	void namenayo_extattr_w(offs_t offset, uint8_t data);
 	void namenayo_unk_d800_w(uint8_t data);
 
@@ -655,12 +665,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(tenspot_fake);
 
-	void tenspot(machine_config &config);
-
-	void init_tenspot();
+	void tenspot(machine_config &config) ATTR_COLD;
+	void init_tenspot() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void unk_6000_w(uint8_t data);
@@ -670,8 +679,8 @@ private:
 
 	void set_game_bank(int bank, bool invalidate_gfx);
 
-	void tenspot_map(address_map &map);
-	void tenspot_select_map(address_map &map);
+	void tenspot_map(address_map &map) ATTR_COLD;
+	void tenspot_select_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<10> m_game_dsw;
 	required_memory_bank m_mainbank;
@@ -689,16 +698,16 @@ public:
 	{
 	}
 
-	void zigzag(machine_config &config);
-	void init_zigzag();
+	void zigzag(machine_config &config) ATTR_COLD;
+	void init_zigzag() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void bankswap_w(uint8_t data);
 	void ay8910_w(offs_t offset, uint8_t data);
-	void zigzag_map(address_map &map);
+	void zigzag_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank_array<2> m_rombanks;
 	uint8_t m_ay8910_latch = 0U;
@@ -714,15 +723,15 @@ public:
 	{
 	}
 
-	void videight(machine_config &config);
-	void init_videight();
+	void videight(machine_config &config) ATTR_COLD;
+	void init_videight() ATTR_COLD;
 
 private:
 	void videight_rombank_w(offs_t offset, uint8_t data);
 	void videight_gfxbank_w(offs_t offset, uint8_t data);
 	void videight_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void videight_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void videight_map(address_map &map);
+	void videight_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_rombank;
 };
@@ -737,14 +746,14 @@ public:
 	{
 	}
 
-	void guttangt(machine_config &config);
-	void guttangts3(machine_config &config);
-	void init_guttangt();
-	void init_guttangts3();
+	void guttangt(machine_config &config) ATTR_COLD;
+	void guttangts3(machine_config &config) ATTR_COLD;
+	void init_guttangt() ATTR_COLD;
+	void init_guttangts3() ATTR_COLD;
 
 private:
-	void guttangt_map(address_map &map);
-	void guttangts3_map(address_map &map);
+	void guttangt_map(address_map &map) ATTR_COLD;
+	void guttangts3_map(address_map &map) ATTR_COLD;
 	void guttangt_rombank_w(uint8_t data);
 
 	optional_memory_bank m_rombank;
@@ -760,8 +769,8 @@ public:
 	{
 	}
 
-	void scorpion(machine_config &config);
-	void init_scorpion();
+	void scorpion(machine_config &config) ATTR_COLD;
+	void init_scorpion() ATTR_COLD;
 
 private:
 	uint8_t ay8910_r(offs_t offset);
@@ -771,9 +780,9 @@ private:
 	uint8_t protection_r();
 	void protection_w(uint8_t data);
 
-	void scorpion_map(address_map &map);
-	void scorpion_sound_map(address_map &map);
-	void scorpion_sound_portmap(address_map &map);
+	void scorpion_map(address_map &map) ATTR_COLD;
+	void scorpion_sound_map(address_map &map) ATTR_COLD;
+	void scorpion_sound_portmap(address_map &map) ATTR_COLD;
 
 	required_device<digitalker_device> m_digitalker;
 };
@@ -789,12 +798,11 @@ public:
 	{
 	}
 
-	void sfx(machine_config &config);
-
-	void init_sfx();
+	void sfx(machine_config &config) ATTR_COLD;
+	void init_sfx() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t sample_io_r(offs_t offset);
 	void sample_io_w(offs_t offset, uint8_t data);
@@ -803,9 +811,9 @@ protected:
 	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sfx_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 
-	void sfx_map(address_map &map);
-	void sfx_sample_map(address_map &map);
-	void sfx_sample_portmap(address_map &map);
+	void sfx_map(address_map &map) ATTR_COLD;
+	void sfx_sample_map(address_map &map) ATTR_COLD;
+	void sfx_sample_portmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audio2;
 	required_device<dac_byte_interface> m_dac;
@@ -824,17 +832,16 @@ public:
 	}
 
 	void monsterz(machine_config& config);
-
-	void init_monsterz();
+	void init_monsterz() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void monsterz_map(address_map& map);
-	void monsterz_sound_map(address_map& map);
-	void monsterz_sound_portmap(address_map& map);
-	void monsterz_sample_map(address_map& map);
+	void monsterz_map(address_map &map) ATTR_COLD;
+	void monsterz_sound_map(address_map &map) ATTR_COLD;
+	void monsterz_sound_portmap(address_map &map) ATTR_COLD;
+	void monsterz_sample_map(address_map &map) ATTR_COLD;
 	void monsterz_ay8910_w(offs_t offset, uint8_t data);
 
 	required_device<dac_byte_interface> m_dac2;
@@ -855,12 +862,12 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+	ioport_value dial_r();
 
-	void moonwar(machine_config &config);
+	void moonwar(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port_select_w(uint8_t data);
@@ -886,19 +893,19 @@ public:
 	{
 	}
 
-	void sbhoei(machine_config &config);
-	void init_sbhoei();
+	void sbhoei(machine_config &config) ATTR_COLD;
+	void init_sbhoei() ATTR_COLD;
 	void sbhoei_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void sbhoei_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void sbhoei_map(address_map &map);
-	void sbhoei_map_discrete(address_map &map);
-	void sbhoei_sound_map(address_map &map);
-	void sbhoei_sound_io_map(address_map &map);
+	void sbhoei_map(address_map &map) ATTR_COLD;
+	void sbhoei_map_discrete(address_map &map) ATTR_COLD;
+	void sbhoei_sound_map(address_map &map) ATTR_COLD;
+	void sbhoei_sound_io_map(address_map &map) ATTR_COLD;
 
 	void sbhoei_palette(palette_device &palette);
 	void sbhoei_soundlatch_w(uint8_t data);
@@ -922,14 +929,14 @@ public:
 	{
 	}
 
-	void bmxstunts(machine_config &config);
-	void init_bmxstunts();
+	void bmxstunts(machine_config &config) ATTR_COLD;
+	void init_bmxstunts() ATTR_COLD;
 	void bmxstunts_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 
 private:
 	required_device<sn76489a_device> m_snsnd;
 
-	void bmxstunts_map(address_map& map);
+	void bmxstunts_map(address_map &map) ATTR_COLD;
 	void snsnd_w(uint8_t data) { m_snsnd->write(bitswap<8>(data,0,1,2,3,4,5,6,7)); }
 };
 

@@ -20,6 +20,7 @@ known chips:
  @049     uPD552C  1981, Bambino Safari (ET-11)
  @054     uPD552C  1980, Epoch Invader From Space
 
+ *024     uPD553C  1981, JIL SX-200 (radio scanner)
  @031     uPD553C  1979, Bambino Super Star Football (ET-03)
  @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
@@ -97,7 +98,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "video/hlcd0515.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -133,8 +134,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<ucom4_cpu_device> m_maincpu;
@@ -339,10 +340,9 @@ void ufombs_state::ufombs(machine_config &config)
 	m_maincpu->write_i().set(FUNC(ufombs_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(243, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	config.set_default_layout(layout_ufombs);
@@ -495,10 +495,9 @@ void ssfball_state::ssfball(machine_config &config)
 	m_maincpu->write_i().set(FUNC(ssfball_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 482);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
@@ -645,10 +644,9 @@ void bmsoccer_state::bmsoccer(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bmsoccer_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(271, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
@@ -765,10 +763,9 @@ void bmsafari_state::bmsafari(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bmsafari_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(248, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 11);
 	config.set_default_layout(layout_bmsafari);
@@ -928,10 +925,9 @@ void splasfgt_state::splasfgt(machine_config &config)
 	m_maincpu->write_i().set(FUNC(splasfgt_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 476);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
 	config.set_default_layout(layout_splasfgt);
@@ -1071,10 +1067,9 @@ void bgunf_state::bgunf(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bgunf_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 528);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
@@ -1171,7 +1166,7 @@ static INPUT_PORTS_START( bgalaxn )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.1") // INT
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_ucom4_state::single_interrupt_line), 0)
 INPUT_PORTS_END
 
 // config
@@ -1190,10 +1185,9 @@ void bgalaxn_state::bgalaxn(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bgalaxn_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(301, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
@@ -1310,10 +1304,9 @@ void bcclimbr_state::bcclimbr(machine_config &config)
 	m_maincpu->write_i().set(FUNC(bcclimbr_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(310, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(6, 20);
 
@@ -1570,7 +1563,7 @@ static INPUT_PORTS_START( ctntune )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Play Button")
 
 	PORT_START("IN.5") // D3 port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, ctntune_state, start_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ctntune_state::start_button), 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1697,10 +1690,9 @@ void einspace_state::einspace(machine_config &config)
 	m_maincpu->write_i().set(FUNC(einspace_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(289, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
@@ -1933,10 +1925,9 @@ void galaxy2_state::galaxy2(machine_config &config)
 	m_maincpu->write_i().set(FUNC(galaxy2_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(304, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 15);
 
@@ -1951,9 +1942,8 @@ void galaxy2_state::galaxy2b(machine_config &config)
 	galaxy2(config);
 
 	// video hardware
-	screen_device *screen = subdevice<screen_device>("screen");
+	screen_svg_device *screen = subdevice<screen_svg_device>("screen");
 	screen->set_size(306, 1080);
-	screen->set_visarea_full();
 }
 
 // roms
@@ -2074,10 +2064,9 @@ void astrocmd_state::astrocmd(machine_config &config)
 	m_maincpu->write_i().set(FUNC(astrocmd_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 525);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
@@ -2190,10 +2179,9 @@ void edracula_state::edracula(machine_config &config)
 	m_maincpu->write_i().set(FUNC(edracula_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 526);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
@@ -2264,14 +2252,14 @@ void mcompgin_state::lcd_w(u8 data)
 
 static INPUT_PORTS_START( mcompgin )
 	PORT_START("IN.0") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Deal / Gin")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Discard")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Draw")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Deal / Gin")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Discard")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Draw")
 
 	PORT_START("IN.1") // port B
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Compare")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Score")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Compare")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Score")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2286,11 +2274,14 @@ void mcompgin_state::mcompgin(machine_config &config)
 	m_maincpu->write_e().set(FUNC(mcompgin_state::lcd_w));
 
 	// video hardware
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 743);
+
 	HLCD0530(config, m_lcd, 500); // C=0.01uF
 	m_lcd->write_cols().set(FUNC(mcompgin_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24);
-
 	config.set_default_layout(layout_mcompgin);
 
 	// no sound!
@@ -2301,6 +2292,9 @@ void mcompgin_state::mcompgin(machine_config &config)
 ROM_START( mcompgin )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "d650c_060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
+
+	ROM_REGION( 331033, "screen", 0)
+	ROM_LOAD( "mcompgin.svg", 0, 331033, CRC(b432b13c) SHA1(6117e30897fcc92de09c69a8d7ede7068e26e43f) )
 ROM_END
 
 
@@ -2511,7 +2505,7 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat")
 
 	PORT_START("IN.4") // INT
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, 0) PORT_NAME("Start-Pitch")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_ucom4_state::single_interrupt_line), 0) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
 
 // config
@@ -2634,10 +2628,9 @@ void tccombat_state::tccombat(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tccombat_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(300, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	config.set_default_layout(layout_tccombat);
@@ -2686,13 +2679,9 @@ public:
 
 	void tmtennis(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { set_clock(); }
-
-protected:
-	virtual void machine_reset() override;
+	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
 
 private:
-	void set_clock();
 	void update_display();
 	void grid_w(offs_t offset, u8 data);
 	void plate_w(offs_t offset, u8 data);
@@ -2700,20 +2689,14 @@ private:
 	u8 input_r(offs_t offset);
 };
 
-void tmtennis_state::machine_reset()
-{
-	hh_ucom4_state::machine_reset();
-	set_clock();
-}
-
 // handlers
 
-void tmtennis_state::set_clock()
+INPUT_CHANGED_MEMBER(tmtennis_state::skill_switch)
 {
 	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
 	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
 	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock((m_inputs[1]->read() & 0x100) ? 260000 : 360000);
+	m_maincpu->set_unscaled_clock((newval & 0x100) ? 260000 : 360000);
 }
 
 void tmtennis_state::update_display()
@@ -2776,9 +2759,9 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
-	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, 0)
+	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tmtennis_state::skill_switch), 0)
 	PORT_CONFSETTING(     0x001, "Practice" )
-	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
+	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> skill_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
 	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x00, "1" )
@@ -2796,7 +2779,7 @@ INPUT_PORTS_END
 void tmtennis_state::tmtennis(machine_config &config)
 {
 	// basic machine hardware
-	NEC_D552(config, m_maincpu, 360000); // see set_clock
+	NEC_D552(config, m_maincpu, 260000); // see skill_switch
 	m_maincpu->read_a().set(FUNC(tmtennis_state::input_r));
 	m_maincpu->read_b().set(FUNC(tmtennis_state::input_r));
 	m_maincpu->write_c().set(FUNC(tmtennis_state::plate_w));
@@ -2808,10 +2791,9 @@ void tmtennis_state::tmtennis(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tmtennis_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 417);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 12);
 	config.set_default_layout(layout_tmtennis);
@@ -2930,10 +2912,9 @@ void tmpacman_state::tmpacman(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tmpacman_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 508);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
@@ -3046,10 +3027,9 @@ void tmscramb_state::tmscramb(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tmscramb_state::grid_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 556);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 16);
 
@@ -3157,10 +3137,9 @@ void tcaveman_state::tcaveman(machine_config &config)
 	m_maincpu->write_i().set(FUNC(tcaveman_state::plate_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920, 559);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
@@ -3305,10 +3284,9 @@ void alnchase_state::alnchase(machine_config &config)
 	m_maincpu->write_i().set(FUNC(alnchase_state::output_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(362, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(9, 17);
 	config.set_default_layout(layout_alnchase);
@@ -3351,13 +3329,13 @@ SYST( 1980, bgunf,    0,        0,      bgunf,    bgunf,    bgunf_state,    empt
 SYST( 1981, bgalaxn,  0,        0,      bgalaxn,  bgalaxn,  bgalaxn_state,  empty_init, "Bandai", "Galaxian (Bandai)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, bcclimbr, 0,        0,      bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1980, tactix,   0,        0,      tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, ctntune,  0,        0,      ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1980, einspace, 0,        0,      einspace, einspace, einspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, efball,   0,        0,      efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, galaxy2,  0,        0,      galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD rev. D)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, galaxy2b, galaxy2,  0,      galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD rev. B)", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, astrocmd, 0,        0,      astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
 SYST( 1982, edracula, 0,        0,      edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
@@ -3365,7 +3343,7 @@ SYST( 1979, mcompgin, 0,        0,      mcompgin, mcompgin, mcompgin_state, empt
 
 SYST( 1979, mvbfree,  0,        0,      mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
+SYST( 1980, grobot9,  0,        0,      grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE ) // some of the games: ***
 
 SYST( 1980, tccombat, 0,        0,      tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, tmtennis, 0,        0,      tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )

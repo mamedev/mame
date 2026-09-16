@@ -50,6 +50,8 @@ mcu_subcmd  = kaneko16_mcu_ram[0x0014/2];    // sub-command parameter, happens o
 #include "emu.h"
 #include "kaneko_toybox.h"
 
+#include "endianness.h"
+
 /***************************************************************************
 
     TOYBOX MCU data for Bonk's Adventure

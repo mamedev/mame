@@ -41,8 +41,8 @@ public:
 	void rd100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -52,7 +52,7 @@ private:
 	int shift_r();
 	int ctrl_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<9> m_keys;
@@ -257,14 +257,14 @@ void rd100_state::rd100(machine_config &config)
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	hd44780_device &hd44780(HD44780(config, "hd44780"));
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(rd100_state::pixel_update));
 

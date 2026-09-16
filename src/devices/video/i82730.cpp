@@ -258,7 +258,7 @@ void i82730_device::mode_set()
 
 	// setup screen mode
 	rectangle visarea(m_mb.hbrdstrt * 16, m_mb.hbrdstp * 16 - 1, m_mb.vsyncstp, m_mb.vfldstp + m_mb.scroll_margin + 1 + m_mb.lpr - 1);
-	attoseconds_t period = HZ_TO_ATTOSECONDS(clock() * 16) * m_mb.line_length * 16 * m_mb.frame_length;
+	attotime period = attotime::from_ticks(m_mb.line_length * 16 * m_mb.frame_length, clock() * 16);
 	screen().configure(m_mb.line_length * 16, m_mb.frame_length, visarea, period);
 
 	// start display is now valid

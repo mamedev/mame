@@ -34,8 +34,8 @@ public:
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void char_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void char_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scn2672_device> m_pvtc;
@@ -74,7 +74,7 @@ void tv924_state::tv924(machine_config &config)
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL)); // SCN2681A
 	duart.irq_cb().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(27'576'960, 848 * 2, 0, 640 * 2, 271, 0, 250);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 
@@ -101,4 +101,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1984, tv924, 0, 0, tv924, tv924, tv924_state, empty_init, "TeleVideo Systems", "TeleVideo 924 Video Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

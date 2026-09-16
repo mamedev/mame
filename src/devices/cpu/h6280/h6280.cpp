@@ -66,7 +66,7 @@
         - Turrican: Allows the game to start
 
         Changed PLX and PLY to set NZ flags. Fixes:
-        - Afterburner: Graphics unpacking
+        - After Burner: Graphics unpacking
         - Aoi Blink: Collision detection with background
 
         Fixed the decimal version of ADC/SBC to *not* update the V flag,
@@ -169,7 +169,7 @@ DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 
 h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, H6280, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21, 0, 16, 0, address_map_constructor(FUNC(h6280_device::internal_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
 	, m_port_in_cb(*this, 0)
@@ -232,8 +232,8 @@ const h6280_device::ophandler h6280_device::s_opcodetable[256] =
 void h6280_device::device_add_mconfig(machine_config &config)
 {
 	C6280(config, m_psg, DERIVED_CLOCK(1,2));
-	m_psg->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_psg->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_psg->add_route(0, *this, 1.0, 0);
+	m_psg->add_route(1, *this, 1.0, 1);
 }
 
 void h6280_device::device_start()
@@ -2266,17 +2266,6 @@ uint32_t h6280_device::execute_min_cycles() const noexcept
 uint32_t h6280_device::execute_max_cycles() const noexcept
 {
 	return 17 + 6*65536;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t h6280_device::execute_input_lines() const noexcept
-{
-	return 4;
 }
 
 

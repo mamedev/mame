@@ -17,7 +17,29 @@ BUGS:
 #include "emu.h"
 #include "beta_m.h"
 
+#include "formats/scl_dsk.h"
 #include "formats/trd_dsk.h"
+
+
+namespace {
+
+void floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add_pc_formats();
+	fr.add(FLOPPY_TRD_FORMAT);
+	fr.add(FLOPPY_SCL_FORMAT);
+}
+
+void beta_disk_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+} // anonymous namespace
 
 
 /***************************************************************************
@@ -47,8 +69,6 @@ void beta_disk_device::device_start()
 	save_item(NAME(m_betadisk_active));
 	save_item(NAME(m_control));
 	save_item(NAME(m_motor_active));
-
-	m_floppy_led.resolve();
 }
 
 //-------------------------------------------------
@@ -173,6 +193,14 @@ void beta_disk_device::data_w(uint8_t data)
 	}
 }
 
+void beta_disk_device::turbo_w(int state)
+{
+	if (m_betadisk_active == 1)
+	{
+		m_wd179x->set_clock_scale(1 << (state & 1));
+	}
+}
+
 void beta_disk_device::fdc_hld_w(int state)
 {
 	m_wd179x->set_force_ready(state); // HLD connected to RDY pin
@@ -195,17 +223,6 @@ void beta_disk_device::motors_control()
 			m_floppy_led[i] = 0;
 		}
 	}
-}
-
-void beta_disk_device::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_TRD_FORMAT);
-}
-
-static void beta_disk_floppies(device_slot_interface &device)
-{
-	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 
@@ -300,7 +317,7 @@ void beta_disk_device::device_add_mconfig(machine_config &config)
 	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
 	m_wd179x->hld_wr_callback().set(FUNC(beta_disk_device::fdc_hld_w));
 	for (auto &floppy : m_floppy)
-		FLOPPY_CONNECTOR(config, floppy, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+		FLOPPY_CONNECTOR(config, floppy, beta_disk_floppies, "525qd", floppy_formats).enable_sound(true);
 }
 
 //-------------------------------------------------

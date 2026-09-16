@@ -68,7 +68,7 @@ public:
 	void tabe22(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -78,12 +78,12 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_device<address_map_bank_device> m_vram_bank;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void vram_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void vram_map(address_map &map) ATTR_COLD;
 
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	void video_ctrl_w(uint8_t data);
 	void crt_brightness_w(uint8_t data);
@@ -242,7 +242,6 @@ void printer_devices(device_slot_interface &device)
 }
 
 static DEVICE_INPUT_DEFAULTS_START( printer_defaults )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_4800 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_4800 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
@@ -255,7 +254,7 @@ void tabe22_state::tabe22(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tabe22_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tabe22_state::io_map);
 
-	ADDRESS_MAP_BANK(config, m_vram_bank, 0);
+	ADDRESS_MAP_BANK(config, m_vram_bank);
 	m_vram_bank->set_map(&tabe22_state::vram_map);
 	m_vram_bank->set_addr_width(13);
 	m_vram_bank->set_data_width(8);
@@ -263,7 +262,7 @@ void tabe22_state::tabe22(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(21.7566_MHz_XTAL, 918, 0, 720, 395, 0, 378); // 80 column mode
 //  m_screen->set_raw(35.8344_MHz_XTAL, 1494, 0, 1188, 395, 0, 378); // 132 column mode

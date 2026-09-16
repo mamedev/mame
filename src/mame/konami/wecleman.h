@@ -46,9 +46,8 @@ public:
 	int hotchase_sound_status_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	enum
 	{
@@ -67,24 +66,24 @@ protected:
 
 	required_region_ptr<uint8_t> m_sprite_region;
 
-	int m_spr_color_offs = 0;
-	int m_prot_state = 0;
-	int m_selected_ip = 0;
-	int m_irqctrl = 0;
-	int m_bgpage[4]{};
-	int m_fgpage[4]{};
-	const int *m_gfx_bank = nullptr;
+	int32_t m_spr_color_offs = 0;
+	int32_t m_prot_state = 0;
+	int32_t m_selected_ip = 0;
+	int32_t m_irqctrl = 0;
+	int32_t m_bgpage[4]{};
+	int32_t m_fgpage[4]{};
+	const int32_t *m_gfx_bank = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_txt_tilemap = nullptr;
-	int m_gameid = 0;
-	int m_spr_offsx = 0;
-	int m_spr_offsy = 0;
-	int m_spr_count = 0;
-	int m_cloud_blend = 0;
-	int m_cloud_ds = 0;
-	int m_cloud_visible = 0;
-	int m_sound_hw_type = 0;
+	int32_t m_gameid = 0;
+	int32_t m_spr_offsx = 0;
+	int32_t m_spr_offsy = 0;
+	int32_t m_spr_count = 0;
+	int32_t m_cloud_blend = 0;
+	int32_t m_cloud_ds = 0;
+	int32_t m_cloud_visible = 0;
+	int32_t m_sound_hw_type = 0;
 	bool m_hotchase_sound_hs = 0;
 	pen_t m_black_pen{};
 
@@ -127,9 +126,9 @@ protected:
 
 	output_finder<1> m_led;
 
-	void wecleman_map(address_map &map);
-	void wecleman_sound_map(address_map &map);
-	void wecleman_sub_map(address_map &map);
+	void wecleman_map(address_map &map) ATTR_COLD;
+	void wecleman_sound_map(address_map &map) ATTR_COLD;
+	void wecleman_sub_map(address_map &map) ATTR_COLD;
 
 	static constexpr int NUM_SPRITES = 256;
 	struct sprite_t
@@ -171,8 +170,8 @@ public:
 	void init_hotchase();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -194,9 +193,9 @@ private:
 
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
 
-	void hotchase_map(address_map &map);
-	void hotchase_sound_map(address_map &map);
-	void hotchase_sub_map(address_map &map);
+	void hotchase_map(address_map &map) ATTR_COLD;
+	void hotchase_sound_map(address_map &map) ATTR_COLD;
+	void hotchase_sub_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KONAMI_WECLEMAN_H

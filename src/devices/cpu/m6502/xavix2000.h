@@ -23,7 +23,7 @@ protected:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 

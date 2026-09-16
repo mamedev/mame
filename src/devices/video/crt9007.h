@@ -71,10 +71,13 @@ public:
 	void ack_w(int state);
 	void lpstb_w(int state);
 
+	// cursor location, for drivers that do not use the CURS output
+	bool cursor_active(unsigned x, unsigned y);
+
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
@@ -90,7 +93,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(frame_update);
 
 private:
-	void crt9007(address_map &map);
+	void crt9007(address_map &map) ATTR_COLD;
 
 	inline uint8_t readbyte(offs_t address);
 
@@ -103,6 +106,7 @@ private:
 	inline void update_drb_timer(bool state);
 	inline void update_dma_timer();
 
+	inline void recompute_cursor();
 	inline void recompute_parameters();
 
 	// address space configurations
@@ -132,6 +136,7 @@ private:
 	bool m_vs;
 	bool m_cblank;
 	bool m_vlt;
+	bool m_curs;
 	bool m_drb;
 	bool m_lpstb;
 
@@ -143,6 +148,10 @@ private:
 	int m_vlt_start;
 	int m_vlt_end;
 	int m_vlt_bottom;
+	int m_curs_start;
+	int m_curs_end;
+	int m_curs_top;
+	int m_curs_bottom;
 	int m_drb_bottom;
 	//int m_wben;
 	//int m_slg;
@@ -151,6 +160,10 @@ private:
 	// DMA
 	bool m_dmar;
 	bool m_ack;
+	uint16_t m_dma_addr;
+	uint16_t m_table_addr;
+	uint16_t m_row_addr;
+	uint8_t m_table_count;
 	uint16_t m_dma_count;
 	uint16_t m_dma_burst;
 	uint8_t m_dma_delay;

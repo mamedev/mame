@@ -8,7 +8,7 @@
 class tigeroad_spr_device : public device_t, public device_gfx_interface
 {
 public:
-	tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tigeroad_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configurations
 	void set_color_base(u16 base) { m_colbase = base; }
@@ -16,8 +16,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* ram, u32 size, bool flip_screen, bool rev_y);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_memory_region m_gfx_region;

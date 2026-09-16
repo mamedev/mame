@@ -26,8 +26,8 @@ public:
 	void embargo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -42,9 +42,9 @@ private:
 	void input_select_w(uint8_t data);
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_data_map(address_map &map);
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
+	void main_data_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_dial_enable_1 = 0;
 	uint8_t m_dial_enable_2 = 0;
@@ -276,7 +276,7 @@ void embargo_state::embargo(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &embargo_state::main_data_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 0, 239);
 	screen.set_refresh_hz(60);

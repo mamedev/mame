@@ -32,11 +32,11 @@ protected:
 	tanbus_tugcombo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -66,12 +66,12 @@ protected:
 	tanbus_tugcombo2716_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device_array<generic_slot_device, 16> m_rom;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -86,12 +86,12 @@ protected:
 	tanbus_tugcombo2732_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device_array<generic_slot_device, 16> m_rom;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -106,10 +106,10 @@ protected:
 	tanbus_tugcombo6116_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 

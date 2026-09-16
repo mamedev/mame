@@ -300,6 +300,7 @@ Notes & Todo:
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -397,26 +398,26 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void bios_io_map(address_map &map);
-	void bios_map(address_map &map);
-	void ppu_map(address_map &map);
-	void cart_map(address_map &map);
-	void cart_a_map(address_map &map);
-	void cart_b_map(address_map &map);
-	void cart_c_map(address_map &map);
-	void cart_d_map(address_map &map);
-	void cart_d2_map(address_map &map);
-	void cart_e_map(address_map &map);
-	void cart_f_map(address_map &map);
-	void cart_f2_map(address_map &map);
-	void cart_g_map(address_map &map);
-	void cart_h_map(address_map &map);
-	void cart_i_map(address_map &map);
-	void cart_k_map(address_map &map);
+	void bios_io_map(address_map &map) ATTR_COLD;
+	void bios_map(address_map &map) ATTR_COLD;
+	void ppu_map(address_map &map) ATTR_COLD;
+	void cart_map(address_map &map) ATTR_COLD;
+	void cart_a_map(address_map &map) ATTR_COLD;
+	void cart_b_map(address_map &map) ATTR_COLD;
+	void cart_c_map(address_map &map) ATTR_COLD;
+	void cart_d_map(address_map &map) ATTR_COLD;
+	void cart_d2_map(address_map &map) ATTR_COLD;
+	void cart_e_map(address_map &map) ATTR_COLD;
+	void cart_f_map(address_map &map) ATTR_COLD;
+	void cart_f2_map(address_map &map) ATTR_COLD;
+	void cart_g_map(address_map &map) ATTR_COLD;
+	void cart_h_map(address_map &map) ATTR_COLD;
+	void cart_i_map(address_map &map) ATTR_COLD;
+	void cart_k_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	struct chr_bank
 	{
@@ -687,8 +688,6 @@ void playch10_state::machine_reset()
 
 void playch10_state::machine_start()
 {
-	m_timedigits.resolve();
-
 	m_vrom = m_vrom_region ? m_vrom_region->base() : nullptr;
 
 	// sanity check: make sure PRG/CHR sizes are powers of 2 and big enough
@@ -1638,7 +1637,7 @@ static INPUT_PORTS_START( playch10 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Channel Select") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(playch10_state, int_detect_r)   // INT Detect
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(playch10_state::int_detect_r))   // INT Detect
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -1926,32 +1925,32 @@ void playch10_state::playch10(machine_config &config)
 	PALETTE(config, "palette", FUNC(playch10_state::playch10_palette), 256);
 	config.set_default_layout(layout_playch10);
 
-	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	screen_device &bottom(SCREEN(config, "bottom"));
 	bottom.set_refresh_hz(60);
 	bottom.set_size(32*8, 262);
 	bottom.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	bottom.set_screen_update(FUNC(playch10_state::screen_update_playch10_bottom));
 
-	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	screen_device &top(SCREEN(config, "top"));
 	top.set_refresh_hz(60);
 	top.set_size(32*8, 262);
 	top.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	top.set_screen_update(FUNC(playch10_state::screen_update_playch10_top));
 	top.screen_vblank().set(FUNC(playch10_state::vblank_irq));
 
-	PPU_2C03B(config, m_ppu, 0);
+	PPU_2C03B(config, m_ppu);
 	m_ppu->set_addrmap(0, &playch10_state::ppu_map);
 	m_ppu->set_screen("bottom");
 	m_ppu->set_cpu_tag("cart");
 	m_ppu->int_callback().set_inputline(m_cartcpu, INPUT_LINE_NMI);
 	m_ppu->int_callback().append(FUNC(playch10_state::int_detect_w));
 
-	NES_ZAPPER_SENSOR(config, m_sensor, 0).set_screen_tag("bottom");
+	NES_ZAPPER_SENSOR(config, m_sensor).set_screen_tag("bottom");
 
 	SPEAKER(config, "mono").front_center();
 	m_cartcpu->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	RP5H01(config, m_rp5h01, 0);
+	RP5H01(config, m_rp5h01);
 }
 
 void playch10_state::playch10_a(machine_config &config)

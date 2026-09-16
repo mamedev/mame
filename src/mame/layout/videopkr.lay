@@ -1,111 +1,98 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca, Grull Osgo.
+
+  Fortune 1 / Video Poker
+  control panel
+
 -->
 <mamelayout version="2">
-	<element name="L0">
-		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.0" />
-		</rect>
-		<text string="  DRAW  ">
+
+	<!-- define elements -->
+
+	<element name="L0" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="DRAW">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L1">
-		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.0" />
-		</rect>
-		<text string=" CANCEL ">
+	<element name="L1" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="CANCEL">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L2">
-		<rect state="0">
-			<color red="0.25" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="0.0" blue="0.0" />
-		</rect>
-		<text string=" HOLD 1 ">
+	<element name="L2" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.20" green="0.20" blue="0.20" /></rect>
+		<text string="HOLD 1">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L3">
-		<rect state="0">
-			<color red="0.25" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="0.0" blue="0.0" />
-		</rect>
-		<text string=" HOLD 2 ">
+	<element name="L3" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.20" green="0.20" blue="0.20" /></rect>
+		<text string="HOLD 2">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L4">
-		<rect state="0">
-			<color red="0.25" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="0.0" blue="0.0" />
-		</rect>
-		<text string=" HOLD 3 ">
+	<element name="L4" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.20" green="0.20" blue="0.20" /></rect>
+		<text string="HOLD 3">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L5">
-		<rect state="0">
-			<color red="0.25" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="0.0" blue="0.0" />
-		</rect>
-		<text string=" HOLD 4 ">
+	<element name="L5" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.20" green="0.20" blue="0.20" /></rect>
+		<text string="HOLD 4">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L6">
-		<rect state="0">
-			<color red="0.25" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="0.0" blue="0.0" />
-		</rect>
-		<text string=" HOLD 5 ">
+	<element name="L6" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.20" green="0.20" blue="0.20" /></rect>
+		<text string="HOLD 5">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
 
-	<element name="L7">
-		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.0" />
-		</rect>
-		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.0" />
-		</rect>
-		<text string="  DEAL  ">
+	<element name="L7" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="DEAL">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.25" width="0.8" height="0.5" />
 		</text>
 	</element>
+
+	<element name="buttonedge_y" defstate="0">
+		<rect state="1"><color red="0.7" green="0.35" blue="0.0" /></rect>
+		<rect state="0"><color red="0.12" green="0.04" blue="0.0" /></rect>
+	</element>
+
+	<element name="buttonedge_w" defstate="0">
+		<rect state="1"><color red="0.77" green="0.77" blue="0.77" /></rect>
+		<rect state="0"><color red="0.12" green="0.12" blue="0.12" /></rect>
+	</element>
+
 
 	<element name="DSKR" defstate="1">
 		<rect state="0">
@@ -126,73 +113,119 @@ license:CC0-1.0
 	</element>
 
 
-	<element name="BX">
-		<rect>
-			<color red="0.00" green="0.00" blue="0.0" />
-		</rect>
-	</element>
-
-	<element name="BZ">
-		<rect>
-			<color red="0.5" green="0.5" blue="0.5" />
-		</rect>
-	</element>
-
 	<element name="Dig1">
 		<led7seg>
 			<color red="0.75" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
 
+
+	<element name="BX">
+		<rect>
+			<color red="0.00" green="0.00" blue="0.0" />
+		</rect>
+	</element>
+
+
+	<!-- define control panel -->
+
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
+
+	<!-- define button-lamps -->
+
+		<element name="lamp0" ref="buttonedge_y" inputtag="IN0" inputmask="0x10">
+			<bounds x="0.06" y="3.12" width="0.44" height="0.24" />
+		</element>
 		<element name="lamp0" ref="L0" inputtag="IN0" inputmask="0x10">
-			<bounds x="0.02313" y="3.12" width="0.5" height="0.30" />
+			<bounds x="0.08" y="3.14" width="0.4" height="0.20" />
+		</element>
+
+		<element name="lamp0" ref="buttonedge_y" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.53" y="3.12" width="0.44" height="0.24" />
 		</element>
 		<element name="lamp0" ref="L1" inputtag="IN0" inputmask="0x20">
-			<bounds x="0.5694" y="3.12" width="0.5" height="0.30" />
+			<bounds x="0.55" y="3.14" width="0.4" height="0.20" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_w" inputtag="IN0" inputmask="0x40">
+			<bounds x="1.02" y="3.12" width="0.39" height="0.24" />
 		</element>
 		<element name="lamp1" ref="L2" inputtag="IN0" inputmask="0x40">
-			<bounds x="1.112" y="3.12" width="0.35" height="0.30" />
+			<bounds x="1.04" y="3.14" width="0.35" height="0.20" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_w" inputtag="IN0" inputmask="0x80">
+			<bounds x="1.44" y="3.12" width="0.39" height="0.24" />
 		</element>
 		<element name="lamp1" ref="L3" inputtag="IN0" inputmask="0x80">
-			<bounds x="1.508" y="3.12" width="0.35" height="0.30" />
+			<bounds x="1.46" y="3.14" width="0.35" height="0.20" />
 		</element>
-		<element name="lamp2" ref="L4" inputtag="IN1" inputmask="0x01">
-			<bounds x="1.904" y="3.12" width="0.35" height="0.30" />
+
+		<element name="lamp1" ref="buttonedge_w" inputtag="IN1" inputmask="0x01">
+			<bounds x="1.86" y="3.12" width="0.39" height="0.24" />
+		</element>
+		<element name="lamp1" ref="L4" inputtag="IN1" inputmask="0x01">
+			<bounds x="1.88" y="3.14" width="0.35" height="0.20" />
+		</element>
+
+		<element name="lamp2" ref="buttonedge_w" inputtag="IN1" inputmask="0x02">
+			<bounds x="2.28" y="3.12" width="0.39" height="0.24" />
 		</element>
 		<element name="lamp2" ref="L5" inputtag="IN1" inputmask="0x02">
-			<bounds x="2.3" y="3.12" width="0.35" height="0.30" />
+			<bounds x="2.30" y="3.14" width="0.35" height="0.20" />
+		</element>
+
+		<element name="lamp2" ref="buttonedge_w" inputtag="IN1" inputmask="0x04">
+			<bounds x="2.70" y="3.12" width="0.39" height="0.24" />
 		</element>
 		<element name="lamp2" ref="L6" inputtag="IN1" inputmask="0x04">
-			<bounds x="2.697" y="3.12" width="0.35" height="0.30" />
+			<bounds x="2.72" y="3.14" width="0.35" height="0.20" />
+		</element>
+
+		<element name="lamp3" ref="buttonedge_y" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.14" y="3.12" width="0.44" height="0.24" />
 		</element>
 		<element name="lamp3" ref="L7" inputtag="IN0" inputmask="0x08">
-			<bounds x="3.093" y="3.12" width="0.5" height="0.30" />
+			<bounds x="3.16" y="3.14" width="0.4" height="0.20" />
 		</element>
+
+
+	<!-- define pulse lamps -->
+
+	<!--
+
+	    // define diverter pulse
+	    <element name="lamp7" ref="DSKV">
+	        <bounds x="0.02" y="3.02" width="0.08" height="0.08" />
+	    </element>
+
+	    // define hopper signal 1
+	    <element name="lamp5" ref="DSKR">
+	        <bounds x="0.12" y="3.02" width="0.08" height="0.08" />
+	    </element>
+
+	    // define hopper signal 2
+	    <element name="lamp6" ref="DSKR">
+	        <bounds x="0.22" y="3.02" width="0.08" height="0.08" />
+	    </element>
+
+	    // define coin accepted pulse
+	    <element name="lamp13" ref="DSKA">
+	        <bounds x="0.32" y="3.02" width="0.08" height="0.08" />
+	    </element>
+
+	-->
+
 		<element ref="BX">
 			<bounds x="3.99" y="3.00" width="0.01" height="0.45" />
 		</element>
 
-		<element ref="BZ">
-			<bounds x="0.01" y="3.01" width="0.42" height="0.10" />
-		</element>
 
-		<element name="lamp7" ref="DSKV">
-			<bounds x="0.02" y="3.02" width="0.08" height="0.08" />
-		</element>
-		<element name="lamp5" ref="DSKR">
-			<bounds x="0.12" y="3.02" width="0.08" height="0.08" />
-		</element>
-		<element name="lamp6" ref="DSKR">
-			<bounds x="0.22" y="3.02" width="0.08" height="0.08" />
-		</element>
-		<element name="lamp13" ref="DSKA">
-			<bounds x="0.32" y="3.02" width="0.08" height="0.08" />
-		</element>
+	<!-- define mech counters -->
 
 		<repeat count="3">
 			<param name="y" start="3.12" increment="0.08" />
@@ -205,5 +238,6 @@ license:CC0-1.0
 				</element>
 			</repeat>
 		</repeat>
+
 	</view>
 </mamelayout>

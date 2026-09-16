@@ -13,12 +13,13 @@
 // TODO: reduce dependence on concrete emu classes
 #include "emu.h"
 #include "main.h"
+#include "render.h"
 #include "uiinput.h"
 
 #include "ui/uimain.h"
 
-#include <SDL2/SDL.h>
-
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 
@@ -55,7 +56,6 @@ void defines_verbose()
 	osd_printf_verbose("\n");
 	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(LSB_FIRST);
-	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_NOASM);
 	MACRO_VERBOSE(MAME_DEBUG);
 	MACRO_VERBOSE(BIGENDIAN);
@@ -168,7 +168,9 @@ sdl_osd_interface::sdl_osd_interface(sdl_options &options) :
 	m_modifier_keys(0),
 	m_last_click_time(std::chrono::steady_clock::time_point::min()),
 	m_last_click_x(0),
-	m_last_click_y(0)
+	m_last_click_y(0),
+	m_enable_touch(false),
+	m_next_ptrdev(0)
 {
 }
 
@@ -260,6 +262,34 @@ void sdl_osd_interface::init(running_machine &machine)
 		}
 	}
 
+	/* do we want touch support or will we use mouse emulation? */
+	m_enable_touch = options().enable_touch();
+	try
+	{
+		if (m_enable_touch)
+		{
+			int const count(SDL_GetNumTouchDevices());
+			m_ptrdev_map.reserve(std::max<int>(count + 1, 8));
+			map_pointer_device(SDL_MOUSE_TOUCHID);
+			for (int i = 0; count > i; ++i)
+			{
+				SDL_TouchID const device(SDL_GetTouchDevice(i));
+				if (device)
+					map_pointer_device(device);
+			}
+		}
+		else
+		{
+			m_ptrdev_map.reserve(1);
+			map_pointer_device(SDL_MOUSE_TOUCHID);
+		}
+	}
+	catch (std::bad_alloc const &)
+	{
+		osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+		// survivable - it will still attempt to allocate mappings when it first sees devices
+	}
+
 #if defined(SDLMAME_ANDROID)
 	SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
 #endif
@@ -343,58 +373,48 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_PGDN);
 			break;
 
-		// OSD hotkeys use LCTRL and start at F3, they start at
-		// F3 because F1-F2 are hardcoded into many drivers to
+		// OSD hotkeys use LALT/LCTRL and start at F3, they start
+		// at F3 because F1-F2 are hardcoded into many drivers to
 		// various dipswitches, and pressing them together with
-		// LCTRL will still press/toggle these dipswitches.
+		// LALT/LCTRL will still press/toggle these dipswitches.
 
-		// add a Not lcrtl condition to the reset key
-		case IPT_UI_SOFT_RESET:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F3, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
-			break;
-
-		// add a Not lcrtl condition to the show gfx key
-		case IPT_UI_SHOW_GFX:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F4, input_seq::not_code, KEYCODE_LCONTROL);
-			break;
-
-		// LCTRL-F5 to toggle OpenGL filtering
+		// LALT-F10 to toggle OpenGL filtering
 		case IPT_OSD_5:
 			entry.configure_osd("TOGGLE_FILTER", N_p("input-name", "Toggle Filter"));
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LCONTROL);
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, KEYCODE_LALT);
 			break;
 
-		// LCTRL-F6 to decrease OpenGL prescaling
+		// add a Not LALT condition to the throttle key
+		case IPT_UI_THROTTLE:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, input_seq::not_code, KEYCODE_LALT);
+			break;
+
+		// LALT-F8 to decrease OpenGL prescaling
 		case IPT_OSD_6:
 			entry.configure_osd("DECREASE_PRESCALE", N_p("input-name", "Decrease Prescaling"));
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, KEYCODE_LCONTROL);
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F8, KEYCODE_LALT);
 			break;
 
-		// add a Not lcrtl condition to the toggle cheat key
-		case IPT_UI_TOGGLE_CHEAT:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, input_seq::not_code, KEYCODE_LCONTROL);
+		// add a Not LALT condition to the frameskip dec key
+		case IPT_UI_FRAMESKIP_DEC:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F8, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT);
 			break;
 
-		// LCTRL-F7 to increase OpenGL prescaling
+		// LALT-F9 to increase OpenGL prescaling
 		case IPT_OSD_7:
 			entry.configure_osd("INCREASE_PRESCALE", N_p("input-name", "Increase Prescaling"));
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, KEYCODE_LCONTROL);
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F9, KEYCODE_LALT);
 			break;
 
-		// lshift-lalt-F12 for fullscreen video (BGFX)
+		// add a Not LALT condition to the load state key
+		case IPT_UI_FRAMESKIP_INC:
+			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F9, input_seq::not_code, KEYCODE_LALT);
+			break;
+
+		// LSHIFT-LALT-F12 for fullscreen video (BGFX)
 		case IPT_OSD_8:
 			entry.configure_osd("RENDER_AVI", N_p("input-name", "Record Rendered Video"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
-			break;
-
-		// add a Not lcrtl condition to the load state key
-		case IPT_UI_LOAD_STATE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
-			break;
-
-		// add a Not lcrtl condition to the throttle key
-		case IPT_UI_THROTTLE:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F10, input_seq::not_code, KEYCODE_LCONTROL);
 			break;
 
 		// disable the config menu if the ALT key is down
@@ -465,33 +485,41 @@ void sdl_osd_interface::process_events()
 			break;
 
 		case SDL_KEYDOWN:
-			if (event.key.keysym.scancode == SDL_SCANCODE_LCTRL)
-				m_modifier_keys |= MODIFIER_KEY_LCTRL;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RCTRL)
-				m_modifier_keys |= MODIFIER_KEY_RCTRL;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
-				m_modifier_keys |= MODIFIER_KEY_LSHIFT;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RSHIFT)
-				m_modifier_keys |= MODIFIER_KEY_RSHIFT;
+			{
+				auto const window = focus_window(event.key);
+				if (!window)
+					break;
 
-			if (event.key.keysym.sym < 0x20)
-			{
-				// push control characters - they don't arrive as text input events
-				machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.keysym.sym);
-			}
-			else if (m_modifier_keys & MODIFIER_KEY_CTRL)
-			{
-				// SDL filters out control characters for text input, so they are decoded here
-				if (event.key.keysym.sym >= 0x40 && event.key.keysym.sym < 0x7f)
+				if (event.key.keysym.scancode == SDL_SCANCODE_LCTRL)
+					m_modifier_keys |= MODIFIER_KEY_LCTRL;
+				else if (event.key.keysym.scancode == SDL_SCANCODE_RCTRL)
+					m_modifier_keys |= MODIFIER_KEY_RCTRL;
+				else if (event.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+					m_modifier_keys |= MODIFIER_KEY_LSHIFT;
+				else if (event.key.keysym.scancode == SDL_SCANCODE_RSHIFT)
+					m_modifier_keys |= MODIFIER_KEY_RSHIFT;
+
+				if (event.key.keysym.sym < 0x20)
 				{
-					machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.keysym.sym & 0x1f);
+					// push control characters - they don't arrive as text input events
+					window->target()->push_char_event(event.key.keysym.sym);
 				}
-				else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
+				else if (m_modifier_keys & MODIFIER_KEY_CTRL)
 				{
-					if (event.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
-						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1e);
-					else if (event.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
-						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1f);
+					// SDL filters out control characters for text input, so they are decoded here
+					if (event.key.keysym.sym >= 0x40 && event.key.keysym.sym < 0x7f)
+					{
+						window->target()->push_char_event(event.key.keysym.sym & 0x1f);
+					}
+					else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
+					{
+						if (event.key.keysym.sym == SDLK_2) // Ctrl-@ (NUL)
+							window->target()->push_char_event(0x00);
+						else if (event.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
+							window->target()->push_char_event(0x1e);
+						else if (event.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
+							window->target()->push_char_event(0x1f);
+					}
 				}
 			}
 			break;
@@ -512,74 +540,126 @@ void sdl_osd_interface::process_events()
 			break;
 
 		case SDL_MOUSEMOTION:
+			if (!m_enable_touch || (SDL_TOUCH_MOUSEID != event.motion.which))
 			{
-				int cx, cy;
-				auto const window = focus_window(event.motion);
-				if (window && window->xy_to_render_target(event.motion.x, event.motion.y, &cx, &cy))
-					machine().ui_input().push_mouse_move_event(window->target(), cx, cy);
+				auto const window = window_from_id(event.motion.windowID);
+				if (!window)
+					break;
+
+				unsigned device;
+				try
+				{
+					device = map_pointer_device(SDL_MOUSE_TOUCHID);
+				}
+				catch (std::bad_alloc const &)
+				{
+					osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+					break;
+				}
+
+				int x, y;
+				window->xy_to_render_target(event.motion.x, event.motion.y, &x, &y);
+				window->mouse_moved(device, x, y);
 			}
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
-			//printf("But down %d %d %d %d %s\n", event.button.which, event.button.button, event.button.x, event.button.y, devinfo->name.c_str());
-			if (event.button.button == 1)
-			{
-				int cx, cy;
-				auto const window = focus_window(event.button);
-				if (window && window->xy_to_render_target(event.button.x, event.button.y, &cx, &cy))
-				{
-					auto const double_click_speed = std::chrono::milliseconds(250);
-					auto const click = std::chrono::steady_clock::now();
-					machine().ui_input().push_mouse_down_event(window->target(), cx, cy);
-
-					// avoid overflow with std::chrono::time_point::min() by adding rather than subtracting
-					if (click < (m_last_click_time + double_click_speed)
-						&& (cx >= (m_last_click_x - 4) && cx <= (m_last_click_x + 4))
-						&& (cy >= (m_last_click_y - 4) && cy <= (m_last_click_y + 4)))
-					{
-						m_last_click_time = std::chrono::time_point<std::chrono::steady_clock>::min();
-						machine().ui_input().push_mouse_double_click_event(window->target(), cx, cy);
-					}
-					else
-					{
-						m_last_click_time = click;
-						m_last_click_x = cx;
-						m_last_click_y = cy;
-					}
-				}
-			}
-			else if (event.button.button == 3)
-			{
-				int cx, cy;
-				auto const window = focus_window(event.button);
-				if (window != nullptr && window->xy_to_render_target(event.button.x, event.button.y, &cx, &cy))
-					machine().ui_input().push_mouse_rdown_event(window->target(), cx, cy);
-			}
-			break;
-
 		case SDL_MOUSEBUTTONUP:
-			//printf("But up %d %d %d %d\n", event.button.which, event.button.button, event.button.x, event.button.y);
-			if (event.button.button == 1)
+			if (!m_enable_touch || (SDL_TOUCH_MOUSEID != event.button.which))
 			{
-				int cx, cy;
-				auto const window = focus_window(event.button);
-				if (window && window->xy_to_render_target(event.button.x, event.button.y, &cx, &cy))
-					machine().ui_input().push_mouse_up_event(window->target(), cx, cy);
-			}
-			else if (event.button.button == 3)
-			{
-				int cx, cy;
-				auto window = focus_window(event.button);
-				if (window && window->xy_to_render_target(event.button.x, event.button.y, &cx, &cy))
-					machine().ui_input().push_mouse_rup_event(window->target(), cx, cy);
+				auto const window = window_from_id(event.button.windowID);
+				if (!window)
+					break;
+
+				unsigned device;
+				try
+				{
+					device = map_pointer_device(SDL_MOUSE_TOUCHID);
+				}
+				catch (std::bad_alloc const &)
+				{
+					osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+					break;
+				}
+
+				int x, y;
+				window->xy_to_render_target(event.button.x, event.button.y, &x, &y);
+				unsigned button(event.button.button - 1);
+				if ((1 == button) || (2 == button))
+					button ^= 3;
+				if (SDL_PRESSED == event.button.state)
+					window->mouse_down(device, x, y, button);
+				else
+					window->mouse_up(device, x, y, button);
 			}
 			break;
 
 		case SDL_MOUSEWHEEL:
 			{
-				auto const window = focus_window(event.wheel);
+				auto const window = window_from_id(event.wheel.windowID);
 				if (window)
-					machine().ui_input().push_mouse_wheel_event(window->target(), 0, 0, event.wheel.y, 3);
+				{
+					unsigned device;
+					try
+					{
+						device = map_pointer_device(SDL_MOUSE_TOUCHID);
+					}
+					catch (std::bad_alloc const &)
+					{
+						osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+						break;
+					}
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+					window->mouse_wheel(device, std::lround(event.wheel.preciseY * 120));
+#else
+					window->mouse_wheel(device, event.wheel.y);
+#endif
+				}
+			}
+			break;
+
+		case SDL_FINGERMOTION:
+		case SDL_FINGERDOWN:
+		case SDL_FINGERUP:
+			if (m_enable_touch && (SDL_MOUSE_TOUCHID != event.tfinger.touchId))
+			{
+				// ignore if it doesn't map to a window we own
+				auto const window = window_from_id(event.tfinger.windowID);
+				if (!window)
+					break;
+
+				// map SDL touch device ID to a zero-based device number
+				unsigned device;
+				try
+				{
+					device = map_pointer_device(event.tfinger.touchId);
+				}
+				catch (std::bad_alloc const &)
+				{
+					osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+					break;
+				}
+
+				// convert normalised coordinates to what MAME wants
+				auto const size = window->get_size();
+				int const winx = std::lround(event.tfinger.x * size.width());
+				int const winy = std::lround(event.tfinger.y * size.height());
+				int x, y;
+				window->xy_to_render_target(winx, winy, &x, &y);
+
+				// call appropriate window method
+				switch (event.type)
+				{
+				case SDL_FINGERMOTION:
+					window->finger_moved(event.tfinger.fingerId, device, x, y);
+					break;
+				case SDL_FINGERDOWN:
+					window->finger_down(event.tfinger.fingerId, device, x, y);
+					break;
+				case SDL_FINGERUP:
+					window->finger_up(event.tfinger.fingerId, device, x, y);
+					break;
+				}
 			}
 			break;
 		}
@@ -630,29 +710,54 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		if (!window->fullscreen())
 #endif
 		{
-			//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
-			window->resize(event.window.data1, event.window.data2);
+			//osd_printf_info("got resize SDL window %s OSD window %p target %d (%d x %d)\n", event.window.windowID, window, window->target()->index(), event.window.data1, event.window.data2);
+			window->renderer().notify_changed();
 		}
 		break;
 
 	case SDL_WINDOWEVENT_ENTER:
-		m_mouse_over_window = 1;
+		{
+			m_mouse_over_window = 1;
+			unsigned device;
+			try
+			{
+				device = map_pointer_device(SDL_MOUSE_TOUCHID);
+			}
+			catch (std::bad_alloc const &)
+			{
+				osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+				break;
+			}
+			window->mouse_entered(device);
+		}
 		break;
 
 	case SDL_WINDOWEVENT_LEAVE:
-		machine().ui_input().push_mouse_leave_event(window->target());
-		m_mouse_over_window = 0;
+		{
+			m_mouse_over_window = 0;
+			unsigned device;
+			try
+			{
+				device = map_pointer_device(SDL_MOUSE_TOUCHID);
+			}
+			catch (std::bad_alloc const &)
+			{
+				osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
+				break;
+			}
+			window->mouse_left(device);
+		}
 		break;
 
 	case SDL_WINDOWEVENT_FOCUS_GAINED:
 		m_focus_window = window;
-		machine().ui_input().push_window_focus_event(window->target());
+		window->target()->push_window_focus_event();
 		break;
 
 	case SDL_WINDOWEVENT_FOCUS_LOST:
 		if (window == m_focus_window)
 			m_focus_window = nullptr;
-		machine().ui_input().push_window_defocus_event(window->target());
+		window->target()->push_window_defocus_event();
 		break;
 
 	case SDL_WINDOWEVENT_CLOSE:
@@ -667,7 +772,7 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 	{
 		auto const window = focus_window(event.text);
 		//printf("Focus window is %p - wl %p\n", window, osd_common_t::window_list().front().get());
-		if (window != nullptr)
+		if (window)
 		{
 			auto ptr = event.text.text;
 			auto len = std::strlen(event.text.text);
@@ -682,7 +787,7 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 				}
 				ptr += chlen;
 				len -= chlen;
-				machine().ui_input().push_char_event(window->target(), ch);
+				window->target()->push_char_event(ch);
 			}
 		}
 	}
@@ -692,7 +797,8 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 void sdl_osd_interface::check_osd_inputs()
 {
 	// check for toggling fullscreen mode (don't do this in debug mode)
-	if (machine().ui_input().pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	auto &inp = machine().ui_input();
+	if (inp.pressed(IPT_OSD_1) && !(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
 		for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)
@@ -705,21 +811,21 @@ void sdl_osd_interface::check_osd_inputs()
 
 	if (USE_OPENGL)
 	{
-		//FIXME: on a per window basis
-		if (machine().ui_input().pressed(IPT_OSD_5))
+		// FIXME: on a per window basis
+		if (inp.pressed(IPT_OSD_5))
 		{
 			video_config.filter = !video_config.filter;
 			machine().ui().popup_time(1, "Filter %s", video_config.filter? "enabled" : "disabled");
 		}
 	}
 
-	if (machine().ui_input().pressed(IPT_OSD_6))
+	if (inp.pressed(IPT_OSD_6))
 		dynamic_cast<sdl_window_info &>(*window).modify_prescale(-1);
 
-	if (machine().ui_input().pressed(IPT_OSD_7))
+	if (inp.pressed(IPT_OSD_7))
 		dynamic_cast<sdl_window_info &>(*window).modify_prescale(1);
 
-	if (machine().ui_input().pressed(IPT_OSD_8))
+	if (inp.pressed(IPT_OSD_8))
 		window->renderer().record();
 }
 
@@ -727,9 +833,28 @@ void sdl_osd_interface::check_osd_inputs()
 template <typename T>
 sdl_window_info *sdl_osd_interface::focus_window(T const &event) const
 {
-	// FIXME: SDL does not properly report the window for certain OS.
-	if (false)
+	// FIXME: SDL does not properly report the window for certain versions of Ubuntu - is this still relevant?
+	if (m_enable_touch)
 		return window_from_id(event.windowID);
 	else
 		return m_focus_window;
+}
+
+
+unsigned sdl_osd_interface::map_pointer_device(SDL_TouchID device)
+{
+	auto devpos(std::lower_bound(
+			m_ptrdev_map.begin(),
+			m_ptrdev_map.end(),
+			device,
+			[] (std::pair<SDL_TouchID, unsigned> const &mapping, SDL_TouchID id)
+			{
+				return mapping.first < id;
+			}));
+	if ((m_ptrdev_map.end() == devpos) || (device != devpos->first))
+	{
+		devpos = m_ptrdev_map.emplace(devpos, device, m_next_ptrdev);
+		++m_next_ptrdev;
+	}
+	return devpos->second;
 }

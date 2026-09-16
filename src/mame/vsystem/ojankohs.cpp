@@ -1,5 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Takahiro Nogi, Uki, Dirk Best
+
 /***************************************************************************
 
     Video System Mahjong hardware
@@ -27,13 +28,464 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ojankohs.h"
+
+#include "vsystem_gga.h"
+
+#include "mahjong.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "vsystem_gga.h"
+#include "sound/msm5205.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class ojankohs_state : public driver_device
+{
+public:
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x1000, 0x800)
+	{ }
+
+	void ojankohs(machine_config &config) ATTR_COLD;
+
+protected:
+	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
+		driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram", vramsize, ENDIANNESS_LITTLE),
+		m_colorram(*this, "colorram", 0x1000, ENDIANNESS_LITTLE),
+		m_paletteram(*this, "paletteram", pramsize, ENDIANNESS_LITTLE),
+		m_mainbank(*this, "mainbank"),
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_coin(*this, "coin"),
+		m_inputs_p{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } },
+		m_dsw(*this, "dsw%u", 1U)
+	{ }
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	void common_state_saving() ATTR_COLD;
+
+	// memory pointers
+	memory_share_creator<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_colorram;
+	memory_share_creator<uint8_t> m_paletteram;
+	required_memory_bank m_mainbank;
+
+	// video-related
+	tilemap_t *m_tilemap = nullptr;
+	bitmap_ind16 m_tmpbitmap;
+	uint8_t m_gfxreg = 0;
+	uint8_t m_flipscreen = 0;
+	uint8_t m_flipscreen_old = 0;
+	int16_t m_scrollx = 0;
+	int16_t m_scrolly = 0;
+	uint8_t m_screen_refresh = 0;
+
+	// misc
+	uint8_t m_port_select = 0;
+	uint8_t m_adpcm_reset = 0;
+	int m_adpcm_data = 0;
+	uint8_t m_vclk_left = 0;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
+	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	// I/O ports
+	required_ioport m_coin;
+	required_ioport_array<5> m_inputs_p[2];
+	required_ioport_array<2> m_dsw;
+
+
+	void rombank_w(uint8_t data);
+	void msm5205_w(uint8_t data);
+	void port_select_w(uint8_t data);
+	template <unsigned P> uint8_t keymatrix_r();
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void adpcm_reset_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void adpcm_int(int state);
+
+private:
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t dipsw1_r();
+	uint8_t dipsw2_r();
+	void gfxreg_w(uint8_t data);
+
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
+};
+
+class ojankoy_state : public ojankohs_state
+{
+public:
+	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x2000, 0x800)
+	{ }
+
+	void ojankoy(machine_config &config) ATTR_COLD;
+
+protected:
+	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
+		ojankohs_state(mconfig, type, tag, vramsize, pramsize)
+	{ }
+
+	virtual void video_start() override ATTR_COLD;
+
+	void map(address_map &map) ATTR_COLD;
+
+	void rombank_adpcm_reset_w(uint8_t data);
+
+private:
+	void coinctr_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+class ccasino_state : public ojankoy_state
+{
+public:
+	ccasino_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankoy_state(mconfig, type, tag, 0x2000, 0x800),
+		m_extra_dsw(*this, "dsw%u", 3U)
+	{ }
+
+	void ccasino(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override  ATTR_COLD { ojankohs_state::machine_start(); }
+
+private:
+	required_ioport_array<2> m_extra_dsw;
+
+	uint8_t dipsw3_r();
+	uint8_t dipsw4_r();
+	void coinctr_w(uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+class ojankoc_state : public ojankohs_state
+{
+public:
+	ojankoc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ojankohs_state(mconfig, type, tag, 0x8000, 0x20)
+	{ }
+
+	void ojankoc(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void ctrl_w(uint8_t data);
+	template <unsigned P> uint8_t keymatrix_r();
+	void palette_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void flipscreen(uint8_t data);
+	void io_map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
+};
+
+
+/******************************************************************************
+
+    Palette system
+
+******************************************************************************/
+
+void ojankoy_state::palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0 = BIT(color_prom[0], 2);
+		int bit1 = BIT(color_prom[0], 3);
+		int bit2 = BIT(color_prom[0], 4);
+		int bit3 = BIT(color_prom[0], 5);
+		int bit4 = BIT(color_prom[0], 6);
+		int const r = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+
+		bit0 = BIT(color_prom[palette.entries()], 5);
+		bit1 = BIT(color_prom[palette.entries()], 6);
+		bit2 = BIT(color_prom[palette.entries()], 7);
+		bit3 = BIT(color_prom[0], 0);
+		bit4 = BIT(color_prom[0], 1);
+		int const g = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+
+		bit0 = BIT(color_prom[palette.entries()], 0);
+		bit1 = BIT(color_prom[palette.entries()], 1);
+		bit2 = BIT(color_prom[palette.entries()], 2);
+		bit3 = BIT(color_prom[palette.entries()], 3);
+		bit4 = BIT(color_prom[palette.entries()], 4);
+		int const b = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
+	}
+}
+
+void ojankohs_state::palette_w(offs_t offset, uint8_t data)
+{
+	m_paletteram[offset] = data;
+
+	offset &= 0x7fe;
+
+	int const r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	int const g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	int const b = (m_paletteram[offset + 1] & 0x1f) >> 0;
+
+	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
+void ccasino_state::palette_w(offs_t offset, uint8_t data)
+{
+	offset = bitswap<11>(offset, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
+
+	m_paletteram[offset] = data;
+
+	offset &= 0x7fe;
+
+	int const r = (m_paletteram[offset + 0] & 0x7c) >> 2;
+	int const g = ((m_paletteram[offset + 0] & 0x03) << 3) | ((m_paletteram[offset + 1] & 0xe0) >> 5);
+	int const b = (m_paletteram[offset + 1] & 0x1f) >> 0;
+
+	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
+void ojankoc_state::palette_w(offs_t offset, uint8_t data)
+{
+	if (m_paletteram[offset] != data)
+	{
+		m_paletteram[offset] = data;
+		m_screen_refresh = 1;
+
+		int const color = (m_paletteram[offset & 0x1e] << 8) | m_paletteram[offset | 0x01];
+
+		int const r = (color >> 10) & 0x1f;
+		int const g = (color >>  5) & 0x1f;
+		int const b = (color >>  0) & 0x1f;
+
+		m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+}
+
+
+/******************************************************************************
+
+    Tilemap system
+
+******************************************************************************/
+
+void ojankohs_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void ojankohs_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
+}
+
+void ojankohs_state::gfxreg_w(uint8_t data)
+{
+	if (m_gfxreg != data)
+	{
+		m_gfxreg = data;
+		m_tilemap->mark_all_dirty();
+	}
+}
+
+void ojankohs_state::flipscreen_w(uint8_t data)
+{
+	if (m_flipscreen != BIT(data, 0))
+	{
+		m_flipscreen = BIT(data, 0);
+
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+
+		if (m_flipscreen)
+		{
+			m_scrollx = -0xe0;
+			m_scrolly = -0x20;
+		}
+		else
+		{
+			m_scrollx = 0;
+			m_scrolly = 0;
+		}
+	}
+}
+
+TILE_GET_INFO_MEMBER(ojankohs_state::get_tile_info)
+{
+	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
+	int color = (m_colorram[tile_index] & 0xe0) >> 5;
+
+	if (m_colorram[tile_index] & 0x10)
+	{
+		tile |= (m_gfxreg & 0x07) << 12;
+		color |= (m_gfxreg & 0xe0) >> 2;
+	}
+
+	tileinfo.set(0, tile, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(ojankoy_state::get_tile_info)
+{
+	int const tile = m_videoram[tile_index] | (m_videoram[tile_index + 0x1000] << 8);
+	int const color = m_colorram[tile_index] & 0x3f;
+	int const flipx = ((m_colorram[tile_index] & 0x40) >> 6) ? TILEMAP_FLIPX : 0;
+	int const flipy = ((m_colorram[tile_index] & 0x80) >> 7) ? TILEMAP_FLIPY : 0;
+
+	tileinfo.set(0, tile, color, (flipx | flipy));
+}
+
+
+/******************************************************************************
+
+    Pixel system
+
+******************************************************************************/
+
+void ojankoc_state::flipscreen(uint8_t data)
+{
+	m_flipscreen = BIT(data, 7);
+
+	if (m_flipscreen == m_flipscreen_old)
+		return;
+
+	for (int y = 0; y < 0x40; y++)
+	{
+		for (int x = 0; x < 0x100; x++)
+		{
+			uint8_t color1 = m_videoram[0x0000 + ((y * 256) + x)];
+			uint8_t color2 = m_videoram[0x3fff - ((y * 256) + x)];
+			videoram_w(0x0000 + ((y * 256) + x), color2);
+			videoram_w(0x3fff - ((y * 256) + x), color1);
+
+			color1 = m_videoram[0x4000 + ((y * 256) + x)];
+			color2 = m_videoram[0x7fff - ((y * 256) + x)];
+			videoram_w(0x4000 + ((y * 256) + x), color2);
+			videoram_w(0x7fff - ((y * 256) + x), color1);
+		}
+	}
+
+	m_flipscreen_old = m_flipscreen;
+}
+
+void ojankoc_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+
+	uint8_t color1 = m_videoram[offset & 0x3fff];
+	uint8_t color2 = m_videoram[offset | 0x4000];
+
+	uint8_t y = offset >> 6;
+	uint8_t x = (offset & 0x3f) << 2;
+	uint8_t xx = 0;
+
+	if (m_flipscreen)
+	{
+		x = 0xfc - x;
+		y = 0xff - y;
+		xx = 3;
+	}
+
+	for (int i = 0; i < 4; i++)
+	{
+		uint8_t color = ((color1 & 0x01) >> 0) | ((color1 & 0x10) >> 3) | ((color2 & 0x01) << 2) | ((color2 & 0x10) >> 1);
+
+		uint8_t px = x + (i ^ xx);
+		uint8_t py = y;
+
+		m_tmpbitmap.pix(py, px) = color;
+
+		color1 >>= 1;
+		color2 >>= 1;
+	}
+}
+
+
+/******************************************************************************
+
+    Start the video hardware emulation
+
+******************************************************************************/
+
+void ojankohs_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+}
+
+void ojankoy_state::video_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankoy_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+}
+
+void ojankoc_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_tmpbitmap);
+
+	save_item(NAME(m_tmpbitmap));
+}
+
+
+/******************************************************************************
+
+    Display refresh
+
+******************************************************************************/
+
+uint32_t ojankohs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tilemap->set_scrollx(0, m_scrollx);
+	m_tilemap->set_scrolly(0, m_scrolly);
+
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+uint32_t ojankoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_screen_refresh)
+	{
+		// redraw bitmap
+		for (int offs = 0; offs < 0x8000; offs++)
+		{
+			videoram_w(offs, m_videoram[offs]);
+		}
+		m_screen_refresh = 0;
+	}
+
+	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
 
 void ojankohs_state::rombank_w(uint8_t data)
@@ -128,8 +580,8 @@ void ojankohs_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("system").w(FUNC(ojankohs_state::port_select_w));
-	map(0x01, 0x01).rw(FUNC(ojankohs_state::keymatrix_p1_r), FUNC(ojankohs_state::rombank_w));
-	map(0x02, 0x02).rw(FUNC(ojankohs_state::keymatrix_p2_r), FUNC(ojankohs_state::gfxreg_w));
+	map(0x01, 0x01).rw(FUNC(ojankohs_state::keymatrix_r<0>), FUNC(ojankohs_state::rombank_w));
+	map(0x02, 0x02).rw(FUNC(ojankohs_state::keymatrix_r<1>), FUNC(ojankohs_state::gfxreg_w));
 	map(0x03, 0x03).w(FUNC(ojankohs_state::adpcm_reset_w));
 	map(0x04, 0x04).w(FUNC(ojankohs_state::flipscreen_w));
 	map(0x05, 0x05).w(FUNC(ojankohs_state::msm5205_w));
@@ -142,8 +594,8 @@ void ojankoy_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("system").w(FUNC(ojankoy_state::port_select_w));
-	map(0x01, 0x01).rw(FUNC(ojankoy_state::keymatrix_p1_r), FUNC(ojankoy_state::rombank_adpcm_reset_w));
-	map(0x02, 0x02).rw(FUNC(ojankoy_state::keymatrix_p2_r), FUNC(ojankoy_state::coinctr_w));
+	map(0x01, 0x01).rw(FUNC(ojankoy_state::keymatrix_r<0>), FUNC(ojankoy_state::rombank_adpcm_reset_w));
+	map(0x02, 0x02).rw(FUNC(ojankoy_state::keymatrix_r<1>), FUNC(ojankoy_state::coinctr_w));
 	map(0x04, 0x04).w(FUNC(ojankoy_state::flipscreen_w));
 	map(0x05, 0x05).w(FUNC(ojankoy_state::msm5205_w));
 	map(0x06, 0x06).r("aysnd", FUNC(ay8910_device::data_r));
@@ -153,8 +605,8 @@ void ojankoy_state::io_map(address_map &map)
 void ccasino_state::io_map(address_map &map)
 {
 	map(0x00, 0x00).mirror(0xff00).portr("system").w(FUNC(ccasino_state::port_select_w));
-	map(0x01, 0x01).mirror(0xff00).rw(FUNC(ccasino_state::keymatrix_p1_r), FUNC(ccasino_state::rombank_w));
-	map(0x02, 0x02).mirror(0xff00).rw(FUNC(ccasino_state::keymatrix_p2_r), FUNC(ccasino_state::coinctr_w));
+	map(0x01, 0x01).mirror(0xff00).rw(FUNC(ccasino_state::keymatrix_r<0>), FUNC(ccasino_state::rombank_w));
+	map(0x02, 0x02).mirror(0xff00).rw(FUNC(ccasino_state::keymatrix_r<1>), FUNC(ccasino_state::coinctr_w));
 	map(0x03, 0x03).mirror(0xff00).r(FUNC(ccasino_state::dipsw3_r)).w(FUNC(ccasino_state::adpcm_reset_w));
 	map(0x04, 0x04).mirror(0xff00).r(FUNC(ccasino_state::dipsw4_r)).w(FUNC(ccasino_state::flipscreen_w));
 	map(0x05, 0x05).mirror(0xff00).w(FUNC(ccasino_state::msm5205_w));
@@ -170,8 +622,8 @@ void ojankoc_state::io_map(address_map &map)
 	map(0x00, 0x1f).w(FUNC(ojankoc_state::palette_w));
 	map(0xf9, 0xf9).w(FUNC(ojankoc_state::msm5205_w));
 	map(0xfb, 0xfb).w(FUNC(ojankoc_state::ctrl_w));
-	map(0xfc, 0xfc).r(FUNC(ojankoc_state::keymatrix_p1_r));
-	map(0xfd, 0xfd).r(FUNC(ojankoc_state::keymatrix_p2_r));
+	map(0xfc, 0xfc).r(FUNC(ojankoc_state::keymatrix_r<0>));
+	map(0xfd, 0xfd).r(FUNC(ojankoc_state::keymatrix_r<1>));
 	map(0xfd, 0xfd).w(FUNC(ojankoc_state::port_select_w));
 	map(0xfe, 0xff).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0xff, 0xff).r("aysnd", FUNC(ay8910_device::data_r));
@@ -195,95 +647,7 @@ static INPUT_PORTS_START( ojankohs )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("p1_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p1_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p1_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p1_3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p1_4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p2_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M)     PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN)   PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p2_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N)     PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET)   PORT_PLAYER(2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p2_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON)   PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p2_3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("p2_4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE) PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE)       PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP)   PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG)         PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL)       PORT_PLAYER(2)
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_INCLUDE(mahjong_matrix_2p_bet_wup)
 
 	PORT_START("dsw1")
 	PORT_DIPNAME(0x07, 0x07, DEF_STR( Difficulty ))       PORT_DIPLOCATION("DSW1:1,2,3")
@@ -420,8 +784,8 @@ static INPUT_PORTS_START( ccasino )
 
 	PORT_START("dsw4")
 	PORT_DIPNAME(0x01, 0x01, DEF_STR( Coin_B ))    PORT_DIPLOCATION("DSW4:1")
-	PORT_DIPSETTING(   0x01, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(   0x00, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(   0x01, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_20C ) )
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
 	PORT_DIPNAME(0x0c, 0x0c, DEF_STR( Coin_A ))    PORT_DIPLOCATION("DSW4:3,4")
 	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_1C ))
@@ -440,77 +804,7 @@ static INPUT_PORTS_START( ojankoc )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN1)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("p1_0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_E)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_M)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_START1)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p1_1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_B)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_N)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p1_2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_C)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_RON)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p1_3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_D)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_L)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_PON)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p2_0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_A)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_E)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_I)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_M)     PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN)   PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_START2)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p2_1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_B)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_F)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_J)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_N)     PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p2_2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_C)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_K)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_RON)   PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("p2_3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_D)     PORT_PLAYER(2)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_H)     PORT_PLAYER(2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_L)     PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_PON)   PORT_PLAYER(2)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_INCLUDE(mahjong_matrix_2p)
 
 	PORT_START("dsw1")
 	PORT_DIPNAME(0x01, 0x01, DEF_STR( Flip_Screen ))  PORT_DIPLOCATION("DSW1:1")
@@ -549,62 +843,32 @@ void ojankohs_state::port_select_w(uint8_t data)
 	m_port_select = data;
 }
 
-uint8_t ojankohs_state::keymatrix_p1_r()
+template <unsigned P>
+uint8_t ojankohs_state::keymatrix_r()
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0x3f;
 
-	if (BIT(m_port_select, 0)) data &= m_inputs_p1[0]->read();
-	if (BIT(m_port_select, 1)) data &= m_inputs_p1[1]->read();
-	if (BIT(m_port_select, 2)) data &= m_inputs_p1[2]->read();
-	if (BIT(m_port_select, 3)) data &= m_inputs_p1[3]->read();
-	if (BIT(m_port_select, 4)) data &= m_inputs_p1_extra->read();
+	for (unsigned i = 0; m_inputs_p[P].size() > i; ++i)
+	{
+		if (BIT(m_port_select, i))
+			data &= m_inputs_p[P][i]->read();
+	}
 
-	data &= m_coin->read();
-
-	return data;
+	return (data & 0x3f) | (m_coin->read() & 0xc0);
 }
 
-uint8_t ojankohs_state::keymatrix_p2_r()
+template <unsigned P>
+uint8_t ojankoc_state::keymatrix_r()
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0x3f;
 
-	if (BIT(m_port_select, 0)) data &= m_inputs_p2[0]->read();
-	if (BIT(m_port_select, 1)) data &= m_inputs_p2[1]->read();
-	if (BIT(m_port_select, 2)) data &= m_inputs_p2[2]->read();
-	if (BIT(m_port_select, 3)) data &= m_inputs_p2[3]->read();
-	if (BIT(m_port_select, 4)) data &= m_inputs_p2_extra->read();
+	for (unsigned i = 0; m_inputs_p[P].size() > i; ++i)
+	{
+		if (!BIT(m_port_select, i))
+			data &= m_inputs_p[P][i]->read();
+	}
 
-	data &= m_coin->read();
-
-	return data;
-}
-
-uint8_t ojankoc_state::keymatrix_p1_r()
-{
-	uint8_t data = 0x00;
-
-	if (BIT(m_port_select, 0) == 0) data |= m_inputs_p1[0]->read();
-	if (BIT(m_port_select, 1) == 0) data |= m_inputs_p1[1]->read();
-	if (BIT(m_port_select, 2) == 0) data |= m_inputs_p1[2]->read();
-	if (BIT(m_port_select, 3) == 0) data |= m_inputs_p1[3]->read();
-
-	data |= m_coin->read();
-
-	return data;
-}
-
-uint8_t ojankoc_state::keymatrix_p2_r()
-{
-	uint8_t data = 0x00;
-
-	if (BIT(m_port_select, 0) == 0) data |= m_inputs_p2[0]->read();
-	if (BIT(m_port_select, 1) == 0) data |= m_inputs_p2[1]->read();
-	if (BIT(m_port_select, 2) == 0) data |= m_inputs_p2[2]->read();
-	if (BIT(m_port_select, 3) == 0) data |= m_inputs_p2[3]->read();
-
-	data |= m_coin->read();
-
-	return data;
+	return (~data & 0x3f) | (m_coin->read() & 0xc0);
 }
 
 uint8_t ojankohs_state::dipsw1_r()
@@ -716,7 +980,7 @@ void ojankohs_state::ojankohs(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 512);
@@ -754,7 +1018,7 @@ void ojankoy_state::ojankoy(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 512);
@@ -790,7 +1054,7 @@ void ccasino_state::ccasino(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 512);
@@ -829,7 +1093,7 @@ void ojankoc_state::ojankoc(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -888,7 +1152,7 @@ ROM_START( ojankoy )
 	ROM_LOAD( "1-ic64.bin", 0x0400, 0x0400, CRC(36c305c5) SHA1(43be6346e421f03a55bddb58a1570905321cf914) )
 ROM_END
 
-ROM_START( ojanko2 )
+ROM_START( ojanko2 ) // VS6-0601-2 PCB
 	ROM_REGION( 0x70000, "maincpu", 0 )
 	ROM_LOAD( "p-ic17.bin", 0x00000, 0x08000, CRC(4b33bd54) SHA1(be235492cf3824ea740f401201ad821bb71c6d89) )
 	ROM_LOAD( "ic30.bin",   0x10000, 0x20000, CRC(37be3f7c) SHA1(9ef19ef1e118d75ae719623b90188d68e6faa8f2) )
@@ -979,11 +1243,13 @@ ROM_START( ojankocb ) // VS6-0501 PCB, has a big metal box, under which there is
 	ROM_LOAD( "0.1n", 0x50000, 0x8000, CRC(5665016e) SHA1(0f7f0a8e55e93bcb3060c91d9704905a6e827250) )
 ROM_END
 
+} // anonymous namespace
+
 
 GAME( 1986, ojankoc,  0,       ojankoc,  ojankoc,  ojankoc_state,  empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ojankocb, ojankoc, ojankoc,  ojankoc,  ojankoc_state,  empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.3, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ojankoca, ojankoc, ojankoc,  ojankoc,  ojankoc_state,  empty_init, ROT0, "V-System Co.", "Ojanko Club (Japan, Program Ver. 1.2)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ojankoy,  0,       ojankoy,  ojankoy,  ojankoy_state,  empty_init, ROT0, "V-System Co.", "Ojanko Yakata (Japan)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojanko2,  0,       ojankoy,  ojankoy,  ojankoy_state,  empty_init, ROT0, "V-System Co.", "Ojanko Yakata 2bankan (Japan)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ccasino_state,  empty_init, ROT0, "V-System Co.", "Chinese Casino [BET] (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ccasino,  0,       ccasino,  ccasino,  ccasino_state,  empty_init, ROT0, "V-System Co.", "Chinese Casino (Japan)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ojankohs, 0,       ojankohs, ojankohs, ojankohs_state, empty_init, ROT0, "V-System Co.", "Ojanko High School (Japan)",                   MACHINE_SUPPORTS_SAVE )

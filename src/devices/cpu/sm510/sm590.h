@@ -99,14 +99,14 @@ public:
 protected:
 	sm590_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
-	void program_512x8(address_map &map);
-	void program_768x8(address_map &map);
-	void program_1kx8(address_map &map);
-	void data_32x4(address_map &map);
-	void data_56x4(address_map &map);
+	void program_512x8(address_map &map) ATTR_COLD;
+	void program_768x8(address_map &map) ATTR_COLD;
+	void program_1kx8(address_map &map) ATTR_COLD;
+	void data_32x4(address_map &map) ATTR_COLD;
+	void data_56x4(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; } // 4 cycles per machine cycle

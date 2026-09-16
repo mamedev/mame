@@ -29,14 +29,15 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 protected:
 	// device_t implementation
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// printer status inputs
@@ -99,16 +100,16 @@ INPUT_PORTS_START(pic)
 	PORT_DIPSETTING(   0x02, "11 microseconds")
 	PORT_DIPSETTING(   0x01, "13 microseconds")
 	PORT_DIPSETTING(   0x00, "15 microseconds")
-	PORT_DIPNAME(0x08, 0x00, "Strobe Output Polarity")      PORT_DIPLOCATION("SW1:4")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_strobe, 0)
+	PORT_DIPNAME(0x08, 0x00, "Strobe Output Polarity")      PORT_DIPLOCATION("SW1:4")       PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_pic_device::sw1_strobe), 0)
 	PORT_DIPSETTING(   0x08, "Positive")
 	PORT_DIPSETTING(   0x00, "Negative")
-	PORT_DIPNAME(0x10, 0x00, "Acknowledge Input Polarity")  PORT_DIPLOCATION("SW1:5")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_ack, 0)
+	PORT_DIPNAME(0x10, 0x00, "Acknowledge Input Polarity")  PORT_DIPLOCATION("SW1:5")       PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_pic_device::sw1_ack), 0)
 	PORT_DIPSETTING(   0x10, "Positive")
 	PORT_DIPSETTING(   0x00, "Negative")
-	PORT_DIPNAME(0x20, 0x20, "Firmware")                    PORT_DIPLOCATION("SW1:6")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_firmware, 0)
+	PORT_DIPNAME(0x20, 0x20, "Firmware")                    PORT_DIPLOCATION("SW1:6")       PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_pic_device::sw1_firmware), 0)
 	PORT_DIPSETTING(   0x20, "Parallel Printer")    // ROM #341-0005 - auto LF after CR
 	PORT_DIPSETTING(   0x00, "Centronics")          // ROM #341-0019 - no auto LF after CR
-	PORT_DIPNAME(0x40, 0x40, "Interrupt")                   PORT_DIPLOCATION("SW1:7")       PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, sw1_irq, 0)
+	PORT_DIPNAME(0x40, 0x40, "Interrupt")                   PORT_DIPLOCATION("SW1:7")       PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_pic_device::sw1_irq), 0)
 	PORT_DIPSETTING(   0x40, "Disabled")
 	PORT_DIPSETTING(   0x00, "Enabled")
 
@@ -116,10 +117,10 @@ INPUT_PORTS_START(pic)
 	PORT_CONFNAME(0x01, 0x01, "PROM Addressing")
 	PORT_CONFSETTING(   0x00, "Flat (X1)")
 	PORT_CONFSETTING(   0x01, "Standard (X2)")
-	PORT_CONFNAME(0x02, 0x02, "Data Output")                PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, x_data_out, 0)
+	PORT_CONFNAME(0x02, 0x02, "Data Output")                PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_pic_device::x_data_out), 0)
 	PORT_CONFSETTING(   0x00, "Disabled (X3)")
 	PORT_CONFSETTING(   0x02, "Enabled (X4)")
-	PORT_CONFNAME(0x04, 0x04, "Character Width")            PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_pic_device, x_char_width, 0)
+	PORT_CONFNAME(0x04, 0x04, "Character Width")            PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_pic_device::x_char_width), 0)
 	PORT_CONFSETTING(   0x00, "7-bit (X5)")
 	PORT_CONFSETTING(   0x04, "8-bit (X6)")
 INPUT_PORTS_END
@@ -217,7 +218,7 @@ u8 a2bus_pic_device::read_c0nx(u8 offset)
 		return 0x97U | (m_perror_in << 5) | (m_select_in << 6) | (m_fault_in << 3);
 
 	case 4U:
-		return (m_ack_latch << 7) | (m_ack_in ^ BIT(m_input_sw1->read(), 4));
+		return (m_ack_latch << 7) | (get_open_bus() & 0x7eU) | (m_ack_in ^ BIT(m_input_sw1->read(), 4));
 
 	case 5U:
 		logerror("500ns negative strobe not implemented\n");
@@ -234,7 +235,7 @@ u8 a2bus_pic_device::read_c0nx(u8 offset)
 		break;
 	}
 
-	return 0x00U;
+	return get_open_bus();
 }
 
 void a2bus_pic_device::write_c0nx(u8 offset, u8 data)
@@ -360,6 +361,12 @@ void a2bus_pic_device::device_start()
 
 
 void a2bus_pic_device::device_reset()
+{
+	reset_from_bus();
+}
+
+
+void a2bus_pic_device::reset_from_bus()
 {
 	ioport_value const sw1(m_input_sw1->read());
 	ioport_value const x(m_input_x->read());

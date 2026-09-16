@@ -41,24 +41,21 @@ portfolio_ram_card_device::portfolio_ram_card_device(const machine_config &mconf
 
 void portfolio_ram_card_device::device_start()
 {
+	m_slot->memspace().install_readwrite_tap(0xc0000, 0xdffff, "ccm_ram",
+		[this] (offs_t offset, u8 &data, u8) { if (m_selected) data = m_nvram[offset & 0x1ffff]; },
+		[this] (offs_t offset, u8 &data, u8) { if (m_selected) m_nvram[offset & 0x1ffff] = data; });
 }
 
 
-//-------------------------------------------------
-//  nrdi_r - read
-//-------------------------------------------------
-
-uint8_t portfolio_ram_card_device::nrdi_r(offs_t offset)
+bool portfolio_ram_card_device::nvram_read(util::read_stream &file)
 {
-	return m_nvram[offset];
+	auto const [err, actual] = read(file, m_nvram, m_nvram.bytes());
+	return !err && (actual == m_nvram.bytes());
 }
 
 
-//-------------------------------------------------
-//  nwri_w - write
-//-------------------------------------------------
-
-void portfolio_ram_card_device::nwri_w(offs_t offset, uint8_t data)
+bool portfolio_ram_card_device::nvram_write(util::write_stream &file)
 {
-	m_nvram[offset] = data;
+	auto const [err, actual] = write(file, m_nvram, m_nvram.bytes());
+	return !err;
 }

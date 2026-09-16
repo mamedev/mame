@@ -77,10 +77,7 @@ public:
 	tiki100_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus, U &&opts, const char *dflt)
 		: tiki100_bus_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		set_bus(std::forward<T>(bus));
 	}
 
@@ -90,7 +87,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override { return get_card_device() ? m_card->z80daisy_irq_state() : 0; }
@@ -104,7 +101,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(TIKI100_BUS_SLOT, tiki100_bus_slot_device)
 
 
@@ -114,7 +111,7 @@ class tiki100_bus_device : public device_t
 {
 public:
 	// construction/destruction
-	tiki100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tiki100_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~tiki100_bus_device();
 
 	auto irq_wr_callback() { return m_irq_cb.bind(); }
@@ -143,7 +140,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	using card_vector = std::vector<std::reference_wrapper<device_tiki100bus_card_interface> >;
@@ -158,7 +155,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(TIKI100_BUS, tiki100_bus_device)
 
 

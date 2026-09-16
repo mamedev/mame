@@ -93,11 +93,11 @@ public:
 	void init_common();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void cpu_map(address_map &map);
-	void acrtc_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void acrtc_map(address_map &map) ATTR_COLD;
 
 	void common(machine_config &config);
 
@@ -245,12 +245,12 @@ void sx1000_state::common(machine_config &config)
 	PIC8259(config, m_pic);
 
 	// M6845 config screen: HTOTAL: 944  VTOTAL: 444  MAX_X: 639  MAX_Y: 399  HSYNC: 720-823  VSYNC: 416-425  Freq: 76.347534fps
-	SCREEN(config, m_screen_crtc, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen_crtc);
 	m_screen_crtc->set_raw(48'800'000, 944, 0, 640, 444, 0, 400);
 	m_screen_crtc->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 
 	// ACRTC: full 944x449 vis (200, 18)-(847, 417)
-	SCREEN(config, m_screen_acrtc, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen_acrtc);
 	m_screen_acrtc->set_raw(48'800'000, 944, 200, 847, 449, 18, 417);
 	m_screen_acrtc->set_screen_update(m_acrtc, FUNC(hd63484_device::update_screen));
 	m_screen_acrtc->set_palette(m_palette_acrtc);
@@ -329,4 +329,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME  FLAGS */
-COMP(1987, sx1010, 0,      0,      sx1010,  sx1010, sx1000_state, init_common, "Casio", "SX1010", MACHINE_IS_SKELETON)
+COMP(1987, sx1010, 0,      0,      sx1010,  sx1010, sx1000_state, init_common, "Casio", "SX1010", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -29,8 +29,8 @@ public:
 	void tr909(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void dac1_w(u8 data);
@@ -49,7 +49,7 @@ private:
 	u8 switches_r();
 	u8 cart_sense_r();
 
-	void tr909_mem(address_map &map);
+	void tr909_mem(address_map &map) ATTR_COLD;
 
 	required_device<generic_cartslot_device> m_cartslot;
 	required_ioport_array<5> m_inputs;

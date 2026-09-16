@@ -223,7 +223,10 @@ void amstrad_state::amstrad_cpc_green_palette(palette_device &palette) const
 /* on PC2. Apparently PC2 is always low on the CPC. ?!? */
 TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 {
+	// MT 8744: strobe-induced port B read must not re-arm the strobe
+	m_in_pc2_strobe = true;
 	m_ppi->pc2_w(0);
+	m_in_pc2_strobe = false;
 }
 
 
@@ -2606,9 +2609,9 @@ uint8_t amstrad_state::amstrad_ppi_portb_r()
 			data |= 0x02;
 	}
 
-//logerror("amstrad_ppi_portb_r\n");
-	/* Schedule a write to PC2 */
-	m_pc2_low_timer->adjust(attotime::zero);
+	// schedule a PC2 strobe unless this read is the strobe itself re-entering (MT 8744)
+	if (!m_in_pc2_strobe)
+		m_pc2_low_timer->adjust(attotime::zero);
 
 	return data;
 }
@@ -2734,7 +2737,7 @@ uint8_t amstrad_state::amstrad_psg_porta_read()
 IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 {
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
-	if( m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
+	if (m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
 	{
 		logerror("IRQ: Not cleared, IRQ was called by DMA [%i]\n",m_plus_irq_cause);
 		m_asic.ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
@@ -2742,9 +2745,9 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 	}
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_gate_array.hsync_counter &= 0x1F;
-	if ( m_asic.enabled )
+	if (m_asic.enabled)
 	{
-		if(m_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
+		if (m_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
 			m_asic.ram[0x2c0f] |= 0x80;
 		else
 		{
@@ -2753,33 +2756,33 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 		}
 		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
 	}
-	if(m_system_type != SYSTEM_GX4000)
+	if (m_system_type != SYSTEM_GX4000)
+	{
+		// update AMX mouse inputs (normally done every 1/300th of a second)
+		if (m_io_ctrltype.read_safe(0) == 2)
 		{
-			// update AMX mouse inputs (normally done every 1/300th of a second)
-			if (m_io_ctrltype.read_safe(0) == 2)
-			{
-				static uint8_t prev_x,prev_y;
-				uint8_t data_x, data_y;
+			static uint8_t prev_x,prev_y;
+			uint8_t data_x, data_y;
 
-				m_amx_mouse_data = 0x0f;
-				data_x = m_io_mouse[0].read_safe(0);
-				data_y = m_io_mouse[1].read_safe(0);
+			m_amx_mouse_data = 0x0f;
+			data_x = m_io_mouse[0].read_safe(0);
+			data_y = m_io_mouse[1].read_safe(0);
 
-				if(data_x > prev_x)
-					m_amx_mouse_data &= ~0x08;
-				if(data_x < prev_x)
-					m_amx_mouse_data &= ~0x04;
-				if(data_y > prev_y)
-					m_amx_mouse_data &= ~0x02;
-				if(data_y < prev_y)
-					m_amx_mouse_data &= ~0x01;
-				m_amx_mouse_data |= (m_io_mouse[2].read_safe(0) << 4);
-				prev_x = data_x;
-				prev_y = data_y;
+			if(data_x > prev_x)
+				m_amx_mouse_data &= ~0x08;
+			if(data_x < prev_x)
+				m_amx_mouse_data &= ~0x04;
+			if(data_y > prev_y)
+				m_amx_mouse_data &= ~0x02;
+			if(data_y < prev_y)
+				m_amx_mouse_data &= ~0x01;
+			m_amx_mouse_data |= (m_io_mouse[2].read_safe(0) << 4);
+			prev_x = data_x;
+			prev_y = data_y;
 
-				m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
-			}
+			m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
 		}
+	}
 	return 0xFF;
 }
 
@@ -2941,7 +2944,7 @@ void amstrad_state::amstrad_common_init()
 TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 {
 	rectangle visarea;
-	attoseconds_t refresh;
+	attotime refresh;
 	int height;
 
 	if ( m_io_solder_links->read() & 0x10 )
@@ -2956,7 +2959,7 @@ TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
 		visarea.set(0, 64 + 640 + 64 - 1, 16, 16 + 15 + 200 + 15 - 1);
 		height = 262;
 	}
-	refresh = HZ_TO_ATTOSECONDS( XTAL(16'000'000) ) * 1024 * height;
+	refresh = attotime::from_ticks(1024 * height, 16'000'000);
 	m_screen->configure( 1024, height, visarea, refresh );
 }
 
@@ -3065,6 +3068,7 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	m_asic.dma_prescaler[2] = 0;
 	m_asic.dma_clear = 1;  // by default, DMA interrupts must be cleared by writing to the DSCR (&6c0f)
 	m_plus_irq_cause = 6;
+	m_in_pc2_strobe = false;
 
 	amstrad_common_init();
 	amstrad_reset_machine();

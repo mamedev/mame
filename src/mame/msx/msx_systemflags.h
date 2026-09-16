@@ -34,7 +34,7 @@ public:
 	void write(u8 data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 m_initial_value;

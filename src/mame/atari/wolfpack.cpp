@@ -40,9 +40,9 @@ public:
 	template <int Bit> int dial_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices, pointers
@@ -73,7 +73,7 @@ private:
 	bitmap_ind16 m_helper;
 	emu_timer *m_periodic_timer = nullptr;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void wolfpack_palette(palette_device &palette) const;
 
@@ -115,8 +115,6 @@ private:
 	void start_speech_w(uint8_t data);
 };
 
-
-// video
 
 void wolfpack_state::wolfpack_palette(palette_device &palette) const
 {
@@ -397,8 +395,6 @@ void wolfpack_state::screen_vblank(int state)
 }
 
 
-// machine
-
 TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
@@ -415,7 +411,6 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 
 void wolfpack_state::machine_start()
 {
-	m_led.resolve();
 	m_periodic_timer = timer_alloc(FUNC(wolfpack_state::periodic_callback), this);
 }
 
@@ -543,8 +538,8 @@ void wolfpack_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<0>)    // dial connects here
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(wolfpack_state, dial_r<1>)    // dial connects here
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(wolfpack_state::dial_r<0>))    // dial connects here
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(wolfpack_state::dial_r<1>))    // dial connects here
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
@@ -687,7 +682,7 @@ void wolfpack_state::wolfpack(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 262);
 	m_screen->set_visarea(0, 511, 16, 239);

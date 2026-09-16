@@ -14,13 +14,14 @@ MIPS III/IV emulator.
 
 #pragma once
 
-
-#include "divtlb.h"
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
 #include "ps2vu.h"
 
-#define ENABLE_O2_DPRINTF       (0)
+#include "cpu/drcuml.h"
+
+#include "divtlb.h"
+
+#include <bitset>
+
 
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
 DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
@@ -237,9 +238,6 @@ enum {
 	MIPS3_R31H,
 };
 
-#define MIPS3_MAX_FASTRAM       3
-#define MIPS3_MAX_HOTSPOTS      16
-
 /* COP1 CCR register */
 #define COP1_FCR31              (m_core->ccr[1][31])
 
@@ -260,21 +258,11 @@ INTERRUPT CONSTANTS
 STRUCTURES
 ***************************************************************************/
 
-/* MIPS3 TLB entry */
-struct mips3_tlb_entry {
-	uint64_t          page_mask;
-	uint64_t          entry_hi;
-	uint64_t          entry_lo[2];
-};
-
-#define MIPS3_MAX_TLB_ENTRIES       48
-
-class mips3_frontend;
-
 class mips3_device : public cpu_device, public device_vtlb_interface {
-	friend class mips3_frontend;
-
 protected:
+	class frontend;
+	class opcode_desc;
+
 	/* MIPS flavors */
 	enum mips3_flavor {
 		/* MIPS III variants */
@@ -296,10 +284,28 @@ protected:
 		MIPS3_TYPE_RM7000
 	};
 
+	static inline constexpr unsigned MIPS3_MAX_FASTRAM      = 3;
+	static inline constexpr unsigned MIPS3_MAX_HOTSPOTS     = 16;
+
+	static inline constexpr unsigned MIPS3_MAX_TLB_ENTRIES  = 48;
+
+	// MIPS3 TLB entry
+	struct mips3_tlb_entry {
+		bool matches_asid(uint8_t asid) const noexcept;
+		bool is_global() const noexcept;
+		void log_half(int tlbindex, int which) const;
+
+		uint64_t    page_mask;
+		uint64_t    entry_hi;
+		uint64_t    entry_lo[2];
+	};
+
 public:
 	// construction/destruction
 	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
+	virtual ~mips3_device();
 
+	void set_drc_cache_size(size_t bytes) { m_drc_cache.set_size(bytes); }
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
 	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
@@ -314,15 +320,14 @@ public:
 	void mips3drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -444,6 +449,8 @@ protected:
 
 	/* derived info based on flavor */
 	uint32_t        m_pfnmask;
+	uint64_t        m_pagemask_mask;
+	uint32_t        m_config_wmask;
 	uint8_t         m_tlbentries;
 
 	/* memory accesses */
@@ -451,7 +458,6 @@ protected:
 	uint32_t        m_byte_xor;
 	uint32_t        m_word_xor;
 	uint32_t        m_dword_xor;
-	data_accessors  m_memory;
 
 	/* cache memory */
 	size_t          c_icache_size;
@@ -477,8 +483,8 @@ protected:
 
 	/* core state */
 	drc_cache       m_drc_cache;                /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>      m_drcuml;/* DRC UML generator state */
-	std::unique_ptr<mips3_frontend>    m_drcfe; /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>  m_drcuml;    /* DRC UML generator state */
+	std::unique_ptr<frontend>      m_drcfe;     /* pointer to the DRC front-end state */
 	uint32_t        m_drcoptions;               /* configurable DRC options */
 
 												/* internal stuff */
@@ -526,7 +532,7 @@ protected:
 	void static_generate_memory_mode_checks(drcuml_block &block, uml::code_handle &exception_addrerr, int &label, int mode);
 	void static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked);
 	void static_generate_memory_rw(drcuml_block &block, int size, bool iswrite, bool ismasked);
-	virtual void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr);
+	virtual void static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr);
 
 	virtual void check_irqs();
 	virtual void handle_mult(uint32_t op);
@@ -624,11 +630,11 @@ private:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	void static_generate_entry_point();
-	void static_generate_nocode_handler();
-	void static_generate_out_of_cycles();
-	void static_generate_tlb_mismatch();
-	void static_generate_exception(uint8_t exception, int recover, const char *name);
+	void static_generate_entry_point(drcuml_block &block, int &label);
+	void static_generate_nocode_handler(drcuml_block &block, int &label);
+	void static_generate_out_of_cycles(drcuml_block &block, int &label);
+	void static_generate_tlb_mismatch(drcuml_block &block, int &label);
+	void static_generate_exception(drcuml_block &block, int &label, uint8_t exception, int recover, const char *name);
 
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
@@ -652,14 +658,12 @@ private:
 	void generate_badcop(drcuml_block &block, const int cop);
 
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	const char *log_desc_flags_to_string(opcode_desc const &desc);
+	void log_register_list(const char *string, const std::bitset<68> &reglist, const std::bitset<68> *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 	void load_elf();
-#if ENABLE_O2_DPRINTF
-	void do_o2_dprintf(uint32_t fmt_addr, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t stack);
-#endif
+	[[maybe_unused]] void do_o2_dprintf(uint32_t fmt_addr, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t stack);
 };
 
 
@@ -764,7 +768,7 @@ public:
 protected:
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	virtual void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr) override;
+	virtual void static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr) override;
 
 	virtual bool RBYTE(offs_t address, uint32_t *result) override;
 	virtual bool RHALF(offs_t address, uint32_t *result) override;
@@ -861,7 +865,7 @@ class vr5500be_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_BIG, 32) // Should be 64 bits
+		: mips3_device(mconfig, VR5500BE, tag, owner, clock, MIPS3_TYPE_VR5500, ENDIANNESS_BIG, 32) // Should be 64 bits
 	{
 	}
 };
@@ -870,7 +874,7 @@ class vr5500le_device : public mips3_device {
 public:
 	// construction/destruction
 	vr5500le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_R5000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
+		: mips3_device(mconfig, VR5500LE, tag, owner, clock, MIPS3_TYPE_VR5500, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
 };
@@ -884,7 +888,7 @@ protected:
 	{
 	}
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -1007,31 +1011,6 @@ public:
 		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
-};
-
-
-
-class mips3_frontend : public drc_frontend {
-public:
-	// construction/destruction
-	mips3_frontend(mips3_device *mips3, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-
-protected:
-	// required overrides
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
-
-private:
-	// internal helpers
-	bool describe_special(uint32_t op, opcode_desc &desc);
-	bool describe_regimm(uint32_t op, opcode_desc &desc);
-	bool describe_idt(uint32_t op, opcode_desc &desc);
-	bool describe_cop0(uint32_t op, opcode_desc &desc);
-	bool describe_cop1(uint32_t op, opcode_desc &desc);
-	bool describe_cop1x(uint32_t op, opcode_desc &desc);
-	bool describe_cop2(uint32_t op, opcode_desc &desc);
-
-	// internal state
-	mips3_device *m_mips3;
 };
 
 

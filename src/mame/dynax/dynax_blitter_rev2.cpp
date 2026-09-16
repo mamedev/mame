@@ -66,6 +66,12 @@ dynax_blitter_rev2_device::dynax_blitter_rev2_device(const machine_config &mconf
 	, m_scrollx_cb(*this)
 	, m_scrolly_cb(*this)
 	, m_ready_cb(*this)
+	, m_blit_pen(0)
+	, m_blit_wrap_enable(0)
+	, m_blit_x(0)
+	, m_blit_y(0)
+	, m_blit_flags(0)
+	, m_blit_src(0)
 {
 }
 

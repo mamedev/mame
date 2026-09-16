@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "m24_kbd.h"
 
-DEFINE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device, "m24_kbd", "Olivetti M24 Keyboard")
+DEFINE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device, "m24_kbd", "Olivetti M24 Keyboard and Mouse")
 
 ROM_START( m24_keyboard )
 	ROM_REGION(0x800, "mcu", 0)
@@ -18,13 +18,13 @@ const tiny_rom_entry *m24_keyboard_device::device_rom_region() const
 
 void m24_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8049(config, m_mcu, XTAL(6'000'000));
+	I8049(config, m_mcu, 6_MHz_XTAL);
 	m_mcu->bus_out_cb().set(FUNC(m24_keyboard_device::bus_w));
 	m_mcu->p1_in_cb().set(FUNC(m24_keyboard_device::p1_r));
 	m_mcu->p1_out_cb().set(FUNC(m24_keyboard_device::p1_w));
 	m_mcu->p2_in_cb().set(FUNC(m24_keyboard_device::p2_r));
-	m_mcu->t0_in_cb().set(FUNC(m24_keyboard_device::t0_r));
-	m_mcu->t1_in_cb().set(FUNC(m24_keyboard_device::t1_r));
+	m_mcu->t0_in_cb().set_constant(0);
+	m_mcu->t1_in_cb().set_constant(0);
 }
 
 INPUT_PORTS_START( m24_keyboard )
@@ -192,10 +192,16 @@ INPUT_PORTS_START( m24_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Btn") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Middle Btn") PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Btn") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Left Btn") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Middle Btn") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Right Btn") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_MINMAX(0, 255) PORT_SENSITIVITY(80) PORT_KEYDELTA(5)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_MINMAX(0, 255) PORT_SENSITIVITY(80) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 
@@ -206,10 +212,17 @@ ioport_constructor m24_keyboard_device::device_input_ports() const
 
 m24_keyboard_device::m24_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, M24_KEYBOARD, tag, owner, clock)
-	, m_rows(*this, "ROW.%u", 0)
-	, m_mousebtn(*this, "MOUSEBTN")
 	, m_out_data(*this)
 	, m_mcu(*this, "mcu")
+	, m_rows(*this, "ROW.%u", 0)
+	, m_mousebtn(*this, "MOUSEBTN")
+	, m_mousex(*this, "MOUSEX")
+	, m_mousey(*this, "MOUSEY")
+	, m_reset_timer(nullptr)
+	, m_mouse_read_count(0)
+	, m_count_mx(0), m_count_my(0)
+	, m_bits_mx(0), m_bits_my(0)
+	, m_last_mx(0), m_last_my(0)
 {
 }
 
@@ -217,11 +230,27 @@ void m24_keyboard_device::device_start()
 {
 	m_out_data(1);
 	m_reset_timer = timer_alloc(FUNC(m24_keyboard_device::reset_mcu), this);
+
+	save_item(NAME(m_p1));
+	save_item(NAME(m_keypress));
+	save_item(NAME(m_kbcdata));
+	save_item(NAME(m_mouse_read_count));
+	save_item(NAME(m_count_mx));
+	save_item(NAME(m_count_my));
+	save_item(NAME(m_bits_mx));
+	save_item(NAME(m_bits_my));
+	save_item(NAME(m_last_mx));
+	save_item(NAME(m_last_my));
 }
 
 void m24_keyboard_device::device_reset()
 {
 	m_kbcdata = true;
+
+	m_count_mx = 0;
+	m_count_my = 0;
+	m_last_mx = 0;
+	m_last_my = 0;
 }
 
 TIMER_CALLBACK_MEMBER(m24_keyboard_device::reset_mcu)
@@ -237,7 +266,7 @@ uint8_t m24_keyboard_device::p1_r()
 
 void m24_keyboard_device::p1_w(uint8_t data)
 {
-	// bit 3 and 4 are leds and bits 6 and 7 are jumpers to ground
+	// bit 3 and 4 are LEDs and bits 6 and 7 are jumpers to ground
 	m_p1 = data & ~0xc0;
 	if(m_p1 & 4)
 		m_p1 |= 2;
@@ -248,17 +277,86 @@ void m24_keyboard_device::p1_w(uint8_t data)
 
 uint8_t m24_keyboard_device::p2_r()
 {
-	return (m_keypress << 7) | m_mousebtn->read();
-}
+	uint8_t mx = m_mousex->read();
+	uint8_t my = m_mousey->read();
 
-int m24_keyboard_device::t0_r()
-{
-	return 0;
-}
+	if (mx != m_last_mx)
+	{
+		int diff = int(unsigned(mx)) - m_last_mx;
 
-int m24_keyboard_device::t1_r()
-{
-	return 0;
+		// check for wrap
+		if (diff > 0x80)
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
+
+		m_count_mx += diff;
+
+		m_last_mx = mx;
+	}
+
+	if (my != m_last_my)
+	{
+		int diff = int(unsigned(my)) - m_last_my;
+
+		if (diff > 0x80)
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
+
+		m_count_my += diff;
+
+		m_last_my = my;
+	}
+
+	// Only update the mouse position signals every 4 reads by the MCU, so
+	// that the signals are not at a higher frequency than the MCU expects.
+	if ((m_mouse_read_count & 3) == 0)
+	{
+		if (m_count_mx)
+		{
+			// Consume max. one unit of accumulated X delta per MCU update
+			if (m_count_mx > 0)
+			{
+				m_count_mx--;
+				m_bits_mx++;
+			}
+			else
+			{
+				m_count_mx++;
+				m_bits_mx--;
+			}
+		}
+
+		if (m_count_my)
+		{
+			// Consume max. one unit of accumulated Y delta per MCU update
+			if (m_count_my > 0)
+			{
+				m_count_my--;
+				m_bits_my++;
+			}
+			else
+			{
+				m_count_my++;
+				m_bits_my--;
+			}
+		}
+	}
+
+	m_mouse_read_count++;
+
+	// Generate appropriate square waves in response to changing mouse
+	// co-ordinates.  The +1 is to put one signal 90 degrees out of phase with
+	// respect to the other, to produce the required "quadrature" encoding,
+	// which lets the MCU determine the direction of movement.
+	return
+			(m_keypress << 7) |
+			m_mousebtn->read() |
+			BIT(m_bits_mx + 1, 1) |
+			BIT(m_bits_mx, 1) << 1 |
+			BIT(m_bits_my, 1) << 2 |
+			BIT(m_bits_my + 1, 1) << 3;
 }
 
 void m24_keyboard_device::bus_w(uint8_t data)
@@ -270,8 +368,10 @@ void m24_keyboard_device::bus_w(uint8_t data)
 void m24_keyboard_device::clock_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, !state);
-	if(!state)
+	if (!state)
+	{
 		m_reset_timer->adjust(attotime::from_msec(50));
+	}
 	else
 	{
 		m_reset_timer->adjust(attotime::never);

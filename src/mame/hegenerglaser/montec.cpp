@@ -21,10 +21,10 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "mmboard.h"
+#include "mboard.h"
 
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
@@ -42,23 +42,20 @@ namespace {
 class montec_state : public driver_device
 {
 public:
-	montec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_lcd_latch(*this, "lcd_latch")
-		, m_led_pwm(*this, "led_pwm")
-		, m_lcd(*this, "lcd%u", 0)
-		, m_keys(*this, "KEY.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
+	montec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_lcd_latch(*this, "lcd_latch"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcd(*this, "lcd%u", 0),
+		m_keys(*this, "KEY.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void montec(machine_config &config);
-	void montec4(machine_config &config);
-	void montec4le(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
+	void montec(machine_config &config) ATTR_COLD;
+	void montec4(machine_config &config) ATTR_COLD;
+	void montec4le(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -69,7 +66,7 @@ private:
 	required_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 
-	void montec_mem(address_map &map);
+	void montec_mem(address_map &map) ATTR_COLD;
 
 	template<int N> void lcd_output_w(u32 data);
 	void led_w(u8 data);
@@ -77,11 +74,6 @@ private:
 	u8 irq_ack_r();
 	u8 input_r();
 };
-
-void montec_state::machine_start()
-{
-	m_digits.resolve();
-}
 
 
 
@@ -151,7 +143,7 @@ void montec_state::montec_mem(address_map &map)
 static INPUT_PORTS_START( montec )
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("BOOK / 9")   PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")        PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")       PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
@@ -224,7 +216,7 @@ void montec_state::montec4le(machine_config &config)
 	montec4(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
+	W65C02(config.replace(), m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &montec_state::montec_mem);
 
 	const attotime irq_period = attotime::from_hz(8_MHz_XTAL / 0x4000);
@@ -267,8 +259,8 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT      CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, montec,     0,        0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC3)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, monteca,    montec,   0,      montec,    montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo (ver. MC2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV: Limited Edition", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1989, montec4,    0,        0,      montec4,   montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, montec4le,  montec4,  0,      montec4le, montec,    montec_state, empty_init, "Hegener + Glaser", "Mephisto Monte Carlo IV: Limited Edition", MACHINE_SUPPORTS_SAVE )

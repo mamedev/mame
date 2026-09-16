@@ -143,8 +143,8 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<u8[]> m_vram;  // video ram
 	std::unique_ptr<u8[]> m_cram;  // colour ram
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	void cctrl_w(offs_t offset, u8 data);
 	void video_w(offs_t offset, u8 data);
 	u8 video_r(offs_t offset);
@@ -152,7 +152,7 @@ private:
 	void ppi_pb_w(offs_t offset, u8 data);
 	void ppi_pc_w(offs_t offset, u8 data);
 	u8 ppi_pc_r(offs_t offset);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	static void floppy_formats(format_registration &fr);
 	u8 m_cctrl = 2;
 	required_device<i8255_device> m_ppi;
@@ -495,7 +495,7 @@ void radionic_state::radionic(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_XTAL, 768, 0, 512, 312, 0, 256);
 	screen.set_screen_update(FUNC(radionic_state::screen_update));
 	screen.set_palette("palette");

@@ -44,7 +44,7 @@ int cmp_msg(long msg[], long msg2[], int n, int i)
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
     int msg_len;
     for (msg_len = 4; msg_len < 100; msg_len += 5) {

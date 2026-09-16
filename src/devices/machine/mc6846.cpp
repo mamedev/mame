@@ -506,7 +506,9 @@ void mc6846_device::set_input_cp2(int data)
 		return;
 	m_cp2 = data;
 	LOG( "%f: mc6846 input CP2 set to %i\n", machine().time().as_double(), data );
-	if (m_pcr & 0x20)
+	/* PCR bit 5 = 0 selects CP2 as an interrupt INPUT (bit 5 = 1 makes it an
+	   output); the edge flag can only latch in input mode */
+	if (!(m_pcr & 0x20))
 	{
 		if (( data &&  (m_pcr & 0x10)) || (!data && !(m_pcr & 0x10)))
 		{

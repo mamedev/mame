@@ -1,7 +1,7 @@
 // BenchCon.h
 
-#ifndef __BENCH_CON_H
-#define __BENCH_CON_H
+#ifndef ZIP7_INC_BENCH_CON_H
+#define ZIP7_INC_BENCH_CON_H
 
 #include <stdio.h>
 

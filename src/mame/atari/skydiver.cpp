@@ -125,7 +125,7 @@ public:
 	void skydiver(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,11 +157,9 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -302,8 +300,6 @@ void skydiver_state::palette(palette_device &palette) const
 	}
 }
 
-
-// machine
 
 
 /*************************************
@@ -453,7 +449,7 @@ static INPUT_PORTS_START( skydiver )
 	PORT_START("IN12")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN13")
 	PORT_BIT (0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -551,7 +547,7 @@ void skydiver_state::skydiver(machine_config &config)
 	latch3.q_out_cb<7>().set("discrete", FUNC(discrete_device::write_line<SKYDIVER_NOISE_RST>));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 224);
 	screen.set_screen_update(FUNC(skydiver_state::screen_update));
 	screen.set_palette(m_palette);

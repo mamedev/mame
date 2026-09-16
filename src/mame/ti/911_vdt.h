@@ -45,7 +45,7 @@ public:
 		FrenchWP      // French word processing
 	};
 
-	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t cru_r(offs_t offset);
 	void cru_w(offs_t offset, uint8_t data);
@@ -55,9 +55,9 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
-	void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 	TIMER_CALLBACK_MEMBER(blink_tick);

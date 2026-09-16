@@ -184,10 +184,10 @@ private:
 
 	void vclk_cb(int state);
 
-	void jngolady_cpu0_map(address_map &map);
-	void jngolady_cpu1_io(address_map &map);
-	void jngolady_cpu1_map(address_map &map);
-	void nsc_map(address_map &map);
+	void jngolady_cpu0_map(address_map &map) ATTR_COLD;
+	void jngolady_cpu1_io(address_map &map) ATTR_COLD;
+	void jngolady_cpu1_map(address_map &map) ATTR_COLD;
+	void nsc_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -590,8 +590,8 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )     PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // guess
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macha )
@@ -648,8 +648,8 @@ static INPUT_PORTS_START( macha )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // guess
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 
@@ -730,11 +730,11 @@ static INPUT_PORTS_START( cntrygrl )
 	PORT_DIPSETTING(    0x00, "20" )
 	PORT_DIPNAME( 0x20, 0x20, "Coin A setting" )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_25C ) )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B setting"  )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jngolady )
@@ -770,8 +770,8 @@ static INPUT_PORTS_START( jngolady )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( roylcrdn )
@@ -831,7 +831,7 @@ static INPUT_PORTS_START( roylcrdn )
 
 	PORT_START("DSW")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( luckygrl )
@@ -897,7 +897,7 @@ static INPUT_PORTS_START( luckygrl )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 
@@ -969,7 +969,7 @@ void cntrygrl_state::cntrygrl(machine_config &config)
 	JANGOU_BLITTER(config, "blitter", MASTER_CLOCK/4);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240); // assume same as nightgal.cpp
 	screen.set_screen_update(FUNC(cntrygrl_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1369,7 +1369,7 @@ void jngolady_state::init_jngolady()
  *
  *************************************/
 
-GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,   empty_init,    ROT0, "Nichibutsu",     "Jangou [BET] (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,    0,        jangou,   jangou,   jangou_state,   empty_init,    ROT0, "Nichibutsu",     "Jangou (Japan)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1983,  macha,     0,        jangou,   macha,    jangou_state,   empty_init,    ROT0, "Logitec",        "Monoshiri Quiz Oshaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  jngolady,  0,        jngolady, jngolady, jngolady_state, init_jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  cntrygrl,  0,        cntrygrl, cntrygrl, cntrygrl_state, empty_init,    ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",            MACHINE_SUPPORTS_SAVE )

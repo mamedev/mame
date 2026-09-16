@@ -40,14 +40,16 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // This must be outside of the namespace
 DECLARE_DEVICE_TYPE(STINGNET_ATAPI_CDROM, stingnet_cdr)
 
-class stingnet_cdr : public atapi_fixed_cdrom_device
+class stingnet_cdr : public atapi_cdrom_device
 {
 public:
 	stingnet_cdr(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: atapi_fixed_cdrom_device(mconfig, STINGNET_ATAPI_CDROM, tag, owner, clock)
+		: atapi_cdrom_device(mconfig, STINGNET_ATAPI_CDROM, tag, owner, clock)
 	{
 	}
 
@@ -56,7 +58,7 @@ public:
 		m_sector_timer = timer_alloc(FUNC(stingnet_cdr::sector_tick), this);
 		m_sector_timer->adjust(attotime::never);
 
-		atapi_fixed_cdrom_device::device_start();
+		atapi_cdrom_device::device_start();
 	}
 
 	// atapicdr has zero delay between the end of a sector and the completion of the next.
@@ -75,7 +77,7 @@ public:
 	TIMER_CALLBACK_MEMBER(sector_tick)
 	{
 		m_sector_timer->adjust(attotime::never);
-		atapi_fixed_cdrom_device::fill_buffer();
+		atapi_cdrom_device::fill_buffer();
 	}
 
 private:
@@ -104,11 +106,11 @@ public:
 		m_ata_irq_pending(false)
 	{ }
 
-	void stingnet(machine_config &config);
+	void stingnet(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -121,10 +123,8 @@ private:
 	required_device<ymz280b_device> m_ymz;
 	required_device<fujitsu_29f016a_device> m_sndflash;
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void main_map(address_map &map);
-	void ymz280b_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void ymz280b_map(address_map &map) ATTR_COLD;
 
 	void gcu_interrupt(int state);
 	void ata_interrupt(int state);
@@ -138,11 +138,6 @@ private:
 	u8 m_control;
 	bool m_ata_irq_pending;
 };
-
-uint32_t stingnet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_gcu->draw(screen, bitmap, cliprect);
-}
 
 void stingnet_state::gcu_interrupt(int state)
 {
@@ -324,33 +319,32 @@ void stingnet_state::stingnet(machine_config &config)
 
 	FUJITSU_29F016A(config, m_sndflash);
 
-	RTC62423(config, m_rtc, 0);
+	RTC62423(config, m_rtc);
 
 	// video hardware
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(800, 600);
 	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(stingnet_state::screen_update));
+	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_gcu, FUNC(k057714_device::vblank_w));
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(stingnet_state::gcu_interrupt));
 
-	PC16552D(config, m_duart, 0);
+	PC16552D(config, m_duart);
 	NS16550(config, "duart:chan0", XTAL(19'660'800));
 	NS16550(config, "duart:chan1", XTAL(19'660'800));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, m_ymz, 16934400));
 	ymz.set_addrmap(0, &stingnet_state::ymz280b_map);
-	ymz.add_route(1, "lspeaker", 1.0);
-	ymz.add_route(0, "rspeaker", 1.0);
+	ymz.add_route(1, "speaker", 1.0, 0);
+	ymz.add_route(0, "speaker", 1.0, 1);
 }
 
 ROM_START( tropchnc )
@@ -363,6 +357,6 @@ ROM_START( tropchnc )
 	DISK_IMAGE("gc968_ver_01", 0, SHA1(e96731a68e306876b9665cb9c1d69b9aa38acc3b))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 GAME(1999, tropchnc, 0, stingnet, stingnet, stingnet_state, empty_init, ROT90, "Konami", "Tropical Chance", MACHINE_NOT_WORKING)

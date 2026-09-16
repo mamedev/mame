@@ -88,7 +88,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mem_ctrl(*this, "memctrl")
-		, m_scsi_ctrl(*this, "scsibus:0:wd33c93")
+		, m_scsi_ctrl(*this, "wd33c93")
 		, m_edlc(*this, "edlc")
 		, m_eeprom(*this, "eeprom")
 		, m_hal2(*this, "hal2")
@@ -111,8 +111,8 @@ public:
 	void indy_4610(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <uint32_t addr_base> uint64_t bus_error_r(offs_t offset, uint64_t mem_mask = ~0);
 	template <uint32_t addr_base> void bus_error_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -120,16 +120,14 @@ protected:
 	uint8_t volume_r(offs_t offset);
 	void volume_w(offs_t offset, uint8_t data);
 
-	void ip24_map(address_map &map);
-	void ip24_base_map(address_map &map);
-	void pio0_map(address_map &map);
-	void pio1_map(address_map &map);
-	void pio2_map(address_map &map);
-	void pio3_map(address_map &map);
-	void pio5_map(address_map &map);
-	void pio6_map(address_map &map);
-
-	void wd33c93(device_t *device);
+	void ip24_map(address_map &map) ATTR_COLD;
+	void ip24_base_map(address_map &map) ATTR_COLD;
+	void pio0_map(address_map &map) ATTR_COLD;
+	void pio1_map(address_map &map) ATTR_COLD;
+	void pio2_map(address_map &map) ATTR_COLD;
+	void pio3_map(address_map &map) ATTR_COLD;
+	void pio5_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	static void scsi_devices(device_slot_interface &device);
 
@@ -158,7 +156,7 @@ class ip22_state : public ip24_state
 public:
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ip24_state(mconfig, type, tag)
-		, m_scsi_ctrl2(*this, "scsibus2:0:wd33c93")
+		, m_scsi_ctrl2(*this, "wd33c93_2")
 	{
 	}
 
@@ -167,11 +165,9 @@ public:
 private:
 	uint32_t eisa_io_r();
 
-	void wd33c93_2(device_t *device);
-
-	void ip22_map(address_map &map);
-	void pio4_map(address_map &map);
-	void pio6_map(address_map &map);
+	void ip22_map(address_map &map) ATTR_COLD;
+	void pio4_map(address_map &map) ATTR_COLD;
+	void pio6_map(address_map &map) ATTR_COLD;
 
 	required_device<wd33c93b_device> m_scsi_ctrl2;
 };
@@ -285,13 +281,6 @@ void ip24_state::machine_reset()
 static INPUT_PORTS_START( ip24 )
 INPUT_PORTS_END
 
-void ip24_state::wd33c93(device_t *device)
-{
-	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_ioc2, FUNC(ioc2_device::scsi0_int_w));
-	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
-}
-
 void ip24_state::scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM_SGI);
@@ -313,9 +302,13 @@ void ip24_state::ip24_base(machine_config &config, uint32_t system_clock)
 	m_mem_ctrl->int_dma_done_cb().set(m_ioc2, FUNC(ioc2_device::mc_dma_done_w));
 	m_mem_ctrl->eisa_present().set_constant(1);
 
-	NSCSI_BUS(config, "scsibus", 0);
-	NSCSI_CONNECTOR(config, "scsibus:0").option_set("wd33c93", WD33C93B)
-		.machine_config([this](device_t *device) { wd33c93(device); });
+	auto &scsibus(NSCSI_BUS(config, "scsibus"));
+
+	WD33C93B(config, m_scsi_ctrl, 10000000);
+	scsibus.set_external_device(0, m_scsi_ctrl);
+	m_scsi_ctrl->irq_cb().set(m_ioc2, FUNC(ioc2_device::scsi0_int_w));
+	m_scsi_ctrl->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi0_drq));
+
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr, false);
@@ -418,13 +411,6 @@ void ip24_state::indy_4610(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ip24_state::ip24_map);
 }
 
-void ip22_state::wd33c93_2(device_t *device)
-{
-	device->set_clock(10000000);
-	downcast<wd33c93b_device *>(device)->irq_cb().set(m_ioc2, FUNC(ioc2_device::scsi1_int_w));
-	downcast<wd33c93b_device *>(device)->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
-}
-
 void ip22_state::indigo2_4415(machine_config &config)
 {
 	constexpr uint32_t system_clock = 50'000'000;
@@ -437,9 +423,13 @@ void ip22_state::indigo2_4415(machine_config &config)
 	ip24_base(config, system_clock);
 	m_mem_ctrl->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(ip22_mc));
 
-	NSCSI_BUS(config, "scsibus2", 0);
-	NSCSI_CONNECTOR(config, "scsibus2:0").option_set("wd33c93", WD33C93B)
-		.machine_config([this](device_t *device) { wd33c93_2(device); });
+	auto &scsibus2(NSCSI_BUS(config, "scsibus2"));
+
+	WD33C93B(config, m_scsi_ctrl2, 10000000);
+	scsibus2.set_external_device(0, m_scsi_ctrl2);
+	m_scsi_ctrl2->irq_cb().set(m_ioc2, FUNC(ioc2_device::scsi1_int_w));
+	m_scsi_ctrl2->drq_cb().set(m_hpc3, FUNC(hpc3_device::scsi1_drq));
+
 	NSCSI_CONNECTOR(config, "scsibus2:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus2:3", scsi_devices, nullptr, false);
@@ -522,9 +512,9 @@ ROM_END
 
 ROM_START( indigo2_4415 )
 	ROM_REGION64_BE( 0x80000, "user1", 0 )
-	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" ) \
+	ROM_SYSTEM_BIOS( 0, "e", "Version 5.3 Rev E R4X00 Jan 29, 1996" )
 	ROMX_LOAD( "ip22prom.070-1367-012.bin", 0x000000, 0x080000, CRC(54460c16) SHA1(330d87b3a02a05fb49c85a569f6f84904587cb35), ROM_GROUPDWORD | ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" ) \
+	ROM_SYSTEM_BIOS( 1, "b4", "Version 5.1.2 Rev B4 R4X00 Dec 9, 1993" )
 	ROMX_LOAD( "ip22prom.070-1367-002.bin", 0x000000, 0x080000, CRC(ae5ecd08) SHA1(422568ae95282ee23b2fe123267f9b915a1dc3dc), ROM_GROUPDWORD | ROM_BIOS(1) )
 ROM_END
 

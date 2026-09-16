@@ -14,14 +14,14 @@
 class sgi_re2_device : public device_t
 {
 public:
-	sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	sgi_re2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	auto out_rdy() { return m_rdy_cb.bind(); }
 	auto out_drq() { return m_drq_cb.bind(); }
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 

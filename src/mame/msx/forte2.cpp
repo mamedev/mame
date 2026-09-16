@@ -63,7 +63,7 @@ public:
 	void pesadelo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,8 +74,8 @@ private:
 	u8 input_r();
 	void input_mask_w(u8 data);
 
-	void io_mem(address_map &map);
-	void program_mem(address_map &map);
+	void io_mem(address_map &map) ATTR_COLD;
+	void program_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -185,7 +185,7 @@ void forte2_state::pesadelo(machine_config &config)
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -123,7 +123,8 @@ space:install_read_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luascript-ref-addrspacetap>` that
     will receive notifications on reads from the specified range of addresses in
     the address space.  The start and end addresses are inclusive.  The name
-    must be a string, and the callback must be a function.
+    must be a string, and the callback must be a function.  Returns the new
+    pass-through handler.
 
     The callback is passed three arguments for the access offset, the data read,
     and the memory access mask.  The offset is the absolute offset into the
@@ -134,7 +135,8 @@ space:install_write_tap(start, end, name, callback)
     Installs a :ref:`pass-through handler <luascript-ref-addrspacetap>` that
     will receive notifications on write to the specified range of addresses in
     the address space.  The start and end addresses are inclusive.  The name
-    must be a string, and the callback must be a function.
+    must be a string, and the callback must be a function.  Returns the new
+    pass-through handler.
 
     The callback is passed three arguments for the access offset, the data
     written, and the memory access mask.  The offset is the absolute offset into
@@ -419,18 +421,28 @@ manager.machine.devices[tag]:memregion(tag)
 Methods
 ~~~~~~~
 
+region:read(offs, len)
+    Reads up to the specified length in bytes from the specified offset in the
+    memory region.  The bytes read will be returned as a string.  If the
+    specified length extends beyond the end of the memory region, the returned
+    string will be shorter than requested.  Note that the data will be in host
+    byte order.
 region:read_i{8,16,32,64}(offs)
     Reads a signed integer value of the size in bits from the specified offset
-    in the memory region.
+    in the memory region.  The offset is specified in bytes.  Reading beyond the
+    end of the memory region returns zero.
 region:read_u{8,16,32,64}(offs)
     Reads an unsigned integer value of the size in bits from the specified
-    offset in the memory region.
+    offset in the memory region.  The offset is specified in bytes.  Reading
+    beyond the end of the memory region returns zero.
 region:write_i{8,16,32,64}(offs, val)
     Writes a signed integer value of the size in bits to the specified offset in
-    the memory region.
+    the memory region.  The offset is specified in bytes.  Attempting to write
+    beyond the end of the memory region has no effect.
 region:write_u{8,16,32,64}(offs, val)
     Writes an unsigned integer value of the size in bits to the specified offset
-    in the memory region.
+    in the memory region.  The offset is specified in bytes.  Attempting to
+    write beyond the end of the memory region has no effect.
 
 Properties
 ~~~~~~~~~~

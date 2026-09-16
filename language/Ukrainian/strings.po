@@ -1,24 +1,24 @@
 # Ukrainian translations for MAME package.
 # Український переклад MAME-пакета
-# Copyright (C) 1997-2023 MAMEdev and contributors
+# Copyright (C) 1997-2026 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
-# Automatically generated, 2023.
+# Automatically generated, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2023-02-18 13:18+0200\n"
+"PO-Revision-Date: 2024-10-12 13:49+0300\n"
 "Last-Translator: Stanley Kid <stanley.udr.kid@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : "
-"n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 3.2.2\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -505,7 +505,7 @@ msgstr "Опції оформлення"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr "Масштабувати до області екрана"
+msgstr "Масштабувати до ділянки екрана"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
@@ -700,19 +700,18 @@ msgid "Wait Vertical Sync"
 msgstr "Чекати вертикальну синхронізацію"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
-#: src/frontend/mame/ui/videoopt.cpp:169
-#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:488
-#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
-#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
+#: src/frontend/mame/ui/videoopt.cpp:169 src/frontend/mame/ui/inputtoggle.cpp:96
+#: src/frontend/mame/ui/custui.cpp:488 src/frontend/mame/ui/analogipt.cpp:527
+#: plugins/cheatfind/init.lua:766 plugins/cheatfind/init.lua:777
+#: plugins/cheat/init.lua:679
 msgid "On"
 msgstr "Увімкнути"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
-#: src/frontend/mame/ui/videoopt.cpp:185
-#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:488
-#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:763
-#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
-#: plugins/cheat/init.lua:691
+#: src/frontend/mame/ui/videoopt.cpp:185 src/frontend/mame/ui/inputtoggle.cpp:91
+#: src/frontend/mame/ui/custui.cpp:488 src/frontend/mame/ui/analogipt.cpp:527
+#: plugins/cheatfind/init.lua:763 plugins/cheatfind/init.lua:774
+#: plugins/cheat/init.lua:682 plugins/cheat/init.lua:691
 msgid "Off"
 msgstr "Вимкнути"
 
@@ -720,8 +719,7 @@ msgstr "Вимкнути"
 msgid "Auto"
 msgstr "Автоматично"
 
-#: src/frontend/mame/ui/menu.cpp:1272
-#: src/frontend/mame/ui/simpleselgame.cpp:283
+#: src/frontend/mame/ui/menu.cpp:1272 src/frontend/mame/ui/simpleselgame.cpp:283
 #: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Return to Previous Menu"
 msgstr "Повернутися до попереднього меню"
@@ -730,17 +728,15 @@ msgstr "Повернутися до попереднього меню"
 msgid "File Manager"
 msgstr "Менеджер файлів"
 
-#: src/frontend/mame/ui/filemngr.cpp:152
-#: src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:581
-#: src/frontend/mame/ui/inputtoggle.cpp:75
+#: src/frontend/mame/ui/filemngr.cpp:152 src/frontend/mame/ui/confswitch.cpp:119
+#: src/frontend/mame/ui/inputmap.cpp:581 src/frontend/mame/ui/inputtoggle.cpp:75
 #: src/frontend/mame/ui/analogipt.cpp:412
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/filemngr.cpp:166
-#: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
+#: src/frontend/mame/ui/filemngr.cpp:166 src/frontend/mame/ui/confswitch.cpp:170
+#: src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
 msgstr "Перезавантажити систему"
 
@@ -760,7 +756,7 @@ msgstr "Опції відео: %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:161
 msgid "Zoom to Screen Area"
-msgstr "Масштабувати до області екрана"
+msgstr "Масштабувати до ділянки екрана"
 
 #: src/frontend/mame/ui/videoopt.cpp:173
 msgid "X Only"
@@ -909,8 +905,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:88
 msgid ""
-"One or more ROMs/disk images for this system have not been correctly "
-"dumped.\n"
+"One or more ROMs/disk images for this system have not been correctly dumped.\n"
 msgstr ""
 "Один або декілька ROM'ів / образів дисків системи неналежно задамплено.\n"
 
@@ -1166,8 +1161,7 @@ msgid "Emulated"
 msgstr "Емульована"
 
 #: src/frontend/mame/ui/keyboard.cpp:60 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:579
-#: src/frontend/mame/ui/inputtoggle.cpp:73
+#: src/frontend/mame/ui/inputmap.cpp:579 src/frontend/mame/ui/inputtoggle.cpp:73
 #: src/frontend/mame/ui/analogipt.cpp:410
 #, c-format
 msgid "%1$s [root%2$s]"
@@ -1323,7 +1317,7 @@ msgstr "Не BIOS"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr ""
+msgstr "Основні"
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1398,7 +1392,7 @@ msgstr "Уподобання"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr ""
+msgstr "Основні"
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -2004,7 +1998,8 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
-"У вибраній програмі відсутній один або декілька необхідних ROM / CHD-образів.\n"
+"У вибраній програмі відсутній один або декілька необхідних ROM / CHD-"
+"образів.\n"
 "Знайди правильні файли чи вибери інший."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:151
@@ -3168,7 +3163,7 @@ msgstr "Програма - клон: %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:695
 msgid "Software is parent"
-msgstr ""
+msgstr "Програма - основна."
 
 #: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Supported: No"
@@ -3184,7 +3179,7 @@ msgstr "Підтримка"
 
 #: src/frontend/mame/ui/selmenu.cpp:726
 msgid "System is parent"
-msgstr ""
+msgstr "Система - основна."
 
 #: src/frontend/mame/ui/selmenu.cpp:728 src/frontend/mame/ui/selmenu.cpp:730
 #, c-format
@@ -3268,7 +3263,7 @@ msgstr "Система - клон\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "System is Parent\t\n"
-msgstr ""
+msgstr "Система - основна\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Analog Controls\tYes\n"
@@ -5785,11 +5780,11 @@ msgstr "Порожній тип імені."
 #: plugins/cheatfind/init.lua:468
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr "Чіт записано до %s та додано до cheat.simple."
+msgstr "Чіт записано до %s та додано до \"cheat.simple\"."
 
 #: plugins/cheatfind/init.lua:478
 msgid "Cheat added to cheat.simple"
-msgstr "Чіт додано до cheat.simple."
+msgstr "Чіт додано до \"cheat.simple\"."
 
 #: plugins/cheatfind/init.lua:483
 msgid ""
@@ -5797,7 +5792,7 @@ msgid ""
 "Ensure that cheatpath folder exists"
 msgstr ""
 "Неможливо записати файл.\n"
-"Переконайсь у наявності теки cheatpath."
+"Переконайсь у наявності теки \"cheatpath\"."
 
 #: plugins/cheatfind/init.lua:497
 msgid "CPU or RAM"
@@ -5829,7 +5824,7 @@ msgstr "Автоматично перемикати призупинення е�
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "Усі слоти очищено, поточний стан збережено до слоту 1."
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -5838,12 +5833,12 @@ msgstr "Розпочати новий пошук"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "Стан пам'яті збережено до слоту %d."
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "Зберегти поточний стан пам'яті до слоту %d"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -5853,27 +5848,27 @@ msgstr "Загалом знайдено %d збігів."
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "Виконати порівняння: слот %d %s слот %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "Виконати порівняння: слот %d %s слот %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "Виконати порівняння: слот %d BITWISE%s слот %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "Виконати порівняння: слот %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "Слот %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
@@ -5933,11 +5928,11 @@ msgstr "Формат даних"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "Значення слота 1"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr ""
+msgstr "Значення останнього слота"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
@@ -5945,15 +5940,19 @@ msgstr "Тестувати / Записати отримане значення"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
-"Use this if you want to poke the Slot 1 value (eg. You started with "
-"something but lost it)"
+"Use this if you want to poke the Slot 1 value (eg. You started with something "
+"but lost it)"
 msgstr ""
+"Використовуй для вставлення значення слота 1 (наприклад, почато з чимось, але "
+"це втрачено)."
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Використовуй для вставлення значення останнього слота (наприклад, почато без "
+"предмету, але нарешті отримано)."
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
@@ -6065,8 +6064,7 @@ msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
 msgstr "[відсутні турбокнопки]"
 
-#: plugins/autofire/autofire_menu.lua:109
-#: plugins/autofire/autofire_menu.lua:263
+#: plugins/autofire/autofire_menu.lua:109 plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
 msgstr "Додати турбокнопку"
@@ -6076,8 +6074,7 @@ msgctxt "plugin-autofire"
 msgid "n/a"
 msgstr "Не доступно"
 
-#: plugins/autofire/autofire_menu.lua:152
-#: plugins/autofire/autofire_menu.lua:154
+#: plugins/autofire/autofire_menu.lua:152 plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
 msgstr "[не встановлено]"

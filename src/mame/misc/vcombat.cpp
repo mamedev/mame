@@ -126,7 +126,7 @@ public:
 	void vcombat(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tlc34076_device> m_tlc34076;
@@ -166,11 +166,11 @@ private:
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void single_i860_map(address_map &map);
-	void dual_i860_map(address_map &map);
-	void sound_map(address_map &map);
-	void vid_0_map(address_map &map);
-	void vid_1_map(address_map &map);
+	void single_i860_map(address_map &map) ATTR_COLD;
+	void dual_i860_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void vid_0_map(address_map &map) ATTR_COLD;
+	void vid_1_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_c_r(offs_t offset, uint64_t *v);
 	void m_c_w(offs_t offset, uint16_t data, uint16_t mem_mask, uint64_t *v);
@@ -720,11 +720,11 @@ void vcombat_state::vcombat(machine_config &config)
 //  m_crtc->set_screen("screen");
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 
-	screen_device &aux(SCREEN(config, "aux", SCREEN_TYPE_RASTER));
+	screen_device &aux(SCREEN(config, "aux"));
 	aux.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
 	aux.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_aux));
 
@@ -757,7 +757,7 @@ void vcombat_state::shadfgtr(machine_config &config)
 	m_crtc->set_char_width(16);
 	m_crtc->out_hsync_callback().set(FUNC(vcombat_state::sound_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224);
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 

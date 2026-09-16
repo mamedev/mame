@@ -38,10 +38,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(set_irq_tick);
 	TIMER_CALLBACK_MEMBER(clr_irq_tick);
@@ -77,15 +77,15 @@ public:
 protected:
 	a2bus_mcms1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override { return false; }
+	virtual void reset_from_bus() override;
 
 private:
 	void irq_w(int state);
@@ -103,14 +103,13 @@ public:
 protected:
 	a2bus_mcms2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override { return false; }
 
 private:
 	a2bus_mcms1_device *m_card1;    // card 1 for passthrough

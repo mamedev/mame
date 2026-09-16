@@ -1,7 +1,7 @@
 // PercentPrinter.h
 
-#ifndef __PERCENT_PRINTER_H
-#define __PERCENT_PRINTER_H
+#ifndef ZIP7_INC_PERCENT_PRINTER_H
+#define ZIP7_INC_PERCENT_PRINTER_H
 
 #include "../../../Common/StdOutStream.h"
 
@@ -26,6 +26,13 @@ struct CPercentPrinterState
 
 class CPercentPrinter: public CPercentPrinterState
 {
+public:
+  CStdOutStream *_so;
+  bool DisablePrint;
+  bool NeedFlush;
+  unsigned MaxLen;
+  
+private:
   UInt32 _tickStep;
   DWORD _prevTick;
 
@@ -41,16 +48,13 @@ class CPercentPrinter: public CPercentPrinterState
   void GetPercents();
 
 public:
-  CStdOutStream *_so;
-
-  bool NeedFlush;
-  unsigned MaxLen;
   
   CPercentPrinter(UInt32 tickStep = 200):
-      _tickStep(tickStep),
-      _prevTick(0),
+      DisablePrint(false),
       NeedFlush(true),
-      MaxLen(80 - 1)
+      MaxLen(80 - 1),
+      _tickStep(tickStep),
+      _prevTick(0)
   {}
 
   ~CPercentPrinter();

@@ -13,7 +13,7 @@ OSC: 32.000MHz
 2 8-way Dipswitch banks
 Ram:
  2 UM61256FK-15 (near 3 & 4 (68k program roms))
- 3 Windbond W24257AK-15 (near TM29F550ZX)
+ 3 Winbond W24257AK-15 (near TM29F550ZX)
  2 UM61256AK-15 (near Z80)
 
 P1, P2 & P3 4-pin connectors (unknown purpose)
@@ -60,7 +60,7 @@ public:
 	void go2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -78,9 +78,9 @@ private:
 	void pcm_1_bankswitch_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_io(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -140,10 +140,10 @@ static INPUT_PORTS_START( go2000 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, "Coin / Credits" ) PORT_DIPLOCATION("SW-1:1,2")
-	PORT_DIPSETTING(      0x0000, "1 Coin / 50 Credits" )
-	PORT_DIPSETTING(      0x0003, "1 Coin / 100 Credits" )
-	PORT_DIPSETTING(      0x0002, "1 Coin / 125 Credits" )
-	PORT_DIPSETTING(      0x0001, "1 Coin / 150 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(      0x0002, "1 Coin/125 Credits" )
+	PORT_DIPSETTING(      0x0001, "1 Coin/150 Credits" )
 	PORT_DIPNAME( 0x000c, 0x000c, "Minimum Coin" ) PORT_DIPLOCATION("SW-1:3,4")
 	PORT_DIPSETTING(      0x000c, "1" )
 	PORT_DIPSETTING(      0x0008, "2" )
@@ -343,7 +343,7 @@ void go2000_state::go2000(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_go2000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -376,4 +376,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2000, go2000, 0, go2000, go2000, go2000_state, empty_init, ROT0, "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, go2000, 0, go2000, go2000, go2000_state, empty_init, ROT0, "SunA", "Go 2000", MACHINE_SUPPORTS_SAVE ) // manufacturer confirmed from https://web.archive.org/web/20160624224827/http://www.grb.or.kr/download/GameImage/2000/2000-A0055.jpg

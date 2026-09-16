@@ -95,7 +95,8 @@ protected:
 	int cass_r();
 	void cass_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+
 	required_device<s2650_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 };
@@ -110,13 +111,13 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void ravens(machine_config &config);
+	void ravens(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 	u8 port17_r();
 	void display_w(offs_t offset, u8 data);
 	void leds_w(u8 data);
@@ -134,21 +135,22 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	void ravens2(machine_config &config);
+	void ravens2(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 	void kbd_put(u8 data);
 	u8 port07_r();
 	void port1b_w(u8 data);
 	void port1c_w(u8 data);
+
+	required_device<generic_terminal_device> m_terminal;
 	u8 m_term_out = 0U;
 	u8 m_term_in = 0U;
-	required_device<generic_terminal_device> m_terminal;
 };
 
 void ravens_base::cass_w(int state)
@@ -163,8 +165,6 @@ int ravens_base::cass_r()
 
 void ravens_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
 }
 
 void ravens_state::display_w(offs_t offset, u8 data)
@@ -380,7 +380,7 @@ void ravens2_state::ravens2(machine_config &config)
 	m_maincpu->flag_handler().set(FUNC(ravens2_state::cass_w));
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ravens2_state::kbd_put));
 
 	/* quickload */

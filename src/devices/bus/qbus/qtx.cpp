@@ -34,7 +34,7 @@ qts1_device::qts1_device(const machine_config &mconfig, const char *tag, device_
 	, device_qbus_card_interface(mconfig, *this)
 	, m_localcpu(*this, "localcpu")
 	, m_mfp(*this, "mfp")
-	, m_asc(*this, "scsibus:7:asc")
+	, m_asc(*this, "asc")
 	, m_dma_address(0)
 {
 }
@@ -102,22 +102,6 @@ void qts1_device::fc7_map(address_map &map)
 	map(0xffff5, 0xffff5).r(m_mfp, FUNC(mc68901_device::get_vector));
 }
 
-static void qtx_scsi_devices(device_slot_interface &device)
-{
-	default_scsi_devices(device);
-	device.option_add_internal("asc", NCR53C90A);
-}
-
-void qts1_device::asc_config(device_t *device)
-{
-	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
-
-	adapter.set_clock(20_MHz_XTAL);
-
-	adapter.irq_handler_cb().set(m_mfp, FUNC(mc68901_device::i7_w)).invert();
-	//adapter.drq_handler_cb().set(?);
-}
-
 void qts1_device::device_add_mconfig(machine_config &config)
 {
 	M68008(config, m_localcpu, 20_MHz_XTAL / 2); // guess
@@ -131,15 +115,18 @@ void qts1_device::device_add_mconfig(machine_config &config)
 	m_mfp->out_so_cb().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_mfp->out_irq_cb().set_inputline("localcpu", M68K_IRQ_2); // probably
 
-	NSCSI_BUS(config, "scsibus");
-	NSCSI_CONNECTOR(config, "scsibus:0", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:1", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:2", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:4", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:5", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:6", qtx_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:7", qtx_scsi_devices, "asc", true).set_option_machine_config("asc", [this] (device_t *device) { asc_config(device); });
+	auto &scsi(NSCSI_BUS(config, "scsibus"));
+	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, nullptr);
+
+	NCR53C90A(config, m_asc, 20_MHz_XTAL);
+	scsi.set_external_device(7, m_asc);
+	m_asc->irq_handler_cb().set(m_mfp, FUNC(mc68901_device::i7_w)).invert();
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_mfp, FUNC(mc68901_device::si_w));

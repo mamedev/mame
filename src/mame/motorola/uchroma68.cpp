@@ -125,7 +125,6 @@ expansion.
 #include "machine/timer.h"
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "machine/terminal.h"
@@ -157,10 +156,10 @@ public:
 	void uchroma68(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void uchroma68_mem(address_map &map);
+	void uchroma68_mem(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(kbd_strobe);
 
@@ -179,7 +178,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6846_device> m_mc6846;
-	required_device<mc6847_ntsc_device> m_mc6847;
+	required_device<mc6847_device> m_mc6847;
 	required_device<pia6821_device> m_pia;
 	required_device<acia6850_device> m_acia;
 	required_device<clock_device> m_acia_tx_clock;
@@ -451,9 +450,12 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
+	// NTSC
+	m_screen->set_raw(XTAL_UCHROMA68 * 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_screen_update(m_mc6847, FUNC(mc6847_base_device::screen_update));
 
-	MC6847_NTSC(config, m_mc6847, XTAL_UCHROMA68);
+	MC6847(config, m_mc6847, XTAL_UCHROMA68);
 	m_mc6847->set_screen(m_screen);
 	m_mc6847->input_callback().set(FUNC(uchroma68_state::mc6847_videoram_r));
 
@@ -461,7 +463,7 @@ void uchroma68_state::uchroma68(machine_config &config)
 	m_pia->readpa_handler().set(FUNC(uchroma68_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(uchroma68_state::pia_pb_r));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set([this] (bool state) { m_cass_txbit = state; });
 
 	CLOCK(config, m_acia_tx_clock, 4800);
@@ -469,7 +471,7 @@ void uchroma68_state::uchroma68(machine_config &config)
 
 	TIMER(config, "kansas_r").configure_periodic(FUNC(uchroma68_state::kansas_r), attotime::from_hz(40000));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(uchroma68_state::kbd_put));
 }
 

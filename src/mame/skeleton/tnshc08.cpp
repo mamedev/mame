@@ -50,8 +50,8 @@ public:
 	u8 ppi_r() { return 0x20; }
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -81,7 +81,7 @@ void tnshc08_state::tnshc08(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tnshc08_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tnshc08_state::io_map);
 
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(tnshc08_state::ppi_r));
 }
 
@@ -100,4 +100,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME     FLAGS
-COMP( 1988, tnshc08, 0,      0,      tnshc08, tnshc08, tnshc08_state, empty_init, u8"JZD Slušovice", "TNS HC-08", MACHINE_IS_SKELETON)
+COMP( 1988, tnshc08, 0,      0,      tnshc08, tnshc08, tnshc08_state, empty_init, u8"JZD Slušovice", "TNS HC-08", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

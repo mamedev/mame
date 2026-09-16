@@ -82,7 +82,7 @@ void x1_001_device::device_start()
 	   perspective.
 
 	   jjsquawk has a garbage tile in the bottom left instead, but in this case the entire
-	   m_spriteylow is initalized (to 0), but sprite entry 0 for the other tables is never
+	   m_spriteylow is initialized (to 0), but sprite entry 0 for the other tables is never
 	   written to, again meaning it picks up whatever we clear the RAM to as positional
 	   values.
 

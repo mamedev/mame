@@ -96,13 +96,13 @@ private:
 	void port94_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_cone = 0;
 	u8 m_port85 = 0U;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<z80pio_device> m_pio_s;
@@ -307,7 +307,7 @@ void pcm_state::pcm(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(pcm_state::screen_update));
@@ -323,7 +323,7 @@ void pcm_state::pcm(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG, 0);
+	K7659_KEYBOARD(config, K7659_KEYBOARD_TAG);
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 

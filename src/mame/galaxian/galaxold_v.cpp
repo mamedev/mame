@@ -68,7 +68,7 @@ void galaxold_state::galaxold_palette(palette_device &palette)
 		// blue component
 		bit0 = BIT(*color_prom, 6);
 		bit1 = BIT(*color_prom, 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, r, g, b);
 		color_prom++;
@@ -134,7 +134,7 @@ void galaxold_state::s2650_palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(*color_prom, 6);
 		bit1 = BIT(*color_prom, 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, r, g, b);
 		color_prom++;
@@ -281,7 +281,7 @@ void galaxold_state::dambustr_palette(palette_device &palette)
 		// blue component
 		bit0 = BIT(*color_prom, 6);
 		bit1 = BIT(*color_prom, 7);
-		int const g = 0x4f * bit0 + 0xa8 * bit1;
+		int const g = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, r, g, b);
 		color_prom++;
@@ -305,7 +305,7 @@ void galaxold_state::dambustr_palette(palette_device &palette)
 	{
 		int const r = BIT(i, 0) * 0x47;
 		int const g = BIT(i, 1) * 0x47;
-		int const b = BIT(i, 2) * 0x4f;
+		int const b = BIT(i, 2) * 0x47;
 		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 }
@@ -600,6 +600,14 @@ VIDEO_START_MEMBER(galaxold_state,drivfrcg)
 	m_modify_color = &galaxold_state::drivfrcg_modify_color;
 
 	m_color_mask = 0xff;
+}
+
+VIDEO_START_MEMBER(galaxold_state, dkingjrv)
+{
+	VIDEO_START_CALL_MEMBER(galaxold);
+
+	m_modify_charcode   = &galaxold_state::pisces_modify_charcode;
+	m_modify_spritecode = &galaxold_state::dkingjrv_modify_spritecode;
 }
 
 VIDEO_START_MEMBER(galaxold_state,ad2083)
@@ -965,6 +973,11 @@ void galaxold_state::ad2083_modify_spritecode(uint8_t *spriteram, int *code, int
 void galaxold_state::dambustr_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	*code += 0x40;
+}
+
+void galaxold_state::dkingjrv_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
+{
+	*code |= (m_gfxbank[1] << 6);
 }
 
 

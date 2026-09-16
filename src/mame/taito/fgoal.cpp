@@ -49,9 +49,9 @@ public:
 	int _80_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -105,11 +105,9 @@ private:
 	static int intensity(int bits);
 	unsigned video_ram_address();
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void fgoal_state::color_w(uint8_t data)
 {
@@ -220,8 +218,6 @@ uint32_t fgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 int fgoal_state::intensity(int bits)
 {
@@ -440,7 +436,7 @@ static INPUT_PORTS_START( fgoal )
 	// extra credit score changes depending on player's performance
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fgoal_state, _80_r) // 128V
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(fgoal_state::_80_r)) // 128V
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
@@ -546,7 +542,7 @@ void fgoal_state::fgoal(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 263);
 	m_screen->set_visarea(0, 255, 16, 255);

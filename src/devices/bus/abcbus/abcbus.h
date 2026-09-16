@@ -95,8 +95,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_DEVICES_ABCBUS_ABCBUS_H
-#define MAME_DEVICES_ABCBUS_ABCBUS_H
+#ifndef MAME_BUS_ABCBUS_ABCBUS_H
+#define MAME_BUS_ABCBUS_ABCBUS_H
 
 #pragma once
 
@@ -163,10 +163,7 @@ public:
 	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: abcbus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	auto irq_callback() { return m_write_irq.bind(); }
@@ -235,9 +232,9 @@ public:
 	void xint5_w(int state) { m_xint5 = state; m_write_xint5(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
@@ -263,7 +260,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device)
 
 
@@ -275,4 +272,4 @@ void abc1600bus_cards(device_slot_interface &device);
 typedef device_type_enumerator<abcbus_slot_device> abcbus_slot_device_enumerator;
 
 
-#endif // MAME_DEVICES_ABCBUS_ABCBUS_H
+#endif // MAME_BUS_ABCBUS_ABCBUS_H

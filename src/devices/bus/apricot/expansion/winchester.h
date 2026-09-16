@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_APRICOT_WINCHESTER_H
-#define MAME_BUS_APRICOT_WINCHESTER_H
+#ifndef MAME_BUS_APRICOT_EXPANSION_WINCHESTER_H
+#define MAME_BUS_APRICOT_EXPANSION_WINCHESTER_H
 
 #pragma once
 
@@ -29,9 +29,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void hdc_intrq_w(int state);
@@ -46,7 +46,7 @@ private:
 	uint8_t data_r();
 	void data_w(uint8_t data);
 
-	void regs(address_map &map);
+	void regs(address_map &map) ATTR_COLD;
 
 	required_device<wd1010_device> m_hdc;
 
@@ -62,4 +62,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(APRICOT_WINCHESTER, apricot_winchester_device)
 
-#endif // MAME_BUS_APRICOT_WINCHESTER_H
+#endif // MAME_BUS_APRICOT_EXPANSION_WINCHESTER_H

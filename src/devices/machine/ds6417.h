@@ -16,7 +16,7 @@ class ds6417_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds6417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ds6417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
@@ -30,8 +30,8 @@ public:
 	int data_r() { return m_read ? m_data : 0; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t calccrc(uint8_t bit, uint8_t crc) const;

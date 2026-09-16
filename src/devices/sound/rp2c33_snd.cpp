@@ -7,7 +7,7 @@
     Based on:
     - NSFplay github code by Brad Smith/Brezza
     - Information from NESDev wiki
-      (https://wiki.nesdev.com/w/index.php/FDS_audio)
+      (https://www.nesdev.org/wiki/FDS_audio)
 
     TODO:
     - verify register behaviors
@@ -221,9 +221,9 @@ void rp2c33_sound_device::write(offs_t offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void rp2c33_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void rp2c33_sound_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		m_output = 0;
 		if (!m_env_halt && !m_wave_halt)
@@ -234,7 +234,7 @@ void rp2c33_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 		exec_mod();
 		exec_wave();
 		/* Update the buffers */
-		outputs[0].put_int(i, m_output * m_mvol_table[m_mvol], 32768);
+		stream.put_int(0, i, m_output * m_mvol_table[m_mvol], 32768);
 	}
 }
 
@@ -299,7 +299,7 @@ inline void rp2c33_sound_device::exec_mod()
 		m_mod_acc += m_mod_freq; // input clock * frequency / 65536
 		while (m_mod_acc > 0xffff)
 		{
-			int val = m_mod_table[((m_mod_addr++) >> 1) & 0x1f] & 7;
+			const int val = m_mod_table[((m_mod_addr++) >> 1) & 0x1f] & 7;
 			m_mod_acc -= (1 << 16);
 			if (val == 4)
 				m_mod_pos = 0;

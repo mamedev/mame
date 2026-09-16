@@ -85,16 +85,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void p0(machine_config &config);   // base config
-	void p2(machine_config &config);   // multi-mode card
-	void p3(machine_config &config);   // unknown card
-	void r1(machine_config &config);   // r1
-	void r1v(machine_config &config);  // r1 with votrax
+	void p0(machine_config &config) ATTR_COLD;   // base config
+	void p2(machine_config &config) ATTR_COLD;   // multi-mode card
+	void p3(machine_config &config) ATTR_COLD;   // unknown card
+	void r1(machine_config &config) ATTR_COLD;   // r1
+	void r1v(machine_config &config) ATTR_COLD;  // r1 with votrax
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port1a_r();
@@ -104,7 +104,7 @@ private:
 	void port2b_w(u8 data);
 	void port3a_w(u8 data);
 	void port3b_w(u8 data);
-	void gts80a_map(address_map &map);
+	void gts80a_map(address_map &map) ATTR_COLD;
 
 	u8 m_segment = 0U;
 	u8 m_lamprow = 0U;
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( gts80a )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X8")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam") PORT_CHANGED_MEMBER(DEVICE_SELF, gts80a_state, slam_w, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gts80a_state::slam_w), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( gts80a_state::slam_w )
@@ -499,9 +499,6 @@ void gts80a_state::port3b_w(u8 data)
 
 void gts80a_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_lamprow));
 	save_item(NAME(m_swrow));
 	save_item(NAME(m_segment));
@@ -596,8 +593,8 @@ public:
 
 private:
 	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void video_io_map(address_map &map);
-	void video_map(address_map &map);
+	void video_io_map(address_map &map) ATTR_COLD;
+	void video_map(address_map &map) ATTR_COLD;
 	required_device<cpu_device> m_videocpu;
 	required_shared_ptr<uint8_t> m_vram;
 };
@@ -651,7 +648,7 @@ void caveman_state::caveman(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &caveman_state::video_map);
 	m_videocpu->set_addrmap(AS_IO, &caveman_state::video_io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -969,29 +966,29 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1981, dvlsdre,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Devil's Dare",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dvlsdre2, 0,       p2,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Devil's Dare (Sound Only)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, rocky,    0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, rockyf,   rocky,   r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, spirit,   0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, punk,     0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, striker,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, krullp,   0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, qbquest,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sorbit,   0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rflshdlx, 0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, goinnuts, 0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, amazonh,  0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, amazonha, amazonh, r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rackempp, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, raimfire, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jack2opn, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, touchdn,  0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Touchdown",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, alienstr, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Alien Star",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, thegames, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "The Games",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, eldorado, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "El Dorado City of Gold",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, icefever, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ice Fever",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dvlsdre,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Devil's Dare",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dvlsdre2, 0,       p2,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Devil's Dare (Sound Only)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rocky,    0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, rockyf,   rocky,   r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, spirit,   0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Spirit",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, punk,     0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Punk!",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, striker,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker (Pinball)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, krullp,   0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, qbquest,  0,       r1v, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sorbit,   0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rflshdlx, 0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, goinnuts, 0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Goin' Nuts",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, amazonh,  0,       r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, amazonha, amazonh, r1,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rackempp, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rack 'em Up! (Pinball)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, raimfire, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ready...Aim...Fire!",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jack2opn, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Jacks to Open",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, touchdn,  0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Touchdown",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, alienstr, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Alien Star",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, thegames, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "The Games",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, eldorado, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "El Dorado City of Gold",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, icefever, 0,       p3,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ice Fever",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 /* custom (+video) */
-GAME( 1981, caveman,  0,       caveman, caveman, caveman_state, empty_init, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, cavemana, caveman, caveman, caveman, caveman_state, empty_init, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, caveman,  0,       caveman, caveman, caveman_state, empty_init, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cavemana, caveman, caveman, caveman, caveman_state, empty_init, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Stefan Jokisch, Ivan Vangelista, Ryan Holtz
+// copyright-holders:Stefan Jokisch, Ryan Holtz
 /***************************************************************************
 
 Atari Flyball Driver
@@ -69,9 +69,9 @@ private:
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void flyball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,7 +80,7 @@ private:
 	TIMER_CALLBACK_MEMBER(pot_clear_callback);
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
-	void flyball_map(address_map &map);
+	void flyball_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -433,7 +433,6 @@ void flyball_state::machine_start()
 		m_pot_assert_timer[i] = timer_alloc(FUNC(flyball_state::joystick_callback), this);
 	m_pot_clear_timer = timer_alloc(FUNC(flyball_state::pot_clear_callback), this);
 	m_quarter_timer = timer_alloc(FUNC(flyball_state::quarter_callback), this);
-	m_lamp.resolve();
 
 	save_item(NAME(m_pitcher_vert));
 	save_item(NAME(m_pitcher_horz));
@@ -473,7 +472,7 @@ void flyball_state::flyball(machine_config &config)
 	m_outlatch->q_out_cb<7>().set(FUNC(flyball_state::lamp_w)); // 1 player lamp
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(flyball_state::screen_update));
 	m_screen->set_palette(m_palette);

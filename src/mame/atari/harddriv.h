@@ -19,7 +19,7 @@
 #include "cpu/dsp32/dsp32.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68010.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "cpu/tms34010/tms34010.h"
 
 #include "machine/74259.h"
@@ -51,14 +51,14 @@ DECLARE_DEVICE_TYPE(STEELTAL1_BOARD,              steeltal1_board_device_state)
 DECLARE_DEVICE_TYPE(STEELTALP_BOARD,              steeltalp_board_device_state)
 DECLARE_DEVICE_TYPE(STRTDRIV_BOARD,               strtdriv_board_device_state)
 DECLARE_DEVICE_TYPE(HDRIVAIR_BOARD,               hdrivair_board_device_state)
-DECLARE_DEVICE_TYPE(HDRIVAIRP_BOARD,              hdrivairp_board_device_state)
+DECLARE_DEVICE_TYPE(HDRIVAIR0_BOARD,              hdrivair0_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD,         harddriv_sound_board_device)
 
 
 class harddriv_state : public device_t
 {
 public:
-	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	harddriv_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void driver_msp(machine_config &config);
 	void driver_nomsp(machine_config &config);
@@ -83,7 +83,7 @@ public:
 	void init_racedrivc1(void);
 
 	void init_hdrivair(void);
-	void init_hdrivairp(void);
+	void init_hdrivair0(void);
 
 	void init_steeltal(void);
 	void init_steeltal1(void);
@@ -267,23 +267,23 @@ protected:
 	void hdds3xdsp_serial_tx_callback(uint32_t data);
 	uint32_t hdds3xdsp_serial_rx_callback();
 
-	void adsp_data_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void driver_68k_map(address_map &map);
-	void driver_gsp_map(address_map &map);
-	void driver_msp_map(address_map &map);
-	void ds3_data_map(address_map &map);
-	void ds3_program_map(address_map &map);
-	void ds3sdsp_data_map(address_map &map);
-	void ds3sdsp_program_map(address_map &map);
-	void ds3xdsp_data_map(address_map &map);
-	void ds3xdsp_program_map(address_map &map);
-	void dsk2_dsp32_map(address_map &map);
-	void dsk_dsp32_map(address_map &map);
-	void multisync2_68k_map(address_map &map);
-	void multisync2_gsp_map(address_map &map);
-	void multisync_68k_map(address_map &map);
-	void multisync_gsp_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
+	void driver_68k_map(address_map &map) ATTR_COLD;
+	void driver_gsp_map(address_map &map) ATTR_COLD;
+	void driver_msp_map(address_map &map) ATTR_COLD;
+	void ds3_data_map(address_map &map) ATTR_COLD;
+	void ds3_program_map(address_map &map) ATTR_COLD;
+	void ds3sdsp_data_map(address_map &map) ATTR_COLD;
+	void ds3sdsp_program_map(address_map &map) ATTR_COLD;
+	void ds3xdsp_data_map(address_map &map) ATTR_COLD;
+	void ds3xdsp_program_map(address_map &map) ATTR_COLD;
+	void dsk2_dsp32_map(address_map &map) ATTR_COLD;
+	void dsk_dsp32_map(address_map &map) ATTR_COLD;
+	void multisync2_68k_map(address_map &map) ATTR_COLD;
+	void multisync2_gsp_map(address_map &map) ATTR_COLD;
+	void multisync_68k_map(address_map &map) ATTR_COLD;
+	void multisync_gsp_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -497,15 +497,15 @@ protected:
 	optional_device<rs232_port_device> m_rs232;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
-class harddriv_sound_board_device :  public device_t
+class harddriv_sound_board_device : public device_t
 {
 public:
 	// construction/destruction
-	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~harddriv_sound_board_device() {}
 
 	uint16_t hd68k_snd_data_r();
@@ -543,33 +543,33 @@ private:
 	uint16_t hdsnddsp_comram_r();
 	uint16_t hdsnddsp_compare_r(offs_t offset);
 
-	void driversnd_68k_map(address_map &map);
-	void driversnd_dsp_io_map(address_map &map);
-	void driversnd_dsp_program_map(address_map &map);
+	void driversnd_68k_map(address_map &map) ATTR_COLD;
+	void driversnd_dsp_io_map(address_map &map) ATTR_COLD;
+	void driversnd_dsp_program_map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<cpu_device> m_soundcpu;
 	required_device<ls259_device> m_latch;
 	required_device<dac_word_interface> m_dac;
-	required_device<tms32010_device> m_sounddsp;
+	required_device<tms320c10_device> m_sounddsp;
 	required_shared_ptr<uint16_t> m_sounddsp_ram;
 	required_region_ptr<uint8_t>  m_sound_rom;
 
-	uint8_t                   m_soundflag = 0;
-	uint8_t                   m_mainflag = 0;
-	uint16_t                  m_sounddata = 0;
-	uint16_t                  m_maindata = 0;
+	uint8_t                 m_soundflag = 0;
+	uint8_t                 m_mainflag = 0;
+	uint16_t                m_sounddata = 0;
+	uint16_t                m_maindata = 0;
 
-	uint8_t                   m_cramen = 0;
-	uint8_t                   m_irq68k = 0;
+	uint8_t                 m_cramen = 0;
+	uint8_t                 m_irq68k = 0;
 
 	offs_t                  m_sound_rom_offs = 0;
 
-	uint16_t                  m_comram[0x400/2]{};
-	uint64_t                  m_last_bio_cycles = 0;
+	uint16_t                m_comram[0x400/2]{};
+	uint64_t                m_last_bio_cycles = 0;
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
@@ -580,175 +580,176 @@ private:
 
 /* Hard Drivin' */
 
-class harddriv_board_device_state :  public harddriv_state
+class harddriv_board_device_state : public harddriv_state
 {
 public:
-	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
 
 /* Hard Drivin' Compact */
 
-class harddrivc_board_device_state :  public harddriv_state
+class harddrivc_board_device_state : public harddriv_state
 {
 public:
-	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
 
 /* Race Drivin' */
 
-class racedriv_board_device_state :  public harddriv_state
+class racedriv_board_device_state : public harddriv_state
 {
 public:
-	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	racedriv_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
-class racedrivb1_board_device_state :  public racedriv_board_device_state
+class racedrivb1_board_device_state : public racedriv_board_device_state
 {
 public:
-	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
 /* Race Drivin' Compact */
 
-class racedrivc_board_device_state :  public harddriv_state
+class racedrivc_board_device_state : public harddriv_state
 {
 public:
-	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	racedrivc_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
-class racedrivc1_board_device_state :  public racedrivc_board_device_state
+class racedrivc1_board_device_state : public racedrivc_board_device_state
 {
 public:
-	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
-class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
+class racedrivc_panorama_side_board_device_state : public racedrivc_board_device_state
 {
 public:
-	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
 /* Stun Runner */
 
-class stunrun_board_device_state :  public harddriv_state
+class stunrun_board_device_state : public harddriv_state
 {
 public:
-	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
 
 /* Steel Talons */
 
-class steeltal_board_device_state :  public harddriv_state
+class steeltal_board_device_state : public harddriv_state
 {
 public:
-	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	steeltal_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
-class steeltal1_board_device_state :  public steeltal_board_device_state
+class steeltal1_board_device_state : public steeltal_board_device_state
 {
 public:
-	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
-class steeltalp_board_device_state :  public steeltal_board_device_state
+class steeltalp_board_device_state : public steeltal_board_device_state
 {
 public:
-	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 
 /* Street Drivin' */
 
-class strtdriv_board_device_state :  public harddriv_state
+class strtdriv_board_device_state : public harddriv_state
 {
 public:
-	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
 
 /* Hard Drivin' Airbourne */
 
-class hdrivair_board_device_state :  public harddriv_state
+class hdrivair_board_device_state : public harddriv_state
 {
 public:
-	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	hdrivair_board_device_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 //  virtual void device_reset();
 };
 
-class hdrivairp_board_device_state :  public hdrivair_board_device_state
+class hdrivair0_board_device_state : public hdrivair_board_device_state
 {
 public:
-	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdrivair0_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 #endif // MAME_ATARI_HARDDRIV_H

@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_RC2014_COMPACT_FLASH_H
-#define MAME_BUS_RC2014_COMPACT_FLASH_H
+#ifndef MAME_BUS_RC2014_CF_H
+#define MAME_BUS_RC2014_CF_H
 
 #pragma once
 
@@ -15,4 +15,4 @@
 
 DECLARE_DEVICE_TYPE(RC2014_COMPACT_FLASH, device_rc2014_card_interface)
 
-#endif // MAME_BUS_RC2014_COMPACT_FLASH_H
+#endif // MAME_BUS_RC2014_CF_H

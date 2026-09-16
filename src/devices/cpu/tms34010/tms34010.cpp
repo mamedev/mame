@@ -16,7 +16,10 @@
 #include "tms34010.h"
 #include "34010dsm.h"
 
+#include "input.h" // for video debug keys
 #include "screen.h"
+
+#include <bit>
 
 #define LOG_CONTROL_REGS (1U << 1)
 #define LOG_GRAPHICS_OPS (1U << 2)
@@ -485,7 +488,7 @@ void tms340x0_device::write_pixel_16(offs_t offset, uint32_t data)
 void tms340x0_device::write_pixel_32(offs_t offset, uint32_t data)
 {
 	/* TODO: plane masking */
-	TMS34010_WRMEM_WORD(offset & 0xffffffe0, data);
+	TMS34010_WRMEM_DWORD(offset & 0xffffffe0, data);
 }
 
 /* No Raster Op + Transparency */
@@ -863,6 +866,7 @@ void tms340x0_device::execute_run()
 	/* Get out if CPU is halted. Absolutely no interrupts must be taken!!! */
 	if (IOREG(REG_HSTCTLH) & 0x8000)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}
@@ -876,7 +880,7 @@ void tms340x0_device::execute_run()
 	/* check interrupts first */
 	m_executing = true;
 	check_interrupt();
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		do
 		{
@@ -1050,7 +1054,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 			int htotal = SMART_IOREG(HTOTAL);
 			if (htotal > 0 && vtotal > 0)
 			{
-				attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_pixclock) * (htotal + 1) * (vtotal + 1);
+				attotime refresh = attotime::from_ticks((htotal + 1) * (vtotal + 1), m_pixclock);
 				int width = (htotal + 1) * m_pixperclock;
 				int height = vtotal + 1;
 				rectangle visarea;
@@ -1079,7 +1083,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 				}
 
 				LOG("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
-						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, ATTOSECONDS_TO_HZ(refresh));
+						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, refresh.as_hz());
 
 				/* interlaced timing not supported */
 				if ((SMART_IOREG(DPYCTL) & 0x4000) == 0)
@@ -1547,7 +1551,8 @@ u16 tms34010_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
+	if (!machine().side_effects_disabled())
+		LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1588,7 +1593,8 @@ u16 tms34020_device::io_register_r(offs_t offset)
 {
 	int result, total;
 
-	LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
+	if (!machine().side_effects_disabled())
+		LOGCONTROLREGS("%s: read %s\n", machine().describe_context(), ioreg020_name[offset]);
 
 	switch (offset)
 	{
@@ -1718,13 +1724,16 @@ u16 tms340x0_device::host_r(offs_t offset)
 			addr = (IOREG(REG_HSTADRH) << 16) | IOREG(REG_HSTADRL);
 			result = TMS34010_RDMEM_WORD(addr & 0xfffffff0);
 
-			/* optional postincrement (it says preincrement, but data is preloaded, so it
-			   is effectively a postincrement */
-			if (IOREG(REG_HSTCTLH) & 0x1000)
+			if (!machine().side_effects_disabled())
 			{
-				addr += 0x10;
-				IOREG(REG_HSTADRH) = addr >> 16;
-				IOREG(REG_HSTADRL) = (uint16_t)addr;
+				/* optional postincrement (it says preincrement, but data is preloaded, so it
+				   is effectively a postincrement */
+				if (IOREG(REG_HSTCTLH) & 0x1000)
+				{
+					addr += 0x10;
+					IOREG(REG_HSTADRH) = addr >> 16;
+					IOREG(REG_HSTADRL) = (uint16_t)addr;
+				}
 			}
 			break;
 
@@ -1735,7 +1744,8 @@ u16 tms340x0_device::host_r(offs_t offset)
 
 		/* error case */
 		default:
-			logerror("tms34010_host_control_r called on invalid register %d\n", reg);
+			if (!machine().side_effects_disabled())
+				logerror("tms34010_host_control_r called on invalid register %d\n", reg);
 			break;
 	}
 

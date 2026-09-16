@@ -21,7 +21,7 @@ INPUT_PORTS_EXTERN( generic_terminal );
 class generic_terminal_device : public device_t
 {
 public:
-	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename... T>
 	void set_keyboard_callback(T &&... args)
@@ -37,10 +37,10 @@ protected:
 	generic_terminal_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned w, unsigned h);
 
 	virtual void term_write(uint8_t data);
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void send_key(uint8_t code) { m_keyboard_cb(code); }
 
 	TIMER_CALLBACK_MEMBER(bell_off);
@@ -54,6 +54,7 @@ protected:
 	unsigned const m_height;
 	std::unique_ptr<uint8_t []> m_buffer;
 	uint8_t m_x_pos;
+	uint8_t m_y_pos;
 
 private:
 	void scroll_line();
@@ -62,7 +63,6 @@ private:
 	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_framecnt;
-	uint8_t m_y_pos;
 
 	emu_timer *m_bell_timer;
 	required_device<beep_device> m_beeper;

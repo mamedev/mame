@@ -32,7 +32,7 @@ public:
 
 	template <typename... T> void set_tile_callback(T &&... args) { m_view2_cb.set(std::forward<T>(args)...); }
 
-	void vram_w(int _N_, offs_t offset, u16 data, u16 mem_mask = u16(~0));
+	void vram_w(int i, offs_t offset, u16 data, u16 mem_mask = u16(~0));
 
 	// call to do the rendering etc.
 	template<class BitmapClass>
@@ -51,7 +51,7 @@ public:
 
 
 	// access
-	void vram_map(address_map &map);
+	void vram_map(address_map &map) ATTR_COLD;
 
 	u16 regs_r(offs_t offset);
 	void regs_w(offs_t offset, u16 data, u16 mem_mask = u16(~0));
@@ -71,16 +71,17 @@ public:
 	void mark_layer_dirty(u8 Layer);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
 	required_shared_ptr_array<u16, 2> m_vram;
 	required_shared_ptr_array<u16, 2> m_vscroll;
 
 	// set when creating device
-	required_memory_region m_gfxrom;
 	u16 m_colbase;
 	int m_dx, m_dy, m_xdim, m_ydim;
 	int m_invert_flip;

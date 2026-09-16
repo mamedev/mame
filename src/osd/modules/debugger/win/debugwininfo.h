@@ -13,6 +13,7 @@
 #include "debugwin.h"
 
 #include "debugbaseinfo.h"
+#include "uimetrics.h"
 
 
 namespace osd::debugger::win {
@@ -23,6 +24,8 @@ public:
 	virtual ~debugwin_info();
 
 	bool is_valid() const { return m_wnd != nullptr; }
+
+	ui_metrics const &metrics() const { return m_metrics; }
 
 	void set_ignore_char_lparam(LPARAM value) { m_ignore_char_lparam = value >> 16; }
 	bool check_ignore_char_lparam(LPARAM value)
@@ -43,6 +46,7 @@ public:
 	void set_foreground() const { SetForegroundWindow(m_wnd); }
 	void redraw();
 	void destroy();
+	bool owns_window(HWND win) const;
 
 	virtual bool set_default_focus();
 	void prev_view(debugview_info *curview);
@@ -58,8 +62,8 @@ protected:
 	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
 	static DWORD const  DEBUG_WINDOW_STYLE_EX = 0;
 
-	static int const    MAX_VIEWS = 4;
 	static int const    EDGE_WIDTH = 3;
+	static int const    MAX_VIEWS = 4;
 
 	enum
 	{
@@ -110,10 +114,12 @@ protected:
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
 		ID_SHOW_REGISTERPOINTS,
+		ID_SHOW_EXCEPTIONPOINTS,
 
 		ID_CLEAR_LOG,
 
 		ID_SAVE_WINDOWS,
+		ID_GROUP_WINDOWS,
 		ID_LIGHT_BACKGROUND,
 		ID_DARK_BACKGROUND,
 
@@ -126,9 +132,12 @@ protected:
 	HWND window() const { return m_wnd; }
 	uint32_t minwidth() const { return m_minwidth; }
 	uint32_t maxwidth() const { return m_maxwidth; }
+	uint32_t minheight() const { return m_minheight; }
 	void set_minwidth(uint32_t value) { m_minwidth = value; }
 	void set_maxwidth(uint32_t value) { m_maxwidth = value; }
+	void set_minheight(uint32_t value) { m_minheight = value; }
 
+	virtual void update_dpi();
 	virtual void recompute_children();
 	virtual void update_menu() { }
 	virtual bool handle_command(WPARAM wparam, LPARAM lparam);
@@ -149,6 +158,7 @@ private:
 
 	static void register_window_class();
 
+	ui_metrics      m_metrics;
 	bool const      m_is_main_console;
 
 	HWND            m_wnd;

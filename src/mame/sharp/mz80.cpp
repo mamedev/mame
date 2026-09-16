@@ -22,10 +22,6 @@ MZ80A ToDo:
 - Disk uses ports D8-DC
 - Keyboard issues listed below
 
-MZ80B
-- Makes extensive use of io ports
-- D000-FFFF is banked ram
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -33,6 +29,7 @@ MZ80B
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/mz_cas.h"
@@ -288,7 +285,7 @@ void mz80_state::mz80k(machine_config &config)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(320, 200);
 	screen.set_visarea(0, 319, 0, 199);
@@ -309,7 +306,7 @@ void mz80_state::mz80k(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(mz80_state::mz80k_8255_portc_w));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(8'000'000)/4);
 	m_pit->out_handler<0>().set(FUNC(mz80_state::pit_out0_changed));
 	m_pit->set_clk<1>(XTAL(8'000'000)/256);
@@ -322,6 +319,9 @@ void mz80_state::mz80k(machine_config &config)
 	m_cassette->set_formats(mz700_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mz_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("mz80k_cass");
 }
 
 void mz80_state::mz80kj(machine_config &config)

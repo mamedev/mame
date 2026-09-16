@@ -88,7 +88,9 @@ void abcbus_slot_device::device_reset()
 
 // slot devices
 #include "abc890.h"
+#include "abc1656.h"
 #include "cadmouse.h"
+#include "db4105.h"
 #include "db4106.h"
 #include "db4107.h"
 #include "db4112.h"
@@ -96,7 +98,6 @@ void abcbus_slot_device::device_reset()
 #include "lux10828.h"
 #include "lux21046.h"
 #include "lux21056.h"
-#include "lux4105.h"
 #include "memcard.h"
 #include "ram.h"
 #include "sio.h"
@@ -162,7 +163,8 @@ void abcbus_cards(device_slot_interface &device)
 
 void abc1600bus_cards(device_slot_interface &device)
 {
-	device.option_add("4105", LUXOR_4105); // SASI interface
+	device.option_add("abc1656", ABC1656);
+	device.option_add("4105", DATABOARD_4105); // SASI interface
 //  device.option_add("4077", LUXOR_4077); // Winchester controller
 //  device.option_add("4004", LUXOR_4004); // ICOM I/O (Z80, Z80PIO, Z80SIO/2, Z80CTC, 2 Z80DMAs, 2 PROMs, 64KB RAM)
 }

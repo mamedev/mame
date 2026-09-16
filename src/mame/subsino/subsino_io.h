@@ -17,8 +17,8 @@ protected:
 	subsino_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// port read/write helpers
 	u8 read_port_data(unsigned port);

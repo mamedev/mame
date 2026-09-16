@@ -53,7 +53,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
 
@@ -108,9 +108,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(break_w);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	class memory_interface : public m6502_device::memory_interface {
@@ -188,7 +188,7 @@ private:
 	bool m_fdc_irq_enabled;
 
 	static void floppies(device_slot_interface &device);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	void extension_board(machine_config &config, int slot_id, const char *tag, const char *def);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -390,7 +390,7 @@ void mtu130_state::machine_start()
 	m_rom_view.disable();
 	m_rof_view.disable();
 
-	for(auto e : m_ext)
+	for (auto &e : m_ext)
 		e->map_io(m_io_view[1]);
 }
 
@@ -754,7 +754,7 @@ void mtu130_state::mtu130(machine_config &config)
 	m_maincpu->set_address_width(18, true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mtu130_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// HSync is between 40 and 79, VSync between 256 and 259, boundaries included
 	m_screen->set_raw(10_MHz_XTAL, 620, 120, 600, 269, 0, 256);
 	m_screen->set_screen_update(FUNC(mtu130_state::screen_update));
@@ -960,10 +960,10 @@ static INPUT_PORTS_START(mtu130)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)   PORT_CHAR(8)
 
 	PORT_START("KM")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INT")   PORT_CHANGED_MEMBER(DEVICE_SELF, mtu130_state, nmi_w, 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INT")   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mtu130_state::nmi_w), 0)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MOD")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, mtu130_state, reset_w, 0)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CHANGED_MEMBER(DEVICE_SELF, mtu130_state, break_w, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mtu130_state::reset_w), 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mtu130_state::break_w), 0)
 INPUT_PORTS_END
 
 ROM_START(mtu130)

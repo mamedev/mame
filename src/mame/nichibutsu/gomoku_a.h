@@ -20,10 +20,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	void make_mixer_table(int voices, int gain);
@@ -42,13 +42,11 @@ private:
 		int oneshotplaying = 0;
 	};
 
-
 	// data about the sound system
 	sound_channel m_channel_list[MAX_VOICES];
 
 	// global sound parameters
 	required_region_ptr<uint8_t> m_sound_rom;
-	bool m_sound_enable;
 	sound_stream *m_stream;
 
 	// mixer tables and internal buffers

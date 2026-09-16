@@ -2,12 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /*****************************************************************************
  *
- * audio/specimx.h
+ * ussr/specialsound.h
  *
  ****************************************************************************/
 
-#ifndef MAME_USSR_SPECIAL_H
-#define MAME_USSR_SPECIAL_H
+#ifndef MAME_USSR_SPECIALSOUND_H
+#define MAME_USSR_SPECIALSOUND_H
 
 #pragma once
 
@@ -15,7 +15,7 @@
 class specimx_sound_device : public device_t, public device_sound_interface
 {
 public:
-	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_input_ch0(int state);
 	void set_input_ch1(int state);
@@ -23,10 +23,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_mixer_channel;
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SPECIMX_SND, specimx_sound_device)
 
-#endif // MAME_USSR_SPECIAL_H
+#endif // MAME_USSR_SPECIALSOUND_H

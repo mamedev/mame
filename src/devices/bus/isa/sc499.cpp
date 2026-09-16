@@ -177,7 +177,7 @@ INPUT_PORTS_END
 
 void sc499_device::device_add_mconfig(machine_config &config)
 {
-	SC499_CTAPE(config, m_image, 0);
+	SC499_CTAPE(config, m_image);
 }
 
 

@@ -84,7 +84,7 @@ public:
 	void sonson(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -111,12 +111,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -251,8 +249,7 @@ void sonson_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -270,8 +267,6 @@ uint32_t sonson_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 void sonson_state::sh_irqtrigger_w(int state)
 {
@@ -439,7 +434,7 @@ void sonson_state::sonson(machine_config &config)
 	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin_counter_w<0>));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(55.40);
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(1*8, 31*8-1, 1*8, 31*8-1);

@@ -79,13 +79,13 @@ private:
 	void kbd_put(u8 data);
 	uint8_t tty_r();
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_tty_data_out = 0U;
 	uint8_t m_tty_data_in = 0U;
 	int m_tty_cnt = 0;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<teleprinter_device> m_teleprinter;
 	required_device<cpu_device> m_maincpu;
 };
@@ -163,7 +163,7 @@ void mod8_state::mod8(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(mod8_state::mod8_irq_callback));
 
 	/* video hardware */
-	TELEPRINTER(config, m_teleprinter, 0);
+	TELEPRINTER(config, m_teleprinter);
 	m_teleprinter->set_keyboard_callback(FUNC(mod8_state::kbd_put));
 }
 

@@ -19,8 +19,8 @@ TODO:
 #include "emu.h"
 
 #include "cpu/cops1/mm5799.h"
-#include "machine/ds8874.h"
 #include "sound/spkrdev.h"
+#include "video/ds8874.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -51,8 +51,8 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cops1_base_device> m_maincpu;
@@ -358,6 +358,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -710,6 +711,7 @@ public:
 
 private:
 	required_device<ds8874_device> m_ds8874;
+
 	void ds8874_output_w(u16 data);
 
 	void update_display();
@@ -772,7 +774,7 @@ static INPUT_PORTS_START( cambrp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("Up/Downshift")
 
 	PORT_START("IN.1") // DS8874 OUT 4 port K
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME(u8"1 / \u221ax / go if neg" /* √ */)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME(u8"1 / \u221ax / go if neg") // U+221A = √
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_NAME("7 / sin / arcsin")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("- / -x / F")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('C') PORT_NAME("C/CE / step")

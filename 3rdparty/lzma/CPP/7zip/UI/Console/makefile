@@ -1,6 +1,6 @@
 PROG = 7z.exe
 CFLAGS = $(CFLAGS)  \
-  -DEXTERNAL_CODECS \
+  -DZ7_EXTERNAL_CODECS \
 
 COMMON_OBJS = \
   $O\CommandLineParser.obj \
@@ -42,6 +42,7 @@ WIN_OBJS = \
   $O\FilterCoder.obj \
   $O\LimitedStreams.obj \
   $O\MethodProps.obj \
+  $O\MultiOutStream.obj \
   $O\ProgressUtils.obj \
   $O\PropId.obj \
   $O\StreamObjects.obj \
@@ -58,10 +59,10 @@ COMPRESS_OBJS = \
 C_OBJS = $(C_OBJS) \
   $O\Alloc.obj \
   $O\CpuArch.obj \
-  $O\Sort.obj \
   $O\Threads.obj \
 
 !include "../../Crc.mak"
+!include "../../Sort.mak"
 !include "Console.mak"
 
 !include "../../7zip.mak"

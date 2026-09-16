@@ -64,7 +64,7 @@ a2bus_ace2x00_slot6_device::a2bus_ace2x00_slot6_device(const machine_config &mco
 //-------------------------------------------------
 void a2bus_ace2x00_slot6_device::device_add_mconfig(machine_config &config)
 {
-	IWM(config, m_iwm, clock(), 1021800*2);
+	IWM(config, m_iwm, clock(), A2BUS_1M_CLOCK*2);
 	m_iwm->phases_cb().set(FUNC(a2bus_ace2x00_slot6_device::phases_w));
 	m_iwm->devsel_cb().set(FUNC(a2bus_ace2x00_slot6_device::devsel_w));
 	applefdintf_device::add_525(config, m_floppy[0]);
@@ -119,6 +119,11 @@ void a2bus_ace2x00_device::device_reset()
 	m_rom = device().machine().root_device().memregion("maincpu")->base();
 }
 
+void a2bus_ace2x00_slot6_device::reset_from_bus()
+{
+	m_iwm->reset();
+}
+
 uint8_t a2bus_ace2x00_device::read_cnxx(uint8_t offset)
 {
 	switch (slotno())
@@ -148,7 +153,7 @@ void a2bus_ace2x00_device::write_c800(uint16_t offset, uint8_t data)
 {
 }
 
-bool a2bus_ace2x00_device::take_c800()
+bool a2bus_ace2x00_device::take_c800() const
 {
 	switch (slotno())
 	{

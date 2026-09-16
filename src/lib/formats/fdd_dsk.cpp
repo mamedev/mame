@@ -34,8 +34,7 @@
 #include "fdd_dsk.h"
 
 #include "ioprocs.h"
-
-#include "osdcomm.h" // little_endianize_int32
+#include "multibyte.h"
 
 #include <cstring>
 
@@ -62,10 +61,11 @@ const char *fdd_format::extensions() const noexcept
 int fdd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[7];
-	size_t actual;
-	io.read_at(0, h, 7, actual);
+	auto const [err, actual] = read_at(io, 0, h, 7); // FIXME: should it really be reading six bytes?  also check for premature EOF.
+	if (err)
+		return false;
 
-	if (strncmp((const char *)h, "VFD1.0", 6) == 0)
+	if (memcmp(h, "VFD1.0", 6) == 0)
 		return FIFID_SIGN;
 
 	return 0;
@@ -92,8 +92,7 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for (int sect = 0; sect < 26; sect++)
 		{
 			// read sector map for this sector
-			size_t actual;
-			io.read_at(pos, hsec, 0x0c, actual);
+			/*auto const [err, actual] =*/ read_at(io, pos, hsec, 0x0c); // FIXME: check for errors and premature EOF
 			pos += 0x0c;
 
 			if (hsec[0] == 0xff)    // unformatted/unused sector
@@ -104,7 +103,7 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			secs[(track * 26) + sect] = hsec[2];
 			sec_sizes[(track * 26) + sect] = hsec[3];
 			fill_vals[(track * 26) + sect] = hsec[4];
-			sec_offs[(track * 26) + sect] = little_endianize_int32(*(uint32_t *)(hsec + 0x08));
+			sec_offs[(track * 26) + sect] = get_u32le(hsec + 0x08);
 
 			curr_track_size += (128 << hsec[3]);
 			curr_num_sec++;
@@ -125,20 +124,21 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			cur_sec_map = track * 26 + i;
 			sector_size = 128 << sec_sizes[cur_sec_map];
 
-			size_t actual;
 			if (sec_offs[cur_sec_map] == 0xffffffff)
 				memset(sect_data + cur_pos, fill_vals[cur_sec_map], sector_size);
 			else
-				io.read_at(sec_offs[cur_sec_map], sect_data + cur_pos, sector_size, actual);
+				/*auto const [err, actual] =*/ read_at(io, sec_offs[cur_sec_map], sect_data + cur_pos, sector_size); // FIXME: check for errors and premature EOF
 
-			sects[i].track       = tracks[cur_sec_map];
-			sects[i].head        = heads[cur_sec_map];
-			sects[i].sector      = secs[cur_sec_map];
-			sects[i].size        = sec_sizes[cur_sec_map];
-			sects[i].actual_size = sector_size;
-			sects[i].deleted     = false;
-			sects[i].bad_crc     = false;
-			sects[i].data        = sect_data + cur_pos;
+			sects[i].track        = tracks[cur_sec_map];
+			sects[i].head         = heads[cur_sec_map];
+			sects[i].sector       = secs[cur_sec_map];
+			sects[i].size         = sec_sizes[cur_sec_map];
+			sects[i].actual_size  = sector_size;
+			sects[i].deleted      = false;
+			sects[i].bad_data_crc = false;
+			sects[i].bad_addr_crc = false;
+			sects[i].weak         = false;
+			sects[i].data         = sect_data + cur_pos;
 			cur_pos += sector_size;
 		}
 
@@ -146,11 +146,6 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 
 	return true;
-}
-
-bool fdd_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const fdd_format FLOPPY_FDD_FORMAT;

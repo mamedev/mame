@@ -28,13 +28,13 @@ public:
 protected:
 	a2bus_softcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override;
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<cpu_device> m_z80;
@@ -44,7 +44,7 @@ private:
 	uint8_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint8_t data);
 
-	void z80_mem(address_map &map);
+	void z80_mem(address_map &map) ATTR_COLD;
 };
 
 // device type definition

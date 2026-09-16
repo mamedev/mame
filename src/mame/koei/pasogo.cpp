@@ -171,8 +171,8 @@ private:
 		} pmu;
 	} m_vg230;
 
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
@@ -181,9 +181,9 @@ private:
 	memory_region *m_cart_rom = nullptr;
 	uint8_t m_ems_index = 0;
 	uint16_t m_ems_bank[28]{};
-	void emsbank_map(address_map &map);
-	void pasogo_io(address_map &map);
-	void pasogo_mem(address_map &map);
+	void emsbank_map(address_map &map) ATTR_COLD;
+	void pasogo_io(address_map &map) ATTR_COLD;
+	void pasogo_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -219,7 +219,7 @@ void pasogo_state::machine_start()
 {
 	system_time systime;
 
-	memset(&m_vg230, 0, sizeof(m_vg230));
+	m_vg230 = decltype(m_vg230)();
 	m_vg230.pmu.write_protected = true;
 	machine().base_datetime(systime);
 
@@ -285,11 +285,12 @@ uint8_t pasogo_state::vg230_io_r(offs_t offset)
 				break;
 
 			case 0x79:
-				/*rtc status*/
+				// rtc mode
 				log = false;
 				break;
 
 			case 0x7a:
+				// rtc status
 				data &= ~3;
 				if (m_vg230.rtc.alarm_interrupt_request)
 					data |= 1<<1;
@@ -363,7 +364,7 @@ void pasogo_state::vg230_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x78:
-				m_vg230.rtc.days = data & 0x1f;
+				m_vg230.rtc.alarm_days = data & 0x1f;
 				break;
 
 			case 0x79:
@@ -484,7 +485,7 @@ static INPUT_PORTS_START( pasogo )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("a") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("b") PORT_CODE(KEYCODE_B)
 	PORT_START("COLOR")
-	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, pasogo_state, contrast, 0)
+	PORT_CONFNAME(0x01, 0x01, "Contrast") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pasogo_state::contrast), 0)
 	PORT_CONFSETTING(0x00, "Actual")
 	PORT_CONFSETTING(0x01, "Enhanced")
 INPUT_PORTS_END
@@ -555,7 +556,7 @@ void pasogo_state::pasogo(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "ems").set_map(&pasogo_state::emsbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x4000);
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -564,7 +565,7 @@ void pasogo_state::pasogo(machine_config &config)
 
 	// It's a CGA device right so lets use isa_cga!  Well, not so much.
 	// The carts use vg230 specific registers and mostly ignore the mc6845.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 320-1, 0, 240-1);

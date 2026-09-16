@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    h8d.h
+    h8s2600d.h
 
     H8S-2600 base cpu emulation, disassembler
 

@@ -22,15 +22,17 @@ public:
 		set_timer0_clock(clk0);
 		set_timer1_clock(clk1);
 	}
-
-	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const XTAL &clk0, const XTAL &clk1)
-		: nsc810_device(mconfig, tag, owner, clock)
+	template <typename T, typename U>
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&clk0, U &&clk1)
+		: nsc810_device(mconfig, tag, owner, 0, clock_value(std::forward<T>(clk0)), clock_value(std::forward<U>(clk1)))
 	{
-		set_timer0_clock(clk0.value());
-		set_timer1_clock(clk1.value());
+		set_timer0_clock(clock_value(std::forward<T>(clk0)));
+		set_timer1_clock(clock_value(std::forward<U>(clk1)));
 	}
+	static uint32_t clock_value(uint32_t v) { return v; }
+	static uint32_t clock_value(const XTAL &v) { return v.value(); }
 
-	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nsc810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto portA_read_callback() { return m_portA_r.bind(); }
 	auto portB_read_callback() { return m_portB_r.bind(); }
@@ -50,8 +52,8 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	template <int Timer> TIMER_CALLBACK_MEMBER(timer_tick);
 

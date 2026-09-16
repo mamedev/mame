@@ -232,10 +232,8 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_digital_select));
 
 	save_item(NAME(m_speech_rom_bitnum));
-
-	save_item(NAME(m_romclk_hack_timer_started));
-	save_item(NAME(m_romclk_hack_state));
 }
+
 
 /**********************************************************************************************
 
@@ -277,11 +275,11 @@ static void printbits(long data, int num)
 
 /******************************************************************************************
 
-     extract_bits -- extract a specific number of bits from the VSM
+     read_bits -- read a specific number of bits from the VSM
 
 ******************************************************************************************/
 
-int tms5110_device::extract_bits(int count)
+int tms5110_device::read_bits(int count)
 {
 	int val = 0;
 	if (DEBUG_5110) logerror("requesting %d bits", count);
@@ -304,7 +302,6 @@ void tms5110_device::perform_dummy_read()
 		m_schedule_dummy_read = false;
 	}
 }
-
 
 
 
@@ -585,6 +582,7 @@ void tms5110_device::process(int16_t *buffer, unsigned int size)
 	}
 }
 
+
 /**********************************************************************************************
 
      clip_analog -- clips the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts/range extends this to 16 bits
@@ -595,7 +593,8 @@ static int16_t clip_analog(int16_t cliptemp)
 {
 	/* clipping, just like the patent shows:
 	 * the top 10 bits of this result are visible on the digital output IO pin.
-	 * next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
+	 * next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output,
+	 * otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
 	 * 1x xxxx xxxx xxxx -> 0b10000000
 	 * 11 1bcd efgh xxxx -> 0b1bcdefgh
 	 * 00 0bcd efgh xxxx -> 0b0bcdefgh
@@ -633,6 +632,7 @@ static int16_t clip_analog(int16_t cliptemp)
      output, this makes almost no difference in the computation.
 
 **********************************************************************************************/
+
 static int32_t matrix_multiply(int32_t a, int32_t b)
 {
 	int32_t result;
@@ -647,6 +647,7 @@ static int32_t matrix_multiply(int32_t a, int32_t b)
 #endif
 	return result;
 }
+
 
 /**********************************************************************************************
 
@@ -721,7 +722,6 @@ int32_t tms5110_device::lattice_filter()
 #endif
 		return m_u[0];
 }
-
 
 
 
@@ -846,7 +846,7 @@ void tms5110_device::PDC_set(int data)
 						fprintf(stderr,"actually reading a bit now\n");
 #endif
 						m_CTL_buffer >>= 1;
-						m_CTL_buffer |= (extract_bits(1)<<3);
+						m_CTL_buffer |= (read_bits(1)<<3);
 						m_CTL_buffer &= 0xF;
 					}
 					break;
@@ -924,7 +924,7 @@ void tms5110_device::parse_frame()
 	m_uv_zpar = m_zpar = 0;
 
 	// attempt to extract the energy index
-	m_new_frame_energy_idx = extract_bits(m_coeff->energy_bits);
+	m_new_frame_energy_idx = read_bits(m_coeff->energy_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_energy_idx,m_coeff->energy_bits);
 	fprintf(stderr," ");
@@ -934,13 +934,13 @@ void tms5110_device::parse_frame()
 	if ((m_new_frame_energy_idx == 0) || (m_new_frame_energy_idx == 15))
 		return;
 
-	rep_flag = extract_bits(1);
+	rep_flag = read_bits(1);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(rep_flag, 1);
 	fprintf(stderr," ");
 #endif
 
-	m_new_frame_pitch_idx = extract_bits(m_coeff->pitch_bits);
+	m_new_frame_pitch_idx = read_bits(m_coeff->pitch_bits);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 	printbits(m_new_frame_pitch_idx,m_coeff->pitch_bits);
 	fprintf(stderr," ");
@@ -954,7 +954,7 @@ void tms5110_device::parse_frame()
 	// extract first 4 K coefficients
 	for (i = 0; i < 4; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
 		fprintf(stderr," ");
@@ -971,7 +971,7 @@ void tms5110_device::parse_frame()
 	// If we got here, we need the remaining 6 K's
 	for (i = 4; i < m_coeff->num_k; i++)
 	{
-		m_new_frame_k_idx[i] = extract_bits(m_coeff->kbits[i]);
+		m_new_frame_k_idx[i] = read_bits(m_coeff->kbits[i]);
 #ifdef DEBUG_PARSE_FRAME_DUMP
 		printbits(m_new_frame_k_idx[i],m_coeff->kbits[i]);
 		fprintf(stderr," ");
@@ -982,29 +982,6 @@ void tms5110_device::parse_frame()
 #endif
 	return;
 }
-
-
-#if 0
-/*This is an example word TEN taken from the TMS5110A datasheet*/
-static const unsigned int example_word_TEN[619]={
-/* 1*/1,0,0,0,  0,  0,0,0,0,0,  1,1,0,0,0,  0,0,0,1,0,  0,1,1,1,    0,1,0,1,
-/* 2*/1,0,0,0,  0,  0,0,0,0,0,  1,0,0,1,0,  0,0,1,1,0,  0,0,1,1,    0,1,0,1,
-/* 3*/1,1,0,0,  0,  1,0,0,0,0,  1,0,1,0,0,  0,1,0,1,0,  0,1,0,0,    1,0,1,0,    1,0,0,0,    1,0,0,1,    0,1,0,1,    0,0,1,  0,1,0,  0,1,1,
-/* 4*/1,1,1,0,  0,  0,1,1,1,1,  1,0,1,0,1,  0,1,1,1,0,  0,1,0,1,    0,1,1,1,    0,1,1,1,    1,0,1,1,    1,0,1,0,    0,1,1,  0,1,0,  0,1,1,
-/* 5*/1,1,1,0,  0,  1,0,0,0,0,  1,0,1,0,0,  0,1,1,1,0,  0,1,0,1,    1,0,1,0,    1,0,0,0,    1,1,0,0,    1,0,1,1,    1,0,0,  0,1,0,  0,1,1,
-/* 6*/1,1,1,0,  0,  1,0,0,0,1,  1,0,1,0,1,  0,1,1,0,1,  0,1,1,0,    0,1,1,1,    0,1,1,1,    1,0,1,0,    1,0,1,0,    1,1,0,  0,0,1,  1,0,0,
-/* 7*/1,1,1,0,  0,  1,0,0,1,0,  1,0,1,1,1,  0,1,1,1,0,  0,1,1,1,    0,1,1,1,    0,1,0,1,    0,1,1,0,    1,0,0,1,    1,1,0,  0,1,0,  0,1,1,
-/* 8*/1,1,1,0,  1,  1,0,1,0,1,
-/* 9*/1,1,1,0,  0,  1,1,0,0,1,  1,0,1,1,1,  0,1,0,1,1,  1,0,1,1,    0,1,1,1,    0,1,0,0,    1,0,0,0,    1,0,0,0,    1,1,0,  0,1,1,  0,1,1,
-/*10*/1,1,0,1,  0,  1,1,0,1,0,  1,0,1,0,1,  0,1,1,0,1,  1,0,1,1,    0,1,0,1,    0,1,0,0,    1,0,0,0,    1,0,1,0,    1,1,0,  0,1,0,  1,0,0,
-/*11*/1,0,1,1,  0,  1,1,0,1,1,  1,0,0,1,1,  1,0,0,1,0,  0,1,1,0,    0,0,1,1,    0,1,0,1,    1,0,0,1,    1,0,1,0,    1,0,0,  0,1,1,  0,1,1,
-/*12*/1,0,0,0,  0,  1,1,1,0,0,  1,0,0,1,1,  0,0,1,1,0,  0,1,0,0,    0,1,1,0,    1,1,0,0,    0,1,0,1,    1,0,0,0,    1,0,0,  0,1,0,  1,0,1,
-/*13*/0,1,1,1,  1,  1,1,1,0,1,
-/*14*/0,1,1,1,  0,  1,1,1,1,0,  1,0,0,1,1,  0,0,1,1,1,  0,1,0,1,    0,1,0,1,    1,1,0,0,    0,1,1,1,    1,0,0,0,    1,0,0,  0,1,0,  1,0,1,
-/*15*/0,1,1,0,  0,  1,1,1,1,0,  1,0,1,0,1,  0,0,1,1,0,  0,1,0,0,    0,0,1,1,    1,1,0,0,    1,0,0,1,    0,1,1,1,    1,0,1,  0,1,0,  1,0,1,
-/*16*/1,1,1,1
-};
-#endif
 
 
 //-------------------------------------------------
@@ -1041,7 +1018,6 @@ void tms5110_device::device_start()
 	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
-	m_romclk_hack_timer = timer_alloc(FUNC(tms5110_device::romclk_hack_toggle), this);
 
 	register_for_save_states();
 }
@@ -1098,10 +1074,6 @@ void tms5110_device::device_reset()
 	m_next_is_address = false;
 	m_address = 0;
 	m_addr_bit = 0;
-
-	m_romclk_hack_timer->adjust(attotime::never);
-	m_romclk_hack_timer_started = false;
-	m_romclk_hack_state = false;
 }
 
 
@@ -1109,7 +1081,8 @@ void tms5110_device::device_reset()
 /******************************************************************************
 
      tms5110_ctl_w -- write Control Command to the sound chip
-commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
+
+     commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
@@ -1178,59 +1151,32 @@ uint8_t m58817_device::status_r()
 {
 	/* bring up to date first */
 	m_stream->update();
-	return (TALK_STATUS() << 0); /*CTL1 = still talking ? */
+	return (TALK_STATUS() << 0); /* CTL1 = still talking ? */
 }
 
-TIMER_CALLBACK_MEMBER(tms5110_device::romclk_hack_toggle)
-{
-	m_romclk_hack_state = !m_romclk_hack_state;
-}
-
-//-------------------------------------------------
-//  romclk_hack_r - read status of romclk
-//-------------------------------------------------
-
-int tms5110_device::romclk_hack_r()
-{
-	/* bring up to date first */
-	m_stream->update();
-
-	/* create and start timer if necessary */
-	if (!m_romclk_hack_timer_started)
-	{
-		m_romclk_hack_timer_started = true;
-		m_romclk_hack_timer->adjust(attotime::from_hz(clock() / 40), 0, attotime::from_hz(clock() / 40));
-	}
-	return m_romclk_hack_state;
-}
 
 
 /******************************************************************************
 
-     tms5110_update -- update the sound chip so that it is in sync with CPU execution
+     sound_stream_update -- update the sound chip so that it is in sync with CPU execution
 
 ******************************************************************************/
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tms5110_device::sound_stream_update(sound_stream &stream)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	auto &buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
-	for (int sampindex = 0; sampindex < buffer.samples(); )
+	for (int sampindex = 0; sampindex < stream.samples(); )
 	{
-		int length = buffer.samples() - sampindex;
+		int length = stream.samples() - sampindex;
 		if (length > MAX_SAMPLE_CHUNK)
 			length = MAX_SAMPLE_CHUNK;
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
 		for (int index = 0; index < length; index++)
-			buffer.put_int(sampindex++, sample_data[index], 32768);
+			stream.put_int(0, sampindex++, sample_data[index], 32768);
 	}
 }
 
@@ -1238,7 +1184,7 @@ void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 /******************************************************************************
 
-     tms5110_set_frequency -- adjusts the playback frequency
+     device_clock_changed -- adjusts the playback frequency
 
 ******************************************************************************/
 
@@ -1493,18 +1439,18 @@ m58817_device::m58817_device(const machine_config &mconfig, const char *tag, dev
 DEFINE_DEVICE_TYPE(TMSPROM, tmsprom_device, "tmsprom", "TMSPROM")
 
 tmsprom_device::tmsprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMSPROM, tag, owner, clock),
-		m_rom(*this, DEVICE_SELF),
-		m_prom(*this, finder_base::DUMMY_TAG),
-		m_rom_size(0),
-		m_pdc_bit(0),
-		m_ctl1_bit(0),
-		m_ctl2_bit(0),
-		m_ctl4_bit(0),
-		m_ctl8_bit(0),
-		m_reset_bit(0),
-		m_stop_bit(0),
-		m_pdc_cb(*this),
-		m_ctl_cb(*this)
+	: device_t(mconfig, TMSPROM, tag, owner, clock)
+	, m_rom(*this, DEVICE_SELF)
+	, m_prom(*this, finder_base::DUMMY_TAG)
+	, m_rom_size(0)
+	, m_pdc_bit(0)
+	, m_ctl1_bit(0)
+	, m_ctl2_bit(0)
+	, m_ctl4_bit(0)
+	, m_ctl8_bit(0)
+	, m_reset_bit(0)
+	, m_stop_bit(0)
+	, m_pdc_cb(*this)
+	, m_ctl_cb(*this)
 {
 }

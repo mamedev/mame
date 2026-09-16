@@ -14,7 +14,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/pic8259.h"
+#include "pic8259.h"
 
 #define LOG_ICW     (1U << 1)
 #define LOG_OCW     (1U << 2)
@@ -195,27 +195,30 @@ uint8_t pic8259_device::read(offs_t offset)
 				{
 					data = 0x80 | m_current_level;
 
-					if (!m_level_trig_mode && (!m_master || !BIT(m_slave, m_current_level)))
-						m_irr &= ~(1 << m_current_level);
+					if (!machine().side_effects_disabled())
+					{
+						if (!m_level_trig_mode && (!m_master || !BIT(m_slave, m_current_level)))
+							m_irr &= ~(1 << m_current_level);
 
-					if (!m_auto_eoi)
-						m_isr |= 1 << m_current_level;
+						if (!m_auto_eoi)
+							m_isr |= 1 << m_current_level;
 
-					m_irq_timer->adjust(attotime::zero);
+						m_irq_timer->adjust(attotime::zero);
+					}
 				}
+
+				if (!machine().side_effects_disabled())
+					m_ocw3 &= 0xfb;
 			}
 			else
 			{
-				switch ( m_ocw3 & 0x03 )
+				switch ( m_ocw3 & 0x01 )
 				{
-				case 2:
+				case 0:
 					data = m_irr;
 					break;
-				case 3:
+				case 1:
 					data = m_isr & ~m_imr;
-					break;
-				default:
-					data = 0x00;
 					break;
 				}
 			}
@@ -241,7 +244,6 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 
 				m_imr                = 0x00;
 				m_isr                = 0x00;
-				m_irr                = 0x00;
 				m_slave              = 0x00;
 				m_level_trig_mode    = (data & 0x08) ? 1 : 0;
 				m_vector_size        = (data & 0x04) ? 1 : 0;
@@ -251,6 +253,7 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 				m_state              = state_t::ICW2;
 				m_current_level      = -1;
 				m_inta_sequence      = 0;
+				m_irr                = m_level_trig_mode ? m_irq_lines : 0;
 				m_out_int_func(0);
 			}
 			else if (m_state == state_t::READY)
@@ -260,8 +263,13 @@ void pic8259_device::write(offs_t offset, uint8_t data)
 					/* write OCW3 */
 					LOGOCW("pic8259_device::write(): OCW3; data=0x%02X\n", data);
 
+					if (BIT(data, 1))
+						m_ocw3 = (m_ocw3 & 0xfe) | (data & 0x01);
+					if (BIT(data, 2))
+						m_ocw3 |= 0x04;
 					// TODO: special mask mode
-					m_ocw3 = data;
+					if (BIT(data, 6))
+						m_ocw3 = (m_ocw3 & 0xdf) | (data & 0x20);
 				}
 				else if ((data & 0x18) == 0x00)
 				{
@@ -428,7 +436,7 @@ void pic8259_device::device_reset()
 	m_prio = 0;
 	m_imr = 0;
 	m_input = 0;
-	m_ocw3 = 2;
+	m_ocw3 = 0;
 	m_level_trig_mode = 0;
 	m_vector_size = 0;
 	m_cascade = 0;

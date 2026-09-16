@@ -29,8 +29,8 @@ public:
 private:
 	u16 data_r(offs_t offset);
 
-	void inst_map(address_map &map);
-	void data_map(address_map &map);
+	void inst_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<dp8344_device> m_bcp;
 	required_region_ptr<u8> m_datarom;
@@ -87,4 +87,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1989, telex1192, 0, 0, telex1192, telex1192, telex1192_state, empty_init, "Memorex Telex", "Telex 1192", MACHINE_IS_SKELETON)
+COMP(1989, telex1192, 0, 0, telex1192, telex1192, telex1192_state, empty_init, "Memorex Telex", "Telex 1192", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

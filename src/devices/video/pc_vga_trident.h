@@ -17,6 +17,10 @@
 class trident_vga_device :  public svga_device
 {
 public:
+	// SDD fails on higher resolutions, TGUI9680 black screens in calchase service mode (wants PCI?),
+	// BitBlt untested, needs major incremental splits
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	uint8_t port_83c6_r(offs_t offset);
 	void port_83c6_w(offs_t offset, uint8_t data);
 	uint8_t port_43c6_r(offs_t offset);
@@ -36,11 +40,11 @@ protected:
 	// construction/destruction
 	trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void io_3bx_3dx_map(address_map &map) override;
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
 	u8 ramdac_hidden_mask_r(offs_t offset);
 	void ramdac_hidden_mask_w(offs_t offset, u8 data);
@@ -53,9 +57,9 @@ protected:
 	void svga_bank_read_w(offs_t offset, u8 data);
 
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
 
 	virtual void recompute_params() override;
 
@@ -160,25 +164,23 @@ private:
 	uint32_t handle_rop(uint32_t src, uint32_t dst);
 };
 
-class tgui9860_device : public trident_vga_device
+class tgui9680_device : public trident_vga_device
 {
 public:
-	tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class tvga9000_device : public trident_vga_device
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
-
-	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void recompute_params() override;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device)
+DECLARE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_device)
 DECLARE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device)
 
 #endif // MAME_VIDEO_PC_VGA_TRIDENT_H

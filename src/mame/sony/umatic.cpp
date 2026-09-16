@@ -28,8 +28,8 @@ public:
 	void io_write(offs_t offset, uint8_t data);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -95,4 +95,4 @@ ROM_END
 
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS             INIT COMPANY  FULLNAME                                    FLAGS
-SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassette Recorder VO-5850PM",  MACHINE_IS_SKELETON)
+SYST(19??, vo5850pm,    0, 0,   umatic, umatic, umatic_state, empty_init, "Sony", "U-Matic Videocassette Recorder VO-5850PM",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

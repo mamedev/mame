@@ -1,7 +1,7 @@
 // Windows/Control/ListView.h
 
-#ifndef __WINDOWS_CONTROL_LISTVIEW_H
-#define __WINDOWS_CONTROL_LISTVIEW_H
+#ifndef ZIP7_INC_WINDOWS_CONTROL_LISTVIEW_H
+#define ZIP7_INC_WINDOWS_CONTROL_LISTVIEW_H
 
 #include "../../Common/MyWindows.h"
 
@@ -28,11 +28,11 @@ public:
   }
  
   bool DeleteAllItems() { return BOOLToBool(ListView_DeleteAllItems(_window)); }
-  bool DeleteColumn(int columnIndex) { return BOOLToBool(ListView_DeleteColumn(_window, columnIndex)); }
+  bool DeleteColumn(unsigned columnIndex) { return BOOLToBool(ListView_DeleteColumn(_window, columnIndex)); }
 
-  int InsertColumn(int columnIndex, const LVCOLUMN *columnInfo) { return ListView_InsertColumn(_window, columnIndex, columnInfo); }
-  int InsertColumn(int columnIndex, LPCTSTR text, int width);
-  bool SetColumnOrderArray(int count, const int *columns)
+  int InsertColumn(unsigned columnIndex, const LVCOLUMN *columnInfo) { return ListView_InsertColumn(_window, columnIndex, columnInfo); }
+  int InsertColumn(unsigned columnIndex, LPCTSTR text, int width);
+  bool SetColumnOrderArray(unsigned count, const int *columns)
     { return BOOLToBool(ListView_SetColumnOrderArray(_window, count, (int *)(void *)columns)); }
 
   /*
@@ -46,43 +46,49 @@ public:
   */
 
   int InsertItem(const LVITEM* item) { return ListView_InsertItem(_window, item); }
-  int InsertItem(int index, LPCTSTR text);
+  int InsertItem(unsigned index, LPCTSTR text);
   bool SetItem(const LVITEM* item) { return BOOLToBool(ListView_SetItem(_window, item)); }
-  int SetSubItem(int index, int subIndex, LPCTSTR text);
+  int SetSubItem(unsigned index, unsigned subIndex, LPCTSTR text);
 
   #ifndef _UNICODE
 
-  int InsertColumn(int columnIndex, const LVCOLUMNW *columnInfo) { return (int)SendMsg(LVM_INSERTCOLUMNW, (WPARAM)columnIndex, (LPARAM)columnInfo); }
-  int InsertColumn(int columnIndex, LPCWSTR text, int width);
+  int InsertColumn(unsigned columnIndex, const LVCOLUMNW *columnInfo) { return (int)SendMsg(LVM_INSERTCOLUMNW, (WPARAM)columnIndex, (LPARAM)columnInfo); }
+  int InsertColumn(unsigned columnIndex, LPCWSTR text, int width);
   int InsertItem(const LV_ITEMW* item) { return (int)SendMsg(LVM_INSERTITEMW, 0, (LPARAM)item); }
-  int InsertItem(int index, LPCWSTR text);
+  int InsertItem(unsigned index, LPCWSTR text);
   bool SetItem(const LV_ITEMW* item) { return BOOLToBool((BOOL)SendMsg(LVM_SETITEMW, 0, (LPARAM)item)); }
-  int SetSubItem(int index, int subIndex, LPCWSTR text);
+  int SetSubItem(unsigned index, unsigned subIndex, LPCWSTR text);
 
   #endif
 
-  bool DeleteItem(int itemIndex) { return BOOLToBool(ListView_DeleteItem(_window, itemIndex)); }
+  bool DeleteItem(unsigned itemIndex) { return BOOLToBool(ListView_DeleteItem(_window, itemIndex)); }
 
   UINT GetSelectedCount() const { return ListView_GetSelectedCount(_window); }
   int GetItemCount() const { return ListView_GetItemCount(_window); }
 
   INT GetSelectionMark() const { return ListView_GetSelectionMark(_window); }
 
-  void SetItemCount(int numItems) { ListView_SetItemCount(_window, numItems); }
-  void SetItemCountEx(int numItems, DWORD flags) {  ListView_SetItemCountEx(_window, numItems, flags); }
+  void SetItemCount(unsigned numItems) { ListView_SetItemCount(_window, numItems); }
+  void SetItemCountEx(unsigned numItems, DWORD flags) {  ListView_SetItemCountEx(_window, numItems, flags); }
 
+  /* startIndex : The index of the item with which to begin the search,
+     or -1 to find the first item that matches the specified flags.
+     The specified item itself is excluded from the search. */
   int GetNextItem(int startIndex, UINT flags) const { return ListView_GetNextItem(_window, startIndex, flags); }
   int GetNextSelectedItem(int startIndex) const { return GetNextItem(startIndex, LVNI_SELECTED); }
   int GetFocusedItem() const { return GetNextItem(-1, LVNI_FOCUSED); }
   
   bool GetItem(LVITEM* item) const { return BOOLToBool(ListView_GetItem(_window, item)); }
-  bool GetItemParam(int itemIndex, LPARAM &param) const;
-  void GetItemText(int itemIndex, int subItemIndex, LPTSTR text, int textSizeMax) const
-    { ListView_GetItemText(_window, itemIndex, subItemIndex, text, textSizeMax); }
+  bool GetItemParam(unsigned itemIndex, LPARAM &param) const;
+  /*
+  void GetItemText(unsigned itemIndex, unsigned subItemIndex, LPTSTR text, unsigned textSizeMax) const
+    { ListView_GetItemText(_window, itemIndex, subItemIndex, text, textSizeMax) }
+  */
   bool SortItems(PFNLVCOMPARE compareFunction, LPARAM dataParam)
     { return BOOLToBool(ListView_SortItems(_window, compareFunction, dataParam)); }
 
-  void SetItemState(int index, UINT state, UINT mask) { ListView_SetItemState(_window, index, state, mask); }
+  // If (index == -1), then the state change is applied to all items.
+  void SetItemState(int index, UINT state, UINT mask) { ListView_SetItemState(_window, index, state, mask) }
   void SetItemState_Selected(int index, bool select) { SetItemState(index, select ? LVIS_SELECTED : 0, LVIS_SELECTED); }
   void SetItemState_Selected(int index) { SetItemState(index, LVIS_SELECTED, LVIS_SELECTED); }
   void SelectAll() { SetItemState_Selected(-1); }
@@ -90,7 +96,7 @@ public:
   UINT GetItemState(int index, UINT mask) const { return ListView_GetItemState(_window, index, mask); }
   bool IsItemSelected(int index) const { return GetItemState(index, LVIS_SELECTED) == LVIS_SELECTED; }
 
-  bool GetColumn(int columnIndex, LVCOLUMN* columnInfo) const
+  bool GetColumn(unsigned columnIndex, LVCOLUMN* columnInfo) const
     { return BOOLToBool(ListView_GetColumn(_window, columnIndex, columnInfo)); }
 
   HIMAGELIST SetImageList(HIMAGELIST imageList, int imageListType)
@@ -101,7 +107,7 @@ public:
   void SetExtendedListViewStyle(DWORD exStyle) { ListView_SetExtendedListViewStyle(_window, exStyle); }
   void SetExtendedListViewStyle(DWORD exMask, DWORD exStyle) { ListView_SetExtendedListViewStyleEx(_window, exMask, exStyle); }
 
-  void SetCheckState(UINT index, bool checkState) { ListView_SetCheckState(_window, index, BoolToBOOL(checkState)); }
+  void SetCheckState(UINT index, bool checkState) { ListView_SetCheckState(_window, index, BoolToBOOL(checkState)) }
   bool GetCheckState(UINT index) { return BOOLToBool(ListView_GetCheckState(_window, index)); }
 
   bool EnsureVisible(int index, bool partialOK) { return BOOLToBool(ListView_EnsureVisible(_window, index, BoolToBOOL(partialOK))); }
@@ -129,7 +135,10 @@ public:
 class CListView2: public CListView
 {
   WNDPROC _origWindowProc;
+  // ~CListView2() ZIP7_eq_delete;
 public:
+  virtual ~CListView2() {}
+  CListView2() {}
   void SetWindowProc();
   virtual LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
 };

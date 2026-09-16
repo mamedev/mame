@@ -14,9 +14,9 @@
 
 #pragma once
 
-#include "video/mc6847.h"
-#include "6883sam.h"
+#include "machine/6883sam.h"
 #include "machine/ram.h"
+#include "video/mc6847.h"
 
 
 //**************************************************************************
@@ -51,6 +51,9 @@ public:
 	bool update_composite(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_rgb(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	// ROM decoder
+	static void decode_gime_font_rom(const uint8_t *raw_rom, uint8_t dest[][12], int char_count, int row_offset, const int *source_order = nullptr);
+
 	// interrupt outputs
 	bool firq_r() const { return m_firq != 0x00; }
 	bool irq_r() const { return m_irq != 0x00; }
@@ -61,21 +64,22 @@ public:
 	void set_il2(bool value) { set_interrupt_value(INTERRUPT_EI2, value); }
 
 protected:
-	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata);
+	gime_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool pal);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// other overrides
-	virtual TIMER_CALLBACK_MEMBER(new_frame) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void new_frame() override;
 	virtual TIMER_CALLBACK_MEMBER(horizontal_sync_changed) override;
 	virtual void enter_bottom_border() override;
 	virtual void record_border_scanline(uint16_t physical_scanline) override;
-	virtual void record_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
+	virtual void record_full_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline) override;
 	virtual void record_partial_body_scanline(uint16_t physical_scanline, uint16_t logical_scanline, int32_t start_clock, int32_t end_clock) override;
 
 protected:
@@ -125,9 +129,8 @@ protected:
 		GIME_TIMER_279NSEC
 	};
 
-	// statics
-	static const uint8_t lowres_font[];
-	static const uint8_t hires_font[128][12];
+	// font
+	uint8_t hires_font[128][12]{};
 
 	// callbacks
 	devcb_write_line   m_write_irq;
@@ -150,7 +153,7 @@ protected:
 	bool                        m_legacy_video;
 	uint32_t                    m_video_position;
 	uint8_t                     m_line_in_row;
-	scanline_record             m_scanlines[25+192+26];
+	scanline_record             m_scanlines[25+25+192+26+25];
 	bool                        m_displayed_rgb;
 
 	// palette state
@@ -239,6 +242,7 @@ protected:
 	// rendering sampled graphics
 	typedef uint32_t (gime_device::*emit_samples_proc)(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	uint32_t emit_dummy_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
+	template<int xscale>
 	uint32_t emit_mc6847_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);
 	template<int xscale>
 	uint32_t emit_gime_text_samples(const scanline_record *scanline, int sample_start, int sample_count, pixel_t *pixels, const pixel_t *palette);

@@ -111,7 +111,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t m_latch;
@@ -145,7 +145,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 m_latch;
@@ -169,7 +169,7 @@ protected:
 	nes_sachen_74x374_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void set_mirror(uint8_t nt);
 	uint8_t m_latch, m_mmc_vrom_bank;
@@ -206,7 +206,7 @@ protected:
 	nes_sachen_8259a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void chr_update();
 	uint8_t m_reg[8];

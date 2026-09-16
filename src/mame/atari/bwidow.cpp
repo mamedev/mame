@@ -225,7 +225,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 
@@ -482,9 +482,9 @@ static INPUT_PORTS_START( bwidow )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bwidow_state, clock_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bwidow_state::clock_r))
 
 	PORT_START("DSW0")
 	PORT_DIPNAME(0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("D4:!7,!8")
@@ -560,9 +560,9 @@ static INPUT_PORTS_START( gravitar )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bwidow_state, clock_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bwidow_state::clock_r))
 
 	PORT_START("DSW0")
 	PORT_DIPUNUSED_DIPLOC( 0x03, IP_ACTIVE_HIGH, "D4:!7,!8" )
@@ -634,9 +634,9 @@ static INPUT_PORTS_START( lunarbat )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bwidow_state, clock_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bwidow_state::clock_r))
 
 	PORT_START("DSW0")  /* DSW0 - Not read */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -668,9 +668,9 @@ static INPUT_PORTS_START( spacduel )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_device::done_r))
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bwidow_state, clock_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bwidow_state::clock_r))
 
 	/* Cabinet type.  The cocktail's harness has a jumper between pins
 	   R and P, which maps to bit 7 of address 0x0907 */
@@ -778,13 +778,10 @@ void bwidow_state::bwidow(machine_config &config)
 	ER2055(config, m_earom);
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 480, 0, 440);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
-	AVG(config, m_avg, 0);
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
+	vector.set_visarea(0, 480, 0, 440);
+	AVG(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
@@ -809,7 +806,7 @@ void bwidow_state::gravitar(machine_config &config)
 	/* basic machine hardware */
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 420, 0, 400);
+	subdevice<vector_device>("vector")->set_visarea(0, 420, 0, 400);
 
 	/* sound hardware */
 	gravitar_audio(config);
@@ -824,7 +821,7 @@ void bwidow_state::lunarbat(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 500, 0, 440);
+	subdevice<vector_device>("vector")->set_visarea(0, 500, 0, 440);
 }
 
 
@@ -836,7 +833,7 @@ void bwidow_state::spacduel(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 540, 0, 400);
+	subdevice<vector_device>("vector")->set_visarea(0, 540, 0, 400);
 }
 
 
@@ -873,14 +870,14 @@ ROM_START( bwidowp )
 	/* Vector ROM */
 	ROM_LOAD( "vg4800",  0x4800, 0x0800, CRC(12c0e382) SHA1(b0a899d013ad00ff5f861da9897780c5f0c5d221) )
 	ROM_LOAD( "vg5000",  0x5000, 0x1000, CRC(7009106a) SHA1(d41d147eccb2bb4e0a3e9bb184c2bfd09c80b92f) )
-	ROM_RELOAD( 0x6000, 0x1000 )
+	ROM_RELOAD(          0x6000, 0x1000 )
 	/* Program ROM */
-	ROM_LOAD( "a000",  0xa000, 0x1000, CRC(ebe0ace2) SHA1(fa919797c243d06761e3fa04b548679b310f0542) )
-	ROM_LOAD( "b000",  0xb000, 0x1000, CRC(b14f33e2) SHA1(f8b2c6cc6907b379786e246ccd559316d3edffb3) )
-	ROM_LOAD( "c000",  0xc000, 0x1000, CRC(79b8af00) SHA1(53e31962d2124bfe06afc6374d5fb2d87bf9e952) )
-	ROM_LOAD( "d000",  0xd000, 0x1000, CRC(10ac77c3) SHA1(f7b832974c224341f67fc4c3d151d8978774b462) )
-	ROM_LOAD( "e000",  0xe000, 0x1000, CRC(dfdda385) SHA1(ac77411722842033027b1717ac1b494507153e55) )
-	ROM_RELOAD(                  0xf000, 0x1000 )   /* for reset/interrupt vectors */
+	ROM_LOAD( "a000",    0xa000, 0x1000, CRC(ebe0ace2) SHA1(fa919797c243d06761e3fa04b548679b310f0542) )
+	ROM_LOAD( "b000",    0xb000, 0x1000, CRC(b14f33e2) SHA1(f8b2c6cc6907b379786e246ccd559316d3edffb3) )
+	ROM_LOAD( "c000",    0xc000, 0x1000, CRC(79b8af00) SHA1(53e31962d2124bfe06afc6374d5fb2d87bf9e952) )
+	ROM_LOAD( "d000",    0xd000, 0x1000, CRC(10ac77c3) SHA1(f7b832974c224341f67fc4c3d151d8978774b462) )
+	ROM_LOAD( "e000",    0xe000, 0x1000, CRC(dfdda385) SHA1(ac77411722842033027b1717ac1b494507153e55) )
+	ROM_RELOAD(          0xf000, 0x1000 )   /* for reset/interrupt vectors */
 
 	/* AVG PROM */
 	ROM_REGION( 0x100, "avg:prom", 0 )

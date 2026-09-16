@@ -36,12 +36,50 @@
 
 
 DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
+DEFINE_DEVICE_TYPE(LSI11,    lsi11_device,    "lsi11",    "DEC LSI-11")
+DEFINE_DEVICE_TYPE(K1801VM1, k1801vm1_device, "k1801vm1", "K1801VM1")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 
+/*
+ * Not implemented:
+ *
+ * instruction timing, microcode-related insns, HALT state and ODT,
+ * traps: double bus error and bus error on vector fetch.
+ */
+lsi11_device::lsi11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: t11_device(mconfig, LSI11, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
+{
+	c_insn_set = IS_LEIS | IS_EIS | IS_MXPS; // EISFIS is an option
+}
+
+/*
+ * Not implemented:
+ *
+ * instruction timing (+ memory timing), bug compatibility (MOVB, MFPS),
+ * built-in timer, revision G (MUL instruction, timer IRQ),
+ * extra PSW bits, on-chip registers, multiprocessing support,
+ * traps: double bus error and bus error on vector fetch.
+ */
+k1801vm1_device::k1801vm1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: t11_device(mconfig, K1801VM1, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
+{
+	c_insn_set = IS_LEIS | IS_MXPS | IS_VM1;
+}
+
+/*
+ * Not implemented:
+ *
+ * instruction timing (+ memory timing), bug compatibility (@PC addressing mode),
+ * HALT mode, traps: double bus error and bus error on vector fetch.
+ */
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
 {
+	c_insn_set = IS_LEIS | IS_EIS | IS_MXPS | IS_VM2;
 }
 
 t11_device::t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -61,11 +99,13 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 		reg.d = 0;
 	m_psw.d = 0;
 	m_ppc.d = 0;
+	m_cp[0] = m_cp[1] = m_cp[2] = m_cp[3] = 0;
 }
 
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, T11, tag, owner, clock)
 {
+	c_insn_set = IS_LEIS | IS_MFPT | IS_MXPS | IS_T11;
 }
 
 device_memory_interface::space_config_vector t11_device::memory_space_config() const
@@ -84,8 +124,7 @@ device_memory_interface::space_config_vector t11_device::memory_space_config() c
 
 int t11_device::ROPCODE()
 {
-	PC &= 0xfffe;
-	int val = m_cache.read_word(PC);
+	int val = m_cache.read_word(PC & 0xfffe);
 	PC += 2;
 	return val;
 }
@@ -105,13 +144,39 @@ void t11_device::WBYTE(int addr, int data)
 
 int t11_device::RWORD(int addr)
 {
-	return m_program.read_word(addr & 0xfffe);
+	if (addr < 0160000)
+		return m_program.read_word(addr & 0xfffe);
+	else // accessing I/O page
+	{
+		auto flags = m_program.lookup_read_word_flags(addr);
+		if (!flags)
+			return m_program.read_word(addr & 0xfffe);
+		else if (flags & UNALIGNED_WORD)
+			return m_program.read_word_unaligned(addr);
+		else if (flags & UNALIGNED_BYTE)
+			return m_program.read_byte(addr);
+		else
+			return m_program.read_word(addr & 0xfffe);
+	}
 }
 
 
 void t11_device::WWORD(int addr, int data)
 {
-	m_program.write_word(addr & 0xfffe, data);
+	if (addr < 0160000)
+		m_program.write_word(addr & 0xfffe, data);
+	else // accessing I/O page
+	{
+		auto flags = m_program.lookup_write_word_flags(addr);
+		if (!flags)
+			m_program.write_word(addr & 0xfffe, data);
+		else if (flags & UNALIGNED_WORD)
+			m_program.write_word_unaligned(addr, data);
+		else if (flags & UNALIGNED_BYTE)
+			m_program.write_byte(addr, data);
+		else
+			m_program.write_word(addr & 0xfffe, data);
+	}
 }
 
 
@@ -155,6 +220,8 @@ int t11_device::POP()
 #define GET_V (PSW & VFLAG)
 #define GET_Z (PSW & ZFLAG)
 #define GET_N (PSW & NFLAG)
+#define GET_T (PSW & (1 << 4))
+#define GET_I (PSW & (1 << 7))
 
 /* clears flags */
 #define CLR_C (PSW &= ~CFLAG)
@@ -201,6 +268,200 @@ static const struct irq_table_entry irq_table[] =
 	{ 7<<5, 0144 },
 	{ 7<<5, 0140 }
 };
+
+// priorities from LSI-11 Processor Handbook, p. 4-70
+void lsi11_device::t11_check_irqs()
+{
+	int8_t              mcir = MCIR_NONE;
+	uint16_t            vsel = 0;
+
+	if (m_mcir != MCIR_NONE)
+	{
+		mcir = m_mcir;
+		vsel = m_vsel;
+	}
+	// 1. bus error
+	else if (m_bus_error)
+	{
+		m_bus_error = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_TIMEOUT;
+	}
+	// 3. illegal insn
+	else if (mcir == MCIR_ILL)
+	{
+		take_interrupt(vsel);
+	}
+	// 4. trace trap
+	else if (m_trace_trap)
+	{
+		if (GET_T)
+		{
+			mcir = MCIR_IRQ;
+			vsel = T11_BPT;
+		}
+		else
+			m_trace_trap = false;
+	}
+	else if (GET_T)
+	{
+		m_trace_trap = true;
+	}
+	// 5. halt line (B HALT L bus signal) -- FIXME not implemented
+	// 6. power fail (B POK H bus signal)
+	else if (m_power_fail)
+	{
+		m_power_fail = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_PWRFAIL;
+	}
+	// 7. event line (B EVNT L bus signal)
+	else if (m_cp[2] && !GET_I)
+	{
+		m_cp[2] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_EVNT;
+	}
+	// 8. device interrupt (B IRQ4 L bus signal)
+	else if (m_vec_active && !GET_I)
+	{
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		else
+		{
+			mcir = MCIR_IRQ;
+			vsel = vec;
+		}
+	}
+
+	if (mcir == MCIR_IRQ)
+		take_interrupt(vsel);
+
+	m_mcir = MCIR_NONE;
+}
+
+
+// PSW7 masks external interrupts (except IRQ1) -- IRQ2, IRQ3, VIRQ
+// PSW11 also masks IRQ1.  PSW10 also masks ACLO.
+void k1801vm1_device::t11_check_irqs()
+{
+	int8_t              mcir = MCIR_NONE;
+	uint16_t            vsel = 0;
+
+	if (m_mcir != MCIR_NONE)
+	{
+		mcir = m_mcir;
+		vsel = m_vsel;
+	}
+	// 2. bus error on vector fetch; nm, vec 160012
+	// 3. double bus error; nm, vec 160006
+	// 4. bus error; PSW11, PSW10
+	else if (m_bus_error)
+	{
+		m_bus_error = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_TIMEOUT;
+	}
+	// 5. illegal insn; nm
+	else if (mcir == MCIR_ILL)
+	{
+		take_interrupt(vsel);
+	}
+	// 6. trace trap; WCPU
+	else if (m_trace_trap)
+	{
+		if (GET_T)
+		{
+			mcir = MCIR_IRQ;
+			vsel = T11_BPT;
+		}
+		else
+			m_trace_trap = false;
+	}
+	else if (GET_T)
+	{
+		m_trace_trap = true;
+	}
+	// 7. power fail (ACLO pin); PSW10
+	else if (m_power_fail)
+	{
+		m_power_fail = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_PWRFAIL;
+	}
+	// 8. external HALT (nIRQ1 pin, level triggered); PSW11, PSW10
+	else if (m_hlt_active)
+	{
+		m_hlt_active = false;
+		mcir = MCIR_HALT;
+		vsel = VM1_HALT;
+	}
+	// 9. internal timer, vector 0270; PSW7, PSW10
+	// 10. line clock (nIRQ2 pin, edge triggered); PSW7, PSW10
+	else if (m_cp[2] && !GET_I)
+	{
+		m_cp[2] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_EVNT;
+	}
+	// 11. nIRQ3 pin, edge triggered; PSW7, PSW10
+	else if (m_cp[3] && !GET_I)
+	{
+		m_cp[3] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_IRQ3;
+	}
+	// 12. nVIRQ pin; PSW7, PSW10
+	else if (m_vec_active && !GET_I)
+	{
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		mcir = MCIR_IRQ;
+		vsel = vec;
+	}
+
+	switch (mcir)
+	{
+	case MCIR_IRQ:
+		take_interrupt(vsel);
+		break;
+
+	case MCIR_HALT:
+		take_interrupt_halt(vsel);
+		break;
+	}
+
+	m_mcir = MCIR_NONE;
+}
+
+void k1801vm1_device::take_interrupt_halt(uint16_t vector)
+{
+	// vectors in HALT mode are word (not doubleword) aligned
+	assert((vector & 1) == 0);
+
+	// enter HALT mode
+	WWORD(VM1_SEL1, RWORD(VM1_SEL1) | SEL1_HALT);
+
+	// push the old state, set the new one
+	WWORD(VM1_STACK, PC);
+	WWORD(VM1_STACK + 2, PSW);
+	PCD = RWORD(vector);
+	PSW = RWORD(vector + 2);
+
+	// count cycles and clear the WAIT flag
+	m_icount -= 114;
+	m_wait_state = 0;
+}
 
 void t11_device::t11_check_irqs()
 {
@@ -277,6 +538,88 @@ void t11_device::take_interrupt(uint8_t vector)
 	m_wait_state = 0;
 }
 
+// priorities from technical manual, pp. 152, 154
+void k1801vm2_device::t11_check_irqs()
+{
+	int8_t              mcir = MCIR_NONE;
+	uint16_t            vsel = 0;
+
+	if (m_mcir != MCIR_NONE)
+	{
+		mcir = m_mcir;
+		vsel = m_vsel;
+	}
+	// 1. bus error; nm
+	else if (m_bus_error)
+	{
+		m_bus_error = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_TIMEOUT;
+	}
+	// 2. illegal insn; nm
+	else if (m_mcir == MCIR_ILL)
+	{
+		take_interrupt(vsel);
+	}
+	// 3. trace trap; WCPU
+	else if (m_trace_trap)
+	{
+		if (GET_T)
+		{
+			mcir = MCIR_IRQ;
+			vsel = T11_BPT;
+		}
+		else
+			m_trace_trap = false;
+	}
+	else if (GET_T)
+	{
+		m_trace_trap = true;
+	}
+	// 4. power fail; PSW7, PSW8
+	else if (m_power_fail)
+	{
+		m_power_fail = false;
+		mcir = MCIR_IRQ;
+		vsel = T11_PWRFAIL;
+	}
+	// 5. external HALT (nHALT pin); PSW8
+	else if (m_hlt_active)
+	{
+		m_hlt_active = false;
+		mcir = MCIR_HALT;
+		vsel = VM2_HALT;
+	}
+	// 6. line clock (nEVNT pin, edge triggered); PSW7
+	else if (m_cp[2] && !GET_I)
+	{
+		m_cp[2] = false;
+		mcir = MCIR_IRQ;
+		vsel = VM1_EVNT;
+	}
+	// 7. nVIRQ pin; PSW7
+	else if (m_vec_active && !GET_I)
+	{
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		mcir = MCIR_IRQ;
+		vsel = vec;
+	}
+
+	switch (mcir)
+	{
+	case MCIR_IRQ:
+		take_interrupt(vsel);
+		break;
+	}
+
+	m_mcir = MCIR_NONE;
+}
 
 
 /*************************************
@@ -329,6 +672,10 @@ void t11_device::device_start()
 	save_item(NAME(m_hlt_active));
 	save_item(NAME(m_power_fail));
 	save_item(NAME(m_ext_halt));
+	save_item(NAME(m_trace_trap));
+	save_item(NAME(m_check_irqs));
+	save_item(NAME(m_mcir));
+	save_item(NAME(m_vsel));
 
 	// Register debugger state
 	state_add( T11_PC,  "PC",  m_reg[7].w.l).formatstr("%06O");
@@ -341,8 +688,8 @@ void t11_device::device_start()
 	state_add( T11_R4,  "R4",  m_reg[4].w.l).formatstr("%06O");
 	state_add( T11_R5,  "R5",  m_reg[5].w.l).formatstr("%06O");
 
-	state_add(STATE_GENPC, "GENPC", m_reg[7].w.l).noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_ppc.w.l).noshow();
+	state_add(STATE_GENPC, "GENPC", m_reg[7].w.l).formatstr("%06O").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_ppc.w.l).formatstr("%06O").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw.b.l).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
@@ -357,6 +704,25 @@ void t11_device::state_string_export(const device_state_entry &entry, std::strin
 				m_psw.b.l & 0x80 ? '?':'.',
 				m_psw.b.l & 0x40 ? 'I':'.',
 				m_psw.b.l & 0x20 ? 'I':'.',
+				m_psw.b.l & 0x10 ? 'T':'.',
+				m_psw.b.l & 0x08 ? 'N':'.',
+				m_psw.b.l & 0x04 ? 'Z':'.',
+				m_psw.b.l & 0x02 ? 'V':'.',
+				m_psw.b.l & 0x01 ? 'C':'.'
+			);
+			break;
+	}
+}
+
+void k1801vm1_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c%c%c%c",
+				m_psw.b.l & 0x80 ? 'I':'.',
+				m_psw.b.l & 0x40 ? '?':'.',
+				m_psw.b.l & 0x20 ? '?':'.',
 				m_psw.b.l & 0x10 ? 'T':'.',
 				m_psw.b.l & 0x08 ? 'N':'.',
 				m_psw.b.l & 0x04 ? 'Z':'.',
@@ -409,6 +775,19 @@ void t11_device::device_reset()
 	m_power_fail = false;
 	m_bus_error = false;
 	m_ext_halt = false;
+	m_trace_trap = false;
+	m_check_irqs = false;
+}
+
+void k1801vm1_device::device_reset()
+{
+	t11_device::device_reset();
+
+	PC = RWORD(VM1_SEL1) & 0177400;
+	WWORD(VM1_SEL1, RWORD(VM1_SEL1) | SEL1_HALT);
+
+	m_mcir = MCIR_NONE;
+	m_vsel = 0;
 }
 
 void k1801vm2_device::device_reset()
@@ -417,6 +796,9 @@ void k1801vm2_device::device_reset()
 
 	PC = RWORD(c_initial_mode);
 	PSW = RWORD(c_initial_mode+2);
+
+	m_mcir = MCIR_NONE;
+	m_vsel = 0;
 }
 
 
@@ -438,7 +820,10 @@ void t11_device::execute_set_input(int irqline, int state)
 		if (state == CLEAR_LINE)
 			m_cp_state &= ~(1 << irqline);
 		else
+		{
 			m_cp_state |= 1 << irqline;
+			m_cp[irqline] = true;
+		}
 		break;
 
 	case VEC_LINE:
@@ -479,6 +864,7 @@ void t11_device::execute_run()
 
 	if (m_wait_state)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}
@@ -493,6 +879,12 @@ void t11_device::execute_run()
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
+
+		if (m_check_irqs || m_trace_trap || GET_T)
+		{
+			m_check_irqs = false;
+			t11_check_irqs();
+		}
 	}
 }
 

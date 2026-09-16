@@ -413,6 +413,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 #include "bus/sunkbd/sunkbd.h"
 #include "bus/sunmouse/sunmouse.h"
@@ -555,7 +556,7 @@ public:
 		, m_floppy(*this, "fdc:0")
 		, m_lance(*this, "lance")
 		, m_scsibus(*this, "scsibus")
-		, m_scsi(*this, "scsibus:7:ncr53c90")
+		, m_scsi(*this, "ncr53c90")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "user1")
@@ -565,8 +566,8 @@ public:
 	void sun4_base(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	u32 debugger_r(offs_t offset, u32 mem_mask = ~0);
 	void debugger_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -598,25 +599,23 @@ protected:
 
 	void fdc_irq(int state);
 
-	void ncr53c90(device_t *device);
+	void debugger_map(address_map &map) ATTR_COLD;
+	void system_asi_map(address_map &map) ATTR_COLD;
+	void segment_asi_map(address_map &map) ATTR_COLD;
+	void page_asi_map(address_map &map) ATTR_COLD;
+	void hw_segment_flush_asi_map(address_map &map) ATTR_COLD;
+	void hw_page_flush_asi_map(address_map &map) ATTR_COLD;
+	void hw_context_flush_asi_map(address_map &map) ATTR_COLD;
+	void user_insn_asi_map(address_map &map) ATTR_COLD;
+	void super_insn_asi_map(address_map &map) ATTR_COLD;
+	void user_data_asi_map(address_map &map) ATTR_COLD;
+	void super_data_asi_map(address_map &map) ATTR_COLD;
+	void sw_segment_flush_asi_map(address_map &map) ATTR_COLD;
+	void sw_page_flush_asi_map(address_map &map) ATTR_COLD;
+	void sw_context_flush_asi_map(address_map &map) ATTR_COLD;
+	void hw_flush_all_asi_map(address_map &map) ATTR_COLD;
 
-	void debugger_map(address_map &map);
-	void system_asi_map(address_map &map);
-	void segment_asi_map(address_map &map);
-	void page_asi_map(address_map &map);
-	void hw_segment_flush_asi_map(address_map &map);
-	void hw_page_flush_asi_map(address_map &map);
-	void hw_context_flush_asi_map(address_map &map);
-	void user_insn_asi_map(address_map &map);
-	void super_insn_asi_map(address_map &map);
-	void user_data_asi_map(address_map &map);
-	void super_data_asi_map(address_map &map);
-	void sw_segment_flush_asi_map(address_map &map);
-	void sw_page_flush_asi_map(address_map &map);
-	void sw_context_flush_asi_map(address_map &map);
-	void hw_flush_all_asi_map(address_map &map);
-
-	void type1space_base_map(address_map &map);
+	void type1space_base_map(address_map &map) ATTR_COLD;
 
 	required_device<sparc_base_device> m_maincpu;
 	required_device<sun4_mmu_base_device> m_mmu;
@@ -682,7 +681,7 @@ public:
 	void sun4(machine_config &config);
 
 private:
-	void type1space_map(address_map &map);
+	void type1space_map(address_map &map) ATTR_COLD;
 };
 
 class sun4c_state : public sun4_base_state
@@ -705,12 +704,12 @@ public:
 	void sun4_75(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	template <int Line> void sbus_irq_w(int state);
 
-	void type1space_map(address_map &map);
+	void type1space_map(address_map &map) ATTR_COLD;
 
 	required_device<sbus_device> m_sbus;
 	required_device_array<sbus_slot_device, 3> m_sbus_slot;
@@ -1367,17 +1366,8 @@ static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr53c90", NCR53C90);
+	device.option_add("tape", NSCSI_TAPE);
 	device.set_option_machine_config("cdrom", sun4_cdrom);
-}
-
-void sun4_base_state::ncr53c90(device_t *device)
-{
-	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
-
-	adapter.set_clock(10000000);
-	adapter.irq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_irq));
-	adapter.drq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_drq));
 }
 
 void sun4_base_state::sun4_base(machine_config &config)
@@ -1385,7 +1375,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	RAM(config, m_ram).set_default_size("16M").set_default_value(0x00);
 	m_ram->set_extra_options("4M,8M,12M,16M,20M,24M,28M,32M,36M,40M,48M,52M,64M");
 
-	M48T02(config, m_timekpr, 0);
+	M48T02(config, m_timekpr);
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
@@ -1393,7 +1383,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
 	// Ethernet
-	AM79C90(config, m_lance);
+	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 	m_lance->dma_in().set([this](offs_t offset)
 	{
 		u32 const data = m_mmu->insn_data_r<sun4c_mmu_device::SUPER_DATA>((0xff000000U | offset) >> 2, 0xffffffffU);
@@ -1433,7 +1423,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	m_rs232[1]->dcd_handler().set(m_scc[1], FUNC(z80scc_device::dcdb_w));
 	m_rs232[1]->cts_handler().set(m_scc[1], FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsibus");
+	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", sun_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:1", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", sun_scsi_devices, nullptr);
@@ -1441,7 +1431,11 @@ void sun4_base_state::sun4_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
+
+	NCR53C90(config, m_scsi, 10000000);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(DEVICE_SELF, FUNC(sun4_base_state::scsi_irq));
+	m_scsi->drq_handler_cb().set(DEVICE_SELF, FUNC(sun4_base_state::scsi_drq));
 }
 
 void sun4_state::sun4(machine_config &config)
@@ -1452,6 +1446,9 @@ void sun4_state::sun4(machine_config &config)
 	m_maincpu->set_addrmap(0, &sun4_state::debugger_map);
 
 	sun4_base(config);
+
+	// add a tape drive at SCSI ID 4
+	subdevice<nscsi_connector>("scsibus:4")->set_default_option("tape");
 
 	// MMU Type 1 device space
 	ADDRESS_MAP_BANK(config, m_type1space).set_map(&sun4_state::type1space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
@@ -1885,4 +1882,3 @@ COMP( 1990, sun4_75,  sun4_300, 0,      sun4_75, sun4,  sun4c_state, empty_init,
 // sun4m (using the SPARC "reference MMU", probably will go to a separate driver)
 COMP( 1992, sun_s10,  sun4_300, 0,      sun4c,   sun4,  sun4c_state, empty_init, "Sun Microsystems", "SPARCstation 10 (Sun S10)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1994, sun_s20,  sun4_300, 0,      sun4c,   sun4,  sun4c_state, empty_init, "Sun Microsystems", "SPARCstation 20",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-

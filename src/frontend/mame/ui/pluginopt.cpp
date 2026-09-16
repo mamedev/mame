@@ -24,16 +24,16 @@ bool menu_plugin::handle(event const *ev)
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref, false);
+			menu::stack_push<menu_plugin_opt>(ui(), target(), (char *)ev->itemref, false);
 	}
 	return false;
 }
 
-menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
-	menu(mui, container),
+menu_plugin::menu_plugin(mame_ui_manager &mui, render_target &target) :
+	menu(mui, target),
 	m_plugins(mame_machine_manager::instance()->lua()->get_menu())
 {
-	set_heading(_("Plugin Options"));
+	set_heading(_("menu-pluginopts", "Plugin Options"));
 }
 
 void menu_plugin::populate()
@@ -43,10 +43,10 @@ void menu_plugin::populate()
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, std::string_view menu)
+void menu_plugin::show_menu(mame_ui_manager &mui, std::string_view menu)
 {
 	// add the plugin menu entry
-	menu::stack_push<menu_plugin_opt>(mui, container, menu, true);
+	menu::stack_push<menu_plugin_opt>(mui, mui.machine().render().ui_target(), menu, true);
 
 	// force the menus on
 	mui.show_menu();
@@ -56,17 +56,19 @@ menu_plugin::~menu_plugin()
 {
 }
 
-menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu, bool one_shot) :
-	ui::menu(mui, container),
+menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_target &target, std::string_view menu, bool one_shot) :
+	ui::menu(mui, target),
 	m_menu(menu),
 	m_need_idle(false)
 {
+	set_needs_prev_menu_item(false);
 	set_one_shot(one_shot);
 }
 
 bool menu_plugin_opt::handle(event const *ev)
 {
 	void *const itemref = ev ? ev->itemref : get_selection_ref();
+	auto const itemrefno = uintptr_t(itemref);
 	std::string key;
 	if (ev)
 	{
@@ -91,6 +93,11 @@ bool menu_plugin_opt::handle(event const *ev)
 			key = "nextgroup";
 			break;
 		case IPT_UI_SELECT:
+			if (!itemrefno)
+			{
+				stack_pop();
+				return false;
+			}
 			key = "select";
 			break;
 		case IPT_UI_DISPLAY_COMMENT:
@@ -116,9 +123,13 @@ bool menu_plugin_opt::handle(event const *ev)
 	if (key.empty() && !m_need_idle)
 		return false;
 
-	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
+	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, itemrefno, key);
 	if (result.second)
-		set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
+	{
+		auto const selno = uintptr_t(*result.second);
+		if (selno >= 1)
+			set_selection(reinterpret_cast<void *>(selno));
+	}
 	if (result.first)
 		reset(reset_options::REMEMBER_REF);
 	else if (ev && (ev->iptkey == IPT_UI_BACK))
@@ -162,7 +173,7 @@ void menu_plugin_opt::populate()
 			else if (flag == "lr")
 				item_flags_or |= FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
 			else if (flag == "invert")
-				item_flags_or |= FLAG_INVERT;
+				item_flags_or |= FLAG_DEEMPHASIZE;
 			else if (flag == "heading")
 				item_flags_or |= FLAG_DISABLE | FLAG_UI_HEADING;
 			else
@@ -176,9 +187,17 @@ void menu_plugin_opt::populate()
 		++i;
 	}
 	item_append(menu_item_type::SEPARATOR);
+	item_append(
+			is_one_shot() ? _("menu-pluginopts", "Close Menu") : _("menu-pluginopts", "Return to Plugin Options Menu"),
+			0,
+			reinterpret_cast<void *>(uintptr_t(0)));
 
 	if (sel)
-		set_selection(reinterpret_cast<void *>(uintptr_t(*sel)));
+	{
+		auto const selno = uintptr_t(*sel);
+		if ((sel >= 1U) && (sel < i))
+			set_selection(reinterpret_cast<void *>(selno));
+	}
 
 	uint32_t process_flags = 0U;
 	m_need_idle = false;

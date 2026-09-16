@@ -60,7 +60,7 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void krokha_mem(address_map &map);
+	void krokha_mem(address_map &map) ATTR_COLD;
 
 	void status_callback(uint8_t data);
 	void speaker_w(uint8_t data);
@@ -138,7 +138,7 @@ void krokha_state::krokha(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &krokha_state::krokha_mem);
 	m_maincpu->out_status_func().set(FUNC(krokha_state::status_callback));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64 * 8, 32 * 8);

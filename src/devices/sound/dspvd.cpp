@@ -21,9 +21,9 @@ u32 dspv_disassembler::opcode_alignment() const
 
 offs_t dspv_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	u16 opc = opcodes.r16(pc);
-
-	util::stream_format(stream, "dc.w %04x", opc);
+	u64 opc = opcodes.r64(pc);
+	u64 mode = (params.r64(pc) >> 32) & 7;
+	util::stream_format(stream, "%x%016x", mode, opc);
 
 	return 1 | SUPPORTED;
 }

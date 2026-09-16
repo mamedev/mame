@@ -67,6 +67,11 @@
 			cfgsuffix       = "ARM",
 			iscrosscompiler = true,
 		},
+		ARM64 =
+		{
+			cfgsuffix       = "ARM64",
+			iscrosscompiler = true,
+		},
 		Orbis =
 		{
 			cfgsuffix       = "orbis",
@@ -104,6 +109,21 @@
 			iscrosscompiler = true,
 			nosharedlibs    = true,
 			namestyle       = "Emscripten",
+		},
+		["gdk-desktop"] =
+		{
+			cfgsuffix       = "gdk-desktop",
+			namestyle       = "windows",
+		},
+		["gdk-xboxone"] =
+		{
+			cfgsuffix       = "gdk-xboxone",
+			namestyle       = "windows",
+		},
+		["gdk-scarlett"] =
+		{
+			cfgsuffix       = "gdk-scarlett",
+			namestyle       = "windows",
 		},
 	}
 

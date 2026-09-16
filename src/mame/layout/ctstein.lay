@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -10,42 +11,15 @@ license:CC0-1.0
 	<element name="static_white"><rect><color red="0.75" green="0.73" blue="0.7" /></rect></element>
 	<element name="static_white2"><rect><color red="0.6" green="0.59" blue="0.57" /></rect></element>
 
-	<element name="text_best">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="BEST"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_score">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="SCORE"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_start">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="START"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_game">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="GAME"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_dif">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="DIFFICULTY"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_1">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_2">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_3">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
-	<element name="text_4">
-		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
-		<text string="4"><color red="0.0" green="0.0" blue="0.0" /></text>
-	</element>
+	<element name="text_best"><text string="BEST"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_score"><text string="SCORE"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_start"><text string="START"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_game"><text string="GAME"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_dif"><text string="DIFFICULTY"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 
 	<element name="switch1" defstate="0">
 		<text string=" "><color red="0" green="0" blue="0" /></text>

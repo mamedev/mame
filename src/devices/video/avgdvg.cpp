@@ -226,7 +226,7 @@ void dvg_device::dvg_draw_to(int x, int y, int intensity)
 				(m_xmin + x - 512) << 16,
 				(m_ymin + 512 - y) << 16,
 				vector_device::color111(7),
-				intensity << 4);
+				pal4bit(intensity));
 }
 
 int dvg_device::handler_2() //dvg_gostrobe
@@ -664,7 +664,7 @@ int avg_device::handler_7() // avg_strobe3
 				x,
 				y,
 				vector_device::color111(m_color),
-				(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
+				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 	}
 
 	return cycles;
@@ -715,7 +715,7 @@ int avg_tempest_device::handler_7() // tempest_strobe3
 				y - m_ycenter + m_xcenter,
 				x - m_xcenter + m_ycenter,
 				rgb_t(r, g, b),
-				(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
+				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 	}
 
 	return cycles;
@@ -832,7 +832,7 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 						x,
 						y,
 						rgb_t(r, g, b),
-						(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
+						pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 				m_spkl_shift = (BIT(m_spkl_shift, 6) ^ BIT(m_spkl_shift, 5) ^ 1) | (m_spkl_shift << 1);
 
 				if ((m_spkl_shift & 0x7f) == 0x7f)
@@ -861,7 +861,7 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 					x,
 					y,
 					rgb_t(r, g, b),
-					(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
+					pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 		}
 	}
 
@@ -923,11 +923,28 @@ int avg_starwars_device::handler_7() // starwars_strobe3
 
 	if (!OP0() && !OP2())
 	{
+		// Star Wars intensity DAC:
+		// 12k / 24k / 47k resistive current summing network.
+		// https://www.amazingarcading.com.au/Star-Wars-Schematic-Page-14B.jpg
+		constexpr float DAC_REFERENCE_RESISTOR = 12000.0f;
+		constexpr float DAC_FULL_SCALE =
+				(DAC_REFERENCE_RESISTOR / 12000.0f) +
+				(DAC_REFERENCE_RESISTOR / 24000.0f) +
+				(DAC_REFERENCE_RESISTOR / 47000.0f);
+
+		const float dac =
+				BIT(m_int_latch, 3) * (DAC_REFERENCE_RESISTOR / 12000.0f) +
+				BIT(m_int_latch, 2) * (DAC_REFERENCE_RESISTOR / 24000.0f) +
+				BIT(m_int_latch, 1) * (DAC_REFERENCE_RESISTOR / 47000.0f);
+
+		// Normalize DAC output to the vector intensity range 0-255.
+		const int intensity = int((dac / DAC_FULL_SCALE) * m_intensity + 0.5f);
+
 		vg_add_point_buf(
 				m_xpos,
 				m_ypos,
 				vector_device::color111(m_color),
-				((m_int_latch >> 1) * m_intensity) >> 3);
+				intensity);
 	}
 
 	return cycles;
@@ -1080,7 +1097,7 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 				y - m_ycenter + m_xcenter,
 				x - m_xcenter + m_ycenter,
 				rgb_t(r, g, b),
-				((m_int_latch == 2) ? m_intensity : m_int_latch) << 4);
+				pal4bit((m_int_latch == 2) ? m_intensity : m_int_latch));
 	}
 	if (OP2())
 	{
@@ -1102,7 +1119,7 @@ int avg_quantum_device::handler_7() // quantum_strobe3
 int avg_bzone_device::handler_1() // bzone_latch1
 {
 	/*
-	 * Battle Zone has clipping hardware. We need to remember the
+	 * Battlezone has clipping hardware. We need to remember the
 	 * position of the beam when the analog switches hst or lst get
 	 * turned off.
 	 */
@@ -1140,7 +1157,7 @@ int avg_bzone_device::handler_6() // bzone_strobe2
 			/*
 			 * If izblank is true the zblank signal gets
 			 * inverted. This behaviour can't be handled with the
-			 * clipping we have right now. Battle Zone doesn't seem to
+			 * clipping we have right now. Battlezone doesn't seem to
 			 * invert zblank so it's no issue.
 			 */
 			m_izblank = m_dvy & 0x100;
@@ -1152,7 +1169,7 @@ int avg_bzone_device::handler_6() // bzone_strobe2
 
 int avg_bzone_device::handler_7() // bzone_strobe3
 {
-	// Battle Zone is B/W
+	// Battlezone is B/W
 	const int cycles = avg_common_strobe3();
 
 	if (!OP0() && !OP2())
@@ -1161,7 +1178,7 @@ int avg_bzone_device::handler_7() // bzone_strobe3
 				m_xpos,
 				m_ypos,
 				vector_device::color111(7),
-				(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
+				pal4bit(((m_int_latch >> 1) == 1) ? m_intensity : (m_int_latch & 0xe)));
 	}
 
 	return cycles;
@@ -1331,7 +1348,7 @@ void dvg_device::device_start()
 {
 	avgdvg_device_base::device_start();
 
-	const rectangle &visarea = m_vector->screen().visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_xmin = visarea.min_x;
 	m_ymin = visarea.min_y;
@@ -1344,7 +1361,7 @@ void avg_device::device_start()
 {
 	avgdvg_device_base::device_start();
 
-	const rectangle &visarea = m_vector->screen().visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_xmin = visarea.min_x;
 	m_ymin = visarea.min_y;
@@ -1501,4 +1518,4 @@ DEFINE_DEVICE_TYPE(AVG_TEMPEST,  avg_tempest_device,  "avg_tempest",  "Atari AVG
 DEFINE_DEVICE_TYPE(AVG_MHAVOC,   avg_mhavoc_device,   "avg_mhavoc",   "Atari AVG (Major Havoc)")
 DEFINE_DEVICE_TYPE(AVG_STARWARS, avg_starwars_device, "avg_starwars", "Atari AVG (Star Wars)")
 DEFINE_DEVICE_TYPE(AVG_QUANTUM,  avg_quantum_device,  "avg_quantum",  "Atari AVG (Quantum)")
-DEFINE_DEVICE_TYPE(AVG_BZONE,    avg_bzone_device,    "avg_bzone",    "Atari AVG (Battle Zone)")
+DEFINE_DEVICE_TYPE(AVG_BZONE,    avg_bzone_device,    "avg_bzone",    "Atari AVG (Battlezone)")

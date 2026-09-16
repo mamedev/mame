@@ -16,7 +16,7 @@
 class raiden2cop_device : public device_t
 {
 public:
-	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Command Table
 	uint16_t cop_func_trigger[0x100/8];       /* function trigger */
@@ -110,29 +110,13 @@ public:
 
 
 	struct colinfo {
-		colinfo()
-		{
-			pos[0] = pos[1] = pos[2] = 0;
-			dx[0] = dx[1] = dx[2] = 0;
-			size[0] = size[1] = size[2] = 0;
-			allow_swap = false;
-			flags_swap = 0;
-			spradr = 0;
-			min[0] = min[1] = min[2] = 0;
-			max[0] = max[1] = max[2] = 0;
-
-		}
-
-
-		int16_t pos[3];
-		int8_t dx[3];
-		uint8_t size[3];
-		bool allow_swap;
-		uint16_t flags_swap;
-		uint32_t spradr;
-		int16_t min[3], max[3];
-
-
+		int16_t pos[3] = { 0, 0, 0 };
+		int8_t dx[3] = { 0, 0, 0 };
+		uint8_t size[3] = { 0, 0, 0 };
+		bool allow_swap = false;
+		uint16_t flags_swap = 0;
+		uint32_t spradr = 0;
+		int16_t min[3] = { 0, 0, 0 }, max[3] = { 0, 0, 0 };
 	};
 
 	colinfo cop_collision_info[2];
@@ -196,7 +180,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// device callbacks
@@ -237,6 +221,10 @@ private:
 	void execute_b100(int offset, uint16_t data);
 	void execute_b900(int offset, uint16_t data);
 	void execute_f105(int offset, uint16_t data);
+
+	void execute_ede5(int offset, uint16_t data);
+	void execute_f790(int offset, uint16_t data);
+	void execute_fc84(int offset, uint16_t data);
 
 	// TODO: remove/rename these
 	//void LEGACY_execute_130e(int offset, uint16_t data);

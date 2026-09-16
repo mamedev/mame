@@ -230,7 +230,9 @@ uint8_t m68307_cpu_device::int_ack(offs_t offset)
 
 void m68307_cpu_device::device_start()
 {
-	reset_cb().append(*this, FUNC(m68307_cpu_device::reset_peripherals));
+	// FIXME: this doesn't work because the devcb has already been resolved before the device starts, all it does is cause an asssertion failure in debug builds
+	// this obviously wasn't tested, it needs to actually integrate with the CPU core properly and not try to hang off a callback for the rest of the system
+	//reset_cb().append(*this, FUNC(m68307_cpu_device::reset_peripherals));
 
 	m68000_device::device_start();
 

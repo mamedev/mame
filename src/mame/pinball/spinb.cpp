@@ -59,7 +59,7 @@ ToDo:
 #include "emu.h"
 #include "genpin.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/7474.h"
@@ -98,23 +98,25 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void dmd(machine_config &config);
-	void gunshot(machine_config &config);
-	void jolypark(machine_config &config);
-	void mach2(machine_config &config);
-	void metalman(machine_config &config);
-	void msm5205(machine_config &config);
-	void msm6585(machine_config &config);
-	void spinb(machine_config &config);
-	void vrnwrld(machine_config &config);
+	void dmd(machine_config &config) ATTR_COLD;
+	void gunshot(machine_config &config) ATTR_COLD;
+	void jolypark(machine_config &config) ATTR_COLD;
+	void mach2(machine_config &config) ATTR_COLD;
+	void metalman(machine_config &config) ATTR_COLD;
+	void msm5205(machine_config &config) ATTR_COLD;
+	void msm6585(machine_config &config) ATTR_COLD;
+	void spinb(machine_config &config) ATTR_COLD;
+	void vrnwrld(machine_config &config) ATTR_COLD;
 
-	void init_1() { m_game = 1; }
-	void init_2() { m_game = 2; }
-	void init_3() { m_game = 3; }
+	void init_1() ATTR_COLD { m_game = 1; }
+	void init_2() ATTR_COLD { m_game = 2; }
+	void init_3() ATTR_COLD { m_game = 3; }
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	void p1_w(u8 data);
 	u8 p3_r();
 	void p3_w(u8 data);
@@ -153,16 +155,16 @@ private:
 	void update_sound_m();
 	void ic5a_w(int state);
 	void ic5m_w(int state);
-	void spinb_palette(palette_device &palette) const;
+	void spinb_palette(palette_device &palette) const ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void dmd_io(address_map &map);
-	void dmd_mem(address_map &map);
-	void audio_map(address_map &map);
-	void spinb_map(address_map &map);
-	void music_map(address_map &map);
-	void vrnwrld_map(address_map &map);
+	void dmd_data(address_map &map) ATTR_COLD;
+	void dmd_mem(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void spinb_map(address_map &map) ATTR_COLD;
+	void music_map(address_map &map) ATTR_COLD;
+	void vrnwrld_map(address_map &map) ATTR_COLD;
 
 	bool m_pc0a = false;
 	bool m_pc0m = false;
@@ -256,7 +258,7 @@ void spinb_state::dmd_mem(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void spinb_state::dmd_io(address_map &map)
+void spinb_state::dmd_data(address_map &map)
 {
 	map(0x0000, 0x1fff).w(FUNC(spinb_state::dmdram_w));
 	map(0x0000, 0xffff).r(FUNC(spinb_state::dmdram_r));
@@ -861,7 +863,7 @@ void spinb_state::ppia_c_w(u8 data)
 	if (m_6585a)
 	{
 		//m_6585a->playmode_w(15);
-		m_6585a->playmode_w(BIT(data, 5) ? 14 : 12);
+		m_6585a->playmode_w(BIT(data, 5) ? 12 : 14);
 		m_6585a->reset_w(BIT(data, 6));
 	}
 	m_ic5a->clear_w(!BIT(data, 6));
@@ -880,7 +882,7 @@ void spinb_state::ppim_c_w(u8 data)
 	if (m_6585m)
 	{
 		//m_6585m->playmode_w(15);
-		m_6585m->playmode_w(BIT(data, 5) ? 14 : 12);
+		m_6585m->playmode_w(BIT(data, 5) ? 12 : 14);
 		m_6585m->reset_w(BIT(data, 6));
 	}
 	m_ic5m->clear_w(!BIT(data, 6));
@@ -889,8 +891,6 @@ void spinb_state::ppim_c_w(u8 data)
 void spinb_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	if (m_dmdcpu)
 		m_dmd_size = memregion("dmdcpu")->bytes();
@@ -922,6 +922,7 @@ void spinb_state::machine_start()
 void spinb_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -934,7 +935,7 @@ void spinb_state::machine_reset()
 	update_sound_m();
 }
 
-void  spinb_state::spinb_palette(palette_device &palette) const
+void spinb_state::spinb_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
@@ -1003,12 +1004,12 @@ void spinb_state::dmd(machine_config &config)
 {
 	I8031(config, m_dmdcpu, XTAL(16'000'000));
 	m_dmdcpu->set_addrmap(AS_PROGRAM, &spinb_state::dmd_mem);
-	m_dmdcpu->set_addrmap(AS_IO, &spinb_state::dmd_io);
+	m_dmdcpu->set_addrmap(AS_DATA, &spinb_state::dmd_data);
 	m_dmdcpu->port_out_cb<1>().set(FUNC(spinb_state::p1_w));
 	m_dmdcpu->port_in_cb<3>().set(FUNC(spinb_state::p3_r));
 	m_dmdcpu->port_out_cb<3>().set(FUNC(spinb_state::p3_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(spinb_state::screen_update));
@@ -1049,16 +1050,16 @@ void spinb_state::msm5205(machine_config &config)
 	ppim.in_pc_callback().set(FUNC(spinb_state::ppim_c_r));
 	ppim.out_pc_callback().set(FUNC(spinb_state::ppim_c_w));
 
-	TTL7474(config, m_ic5a, 0);
+	TTL7474(config, m_ic5a);
 	m_ic5a->comp_output_cb().set(FUNC(spinb_state::ic5a_w));
 
-	HC157(config, m_ic14a, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14a); // IC15 on Jolly Park
 	m_ic14a->out_callback().set("5205a", FUNC(msm5205_device::data_w));
 
-	TTL7474(config, m_ic5m, 0);
+	TTL7474(config, m_ic5m);
 	m_ic5m->comp_output_cb().set(FUNC(spinb_state::ic5m_w));
 
-	HC157(config, m_ic14m, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14m); // IC15 on Jolly Park
 	m_ic14m->out_callback().set("5205m", FUNC(msm5205_device::data_w));
 }
 
@@ -1092,16 +1093,16 @@ void spinb_state::msm6585(machine_config &config)
 	ppim.in_pc_callback().set(FUNC(spinb_state::ppim_c_r));
 	ppim.out_pc_callback().set(FUNC(spinb_state::ppim_c_w));
 
-	TTL7474(config, m_ic5a, 0);
+	TTL7474(config, m_ic5a);
 	m_ic5a->comp_output_cb().set(FUNC(spinb_state::ic5a_w));
 
-	HC157(config, m_ic14a, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14a); // IC15 on Jolly Park
 	m_ic14a->out_callback().set("6585a", FUNC(msm5205_device::data_w));
 
-	TTL7474(config, m_ic5m, 0);
+	TTL7474(config, m_ic5m);
 	m_ic5m->comp_output_cb().set(FUNC(spinb_state::ic5m_w));
 
-	HC157(config, m_ic14m, 0); // IC15 on Jolly Park
+	HC157(config, m_ic14m); // IC15 on Jolly Park
 	m_ic14m->out_callback().set("6585m", FUNC(msm5205_device::data_w));
 }
 
@@ -1414,12 +1415,12 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1992, metalman, 0,       metalman, metalman, spinb_state, init_3,     ROT0, "Inder",    "Metal Man",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993, bushido,  0,       mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993, bushidoa, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1993, bushidob, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 3)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995, mach2,    0,       mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 1)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1995, mach2a,   mach2,   mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 2)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996, jolypark, 0,       jolypark, spinb,    spinb_state, init_1,     ROT0, "Spinball", "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996, vrnwrld,  0,       vrnwrld,  vrnwrld,  spinb_state, init_2,     ROT0, "Spinball", "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1996, gunshot,  0,       gunshot,  spinb,    spinb_state, empty_init, ROT0, "Spinball", "Gun Shot",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+GAME(1992, metalman, 0,       metalman, metalman, spinb_state, init_3,     ROT0, "Inder",    "Metal Man",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993, bushido,  0,       mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993, bushidoa, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1993, bushidob, bushido, mach2,    bushido,  spinb_state, empty_init, ROT0, "Inder",    "Bushido (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995, mach2,    0,       mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1995, mach2a,   mach2,   mach2,    mach2,    spinb_state, empty_init, ROT0, "Spinball", "Mach 2 (set 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996, jolypark, 0,       jolypark, spinb,    spinb_state, init_1,     ROT0, "Spinball", "Jolly Park",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996, vrnwrld,  0,       vrnwrld,  vrnwrld,  spinb_state, init_2,     ROT0, "Spinball", "Verne's World",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1996, gunshot,  0,       gunshot,  spinb,    spinb_state, empty_init, ROT0, "Spinball", "Gun Shot",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

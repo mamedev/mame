@@ -50,8 +50,8 @@ private:
 	required_ioport m_peny;
 
 	uint32_t m_port[9] = { };
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
@@ -63,7 +63,7 @@ private:
 	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
 	uint32_t s3c2440_adc_data_r(offs_t offset);
 
-	void mini2440_map(address_map &map);
+	void mini2440_map(address_map &map) ATTR_COLD;
 };
 
 inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -234,17 +234,16 @@ void mini2440_state::mini2440(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 239, 0, 319);
 	screen.set_screen_update("s3c2440", FUNC(s3c2440_device::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
-	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
+	SPEAKER(config, "speaker", 2).front();
+	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // uda1341ts.u12
+	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // uda1341ts.u12
 
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");
@@ -259,13 +258,13 @@ void mini2440_state::mini2440(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	SAMSUNG_K9F1G08U0B(config, m_nand, 0);
+	SAMSUNG_K9F1G08U0B(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 
 static INPUT_PORTS_START( mini2440 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, mini2440_state, mini2440_input_changed, 0) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mini2440_state::mini2440_input_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_MINMAX(80, 950) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_KEYDELTA(30) PORT_PLAYER(1)
 	PORT_START( "PENY" )

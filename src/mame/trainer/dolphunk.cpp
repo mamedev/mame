@@ -117,9 +117,9 @@ private:
 	void port00_w(offs_t offset, u8 data);
 	void port06_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void machine_start() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	u8 m_cass_data = 0U;
 	u8 m_last_key = 0U;
@@ -277,9 +277,9 @@ ROM_START( dauphin )
 	// Cassette rom
 	ROM_LOAD( "dolphin_moni.rom", 0x0100, 0x0100, NO_DUMP )
 
-	//ROM_LOAD_OPTIONAL( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
+	//ROM_LOAD( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
 	// This rom is a bugfixed and relocated version of the game found on the Amigan site
-	ROM_LOAD_OPTIONAL( "reflexes.bin", 0x0c00, 0x0400, CRC(14a1557d) SHA1(789d10551f1bb3472057901fa3cee0c6bfe220ac) )
+	ROM_LOAD( "reflexes.bin", 0x0c00, 0x0400, CRC(14a1557d) SHA1(789d10551f1bb3472057901fa3cee0c6bfe220ac) )
 	// This the original
 	//ROM_LOAD( "reflexes.bin", 0x0c00, 0x0072, CRC(c4bed94b) SHA1(cf525755a1dbce6a4681353be692ddf0346f323b) )
 ROM_END

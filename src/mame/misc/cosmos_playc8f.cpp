@@ -92,7 +92,7 @@
 
 #include "emu.h"
 #include "cpu/m6805/m68hc05.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/okim9810.h"
 #include "speaker.h"
 
@@ -173,6 +173,6 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME        PARENT     MACHINE            INPUT    CLASS                 INIT        ROT   COMPANY                  FULLNAME                               FLAGS
-GAME(2013, bgbasketb,  0,         playc8f_symusic01, playc8f, cosmos_playc8f_state, empty_init, ROT0, "Benchmark Games, Inc.", "Basketball (Benchmark Games, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2004, bgbasketbb, bgbasketb, playc8f_symusic01, playc8f, cosmos_playc8f_state, empty_init, ROT0, "Benchmark Games, Inc.", "Basketball (Benchmark Games, set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(2003, tenstrikc,  0,         playc8f,           playc8f, cosmos_playc8f_state, empty_init, ROT0, "Benchmark Games, Inc.", "Ten Strike Classic",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(2013, bgbasketb,  0,         playc8f_symusic01, playc8f, cosmos_playc8f_state, empty_init, ROT0, "Benchmark Games, Inc.", "Basketball (Benchmark Games, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2004, bgbasketbb, bgbasketb, playc8f_symusic01, playc8f, cosmos_playc8f_state, empty_init, ROT0, "Benchmark Games, Inc.", "Basketball (Benchmark Games, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2003, tenstrikc,  0,         playc8f,           playc8f, cosmos_playc8f_state, empty_init, ROT0, "Benchmark Games, Inc.", "Ten Strike Classic",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

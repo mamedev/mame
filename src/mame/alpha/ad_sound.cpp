@@ -157,7 +157,7 @@ TIMER_CALLBACK_MEMBER(ad_59mc07_device::frq_adjuster_callback)
 	uint8_t frq = m_frq_adjuster->read();
 
 	m_msm->set_clock(MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
-//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", m_8155_port_c, m_8155_port_a, m_ay_port_a, m_ay_port_b, m_cymbal_ctrl & 15);
+	//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", m_8155_port_c, m_8155_port_a, m_ay_port_a, m_ay_port_b, m_cymbal_ctrl & 15);
 
 	m_cymvol *= 0.94f;
 	m_hihatvol *= 0.94f;
@@ -189,11 +189,11 @@ void ad_59mc07_device::c0f8_w(offs_t offset, uint8_t data)
 
 		case 4: // c0fc: increment PROM address (written by NMI handler)
 			m_sound_prom_address = (m_sound_prom_address + 1) & 0x1f;
-//       at this point, the 5-bit value
-//       goes to an op-amp and to the base of a transistor. The transistor is part
-//       of a resonator that is used to generate the M5232 clock. The PROM doesn't
-//       actually seem to be important, since even removing it the M5232 clock
-//       continues to come out normally.
+			// at this point, the 5-bit value
+			// goes to an op-amp and to the base of a transistor. The transistor is part
+			// of a resonator that is used to generate the M5232 clock. The PROM doesn't
+			// actually seem to be important, since even removing it the M5232 clock
+			// continues to come out normally.
 			break;
 
 		case 5: // c0fd: n.c.
@@ -230,7 +230,7 @@ void ad_59mc07_device::ay8910_porta_w(uint8_t data)
 void ad_59mc07_device::ay8910_portb_w(uint8_t data)
 {
 	// bongo 3
-	m_samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
+	m_samples->set_volume(2, ((data & 0x30) >> 4) * 0.33);
 	if (data & ~m_ay_port_b & 0x80)
 		m_samples->start(2, 2);
 
@@ -336,7 +336,7 @@ void ad_59mc07_device::device_add_mconfig(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &ad_59mc07_device::sound_portmap);
 	m_audiocpu->set_clk_out(m_audio8155, FUNC(i8155_device::set_unscaled_clock_int));
 
-	I8155(config, m_audio8155, 0);
+	I8155(config, m_audio8155);
 	m_audio8155->out_pa_callback().set(FUNC(ad_59mc07_device::i8155_porta_w));
 	m_audio8155->out_pb_callback().set(FUNC(ad_59mc07_device::i8155_portb_w));
 	m_audio8155->out_pc_callback().set(FUNC(ad_59mc07_device::i8155_portc_w));

@@ -990,7 +990,7 @@ void i386_device::i386_arpl()           // Opcode 0x63
 		SetZF(flag);
 	}
 	else
-		i386_trap(6, 0, 0);  // invalid opcode in real mode or v8086 mode
+		i386_trap(6, 0);  // invalid opcode in real mode or v8086 mode
 }
 
 void i386_device::i386_push_i8()           // Opcode 0x6a
@@ -1144,11 +1144,19 @@ void i386_device::i386_repeat(int invert_flag)
 		m_segment_prefix=1;
 		break;
 		case 0x66:
-		m_operand_size ^= 1;
-		m_xmm_operand_size ^= 1;
+		if(!m_operand_prefix)
+		{
+			m_operand_size ^= 1;
+			m_xmm_operand_size ^= 1;
+			m_operand_prefix = 1;
+		}
 		break;
 		case 0x67:
-		m_address_size ^= 1;
+		if(!m_address_prefix)
+		{
+			m_address_size ^= 1;
+			m_address_prefix = 1;
+		}
 		break;
 		default:
 		prefix_flag=0;
@@ -1270,7 +1278,7 @@ void i386_device::i386_repeat(int invert_flag)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
-		if (m_cycles <= 0)
+		if (count && (m_cycles <= 0))
 			goto outofcycles;
 	}
 	while( count && (!flag || (invert_flag ? !*flag : *flag)) );
@@ -2148,7 +2156,7 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 							m_CF = 1;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -2169,7 +2177,7 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 				if( src ) {
 					remainder = quotient % (int16_t)(int8_t)src;
 					result = quotient / (int16_t)(int8_t)src;
-					if( result > 0xff ) {
+					if( result > 0x7f || result < -0x80 ) {
 						/* TODO: Divide error */
 					} else {
 						REG8(AH) = (uint8_t)remainder & 0xff;
@@ -2180,7 +2188,7 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 							m_CF = 1;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -2333,7 +2341,7 @@ void i386_device::i386_int3()              // Opcode 0xcc
 {
 	CYCLES(CYCLES_INT3);
 	m_ext = 0; // not an external interrupt
-	i386_trap(3, 1, 0);
+	i386_trap(3, 1);
 	m_ext = 1;
 }
 
@@ -2342,7 +2350,7 @@ void i386_device::i386_int()               // Opcode 0xcd
 	int interrupt = FETCH();
 	CYCLES(CYCLES_INT);
 	m_ext = 0; // not an external interrupt
-	i386_trap(interrupt, 1, 0);
+	i386_trap(interrupt, 1);
 	m_ext = 1;
 }
 
@@ -2350,7 +2358,7 @@ void i386_device::i386_into()              // Opcode 0xce
 {
 	if( m_OF ) {
 		m_ext = 0;
-		i386_trap(4, 1, 0);
+		i386_trap(4, 1);
 		m_ext = 1;
 		CYCLES(CYCLES_INTO_OF1);
 	}
@@ -2471,7 +2479,7 @@ void i386_device::i386_aam()               // Opcode 0xd4
 
 	if(!i)
 	{
-		i386_trap(0, 0, 0);
+		i386_trap(0, 0);
 		return;
 	}
 	REG8(AH) = tempAL / i;
@@ -2485,15 +2493,15 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 	// Privileged instruction, CPL must be zero.  Can be used in real or v86 mode.
 	if(PROTECTED_MODE && m_CPL != 0)
 		FAULT(FAULT_GP,0)
-	m_cr[0] &= ~0x08;   /* clear TS bit */
+	m_cr[0] &= ~CR0_TS;   /* clear TS bit */
 	CYCLES(CYCLES_CLTS);
 }
 
 void i386_device::i386_wait()              // Opcode 0x9B
 {
-	if ((m_cr[0] & 0xa) == 0xa)
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	// TODO
@@ -2589,7 +2597,7 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 void i386_device::i386_invalid()
 {
 	report_invalid_opcode();
-	i386_trap(6, 0, 0);
+	i386_trap(6, 0);
 }
 
 void i386_device::i386_xlat()          // Opcode 0xd7

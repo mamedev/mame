@@ -2,11 +2,11 @@
 // copyright-holders: Takahiro Nogi, David Haywood
 /******************************************************************************
 
-    Gomoku Narabe Renju
-    (c)1981 Nihon Bussan Co.,Ltd.
+Gomoku Narabe Renju
+(c)1981 Nihon Bussan Co.,Ltd.
 
-    Driver by Takahiro Nogi 1999/11/06 -
-    Updated to compile again by David Haywood 19th Oct 2002
+Driver by Takahiro Nogi 1999/11/06 -
+Updated to compile again by David Haywood 19th Oct 2002
 
 TODO:
 - Refactor sound emulation.
@@ -51,7 +51,7 @@ public:
 	void gomoku(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -78,15 +78,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
-// video
-
 /******************************************************************************
 
-    palette RAM
+    Palette RAM
 
 ******************************************************************************/
 
@@ -279,8 +277,6 @@ uint32_t gomoku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-// machine
-
 uint8_t gomoku_state::input_port_r(offs_t offset)
 {
 	int res = 0;
@@ -383,7 +379,7 @@ void gomoku_state::gomoku(machine_config &config)
 	latch.q_out_cb<7>().set_nop(); // start LED?
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);

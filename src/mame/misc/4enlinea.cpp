@@ -255,17 +255,17 @@ private:
 	uint8_t m_serial_flags = 0;
 	uint8_t m_serial_data[2]{};
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_eeprom;
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 
-	void k7_mem_map(address_map &map);
-	void k7_io_map(address_map &map);
+	void k7_mem_map(address_map &map) ATTR_COLD;
+	void k7_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -284,8 +284,8 @@ public:
 	void _4enlinea_mode_control_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 const tiny_rom_entry *isa8_cga_4enlinea_device::device_rom_region() const
@@ -613,10 +613,11 @@ void _4enlinea_state::_4enlinea(machine_config &config)
 	I2C_24C16(config, m_eeprom); // X24C16P
 
 	// FIXME: determine ISA bus clock
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true);
 
 
@@ -648,10 +649,11 @@ void _4enlinea_state::k7_olym(machine_config &config)
 
 	I2C_24C16(config, m_eeprom); // X24C16P
 
-	isa8_device &isa(ISA8(config, "isa", 0));
+	isa8_device &isa(ISA8(config, "isa"));
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", _4enlinea_isa8_cards, "4enlinea", true); // UM487F
 
 	SPEAKER(config, "mono").front_center();

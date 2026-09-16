@@ -30,12 +30,12 @@ public:
 	void poly800mdk(machine_config &config);
 
 protected:
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void mdk_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void mdk_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -52,7 +52,7 @@ public:
 	void poly800ii(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void poly800_state::common_map(address_map &map)
@@ -149,6 +149,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, poly800,    0, 0, poly800,    poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
-SYST(1984, poly800mdk, 0, 0, poly800mdk, poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer (MIDI Dump Kit)", MACHINE_IS_SKELETON)
-SYST(1986, poly800ii,  0, 0, poly800ii,  poly800, poly800ii_state, empty_init, "Korg", "Poly-800II Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1984, poly800,    0, 0, poly800,    poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1984, poly800mdk, 0, 0, poly800mdk, poly800, poly800_state,   empty_init, "Korg", "Poly-800 Programmable Polyphonic Synthesizer (MIDI Dump Kit)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1986, poly800ii,  0, 0, poly800ii,  poly800, poly800ii_state, empty_init, "Korg", "Poly-800II Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

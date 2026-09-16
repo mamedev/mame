@@ -41,14 +41,14 @@ public:
 	void rambo(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void rambo_prg_map(address_map &map);
-	void rambo_data_map(address_map &map);
+	void rambo_prg_map(address_map &map) ATTR_COLD;
+	void rambo_data_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port_a = 0;
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega2560_device> m_maincpu;
 };
 
 /****************************************************\
@@ -57,7 +57,7 @@ private:
 
 void rambo_state::rambo_prg_map(address_map &map)
 {
-	map(0x0000, 0x1FFFF).rom();
+	map(0x00000, 0x3ffff).rom();
 }
 
 void rambo_state::rambo_data_map(address_map &map)
@@ -89,8 +89,8 @@ void rambo_state::rambo(machine_config &config)
 	m_maincpu->set_high_fuses(0xda);
 	m_maincpu->set_extended_fuses(0xf4);
 	m_maincpu->set_lock_bits(0x0f);
-	m_maincpu->gpio_in<AVR8_IO_PORTA>().set([this]() { return m_port_a; });
-	m_maincpu->gpio_out<AVR8_IO_PORTA>().set([this](uint8_t data) { m_port_a = data; });
+	m_maincpu->gpio_in<atmega2560_device::GPIOA>().set([this]() { return m_port_a; });
+	m_maincpu->gpio_out<atmega2560_device::GPIOA>().set([this](uint8_t data) { m_port_a = data; });
 
 	/*TODO: Add an ATMEGA32U2 for USB-Serial communications */
 	/*TODO: Emulate the AD5206 digipot */
@@ -101,7 +101,7 @@ void rambo_state::rambo(machine_config &config)
 }
 
 ROM_START( metamaq2 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("20131015")
 
 	ROM_SYSTEM_BIOS( 0, "20130619", "June 19th, 2013" )
@@ -158,7 +158,7 @@ ROM_START( metamaq2 )
 	   A proper dump would be good.
 	   Also, it is not clear whether there's any difference in the bootloader
 	   between the ATMEGA1280 and the ATMEGA2560 MCUs */
-	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x1f000, 0x0f16, BAD_DUMP CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) )
+	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x3f000, 0x0f16, BAD_DUMP CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) )
 
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )

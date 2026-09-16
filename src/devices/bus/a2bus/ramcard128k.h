@@ -30,8 +30,8 @@ public:
 protected:
 	a2bus_ssramcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -41,6 +41,7 @@ protected:
 	virtual uint16_t inh_start() override { return 0xd000; }
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
+	virtual void reset_from_bus() override;
 
 private:
 	void do_io(int offset);

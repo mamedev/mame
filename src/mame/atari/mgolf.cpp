@@ -30,11 +30,11 @@ public:
 	void mgolf(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t wram_r(offs_t offset);
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( mgolf )
 	PORT_BIT ( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* DIAL A */
 	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* DIAL B */
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("60")
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
@@ -356,7 +356,7 @@ void mgolf_state::mgolf(machine_config &config)
 
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 262);
 	m_screen->set_visarea(0, 255, 0, 223);

@@ -164,13 +164,13 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(audio_comm_stat_0c01_r);
+	ioport_value audio_comm_stat_0c01_r();
 	void jedi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u8> m_backgroundram;
@@ -226,12 +226,10 @@ private:
 	void draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// audio
 
 /*************************************
  *
@@ -266,7 +264,7 @@ u8 jedi_state::audio_comm_stat_r()
 }
 
 
-CUSTOM_INPUT_MEMBER(jedi_state::audio_comm_stat_0c01_r)
+ioport_value jedi_state::audio_comm_stat_0c01_r()
 {
 	return (m_soundlatch->pending_r() << 1) | m_sacklatch->pending_r();
 }
@@ -324,8 +322,6 @@ void jedi_state::audio_map(address_map &map)
 	map(0x2000, 0x7fff).noprw();
 	map(0x8000, 0xffff).rom();
 }
-
-// video
 
 /***************************************************************************
 
@@ -705,8 +701,6 @@ GFXDECODE_END
 #endif
 
 
-// machine
-
 /*************************************
  *
  *  Interrupt handling
@@ -884,8 +878,8 @@ static INPUT_PORTS_START( jedi )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x18, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(jedi_state, audio_comm_stat_0c01_r)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(jedi_state::audio_comm_stat_0c01_r))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
@@ -940,7 +934,7 @@ void jedi_state::jedi(machine_config &config)
 #if DEBUG_GFXDECODE
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jedi);
 #endif
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64*8, 262); // verify vert size
 	m_screen->set_visarea(0*8, 37*8-1, 0*8, 30*8-1);
@@ -952,30 +946,29 @@ void jedi_state::jedi(machine_config &config)
 	M6502(config, m_audiocpu, JEDI_AUDIO_CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jedi_state::audio_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	pokey_device &pokey1(POKEY(config, "pokey1", JEDI_POKEY_CLOCK));
 	pokey1.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	pokey1.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	pokey1.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	pokey_device &pokey2(POKEY(config, "pokey2", JEDI_POKEY_CLOCK));
 	pokey2.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	pokey2.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	pokey2.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	pokey_device &pokey3(POKEY(config, "pokey3", JEDI_POKEY_CLOCK));
 	pokey3.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey3.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey3.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
 
 	pokey_device &pokey4(POKEY(config, "pokey4", JEDI_POKEY_CLOCK));
 	pokey4.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey4.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	pokey4.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	TMS5220(config, m_tms, JEDI_TMS5220_CLOCK);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	GENERIC_LATCH_8(config, m_soundlatch); // 5E (LS374) + 3E (LS279) pins 13-15
 	GENERIC_LATCH_8(config, m_sacklatch); // 4E (LS374) + 3E (LS279) pins 1-4

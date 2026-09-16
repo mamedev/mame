@@ -79,7 +79,7 @@ TIMER_CALLBACK_MEMBER(dmv_k210_device::strobe_tick)
 
 void dmv_k210_device::device_add_mconfig(machine_config &config)
 {
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(dmv_k210_device::porta_r));
 	m_ppi->in_pb_callback().set(FUNC(dmv_k210_device::portb_r));
 	m_ppi->in_pc_callback().set(FUNC(dmv_k210_device::portc_r));

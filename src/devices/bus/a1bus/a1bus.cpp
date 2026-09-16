@@ -152,7 +152,7 @@ void a1bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 device_a1bus_card_interface::device_a1bus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "a1bus")
 	, m_a1bus_finder(device, finder_base::DUMMY_TAG), m_a1bus(nullptr)
-	, m_a1bus_slottag(nullptr), m_next(nullptr)
+	, m_a1bus_slottag(nullptr)
 {
 }
 

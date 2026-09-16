@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "machine/spchrom.h"
-
 /* HACK: if defined, uses impossibly perfect 'straight line' interpolation */
 #undef TMS5220_PERFECT_INTERPOLATION_HACK
 
@@ -30,9 +28,6 @@ public:
 
 	// Ready callback function, active low, i.e. state=0
 	auto ready_cb() { return m_readyq_handler.bind(); }
-
-	// old VSM support, remove me!
-	void set_speechrom_tag(const char *_tag) { m_speechrom_tag = _tag; }
 
 	// new VSM support
 	auto m0_cb() { return m_m0_cb.bind(); }
@@ -68,28 +63,29 @@ protected:
 	tms5220_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(set_io_ready);
 
 private:
 	static constexpr unsigned FIFO_SIZE = 16;
 
-	// 51xx and VSM related
-	void new_int_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr);
-	void new_int_write_addr(uint8_t addr);
-	uint8_t new_int_read();
+	void vsm_write(uint8_t rc, uint8_t m0, uint8_t m1, uint8_t addr);
+	void vsm_write_addr(uint8_t addr);
+	uint8_t vsm_read();
+	void vsm_read_and_branch();
+
 	void perform_dummy_read();
 	// 52xx or common
 	void register_for_save_states();
 	void data_write(int data);
 	void update_fifo_status_and_ints();
-	int extract_bits(int count);
+	int read_bits(int count);
 	uint8_t status_read(bool clear_int);
 	bool ready_read();
 	bool int_read();
@@ -97,7 +93,7 @@ private:
 	int16_t clip_analog(int16_t cliptemp) const;
 	int32_t matrix_multiply(int32_t a, int32_t b) const;
 	int32_t lattice_filter();
-	void process_command(unsigned char cmd);
+	void process_command(uint8_t cmd);
 	void parse_frame();
 	void set_interrupt_state(int state);
 	void update_ready_state();
@@ -156,6 +152,12 @@ private:
 	bool m_buffer_empty;        /* If 1, FIFO is empty */
 	bool m_irq_pin;             /* state of the IRQ pin (output) */
 	bool m_ready_pin;           /* state of the READY pin (output) */
+
+	/* Currently processed command */
+	uint8_t m_command_register;
+
+	/* Indicates a value latched from the data lines and not yet processed */
+	bool m_data_latched;
 
 	/* these contain data describing the current and previous voice frames */
 	bool m_OLDE;
@@ -231,10 +233,8 @@ private:
 	/* callbacks */
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_readyq_handler;
-	// next 2 lines are old speechrom handler, remove me!
-	const char *m_speechrom_tag;
-	speechrom_device *m_speechrom;
-	// next lines are new speechrom handler
+
+	// Speech ROM handler
 	devcb_write_line   m_m0_cb;      // the M0 line
 	devcb_write_line   m_m1_cb;      // the M1 line
 	devcb_write8       m_addr_cb;    // Write to ADD1,2,4,8 - 4 address bits

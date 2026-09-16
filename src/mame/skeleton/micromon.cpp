@@ -38,10 +38,10 @@ public:
 private:
 	int clear_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint8_t m_resetcnt = 0U;
 	required_device<cosmac_device> m_maincpu;
 };
@@ -98,4 +98,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1995?, micromon7141, 0, 0, micromon, micromon, micromon_state, empty_init, "Kontron Instruments",  "Micromon 7141 ECG unit",  MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+SYST( 1995?, micromon7141, 0, 0, micromon, micromon, micromon_state, empty_init, "Kontron Instruments",  "Micromon 7141 ECG unit",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

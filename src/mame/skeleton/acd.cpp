@@ -49,4 +49,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 198?, acd, 0, 0, acd, acd, acd_state, empty_init, "Advanced Computer Design", "unknown ACD computer", MACHINE_IS_SKELETON )
+COMP( 198?, acd, 0, 0, acd, acd, acd_state, empty_init, "Advanced Computer Design", "unknown ACD computer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

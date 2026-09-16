@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
-//  sdlos_*.c - OS specific low level code
+//  osdlib_unix.cpp - OS specific low level code for POSIX-like systems
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -12,13 +12,19 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include <csignal>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <iomanip>
 #include <memory>
+#include <string_view>
 
 #include <dlfcn.h>
 #include <sys/mman.h>
@@ -53,20 +59,85 @@ void osd_process_kill()
 	kill(getpid(), SIGKILL);
 }
 
+
 //============================================================
 //  osd_break_into_debugger
 //============================================================
 
 void osd_break_into_debugger(const char *message)
 {
-#ifdef MAME_DEBUG
-	printf("MAME exception: %s\n", message);
-	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP);
+#if defined(__linux__)
+	bool do_break = false;
+	FILE *const f = std::fopen("/proc/self/status", "r");
+	if (f)
+	{
+		using namespace std::literals;
+
+		std::string_view const tag = "TracerPid:\t"sv;
+		char buf[128];
+		bool ignore = false;
+		while (std::fgets(buf, std::size(buf), f))
+		{
+			// ignore excessively long lines
+			auto const len = strnlen(buf, std::size(buf));
+			bool const noeol = !len || ('\n' != buf[len - 1]);
+			if (ignore || noeol)
+			{
+				ignore = noeol;
+				continue;
+			}
+
+			if (!std::strncmp(buf, tag.data(), tag.length()))
+			{
+				long tpid;
+				if ((std::sscanf(buf + tag.length(), "%ld", &tpid) == 1) && (0 != tpid))
+					do_break = true;
+				break;
+			}
+		}
+		std::fclose(f);
+	}
+#elif defined(MAME_DEBUG)
+	bool const do_break = true;
 #else
-	printf("Ignoring MAME exception: %s\n", message);
+	bool const do_break = false;
+#endif
+	if (do_break)
+	{
+		printf("MAME exception: %s\n", message);
+		printf("Attempting to fall into debugger\n");
+		kill(getpid(), SIGTRAP);
+	}
+	else
+	{
+		printf("Ignoring MAME exception: %s\n", message);
+	}
+}
+
+
+//============================================================
+//  osd_get_cache_line_size
+//============================================================
+
+std::pair<std::error_condition, unsigned> osd_get_cache_line_size() noexcept
+{
+#if defined(__linux__)
+	FILE *const f = std::fopen("/sys/devices/system/cpu/cpu0/cache/index0/coherency_line_size", "r");
+	if (!f)
+		return std::make_pair(std::error_condition(errno, std::generic_category()), 0U);
+
+	unsigned result = 0;
+	auto const cnt = std::fscanf(f, "%u", &result);
+	std::fclose(f);
+	if (1 == cnt)
+		return std::make_pair(std::error_condition(), result);
+	else
+		return std::make_pair(std::errc::io_error, 0U);
+#else // defined(__linux__)
+	return std::make_pair(std::errc::not_supported, 0U);
 #endif
 }
+
 
 #ifdef SDLMAME_ANDROID
 std::string osd_get_clipboard_text() noexcept
@@ -116,7 +187,11 @@ std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
 	try
 	{
 		std::string const clip(text); // need to do this to ensure there's a terminating NUL for SDL
+		#ifdef SDLMAME_SDL3
+		if (!SDL_SetClipboardText(clip.c_str()))
+		#else
 		if (0 > SDL_SetClipboardText(clip.c_str()))
+		#endif
 		{
 			// SDL_GetError returns a message, can't really convert it to an error condition
 			return std::errc::io_error; // TODO: better error code?

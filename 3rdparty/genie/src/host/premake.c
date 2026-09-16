@@ -130,6 +130,8 @@ int premake_locate(lua_State* L, const char* argv0)
 	char buffer[PATH_MAX];
 	const char* path = NULL;
 
+	memset(buffer, 0, PATH_MAX);
+
 #if PLATFORM_WINDOWS
 	DWORD len = GetModuleFileName(NULL, buffer, PATH_MAX);
 	if (len > 0)

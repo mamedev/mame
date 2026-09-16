@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_videobrain_expansion_card_interface overrides
 	virtual uint8_t videobrain_bo_r(offs_t offset, int cs1, int cs2) override;

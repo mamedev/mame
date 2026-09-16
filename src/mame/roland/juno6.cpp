@@ -35,7 +35,7 @@ public:
 	void juno6(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 keyboard_r();
@@ -43,7 +43,7 @@ private:
 	void db_w(u8 data);
 	void p2_w(u8 data);
 
-	void ext_map(address_map &map);
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device_array<pit8253_device, 2> m_pit;
@@ -132,4 +132,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1982, juno6, 0, 0, juno6, juno6, juno6_state, empty_init, "Roland", "Juno-6 (JU-6) Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1982, juno6, 0, 0, juno6, juno6, juno6_state, empty_init, "Roland", "Juno-6 (JU-6) Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

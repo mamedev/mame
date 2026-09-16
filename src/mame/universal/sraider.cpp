@@ -60,12 +60,12 @@ protected:
 	virtual void io_w(u8 data);
 	void mrsdyna_palette(palette_device &palette) const;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
-	void cpu2_io_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu2_io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -98,7 +98,7 @@ protected:
 
 	tilemap_t *m_grid_tilemap = nullptr;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
@@ -635,7 +635,7 @@ void mrsdyna_state::mrsdyna(machine_config &config)
 	unklatch.parallel_out_cb().set(FUNC(mrsdyna_state::unk_0x28_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9'828'000 / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(mrsdyna_state::screen_update));
 	screen.set_palette(m_palette);

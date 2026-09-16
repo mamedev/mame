@@ -40,7 +40,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// device_rom_interface implementation

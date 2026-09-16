@@ -122,10 +122,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -162,7 +162,7 @@ static INPUT_PORTS_START( swtpc )
 	// available at speeds up to 2MHz so that might not have been
 	// impossible. An overclock option of 4MHz is also implemented.
 	PORT_START("MAINCPU_CLOCK")
-	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc_state, maincpu_clock_change, 0)
+	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc_state::maincpu_clock_change), 0)
 	PORT_CONFSETTING( 898550, "0.89855 MHz")  // MIKBUG
 	PORT_CONFSETTING( 921600, "0.92160 MHz")  // SWTPC
 	PORT_CONFSETTING(1000000, "1.0 MHz")

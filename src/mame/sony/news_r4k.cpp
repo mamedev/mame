@@ -97,6 +97,7 @@
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/mips/r4000.h"
 #include "imagedev/floppy.h"
@@ -147,8 +148,8 @@ public:
 		m_fdc(*this, "fdc"),
 		m_hid(*this, "hid"),
 		m_dmac(*this, "dmac"),
-		m_scsi0(*this, "scsi0:7:spifi3"),
-		m_scsi1(*this, "scsi1:7:spifi3"),
+		m_scsi0(*this, "spifi3_0"),
+		m_scsi1(*this, "spifi3_1"),
 		m_scsibus0(*this, "scsi0"),
 		m_scsibus1(*this, "scsi1"),
 		m_dip_switch(*this, "FRONT_PANEL"),
@@ -156,7 +157,7 @@ public:
 	{
 	}
 
-	void nws5000x(machine_config &config);
+	void nws5000x(machine_config &config) ATTR_COLD;
 
 protected:
 
@@ -304,16 +305,16 @@ protected:
 	};
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void machine_common(machine_config &config);
 
 	// address maps
-	void cpu_map(address_map &map);
-	void sonic3_map(address_map &map);
-	void cpu_map_main_memory(address_map &map);
-	void cpu_map_debug(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void sonic3_map(address_map &map) ATTR_COLD;
+	void cpu_map_main_memory(address_map &map) ATTR_COLD;
+	void cpu_map_debug(address_map &map) ATTR_COLD;
 
 	// Interrupts
 	// See news5000 section of https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
@@ -373,6 +374,7 @@ static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 /*
@@ -416,8 +418,8 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_escc->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
 	m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<ESCC>));
 
-	CXD8442Q(config, m_fifo0, 0);
-	CXD8442Q(config, m_fifo1, 0);
+	CXD8442Q(config, m_fifo0);
+	CXD8442Q(config, m_fifo1);
 
 	// Reverse polarity for ESCC DMA signals
 	m_escc->out_dtra_callback().set(
@@ -442,7 +444,7 @@ void news_r4k_state::machine_common(machine_config &config)
 				escc1_int_status = status ? 0x8 : 0x0; // guess
 			});
 
-	CXD8452AQ(config, m_sonic3, 0);
+	CXD8452AQ(config, m_sonic3);
 	m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
 	m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
 	m_sonic3->set_bus(m_cpu, 0);
@@ -452,10 +454,6 @@ void news_r4k_state::machine_common(machine_config &config)
 	DP83932C(config, m_sonic, 20'000'000);
 	m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
 	m_sonic->set_bus(m_sonic3, 1);
-
-	// Use promiscuous mode to force network driver to accept all packets, since SONIC has its own filter (CAM table)
-	// Not sure if needing to use this means something else isn't set up correctly.
-	m_sonic->set_promisc(true);
 
 	// Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
 	// See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/ms_ap.c#L103
@@ -476,7 +474,7 @@ void news_r4k_state::machine_common(machine_config &config)
 			[this] ()
 			{ return uint32_t(m_fdc->dma_r()); });
 
-	DMAC3(config, m_dmac, 0);
+	DMAC3(config, m_dmac);
 	m_dmac->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
 	m_dmac->set_bus(m_cpu, 0);
 	m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
@@ -501,29 +499,22 @@ void news_r4k_state::machine_common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
 	// TODO: Actual SPIFI3 clock frequency
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3)
-		.clock(16'000'000)
-		.machine_config(
-			[this](device_t *device)
-			{
-				spifi3_device &adapter = dynamic_cast<spifi3_device &>(*device);
-				adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
-				adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
-			});
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3)
-		.clock(16'000'000)
-		.machine_config(
-			[this](device_t *device)
-			{
-				spifi3_device &adapter = dynamic_cast<spifi3_device &>(*device);
-				adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
-				adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
-			});
+	SPIFI3(config, m_scsi0, 16'000'000);
+	m_scsibus0->set_external_device(7, m_scsi0);
+	m_scsi0->irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
+	m_scsi0->drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
+
+	SPIFI3(config, m_scsi1, 16'000'000);
+	m_scsibus1->set_external_device(7, m_scsi1);
+	m_scsi1->irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
+	m_scsi1->drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
 
 	m_dmac->dma_r_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_r));
 	m_dmac->dma_w_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_w));
 	m_dmac->dma_r_cb<dmac3_device::CTRL1>().set(m_scsi1, FUNC(spifi3_device::dma_r));
 	m_dmac->dma_w_cb<dmac3_device::CTRL1>().set(m_scsi1, FUNC(spifi3_device::dma_w));
+
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS5000");
 }
 
 void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
@@ -801,9 +792,6 @@ void news_r4k_state::ram_w(offs_t offset, uint8_t data)
  */
 void news_r4k_state::machine_start()
 {
-	// Init front panel LEDs
-	m_led.resolve();
-
 	// Save state support
 	save_item(NAME(m_inten));
 	save_item(NAME(m_intst));

@@ -12,20 +12,27 @@
 #pragma once
 
 #include "sh2.h"
+#include "sh7014_adc.h"
 #include "sh7014_bsc.h"
 #include "sh7014_dmac.h"
 #include "sh7014_intc.h"
 #include "sh7014_mtu.h"
 #include "sh7014_port.h"
 #include "sh7014_sci.h"
+#include "sh7014_wdt.h"
 
-class sh2_sh7014_device : public sh2_device
+
+class sh7014_device : public sh2_device
 {
 public:
-	sh2_sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh7014_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<int Sci> auto sci_tx_w() {
 		return m_sci[Sci].lookup()->write_sci_tx();
+	}
+
+	template<int Sci> void sci_rx_w(int state) {
+		m_sci[Sci]->rx_w(state);
 	}
 
 	template<int Sci> void sci_set_external_clock_period(const attotime &period) {
@@ -47,17 +54,19 @@ public:
 
 	auto read_portf()  { return m_port.lookup()->port_f_read_callback(); }
 
+	template <int Channel> auto read_adc() { return m_adc.lookup()->analog_callback<Channel>(); }
+
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void sh2_exception_internal(const char *message, int irqline, int vector) override;
 
 private:
-	void sh7014_map(address_map &map);
+	void sh7014_map(address_map &map) ATTR_COLD;
 
 	void set_irq(int vector, int level, bool is_internal);
 
@@ -66,6 +75,8 @@ private:
 	uint16_t ccr_r();
 	void ccr_w(offs_t offset, uint16_t dat, uint16_t mem_mask = ~0);
 
+	required_device<sh7014_adc_device> m_adc;
+	required_device<sh7014_wdt_device> m_wdt;
 	required_device_array<sh7014_sci_device, 2> m_sci;
 	required_device<sh7014_bsc_device> m_bsc;
 	required_device<sh7014_dmac_device> m_dmac;
@@ -78,6 +89,6 @@ private:
 	uint16_t m_ccr;
 };
 
-DECLARE_DEVICE_TYPE(SH2_SH7014,  sh2_sh7014_device)
+DECLARE_DEVICE_TYPE(SH7014,  sh7014_device)
 
 #endif // MAME_CPU_SH_SH7014_H

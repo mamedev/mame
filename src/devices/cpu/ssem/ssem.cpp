@@ -195,17 +195,6 @@ uint32_t ssem_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t ssem_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
 //  execute_set_input - set the state of an input
 //  line during execution
 //-------------------------------------------------

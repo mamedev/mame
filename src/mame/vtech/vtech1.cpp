@@ -84,10 +84,10 @@ public:
 
 	void vtech1(machine_config &config);
 
-	void laser110_mem(address_map &map);
-	void laser210_mem(address_map &map);
-	void laser310_mem(address_map &map);
-	void vtech1_io(address_map &map);
+	void laser110_mem(address_map &map) ATTR_COLD;
+	void laser210_mem(address_map &map) ATTR_COLD;
+	void laser310_mem(address_map &map) ATTR_COLD;
+	void vtech1_io(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -123,7 +123,7 @@ public:
 	void laser210(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_vram;
@@ -142,7 +142,7 @@ public:
 	void laser310h(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	memory_share_creator<uint8_t> m_vram;
@@ -151,8 +151,8 @@ private:
 	void video_bank_w(uint8_t data);
 	uint8_t mc6847_videoram_r(offs_t offset);
 
-	void vtech1_shrg_mem(address_map &map);
-	void vtech1_shrg_io(address_map &map);
+	void vtech1_shrg_mem(address_map &map) ATTR_COLD;
+	void vtech1_shrg_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -477,14 +477,16 @@ void vtech1_base_state::vtech1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vtech1_base_state::vtech1_io);
 
 	// video hardware
-	MC6847_PAL(config, m_crtc, XTAL(4'433'619));
+	MC6847(config, m_crtc, XTAL(4'433'619), true);
 	m_crtc->set_screen("screen");
 	m_crtc->fsync_wr_callback().set_inputline(m_maincpu, 0).invert();
-	m_crtc->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
+	m_crtc->set_get_fixed_mode(mc6847_device::MODE_GM1);
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_crtc, FUNC(mc6847_base_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -554,7 +556,7 @@ void laser310h_state::laser310h(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &laser310h_state::vtech1_shrg_io);
 
 	m_crtc->input_callback().set(FUNC(laser310h_state::mc6847_videoram_r));
-	m_crtc->set_get_fixed_mode(mc6847_pal_device::MODE_GM1);
+	m_crtc->set_get_fixed_mode(mc6847_device::MODE_GM1);
 	// INTEXT = GND
 	// other lines not connected
 }

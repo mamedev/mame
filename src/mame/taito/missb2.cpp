@@ -44,8 +44,8 @@ public:
 	void init_missb2();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void missb2_bg_bank_w(uint8_t data);
@@ -54,9 +54,9 @@ private:
 	void irqhandler(int state);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void maincpu_map(address_map &map);
-	void sound_map(address_map &map);
-	void subcpu_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
 
 	void configure_banks();
 
@@ -486,7 +486,7 @@ void missb2_state::missb2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

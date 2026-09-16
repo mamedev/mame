@@ -32,10 +32,7 @@ public:
 	uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: uts_keyboard_port_device(mconfig, tag, owner, 0U)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	// configuration
@@ -47,7 +44,7 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// called from keyboard
 	void write_rxd(int state) { m_rxd_callback(state); }

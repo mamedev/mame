@@ -35,16 +35,26 @@ void i82371sb_isa_device::config_map(address_map &map)
 void i82371sb_isa_device::internal_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0020, 0x0021).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+//  map(0x002e, 0x002f) Super I/O config
+	map(0x0040, 0x0043).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+//  map(0x004e, 0x004f) Alt Super I/O config, watchdog-ish in thinkpad600e
 	map(0x0061, 0x0061).rw(FUNC(i82371sb_isa_device::at_portb_r), FUNC(i82371sb_isa_device::at_portb_w));
+//  map(0x0070, 0x0070) RTC address, bit 7 NMI enable
+//  map(0x0071, 0x0071) RTC data
+//  map(0x0078, 0x0079) Board Configuration
 	map(0x0080, 0x009f).rw(FUNC(i82371sb_isa_device::at_page8_r), FUNC(i82371sb_isa_device::at_page8_w));
-	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));
+	// Up to $de according to TC430HX spec?
 	map(0x00c0, 0x00df).rw(FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
+//  map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
+	map(0x00ed, 0x00ed).lw8(NAME([] (offs_t offset, u8 data) { }));
+
+//  map(0x00f0, 0x00f0) Reset Numeric Error
+//  map(0x0270, 0x0273) I/O read port for PnP
 	map(0x04d0, 0x04d1).rw(FUNC(i82371sb_isa_device::eisa_irq_read), FUNC(i82371sb_isa_device::eisa_irq_write));
 	map(0x0cf9, 0x0cf9).rw(FUNC(i82371sb_isa_device::reset_control_r), FUNC(i82371sb_isa_device::reset_control_w));
-	map(0x00e0, 0x00ef).noprw();
 }
 
 //-------------------------------------------------
@@ -107,7 +117,7 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	ISA16(config, m_isabus, 0);
+	ISA16(config, m_isabus);
 	m_isabus->irq3_callback().set(FUNC(i82371sb_isa_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(i82371sb_isa_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(i82371sb_isa_device::pc_irq5_w));
@@ -169,6 +179,13 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, device_t
 	, m_channel_check(0)
 	, m_nmi_enabled(0)
 {
+}
+
+void i82371sb_isa_device::device_start()
+{
+	pci_device::device_start();
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(i82371sb_isa_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(i82371sb_isa_device::irq_handler)));
 }
 
 void i82371sb_isa_device::device_reset()
@@ -246,6 +263,7 @@ void i82371sb_isa_device::xbcs_w(offs_t offset, uint16_t data, uint16_t mem_mask
 {
 	COMBINE_DATA(&xbcs);
 	logerror("xbcs = %04x\n", xbcs);
+	// TODO: likely needs a remap_cb
 }
 
 uint8_t i82371sb_isa_device::pirqrc_r(offs_t offset)
@@ -810,6 +828,7 @@ void i82371sb_isa_device::pc_mirq0_w(int state)
 	redirect_irq(irq, state);
 }
 
+// FIXME: this is PIIX specific, doesn't exist on PIIX3
 void i82371sb_isa_device::pc_mirq1_w(int state)
 {
 	int irq = mbirq1 & 15;
@@ -947,6 +966,23 @@ void i82371sb_isa_device::update_smireq_line()
 	else
 		m_smi_callback(0);
 }
+
+int i82371sb_isa_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || (pirqrc[pin] & 0x80))
+		return -1;
+	return pirqrc[pin];
+}
+
+void i82371sb_isa_device::irq_handler(int line, int state)
+{
+	if(line < 0 || line >= 16)
+		return;
+
+	logerror("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
 
 DEFINE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device, "i82371sb_ide", "Intel 82371 southbridge IDE interface")
 

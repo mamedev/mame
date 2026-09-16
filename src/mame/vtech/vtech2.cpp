@@ -263,15 +263,15 @@ static INPUT_PORTS_START( laser500 )
 
 	PORT_START("ROWD") /* KEY ROW D */
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xCE\xBC  \xC2\xA3") PORT_CODE(KEYCODE_END) PORT_CHAR(0xa3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)          PORT_CHAR(U'μ') PORT_CHAR(U'£')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)             PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT)          PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, vtech2_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vtech2_state::reset_button), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(vtech2_state::reset_button)
@@ -477,7 +477,7 @@ void vtech2_state::laser350(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankd").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(0);
 	screen.set_size(88*8, 24*8+32);
@@ -507,7 +507,7 @@ void vtech2_state::laser350(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load));
 
 	/* 5.25" Floppy drive */
-	LEGACY_FLOPPY(config, m_laser_file[0], 0, &vtech2_floppy_interface);
+	LEGACY_FLOPPY(config, m_laser_file[0], &vtech2_floppy_interface);
 }
 
 
@@ -532,7 +532,7 @@ void vtech2_state::laser700(machine_config &config)
 	ADDRESS_MAP_BANK(config.replace(), "bankd").set_map(&vtech2_state::m_map700).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 
 	/* Second 5.25" floppy drive */
-	LEGACY_FLOPPY(config, m_laser_file[1], 0, &vtech2_floppy_interface);
+	LEGACY_FLOPPY(config, m_laser_file[1], &vtech2_floppy_interface);
 }
 
 

@@ -66,7 +66,7 @@ public:
 	void blockch(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -75,8 +75,13 @@ private:
 	required_shared_ptr<u8> m_vram;
 	required_ioport_array<5> m_inputs;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
+	u8 m_sound = 0;
+	u8 m_ball_x = 0;
+	u8 m_ball_y = 0;
+	u8 m_vctrl = 0;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -86,11 +91,6 @@ private:
 	void ppi1_b_w(u8 data);
 	void ppi1_c_w(u8 data);
 	u8 ppi1_c_r();
-
-	u8 m_sound = 0;
-	u8 m_ball_x = 0;
-	u8 m_ball_y = 0;
-	u8 m_vctrl = 0;
 };
 
 void blockch_state::machine_start()
@@ -349,7 +349,7 @@ void blockch_state::blockch(machine_config &config)
 	m_ppi[1]->in_pc_callback().set(FUNC(blockch_state::ppi1_c_r));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(4, 384-12-1, 4, 248-1);

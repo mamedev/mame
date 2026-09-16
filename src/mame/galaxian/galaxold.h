@@ -70,7 +70,7 @@ public:
 	output_finder<2> m_leds;
 
 	int m_irq_line = 0;
-	uint8_t m__4in1_bank = 0U;
+	uint8_t m_4in1_bank = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 	int m_spriteram2_present = 0;
 	uint8_t m_gfxbank[5]{};
@@ -149,11 +149,13 @@ public:
 	uint8_t rescueb_a002_r() { return 0xfc; }
 	template <int Mask> int _4in1_fake_port_r();
 	template <int Mask> int vpool_lives_r();
-	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+	template <int Mask> ioport_value dkongjrm_coinage_r();
 
 	void init_bullsdrtg();
 	void init_ladybugg();
 	void init_4in1();
+	void init_superbikg();
+	void init_dkingjrv();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -193,6 +195,7 @@ public:
 	DECLARE_VIDEO_START(mariner);
 	DECLARE_VIDEO_START(mimonkey);
 	DECLARE_VIDEO_START(scorpion);
+	DECLARE_VIDEO_START(dkingjrv);
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
 	DECLARE_VIDEO_START(harem);
@@ -220,6 +223,7 @@ public:
 	void batman2_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dkongjrm_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dkongjrmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void dkingjrv_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void ad2083_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dambustr_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void drivfrcg_modify_color(uint8_t *color);
@@ -255,12 +259,17 @@ public:
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
+	void devilfshv(machine_config &config);
+	void dingov(machine_config &config);
+	void dkingjrv(machine_config &config);
+	void junglekv(machine_config &config);
 	void hexpoola(machine_config &config);
 	void dkongjrm(machine_config &config);
 	void tazzmang(machine_config &config);
 	void scrambleo(machine_config &config);
 	void scrambler(machine_config &config);
 	void spcwarp(machine_config &config);
+	void superbikg(machine_config &config);
 	void dkongjrmc(machine_config &config);
 	void bullsdrtg(machine_config &config);
 	void drivfrcg(machine_config &config);
@@ -270,32 +279,42 @@ public:
 	void mooncrst(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
-	void _4in1_map(address_map &map);
-	void bullsdrtg_data_map(address_map &map);
-	void dkongjrm_map(address_map &map);
-	void dkongjrmc_map(address_map &map);
-	void drivfrcg_program(address_map &map);
-	void drivfrcg_io(address_map &map);
-	void galaxold_map(address_map &map);
-	void hexpoola_data(address_map &map);
-	void hexpoola_io(address_map &map);
-	void hunchbkg_map(address_map &map);
-	void hunchbkg_data(address_map &map);
-	void hustlerb3_map(address_map &map);
-	void mooncrst_map(address_map &map);
-	void racknrol_map(address_map &map);
-	void racknrol_io(address_map &map);
-	void scramb_common_map(address_map &map);
-	void scramb2_map(address_map &map);
-	void scramb3_map(address_map &map);
-	void scramblb_map(address_map &map);
-	void scrambleo_map(address_map &map);
-	void scrambler_map(address_map &map);
-	void spcwarp_map(address_map &map);
-	void tazzmang_map(address_map &map);
+	void _4in1_map(address_map &map) ATTR_COLD;
+	void bullsdrtg_data_map(address_map &map) ATTR_COLD;
+	void devilfshv_map(address_map &map) ATTR_COLD;
+	void dingov_map(address_map &map) ATTR_COLD;
+	void dkongjrm_map(address_map &map) ATTR_COLD;
+	void dkongjrmc_map(address_map &map) ATTR_COLD;
+	void dkingjrv_audio_map(address_map &map) ATTR_COLD;
+	void dkingjrv_audio_io_map(address_map &map) ATTR_COLD;
+	void dkingjrv_io_map(address_map &map) ATTR_COLD;
+	void dkingjrv_map(address_map &map) ATTR_COLD;
+	void drivfrcg_program(address_map &map) ATTR_COLD;
+	void drivfrcg_io(address_map &map) ATTR_COLD;
+	void galaxold_map(address_map &map) ATTR_COLD;
+	void hexpoola_data(address_map &map) ATTR_COLD;
+	void hexpoola_io(address_map &map) ATTR_COLD;
+	void hunchbkg_map(address_map &map) ATTR_COLD;
+	void hunchbkg_data(address_map &map) ATTR_COLD;
+	void hustlerb3_map(address_map &map) ATTR_COLD;
+	void mooncrst_map(address_map &map) ATTR_COLD;
+	void racknrol_map(address_map &map) ATTR_COLD;
+	void racknrol_io(address_map &map) ATTR_COLD;
+	void scramb_common_map(address_map &map) ATTR_COLD;
+	void scramb2_map(address_map &map) ATTR_COLD;
+	void scramb3_map(address_map &map) ATTR_COLD;
+	void scramblb_map(address_map &map) ATTR_COLD;
+	void scrambleo_map(address_map &map) ATTR_COLD;
+	void scrambler_map(address_map &map) ATTR_COLD;
+	void spcwarp_map(address_map &map) ATTR_COLD;
+	void superbikg_data(address_map &map) ATTR_COLD;
+	void superbikg_io(address_map &map) ATTR_COLD;
+	void superbikg_map(address_map &map) ATTR_COLD;
+	void junglekv_map(address_map &map) ATTR_COLD;
+	void tazzmang_map(address_map &map) ATTR_COLD;
 
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+private:
+	uint8_t m_superbikg_latch = 0;
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

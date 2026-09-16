@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/rp5h01.h"
+#include "rp5h01.h"
 
 // this is the contents of an unprogrammed PROM
 uint8_t const rp5h01_device::s_initial_data[0x10] =

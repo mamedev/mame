@@ -54,4 +54,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY    FULLNAME           FLAGS
-GAME( 19??, cwheel, 0,      cwheel,  cwheel, cwheel_state, empty_init, ROT0, "Gamebar", "Catherine Wheel", MACHINE_IS_SKELETON )
+GAME( 19??, cwheel, 0,      cwheel,  cwheel, cwheel_state, empty_init, ROT0, "Gamebar", "Catherine Wheel", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

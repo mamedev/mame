@@ -12,7 +12,7 @@
 #pragma once
 
 #include "isa.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/gen_latch.h"
 
 
@@ -26,15 +26,15 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<generic_latch_8_device> m_sublatch;
 	std::unique_ptr<u32[]> m_ram;
@@ -46,7 +46,7 @@ private:
 	uint8_t chessmsr_r(offs_t offset);
 	void chessmsr_w(offs_t offset, uint8_t data);
 
-	void chessmsr_mem(address_map &map);
+	void chessmsr_mem(address_map &map) ATTR_COLD;
 };
 
 

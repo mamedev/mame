@@ -38,7 +38,7 @@ class hp9845_io_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp9845_io_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~hp9845_io_slot_device();
 
 	// Callback setups
@@ -67,7 +67,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_irq_cb_func;

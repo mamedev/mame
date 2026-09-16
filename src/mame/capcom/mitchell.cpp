@@ -119,7 +119,7 @@ mw-9.rom = ST M27C1001 / GFX
 
 #include "emu.h"
 
-#include "kabuki.h"  // needed for decoding functions only
+#include "kabuki.h" // needed for decoding functions only
 
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
@@ -142,8 +142,8 @@ namespace {
 class mitchell_state : public driver_device
 {
 public:
-	mitchell_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mitchell_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_nvram(*this, "nvram"),
@@ -159,7 +159,8 @@ public:
 		m_sys0(*this, "SYS0"),
 		m_in(*this, "IN%u", 0U),
 		m_dial_in(*this, "DIAL%u", 1U),
-		m_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } } { }
+		m_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
+	{ }
 
 	void mgakuen(machine_config &config);
 	void marukin(machine_config &config);
@@ -184,9 +185,9 @@ public:
 	void init_dokaben();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -250,23 +251,24 @@ protected:
 	void bootleg_decode();
 	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
 
-	void decrypted_opcodes_map(address_map &map);
-	void mgakuen_map(address_map &map);
-	void mitchell_io_map(address_map &map);
-	void mitchell_map(address_map &map);
-	void main_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mgakuen_map(address_map &map) ATTR_COLD;
+	void mitchell_io_map(address_map &map) ATTR_COLD;
+	void mitchell_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 // adds a Z80 as audio CPU and has an Oki M5205 instead of M6295
 class spangbl_state : public mitchell_state
 {
 public:
-	spangbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mitchell_state(mconfig, type, tag),
+	spangbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mitchell_state(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
-		m_soundbank(*this, "soundbank") { }
+		m_soundbank(*this, "soundbank")
+	{ }
 
 	void mstworld2(machine_config &config);
 	void pangba(machine_config &config);
@@ -275,8 +277,8 @@ public:
 	void init_spangbl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -293,11 +295,11 @@ private:
 	void sound_bankswitch_w(uint8_t data);
 	void adpcm_int(int state);
 
-	void mstworld2_io_map(address_map &map);
-	void pangba_sound_map(address_map &map);
-	void spangbl_io_map(address_map &map);
-	void main_map(address_map &map);
-	void spangbl_sound_map(address_map &map);
+	void mstworld2_io_map(address_map &map) ATTR_COLD;
+	void pangba_sound_map(address_map &map) ATTR_COLD;
+	void spangbl_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void spangbl_sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -305,9 +307,10 @@ private:
 class mstworld_state : public mitchell_state
 {
 public:
-	mstworld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mitchell_state(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu") { }
+	mstworld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mitchell_state(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu")
+	{ }
 
 	void mstworld(machine_config &config);
 
@@ -318,17 +321,18 @@ private:
 
 	void gfxctrl_w(uint8_t data);
 
-	void io_map(address_map &map);
-	void sound_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 // has an Oki M5205 instead of an Oki M6295 without additional audio CPU
 class pkladiesbl_state : public mitchell_state
 {
 public:
-	pkladiesbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mitchell_state(mconfig, type, tag),
-		m_msm(*this, "msm") { }
+	pkladiesbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mitchell_state(mconfig, type, tag),
+		m_msm(*this, "msm")
+	{ }
 
 	void pkladiesbl(machine_config &config);
 
@@ -337,11 +341,9 @@ public:
 private:
 	required_device<msm5205_device> m_msm;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -543,8 +545,6 @@ uint32_t mitchell_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 /*************************************
  *
  *  EEPROM
@@ -609,7 +609,7 @@ uint8_t mitchell_state::block_input_r(offs_t offset)
 			delta = (-delta) & 0xff;
 			if (m_dir[offset])
 			{
-			// don't report movement on a direction change, otherwise it will stutter
+				// don't report movement on a direction change, otherwise it will stutter
 				m_dir[offset] = 0;
 				delta = 0;
 			}
@@ -618,7 +618,7 @@ uint8_t mitchell_state::block_input_r(offs_t offset)
 		{
 			if (!m_dir[offset])
 			{
-			// don't report movement on a direction change, otherwise it will stutter
+				// don't report movement on a direction change, otherwise it will stutter
 				m_dir[offset] = 1;
 				delta = 0;
 			}
@@ -751,7 +751,7 @@ void mitchell_state::mitchell_io_map(address_map &map)
 	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_w));
 	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::address_w));
 	map(0x05, 0x05).r(FUNC(mitchell_state::port5_r)).w(m_oki, FUNC(okim6295_device::write));
-	map(0x06, 0x06).noprw();                     // watchdog? IRQ ack? video buffering?
+	map(0x06, 0x06).noprw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data; }));
 	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
 	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
@@ -766,7 +766,7 @@ void spangbl_state::main_map(address_map &map)
 	map(0xc000, 0xc7ff).rw(FUNC(spangbl_state::paletteram_r), FUNC(spangbl_state::paletteram_w)); // Banked palette RAM
 	map(0xc800, 0xcfff).ram().w(FUNC(spangbl_state::colorram_w)).share(m_colorram); // Attribute RAM
 	map(0xd000, 0xdfff).rw(FUNC(spangbl_state::videoram_r), FUNC(spangbl_state::videoram_w)).share(m_videoram); // Banked char / OBJ RAM
-	map(0xe000, 0xffff).ram().share("nvram");     // Work RAM
+	map(0xe000, 0xffff).ram().share("nvram"); // Work RAM
 }
 
 void spangbl_state::spangbl_io_map(address_map &map)
@@ -777,7 +777,7 @@ void spangbl_state::spangbl_io_map(address_map &map)
 	map(0x02, 0x02).w(FUNC(spangbl_state::bankswitch_w));
 	map(0x03, 0x03).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05, 0x05).portr("SYS0");
-	map(0x06, 0x06).nopw();    // watchdog? irq ack?
+	map(0x06, 0x06).nopw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data; }));
 	map(0x08, 0x08).w(FUNC(spangbl_state::eeprom_cs_w));
 	map(0x10, 0x10).w(FUNC(spangbl_state::eeprom_clock_w));
@@ -834,14 +834,14 @@ void mstworld_state::sound_map(address_map &map)
 void mstworld_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(FUNC(mstworld_state::gfxctrl_w));   // Palette bank, layer enable, coin counters, more
+	map(0x00, 0x00).portr("IN0").w(FUNC(mstworld_state::gfxctrl_w)); // Palette bank, layer enable, coin counters, more
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(FUNC(mstworld_state::bankswitch_w));
 	map(0x03, 0x03).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).portr("SYS0");
 	map(0x06, 0x06).portr("DSW2");
-	map(0x06, 0x06).nopw();        // watchdog? irq ack?
+	map(0x06, 0x06).nopw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data & 0x01; })); // for some reason mstworld freaks out if this isn't masked
 }
 
@@ -854,7 +854,7 @@ void pkladiesbl_state::io_map(address_map &map) // TODO: check everything, where
 	map(0x03, 0x03).portr("DSW0");
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).r(FUNC(pkladiesbl_state::port5_r));
-	map(0x06, 0x06).noprw();                     // watchdog? IRQ ack? video buffering?
+	map(0x06, 0x06).noprw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data; }));
 	map(0x08, 0x08).w(FUNC(pkladiesbl_state::eeprom_cs_w));
 	map(0x09, 0x09).w("ymsnd", FUNC(ym2413_device::data_w));
@@ -873,9 +873,9 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // USED - handled in port5_r
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1132,11 +1132,11 @@ static INPUT_PORTS_START( pkladiesbl )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // USED - handled in port5_r
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) // ok
@@ -1231,9 +1231,9 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // USED - handled in port5_r
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1248,7 +1248,7 @@ static INPUT_PORTS_START( pang )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_OPTIONAL // "Shot B" in service mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    // "Shot B" in service mode (not used for gameplay)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -1258,7 +1258,7 @@ static INPUT_PORTS_START( pang )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_OPTIONAL // "Shot B" in service mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // "Shot B" in service mode (not used for gameplay)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
@@ -1337,7 +1337,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
 
@@ -1507,9 +1507,9 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // USED - handled in port5_r
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    // same as the service mode farther down
@@ -1547,9 +1547,9 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // USED - handled in port5_r
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1589,9 +1589,9 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    // USED - handled in port5_r
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    // unused?
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1796,7 +1796,7 @@ void mitchell_state::mgakuen(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);
@@ -1820,7 +1820,7 @@ void mitchell_state::mgakuen(machine_config &config)
 void mitchell_state::pang(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(16'000'000 )/ 2); // verified on PCB
+	Z80(config, m_maincpu, XTAL(16'000'000) / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
 	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
@@ -1829,7 +1829,7 @@ void mitchell_state::pang(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.42);   // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);
@@ -1913,7 +1913,7 @@ void spangbl_state::spangbl(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 }
 
@@ -1950,7 +1950,7 @@ void mstworld_state::mstworld(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mstworld_state::sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);
@@ -2009,7 +2009,7 @@ void pkladiesbl_state::pkladiesbl(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.09); // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);
@@ -2074,7 +2074,7 @@ ROM_START( 7toitsu )
 	ROM_LOAD( "mg-5.1c",      0x00000, 0x80000, CRC(170332f1) SHA1(bc60f144a224f348fd5b8c0207e18a881f739fc1) )  // banked
 ROM_END
 
-ROM_START( mgakuen2 )
+ROM_START( mgakuen2 ) // 63121-A-2 MADE IN JAPAN CG-2
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mg2-xf.1j",    0x00000, 0x08000, CRC(c8165d2d) SHA1(95146e293b2e005c4015590811119a4070dda65b) )
 	ROM_LOAD( "mg2-y.1l",     0x10000, 0x20000, CRC(75bbcc14) SHA1(52ec279fda131c8de06d8c940df12d61ec6881cc) )
@@ -2193,6 +2193,40 @@ ROM_START( pkladiesbl )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD("3.ic127", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
+ROM_END
+
+ROM_START( pkladiesblu )  // uncensored encrypted bootleg. ROMs 1, 2, 3, 16 & 17 are identical to set pkladiesbl
+	ROM_REGION( 0x50000*2, "maincpu", 0 )
+	// only pklbu1.bin is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses.
+	ROM_LOAD( "pklbu1.bin", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
+	ROM_CONTINUE(0x00000,0x08000)
+	ROM_LOAD( "pklbu2.bin", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x10000,0x10000)
+
+	ROM_REGION( 0x240000, "chars", ROMREGION_INVERT )
+	ROM_LOAD32_BYTE("pklbu20.bin", 0x000000, 0x20000, CRC(1f537087) SHA1(87ea5bee67bb2a1f8bbe191ed3e8a83491a3cd0f) )
+	ROM_LOAD32_BYTE("pklbu14.bin", 0x000001, 0x20000, CRC(3fd2684d) SHA1(0f14cce27551af64ccc607fa14689cfceb0bb367) )
+	ROM_LOAD32_BYTE("pklbu10.bin", 0x000002, 0x20000, CRC(97424238) SHA1(9c3ef3d5524133ba79929318288010ec5a15641a) )
+	ROM_LOAD32_BYTE("pklbu6.bin",  0x000003, 0x20000, CRC(96c7eed0) SHA1(d435e6785cc447bee538dc89c1cbbe84071301d8) )
+	ROM_LOAD32_BYTE("pklbu21.bin", 0x080000, 0x20000, CRC(6c18df0d) SHA1(eef87c710bbb2f643a7ea8ba2b2f609fb663b579) )
+	ROM_LOAD32_BYTE("pklbu15.bin", 0x080001, 0x20000, CRC(0a52206a) SHA1(68f2aa9cda53fb9d545fd5ec29ac7e1ccf0faac7) )
+	ROM_LOAD32_BYTE("pklbu11.bin", 0x080002, 0x20000, CRC(7f995c59) SHA1(cb533d524dd35d1058cb319e8f7b60c9d675c858) )
+	ROM_LOAD32_BYTE("pklbu7.bin",  0x080003, 0x20000, CRC(d6a7a95b) SHA1(2a4b4ed65dbca88d38f5977f49b6800f8adc519b) )
+	ROM_LOAD32_BYTE("pklbu18.bin", 0x100000, 0x20000, CRC(1280a069) SHA1(e2622f528d08eb05dd178fda003b4648828eaf06) )
+	ROM_LOAD32_BYTE("pklbu12.bin", 0x100001, 0x20000, CRC(09aa3215) SHA1(d8bfd9eeba33e5b965b6f10421cfee675c44cd61) )
+	ROM_LOAD32_BYTE("pklbu8.bin",  0x100002, 0x20000, CRC(2132c239) SHA1(fd770fc212476d32e08e2fae3af3fa42bce5abe2) )
+	ROM_LOAD32_BYTE("pklbu4.bin",  0x100003, 0x20000, CRC(b798d926) SHA1(de21e5efff32ef421f68545ccbddfb18db54436b) )
+	ROM_LOAD32_BYTE("pklbu19.bin", 0x180000, 0x20000, CRC(95d838cf) SHA1(179634dc6628f858e3f099070604599257aafbe9) )
+	ROM_LOAD32_BYTE("pklbu13.bin", 0x180001, 0x20000, CRC(10be806b) SHA1(36cc07a93412be2a0e90bcc133b52febfed8bd90) )
+	ROM_LOAD32_BYTE("pklbu9.bin",  0x180002, 0x20000, CRC(9059d383) SHA1(5e8a5a6079838b51363c3a763475b9ca4326d598) )
+	ROM_LOAD32_BYTE("pklbu5.bin",  0x180003, 0x20000, CRC(8819affb) SHA1(095d951fa77ae09c4a68c4d971f532c517cb295a) )
+
+	ROM_REGION( 0x040000, "sprites", ROMREGION_INVERT )
+	ROM_LOAD("pklbu16.bin", 0x020000, 0x20000, CRC(c6decb5e) SHA1(3d35cef348deb16a62a066acdfbabebcf11fa997) )
+	ROM_LOAD("pklbu17.bin", 0x000000, 0x20000, CRC(5a6efdcc) SHA1(04120dd4da0ff8df514f98a44d7eee7100e4c033) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD("pklbu3.bin", 0x000000, 0x20000, CRC(16b79788) SHA1(6b796119d3c57229ba3d613ce8832c94e9616f76) )
 ROM_END
 
 ROM_START( pkladiesbl2 ) // same as the above but without the z80 block, only 1.ic112 differs
@@ -2923,50 +2957,50 @@ ROM_END
 
 ROM_START( qtono1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "q3-05.rom",    0x00000, 0x08000, CRC(1dd0a344) SHA1(814049bf957b78ff2d1c8da316dfe5303abee4df) )
-	ROM_LOAD( "q3-06.rom",    0x10000, 0x20000, CRC(bd6a2110) SHA1(8c4d7a10dfaee0fcd18be21c80fc3d2ff9615eae) )
-	ROM_LOAD( "q3-07.rom",    0x30000, 0x20000, CRC(61e53c4f) SHA1(bcde0029a217994561ae0a6fb0482bf1e3517913) )
+	ROM_LOAD( "q3-05.14f",    0x00000, 0x08000, CRC(1dd0a344) SHA1(814049bf957b78ff2d1c8da316dfe5303abee4df) )
+	ROM_LOAD( "q3-06.15f",    0x10000, 0x20000, CRC(bd6a2110) SHA1(8c4d7a10dfaee0fcd18be21c80fc3d2ff9615eae) )
+	ROM_LOAD( "q3-07.16f",    0x30000, 0x20000, CRC(61e53c4f) SHA1(bcde0029a217994561ae0a6fb0482bf1e3517913) )
 
 	ROM_REGION( 0x100000, "chars", ROMREGION_ERASEFF )
-	ROM_LOAD( "q3-08.rom",    0x000000, 0x20000, CRC(1533b978) SHA1(586d3b93152cc78a3ae42987e66d984645cd2849) )
-	ROM_LOAD( "q3-09.rom",    0x020000, 0x20000, CRC(a32db2f2) SHA1(df2243bff5fd44ebdfe02c5e0bbcccaff5c32628) )
-	ROM_LOAD( "q3-10.rom",    0x040000, 0x20000, CRC(ed681aa8) SHA1(9f8dcebc384ca1582d509de94c194df9e3f81441) )
-	ROM_LOAD( "q3-11.rom",    0x060000, 0x20000, CRC(38b2fd10) SHA1(2eee32e7c70f9f529a48d41fa886b3695228a7d3) )
-	ROM_LOAD( "q3-18.rom",    0x080000, 0x20000, CRC(9e4292ac) SHA1(e1d96ef2bdb73c291734d0f8a4d7a7efbeef4fb2) )
-	ROM_LOAD( "q3-19.rom",    0x0a0000, 0x20000, CRC(b7f6d40f) SHA1(40506ff901fd31a6f67ac23d2a3fdcaac5f7c8f9) )
-	ROM_LOAD( "q3-20.rom",    0x0c0000, 0x20000, CRC(6cd7f38d) SHA1(cfc549331aa86a687bd9db8b3a926e490bbd4f55) )
-	ROM_LOAD( "q3-21.rom",    0x0e0000, 0x20000, CRC(b4aa6b4b) SHA1(c7c771b69051fd820e9eb3faab62779b8df19209) )
+	ROM_LOAD( "q3-08.8h",     0x000000, 0x20000, CRC(1533b978) SHA1(586d3b93152cc78a3ae42987e66d984645cd2849) )
+	ROM_LOAD( "q3-09.9h",     0x020000, 0x20000, CRC(a32db2f2) SHA1(df2243bff5fd44ebdfe02c5e0bbcccaff5c32628) )
+	ROM_LOAD( "q3-10.10h",    0x040000, 0x20000, CRC(ed681aa8) SHA1(9f8dcebc384ca1582d509de94c194df9e3f81441) )
+	ROM_LOAD( "q3-11.11h",    0x060000, 0x20000, CRC(38b2fd10) SHA1(2eee32e7c70f9f529a48d41fa886b3695228a7d3) )
+	ROM_LOAD( "q3-18.8j",     0x080000, 0x20000, CRC(9e4292ac) SHA1(e1d96ef2bdb73c291734d0f8a4d7a7efbeef4fb2) )
+	ROM_LOAD( "q3-19.9j",     0x0a0000, 0x20000, CRC(b7f6d40f) SHA1(40506ff901fd31a6f67ac23d2a3fdcaac5f7c8f9) )
+	ROM_LOAD( "q3-20.10j",    0x0c0000, 0x20000, CRC(6cd7f38d) SHA1(cfc549331aa86a687bd9db8b3a926e490bbd4f55) )
+	ROM_LOAD( "q3-21.11j",    0x0e0000, 0x20000, CRC(b4aa6b4b) SHA1(c7c771b69051fd820e9eb3faab62779b8df19209) )
 
 	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "q3-16.rom",    0x000000, 0x20000, CRC(863d6836) SHA1(ec78c462bb80e01f581673f2e9431efdf05599d7) )
-	ROM_LOAD( "q3-17.rom",    0x020000, 0x20000, CRC(459bf59c) SHA1(89975c6ff259bf68ac0c25eb0c8afb6862f11c87) )
+	ROM_LOAD( "q3-16.2j",     0x000000, 0x20000, CRC(863d6836) SHA1(ec78c462bb80e01f581673f2e9431efdf05599d7) )
+	ROM_LOAD( "q3-17.3j",     0x020000, 0x20000, CRC(459bf59c) SHA1(89975c6ff259bf68ac0c25eb0c8afb6862f11c87) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "q3-01.rom",    0x00000, 0x20000, CRC(6c1be591) SHA1(7cab7121d78284dc95ae4218d1e7639a659dda8b) )
+	ROM_LOAD( "q3-01.2d",     0x00000, 0x20000, CRC(6c1be591) SHA1(7cab7121d78284dc95ae4218d1e7639a659dda8b) )
 ROM_END
 
 ROM_START( qsangoku )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "q4-05c.rom",   0x00000, 0x08000, CRC(e1d010b4) SHA1(7fca1ee45054331320abb6a99f10fa98dd4be994) )
-	ROM_LOAD( "q4-06.rom",    0x10000, 0x20000, CRC(a0301849) SHA1(60910d84f869fd5735cd5500a93b761d8b8dbacb) )
-	ROM_LOAD( "q4-07.rom",    0x30000, 0x20000, CRC(2941ef5b) SHA1(a86f5365edd315fcbb2a50489d63b4be9587ae29) )
+	ROM_LOAD( "q4-05c.14f",   0x00000, 0x08000, CRC(e1d010b4) SHA1(7fca1ee45054331320abb6a99f10fa98dd4be994) )
+	ROM_LOAD( "q4-06.15f",    0x10000, 0x20000, CRC(a0301849) SHA1(60910d84f869fd5735cd5500a93b761d8b8dbacb) )
+	ROM_LOAD( "q4-07.16f",    0x30000, 0x20000, CRC(2941ef5b) SHA1(a86f5365edd315fcbb2a50489d63b4be9587ae29) )
 
 	ROM_REGION( 0x100000, "chars", ROMREGION_ERASEFF )
-	ROM_LOAD( "q4-08.rom",    0x000000, 0x20000, CRC(dc84c6cb) SHA1(0fb5737bb2adeddde888d24974806d4c2ac5b2ee) )
-	ROM_LOAD( "q4-09.rom",    0x020000, 0x20000, CRC(cbb6234c) SHA1(76b749cc39d3af1d9e4959ea513ed054723ffefd) )
-	ROM_LOAD( "q4-10.rom",    0x040000, 0x20000, CRC(c20a27a8) SHA1(f462babb7090b2838326bb65e2cafab0fea12f99) )
-	ROM_LOAD( "q4-11.rom",    0x060000, 0x20000, CRC(4ff66aed) SHA1(0d70aae5eb930647753650486c7f7eb56239f1ad) )
-	ROM_LOAD( "q4-18.rom",    0x080000, 0x20000, CRC(ca3acea5) SHA1(2aba26a7886481691097e80ec7714a7df5873630) )
-	ROM_LOAD( "q4-19.rom",    0x0a0000, 0x20000, CRC(1fd92b7d) SHA1(ca4ae05c97fcdec9f7fa024f09b797391e8b3c14) )
-	ROM_LOAD( "q4-20.rom",    0x0c0000, 0x20000, CRC(b02dc6a1) SHA1(78d59ef4a3f7eaa3a003765060b8367348c4cfef) )
-	ROM_LOAD( "q4-21.rom",    0x0e0000, 0x20000, CRC(432b1dc1) SHA1(9beb45fe95a2ef78401d50d70eba1e683102cd39) )
+	ROM_LOAD( "q4-08.8h",     0x000000, 0x20000, CRC(dc84c6cb) SHA1(0fb5737bb2adeddde888d24974806d4c2ac5b2ee) )
+	ROM_LOAD( "q4-09.9h",     0x020000, 0x20000, CRC(cbb6234c) SHA1(76b749cc39d3af1d9e4959ea513ed054723ffefd) )
+	ROM_LOAD( "q4-10.10h",    0x040000, 0x20000, CRC(c20a27a8) SHA1(f462babb7090b2838326bb65e2cafab0fea12f99) )
+	ROM_LOAD( "q4-11.11h",    0x060000, 0x20000, CRC(4ff66aed) SHA1(0d70aae5eb930647753650486c7f7eb56239f1ad) )
+	ROM_LOAD( "q4-18.8j",     0x080000, 0x20000, CRC(ca3acea5) SHA1(2aba26a7886481691097e80ec7714a7df5873630) )
+	ROM_LOAD( "q4-19.9j",     0x0a0000, 0x20000, CRC(1fd92b7d) SHA1(ca4ae05c97fcdec9f7fa024f09b797391e8b3c14) )
+	ROM_LOAD( "q4-20.10j",    0x0c0000, 0x20000, CRC(b02dc6a1) SHA1(78d59ef4a3f7eaa3a003765060b8367348c4cfef) )
+	ROM_LOAD( "q4-21.11j",    0x0e0000, 0x20000, CRC(432b1dc1) SHA1(9beb45fe95a2ef78401d50d70eba1e683102cd39) )
 
 	ROM_REGION( 0x040000, "sprites", 0 )
-	ROM_LOAD( "q4-16.rom",    0x000000, 0x20000, CRC(77342320) SHA1(a05684f6c75a19569350d6e14eb6cb9777fb1f09) )
-	ROM_LOAD( "q4-17.rom",    0x020000, 0x20000, CRC(1275c436) SHA1(ed84fb07749b49066d1caf0c21e46ada94d4c213) )
+	ROM_LOAD( "q4-16.2j",     0x000000, 0x20000, CRC(77342320) SHA1(a05684f6c75a19569350d6e14eb6cb9777fb1f09) )
+	ROM_LOAD( "q4-17.3j",     0x020000, 0x20000, CRC(1275c436) SHA1(ed84fb07749b49066d1caf0c21e46ada94d4c213) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "q4-01.rom",    0x00000, 0x20000, CRC(5d0d07d8) SHA1(d36e42852dd1ec0955d19b16e7dfe157b3d48522) )
+	ROM_LOAD( "q4-01.2d",     0x00000, 0x20000, CRC(5d0d07d8) SHA1(d36e42852dd1ec0955d19b16e7dfe157b3d48522) )
 ROM_END
 
 ROM_START( block )
@@ -3268,7 +3302,8 @@ GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state,   ini
 GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
+GAME( 1989, pkladiesblu, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Uncensored bootleg, encrypted)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
 GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
 
 GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state,   init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )

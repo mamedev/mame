@@ -68,7 +68,7 @@ private:
 	required_device_array<floppy_image_device, 2> m_floppy;
 	required_ioport_array<8> m_kbd_row;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,7 +119,7 @@ private:
 	void osbexec_c000_w(offs_t offset, uint8_t data);
 	uint8_t osbexec_kbd_r(offs_t offset);
 	uint8_t osbexec_rtc_r();
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
 	uint8_t osbexec_pia0_a_r();
 	void osbexec_pia0_a_w(uint8_t data);
@@ -132,8 +132,8 @@ private:
 	void modem_dsr_w(int state);
 	void modem_ri_w(int state);
 	void comm_clk_a_w(int state);
-	void osbexec_io(address_map &map);
-	void osbexec_mem(address_map &map);
+	void osbexec_io(address_map &map) ATTR_COLD;
+	void osbexec_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -537,7 +537,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &osbexec_state::osbexec_io);
 	m_maincpu->set_daisy_config(osbexec_daisy_config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(osbexec_state::screen_update));
 	m_screen->set_raw(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240);    // May not be correct
@@ -578,7 +578,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_sio->out_rtsb_callback().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
-	pit8253_device &ctc(PIT8253(config, "ctc", 0));
+	pit8253_device &ctc(PIT8253(config, "ctc"));
 	ctc.set_clk<0>(MAIN_CLOCK / 13); // divided by 74S161 @ UC25
 	ctc.set_clk<1>(MAIN_CLOCK / 13); // divided by 74S161 @ UC25
 	ctc.set_clk<2>(MAIN_CLOCK / 12);

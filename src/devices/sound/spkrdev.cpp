@@ -72,7 +72,11 @@
  */
 
 #include "emu.h"
-#include "sound/spkrdev.h"
+#include "spkrdev.h"
+
+#include <algorithm>
+#include <numbers>
+
 
 // The default is 1-bit, but can be customized with set_levels.
 static constexpr double default_levels[2] = { 0.0, 1.0 };
@@ -99,14 +103,10 @@ speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const 
 
 void speaker_sound_device::device_start()
 {
-	int i;
-	double x;
-
 	m_channel = stream_alloc(0, 1, machine().sample_rate());
 
 	m_level = 0;
-	for (i = 0; i < FILTER_LENGTH; i++)
-		m_composed_volume[i] = 0;
+	std::fill(std::begin(m_composed_volume), std::end(m_composed_volume), 0.0);
 
 	m_composed_sample_index = 0;
 	m_interm_sample_index = 0;
@@ -141,8 +141,10 @@ void speaker_sound_device::device_start()
 	 *    With -samplerate 96000, cutoff freq is ca 24kHz while the Nyq. freq is 48kHz.
 	 * For a steeper, more efficient filter, increase FILTER_LENGTH at the expense of CPU usage.
 	 */
-#define FILTER_STEP  (M_PI / 2 / RATE_MULTIPLIER)
+	constexpr double FILTER_STEP = std::numbers::pi / 2 / RATE_MULTIPLIER;
 	/* Distribute symmetrically on x axis; center has x=0 if length is odd */
+	int i;
+	double x;
 	for (i = 0, x = (0.5 - FILTER_LENGTH / 2.) * FILTER_STEP;
 			i < FILTER_LENGTH;
 			i++, x += FILTER_STEP)
@@ -157,8 +159,7 @@ void speaker_sound_device::device_start()
 	 * First zero (frequency where amplification=0) = sample rate / filter length
 	 * Cutoff frequency approx <= first zero / 2
 	 */
-	for (i = 0, i < FILTER_LENGTH; i++)
-		m_ampl[i] = 1;
+	std::fill(std::begin(m_ampl), std::end(m_ampl), 1.0);
 #endif
 
 	save_item(NAME(m_level));
@@ -187,19 +188,18 @@ void speaker_sound_device::device_post_load()
 //-------------------------------------------------
 
 // This can be triggered by the core (based on emulated time) or via level_w().
-void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void speaker_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
 	double volume = m_levels[m_level];
 	double filtered_volume;
 	attotime sampled_time = attotime::zero;
 
-	if (buffer.samples() > 0)
+	if (stream.samples() > 0)
 	{
 		/* Prepare to update time state */
 		sampled_time = attotime(0, m_channel_sample_period);
-		if (buffer.samples() > 1)
-			sampled_time *= buffer.samples();
+		if (stream.samples() > 1)
+			sampled_time *= stream.samples();
 
 		/* Note: since the stream is in the process of being updated,
 		 * stream->sample_time() will return the time before the update! (MAME 0.130)
@@ -207,19 +207,19 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		 */
 	}
 
-	for (int sampindex = 0; sampindex < buffer.samples(); )
+	for (int sampindex = 0; sampindex < stream.samples(); )
 	{
 		/* Note that first intermediate sample may be composed... */
 		filtered_volume = update_interm_samples_get_filtered_volume(volume);
 
 		/* Composite volume is now quantized to the stream resolution */
-		buffer.put(sampindex++, filtered_volume);
+		stream.put(0, sampindex++, filtered_volume);
 
 		/* Any additional samples will be homogeneous, however may need filtering across samples: */
-		while (sampindex < buffer.samples())
+		while (sampindex < stream.samples())
 		{
 			filtered_volume = update_interm_samples_get_filtered_volume(volume);
-			buffer.put(sampindex++, filtered_volume);
+			stream.put(0, sampindex++, filtered_volume);
 		}
 
 		/* Update the time state */
@@ -269,7 +269,7 @@ void speaker_sound_device::level_w(int new_level)
 	/* This is redundant because time update has to be done within sound_stream_update() anyway,
 	 * however this ensures synchronization between the speaker and stream timing:
 	 */
-	m_channel_last_sample_time = m_channel->sample_time();
+	m_channel_last_sample_time = m_channel->end_time();
 
 	/* sample_time() may be ahead of us */
 	if (m_channel_last_sample_time > time)

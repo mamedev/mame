@@ -37,7 +37,7 @@ pin     desc
 class hd61603_device : public device_t
 {
 public:
-	hd61603_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hd61603_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); }
@@ -45,9 +45,9 @@ public:
 	void data_w(u8 data);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 m_count;

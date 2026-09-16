@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AM9517_H
-#define MAME_MACHINE_AM9517_H
+#ifndef MAME_MACHINE_AM9517A_H
+#define MAME_MACHINE_AM9517A_H
 
 #pragma once
 
@@ -81,9 +81,11 @@ public:
 protected:
 	am9517a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_execute_interface implementation
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
@@ -92,6 +94,8 @@ protected:
 	virtual void dma_write();
 
 	virtual int transfer_size(int const channel) const { return 1; }
+
+	virtual void soft_reset();
 
 	int m_icount;
 	uint32_t m_address_mask;
@@ -143,11 +147,11 @@ private:
 };
 
 
-class v5x_dmau_device : public am9517a_device
+class upd71071_device : public am9517a_device
 {
 public:
 	// construction/destruction
-	v5x_dmau_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+	upd71071_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 	auto in_mem16r_callback() { return m_in_mem16r_cb.bind(); }
 	auto out_mem16w_callback() { return m_out_mem16w_cb.bind(); }
@@ -159,9 +163,11 @@ public:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	upd71071_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_read() override;
 	virtual void dma_write() override;
@@ -180,6 +186,15 @@ protected:
 };
 
 
+class v5x_dmau_device : public upd71071_device
+{
+public:
+	v5x_dmau_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void write(offs_t offset, uint8_t data) override;
+};
+
+
 class pcxport_dmac_device : public am9517a_device
 {
 public:
@@ -187,8 +202,7 @@ public:
 	pcxport_dmac_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
-
+	virtual void soft_reset() override;
 	virtual void end_of_process() override;
 };
 
@@ -231,7 +245,7 @@ public:
 	}
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u32 m_stop[4];
@@ -240,8 +254,9 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(AM9517A,      am9517a_device)
+DECLARE_DEVICE_TYPE(UPD71071,     upd71071_device)
 DECLARE_DEVICE_TYPE(V5X_DMAU,     v5x_dmau_device)
 DECLARE_DEVICE_TYPE(PCXPORT_DMAC, pcxport_dmac_device)
 DECLARE_DEVICE_TYPE(EISA_DMA,     eisa_dma_device)
 
-#endif // MAME_MACHINE_AM9517_H
+#endif // MAME_MACHINE_AM9517A_H

@@ -2,7 +2,7 @@
 // detail/null_socket_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,11 +29,12 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename Protocol>
 class null_socket_service :
-  public execution_context_service_base<null_socket_service<Protocol> >
+  public execution_context_service_base<null_socket_service<Protocol>>
 {
 public:
   // The protocol type.
@@ -52,7 +53,7 @@ public:
 
   // Constructor.
   null_socket_service(execution_context& context)
-    : execution_context_service_base<null_socket_service<Protocol> >(context)
+    : execution_context_service_base<null_socket_service<Protocol>>(context)
   {
   }
 
@@ -510,6 +511,7 @@ public:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

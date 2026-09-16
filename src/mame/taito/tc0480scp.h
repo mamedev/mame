@@ -16,7 +16,7 @@ enum
 class tc0480scp_device : public device_t, public device_gfx_interface
 {
 public:
-	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	void set_gfxlayout(int gfxlayout) { m_gfxlayout = gfxlayout; }
@@ -59,8 +59,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:

@@ -70,7 +70,7 @@ public:
 	void bingoc(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	//uint8_t m_x;
@@ -81,9 +81,9 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<upd7759_device> m_upd7759;
 	required_device<generic_latch_8_device> m_soundlatch;
-	void main_map(address_map &map);
-	void sound_io(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #define SOUND_TEST 0
@@ -203,10 +203,10 @@ void bingoc_state::bingoc(machine_config &config)
 	I8251(config, "uart7", 4000000); // unknown
 	I8251(config, "uart8", 4000000); // unknown
 
-	SEGA_315_5338A(config, "io", 0); // ?
+	SEGA_315_5338A(config, "io"); // ?
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -217,16 +217,16 @@ void bingoc_state::bingoc(machine_config &config)
 	PALETTE(config, "palette").set_entries(0x100);
 
 
-	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front(); //might just be mono...
+
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 7159160/2).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 7159160/2).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	// terminals
 	BINGOCT(config, "term1");

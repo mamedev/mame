@@ -133,8 +133,8 @@ void snug_enhanced_video_device::nvram_default()
 
 bool snug_enhanced_video_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
+	auto const [err, actual] = util::read(file, m_novram.get(), NOVRAM_SIZE);
+	return !err && (actual == NOVRAM_SIZE);
 }
 
 //-------------------------------------------------
@@ -144,8 +144,8 @@ bool snug_enhanced_video_device::nvram_read(util::read_stream &file)
 
 bool snug_enhanced_video_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_novram.get(), NOVRAM_SIZE, actual) && actual == NOVRAM_SIZE;
+	auto const [err, actual] = util::write(file, m_novram.get(), NOVRAM_SIZE);
+	return !err;
 }
 
 /*
@@ -503,7 +503,7 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
 	m_video->set_screen(EVPC_SCREEN_TAG);
 	m_video->set_vram_size(0x20000); // gets changed at device_reset, but give it a default value to avoid assert
-	screen_device& screen(SCREEN(config, EVPC_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, EVPC_SCREEN_TAG));
 	screen.set_raw(XTAL(21'477'272),
 		v99x8_device::HTOTAL,
 		0,
@@ -520,7 +520,7 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
 	// Mouse connected to the color bus of the v9938; default: none
-	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
+	V9938_COLORBUS(config, m_colorbus, ti99_colorbus_options, nullptr);
 }
 
 } // end namespace bus::ti99::peb

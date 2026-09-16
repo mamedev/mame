@@ -2,7 +2,7 @@
 // detail/signal_handler.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,6 +26,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename Handler, typename IoExecutor>
@@ -36,7 +37,7 @@ public:
 
   signal_handler(Handler& h, const IoExecutor& io_ex)
     : signal_op(&signal_handler::do_complete),
-      handler_(ASIO_MOVE_CAST(Handler)(h)),
+      handler_(static_cast<Handler&&>(h)),
       work_(handler_, io_ex)
   {
   }
@@ -53,7 +54,7 @@ public:
 
     // Take ownership of the operation's outstanding work.
     handler_work<Handler, IoExecutor> w(
-        ASIO_MOVE_CAST2(handler_work<Handler, IoExecutor>)(
+        static_cast<handler_work<Handler, IoExecutor>&&>(
           h->work_));
 
     // Make a copy of the handler so that the memory can be deallocated before
@@ -83,6 +84,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

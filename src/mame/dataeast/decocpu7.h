@@ -15,7 +15,7 @@ public:
 protected:
 	class mi_decrypt : public mi_default {
 	public:
-		bool had_written;
+		bool m_had_written;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
@@ -24,7 +24,7 @@ protected:
 
 	class disassembler : public m6502_disassembler {
 	public:
-		mi_decrypt *mintf;
+		mi_decrypt *m_mintf;
 
 		disassembler(mi_decrypt *m);
 		virtual ~disassembler() = default;
@@ -32,8 +32,8 @@ protected:
 		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
 	};
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 

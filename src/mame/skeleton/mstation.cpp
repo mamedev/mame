@@ -56,8 +56,8 @@ public:
 	void mstation(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -104,9 +104,9 @@ private:
 	void mstation_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
-	void mstation_banked_map(address_map &map);
-	void mstation_io(address_map &map);
-	void mstation_mem(address_map &map);
+	void mstation_banked_map(address_map &map) ATTR_COLD;
+	void mstation_io(address_map &map) ATTR_COLD;
+	void mstation_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("PG Up")      PORT_CODE( KEYCODE_PGUP )   PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
 	PORT_START( "LINE.2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("\xc2\xb4")       PORT_CODE( KEYCODE_0_PAD )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_0_PAD )  PORT_CHAR(U'´')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_1 )      PORT_CHAR('1')      PORT_CHAR('!')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_2 )      PORT_CHAR('2')      PORT_CHAR('@')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_3 )      PORT_CHAR('3')      PORT_CHAR('#')
@@ -456,7 +456,7 @@ void mstation_state::mstation(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mstation_state::mstation_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(mstation_state::screen_update));

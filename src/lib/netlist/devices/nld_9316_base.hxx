@@ -122,7 +122,7 @@ namespace netlist::devices
 	struct desc_9310 : public desc_base
 	{
 		using ASYNC  = desc_const_t<bool, true>;
-		using MAXCNT = desc_const_t<unsigned, 10>;
+		using MAXCNT = desc_const_t<unsigned, 9>;
 		using tRC    = time_ns<27>;
 		using tCLR   = time_ns<36>;
 		using tLDCNT = time_ns<20>;

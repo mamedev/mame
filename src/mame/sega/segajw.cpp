@@ -58,13 +58,13 @@ public:
 	void segajw(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	ioport_value coin_sensors_r();
 	int hopper_sensors_r();
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t coin_counter_r();
@@ -74,11 +74,11 @@ private:
 	void lamps2_w(uint8_t data);
 	void coinlockout_w(uint8_t data);
 
-	void ramdac_map(address_map &map);
-	void segajw_audiocpu_io_map(address_map &map);
-	void segajw_audiocpu_map(address_map &map);
-	void segajw_hd63484_map(address_map &map);
-	void segajw_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void segajw_audiocpu_io_map(address_map &map) ATTR_COLD;
+	void segajw_audiocpu_map(address_map &map) ATTR_COLD;
+	void segajw_hd63484_map(address_map &map) ATTR_COLD;
+	void segajw_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -153,7 +153,7 @@ int segajw_state::hopper_sensors_r()
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
+ioport_value segajw_state::coin_sensors_r()
 {
 	uint8_t data = 0;
 
@@ -239,21 +239,21 @@ static INPUT_PORTS_START( segajw )
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Meter")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Meter")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Last Game")   PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("M-Door")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("D-Door")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_READ_LINE_MEMBER(segajw_state, hopper_sensors_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )       PORT_READ_LINE_MEMBER(FUNC(segajw_state::hopper_sensors_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Full")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("Hopper Fill")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segajw_state, coin_sensors_r)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(segajw_state::coin_sensors_r))
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, segajw_state, coin_drop_start, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(segajw_state::coin_drop_start), 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0000, "Progressive" )   PORT_DIPLOCATION("SW1:1")
@@ -351,9 +351,6 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
-	m_lamps.resolve();
-	m_towerlamps.resolve();
-
 	m_coin_start_cycles = 0;
 	m_hopper_start_cycles = 0;
 
@@ -388,14 +385,14 @@ void segajw_state::segajw(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a", 0)); // unknown clock
+	sega_315_5296_device &io1a(SEGA_315_5296(config, "io1a")); // unknown clock
 	io1a.out_pa_callback().set(FUNC(segajw_state::coin_counter_w));
 	io1a.out_pb_callback().set(FUNC(segajw_state::lamps1_w));
 	io1a.out_pc_callback().set(FUNC(segajw_state::lamps2_w));
 	io1a.out_pd_callback().set(FUNC(segajw_state::hopper_w));
 	io1a.in_pf_callback().set(FUNC(segajw_state::coin_counter_r));
 
-	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c", 0)); // unknown clock
+	sega_315_5296_device &io1c(SEGA_315_5296(config, "io1c")); // unknown clock
 	io1c.in_pa_callback().set_ioport("IN0");
 	io1c.in_pb_callback().set_ioport("IN1");
 	io1c.in_pc_callback().set_ioport("IN2");
@@ -403,7 +400,7 @@ void segajw_state::segajw(machine_config &config)
 	io1c.out_pg_callback().set(FUNC(segajw_state::coinlockout_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
@@ -412,7 +409,7 @@ void segajw_state::segajw(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(16);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &segajw_state::ramdac_map);
 
 	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));

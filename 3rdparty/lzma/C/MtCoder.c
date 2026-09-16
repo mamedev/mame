@@ -1,28 +1,28 @@
 /* MtCoder.c -- Multi-thread Coder
-2021-12-21 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
 #include "MtCoder.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 
-static SRes MtProgressThunk_Progress(const ICompressProgress *pp, UInt64 inSize, UInt64 outSize)
+static SRes MtProgressThunk_Progress(ICompressProgressPtr pp, UInt64 inSize, UInt64 outSize)
 {
-  CMtProgressThunk *thunk = CONTAINER_FROM_VTBL(pp, CMtProgressThunk, vt);
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(CMtProgressThunk)
   UInt64 inSize2 = 0;
   UInt64 outSize2 = 0;
   if (inSize != (UInt64)(Int64)-1)
   {
-    inSize2 = inSize - thunk->inSize;
-    thunk->inSize = inSize;
+    inSize2 = inSize - p->inSize;
+    p->inSize = inSize;
   }
   if (outSize != (UInt64)(Int64)-1)
   {
-    outSize2 = outSize - thunk->outSize;
-    thunk->outSize = outSize;
+    outSize2 = outSize - p->outSize;
+    p->outSize = outSize;
   }
-  return MtProgress_ProgressAdd(thunk->mtProgress, inSize2, outSize2);
+  return MtProgress_ProgressAdd(p->mtProgress, inSize2, outSize2);
 }
 
 
@@ -36,25 +36,31 @@ void MtProgressThunk_CreateVTable(CMtProgressThunk *p)
 #define RINOK_THREAD(x) { if ((x) != 0) return SZ_ERROR_THREAD; }
 
 
-static WRes ArEvent_OptCreate_And_Reset(CEvent *p)
-{
-  if (Event_IsCreated(p))
-    return Event_Reset(p);
-  return AutoResetEvent_CreateNotSignaled(p);
-}
-
-
 static THREAD_FUNC_DECL ThreadFunc(void *pp);
 
 
-static SRes MtCoderThread_CreateAndStart(CMtCoderThread *t)
+static SRes MtCoderThread_CreateAndStart(CMtCoderThread *t
+#ifdef _WIN32
+    , CMtCoder * const mtc
+#endif
+    )
 {
-  WRes wres = ArEvent_OptCreate_And_Reset(&t->startEvent);
+  WRes wres = AutoResetEvent_OptCreate_And_Reset(&t->startEvent);
+  // printf("\n====== MtCoderThread_CreateAndStart : \n");
   if (wres == 0)
   {
     t->stop = False;
     if (!Thread_WasCreated(&t->thread))
-      wres = Thread_Create(&t->thread, ThreadFunc, t);
+    {
+#ifdef _WIN32
+      if (mtc->numThreadGroups)
+        wres = Thread_Create_With_Group(&t->thread, ThreadFunc, t,
+            ThreadNextGroup_GetNext(&mtc->nextGroup), // group
+            0); // affinityMask
+      else
+#endif
+        wres = Thread_Create(&t->thread, ThreadFunc, t);
+    }
     if (wres == 0)
       wres = Event_Set(&t->startEvent);
   }
@@ -64,6 +70,7 @@ static SRes MtCoderThread_CreateAndStart(CMtCoderThread *t)
 }
 
 
+Z7_FORCE_INLINE
 static void MtCoderThread_Destruct(CMtCoderThread *t)
 {
   if (Thread_WasCreated(&t->thread))
@@ -84,24 +91,6 @@ static void MtCoderThread_Destruct(CMtCoderThread *t)
 
 
 
-static SRes FullRead(ISeqInStream *stream, Byte *data, size_t *processedSize)
-{
-  size_t size = *processedSize;
-  *processedSize = 0;
-  while (size != 0)
-  {
-    size_t cur = size;
-    SRes res = ISeqInStream_Read(stream, data, &cur);
-    *processedSize += cur;
-    data += cur;
-    size -= cur;
-    RINOK(res);
-    if (cur == 0)
-      return SZ_OK;
-  }
-  return SZ_OK;
-}
-
 
 /*
   ThreadFunc2() returns:
@@ -111,7 +100,7 @@ static SRes FullRead(ISeqInStream *stream, Byte *data, size_t *processedSize)
 
 static SRes ThreadFunc2(CMtCoderThread *t)
 {
-  CMtCoder *mtc = t->mtCoder;
+  CMtCoder * const mtc = t->mtCoder;
 
   for (;;)
   {
@@ -152,7 +141,7 @@ static SRes ThreadFunc2(CMtCoderThread *t)
         }
         if (res == SZ_OK)
         {
-          res = FullRead(mtc->inStream, t->inBuf, &size);
+          res = SeqInStream_ReadMax(mtc->inStream, t->inBuf, &size);
           readProcessed = mtc->readProcessed + size;
           mtc->readProcessed = readProcessed;
         }
@@ -211,7 +200,11 @@ static SRes ThreadFunc2(CMtCoderThread *t)
       if (mtc->numStartedThreads < mtc->numStartedThreadsLimit
           && mtc->expectedDataSize != readProcessed)
       {
-        res = MtCoderThread_CreateAndStart(&mtc->threads[mtc->numStartedThreads]);
+        res = MtCoderThread_CreateAndStart(&mtc->threads[mtc->numStartedThreads]
+#ifdef _WIN32
+            , mtc
+#endif
+            );
         if (res == SZ_OK)
           mtc->numStartedThreads++;
         else
@@ -247,13 +240,13 @@ static SRes ThreadFunc2(CMtCoderThread *t)
     }
 
     {
-      CMtCoderBlock *block = &mtc->blocks[bi];
+      CMtCoderBlock * const block = &mtc->blocks[bi];
       block->res = res;
       block->bufIndex = bufIndex;
       block->finished = finished;
     }
     
-    #ifdef MTCODER__USE_WRITE_THREAD
+    #ifdef MTCODER_USE_WRITE_THREAD
       RINOK_THREAD(Event_Set(&mtc->writeEvents[bi]))
     #else
     {
@@ -337,7 +330,7 @@ static SRes ThreadFunc2(CMtCoderThread *t)
 
 static THREAD_FUNC_DECL ThreadFunc(void *pp)
 {
-  CMtCoderThread *t = (CMtCoderThread *)pp;
+  CMtCoderThread * const t = (CMtCoderThread *)pp;
   for (;;)
   {
     if (Event_Wait(&t->startEvent) != 0)
@@ -345,16 +338,16 @@ static THREAD_FUNC_DECL ThreadFunc(void *pp)
     if (t->stop)
       return 0;
     {
-      SRes res = ThreadFunc2(t);
+      const SRes res = ThreadFunc2(t);
       CMtCoder *mtc = t->mtCoder;
       if (res != SZ_OK)
       {
         MtProgress_SetError(&mtc->mtProgress, res);
       }
       
-      #ifndef MTCODER__USE_WRITE_THREAD
+      #ifndef MTCODER_USE_WRITE_THREAD
       {
-        unsigned numFinished = (unsigned)InterlockedIncrement(&mtc->numFinishedThreads);
+        const unsigned numFinished = (unsigned)InterlockedIncrement(&mtc->numFinishedThreads);
         if (numFinished == mtc->numStartedThreads)
           if (Event_Set(&mtc->finishedEvent) != 0)
             return (THREAD_FUNC_RET_TYPE)SZ_ERROR_THREAD;
@@ -372,6 +365,7 @@ void MtCoder_Construct(CMtCoder *p)
   
   p->blockSize = 0;
   p->numThreadsMax = 0;
+  p->numThreadGroups = 0;
   p->expectedDataSize = (UInt64)(Int64)-1;
 
   p->inStream = NULL;
@@ -389,7 +383,7 @@ void MtCoder_Construct(CMtCoder *p)
   Event_Construct(&p->readEvent);
   Semaphore_Construct(&p->blocksSemaphore);
 
-  for (i = 0; i < MTCODER__THREADS_MAX; i++)
+  for (i = 0; i < MTCODER_THREADS_MAX; i++)
   {
     CMtCoderThread *t = &p->threads[i];
     t->mtCoder = p;
@@ -397,11 +391,11 @@ void MtCoder_Construct(CMtCoder *p)
     t->inBuf = NULL;
     t->stop = False;
     Event_Construct(&t->startEvent);
-    Thread_Construct(&t->thread);
+    Thread_CONSTRUCT(&t->thread)
   }
 
-  #ifdef MTCODER__USE_WRITE_THREAD
-    for (i = 0; i < MTCODER__BLOCKS_MAX; i++)
+  #ifdef MTCODER_USE_WRITE_THREAD
+    for (i = 0; i < MTCODER_BLOCKS_MAX; i++)
       Event_Construct(&p->writeEvents[i]);
   #else
     Event_Construct(&p->finishedEvent);
@@ -424,14 +418,14 @@ static void MtCoder_Free(CMtCoder *p)
     Event_Set(&p->readEvent);
   */
 
-  for (i = 0; i < MTCODER__THREADS_MAX; i++)
+  for (i = 0; i < MTCODER_THREADS_MAX; i++)
     MtCoderThread_Destruct(&p->threads[i]);
 
   Event_Close(&p->readEvent);
   Semaphore_Close(&p->blocksSemaphore);
 
-  #ifdef MTCODER__USE_WRITE_THREAD
-    for (i = 0; i < MTCODER__BLOCKS_MAX; i++)
+  #ifdef MTCODER_USE_WRITE_THREAD
+    for (i = 0; i < MTCODER_BLOCKS_MAX; i++)
       Event_Close(&p->writeEvents[i]);
   #else
     Event_Close(&p->finishedEvent);
@@ -455,20 +449,22 @@ SRes MtCoder_Code(CMtCoder *p)
   unsigned i;
   SRes res = SZ_OK;
 
-  if (numThreads > MTCODER__THREADS_MAX)
-    numThreads = MTCODER__THREADS_MAX;
-  numBlocksMax = MTCODER__GET_NUM_BLOCKS_FROM_THREADS(numThreads);
+  // printf("\n====== MtCoder_Code : \n");
+
+  if (numThreads > MTCODER_THREADS_MAX)
+      numThreads = MTCODER_THREADS_MAX;
+  numBlocksMax = MTCODER_GET_NUM_BLOCKS_FROM_THREADS(numThreads);
   
   if (p->blockSize < ((UInt32)1 << 26)) numBlocksMax++;
   if (p->blockSize < ((UInt32)1 << 24)) numBlocksMax++;
   if (p->blockSize < ((UInt32)1 << 22)) numBlocksMax++;
 
-  if (numBlocksMax > MTCODER__BLOCKS_MAX)
-    numBlocksMax = MTCODER__BLOCKS_MAX;
+  if (numBlocksMax > MTCODER_BLOCKS_MAX)
+      numBlocksMax = MTCODER_BLOCKS_MAX;
 
   if (p->blockSize != p->allocatedBufsSize)
   {
-    for (i = 0; i < MTCODER__THREADS_MAX; i++)
+    for (i = 0; i < MTCODER_THREADS_MAX; i++)
     {
       CMtCoderThread *t = &p->threads[i];
       if (t->inBuf)
@@ -484,23 +480,23 @@ SRes MtCoder_Code(CMtCoder *p)
 
   MtProgress_Init(&p->mtProgress, p->progress);
 
-  #ifdef MTCODER__USE_WRITE_THREAD
+  #ifdef MTCODER_USE_WRITE_THREAD
     for (i = 0; i < numBlocksMax; i++)
     {
-      RINOK_THREAD(ArEvent_OptCreate_And_Reset(&p->writeEvents[i]));
+      RINOK_THREAD(AutoResetEvent_OptCreate_And_Reset(&p->writeEvents[i]))
     }
   #else
-    RINOK_THREAD(ArEvent_OptCreate_And_Reset(&p->finishedEvent));
+    RINOK_THREAD(AutoResetEvent_OptCreate_And_Reset(&p->finishedEvent))
   #endif
 
   {
-    RINOK_THREAD(ArEvent_OptCreate_And_Reset(&p->readEvent));
-    RINOK_THREAD(Semaphore_OptCreateInit(&p->blocksSemaphore, numBlocksMax, numBlocksMax));
+    RINOK_THREAD(AutoResetEvent_OptCreate_And_Reset(&p->readEvent))
+    RINOK_THREAD(Semaphore_OptCreateInit(&p->blocksSemaphore, (UInt32)numBlocksMax, (UInt32)numBlocksMax))
   }
 
-  for (i = 0; i < MTCODER__BLOCKS_MAX - 1; i++)
+  for (i = 0; i < MTCODER_BLOCKS_MAX - 1; i++)
     p->freeBlockList[i] = i + 1;
-  p->freeBlockList[MTCODER__BLOCKS_MAX - 1] = (unsigned)(int)-1;
+  p->freeBlockList[MTCODER_BLOCKS_MAX - 1] = (unsigned)(int)-1;
   p->freeBlockHead = 0;
 
   p->readProcessed = 0;
@@ -508,26 +504,37 @@ SRes MtCoder_Code(CMtCoder *p)
   p->numBlocksMax = numBlocksMax;
   p->stopReading = False;
 
-  #ifndef MTCODER__USE_WRITE_THREAD
+  #ifndef MTCODER_USE_WRITE_THREAD
     p->writeIndex = 0;
     p->writeRes = SZ_OK;
-    for (i = 0; i < MTCODER__BLOCKS_MAX; i++)
+    for (i = 0; i < MTCODER_BLOCKS_MAX; i++)
       p->ReadyBlocks[i] = False;
     p->numFinishedThreads = 0;
   #endif
 
   p->numStartedThreadsLimit = numThreads;
   p->numStartedThreads = 0;
+  ThreadNextGroup_Init(&p->nextGroup, p->numThreadGroups, 0); // startGroup
 
   // for (i = 0; i < numThreads; i++)
   {
+    // here we create new thread for first block.
+    // And each new thread will create another new thread after block reading
+    // until numStartedThreadsLimit is reached.
     CMtCoderThread *nextThread = &p->threads[p->numStartedThreads++];
-    RINOK(MtCoderThread_CreateAndStart(nextThread));
+    {
+      const SRes res2 = MtCoderThread_CreateAndStart(nextThread
+#ifdef _WIN32
+            , p
+#endif
+            );
+      RINOK(res2)
+    }
   }
 
   RINOK_THREAD(Event_Set(&p->readEvent))
 
-  #ifdef MTCODER__USE_WRITE_THREAD
+  #ifdef MTCODER_USE_WRITE_THREAD
   {
     unsigned bi = 0;
 
@@ -539,9 +546,9 @@ SRes MtCoder_Code(CMtCoder *p)
       RINOK_THREAD(Event_Wait(&p->writeEvents[bi]))
 
       {
-        const CMtCoderBlock *block = &p->blocks[bi];
-        unsigned bufIndex = block->bufIndex;
-        BoolInt finished = block->finished;
+        const CMtCoderBlock * const block = &p->blocks[bi];
+        const unsigned bufIndex = block->bufIndex;
+        const BoolInt finished = block->finished;
         if (res == SZ_OK && block->res != SZ_OK)
           res = block->res;
 
@@ -571,7 +578,7 @@ SRes MtCoder_Code(CMtCoder *p)
   }
   #else
   {
-    WRes wres = Event_Wait(&p->finishedEvent);
+    const WRes wres = Event_Wait(&p->finishedEvent);
     res = MY_SRes_HRESULT_FROM_WRes(wres);
   }
   #endif
@@ -582,7 +589,7 @@ SRes MtCoder_Code(CMtCoder *p)
   if (res == SZ_OK)
     res = p->mtProgress.res;
 
-  #ifndef MTCODER__USE_WRITE_THREAD
+  #ifndef MTCODER_USE_WRITE_THREAD
     if (res == SZ_OK)
       res = p->writeRes;
   #endif
@@ -593,3 +600,5 @@ SRes MtCoder_Code(CMtCoder *p)
 }
 
 #endif
+
+#undef RINOK_THREAD

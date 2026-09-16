@@ -1,0 +1,26 @@
+name: 'Check #include guards'
+
+on:
+  push:
+    paths:
+    - '.github/workflows/**'
+    - 'src/devices/**.h'
+    - 'src/mame/**.h'
+  pull_request:
+    paths:
+    - '.github/workflows/**'
+    - 'src/devices/**.h'
+    - 'src/mame/**.h'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Validate
+      run: python3 scripts/build/check_include_guards.py src/devices src/mame

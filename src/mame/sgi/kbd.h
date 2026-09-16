@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 class device_sgi_kbd_port_interface;
 
@@ -21,10 +21,7 @@ public:
 	sgi_kbd_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: sgi_kbd_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sgi_kbd_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sgi_kbd_port_device();
@@ -34,7 +31,7 @@ public:
 
 protected:
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_rxd_handler;
@@ -67,14 +64,14 @@ public:
 	virtual void write_txd(int state) override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	virtual void map_mem(address_map &map);
-	virtual void map_pio(address_map &map);
+	virtual void map_mem(address_map &map) ATTR_COLD;
+	virtual void map_pio(address_map &map) ATTR_COLD;
 
 	void scan_matrix(int state);
 	void led_w(u8 data);

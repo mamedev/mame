@@ -54,9 +54,9 @@ public:
 	void videopin(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -78,7 +78,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	emu_timer *m_interrupt_timer = nullptr;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t misc_r();
 	void led_w(uint8_t data);
@@ -98,8 +98,6 @@ private:
 	double calc_plunger_pos();
 };
 
-
-// video
 
 TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
 {
@@ -185,8 +183,6 @@ void videopin_state::video_ram_w(offs_t offset, uint8_t data)
 }
 
 
-// machine
-
 void videopin_state::update_plunger()
 {
 	uint8_t const val = m_in[1]->read();
@@ -227,7 +223,6 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 void videopin_state::machine_start()
 {
-	m_leds.resolve();
 	m_interrupt_timer = timer_alloc(FUNC(videopin_state::interrupt_callback), this);
 
 	save_item(NAME(m_time_pushed));
@@ -430,7 +425,7 @@ static INPUT_PORTS_START( videopin )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Nudge") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Ball Shooter") PORT_CODE(KEYCODE_DOWN)
@@ -498,7 +493,7 @@ void videopin_state::videopin(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 263);
 	m_screen->set_visarea(0, 303, 0, 255);

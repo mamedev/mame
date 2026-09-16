@@ -24,7 +24,7 @@ class segam1audio_device : public device_t
 {
 public:
 	// construction/destruction
-	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segam1audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
@@ -34,14 +34,14 @@ public:
 
 	void write_txd(int state);
 
-	void mpcm1_map(address_map &map);
-	void mpcm2_map(address_map &map);
-	void segam1audio_map(address_map &map);
+	void mpcm1_map(address_map &map) ATTR_COLD;
+	void mpcm2_map(address_map &map) ATTR_COLD;
+	void segam1audio_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_audiocpu;

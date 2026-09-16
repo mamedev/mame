@@ -21,7 +21,7 @@ public:
 	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void vblank_w(int state);
-	void topcat_mem(address_map &map);
+	void topcat_mem(address_map &map) ATTR_COLD;
 
 	bool plane_enabled();
 
@@ -29,8 +29,8 @@ public:
 protected:
 	topcat_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 

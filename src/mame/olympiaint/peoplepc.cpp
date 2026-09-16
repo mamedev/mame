@@ -94,11 +94,11 @@ private:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg = 0, m_p7c = 0;
-	void peoplepc_io(address_map &map);
-	void peoplepc_map(address_map &map);
+	void peoplepc_io(address_map &map) ATTR_COLD;
+	void peoplepc_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 static const gfx_layout peoplepc_charlayout =
@@ -290,7 +290,7 @@ void peoplepc_state::olypeopl(machine_config &config)
 
 	I8255(config, "ppi8255");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(XTAL(22'000'000), 640, 0, 640, 475, 0, 475);
 	screen.set_screen_update("h46505", FUNC(mc6845_device::screen_update));
 

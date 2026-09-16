@@ -92,6 +92,9 @@ std::pair<std::error_condition, std::string> colecovision_cartridge_slot_device:
 			// TODO 8000/a000/c000/e000
 			memcpy(m_card->m_rom, get_software_region("rom"), size);
 		}
+
+		// signal cartridge that rom data is now available
+		m_card->load_done();
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
@@ -121,16 +124,28 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 
 
 //-------------------------------------------------
-//  bd_r - cartridge data read
+//  read - cartridge data read
 //-------------------------------------------------
 
-
-uint8_t colecovision_cartridge_slot_device::bd_r(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
+uint8_t colecovision_cartridge_slot_device::read(offs_t offset, int _8000, int _a000, int _c000, int _e000)
 {
+	uint8_t data = 0xff;
+
 	if (m_card)
-		data = m_card->bd_r(offset , data, _8000, _a000, _c000, _e000);
+		data = m_card->read(offset, _8000, _a000, _c000, _e000);
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  write - cartridge data write
+//-------------------------------------------------
+
+void colecovision_cartridge_slot_device::write(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000)
+{
+	if (m_card)
+		m_card->write(offset, data, _8000, _a000, _c000, _e000);
 }
 
 
@@ -138,14 +153,22 @@ uint8_t colecovision_cartridge_slot_device::bd_r(offs_t offset, uint8_t data, in
 //  SLOT_INTERFACE( colecovision_cartridges )
 //-------------------------------------------------
 
+#include "activision.h"
 #include "megacart.h"
+#include "sgc.h"
 #include "std.h"
 #include "xin1.h"
 
 void colecovision_cartridges(device_slot_interface &device)
 {
 	// the following need ROMs from the software list
+	device.option_add_internal("activision", COLECOVISION_ACTIVISION);
+	device.option_add_internal("activision_256b", COLECOVISION_ACTIVISION_256B);
+	device.option_add_internal("activision_32k", COLECOVISION_ACTIVISION_32K);
 	device.option_add_internal("megacart", COLECOVISION_MEGACART);
+	device.option_add_internal("sgc_1mbit", COLECOVISION_SGC_1MBIT);
+	device.option_add_internal("sgc_2mbit", COLECOVISION_SGC_2MBIT);
+	device.option_add_internal("sgc_4mbit", COLECOVISION_SGC_4MBIT);
 	device.option_add_internal("standard", COLECOVISION_STANDARD);
 	device.option_add_internal("xin1", COLECOVISION_XIN1);
 }

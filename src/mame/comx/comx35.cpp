@@ -17,12 +17,115 @@
 */
 
 #include "emu.h"
-#include "comx35.h"
+
+#include "bus/comx35/exp.h"
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "imagedev/printer.h"
+#include "imagedev/snapquik.h"
+#include "machine/cdp1871.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "sound/cdp1869.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
+#include "speaker.h"
 
 #include "multibyte.h"
 #include "utf8.h"
+
+#define SCREEN_TAG          "screen"
+
+#define CDP1870_TAG         "u1"
+#define CDP1869_TAG         "u2"
+#define CDP1802_TAG         "u3"
+#define CDP1871_TAG         "u4"
+#define EXPANSION_TAG       "exp"
+
+#define COMX35_CHARRAM_SIZE 0x800
+#define COMX35_CHARRAM_MASK 0x7ff
+
+namespace {
+
+class comx35_state : public driver_device
+{
+public:
+	comx35_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, CDP1802_TAG),
+			m_vis(*this, CDP1869_TAG),
+			m_kbe(*this, CDP1871_TAG),
+			m_cassette(*this, "cassette"),
+			m_ram(*this, RAM_TAG),
+			m_exp(*this, EXPANSION_TAG),
+			m_rom(*this, CDP1802_TAG),
+			m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
+			m_d6(*this, "D6"),
+			m_modifiers(*this, "MODIFIERS")
+	{ }
+
+	void pal(machine_config &config) ATTR_COLD;
+	void ntsc(machine_config &config) ATTR_COLD;
+	void comx35_pal_video(machine_config &config) ATTR_COLD;
+	void comx35_ntsc_video(machine_config &config) ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1869_device> m_vis;
+	required_device<cdp1871_device> m_kbe;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	required_device<comx_expansion_slot_device> m_exp;
+	required_memory_region m_rom;
+	memory_share_creator<uint8_t> m_char_ram;
+	required_ioport m_d6;
+	required_ioport m_modifiers;
+	emu_timer *m_reset_done_timer = nullptr;
+
+	void base(machine_config &config, const XTAL clock) ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(reset_done);
+
+	void check_interrupt();
+
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	void cdp1869_w(offs_t offset, uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef4_r();
+	void q_w(int state);
+	void sc_w(uint8_t data);
+	void irq_w(int state);
+	void prd_w(int state);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
+	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);
+	CDP1869_CHAR_RAM_WRITE_MEMBER(comx35_charram_w);
+	CDP1869_PCB_READ_MEMBER(comx35_pcb_r);
+
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void comx35_io(address_map &map) ATTR_COLD;
+	void comx35_mem(address_map &map) ATTR_COLD;
+
+	// processor state
+	int m_clear = 0;                // CPU mode
+	int m_q = 0;                    // Q flag
+	int m_iden = 0;                 // interrupt/DMA enable
+	int m_dma = 0;                  // memory refresh DMA
+	int m_int = 0;                  // interrupt request
+	int m_prd = 0;                  // predisplay
+	int m_cr1 = 0;                  // interrupt enable
+};
 
 /***************************************************************************
     PARAMETERS
@@ -419,12 +522,12 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("MODIFIERS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_WRITE_LINE_DEVICE_MEMBER(CDP1871_TAG, cdp1871_device, shift_w)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CNTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) PORT_WRITE_LINE_DEVICE_MEMBER(CDP1871_TAG, cdp1871_device, control_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_WRITE_LINE_DEVICE_MEMBER(CDP1871_TAG, FUNC(cdp1871_device::shift_w))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CNTL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL)) PORT_WRITE_LINE_DEVICE_MEMBER(CDP1871_TAG, FUNC(cdp1871_device::control_w))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, comx35_state, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(comx35_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 
@@ -534,6 +637,79 @@ void comx35_state::irq_w(int state)
 
 
 //**************************************************************************
+//  VIDEO HARDWARE
+//**************************************************************************
+
+void comx35_state::cdp1869_w(offs_t offset, uint8_t data)
+{
+	uint16_t ma = m_maincpu->get_memory_address();
+
+	switch (offset)
+	{
+	case 3:
+		m_vis->out3_w(data);
+		break;
+
+	case 4:
+		m_vis->out4_w(ma);
+		break;
+
+	case 5:
+		m_vis->out5_w(ma);
+		break;
+
+	case 6:
+		m_vis->out6_w(ma);
+		break;
+
+	case 7:
+		m_vis->out7_w(ma);
+		break;
+	}
+}
+
+/* CDP1869 */
+
+void comx35_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x7ff).ram();
+}
+
+CDP1869_CHAR_RAM_READ_MEMBER( comx35_state::comx35_charram_r )
+{
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
+
+	return m_char_ram[charaddr];
+}
+
+CDP1869_CHAR_RAM_WRITE_MEMBER( comx35_state::comx35_charram_w )
+{
+	uint8_t column = pmd & 0x7f;
+	uint16_t charaddr = (column << 4) | cma;
+
+	m_char_ram[charaddr] = data;
+}
+
+CDP1869_PCB_READ_MEMBER( comx35_state::comx35_pcb_r )
+{
+	return BIT(pmd, 7);
+}
+
+void comx35_state::prd_w(int state)
+{
+	if ((m_prd == ASSERT_LINE) && (state == CLEAR_LINE))
+	{
+		m_cr1 = m_iden ? CLEAR_LINE : ASSERT_LINE;
+		check_interrupt();
+	}
+
+	m_prd = state;
+}
+
+
+
+//**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
@@ -603,6 +779,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_maincpu->set_addrmap(AS_IO, &comx35_state::comx35_io);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(comx35_state::clear_r));
+	m_maincpu->ef1_cb().set(m_vis, FUNC(cdp1869_device::predisplay_r));
 	m_maincpu->ef2_cb().set(FUNC(comx35_state::ef2_r));
 	m_maincpu->ef4_cb().set(FUNC(comx35_state::ef4_r));
 	m_maincpu->q_cb().set(FUNC(comx35_state::q_w));
@@ -627,16 +804,48 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 
 	QUICKLOAD(config, "quickload", "comx").set_load_callback(FUNC(comx35_state::quickload_cb));
 
+	SPEAKER(config, "mono").front_center();
+
 	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion bus
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
+	// FIXME: determine expansion bus clock frequency
+	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, nullptr).irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K");
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("comx35_flop");
+}
+
+void comx35_state::comx35_pal_video(machine_config &config)
+{
+	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_PAL, &comx35_state::cdp1869_page_ram);
+	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_vis->set_pcb_read_callback(FUNC(comx35_state::comx35_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(comx35_state::comx35_charram_r));
+	m_vis->set_char_ram_write_callback(FUNC(comx35_state::comx35_charram_w));
+	m_vis->pal_ntsc_callback().set_constant(1);
+	m_vis->prd_callback().set(FUNC(comx35_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void comx35_state::comx35_ntsc_video(machine_config &config)
+{
+	CDP1869(config, m_vis, cdp1869_device::DOT_CLK_NTSC, &comx35_state::cdp1869_page_ram);
+	m_vis->add_ntsc_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_NTSC);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_NTSC);
+	m_vis->set_pcb_read_callback(FUNC(comx35_state::comx35_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(comx35_state::comx35_charram_r));
+	m_vis->set_char_ram_write_callback(FUNC(comx35_state::comx35_charram_w));
+	m_vis->pal_ntsc_callback().set_constant(0);
+	m_vis->prd_callback().set(FUNC(comx35_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	m_vis->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void comx35_state::pal(machine_config &config)
@@ -677,12 +886,12 @@ ROM_END
 
 #define rom_comx35n rom_comx35p
 
-
+} // anonymous namespace
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
-COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_SUPPORTS_SAVE )

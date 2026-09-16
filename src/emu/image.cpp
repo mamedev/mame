@@ -20,10 +20,12 @@
 
 // lib/util
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "xmlfile.h"
 #include "zippath.h"
 
 #include <cctype>
+#include <locale>
 
 
 //**************************************************************************
@@ -54,7 +56,7 @@ image_manager::image_manager(running_machine &machine)
 		if (!startup_image.empty())
 		{
 			// we do have a startup image specified - load it
-			std::pair<std::error_condition, std::string> result(image_error::UNSPECIFIED, std::string());
+			std::pair<std::error_condition, std::string> result(image_error::NOSOFTWARE, std::string());
 
 			// try as a softlist
 			if (software_name_parse(startup_image))
@@ -64,17 +66,17 @@ image_manager::image_manager(running_machine &machine)
 			}
 
 			// failing that, try as an image
-			if (result.first)
+			if (result.first == image_error::NOSOFTWARE)
 			{
 				osd_printf_verbose("%s: attempting to load media image %s\n", image.device().tag(), startup_image);
 				result = image.load(startup_image);
-			}
 
-			// failing that, try creating it (if appropriate)
-			if (result.first && image.support_command_line_image_creation())
-			{
-				osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
-				result = image.create(startup_image);
+				// failing that, try creating it (if appropriate)
+				if (result.first && image.support_command_line_image_creation())
+				{
+					osd_printf_verbose("%s: attempting to create media image %s\n", image.device().tag(), startup_image);
+					result = image.create(startup_image);
+				}
 			}
 
 			// did the image load fail?
@@ -84,6 +86,7 @@ image_manager::image_manager(running_machine &machine)
 				image.unload();
 
 				// make sure it is removed from the ini file too
+				const std::string failed_startup_image = startup_image;
 				machine.options().image_option(image.instance_name()).specify("");
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
@@ -95,7 +98,7 @@ image_manager::image_manager(running_machine &machine)
 							: "Device %1$s load (-%2$s %3$s) failed: %7$s (%5$s:%6$d)",
 						image.device().name(),
 						image.instance_name(),
-						startup_image,
+						failed_startup_image,
 						result.second,
 						result.first.category().name(),
 						result.first.value(),
@@ -138,7 +141,7 @@ void image_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			{
 				for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name().c_str()))
+					if (image.instance_name() == dev_instance)
 					{
 						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
@@ -181,24 +184,34 @@ void image_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 int image_manager::write_config(emu_options &options, const char *filename, const game_driver *gamedrv)
 {
-	char buffer[128];
-	int retval = 1;
-
-	if (gamedrv != nullptr)
+	std::string buffer;
+	if (gamedrv)
 	{
-		sprintf(buffer, "%s.ini", gamedrv->name);
-		filename = buffer;
+		buffer.reserve(strlen(gamedrv->name) + 4);
+		buffer = gamedrv->name;
+		buffer += ".ini";
+		filename = buffer.c_str();
 	}
 
 	emu_file file(options.ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	std::error_condition const filerr = file.open(filename);
-	if (!filerr)
+	if (filerr)
+		return 1;
+
+	try
 	{
-		std::string inistring = options.output_ini();
-		file.puts(inistring);
-		retval = 0;
+		util::owritestream str(file);
+		str.imbue(std::locale::classic());
+		options.output_ini(str);
+		str << std::flush;
+		if (file.flush() || !str)
+			return 1;
 	}
-	return retval;
+	catch (std::bad_alloc const &)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 /*-------------------------------------------------
@@ -301,7 +314,7 @@ bool image_manager::try_change_working_directory(std::string &working_directory,
 		bool done = false;
 		while (!done && (entry = directory->read()) != nullptr)
 		{
-			if (!core_stricmp(subdir.c_str(), entry->name))
+			if (!core_stricmp(subdir, entry->name))
 			{
 				done = true;
 				success = entry->type == osd::directory::entry::entry_type::DIR;

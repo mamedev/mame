@@ -26,6 +26,8 @@ exports.author = { name = "Carl" }
 
 local portname = exports
 
+local start_subscription
+
 function portname.startplugin()
 	local json = require("json")
 	local ctrlrpath = manager.options.entries.ctrlrpath:value():match("([^;]+)")
@@ -70,7 +72,7 @@ function portname.startplugin()
 		end
 	end
 
-	emu.register_start(function()
+	start_subscription = emu.add_machine_reset_notifier(function()
 		local file = emu.file(ctrlrpath .. "/portname", "r")
 		local ret = file:open(get_filename())
 		if ret then

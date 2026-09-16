@@ -176,8 +176,8 @@ public:
 	void init_nevada();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device_array<mc68681_device, 3> m_duart;
@@ -216,7 +216,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void nevada_map(address_map &map);
+	void nevada_map(address_map &map) ATTR_COLD;
 };
 
 /*
@@ -583,7 +583,7 @@ void nevada_state::nevada(machine_config &config)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(nevada_state::nvram_init));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size((42+1)*8, (32+1)*8);                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */

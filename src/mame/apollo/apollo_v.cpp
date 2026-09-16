@@ -1715,7 +1715,7 @@ void apollo_graphics_15i::register_vblank_callback()
 void apollo_graphics_15i::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_apollo_15i);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(68000000, 1346, 0, 1024, 841, 0, 800);
 	m_screen->set_screen_update(FUNC(apollo_graphics_15i::screen_update));
@@ -1879,7 +1879,7 @@ void apollo_graphics_19i::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_apollo);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(120000000, 1728, 0, 1280, 1066, 0, 1024);
 	m_screen->set_screen_update(FUNC(apollo_graphics_19i::screen_update));

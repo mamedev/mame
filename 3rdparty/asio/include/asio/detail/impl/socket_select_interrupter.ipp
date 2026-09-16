@@ -2,7 +2,7 @@
 // detail/impl/socket_select_interrupter.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,7 @@
 #if !defined(ASIO_WINDOWS_RUNTIME)
 
 #if defined(ASIO_WINDOWS) \
-  || defined(__CYGWIN__) \
+  || defined(ASIO_CYGWIN_W32_SOCKETS) \
   || defined(__SYMBIAN32__)
 
 #include <cstdlib>
@@ -33,9 +33,10 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
-socket_select_interrupter::socket_select_interrupter()
+socket_select_interrupter::socket_select_interrupter(bool)
 {
   open_descriptors();
 }
@@ -60,11 +61,11 @@ void socket_select_interrupter::open_descriptors()
   addr.sin_family = AF_INET;
   addr.sin_addr.s_addr = socket_ops::host_to_network_long(INADDR_LOOPBACK);
   addr.sin_port = 0;
-  if (socket_ops::bind(acceptor.get(), (const socket_addr_type*)&addr,
+  if (socket_ops::bind(acceptor.get(), &addr,
         addr_len, ec) == socket_error_retval)
     asio::detail::throw_error(ec, "socket_select_interrupter");
 
-  if (socket_ops::getsockname(acceptor.get(), (socket_addr_type*)&addr,
+  if (socket_ops::getsockname(acceptor.get(), &addr,
         &addr_len, ec) == socket_error_retval)
     asio::detail::throw_error(ec, "socket_select_interrupter");
 
@@ -83,14 +84,14 @@ void socket_select_interrupter::open_descriptors()
   if (client.get() == invalid_socket)
     asio::detail::throw_error(ec, "socket_select_interrupter");
 
-  if (socket_ops::connect(client.get(), (const socket_addr_type*)&addr,
+  if (socket_ops::connect(client.get(), &addr,
         addr_len, ec) == socket_error_retval)
     asio::detail::throw_error(ec, "socket_select_interrupter");
 
   socket_holder server(socket_ops::accept(acceptor.get(), 0, 0, ec));
   if (server.get() == invalid_socket)
     asio::detail::throw_error(ec, "socket_select_interrupter");
-  
+
   ioctl_arg_type non_blocking = 1;
   socket_ops::state_type client_state = 0;
   if (socket_ops::ioctl(client.get(), client_state,
@@ -172,12 +173,13 @@ bool socket_select_interrupter::reset()
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
 
 #endif // defined(ASIO_WINDOWS)
-       // || defined(__CYGWIN__)
+       // || defined(ASIO_CYGWIN_W32_SOCKETS)
        // || defined(__SYMBIAN32__)
 
 #endif // !defined(ASIO_WINDOWS_RUNTIME)

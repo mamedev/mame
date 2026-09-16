@@ -30,7 +30,7 @@ template<class DeviceType>
 class menu_device_control : public menu
 {
 public:
-	menu_device_control(mame_ui_manager &mui, render_container &container, DeviceType *device);
+	menu_device_control(mame_ui_manager &mui, render_target &target, DeviceType *device);
 
 protected:
 	DeviceType *current_device() { return m_device; }
@@ -56,8 +56,8 @@ private:
 //-------------------------------------------------
 
 template<class DeviceType>
-menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, render_container &container, DeviceType *device)
-	: menu(mui, container)
+menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, render_target &target, DeviceType *device)
+	: menu(mui, target)
 {
 	enumerator iter(mui.machine().root_device());
 	m_count = iter.count();

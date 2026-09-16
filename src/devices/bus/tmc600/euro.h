@@ -42,8 +42,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_DEVICES_TMC600_EURO_H
-#define MAME_DEVICES_TMC600_EURO_H
+#ifndef MAME_BUS_TMC600_EURO_H
+#define MAME_BUS_TMC600_EURO_H
 
 #pragma once
 
@@ -79,17 +79,24 @@ public:
 	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: tmc600_eurobus_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	tmc600_eurobus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
+
+	// card interface
+	auto const &memspace() { return m_memspace; }
+	auto const &iospace() { return m_iospace; }
+
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
+
+	required_address_space m_memspace;
+	required_address_space m_iospace;
 
 	device_tmc600_eurobus_card_interface *m_card;
 };
@@ -104,5 +111,4 @@ void tmc600_eurobus_cards(device_slot_interface &device);
 
 typedef device_type_enumerator<tmc600_eurobus_slot_device> tmc600_eurobus_slot_enumerator;
 
-
-#endif // MAME_DEVICES_TMC600_EURO_H
+#endif // MAME_BUS_TMC600_EURO_H

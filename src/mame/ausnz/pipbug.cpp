@@ -68,7 +68,7 @@ public:
 	void pipbug(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void pipbug_ctrl_w(u8 data);
 	int serial_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
@@ -76,8 +76,8 @@ private:
 	required_device<s2650_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void data_map(address_map &map);
-	void mem_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 m_cass_data[4]{};
 	bool m_cassold = false, m_cassinbit = false;
 };
@@ -118,7 +118,7 @@ int pipbug_state::serial_r()
 
 void pipbug_state::machine_start()
 {
-	save_pointer(NAME(m_cass_data), 4);
+	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cassinbit));
 }

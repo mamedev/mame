@@ -20,7 +20,7 @@
 #include "machine/eepromser.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
-#include "mb87013.h"
+#include "machine/mb87013.h"
 
 
 namespace {
@@ -39,14 +39,14 @@ public:
 	void pr100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 port9x_r(offs_t offset);
 	void port9x_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

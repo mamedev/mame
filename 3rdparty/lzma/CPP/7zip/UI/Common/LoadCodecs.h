@@ -1,7 +1,7 @@
 // LoadCodecs.h
 
-#ifndef __LOAD_CODECS_H
-#define __LOAD_CODECS_H
+#ifndef ZIP7_INC_LOAD_CODECS_H
+#define ZIP7_INC_LOAD_CODECS_H
 
 /*
 Client application uses LoadCodecs.* to load plugins to
@@ -10,26 +10,26 @@ CCodecs object, that contains 3 lists of plugins:
   2) Codecs  - external codecs
   3) Hashers - external hashers
 
-EXTERNAL_CODECS
+Z7_EXTERNAL_CODECS
 ---------------
 
-  if EXTERNAL_CODECS is defined, then the code tries to load external
+  if Z7_EXTERNAL_CODECS is defined, then the code tries to load external
   plugins from DLL files (shared libraries).
 
   There are two types of executables in 7-Zip:
   
   1) Executable that uses external plugins must be compiled
-     with EXTERNAL_CODECS defined:
+     with Z7_EXTERNAL_CODECS defined:
        - 7z.exe, 7zG.exe, 7zFM.exe
     
-     Note: EXTERNAL_CODECS is used also in CPP/7zip/Common/CreateCoder.h
+     Note: Z7_EXTERNAL_CODECS is used also in CPP/7zip/Common/CreateCoder.h
            that code is used in plugin module (7z.dll).
   
-  2) Standalone modules are compiled without EXTERNAL_CODECS:
+  2) Standalone modules are compiled without Z7_EXTERNAL_CODECS:
     - SFX modules: 7z.sfx, 7zCon.sfx
     - standalone versions of console 7-Zip: 7za.exe, 7zr.exe
 
-  if EXTERNAL_CODECS is defined, CCodecs class implements interfaces:
+  if Z7_EXTERNAL_CODECS is defined, CCodecs class implements interfaces:
     - ICompressCodecsInfo : for Codecs
     - IHashers            : for Hashers
   
@@ -51,7 +51,7 @@ EXTERNAL_CODECS
 #include "../../../Common/MyString.h"
 #include "../../../Common/ComTry.h"
 
-#ifdef EXTERNAL_CODECS
+#ifdef Z7_EXTERNAL_CODECS
 #include "../../../Windows/DLL.h"
 #endif
 
@@ -60,7 +60,7 @@ EXTERNAL_CODECS
 #include "../../Archive/IArchive.h"
 
 
-#ifdef EXTERNAL_CODECS
+#ifdef Z7_EXTERNAL_CODECS
 
 struct CDllCodecInfo
 {
@@ -104,19 +104,21 @@ struct CArcInfoEx
   UString Name;
   CObjectVector<CArcExtInfo> Exts;
   
-  #ifndef _SFX
+  #ifndef Z7_SFX
     Func_CreateOutArchive CreateOutArchive;
     bool UpdateEnabled;
     bool NewInterface;
     // UInt32 Version;
     UInt32 SignatureOffset;
     CObjectVector<CByteBuffer> Signatures;
+    /*
     #ifdef NEW_FOLDER_INTERFACE
       UStringVector AssociateExts;
     #endif
+    */
   #endif
   
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
     int LibIndex;
     UInt32 FormatIndex;
     CLSID ClassID;
@@ -124,10 +126,10 @@ struct CArcInfoEx
 
   int Compare(const CArcInfoEx &a) const
   {
-    int res = Name.Compare(a.Name);
+    const int res = Name.Compare(a.Name);
     if (res != 0)
       return res;
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     return MyCompare(LibIndex, a.LibIndex);
     #else
     return 0;
@@ -192,6 +194,7 @@ struct CArcInfoEx
   bool Is_Tar()   const { return Name.IsEqualTo_Ascii_NoCase("tar"); }
   bool Is_Zip()   const { return Name.IsEqualTo_Ascii_NoCase("zip"); }
   bool Is_Rar()   const { return Name.IsEqualTo_Ascii_NoCase("rar"); }
+  bool Is_Zstd()  const { return Name.IsEqualTo_Ascii_NoCase("zstd"); }
 
   /*
   UString GetAllExtensions() const
@@ -200,7 +203,7 @@ struct CArcInfoEx
     for (int i = 0; i < Exts.Size(); i++)
     {
       if (i > 0)
-        s += ' ';
+        s.Add_Space();
       s += Exts[i].Ext;
     }
     return s;
@@ -215,42 +218,23 @@ struct CArcInfoEx
       TimeFlags(0),
       CreateInArchive(NULL),
       IsArcFunc(NULL)
-      #ifndef _SFX
+      #ifndef Z7_SFX
       , CreateOutArchive(NULL)
       , UpdateEnabled(false)
       , NewInterface(false)
       // , Version(0)
       , SignatureOffset(0)
       #endif
-      #ifdef EXTERNAL_CODECS
+      #ifdef Z7_EXTERNAL_CODECS
       , LibIndex(-1)
       #endif
   {}
 };
 
-#ifdef NEW_FOLDER_INTERFACE
 
-struct CCodecIcons
-{
-  struct CIconPair
-  {
-    UString Ext;
-    int IconIndex;
-  };
-  CObjectVector<CIconPair> IconPairs;
-
-  void LoadIcons(HMODULE m);
-  bool FindIconIndex(const UString &ext, int &iconIndex) const;
-};
-
-#endif
-
-#ifdef EXTERNAL_CODECS
+#ifdef Z7_EXTERNAL_CODECS
 
 struct CCodecLib
-  #ifdef NEW_FOLDER_INTERFACE
-    : public CCodecIcons
-  #endif
 {
   NWindows::NDLL::CLibrary Lib;
   FString Path;
@@ -262,17 +246,23 @@ struct CCodecLib
   Func_SetCodecs SetCodecs;
 
   CMyComPtr<IHashers> ComHashers;
+
+  UInt32 Version;
   
+  /*
   #ifdef NEW_FOLDER_INTERFACE
-  void LoadIcons() { CCodecIcons::LoadIcons((HMODULE)Lib); }
+  CCodecIcons CodecIcons;
+  void LoadIcons() { CodecIcons.LoadIcons((HMODULE)Lib); }
   #endif
+  */
   
   CCodecLib():
       CreateObject(NULL),
       GetMethodProperty(NULL),
       CreateDecoder(NULL),
       CreateEncoder(NULL),
-      SetCodecs(NULL)
+      SetCodecs(NULL),
+      Version(0)
       {}
 };
 
@@ -301,8 +291,8 @@ struct CCodecInfoUser
 };
 
 
-class CCodecs:
-  #ifdef EXTERNAL_CODECS
+class CCodecs Z7_final:
+  #ifdef Z7_EXTERNAL_CODECS
     public ICompressCodecsInfo,
     public IHashers,
   #else
@@ -310,9 +300,15 @@ class CCodecs:
   #endif
   public CMyUnknownImp
 {
-  CLASS_NO_COPY(CCodecs);
+#ifdef Z7_EXTERNAL_CODECS
+  Z7_IFACES_IMP_UNK_2(ICompressCodecsInfo, IHashers)
+#else
+  Z7_COM_UNKNOWN_IMP_0
+#endif // Z7_EXTERNAL_CODECS
+
+  Z7_CLASS_NO_COPY(CCodecs)
 public:
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
   
   CObjectVector<CCodecLib> Libs;
   FString MainDll_ErrorPath;
@@ -323,7 +319,7 @@ public:
 
   class CReleaser
   {
-    CLASS_NO_COPY(CReleaser);
+    Z7_CLASS_NO_COPY(CReleaser)
 
     /* CCodecsReleaser object releases CCodecs links.
          1) CCodecs is COM object that is deleted when all links to that object will be released/
@@ -352,13 +348,15 @@ public:
   
   #endif
 
+  /*
   #ifdef NEW_FOLDER_INTERFACE
   CCodecIcons InternalIcons;
   #endif
+  */
 
   CObjectVector<CArcInfoEx> Formats;
   
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
   CRecordVector<CDllCodecInfo> Codecs;
   CRecordVector<CDllHasherInfo> Hashers;
   #endif
@@ -367,7 +365,7 @@ public:
   bool CaseSensitive;
 
   CCodecs():
-      #ifdef EXTERNAL_CODECS
+      #ifdef Z7_EXTERNAL_CODECS
       NeedSetLibCodecs(true),
       #endif
       CaseSensitive_Change(false),
@@ -386,34 +384,14 @@ public:
 
   HRESULT Load();
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   int FindFormatForArchiveName(const UString &arcPath) const;
   int FindFormatForExtension(const UString &ext) const;
   int FindFormatForArchiveType(const UString &arcType) const;
   bool FindFormatForArchiveType(const UString &arcType, CIntVector &formatIndices) const;
   #endif
 
-  #ifdef EXTERNAL_CODECS
-
-  MY_UNKNOWN_IMP2(ICompressCodecsInfo, IHashers)
-    
-  STDMETHOD(GetNumMethods)(UInt32 *numMethods);
-  STDMETHOD(GetProperty)(UInt32 index, PROPID propID, PROPVARIANT *value);
-  STDMETHOD(CreateDecoder)(UInt32 index, const GUID *iid, void **coder);
-  STDMETHOD(CreateEncoder)(UInt32 index, const GUID *iid, void **coder);
-
-  STDMETHOD_(UInt32, GetNumHashers)();
-  STDMETHOD(GetHasherProp)(UInt32 index, PROPID propID, PROPVARIANT *value);
-  STDMETHOD(CreateHasher)(UInt32 index, IHasher **hasher);
-
-  #else
-
-  MY_UNKNOWN_IMP
-
-  #endif // EXTERNAL_CODECS
-
-  
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
 
   int GetCodec_LibIndex(UInt32 index) const;
   bool GetCodec_DecoderIsAssigned(UInt32 index) const;
@@ -435,7 +413,7 @@ public:
   HRESULT CreateInArchive(unsigned formatIndex, CMyComPtr<IInArchive> &archive) const
   {
     const CArcInfoEx &ai = Formats[formatIndex];
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     if (ai.LibIndex < 0)
     #endif
     {
@@ -444,17 +422,17 @@ public:
       return S_OK;
       COM_TRY_END
     }
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     return CreateArchiveHandler(ai, false, (void **)&archive);
     #endif
   }
   
-  #ifndef _SFX
+  #ifndef Z7_SFX
 
   HRESULT CreateOutArchive(unsigned formatIndex, CMyComPtr<IOutArchive> &archive) const
   {
     const CArcInfoEx &ai = Formats[formatIndex];
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     if (ai.LibIndex < 0)
     #endif
     {
@@ -464,7 +442,7 @@ public:
       COM_TRY_END
     }
     
-    #ifdef EXTERNAL_CODECS
+    #ifdef Z7_EXTERNAL_CODECS
     return CreateArchiveHandler(ai, true, (void **)&archive);
     #endif
   }
@@ -484,21 +462,21 @@ public:
 
   void Get_CodecsInfoUser_Vector(CObjectVector<CCodecInfoUser> &v);
 
-  #endif // _SFX
+  #endif // Z7_SFX
 };
 
-#ifdef EXTERNAL_CODECS
+#ifdef Z7_EXTERNAL_CODECS
   #define CREATE_CODECS_OBJECT \
     CCodecs *codecs = new CCodecs; \
-    CExternalCodecs __externalCodecs; \
-    __externalCodecs.GetCodecs = codecs; \
-    __externalCodecs.GetHashers = codecs; \
+    CExternalCodecs _externalCodecs; \
+    _externalCodecs.GetCodecs = codecs; \
+    _externalCodecs.GetHashers = codecs; \
     CCodecs::CReleaser codecsReleaser; \
     codecsReleaser.Set(codecs);
 #else
   #define CREATE_CODECS_OBJECT \
     CCodecs *codecs = new CCodecs; \
-    CMyComPtr<IUnknown> __codecsRef = codecs;
+    CMyComPtr<IUnknown> _codecsRef = codecs;
 #endif
 
 #endif

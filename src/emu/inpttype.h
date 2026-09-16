@@ -2,11 +2,12 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    inpttype.ipp
+    inpttype.h
 
     Core-defined input types.
 
 ***************************************************************************/
+
 #ifndef MAME_EMU_INPTTYPE_H
 #define MAME_EMU_INPTTYPE_H
 
@@ -60,22 +61,16 @@ enum ioport_type : osd::u32
 	IPT_SERVICE3,
 	IPT_SERVICE4,
 
-	// tilt inputs
-	IPT_TILT1,
-	IPT_TILT2,
-	IPT_TILT3,
-	IPT_TILT4,
-
 	// misc other digital inputs
 	IPT_POWER_ON,
 	IPT_POWER_OFF,
 	IPT_SERVICE,
 	IPT_TILT,
-	IPT_INTERLOCK,
+	IPT_DOOR,
 	IPT_MEMORY_RESET,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
-	IPT_START,              // use the numbered start button(s) for coin-ops
+	IPT_START, // use the numbered start button(s) for coin-ops
 	IPT_SELECT,
 	IPT_KEYPAD,
 	IPT_KEYBOARD,
@@ -175,13 +170,7 @@ enum ioport_type : osd::u32
 
 		IPT_GAMBLE_KEYIN,   // attendant
 		IPT_GAMBLE_KEYOUT,  // attendant
-		IPT_GAMBLE_SERVICE, // attendant
 		IPT_GAMBLE_BOOK,    // attendant
-		IPT_GAMBLE_DOOR,    // attendant
-	//  IPT_GAMBLE_DOOR2,   // many gambling games have several doors.
-	//  IPT_GAMBLE_DOOR3,
-	//  IPT_GAMBLE_DOOR4,
-	//  IPT_GAMBLE_DOOR5,
 
 		IPT_GAMBLE_PAYOUT,  // player
 		IPT_GAMBLE_BET,     // player
@@ -206,6 +195,7 @@ enum ioport_type : osd::u32
 		IPT_SLOT_STOP2,
 		IPT_SLOT_STOP3,
 		IPT_SLOT_STOP4,
+		IPT_SLOT_STOP5,
 		IPT_SLOT_STOP_ALL,
 
 	IPT_GAMBLING_LAST,
@@ -268,7 +258,9 @@ enum ioport_type : osd::u32
 		IPT_UI_PAUSE_SINGLE,
 		IPT_UI_REWIND_SINGLE,
 		IPT_UI_SAVE_STATE,
+		IPT_UI_SAVE_STATE_QUICK,
 		IPT_UI_LOAD_STATE,
+		IPT_UI_LOAD_STATE_QUICK,
 		IPT_UI_RESET_MACHINE,
 		IPT_UI_SOFT_RESET,
 		IPT_UI_SHOW_GFX,

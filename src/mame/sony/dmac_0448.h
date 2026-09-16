@@ -9,7 +9,7 @@
 class dmac_0448_device : public device_t
 {
 public:
-	dmac_0448_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	dmac_0448_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
@@ -21,12 +21,12 @@ public:
 	template <unsigned IRQ> void irq(int state) { set_irq_line(IRQ, state); }
 	template <unsigned DRQ> void drq(int state) { set_drq_line(DRQ, state); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void set_irq_line(int number, int state);
 	void set_drq_line(int channel, int state);

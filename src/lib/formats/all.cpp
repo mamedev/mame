@@ -9,6 +9,7 @@
 
 #include "cqm_dsk.h"
 #include "dsk_dsk.h"
+#include "ipf_dsk.h"
 #include "td0_dsk.h"
 #include "hxchfe_dsk.h"
 #include "hxcmfm_dsk.h"
@@ -18,6 +19,7 @@
 #include "pc_dsk.h"
 #include "d88_dsk.h"
 #include "dfi_dsk.h"
+#include "86f_dsk.h"
 #include "fs_unformatted.h"
 
 #ifdef HAS_FORMATS_2D_DSK
@@ -90,6 +92,10 @@
 
 #ifdef HAS_FORMATS_APPLIX_DSK
 #include "applix_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+#include "apricotpc_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_APRIDISK
@@ -212,6 +218,10 @@
 #include "d81_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_D2M_DSK
+#include "d2m_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_D82_DSK
 #include "d82_dsk.h"
 #endif
@@ -308,6 +318,10 @@
 #include "fsd_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_FZ1_DSK
+#include "fz1_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_G64_DSK
 #include "g64_dsk.h"
 #endif
@@ -318,6 +332,10 @@
 
 #ifdef HAS_FORMATS_GUAB_DSK
 #include "guab_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_H17D_DSK
+#include "h17disk.h"
 #endif
 
 #ifdef HAS_FORMATS_H8_CAS
@@ -452,6 +470,10 @@
 #include "mz_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_NABUPC_DSK
+#include "nabupc_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_NANOS_DSK
 #include "nanos_dsk.h"
 #endif
@@ -504,12 +526,16 @@
 #include "p2000t_cas.h"
 #endif
 
-#ifdef HAS_FORMATS_P6001_CAS
-#include "p6001_cas.h"
-#endif
+//#ifdef HAS_FORMATS_P6001_CAS
+//#include "p6001_cas.h"
+//#endif
 
 #ifdef HAS_FORMATS_PASTI_DSK
 #include "pasti_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_PC88_T88
+#include "pc88_t88.h"
 #endif
 
 #ifdef HAS_FORMATS_PC98FDI_DSK
@@ -518,10 +544,6 @@
 
 #ifdef HAS_FORMATS_PC98_DSK
 #include "pc98_dsk.h"
-#endif
-
-#ifdef HAS_FORMATS_IPF_DSK
-#include "ipf_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_PHC25_CAS
@@ -570,6 +592,14 @@
 
 #ifdef HAS_FORMATS_RX50_DSK
 #include "rx50_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_S900_DSK
+#include "s900_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_SAP_DSK
+#include "sap_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_SC3000_BIT
@@ -712,6 +742,10 @@
 #include "wd177x_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_WREN_DSK
+#include "wren_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_X07_CAS
 #include "x07_cas.h"
 #endif
@@ -748,6 +782,10 @@
 #include "fs_hp98x5.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_ADAM_EOS
+#include "fs_adam_eos.h"
+#endif
+
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
@@ -767,6 +805,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_MFM_FORMAT); // hxcmfm_dsk.h
 	en.add(FLOPPY_TD0_FORMAT); // td0_dsk.h
 	en.add(FLOPPY_IMD_FORMAT); // imd_dsk.h
+	en.add(FLOPPY_86F_FORMAT); // 86f_dsk.h
 
 	en.category("Container MFM");
 	en.add(FLOPPY_D88_FORMAT); // d88_dsk.h
@@ -781,9 +820,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(fs::PRODOS);
 #endif
 #ifdef HAS_FORMATS_AP2_DSK
+	en.add(FLOPPY_A213S_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_A216S_DOS_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_A216S_PRODOS_FORMAT); // ap2_dsk.h
-	en.add(FLOPPY_RWTS18_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_EDD_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_NIB_FORMAT); // ap2_dsk.h
 #endif
@@ -805,6 +844,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 
 	en.category("PC");
 	en.add(FLOPPY_PC_FORMAT); // pc_dsk.h
+	en.add(FLOPPY_IPF_FORMAT); // ipf_dsk.h
 #ifdef HAS_FORMATS_IBMXDF_DSK
 	en.add(FLOPPY_IBMXDF_FORMAT); // ibmxdf_dsk.h
 #endif
@@ -815,6 +855,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Sharp");
 #ifdef HAS_FORMATS_MZ_CAS
 	en.add(mz700_cassette_formats); // mz_cas.h
+	en.add(mz80b_cassette_formats); // mz_cas.h
 #endif
 #ifdef HAS_FORMATS_X1_TAP
 	en.add(x1_cassette_formats); // x1_tap.h
@@ -870,6 +911,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Coleco");
+#ifdef HAS_FORMATS_FS_ADAM_EOS
+	en.add(fs::ADAM_EOS); // fs_adam_eos.h
+#endif
 #ifdef HAS_FORMATS_ADAM_CAS
 	en.add(coleco_adam_cassette_formats); // adam_cas.h
 #endif
@@ -880,9 +924,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Amiga");
 #ifdef HAS_FORMATS_AMI_DSK
 	en.add(FLOPPY_ADF_FORMAT); // ami_dsk.h
-#endif
-#ifdef HAS_FORMATS_IPF_DSK
-	en.add(FLOPPY_IPF_FORMAT); // ipf_dsk.h
 #endif
 
 	en.category("Archimedes");
@@ -904,7 +945,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_HPI_FORMAT); // hpi_dsk.h
 #endif
 #ifdef HAS_FORMATS_FS_HPLIF
-	en.add(fs::HPLIF); // fs_lif.h
+	en.add(fs::HPLIF); // fs_hplif.h
 #endif
 #ifdef HAS_FORMATS_FS_HP98X5
 	en.add(fs::HP9825);
@@ -918,6 +959,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 
 	en.category("Apricot");
+#ifdef HAS_FORMATS_APRICOTPC_DSK
+	en.add(FLOPPY_APRICOTPC_FORMAT); // apricotpc_dsk.h
+#endif
 #ifdef HAS_FORMATS_APRIDISK
 	en.add(FLOPPY_APRIDISK_FORMAT); // apridisk.h
 #endif
@@ -959,6 +1003,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_D81_DSK
 	en.add(FLOPPY_D81_FORMAT); // d81_dsk.h
+#endif
+#ifdef HAS_FORMATS_D2M_DSK
+	en.add(FLOPPY_D1M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D2M_FORMAT); // d2m_dsk.h
+	en.add(FLOPPY_D4M_FORMAT); // d2m_dsk.h
 #endif
 #ifdef HAS_FORMATS_D82_DSK
 	en.add(FLOPPY_D82_FORMAT); // d82_dsk.h
@@ -1204,7 +1253,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("MikroMikko");
 #ifdef HAS_FORMATS_MM_DSK
 	en.add(FLOPPY_MM1_FORMAT); // mm_dsk.h
-	en.add(FLOPPY_MM2_FORMAT); // mm_dsk.h
 #endif
 
 	en.category("Elektronika");
@@ -1216,6 +1264,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_FMSX_CAS
 	en.add(fmsx_cassette_formats); // fmsx_cas.h
 #endif
+#ifdef HAS_FORMATS_TZX_CAS
+	en.add(tsx_cassette_formats); // tzx_cas.h
+#endif
 #ifdef HAS_FORMATS_MSX_DSK
 	en.add(FLOPPY_MSX_FORMAT); // msx_dsk.h
 #endif
@@ -1223,6 +1274,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("MTX");
 #ifdef HAS_FORMATS_MTX_DSK
 	en.add(FLOPPY_MTX_FORMAT); // mtx_dsk.h
+#endif
+
+	en.category("NABU PC");
+#ifdef HAS_FORMATS_NABUPC_DSK
+	en.add(FLOPPY_NABUPC_FORMAT); // nabupc_dsk.h
 #endif
 
 	en.category("Nanos");
@@ -1330,6 +1386,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_THOMSON_525_FORMAT); // thom_dsk.h
 	en.add(FLOPPY_THOMSON_35_FORMAT); // thom_dsk.h
 #endif
+#ifdef HAS_FORMATS_SAP_DSK
+	en.add(FLOPPY_SAP_FORMAT);
+#endif
 
 	en.category("Texas Instruments");
 #ifdef HAS_FORMATS_TI99_DSK
@@ -1430,6 +1489,14 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VGI_FORMAT); // vgi_dsk.h
 #endif
 
+    en.category("NEC");
+#ifdef HAS_FORMATS_PC88_T88
+  en.add(t88_cassette_formats); // pc88_t88.h
+#endif	
+//#ifdef HAS_FORMATS_P6001_CAS
+//  en.add(pc6001_cassette_formats); // p6001_cas.h
+//#endif
+
 	en.category("Orao");
 #ifdef HAS_FORMATS_ORAO_CAS
 	en.add(orao_cassette_formats); // orao_cas.h
@@ -1441,11 +1508,6 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_P2000T_CAS
 	en.add(p2000t_cassette_formats); // p2000t_cas.h
-#endif
-
-	en.category("NEC");
-#ifdef HAS_FORMATS_P6001_CAS
-	en.add(pc6001_cassette_formats); // p6001_cas.h
 #endif
 
 	en.category("Sanyo");
@@ -1501,7 +1563,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(vtech1_cassette_formats); // vt_cas.h
 	en.add(vtech2_cassette_formats); // vt_cas.h
 #endif
-#ifdef HAS_FORMATS_VT_DSJ
+#ifdef HAS_FORMATS_VT_DSK
 	en.add(FLOPPY_VTECH_BIN_FORMAT); // vt_dsk.h
 	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
 #endif
@@ -1512,5 +1574,25 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Canon");
 #ifdef HAS_FORMATS_X07_CAS
 	en.add(x07_cassette_formats); // x07_cas.h
+#endif
+
+	en.category("Heath");
+#ifdef HAS_FORMATS_H17D_DSK
+	en.add(FLOPPY_H17D_FORMAT); // h17disk.h
+#endif
+
+	en.category("Casio");
+#ifdef HAS_FORMATS_FZ1_DSK
+	en.add(FLOPPY_FZ1_FORMAT); // fz1_dsk.h
+#endif
+
+	en.category("Wren");
+#ifdef HAS_FORMATS_WREN_DSK
+	en.add(FLOPPY_WREN_FORMAT); // wren_dsk.h
+#endif
+
+	en.category("Akai");
+#ifdef HAS_FORMATS_S900_DSK
+	en.add(FLOPPY_S900_FORMAT); // s900_dsk.h
 #endif
 }

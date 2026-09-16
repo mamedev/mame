@@ -53,15 +53,15 @@ public:
 	void sacstate(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 port00_r();
 	u8 port01_r();
 	u8 port04_r();
 	void port08_w(u8 data);
 	void kbd_put(u8 data);
-	void sacstate_io(address_map &map);
-	void sacstate_mem(address_map &map);
+	void sacstate_io(address_map &map) ATTR_COLD;
+	void sacstate_mem(address_map &map) ATTR_COLD;
 
 	u8 m_term_data = 0U;
 	u8 m_val = 0U;
@@ -151,7 +151,7 @@ void sacstate_state::sacstate(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sacstate_state::sacstate_io);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(sacstate_state::kbd_put));
 }
 

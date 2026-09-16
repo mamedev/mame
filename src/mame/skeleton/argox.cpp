@@ -60,7 +60,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	void os214_prg_map(address_map &map);
+	void os214_prg_map(address_map &map) ATTR_COLD;
 };
 
 void os214_state::os214_prg_map(address_map &map)
@@ -90,4 +90,4 @@ ROM_END
 
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME                         FLAGS
-COMP( 1996, os214, 0,      0,      os214,   0,     os214_state, init_os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_IS_SKELETON)
+COMP( 1996, os214, 0,      0,      os214,   0,     os214_state, init_os214, "Argox", "Rabbit Printer (model OS-214)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -77,7 +77,7 @@
 */
 
 #include "emu.h"
-#include "machine/mb89363b.h"
+#include "mb89363b.h"
 
 
 DEFINE_DEVICE_TYPE(MB89363B, mb89363b_device, "mb89363b", "Fujitsu MB89363B I/O")

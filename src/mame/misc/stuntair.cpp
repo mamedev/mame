@@ -113,9 +113,9 @@ public:
 	void stuntair(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -152,9 +152,9 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void stuntair_palette(palette_device &palette) const;
-	void stuntair_map(address_map &map);
-	void stuntair_sound_map(address_map &map);
-	void stuntair_sound_portmap(address_map &map);
+	void stuntair_map(address_map &map) ATTR_COLD;
+	void stuntair_sound_map(address_map &map) ATTR_COLD;
+	void stuntair_sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -536,7 +536,7 @@ void stuntair_state::stuntair(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60); // ?
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);

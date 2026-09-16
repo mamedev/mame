@@ -77,7 +77,9 @@ public class JPortMidi {
             throw new JPortMidiException(pmStreamOpen,
                     "RefreshDeviceLists called while stream is open");
         }
+        if (trace) System.out.println("Pm_Terminate");
         checkError(pm.Pm_Terminate());
+        if (trace) System.out.println("Pm_Initialize");
         checkError(pm.Pm_Initialize());
     }
 

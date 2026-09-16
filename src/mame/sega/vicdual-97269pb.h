@@ -13,7 +13,7 @@ class s97269pb_device : public device_t
 {
 public:
 	// construction/destruction
-	s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s97269pb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// daughterboard logic
 	void palette_bank_w(uint8_t data);
@@ -21,9 +21,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_prom_ptr;

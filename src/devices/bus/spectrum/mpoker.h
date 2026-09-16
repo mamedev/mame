@@ -27,20 +27,20 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	required_memory_region m_rom;
 
-	int m_romcs;
+	bool m_romcs;
 };
 
 // device type definition

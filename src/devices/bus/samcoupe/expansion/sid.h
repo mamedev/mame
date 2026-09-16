@@ -31,7 +31,7 @@ public:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device<mos6581_device> m_sid;
 };
@@ -45,7 +45,7 @@ public:
 	sam_sid6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // ======================> sam_sid8580_device
@@ -57,7 +57,7 @@ public:
 	sam_sid8580_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 // device type definition

@@ -64,7 +64,7 @@ public:
 	void init_xorworld();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -88,11 +88,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -205,8 +203,6 @@ uint32_t xorworld_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 /****************************************************************
                 EEPROM read/write/control
 ****************************************************************/
@@ -247,7 +243,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // used for accessing the NVRAM
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))   // used for accessing the NVRAM
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
@@ -329,7 +325,7 @@ void xorworld_state::xorworld(machine_config &config)
 	mainlatch.q_out_cb<6>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)); // EEPROM data (DIN)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -352,14 +348,30 @@ ROM_START( xorworld )
 	ROM_LOAD16_BYTE( "b13.bin", 0x000001, 0x010000, CRC(632e8ee5) SHA1(ec53e632c762f72ad1fe3fab85111bdcc1e818ae) )
 
 	ROM_REGION( 0x020000, "gfx", 0 )
-	ROM_LOAD( "d9.bin", 0x000000, 0x010000, CRC(da8d4d65) SHA1(41bcc15f26066bd820b44c0f258e70d0102953c9) )
-	ROM_LOAD( "d10.bin",    0x010000, 0x010000, CRC(3b1d6f24) SHA1(bedf60a4cbf20492b8a846b6a7b578f8fe8dbde9) )
+	ROM_LOAD( "d9.bin",  0x000000, 0x010000, CRC(da8d4d65) SHA1(41bcc15f26066bd820b44c0f258e70d0102953c9) )
+	ROM_LOAD( "d10.bin", 0x010000, 0x010000, CRC(3b1d6f24) SHA1(bedf60a4cbf20492b8a846b6a7b578f8fe8dbde9) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "b4.bin",   0x0000, 0x0100, CRC(75e468af) SHA1(b5fd1a086c27ca2e837cbbf1b7e57dfdd369b0d0) )  // Red palette ROM (4 bits)
 	ROM_LOAD( "b7.bin",   0x0100, 0x0100, CRC(7e1cd146) SHA1(fd26a28f90c50ffcb0fe7718820c81eb9fe79e66) )  // Green palette ROM (4 bits)
 	ROM_LOAD( "b5.bin",   0x0200, 0x0100, CRC(c1b9d9f9) SHA1(c4b02bf60db449fb308a5eb3e41c43299ad8e3e3) )  // Blue palette ROM (4 bits)
 ROM_END
+
+ROM_START( xorworlda ) // just a single byte change in one of the 68k ROMs
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "1_4_27c512.bin",  0x000001, 0x010000, CRC(4919889a) SHA1(55778e810d8e0f265299aab151f8e11e9cbd1041) )
+	ROM_LOAD16_BYTE( "2_p3_27c512.bin", 0x000000, 0x010000, CRC(615a864d) SHA1(db07eef19d26a4daa0bcc17ac24d237483f93bf6) )
+
+	ROM_REGION( 0x020000, "gfx", 0 )
+	ROM_LOAD( "d9.bin",  0x000000, 0x010000, CRC(da8d4d65) SHA1(41bcc15f26066bd820b44c0f258e70d0102953c9) )
+	ROM_LOAD( "d10.bin", 0x010000, 0x010000, CRC(3b1d6f24) SHA1(bedf60a4cbf20492b8a846b6a7b578f8fe8dbde9) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "b4.bin",   0x0000, 0x0100, CRC(75e468af) SHA1(b5fd1a086c27ca2e837cbbf1b7e57dfdd369b0d0) )  // Red palette ROM (4 bits)
+	ROM_LOAD( "b7.bin",   0x0100, 0x0100, CRC(7e1cd146) SHA1(fd26a28f90c50ffcb0fe7718820c81eb9fe79e66) )  // Green palette ROM (4 bits)
+	ROM_LOAD( "b5.bin",   0x0200, 0x0100, CRC(c1b9d9f9) SHA1(c4b02bf60db449fb308a5eb3e41c43299ad8e3e3) )  // Blue palette ROM (4 bits)
+ROM_END
+
 
 
 #define PATCH(data) *rom = data; rom++
@@ -386,4 +398,5 @@ void xorworld_state::init_xorworld()
 } // anonymous namespace
 
 
-GAME( 1990, xorworld, 0, xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorworld,  0,        xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (ver 1.2, checksum DB5D0F, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorworlda, xorworld, xorworld, xorworld, xorworld_state, init_xorworld, ROT0, "Gaelco", "Xor World (ver 1.2, checksum DB5D10, prototype)", MACHINE_SUPPORTS_SAVE )

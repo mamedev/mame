@@ -55,8 +55,8 @@ public:
 	void init_microdec();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t portf5_r();
@@ -66,8 +66,8 @@ private:
 	void portf7_w(uint8_t data);
 	void portf8_w(uint8_t data);
 
-	void microdec_io(address_map &map);
-	void microdec_mem(address_map &map);
+	void microdec_io(address_map &map) ATTR_COLD;
+	void microdec_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_portf8 = 0U;
 	bool m_fdc_rdy = 0;

@@ -1,11 +1,54 @@
 // MyWindowsNew.h
 
-#ifndef __MY_WINDOWS_NEW_H
-#define __MY_WINDOWS_NEW_H
+#ifndef ZIP7_INC_MY_WINDOWS_NEW_H
+#define ZIP7_INC_MY_WINDOWS_NEW_H
 
-#ifdef _MSC_VER
+#if defined(__MINGW32__) || defined(__MINGW64__) || defined(__MINGW32_VERSION)
+#include <shobjidl.h>
 
+#if defined(__MINGW32_VERSION) && !defined(__ITaskbarList3_INTERFACE_DEFINED__)
+// for old mingw
+extern "C" {
+DEFINE_GUID(IID_ITaskbarList3, 0xEA1AFB91, 0x9E28, 0x4B86, 0x90, 0xE9, 0x9E, 0x9F, 0x8A, 0x5E, 0xEF, 0xAF);
+DEFINE_GUID(CLSID_TaskbarList, 0x56fdf344, 0xfd6d, 0x11d0, 0x95,0x8a, 0x00,0x60,0x97,0xc9,0xa0,0x90);
+}
+#endif
+
+#else // is not __MINGW*
+
+#ifndef Z7_OLD_WIN_SDK
 #include <ShObjIdl.h>
+#else
+
+#ifndef HIMAGELIST
+struct _IMAGELIST;
+typedef struct _IMAGELIST* HIMAGELIST;
+#endif
+
+#ifndef __ITaskbarList_INTERFACE_DEFINED__
+#define __ITaskbarList_INTERFACE_DEFINED__
+DEFINE_GUID(IID_ITaskbarList, 0x56FDF342, 0xFD6D, 0x11d0, 0x95, 0x8A, 0x00, 0x60, 0x97, 0xC9, 0xA0, 0x90);
+struct ITaskbarList: public IUnknown
+{
+  STDMETHOD(HrInit)(void) = 0;
+  STDMETHOD(AddTab)(HWND hwnd) = 0;
+  STDMETHOD(DeleteTab)(HWND hwnd) = 0;
+  STDMETHOD(ActivateTab)(HWND hwnd) = 0;
+  STDMETHOD(SetActiveAlt)(HWND hwnd) = 0;
+};
+#endif // __ITaskbarList_INTERFACE_DEFINED__
+
+#ifndef __ITaskbarList2_INTERFACE_DEFINED__
+#define __ITaskbarList2_INTERFACE_DEFINED__
+DEFINE_GUID(IID_ITaskbarList2, 0x602D4995, 0xB13A, 0x429b, 0xA6, 0x6E, 0x19, 0x35, 0xE4, 0x4F, 0x43, 0x17);
+struct ITaskbarList2: public ITaskbarList
+{
+  STDMETHOD(MarkFullscreenWindow)(HWND hwnd, BOOL fFullscreen) = 0;
+};
+#endif // __ITaskbarList2_INTERFACE_DEFINED__
+
+#endif // Z7_OLD_WIN_SDK
+
 
 #ifndef __ITaskbarList3_INTERFACE_DEFINED__
 #define __ITaskbarList3_INTERFACE_DEFINED__
@@ -69,8 +112,8 @@ struct ITaskbarList3: public ITaskbarList2
   STDMETHOD(SetThumbnailClip)(HWND hwnd, RECT *prcClip) = 0;
 };
 
-#endif
+#endif // __ITaskbarList3_INTERFACE_DEFINED__
 
-#endif
+#endif // __MINGW*
 
 #endif

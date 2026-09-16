@@ -2,8 +2,9 @@
 // copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
 #include "undrfire.h"
-#include "screen.h"
 
+#include "input.h" // for video debug keys
+#include "screen.h"
 
 
 /******************************************************************/
@@ -181,7 +182,7 @@ void undrfire_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 		}
 
 		if (bad_chunks)
-logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
+			logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != nullptr */
@@ -392,7 +393,7 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
    bottom layer usually full of bright garish colors that
    vaguely mimic the structure of the layers on top. Seems
    pointless - it's always hidden by other layers. Does it
-   serve some blending pupose ? */
+   serve some blending purpose? */
 
 	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[0], TILEMAP_DRAW_OPAQUE, 0);
 	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[1], 0, 0);
@@ -440,14 +441,6 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 	m_tc0620scc->tilemap_draw(screen, bitmap, cliprect, scclayer[2], 0, 0); /* TC0620SCC text layer */
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);    /* TC0480SCP text layer */
-
-	/* See if we should draw artificial gun targets */
-	/* (not yet implemented...) */
-
-	if (m_io_fake->read() & 0x1)   /* Fake DSW */
-	{
-		popmessage("Gunsights on");
-	}
 
 /* Enable this to see rotation (?) control words */
 #if 0

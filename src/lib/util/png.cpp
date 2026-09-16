@@ -11,9 +11,8 @@
 #include "png.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 #include "unicode.h"
-
-#include "osdcomm.h"
 
 #include <zlib.h>
 
@@ -24,6 +23,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <new>
+#include <tuple>
 
 
 namespace util {
@@ -95,14 +95,6 @@ constexpr std::uint8_t  PNG_PF_Paeth    = 4;
 ***************************************************************************/
 
 inline int compute_rowbytes(const png_info &pnginfo) noexcept { return (pnginfo.width * samples[pnginfo.color_type] * pnginfo.bit_depth + 7) / 8; }
-
-inline uint8_t fetch_8bit(uint8_t const *v) noexcept { return *v; }
-inline uint16_t fetch_16bit(uint8_t const *v) noexcept { return big_endianize_int16(*reinterpret_cast<uint16_t const *>(v)); }
-inline uint32_t fetch_32bit(uint8_t const *v) noexcept { return big_endianize_int32(*reinterpret_cast<uint32_t const *>(v)); }
-
-inline void put_8bit(uint8_t *v, uint8_t data) noexcept { *v = data; }
-inline void put_16bit(uint8_t *v, uint16_t data) noexcept { *reinterpret_cast<uint16_t *>(v) = big_endianize_int16(data); }
-inline void put_32bit(uint8_t *v, uint32_t data) noexcept { *reinterpret_cast<uint32_t *>(v) = big_endianize_int32(data); }
 
 
 /***************************************************************************
@@ -327,13 +319,13 @@ private:
 		case PNG_CN_IHDR: // image header
 			if (13 > length)
 				return png_error::FILE_CORRUPT;
-			pnginfo.width = fetch_32bit(&data[0]);
-			pnginfo.height = fetch_32bit(&data[4]);
-			pnginfo.bit_depth = fetch_8bit(&data[8]);
-			pnginfo.color_type = fetch_8bit(&data[9]);
-			pnginfo.compression_method = fetch_8bit(&data[10]);
-			pnginfo.filter_method = fetch_8bit(&data[11]);
-			pnginfo.interlace_method = fetch_8bit(&data[12]);
+			pnginfo.width = get_u32be(&data[0]);
+			pnginfo.height = get_u32be(&data[4]);
+			pnginfo.bit_depth = data[8];
+			pnginfo.color_type = data[9];
+			pnginfo.compression_method = data[10];
+			pnginfo.filter_method = data[11];
+			pnginfo.interlace_method = data[12];
 			break;
 
 		case PNG_CN_PLTE: // palette
@@ -358,15 +350,15 @@ private:
 		case PNG_CN_gAMA: // gamma
 			if (4 > length)
 				return png_error::FILE_CORRUPT;
-			pnginfo.source_gamma = fetch_32bit(data.get()) / 100000.0;
+			pnginfo.source_gamma = get_u32be(data.get()) / 100000.0;
 			break;
 
 		case PNG_CN_pHYs: // physical information
 			if (9 > length)
 				return png_error::FILE_CORRUPT;
-			pnginfo.xres = fetch_32bit(&data[0]);
-			pnginfo.yres = fetch_32bit(&data[4]);
-			pnginfo.resolution_unit = fetch_8bit(&data[8]);
+			pnginfo.xres = get_u32be(&data[0]);
+			pnginfo.yres = get_u32be(&data[4]);
+			pnginfo.resolution_unit = data[8];
 			break;
 
 		case PNG_CN_tEXt: // text
@@ -452,20 +444,20 @@ private:
 		std::uint8_t tempbuff[4];
 
 		// fetch the length of this chunk
-		err = fp.read(tempbuff, 4, actual);
+		std::tie(err, actual) = read(fp, tempbuff, 4);
 		if (err)
 			return err;
 		else if (4 != actual)
 			return png_error::FILE_TRUNCATED;
-		length = fetch_32bit(tempbuff);
+		length = get_u32be(tempbuff);
 
 		// fetch the type of this chunk
-		err = fp.read(tempbuff, 4, actual);
+		std::tie(err, actual) = read(fp, tempbuff, 4);
 		if (err)
 			return err;
 		else if (4 != actual)
 			return png_error::FILE_TRUNCATED;
-		type = fetch_32bit(tempbuff);
+		type = get_u32be(tempbuff);
 
 		// stop when we hit an IEND chunk
 		if (type == PNG_CN_IEND)
@@ -477,13 +469,8 @@ private:
 		// read the chunk itself into an allocated memory buffer
 		if (length)
 		{
-			// allocate memory for this chunk
-			data.reset(new (std::nothrow) std::uint8_t [length]);
-			if (!data)
-				return std::errc::not_enough_memory;
-
-			// read the data from the file
-			err = fp.read(data.get(), length, actual);
+			// allocate memory and read the data from the file
+			std::tie(err, data, actual) = read(fp, length);
 			if (err)
 			{
 				data.reset();
@@ -500,7 +487,7 @@ private:
 		}
 
 		// read the CRC
-		err = fp.read(tempbuff, 4, actual);
+		std::tie(err, actual) = read(fp, tempbuff, 4);
 		if (err)
 		{
 			data.reset();
@@ -511,7 +498,7 @@ private:
 			data.reset();
 			return png_error::FILE_TRUNCATED;
 		}
-		std::uint32_t const chunk_crc = fetch_32bit(tempbuff);
+		std::uint32_t const chunk_crc = get_u32be(tempbuff);
 
 		// validate the CRC
 		if (crc != chunk_crc)
@@ -584,13 +571,13 @@ public:
 			{
 				// handle grayscale non-alpha case
 				uint32_t const bpp(pnginfo.bit_depth >> 3);
-				std::uint16_t const transpen(pnginfo.trans ? fetch_16bit(pnginfo.trans.get()) : 0U);
+				std::uint16_t const transpen(pnginfo.trans ? get_u16be(pnginfo.trans.get()) : 0U);
 				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
 					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						std::uint16_t i_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src));
+						std::uint16_t i_val((8 < pnginfo.bit_depth) ? get_u16be(src) : *src);
 						std::uint8_t const a_val((pnginfo.trans && (transpen == i_val)) ? 0x00 : 0xff);
 						i_val >>= samp_shift;
 						accumalpha &= a_val;
@@ -619,17 +606,17 @@ public:
 				uint32_t const r(0 * bps);
 				uint32_t const g(1 * bps);
 				uint32_t const b(2 * bps);
-				std::uint16_t const transpen_r(pnginfo.trans ? fetch_16bit(&pnginfo.trans[0]) : 0U);
-				std::uint16_t const transpen_g(pnginfo.trans ? fetch_16bit(&pnginfo.trans[2]) : 0U);
-				std::uint16_t const transpen_b(pnginfo.trans ? fetch_16bit(&pnginfo.trans[4]) : 0U);
+				std::uint16_t const transpen_r(pnginfo.trans ? get_u16be(&pnginfo.trans[0]) : 0U);
+				std::uint16_t const transpen_g(pnginfo.trans ? get_u16be(&pnginfo.trans[2]) : 0U);
+				std::uint16_t const transpen_b(pnginfo.trans ? get_u16be(&pnginfo.trans[4]) : 0U);
 				unsigned const samp_shift((8 < pnginfo.bit_depth) ? 8 : 0);
 				for (std::uint32_t y = 0; dimensions.second > y; ++y)
 				{
 					for (std::uint32_t x = 0; dimensions.first > x; ++x, src += bpp)
 					{
-						uint16_t r_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + r));
-						uint16_t g_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + g));
-						uint16_t b_val((8 < pnginfo.bit_depth) ? fetch_16bit(src) : fetch_8bit(src + b));
+						uint16_t r_val((8 < pnginfo.bit_depth) ? get_u16be(src) : src[r]);
+						uint16_t g_val((8 < pnginfo.bit_depth) ? get_u16be(src) : src[g]);
+						uint16_t b_val((8 < pnginfo.bit_depth) ? get_u16be(src) : src[b]);
 						std::uint8_t const a_val((pnginfo.trans && (transpen_r == r_val) && (transpen_g == g_val) && (transpen_b == b_val)) ? 0x00 : 0xff);
 						r_val >>= samp_shift;
 						g_val >>= samp_shift;
@@ -736,10 +723,10 @@ public:
 		// upsample transparent pen as well
 		if ((0 == pnginfo.color_type) && pnginfo.trans)
 		{
-			std::uint16_t pen(fetch_16bit(&pnginfo.trans[0]));
+			std::uint16_t pen(get_u16be(&pnginfo.trans[0]));
 			for (unsigned k = 4; pnginfo.bit_depth <= k; k >>= 1)
 				pen |= pen << k;
-			put_16bit(&pnginfo.trans[0], pen);
+			put_u16be(&pnginfo.trans[0], pen);
 		}
 
 		pnginfo.image = std::move(outbuf);
@@ -789,8 +776,7 @@ public:
 		std::uint8_t signature[sizeof(PNG_SIGNATURE)];
 
 		// read 8 bytes
-		std::size_t actual;
-		std::error_condition err = fp.read(signature, sizeof(signature), actual);
+		auto const [err, actual] = read(fp, signature, sizeof(signature));
 		if (err)
 			return err;
 		else if (sizeof(signature) != actual)
@@ -941,40 +927,33 @@ std::error_condition png_info::add_text(std::string_view keyword, std::string_vi
 static std::error_condition write_chunk(write_stream &fp, const uint8_t *data, uint32_t type, uint32_t length) noexcept
 {
 	std::error_condition err;
-	std::size_t written;
 	std::uint8_t tempbuff[8];
 	std::uint32_t crc;
 
 	// stuff the length/type into the buffer
-	put_32bit(tempbuff + 0, length);
-	put_32bit(tempbuff + 4, type);
+	put_u32be(tempbuff + 0, length);
+	put_u32be(tempbuff + 4, type);
 	crc = crc32(0, tempbuff + 4, 4);
 
 	// write that data
-	err = fp.write(tempbuff, 8, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 8);
 	if (err)
 		return err;
-	else if (8 != written)
-		return std::errc::io_error;
 
 	// append the actual data
 	if (length > 0)
 	{
-		err = fp.write(data, length, written);
+		std::tie(err, std::ignore) = write(fp, data, length);
 		if (err)
 			return err;
-		else if (length != written)
-			return std::errc::io_error;
 		crc = crc32(crc, data, length);
 	}
 
 	// write the CRC
-	put_32bit(tempbuff, crc);
-	err = fp.write(tempbuff, 4, written);
+	put_u32be(tempbuff, crc);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 4);
 	if (err)
 		return err;
-	else if (4 != written)
-		return std::errc::io_error;
 
 	return std::error_condition();
 }
@@ -993,7 +972,6 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 	if (err)
 		return err;
 
-	std::size_t written;
 	std::uint8_t tempbuff[8192];
 	std::uint32_t zlength = 0;
 	z_stream stream;
@@ -1001,16 +979,14 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 	int zerr;
 
 	// stuff the length/type into the buffer
-	put_32bit(tempbuff + 0, length);
-	put_32bit(tempbuff + 4, type);
+	put_u32be(tempbuff + 0, length);
+	put_u32be(tempbuff + 4, type);
 	crc = crc32(0, tempbuff + 4, 4);
 
 	// write that data
-	err = fp.write(tempbuff, 8, written);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 8);
 	if (err)
 		return err;
-	else if (8 != written)
-		return std::errc::io_error;
 
 	// initialize the stream
 	memset(&stream, 0, sizeof(stream));
@@ -1036,16 +1012,11 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 		if (stream.avail_out < sizeof(tempbuff))
 		{
 			int bytes = sizeof(tempbuff) - stream.avail_out;
-			err = fp.write(tempbuff, bytes, written);
+			std::tie(err, std::ignore) = write(fp, tempbuff, bytes);
 			if (err)
 			{
 				deflateEnd(&stream);
 				return err;
-			}
-			else if (bytes != written)
-			{
-				deflateEnd(&stream);
-				return std::errc::io_error;
 			}
 			crc = crc32(crc, tempbuff, bytes);
 			zlength += bytes;
@@ -1078,23 +1049,19 @@ static std::error_condition write_deflated_chunk(random_write &fp, uint8_t *data
 		return png_error::COMPRESS_ERROR;
 
 	// write the CRC
-	put_32bit(tempbuff, crc);
-	err = fp.write(tempbuff, 4, written);
+	put_u32be(tempbuff, crc);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 4);
 	if (err)
 		return err;
-	else if (4 != written)
-		return std::errc::io_error;
 
 	// seek back and update the length
 	err = fp.seek(lengthpos, SEEK_SET);
 	if (err)
 		return err;
-	put_32bit(tempbuff + 0, zlength);
-	err = fp.write(tempbuff, 4, written);
+	put_u32be(tempbuff + 0, zlength);
+	std::tie(err, std::ignore) = write(fp, tempbuff, 4);
 	if (err)
 		return err;
-	else if (4 != written)
-		return std::errc::io_error;
 
 	// return to the end
 	return fp.seek(lengthpos + 8 + zlength + 4, SEEK_SET);
@@ -1253,13 +1220,13 @@ static std::error_condition write_png_stream(random_write &fp, png_info &pnginfo
 	// if we wanted to get clever and do filtering, we would do it here
 
 	// write the IHDR chunk
-	put_32bit(tempbuff + 0, pnginfo.width);
-	put_32bit(tempbuff + 4, pnginfo.height);
-	put_8bit(tempbuff + 8, pnginfo.bit_depth);
-	put_8bit(tempbuff + 9, pnginfo.color_type);
-	put_8bit(tempbuff + 10, pnginfo.compression_method);
-	put_8bit(tempbuff + 11, pnginfo.filter_method);
-	put_8bit(tempbuff + 12, pnginfo.interlace_method);
+	put_u32be(tempbuff + 0, pnginfo.width);
+	put_u32be(tempbuff + 4, pnginfo.height);
+	tempbuff[8] = pnginfo.bit_depth;
+	tempbuff[9] = pnginfo.color_type;
+	tempbuff[10] = pnginfo.compression_method;
+	tempbuff[11] = pnginfo.filter_method;
+	tempbuff[12] = pnginfo.interlace_method;
 	error = write_chunk(fp, tempbuff, PNG_CN_IHDR, 13);
 	if (error)
 		return error;
@@ -1326,12 +1293,9 @@ std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t
 		info = &pnginfo;
 
 	// write the PNG signature
-	std::size_t written;
-	std::error_condition err = fp.write(PNG_SIGNATURE, sizeof(PNG_SIGNATURE), written);
+	auto const [err, written] = write(fp, PNG_SIGNATURE, sizeof(PNG_SIGNATURE));
 	if (err)
 		return err;
-	else if (sizeof(PNG_SIGNATURE) != written)
-		return std::errc::io_error;
 
 	// write the rest of the PNG data
 	return write_png_stream(fp, *info, bitmap, palette_length, palette);
@@ -1347,19 +1311,16 @@ std::error_condition png_write_bitmap(random_write &fp, png_info *info, bitmap_t
 
 std::error_condition mng_capture_start(random_write &fp, bitmap_t const &bitmap, unsigned rate) noexcept
 {
-	std::size_t written;
-	std::error_condition err = fp.write(MNG_Signature, 8, written);
+	auto const [err, written] = write(fp, MNG_Signature, 8);
 	if (err)
 		return err;
-	else if (8 != written)
-		return std::errc::io_error;
 
 	uint8_t mhdr[28];
 	memset(mhdr, 0, 28);
-	put_32bit(mhdr + 0, bitmap.width());
-	put_32bit(mhdr + 4, bitmap.height());
-	put_32bit(mhdr + 8, rate);
-	put_32bit(mhdr + 24, 0x0041); // Simplicity profile - frame count and play time unspecified because we don't know at this stage
+	put_u32be(mhdr + 0, bitmap.width());
+	put_u32be(mhdr + 4, bitmap.height());
+	put_u32be(mhdr + 8, rate);
+	put_u32be(mhdr + 24, 0x0041); // Simplicity profile - frame count and play time unspecified because we don't know at this stage
 	return write_chunk(fp, mhdr, MNG_CN_MHDR, 28);
 }
 

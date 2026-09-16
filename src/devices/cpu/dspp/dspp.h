@@ -13,40 +13,41 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class dspp_frontend;
-
 // ======================> dspp_device
 
 class dspp_device : public cpu_device
 {
-	friend class dspp_frontend;
 public:
 	// Construction/destruction
-	dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor,
-		address_map_constructor data_map_ctor);
 	dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~dspp_device();
 
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
 	auto dma_read_handler() { return m_dma_read_handler.bind(); }
 	auto dma_write_handler() { return m_dma_write_handler.bind(); }
+	// DMA channel rolled over to its next buffer (offset = channel)
+	auto dma_rollover_handler() { return m_dma_rollover_handler.bind(); }
 
-	// Public interfaces
-	uint32_t read(offs_t offset);
-	void write(offs_t offset, uint32_t data);
+	// Host side interface (DMA registers live in Madam, enables in Clio)
+	void frame_sync();
+	void host_dma_w(int channel, int reg, uint32_t data);
+	uint32_t host_dma_r(int channel, int reg);
+	void host_channel_enable_w(uint32_t set_mask, uint32_t clr_mask);
+	void host_fifo_init_w(uint32_t mask);
+	uint16_t host_fifo_status_r(int channel);
+	void host_tick_reset(bool default_period);
 
 	uint16_t read_output_fifo();
 
-	void dump_state(); // TODO: DEBUG REMOVE ME
+	void dump_state(std::ostream &str); // TODO: DEBUG REMOVE ME
 
 	// Internal registers
 	uint16_t input_r();
@@ -72,29 +73,48 @@ public:
 	void print_value() { printf("Value is %08x\n", m_core->m_arg0); }
 	void print_addr() { printf("New value is %08x from %08x\n", m_core->m_arg0, m_core->m_arg1); }
 
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void host_n_write(offs_t offset, u16 data);
+	u16 host_eo_read(offs_t offset);
+	void host_ei_write(offs_t offset, u16 data);
+	void host_gw_control_write(offs_t offset, u16 data);
 
-	// device_execute_interface overrides
+protected:
+	class frontend;
+	class opcode_desc;
+
+	dspp_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			address_map_constructor code_map_ctor,
+			address_map_constructor data_map_ctor);
+
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
+	void update_ticks();
+	void execute_one(bool check_debugger);
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void code_map(address_map &map);
-	void data_map(address_map &map);
+	void code_map(address_map &map) ATTR_COLD;
+	void data_clio_map(address_map &map) ATTR_COLD;
 
 	enum
 	{
@@ -149,27 +169,42 @@ private:
 	devcb_write_line    m_int_handler;
 	devcb_read8         m_dma_read_handler;
 	devcb_write8        m_dma_write_handler;
+	devcb_write32       m_dma_rollover_handler;
+
+	// Audio frame model
+	uint32_t    m_frame_period;
+	int32_t     m_frame_counter;
+	bool        m_frame_sync;
+	uint16_t    m_tick;
+	uint16_t fifo_peek_r(offs_t offset);
+	void fifo_head_w(offs_t offset, uint16_t data);
+	uint16_t fifo_status_r(offs_t offset);
+	uint16_t outfifo_status_r(offs_t offset);
+	uint16_t fifo_pop_r(offs_t offset);
+	void outfifo_w(offs_t offset, uint16_t data);
+	uint16_t tick_r();
+	void tick_w(uint16_t data);
+	void new_frame();
 
 	// Internal functions
 	uint16_t read_op(offs_t pc);
-	inline uint16_t read_data(offs_t addr);
-	inline void write_data(offs_t addr, uint16_t data);
+	uint16_t read_data(offs_t addr);
+	void write_data(offs_t addr, uint16_t data);
 
-	inline void update_pc();
-	inline void update_ticks();
-	inline void exec_control();
-	inline void exec_super_special();
-	inline void exec_special();
-	inline void exec_branch();
-	inline void exec_complex_branch();
-	inline void exec_arithmetic();
+	void update_pc();
+	void exec_control();
+	void exec_super_special();
+	void exec_special();
+	void exec_branch();
+	void exec_complex_branch();
+	void exec_arithmetic();
 	void parse_operands(uint32_t numops);
 	uint16_t read_next_operand();
 	void write_next_operand(uint16_t value);
-	inline void push_pc();
-	inline uint16_t pop_pc();
-	inline void set_rbase(uint32_t base, uint32_t addr);
-	inline uint16_t translate_reg(uint16_t reg);
+	void push_pc();
+	uint16_t pop_pc();
+	void set_rbase(uint32_t base, uint32_t addr);
+	uint16_t translate_reg(uint16_t reg);
 
 	void process_next_dma(int32_t channel);
 	void service_input_dma(int32_t channel);
@@ -188,6 +223,7 @@ private:
 	uint32_t get_interrupt_state();
 	void update_host_interrupt();
 
+protected:
 	uint32_t read_dma_stack(offs_t offset);
 	void write_dma_stack(offs_t offset, uint32_t data);
 
@@ -203,6 +239,7 @@ private:
 	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_code;
 	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_data;
 
+private:
 	struct dspp_internal_state
 	{
 		// Internal state
@@ -243,7 +280,11 @@ private:
 
 		// External control registers
 		uint32_t    m_dspx_control;
-	} * m_core;
+	};
+protected:
+	dspp_internal_state* m_core;
+private:
+	dspp_internal_state m_local_core; // for non-DRC mode
 
 	// DMA
 	struct fifo_dma
@@ -305,7 +346,7 @@ private:
 	bool        m_cache_dirty;
 	drc_cache   m_cache;
 	std::unique_ptr<drcuml_state>   m_drcuml;
-	std::unique_ptr<dspp_frontend>  m_drcfe;
+	std::unique_ptr<frontend>       m_drcfe;
 	uint32_t    m_drcoptions;
 
 	/* internal compiler state */
@@ -319,7 +360,7 @@ private:
 	};
 
 public: // TODO
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
 //  void arm7_drc_init();
@@ -375,6 +416,22 @@ public: // TODO
 	uml::code_handle *m_dm_write16;
 };
 
+class dspp_bulldog_device : public dspp_device
+{
+public:
+	dspp_bulldog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// Public interfaces
+	// TODO: convert to address_map
+	uint32_t host_read(offs_t offset);
+	void host_write(offs_t offset, uint32_t data);
+
+protected:
+	// device_execute_interface implementation
+	virtual void execute_run() override;
+
+	void data_bulldog_map(address_map &map) ATTR_COLD;
+};
 
 /***************************************************************************
  COMPILER-SPECIFIC OPTIONS
@@ -388,6 +445,6 @@ public: // TODO
 
 // device type definition
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
-
+DECLARE_DEVICE_TYPE(DSPP_BULLDOG, dspp_bulldog_device);
 
 #endif // MAME_CPU_DSPP_DSPP_H

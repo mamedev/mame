@@ -40,7 +40,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 
@@ -75,8 +75,8 @@ public:
 	static const char *const SWITCHES_TAG;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(drive_2ppr_tick);
 
@@ -214,22 +214,22 @@ private:
 		DRIVE_P1_TP2_BIT    = 7
 	};
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void z80_program_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void datamcu_program_map(address_map &map);
+	void z80_program_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void datamcu_program_map(address_map &map) ATTR_COLD;
 	void set_int_line(uint8_t line, uint8_t value);
 	void update_cpu_int();
 
-	void ctrl_program_map(address_map &map);
-	void ctrl_io_map(address_map &map);
-	void ctrlmcu_program_map(address_map &map);
+	void ctrl_program_map(address_map &map) ATTR_COLD;
+	void ctrl_data_map(address_map &map) ATTR_COLD;
+	void ctrlmcu_program_map(address_map &map) ATTR_COLD;
 	void sd_w(uint8_t data);
 	uint8_t sd_r();
 
-	void drive_program_map(address_map &map);
-	void drive_io_map(address_map &map);
+	void drive_program_map(address_map &map) ATTR_COLD;
+	void drive_data_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_datacpu;
 	required_device<i8041a_device> m_datamcu;
@@ -421,7 +421,7 @@ void vp415_state::z80_program_map(address_map &map)
 void vp415_state::z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(SCSI_TAG, FUNC(ncr5385_device::read), FUNC(ncr5385_device::write));
+	map(0x00, 0x0f).m(SCSI_TAG, FUNC(ncr5385_device::map));
 	// 0x20, 0x21: Connected to A0 + D0..D7 of SLAVE i8041
 	map(0x34, 0x34).w(FUNC(vp415_state::sel34_w));
 	map(0x37, 0x37).r(FUNC(vp415_state::sel37_r));
@@ -558,7 +558,7 @@ void vp415_state::ctrl_program_map(address_map &map)
 	map(0x0000, 0xffff).rom().region(CONTROL_ROM_TAG, 0);
 }
 
-void vp415_state::ctrl_io_map(address_map &map)
+void vp415_state::ctrl_data_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share(CTRLRAM_TAG);
 	map(0xe000, 0xffff).rw(FUNC(vp415_state::ctrl_regs_r), FUNC(vp415_state::ctrl_regs_w)).mask(0x1e00);
@@ -674,7 +674,7 @@ void vp415_state::drive_program_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region(DRIVE_ROM_TAG, 0);
 }
 
-void vp415_state::drive_io_map(address_map &map)
+void vp415_state::drive_data_map(address_map &map)
 {
 	map(0x0000, 0x0003).mirror(0xfbfc).rw(I8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0400, 0x04ff).mirror(0xf800).rw(I8155_TAG, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -738,7 +738,7 @@ void vp415_state::vp415(machine_config &config)
 	m_ctrlcpu->port_out_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_w));
 	m_ctrlcpu->port_in_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_r));
 	m_ctrlcpu->set_addrmap(AS_PROGRAM, &vp415_state::ctrl_program_map);
-	m_ctrlcpu->set_addrmap(AS_IO, &vp415_state::ctrl_io_map);
+	m_ctrlcpu->set_addrmap(AS_DATA, &vp415_state::ctrl_data_map);
 
 	I8041A(config, m_ctrlmcu, XTAL(4'000'000)); // Verified on schematic
 	m_ctrlmcu->p1_in_cb().set(FUNC(vp415_state::ctrl_mcu_port1_r));
@@ -752,9 +752,9 @@ void vp415_state::vp415(machine_config &config)
 	m_drivecpu->port_out_cb<1>().set(FUNC(vp415_state::drive_cpu_port1_w));
 	m_drivecpu->port_out_cb<3>().set(FUNC(vp415_state::drive_cpu_port3_w));
 	m_drivecpu->set_addrmap(AS_PROGRAM, &vp415_state::drive_program_map);
-	m_drivecpu->set_addrmap(AS_IO, &vp415_state::drive_io_map);
+	m_drivecpu->set_addrmap(AS_DATA, &vp415_state::drive_data_map);
 
-	i8155_device &i8155(I8155(config, I8155_TAG, 0));
+	i8155_device &i8155(I8155(config, I8155_TAG));
 	i8155.out_pa_callback().set(CHARGEN_TAG, FUNC(mb88303_device::da_w));
 	i8155.in_pb_callback().set(FUNC(vp415_state::drive_i8155_pb_r));
 	i8155.in_pc_callback().set(FUNC(vp415_state::drive_i8155_pc_r));
@@ -764,12 +764,12 @@ void vp415_state::vp415(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(vp415_state::drive_i8255_pb_w));
 	ppi.in_pc_callback().set(FUNC(vp415_state::drive_i8255_pc_r));
 
-	MB88303(config, m_chargen, 0);
+	MB88303(config, m_chargen);
 
 	saa1043_device &saa1043(SAA1043(config, SYNCGEN_TAG, XTAL(5'000'000)));
 	saa1043.v2_callback().set(FUNC(vp415_state::refv_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(320, 240);
@@ -806,4 +806,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, empty_init, "Philips", "VP415", MACHINE_IS_SKELETON )
+CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, empty_init, "Philips", "VP415", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

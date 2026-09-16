@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Felipe Sanches
 /*******************************************************************
 
 Toshiba TMP95C063 emulation
@@ -8,38 +8,19 @@ Toshiba TMP95C063 emulation
 
 #include "emu.h"
 #include "tmp95c063.h"
+#include "dasm900.h"
 
 DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063")
 
 
 tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	tlcs900h_device(mconfig, TMP95C063, tag, owner, clock),
-	m_port1_read(*this, 0),
-	m_port1_write(*this),
-	m_port2_write(*this),
-	m_port5_read(*this, 0),
-	m_port5_write(*this),
-	m_port6_read(*this, 0),
-	m_port6_write(*this),
-	m_port7_read(*this, 0),
-	m_port7_write(*this),
-	m_port8_read(*this, 0),
-	m_port8_write(*this),
-	m_port9_read(*this, 0),
-	m_port9_write(*this),
-	m_porta_read(*this, 0),
-	m_porta_write(*this),
-	m_portb_read(*this, 0),
-	m_portb_write(*this),
-	m_portc_read(*this, 0),
-	m_portd_read(*this, 0),
-	m_portd_write(*this),
-	m_porte_read(*this, 0),
-	m_porte_write(*this),
 	m_an_read(*this, 0),
-	m_port_latch{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	m_port_control{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	m_port_function{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_read(*this, 0),
+	m_port_write(*this),
+	m_port_latch{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_control{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_port_function{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_t8run(0),
 	m_t8_reg{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_t8_mode{ 0, 0, 0, 0 },
@@ -74,28 +55,54 @@ tmp95c063_device::tmp95c063_device(const machine_config &mconfig, const char *ta
 {
 }
 
+template <uint8_t P>
+void tmp95c063_device::port_w(uint8_t data)
+{
+	m_port_latch[P] = data;
+	m_port_write[P](0, data, 0xff);
+}
+
+template <uint8_t P>
+uint8_t tmp95c063_device::port_r()
+{
+	return m_port_read[P](0);
+}
+
+template <uint8_t P>
+void tmp95c063_device::port_cr_w(uint8_t data)
+{
+	m_port_control[P] = data;
+}
+
+template <uint8_t P>
+void tmp95c063_device::port_fc_w(uint8_t data)
+{
+	m_port_function[P] = data;
+}
+
+
 void tmp95c063_device::internal_mem(address_map &map)
 {
-	map(0x000001, 0x000001).rw(FUNC(tmp95c063_device::p1_r), FUNC(tmp95c063_device::p1_w));
-	map(0x000004, 0x000004).w(FUNC(tmp95c063_device::p1cr_w));
-	map(0x000006, 0x000006).rw(FUNC(tmp95c063_device::p2_r), FUNC(tmp95c063_device::p2_w));
-	map(0x000009, 0x000009).w(FUNC(tmp95c063_device::p2fc_w));
-	map(0x00000d, 0x00000d).rw(FUNC(tmp95c063_device::p5_r), FUNC(tmp95c063_device::p5_w));
-	map(0x000010, 0x000010).w(FUNC(tmp95c063_device::p5cr_w));
-	map(0x000011, 0x000011).w(FUNC(tmp95c063_device::p5fc_w));
-	map(0x000012, 0x000012).rw(FUNC(tmp95c063_device::p6_r), FUNC(tmp95c063_device::p6_w));
-	map(0x000013, 0x000013).rw(FUNC(tmp95c063_device::p7_r), FUNC(tmp95c063_device::p7_w));
-	map(0x000015, 0x000015).w(FUNC(tmp95c063_device::p6fc_w));
-	map(0x000016, 0x000016).w(FUNC(tmp95c063_device::p7cr_w));
-	map(0x000017, 0x000017).w(FUNC(tmp95c063_device::p7fc_w));
-	map(0x000018, 0x000018).rw(FUNC(tmp95c063_device::p8_r), FUNC(tmp95c063_device::p8_w));
-	map(0x000019, 0x000019).rw(FUNC(tmp95c063_device::p9_r), FUNC(tmp95c063_device::p9_w));
-	map(0x00001a, 0x00001a).w(FUNC(tmp95c063_device::p8cr_w));
-	map(0x00001b, 0x00001b).w(FUNC(tmp95c063_device::p8fc_w));
-	map(0x00001c, 0x00001c).w(FUNC(tmp95c063_device::p9cr_w));
-	map(0x00001d, 0x00001d).w(FUNC(tmp95c063_device::p9fc_w));
-	map(0x00001e, 0x00001e).rw(FUNC(tmp95c063_device::pa_r), FUNC(tmp95c063_device::pa_w));
-	map(0x00001f, 0x00001f).rw(FUNC(tmp95c063_device::pb_r), FUNC(tmp95c063_device::pb_w));
+	map(0x000001, 0x000001).rw(FUNC(tmp95c063_device::port_r<PORT_1>), FUNC(tmp95c063_device::port_w<PORT_1>));
+	map(0x000004, 0x000004).w(FUNC(tmp95c063_device::port_cr_w<PORT_1>));
+	map(0x000006, 0x000006).rw(FUNC(tmp95c063_device::port_r<PORT_2>), FUNC(tmp95c063_device::port_w<PORT_2>));
+	map(0x000009, 0x000009).w(FUNC(tmp95c063_device::port_fc_w<PORT_2>));
+	map(0x00000d, 0x00000d).rw(FUNC(tmp95c063_device::port_r<PORT_5>), FUNC(tmp95c063_device::port_w<PORT_5>));
+	map(0x000010, 0x000010).w(FUNC(tmp95c063_device::port_cr_w<PORT_5>));
+	map(0x000011, 0x000011).w(FUNC(tmp95c063_device::port_fc_w<PORT_5>));
+	map(0x000012, 0x000012).rw(FUNC(tmp95c063_device::port_r<PORT_6>), FUNC(tmp95c063_device::port_w<PORT_6>));
+	map(0x000013, 0x000013).rw(FUNC(tmp95c063_device::port_r<PORT_7>), FUNC(tmp95c063_device::port_w<PORT_7>));
+	map(0x000015, 0x000015).w(FUNC(tmp95c063_device::port_fc_w<PORT_6>));
+	map(0x000016, 0x000016).w(FUNC(tmp95c063_device::port_cr_w<PORT_7>));
+	map(0x000017, 0x000017).w(FUNC(tmp95c063_device::port_fc_w<PORT_7>));
+	map(0x000018, 0x000018).rw(FUNC(tmp95c063_device::port_r<PORT_8>), FUNC(tmp95c063_device::port_w<PORT_8>));
+	map(0x000019, 0x000019).rw(FUNC(tmp95c063_device::port_r<PORT_9>), FUNC(tmp95c063_device::port_w<PORT_9>));
+	map(0x00001a, 0x00001a).w(FUNC(tmp95c063_device::port_cr_w<PORT_8>));
+	map(0x00001b, 0x00001b).w(FUNC(tmp95c063_device::port_fc_w<PORT_8>));
+	map(0x00001c, 0x00001c).w(FUNC(tmp95c063_device::port_cr_w<PORT_9>));
+	map(0x00001d, 0x00001d).w(FUNC(tmp95c063_device::port_fc_w<PORT_9>));
+	map(0x00001e, 0x00001e).rw(FUNC(tmp95c063_device::port_r<PORT_A>), FUNC(tmp95c063_device::port_w<PORT_A>));
+	map(0x00001f, 0x00001f).rw(FUNC(tmp95c063_device::port_r<PORT_B>), FUNC(tmp95c063_device::port_w<PORT_B>));
 	map(0x000020, 0x000020).rw(FUNC(tmp95c063_device::t8run_r), FUNC(tmp95c063_device::t8run_w));
 	map(0x000021, 0x000021).rw(FUNC(tmp95c063_device::trdc_r), FUNC(tmp95c063_device::trdc_w));
 	map(0x000022, 0x000023).w(FUNC(tmp95c063_device::treg01_w));
@@ -140,15 +147,15 @@ void tmp95c063_device::internal_mem(address_map &map)
 	map(0x00006f, 0x00006f).w(FUNC(tmp95c063_device::wdcr_w));
 	map(0x000070, 0x00007e).rw(FUNC(tmp95c063_device::inte_r), FUNC(tmp95c063_device::inte_w));
 	map(0x00007f, 0x00007f).w(FUNC(tmp95c063_device::iimc_w));
-	map(0x000080, 0x000080).w(FUNC(tmp95c063_device::pacr_w));
-	map(0x000081, 0x000081).w(FUNC(tmp95c063_device::pafc_w));
-	map(0x000082, 0x000082).w(FUNC(tmp95c063_device::pbcr_w));
-	map(0x000083, 0x000083).w(FUNC(tmp95c063_device::pbfc_w));
-	map(0x000084, 0x000084).r(FUNC(tmp95c063_device::pc_r));
-	map(0x000085, 0x000085).rw(FUNC(tmp95c063_device::pd_r), FUNC(tmp95c063_device::pd_w));
-	map(0x000088, 0x000088).w(FUNC(tmp95c063_device::pdcr_w));
-	map(0x00008a, 0x00008a).rw(FUNC(tmp95c063_device::pe_r), FUNC(tmp95c063_device::pe_w));
-	map(0x00008c, 0x00008c).w(FUNC(tmp95c063_device::pecr_w));
+	map(0x000080, 0x000080).w(FUNC(tmp95c063_device::port_cr_w<PORT_A>));
+	map(0x000081, 0x000081).w(FUNC(tmp95c063_device::port_fc_w<PORT_A>));
+	map(0x000082, 0x000082).w(FUNC(tmp95c063_device::port_cr_w<PORT_B>));
+	map(0x000083, 0x000083).w(FUNC(tmp95c063_device::port_fc_w<PORT_B>));
+	map(0x000084, 0x000084).r(FUNC(tmp95c063_device::port_r<PORT_C>));
+	map(0x000085, 0x000085).rw(FUNC(tmp95c063_device::port_r<PORT_D>), FUNC(tmp95c063_device::port_w<PORT_D>));
+	map(0x000088, 0x000088).w(FUNC(tmp95c063_device::port_cr_w<PORT_D>));
+	map(0x00008a, 0x00008a).rw(FUNC(tmp95c063_device::port_r<PORT_E>), FUNC(tmp95c063_device::port_w<PORT_E>));
+	map(0x00008c, 0x00008c).w(FUNC(tmp95c063_device::port_cr_w<PORT_E>));
 	map(0x00008f, 0x00008f).w(FUNC(tmp95c063_device::bexcs_w));
 	map(0x000090, 0x000093).w(FUNC(tmp95c063_device::bcs_w));
 	map(0x000094, 0x00009b).rw(FUNC(tmp95c063_device::msar_r), FUNC(tmp95c063_device::msar_w));
@@ -176,64 +183,64 @@ void tmp95c063_device::device_config_complete()
 	}
 }
 
+enum
+{
+	INTE0AD,
+	INTE12,
+	INTE34,
+	INTE56,
+	INTE78,
+	INTET01,
+	INTET23,
+	INTET45,
+	INTET67,
+	INTET89,
+	INTETAB,
+	INTES0,
+	INTES1,
+	INTETC01,
+	INTETC23
+};
 
-
-#define TMP95C063_INTE0AD   0x0
-#define TMP95C063_INTE12    0x1
-#define TMP95C063_INTE34    0x2
-#define TMP95C063_INTE56    0x3
-#define TMP95C063_INTE78    0x4
-#define TMP95C063_INTET01   0x5
-#define TMP95C063_INTET23   0x6
-#define TMP95C063_INTET45   0x7
-#define TMP95C063_INTET67   0x8
-#define TMP95C063_INTET89   0x9
-#define TMP95C063_INTETAB   0xa
-#define TMP95C063_INTES0    0xb
-#define TMP95C063_INTES1    0xc
-#define TMP95C063_INTETC01  0xd
-#define TMP95C063_INTETC23  0xe
-
-
-#define TMP95C063_NUM_MASKABLE_IRQS 30
 static const struct {
 	uint8_t reg;
 	uint8_t iff;
 	uint8_t vector;
-} tmp95c063_irq_vector_map[TMP95C063_NUM_MASKABLE_IRQS] =
+} tmp95c063_irq_vector_map[] =
 {
-	{ TMP95C063_INTETC23, 0x80, 0xa0 },     /* INTTC3 */
-	{ TMP95C063_INTETC23, 0x08, 0x9c },     /* INTTC2 */
-	{ TMP95C063_INTETC01, 0x80, 0x98 },     /* INTTC1 */
-	{ TMP95C063_INTETC01, 0x08, 0x94 },     /* INTTC0 */
-	{ TMP95C063_INTE0AD, 0x80, 0x90 },      /* INTAD */
-	{ TMP95C063_INTES1, 0x80, 0x8c },       /* INTTX1 */
-	{ TMP95C063_INTES1, 0x08, 0x88 },       /* INTRX1 */
-	{ TMP95C063_INTES0, 0x80, 0x84 },       /* INTTX0 */
-	{ TMP95C063_INTES0, 0x08, 0x80 },       /* INTRX0 */
-	{ TMP95C063_INTETAB, 0x80, 0x7c },      /* INTTRB */
-	{ TMP95C063_INTETAB, 0x08, 0x78 },      /* INTTRA */
-	{ TMP95C063_INTET89, 0x80, 0x74 },      /* INTTR9 */
-	{ TMP95C063_INTET89, 0x80, 0x70 },      /* INTTR8 */
-	{ TMP95C063_INTET67, 0x80, 0x6c },      /* INTT7 */
-	{ TMP95C063_INTET67, 0x08, 0x68 },      /* INTT6 */
-	{ TMP95C063_INTET45, 0x80, 0x64 },      /* INTT5 */
-	{ TMP95C063_INTET45, 0x08, 0x60 },      /* INTT4 */
-	{ TMP95C063_INTET23, 0x80, 0x5c },      /* INTT3 */
-	{ TMP95C063_INTET23, 0x08, 0x58 },      /* INTT2 */
-	{ TMP95C063_INTET01, 0x80, 0x54 },      /* INTT1 */
-	{ TMP95C063_INTET01, 0x08, 0x50 },      /* INTT0 */
-	{ TMP95C063_INTE78, 0x80, 0x4c },       /* int8_t */
-	{ TMP95C063_INTE78, 0x08, 0x48 },       /* INT7 */
-	{ TMP95C063_INTE56, 0x80, 0x44 },       /* INT6 */
-	{ TMP95C063_INTE56, 0x08, 0x40 },       /* INT5 */
-								/* 0x3c - reserved */
-	{ TMP95C063_INTE34, 0x80, 0x38 },       /* INT4 */
-	{ TMP95C063_INTE34, 0x08, 0x34 },       /* INT3 */
-	{ TMP95C063_INTE12, 0x80, 0x30 },       /* INT2 */
-	{ TMP95C063_INTE12, 0x08, 0x2c },       /* INT1 */
-	{ TMP95C063_INTE0AD, 0x08, 0x28 }       /* INT0 */
+	{ INTETC23, 0x80, 0xa0 },     // INTTC3
+	{ INTETC23, 0x08, 0x9c },     // INTTC2
+	{ INTETC01, 0x80, 0x98 },     // INTTC1
+	{ INTETC01, 0x08, 0x94 },     // INTTC0
+	{ INTE0AD,  0x80, 0x90 },     // INTAD
+	{ INTES1,   0x80, 0x8c },     // INTTX1
+	{ INTES1,   0x08, 0x88 },     // INTRX1
+	{ INTES0,   0x80, 0x84 },     // INTTX0
+	{ INTES0,   0x08, 0x80 },     // INTRX0
+	{ INTETAB,  0x80, 0x7c },     // INTTRB
+	{ INTETAB,  0x08, 0x78 },     // INTTRA
+	{ INTET89,  0x80, 0x74 },     // INTTR9
+	{ INTET89,  0x80, 0x70 },     // INTTR8
+	{ INTET67,  0x80, 0x6c },     // INTT7
+	{ INTET67,  0x08, 0x68 },     // INTT6
+	{ INTET45,  0x80, 0x64 },     // INTT5
+	{ INTET45,  0x08, 0x60 },     // INTT4
+	{ INTET23,  0x80, 0x5c },     // INTT3
+	{ INTET23,  0x08, 0x58 },     // INTT2
+	{ INTET01,  0x80, 0x54 },     // INTT1
+	{ INTET01,  0x08, 0x50 },     // INTT0
+	{ INTE78,   0x80, 0x4c },     // INT8
+	{ INTE78,   0x08, 0x48 },     // INT7
+	{ INTE56,   0x80, 0x44 },     // INT6
+	{ INTE56,   0x08, 0x40 },     // INT5
+								  // 0x3c - reserved
+	{ INTE34,   0x80, 0x38 },     // INT4
+	{ INTE34,   0x08, 0x34 },     // INT3
+	{ INTE12,   0x80, 0x30 },     // INT2
+	{ INTE12,   0x08, 0x2c },     // INT1
+	{ INTE0AD,  0x08, 0x28 }      // INT0
 };
+static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp95c063_irq_vector_map) / 3;
 
 void tmp95c063_device::tlcs900_handle_timers()
 {
@@ -265,8 +272,8 @@ void tmp95c063_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
 		{
-			m_timer[0] += 1;
-			if ( m_timer[0] == m_t8_reg[0] )
+			m_timer_8[0] += 1;
+			if ( m_timer_8[0] == m_t8_reg[0] )
 			{
 				if ( ( m_t8run & 0x02 ) && ( m_t8_mode[0] & 0x0c ) == 0x00 )
 				{
@@ -276,8 +283,8 @@ void tmp95c063_device::tlcs900_handle_timers()
 				/* In 16bit timer mode the timer should not be reset */
 				if ( ( m_t8_mode[0] & 0xc0 ) != 0x40 )
 				{
-					m_timer[0] = 0;
-					m_int_reg[TMP95C063_INTET01] |= 0x08;
+					m_timer_8[0] = 0;
+					m_int_reg[INTET01] |= 0x08;
 				}
 			}
 		}
@@ -303,11 +310,11 @@ void tmp95c063_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
 		{
-			m_timer[1] += 1;
-			if ( m_timer[1] == m_t8_reg[1] )
+			m_timer_8[1] += 1;
+			if ( m_timer_8[1] == m_t8_reg[1] )
 			{
-				m_timer[1] = 0;
-				m_int_reg[TMP95C063_INTET01] |= 0x80;
+				m_timer_8[1] = 0;
+				m_int_reg[INTET01] |= 0x80;
 
 				if ( m_t8_invert[0] & 0x02 )
 				{
@@ -317,7 +324,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 				/* In 16bit timer mode also reset timer 0 */
 				if ( ( m_t8_mode[0] & 0xc0 ) == 0x40 )
 				{
-					m_timer[0] = 0;
+					m_timer_8[0] = 0;
 				}
 			}
 		}
@@ -342,8 +349,8 @@ void tmp95c063_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
 		{
-			m_timer[2] += 1;
-			if ( m_timer[2] == m_t8_reg[2] )
+			m_timer_8[2] += 1;
+			if ( m_timer_8[2] == m_t8_reg[2] )
 			{
 				if ( ( m_t8run & 0x08 ) && ( m_t8_mode[1] & 0x0c ) == 0x00 )
 				{
@@ -353,8 +360,8 @@ void tmp95c063_device::tlcs900_handle_timers()
 				/* In 16bit timer mode the timer should not be reset */
 				if ( ( m_t8_mode[1] & 0xc0 ) != 0x40 )
 				{
-					m_timer[2] = 0;
-					m_int_reg[TMP95C063_INTET23] |= 0x08;
+					m_timer_8[2] = 0;
+					m_int_reg[INTET23] |= 0x08;
 				}
 			}
 		}
@@ -380,11 +387,11 @@ void tmp95c063_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
 		{
-			m_timer[3] += 1;
-			if ( m_timer[3] == m_t8_reg[3] )
+			m_timer_8[3] += 1;
+			if ( m_timer_8[3] == m_t8_reg[3] )
 			{
-				m_timer[3] = 0;
-				m_int_reg[TMP95C063_INTET23] |= 0x80;
+				m_timer_8[3] = 0;
+				m_int_reg[INTET23] |= 0x80;
 
 				if ( m_t8_invert[1] & 0x20 )
 				{
@@ -394,7 +401,7 @@ void tmp95c063_device::tlcs900_handle_timers()
 				/* In 16bit timer mode also reset timer 2 */
 				if ( ( m_t8_mode[1] & 0xc0 ) == 0x40 )
 				{
-					m_timer[2] = 0;
+					m_timer_8[2] = 0;
 				}
 			}
 		}
@@ -410,11 +417,6 @@ void tmp95c063_device::tlcs900_check_hdma()
 
 void tmp95c063_device::tlcs900_check_irqs()
 {
-	int irq_vectors[9] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-	int level = 0;
-	int irq = -1;
-	int i;
-
 	/* Check for NMI */
 	if ( m_nmi_state == ASSERT_LINE )
 	{
@@ -434,7 +436,8 @@ void tmp95c063_device::tlcs900_check_irqs()
 	}
 
 	/* Check regular irqs */
-	for( i = 0; i < TMP95C063_NUM_MASKABLE_IRQS; i++ )
+	int irq_vectors[9] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	for( int i = 0; i < NUM_MASKABLE_IRQS; i++ )
 	{
 		if ( m_int_reg[tmp95c063_irq_vector_map[i].reg] & tmp95c063_irq_vector_map[i].iff )
 		{
@@ -451,7 +454,9 @@ void tmp95c063_device::tlcs900_check_irqs()
 	}
 
 	/* Check highest allowed priority irq */
-	for ( i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
+	int irq = -1;
+	int level = 0;
+	for ( int i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
 	{
 		if ( irq_vectors[i] >= 0 )
 		{
@@ -544,12 +549,21 @@ void tmp95c063_device::tlcs900_handle_ad()
 			m_ad_mode1 &= ~ 0x40;
 			m_ad_mode1 |= 0x80;
 
-			m_int_reg[TMP95C063_INTE0AD] |= 0x80;
+			m_int_reg[INTE0AD] |= 0x80;
 			m_check_irqs = 1;
 		}
 	}
 }
 
+
+void tmp95c063_device::device_resolve_objects()
+{
+	m_nmi_state = CLEAR_LINE;
+	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
+	{
+		m_level[i] = CLEAR_LINE;
+	}
+}
 
 void tmp95c063_device::device_start()
 {
@@ -596,23 +610,24 @@ void tmp95c063_device::device_reset()
 	tlcs900h_device::device_reset();
 
 	m_ad_cycles_left = 0;
-	m_nmi_state = CLEAR_LINE;
 	m_timer_pre = 0;
 	m_timer_change[0] = 0;
 	m_timer_change[1] = 0;
 	m_timer_change[2] = 0;
 	m_timer_change[3] = 0;
 
-	m_port_latch[1] = 0x00;
-	m_port_latch[2] = 0xff;
-	m_port_latch[5] = 0x3d;
-	m_port_latch[6] = 0x3b;
-	m_port_latch[7] = 0xff;
-	m_port_latch[8] = 0x3f;
-	m_port_latch[0xa] = 0x0f;
-	m_port_latch[0xb] = 0xff;
-	std::fill_n(&m_port_control[0], 0xc, 0x00);
-	std::fill_n(&m_port_function[0], 0xc, 0x00);
+	m_port_latch[PORT_1] = 0x00;
+	m_port_latch[PORT_2] = 0xff;
+	m_port_latch[PORT_5] = 0x3d;
+	m_port_latch[PORT_6] = 0x3b;
+	m_port_latch[PORT_7] = 0xff;
+	m_port_latch[PORT_8] = 0x3f;
+	m_port_latch[PORT_A] = 0x0f;
+	m_port_latch[PORT_B] = 0xff;
+	// FIXME: init ports 9, C, D & E
+	std::fill_n(&m_port_control[0], NUM_PORTS, 0x00);
+	std::fill_n(&m_port_function[0], NUM_PORTS, 0x00);
+
 	m_t8run = 0x00;
 	std::fill_n(&m_t8_mode[0], 4, 0x00);
 	std::fill_n(&m_t8_invert[0], 2, 0xcc);
@@ -647,221 +662,7 @@ void tmp95c063_device::device_reset()
 	std::fill_n(&m_dram_refresh[0], 2, 0x00);
 	std::fill_n(&m_dram_access[0], 2, 0x80);
 	m_da_drive = 0x00;
-
-	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
-		m_level[i] = CLEAR_LINE;
 }
-
-
-uint8_t tmp95c063_device::p1_r()
-{
-	return m_port1_read(0);
-}
-
-void tmp95c063_device::p1_w(uint8_t data)
-{
-	m_port_latch[1] = data;
-	m_port1_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p1cr_w(uint8_t data)
-{
-	m_port_control[1] = data;
-}
-
-uint8_t tmp95c063_device::p2_r()
-{
-	return m_port_latch[2];
-}
-
-void tmp95c063_device::p2_w(uint8_t data)
-{
-	m_port_latch[2] = data;
-	m_port2_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p2fc_w(uint8_t data)
-{
-	m_port_control[2] = data;
-}
-
-uint8_t tmp95c063_device::p5_r()
-{
-	return m_port5_read(0);
-}
-
-void tmp95c063_device::p5_w(uint8_t data)
-{
-	m_port_latch[5] = data;
-	m_port5_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p5cr_w(uint8_t data)
-{
-	m_port_control[5] = data;
-}
-
-void tmp95c063_device::p5fc_w(uint8_t data)
-{
-	m_port_function[5] = data;
-}
-
-uint8_t tmp95c063_device::p6_r()
-{
-	return m_port6_read(0);
-}
-
-void tmp95c063_device::p6_w(uint8_t data)
-{
-	m_port_latch[6] = data;
-	m_port6_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p6fc_w(uint8_t data)
-{
-	m_port_function[6] = data;
-}
-
-uint8_t tmp95c063_device::p7_r()
-{
-	return m_port7_read(0);
-}
-
-void tmp95c063_device::p7_w(uint8_t data)
-{
-	m_port_latch[7] = data;
-	m_port7_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p7cr_w(uint8_t data)
-{
-	m_port_control[7] = data;
-}
-
-void tmp95c063_device::p7fc_w(uint8_t data)
-{
-	m_port_function[7] = data;
-}
-
-uint8_t tmp95c063_device::p8_r()
-{
-	return m_port8_read(0);
-}
-
-void tmp95c063_device::p8_w(uint8_t data)
-{
-	m_port_latch[8] = data;
-	m_port8_write(0, data, 0xff);
-}
-
-void tmp95c063_device::p8cr_w(uint8_t data)
-{
-	m_port_control[8] = data;
-}
-
-void tmp95c063_device::p8fc_w(uint8_t data)
-{
-	m_port_function[8] = data;
-}
-
-uint8_t tmp95c063_device::p9_r()
-{
-	return m_port9_read(0);
-}
-
-void tmp95c063_device::p9_w(uint8_t data)
-{
-	m_port_latch[0x9] = data;
-}
-
-void tmp95c063_device::p9cr_w(uint8_t data)
-{
-	m_port_control[0x9] = data;
-}
-
-void tmp95c063_device::p9fc_w(uint8_t data)
-{
-	m_port_function[0x9] = data;
-}
-
-uint8_t tmp95c063_device::pa_r()
-{
-	return m_porta_read(0);
-}
-
-void tmp95c063_device::pa_w(uint8_t data)
-{
-	m_port_latch[0xa] = data;
-}
-
-void tmp95c063_device::pacr_w(uint8_t data)
-{
-	m_port_control[0xa] = data;
-}
-
-void tmp95c063_device::pafc_w(uint8_t data)
-{
-	m_port_function[0xa] = data;
-}
-
-uint8_t tmp95c063_device::pb_r()
-{
-	return m_portb_read(0);
-}
-
-void tmp95c063_device::pb_w(uint8_t data)
-{
-	m_port_latch[0xb] = data;
-	m_portb_write(0, data, 0xff);
-}
-
-void tmp95c063_device::pbcr_w(uint8_t data)
-{
-	m_port_control[0xb] = data;
-}
-
-void tmp95c063_device::pbfc_w(uint8_t data)
-{
-	m_port_function[0xb] = data;
-}
-
-uint8_t tmp95c063_device::pc_r()
-{
-	return m_portc_read(0);
-}
-
-uint8_t tmp95c063_device::pd_r()
-{
-	return m_portd_read(0);
-}
-
-void tmp95c063_device::pd_w(uint8_t data)
-{
-	m_port_latch[0xd] = data;
-	m_portd_write(0, data, 0xff);
-}
-
-void tmp95c063_device::pdcr_w(uint8_t data)
-{
-	m_port_control[0xd] = data;
-}
-
-uint8_t tmp95c063_device::pe_r()
-{
-	return m_porte_read(0);
-}
-
-void tmp95c063_device::pe_w(uint8_t data)
-{
-	m_port_latch[0xe] = data;
-	m_porte_write(0, data, 0xff);
-}
-
-void tmp95c063_device::pecr_w(uint8_t data)
-{
-	m_port_control[0xe] = data;
-}
-
 
 uint8_t tmp95c063_device::t8run_r()
 {
@@ -872,28 +673,28 @@ void tmp95c063_device::t8run_w(uint8_t data)
 {
 	if ( ! ( data & 0x01 ) )
 	{
-		m_timer[0] = 0;
+		m_timer_8[0] = 0;
 		m_timer_change[0] = 0;
 	}
 	if ( ! ( data & 0x02 ) )
 	{
-		m_timer[1] = 0;
+		m_timer_8[1] = 0;
 		m_timer_change[1] = 0;
 	}
 	if ( ! ( data & 0x04 ) )
 	{
-		m_timer[2] = 0;
+		m_timer_8[2] = 0;
 		m_timer_change[2] = 0;
 	}
 	if ( ! ( data & 0x08 ) )
 	{
-		m_timer[3] = 0;
+		m_timer_8[3] = 0;
 		m_timer_change[3] = 0;
 	}
 	if ( ! ( data & 0x10 ) )
-		m_timer[4] = 0;
+		m_timer_8[4] = 0;
 	if ( ! ( data & 0x20 ) )
-		m_timer[5] = 0;
+		m_timer_8[5] = 0;
 
 	m_t8run = data;
 }
@@ -1225,7 +1026,7 @@ uint8_t tmp95c063_device::sc0buf_r()
 void tmp95c063_device::sc0buf_w(uint8_t data)
 {
 	// Fake finish sending data
-	m_int_reg[TMP95C063_INTES0] |= 0x80;
+	m_int_reg[INTES0] |= 0x80;
 	m_check_irqs = 1;
 }
 
@@ -1270,7 +1071,7 @@ uint8_t tmp95c063_device::sc1buf_r()
 void tmp95c063_device::sc1buf_w(uint8_t data)
 {
 	// Fake finish sending data
-	m_int_reg[TMP95C063_INTES1] |= 0x80;
+	m_int_reg[INTES1] |= 0x80;
 	m_check_irqs = 1;
 }
 
@@ -1503,16 +1304,16 @@ void tmp95c063_device::execute_set_input(int input, int level)
 				{
 					/* Leave HALT state */
 					m_halted = 0;
-					m_int_reg[TMP95C063_INTE0AD] |= 0x08;
+					m_int_reg[INTE0AD] |= 0x08;
 				}
 			}
 			else
 			{
 				/* Level detect */
 				if (level == ASSERT_LINE)
-					m_int_reg[TMP95C063_INTE0AD] |= 0x08;
+					m_int_reg[INTE0AD] |= 0x08;
 				else
-					m_int_reg[TMP95C063_INTE0AD] &= ~ 0x08;
+					m_int_reg[INTE0AD] &= ~ 0x08;
 			}
 		}
 		m_level[TLCS900_INT0] = level;
@@ -1521,11 +1322,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT1:
 		if (m_level[TLCS900_INT1] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] |= 0x08;
+			m_int_reg[INTE12] |= 0x08;
 		}
 		else if (m_level[TLCS900_INT1] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] &= ~0x08;
+			m_int_reg[INTE12] &= ~0x08;
 		}
 		m_level[TLCS900_INT1] = level;
 		break;
@@ -1533,11 +1334,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT2:
 		if (m_level[TLCS900_INT2] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] |= 0x80;
+			m_int_reg[INTE12] |= 0x80;
 		}
 		else if (m_level[TLCS900_INT2] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE12] &= ~0x80;
+			m_int_reg[INTE12] &= ~0x80;
 		}
 		m_level[TLCS900_INT2] = level;
 		break;
@@ -1545,11 +1346,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT3:
 		if (m_level[TLCS900_INT3] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE34] |= 0x08;
+			m_int_reg[INTE34] |= 0x08;
 		}
 		else if (m_level[TLCS900_INT3] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE34] &= ~0x08;
+			m_int_reg[INTE34] &= ~0x08;
 		}
 		m_level[TLCS900_INT3] = level;
 		break;
@@ -1559,7 +1360,7 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		{
 			if ( m_level[TLCS900_INT4] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_int_reg[TMP95C063_INTE34] |= 0x80;
+				m_int_reg[INTE34] |= 0x80;
 			}
 		}
 		m_level[TLCS900_INT4] = level;
@@ -1570,7 +1371,7 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		{
 			if ( m_level[TLCS900_INT5] == CLEAR_LINE && level == ASSERT_LINE )
 			{
-				m_int_reg[TMP95C063_INTE56] |= 0x08;
+				m_int_reg[INTE56] |= 0x08;
 			}
 		}
 		m_level[TLCS900_INT5] = level;
@@ -1579,11 +1380,11 @@ void tmp95c063_device::execute_set_input(int input, int level)
 	case TLCS900_INT6:
 		if (m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE)
 		{
-			m_int_reg[TMP95C063_INTE56] |= 0x80;
+			m_int_reg[INTE56] |= 0x80;
 		}
 		else if (m_level[TLCS900_INT6] == ASSERT_LINE && level == CLEAR_LINE)
 		{
-			m_int_reg[TMP95C063_INTE56] &= ~0x80;
+			m_int_reg[INTE56] &= ~0x80;
 		}
 		m_level[TLCS900_INT6] = level;
 		break;
@@ -1600,4 +1401,61 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		break;
 	}
 	m_check_irqs = 1;
+}
+
+static std::pair<u16, char const *> const tmp95c063_syms[] = {
+	{ 0x01, "P1" }, { 0x04, "P1CR" }, { 0x06, "P2" }, { 0x09, "P2FC" },
+	{ 0x0d, "P5" }, { 0x10, "P5CR" }, { 0x11, "P5FC" },
+	{ 0x12, "P6" }, { 0x13, "P7" }, { 0x15, "P6FC" }, { 0x16, "P7CR" }, { 0x17, "P7FC" },
+	{ 0x18, "P8" }, { 0x19, "P9" }, { 0x1a, "P8CR" }, { 0x1b, "P8FC" }, { 0x1c, "P9CR" }, { 0x1d, "P9FC" },
+	{ 0x1e, "PA" }, { 0x1f, "PB" },
+	{ 0x20, "T8RUN" }, { 0x21, "TRDC" }, { 0x22, "TREG0" },
+	{ 0x23, "TREG1" }, { 0x24, "T01MOD" }, { 0x25, "T02FFCR" },
+	{ 0x26, "TREG2" }, { 0x27, "TREG3" }, { 0x28, "T23MOD" },
+	{ 0x29, "TREG4" }, { 0x2a, "TREG5" }, { 0x2b, "T45MOD" },
+	{ 0x2c, "TA46FFCR" }, { 0x2d, "TREG6" }, { 0x2e, "TREG7" },
+	{ 0x2f, "T67MOD" }, { 0x30, "TREG8L" }, { 0x31, "TREG8H" },
+	{ 0x32, "TREG9L" }, { 0x33, "TREG9H" }, { 0x34, "CAP1L" },
+	{ 0x35, "CAP1H" }, { 0x36, "CAP2L" }, { 0x37, "CAP2H" },
+	{ 0x38, "T8MOD" }, { 0x39, "T8FFCR" }, { 0x3a, "T89CR" },
+	{ 0x3b, "T16RUN" },
+	{ 0x40, "TREGAL" }, { 0x41, "TREGAH" }, { 0x42, "TREGBL" }, { 0x43, "TREGBH" },
+	{ 0x44, "CAP3L" }, { 0x45, "CAP3H" }, { 0x46, "CAP4L" }, { 0x47, "CAP4H" },
+	{ 0x48, "T9MOD" }, { 0x49, "T9FFCR" },
+	{ 0x4a, "DAREG0" }, { 0x4b, "DAREG1" },
+	{ 0x4c, "PG0REG" }, { 0x4d, "PG1REG" }, { 0x4e, "PG01CR" }, { 0x4f, "DADRV" },
+	{ 0x50, "SC0BUF" }, { 0x51, "SC0CR" }, { 0x52, "SC0MOD" }, { 0x53, "BR0CR" },
+	{ 0x54, "SC1BUF" }, { 0x55, "SC1CR" }, { 0x56, "SC1MOD" }, { 0x57, "BR1CR" },
+	{ 0x58, "ODE" },
+	{ 0x5a, "DMA0V" }, { 0x5b, "DMA1V" }, { 0x5c, "DMA2V" }, { 0x5d, "DMA3V" },
+	{ 0x5e, "ADMOD1" }, { 0x5f, "ADMOD2" },
+	{ 0x60, "ADREG04L" }, { 0x61, "ADREG04H" }, { 0x62, "ADREG15L" }, { 0x63, "ADREG15H" },
+	{ 0x64, "ADREG26L" }, { 0x65, "ADREG26H" }, { 0x66, "ADREG37L" }, { 0x67, "ADREG37H" },
+	{ 0x6a, "SDMACR0" }, { 0x6b, "SDMACR1" }, { 0x6c, "SDMACR2" }, { 0x6d, "SDMACR3" },
+	{ 0x6e, "WDMOD" }, { 0x6f, "WDCR" },
+	{ 0x70, "INTE_0AD" }, { 0x71, "INTE12" },
+	{ 0x72, "INTE34" }, { 0x73, "INTE56" }, { 0x74, "INT78" },
+	{ 0x75, "INTET01" }, { 0x76, "INTET32" }, { 0x77, "INTET45" },
+	{ 0x78, "INTET67" }, { 0x79, "INTET89" }, { 0x7a, "INTETAB" },
+	{ 0x7b, "INTES0" }, { 0x7c, "INTES1" }, { 0x7d, "INTETC01" },
+	{ 0x7e, "INTETC23" }, { 0x7f, "IIMC" },
+	{ 0x80, "PACR" }, { 0x81, "PAFC" }, { 0x82, "PBCR" }, { 0x83, "PBFC" },
+	{ 0x84, "PC" }, { 0x85, "PD"}, { 0x88, "PDCR" }, { 0x8a, "PE" }, { 0x8c, "PECR" },
+	{ 0x8f, "BEXCS" },
+	{ 0x90, "B0CS" }, { 0x91, "B1CS" }, { 0x92, "B2CS" }, { 0x93, "B3CS" },
+	{ 0x94, "MSAR0" }, { 0x95, "MAMR0" }, { 0x96, "MSAR1" }, { 0x97, "MAMR1" },
+	{ 0x98, "MSAR2" }, { 0x99, "MAMR2" }, { 0x9a, "MSAR3" }, { 0x9b, "MAMR3" },
+	{ 0x9c, "DREFCR1" }, { 0x9d, "DMEMCR1" }, { 0x9e, "DREFCR3" }, { 0x9f, "DMEMCR3" }
+};
+
+static tlcs900_disassembler::cr_sym const tmp95c063_cr_syms[] = {
+	{ 8,  0x22, "DMAM0" }, { 8,  0x26, "DMAM1" }, { 8,  0x2a, "DMAM2" }, { 8,  0x2e, "DMAM3" },
+	{ 16, 0x20, "DMAC0" }, { 16, 0x24, "DMAC1" }, { 16, 0x28, "DMAC2" }, { 16, 0x2c, "DMAC3" },
+	{ 32, 0x00, "DMAS0" }, { 32, 0x04, "DMAS1" }, { 32, 0x08, "DMAS2" }, { 32, 0x0c, "DMAS3" },
+	{ 32, 0x10, "DMAD0" }, { 32, 0x14, "DMAD1" }, { 32, 0x18, "DMAD2" }, { 32, 0x1c, "DMAD3" },
+};
+
+std::unique_ptr<util::disasm_interface> tmp95c063_device::create_disassembler()
+{
+	return std::make_unique<tlcs900_disassembler>(tmp95c063_syms, tmp95c063_cr_syms);
 }

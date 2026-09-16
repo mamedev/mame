@@ -44,15 +44,19 @@ public:
 		, m_mainlatch(*this, "mainlatch")
 		, m_ymsnd(*this, "ymsnd")
 		, m_mob(*this, "mob")
+		, m_soundbank(*this, "soundbank")
+		, m_io_audio(*this, "AUDIO")
+		, m_io_pedals(*this, "PEDALS")
+		, m_io_fe4000(*this, "FE4000")
 	{ }
 
 	void badlands(machine_config &config);
 	void init_badlands();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -69,6 +73,11 @@ private:
 	optional_device<generic_latch_8_device> m_mainlatch;
 	optional_device<ym2151_device> m_ymsnd;
 	optional_device<atari_motion_objects_device> m_mob;
+	optional_memory_bank m_soundbank;
+
+	required_ioport m_io_audio;
+	required_ioport m_io_pedals;
+	required_ioport m_io_fe4000;
 
 	uint16_t sound_busy_r();
 	void sound_reset_w(uint16_t data);
@@ -85,8 +94,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_scanline);
 
 	static const atari_motion_objects_config s_mob_config;
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t           m_pedal_value[2]{};
@@ -110,12 +119,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bootleg_sound_scanline);
 
 	void badlandsb(machine_config &config);
-	void bootleg_map(address_map &map);
-	void bootleg_audio_map(address_map &map);
+	void bootleg_map(address_map &map) ATTR_COLD;
+	void bootleg_audio_map(address_map &map) ATTR_COLD;
 	uint32_t screen_update_badlandsbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_b_sharedram;

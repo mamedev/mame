@@ -11,12 +11,12 @@ class thomson_speech_device : public device_t, public thomson_extension_interfac
 public:
 	thomson_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void rom_map(address_map &map) override;
-	virtual void io_map(address_map &map) override;
+	virtual void rom_map(address_map &map) override ATTR_COLD;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 };
 
 // device type declaration

@@ -18,13 +18,12 @@
 
 #include "emu.h"
 #include "apple3.h"
-#include "formats/ap2_dsk.h"
-#include "formats/as_dsk.h"
 
 #include "bus/a2bus/cards.h"
 
 #include "bus/rs232/rs232.h"
 
+#include "machine/applefdintf.h"
 #include "machine/input_merger.h"
 
 #include "softlist_dev.h"
@@ -35,21 +34,6 @@
 void apple3_state::apple3_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
-}
-
-static void a3_floppies(device_slot_interface &device)
-{
-	device.option_add("525", FLOPPY_525_SD);
-}
-
-void apple3_state::floppy_formats(format_registration &fr)
-{
-	fr.add(FLOPPY_A216S_DOS_FORMAT);
-	fr.add(FLOPPY_A216S_PRODOS_FORMAT);
-	fr.add(FLOPPY_RWTS18_FORMAT);
-	fr.add(FLOPPY_EDD_FORMAT);
-	fr.add(FLOPPY_WOZ_FORMAT);
-	fr.add(FLOPPY_NIB_FORMAT);
 }
 
 void apple3_state::apple3(machine_config &config)
@@ -66,7 +50,7 @@ void apple3_state::apple3(machine_config &config)
 	mainirq.output_handler().append(m_via[1], FUNC(via6522_device::write_pa7)).invert(); // this is active low
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL, 910, 0, 560, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple3_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -77,7 +61,7 @@ void apple3_state::apple3(machine_config &config)
 	PALETTE(config, m_palette, FUNC(apple3_state::palette_init), 32);
 
 	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -96,29 +80,29 @@ void apple3_state::apple3(machine_config &config)
 	TIMER(config, m_repttimer).configure_generic(FUNC(apple3_state::ay3600_repeat));
 
 	/* slot bus */
-	A2BUS(config, m_a2bus, 0);
+	A2BUS(config, m_a2bus);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
 	m_a2bus->irq_w().set(FUNC(apple3_state::a2bus_irq_w));
 	m_a2bus->nmi_w().set(FUNC(apple3_state::a2bus_nmi_w));
 	m_a2bus->inh_w().set(FUNC(apple3_state::a2bus_inh_w));
 	m_a2bus->dma_w().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	A2BUS_SLOT(config, "sl1", m_a2bus, apple3_cards, nullptr);
-	A2BUS_SLOT(config, "sl2", m_a2bus, apple3_cards, nullptr);
-	A2BUS_SLOT(config, "sl3", m_a2bus, apple3_cards, nullptr);
-	A2BUS_SLOT(config, "sl4", m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl1", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl2", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl3", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
+	A2BUS_SLOT(config, "sl4", 14.318181_MHz_XTAL / 2, m_a2bus, apple3_cards, nullptr);
 
 	/* fdc */
 	APPLEIII_FDC(config, m_fdc, 1021800*2);
-	FLOPPY_CONNECTOR(config, "0", a3_floppies, "525", apple3_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "1", a3_floppies, "525", apple3_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "2", a3_floppies, "525", apple3_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "3", a3_floppies, "525", apple3_state::floppy_formats);
+	applefdintf_device::add_525(config, "0");
+	applefdintf_device::add_525(config, "1");
+	applefdintf_device::add_525(config, "2");
+	applefdintf_device::add_525(config, "3");
 
 	/* softlist for fdc */
 	SOFTWARE_LIST(config, "flop525_list").set_original("apple3");
 
 	/* acia */
-	MOS6551(config, m_acia, 0);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200)); // HACK: The schematic shows an external clock generator but using a XTAL is faster to emulate.
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -320,10 +304,10 @@ static INPUT_PORTS_START( apple3 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CHANGED_MEMBER(DEVICE_SELF, apple3_state, apple3_state::keyb_special_changed, 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(apple3_state::apple3_state::keyb_special_changed), 0) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Apple")   PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, apple3_state, apple3_state::keyb_special_changed, 0) PORT_CODE(KEYCODE_F12)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(apple3_state::apple3_state::keyb_special_changed), 0) PORT_CODE(KEYCODE_F12)
 
 	PORT_START("joy_1_x")      /* Joystick 1 X Axis */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("P1 Joystick X")
@@ -351,7 +335,7 @@ INPUT_PORTS_END
 ROM_START(apple3)
 	ROM_REGION(0x1000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "original", "Apple /// boot ROM")
-	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967), ROM_BIOS(0))
+	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(1af7ec42) SHA1(8043f914ebdcdab9838dbb78f8a2ee3867d210d2), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "soshd", "Rob Justice SOSHDBOOT")
 	ROMX_LOAD( "soshdboot.bin", 0x000000, 0x001000, CRC(fd5ac9e2) SHA1(ba466a54ddb7f618c4f18f344754343c5945b417), ROM_BIOS(1))

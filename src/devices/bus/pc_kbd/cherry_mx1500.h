@@ -16,10 +16,10 @@ public:
 protected:
 	virtual void data_write(int state) override;
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void mcu_p1_w(u8 data);
@@ -28,8 +28,8 @@ private:
 	u8 matrix_r(offs_t offset);
 	void outputs_w(offs_t offset, u8 data);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_mcu;
 	required_ioport_array<13> m_keys;

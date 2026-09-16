@@ -17,6 +17,7 @@
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -148,8 +149,8 @@ void gba_state::request_irq(uint32_t int_type)
 		// master enable?
 		if (IME & 1)
 		{
-			m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-			m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -319,31 +320,30 @@ void gba_state::dma_exec(int ch)
 
 void gba_state::audio_tick(int ref)
 {
-	if (!(SOUNDCNT_X & 0x80))
+	if (BIT(~SOUNDCNT_X, 7))
 		return;
+
+	fifo_t &fifo = m_fifo[ref ? 1 : 0];
+	if ((fifo.size > 0) && (fifo.remains == 0))
+	{
+		fifo.sample = fifo.word[fifo.ptr];
+		fifo.ptr = (fifo.ptr + 1) & 7;
+		fifo.remains = 4;
+		fifo.size--;
+	}
 
 	if (!ref)
 	{
-		if (m_fifo_a_ptr != m_fifo_a_in)
+		if (BIT(SOUNDCNT_H, 9))
 		{
-			if (m_fifo_a_ptr == 17)
-			{
-				m_fifo_a_ptr = 0;
-			}
-
-			if (SOUNDCNT_H & 0x200)
-			{
-				m_ldaca->write(m_fifo_a[m_fifo_a_ptr]);
-			}
-			if (SOUNDCNT_H & 0x100)
-			{
-				m_rdaca->write(m_fifo_a[m_fifo_a_ptr]);
-			}
-			m_fifo_a_ptr++;
+			m_ldac[0]->write(uint8_t(fifo.sample));
 		}
-
-		// fifo empty?
-		if (m_fifo_a_ptr == m_fifo_a_in)
+		if (BIT(SOUNDCNT_H, 8))
+		{
+			m_rdac[0]->write(uint8_t(fifo.sample));
+		}
+		// fifo half empty?
+		if (fifo.size <= 4)
 		{
 			// is a DMA set up to feed us?
 			if ((DMADAD(1) == 0x40000a0) && ((DMACNT_H(1) & 0x3000) == 0x3000))
@@ -360,25 +360,16 @@ void gba_state::audio_tick(int ref)
 	}
 	else
 	{
-		if (m_fifo_b_ptr != m_fifo_b_in)
+		if (BIT(SOUNDCNT_H, 13))
 		{
-			if (m_fifo_b_ptr == 17)
-			{
-				m_fifo_b_ptr = 0;
-			}
-
-			if (SOUNDCNT_H & 0x2000)
-			{
-				m_ldacb->write(m_fifo_b[m_fifo_b_ptr]);
-			}
-			if (SOUNDCNT_H & 0x1000)
-			{
-				m_rdacb->write(m_fifo_b[m_fifo_b_ptr]);
-			}
-			m_fifo_b_ptr++;
+			m_ldac[1]->write(uint8_t(fifo.sample));
 		}
-
-		if (m_fifo_b_ptr == m_fifo_b_in)
+		if (BIT(SOUNDCNT_H, 12))
+		{
+			m_rdac[1]->write(uint8_t(fifo.sample));
+		}
+		// fifo half empty?
+		if (fifo.size <= 4)
 		{
 			// is a DMA set up to feed us?
 			if ((DMADAD(1) == 0x40000a4) && ((DMACNT_H(1) & 0x3000) == 0x3000))
@@ -392,6 +383,11 @@ void gba_state::audio_tick(int ref)
 				dma_exec(2);
 			}
 		}
+	}
+	if (fifo.remains > 0)
+	{
+		fifo.sample >>= 8;
+		fifo.remains--;
 	}
 }
 
@@ -419,19 +415,19 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	// check if timers 0 or 1 are feeding directsound
 	if (tmr == 0)
 	{
-		if (!(SOUNDCNT_H & 0x400))
+		if (BIT(~SOUNDCNT_H, 10))
 			audio_tick(0);
 
-		if (!(SOUNDCNT_H & 0x4000))
+		if (BIT(~SOUNDCNT_H, 14))
 			audio_tick(1);
 	}
 
 	if (tmr == 1)
 	{
-		if (SOUNDCNT_H & 0x400)
+		if (BIT(SOUNDCNT_H, 10))
 			audio_tick(0);
 
-		if (SOUNDCNT_H & 0x4000)
+		if (BIT(SOUNDCNT_H, 14))
 			audio_tick(1);
 	}
 
@@ -717,6 +713,11 @@ uint32_t gba_state::gba_io_r(offs_t offset, uint32_t mem_mask)
 		case 0x0200/4:
 			retval = IE | (IF << 16);
 			break;
+		case 0x0204/4:
+			// TODO: bit 15 is CGB mode (from cart IN35, read only)
+			// not being writeable fixes hang in dkkswing later stages
+			retval = WAITCNT & 0x5fff;
+			break;
 		default:
 			if( ACCESSING_BITS_0_15 )
 			{
@@ -748,6 +749,8 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint8_t soundcnt_x = SOUNDCNT_X;
 	uint16_t siocnt = SIOCNT;
 	uint16_t dmachcnt[4] = { DMACNT_H(0), DMACNT_H(1), DMACNT_H(2), DMACNT_H(3) };
+	static const float dac_gain_table[2] = { 0.5f, 1.0f };
+	static const float psg_gain_table[4] = { 0.25f, 0.5f, 1.0f, 1.0f/* prohibited? */ };
 
 	COMBINE_DATA(&m_regs[offset]);
 
@@ -864,22 +867,37 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			if (ACCESSING_BITS_16_31)
 			{
+				// master volume
+				if (((data >> 16) & 3) == 3)
+					logerror("%s: Using prohibited PSG Master volume value\n", machine().describe_context());
+
+				m_gbsound->set_output_gain(ALL_OUTPUTS, psg_gain_table[(data >> 16) & 3]);
+				m_ldac[0]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 18)]);
+				m_rdac[0]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 18)]);
+				m_ldac[1]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 19)]);
+				m_rdac[1]->set_output_gain(ALL_OUTPUTS, dac_gain_table[BIT(data, 19)]);
 				// DAC A reset?
-				if (data & 0x08000000)
+				if (BIT(data, 27))
 				{
-					m_fifo_a_ptr = 17;
-					m_fifo_a_in = 17;
-					m_ldaca->write(0);
-					m_rdaca->write(0);
+					m_fifo[0].ptr = 0;
+					m_fifo[0].in = 0;
+					m_fifo[0].size = 0;
+					m_fifo[0].remains = 0;
+					m_fifo[0].sample = 0;
+					m_ldac[0]->write(0);
+					m_rdac[0]->write(0);
 				}
 
 				// DAC B reset?
-				if (data & 0x80000000)
+				if (BIT(data, 31))
 				{
-					m_fifo_b_ptr = 17;
-					m_fifo_b_in = 17;
-					m_ldacb->write(0);
-					m_rdacb->write(0);
+					m_fifo[1].ptr = 0;
+					m_fifo[1].in = 0;
+					m_fifo[1].size = 0;
+					m_fifo[1].remains = 0;
+					m_fifo[1].sample = 0;
+					m_ldac[1]->write(0);
+					m_rdac[1]->write(0);
 				}
 			}
 			break;
@@ -887,14 +905,18 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			if( ACCESSING_BITS_0_7 )
 			{
 				m_gbsound->sound_w(0x16, data);
-				if ((data & 0x80) && !(soundcnt_x & 0x80))
+				if (BIT(data, 7) && BIT(~soundcnt_x, 7))
 				{
-					m_fifo_a_ptr = m_fifo_a_in = 17;
-					m_fifo_b_ptr = m_fifo_b_in = 17;
-					m_ldaca->write(0);
-					m_rdaca->write(0);
-					m_ldacb->write(0);
-					m_rdacb->write(0);
+					m_fifo[0].ptr = m_fifo[0].in = 0;
+					m_fifo[0].size = m_fifo[0].remains = 0;
+					m_fifo[0].sample = 0;
+					m_fifo[1].ptr = m_fifo[1].in = 0;
+					m_fifo[1].size = m_fifo[1].remains = 0;
+					m_fifo[1].sample = 0;
+					m_ldac[0]->write(0);
+					m_rdac[0]->write(0);
+					m_ldac[1]->write(0);
+					m_rdac[1]->write(0);
 				}
 			}
 			break;
@@ -971,49 +993,19 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 		case 0x00a0/4:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_fifo_a_in %= 17;
-				m_fifo_a[m_fifo_a_in++] = (data)&0xff;
-			}
-			if (ACCESSING_BITS_8_15)
-			{
-				m_fifo_a_in %= 17;
-				m_fifo_a[m_fifo_a_in++] = (data>>8)&0xff;
-			}
-			if (ACCESSING_BITS_16_23)
-			{
-				m_fifo_a_in %= 17;
-				m_fifo_a[m_fifo_a_in++] = (data>>16)&0xff;
-			}
-			if (ACCESSING_BITS_24_31)
-			{
-				m_fifo_a_in %= 17;
-				m_fifo_a[m_fifo_a_in++] = (data>>24)&0xff;
-			}
-			break;
 		case 0x00a4/4:
-			if (ACCESSING_BITS_0_7)
+		{
+			fifo_t &fifo = m_fifo[offset & 1];
+			if (fifo.size >= 8)
 			{
-				m_fifo_b_in %= 17;
-				m_fifo_b[m_fifo_b_in++] = (data)&0xff;
+				logerror("%s: Sound FIFO %01x write overflow %04x & %04x\n", machine().describe_context(), offset & 1, data, mem_mask);
+				return;
 			}
-			if (ACCESSING_BITS_8_15)
-			{
-				m_fifo_b_in %= 17;
-				m_fifo_b[m_fifo_b_in++] = (data>>8)&0xff;
-			}
-			if (ACCESSING_BITS_16_23)
-			{
-				m_fifo_b_in %= 17;
-				m_fifo_b[m_fifo_b_in++] = (data>>16)&0xff;
-			}
-			if (ACCESSING_BITS_24_31)
-			{
-				m_fifo_b_in %= 17;
-				m_fifo_b[m_fifo_b_in++] = (data>>24)&0xff;
-			}
+			COMBINE_DATA(&fifo.word[fifo.in]);
+			fifo.in = (fifo.in + 1) & 7;
+			fifo.size++;
 			break;
+		}
 		case 0x00b8/4:
 		case 0x00c4/4:
 		case 0x00d0/4:
@@ -1169,35 +1161,77 @@ uint32_t gba_cons_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 			return 0;
 	}
 
-	if (m_maincpu->pc() >= 0x4000)
+	const uint32_t pc = m_maincpu->pc();
+	if (pc >= 0x4000)
 	{
-		//printf("GBA protection: blocking PC=%x\n", m_maincpu->pc());
-		return 0;
+		// The BIOS can only be read while executing from it; other reads return the most recently
+		// fetched BIOS opcode as per GBATEK.
+		return m_bios_prefetch;
 	}
 
-	return rom[offset & 0x3fff];
+	// The core prefetches 2 words ahead of the PC like the real pipeline, so PC+8
+	if (((offset << 2) == ((pc & ~3) + 8)) && !machine().side_effects_disabled())
+	{
+		m_bios_prefetch = rom[offset];
+	}
+
+	return rom[offset];
 }
 
-uint32_t gba_state::gba_10000000_r(offs_t offset, uint32_t mem_mask)
+// Reads from unused address space return the most recently prefetched opcode.
+// Justice League Chronicles and The Pinball of the Dead both do null pointer
+// reads and work by accident.
+uint32_t gba_state::gba_open_bus_r(offs_t offset, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t data;
-	uint32_t pc = m_maincpu->state_int(ARM7_PC);
-	if (pc >= 0x10000000)
+	const uint32_t pc = m_maincpu->pc();
+
+	// don't recurse if we're somehow executing from unused space
+	if ((pc >= 0x10000000) || ((pc >= 0x4000) && (pc < 0x02000000)))
 	{
 		return 0;
 	}
-	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
-	if (T_IS_SET( cpsr))
+
+	uint32_t data;
+	if (T_IS_SET(m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR)))
 	{
-		data = mspace.read_dword(pc + 8);
+		// Thumb: the two halves depend on where the code is and how it's aligned
+		switch (pc >> 24)
+		{
+			case 0x00: // BIOS
+			case 0x07: // OAM
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 6) << 16);
+				}
+				break;
+
+			case 0x03: // IWRAM: the other half is the previous prefetch, usually [$+2]
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 2) << 16);
+				}
+				break;
+
+			default: // EWRAM, palette, VRAM, cartridge ROM
+				data = mspace.read_word(pc + 4);
+				data |= data << 16;
+				break;
+		}
 	}
 	else
 	{
-		uint16_t insn = mspace.read_word(pc + 4);
-		data = (insn << 16) | (insn << 0);
+		data = mspace.read_dword(pc + 8);
 	}
-	logerror("%s: unmapped program memory read from %08X = %08X & %08X\n", machine().describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);
+	logerror("%s: unmapped program memory read = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
@@ -1241,8 +1275,8 @@ void gba_state::dma_vblank_callback(int state)
 void gba_state::gba_map(address_map &map)
 {
 	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000);
-	map(0x03000000, 0x03007fff).ram().mirror(0xff8000);
+	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000); // External RAM (16 bit)
+	map(0x03000000, 0x03007fff).ram().mirror(0xff8000); // Internal RAM (32 bit)
 	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
 	map(0x04000060, 0x040003ff).rw(FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
 	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
@@ -1251,14 +1285,15 @@ void gba_state::gba_map(address_map &map)
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
 
-	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_open_bus_r));
 }
 
 void gba_cons_state::gba_cons_map(address_map &map)
 {
 	gba_map(map);
 
-	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_cons_state::gba_bios_r));
+	map(0x00000000, 0x00003fff).rom().r(FUNC(gba_cons_state::gba_bios_r));
+	map(0x00004000, 0x01ffffff).r(FUNC(gba_cons_state::gba_open_bus_r));
 	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 }
 
@@ -1313,14 +1348,19 @@ void gba_state::machine_reset()
 	m_dma_timer[2]->adjust(attotime::never, 2);
 	m_dma_timer[3]->adjust(attotime::never, 3);
 
-	m_fifo_a_ptr = m_fifo_b_ptr = 17;   // indicate empty
-	m_fifo_a_in = m_fifo_b_in = 17;
+	for (auto &fifo : m_fifo)
+	{
+		fifo.ptr = fifo.in = 0;   // indicate empty
+		fifo.size = 0;
+		fifo.remains = 0;
+		fifo.sample = 0;
+	}
 
 	// and clear the DACs
-	m_ldaca->write(0);
-	m_rdaca->write(0);
-	m_ldacb->write(0);
-	m_rdacb->write(0);
+	m_ldac[0]->write(0);
+	m_rdac[0]->write(0);
+	m_ldac[1]->write(0);
+	m_rdac[1]->write(0);
 }
 
 void gba_state::machine_start()
@@ -1357,17 +1397,19 @@ void gba_state::machine_start()
 	save_item(NAME(m_timer_reload));
 	save_item(NAME(m_timer_recalc));
 	save_item(NAME(m_timer_hz));
-	save_item(NAME(m_fifo_a_ptr));
-	save_item(NAME(m_fifo_b_ptr));
-	save_item(NAME(m_fifo_a_in));
-	save_item(NAME(m_fifo_b_in));
-	save_item(NAME(m_fifo_a));
-	save_item(NAME(m_fifo_b));
+	save_item(STRUCT_MEMBER(m_fifo, ptr));
+	save_item(STRUCT_MEMBER(m_fifo, in));
+	save_item(STRUCT_MEMBER(m_fifo, size));
+	save_item(STRUCT_MEMBER(m_fifo, remains));
+	save_item(STRUCT_MEMBER(m_fifo, sample));
+	save_item(STRUCT_MEMBER(m_fifo, word));
 }
 
 void gba_cons_state::machine_start()
 {
 	gba_state::machine_start();
+
+	save_item(NAME(m_bios_prefetch));
 
 	// install the cart ROM & SRAM into the address map, if present
 	if (m_cart->exists())
@@ -1453,26 +1495,25 @@ static void gba_cart(device_slot_interface &device)
 
 void gba_state::gbadv(machine_config &config)
 {
-	ARM7(config, m_maincpu, XTAL(16'777'216));
+	ARM7(config, m_maincpu, 4.194304_MHz_XTAL * 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gba_state::gba_map);
 
-	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
+	gba_lcd_device &lcd(GBA_LCD(config, "lcd"));
 	lcd.int_hblank_callback().set(FUNC(gba_state::int_hblank_callback));
 	lcd.int_vblank_callback().set(FUNC(gba_state::int_vblank_callback));
 	lcd.int_vcount_callback().set(FUNC(gba_state::int_vcount_callback));
 	lcd.dma_hblank_callback().set(FUNC(gba_state::dma_hblank_callback));
 	lcd.dma_vblank_callback().set(FUNC(gba_state::dma_vblank_callback));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	CGB04_APU(config, m_gbsound, XTAL(16'777'216)/4);
-	m_gbsound->add_route(0, "lspeaker", 0.5);
-	m_gbsound->add_route(1, "rspeaker", 0.5);
+	SPEAKER(config, "speaker", 2).front();
+	AGB_APU(config, m_gbsound, 4.194304_MHz_XTAL);
+	m_gbsound->add_route(0, "speaker", 0.5, 0);
+	m_gbsound->add_route(1, "speaker", 0.5, 1);
 
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldaca, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdaca, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldacb, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdacb, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 
 }
 

@@ -28,7 +28,7 @@ QVariant DevicesWindowModel::data(const QModelIndex &index, int role) const
 	switch (index.column())
 	{
 	case 0: return (dev == &m_machine.root_device()) ? QString("<root>") : QString(dev->basetag());
-	case 1: return QString(dev->name());
+	case 1: return QString::fromUtf8(dev->name());
 	}
 
 	return QVariant();
@@ -60,7 +60,6 @@ QModelIndex DevicesWindowModel::index(int row, int column, const QModelIndex &pa
 	{
 		if (row == 0)
 			target = &m_machine.root_device();
-
 	}
 	else
 	{

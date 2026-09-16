@@ -47,12 +47,12 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void atari_s2(machine_config &config);
-	void atari_s3(machine_config &config);
+	void atari_s2(machine_config &config) ATTR_COLD;
+	void atari_s3(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void sound0_w(u8 data);
@@ -65,8 +65,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 
-	void atari_s2_map(address_map &map);
-	void atari_s3_map(address_map &map);
+	void atari_s2_map(address_map &map) ATTR_COLD;
+	void atari_s3_map(address_map &map) ATTR_COLD;
 
 	bool m_timer_sb = false;
 	u8 m_timer_s[5]{};
@@ -484,9 +484,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::irq )
 void atari_s2_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_timer_sb));
 	save_item(NAME(m_timer_s));

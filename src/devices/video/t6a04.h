@@ -21,7 +21,7 @@ class t6a04_device : public device_t
 {
 public:
 	// construction/destruction
-	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	t6a04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_size(int w, int h)
 	{
@@ -39,8 +39,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:

@@ -39,6 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 
+// MAME: when #included from actual MAME code, we need the endianness to match what the build system set
+#ifdef LSB_FIRST
+#ifndef LITTLEENDIAN
+#define LITTLEENDIAN
+#endif
+#endif
+
 /*----------------------------------------------------------------------------
 | Types used to pass 16-bit, 32-bit, 64-bit, and 128-bit floating-point
 | arguments and results to/from functions.  These types must be exactly

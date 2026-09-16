@@ -552,5 +552,4 @@ void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *
 		if (crosshairnode)
 			crosshairnode->set_attribute_int("val", m_auto_time);
 	}
-
 }

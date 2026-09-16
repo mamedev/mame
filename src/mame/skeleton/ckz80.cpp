@@ -68,8 +68,8 @@ public:
 	void ckz80(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	u8 port80_r();
 	u8 port81_r();
 	void port40_w(u8 data);
@@ -77,8 +77,8 @@ private:
 	void ctc_z0_w(int state);
 	void ctc_z1_w(int state);
 	void ctc_z2_w(int state);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 m_term_data = 0U;
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
@@ -204,7 +204,7 @@ void ckz80_state::ckz80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ckz80_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ckz80_state::kbd_put));
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);

@@ -102,7 +102,7 @@ public:
 	void init_jokrwild();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -119,7 +119,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void jokrwild_palette(palette_device &palette) const;
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void jokrwild_map(address_map &map);
+	void jokrwild_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -436,7 +436,7 @@ void jokrwild_state::jokrwild(machine_config &config)
 	pia1.readpb_handler().set_ioport("IN3");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size((32+1)*8, (32+1)*8);                  // From MC6845, registers 00 & 04. (value-1)

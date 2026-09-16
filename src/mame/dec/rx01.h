@@ -24,18 +24,18 @@ class rx01_device :  public device_t
 {
 public:
 	// construction/destruction
-	rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rx01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void command_write(uint16_t data);
 	uint16_t status_read();
@@ -50,8 +50,8 @@ protected:
 	void write_sector(int ddam);
 
 private:
-	void firmware_map(address_map &map);
-	void secbuf_map(address_map &map);
+	void firmware_map(address_map &map) ATTR_COLD;
+	void secbuf_map(address_map &map) ATTR_COLD;
 
 	enum rx01_state {
 		RX01_FILL,

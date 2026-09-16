@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    chd.h
-
     MAME Compressed Hunks of Data file format
 
 ***************************************************************************/
@@ -229,6 +227,8 @@ constexpr chd_metadata_tag CDROM_TRACK_METADATA_TAG = CHD_MAKE_TAG('C','H','T','
 extern const char *CDROM_TRACK_METADATA_FORMAT;
 constexpr chd_metadata_tag CDROM_TRACK_METADATA2_TAG = CHD_MAKE_TAG('C','H','T','2');
 extern const char *CDROM_TRACK_METADATA2_FORMAT;
+constexpr chd_metadata_tag CDROM_SESSION_METADATA_TAG = CHD_MAKE_TAG('C','H','S','E');
+extern const char *CDROM_SESSION_METADATA_FORMAT;
 constexpr chd_metadata_tag GDROM_OLD_METADATA_TAG = CHD_MAKE_TAG('C','H','G','T');
 constexpr chd_metadata_tag GDROM_TRACK_METADATA_TAG = CHD_MAKE_TAG('C', 'H', 'G', 'D');
 extern const char *GDROM_TRACK_METADATA_FORMAT;
@@ -309,33 +309,37 @@ public:
 	uint32_t hunk_count() const noexcept { return m_hunkcount; }
 	uint32_t unit_bytes() const noexcept { return m_unitbytes; }
 	uint64_t unit_count() const noexcept { return m_unitcount; }
-	bool compressed() const { return (m_compression[0] != CHD_CODEC_NONE); }
+	bool compressed() const noexcept { return (m_compression[0] != CHD_CODEC_NONE); }
 	chd_codec_type compression(int index) const noexcept { return m_compression[index]; }
 	chd_file *parent() const noexcept { return m_parent.get(); }
 	bool parent_missing() const noexcept;
-	util::sha1_t sha1();
-	util::sha1_t raw_sha1();
-	util::sha1_t parent_sha1();
+	util::sha1_t sha1() const noexcept;
+	util::sha1_t raw_sha1() const noexcept;
+	util::sha1_t parent_sha1() const noexcept;
 	std::error_condition hunk_info(uint32_t hunknum, chd_codec_type &compressor, uint32_t &compbytes);
 
 	// setters
-	void set_raw_sha1(util::sha1_t rawdata);
-	void set_parent_sha1(util::sha1_t parent);
+	std::error_condition set_raw_sha1(util::sha1_t rawdata) noexcept;
+	std::error_condition set_parent_sha1(util::sha1_t parent) noexcept;
 
 	// file create
-	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4]);
-	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, chd_codec_type compression[4]);
-	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent);
-	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, chd_codec_type compression[4], chd_file &parent);
+	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
+	std::error_condition create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
+	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, uint32_t unitbytes, const chd_codec_type (&compression)[4]);
+	std::error_condition create(std::string_view filename, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
+	std::error_condition create(util::random_read_write &file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
+	std::error_condition create(util::random_read_write::ptr &&file, uint64_t logicalbytes, uint32_t hunkbytes, const chd_codec_type (&compression)[4], chd_file &parent);
 
 	// file open
 	std::error_condition open(std::string_view filename, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
+	std::error_condition open(util::random_read_write &file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 	std::error_condition open(util::random_read_write::ptr &&file, bool writeable = false, chd_file *parent = nullptr, const open_parent_func &open_parent = nullptr);
 
 	// file close
 	void close();
 
 	// read/write
+	std::error_condition codec_process_hunk(uint32_t hunknum);
 	std::error_condition read_hunk(uint32_t hunknum, void *buffer);
 	std::error_condition write_hunk(uint32_t hunknum, const void *buffer);
 	std::error_condition read_units(uint64_t unitnum, void *buffer, uint32_t count = 1);
@@ -345,12 +349,13 @@ public:
 
 	// metadata management
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output);
+	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::string &output, uint32_t &index);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, void *output, uint32_t outputlen, uint32_t &resultlen);
 	std::error_condition read_metadata(chd_metadata_tag searchtag, uint32_t searchindex, std::vector<uint8_t> &output, chd_metadata_tag &resulttag, uint8_t &resultflags);
 	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const void *inputbuf, uint32_t inputlen, uint8_t flags = CHD_MDFLAGS_CHECKSUM);
 	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const std::string &input, uint8_t flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.c_str(), input.length() + 1, flags); }
-	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const std::vector<uint8_t> &input, uint8_t flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, &input[0], input.size(), flags); }
+	std::error_condition write_metadata(chd_metadata_tag metatag, uint32_t metaindex, const std::vector<uint8_t> &input, uint8_t flags = CHD_MDFLAGS_CHECKSUM) { return write_metadata(metatag, metaindex, input.data(), input.size(), flags); }
 	std::error_condition delete_metadata(chd_metadata_tag metatag, uint32_t metaindex);
 	std::error_condition clone_all_metadata(chd_file &source);
 
@@ -361,23 +366,22 @@ public:
 	std::error_condition codec_configure(chd_codec_type codec, int param, void *config);
 
 	// typing
-	bool is_hd() const;
-	bool is_cd() const;
-	bool is_gd() const;
-	bool is_dvd() const;
-	bool is_av() const;
+	std::error_condition check_is_hd() const noexcept;
+	std::error_condition check_is_cd() const noexcept;
+	std::error_condition check_is_gd() const noexcept;
+	std::error_condition check_is_dvd() const noexcept;
+	std::error_condition check_is_av() const noexcept;
 
 private:
 	struct metadata_entry;
 	struct metadata_hash;
 
 	// inline helpers
-	util::sha1_t be_read_sha1(const uint8_t *base) const;
-	void be_write_sha1(uint8_t *base, util::sha1_t value);
-	void file_read(uint64_t offset, void *dest, uint32_t length) const;
-	void file_write(uint64_t offset, const void *source, uint32_t length);
+	util::sha1_t be_read_sha1(const uint8_t *base) const noexcept;
+	void be_write_sha1(uint8_t *base, util::sha1_t value) noexcept;
+	std::error_condition file_read(uint64_t offset, void *dest, uint32_t length) const noexcept;
+	std::error_condition file_write(uint64_t offset, const void *source, uint32_t length) noexcept;
 	uint64_t file_append(const void *source, uint32_t length, uint32_t alignment = 0);
-	uint8_t bits_for_value(uint64_t value);
 
 	// internal helpers
 	uint32_t guess_unitbytes();
@@ -389,17 +393,17 @@ private:
 	std::error_condition create_common();
 	std::error_condition open_common(bool writeable, const open_parent_func &open_parent);
 	void create_open_common();
-	void verify_proper_compression_append(uint32_t hunknum);
+	std::error_condition verify_proper_compression_append(uint32_t hunknum) const noexcept;
 	void hunk_write_compressed(uint32_t hunknum, int8_t compression, const uint8_t *compressed, uint32_t complength, util::crc16_t crc16);
 	void hunk_copy_from_self(uint32_t hunknum, uint32_t otherhunk);
 	void hunk_copy_from_parent(uint32_t hunknum, uint64_t parentunit);
-	bool metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const;
-	void metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset);
+	std::error_condition metadata_find(chd_metadata_tag metatag, int32_t metaindex, metadata_entry &metaentry, bool resume = false) const noexcept;
+	std::error_condition metadata_set_previous_next(uint64_t prevoffset, uint64_t nextoffset) noexcept;
 	void metadata_update_hash();
-	static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
 	// file characteristics
-	util::random_read_write::ptr m_file;        // handle to the open core file
+	util::random_read_write::ptr m_owned_file;  // open file if we own it
+	util::random_read_write *m_file;            // handle to the open file
 	bool                    m_allow_reads;      // permit reads from this CHD?
 	bool                    m_allow_writes;     // permit writes to this CHD?
 
@@ -413,7 +417,7 @@ private:
 	uint32_t                m_unitbytes;        // size of each unit in bytes
 	uint64_t                m_unitcount;        // number of units represented
 	chd_codec_type          m_compression[4];   // array of compression types used
-	std::shared_ptr<chd_file> m_parent;           // pointer to parent file, or nullptr if none
+	std::shared_ptr<chd_file> m_parent;         // pointer to parent file, or nullptr if none
 	bool                    m_parent_missing;   // are we missing our parent?
 
 	// key offsets within the header
@@ -466,7 +470,7 @@ private:
 
 		// operations
 		void reset();
-		uint64_t find(util::crc16_t crc16, util::sha1_t sha1);
+		uint64_t find(util::crc16_t crc16, util::sha1_t sha1) const noexcept;
 		void add(uint64_t itemnum, util::crc16_t crc16, util::sha1_t sha1);
 
 		// constants
@@ -563,7 +567,7 @@ private:
 	osd_work_queue *        m_read_queue;       // work queue for reading
 	uint64_t                m_read_queue_offset;// next offset to enqueue
 	uint64_t                m_read_done_offset; // next offset that will complete
-	bool                    m_read_error;       // error during reading?
+	std::error_condition    m_read_error;       // error during reading, if any
 
 	// work item thread
 	static constexpr int WORK_BUFFER_HUNKS = 256;

@@ -63,7 +63,7 @@ public:
 	void ibm5550(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -75,8 +75,8 @@ private:
 	required_shared_ptr<uint16_t> m_gfxram;
 	required_device<palette_device> m_palette;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -226,7 +226,7 @@ void ibm5550_state::ibm5550(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	// D8253C-2
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 
 	// Parallel port, 36 pins
 	// keyboard connector
@@ -245,7 +245,7 @@ void ibm5550_state::ibm5550(machine_config &config)
 	// IBM6343869 / MN50007SPF
 	// x2 HM6116P-2
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(ibm5550_state::screen_update));
@@ -287,4 +287,4 @@ ROM_START( ibm5550 )
 	ROM_LOAD("chargen.rom", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
-COMP( 1983, ibm5550, 0, 0, ibm5550, ibm5550, ibm5550_state, empty_init, "International Business Machines", "Multistation 5550", MACHINE_IS_SKELETON )
+COMP( 1983, ibm5550, 0, 0, ibm5550, ibm5550, ibm5550_state, empty_init, "International Business Machines", "Multistation 5550", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

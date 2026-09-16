@@ -24,6 +24,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -52,27 +53,27 @@ public:
 	void prschess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data[2] = { };
+
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
 	void leds_w(offs_t offset, u8 data);
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data[2] = { };
 };
 
 void prschess_state::machine_start()
@@ -187,7 +188,7 @@ INPUT_PORTS_END
 void prschess_state::prschess(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000);
+	M6502(config, m_maincpu, 2'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &prschess_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(prschess_state::nmi_line_pulse), attotime::from_hz(100)); // guessed
 
@@ -225,4 +226,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, prschess, 0,      0,      prschess, prschess, prschess_state, empty_init, "SciSys", "President Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, prschess, 0,      0,      prschess, prschess, prschess_state, empty_init, "SciSys / Heuristic Software", "President Chess", MACHINE_SUPPORTS_SAVE )

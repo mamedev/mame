@@ -4,8 +4,6 @@
 
     ACT Apricot FP
 
-    preliminary driver by Angelo Salese
-
 
 11/09/2011 - modernised. The portable doesn't seem to have
              scroll registers, and it sets the palette to black.
@@ -121,10 +119,10 @@ private:
 	floppy_image_device *m_floppy;
 	required_device<centronics_device> m_centronics;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	MC6845_UPDATE_ROW(update_row);
@@ -156,10 +154,8 @@ private:
 	void write_centronics_fault(int state);
 	void write_centronics_perror(int state);
 
-	void fp_io(address_map &map);
-	void fp_mem(address_map &map);
-	void sound_io(address_map &map);
-	void sound_mem(address_map &map);
+	void fp_io(address_map &map) ATTR_COLD;
+	void fp_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -456,16 +452,6 @@ void fp_state::fp_io(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( sound_mem )
-//-------------------------------------------------
-
-void fp_state::sound_mem(address_map &map)
-{
-	map(0xf000, 0xffff).rom().region(HD63B01V1_TAG, 0);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -576,13 +562,12 @@ void fp_state::fp(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	HD6301V1(config, m_soundcpu, 2000000);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
 	m_soundcpu->set_disable();
 
 	/* video hardware */
 	config.set_default_layout(layout_apricotp);
 
-	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG));
 	screen_lcd.set_refresh_hz(50);
 	screen_lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_lcd.set_screen_update(FUNC(fp_state::screen_update));
@@ -590,7 +575,7 @@ void fp_state::fp(machine_config &config)
 	screen_lcd.set_visarea_full();
 	screen_lcd.set_palette("palette");
 
-	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG));
 	screen_crt.set_refresh_hz(50);
 	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
@@ -611,17 +596,17 @@ void fp_state::fp(machine_config &config)
 	SN76489A(config, SN76489AN_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
-	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG);
 
 	AM9517A(config, m_dmac, 250000);
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
 	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
 	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(2000000);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(2000000);

@@ -27,14 +27,14 @@ class at28c16_device :
 {
 public:
 	// construction/destruction
-	at28c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	at28c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -58,7 +58,7 @@ private:
 	void set_oe_12v(int state);
 	TIMER_CALLBACK_MEMBER( write_complete );
 
-	void at28c16_map8(address_map &map);
+	void at28c16_map8(address_map &map) ATTR_COLD;
 };
 
 

@@ -28,8 +28,8 @@ public:
 
 private:
 	uint32_t dd_null_r();
-	void n64_map(address_map &map);
-	void n64dd_map(address_map &map);
+	void n64_map(address_map &map) ATTR_COLD;
+	void n64dd_map(address_map &map) ATTR_COLD;
 
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
@@ -37,8 +37,8 @@ private:
 	void mempak_format(uint8_t* pak);
 	std::error_condition disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
-	void rsp_imem_map(address_map &map);
-	void rsp_dmem_map(address_map &map);
+	void rsp_imem_map(address_map &map) ATTR_COLD;
+	void rsp_dmem_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t n64_console_state::dd_null_r()
@@ -409,7 +409,7 @@ void n64_console_state::n64(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
 	// TODO: with 480 vertical will generate invalid vblanks
 	// cfr. amenairc -drc
@@ -420,13 +420,14 @@ void n64_console_state::n64(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	N64PERIPH(config, m_rcp_periphs, 0);
+	N64PERIPH(config, m_rcp_periphs);
+	m_rcp_periphs->set_sram(m_sram);
+	m_rcp_periphs->set_rdram(m_rdram);
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));

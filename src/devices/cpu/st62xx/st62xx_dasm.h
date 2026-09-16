@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_CPU_ST62XX_DASM_H
-#define MAME_CPU_ST62XX_DASM_H
+#ifndef MAME_CPU_ST62XX_ST62XX_DASM_H
+#define MAME_CPU_ST62XX_ST62XX_DASM_H
 
 #pragma once
 
@@ -24,4 +24,4 @@ protected:
 	std::string reg_name(const uint8_t reg);
 };
 
-#endif // MAME_CPU_ST62XX_DASM_H
+#endif // MAME_CPU_ST62XX_ST62XX_DASM_H

@@ -33,7 +33,7 @@ public:
 private:
 	u16 one_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -69,4 +69,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(2002, triumec, 0, 0, trium, trium, trium_state, empty_init, "Mitsubishi", "Trium Eclipse", MACHINE_IS_SKELETON)
+SYST(2002, triumec, 0, 0, trium, trium, trium_state, empty_init, "Mitsubishi", "Trium Eclipse", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

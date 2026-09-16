@@ -101,9 +101,9 @@ public:
 	void init_agress();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -121,7 +121,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void irq_handler(int state);
 	void irq6_ack_w(uint16_t data);
 	void irq5_ack_w(uint16_t data);
 	void frontcolor_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -130,12 +129,10 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	static rgb_t xBGR_444(u32 raw);
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 rgb_t blockout_state::xBGR_444(u32 raw)
 {
@@ -230,8 +227,6 @@ u32 blockout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-// machine
 
 void blockout_state::irq6_ack_w(uint16_t data)
 {
@@ -399,19 +394,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-// handler called by the 2151 emulator when the internal timers cause an IRQ
-void blockout_state::irq_handler(int state)
-{
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
-}
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -451,7 +433,7 @@ void blockout_state::blockout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume same as ddragon3 with adjusted visible display area
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
 	m_screen->set_screen_update(FUNC(blockout_state::screen_update));
@@ -460,20 +442,19 @@ void blockout_state::blockout(machine_config &config)
 	PALETTE(config, m_palette).set_format(2, &blockout_state::xBGR_444, 513);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
-	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // IM 1
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 

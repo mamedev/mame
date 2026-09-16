@@ -49,9 +49,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_buffered_serial_interface implementation
 	virtual void tra_callback() override;
@@ -84,7 +84,7 @@ private:
 			uint8_t crc[2];
 		};
 	public:
-		std::error_condition read_archive(util::core_file &stream, uint32_t segment_id);
+		std::error_condition read_archive(util::random_read &stream, uint32_t segment_id);
 		std::error_condition load(std::string_view local_path, uint32_t segment_id);
 		const pak& operator[](const int index) const;
 		uint32_t size() const { return pak_list.size(); }

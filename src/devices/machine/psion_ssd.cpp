@@ -106,9 +106,6 @@ void psion_ssd_device::device_start()
 
 	m_door_timer = timer_alloc(FUNC(psion_ssd_device::close_door), this);
 	m_door_timer->reset();
-
-	save_pointer(NAME(m_ssd_data), 0x800000);
-	save_item(NAME(m_info_byte));
 }
 
 //-------------------------------------------------
@@ -163,8 +160,8 @@ std::pair<std::error_condition, std::string> psion_ssd_device::call_load()
 	if (size < 0x10000 || size > 0x800000 || (size & (size - 1)) != 0)
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size, must be 64K, 128K, 256K, 512K, 1M, 2M, 4M, 8M");
 
-	if (fread(m_ssd_data, size) != size)
-		return std::make_pair(std::errc::io_error, std::string());
+	fseek(0, SEEK_SET);
+	fread(m_ssd_data.get(), size);
 
 	// check for Flash header
 	if ((m_ssd_data[0] | (m_ssd_data[1] << 8)) == 0xf1a5) // Flash

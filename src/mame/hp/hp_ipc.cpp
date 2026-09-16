@@ -411,8 +411,8 @@ public:
 	void hp9808a(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
@@ -435,11 +435,11 @@ private:
 	[[maybe_unused]] void irq_6(int state);
 	void irq_7(int state);
 
-	void hp_ipc_mem_inner_base(address_map &map);
-	void hp_ipc_mem_inner_9807a(address_map &map);
-	void hp_ipc_mem_outer(address_map &map);
+	void hp_ipc_mem_inner_base(address_map &map) ATTR_COLD;
+	void hp_ipc_mem_inner_9807a(address_map &map) ATTR_COLD;
+	void hp_ipc_mem_outer(address_map &map) ATTR_COLD;
 
-	void hp_ipc_mem_inner_9808a(address_map &map);
+	void hp_ipc_mem_inner_9808a(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -797,7 +797,7 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	// Beeper
 	COP452(config , m_spkr , 2_MHz_XTAL);
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, 0);
 	m_spkr->oa_w().set(m_dac , FUNC(dac_1bit_device::write));
 
 	// IO slots
@@ -838,7 +838,7 @@ void hp_ipc_state::hp_ipc(machine_config &config)
 	// horizontal time = 60 us (min)
 	// ver.refresh period = ~300 us
 	// ver.period = 16.7ms (~60 hz)
-	SCREEN(config , m_screen , SCREEN_TYPE_LCD); // actually an EL display
+	SCREEN(config, m_screen).set_lcd(); // actually an EL display
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
 	m_screen->set_raw(6_MHz_XTAL * 2 , 720 , 0 , 512 , 261 , 0 , 255);
@@ -857,7 +857,7 @@ void hp_ipc_state::hp9808a(machine_config &config)
 	// 64kw/128kb video RAM
 	m_gpu->set_vram_size(64);
 
-	SCREEN(config , m_screen , SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_color(rgb_t::amber()); // actually a kind of EL display
 	m_screen->set_screen_update("gpu" , FUNC(hp1ll3_device::screen_update));
 	m_screen->set_raw(6_MHz_XTAL * 2 , 880 , 0 , 640 , 425 , 0 , 400);

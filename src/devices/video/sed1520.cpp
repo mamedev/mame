@@ -5,14 +5,19 @@
     SED1520 LCD controller
     SED1560 LCD controller
     EPL43102 LCD controller
+    NT7502 LCD controller
 
     TODO:
+    - add a callback for outputting com/seg pins (in theory, the chip doesn't
+      require a raster screen, and can be used for eg. a 7seg panel)
+    - screen update callback shouldn't have any business with internal state
+      of the chip, such as m_start_line
     - busy flag
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/sed1520.h"
+#include "sed1520.h"
 
 #include "screen.h"
 
@@ -24,6 +29,7 @@
 DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520 LCD Driver")
 DEFINE_DEVICE_TYPE(SED1560, sed1560_device, "sed1560", "Epson SED1560 LCD Driver")
 DEFINE_DEVICE_TYPE(EPL43102, epl43102_device, "epl43102", "Elan EPL43102 LCD Driver")
+DEFINE_DEVICE_TYPE(NT7502, nt7502_device, "nt7502", "Novatek NT7502 LCD Driver")
 
 
 //**************************************************************************
@@ -69,7 +75,12 @@ sed1560_device::sed1560_device(const machine_config &mconfig, const char *tag, d
 }
 
 epl43102_device::epl43102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sed1560_device(mconfig, EPL43102, tag, owner, clock, 455, 102)   // 102 × 43-bit display RAM (TODO: page map is not straightforward)
+	: sed1560_device(mconfig, EPL43102, tag, owner, clock, 714, 102)   // 102 × 43-bit display RAM (TODO: page map is not straightforward)
+{
+}
+
+nt7502_device::nt7502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1560_device(mconfig, NT7502, tag, owner, clock, 1188, 166)   // 132 × 65-bit display RAM
 {
 }
 
@@ -174,6 +185,14 @@ void epl43102_device::device_start()
 	save_item(NAME(m_last_command));
 }
 
+void nt7502_device::device_start()
+{
+	sed1560_device::device_start();
+
+	// state saving
+	save_item(NAME(m_last_command));
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -192,6 +211,13 @@ void sed1560_device::device_reset()
 }
 
 void epl43102_device::device_reset()
+{
+	sed1560_device::device_reset();
+
+	m_last_command = 0;
+}
+
+void nt7502_device::device_reset()
 {
 	sed1560_device::device_reset();
 
@@ -403,6 +429,55 @@ void epl43102_device::control_write(uint8_t data)
 	}
 }
 
+
+void nt7502_device::control_write(uint8_t data)
+{
+	switch (m_last_command)
+	{
+	case 0x81:
+		m_contrast = data & 0x3f;
+		m_last_command = 0;
+		break;
+
+	case 0xad:
+		if ((data & 0x03) == 0)
+			logerror("%s: Status indicator off\n", machine().describe_context());
+		else
+			logerror("%s: Status indicator on (%s)\n", machine().describe_context(), (data & 0x03) == 0x01 ? "0.5-second blinking" : (data & 0x03) == 0x02 ? "1-second blinking" : "continuously");
+		m_last_command = 0;
+		break;
+
+	default:
+		if (data == 0x81 || data == 0xad)
+		{
+			// 2-byte instructions
+			m_last_command = data;
+		}
+		else if ((data & 0xfe) == 0xa2)
+			logerror("%s: LCD voltage bias = %s\n", machine().describe_context(), BIT(data, 0) ? "1/5, 1/6 or 1/7" : "1/7, 1/8 or 1/9");
+		else if ((data & 0xf0) == 0xc0)
+			logerror("%s: COM output direction = %s\n", machine().describe_context(), BIT(data, 3) ? "reverse" : "normal");
+		else if ((data & 0xf8) == 0x28)
+			logerror("%s: Voltage booster %s, regulator %s, follower %s\n", machine().describe_context(), BIT(data, 2) ? "on" : "off", BIT(data, 1) ? "on" : "off", BIT(data, 0) ? "on" : "off");
+		else if ((data & 0xf8) == 0x20)
+			logerror("%s: V0 voltage regulator internal resistor select = %d\n", machine().describe_context(), data & 0x07);
+		else if (data == 0xac)
+			logerror("%s: Static indicator off\n", machine().describe_context());
+		else if (data == 0xe3)
+			/* NOP command */;
+		else if ((data & 0xf0) == 0xf0)
+			logerror("%s: Test mode %s (%02X)\n", machine().describe_context(), data == 0xf0 ? "reset" : "on", data);
+		else
+			sed1560_device::control_write(data);
+		break;
+	}
+}
+
+
+std::tuple<bool, bool, uint8_t *, uint8_t, uint8_t, uint8_t> sed1520_device::render()
+{
+	return std::make_tuple(m_static_drive, m_lcd_on, m_ddr.get(), m_start_line, m_adc, m_duty);
+}
 
 uint32_t sed1520_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

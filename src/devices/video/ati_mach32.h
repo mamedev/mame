@@ -6,8 +6,8 @@
  *  Created on: 16/05/2014
  */
 
-#ifndef MAME_BUS_ISA_MACH32_H
-#define MAME_BUS_ISA_MACH32_H
+#ifndef MAME_VIDEO_ATI_MACH32_H
+#define MAME_VIDEO_ATI_MACH32_H
 
 #pragma once
 
@@ -21,7 +21,7 @@ class mach32_8514a_device : public mach8_device
 {
 public:
 	// construction/destruction
-	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t mach32_chipid_r() { return m_chip_ID; }
 	uint16_t mach32_mem_boundary_r() { return m_membounds; }
@@ -37,21 +37,23 @@ public:
 protected:
 	mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint16_t m_chip_ID;
 	uint16_t m_membounds;
 	bool display_mode_change;
-
 };
 
 // main SVGA device
 class mach32_device : public ati_vga_device
 {
 public:
+	// BitBlt interface needs testing, mach64 don't even draw BIOS properly
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	// construction/destruction
-	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	uint32_t draw_hw_cursor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -164,9 +166,9 @@ protected:
 	mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void ati_define_video_mode() override;
 	virtual uint16_t offset() override;
 
@@ -184,6 +186,7 @@ protected:
 	uint8_t m_cursor_offset_horizontal;
 	uint8_t m_cursor_offset_vertical;
 
+	virtual void refresh_bank() override;
 };
 
 /*
@@ -195,13 +198,13 @@ class mach64_8514a_device : public mach32_8514a_device
 {
 public:
 	// construction/destruction
-	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 // main SVGA device
@@ -209,7 +212,7 @@ class mach64_device : public mach32_device
 {
 public:
 	// construction/destruction
-	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void mach64_config1_w(uint16_t data) { }  // why does the mach64 BIOS write to these, they are read only on the mach32 and earlier
 	void mach64_config2_w(uint16_t data) { }
@@ -220,14 +223,15 @@ public:
 	u32 framebuffer_be_r(offs_t offset, u32 mem_mask);
 	void framebuffer_be_w(offs_t offset, u32 data, u32 mem_mask);
 	u8 *get_framebuffer_addr() { return &vga.memory[0]; }
+	size_t get_framebuffer_size() const { return vga.svga_intf.vram_size; }
 
 protected:
 	mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<mach64_8514a_device> m_8514a;  // provides accelerated 2D drawing, derived from the Mach8 device
 
@@ -240,4 +244,4 @@ DECLARE_DEVICE_TYPE(ATIMACH32_8514A, mach32_8514a_device)
 DECLARE_DEVICE_TYPE(ATIMACH64,       mach64_device)
 DECLARE_DEVICE_TYPE(ATIMACH64_8514A, mach64_8514a_device)
 
-#endif // MAME_BUS_ISA_MACH32_H
+#endif // MAME_VIDEO_ATI_MACH32_H

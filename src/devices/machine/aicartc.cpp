@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/aicartc.h"
+#include "aicartc.h"
 
 
 

@@ -17,7 +17,7 @@
 class sega_speech_device : public device_t, public device_mixer_interface
 {
 public:
-	sega_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_speech_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 //  auto int_cb() { return m_int_cb.bind(); }
 
@@ -26,8 +26,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	int t0_r();
 	int t1_r();
@@ -39,8 +39,8 @@ protected:
 	void drq_w(int state);
 
 private:
-	void speech_map(address_map &map);
-	void speech_portmap(address_map &map);
+	void speech_map(address_map &map) ATTR_COLD;
+	void speech_portmap(address_map &map) ATTR_COLD;
 
 	required_memory_region m_speech;
 	required_device<cpu_device> m_cpu;

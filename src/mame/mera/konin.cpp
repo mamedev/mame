@@ -45,10 +45,10 @@ public:
 private:
 	void picu_r3_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8214_device> m_picu;
 	required_device<i8255_device> m_ioppi;
@@ -105,7 +105,7 @@ void konin_state::konin(machine_config &config)
 	maincpu.out_inte_func().set(m_picu, FUNC(i8214_device::inte_w));
 	maincpu.set_irq_acknowledge_callback("intlatch", FUNC(i8212_device::inta_cb));
 
-	i8212_device &intlatch(I8212(config, "intlatch", 0));
+	i8212_device &intlatch(I8212(config, "intlatch"));
 	intlatch.md_rd_callback().set_constant(0);
 	intlatch.di_rd_callback().set(m_picu, FUNC(i8214_device::vector_r));
 	intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE);
@@ -113,19 +113,19 @@ void konin_state::konin(machine_config &config)
 	I8214(config, m_picu, XTAL(4'000'000));
 	m_picu->int_wr_callback().set("intlatch", FUNC(i8212_device::stb_w));
 
-	pit8253_device &mainpit(PIT8253(config, "mainpit", 0));
+	pit8253_device &mainpit(PIT8253(config, "mainpit"));
 	// wild guess at UART clock and source
 	mainpit.set_clk<0>(1536000);
 	mainpit.out_handler<0>().set("uart", FUNC(i8251_device::write_txc));
 	mainpit.out_handler<0>().append("uart", FUNC(i8251_device::write_rxc));
 
-	I8255(config, "mainppi", 0);
+	I8255(config, "mainppi");
 
-	PIT8253(config, m_iopit, 0);
+	PIT8253(config, m_iopit);
 
-	I8255(config, m_ioppi, 0);
+	I8255(config, m_ioppi);
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -158,4 +158,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY       FULLNAME  FLAGS
-COMP( 198?, konin, 0,      0,      konin,   konin, konin_state, empty_init, "Mera-Elzab", "Konin",  MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 198?, konin, 0,      0,      konin,   konin, konin_state, empty_init, "Mera-Elzab", "Konin",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

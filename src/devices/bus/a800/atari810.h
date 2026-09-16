@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_A800_ATARI810
-#define MAME_BUS_A800_ATARI810 1
+#ifndef MAME_BUS_A800_ATARI810_H
+#define MAME_BUS_A800_ATARI810_H
 
 #pragma once
 
@@ -24,10 +24,10 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void data_out_w(int state) override;
 	virtual void command_w(int state) override;
@@ -36,7 +36,7 @@ protected:
 private:
 	void step_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mos6532_device> m_pia;
 	required_device<fd1771_device> m_fdc;
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ATARI810, atari810_device)
 
-#endif // MAME_BUS_A800_ATARI810
+#endif // MAME_BUS_A800_ATARI810_H

@@ -41,8 +41,8 @@ public:
 	void fb01(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ym2164_irq_w(int state);
@@ -52,8 +52,8 @@ private:
 	void fb01_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
-	void fb01_io(address_map &map);
-	void fb01_mem(address_map &map);
+	void fb01_io(address_map &map) ATTR_COLD;
+	void fb01_mem(address_map &map) ATTR_COLD;
 
 	void update_int();
 
@@ -170,7 +170,7 @@ void fb01_state::fb01(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fb01_state::fb01_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16, 9);
@@ -182,8 +182,8 @@ void fb01_state::fb01(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(fb01_state::fb01_palette), 2);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
-	hd44780.set_lcd_size(2, 8);   // 2x8 displayed as 1x16
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // TODO: clock not measured, datasheet typical clock used
+	hd44780.set_lcd_size(2, 8); // 2x8 displayed as 1x16
 	hd44780.set_pixel_update_cb(FUNC(fb01_state::fb01_pixel_update));
 
 	I8251(config, m_upd71051, XTAL(4'000'000));
@@ -203,12 +203,11 @@ void fb01_state::fb01(machine_config &config)
 
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ym2164_device &ym2164(YM2164(config, "ym2164", XTAL(4'000'000)));
 	ym2164.irq_handler().set(FUNC(fb01_state::ym2164_irq_w));
-	ym2164.add_route(0, "lspeaker", 1.00);
-	ym2164.add_route(1, "rspeaker", 1.00);
+	ym2164.add_route(0, "speaker", 1.00, 0);
+	ym2164.add_route(1, "speaker", 1.00, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -217,7 +216,11 @@ void fb01_state::fb01(machine_config &config)
 /* ROM definition */
 ROM_START( fb01 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD("nec__-011_xb712c0__8709ex700__d27c256c-15.ic11", 0, 0x8000, CRC(7357e9a4) SHA1(049c482d6c91b7e2846757dd0f5138e0d8b687f0)) // OTP 27c256 windowless eprom?
+	ROM_DEFAULT_BIOS("209")
+	ROM_SYSTEM_BIOS(0, "209", "M002.00.009")
+	ROMX_LOAD("nec__-011_xb712c0__8709ex700__d27c256c-15.ic11", 0, 0x8000, CRC(7357e9a4) SHA1(049c482d6c91b7e2846757dd0f5138e0d8b687f0), ROM_BIOS(0)) // OTP 27c256 windowless eprom?
+	ROM_SYSTEM_BIOS(1, "206", "M002.00.006")
+	ROMX_LOAD("8623p9__xb712a0_505.ic11", 0, 0x8000, CRC(4264c353) SHA1(4916469e1d40692c0a1de09fed0b95e2ceccc01e), ROM_BIOS(1))	// from FB-01 with serial no. 18656
 ROM_END
 
 } // anonymous namespace

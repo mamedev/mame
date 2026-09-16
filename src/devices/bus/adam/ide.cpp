@@ -116,7 +116,7 @@ uint8_t powermate_ide_device::adam_bd_r(offs_t offset, uint8_t data, int bmreq, 
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			data = m_ata->cs0_r(offset & 0x07, 0xff);
+			data = m_ata->cs0_r(offset & 0x07);
 			break;
 
 		case 0x40: // Printer status
@@ -147,7 +147,7 @@ uint8_t powermate_ide_device::adam_bd_r(offs_t offset, uint8_t data, int bmreq, 
 			break;
 
 		case 0x5a:
-			data = m_ata->cs1_r(6, 0xff);
+			data = m_ata->cs1_r(6);
 			break;
 
 		case 0x5b: // Digital Input Register
@@ -176,7 +176,7 @@ void powermate_ide_device::adam_bd_w(offs_t offset, uint8_t data, int bmreq, int
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			m_ata->cs0_w(offset & 0x07, data, 0xff);
+			m_ata->cs0_w(offset & 0x07, data);
 			break;
 
 		case 0x40:

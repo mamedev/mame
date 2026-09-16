@@ -16,9 +16,10 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68010.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68010.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/6850acia.h"
@@ -30,6 +31,7 @@
 #include "machine/wd1010.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -66,8 +68,8 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t line_printer_r();
 	void disk_control_w(uint8_t data);
@@ -92,7 +94,7 @@ private:
 
 	void wd1010_intrq_w(int state);
 
-	void unixpc_mem(address_map &map);
+	void unixpc_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -153,7 +155,7 @@ void unixpc_state::ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void unixpc_state::machine_start()
 {
-	m_ramptr = (uint16_t *)m_ram->pointer();
+	m_ramptr = m_ram->pointer<uint16_t>();
 	m_ramsize = m_ram->size();
 }
 
@@ -391,7 +393,7 @@ void unixpc_state::unixpc(machine_config &config)
 	// bit 7 (D15) = VBL ack (must go high-low-high to ack)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(unixpc_state::screen_update));
 	screen.set_raw(40_MHz_XTAL / 2, 896, 0, 720, 367, 0, 348);
 	screen.set_palette("palette");
@@ -420,7 +422,7 @@ void unixpc_state::unixpc(machine_config &config)
 	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	mpsc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	acia6850_device &kbc(ACIA6850(config, "kbc", 0));
+	acia6850_device &kbc(ACIA6850(config, "kbc"));
 	kbc.irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// TODO: RTC

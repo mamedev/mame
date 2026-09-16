@@ -55,8 +55,8 @@ public:
 	void subs(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -90,11 +90,9 @@ private:
 
 	template <uint8_t Which> int steering();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 template <uint8_t Pen>
 void subs_state::invert_w(int state)
@@ -196,8 +194,6 @@ void subs_state::palette(palette_device &palette) const
 	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
 }
 
-
-// machine
 
 /***************************************************************************
 machine initialization
@@ -413,7 +409,7 @@ static INPUT_PORTS_START( subs )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("lscreen")
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("lscreen", FUNC(screen_device::vblank))
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -487,7 +483,7 @@ void subs_state::subs(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(57);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	lscreen.set_size(32*8, 32*8);
@@ -495,7 +491,7 @@ void subs_state::subs(machine_config &config)
 	lscreen.set_screen_update(FUNC(subs_state::screen_update<0>));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(57);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	rscreen.set_size(32*8, 32*8);
@@ -505,10 +501,9 @@ void subs_state::subs(machine_config &config)
 
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	ls259_device &latch(LS259(config, "latch")); // C9
 	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1

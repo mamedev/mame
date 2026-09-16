@@ -10,16 +10,15 @@
 
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
-#include "bus/rs232/rs232.h"
-#include "lpc-acpi.h"
+#include "sis950_acpi.h"
 #include "sis950_smbus.h"
 
 #include "cpu/i386/i386.h"
 
-#include "machine/8042kbdc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "machine/at_keybc.h"
 #include "machine/am9517a.h"
 #include "machine/ds128x.h"
-#include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/pc_lpt.h"
 #include "machine/pic8259.h"
@@ -34,9 +33,9 @@ class sis950_lpc_device : public pci_device
 {
 public:
 	template <typename T, typename U> sis950_lpc_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		T &&cpu_tag, U &&flash_tag
-	) : sis950_lpc_device(mconfig, tag, owner, clock)
+			const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+			T &&cpu_tag, U &&flash_tag)
+		: sis950_lpc_device(mconfig, tag, owner, clock)
 	{
 		// Revision 0 -> A0
 		set_ids(0x10390008, 0x00, 0x060100, 0x00);
@@ -51,19 +50,41 @@ public:
 
 	auto fast_reset_cb() { return m_fast_reset_cb.bind(); }
 
+	void pc_irq1_w(int state);
+	void pc_irq3_w(int state);
+	void pc_irq4_w(int state);
+	void pc_irq5_w(int state);
+	void pc_irq6_w(int state);
+	void pc_irq7_w(int state);
+	void pc_irq8n_w(int state);
+	void pc_irq9_w(int state);
+	void pc_irq10_w(int state);
+	void pc_irq11_w(int state);
+	void pc_irq12m_w(int state);
+	void pc_irq14_w(int state);
+	void pc_irq15_w(int state);
+
+	// IDE Primary/Secondary Channel interrupts
+	void pc_iirqa_w(int state);
+	void pc_iirqb_w(int state);
+
 protected:
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_config_complete() override;
 
 //  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	template <unsigned N> void memory_map(address_map &map);
-	void io_map(address_map &map);
+	template <unsigned N> void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	virtual bool map_first() const override { return true; }
 
 private:
 	required_device<cpu_device> m_host_cpu;
@@ -73,11 +94,13 @@ private:
 	required_device<am9517a_device> m_dmac_master;
 	required_device<am9517a_device> m_dmac_slave;
 	required_device<pit8254_device> m_pit;
-	required_device<kbdc8042_device> m_keybc;
+	required_device<ps2_keyboard_controller_device> m_keybc;
+	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885ext_device> m_rtc;
-	required_device<ins8250_device> m_uart;
-	required_device<lpc_acpi_device> m_acpi;
+	required_device<pc_kbdc_device> m_ps2_con;
+	required_device<pc_kbdc_device> m_aux_con;
+	required_device<sis950_acpi_device> m_acpi;
 	required_device<sis950_smbus_device> m_smbus;
 
 	devcb_write_line m_fast_reset_cb;
@@ -125,6 +148,11 @@ private:
 	};
 	u8 m_irq_remap[9]{};
 
+	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
+
 	// LPC vendor specific, verify if it's common for all
 	u8 lpc_fast_init_r();
 	void lpc_fast_init_w(offs_t offset, u8 data);
@@ -132,7 +160,7 @@ private:
 		u8 fast_init;
 	} m_lpc_legacy;
 
-	// SB implementation, to be moved out
+	// southbridge implementation
 	void pit_out0(int state);
 	void pit_out1(int state);
 	void pit_out2(int state);
@@ -151,7 +179,7 @@ private:
 	bool m_at_spkrdata = 0;
 	uint8_t m_channel_check = 0;
 	int m_dma_channel = -1;
-//  bool m_cur_eop = false;
+	bool m_cur_eop = false;
 	uint16_t m_dma_high_byte = 0;
 
 	void cpu_a20_w(int state);
@@ -161,14 +189,22 @@ private:
 	void at_page8_w(offs_t offset, uint8_t data);
 	u8 nmi_status_r();
 	void nmi_control_w(uint8_t data);
-	u8 at_keybc_r(offs_t offset);
-	void at_keybc_w(offs_t offset, u8 data);
-	u8 keybc_status_r(offs_t offset);
-	void keybc_command_w(offs_t offset, u8 data);
 	void at_speaker_set_spkrdata(uint8_t data);
+	void iochck_w(int state);
+
+	template <unsigned Which> uint8_t pc_dma8237_dack_r();
+	template <unsigned Which> void pc_dma8237_dack_w(uint8_t data);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
+	void at_dma8237_out_eop(int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device)
 
-
-#endif
+#endif // MAME_MACHINE_SIS950_LPC_H

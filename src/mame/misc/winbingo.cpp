@@ -25,10 +25,12 @@ Others:
 */
 
 #include "emu.h"
+
+#include "cpu/h8/h83048.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "cpu/h8/h83048.h"
 
 
 namespace {
@@ -38,7 +40,7 @@ class winbingo_state : public driver_device
 public:
 	winbingo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	{}
+	{ }
 
 	void wbingo06(machine_config &config);
 
@@ -85,7 +87,7 @@ void winbingo_state::wbingo06(machine_config &config)
 	// SX28AC(config, "sx28ac", 32.768_kHz_XTAL); // clock for the internal RTC, chip should operate at higher frequencies
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -116,4 +118,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2006, wbingo06, 0, wbingo06, wbingo06, winbingo_state, empty_init, ROT0, "<unknown>", "Win Bingo 2006", MACHINE_IS_SKELETON )
+GAME( 2006, wbingo06, 0, wbingo06, wbingo06, winbingo_state, empty_init, ROT0, "<unknown>", "Win Bingo 2006", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

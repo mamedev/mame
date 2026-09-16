@@ -36,10 +36,10 @@ private:
 	uint8_t zpram_r(offs_t offset);
 	void zpram_w(offs_t offset, uint8_t data);
 
-	void harriet_map(address_map &map);
+	void harriet_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	std::unique_ptr<u8[]> m_zpram_data;
@@ -64,7 +64,7 @@ void harriet_state::harriet_map(address_map &map)
 	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xf30000, 0xf301ff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
-	map(0xf40000, 0xf4003f).rw("scsia:7:wdc", FUNC(wd33c93_device::dir_r), FUNC(wd33c93_device::dir_w)).umask16(0x00ff);
+	map(0xf40000, 0xf4003f).rw("wdc", FUNC(wd33c93_device::dir_r), FUNC(wd33c93_device::dir_w)).umask16(0x00ff);
 	//map(0xf60000, 0xf60007).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write)).umask16(0x00ff);
 	map(0xf60006, 0xf60007).nopr();
 	map(0xfa0000, 0xfa0001).nopr();
@@ -109,7 +109,7 @@ void harriet_state::harriet(machine_config &config)
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::rc_w));
 	mfp.out_tdo_cb().set("mfp", FUNC(mc68901_device::tc_w));
 
-	HD63450(config, "dmac", 40_MHz_XTAL / 4, "maincpu"); // MC68450R10 (or HD68450Y-10)
+	HD63450(config, "dmac", 40_MHz_XTAL / 4, m_maincpu, AS_PROGRAM); // MC68450R10 (or HD68450Y-10)
 
 	M48T02(config, "timekpr");
 	NVRAM(config, "zpram", nvram_device::DEFAULT_ALL_0); // MK48Z02
@@ -119,8 +119,9 @@ void harriet_state::harriet(machine_config &config)
 	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
 	rs232.set_option_device_input_defaults("terminal", terminal_defaults);
 
-	NSCSI_BUS(config, "scsia");
-	NSCSI_CONNECTOR(config, "scsia:7").option_set("wdc", WD33C93A).clock(40_MHz_XTAL / 4);
+	auto &scsi(NSCSI_BUS(config, "scsia"));
+	auto &wdc(WD33C93A(config, "wdc", 40_MHz_XTAL / 4));
+	scsi.set_external_device(7, wdc);
 
 	//WD33C93(config, "wdcb", 40_MHz_XTAL / 4);
 	//IMSC012(config, "c012", 40_MHz_XTAL / 8); // INMOS IMSC012-P20S link adaptor
@@ -136,4 +137,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_IS_SKELETON )
+COMP( 1990, harriet, 0, 0, harriet, harriet, harriet_state, empty_init, "Quantel", "Harriet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

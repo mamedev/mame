@@ -379,12 +379,11 @@ void hal2_device::dma_write(uint32_t channel, int16_t data)
 
 void hal2_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0);
-	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_ldac->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0);
-	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_rdac->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }

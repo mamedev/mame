@@ -8,10 +8,10 @@
 //the DSP Context
 struct AICADSP
 {
-	void init();
-	void setsample(s32 sample, u8 SEL, s32 MXL);
+	void init() noexcept;
+	void setsample(s32 sample, u8 SEL, s32 MXL) noexcept;
 	void step();
-	void start();
+	void start() noexcept;
 
 //Config
 	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache cache;

@@ -104,11 +104,11 @@ private:
 
 	void busrq_w(int state);
 
-	void tiki100_io(address_map &map);
-	void tiki100_mem(address_map &map);
+	void tiki100_io(address_map &map) ATTR_COLD;
+	void tiki100_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 	required_device<z80_device> m_maincpu;

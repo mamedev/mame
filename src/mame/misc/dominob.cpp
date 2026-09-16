@@ -88,7 +88,7 @@ public:
 	void dominob(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -108,8 +108,8 @@ private:
 	uint8_t dominob_unk_port02_r();
 	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 void dominob_state::video_start()
@@ -303,7 +303,7 @@ void dominob_state::dominob(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(dominob_state::irq0_line_hold));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1524);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

@@ -59,6 +59,9 @@ public:
 	//   3.5
 	static void formats_35(format_registration &fr);
 
+	//   Twiggy
+	static void formats_twiggy(format_registration &fr);
+
 	// Floppy drives slot-level
 	//   5.25
 	static void floppies_525(device_slot_interface &device);
@@ -91,6 +94,12 @@ public:
 		FLOPPY_CONNECTOR(config, floppy, floppies_35, nullptr, formats_35).enable_sound(true);
 	}
 
+	//   3.5
+	static void floppies_twiggy(device_slot_interface &device);
+	template<typename T> static void add_twiggy(machine_config &config, T &floppy) {
+		FLOPPY_CONNECTOR(config, floppy, floppies_twiggy, "tw", formats_twiggy).enable_sound(false);
+	}
+
 	// Sync the state when something external is going to change, like
 	// the floppy side or rpm.
 	virtual void sync() = 0;
@@ -107,8 +116,8 @@ protected:
 
 	applefdintf_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void update_phases();
 };

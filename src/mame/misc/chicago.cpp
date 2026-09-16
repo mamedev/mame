@@ -60,10 +60,10 @@ public:
 protected:
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 
@@ -104,7 +104,7 @@ void chicago_state::chicago(machine_config &config)
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_chicago);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
 	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
@@ -147,4 +147,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby (Chicago Coin)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -86,7 +86,7 @@ void a800_left(device_slot_interface &device)
 	// converts analog mono sound to digital by reading $d500 low 4 bitset
 //  device.option_add(         "ad_converter",  A800_AD_CONVERTER);
 	device.option_add(         "supercharger",  A800_SUPER_CHARGER);
-	// The PILL! / Super PILL! / Super Cart with RD4/RD5 held high and that's about it (lolwut)
+	// The PILL! / Super PILL! / Super Cart with RD4/RD5 held high, cart copier thru own floppy based program
 //  device.option_add(         "pill",          A800_PILL);
 	// Thompson Proburner, EPROM burner
 //  device.option_add(         "proburner",     A800_PROBURNER);

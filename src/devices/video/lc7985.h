@@ -25,15 +25,15 @@ public:
 	const u8 *render();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 
 private:
 	optional_region_ptr<u8> m_cgrom_region; // internal chargen ROM
-	u8 m_render_buffer[16*40];
+	u8 m_render_buffer[16*80];
 	u8 m_ddram[80];
 	u8 m_cgram[64];
 	const u8 *m_cgrom;

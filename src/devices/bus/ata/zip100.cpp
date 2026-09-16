@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "zip100.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 
 DEFINE_DEVICE_TYPE(ZIP100_IDE, zip100_ide_device, "zip100_ide", "Iomega Zip 100MB IDE Drive")
 
@@ -27,30 +27,27 @@ void zip100_ide_device::device_start()
 }
 
 
-u16 zip100_ide_device::read_dma()
+void zip100_ide_device::read_dma(PAIR16 &data)
 {
-	return 0;
 }
 
-u16 zip100_ide_device::read_cs0(offs_t offset, u16 mem_mask)
+void zip100_ide_device::read_cs0(offs_t offset, PAIR16 &data)
 {
-	return 0;
 }
 
-u16 zip100_ide_device::read_cs1(offs_t offset, u16 mem_mask)
+void zip100_ide_device::read_cs1(offs_t offset, PAIR16 &data)
 {
-	return 0;
 }
 
 void zip100_ide_device::write_dma(u16 data)
 {
 }
 
-void zip100_ide_device::write_cs0(offs_t offset, u16 data, u16 mem_mask)
+void zip100_ide_device::write_cs0(offs_t offset, u16 data)
 {
 }
 
-void zip100_ide_device::write_cs1(offs_t offset, u16 data, u16 mem_mask)
+void zip100_ide_device::write_cs1(offs_t offset, u16 data)
 {
 }
 
@@ -85,7 +82,7 @@ void zip100_ide_device::device_add_mconfig(machine_config &config)
 {
 	i80c32_device &mcu(I80C32(config, "mcu", 12'000'000)); // custom SoC; clock unknown
 	mcu.set_addrmap(AS_PROGRAM, &zip100_ide_device::mem_map);
-	mcu.set_addrmap(AS_IO, &zip100_ide_device::ext_map);
+	mcu.set_addrmap(AS_DATA, &zip100_ide_device::ext_map);
 }
 
 ROM_START(zip100_ide)

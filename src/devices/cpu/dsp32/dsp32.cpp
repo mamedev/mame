@@ -24,13 +24,15 @@
 
     In addition, there are several optimizations enabled which make
     assumptions about the code which may not be valid for other
-    applications. Check dsp32ops.inc for details.
+    applications. Check dsp32ops.hxx for details.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "dsp32.h"
 #include "dsp32dis.h"
+
+#include "endianness.h"
 
 
 //**************************************************************************
@@ -553,17 +555,6 @@ uint32_t dsp32c_device::execute_max_cycles() const noexcept
 }
 
 
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t dsp32c_device::execute_input_lines() const noexcept
-{
-	return 2;
-}
-
-
 void dsp32c_device::execute_set_input(int inputnum, int state)
 {
 }
@@ -574,6 +565,7 @@ void dsp32c_device::execute_run()
 	// skip if halted
 	if ((m_pcr & PCR_RESET) == 0)
 	{
+		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}

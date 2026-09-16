@@ -33,9 +33,9 @@ public:
 protected:
 	a2bus_computereyes2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
@@ -135,7 +135,7 @@ uint8_t a2bus_computereyes2_device::read_c0nx(uint8_t offset)
 			else
 			{
 				u8 ret = (m_cer0 & 0xc0) | 0x10;
-				u64 video_ticks = machine().time().as_ticks(1021800);
+				u64 video_ticks = machine().time().as_ticks(A2BUS_1M_CLOCK);
 				int frame_time = video_ticks % (65 * 262);  // 65 clocks per scanline, 262 scanlines per frame
 				int h = frame_time % 65;
 				int v = frame_time / 65;

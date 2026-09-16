@@ -71,4 +71,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 198?, rlndtnsc1, 0, 0, rlndtnsc1, rlndtnsc1, rlndtnsc1_state, empty_init, "Roland", "Roland Music Style Card TN-SC1 Software List holder", MACHINE_IS_SKELETON )
+CONS( 198?, rlndtnsc1, 0, 0, rlndtnsc1, rlndtnsc1, rlndtnsc1_state, empty_init, "Roland", "Roland Music Style Card TN-SC1 Software List holder", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

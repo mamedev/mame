@@ -2,7 +2,7 @@
 // compose.hpp
 // ~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,14 +16,12 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#include "asio/async_result.hpp"
+#include "asio/composed.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
-
-#if defined(ASIO_HAS_VARIADIC_TEMPLATES) \
-  || defined(GENERATING_DOCUMENTATION)
+ASIO_INLINE_NAMESPACE_BEGIN
 
 /// Launch an asynchronous operation with a stateful implementation.
 /**
@@ -37,11 +35,18 @@ namespace asio {
  * handler. The remaining arguments are any arguments that originate from the
  * completion handlers of any asynchronous operations performed by the
  * implementation.
-
+ *
  * @param token The completion token.
  *
  * @param io_objects_or_executors Zero or more I/O objects or I/O executors for
  * which outstanding work must be maintained.
+ *
+ * @par Per-Operation Cancellation
+ * By default, terminal per-operation cancellation is enabled for
+ * composed operations that are implemented using @c async_compose. To
+ * disable cancellation for the composed operation, or to alter its
+ * supported cancellation types, call the @c self object's @c
+ * reset_cancellation_state function.
  *
  * @par Example:
  *
@@ -86,10 +91,12 @@ namespace asio {
  * template <typename CompletionToken>
  * auto async_echo(tcp::socket& socket,
  *     asio::mutable_buffer buffer,
- *     CompletionToken&& token) ->
- *   typename asio::async_result<
- *     typename std::decay<CompletionToken>::type,
- *       void(asio::error_code, std::size_t)>::return_type
+ *     CompletionToken&& token)
+ *   -> decltype(
+ *     asio::async_compose<CompletionToken,
+ *       void(asio::error_code, std::size_t)>(
+ *         std::declval<async_echo_implementation>(),
+ *         token, socket))
  * {
  *   return asio::async_compose<CompletionToken,
  *     void(asio::error_code, std::size_t)>(
@@ -97,40 +104,29 @@ namespace asio {
  *         async_echo_implementation::starting},
  *       token, socket);
  * } @endcode
+ *
+ * @sa @ref overview_compose "Compositions as asynchronous operations"
  */
 template <typename CompletionToken, typename Signature,
     typename Implementation, typename... IoObjectsOrExecutors>
-ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, Signature)
-async_compose(ASIO_MOVE_ARG(Implementation) implementation,
-    ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token,
-    ASIO_MOVE_ARG(IoObjectsOrExecutors)... io_objects_or_executors);
+inline auto async_compose(Implementation&& implementation,
+    type_identity_t<CompletionToken>& token,
+    IoObjectsOrExecutors&&... io_objects_or_executors)
+  -> decltype(
+    async_initiate<CompletionToken, Signature>(
+      composed<Signature>(static_cast<Implementation&&>(implementation),
+        static_cast<IoObjectsOrExecutors&&>(io_objects_or_executors)...),
+      token))
+{
+  return async_initiate<CompletionToken, Signature>(
+      composed<Signature>(static_cast<Implementation&&>(implementation),
+        static_cast<IoObjectsOrExecutors&&>(io_objects_or_executors)...),
+      token);
+}
 
-#else // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-      //   || defined(GENERATING_DOCUMENTATION)
-
-template <typename CompletionToken, typename Signature, typename Implementation>
-ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, Signature)
-async_compose(ASIO_MOVE_ARG(Implementation) implementation,
-    ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token);
-
-#define ASIO_PRIVATE_ASYNC_COMPOSE_DEF(n) \
-  template <typename CompletionToken, typename Signature, \
-      typename Implementation, ASIO_VARIADIC_TPARAMS(n)> \
-  ASIO_INITFN_AUTO_RESULT_TYPE(CompletionToken, Signature) \
-  async_compose(ASIO_MOVE_ARG(Implementation) implementation, \
-      ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token, \
-      ASIO_VARIADIC_MOVE_PARAMS(n));
-  /**/
-  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_ASYNC_COMPOSE_DEF)
-#undef ASIO_PRIVATE_ASYNC_COMPOSE_DEF
-
-#endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
-       //   || defined(GENERATING_DOCUMENTATION)
-
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
-
-#include "asio/impl/compose.hpp"
 
 #endif // ASIO_COMPOSE_HPP

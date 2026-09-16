@@ -229,8 +229,8 @@ public:
 	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
-	void set_outer_prg_size(int val) { m_outer_prg_size = val; }
-	void set_outer_chr_size(int val) { m_outer_chr_size = val; }
+	void set_outer_prg_size(unsigned val) { m_outer_prg_size = val; }
+	void set_outer_chr_size(unsigned val) { m_outer_chr_size = val; }
 	void set_smd133_addr(int val) {  m_smd133_addr = val; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
@@ -316,12 +316,12 @@ protected:
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
 	int m_n163_vol;
-	int m_outer_prg_size;
-	int m_outer_chr_size;
+	unsigned m_outer_prg_size;
+	unsigned m_outer_chr_size;
 	int m_smd133_addr;
 	uint8_t m_fk23c_solder_pad;
 
-	int m_mirroring;
+	int32_t m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
 	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
@@ -336,7 +336,7 @@ public:
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
 	memory_bank *m_prg_bank_mem[4];
-	int m_prg_bank[4];
+	int32_t m_prg_bank[4];
 	uint32_t m_prg_chunks;
 	uint32_t m_prg_mask;
 
@@ -352,12 +352,12 @@ public:
 
 
 	// CHR
-	int m_chr_source;   // global source for the 8 VROM banks
+	int32_t m_chr_source;   // global source for the 8 VROM banks
 
 	//these were previously called chr_map. they are a quick banking structure,
 	//because some of these change multiple times per scanline!
-	int m_chr_src[8]; //defines source of base pointer
-	int m_chr_orig[8]; //defines offset of 0x400 byte segment at base pointer
+	int32_t m_chr_src[8]; //defines source of base pointer
+	int32_t m_chr_orig[8]; //defines offset of 0x400 byte segment at base pointer
 	uint8_t *m_chr_access[8];  //source translated + origin -> valid pointer!
 
 	uint32_t m_vrom_chunks;
@@ -389,9 +389,9 @@ public:
 
 	// NameTable & Mirroring
 	//these were previously called nt_page. they are a quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
-	int m_nt_src[4];
-	int m_nt_orig[4];
-	int m_nt_writable[4];
+	int32_t m_nt_src[4];
+	int32_t m_nt_orig[4];
+	int32_t m_nt_writable[4];
 	uint8_t *m_nt_access[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 	void set_nt_page(int page, int source, int bank, int writable);
@@ -412,10 +412,7 @@ public:
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: nes_cart_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
@@ -461,7 +458,7 @@ public:
 	
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
 	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
@@ -473,7 +470,7 @@ protected:
 	void call_load_pcb();
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 #endif // MAME_BUS_NES_NES_SLOT_H

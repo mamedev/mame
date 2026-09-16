@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_HLE_PS2_MOUSE_H
-#define MAME_BUS_HLE_PS2_MOUSE_H
+#ifndef MAME_BUS_PC_KBD_HLE_MOUSE_H
+#define MAME_BUS_PC_KBD_HLE_MOUSE_H
 
 #pragma once
 
@@ -17,9 +17,9 @@ public:
 
 protected:
 	// device_t overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_pc_kbd_interface overrides
 	virtual void clock_write(int state) override;
@@ -95,4 +95,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HLE_PS2_MOUSE, hle_ps2_mouse_device)
 
-#endif // MAME_BUS_HLE_PS2_MOUSE_H
+#endif // MAME_BUS_PC_KBD_HLE_MOUSE_H

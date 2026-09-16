@@ -65,7 +65,6 @@ TODO:
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -94,8 +93,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t io4_r(offs_t offset, uint32_t mem_mask = ~0);
 	void io4_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -106,7 +105,7 @@ private:
 	void io10_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update_mk3b_soc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	std::string debug_buf;
 };
 
@@ -114,7 +113,7 @@ private:
 void mk3b_soc_state::map(address_map &map)
 {
 	// 64MB external NOR flash
-	map(0x08000000, 0x0BFFFFFF).rom().share("norflash");
+	map(0x08000000, 0x0BFFFFFF).rom().region("norflash", 0);
 	// unknown amount and configuration of internal RAM
 	map(0x00000000, 0x0000FFFF).ram().share("iram0");
 	// This section of RAM seems to contain the stack
@@ -157,7 +156,7 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 	ARM920T(config, m_maincpu, 240000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk3b_soc_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(1280, 720);
@@ -168,8 +167,10 @@ void mk3b_soc_state::mk3b_soc(machine_config &config)
 uint32_t mk3b_soc_state::io4_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset) {
-		case 0x01:
+		case 0x0001:
 			return (m_screen->vblank() << 27) | m_screen->vblank(); // who knows? seems to need to toggle between 0 and 1
+		case 0x021a:
+			return m_screen->vblank() << 15; // same
 		default:
 			logerror("%s: IO 0x04 read 0x%04X\n", machine().describe_context(), offset);
 			return 0x00;
@@ -247,12 +248,18 @@ void mk3b_soc_state::init_rs70()
 }
 
 
+ROM_START( afbp4 )
+	ROM_REGION32_LE(0x04000000, "norflash", 0)
+	ROM_LOAD("mx29lv640eb.bin", 0x000000, 0x00800000, CRC(477e8039) SHA1(ee0d351afece111816aca242ec4bc62d92e5eec2) )
+ROM_END
+
 ROM_START( rs70_648 )
-	ROM_REGION(0x04000000, "norflash", 0)
+	ROM_REGION32_LE(0x04000000, "norflash", 0)
 	ROM_LOAD("s29gl512p.bin", 0x000000, 0x04000000, CRC(cb452bd7) SHA1(0b19a13a3d0b829725c10d64d7ff852ff5202ed0) )
 ROM_END
 
 } // anonymous namespace
 
 
-CONS( 2019, rs70_648,  0,        0, mk3b_soc, mk3b_soc, mk3b_soc_state, init_rs70, "CoolBoy", "RS-70 648-in-1",      MACHINE_IS_SKELETON )
+CONS( 2019, afbp4,    0, 0, mk3b_soc, mk3b_soc, mk3b_soc_state, empty_init, "AtGames", "Atari Flashback Portable (version 4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2019, rs70_648, 0, 0, mk3b_soc, mk3b_soc, mk3b_soc_state, init_rs70,  "CoolBoy", "RS-70 648-in-1",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -36,8 +36,8 @@ protected:
 	nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 latch_fill = 0x80);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	//virtual void set_latch() { m_latch = m_joypad->read(); }
 	virtual void set_latch()
@@ -48,7 +48,7 @@ protected:
 	//void latch_now();
 
 	required_ioport m_joypad;
-	u32 m_latch;  // wider than standard joypad's 8-bit latch to accomodate subclass devices
+	u32 m_latch;  // wider than standard joypad's 8-bit latch to accommodate subclass devices
 	const u32 m_latch_fill;  // the new MSB as a joypad's shift register shifts
 	int button_index;
 };
@@ -82,7 +82,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_ioport m_mic;
@@ -99,7 +99,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -113,7 +113,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -130,8 +130,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<nes_control_port_device> m_daisychain;
@@ -149,7 +149,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 

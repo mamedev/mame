@@ -26,7 +26,7 @@ static INPUT_PORTS_START( nes_zapper )
 	PORT_START("GUN_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0, 239)
 	PORT_START("GUN_T")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger") PORT_CHANGED_MEMBER(DEVICE_SELF, nes_zapper_device, trigger, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nes_zapper_device::trigger), 0)
 INPUT_PORTS_END
 
 ioport_constructor nes_zapper_device::device_input_ports() const
@@ -48,7 +48,7 @@ INPUT_CHANGED_MEMBER(nes_zapper_device::trigger)
 
 void nes_zapper_device::device_add_mconfig(machine_config &config)
 {
-	NES_ZAPPER_SENSOR(config, m_sensor, 0);
+	NES_ZAPPER_SENSOR(config, m_sensor);
 	if (m_port != nullptr)
 		m_sensor->set_screen_tag(m_port->m_screen);
 }

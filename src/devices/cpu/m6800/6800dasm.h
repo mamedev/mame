@@ -58,7 +58,7 @@ private:
 	};
 
 	static const char *const op_name_str[];
-	static const uint8_t table[0x104][3];
+	static const u8 table[0x104][3];
 
 	int m_subtype;
 };

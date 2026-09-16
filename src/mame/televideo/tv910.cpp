@@ -36,8 +36,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "utf8.h"
-
 
 namespace {
 
@@ -69,8 +67,8 @@ public:
 	void tv910(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -90,7 +88,7 @@ private:
 	void ay3600_data_ready_w(int state);
 	void ay3600_ako_w(int state);
 
-	void tv910_mem(address_map &map);
+	void tv910_mem(address_map &map) ATTR_COLD;
 
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -305,7 +303,7 @@ static INPUT_PORTS_START( tv910 )
 	PORT_START("X5")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PRTSCR)    PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)          PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2190")         PORT_CODE(KEYCODE_LEFT) // ←
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
@@ -325,11 +323,11 @@ static INPUT_PORTS_START( tv910 )
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F18)       PORT_CHAR(UCHAR_MAMEKEY(F18))
 
 	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)         PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2192")         PORT_CODE(KEYCODE_RIGHT) // →
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)            PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2191")         PORT_CODE(KEYCODE_UP) // ↑
 /// 008 - CLRSP
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)          PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)      // E0 47
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2193")         PORT_CODE(KEYCODE_DOWN)     PORT_CHAR(10)      // ↓  E0 47
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 
 	PORT_START("X8")
@@ -524,7 +522,7 @@ void tv910_state::tv910(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 840, 0, 640, 270, 0, 240);
 	screen.set_screen_update(CRTC_TAG, FUNC(r6545_1_device::screen_update));
 
@@ -536,7 +534,7 @@ void tv910_state::tv910(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(tv910_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(tv910_state::vbl_w));
 
-	AY3600(config, m_ay3600, 0);
+	AY3600(config, m_ay3600);
 	m_ay3600->x0().set_ioport("X0");
 	m_ay3600->x1().set_ioport("X1");
 	m_ay3600->x2().set_ioport("X2");
@@ -551,7 +549,7 @@ void tv910_state::tv910(machine_config &config)
 	m_ay3600->data_ready().set(FUNC(tv910_state::ay3600_data_ready_w));
 	m_ay3600->ako().set(FUNC(tv910_state::ay3600_ako_w));
 
-	mos6551_device &acia(MOS6551(config, ACIA_TAG, 0));
+	mos6551_device &acia(MOS6551(config, ACIA_TAG));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	acia.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));

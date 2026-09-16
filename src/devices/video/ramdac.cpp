@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/ramdac.h"
+#include "ramdac.h"
 
 // default address map
 void ramdac_device::ramdac_palram(address_map &map)

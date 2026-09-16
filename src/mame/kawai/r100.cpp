@@ -30,7 +30,7 @@ public:
 	void r100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -41,8 +41,8 @@ private:
 	void p3_w(u8 data);
 	void buffer_w(u8 data);
 
-	void main_map(address_map &map);
-	void data_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<m50734_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -122,7 +122,7 @@ void kawai_r100_state::r100(machine_config &config)
 	//M60009_AGU_DGU(config, "pcm", 5_MHz_XTAL);
 
 	// LCD unit
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -132,7 +132,7 @@ void kawai_r100_state::r100(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(kawai_r100_state::pixel_update));
 }
@@ -153,4 +153,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1987, r100, 0, 0, r100, r100, kawai_r100_state, empty_init, "Kawai Musical Instrument Manufacturing", "R-100 Digital Drum Machine", MACHINE_IS_SKELETON)
+SYST(1987, r100, 0, 0, r100, r100, kawai_r100_state, empty_init, "Kawai Musical Instrument Manufacturing", "R-100 Digital Drum Machine", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

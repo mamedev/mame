@@ -111,33 +111,41 @@ public:
 		m_k054338(*this, "k054338"),
 		m_k055555(*this, "k055555"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_red_button_lamps(*this, "player %u red", 1U),
+		m_green_button_lamps(*this, "player %u green", 1U),
+		m_blue_button_lamps(*this, "player %u blue", 1U),
+		m_start_button_lamps(*this, "player %u start", 1U)
 	{ }
 
 	void bishi(machine_config &config);
+	void bishi2p(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint16_t control_r();
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t bishi_mirror_r(offs_t offset);
-	uint16_t bishi_K056832_rom_r(offs_t offset);
-	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
+	void lamp_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t palette_mirror_r(offs_t offset);
+	uint16_t K056832_rom_r(offs_t offset);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	K056832_CB_MEMBER(tile_callback);
 
-	void main_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-private:
+	void main_map(address_map &map) ATTR_COLD;
+
 	/* misc */
 	uint16_t     m_cur_control = 0U;
 	uint16_t     m_cur_control2 = 0U;
+	bool         m_is_2players = false;
 
 	/* video-related */
-	int        m_layer_colorbase[4]{};
+	uint16_t     m_layer_colorbase[4]{};
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -146,17 +154,21 @@ private:
 	required_device<k055555_device> m_k055555;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	output_finder<3> m_red_button_lamps;
+	output_finder<3> m_green_button_lamps;
+	output_finder<3> m_blue_button_lamps;
+	output_finder<3> m_start_button_lamps;
 };
 
 
 K056832_CB_MEMBER(bishi_state::tile_callback)
 {
-//  *code -= '0';
-//  *color = m_layer_colorbase[layer] | (*color>>2 & 0x0f);
+//  code -= '0';
+//  color = m_layer_colorbase[layer] | (color>>2 & 0x0f);
 //  K055555GX_decode_vmixcolor(layer, color);
-//  if (*color) osd_printf_debug("plane %x col %x [55 %x %x]\n", layer, *color, layer_colorbase[layer], K055555_get_palette_index(layer));
+//  if (color) osd_printf_debug("plane %x col %x [55 %x %x]\n", layer, *color, layer_colorbase[layer], K055555_get_palette_index(layer));
 
-	*color = m_layer_colorbase[layer] + ((*color & 0xf0));
+	color = m_layer_colorbase[layer] + ((color & 0xf0));
 }
 
 void bishi_state::video_start()
@@ -177,7 +189,7 @@ void bishi_state::video_start()
 	m_layer_colorbase[3] = 0xc0;
 }
 
-uint32_t bishi_state::screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t bishi_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int layers[4], layerpri[4], i;/*, old;*/
 /*  int bg_colorbase, new_colorbase, plane, dirty; */
@@ -225,7 +237,22 @@ void bishi_state::control2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_cur_control2);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
+void bishi_state::lamp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	uint16_t new_state = ~data & 0xfff;
+	for (int lamp_index = 0, i = 0; i < 3; i++)
+	{
+		// Only 1st and 3rd player in the 2 player variant.
+		if (i == 1 && m_is_2players) continue;
+		m_red_button_lamps[lamp_index] = BIT(new_state, i * 3 + 0);
+		m_green_button_lamps[lamp_index] = BIT(new_state, i * 3 + 1);
+		m_blue_button_lamps[lamp_index] = BIT(new_state, i * 3 + 2);
+		m_start_button_lamps[lamp_index] = BIT(new_state, i + 9);
+		lamp_index++;
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::scanline)
 {
 	int scanline = param;
 
@@ -240,12 +267,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
 }
 
 /* compensate for a bug in the ram/rom test */
-uint16_t bishi_state::bishi_mirror_r(offs_t offset)
+uint16_t bishi_state::palette_mirror_r(offs_t offset)
 {
 	return m_palette->basemem().read16(offset);
 }
 
-uint16_t bishi_state::bishi_K056832_rom_r(offs_t offset)
+uint16_t bishi_state::K056832_rom_r(offs_t offset)
 {
 	uint16_t ouroffs;
 
@@ -268,7 +295,7 @@ void bishi_state::main_map(address_map &map)
 	map(0x800006, 0x800007).portr("SYSTEM");
 	map(0x800008, 0x800009).portr("INPUTS");
 	map(0x810000, 0x810003).w(FUNC(bishi_state::control2_w));       // bank switch for K056832 character ROM test
-	map(0x820000, 0x820001).nopw();            // lamps (see lamp test in service menu)
+	map(0x820000, 0x820001).w(FUNC(bishi_state::lamp_w));            // lamps (see lamp test in service menu)
 	map(0x830000, 0x83003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x840000, 0x840007).w(m_k056832, FUNC(k056832_device::b_word_w));    // VSCCS
 	map(0x850000, 0x85001f).w(m_k054338, FUNC(k054338_device::word_w));  // CLTC
@@ -276,8 +303,8 @@ void bishi_state::main_map(address_map &map)
 	map(0x880000, 0x880003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // Graphic planes
 	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xb04000, 0xb047ff).r(FUNC(bishi_state::bishi_mirror_r));    // bug in the ram/rom test?
-	map(0xc00000, 0xc01fff).r(FUNC(bishi_state::bishi_K056832_rom_r));
+	map(0xb04000, 0xb047ff).r(FUNC(bishi_state::palette_mirror_r));    // bug in the ram/rom test?
+	map(0xc00000, 0xc01fff).r(FUNC(bishi_state::K056832_rom_r));
 }
 
 static INPUT_PORTS_START( bishi )
@@ -497,20 +524,20 @@ void bishi_state::bishi(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, CPU_CLOCK); /* 12MHz (24MHz OSC / 2 ) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &bishi_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bishi_state::bishi_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bishi_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(29, 29+288-1, 16, 16+224-1);
-	m_screen->set_screen_update(FUNC(bishi_state::screen_update_bishi));
+	m_screen->set_screen_update(FUNC(bishi_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback));
@@ -520,16 +547,21 @@ void bishi_state::bishi(machine_config &config)
 	K054338(config, m_k054338, 0);
 	// FP 201404: any reason why this is not connected to the k055555 below?
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", SOUND_CLOCK)); /* 16.9344MHz */
 	ymz.irq_handler().set_inputline("maincpu", M68K_IRQ_1);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
+}
+
+void bishi_state::bishi2p(machine_config &config)
+{
+	bishi(config);
+	m_is_2players = true;
 }
 
 // ROM definitions
@@ -623,6 +655,6 @@ ROM_END
 } // anonymous namespace
 
 GAME( 1996, bishi,    0,      bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Bishi Bashi Champ Mini Game Senshuken (ver JAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbishi,   0,      bishi,    bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbishi,   0,      bishi2p,  bishi2p,  bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver JAA, 2 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbishik,  sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver KAB, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, sbishika, sbishi, bishi,    bishi,    bishi_state, empty_init, ROT0, "Konami", "Super Bishi Bashi Champ (ver KAA, 3 Players)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

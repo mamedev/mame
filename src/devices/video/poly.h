@@ -37,8 +37,9 @@
 
 #pragma once
 
-#include <climits>
 #include <atomic>
+#include <climits>
+#include <limits>
 
 
 #define KEEP_POLY_STATISTICS 0
@@ -306,23 +307,23 @@ public:
 
 	// tiles
 	template<int ParamCount>
-	uint32_t render_tile(rectangle const &cliprect, render_delegate callback, vertex_t const &v1, vertex_t const &v2);
+	uint32_t render_tile(rectangle const &cliprect, const render_delegate &callback, vertex_t const &v1, vertex_t const &v2);
 
 	// triangles
 	template<int ParamCount>
-	uint32_t render_triangle(rectangle const &cliprect, render_delegate callback, vertex_t const &v1, vertex_t const &v2, vertex_t const &v3);
+	uint32_t render_triangle(rectangle const &cliprect, const render_delegate &callback, vertex_t const &v1, vertex_t const &v2, vertex_t const &v3);
 	template<int ParamCount>
-	uint32_t render_triangle_fan(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v);
+	uint32_t render_triangle_fan(rectangle const &cliprect, const render_delegate &callback, int numverts, vertex_t const *v);
 	template<int ParamCount>
-	uint32_t render_triangle_strip(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v);
+	uint32_t render_triangle_strip(rectangle const &cliprect, const render_delegate &callback, int numverts, vertex_t const *v);
 
 	// polygons
 	template<int NumVerts, int ParamCount>
-	uint32_t render_polygon(rectangle const &cliprect, render_delegate callback, vertex_t const *v);
+	uint32_t render_polygon(rectangle const &cliprect, const render_delegate &callback, vertex_t const *v);
 
 	// direct custom extents
 	template<int ParamCount>
-	uint32_t render_extents(rectangle const &cliprect, render_delegate callback, int startscanline, int numscanlines, extent_t const *extents);
+	uint32_t render_extents(rectangle const &cliprect, const render_delegate &callback, int startscanline, int numscanlines, extent_t const *extents);
 
 	// public helpers
 	template<int ParamCount>
@@ -364,16 +365,23 @@ private:
 	using unit_array = poly_array<work_unit, 0>;
 
 	// round in a cross-platform consistent manner
-	inline int32_t round_coordinate(BaseType value)
+	static int32_t round_coordinate(BaseType value)
 	{
-		int32_t result = int32_t(std::floor(value));
-		if (value > 0 && result < 0)
-			return INT_MAX - 1;
-		return result + (value - BaseType(result) > BaseType(0.5));
+		// saturate (avoid overflow/underflow)
+		if (value >= BaseType(std::numeric_limits<int32_t>::max()))
+			return std::numeric_limits<int32_t>::max();
+		const BaseType ipart = std::floor(value);
+		if (ipart < BaseType(std::numeric_limits<int32_t>::min()))
+			return std::numeric_limits<int32_t>::min();
+
+		// round
+		// TODO: this rounds the midpoint towards negative infinity - should it use more standard behaviour?
+		const BaseType fpart = value - ipart;
+		return int32_t(ipart) + ((fpart > BaseType(0.5)) ? 1 : 0);
 	}
 
 	// internal helpers
-	primitive_info &primitive_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
+	primitive_info &primitive_alloc(int minx, int maxx, int miny, int maxy, const render_delegate &callback)
 	{
 		// return and initialize the next one
 		primitive_info &primitive = m_primitive.next();
@@ -684,7 +692,7 @@ void poly_manager<BaseType, ObjectType, MaxParams, Flags>::wait(char const *debu
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(rectangle const &cliprect, render_delegate callback, vertex_t const &_v1, vertex_t const &_v2)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(rectangle const &cliprect, const render_delegate &callback, vertex_t const &_v1, vertex_t const &_v2)
 {
 	vertex_t const *v1 = &_v1;
 	vertex_t const *v2 = &_v2;
@@ -808,7 +816,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(const rectangle &cliprect, render_delegate callback, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(const rectangle &cliprect, const render_delegate &callback, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
 {
 	vertex_t const *v1 = &_v1;
 	vertex_t const *v2 = &_v2;
@@ -971,7 +979,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_fan(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_fan(rectangle const &cliprect, const render_delegate &callback, int numverts, vertex_t const *v)
 {
 	// iterate over vertices
 	uint32_t pixels = 0;
@@ -988,7 +996,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_f
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_strip(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_strip(rectangle const &cliprect, const render_delegate &callback, int numverts, vertex_t const *v)
 {
 	// iterate over vertices
 	uint32_t pixels = 0;
@@ -1005,7 +1013,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_s
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(rectangle const &cliprect, render_delegate callback, int startscanline, int numscanlines, extent_t const *extents)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(rectangle const &cliprect, const render_delegate &callback, int startscanline, int numscanlines, extent_t const *extents)
 {
 	// clip coordinates
 	int32_t v1yclip = startscanline;
@@ -1093,7 +1101,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(re
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int NumVerts, int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(rectangle const &cliprect, render_delegate callback, vertex_t const *v)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(rectangle const &cliprect, const render_delegate &callback, vertex_t const *v)
 {
 	// determine min/max Y vertices
 	BaseType minx = v[0].x;
@@ -1231,8 +1239,20 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 			int32_t istartx = round_coordinate(startx);
 			int32_t istopx = round_coordinate(stopx);
 
-			// compute parameter starting points and deltas
+			// force start < stop
+			if (istartx > istopx)
+				std::swap(istartx, istopx);
+
+			// apply left/right clipping BEFORE calculating parameter start
+			if (!(Flags & POLY_FLAG_NO_CLIPPING))
+			{
+				istartx = std::max(istartx, cliprect.left());
+				istopx = std::min(istopx, cliprect.right() + 1);
+			}
+
+			// set the extent
 			extent_t &extent = unit.extent[extnum];
+
 			if (ParamCount > 0)
 			{
 				BaseType ldy = fully - ledge->v1->y;
@@ -1244,24 +1264,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(re
 				{
 					BaseType lparam = ledge->v1->p[paramnum] + ldy * ledge->dpdy[paramnum];
 					BaseType rparam = redge->v1->p[paramnum] + rdy * redge->dpdy[paramnum];
+
 					BaseType dpdx = (rparam - lparam) * oox;
 
-					extent.param[paramnum].start = lparam;// - (BaseType(istartx) + 0.5f) * dpdx;
+					extent.param[paramnum].start = lparam + (BaseType(istartx) + BaseType(0.5) - startx) * dpdx;
 					extent.param[paramnum].dpdx = dpdx;
 				}
-			}
-
-			// apply left/right clipping
-			if (!(Flags & POLY_FLAG_NO_CLIPPING))
-			{
-				if (istartx < cliprect.left())
-				{
-					for (int paramnum = 0; paramnum < ParamCount; paramnum++)
-						extent.param[paramnum].start += (cliprect.left() - istartx) * extent.param[paramnum].dpdx;
-					istartx = cliprect.left();
-				}
-				if (istopx > cliprect.right())
-					istopx = cliprect.right() + 1;
 			}
 
 			// set the extent and update the total pixel count

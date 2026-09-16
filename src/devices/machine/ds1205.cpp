@@ -12,6 +12,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <tuple>
 
 
 #define VERBOSE_LEVEL ( 0 )
@@ -21,7 +22,7 @@ inline void ATTR_PRINTF( 3, 4 ) ds1205_device::verboselog( int n_level, const ch
 	if( VERBOSE_LEVEL >= n_level )
 	{
 		va_list v;
-		char buf[ 32768 ];
+		char buf[32768];
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
@@ -96,14 +97,19 @@ void ds1205_device::nvram_default()
 
 bool ds1205_device::nvram_read( util::read_stream &file )
 {
+	std::error_condition err;
+	size_t actual;
+
 	for(int i = 0; i < 3; i++)
 	{
-		size_t actual;
-		if( file.read( m_identification[i], sizeof( m_identification[i] ), actual ) || actual != sizeof( m_identification[i] ) )
+		std::tie( err, actual ) = read( file, m_identification[i], sizeof( m_identification[i] ) );
+		if( err || ( sizeof( m_identification[i] ) != actual ) )
 			return false;
-		if( file.read( m_security_match[i], sizeof( m_security_match[i] ), actual ) || actual != sizeof( m_security_match[i] ) )
+		std::tie( err, actual ) = read( file, m_security_match[i], sizeof( m_security_match[i] ) );
+		if( err || ( sizeof( m_security_match[i] ) != actual ) )
 			return false;
-		if( file.read( m_secure_memory[i], sizeof( m_secure_memory[i] ), actual ) || actual != sizeof( m_secure_memory[i] ) )
+		std::tie( err, actual ) = read( file, m_secure_memory[i], sizeof( m_secure_memory[i] ) );
+		if( err || ( sizeof( m_secure_memory[i] ) != actual ) )
 			return false;
 	}
 
@@ -112,14 +118,19 @@ bool ds1205_device::nvram_read( util::read_stream &file )
 
 bool ds1205_device::nvram_write( util::write_stream &file )
 {
+	std::error_condition err;
+	size_t actual;
+
 	for(int i = 0; i < 3; i++)
 	{
-		size_t actual;
-		if( file.write( m_identification[i], sizeof( m_identification[i] ), actual ) || actual != sizeof( m_identification[i] ) )
+		std::tie( err, actual ) = write( file, m_identification[i], sizeof( m_identification[i] ) );
+		if( err )
 			return false;
-		if( file.write( m_security_match[i], sizeof( m_security_match[i] ), actual ) || actual != sizeof( m_security_match[i] ) )
+		std::tie( err, actual ) = write( file, m_security_match[i], sizeof( m_security_match[i] ) );
+		if( err )
 			return false;
-		if( file.write( m_secure_memory[i], sizeof( m_secure_memory[i] ), actual ) || actual != sizeof( m_secure_memory[i] ) )
+		std::tie( err, actual ) = write( file, m_secure_memory[i], sizeof( m_secure_memory[i] ) );
+		if( err )
 			return false;
 	}
 
@@ -141,11 +152,11 @@ void ds1205_device::writebit( u8 *buffer )
 
 		if( m_dqw )
 		{
-			buffer[ index ] |= mask;
+			buffer[index] |= mask;
 		}
 		else
 		{
-			buffer[ index ] &= ~mask;
+			buffer[index] &= ~mask;
 		}
 
 		m_bit++;
@@ -159,7 +170,7 @@ void ds1205_device::readbit( u8 *buffer )
 		int index = m_bit / 8;
 		int mask = 1 << ( m_bit % 8 );
 
-		if( buffer[ index ] & mask )
+		if( buffer[index] & mask )
 		{
 			m_dqr = 1;
 		}
@@ -226,17 +237,17 @@ void ds1205_device::write_clk(int state)
 			if( m_bit == 24 )
 			{
 				verboselog( 1, "-> command %02x %02x %02x\n",
-					m_command[ 0 ], m_command[ 1 ], m_command[ 2 ] );
+					m_command[0], m_command[1], m_command[2] );
 
-				if( m_command[ 0 ] == COMMAND_GET_SCRATCHPAD && (m_command[ 1 ] & 0xc0) == 0xc0 && m_command[ 1 ] == ( ~m_command[ 2 ] & 0xff ) )
+				if( m_command[0] == COMMAND_GET_SCRATCHPAD && (m_command[1] & 0xc0) == 0xc0 && m_command[1] == ( ~m_command[2] & 0xff ) )
 				{
 					new_state( STATE_READ_SCRATCH );
 				}
-				else if( m_command[ 0 ] == COMMAND_GET_DATA && (m_command[ 1 ] & 0xc0) != 0xc0 && (m_command[ 1 ] & 0x3f) >= 0x10 && m_command[ 1 ] == ( ~m_command[ 2 ] & 0xff ) )
+				else if( m_command[0] == COMMAND_GET_DATA && (m_command[1] & 0xc0) != 0xc0 && (m_command[1] & 0x3f) >= 0x10 && m_command[1] == ( ~m_command[2] & 0xff ) )
 				{
 					new_state( STATE_READ_IDENTIFICATION );
 				}
-				else if( m_command[ 0 ] == COMMAND_SET_SECURITY && (m_command[ 1 ] & 0xc0) != 0xc0 && !(m_command [ 1 ] & 0x3f) && m_command[ 1 ] == ( ~m_command[ 2 ] & 0xff ) )
+				else if( m_command[0] == COMMAND_SET_SECURITY && (m_command[1] & 0xc0) != 0xc0 && !(m_command[1] & 0x3f) && m_command[1] == ( ~m_command[2] & 0xff ) )
 				{
 					new_state( STATE_READ_IDENTIFICATION );
 				}
@@ -248,14 +259,14 @@ void ds1205_device::write_clk(int state)
 			break;
 
 		case STATE_READ_IDENTIFICATION:
-			readbit( m_identification[ m_command[ 1 ] >> 6 ] );
+			readbit( m_identification[m_command[1] >> 6] );
 
 			if( m_bit == 64 )
 			{
-				int page = m_command [ 1 ] >> 6;
+				int page = m_command [1] >> 6;
 				verboselog( 1, "<- identification %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_identification[ page ][ 0 ], m_identification[ page ][ 1 ], m_identification[ page ][ 2 ], m_identification[ page ][ 3 ],
-					m_identification[ page ][ 4 ], m_identification[ page ][ 5 ], m_identification[ page ][ 6 ], m_identification[ page ][ 7 ] );
+					m_identification[page][0], m_identification[page][1], m_identification[page][2], m_identification[page][3],
+					m_identification[page][4], m_identification[page][5], m_identification[page][6], m_identification[page][7] );
 
 				new_state( STATE_WRITE_COMPARE_REGISTER );
 			}
@@ -266,24 +277,24 @@ void ds1205_device::write_clk(int state)
 
 			if( m_bit == 64 )
 			{
-				int page = m_command[ 1 ] >> 6;
+				int page = m_command[1] >> 6;
 				verboselog( 1, "-> compare register %02x %02x %02x %02x %02x %02x %02x %02x (%02x %02x %02x %02x %02x %02x %02x %02x)\n",
-					m_compare_register[ 0 ], m_compare_register[ 1 ], m_compare_register[ 2 ], m_compare_register[ 3 ],
-					m_compare_register[ 4 ], m_compare_register[ 5 ], m_compare_register[ 6 ], m_compare_register[ 7 ],
-					m_security_match[ page ][ 0 ], m_security_match[ page ][ 1 ], m_security_match[ page ][ 2 ], m_security_match[ page ][ 3 ],
-					m_security_match[ page ][ 4 ], m_security_match[ page ][ 5 ], m_security_match[ page ][ 6 ], m_security_match[ page ][ 7 ] );
+					m_compare_register[0], m_compare_register[1], m_compare_register[2], m_compare_register[3],
+					m_compare_register[4], m_compare_register[5], m_compare_register[6], m_compare_register[7],
+					m_security_match[page][0], m_security_match[page][1], m_security_match[page][2], m_security_match[page][3],
+					m_security_match[page][4], m_security_match[page][5], m_security_match[page][6], m_security_match[page][7] );
 
-				if( memcmp( m_compare_register, m_security_match[ page ], sizeof( m_compare_register ) ) == 0 )
+				if( memcmp( m_compare_register, m_security_match[page], sizeof( m_compare_register ) ) == 0 )
 				{
-					if( m_command[ 0 ] == COMMAND_GET_DATA )
+					if( m_command[0] == COMMAND_GET_DATA )
 					{
 						new_state( STATE_READ_DATA );
 					}
-					else if( m_command[ 0 ] == COMMAND_GET_SCRATCHPAD)
+					else if( m_command[0] == COMMAND_GET_SCRATCHPAD)
 					{
 						new_state( STATE_READ_SCRATCH );
 					}
-					else if( m_command[ 0 ] == COMMAND_SET_SECURITY)
+					else if( m_command[0] == COMMAND_SET_SECURITY)
 					{
 						new_state( STATE_WRITE_IDENTIFICATION );
 					}
@@ -296,16 +307,16 @@ void ds1205_device::write_clk(int state)
 			break;
 
 		case STATE_READ_DATA:
-			readbit( m_secure_memory[ m_command[ 1 ] >> 6 ] );
+			readbit( m_secure_memory[m_command[1] >> 6] );
 
 			if( m_bit == 384 )
 			{
-				int page = m_command [ 1 ] >> 6;
+				int page = m_command[1] >> 6;
 				verboselog( 1, "<- secure memory %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_secure_memory[ page ][ 0 ], m_secure_memory[ page ][ 1 ], m_secure_memory[ page ][ 2 ], m_secure_memory[ page ][ 3 ],
-					m_secure_memory[ page ][ 4 ], m_secure_memory[ page ][ 5 ], m_secure_memory[ page ][ 6 ], m_secure_memory[ page ][ 7 ],
-					m_secure_memory[ page ][ 8 ], m_secure_memory[ page ][ 9 ], m_secure_memory[ page ][ 10 ], m_secure_memory[ page ][ 11 ],
-					m_secure_memory[ page ][ 12 ], m_secure_memory[ page ][ 13 ], m_secure_memory[ page ][ 14 ], m_secure_memory[ page ][ 15 ] );
+					m_secure_memory[page][0], m_secure_memory[page][1], m_secure_memory[page][2], m_secure_memory[page][3],
+					m_secure_memory[page][4], m_secure_memory[page][5], m_secure_memory[page][6], m_secure_memory[page][7],
+					m_secure_memory[page][8], m_secure_memory[page][9], m_secure_memory[page][10], m_secure_memory[page][11],
+					m_secure_memory[page][12], m_secure_memory[page][13], m_secure_memory[page][14], m_secure_memory[page][15] );
 
 				new_state( STATE_STOP );
 			}
@@ -317,57 +328,57 @@ void ds1205_device::write_clk(int state)
 			if( m_bit == 512 )
 			{
 				verboselog( 1, "<- scratchpad %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_scratchpad[ 0 ], m_scratchpad[ 1 ], m_scratchpad[ 2 ], m_scratchpad[ 3 ],
-					m_scratchpad[ 4 ], m_scratchpad[ 5 ], m_scratchpad[ 6 ], m_scratchpad[ 7 ],
-					m_scratchpad[ 8 ], m_scratchpad[ 9 ], m_scratchpad[ 10 ], m_scratchpad[ 11 ],
-					m_scratchpad[ 12 ], m_scratchpad[ 13 ], m_scratchpad[ 14 ], m_scratchpad[ 15 ] );
+					m_scratchpad[0], m_scratchpad[1], m_scratchpad[2], m_scratchpad[3],
+					m_scratchpad[4], m_scratchpad[5], m_scratchpad[6], m_scratchpad[7],
+					m_scratchpad[8], m_scratchpad[9], m_scratchpad[10], m_scratchpad[11],
+					m_scratchpad[12], m_scratchpad[13], m_scratchpad[14], m_scratchpad[15] );
 
 				new_state( STATE_STOP );
 			}
 			break;
 
 		case STATE_WRITE_IDENTIFICATION:
-			writebit( m_identification[ m_command[ 1 ] >> 6 ] );
+			writebit( m_identification[m_command[1] >> 6] );
 
 			if( m_bit == 64 )
 			{
-				int page = m_command[ 1 ] >> 6;
+				int page = m_command[1] >> 6;
 				verboselog( 1, "-> identification %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_identification[ page ][ 0 ], m_identification[ page ][ 1 ], m_identification[ page ][ 2 ], m_identification[ page ][ 3 ],
-					m_identification[ page ][ 4 ], m_identification[ page ][ 5 ], m_identification[ page ][ 6 ], m_identification[ page ][ 7 ] );
+					m_identification[page][0], m_identification[page][1], m_identification[page][2], m_identification[page][3],
+					m_identification[page][4], m_identification[page][5], m_identification[page][6], m_identification[page][7] );
 
 				new_state( STATE_WRITE_SECURITY_MATCH );
 			}
 			break;
 
 		case STATE_WRITE_SECURITY_MATCH:
-			writebit( m_security_match[ m_command[ 1 ] >> 6 ] );
+			writebit( m_security_match[m_command[1] >> 6] );
 
 			if( m_bit == 64 )
 			{
-				int page = m_command[ 1 ] >> 6;
+				int page = m_command[1] >> 6;
 				verboselog( 1, ">- security match %02x %02x %02x %02x %02x %02x %02x %02x\n",
-					m_security_match[ page ][ 0 ], m_security_match[ page ][ 1 ], m_security_match[ page ][ 2 ], m_security_match[ page ][ 3 ],
-					m_security_match[ page ][ 4 ], m_security_match[ page ][ 5 ], m_security_match[ page ][ 6 ], m_security_match[ page ][ 7 ] );
+					m_security_match[page][0], m_security_match[page][1], m_security_match[page][2], m_security_match[page][3],
+					m_security_match[page][4], m_security_match[page][5], m_security_match[page][6], m_security_match[page][7] );
 
 				new_state( STATE_STOP );
 			}
 			break;
 
 		case STATE_OUTPUT_GARBLED_DATA:
-			if( !m_clk && m_command[ 0 ] == COMMAND_GET_DATA )
+			if( !m_clk && m_command[0] == COMMAND_GET_DATA )
 			{
 				m_dqr = machine().rand() & 1;
 				m_bit++;
 			}
-			else if( m_clk && m_command[ 0 ] == COMMAND_SET_DATA )
+			else if( m_clk && m_command[0] == COMMAND_SET_DATA )
 			{
 				m_bit++;
 			}
 
 			if( m_bit == 64 )
 			{
-				if( m_command[ 0 ] == COMMAND_GET_DATA )
+				if( m_command[0] == COMMAND_GET_DATA )
 				{
 					verboselog( 1, "<- random\n" );
 				}

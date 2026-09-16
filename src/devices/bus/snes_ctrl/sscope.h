@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_SNES_CTRL_SUPERSCOPE_H
-#define MAME_BUS_SNES_CTRL_SUPERSCOPE_H
+#ifndef MAME_BUS_SNES_CTRL_SSCOPE_H
+#define MAME_BUS_SNES_CTRL_SSCOPE_H
 
 #pragma once
 
@@ -28,12 +28,12 @@ public:
 	snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_snes_control_port_interface overrides
 	virtual uint8_t read_pin4() override;
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SNES_SUPERSCOPE, snes_sscope_device)
 
-#endif // MAME_BUS_SNES_CTRL_SUPERSCOPE_H
+#endif // MAME_BUS_SNES_CTRL_SSCOPE_H

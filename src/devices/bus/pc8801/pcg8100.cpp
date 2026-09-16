@@ -35,7 +35,7 @@ void pcg8100_device::device_add_mconfig(machine_config &config)
 {
 	constexpr XTAL pcg_clock = XTAL(31'948'800) / 8;
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(pcg_clock);
 	m_pit->out_handler<0>().set(m_dac1bit[0], FUNC(speaker_sound_device::level_w));
 	m_pit->set_clk<1>(pcg_clock);
@@ -46,8 +46,8 @@ void pcg8100_device::device_add_mconfig(machine_config &config)
 	for (auto &dac1bit : m_dac1bit)
 	{
 		SPEAKER_SOUND(config, dac1bit);
-		dac1bit->add_route(ALL_OUTPUTS, "^^lspeaker", 0.25);
-		dac1bit->add_route(ALL_OUTPUTS, "^^rspeaker", 0.25);
+		dac1bit->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 0);
+		dac1bit->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 1);
 	}
 }
 

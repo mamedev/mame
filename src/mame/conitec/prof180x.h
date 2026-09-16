@@ -28,8 +28,8 @@ public:
 private:
 	required_device<centronics_device> m_centronics;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -54,8 +54,8 @@ private:
 	int m_c2 = 0;
 	int m_mm0 = 0;
 	int m_mm1 = 0;
-	void prof180x_io(address_map &map);
-	void prof180x_mem(address_map &map);
+	void prof180x_io(address_map &map) ATTR_COLD;
+	void prof180x_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_CONITEC_PROF180X_H

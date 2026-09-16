@@ -14,7 +14,7 @@ class cedar_magnet_flop_device : public device_t
 {
 public:
 	// construction/destruction
-	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cedar_magnet_flop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u8 port60_r();
 	u8 port61_r();
@@ -28,9 +28,9 @@ public:
 	void write(offs_t offset, u8 data);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<u8> m_disk;

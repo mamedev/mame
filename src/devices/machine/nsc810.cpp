@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "nsc810.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -56,6 +56,19 @@ void nsc810_device::device_start()
 
 	m_timer[0] = timer_alloc(FUNC(nsc810_device::timer_tick<0>), this);
 	m_timer[1] = timer_alloc(FUNC(nsc810_device::timer_tick<1>), this);
+
+	save_item(NAME(m_portA_latch));
+	save_item(NAME(m_portB_latch));
+	save_item(NAME(m_portC_latch));
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_ddrB));
+	save_item(NAME(m_ddrC));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_timer_mode));
+	save_item(NAME(m_timer_counter));
+	save_item(NAME(m_timer_base));
+	save_item(NAME(m_timer_running));
+	save_item(NAME(m_ramselect));
 }
 
 void nsc810_device::device_reset()

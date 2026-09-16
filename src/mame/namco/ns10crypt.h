@@ -7,6 +7,7 @@
 #pragma once
 
 #include <array>
+#include <bit>
 #include <cstdint>
 
 
@@ -24,8 +25,8 @@ public:
 protected:
 	ns10_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void init(int iv) = 0;
 
@@ -42,8 +43,8 @@ public:
 protected:
 	ns10_type1_decrypter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const int INIT_SBOX[16];
@@ -76,12 +77,12 @@ public:
 
 	static int gf2_reduce(uint64_t num)
 	{
-		return population_count_64(num) & 1;
+		return std::popcount(num) & 1;
 	}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const int INIT_SBOX[16];
@@ -119,12 +120,12 @@ public:
 
 	static int gf2_reduce(uint64_t num)
 	{
-		return population_count_64(num) & 1;
+		return std::popcount(num) & 1;
 	}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const int INIT_SBOX[16];
@@ -146,7 +147,7 @@ private:
 class mrdrilr2_decrypter_device : public ns10_type1_decrypter_device
 {
 public:
-	mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mrdrilr2_decrypter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device) // Type 1

@@ -2,7 +2,7 @@
 // server.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -33,7 +33,7 @@ private:
   void do_handshake()
   {
     auto self(shared_from_this());
-    socket_.async_handshake(asio::ssl::stream_base::server, 
+    socket_.async_handshake(asio::ssl::stream_base::server,
         [this, self](const std::error_code& error)
         {
           if (!error)
@@ -88,7 +88,7 @@ public:
     context_.set_password_callback(std::bind(&server::get_password, this));
     context_.use_certificate_chain_file("server.pem");
     context_.use_private_key_file("server.pem", asio::ssl::context::pem);
-    context_.use_tmp_dh_file("dh2048.pem");
+    context_.use_tmp_dh_file("dh4096.pem");
 
     do_accept();
   }

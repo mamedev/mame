@@ -31,16 +31,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
-	virtual void ioc_map(address_map &map) override;
-	virtual void memc_map(address_map &map) override;
+	virtual void ioc_map(address_map &map) override ATTR_COLD;
+	virtual void memc_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_memory_region m_podule_rom;
@@ -122,7 +122,7 @@ const tiny_rom_entry *arc_lark_device::device_rom_region() const
 
 void arc_lark_device::device_add_mconfig(machine_config &config)
 {
-	AD1848(config, m_ad1848, 0);
+	AD1848(config, m_ad1848);
 	//m_ad1848->irq().set([this](int state) { set_irq(IRQ_AD1848, state); }); // not used/connected?
 	m_ad1848->drq().set(FUNC(arc_lark_device::playback_drq));
 

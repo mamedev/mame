@@ -2,7 +2,7 @@
 // ip/impl/address_v4.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ip {
 
 address_v4::address_v4(const address_v4::bytes_type& bytes)
@@ -57,29 +58,18 @@ address_v4::address_v4(address_v4::uint_type addr)
       static_cast<asio::detail::u_long_type>(addr));
 }
 
-address_v4::bytes_type address_v4::to_bytes() const ASIO_NOEXCEPT
+address_v4::bytes_type address_v4::to_bytes() const noexcept
 {
   using namespace std; // For memcpy.
   bytes_type bytes;
-#if defined(ASIO_HAS_STD_ARRAY)
   memcpy(bytes.data(), &addr_.s_addr, 4);
-#else // defined(ASIO_HAS_STD_ARRAY)
-  memcpy(bytes.elems, &addr_.s_addr, 4);
-#endif // defined(ASIO_HAS_STD_ARRAY)
   return bytes;
 }
 
-address_v4::uint_type address_v4::to_uint() const ASIO_NOEXCEPT
+address_v4::uint_type address_v4::to_uint() const noexcept
 {
   return asio::detail::socket_ops::network_to_host_long(addr_.s_addr);
 }
-
-#if !defined(ASIO_NO_DEPRECATED)
-unsigned long address_v4::to_ulong() const
-{
-  return asio::detail::socket_ops::network_to_host_long(addr_.s_addr);
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
 
 std::string address_v4::to_string() const
 {
@@ -94,69 +84,20 @@ std::string address_v4::to_string() const
   return addr;
 }
 
-#if !defined(ASIO_NO_DEPRECATED)
-std::string address_v4::to_string(asio::error_code& ec) const
-{
-  char addr_str[asio::detail::max_addr_v4_str_len];
-  const char* addr =
-    asio::detail::socket_ops::inet_ntop(
-        ASIO_OS_DEF(AF_INET), &addr_, addr_str,
-        asio::detail::max_addr_v4_str_len, 0, ec);
-  if (addr == 0)
-    return std::string();
-  return addr;
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
-
-bool address_v4::is_loopback() const ASIO_NOEXCEPT
+bool address_v4::is_loopback() const noexcept
 {
   return (to_uint() & 0xFF000000) == 0x7F000000;
 }
 
-bool address_v4::is_unspecified() const ASIO_NOEXCEPT
+bool address_v4::is_unspecified() const noexcept
 {
   return to_uint() == 0;
 }
 
-#if !defined(ASIO_NO_DEPRECATED)
-bool address_v4::is_class_a() const
-{
-  return (to_uint() & 0x80000000) == 0;
-}
-
-bool address_v4::is_class_b() const
-{
-  return (to_uint() & 0xC0000000) == 0x80000000;
-}
-
-bool address_v4::is_class_c() const
-{
-  return (to_uint() & 0xE0000000) == 0xC0000000;
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
-
-bool address_v4::is_multicast() const ASIO_NOEXCEPT
+bool address_v4::is_multicast() const noexcept
 {
   return (to_uint() & 0xF0000000) == 0xE0000000;
 }
-
-#if !defined(ASIO_NO_DEPRECATED)
-address_v4 address_v4::broadcast(const address_v4& addr, const address_v4& mask)
-{
-  return address_v4(addr.to_uint() | (mask.to_uint() ^ 0xFFFFFFFF));
-}
-
-address_v4 address_v4::netmask(const address_v4& addr)
-{
-  if (addr.is_class_a())
-    return address_v4(0xFF000000);
-  if (addr.is_class_b())
-    return address_v4(0xFFFF0000);
-  if (addr.is_class_c())
-    return address_v4(0xFFFFFF00);
-  return address_v4(0xFFFFFFFF);
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
 
 address_v4 make_address_v4(const char* str)
 {
@@ -167,7 +108,7 @@ address_v4 make_address_v4(const char* str)
 }
 
 address_v4 make_address_v4(const char* str,
-    asio::error_code& ec) ASIO_NOEXCEPT
+    asio::error_code& ec) noexcept
 {
   address_v4::bytes_type bytes;
   if (asio::detail::socket_ops::inet_pton(
@@ -182,7 +123,7 @@ address_v4 make_address_v4(const std::string& str)
 }
 
 address_v4 make_address_v4(const std::string& str,
-    asio::error_code& ec) ASIO_NOEXCEPT
+    asio::error_code& ec) noexcept
 {
   return make_address_v4(str.c_str(), ec);
 }
@@ -195,7 +136,7 @@ address_v4 make_address_v4(string_view str)
 }
 
 address_v4 make_address_v4(string_view str,
-    asio::error_code& ec) ASIO_NOEXCEPT
+    asio::error_code& ec) noexcept
 {
   return make_address_v4(static_cast<std::string>(str), ec);
 }
@@ -203,6 +144,7 @@ address_v4 make_address_v4(string_view str,
 #endif // defined(ASIO_HAS_STRING_VIEW)
 
 } // namespace ip
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

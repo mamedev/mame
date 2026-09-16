@@ -49,10 +49,7 @@ public:
 	bbc_joyport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
 		: bbc_joyport_slot_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	bbc_joyport_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
@@ -72,8 +69,8 @@ public:
 	void write_cb2(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_joyport_interface *m_device;
 
@@ -96,7 +93,7 @@ public:
 protected:
 	device_bbc_joyport_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_joyport_slot_device *m_slot;
+	bbc_joyport_slot_device *const m_slot;
 };
 
 

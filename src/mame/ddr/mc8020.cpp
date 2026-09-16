@@ -44,11 +44,11 @@ private:
 	void port_b_w(u8 data);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
 	required_ioport_array<7> m_keyboard;
@@ -314,7 +314,7 @@ void mc8020_state::mc8020(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(32*6, 16*8);

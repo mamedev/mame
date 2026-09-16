@@ -10,11 +10,12 @@ CPU main PCB is a standard EPIA
 ROMs    epia BIOS + solid state HD
 
 1x VIA EPIA5000EAG (main PCB) with:
+VT6801A North Bridge PLE133
 VT8231 South Bridge
 VIA Eden Processor
 VIA EPIA Companion Chip VT1612A (Audio CODEC)
 VIA EPIA Companion Chip VT6103 (Networking)
-processor speed is 533MHz <- likely to be a Celeron / Pentium III Socket 370 -AS
+processor speed is 533MHz, EBGA368 socket (VIA C3 or later, Pentium 3 equivalent + 3DNow as bare minimum)
 
  it's a 2002 era PC at least based on the BIOS,
   almost certainly newer than the standard 'PENTIUM' CPU
@@ -60,11 +61,11 @@ private:
 	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void intel82439tx_init();
-	void queen_io(address_map &map);
-	void queen_map(address_map &map);
+	void queen_io(address_map &map) ATTR_COLD;
+	void queen_map(address_map &map) ATTR_COLD;
 
 	uint8_t mtxc_config_r(int function, int reg);
 	void mtxc_config_w(int function, int reg, uint8_t data);
@@ -315,4 +316,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2002?, queen,  0,    queen, 0, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )
+GAME( 2002?, queen,  0,    queen, 0, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

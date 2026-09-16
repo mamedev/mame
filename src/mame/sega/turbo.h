@@ -44,11 +44,11 @@ public:
 		, m_lamp(*this, "lamp")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+	ioport_value pedal_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// device / memory pointers
 	required_device<z80_device> m_maincpu;
@@ -117,8 +117,8 @@ public:
 	void buckrog_samples(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_subcpu;
@@ -152,10 +152,10 @@ private:
 	uint32_t get_sprite_bits(uint8_t *plb);
 	void update_samples();
 
-	void decrypted_opcodes_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sub_prg_map(address_map &map);
-	void sub_portmap(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sub_prg_map(address_map &map) ATTR_COLD;
+	void sub_portmap(address_map &map) ATTR_COLD;
 };
 
 class subroc3d_state : public turbo_base_state
@@ -171,7 +171,7 @@ public:
 	void subroc3d_samples(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -201,7 +201,7 @@ private:
 	uint32_t get_sprite_bits(uint8_t *plb);
 	inline void update_volume(int leftchan, uint8_t dis, uint8_t dir);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class turbo_state : public turbo_base_state
@@ -223,7 +223,7 @@ public:
 	void init_turbo_enc();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_roadroms;
@@ -274,7 +274,7 @@ private:
 	void update_samples();
 	TIMER_CALLBACK_MEMBER(update_sound_a);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 

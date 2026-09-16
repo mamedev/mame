@@ -421,7 +421,7 @@ protected:
 	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	const voodoo::voodoo_model m_model;      // which voodoo model
@@ -490,7 +490,7 @@ public:
 	virtual ~voodoo_1_device();
 
 	// address map and read/write helpers
-	virtual void core_map(address_map &map) override;
+	virtual void core_map(address_map &map) override ATTR_COLD;
 	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
 	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
 
@@ -502,9 +502,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// system management
@@ -724,7 +724,7 @@ inline u32 voodoo::register_table_entry::write(voodoo_1_device &device, u32 chip
 		if (regnum < voodoo_regs::reg_fvertexAx || regnum > voodoo_regs::reg_fdWdY)
 			device.logerror("VOODOO.REG:%s(%d) write = %08X\n", m_name, chipmask, data);
 		else
-			device.logerror("VOODOO.REG:%s(%d) write = %f\n", m_name, chipmask, double(u2f(data)));
+			device.logerror("VOODOO.REG:%s(%d) write = %f\n", m_name, chipmask, std::bit_cast<float>(data));
 	}
 	return m_write(chipmask & m_chipmask_flags, regnum, data & m_mask);
 }

@@ -228,7 +228,7 @@ static INPUT_PORTS_START( tiamc1 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // Jump
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gorodki )
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( gorodki )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) // right button
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) // left button
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kot )
@@ -279,7 +279,7 @@ static INPUT_PORTS_START( kot )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Punch / Right
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Kick / Left
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 
@@ -317,12 +317,12 @@ static const gfx_layout char_rom_layout =
 };
 
 static GFXDECODE_START( gfx_tiamc1 )
-	GFXDECODE_ENTRY( nullptr, 0x0000, char_layout, 0, 16 )
+	GFXDECODE_RAM( nullptr, 0x0000, char_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_kot )
-	GFXDECODE_ENTRY( nullptr, 0x0000, char_rom_layout, 0, 16 )
+	GFXDECODE_RAM( nullptr, 0x0000, char_rom_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
@@ -341,7 +341,7 @@ void tiamc1_state::tiamc1(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(tiamc1_state::tiamc1_control_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 312, 0, 256);       // pixel clock and htotal comes from docs/schematics, the rest is guess (determined by undumped PROM)
 	screen.set_screen_update(FUNC(tiamc1_state::screen_update_tiamc1));
 	screen.set_palette(m_palette);
@@ -370,7 +370,7 @@ void tiamc1_state::kot(machine_config &config)
 	config.device_remove("2x8253");
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(PIXEL_CLOCK / 4);
 	pit8253.set_clk<2>(SND_CLOCK);                // guess
 	pit8253.out_handler<2>().set(FUNC(tiamc1_state::pit8253_2_w));

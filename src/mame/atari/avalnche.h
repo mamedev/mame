@@ -39,13 +39,13 @@ private:
 	void credit_1_lamp_w(int state);
 	void credit_2_lamp_w(int state);
 	void start_lamp_w(int state);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_16v);
 	uint32_t screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void avalnche_noise_amplitude_w(uint8_t data);
 	void catch_aud0_w(int state);
 	void catch_aud1_w(int state);
 	void catch_aud2_w(int state);
-	void catch_map(address_map &map);
-	void main_map(address_map &map);
+	void catch_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };

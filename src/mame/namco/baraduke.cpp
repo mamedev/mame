@@ -96,9 +96,7 @@ TODO:
   but they don't seem to work as expected. During the first few frames they are
   written out of order and hooking them up in the usual way causes the MCU to
   stop receiving interrupts.
-
-- remove the sound kludge in Baraduke. This might actually be a feature of the
-  CUS30 chip.
+- Merge sprite draw function into namco/namcos1_sprite.cpp
 
 
 DIP locations verified for:
@@ -110,10 +108,13 @@ DIP locations verified for:
 
 #include "emu.h"
 
+#include "namco_cus4xtmap.h"
+
 #include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
+#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -129,11 +130,11 @@ public:
 	baraduke_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
+		m_tilegen(*this, "tilegen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_in(*this, "IN%u", 0U),
@@ -142,42 +143,37 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void init_baraduke();
-	void baraduke(machine_config &config);
+	void init_baraduke() ATTR_COLD;
+	void baraduke(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void inputport_select_w(uint8_t data);
 	uint8_t inputport_r();
 	void lamps_w(uint8_t data);
 	void irq_ack_w(uint8_t data);
-	uint8_t soundkludge_r();
-	void videoram_w(offs_t offset, uint8_t data);
 	void textram_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> void scroll_w(offs_t offset, uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
 	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	void palette(palette_device &palette) const;
+	void tile_cb(u8 layer, u8 &gfxno, u32 &code);
+	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
-	void set_scroll(int layer);
-	void main_map(address_map &map);
-	void mcu_map(address_map &map);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_textram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd63701v0_cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
+	required_device<namco_cus4xtmap_device> m_tilegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -187,16 +183,10 @@ private:
 	output_finder<2> m_lamps;
 
 	uint8_t m_inputport_selected = 0;
-	int m_counter = 0;
 	tilemap_t *m_tx_tilemap = nullptr;
-	tilemap_t *m_bg_tilemap[2]{};
-	uint16_t m_xscroll[2]{};
-	uint8_t m_yscroll[2]{};
-	uint8_t m_copy_sprites = 0;
+	bool m_copy_sprites = false;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -204,44 +194,60 @@ private:
 
     The palette PROMs are connected to the RGB output this way:
 
-    bit 3   -- 220 ohm resistor  -- RED/GREEN/BLUE
-            -- 470 ohm resistor  -- RED/GREEN/BLUE
-            -- 1  kohm resistor  -- RED/GREEN/BLUE
-    bit 0   -- 2.2kohm resistor  -- RED/GREEN/BLUE
+    bit 7 -- 220 ohm resistor  -- BLUE
+          -- 470 ohm resistor  -- BLUE
+          -- 1  kohm resistor  -- BLUE
+          -- 2.2kohm resistor  -- BLUE
+          -- 220 ohm resistor  -- GREEN
+          -- 470 ohm resistor  -- GREEN
+          -- 1  kohm resistor  -- GREEN
+    bit 0 -- 2.2kohm resistor  -- GREEN
+
+    bit 3 -- 220 ohm resistor  -- RED
+          -- 470 ohm resistor  -- RED
+          -- 1  kohm resistor  -- RED
+    bit 0 -- 2.2kohm resistor  -- RED
 
 ***************************************************************************/
 
 void baraduke_state::palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[4] = { 2200, 1000, 470, 220 };
+
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
+	compute_resistor_weights(0, 255, -1.0,
+			4, &resistances[0], rweights, 0, 0,
+			4, &resistances[0], gweights, 0, 0,
+			4, &resistances[0], bweights, 0, 0);
 
 	for (int i = 0; i < 2048; i++)
 	{
 		int bit0, bit1, bit2, bit3;
 
 		// red component
-		bit0 = BIT(color_prom[2048], 0);
-		bit1 = BIT(color_prom[2048], 1);
-		bit2 = BIT(color_prom[2048], 2);
-		bit3 = BIT(color_prom[2048], 3);
-		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i | 0x800], 0);
+		bit1 = BIT(color_prom[i | 0x800], 1);
+		bit2 = BIT(color_prom[i | 0x800], 2);
+		bit3 = BIT(color_prom[i | 0x800], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
 		// green component
-		bit0 = BIT(color_prom[0], 0);
-		bit1 = BIT(color_prom[0], 1);
-		bit2 = BIT(color_prom[0], 2);
-		bit3 = BIT(color_prom[0], 3);
-		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
 		// blue component
-		bit0 = BIT(color_prom[0], 4);
-		bit1 = BIT(color_prom[0], 5);
-		bit2 = BIT(color_prom[0], 6);
-		bit3 = BIT(color_prom[0], 7);
-		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		bit2 = BIT(color_prom[i], 6);
+		bit3 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -253,19 +259,16 @@ void baraduke_state::palette(palette_device &palette) const
 
 ***************************************************************************/
 
-// convert from 32x32 to 36x28
 TILEMAP_MAPPER_MEMBER(baraduke_state::tx_tilemap_scan)
 {
-	int offs;
-
+	// convert from 32x32 to 36x28
 	row += 2;
 	col -= 2;
-	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
-	else
-		offs = col + (row << 5);
 
-	return offs;
+	if (col & 0x20)
+		return row + ((col & 0x1f) << 5);
+	else
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(baraduke_state::tx_get_tile_info)
@@ -276,28 +279,10 @@ TILE_GET_INFO_MEMBER(baraduke_state::tx_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info0)
+void baraduke_state::tile_cb(u8 layer, u8& gfxno, u32& code)
 {
-	int const code = m_videoram[2 * tile_index];
-	int const attr = m_videoram[2 * tile_index + 1];
-
-	tileinfo.set(1,
-			code + ((attr & 0x03) << 8),
-			attr,
-			0);
+	gfxno = layer & 1;
 }
-
-TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
-{
-	int const code = m_videoram[0x1000 + 2 * tile_index];
-	int const attr = m_videoram[0x1000 + 2 * tile_index + 1];
-
-	tileinfo.set(2,
-			code + ((attr & 0x03) << 8),
-			attr,
-			0);
-}
-
 
 
 /***************************************************************************
@@ -309,21 +294,9 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
 void baraduke_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(baraduke_state::tx_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(baraduke_state::tx_tilemap_scan)), 8, 8, 36, 28);
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(baraduke_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(baraduke_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
 	m_tx_tilemap->set_transparent_pen(3);
-	m_bg_tilemap[0]->set_transparent_pen(7);
-	m_bg_tilemap[1]->set_transparent_pen(7);
-
-	m_bg_tilemap[0]->set_scrolldx(-26, -227 + 26);
-	m_bg_tilemap[1]->set_scrolldx(-24, -227 + 24);
-	m_bg_tilemap[0]->set_scrolldy(-9, 9);
-	m_bg_tilemap[1]->set_scrolldy(-9, 9);
 	m_tx_tilemap->set_scrolldy(16, 16);
 
-	save_item(NAME(m_xscroll));
-	save_item(NAME(m_yscroll));
 	save_item(NAME(m_copy_sprites));
 }
 
@@ -335,33 +308,10 @@ void baraduke_state::video_start()
 
 ***************************************************************************/
 
-void baraduke_state::videoram_w(offs_t offset, uint8_t data)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap[offset / 0x1000]->mark_tile_dirty((offset & 0xfff) / 2);
-}
-
 void baraduke_state::textram_w(offs_t offset, uint8_t data)
 {
 	m_textram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-template <uint8_t Which>
-void baraduke_state::scroll_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0: // high scroll x
-			m_xscroll[Which] = (m_xscroll[Which] & 0xff) | (data << 8);
-			break;
-		case 1: // low scroll x
-			m_xscroll[Which] = (m_xscroll[Which] & 0xff00) | data;
-			break;
-		case 2: // scroll y
-			m_yscroll[Which] = data;
-			break;
-	}
 }
 
 void baraduke_state::spriteram_w(offs_t offset, uint8_t data)
@@ -370,7 +320,7 @@ void baraduke_state::spriteram_w(offs_t offset, uint8_t data)
 
 	// a write to this offset tells the sprite chip to buffer the sprite list
 	if (offset == 0x1ff2)
-		m_copy_sprites = 1;
+		m_copy_sprites = true;
 }
 
 
@@ -381,116 +331,92 @@ void baraduke_state::spriteram_w(offs_t offset, uint8_t data)
 
 ***************************************************************************/
 
-void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
+void baraduke_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram + 0x1800;
-	const uint8_t *source = &spriteram[0x0000];
-	const uint8_t *finish = &spriteram[0x0800 - 16];    // the last is NOT a sprite
+	const uint8_t *source = &m_spriteram[0x2000 - 32]; // the last is NOT a sprite
+	const uint8_t *finish = &m_spriteram[0x1800];
 
-	int const sprite_xoffs = spriteram[0x07f5] - 256 * (spriteram[0x07f4] & 1);
-	int const sprite_yoffs = spriteram[0x07f7];
+	int const sprite_xoffs = m_spriteram[0x1ff5] - 256 * (m_spriteram[0x1ff4] & 1);
+	int const sprite_yoffs = m_spriteram[0x1ff7];
 
-	while (source < finish)
+	static constexpr int gfx_offs[2][2] =
 	{
-/*
-    source[10] S-FT ---P
-    source[11] TTTT TTTT
-    source[12] CCCC CCCX
-    source[13] XXXX XXXX
-    source[14] ---T -S-F
-    source[15] YYYY YYYY
-*/
+		{ 0, 1 },
+		{ 2, 3 }
+	};
+
+	while (source >= finish)
+	{
+		/* sprite format:
+		source[10] S-FT ---P
+		source[11] TTTT TTTT
+		source[12] CCCC CCCX
+		source[13] XXXX XXXX
+		source[14] ---T -S-F
+		source[15] YYYY YYYY
+		*/
 		int const priority = source[10] & 0x01;
-		if (priority == sprite_priority)
+		uint32_t const pri_mask = priority ? 0 : GFX_PMASK_2;
+		int const attr1 = source[10];
+		int const attr2 = source[14];
+		int color = source[12];
+		int sx = source[13] + (color & 0x01) * 256;
+		int sy = 240 - source[15];
+		int flipx = BIT(attr1, 5);
+		int flipy = BIT(attr2, 0);
+		int const sizex = BIT(attr1, 7);
+		int const sizey = BIT(attr2, 2);
+		int sprite = (source[11] & 0xff) * 4;
+
+		if (BIT(attr1, 4) && !sizex) sprite += 1;
+		if (BIT(attr2, 4) && !sizey) sprite += 2;
+		color = color >> 1;
+
+		sx += sprite_xoffs;
+		sy -= sprite_yoffs;
+
+		sy -= 16 * sizey;
+
+		if (flip_screen())
 		{
-			static const int gfx_offs[2][2] =
+			sx = 496 + 3 - 16 * sizex - sx;
+			sy = 240 - 16 * sizey - sy;
+			flipx ^= 1;
+			flipy ^= 1;
+		}
+
+		for (int y = 0; y <= sizey; y++)
+		{
+			for (int x = 0; x <= sizex; x++)
 			{
-				{ 0, 1 },
-				{ 2, 3 }
-			};
-			int const attr1 = source[10];
-			int const attr2 = source[14];
-			int color = source[12];
-			int sx = source[13] + (color & 0x01) * 256;
-			int sy = 240 - source[15];
-			int flipx = (attr1 & 0x20) >> 5;
-			int flipy = (attr2 & 0x01);
-			int const sizex = (attr1 & 0x80) >> 7;
-			int const sizey = (attr2 & 0x04) >> 2;
-			int sprite = (source[11] & 0xff) * 4;
-
-			if ((attr1 & 0x10) && !sizex) sprite += 1;
-			if ((attr2 & 0x10) && !sizey) sprite += 2;
-			color = color >> 1;
-
-			sx += sprite_xoffs;
-			sy -= sprite_yoffs;
-
-			sy -= 16 * sizey;
-
-			if (flip_screen())
-			{
-				sx = 496 + 3 - 16 * sizex - sx;
-				sy = 240 - 16 * sizey - sy;
-				flipx ^= 1;
-				flipy ^= 1;
-			}
-
-			for (int y = 0; y <= sizey; y++)
-			{
-				for (int x = 0; x <= sizex; x++)
-				{
-					m_gfxdecode->gfx(3)->transpen(bitmap, cliprect,
-						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
-						color,
-						flipx, flipy,
-						-71 + ((sx + 16 * x) & 0x1ff),
-						1 + ((sy + 16 * y) & 0xff), 0xf);
-				}
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect,
+					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
+					color,
+					flipx, flipy,
+					-71 + ((sx + 16 * x) & 0x1ff),
+					1 + ((sy + 16 * y) & 0xff),
+					screen.priority(), pri_mask, 0xf);
 			}
 		}
 
-		source += 16;
+		source -= 16;
 	}
-}
-
-
-void baraduke_state::set_scroll(int layer)
-{
-	int scrollx = m_xscroll[layer];
-	int scrolly = m_yscroll[layer];
-
-	if (flip_screen())
-	{
-		scrollx = -scrollx;
-		scrolly = -scrolly;
-	}
-
-	m_bg_tilemap[layer]->set_scrollx(0, scrollx);
-	m_bg_tilemap[layer]->set_scrolly(0, scrolly);
 }
 
 
 uint32_t baraduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *spriteram = m_spriteram + 0x1800;
+	screen.priority().fill(0, cliprect);
 
 	// flip screen is embedded in the sprite control registers
-	flip_screen_set(spriteram[0x07f6] & 0x01);
-	set_scroll(0);
-	set_scroll(1);
+	flip_screen_set(BIT(m_spriteram[0x1ff6], 0));
+	m_tilegen->init_scroll(flip_screen());
 
-	int back;
+	int const back = (((m_tilegen->xscroll_r(0) & 0x0e00) >> 9) == 6) ? 1 : 0;
 
-	if (((m_xscroll[0] & 0x0e00) >> 9) == 6)
-		back = 1;
-	else
-		back = 0;
-
-	m_bg_tilemap[back]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(bitmap, cliprect, 0);
-	m_bg_tilemap[back ^ 1]->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, 1);
+	m_tilegen->draw(screen, bitmap, cliprect, back, TILEMAP_DRAW_OPAQUE, 1);
+	m_tilegen->draw(screen, bitmap, cliprect, back ^ 1, 0, 2);
+	draw_sprites(screen, bitmap, cliprect);
 
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -504,15 +430,13 @@ void baraduke_state::screen_vblank(int state)
 	{
 		if (m_copy_sprites)
 		{
-			uint8_t *spriteram = m_spriteram + 0x1800;
-
-			for (int i = 0; i < 0x800; i += 16)
+			for (int i = 0x1800; i < 0x2000; i += 16)
 			{
 				for (int j = 10; j < 16; j++)
-					spriteram[i + j] = spriteram[i + j - 6];
+					m_spriteram[i + j] = m_spriteram[i + j - 6];
 			}
 
-			m_copy_sprites = 0;
+			m_copy_sprites = false;
 		}
 
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -521,17 +445,15 @@ void baraduke_state::screen_vblank(int state)
 }
 
 
-// machine
-
 void baraduke_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
 	else if ((data & 0xe0) == 0xc0)
 	{
-		machine().bookkeeping().coin_lockout_global_w(~data & 1);
-		machine().bookkeeping().coin_counter_w(0, data & 2);
-		machine().bookkeeping().coin_counter_w(1, data & 4);
+		machine().bookkeeping().coin_lockout_global_w(BIT(~data, 0));
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 	}
 }
 
@@ -574,32 +496,23 @@ void baraduke_state::irq_ack_w(uint8_t data)
 void baraduke_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().w(FUNC(baraduke_state::spriteram_w)).share(m_spriteram);
-	map(0x2000, 0x3fff).ram().w(FUNC(baraduke_state::videoram_w)).share(m_videoram);
-	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
+	map(0x2000, 0x3fff).rw(m_tilegen, FUNC(namco_cus4xtmap_device::vram_r), FUNC(namco_cus4xtmap_device::vram_w));
+	map(0x4000, 0x43ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
 	map(0x4800, 0x4fff).ram().w(FUNC(baraduke_state::textram_w)).share(m_textram);
+	map(0x6000, 0xffff).rom();
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8800, 0x8800).w(FUNC(baraduke_state::irq_ack_w));
-	map(0xb000, 0xb002).w(FUNC(baraduke_state::scroll_w<0>));
-	map(0xb004, 0xb006).w(FUNC(baraduke_state::scroll_w<1>));
-	map(0x6000, 0xffff).rom();
-}
-
-uint8_t baraduke_state::soundkludge_r()
-{
-	return ((m_counter++) >> 4) & 0xff;
+	map(0xb000, 0xb002).w(m_tilegen, FUNC(namco_cus4xtmap_device::scroll_w<0>));
+	map(0xb004, 0xb006).w(m_tilegen, FUNC(namco_cus4xtmap_device::scroll_w<1>));
 }
 
 void baraduke_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io)); // internal registers
-	map(0x0080, 0x00ff).ram(); // built in RAM
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
-	map(0x1105, 0x1105).r(FUNC(baraduke_state::soundkludge_r)); // cures speech
-	map(0x8000, 0xbfff).rom();  // MCU external ROM
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
+	map(0x8000, 0xbfff).rom().region("mcusub", 0);  // MCU external ROM
 	map(0x8000, 0x8000).nopw(); // watchdog reset?
 	map(0x8800, 0x8800).nopw(); // IRQ acknowledge?
 	map(0xc000, 0xc7ff).ram();
-	map(0xf000, 0xffff).rom();  // MCU internal ROM
 }
 
 
@@ -726,10 +639,10 @@ static const gfx_layout text_layout =
 	8,8,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 4 },
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8
+	{ STEP2(0, 4) },
+	{ STEP4(8*8, 1), STEP4(0, 1) },
+	{ STEP8(0, 8) },
+	8*8*2
 };
 
 static const gfx_layout tile_layout =
@@ -737,26 +650,26 @@ static const gfx_layout tile_layout =
 	8,8,
 	1024,
 	3,
-	{ 0x8000*8, 0, 4 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
+	{ 0x8000*8, STEP2(0, 4) },
+	{ STEP4(0, 1), STEP4(8, 1) },
+	{ STEP8(0, 8*2) },
 	16*8
 };
 
 static GFXDECODE_START( gfx_baraduke )
-	GFXDECODE_ENTRY( "chars",   0,      text_layout,            0, 512 )
-	GFXDECODE_ENTRY( "tiles",   0x0000, tile_layout,            0, 256 )
-	GFXDECODE_ENTRY( "tiles",   0x4000, tile_layout,            0, 256 )
-	GFXDECODE_ENTRY( "sprites", 0,      gfx_16x16x4_packed_msb, 0, 128 )
+	GFXDECODE_ENTRY( "chars",   0, text_layout,            0, 512 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 0, 128 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_baraduke_tile )
+	GFXDECODE_ENTRY( "tiles", 0x0000, tile_layout, 0, 256 )
+	GFXDECODE_ENTRY( "tiles", 0x4000, tile_layout, 0, 256 )
 GFXDECODE_END
 
 
 void baraduke_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_inputport_selected));
-	save_item(NAME(m_counter));
 }
 
 
@@ -770,19 +683,23 @@ void baraduke_state::baraduke(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &baraduke_state::mcu_map);
 	m_mcu->in_p1_cb().set(FUNC(baraduke_state::inputport_r));
 	m_mcu->out_p1_cb().set(FUNC(baraduke_state::inputport_select_w));
-	m_mcu->in_p2_cb().set_constant(0xff);                             // LEDs won't work otherwise
+	m_mcu->in_p2_cb().set_constant(0xff); // LEDs won't work otherwise
 	m_mcu->out_p2_cb().set(FUNC(baraduke_state::lamps_w));
 
-	config.set_maximum_quantum(attotime::from_hz(6000));      // we need heavy synch
+	config.set_maximum_quantum(attotime::from_hz(6000)); // we need heavy synch
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(49'152'000) / 8, 384, 0, 36 * 8, 264, 2 * 8, 30 * 8);
 	screen.set_screen_update(FUNC(baraduke_state::screen_update));
 	screen.screen_vblank().set(FUNC(baraduke_state::screen_vblank));
 	screen.set_palette(m_palette);
+
+	NAMCO_CUS4XTMAP(config, m_tilegen, m_palette, gfx_baraduke_tile);
+	m_tilegen->set_offset(-26, -227, -9, 9);
+	m_tilegen->set_tile_callback(FUNC(baraduke_state::tile_cb));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_baraduke);
 	PALETTE(config, m_palette, FUNC(baraduke_state::palette), 2048);
@@ -791,7 +708,6 @@ void baraduke_state::baraduke(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000) / 2048);
-	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -803,9 +719,11 @@ ROM_START( aliensec )
 	ROM_LOAD( "bd2_1.9a", 0x8000, 0x04000, CRC(9a0a9a87) SHA1(6d88fb5b443c822ede4884d4452e333834b16aca) )
 	ROM_LOAD( "bd2_2.9b", 0xc000, 0x04000, CRC(383e5458) SHA1(091f25e287f0a81649c9a4fa196ebe4112a82295) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "bd1_4.3b",       0x8000, 0x4000, CRC(abda0fe7) SHA1(f7edcb5f9fa47bb38a8207af5678cf4ccc243547) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "bd1_4.3b", 0x0000, 0x4000, CRC(abda0fe7) SHA1(f7edcb5f9fa47bb38a8207af5678cf4ccc243547) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "bd1_5.3j", 0x00000, 0x2000, CRC(706b7fee) SHA1(e5694289bd4346c1a3a004feaa940710cea755c6) )
@@ -833,9 +751,11 @@ ROM_START( baraduke )
 	ROM_LOAD( "bd1_1.9a", 0x8000, 0x04000, CRC(4e9f2bdc) SHA1(bc6e71d4d3b2064e662a105c1a77d2731070d58e) )
 	ROM_LOAD( "bd1_2.9b", 0xc000, 0x04000, CRC(40617fcd) SHA1(51d17f3a2fc96e13c8ef5952efece526e0fb33f4) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "bd1_4b.3b",      0x8000, 0x4000, CRC(a47ecd32) SHA1(a2a75e65deb28224a5729ed134ee4d5ea8c50706) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "bd1_4b.3b", 0x0000, 0x4000, CRC(a47ecd32) SHA1(a2a75e65deb28224a5729ed134ee4d5ea8c50706) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "bd1_5.3j", 0x00000, 0x2000, CRC(706b7fee) SHA1(e5694289bd4346c1a3a004feaa940710cea755c6) )
@@ -863,9 +783,11 @@ ROM_START( metrocrs )
 	ROM_LOAD( "mc1-1.9a",   0x8000, 0x04000, CRC(10b0977e) SHA1(6266d173b55075da1f252092bf38185880bc4969) )
 	ROM_LOAD( "mc1-2.9b",   0xc000, 0x04000, CRC(5c846f35) SHA1(3c98a0f1131f2e2477fc75a588123c57ff5350ad) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "mc1-4.3b",       0x8000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "mc1-4.3b", 0x0000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "mc1-5.3j",   0x00000, 0x2000, CRC(9b5ea33a) SHA1(a8108e71e3440b645ebdb5cdbd87712151299789) )
@@ -891,9 +813,11 @@ ROM_START( metrocrsa )
 	ROM_LOAD( "mc2-1.9a",   0x8000, 0x04000, CRC(05a239ea) SHA1(3e7c7d305d0f48e2431d60b176a0cb451ddc4637) )
 	ROM_LOAD( "mc2-2.9a",   0xc000, 0x04000, CRC(db9b0e6d) SHA1(2772b59fe7dc0e78ee29dd001a6bba75b94e0334) )
 
-	ROM_REGION(  0x10000 , "mcu", 0 )
-	ROM_LOAD( "mc1-4.3b",       0x8000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x4000, "mcusub", 0 )
+	ROM_LOAD( "mc1-4.3b",   0x0000, 0x2000, CRC(9c88f898) SHA1(d6d0345002b70c5aca41c664f34181715cd87669) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "mc1-5.3j",   0x00000, 0x2000, CRC(9b5ea33a) SHA1(a8108e71e3440b645ebdb5cdbd87712151299789) )

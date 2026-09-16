@@ -33,7 +33,7 @@ public:
 	void tr606(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<ucom4_cpu_device> m_maincpu;
@@ -91,4 +91,4 @@ ROM_END
     Drivers
 ***************************************************************************/
 
-SYST( 1982, tr606, 0, 0, tr606, tr606, tr606_state, empty_init, "Roland", "TR-606 Drumatix", MACHINE_IS_SKELETON )
+SYST( 1982, tr606, 0, 0, tr606, tr606, tr606_state, empty_init, "Roland", "TR-606 Drumatix", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

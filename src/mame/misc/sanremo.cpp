@@ -123,11 +123,11 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void roadstar(machine_config &config);
-	void sanremo(machine_config &config);
+	void roadstar(machine_config &config) ATTR_COLD;
+	void sanremo(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -145,9 +145,9 @@ private:
 	void lamps_w(uint8_t data);
 	void sanremo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void number1_map(address_map &map);
-	void roadstar_map(address_map &map);
-	void sanremo_portmap(address_map &map);
+	void number1_map(address_map &map) ATTR_COLD;
+	void roadstar_map(address_map &map) ATTR_COLD;
+	void sanremo_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -174,8 +174,6 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 void sanremo_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanremo_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
-
-	m_lamps.resolve();
 
 	save_item(NAME(m_attrram));
 	save_item(NAME(m_banksel));
@@ -378,7 +376,7 @@ void sanremo_state::sanremo(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(70*8, 41*8);

@@ -90,8 +90,8 @@ public:
 	void kungfur(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -103,7 +103,7 @@ private:
 	output_finder<8> m_lamps;
 
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
@@ -123,9 +123,6 @@ private:
 
 void kungfur_state::machine_start()
 {
-	m_digits.resolve();
-	m_lamps.resolve();
-
 	// register for savestates
 	save_item(NAME(m_control));
 	save_item(NAME(m_digit_data));

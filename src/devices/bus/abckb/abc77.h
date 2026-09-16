@@ -39,13 +39,13 @@ protected:
 	abc77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
@@ -76,8 +76,8 @@ private:
 	void prog_w(int state) { m_stb = state; }
 	void j3_w(uint8_t data) { m_j3 = data; }
 
-	void abc77_io(address_map &map);
-	void abc77_map(address_map &map);
+	void abc77_io(address_map &map) ATTR_COLD;
+	void abc77_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -88,7 +88,7 @@ public:
 	abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 

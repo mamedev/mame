@@ -137,6 +137,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
+#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
 #include "speaker.h"
 
 //#define VERBOSE 1
@@ -155,8 +156,8 @@ public:
 		: by35_state(mconfig, type, tag, s_solenoid_features_default)
 	{ }
 
-	void init_by35_6() { m_7d = 0; }
-	void init_by35_7() { m_7d = 1; }
+	void init_by35_6() ATTR_COLD { m_7d = 0; }
+	void init_by35_7() ATTR_COLD { m_7d = 1; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -164,14 +165,14 @@ public:
 	template <int Param> int drop_target_x0();
 	template <int Param> int kickback_x3();
 
-	void by35(machine_config &config);
-	void nuovo(machine_config &config);
-	void as2888(machine_config &config);
-	void as3022(machine_config &config);
-	void sounds_plus(machine_config &config);
-	void cheap_squeak(machine_config &config);
-	void squawk_n_talk(machine_config &config);
-	void squawk_n_talk_ay(machine_config &config);
+	void by35(machine_config &config) ATTR_COLD;
+	void nuovo(machine_config &config) ATTR_COLD;
+	void as2888(machine_config &config) ATTR_COLD;
+	void as3022(machine_config &config) ATTR_COLD;
+	void sounds_plus(machine_config &config) ATTR_COLD;
+	void cheap_squeak(machine_config &config) ATTR_COLD;
+	void squawk_n_talk(machine_config &config) ATTR_COLD;
+	void squawk_n_talk_ay(machine_config &config) ATTR_COLD;
 
 protected:
 	typedef uint8_t solenoid_feature_data[20][4];
@@ -221,15 +222,15 @@ protected:
 	void u10_ca2_w(int state);
 	void u10_cb2_w(int state);
 	void u11_cb2_w(int state);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 
-	void by35_map(address_map &map);
-	void nuovo_map(address_map &map);
+	void by35_map(address_map &map) ATTR_COLD;
+	void nuovo_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_u10a = 0U;
 	uint8_t m_u10b = 0U;
@@ -307,8 +308,8 @@ void by35_state::nuovo_map(address_map &map)
 
 static INPUT_PORTS_START( by35 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_CHANGED_MEMBER(DEVICE_SELF, by35_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity")  PORT_CHANGED_MEMBER(DEVICE_SELF, by35_state, activity_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by35_state::self_test), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by35_state::activity_button), 0)
 
 
 	PORT_START("DSW0")
@@ -332,7 +333,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
 	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
 	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
@@ -374,7 +375,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
 	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
 	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
@@ -432,7 +433,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_9C ))
-	PORT_DIPSETTING(    0x0a, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
@@ -460,7 +461,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, outhole_x0<0x07>) // PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::outhole_x0<0x07>)) // PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -470,7 +471,7 @@ static INPUT_PORTS_START( by35 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP13")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP14")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP15")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )   PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP17")
@@ -530,7 +531,7 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
 	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
 	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
@@ -571,7 +572,7 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
 	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
 	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
@@ -604,14 +605,14 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x09, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
 	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits")
-	PORT_DIPNAME( 0x30, 0x60, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
+	PORT_DIPNAME( 0x30, 0x30, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
 	PORT_DIPSETTING(    0x00, "Nothing")
 	PORT_DIPSETTING(    0x10, "1 Credit")
 	PORT_DIPSETTING(    0x20, "2 Credits")
@@ -664,7 +665,7 @@ static INPUT_PORTS_START( by35_os40 )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
@@ -708,7 +709,7 @@ static INPUT_PORTS_START( by35_os40 )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
@@ -753,8 +754,8 @@ static INPUT_PORTS_START( by35_os40 )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x09, "1 Coin/9 Credits")
-	PORT_DIPSETTING(    0x0a, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
@@ -814,7 +815,7 @@ static INPUT_PORTS_START( by35_os5x )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
@@ -849,7 +850,7 @@ static INPUT_PORTS_START( by35_os5x )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ))
-	PORT_DIPSETTING(    0x08, "1 Coin/9 Credits")
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x09, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0a, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0b, DEF_STR( 2C_1C ))
@@ -901,14 +902,14 @@ static INPUT_PORTS_START( playboy )
 	PORT_DIPSETTING(    0x40, "Extra Ball or Special Held Until Collected")
 
 	PORT_MODIFY("X0")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x00>) // PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x01>) // PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x02>) // PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x03>) // PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, drop_target_x0<0x04>) // PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::drop_target_x0<0x00>)) // PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::drop_target_x0<0x01>)) // PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::drop_target_x0<0x02>)) // PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::drop_target_x0<0x03>)) // PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::drop_target_x0<0x04>)) // PORT_CODE(KEYCODE_BACKSLASH)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by35_state, kickback_x3<0x37>) // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by35_state::kickback_x3<0x37>)) // PORT_CODE(KEYCODE_Q)
 
 	PORT_START("RT2")
 	PORT_ADJUSTER( 50, "RT2 - Tone Sustain" )
@@ -959,14 +960,14 @@ static INPUT_PORTS_START( frontier )
 	PORT_DIPSETTING(    0x20, "Both Lites Come On")
 
 	PORT_MODIFY("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("30 Point Rebound") PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Right Out Special") PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Right Flipper Feed Lane") PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Left Flipper Feed Lane") PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Left Out Special") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )  PORT_NAME("Start")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )    PORT_NAME("Tilt")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD )   PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("30 Point Rebound") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Out Special") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Right Flipper Feed Lane") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left Flipper Feed Lane") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Left Out Special") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )   PORT_NAME("Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_MODIFY("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin3")
@@ -976,7 +977,7 @@ static INPUT_PORTS_START( frontier )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("A Rollover Lane") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B Rollover Lane") PORT_CODE(KEYCODE_COLON)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("C Rollover Lane") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )   PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
 
 	PORT_MODIFY("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1450,10 +1451,6 @@ void by35_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_lamps.resolve();
-	m_digits.resolve();
-	m_solenoids.resolve();
-
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));
 	save_item(NAME(m_u11a));
@@ -1795,6 +1792,17 @@ ROM_END
 / Rolling Stones #1187
 /-------------------------------*/
 ROM_START(rollston)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "e-796-21-u1.u1", 0x1000, 0x0800, CRC(35141d40) SHA1(22283ff6f15e91838edbe6260faa0c1059499917))
+	ROM_LOAD( "796-18_2.716",   0x5000, 0x0800, CRC(08c75b1a) SHA1(792a535514fe4d9476914f7f61c696a7a1bdb549))
+	ROM_LOAD( "720-35_6.716",   0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
+	ROM_RELOAD( 0x7800, 0x0800)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("796-19_4.716", 0x1000, 0x0800, CRC(b740d047) SHA1(710edb6bbba0a03e4f516b501f019493a3a4033e))
+	ROM_RELOAD( 0x1800, 0x0800)
+ROM_END
+
+ROM_START(rollstonv17)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "796-17_1.716", 0x1000, 0x0800, CRC(51a826d7) SHA1(6811149c8948066b85b4018802afd409dbe8c2e1))
 	ROM_LOAD( "796-18_2.716", 0x5000, 0x0800, CRC(08c75b1a) SHA1(792a535514fe4d9476914f7f61c696a7a1bdb549))
@@ -2874,7 +2882,8 @@ GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, by35_state, init_by35_
 GAME( 1980, slbmania,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, futurspa,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spaceinv,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones (V21)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rollstonv17,rollston, as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones (V17)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mystic,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, xenon,      0,        sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
@@ -2920,25 +2929,25 @@ GAME( 1984, blakpyra, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0,
 GAME( 1985, cybrnaut, 0, cheap_squeak, by35_os5x, by35_state, init_by35_7, ROT0, "Bally", "Cybernaut",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 // Other manufacturers
-GAME( 1984, suprbowl, xsandos,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, tigerrag, kosteel,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cosflash, flashgdn, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, newwave,  blakpyra, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, saturn2,  spyhuntr, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, worlddef, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spacehaw, cybrnaut, by35,             by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darkshad, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, skflight, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, cobrap,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, futrquen, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, f1gpp,    0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toppin,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, uboat65,  0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bullseye, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bullseyn, bullseye, by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bbbowlin, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, monrobwl, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, suprbowl, xsandos,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Super Bowl",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tigerrag, kosteel,  by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Tiger Rag",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cosflash, flashgdn, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Cosmic Flash",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, newwave,  blakpyra, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "New Wave",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, saturn2,  spyhuntr, by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "Saturn 2",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, worlddef, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Bell Games",         "World Defender",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spacehaw, cybrnaut, by35,             by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Space Hawks",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darkshad, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Dark Shadow",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, skflight, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Skill Flight",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cobrap,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Cobra",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, futrquen, 0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Future Queen",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, f1gpp,    0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "F1 Grand Prix (Nuova Bell Games)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toppin,   0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "Top Pin",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, uboat65,  0,        nuovo,            by35, by35_state, init_by35_7, ROT0, "Nuova Bell Games",   "U-boat 65",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bullseye, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (301 Darts Scoring)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bullseyn, bullseye, by35,             by35, by35_state, init_by35_7, ROT0, "Grand Products",     "301/Bullseye (Traditional Scoring)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bbbowlin, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "United",             "Big Ball Bowling (Bowler)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, monrobwl, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Monroe Bowling Co.", "Stars & Strikes (Bowler)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bigbat,   0,        squawk_n_talk_ay, by35, by35_state, init_by35_7, ROT0, "Bally Midway",       "Big Bat (Bat game)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mdntmrdr, 0,        squawk_n_talk_ay, by35, by35_state, init_by35_6, ROT0, "Bally Midway",       "Midnight Marauders (Gun game)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, blbeauty, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststar, 0,        by35,             by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, blbeauty, 0,        by35,             by35, by35_state, init_by35_7, ROT0, "Stern",              "Black Beauty (Shuffle)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststar, 0,        by35,             by35, by35_state, init_by35_6, ROT0, "Zaccaria",           "Mystic Star",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -96,7 +96,7 @@ public:
 	void exterm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms34010_device> m_maincpu;
@@ -121,8 +121,8 @@ private:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_slave);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_slave);
 
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -466,7 +466,7 @@ void exterm_state::exterm(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", FUNC(exterm_state::exterm_palette)).set_format(palette_device::xRGB_555, 2048+32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(40000000/8, 318, 0, 256, 264, 0, 240);
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
 	screen.set_palette("palette");

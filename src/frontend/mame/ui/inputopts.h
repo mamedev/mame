@@ -21,7 +21,7 @@ namespace ui {
 class menu_input_options : public menu
 {
 public:
-	menu_input_options(mame_ui_manager &mui, render_container &container);
+	menu_input_options(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_input_options();
 
 protected:

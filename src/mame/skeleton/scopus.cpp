@@ -54,8 +54,8 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 
 	/* devices */
 	required_device<palette_device> m_palette;
@@ -66,8 +66,8 @@ private:
 	// Character generator
 	const uint8_t *m_chargen = nullptr;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void sagitta180_state::machine_start()
@@ -101,15 +101,16 @@ I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
 	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 
 	uint8_t pixels;
-	if (lten) {
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) {
 		pixels = ~0;
-	} else if (vsp != 0 || (linecount & 8) != 0) {
+	} else if (BIT(attrcode, VSP) || (linecount & 8) != 0) {
 		pixels = 0;
 	} else {
 		pixels = chargen_byte;
 	}
 
-	if (rvv) {
+	if (BIT(attrcode, RVV)) {
 		pixels = ~pixels;
 	}
 
@@ -188,7 +189,7 @@ void sagitta180_state::sagitta180(machine_config &config)
 	m_dma8257->out_hrq_cb().set(FUNC(sagitta180_state::hrq_w));
 	m_dma8257->in_memr_cb().set(FUNC(sagitta180_state::memory_read_byte));
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -202,13 +203,13 @@ void sagitta180_state::sagitta180(machine_config &config)
 	uart_clock.signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-//  i8212_device &intlatch(I8212(config, "intlatch", 0));
+//  i8212_device &intlatch(I8212(config, "intlatch"));
 //  intlatch.md_rd_callback().set_constant(GND); // guessed !
 //  intlatch.di_rd_callback().set("picu", FUNC(i8214_device::vector_r));
 //  intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE); // guessed !
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

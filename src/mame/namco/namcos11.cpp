@@ -16,8 +16,10 @@
    - pocketrc locks up if you try to exit testmode (note: it is not related to
      unimplemented C76 internal watchdog timer or software reset)
      Update: now it always locks up in test mode, regression?
+
+  Notes:
    - pocketrc long samples and drum loops go out of sync, it sounds better when
-     the C352 is underclocked to match the one in namcos22. It's possibly a BTANB,
+     the C352 is underclocked to match the one in namcos22. It's a BTANB, however,
      since current C352 frequency is the same as Tekken/Tekken 2 real PCB.
 
 Known Dumps
@@ -450,13 +452,16 @@ It is highly likely Namco's game uses the same sensors and mechanics.
 #include "screen.h"
 #include "speaker.h"
 
-#include <cstdarg>
+#define LOG_LIMITED ( 1U << 1 )
+#define LOG_MORE    ( 1U << 2 )
+
+#define VERBOSE     ( 0 )
+#include "logmacro.h"
 
 
 namespace {
 
-#define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
-#define VERBOSE_LEVEL ( 0 )
+#define C76_SPEEDUP ( 1 ) // sound CPU idle skipping
 
 class namcos11_state : public driver_device
 {
@@ -466,6 +471,9 @@ public:
 		, m_sharedram(*this, "sharedram")
 		, m_maincpu(*this, "maincpu")
 		, m_mcu(*this, "c76")
+		, m_gpu(*this, "gpu")
+		, m_ram(*this, "ram")
+		, m_gpu_ram(*this, "gpu_ram")
 		, m_bankedroms(*this, "bankedroms")
 		, m_bank(*this, "bank%u", 1)
 		, m_lightgun_io(*this, {"GUN1X", "GUN1Y", "GUN2X", "GUN2Y"})
@@ -474,21 +482,21 @@ public:
 	{
 	}
 
-	void coh110(machine_config &config);
-	void coh100(machine_config &config);
-	void myangel3(machine_config &config);
-	void xevi3dg(machine_config &config);
-	void dunkmnia(machine_config &config);
-	void pocketrc(machine_config &config);
-	void ptblank2ua(machine_config &config);
-	void tekken2o(machine_config &config);
-	void danceyes(machine_config &config);
-	void starswep(machine_config &config);
-	void primglex(machine_config &config);
-	void souledge(machine_config &config);
-	void tekken(machine_config &config);
-	void tekken2(machine_config &config);
-	void fambowl(machine_config &config);
+	void coh110(machine_config &config) ATTR_COLD;
+	void coh100(machine_config &config) ATTR_COLD;
+	void myangel3(machine_config &config) ATTR_COLD;
+	void xevi3dg(machine_config &config) ATTR_COLD;
+	void dunkmnia(machine_config &config) ATTR_COLD;
+	void pocketrc(machine_config &config) ATTR_COLD;
+	void ptblank2ua(machine_config &config) ATTR_COLD;
+	void tekken2o(machine_config &config) ATTR_COLD;
+	void danceyes(machine_config &config) ATTR_COLD;
+	void starswep(machine_config &config) ATTR_COLD;
+	void primglex(machine_config &config) ATTR_COLD;
+	void souledge(machine_config &config) ATTR_COLD;
+	void tekken(machine_config &config) ATTR_COLD;
+	void tekken2(machine_config &config) ATTR_COLD;
+	void fambowl(machine_config &config) ATTR_COLD;
 
 private:
 	void rom8_w(offs_t offset, uint16_t data);
@@ -503,17 +511,20 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 
-	void c76_map(address_map &map);
-	void namcos11_map(address_map &map);
-	void ptblank2ua_map(address_map &map);
-	void rom8_64_map(address_map &map);
-	void rom8_map(address_map &map);
+	void c76_map(address_map &map) ATTR_COLD;
+	void namcos11_map(address_map &map) ATTR_COLD;
+	void ptblank2ua_map(address_map &map) ATTR_COLD;
+	void rom8_64_map(address_map &map) ATTR_COLD;
+	void rom8_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override;
 
 	required_shared_ptr<uint16_t> m_sharedram;
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 	required_device<m37710_cpu_device> m_mcu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
 
 	optional_memory_region m_bankedroms;
 	optional_memory_bank_array<8> m_bank;
@@ -523,22 +534,7 @@ private:
 
 	uint32_t m_n_bankoffset;
 	uint8_t m_su_83;
-
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 };
-
-inline void ATTR_PRINTF(3,4) namcos11_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
 
 void namcos11_state::rom8_w(offs_t offset, uint16_t data)
 {
@@ -547,14 +543,14 @@ void namcos11_state::rom8_w(offs_t offset, uint16_t data)
 
 void namcos11_state::rom8_64_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(2, "rom8_64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOGMASKED(LOG_MORE, "rom8_64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask);
 
 	m_n_bankoffset = offset * 16;
 }
 
 void namcos11_state::rom8_64_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(2, "rom8_64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOGMASKED(LOG_MORE, "rom8_64_w( %08x, %08x, %08x )\n", offset, data, mem_mask);
 
 	// TODO: verify behaviour
 	m_bank[ offset ]->set_entry( ( ( ( ( data & 0xc0 ) >> 3 ) + ( data & 0x07 ) ) ^ m_n_bankoffset ) );
@@ -570,11 +566,11 @@ void namcos11_state::lightgun_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_recoil[0] = BIT(~data, 1);
 		m_recoil[1] = BIT(~data, 0);
 
-		verboselog(1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
+		LOGMASKED(LOG_LIMITED, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask);
 		break;
 
 	case 1:
-		verboselog(2, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask );
+		LOGMASKED(LOG_MORE, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask);
 		break;
 	}
 }
@@ -609,7 +605,7 @@ uint16_t namcos11_state::lightgun_r(offs_t offset, uint16_t mem_mask)
 		data = m_lightgun_io[3]->read() + 1;
 		break;
 	}
-	verboselog(2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	LOGMASKED(LOG_MORE, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data);
 	return data;
 }
 
@@ -707,9 +703,6 @@ void namcos11_state::c76_speedup_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void namcos11_state::driver_start()
 {
-	m_led.resolve();
-	m_recoil.resolve();
-
 	// C76 idle skipping, large speedboost
 	if (C76_SPEEDUP)
 	{
@@ -751,9 +744,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
 
 void namcos11_state::coh110(machine_config &config)
 {
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->set_ram(m_ram);
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	/* basic machine hardware */
 	NAMCO_C76(config, m_mcu, 16934400);
@@ -771,30 +766,38 @@ void namcos11_state::coh110(machine_config &config)
 	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcos11_state::mcu_irq0_cb), attotime::from_hz(60));
 	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcos11_state::mcu_irq2_cb), attotime::from_hz(60));
 
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SCREEN(config, "screen");
+
+	SPEAKER(config, "speaker", 2).front();
 
 	c352_device &c352(C352(config, "c352", 25401600, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-	//c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "speaker", 1.00);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 }
 
 void namcos11_state::coh100(machine_config &config)
 {
 	coh110(config);
-	CXD8530AQ(config.replace(), m_maincpu, XTAL(67'737'600));
+	CXD8530AQ(config.replace(), m_maincpu, 67.7376_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+	m_maincpu->set_ram(m_ram);
 
-	CXD8538Q(config.replace(), "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+	CXD8538Q(config.replace(), m_gpu, 53.693175_MHz_XTAL);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_screen("screen");
+	m_gpu->set_ram(m_gpu_ram);
 }
 
 void namcos11_state::tekken(machine_config &config)
@@ -802,90 +805,90 @@ void namcos11_state::tekken(machine_config &config)
 	coh100(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
 	// TODO: either allow optional devices in memory maps, add another memory map without keycus or add a dummy keycus for tekken
-	KEYCUS_C406(config, "keycus", 0);
+	KEYCUS_C406(config, "keycus");
 }
 
 void namcos11_state::tekken2o(machine_config &config)
 {
 	coh100(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C406(config, "keycus", 0);
+	KEYCUS_C406(config, "keycus");
 }
 
 void namcos11_state::tekken2(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C406(config, "keycus", 0);
+	KEYCUS_C406(config, "keycus");
 }
 
 void namcos11_state::souledge(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C409(config, "keycus", 0);
+	KEYCUS_C409(config, "keycus");
 }
 
 void namcos11_state::dunkmnia(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C410(config, "keycus", 0);
+	KEYCUS_C410(config, "keycus");
 }
 
 void namcos11_state::primglex(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C411(config, "keycus", 0);
+	KEYCUS_C411(config, "keycus");
 }
 
 void namcos11_state::xevi3dg(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C430(config, "keycus", 0);
+	KEYCUS_C430(config, "keycus");
 }
 
 void namcos11_state::danceyes(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C431(config, "keycus", 0);
+	KEYCUS_C431(config, "keycus");
 }
 
 void namcos11_state::pocketrc(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C432(config, "keycus", 0);
+	KEYCUS_C432(config, "keycus");
 }
 
 void namcos11_state::fambowl(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
-	KEYCUS_C432(config, "keycus", 0);   // no keycus is actually present, but the driver isn't ready for that
+	KEYCUS_C432(config, "keycus");   // no keycus is actually present, but the driver isn't ready for that
 }
 
 void namcos11_state::starswep(machine_config &config)
 {
 	coh110(config);
-	KEYCUS_C442(config, "keycus", 0);
+	KEYCUS_C442(config, "keycus");
 }
 
 void namcos11_state::myangel3(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_64_map);
-	KEYCUS_C443(config, "keycus", 0);
+	KEYCUS_C443(config, "keycus");
 }
 
 void namcos11_state::ptblank2ua(machine_config &config)
 {
 	coh110(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::ptblank2ua_map);
-	KEYCUS_C443(config, "keycus", 0);
+	KEYCUS_C443(config, "keycus");
 }
 
 static INPUT_PORTS_START( namcos11 )
@@ -1761,58 +1764,10 @@ ROM_END
 
 ROM_START( tekken2 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "tes3verd.2l",  0x0000000, 0x100000, CRC(0768f36c) SHA1(fe299998649eeded77ab4bda23090997f4b39734) )
-	ROM_LOAD16_BYTE( "tes3verd.2j",  0x0000001, 0x100000, CRC(d29a0545) SHA1(b969f388d141d2e5cdb021aa72024ea040f493c7) )
-	ROM_LOAD16_BYTE( "tes3verd.2k",  0x0200000, 0x100000, CRC(846ace0a) SHA1(2016b415ba771d159d63b01f3a12a6cadf23451d) )
-	ROM_LOAD16_BYTE( "tes3verd.2f",  0x0200001, 0x100000, CRC(7a0663b4) SHA1(f0036f5c2bf81471e63cd5cf86698dc0721ab9b4) )
-
-	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
-	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
-	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
-	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
-	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
-	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
-	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
-	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
-
-	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
-	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
-
-	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
-	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
-ROM_END
-
-ROM_START( tekken2ub )
-	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "tes3verb.2l",  0x0000000, 0x100000, CRC(4692075f) SHA1(d048a92040ceb57ef7462bebc2c1112b964570ec) )
-	ROM_LOAD16_BYTE( "tes3verb.2j",  0x0000001, 0x100000, CRC(db3ec640) SHA1(fc9f475232ea77abd2eb7e2e09314281264e9d38) )
-	ROM_LOAD16_BYTE( "tes1verb.2k",  0x0200000, 0x100000, CRC(668ca712) SHA1(67100db4c6a3ca62d3f62f6fcef974ce017e2c9e) )
-	ROM_LOAD16_BYTE( "tes1verb.2f",  0x0200001, 0x100000, CRC(c4f66a0a) SHA1(1b3dd33d7e6d9122826bf8be0dbbc088e4cc41e8) )
-
-	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
-	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
-	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
-	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
-	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
-	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
-	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
-	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
-
-	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
-	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
-
-	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
-	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
-ROM_END
-
-ROM_START( tekken2ua )
-	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "tes3vera.2l",  0x0000000, 0x100000, CRC(0276680b) SHA1(508bb1c8a0ce929181508108ad3797e67ddd3df8) )
-	ROM_LOAD16_BYTE( "tes3vera.2j",  0x0000001, 0x100000, CRC(80e9b5ec) SHA1(2f6313492f0d78b9745303418cd77347d14acc8c) )
-	ROM_LOAD16_BYTE( "tes1vera.2k",  0x0200000, 0x100000, CRC(78e2ce1a) SHA1(fb242725dc72fa234bd7df81cec57fe010cf58f3) )
-	ROM_LOAD16_BYTE( "tes1vera.2f",  0x0200001, 0x100000, CRC(fbb0b146) SHA1(08b11ac0fbfeed62910c5cb5ff7b5939ecbca142) )
+	ROM_LOAD16_BYTE( "tes2verd.2l",  0x0000000, 0x100000, CRC(1aef3da8) SHA1(1bb5359b28777fa26034d6916bcda1cc225a0574) )
+	ROM_LOAD16_BYTE( "tes2verd.2j",  0x0000001, 0x100000, CRC(03787fd0) SHA1(c4971de47b61cae149d0c8a493ca0b3a2ee7a4ab) )
+	ROM_LOAD16_BYTE( "tes1verd.2k",  0x0200000, 0x100000, CRC(846ace0a) SHA1(2016b415ba771d159d63b01f3a12a6cadf23451d) )
+	ROM_LOAD16_BYTE( "tes1verd.2f",  0x0200001, 0x100000, CRC(7a0663b4) SHA1(f0036f5c2bf81471e63cd5cf86698dc0721ab9b4) )
 
 	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
@@ -1859,6 +1814,78 @@ ROM_START( tekken2a )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes2vera.2l",  0x0000000, 0x100000, CRC(8bb82bf0) SHA1(ac4e0077dff4c46ea2435903c410590f91cafe7d) )
 	ROM_LOAD16_BYTE( "tes2vera.2j",  0x0000001, 0x100000, CRC(4e02f921) SHA1(15339c2626033912947d33e5f59a109e607be0bf) )
+	ROM_LOAD16_BYTE( "tes1vera.2k",  0x0200000, 0x100000, CRC(78e2ce1a) SHA1(fb242725dc72fa234bd7df81cec57fe010cf58f3) )
+	ROM_LOAD16_BYTE( "tes1vera.2f",  0x0200001, 0x100000, CRC(fbb0b146) SHA1(08b11ac0fbfeed62910c5cb5ff7b5939ecbca142) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
+	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
+	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
+	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
+	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
+	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
+	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
+	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
+ROM_END
+
+ROM_START( tekken2ud )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tes3verd.2l",  0x0000000, 0x100000, CRC(0768f36c) SHA1(fe299998649eeded77ab4bda23090997f4b39734) )
+	ROM_LOAD16_BYTE( "tes3verd.2j",  0x0000001, 0x100000, CRC(d29a0545) SHA1(b969f388d141d2e5cdb021aa72024ea040f493c7) )
+	ROM_LOAD16_BYTE( "tes1verd.2k",  0x0200000, 0x100000, CRC(846ace0a) SHA1(2016b415ba771d159d63b01f3a12a6cadf23451d) )
+	ROM_LOAD16_BYTE( "tes1verd.2f",  0x0200001, 0x100000, CRC(7a0663b4) SHA1(f0036f5c2bf81471e63cd5cf86698dc0721ab9b4) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
+	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
+	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
+	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
+	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
+	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
+	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
+	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
+ROM_END
+
+ROM_START( tekken2ub )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tes3verb.2l",  0x0000000, 0x100000, CRC(4692075f) SHA1(d048a92040ceb57ef7462bebc2c1112b964570ec) )
+	ROM_LOAD16_BYTE( "tes3verb.2j",  0x0000001, 0x100000, CRC(db3ec640) SHA1(fc9f475232ea77abd2eb7e2e09314281264e9d38) )
+	ROM_LOAD16_BYTE( "tes1verb.2k",  0x0200000, 0x100000, CRC(668ca712) SHA1(67100db4c6a3ca62d3f62f6fcef974ce017e2c9e) )
+	ROM_LOAD16_BYTE( "tes1verb.2f",  0x0200001, 0x100000, CRC(c4f66a0a) SHA1(1b3dd33d7e6d9122826bf8be0dbbc088e4cc41e8) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
+	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
+	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
+	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
+	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
+	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
+	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
+	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
+ROM_END
+
+ROM_START( tekken2ua )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tes3vera.2l",  0x0000000, 0x100000, CRC(0276680b) SHA1(508bb1c8a0ce929181508108ad3797e67ddd3df8) )
+	ROM_LOAD16_BYTE( "tes3vera.2j",  0x0000001, 0x100000, CRC(80e9b5ec) SHA1(2f6313492f0d78b9745303418cd77347d14acc8c) )
 	ROM_LOAD16_BYTE( "tes1vera.2k",  0x0200000, 0x100000, CRC(78e2ce1a) SHA1(fb242725dc72fa234bd7df81cec57fe010cf58f3) )
 	ROM_LOAD16_BYTE( "tes1vera.2f",  0x0200001, 0x100000, CRC(fbb0b146) SHA1(08b11ac0fbfeed62910c5cb5ff7b5939ecbca142) )
 
@@ -2028,12 +2055,13 @@ ROM_END
 */
 
 GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    0 )
-GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     0 )
 GAME( 1994, tekkenb,    tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.B)",                    0 )
+GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     0 )
 GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Japan, TE1/VER.B)",                    0 )
-GAME( 1996, tekken2,    0,        tekken2,    tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.D)",              0 )
-GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.B)",              0 )
+GAME( 1996, tekken2,    0,        tekken2,    tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (World, TES2/VER.D)",           0 )
 GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (World, TES2/VER.B)",           0 )
+GAME( 1996, tekken2ud,  tekken2,  tekken2,    tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.D)",              0 )
+GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.B)",              0 )
 GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           0 )
 GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           0 )
 GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 0 )
@@ -2053,7 +2081,7 @@ GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, empty_
 GAME( 1996, danceyesu,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 0 ) // Oct 30 1996  17:36:39
 GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              0 ) // Sep  4 1996  11:50:49
 GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, empty_init, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_NODEVICE_LAN )
-GAME( 1997, fambowl,    0,        fambowl,    namcos11,   namcos11_state, empty_init, ROT90,"Namco",         "Family Bowl (Japan, FB1/VER.A V1.00)",                       MACHINE_NOT_WORKING )
+GAME( 1997, fambowl,    0,        fambowl,    namcos11,   namcos11_state, empty_init, ROT90,"Namco",         "Family Bowl (Japan, FB1/VER.A V1.00)",         MACHINE_NOT_WORKING )
 GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               0 )
 GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               0 )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )

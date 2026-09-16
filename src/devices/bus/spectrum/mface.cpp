@@ -142,7 +142,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MPRINT, spectrum_mprint_device, "spectrum_mprint", "
 
 INPUT_PORTS_START( mface )
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Red Button") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_mface_base_device, magic_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Red Button") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_mface_base_device::magic_button), 0)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( mface1v2 )
@@ -509,9 +509,9 @@ void spectrum_mprint_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_mface_base_device::romcs()
+bool spectrum_mface_base_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_mface_base_device::pre_opcode_fetch(offs_t offset)

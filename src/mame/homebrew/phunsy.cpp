@@ -72,13 +72,13 @@ private:
 	void phunsy_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void phunsy_data(address_map &map);
-	void phunsy_io(address_map &map);
-	void phunsy_mem(address_map &map);
+	void phunsy_data(address_map &map) ATTR_COLD;
+	void phunsy_io(address_map &map) ATTR_COLD;
+	void phunsy_mem(address_map &map) ATTR_COLD;
 
 	uint8_t       m_data_out = 0U;
 	uint8_t       m_keyboard_input = 0U;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
@@ -342,7 +342,7 @@ void phunsy_state::phunsy(machine_config &config)
 	m_maincpu->flag_handler().set(FUNC(phunsy_state::cass_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	/* Display (page 12 of pdf)
 	   - 8Mhz clock
 	   - 64 6 pixel characters on a line.
@@ -361,7 +361,7 @@ void phunsy_state::phunsy(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(phunsy_state::kbd_put));
 
 	CASSETTE(config, m_cass);

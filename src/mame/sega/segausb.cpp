@@ -454,12 +454,10 @@ void usb_sound_device::env_w(int which, u8 offset, u8 data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void usb_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void usb_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &dest = outputs[0];
-
 	// iterate over samples
-	for (int sampindex = 0; sampindex < dest.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		/*----------------
 		    Noise Source
@@ -590,7 +588,7 @@ void usb_sound_device::sound_stream_update(sound_stream &stream, std::vector<rea
 		  WEIGHT
 
 		*/
-		dest.put(sampindex, 0.1 * m_final_filter.step_cr(sample));
+		stream.put(0, sampindex, 0.1 * m_final_filter.step_cr(sample));
 	}
 }
 
@@ -764,13 +762,13 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	m_ourcpu->p2_out_cb().set(FUNC(usb_sound_device::p2_w));
 	m_ourcpu->t1_in_cb().set(FUNC(usb_sound_device::t1_r));
 
-	TIMER(config, "usb_timer", 0).configure_periodic(
+	TIMER(config, "usb_timer").configure_periodic(
 			FUNC(usb_sound_device::increment_t1_clock_timer_cb),
 			attotime::from_hz(USB_2MHZ_CLOCK / 256));
 
 #if (ENABLE_SEGAUSB_NETLIST)
 
-	TIMER(config, "gos_timer", 0).configure_periodic(
+	TIMER(config, "gos_timer").configure_periodic(
 			FUNC(usb_sound_device::gos_timer), attotime::from_hz(USB_GOS_CLOCK));
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
@@ -810,7 +808,7 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	// configure the PIT clocks and gates
 	for (int index = 0; index < 3; index++)
 	{
-		PIT8253(config, m_pit[index], 0);
+		PIT8253(config, m_pit[index]);
 		m_pit[index]->set_clk<0>(USB_PCS_CLOCK);
 		m_pit[index]->set_clk<1>(USB_PCS_CLOCK);
 		m_pit[index]->set_clk<2>(USB_2MHZ_CLOCK);

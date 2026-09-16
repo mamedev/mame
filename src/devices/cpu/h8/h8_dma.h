@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "h8.h"
+#include "h8_cpu_base.h"
 #include "h8_intc.h"
 
 struct h8_dma_state {
@@ -73,11 +73,11 @@ public:
 	void start_stop_test();
 
 protected:
-	required_device<h8_device> m_cpu;
+	required_device<h8_cpu_base> m_cpu;
 	optional_device_array<h8gen_dma_channel_device, 4> m_dmach;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u8 active_channels() const = 0;
 
@@ -125,12 +125,11 @@ protected:
 	u8 m_dmawer, m_dmatcr;
 	u16 m_dmabcr;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	u8 active_channels() const override;
 };
-
 
 
 
@@ -182,10 +181,11 @@ public:
 	bool transfer_test_interrupt(int vector);
 	void set_dreq(int state);
 	void start(int submodule);
+	void abort(int submodule) { dma_done(submodule); }
 
 protected:
-	required_device<h8_device> m_cpu;
-	required_device<h8_intc_device> m_intc;
+	required_device<h8_cpu_base> m_cpu;
+	required_device<h8_intc_base> m_intc;
 	int m_irq_base;
 	u32 m_ioar_mask; // ff0000 for h8s, ffff00 for h8h
 
@@ -193,8 +193,8 @@ protected:
 	u16 m_ioar[2], m_etcr[2];
 	bool m_dreq;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_done(int subchannel);
 	virtual int channel_mode() const = 0;
@@ -231,8 +231,8 @@ protected:
 	bool m_has_adc;
 	bool m_targets_sci1;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void dma_done(int subchannel) override;
 
 	int channel_mode() const override;
@@ -261,8 +261,8 @@ protected:
 	u16 m_dmacr;
 
 	required_device<h8s_dma_device> m_dma;
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void dma_done(int subchannel) override;
 
 	int channel_mode() const override;

@@ -47,9 +47,9 @@ public:
 private:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	virtual void machine_reset() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -120,7 +120,7 @@ void altair_state::altair(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &altair_state::io_map);
 
 	/* video hardware */
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 

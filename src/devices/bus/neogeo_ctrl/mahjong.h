@@ -29,9 +29,9 @@ protected:
 	neogeo_mjctrl_ac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual uint8_t read_start_sel() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_neogeo_control_port_interface overrides
 	virtual uint8_t read_ctrl() override;
@@ -54,7 +54,7 @@ public:
 
 protected:
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_neogeo_control_port_interface overrides
 	virtual uint8_t read_start_sel() override;

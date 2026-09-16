@@ -4,12 +4,9 @@
 
 Sengoku Mahjong (c) 1991 Sigma
 
-driver by Angelo Salese & Pierpaolo Prazzoli
-
 Uses the same Seibu custom chips of the D-Con HW.
 
 TODO:
-- Find what the remaining video C.R.T. registers do;
 - Fix sprites bugs at a start of a play;
 - Check NVRAM boundaries;
 - How does the "SW Service Mode" (press F2 during gameplay) really work (inputs etc)? Nothing mapped works with it...
@@ -55,6 +52,8 @@ RSSENGO2.72   chr.
 
 #include "emu.h"
 
+#include "sei021x_sei0220_spr.h"
+
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -78,6 +77,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_spritegen(*this, "spritegen"),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
@@ -88,13 +88,14 @@ public:
 	void sengokmj(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei0210_device> m_spritegen;
 
 	required_shared_ptr<uint16_t> m_sc0_vram;
 	required_shared_ptr<uint16_t> m_sc1_vram;
@@ -128,13 +129,14 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+	uint32_t pri_cb(uint8_t pri, uint8_t ext);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sengokmj_io_map(address_map &map);
-	void sengokmj_map(address_map &map);
+	void sengokmj_io_map(address_map &map) ATTR_COLD;
+	void sengokmj_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -245,67 +247,39 @@ TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
 //  tile+=(m_seibucrtc_sc0bank<<12);
-	tileinfo.set(1, tile, color, 0);
+	tileinfo.set(0, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc2_tile_info )
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
-	tileinfo.set(2, tile, color, 0);
+	tileinfo.set(1, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc1_tile_info )
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
-	tileinfo.set(3, tile, color, 0);
+	tileinfo.set(2, tile, color, 0);
 }
 
 TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc3_tile_info )
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
-	tileinfo.set(4, tile, color, 0);
+	tileinfo.set(3, tile, color, 0);
 }
 
-void sengokmj_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+uint32_t sengokmj_state::pri_cb(uint8_t pri, uint8_t ext)
 {
-	int offs,fx,fy,x,y,color,sprite;
-	int dx,dy,ax,ay;
-
-	for (offs = 0x400-4;offs >= 0;offs -= 4)
+	switch (pri)
 	{
-		if ((m_spriteram16[offs+0]&0x8000)!=0x8000) continue;
-		sprite = m_spriteram16[offs+1];
-		if ((sprite>>14)!=pri) continue;
-		sprite &= 0x1fff;
-
-		y = m_spriteram16[offs+3];
-		x = m_spriteram16[offs+2];
-
-		if (x&0x8000) x=0-(0x200-(x&0x1ff));
-		else x&=0x1ff;
-		if (y&0x8000) y=0-(0x200-(y&0x1ff));
-		else y&=0x1ff;
-
-		color = m_spriteram16[offs+0]&0x3f;
-		fx = m_spriteram16[offs+0]&0x4000;
-		fy = m_spriteram16[offs+0]&0x2000;
-		dy=((m_spriteram16[offs+0]&0x0380)>>7)+1;
-		dx=((m_spriteram16[offs+0]&0x1c00)>>10)+1;
-
-		for (ax=0; ax<dx; ax++)
-			for (ay=0; ay<dy; ay++) {
-				if (!fx)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,x+ax*16,y+ay*16,15);
-				else
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-						sprite++,
-						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,15);
-			}
+		case 0: return GFX_PMASK_8;
+		case 1: return GFX_PMASK_8 | GFX_PMASK_4;
+		case 2: return GFX_PMASK_8 | GFX_PMASK_4 | GFX_PMASK_2;
+		case 3:
+		default: return 0;
 	}
 }
 
@@ -326,6 +300,7 @@ void sengokmj_state::video_start()
 
 uint32_t sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	/* TODO: offsetted? */
@@ -338,14 +313,11 @@ uint32_t sengokmj_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sc3_tilemap->set_scrollx(0, (128) & 0x1ff );
 	m_sc3_tilemap->set_scrolly(0, (0) & 0x1ff );
 
-	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 2); }
-	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 1); }
-	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 0); }
-	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(screen, bitmap, cliprect, 0,0); }
-	if(SEIBU_CRTC_ENABLE_SPR) { draw_sprites(bitmap,cliprect, 3); }
+	if(SEIBU_CRTC_ENABLE_SC0) { m_sc0_tilemap->draw(screen, bitmap, cliprect, 0, 1); }
+	if(SEIBU_CRTC_ENABLE_SC2) { m_sc2_tilemap->draw(screen, bitmap, cliprect, 0, 2); }
+	if(SEIBU_CRTC_ENABLE_SC1) { m_sc1_tilemap->draw(screen, bitmap, cliprect, 0, 4); }
+	if(SEIBU_CRTC_ENABLE_SC3) { m_sc3_tilemap->draw(screen, bitmap, cliprect, 0, 8); }
+	if(SEIBU_CRTC_ENABLE_SPR) { m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram16, m_spriteram16.bytes()); }
 
 	return 0;
 }
@@ -433,7 +405,9 @@ void sengokmj_state::sengokmj_io_map(address_map &map)
 static INPUT_PORTS_START( sengokmj )
 	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
 
-	PORT_START("DSW") // Names and locations from service mode
+	// Names and locations from service mode
+	// TODO: improve labels
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -453,7 +427,8 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_DIPNAME( 0x0040, 0x0040, "Out Sw" ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) ) // One of these probably selects coins
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // The other probably selects tickets
-	PORT_DIPNAME( 0x0080, 0x0000, "Hopper" ) PORT_DIPLOCATION("SW1:8") //game gives hopper error with this off.
+	// game gives hopper error with this off. Meaning may be reversed
+	PORT_DIPNAME( 0x0080, 0x0000, "Hopper" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0100, 0x0100, "SW2:1" )
@@ -521,8 +496,8 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) // Only used in service mode?
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_DOOR ) // Only used in service mode?
+	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Opt. 1st") // Only used in service mode?
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -558,17 +533,25 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_sengokmj )
-	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x400, 0x10 ) /* Tiles */
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x500, 0x10 ) /* Tiles */
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0x600, 0x10 ) /* Tiles */
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_sengokmj_spr )
+	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
+GFXDECODE_END
+
+IRQ_CALLBACK_MEMBER(sengokmj_state::vector_r)
+{
+	return 0xc8 / 4;
+}
+
 void sengokmj_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void sengokmj_state::layer_en_w(uint16_t data)
@@ -588,6 +571,7 @@ void sengokmj_state::sengokmj(machine_config &config)
 	V30(config, m_maincpu, 16000000/2); /* V30-8 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &sengokmj_state::sengokmj_map);
 	m_maincpu->set_addrmap(AS_IO, &sengokmj_state::sengokmj_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sengokmj_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
 	audiocpu.set_addrmap(AS_PROGRAM, &sengokmj_state::seibu_sound_map);
@@ -596,7 +580,7 @@ void sengokmj_state::sengokmj(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -605,12 +589,15 @@ void sengokmj_state::sengokmj(machine_config &config)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(sengokmj_state::vblank_irq));
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	crtc.layer_en_callback().set(FUNC(sengokmj_state::layer_en_w));
 	crtc.layer_scroll_callback().set(FUNC(sengokmj_state::layer_scroll_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sengokmj);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
+
+	SEI0210(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_sengokmj_spr);
+	m_spritegen->set_pri_callback(FUNC(sengokmj_state::pri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -622,10 +609,11 @@ void sengokmj_state::sengokmj(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
+	seibu_sound.coin_io_callback().set_ioport("COIN");
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -669,5 +657,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-/*Non-Bet Version?*/
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// is a Non-Bet version a thing?

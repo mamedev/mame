@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Roberto Fresca
+// copyright-holders: Ernesto Corvi, Roberto Fresca
+
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985
@@ -116,12 +117,12 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void tehkanwcb(machine_config &config);
-	void tehkanwc(machine_config &config);
+	void tehkanwcb(machine_config &config) ATTR_COLD;
+	void tehkanwc(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -181,11 +182,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void shared_mem(address_map &map);
-	void main_mem(address_map &map);
-	void sound_mem(address_map &map);
-	void sound_port(address_map &map);
-	void sub_mem(address_map &map);
+	void shared_mem(address_map &map) ATTR_COLD;
+	void main_mem(address_map &map) ATTR_COLD;
+	void sound_mem(address_map &map) ATTR_COLD;
+	void sound_port(address_map &map) ATTR_COLD;
+	void sub_mem(address_map &map) ATTR_COLD;
 };
 
 void tehkanwc_state::machine_start()
@@ -196,8 +197,6 @@ void tehkanwc_state::machine_start()
 	save_item(NAME(m_msm_data_offs));
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_scroll_x));
-
-	m_digits.resolve();
 }
 
 void tehkanwc_state::sub_cpu_reset_w(uint8_t data)
@@ -429,8 +428,8 @@ void tehkanwc_state::shared_mem(address_map &map)
 	map(0xc800, 0xcfff).ram().share("shareram");
 	map(0xd000, 0xd3ff).ram().w(FUNC(tehkanwc_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(tehkanwc_state::colorram_w)).share("colorram");
-	map(0xd800, 0xddff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xde00, 0xdfff).nopw(); // unused part of the palette RAM, I think? Gridiron writes here
+	map(0xd800, 0xddff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xde00, 0xdfff).ram().share("palette2"); // unused part of the palette RAM, I think? Gridiron writes here
 	map(0xe000, 0xe7ff).ram().w(FUNC(tehkanwc_state::videoram2_w)).share("videoram2");
 	map(0xe800, 0xebff).ram().share("spriteram");
 	map(0xec00, 0xec01).w(FUNC(tehkanwc_state::scroll_x_w));
@@ -801,29 +800,26 @@ GFXDECODE_END
 void tehkanwc_state::tehkanwc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/4);     /* 18.432000 / 4 */
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::main_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 18432000/4);
+	Z80(config, m_subcpu, 18.432_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sub_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 18432000/4);
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sound_mem);
 	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
 	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.set_maximum_quantum(attotime::from_hz(600)); // 10 CPU slices per frame - seems enough to keep the CPUs in sync
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // verified from unofficial schematics
 	screen.set_screen_update(FUNC(tehkanwc_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -836,12 +832,12 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ym2149_device &ay1(YM2149(config, "ay1", 18.432_MHz_XTAL / 12));
 	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
 	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ym2149_device &ay2(YM2149(config, "ay2", 18.432_MHz_XTAL / 12));
 	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -855,12 +851,12 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 void tehkanwc_state::tehkanwcb(machine_config &config)
 {
 	tehkanwc(config);
-	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18.432_MHz_XTAL / 12));
 	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
 	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18.432_MHz_XTAL / 12));
 	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1022,7 +1018,9 @@ ROM_START( tehkanwcd ) // from a 2-PCB set labeled "A-32302 Tehkan" and "B-32302
 	ROM_LOAD( "twc-5.bin",    0x0000, 0x4000, CRC(444b5544) SHA1(0786d6d9ada7fe49c8ab9751b049095474d2e598) )
 ROM_END
 
-/* Just a year hack to put "1986" plus some other small changes, but this set has been found on different bootleg TWC PCBs. */
+/* Just a year hack to put "1986" plus some other small changes, but this set has been found on different bootleg TWC PCBs.
+   Cocamatic (Spain) distributed this set using 27256 for all ROMs, giving the dump different hashes (but with exactly the
+   same content (with 1ST AND 2ND HALF IDENTICAL). */
 ROM_START( tehkanwch )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "worldcup_3.bin",   0x0000, 0x4000, CRC(dd3f789b) SHA1(8e616a64d96f62797485c78e9c3f36fa90486e3f) ) // 27128
@@ -1078,6 +1076,35 @@ ROM_START( gridiron )
 
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
 	ROM_LOAD( "gfight6.bin",  0x0000, 0x4000, CRC(d05d463d) SHA1(30f2bce0ad75c4a7d8344cff16bce27f5e3a3f5d) )
+ROM_END
+
+ROM_START( aafootb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.3a", 0x0000, 0x4000, CRC(ef88d54b) SHA1(ed8e279226fc044803655469b51420ac46c6e15b) )
+	ROM_LOAD( "2.3b", 0x4000, 0x4000, CRC(80c72ab4) SHA1(4a659d9c731190a9b3d6443f808507ea3fda9d93) )
+	ROM_LOAD( "3.3c", 0x8000, 0x4000, CRC(e19b8779) SHA1(15b3431830825c55a5831c1ecab89d53e67c9d92) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "4.9c", 0x0000, 0x8000, CRC(e4d6522e) SHA1(2df28374f3c067f28c90a42586be18806949a22d) ) // 1xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6.9p", 0x0000, 0x4000, CRC(92ca3c07) SHA1(580077ca8cf01996b29497187e41a54242de7f50) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "10.8t", 0x0000, 0x4000, CRC(04390cca) SHA1(ff010c0c18ddd1f793b581f0a70bc1b98ef7d21d) )   /* fg tiles */
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "8.5h", 0x0000, 0x8000, CRC(39d6f81e) SHA1(70095b5e5c96a4b03f14a79a4624abc89bf2ffe6) )   /* sprites */
+	ROM_LOAD( "7.5d", 0x8000, 0x4000, CRC(9afaed21) SHA1(d66840990c903660a67fae487709de1b8d71ffdd) )
+	ROM_IGNORE(               0x4000 ) // 1xxxxxxxxxxxxxx = 0xFF
+	/* 0c000-0ffff empty */
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "9.8m", 0x0000, 0x8000, CRC(7f62eafa) SHA1(4d66fd90df45d761f93819748ce233aff56d62a1) )   /* bg tiles */
+	/* 08000-0ffff empty */
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
+	ROM_LOAD( "5.4p", 0x0000, 0x4000, CRC(d05d463d) SHA1(30f2bce0ad75c4a7d8344cff16bce27f5e3a3f5d) )
 ROM_END
 
 ROM_START( teedoff )
@@ -1137,13 +1164,14 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",    MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight (World)",               MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAMEL(1987, aafootb,   gridiron, tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tecmo",   "All American Football (Tecmo, Japan)", MACHINE_SUPPORTS_SAVE, layout_gridiron )
 
-GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
-GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                    MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
+GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                    MACHINE_SUPPORTS_SAVE )

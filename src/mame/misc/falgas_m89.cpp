@@ -108,7 +108,7 @@ public:
 	void falgasm87(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 
@@ -116,8 +116,8 @@ private:
 	void psg_pa_w(u8 data);
 	u8 psg_pb_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_ioport_array<4> m_inputs;
 
@@ -138,9 +138,9 @@ public:
 private:
 	required_device<i8085a_cpu_device> m_videocpu;
 
-	void main_io_map(address_map &map);
-	void video_mem_map(address_map &map);
-	void video_io_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void video_mem_map(address_map &map) ATTR_COLD;
+	void video_io_map(address_map &map) ATTR_COLD;
 };
 
 void falgasm89_state::machine_start()
@@ -261,7 +261,7 @@ void falgasm89_video_state::falgasm89_video(machine_config &config)
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x10000); // 2 x UD61464DC
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	i8155_device &i8155(I8155(config, "i8155", 6_MHz_XTAL)); // NEC D8155HC
 	i8155.in_pa_callback().set([this] () { logerror("from main (i8155 PA in)\n"); return 0x00; }); // TODO: from main? returning rand() shows inputs come from here, probably sent from the main CPU
@@ -352,8 +352,8 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME         PARENT   MACHINE           INPUT      CLASS                  INIT        ROT   COMPANY   FULLNAME                                    FLAGS
-GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                              MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, fantcar87,   fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, newer)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, fantcar87a,  fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, older)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1991, cbully,      0,       falgasm89_simple, falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Coche Bully",                              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 19??, fantcar,     0,       falgasm89,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (M89 hardware)",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, fantcar87,   fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, newer)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, fantcar87a,  fantcar, falgasm87,        falgasm89, falgasm89_state,       empty_init, ROT0, "Falgas", "Fantastic Car (Micro-87 hardware, older)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1991, rmontecarlo, 0,       falgasm89_video,  falgasm89, falgasm89_video_state, empty_init, ROT0, "Falgas", "Rally Montecarlo",                         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -72,17 +72,20 @@ ToDo:
 
 
 #include "emu.h"
-#include "cpu/s2650/s2650.h"
+#include "genpin.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/s2650/s2650.h"
 #include "machine/clock.h"
 #include "machine/gen_latch.h"
-#include "genpin.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/mm5837.h"
 #include "sound/sn76477.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
+
 #include "zac_1.lh"
 
 namespace {
@@ -105,12 +108,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
-	void locomotp(machine_config &config);
-	void config_base(machine_config &config);
-	void zac1(machine_config &config);
-	void zac2(machine_config &config);
-	void zac3(machine_config &config);
-	void zac4(machine_config &config);
+	void locomotp(machine_config &config) ATTR_COLD;
+	void config_base(machine_config &config) ATTR_COLD;
+	void zac1(machine_config &config) ATTR_COLD;
+	void zac2(machine_config &config) ATTR_COLD;
+	void zac3(machine_config &config) ATTR_COLD;
+	void zac4(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ctrl_r();
@@ -124,19 +131,17 @@ private:
 	void reset_int_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	void audio_command_w(u8 data);
 	u8 audio_command_r();
 
-	void locomotp_data(address_map &map);
-	void locomotp_io(address_map &map);
-	void locomotp_map(address_map &map);
-	void zac_1_data(address_map &map);
-	void zac_1_io(address_map &map);
-	void zac_1_map(address_map &map);
-	void audio_data(address_map &map);
-	void audio_io(address_map &map);
+	void locomotp_data(address_map &map) ATTR_COLD;
+	void locomotp_io(address_map &map) ATTR_COLD;
+	void locomotp_map(address_map &map) ATTR_COLD;
+	void zac_1_data(address_map &map) ATTR_COLD;
+	void zac_1_io(address_map &map) ATTR_COLD;
+	void zac_1_map(address_map &map) ATTR_COLD;
+	void audio_data(address_map &map) ATTR_COLD;
+	void audio_io(address_map &map) ATTR_COLD;
 
 	u8 m_t_c = 0U;
 	u8 m_out_offs = 0U;
@@ -536,9 +541,6 @@ void zac_1_state::machine_reset()
 
 void zac_1_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_out_offs));
 	save_item(NAME(m_input_line));
@@ -660,7 +662,7 @@ void zac_1_state::zac1(machine_config &config)
 {
 	config_base(config);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0); // basic audio
+	CLOCK(config, m_monotone); // basic audio
 	m_monotone->signal_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
 }
 
@@ -760,7 +762,7 @@ void zac_1_state::locomotp(machine_config &config)
 	noise.output_callback().set(FUNC(zac_1_state::noise_w));
 
 	// 555 timer, 1277 Hz, merges with noise to make a steam whistle
-	CLOCK(config, m_astable, 0);
+	CLOCK(config, m_astable);
 	m_astable->signal_handler().set(FUNC(zac_1_state::clock_w));
 }
 
@@ -949,23 +951,23 @@ ROM_END
 } // anonymous namespace
 
 // Basic audio
-GAME(1978, wsports,   0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Winter Sports",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1978, hod,       0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "House of Diamonds",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1978, futurwld,  0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Future World",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1978, wsports,   0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Winter Sports",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1978, hod,       0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "House of Diamonds",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1978, futurwld,  0,       zac1,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Future World",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
 
 // 1B1125 audio (SN76477, NE555)
-GAME(1979, strapids,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Shooting the Rapids",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1979, hotwheel,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Hot Wheels",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1980, firemntn,  0,       zac3,  firemntn, zac_1_state, empty_init, ROT0, "Zaccaria", "Fire Mountain",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1980, stargod,   0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1980, stargodb,  stargod, zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (variable replay score)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1979, strapids,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Shooting the Rapids",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1979, hotwheel,  0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Hot Wheels",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, firemntn,  0,       zac3,  firemntn, zac_1_state, empty_init, ROT0, "Zaccaria", "Fire Mountain",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, stargod,   0,       zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, stargodb,  stargod, zac3,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (variable replay score)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
 
 // 1B1346 audio (i8035, MC1408)
-GAME(1980, sshtlzac,  0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Space Shuttle (Zaccaria)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
-GAME(1981, ewf,       0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Earth Wind Fire",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, sshtlzac,  0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Space Shuttle (Zaccaria)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
+GAME(1981, ewf,       0,       zac2,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Earth Wind Fire",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
 
 // 1B1146 audio (i8035, MC1408, SN76477, NE555, MM5837)
-GAME(1981, locomotp,  0,       locomotp, zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Locomotion",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1981, locomotp,  0,       locomotp, zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Locomotion",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )
 
 // unknown audio
-GAME(1980, stargoda,  stargod, zac4,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (alternate sound)",       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE  )
+GAME(1980, stargoda,  stargod, zac4,     zac_1, zac_1_state, empty_init, ROT0, "Zaccaria", "Star God (alternate sound)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE  )

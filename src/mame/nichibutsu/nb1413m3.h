@@ -31,7 +31,7 @@ public:
 		set_type(type);
 	}
 
-	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~nb1413m3_device() {}
 
 	// configuration helpers
@@ -176,8 +176,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_blitter_rom;

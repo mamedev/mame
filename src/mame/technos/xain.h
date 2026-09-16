@@ -39,11 +39,11 @@ public:
 	void xsleenab(machine_config &config);
 
 	int vblank_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	ioport_value mcu_status_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void cpuA_bankswitch_w(uint8_t data);
@@ -66,10 +66,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bootleg_map(address_map &map);
-	void main_map(address_map &map);
-	void cpu_map_B(address_map &map);
-	void sound_map(address_map &map);
+	void bootleg_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void cpu_map_B(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	int scanline_to_vcount(int scanline);
 

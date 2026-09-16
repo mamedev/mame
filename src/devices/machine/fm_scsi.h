@@ -17,7 +17,7 @@ class fmscsi_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -40,8 +40,8 @@ public:
 
 protected:
 	// device-level overrides (none are required, but these are common)
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_transfer);
 

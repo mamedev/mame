@@ -80,8 +80,8 @@ private:
 	u8 m_cass_data[4]{};
 	bool m_cassold = 0, m_cassinbit = 0, m_cassoutbit = 0;
 
-	void mem_map(address_map &map);
-	void machine_start() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -260,7 +260,7 @@ void binbug_state::binbug(machine_config &config)
 	/* quickload */
 	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(binbug_state::quickload_cb));
 
-	S100_BUS(config, m_s100, 0);
+	S100_BUS(config, m_s100);
 	S100_SLOT(config, "s100:1", binbug_s100_devices, "dg640");
 }
 

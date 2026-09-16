@@ -30,7 +30,16 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_rom_tag(rom_tag);
 	}
-	mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	template <typename T>
+	mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, map_type map, T &&cpu_tag, const char *rom_tag)
+		: mpc106_host_device(mconfig, tag, owner, 0, map, std::forward<T>(cpu_tag), rom_tag)
+	{
+		set_ids_host(0x10570002, 0x00, 0x00000000);
+		set_map_type(map);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_rom_tag(rom_tag);
+	}
+	mpc106_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_info(u8 *ram_ptr, int ram_size);
@@ -38,21 +47,22 @@ public:
 	void set_map_type(map_type maptype);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 						   u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	void access_map_le(address_map &map);
-	void access_map_be(address_map &map);
+	void install_config_access_map();
+	void access_map_le(address_map &map) ATTR_COLD;
+	void access_map_be(address_map &map) ATTR_COLD;
 	u32 be_config_address_r();
 	void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 be_config_data_r(offs_t offset, u32 mem_mask = ~0);

@@ -94,8 +94,8 @@ public:
 
 protected:
 	// device-level overrides
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
 	devcb_write8 m_output_a;

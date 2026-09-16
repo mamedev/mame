@@ -2,7 +2,7 @@
 // is_applicable_property.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,6 +19,7 @@
 #include "asio/detail/type_traits.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename T, typename Property, typename = void>
@@ -30,11 +31,11 @@ struct is_applicable_property_trait : false_type
 
 template <typename T, typename Property>
 struct is_applicable_property_trait<T, Property,
-  typename void_type<
-    typename enable_if<
+  void_t<
+    enable_if_t<
       !!Property::template is_applicable_property_v<T>
-    >::type
-  >::type> : true_type
+    >
+  >> : true_type
 {
 };
 
@@ -51,11 +52,12 @@ struct is_applicable_property :
 #if defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
 template <typename T, typename Property>
-ASIO_CONSTEXPR const bool is_applicable_property_v
+constexpr const bool is_applicable_property_v
   = is_applicable_property<T, Property>::value;
 
 #endif // defined(ASIO_HAS_VARIABLE_TEMPLATES)
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #endif // ASIO_IS_APPLICABLE_PROPERTY_HPP

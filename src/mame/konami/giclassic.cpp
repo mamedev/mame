@@ -73,24 +73,24 @@ public:
 	void giclassic(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<palette_device> m_palette;
 
-	INTERRUPT_GEN_MEMBER(giclassic_interrupt);
+	INTERRUPT_GEN_MEMBER(interrupt);
 
-	uint32_t screen_update_giclassic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 
 	void control_w(uint16_t data);
 	uint16_t vrom_r(offs_t offset);
 
-	void satellite_main(address_map &map);
+	void satellite_main(address_map &map) ATTR_COLD;
 
 	uint8_t m_control = 0;
 };
@@ -101,14 +101,14 @@ private:
 
 K056832_CB_MEMBER(giclassic_state::tile_callback)
 {
-	*color = (*color & 0xf);
+	color = (color & 0xf);
 }
 
 void giclassic_state::video_start()
 {
 }
 
-uint32_t giclassic_state::screen_update_giclassic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t giclassic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
@@ -121,7 +121,7 @@ uint32_t giclassic_state::screen_update_giclassic(screen_device &screen, bitmap_
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(giclassic_state::giclassic_interrupt)
+INTERRUPT_GEN_MEMBER(giclassic_state::interrupt)
 {
 	if (m_control & 2)
 	{
@@ -171,6 +171,7 @@ INPUT_PORTS_END
 
 void giclassic_state::machine_start()
 {
+	save_item(NAME(m_control));
 }
 
 void giclassic_state::machine_reset()
@@ -195,8 +196,8 @@ public:
 	void giclassvr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -204,16 +205,16 @@ private:
 	required_device<k055673_device> m_k055673;
 	required_device<palette_device> m_palette;
 
-	INTERRUPT_GEN_MEMBER(giclassicsvr_interrupt);
+	INTERRUPT_GEN_MEMBER(interrupt);
 
-	uint32_t screen_update_giclassicsvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K056832_CB_MEMBER(tile_callback);
 	K055673_CB_MEMBER(sprite_callback);
 
 	void control_w(uint16_t data);
 	uint16_t control_r();
 
-	void server_main(address_map &map);
+	void server_main(address_map &map) ATTR_COLD;
 
 	uint16_t m_control = 0;
 };
@@ -228,7 +229,7 @@ uint16_t giclassicsvr_state::control_r()
 	return m_control;
 }
 
-INTERRUPT_GEN_MEMBER(giclassicsvr_state::giclassicsvr_interrupt)
+INTERRUPT_GEN_MEMBER(giclassicsvr_state::interrupt)
 {
 	//if (m_control & 2)
 	{
@@ -243,16 +244,16 @@ K056832_CB_MEMBER(giclassicsvr_state::tile_callback)
 
 K055673_CB_MEMBER(giclassicsvr_state::sprite_callback)
 {
-	int c = *color;
+	int c = color;
 
-	*color = (c & 0x001f);
+	color = (c & 0x001f);
 	//int pri = (c >> 5) & 7;
 	// .... .... ...x xxxx - Color
 	// .... .... xxx. .... - Priority?
 	// .... ..x. .... .... - ?
 	// ..x. .... .... .... - ?
 
-	*priority_mask = 0;
+	priority_mask = 0;
 
 	// 0 - Sprites over everything
 	// f0 -
@@ -265,7 +266,7 @@ K055673_CB_MEMBER(giclassicsvr_state::sprite_callback)
 }
 
 
-uint32_t giclassicsvr_state::screen_update_giclassicsvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t giclassicsvr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
@@ -301,6 +302,7 @@ INPUT_PORTS_END
 
 void giclassicsvr_state::machine_start()
 {
+	save_item(NAME(m_control));
 }
 
 void giclassicsvr_state::machine_reset()
@@ -312,15 +314,15 @@ void giclassic_state::giclassic(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000) / 2); // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &giclassic_state::satellite_main);
-	m_maincpu->set_vblank_int("screen", FUNC(giclassic_state::giclassic_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(giclassic_state::interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(600, 384);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(giclassic_state::screen_update_giclassic));
+	screen.set_screen_update(FUNC(giclassic_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
@@ -337,14 +339,14 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)); // unknown speed
 	m_maincpu->set_addrmap(AS_PROGRAM, &giclassicsvr_state::server_main);
-	m_maincpu->set_vblank_int("screen", FUNC(giclassicsvr_state::giclassicsvr_interrupt));
+	m_maincpu->set_vblank_int("screen", FUNC(giclassicsvr_state::interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.62);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(giclassicsvr_state::screen_update_giclassicsvr));
+	screen.set_screen_update(FUNC(giclassicsvr_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 16384);
@@ -355,7 +357,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 0, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055673(config, m_k055673, 0);
+	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette(m_palette);

@@ -4,7 +4,8 @@
 
   Hitachi HMCS40 MCU family disassembler
 
-  NOTE: start offset(basepc) is $3F, not 0
+  NOTE: start offset(basepc) is $3F, not 0. In other words, if you want a full
+  disasm from MAME's debugger: dasm x.asm,3f,1000
 
 */
 
@@ -16,7 +17,7 @@
 hmcs40_disassembler::hmcs40_disassembler()
 {
 	// init lfsr pc lut
-	for (u32 i = 0, pc = 0; i < 0x40; i++)
+	for (u32 i = 0, pc = 0x3f; i < 0x40; i++)
 	{
 		m_l2r[i] = pc;
 		m_r2l[pc] = i;
@@ -35,8 +36,28 @@ hmcs40_disassembler::hmcs40_disassembler()
 	}
 }
 
+hmcs40_disassembler::~hmcs40_disassembler()
+{
+}
+
 
 // common lookup tables
+
+enum hmcs40_disassembler::e_mnemonics : unsigned
+{
+	mILL,
+	mLAB, mLBA, mLAY, mLASPX, mLASPY, mXAMR,
+	mLXA, mLYA, mLXI, mLYI, mIY, mDY, mAYY, mSYY, mXSP,
+	mLAM, mLBM, mXMA, mXMB, mLMAIY, mLMADY,
+	mLMIIY, mLAI, mLBI,
+	mAI, mIB, mDB, mAMC, mSMC, mAM, mDAA, mDAS, mNEGA, mCOMB, mSEC, mREC, mTC, mROTL, mROTR, mOR,
+	mMNEI, mYNEI, mANEM, mBNEM, mALEI, mALEM, mBLEM,
+	mSEM, mREM, mTM,
+	mBR, mCAL, mLPU, mTBR, mRTN,
+	mSEIE, mSEIF0, mSEIF1, mSETF, mSECF, mREIE, mREIF0, mREIF1, mRETF, mRECF, mTI0, mTI1, mTIF0, mTIF1, mTTF, mLTI, mLTA, mLAT, mRTNI,
+	mSED, mRED, mTD, mSEDD, mREDD, mLAR, mLBR, mLRA, mLRB, mP,
+	mNOP
+};
 
 const char *const hmcs40_disassembler::s_mnemonics[] =
 {
@@ -215,11 +236,7 @@ offs_t hmcs40_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			}
 
 			param &= ((1 << bits) - 1);
-
-			if (bits > 5)
-				util::stream_format(stream, "$%02X", param);
-			else
-				util::stream_format(stream, "%d", param);
+			util::stream_format(stream, (bits > 4) ? "$%02X" : (param < 10) ? "%d" : "$%X", param);
 		}
 	}
 

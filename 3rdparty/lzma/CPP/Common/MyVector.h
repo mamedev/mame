@@ -1,9 +1,11 @@
 // Common/MyVector.h
 
-#ifndef __COMMON_MY_VECTOR_H
-#define __COMMON_MY_VECTOR_H
+#ifndef ZIP7_INC_COMMON_MY_VECTOR_H
+#define ZIP7_INC_COMMON_MY_VECTOR_H
 
 #include <string.h>
+
+#include "Common.h"
 
 const unsigned k_VectorSizeMax = ((unsigned)1 << 31) - 1;
 
@@ -22,7 +24,7 @@ class CRecordVector
   void ReAllocForNewCapacity(const unsigned newCapacity)
   {
     T *p;
-    MY_ARRAY_NEW(p, T, newCapacity);
+    Z7_ARRAY_NEW(p, T, newCapacity)
     // p = new T[newCapacity];
     if (_size != 0)
       memcpy(p, _items, (size_t)_size * sizeof(T));
@@ -53,7 +55,7 @@ public:
     const unsigned size = v.Size();
     if (size != 0)
     {
-      // MY_ARRAY_NEW(_items, T, size)
+      // Z7_ARRAY_NEW(_items, T, size)
       _items = new T[size];
       _size = size;
       _capacity = size;
@@ -68,7 +70,7 @@ public:
   {
     if (size != 0)
     {
-      MY_ARRAY_NEW(_items, T, size)
+      Z7_ARRAY_NEW(_items, T, size)
       // _items = new T[size];
       _capacity = size;
     }
@@ -100,7 +102,7 @@ public:
       delete []_items;
       _items = NULL;
       _capacity = 0;
-      MY_ARRAY_NEW(_items, T, newCapacity)
+      Z7_ARRAY_NEW(_items, T, newCapacity)
       // _items = new T[newCapacity];
       _capacity = newCapacity;
     }
@@ -119,7 +121,7 @@ public:
     T *p = NULL;
     if (_size != 0)
     {
-      // MY_ARRAY_NEW(p, T, _size)
+      // Z7_ARRAY_NEW(p, T, _size)
       p = new T[_size];
       memcpy(p, _items, (size_t)_size * sizeof(T));
     }
@@ -256,7 +258,7 @@ public:
   {
     if (index != 0)
     {
-      T temp = _items[index];
+      const T temp = _items[index];
       memmove(_items + 1, _items, (size_t)index * sizeof(T));
       _items[0] = temp;
     }
@@ -264,15 +266,31 @@ public:
 
   const T& operator[](unsigned index) const { return _items[index]; }
         T& operator[](unsigned index)       { return _items[index]; }
+  const T& operator[](int index) const { return _items[(unsigned)index]; }
+        T& operator[](int index)       { return _items[(unsigned)index]; }
+
+  const T* ConstData()    const { return _items; }
+        T* NonConstData() const { return _items; }
+        T* NonConstData()       { return _items; }
+
+  const T* Data() const         { return _items; }
+        T* Data()               { return _items; }
+
+  const T& FrontItem() const { return _items[0]; }
+        T& FrontItem()       { return _items[0]; }
+  /*
+  const T Front() const { return _items[0]; }
+        T Front()       { return _items[0]; }
   const T& Front() const { return _items[0]; }
         T& Front()       { return _items[0]; }
+  */
   const T& Back() const  { return _items[(size_t)_size - 1]; }
         T& Back()        { return _items[(size_t)_size - 1]; }
 
   /*
   void Swap(unsigned i, unsigned j)
   {
-    T temp = _items[i];
+    const T temp = _items[i];
     _items[i] = _items[j];
     _items[j] = temp;
   }
@@ -364,7 +382,7 @@ public:
 
   static void SortRefDown(T* p, unsigned k, unsigned size, int (*compare)(const T*, const T*, void *), void *param)
   {
-    T temp = p[k];
+    const T temp = p[k];
     for (;;)
     {
       unsigned s = (k << 1);
@@ -385,16 +403,16 @@ public:
     unsigned size = _size;
     if (size <= 1)
       return;
-    T* p = (&Front()) - 1;
+    T* p = _items - 1;
     {
       unsigned i = size >> 1;
       do
         SortRefDown(p, i, size, compare, param);
-      while (--i != 0);
+      while (--i);
     }
     do
     {
-      T temp = p[size];
+      const T temp = p[size];
       p[size--] = p[1];
       p[1] = temp;
       SortRefDown(p, 1, size, compare, param);
@@ -404,7 +422,7 @@ public:
 
   static void SortRefDown2(T* p, unsigned k, unsigned size)
   {
-    T temp = p[k];
+    const T temp = p[k];
     for (;;)
     {
       unsigned s = (k << 1);
@@ -425,16 +443,16 @@ public:
     unsigned size = _size;
     if (size <= 1)
       return;
-    T* p = (&Front()) - 1;
+    T* p = _items - 1;
     {
       unsigned i = size >> 1;
       do
         SortRefDown2(p, i, size);
-      while (--i != 0);
+      while (--i);
     }
     do
     {
-      T temp = p[size];
+      const T temp = p[size];
       p[size--] = p[1];
       p[1] = temp;
       SortRefDown2(p, 1, size);
@@ -497,6 +515,8 @@ public:
   
   const T& operator[](unsigned index) const { return *((T *)_v[index]); }
         T& operator[](unsigned index)       { return *((T *)_v[index]); }
+  const T& operator[](int index) const { return *((T *)_v[(unsigned)index]); }
+        T& operator[](int index)       { return *((T *)_v[(unsigned)index]); }
   const T& Front() const { return operator[](0); }
         T& Front()       { return operator[](0); }
   const T& Back() const  { return *(T *)_v.Back(); }
@@ -604,6 +624,7 @@ public:
     delete (T *)_v[index];
     _v.Delete(index);
   }
+  // void Delete(int index) { Delete((unsigned)index); }
 
   /*
   void Delete(unsigned index, unsigned num)

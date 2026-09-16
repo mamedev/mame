@@ -52,9 +52,9 @@ private:
 	void output_port_0_w(uint8_t data);
 	void output_port_1_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_hitme_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	DECLARE_VIDEO_START(barricad);
 	uint32_t screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_barricad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -64,8 +64,8 @@ private:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	void hitme_map(address_map &map);
-	void hitme_portmap(address_map &map);
+	void hitme_map(address_map &map) ATTR_COLD;
+	void hitme_portmap(address_map &map) ATTR_COLD;
 };
 
 

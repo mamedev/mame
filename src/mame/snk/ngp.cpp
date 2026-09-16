@@ -4,6 +4,10 @@
 
 SNK NeoGeo Pocket driver
 
+After setting the initial console settings power cycle the unit at least once,
+otherwise the settings will not be saved properly.
+
+
 The NeoGeo Pocket (Color) contains one big chip which contains the following
 components:
 - Toshiba TLCS-900/H cpu core with 64KB ROM
@@ -98,6 +102,7 @@ the Neogeo Pocket.
 
 
 #include "emu.h"
+#include "k1ge.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -106,7 +111,7 @@ the Neogeo Pocket.
 #include "sound/t6w28.h"
 #include "sound/dac.h"
 
-#include "k1ge.h"
+#include "dirtc.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -128,13 +133,15 @@ enum flash_state
 };
 
 
-class ngp_state : public driver_device, public device_nvram_interface
+class ngp_state : public driver_device, public device_nvram_interface, device_rtc_interface
 {
 public:
 	ngp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		device_nvram_interface(mconfig, *this),
+		device_rtc_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_z80(*this, "soundcpu"),
 		m_t6w28(*this, "t6w28"),
 		m_ldac(*this, "ldac"),
@@ -153,26 +160,17 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override ATTR_COLD;
+
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
-
-	uint8_t m_io_reg[0x40] = { };
-	uint8_t m_old_to3 = 0;
-	emu_timer* m_seconds_timer = nullptr;
-
-	struct {
-		int       present = 0;
-		uint8_t   manufacturer_id = 0;
-		uint8_t   device_id = 0;
-		uint8_t   *data = nullptr;
-		uint8_t   org_data[16] = { };
-		int       state = F_READ;
-		uint8_t   command[2] = { };
-	} m_flash_chip[2];
-
 	required_device<tmp95c061_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_z80;
 	required_device<t6w28_device> m_t6w28;
 	required_device<dac_byte_interface> m_ldac;
@@ -180,88 +178,81 @@ private:
 	required_device<generic_slot_device> m_cart;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<k1ge_device> m_k1ge;
+	required_ioport m_io_controls;
+	required_ioport m_io_power;
 
-	uint8_t ngp_io_r(offs_t offset);
-	void ngp_io_w(offs_t offset, uint8_t data);
+	uint8_t m_io_reg[0x40] = { };
+	uint8_t m_old_to3 = 0;
+	emu_timer* m_seconds_timer = nullptr;
+
+	struct {
+		bool      present = false;
+		uint8_t   manufacturer_id = 0;
+		uint8_t   device_id = 0;
+		uint8_t   *data = nullptr;
+		uint8_t   org_data[16] = { };
+		int32_t   state = F_READ;
+		uint8_t   command[2] = { };
+	} m_flash_chip[2];
+
+	bool m_nvram_loaded = false;
+
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
 
 	template <int Which> void flash_w(offs_t offset, uint8_t data);
 	void flash0_w(offs_t offset, uint8_t data);
 	void flash1_w(offs_t offset, uint8_t data);
 
-	uint8_t ngp_z80_comm_r();
-	void ngp_z80_comm_w(uint8_t data);
-	void ngp_z80_signal_main_w(uint8_t data);
+	uint8_t z80_comm_r();
+	void z80_comm_w(uint8_t data);
+	void z80_signal_main_w(uint8_t data);
 
-	void ngp_z80_clear_irq(uint8_t data);
+	void z80_clear_irq(uint8_t data);
 
-	void ngp_vblank_pin_w(int state);
-	void ngp_hblank_pin_w(int state);
-	void ngp_tlcs900_porta(offs_t offset, uint8_t data);
-	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
+	void vblank_pin_w(int state);
+	void hblank_pin_w(int state);
+	void tlcs900_porta(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(seconds_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_ngp_cart);
 
-	void ngp_mem(address_map &map);
-	void z80_io(address_map &map);
-	void z80_mem(address_map &map);
-
-	bool m_nvram_loaded = false;
-	required_ioport m_io_controls;
-	required_ioport m_io_power;
-
-	virtual void nvram_default() override;
-	virtual bool nvram_read(util::read_stream &file) override;
-	virtual bool nvram_write(util::write_stream &file) override;
+	void main_mem(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_mem(address_map &map) ATTR_COLD;
 };
 
 
-TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
+TIMER_CALLBACK_MEMBER(ngp_state::seconds_callback)
 {
-	m_io_reg[0x16] += 1;
-	if ((m_io_reg[0x16] & 0x0f) == 0x0a)
-	{
-		m_io_reg[0x16] += 0x06;
-	}
-
-	if (m_io_reg[0x16] >= 0x60)
-	{
-		m_io_reg[0x16] = 0;
-		m_io_reg[0x15] += 1;
-		if ((m_io_reg[0x15] & 0x0f) == 0x0a) {
-			m_io_reg[0x15] += 0x06;
-		}
-
-		if (m_io_reg[0x15] >= 0x60)
-		{
-			m_io_reg[0x15] = 0;
-			m_io_reg[0x14] += 1;
-			if ((m_io_reg[0x14] & 0x0f) == 0x0a) {
-				m_io_reg[0x14] += 0x06;
-			}
-
-			if (m_io_reg[0x14] == 0x24)
-			{
-				m_io_reg[0x14] = 0;
-			}
-		}
-	}
+	advance_seconds();
 }
 
 
-uint8_t ngp_state::ngp_io_r(offs_t offset)
+uint8_t ngp_state::io_r(offs_t offset)
 {
 	uint8_t data = m_io_reg[offset];
 
 	switch (offset)
 	{
-	case 0x30:  /* Read controls */
-		data = m_io_controls->read();
-		break;
+	case 0x11:  // year
+		return convert_to_bcd(get_clock_register(RTC_YEAR) % 100);
+	case 0x12:  // month
+		return convert_to_bcd(get_clock_register(RTC_MONTH));
+	case 0x13:  // day
+		return convert_to_bcd(get_clock_register(RTC_DAY));
+	case 0x14:  // hour
+		return convert_to_bcd(get_clock_register(RTC_HOUR));
+	case 0x15:  // minute
+		return convert_to_bcd(get_clock_register(RTC_MINUTE));
+	case 0x16:  // second
+		return convert_to_bcd(get_clock_register(RTC_SECOND));
+	case 0x30:  // Read controls
+		return m_io_controls->read();
 	case 0x31:
 		data = m_io_power->read() & 0x01;
-		/* Sub-battery OK */
+		// Sub-battery OK
 		data |= 0x02;
 		break;
 	}
@@ -269,56 +260,71 @@ uint8_t ngp_state::ngp_io_r(offs_t offset)
 }
 
 
-void ngp_state::ngp_io_w(offs_t offset, uint8_t data)
+void ngp_state::io_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-	case 0x20:      /* t6w28 "right" */
-	case 0x21:      /* t6w28 "left" */
+	case 0x11:  // year
+		set_clock_register(RTC_YEAR, bcd_to_integer(data));
+		break;
+	case 0x12:  // month
+		set_clock_register(RTC_MONTH, bcd_to_integer(data));
+		break;
+	case 0x13:  // day
+		set_clock_register(RTC_DAY, bcd_to_integer(data));
+		break;
+	case 0x14:  // hour
+		set_clock_register(RTC_HOUR, bcd_to_integer(data));
+		break;
+	case 0x15:  // minute
+		set_clock_register(RTC_MINUTE, bcd_to_integer(data));
+		break;
+	case 0x16:  // second
+		set_clock_register(RTC_SECOND, bcd_to_integer(data));
+		break;
+	case 0x20:  // t6w28 "right"
+	case 0x21:  // t6w28 "left"
 		if (m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA)
-		{
 			m_t6w28->write(0, data);
-		}
 		break;
 
-	case 0x22:      /* DAC right */
+	case 0x22:  // DAC right
 		m_rdac->write(data);
 		break;
-	case 0x23:      /* DAC left */
+	case 0x23:  // DAC left
 		m_ldac->write(data);
 		break;
 
-	/* Internal eeprom related? */
-	case 0x36:
+	case 0x36: // 50 written when system powers down, 05 written when system starts up
 	case 0x37:
 		break;
-	case 0x38:  /* Sound enable/disable. */
+	case 0x38:  // Sound enable/disable.
 		switch (data)
 		{
-		case 0x55:      /* Enabled sound */
+		case 0x55:  // Enabled sound
 			m_t6w28->set_enable(true);
 			break;
-		case 0xAA:      /* Disable sound */
+		case 0xAA:  // Disable sound
 			m_t6w28->set_enable(false);
 			break;
 		}
 		break;
 
-	case 0x39:  /* Z80 enable/disable. */
+	case 0x39:  // Z80 enable/disable.
 		switch (data)
 		{
-		case 0x55:      /* Enable Z80 */
+		case 0x55:  // Enable Z80
 			m_z80->resume(SUSPEND_REASON_HALT);
 			m_z80->reset();
 			m_z80->set_input_line(0, CLEAR_LINE);
 			break;
-		case 0xAA:      /* Disable Z80 */
+		case 0xAA:  // Disable Z80
 			m_z80->suspend(SUSPEND_REASON_HALT, 1);
 			break;
 		}
 		break;
 
-	case 0x3a:  /* Trigger Z80 NMI */
+	case 0x3a:  // Trigger Z80 NMI
 		m_z80->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		break;
 	}
@@ -549,11 +555,11 @@ void ngp_state::flash1_w(offs_t offset, uint8_t data)
 }
 
 
-void ngp_state::ngp_mem(address_map &map)
+void ngp_state::main_mem(address_map &map)
 {
-	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
-	map(0x004000, 0x006fff).ram().share("mainram");                              /* work ram */
-	map(0x007000, 0x007fff).ram().share("share1");                               /* shared with sound cpu */
+	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::io_r), FUNC(ngp_state::io_w));                        /* ngp/c specific i/o */
+	map(0x004000, 0x006fff).ram().share(m_mainram);                              /* work ram */
+	map(0x007000, 0x007fff).ram().share("soundram");                             /* shared with sound cpu */
 	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
 	map(0x200000, 0x3fffff).w(FUNC(ngp_state::flash0_w));   /* cart area #1 */
 	map(0x800000, 0x9fffff).w(FUNC(ngp_state::flash1_w));   /* cart area #2 */
@@ -561,19 +567,19 @@ void ngp_state::ngp_mem(address_map &map)
 }
 
 
-uint8_t ngp_state::ngp_z80_comm_r()
+uint8_t ngp_state::z80_comm_r()
 {
 	return m_io_reg[0x3c];
 }
 
 
-void ngp_state::ngp_z80_comm_w(uint8_t data)
+void ngp_state::z80_comm_w(uint8_t data)
 {
 	m_io_reg[0x3c] = data;
 }
 
 
-void ngp_state::ngp_z80_signal_main_w(uint8_t data)
+void ngp_state::z80_signal_main_w(uint8_t data)
 {
 	m_maincpu->set_input_line(TLCS900_INT5, ASSERT_LINE);
 }
@@ -581,14 +587,14 @@ void ngp_state::ngp_z80_signal_main_w(uint8_t data)
 
 void ngp_state::z80_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().share("share1");                       /* shared with tlcs900 */
+	map(0x0000, 0x0fff).ram().share("soundram");                    /* shared with tlcs900 */
 	map(0x4000, 0x4001).w(m_t6w28, FUNC(t6w28_device::write));      /* sound chip (right, left) */
-	map(0x8000, 0x8000).rw(FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
-	map(0xc000, 0xc000).w(FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
+	map(0x8000, 0x8000).rw(FUNC(ngp_state::z80_comm_r), FUNC(ngp_state::z80_comm_w));  /* main-sound communication */
+	map(0xc000, 0xc000).w(FUNC(ngp_state::z80_signal_main_w));               /* signal irq to main cpu */
 }
 
 
-void ngp_state::ngp_z80_clear_irq(uint8_t data)
+void ngp_state::z80_clear_irq(uint8_t data)
 {
 	m_z80->set_input_line(0, CLEAR_LINE);
 
@@ -599,16 +605,14 @@ void ngp_state::ngp_z80_clear_irq(uint8_t data)
 
 void ngp_state::z80_io(address_map &map)
 {
-	map(0x0000, 0xffff).w(FUNC(ngp_state::ngp_z80_clear_irq));
+	map(0x0000, 0xffff).w(FUNC(ngp_state::z80_clear_irq));
 }
 
 
 INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
-	if (m_io_reg[0x33] & 0x04)
-	{
-		m_maincpu->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	}
+	if (BIT(m_io_reg[0x33], 2))
+		m_maincpu->set_input_line(TLCS900_NMI, (BIT(m_io_power->read(), 0) ? CLEAR_LINE : ASSERT_LINE));
 }
 
 
@@ -624,26 +628,27 @@ static INPUT_PORTS_START(ngp)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("Power")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, ngp_state, power_callback, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_ON) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ngp_state::power_callback), 0)
 INPUT_PORTS_END
 
 
-void ngp_state::ngp_vblank_pin_w(int state)
+void ngp_state::vblank_pin_w(int state)
 {
 	m_maincpu->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void ngp_state::ngp_hblank_pin_w(int state)
+void ngp_state::hblank_pin_w(int state)
 {
 	m_maincpu->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-void ngp_state::ngp_tlcs900_porta(offs_t offset, uint8_t data)
+void ngp_state::tlcs900_porta(offs_t offset, uint8_t data)
 {
 	int to3 = BIT(data,3);
-	if (to3 && ! m_old_to3)
+
+	if (to3 && !m_old_to3)
 		m_z80->set_input_line(0, ASSERT_LINE);
 
 	m_old_to3 = to3;
@@ -702,7 +707,7 @@ void ngp_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).unmap_read(0x800000, 0x9fffff);
 	}
 
-	m_seconds_timer = timer_alloc(FUNC(ngp_state::ngp_seconds_callback), this);
+	m_seconds_timer = timer_alloc(FUNC(ngp_state::seconds_callback), this);
 	m_seconds_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	save_item(NAME(m_io_reg));
@@ -737,13 +742,6 @@ void ngp_state::machine_reset()
 }
 
 
-uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_k1ge->update(bitmap, cliprect);
-	return 0;
-}
-
-
 DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
@@ -758,7 +756,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 	//printf("%2x%2x - %x - %x\n", (unsigned int) memregion("cart")->u8(0x20), (unsigned int) memregion("cart")->u8(0x21),
 	//        (unsigned int) memregion("cart")->u8(0x22), (unsigned int) memregion("cart")->u8(0x23));
 	m_flash_chip[0].manufacturer_id = 0x98;
-	m_flash_chip[0].present = 1;
+	m_flash_chip[0].present = true;
 	m_flash_chip[0].state = F_READ;
 
 	switch (size)
@@ -780,7 +778,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 	{
 		m_flash_chip[1].manufacturer_id = 0x98;
 		m_flash_chip[1].device_id = 0x2f;
-		m_flash_chip[1].present = 1;
+		m_flash_chip[1].present = true;
 		m_flash_chip[1].state = F_READ;
 	}
 
@@ -790,10 +788,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
 
 DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state::unload_ngp_cart)
 {
-	m_flash_chip[0].present = 0;
+	m_flash_chip[0].present = false;
 	m_flash_chip[0].state = F_READ;
 
-	m_flash_chip[1].present = 0;
+	m_flash_chip[1].present = false;
 	m_flash_chip[1].state = F_READ;
 }
 
@@ -805,9 +803,20 @@ void ngp_state::nvram_default()
 
 bool ngp_state::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (!file.read(m_mainram, 0x3000, actual) && actual == 0x3000)
+	u8 data[0x3000 + 0x20];
+
+	auto const [err, actual] = read(file, data, 0x3000 + 0x20);
+	if (!err && (actual == 0x3000 + 0x20))
 	{
+		for (int i = 0; i < 0x3000; i++)
+			m_mainram[i] = data[i];
+		for (int i = 0; i < 0x20; i++)
+			m_io_reg[i] = data[0x3000 + i];
+
+		system_time curtime;
+		machine().current_datetime(curtime);
+		set_current_time(curtime);
+
 		m_nvram_loaded = true;
 		return true;
 	}
@@ -817,8 +826,26 @@ bool ngp_state::nvram_read(util::read_stream &file)
 
 bool ngp_state::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_mainram, 0x3000, actual) && actual == 0x3000;
+	u8 data[0x3000 + 0x20];
+
+	for (int i = 0; i < 0x3000; i++)
+		data[i] = m_mainram[i];
+	for (int i = 0; i < 0x20; i++)
+		data[0x3000 + i] = m_io_reg[i];
+
+	auto const [err, actual] = write(file, data, 0x3000 + 0x20);
+	return !err;
+}
+
+
+void ngp_state::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_io_reg[0x16] = convert_to_bcd(second);
+	m_io_reg[0x15] = convert_to_bcd(minute);
+	m_io_reg[0x14] = convert_to_bcd(hour);
+	m_io_reg[0x13] = convert_to_bcd(day);
+	m_io_reg[0x12] = convert_to_bcd(month);
+	m_io_reg[0x11] = convert_to_bcd(year % 100);
 }
 
 
@@ -826,28 +853,26 @@ void ngp_state::ngp_common(machine_config &config)
 {
 	TMP95C061(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_am8_16(1);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::ngp_mem);
-	m_maincpu->porta_write().set(FUNC(ngp_state::ngp_tlcs900_porta));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::main_mem);
+	m_maincpu->porta_write().set(FUNC(ngp_state::tlcs900_porta));
 	m_maincpu->an_read<0>().set_constant(0x3ff); // main battery power
 
 	z80_device &soundcpu(Z80(config, "soundcpu", 6.144_MHz_XTAL/2));
 	soundcpu.set_addrmap(AS_PROGRAM, &ngp_state::z80_mem);
 	soundcpu.set_addrmap(AS_IO, &ngp_state::z80_io);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_raw(6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152);
-	screen.set_screen_update(FUNC(ngp_state::screen_update_ngp));
+	SCREEN(config, m_screen).set_lcd();
+	m_screen->set_raw(6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	T6W28(config, m_t6w28, 6.144_MHz_XTAL/2);
-	m_t6w28->add_route(0, "lspeaker", 0.50);
-	m_t6w28->add_route(1, "rspeaker", 0.50);
+	m_t6w28->add_route(0, "speaker", 0.50, 0);
+	m_t6w28->add_route(1, "speaker", 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 
@@ -855,17 +880,17 @@ void ngp_state::ngp(machine_config &config)
 {
 	ngp_common(config);
 
-	K1GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
-	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
-	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
+	K1GE(config, m_k1ge, 6.144_MHz_XTAL, m_screen);
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::hblank_pin_w));
 
-	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
+	m_screen->set_screen_update(m_k1ge, FUNC(k1ge_device::screen_update));
+	m_screen->set_palette(m_k1ge);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
 	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
 	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
-	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngp");
 	SOFTWARE_LIST(config, "ngpc_list").set_compatible("ngpc");
 }
@@ -874,17 +899,17 @@ void ngp_state::ngp(machine_config &config)
 void ngp_state::ngpc(machine_config &config)
 {
 	ngp_common(config);
-	K2GE(config, m_k1ge, 6.144_MHz_XTAL, "screen");
-	m_k1ge->vblank_callback().set(FUNC(ngp_state::ngp_vblank_pin_w));
-	m_k1ge->hblank_callback().set(FUNC(ngp_state::ngp_hblank_pin_w));
+	K2GE(config, m_k1ge, 6.144_MHz_XTAL, m_screen);
+	m_k1ge->vblank_callback().set(FUNC(ngp_state::vblank_pin_w));
+	m_k1ge->hblank_callback().set(FUNC(ngp_state::hblank_pin_w));
 
-	subdevice<screen_device>("screen")->set_palette("k1ge:palette");
+	m_screen->set_screen_update(m_k1ge, FUNC(k1ge_device::screen_update));
+	m_screen->set_palette(m_k1ge);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
 	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
 	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
-	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ngpc");
 	SOFTWARE_LIST(config, "ngp_list").set_compatible("ngp");
 }

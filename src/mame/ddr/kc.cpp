@@ -177,7 +177,7 @@ void kc_state::kc85_base(machine_config &config, uint32_t clock)
 	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
 	m_screen->set_palette("palette");
 	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
@@ -189,12 +189,11 @@ void kc_state::kc85_base(machine_config &config, uint32_t clock)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER(config, "outl").front_left();
-	SPEAKER(config, "outr").front_right();
+	SPEAKER(config, "out", 2).front();
 	SPEAKER_SOUND(config, m_dac);
 	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
-	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
-	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
+	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "out", 0.25, 0);
+	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "out", 0.25, 1);
 
 	kc85_slots(config);
 }

@@ -45,7 +45,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t truesys_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -89,7 +89,7 @@ void truesys_state::unkts(machine_config &config)
 	// PIC16F874. TODO: not emulated
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: all wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
@@ -115,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, unkts, 0, unkts, unkts, truesys_state, empty_init, ROT0, "<unknown>", "unknown game on TrueSys hardware", MACHINE_IS_SKELETON )
+GAME( 200?, unkts, 0, unkts, unkts, truesys_state, empty_init, ROT0, "<unknown>", "unknown game on TrueSys hardware", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

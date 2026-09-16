@@ -8,6 +8,7 @@
 #include "taito68705.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
@@ -33,12 +34,13 @@ public:
 		, m_muxports(*this, "P%u", 1)
 		, m_maincpu(*this, "maincpu")
 		, m_mcuintf(*this, "mcu")
+		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
+	ioport_value arkanoid_semaphore_input_r();
 	void init_block2();
 	void init_arkblock();
 	void init_hexa();
@@ -51,7 +53,7 @@ public:
 	void init_arkbloc2();
 	void init_arkangc();
 	void init_brixian();
-	void arkanoid_bootleg_init(  );
+	void arkanoid_bootleg_init();
 
 	void bootleg(machine_config &config);
 	void p3mcuay(machine_config &config);
@@ -61,6 +63,7 @@ public:
 	void hexaa(machine_config &config);
 	void p3mcu(machine_config &config);
 	void arkanoid(machine_config &config);
+	void cruisin5(machine_config &config);
 
 private:
 	/* memory pointers */
@@ -88,6 +91,7 @@ private:
 	optional_ioport_array<2> m_muxports;
 	required_device<cpu_device> m_maincpu;
 	optional_device<arkanoid_mcu_device_base> m_mcuintf;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -106,19 +110,19 @@ private:
 	uint8_t hexaa_sub_90_r();
 	uint8_t input_mux_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void arkanoid_map(address_map &map);
-	void bootleg_map(address_map &map);
-	void brixian_map(address_map &map);
-	void hexa_map(address_map &map);
-	void hexaa_map(address_map &map);
-	void hexaa_sub_iomap(address_map &map);
-	void hexaa_sub_map(address_map &map);
+	void arkanoid_map(address_map &map) ATTR_COLD;
+	void bootleg_map(address_map &map) ATTR_COLD;
+	void brixian_map(address_map &map) ATTR_COLD;
+	void hexa_map(address_map &map) ATTR_COLD;
+	void hexaa_map(address_map &map) ATTR_COLD;
+	void hexaa_sub_iomap(address_map &map) ATTR_COLD;
+	void hexaa_sub_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_ARKANOID_H

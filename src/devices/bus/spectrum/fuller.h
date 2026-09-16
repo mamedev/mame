@@ -31,11 +31,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
@@ -47,7 +47,7 @@ protected:
 	virtual void post_data_fetch(offs_t offset) override { m_exp->post_data_fetch(offset); }
 	virtual uint8_t mreq_r(offs_t offset) override { return m_exp->romcs() ? m_exp->mreq_r(offset) : 0xff; }
 	virtual void mreq_w(offs_t offset, uint8_t data) override { if (m_exp->romcs()) m_exp->mreq_w(offset, data); }
-	virtual int romcs() override { return m_exp->romcs(); }
+	virtual bool romcs() override { return m_exp->romcs(); }
 
 private:
 	required_device<spectrum_expansion_slot_device> m_exp;

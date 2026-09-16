@@ -6,8 +6,8 @@
     Supports 5 different modelines at up to 16bpp
 
 *********************************************************************/
-#ifndef MAME_MACHINE_MAC_VIDEO_SONORA_H
-#define MAME_MACHINE_MAC_VIDEO_SONORA_H
+#ifndef MAME_MACHINE_MV_SONORA_H
+#define MAME_MACHINE_MV_SONORA_H
 
 #pragma once
 
@@ -33,12 +33,14 @@ public:
 	void set_vram_base(const uint64_t *vram) { m_vram = vram; }
 	void set_vram_offset(uint32_t offset) { m_vram_offset = offset; }
 	void set_32bit() { m_is32bit = true; }
+	void set_PDM() { m_isPDM = true; }
+	void set_pixel_clock(uint32_t pclk) { m_extPixelClock = pclk; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	struct modeline {
@@ -48,6 +50,7 @@ private:
 		uint32_t htot, hfp, hs, hbp;
 		uint32_t vtot, vfp, vs, vbp;
 		bool supports_16bpp;
+		bool monochrome;
 	};
 
 	static const modeline modelines[5];
@@ -58,10 +61,11 @@ private:
 	devcb_write_line m_screen_vblank;
 
 	const uint64_t *m_vram;
-	uint32_t m_vram_offset;
+	uint32_t m_vram_offset, m_extPixelClock;
 	uint8_t m_mode, m_depth, m_monitor_id, m_vtest;
 	uint8_t m_pal_address, m_pal_idx, m_pal_control, m_pal_colkey;
 	int m_modeline_id;
+	bool m_isPDM;
 	bool m_is32bit;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -69,4 +73,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MAC_VIDEO_SONORA, mac_video_sonora_device)
 
-#endif  /* MAME_MACHINE_MAC_VIDEO_SONORA_H */
+#endif // MAME_MACHINE_MV_SONORA_H

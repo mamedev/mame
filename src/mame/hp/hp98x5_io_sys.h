@@ -17,11 +17,11 @@ class hp98x5_io_sys_device : public device_t
 {
 public:
 	// construction/destruction
-	hp98x5_io_sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp98x5_io_sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	auto irl() { return m_irl_handler.bind(); }
 	auto irh() { return m_irh_handler.bind(); }

@@ -13,58 +13,61 @@ Guru Readme for Namco System 10 Hardware
 Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
 
 This document covers all the known Namco System 10 games, including....
-*Aim For Cash (AFC2 Ver.A)                                       (C) Namco, 2004
-Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)    (C) Namco, 2005
-*Dice ROM                                                        (C) Namco, 2004
-*Dokidoki! Flower                                                (C) Namco, 2004
-***Drum Master                                                   (C) Namco, 2001
-***Drum Master 2                                                 (C) Namco, 2001
-***Drum Master 3                                                 (C) Namco, 2002
-***Drum Master 4                                                 (C) Namco, 2003
-***Drum Master 5                                                 (C) Namco, 2003
-***Drum Master 6                                                 (C) Namco, 2004
-GAHAHA Ippatsu-dou (GID2 Ver.A)                                  (C) Namco/Metro, 2000
-GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                (C) Namco/Metro, 2001
-Gamshara (10021 Ver.A)                                           (C) Mitchell, 2003
-Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A) (C) Namco, 2007
-GekiToride-Jong Space (10011 Ver.A)                              (C) Namco/Metro, 2001
-Golgo 13 Juusei no Requiem (GLT1 Ver.A)                          (C) Namco/8ing/Raizing, 2001
-Gunbalina (GNN1 Ver. A)                                          (C) Namco, 2000
-*Hard Puncher Hajime no Ippo: The Fighting                       (C) Namco/Taito, 2001
-*Hard Puncher Hajime no Ippo 2: The Fighting Round 2 (VER.2.00J) (C) Namco/Taito, 2002
-*Honne Hakkenki                                                  (C) Namco, 2001
-Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)  (C) Namco, 2006
-**Knock Down 2001 / KO2001 (KD11 Ver.B)                          (C) Namco, 2001
-Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)   (C) Mitchell 2003
-Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                         (C) Namco, 2001
-Medal no Tatsujin ((MTL1 SPR0B)                                  (C) Namco, 2005
-Medal no Tatsujin 2 (MTA1001 STMPR0A)                            (C) Namco, 2007
-Mr Driller 2 (DR21 Ver.A)                                        (C) Namco, 2000
-Mr Driller 2 (DR22 Ver.A)                                        (C) Namco, 2000
-Mr Driller 2 (DR23 Ver.A)                                        (C) Namco, 2000
-Mr Driller G (DRG1 Ver.A)                                        (C) Namco, 2001
-NFL Classic Football (NCF3 Ver.A)                                (C) Namco, 2003
-Pacman Ball (PMB2 Ver.A)                                         (C) Namco, 2003
-Panikuru Panekuru (PPA1 Ver.A)                                   (C) Namco, 2001
-*Peter The Shepherd                                              (C) Namco, 2003
-*Photo Battle (PBT1 Ver.B)                                       (C) Namco, 2001
-Point Blank 3 (GNN2 Ver. A)                                      (C) Namco, 2000
-Puzz Ball (PZB1 Ver. A)                                          (C) Namco, 2002
-*Puzz Cube                                                       (C) Namco, 2005
-Seishun-Quiz Colorful High School (CHS1 Ver.A)                   (C) Namco, 2002
-Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                          (C) Namco, 2004
-*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                        (C) Kato/Konami, 2003
-*Slot no Oujisama / Slot Prince (SLO1 Ver.A),(SLO1 Ver.B)        (C) Namco, 2002
-Star Trigon (STT1 Ver.A)                                         (C) Namco, 2002
-Sugorotic Japan (STJ1 Ver.C)                                     (C) Namco, 2002
-*Taiko no Tatsujin  (with CDROM?)                                (C) Namco, 2001
-Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)           (C) Namco, 2001
-Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)           (C) Namco, 2002
-Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                    (C) Namco, 2003
-Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                    (C) Namco, 2003
-Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                    (C) Namco, 2004
-Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                  (C) Namco/Metro, 2002
-Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)               (C) Namco, 2002
+*Aim For Cash (AFC2 Ver.A)                                                    (C) Namco, 2004
+Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)                 (C) Namco, 2005
+*Dice ROM                                                                     (C) Namco, 2004
+***Drum Master                                                                (C) Namco, 2001
+***Drum Master 2                                                              (C) Namco, 2001
+***Drum Master 3                                                              (C) Namco, 2002
+***Drum Master 4                                                              (C) Namco, 2003
+***Drum Master 5                                                              (C) Namco, 2003
+***Drum Master 6                                                              (C) Namco, 2004
+GAHAHA Ippatsu-dou (GID2 Ver.A)                                               (C) Namco/Metro, 2000
+GAHAHA Ippatsu-dou 2 (GIS1 Ver.A)                                             (C) Namco/Metro, 2001
+Gamshara (10021 Ver.A)                                                        (C) Mitchell, 2003
+Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)              (C) Namco, 2007
+GekiToride-Jong Space (10011 Ver.A)                                           (C) Namco/Metro, 2001
+Golgo 13 Juusei no Requiem (GLT1 Ver.A)                                       (C) Namco/8ing/Raizing, 2001
+Gunbalina (GNN1 Ver. A)                                                       (C) Namco, 2000
+Hard Puncher Hajime no Ippo: The Fighting (VER.2.02J)                         (C) Namco/Taito, 2001
+Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J) (C) Namco/Taito, 2002
+*Honne Hakkenki                                                               (C) Namco, 2001
+Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)               (C) Namco, 2006
+Knock Down 2001 / KO2001 (KD11 Ver.B)                                         (C) Namco, 2001
+Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)                (C) Mitchell 2003
+Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                                      (C) Namco, 2001
+Medal no Tatsujin (MTL1 SPR0B)                                                (C) Namco, 2005
+Medal no Tatsujin 2 (MTA1001 STMPR0A)                                         (C) Namco, 2007
+Mr Driller 2 (DR21 Ver.A)                                                     (C) Namco, 2000
+Mr Driller 2 (DR22 Ver.A)                                                     (C) Namco, 2000
+Mr Driller 2 (DR23 Ver.A)                                                     (C) Namco, 2000
+Mr Driller G (DRG1 Ver.A)                                                     (C) Namco, 2001
+NFL Classic Football (NCF3 Ver.A)                                             (C) Namco, 2003
+Pacman Ball (PMB2 Ver.A)                                                      (C) Namco, 2003
+Panikuru Panekuru (PPA1 Ver.A)                                                (C) Namco, 2001
+*Peter The Shepherd                                                           (C) Namco, 2003
+*Photo Battle (PBT1 Ver.B)                                                    (C) Namco, 2001
+Point Blank 3 (GNN2 Ver. A)                                                   (C) Namco, 2000
+Puzz Ball (PZB1 Ver. A)                                                       (C) Namco, 2002
+Puzz Ball (PZB1 Ver. C)                                                       (C) Namco, 2002
+*Puzz Cube                                                                    (C) Namco, 2005
+Seishun-Quiz Colorful High School (CHS1 Ver.A)                                (C) Namco, 2002
+Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                                       (C) Namco, 2004
+*Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                     (C) Kato/Konami, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                   (C) Namco, 2003
+Slot no Oujisama / Slot Prince (SLO1 Ver.B)                                   (C) Namco, 2003
+Star Trigon (STT1 Ver.A)                                                      (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.A)                                                  (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.B)                                                  (C) Namco, 2002
+Sugorotic JAPAN (STJ1 Ver.C)                                                  (C) Namco, 2002
+*Taiko no Tatsujin  (with CDROM?)                                             (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C & CDROM NM-002 TK21-A)                        (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A & CDROM NM-003 TK31-A)                        (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A & CDROM TK-4)                                 (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A & CDROM TK-5)                                 (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A & CDROM TK-6)                                 (C) Namco, 2004
+Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)                               (C) Namco/Metro, 2002
+Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A)                            (C) Namco, 2002
 
 * - denotes not dumped yet. If a game code is listed a PCB has been seen.
 ** - denotes incomplete dump due to damaged ROMs. A redump is required.
@@ -299,6 +302,7 @@ Knock Down 2001                                     KD11  Ver.B   KC011A   8E, 8
 Kono e Tako                                         10021 Ver.A   KC034A   8E, 8D               N/A           RAN Ver.A in test mode, all seem to be re-programmed Gamshara PCB
 Kotoba no Puzzle Mojipittan                         KPM1  Ver.A   KC012A   8E, 8D, 7E           N/A           also has a Namco System10 EXIO 8906960602 (8906970602) PCB
 Medal no Tatsujin                                   MTL1  SPR0B   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
+Medal no Tatsujin                                   MTL1  SPR0A   KC043A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
 Medal no Tatsujin 2                                 MTA1  STMPR0A KC048A   8E, 8D               N/A           also has a Namco System10 EXFINAL PCB 8906962603 (8906962703)
 Mr Driller G                                        DRG1  Ver.A   KC007A   8E, 8D, 7E           N/A           I/O board = none
 NFL Classic Football                                NCF3  Ver.A   KC027A   8E, 8D, 7E, 7D       N/A           also has a Namco System10 EXIO PCB
@@ -306,9 +310,14 @@ Pacman Ball                                         PMB2  Ver.A   KC026A   8E, 8
 Panikuru Panekuru                                   PPA1  Ver.A   KC017A   8E, 8D, 7E           N/A           I/O board = none
 Point Blank 3                                       GNN2  Ver.A   KC002A   8E, 8D               N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
 Puzz Ball                                           PZB1  Ver.A   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Puzz Ball                                           PZB1  Ver.C   KC013A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Sekai Kaseki Hakken                                 SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
+Slot no Oujisama/Slot Prince                        SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Slot no Oujisama/Slot Prince                        SLO1  Ver.A   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Star Trigon                                         STT1  Ver.A   KC019A   8E, 8D               N/A           I/O board = none
-Sugorotic Japan                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Sugorotic JAPAN                                     STJ1  Ver.C   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Sugorotic JAPAN                                     STJ1  Ver.B   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
+Sugorotic JAPAN                                     STJ1  Ver.A   KC014A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 Taiko no Tatsujin 2                                 TK21  Ver.C   KC010A   8E, 8D, 7E           NM-002        KEYCUS is marked KC007A, KC010A is a sticker on top. I/O board = ?. For all TK* games see note 2 and 3
 Taiko no Tatsujin 3                                 TK31  Ver.A   KC016A   8E, 8D, 7E           NM-003        I/O board = ?
 Taiko no Tatsujin 4                                 TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4          also has a fully populated Namco System10 EXIO 8906961602 (8906970602) PCB
@@ -319,7 +328,6 @@ Utyuu Daisakusen Chocovader Contactee               CVC1  Ver.A   KC022A   8E, 8
 Other games verified to use this PCB but NOT DUMPED (move into list above when dumped)
 Shamisen Brothers                                   KT-SB2Ver.A   KC038A   8E                   not dumped    I/O board = none
 Photo Battle                                        PBT1  Ver.B   KC006A   1D-8E (16)           N/A           also has a Namco System10 EXIO(G) 8906961602 (8906970602) PCB. TMP95C061 and RAM not populated
-Slot no Oujisama/Slot Prince (Ver.A & Ver.B seen)   SLO1  Ver.B   KC023A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB
 
       Notes:
       1. The ROM PCB has locations for 16x 128Mbit FlashROMs (Total capacity = 2048Mbits) but usually only a few are populated.
@@ -436,8 +444,10 @@ Notes:
                CN2 - 10-pin connector for controls
 
 This PCB is used on..
-Hajime no Ippo Hard Puncher   - CPLD marked F06-01. I/O board = none
-Hajime no Ippo Hard Puncher 2 - sticker HAZIMENO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-03. I/O board = none
+Hajime no Ippo Hard Puncher   - sticker HAZIME NO IPPO K91J0873A, HAZIME NO IPPO VER.2.02J. CPLD marked F06-01. I/O board = none
+Hajime no Ippo Hard Puncher 2 - sticker HAZIME NO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-03. I/O board = unknown sensor board
+
+Notes: There is a hidden "MEM(N)DATA CHECK SUM DISP" menu available in ippo2 that can be accessed by holding Speed Sensor Up + Start + Select during boot.
 
 
 Expansion Daughterboards
@@ -667,6 +677,8 @@ User data note:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -676,6 +688,11 @@ public:
 	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_gpu(*this, "gpu")
+		, m_spu(*this, "spu")
+		, m_ram(*this, "ram")
+		, m_gpu_ram(*this, "gpu_ram")
+		, m_spu_ram(*this, "spu_ram")
 		, m_decrypter(*this, "decrypter")
 		, m_ata(*this, "ata")
 		, m_io_update_interrupt(*this)
@@ -693,25 +710,29 @@ public:
 protected:
 	using unscramble_func = uint16_t (*)(uint16_t);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_resolve_objects() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void namcos10_base(machine_config &config);
-	void namcos10_exio(machine_config &config);
-	void namcos10_mgexio(machine_config &config);
-	void namcos10_exfinalio(machine_config &config);
+	void namcos10_base(machine_config &config) ATTR_COLD;
+	void namcos10_exio(machine_config &config) ATTR_COLD;
+	void namcos10_mgexio(machine_config &config) ATTR_COLD;
+	void namcos10_exfinalio(machine_config &config) ATTR_COLD;
 
-	void namcos10_map_inner(address_map &map);
-	void namcos10_map(address_map &map);
+	void namcos10_map_inner(address_map &map) ATTR_COLD;
+	void namcos10_map(address_map &map) ATTR_COLD;
 
-	void namcos10_map_exio_inner(address_map &map);
-	void namcos10_map_exio(address_map &map);
+	void namcos10_map_exio_inner(address_map &map) ATTR_COLD;
+	void namcos10_map_exio(address_map &map) ATTR_COLD;
 
-	void namcos10_map_mgexio_inner(address_map &map);
-	void namcos10_map_mgexio(address_map &map);
+	void namcos10_map_mgexio_inner(address_map &map) ATTR_COLD;
+	void namcos10_map_mgexio(address_map &map) ATTR_COLD;
 
 	required_device<psxcpu_device> m_maincpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	optional_device<ns10_decrypter_device> m_decrypter;
 
 	unscramble_func m_unscrambler;
@@ -792,21 +813,21 @@ public:
 		, m_nand(*this, "nand")
 	{ }
 
-	void ns10_mrdrilr2(machine_config &config);
+	void ns10_mrdrilr2(machine_config &config) ATTR_COLD;
 
-	void init_mrdrilr2();
+	void init_mrdrilr2() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void namcos10_memm(machine_config &config);
+	void namcos10_memm(machine_config &config) ATTR_COLD;
 
-	void namcos10_memm_map_inner(address_map &map);
-	void namcos10_memm_map(address_map &map);
+	void namcos10_memm_map_inner(address_map &map) ATTR_COLD;
+	void namcos10_memm_map(address_map &map) ATTR_COLD;
 
-	void memm_driver_init();
+	void memm_driver_init() ATTR_COLD;
 
 	void crypto_switch_w(uint16_t data);
 	uint16_t range_r(offs_t offset);
@@ -828,56 +849,63 @@ public:
 	namcos10_memn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_state(mconfig, type, tag)
 		, m_nand(*this, "nand%u", 0U)
+		, m_data_xor(0xaaaa)
 	{ }
 
-	void ns10_ballpom(machine_config &config);
-	void ns10_chocovdr(machine_config &config);
-	void ns10_gahaha(machine_config &config);
-	void ns10_gahaha2(machine_config &config);
-	void ns10_gamshara(machine_config &config);
-	void ns10_gegemdb(machine_config &config);
-	void ns10_gjspace(machine_config &config);
-	void ns10_kd2001(machine_config &config);
-	void ns10_keroro(machine_config &config);
-	void ns10_knpuzzle(machine_config &config);
-	void ns10_konotako(machine_config &config);
-	void ns10_medalnt(machine_config &config);
-	void ns10_medalnt2(machine_config &config);
-	void ns10_mrdrilrg(machine_config &config);
-	void ns10_nflclsfb(machine_config &config);
-	void ns10_pacmball(machine_config &config);
-	void ns10_panikuru(machine_config &config);
-	void ns10_ptblank3(machine_config &config);
-	void ns10_puzzball(machine_config &config);
-	void ns10_sekaikh(machine_config &config);
-	void ns10_startrgn(machine_config &config);
-	void ns10_sugorotic(machine_config &config);
-	void ns10_taiko2(machine_config &config);
-	void ns10_taiko3(machine_config &config);
-	void ns10_taiko4(machine_config &config);
-	void ns10_taiko5(machine_config &config);
-	void ns10_taiko6(machine_config &config);
-	void ns10_taikort(machine_config &config);
+	void ns10_ballpom(machine_config &config) ATTR_COLD;
+	void ns10_chocovdr(machine_config &config) ATTR_COLD;
+	void ns10_gahaha(machine_config &config) ATTR_COLD;
+	void ns10_gahaha2(machine_config &config) ATTR_COLD;
+	void ns10_gamshara(machine_config &config) ATTR_COLD;
+	void ns10_gegemdb(machine_config &config) ATTR_COLD;
+	void ns10_gjspace(machine_config &config) ATTR_COLD;
+	void ns10_kd2001(machine_config &config) ATTR_COLD;
+	void ns10_keroro(machine_config &config) ATTR_COLD;
+	void ns10_knpuzzle(machine_config &config) ATTR_COLD;
+	void ns10_konotako(machine_config &config) ATTR_COLD;
+	void ns10_medalnt(machine_config &config) ATTR_COLD;
+	void ns10_medalnt2(machine_config &config) ATTR_COLD;
+	void ns10_mrdrilrg(machine_config &config) ATTR_COLD;
+	void ns10_nflclsfb(machine_config &config) ATTR_COLD;
+	void ns10_pacmball(machine_config &config) ATTR_COLD;
+	void ns10_panikuru(machine_config &config) ATTR_COLD;
+	void ns10_ptblank3(machine_config &config) ATTR_COLD;
+	void ns10_puzzball(machine_config &config) ATTR_COLD;
+	void ns10_sekaikh(machine_config &config) ATTR_COLD;
+	void ns10_slotouji(machine_config &config) ATTR_COLD;
+	void ns10_startrgn(machine_config &config) ATTR_COLD;
+	void ns10_sugorotic(machine_config &config) ATTR_COLD;
+	void ns10_taiko2(machine_config &config) ATTR_COLD;
+	void ns10_taiko3(machine_config &config) ATTR_COLD;
+	void ns10_taiko4(machine_config &config) ATTR_COLD;
+	void ns10_taiko5(machine_config &config) ATTR_COLD;
+	void ns10_taiko6(machine_config &config) ATTR_COLD;
+	void ns10_taikort(machine_config &config) ATTR_COLD;
 
-	void memn_driver_init();
+	void memn_driver_init() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void namcos10_memn_base(machine_config &config);
-	void namcos10_memn(machine_config &config);
+	void namcos10_memn_base(machine_config &config) ATTR_COLD;
+	void namcos10_memn(machine_config &config) ATTR_COLD;
 
-	void namcos10_memn_map(address_map &map);
+	void namcos10_memn_map(address_map &map) ATTR_COLD;
 
-	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
-	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
+	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count) ATTR_COLD;
+	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count) ATTR_COLD;
 
 	void pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 
+	optional_device_array<nand_device, 16> m_nand;
+
+	uint16_t m_data_xor;
+	uint8_t m_nand_rnb_state[16];
+
 private:
-	void namcos10_memn_map_inner(address_map &map);
+	void namcos10_memn_map_inner(address_map &map) ATTR_COLD;
 
 	void nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t address, int len);
 
@@ -894,11 +922,8 @@ private:
 	void nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void nand_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	optional_device_array<nand_device, 16> m_nand;
-
 	uint32_t m_ctrl_reg;
 	uint32_t m_nand_device_idx;
-	uint8_t m_nand_rnb_state[16];
 	uint32_t m_nand_address;
 };
 
@@ -907,27 +932,26 @@ class namcos10_memp3_state : public namcos10_memn_state
 public:
 	namcos10_memp3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: namcos10_memn_state(mconfig, type, tag)
-		, m_ram(*this, "maincpu:ram")
 		, m_memp3_mcu(*this, "memp3_mcu")
 		, m_lc82310(*this, "mp3_decoder")
 		, m_mcu_ram(*this, "mcu_ram")
 		, m_p3_analog(*this, "P3_ANALOG%u", 1U)
 	{ }
 
-	void ns10_g13jnr(machine_config &config);
-	void ns10_nicetsuk(machine_config &config);
-	void ns10_squizchs(machine_config &config);
+	void ns10_g13jnr(machine_config &config) ATTR_COLD;
+	void ns10_nicetsuk(machine_config &config) ATTR_COLD;
+	void ns10_squizchs(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void namcos10_memp3_base(machine_config &config);
 
-	void namcos10_memp3_map_inner(address_map &map);
-	void namcos10_memp3_map(address_map &map);
-	void mcu_map(address_map &map);
+	void namcos10_memp3_map_inner(address_map &map) ATTR_COLD;
+	void namcos10_memp3_map(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
 
 	template <int Port> uint8_t port_read(offs_t offset);
 	template <int Port> void port_write(offs_t offset, uint8_t data);
@@ -964,7 +988,6 @@ private:
 
 	void mp3_data_w(uint16_t data);
 
-	required_device<ram_device> m_ram;
 	required_device<tmp95c061_device> m_memp3_mcu;
 	required_device<lc82310_device> m_lc82310;
 	required_shared_ptr<uint16_t> m_mcu_ram;
@@ -978,6 +1001,31 @@ private:
 	uint8_t m_mp3_porta_data;
 	bool m_mp3_stream_available;
 	bool m_mp3_received_byte;
+};
+
+class namcos10_memio_state : public namcos10_memn_state
+{
+public:
+	namcos10_memio_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcos10_memn_state(mconfig, type, tag)
+	{
+		m_data_xor = 0x5300; // TODO: does the default value change depending on the game?
+	}
+
+	void ns10_ippo(machine_config &config) ATTR_COLD;
+	void ns10_ippo2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void namcos10_memio_base(machine_config &config) ATTR_COLD;
+	void namcos10_memio_map(address_map &map) ATTR_COLD;
+	void namcos10_memio_map_inner(address_map &map) ATTR_COLD;
+
+	void namcos10_nand_tc58256aft(machine_config &config, int nand_count) ATTR_COLD;
+
+	void nand_dataxor_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1038,11 +1086,6 @@ void namcos10_state::machine_reset()
 	std::fill(std::begin(m_mgexio_coin_start_time), std::end(m_mgexio_coin_start_time), attotime::never);
 }
 
-void namcos10_state::device_resolve_objects()
-{
-	m_mgexio_outputs.resolve();
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 {
 	m_int |= 8; // I/O interrupt
@@ -1054,25 +1097,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos10_state::io_update_interrupt_callback)
 void namcos10_state::namcos10_base(machine_config &config)
 {
 	/* basic machine hardware */
-	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
+	CXD8606BQ(config, m_maincpu, 101.4912_MHz_XTAL);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->set_disable_rom_berr(true);
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
+
+	RAM(config, m_ram).set_bits(32).set_default_size("4M").set_extra_options("4M,8M,16M").set_default_value(0);
 
 	/* video hardware */
-	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen"); // 2 54V25632s
+	CXD8561CQ(config, m_gpu, 101.4912_MHz_XTAL / 2);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("2M").set_extra_options("2M").set_default_value(0); // 2 54V25632s
+
+	SCREEN(config, "screen");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// CXD2938Q; SPU with CD-ROM controller - also seen in PSone, 101.4912MHz / 2
 	// TODO: This must be replaced with a proper CXD2938Q device, CD-ROM functionality of chip not used
-	spu_device &spu(SPU(config, "spu", XTAL(101'491'200)/2, m_maincpu.target()));
-	spu.set_stream_flags(STREAM_SYNCHRONOUS);
-	spu.add_route(0, "lspeaker", 0.75);
-	spu.add_route(1, "rspeaker", 0.75);
+	SPU(config, m_spu, 101.4912_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->set_stream_flags(STREAM_SYNCHRONOUS);
+	m_spu->add_route(0, "speaker", 0.75, 0);
+	m_spu->add_route(1, "speaker", 0.75, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K").set_default_value(0); // ram is external on CXD2938Q, internal on CXD2941R. Both limited to 512k
 
 	// TODO: Trace main PCB to see where JAMMA I/O goes and/or how int10 can be triggered (SM10MA3?)
 	m_io_update_interrupt.bind().set("maincpu:irq", FUNC(psxirq_device::intin10));
@@ -1276,7 +1330,7 @@ void namcos10_state::i2c_update()
 
 void namcos10_state::namcos10_exio(machine_config &config)
 {
-	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio, 0));
+	namcos10_exio_device &exio(NAMCOS10_EXIO(config, m_exio));
 
 	exio.analog_callback().set([this] (offs_t offset) {
 		return m_exio_analog[offset].read_safe(0);
@@ -1344,14 +1398,14 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 
 	// TODO: puzzball wants to see IRQ 2 triggering. Where from MGEXIO does that come? Probably a port
 
-	namcos10_mgexio_device &mgexio(NAMCOS10_MGEXIO(config, m_exio, 0));
+	namcos10_mgexio_device &mgexio(NAMCOS10_MGEXIO(config, m_exio));
 
-	HOPPER(config, m_mgexio_hopper[0], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_mgexio_hopper[1], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	HOPPER(config, m_mgexio_hopper[2], attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_mgexio_hopper[0], attotime::from_msec(100));
+	HOPPER(config, m_mgexio_hopper[1], attotime::from_msec(100));
+	HOPPER(config, m_mgexio_hopper[2], attotime::from_msec(100));
 
 	mgexio.port4_read_callback().set([this] (offs_t offset) {
-		uint16_t r = 0;
+		uint8_t r = 0;
 		r |= (m_mgexio_outputs[6] & 1); // divider sol (l) sensor
 		r |= (m_mgexio_outputs[7] & 1) << 1; //divider sol (r) sensor
 		return r;
@@ -1362,7 +1416,7 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 	});
 
 	mgexio.porta_read_callback().set([this] (offs_t offset) {
-		uint16_t r = 0b1111;
+		uint8_t r = 0b1111;
 
 		// update coin states
 		auto curtime = machine().time();
@@ -1387,11 +1441,11 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 		return r;
 	});
 
-	mgexio.port4_write_callback().set([this] (uint16_t data) {
+	mgexio.port4_write_callback().set([this] (uint8_t data) {
 		m_mgexio_outputs[8] = BIT(data, 6); // win lamp
 	});
 
-	mgexio.portb_write_callback().set([this] (uint16_t data) {
+	mgexio.portb_write_callback().set([this] (uint8_t data) {
 		m_mgexio_hopper[0]->motor_w(BIT(data, 0));
 		m_mgexio_hopper[1]->motor_w(BIT(data, 1));
 		m_mgexio_hopper[2]->motor_w(BIT(data, 4));
@@ -1606,7 +1660,7 @@ void namcos10_memm_state::ns10_mrdrilr2(machine_config &config)
 {
 	namcos10_memm(config);
 	/* decrypter device (CPLD in hardware?) */
-	MRDRILR2_DECRYPTER(config, m_decrypter, 0);
+	MRDRILR2_DECRYPTER(config, m_decrypter);
 }
 
 
@@ -1706,7 +1760,7 @@ uint16_t namcos10_memn_state::nand_data_r()
 	if (m_nand_device_idx == 0 && (BIT(m_nand_address, 8, 16) >> 5) < 2)
 		return data;
 
-	return m_unscrambler(data ^ 0xaaaa);
+	return m_unscrambler(data ^ m_data_xor);
 }
 
 void namcos10_memn_state::nand_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -1811,7 +1865,7 @@ void namcos10_memn_state::nand_copy(uint8_t *nand_base, uint16_t *dst, uint32_t 
 
 		for (int i = 0; i < 0x200; i += 2) {
 			uint16_t data = nand_base[address + i + 1] | (nand_base[address + i] << 8);
-			*dst = m_unscrambler(data ^ 0xaaaa);
+			*dst = m_unscrambler(data ^ m_data_xor);
 			dst++;
 		}
 	}
@@ -1830,7 +1884,7 @@ void namcos10_memn_state::memn_driver_init()
 void namcos10_memn_state::namcos10_nand_k9f2808u0b(machine_config &config, int nand_count)
 {
 	for (int i = 0; i < nand_count; i++) {
-		SAMSUNG_K9F2808U0B(config, m_nand[i], 0);
+		SAMSUNG_K9F2808U0B(config, m_nand[i]);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1838,7 +1892,7 @@ void namcos10_memn_state::namcos10_nand_k9f2808u0b(machine_config &config, int n
 void namcos10_memn_state::namcos10_nand_k9f5608u0d(machine_config &config, int nand_count)
 {
 	for (int i = 0; i < nand_count; i++) {
-		SAMSUNG_K9F5608U0D(config, m_nand[i], 0);
+		SAMSUNG_K9F5608U0D(config, m_nand[i]);
 		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
 	}
 }
@@ -1855,7 +1909,7 @@ void namcos10_memn_state::ns10_ballpom(machine_config &config)
 	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xc, 0xe, 0xf, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x3, 0x0, 0x2); };
 
 	/* decrypter device (CPLD in hardware?) */
-	// BALLPOM_DECRYPTER(config, m_decrypter, 0);
+	// BALLPOM_DECRYPTER(config, m_decrypter);
 }
 
 void namcos10_memn_state::ns10_chocovdr(machine_config &config)
@@ -1878,7 +1932,8 @@ void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 			0x000000006800d3f5ULL, 0x0000000000000058ULL, 0x000000006800d2d5ULL, 0x0000000000001840ULL,
 		},
 		0x5b22,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 9) & (gf2_reduce(0x0000000010065810ULL & previous_cipherwords) ^ gf2_reduce(0x0000000021005810ULL & previous_plainwords)) & 1) << 10;
 		}
@@ -1906,7 +1961,8 @@ void namcos10_memn_state::ns10_gahaha(machine_config &config)
 			0x000000003120c000ULL, 0x0000000000002100ULL, 0x0000000018e002a6ULL, 0x00000000a19121a0ULL,
 		},
 		0xaea7,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return 0;
 		}
 	});
@@ -1933,7 +1989,8 @@ void namcos10_memn_state::ns10_gahaha2(machine_config &config)
 			0x0000000001800400ULL, 0x0000000090000040ULL, 0x0000000000009002ULL, 0x00000403a5020004ULL,
 		},
 		0x925a,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			u64 previous_masks = previous_cipherwords^previous_plainwords;
 			return (1 & ((previous_masks >> 26) ^ (previous_masks >> 37)) & (previous_masks >> 46)) * 0x8860;
 		}
@@ -1960,7 +2017,8 @@ void namcos10_memn_state::ns10_gamshara(machine_config &config)
 			0x000000004400d1f1ULL, 0x000000006001ce08ULL, 0x00000000000000c8ULL, 0x0000000054023002ULL,
 		},
 		0x25ab,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 7) & (previous_masks >> 13) & 1) << 2;
 		}
@@ -1973,8 +2031,74 @@ void namcos10_memn_state::ns10_gegemdb(machine_config &config)
 	namcos10_mgexio(config);
 	namcos10_nand_k9f5608u0d(config, 2);
 
-	/* decrypter device (CPLD in hardware?) */
-	// GEGEMDB_DECRYPTER(config, m_decrypter, 0);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xd, 0xf, 0xc, 0xe, 0x9, 0x8, 0xb, 0xa, 0x4, 0x5, 0x7, 0x6, 0x1, 0x3, 0x0, 0x2); };
+
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000000000000094ULL,
+			0x0000000000000801ULL,
+			0x00000000a3980c08ULL,
+			0x0000000000001022ULL,
+			0x0000000000000882ULL,
+			0x0000000000005100ULL,
+			0x0000000069d345dbULL,
+			0x0000000020012006ULL,
+			0x0000000000000041ULL,
+			0x0000000000000001ULL,
+			0x00000000000001a0ULL,
+			0x0000000000008030ULL,
+			0x0000000000004500ULL,
+			0x000000009125e81eULL,
+			0x0000000000008240ULL,
+			0x000000009125ea1aULL,
+		},
+		{
+			0x00000000000000a4ULL,
+			0x0000000000000801ULL,
+			0x0000000022000c09ULL,
+			0x0000000000001042ULL,
+			0x0000000000001082ULL,
+			0x0000000000005200ULL,
+			0x00000000200545ddULL,
+			0x0000000020014006ULL,
+			0x0000000000000041ULL,
+			0x0000000000000002ULL,
+			0x0000000000000020ULL,
+			0x0000000000000030ULL,
+			0x0000000000008500ULL,
+			0x000000000209e812ULL,
+			0x0000000000008440ULL,
+			0x000000000209e61aULL,
+		},
+		0x1d39,
+		[] (std::uint64_t previous_cipherwords, std::uint64_t previous_plainwords) -> std::uint16_t
+		{
+			const std::uint64_t previous_masks =
+				previous_cipherwords ^ previous_plainwords;
+
+			return ((previous_masks >> 3) &
+					(gf2_reduce(previous_cipherwords & 0x00000000a3980c00ULL) ^
+					gf2_reduce(previous_plainwords & 0x0000000022000c00ULL)) &
+					1U)
+					<< 9;
+		},
+		[] (int iv) -> std::uint64_t
+		{
+			constexpr std::uint64_t values[16]{
+				0x0000000000000000ULL, 0x000000000000000eULL,
+				0x000000000000000fULL, 0x0000000000000009ULL,
+				0x0000000000000003ULL, 0x0000000000000001ULL,
+				0x0000000000000002ULL, 0x000000000000000dULL,
+				0x0000000000000006ULL, 0x000000000000000cULL,
+				0x0000000000000008ULL, 0x000000000000000bULL,
+				0x0000000000000007ULL, 0x0000000000000005ULL,
+				0x0000000000000004ULL, 0x000000000000000aULL,
+			};
+
+			return values[iv & 0x0f];
+		},
+	});
+
 }
 
 void namcos10_memn_state::ns10_gjspace(machine_config &config)
@@ -1997,7 +2121,8 @@ void namcos10_memn_state::ns10_gjspace(machine_config &config)
 			0x0000000000001101ULL, 0x000000000000a002ULL, 0x0000000029001740ULL, 0x00000000a4309bfcULL,
 		},
 		0x2e7f,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return 0;
 		}
 	});
@@ -2010,7 +2135,57 @@ void namcos10_memn_state::ns10_kd2001(machine_config &config)
 
 	// TODO: Also has a "pdrive" ROM? What's that for?
 
-	// NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, logic);
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xf, 0xe, 0xd, 0x9, 0x8, 0xb, 0xa, 0x6, 0x5, 0x4, 0x7, 0x2, 0x3, 0x0, 0x1); };
+
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x00008938899c4390ULL,
+			0x0000000000001400ULL,
+			0x0000000000000010ULL,
+			0x00000040618019ULL,
+			0x00000000004200ULL,
+			0x00006c25af247961ULL,
+			0x00006c258fac3921ULL,
+			0x00000056c1005aULL,
+			0x00000056c1087aULL,
+			0x00000000000818ULL,
+			0x00000000001280ULL,
+			0x000016862d1ae887ULL,
+			0x00008938ba206792ULL,
+			0x00000000000118ULL,
+			0x00000000008800ULL,
+			0x00000040618018ULL,
+		},
+		{
+			0x0000000104a4c790ULL,
+			0x0000000000001400ULL,
+			0x0000000000000200ULL,
+			0x0000000227801dULL,
+			0x00000000004200ULL,
+			0x0000000c02b17961ULL,
+			0x0000000c02397921ULL,
+			0x0000000607805aULL,
+			0x0000000607007aULL,
+			0x00000000000910ULL,
+			0x00000000000280ULL,
+			0x0000002c0084e803ULL,
+			0x00000001023a6792ULL,
+			0x00000000002018ULL,
+			0x00000000008810ULL,
+			0x0000000227805aULL,
+		},
+		0x869b,
+		[] (std::uint64_t previous_cipherwords, std::uint64_t previous_plainwords) -> std::uint16_t
+		{
+			const std::uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+
+			return ((previous_masks >> 12) &
+					(gf2_reduce(previous_cipherwords & 0x00008938899c4390ULL) ^
+					gf2_reduce(previous_plainwords & 0x0000000104a44390ULL)) &
+					1U)
+					<< 2;
+		},
+	});
 }
 
 void namcos10_memn_state::ns10_keroro(machine_config &config)
@@ -2034,11 +2209,13 @@ void namcos10_memn_state::ns10_keroro(machine_config &config)
 			0x0000000020014080ULL, 0x0000000000002208ULL, 0x0000000000000228ULL, 0x0000000020014200ULL,
 		},
 		0xee91,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks>>4) & ((previous_masks>>24) ^ (previous_masks>>26)) & 1) << 6;
+			return ((previous_masks >> 4) & ((previous_masks >> 24) ^ (previous_masks >> 26)) & 1) << 6;
 		},
-		[] (int iv) -> uint64_t {
+		[] (int iv) -> uint64_t
+		{
 			constexpr uint64_t values[16]{
 				0x0000, 0x0602, 0x0302, 0x0101, 0x0203, 0x0802, 0x0603, 0x0303,
 				0x0001, 0x0803, 0x0501, 0x0500, 0x0202, 0x0100, 0x0401, 0x0400,
@@ -2068,7 +2245,8 @@ void namcos10_memn_state::ns10_knpuzzle(machine_config &config)
 			0x00000000012a04a2ULL, 0x00000000003984a4ULL, 0x0000000000000700ULL, 0x0000000000000882ULL,
 		},
 		0x01e2,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 0x13) & (gf2_reduce(0x0000000014001290ULL & previous_cipherwords) ^ gf2_reduce(0x0000000000021290ULL & previous_plainwords)) & 1) << 1;
 		}
@@ -2095,7 +2273,8 @@ void namcos10_memn_state::ns10_konotako(machine_config &config)
 			0x000000009000200bULL, 0x0000000000000310ULL, 0x0000000000001840ULL, 0x0000000000000400ULL,
 		},
 		0x0748,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 7) & (previous_masks >> 15) & 1) << 15;
 		}
@@ -2123,7 +2302,8 @@ void namcos10_memn_state::ns10_medalnt(machine_config &config)
 			0x000000004c000044ULL, 0x000000000000080aULL, 0x000000000a001214ULL, 0x0000000000000190ULL,
 		},
 		0x5d04,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>26) & (gf2_reduce(previous_cipherwords & 0x10100080) ^ gf2_reduce(previous_plainwords & 0x40100080))) << 4;
 		}
@@ -2151,7 +2331,8 @@ void namcos10_memn_state::ns10_medalnt2(machine_config &config)
 			0x0000000000000024ULL, 0x000000000000a080ULL, 0x0000000000000042ULL, 0x000000000020001eULL,
 		},
 		0x4c57,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (((previous_masks>>15) & (gf2_reduce(previous_cipherwords & 0x24200000) ^ gf2_reduce(previous_plainwords & 0x44200000))) & 1) << 9;
 		}
@@ -2178,11 +2359,13 @@ void namcos10_memn_state::ns10_mrdrilrg(machine_config &config)
 			0x00000081470a1122ULL, 0x0000000000006200ULL, 0x00009170ac403013ULL, 0x0000000000001044ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & gf2_reduce(previous_masks & 0x120100400000) & gf2_reduce(previous_masks & 0x11800020000)) * 0x11;
 		},
-		[] (int iv) -> uint64_t {
+		[] (int iv) -> uint64_t
+		{
 			constexpr uint64_t values[16]{
 				0x0000, 0x0000, 0x0000, 0x2000, 0x801a, 0x6000, 0x0002, 0x0000,
 				0x0000, 0x0018, 0x0000, 0x0420, 0x0000, 0x8800, 0x0000, 0xc000,
@@ -2213,7 +2396,8 @@ void namcos10_memn_state::ns10_nflclsfb(machine_config &config)
 			0x0000000000000404ULL, 0x0000000000004201ULL, 0x0000000000001100ULL, 0x000000008c0057b2ULL,
 		},
 		0xbe32,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 1) & (gf2_reduce(0x0000000040de8fb3ULL & previous_cipherwords) ^ gf2_reduce(0x0000000088008fb3ULL & previous_plainwords)) & 1) << 2;
 		}
@@ -2241,7 +2425,8 @@ void namcos10_memn_state::ns10_pacmball(machine_config &config)
 			0x0000000000000a80ULL, 0x0000000000004408ULL, 0x0000000000000300ULL, 0x0000800000228002ULL,
 		},
 		0x247c,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 2) & (previous_masks >> 6) & 1) << 1;
 		}
@@ -2268,10 +2453,14 @@ void namcos10_memn_state::ns10_panikuru(machine_config &config)
 			0x0000000000000214ULL, 0x0000000090004190ULL, 0x0000000000001040ULL, 0x0000000000006008ULL,
 		},
 		0x7c29,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
-			return (1 & ((gf2_reduce(0x0000000088300281ULL & previous_cipherwords) ^ gf2_reduce(0x0000000004600281ULL & previous_plainwords))) & ((gf2_reduce(0x0000a13140090000ULL & previous_cipherwords) ^ gf2_reduce(0x0000806240090000ULL & previous_plainwords)))) << 2;
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
+			return (1 &
+					((gf2_reduce(0x0000000088300281ULL & previous_cipherwords) ^ gf2_reduce(0x0000000004600281ULL & previous_plainwords))) &
+					((gf2_reduce(0x0000a13140090000ULL & previous_cipherwords) ^ gf2_reduce(0x0000806240090000ULL & previous_plainwords)))) << 2;
 		},
-		[] (int iv) -> uint64_t {
+		[] (int iv) -> uint64_t
+		{
 			constexpr uint64_t values[16]{
 				0x0000, 0x020e, 0x0412, 0x0411, 0x0204, 0x001b, 0x0009, 0x0207,
 				0x2040, 0x2440, 0x0012, 0x0001, 0x0614, 0x000a, 0x0214, 0x041b,
@@ -2303,7 +2492,8 @@ void namcos10_memn_state::ns10_ptblank3(machine_config &config)
 			0x0000002400880201ULL,0x0000000000000300ULL,0x00000000000000c0ULL,0x0000000000000408ULL
 		},
 		0xe1b8,
-		[] (uint16_t nonlinear_bit) -> uint16_t {
+		[] (uint16_t nonlinear_bit) -> uint16_t
+		{
 			return nonlinear_bit << 11;
 		}
 	});
@@ -2330,9 +2520,10 @@ void namcos10_memn_state::ns10_puzzball(machine_config &config)
 			0x0000000000008402ULL, 0x0000021d0040c004ULL, 0x0000008c40880123ULL, 0x000000000000c000ULL,
 		},
 		0x31d6,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return (1 & (previous_masks>>29) & (gf2_reduce(previous_cipherwords & 0x180882002000ULL) ^ gf2_reduce(previous_plainwords & 0x80ac0002000ULL))) << 4;
+			return (1 & (previous_masks >> 29) & (gf2_reduce(previous_cipherwords & 0x180882002000ULL) ^ gf2_reduce(previous_plainwords & 0x80ac0002000ULL))) << 4;
 		}
 	});
 }
@@ -2359,11 +2550,72 @@ void namcos10_memn_state::ns10_sekaikh(machine_config &config)
 			0x0000000001410806ULL, 0x00000000042c8019ULL, 0x0000000000000880ULL, 0x00000000b0010920ULL,
 		},
 		0x3aa8,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 0) & (previous_masks >> 3) & 1) << 10;
 		}
 	});
+}
+
+void namcos10_memn_state::ns10_slotouji(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_mgexio(config);
+	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xe, 0xd, 0xc, 0xf, 0xa, 0xb, 0x8, 0x9, 0x6, 0x5, 0x4, 0x7, 0x1, 0x0, 0x2, 0x3); };
+
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000aa54e43d43aeULL,
+			0x000000000000a001ULL,
+			0x0000000000002028ULL,
+			0x0000000002d72600ULL,
+			0x0000000000000800ULL,
+			0x0000000000000008ULL,
+			0x0000aa540e548327ULL,
+			0x00000000000000c0ULL,
+			0x0000000000200130ULL,
+			0x0000000000001000ULL,
+			0x0000000000290024ULL,
+			0x00000000a3d165c2ULL,
+			0x0000000000000205ULL,
+			0x00000000000000d0ULL,
+			0x0000000000000940ULL,
+			0x00000000a3d160c3ULL,
+		},
+		{
+			0x000000044402438eULL,
+			0x000000000000a000ULL,
+			0x0000000000002020ULL,
+			0x0000000000133620ULL,
+			0x0000000000000010ULL,
+			0x000000000000000aULL,
+			0x00000004022383a6ULL,
+			0x00000000000020c0ULL,
+			0x0000000004300120ULL,
+			0x0000000000001004ULL,
+			0x0000000002224024ULL,
+			0x00000000021361caULL,
+			0x0000000000000001ULL,
+			0x0000000000000090ULL,
+			0x0000000000000842ULL,
+			0x00000000021368c3ULL,
+		},
+		0x3583,
+		[] (std::uint64_t previous_cipherwords, std::uint64_t previous_plainwords) -> std::uint16_t
+		{
+			const std::uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+
+			return ((previous_masks >> 10) &
+					(gf2_reduce(previous_cipherwords & 0x0000000000000100ULL) ^
+					gf2_reduce(previous_plainwords & 0x0000000000000100ULL)) &
+					1U)
+					<< 4;
+		},
+	});
+
 }
 
 void namcos10_memn_state::ns10_startrgn(machine_config &config)
@@ -2386,7 +2638,8 @@ void namcos10_memn_state::ns10_startrgn(machine_config &config)
 			0x0000000000000428ULL, 0x0000000000001001ULL, 0x000012020b10ceabULL, 0x0000000000000144ULL,
 		},
 		0x8c46,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 12) & (previous_masks >> 14) & 1) << 4;
 		}
@@ -2414,7 +2667,8 @@ void namcos10_memn_state::ns10_sugorotic(machine_config &config)
 			0x0000000040228110ULL, 0x000000000016c000ULL, 0x0000000000003002ULL, 0x0000223010010020ULL,
 		},
 		0x9006,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 25) & (previous_masks >> 22)) * 0xa00;
 		}
@@ -2442,7 +2696,8 @@ void namcos10_memn_state::ns10_taiko2(machine_config &config)
 			0x0000184022210002ULL, 0x000000006c00400cULL, 0x000000004e140816ULL, 0x0000000080090008ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 25) & (previous_masks >> 31)) << 4;
 		}
@@ -2470,7 +2725,8 @@ void namcos10_memn_state::ns10_taiko3(machine_config &config)
 			0x00002a004a150020ULL, 0x0000000030804200ULL, 0x0000000000000610ULL, 0x00000000c2001080ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return ((
 				(((previous_cipherwords >> 35) ^ (previous_cipherwords >> 39) ^ (previous_plainwords >> 40) ^ (previous_plainwords >> 42)) & (gf2_reduce(previous_cipherwords & 0x820508000800ULL) ^ gf2_reduce(previous_plainwords & 0x90c12c000800ULL))) ^
 				(((previous_cipherwords >> 35) ^ (previous_cipherwords >> 39)) & ((previous_plainwords >> 40) ^ (previous_plainwords >> 42))) ^
@@ -2501,7 +2757,8 @@ void namcos10_memn_state::ns10_taiko4(machine_config &config)
 			0x000000000a801a80ULL, 0x0000000000001400ULL, 0x0000000000250262ULL, 0x0000000020404081ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 2) & (previous_masks>>14)) << 1;
 		}
@@ -2529,7 +2786,8 @@ void namcos10_memn_state::ns10_taiko5(machine_config &config)
 			0x0000000050020216ULL, 0x0000288101811400ULL, 0x0000000000000009ULL, 0x0000000000000124ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return ((
 				((previous_cipherwords >> 4) & (gf2_reduce(previous_cipherwords & 0x242800000000) ^ gf2_reduce(previous_plainwords & 0x42100010000))) ^
 				((previous_cipherwords >> 17) & (gf2_reduce(previous_cipherwords & 0x1094000) ^ gf2_reduce(previous_plainwords & 0x100084000))) ^
@@ -2562,7 +2820,8 @@ void namcos10_memn_state::ns10_taiko6(machine_config &config)
 			0x00000000320b0890ULL, 0x0000000000000802ULL, 0x00000000902a8800ULL, 0x0000000000000020ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>13) & (gf2_reduce(previous_cipherwords & 0x86000000ULL) ^ gf2_reduce(previous_plainwords & 0x8a000000ULL))) << 15;
 		}
@@ -2590,11 +2849,12 @@ void namcos10_memn_state::ns10_taikort(machine_config &config)
 			0x0000000098619241ULL, 0x0000000000004808ULL, 0x000000000f201040ULL, 0x0000a0d290820001ULL
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			return ((((previous_plainwords >> 25) & (gf2_reduce(previous_cipherwords & 0x40a000000001ULL) ^ gf2_reduce(previous_plainwords & 0xa000200001ULL))) ^
 					((previous_plainwords >> 27) & (gf2_reduce(previous_cipherwords & 0x2400440ULL) ^ gf2_reduce(previous_plainwords & 0x80400440ULL))) ^
 					((previous_cipherwords >> 19) & (gf2_reduce(previous_cipherwords & 0x18000201ULL) ^ gf2_reduce(previous_plainwords & 0x10000201ULL))) ^
-					((previous_cipherwords ^ previous_plainwords ^ (previous_cipherwords >> 27) ^ (previous_plainwords >> 21)) & ((previous_cipherwords^previous_plainwords) >> 6 ^ (previous_cipherwords^previous_plainwords) >> 26)) ) & 1) * 0x4010;
+					((previous_cipherwords ^ previous_plainwords ^ (previous_cipherwords >> 27) ^ (previous_plainwords >> 21)) & ((previous_cipherwords ^ previous_plainwords) >> 6 ^ (previous_cipherwords^previous_plainwords) >> 26))) & 1) * 0x4010;
 		}
 	});
 }
@@ -2847,8 +3107,8 @@ void namcos10_memp3_state::namcos10_memp3_base(machine_config &config)
 	});
 
 	LC82310(config, m_lc82310, XTAL(16'934'400));
-	m_lc82310->add_route(0, "lspeaker", 1.0);
-	m_lc82310->add_route(1, "rspeaker", 1.0);
+	m_lc82310->add_route(0, "speaker", 1.0, 0);
+	m_lc82310->add_route(1, "speaker", 1.0, 1);
 }
 
 void namcos10_memp3_state::machine_start()
@@ -2905,7 +3165,8 @@ void namcos10_memp3_state::ns10_g13jnr(machine_config &config)
 			0x0000470001100102ULL, 0x00000000408c0083ULL, 0x0000000000000002ULL, 0x0000000000000308ULL,
 		},
 		0x9546,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks >> 6) & (previous_masks >> 10)) << 14;
 		}
@@ -2932,7 +3193,8 @@ void namcos10_memp3_state::ns10_nicetsuk(machine_config &config)
 			0x00000000c8000504ULL, 0x0000000000000111ULL, 0x0000000032086008ULL, 0x0000000000000248ULL,
 		},
 		0x9f6b,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x808400410000ULL) ^ gf2_reduce(previous_plainwords & 0x81100630000ULL))) << 4;
 		}
@@ -2959,7 +3221,8 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 			0x0000000080209020ULL, 0x0000141044200008ULL, 0x0000000000000020ULL, 0x0000000000008108ULL,
 		},
 		0x0000,
-		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t {
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return (1 & (previous_masks>>12) & (gf2_reduce(previous_cipherwords & 0x140840000000ULL) ^ gf2_reduce(previous_plainwords & 0x141040000000ULL))) << 14;
 		},
@@ -2973,6 +3236,67 @@ void namcos10_memp3_state::ns10_squizchs(machine_config &config)
 		}
 	});
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// MEM/IO TODO!
+
+void namcos10_memio_state::namcos10_memio_base(machine_config &config)
+{
+	namcos10_memn_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_memio_state::namcos10_memio_map);
+}
+
+void namcos10_memio_state::machine_reset()
+{
+	namcos10_memn_state::machine_reset();
+	m_data_xor = 0x5300;
+}
+
+void namcos10_memio_state::namcos10_memio_map_inner(address_map &map)
+{
+	map(0xf468000, 0xf468001).w(FUNC(namcos10_memio_state::nand_dataxor_w));
+	// map(0xf478000, 0xf478001).w(); // bit 0 = Triggers solenoid when set. This is used to make the punch pad stand up, triggering the speed sensors along the way
+}
+
+void namcos10_memio_state::namcos10_memio_map(address_map &map)
+{
+	namcos10_memn_map(map);
+
+	map(0x10000000, 0x1fffffff).m(FUNC(namcos10_memio_state::namcos10_memio_map_inner));
+	map(0x90000000, 0x9fffffff).m(FUNC(namcos10_memio_state::namcos10_memio_map_inner));
+	map(0xb0000000, 0xbfffffff).m(FUNC(namcos10_memio_state::namcos10_memio_map_inner));
+}
+
+void namcos10_memio_state::namcos10_nand_tc58256aft(machine_config &config, int nand_count)
+{
+	for (int i = 0; i < nand_count; i++) {
+		TOSHIBA_TC58256AFT(config, m_nand[i]);
+		m_nand[i]->rnb_wr_callback().set([this, i] (int state) { m_nand_rnb_state[i] = state != 1; });
+	}
+}
+
+void namcos10_memio_state::nand_dataxor_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// logerror("%s: nand_dataxor_w: %04x\n", machine().describe_context(), data);
+	m_data_xor = ((data & 0xff) << 8) | (data >> 8);
+}
+
+void namcos10_memio_state::ns10_ippo(machine_config &config)
+{
+	namcos10_memio_base(config);
+	namcos10_nand_k9f2808u0b(config, 6);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0); };
+}
+
+void namcos10_memio_state::ns10_ippo2(machine_config &config)
+{
+	namcos10_memio_base(config);
+	namcos10_nand_tc58256aft(config, 6);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0); };
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -3069,6 +3393,9 @@ static INPUT_PORTS_START( gamshara )
 	PORT_DIPNAME( 0x7f, 0x7f, DEF_STR( Region ) ) PORT_DIPLOCATION("SW1:8,7,6,5,4,3,2")
 	PORT_DIPSETTING(0x7f, DEF_STR( Japan ) ) // JPN
 	PORT_DIPSETTING(0x6e, DEF_STR( World ) ) // ETC
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1") // read on boot / restart only, but if turned you can exit through menu selection (6: Exit Test) - using F2 don't allow this option
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( startrgn )
@@ -3237,18 +3564,18 @@ static INPUT_PORTS_START( mgexio_medal )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("MGEXIO_SENSOR")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Check Sensor(2)")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Check Sensor(1)")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Check Sensor(4)")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Check Sensor(3)")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Check Sensor(6)")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Check Sensor(5)")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Check Sensor(7)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Check Sensor(2)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Check Sensor(1)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Check Sensor(4)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Check Sensor(3)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Check Sensor(6)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Check Sensor(5)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Check Sensor(7)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("MGEXIO_COIN")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 0)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, namcos10_state, mgexio_coin_start, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin Sensor(L)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(namcos10_state::mgexio_coin_start), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin Sensor(R)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(namcos10_state::mgexio_coin_start), 1)
 
 INPUT_PORTS_END
 
@@ -3330,6 +3657,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ptblank3 )
 	PORT_INCLUDE(namcos10)
 
+	PORT_MODIFY("SYSTEM")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0fff6f6f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -3346,6 +3678,35 @@ static INPUT_PORTS_START( ptblank3 )
 
 	PORT_START("EXIO_LIGHTGUN4") // P2 Y
 	PORT_BIT( 0x3fffff, 0x78, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x000,0xef) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ippo2 )
+	PORT_INCLUDE(namcos10)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x07ff0f61, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// TODO: These sensors must match what the game is expecting based on when it's trying to raise the punch pad or else it will throw a speed error
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Speed Sensor Down")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Speed Sensor Mid")
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Speed Sensor Up")
+
+	// If the safety sensor is still triggered when the speed sensor is at the mid or up position then the game
+	// pauses and displays an message saying that something obstructing the safety sensor
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Safety Sensor")
+
+	// If none of the following sensors are set then the game pauses and tells the player to step closer to the machine
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Human Sensor 1")
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Human Sensor 2")
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Human Sensor 3")
+
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SELECT )
+
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_TILT )
+
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
 INPUT_PORTS_END
 
@@ -3473,12 +3834,11 @@ ROM_START( gegemdb )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
-	// gym1.8e appears to be interleaved, none of the other larger NAND chip dumps look like this. Highly suspected to be a bad dump.
 	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
-	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, BAD_DUMP CRC(ea740351) SHA1(4dc7ce256a2d60be512d04a992b2103602bcfaa9) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "gym1.8e", 0x0000000, 0x2100000, CRC(f1d77330) SHA1(143e14fbfe525ac675eacf2de12758b0d20d81d5) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
 
 	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
-	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, BAD_DUMP CRC(0145a8c1) SHA1(a32dd944d022df14450bbcb01b4d1712683c0680) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
+	ROM_LOAD( "gym1.8d", 0x0000000, 0x2100000, CRC(f74a5dbf) SHA1(80ce701abd5ee02a3b8759eae6b50da4338809f5) ) // K9F5608U0D, double sized wrt to the other games and PCB silkscreen
 
 	ROM_REGION( 0x8000, "nvram", 0 )
 	ROM_LOAD( "nvram.bin", 0x0000, 0x8000, CRC(c0c87c71) SHA1(263f7f3df772644bcf973413d3fac9ae305fda6c) )
@@ -3520,10 +3880,10 @@ ROM_START( kd2001 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, NO_DUMP ) // broken flash ROM, couldn't be dumped
+	ROM_LOAD( "0.8e", 0x0000000, 0x1080000, CRC(83b50470) SHA1(56aa687fb0dc360832e705d66ec67265d61fa322) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(2b0d0e8c) SHA1(d679e7044e1f93bb7bd449e6d8fcb7737d154025) )
+	ROM_LOAD( "1.8d", 0x0000000, 0x1080000, CRC(fed610a8) SHA1(8f4e238164fd80342e4fab6b40da693f241048f7) )
 
 	ROM_REGION( 0x20000, "pdrivecpu", 0 )
 	ROM_LOAD( "kd11-dr0-ic10.bin", 0x00000, 0x20000, CRC(59649293) SHA1(71c3a0e73d077398e7f3d95acedc47814e99fbc6) )
@@ -3574,6 +3934,17 @@ ROM_START( medalnt )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(49a2a732) SHA1(1a473177827a6d0e58c289d9af064665b941519b) )
+ROM_END
+
+ROM_START( medalnta )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(e3f2ee5c) SHA1(3857077bfb211df72e44d5f7c92476b6c82ba98c) ) // SLDH
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(e857c20f) SHA1(e72842446073d79c013e88f78eee918d6377801a) ) // SLDH
 ROM_END
 
 ROM_START( medalnt2 )
@@ -3662,10 +4033,21 @@ ROM_START( puzzball )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(0d9bac12) SHA1(f386fca5e5dd65995bb0bb04688222e0962fffd0) )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(b136ad99) SHA1(033fb9d0369dc07d0747091f7721f14f8d0a3e1f) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(0002794e) SHA1(44b6bcea835d3dbb6b2e85ba3ea4404e1400c4f5) )
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(dc9dd8fe) SHA1(de25ef1e0a5b60a80e28bfc84f64aabe3301bbe7) )
+ROM_END
+
+ROM_START( puzzballa )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(0d9bac12) SHA1(f386fca5e5dd65995bb0bb04688222e0962fffd0) ) // SLDH
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(0002794e) SHA1(44b6bcea835d3dbb6b2e85ba3ea4404e1400c4f5) ) // SLDH
 ROM_END
 
 ROM_START( sekaikh )
@@ -3696,6 +4078,28 @@ ROM_START( sekaikha )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( slotouji )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(26bbbd8c) SHA1(3976e6fe98d6f6e7b5af99825db7c3c46233ce2c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(7f3744fe) SHA1(5ad4d700a274a4d5b87dff3706a9b958c1aa4763) )
+ROM_END
+
+ROM_START( slotoujia )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(9c64859f) SHA1(b0609744f37ca16e4a5c5f2c5e6e1fb16357f634) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(70ba4025) SHA1(8957dc0c56a385534d65b793592d40fdeebb1230) )
+ROM_END
+
 ROM_START( startrgn )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -3716,6 +4120,28 @@ ROM_START( sugorotc )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
 	ROM_LOAD( "stj1verc_1.8d", 0x0000000, 0x1080000, CRC(a7a20960) SHA1(72bc89637f966fe23a84c34346be3cdc20d712e5) )
+ROM_END
+
+ROM_START( sugorotcb )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(4f2a62c2) SHA1(db38a2976e464c5499791150ad31d281071b7337) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(796fb7c9) SHA1(3cd8fbe115bcb3a304b49e26c0e8155391c26a98) )
+ROM_END
+
+ROM_START( sugorotca )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0b.8e", 0x0000000, 0x1080000, CRC(7171f8b9) SHA1(e6cb0641b71a6a6a0ab72f7260d7b5a63c7c4805) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0b.8d", 0x0000000, 0x1080000, CRC(072bd579) SHA1(cd763bc553da6ce30f5207b1895eb5403f085406) )
 ROM_END
 
 ROM_START( taiko2 )
@@ -3925,7 +4351,72 @@ ROM_START( squizchs )
 	ROM_LOAD( "chs1vera_13.1b", 0x0000000, 0x1080000, CRC(739e3b1e) SHA1(d7a25984d939d69de11b0fea000e51fdb4759163) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( ippo )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0a.ic4", 0x0000000, 0x1080000, CRC(f93878db) SHA1(921d316b74368d5ebeddb3c40fec7911f2ad33eb) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0a.ic8", 0x0000000, 0x1080000, CRC(142744bc) SHA1(fadc3265f87cd9fc3774e4c32a8e46167b397acf) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "k9f2808u0a.ic5", 0x0000000, 0x1080000, CRC(3880d85b) SHA1(b7459b2e7bac02383ac67229927b38f8b796e2b0) )
+
+	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
+	ROM_LOAD( "k9f2808u0a.ic9", 0x0000000, 0x1080000, CRC(da2fcdbb) SHA1(7f509c0c21442dc17beda6cfd086aebfc33a658c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand4", 0 )
+	ROM_LOAD( "k9f2808u0a.ic6", 0x0000000, 0x1080000, CRC(d791a383) SHA1(90917d818c4697ed7977901bbbd54b6bcc74b718) )
+
+	ROM_REGION32_LE( 0x1080000, "nand5", 0 )
+	ROM_LOAD( "k9f2808u0a.ic10", 0x0000000, 0x1080000, CRC(f997c4d1) SHA1(88e79dd9985b5f6199ab608c8923299a6fdf7ced) )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "f06-02.ic15", 0x000, 0x157, NO_DUMP ) // PAL20V8
+ROM_END
+
+ROM_START( ippo2 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	/*
+	Verified against real hardware using the "MEM(N) DATA CHECK SUM DISP" in-game checksum tool which can be accessed
+	by holding Speed Sensor Up (punch pad held in upright position) + Start + Select while the game is booting.
+	NOTE: Human sensors must also not be triggered (must be showing OFF in I/O test) for this to work.
+
+	Real hardware checksums:
+	DATA BLOCK0: CA17B6CD
+	DATA BLOCK1: 2D1A56F7
+	DATA BLOCK2: 064F8287
+	DATA BLOCK3: F3416DB4
+	DATA BLOCK4: 7521CB55
+	DATA BLOCK5: 306E5EE6
+	*/
+	ROM_REGION32_LE( 0x2100000, "nand0", 0 )
+	ROM_LOAD( "tc58256aft.ic4", 0x0000000, 0x2100000, CRC(1fdb4a2d) SHA1(0712f8256330098a6ad0b5c3d5d99f771c19669c) )
+
+	ROM_REGION32_LE( 0x2100000, "nand1", 0 )
+	ROM_LOAD( "tc58256aft.ic8", 0x0000000, 0x2100000, CRC(f6d97189) SHA1(9cb145ea35ea7e5d36e124f3d5ed6dfea4ecc252) )
+
+	ROM_REGION32_LE( 0x2100000, "nand2", 0 )
+	ROM_LOAD( "tc58256aft.ic5", 0x0000000, 0x2100000, CRC(47e970cc) SHA1(e884d259448ad258a19fad466bf664c4052555e7) )
+
+	ROM_REGION32_LE( 0x2100000, "nand3", 0 )
+	ROM_LOAD( "tc58256aft.ic9", 0x0000000, 0x2100000, CRC(8158e228) SHA1(ea82f4ee6aa98c734c035465a5543ecb34fd5d38) )
+
+	ROM_REGION32_LE( 0x2100000, "nand4", 0 )
+	ROM_LOAD( "tc58256aft.ic6", 0x0000000, 0x2100000, CRC(ab84f5fd) SHA1(b5f41b4cff7741d6af4490b1ce32b2d9eeb09625) )
+
+	ROM_REGION32_LE( 0x2100000, "nand5", 0 )
+	ROM_LOAD( "tc58256aft.ic10", 0x0000000, 0x2100000, CRC(2a084db7) SHA1(67b0922aa92255b8ce60feda87f2937d94336c09) )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "f06-02.ic15", 0x000, 0x157, NO_DUMP ) // PAL20V8
+ROM_END
+
+} // anonymous namespace
 
 
 // MEM(M)
@@ -3939,25 +4430,31 @@ GAME( 2000, ptblank3,  0,        ns10_ptblank3,  ptblank3,     namcos10_memn_sta
 GAME( 2000, gunbalina, ptblank3, ns10_ptblank3,  ptblank3,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, gahaha2,   0,        ns10_gahaha2,   gahaha,       namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GAHAHA Ippatsudou 2 (Japan, GIS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace,   gjspace,      namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "GekiToride-Jong Space (10011 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  empty_init,       ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, kd2001,    0,        ns10_kd2001,    namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Knock Down 2001 (Japan, KD11 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ROM VER. B 01/11/19 MON 00:00:00 in test mode
 GAME( 2001, knpuzzle,  0,        ns10_knpuzzle,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Kotoba no Puzzle Mojipittan (Japan, KPM1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, mrdrilrg,  0,        ns10_mrdrilrg,  mrdrilr2,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Mr. Driller G (Japan, DRG1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, chocovdr,  0,        ns10_chocovdr,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Uchuu Daisakusen: Chocovader Contactee (Japan, CVC1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, gamshara,  0,        ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Gamshara (20020912A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, gamsharao, gamshara, ns10_gamshara,  gamshara,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Gamshara (20020716A / 10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, panikuru,  0,        ns10_panikuru,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Panikuru Panekuru (Japan, PPA1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, puzzball,  0,        ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Aug  6 2002 13:32:48
+GAME( 2002, puzzballa, puzzball, ns10_puzzball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Puzz Ball (Japan, PZB1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Feb 15 2002 11:28:06
 GAME( 2002, startrgn,  0,        ns10_startrgn,  startrgn,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Star Trigon (Japan, STT1 Ver.A)", MACHINE_IMPERFECT_SOUND )
-GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, sugorotc,  0,        ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Aug  6 2002 13:23:31
+GAME( 2002, sugorotcb, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // May 12 2002 10:43:07
+GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sugorotic JAPAN (STJ1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Feb 15 2002 11:23:57
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
+GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
-GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2005, medalnt,   0,        ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Jun 14 2005 17:12:31
+GAME( 2005, medalnta,  medalnt,  ns10_medalnt,   namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin Doki! Ooatari-Darake no Sugoroku Matsuri (MTL1 SPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Mar  8 2005 11:18:10
 GAME( 2006, keroro,    0,        ns10_keroro,    mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Banpresto", "Keroro Gunsou: Pekopon Shinryaku Shirei...De Arimasu! (KRG1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ケロロ軍曹　地球侵略指令…であります！
-GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  empty_init,       ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ
+GAME( 2007, gegemdb,   0,        ns10_gegemdb,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // ゲゲゲの鬼太郎　妖怪横丁まつりでバトルじゃ GYM100-1-WP-MPR-0-A20 MON MAR 3 2008 14:47:17
 GAME( 2007, medalnt2,  0,        ns10_medalnt2,  namcos10,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Medal no Tatsujin 2 Atsumare! Go! Go! Sugoroku Sentai Don Ranger Five (MTA1 STMPR0A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // メダルの達人2 あつまれ!ゴー!ゴー!双六戦隊ドンレンジャーファイブ MTA100-1-ST-MPR0-A00 2007/01/30 19:51:54
 
 GAME( 2001, taiko2,    0,        ns10_taiko2,    taiko,        namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Taiko no Tatsujin 2 (Japan, TK21 Ver.C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -3971,3 +4468,7 @@ GAME( 2004, taikort,   0,        ns10_taikort,   taiko,        namcos10_memn_sta
 GAME( 2001, g13jnr,    0,        ns10_g13jnr,    g13jnr,       namcos10_memp3_state, memn_driver_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Requiem (Japan, GLT1 VER.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco / Metro",              "Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco",                      "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
+
+// MEM/IO
+GAME( 2001, ippo,      0,        ns10_ippo,      ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo - The Fighting! (VER.2.02J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // 2001/06/23 14:15:16
+GAME( 2002, ippo2,     0,        ns10_ippo2,     ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // copyright 2001 but 2002/01/20 18:27:18 in ROM e 2002 on flyer

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -182,4 +182,16 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="diag11">
+		<description>Amstrad Diagnostics v1.1 PC 1512</description>
+		<year>1987</year>
+		<publisher>Amstrad</publisher>	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="diag11.img" size="368640" crc="f5eba99d" sha1="d639acff93cb2394f27d408cb211e0f0ef18c082"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

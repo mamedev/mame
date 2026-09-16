@@ -14,7 +14,7 @@ public:
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfx_region = gfxregion; }
 
-	vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vs920a_text_tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_pal_base(int pal_base) { m_pal_base = pal_base; }
 	void set_transparent_pen(pen_t pen) { m_tmap->set_transparent_pen(pen); }
@@ -24,8 +24,8 @@ public:
 	uint16_t vram_r(offs_t offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info);

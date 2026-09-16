@@ -26,13 +26,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
-	virtual void ioc_map(address_map &map) override;
+	virtual void ioc_map(address_map &map) override ATTR_COLD;
 };
 
 

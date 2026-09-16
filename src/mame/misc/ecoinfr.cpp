@@ -40,7 +40,6 @@
 
 #include "emu.h"
 
-#include "awpvid.h" // drawing reels
 
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
@@ -57,18 +56,18 @@
 class ecoinfr_state : public driver_device
 {
 public:
-	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_reel(*this, "reel%u", 0U),
+		m_reel(*this, "reel%u", 1U),
 		m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
-	void ecoinfr(machine_config &config);
+	void ecoinfr(machine_config &config) ATTR_COLD;
 
-	void init_ecoinfrbr();
-	void init_ecoinfr();
-	void init_ecoinfrmab();
+	void init_ecoinfrbr() ATTR_COLD;
+	void init_ecoinfr() ATTR_COLD;
+	void init_ecoinfrmab() ATTR_COLD;
 
 	int reel1_opto_r();
 	int reel2_opto_r();
@@ -115,8 +114,7 @@ private:
 	void ec_port17_out_w(uint8_t data);
 	void ec_port18_out_w(uint8_t data);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
 	uint8_t m_banksel = 0;
@@ -125,8 +123,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<stepper_device, 4> m_reel;
 	output_finder<16> m_digits;
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -172,7 +170,7 @@ void ecoinfr_state::ec_port00_out_w(uint8_t data)
 
 	m_reel[0]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel1", *m_reel[0]);
+	m_reel[0]->draw();
 }
 
 void ecoinfr_state::ec_port01_out_w(uint8_t data)
@@ -184,7 +182,7 @@ void ecoinfr_state::ec_port01_out_w(uint8_t data)
 
 	m_reel[1]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel2", *m_reel[1]);
+	m_reel[1]->draw();
 }
 
 void ecoinfr_state::ec_port02_out_w(uint8_t data)
@@ -196,7 +194,7 @@ void ecoinfr_state::ec_port02_out_w(uint8_t data)
 
 	m_reel[2]->update(data&0x0f);
 
-	awp_draw_reel(machine(),"reel3", *m_reel[2]);
+	m_reel[2]->draw();
 }
 
 
@@ -564,12 +562,12 @@ static INPUT_PORTS_START( ecoinfr_barx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel1_opto_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ecoinfr_state::reel1_opto_r))
 	PORT_DIPNAME( 0x02, 0x02, "IN1:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel3_opto_r)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ecoinfr_state, reel2_opto_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ecoinfr_state::reel3_opto_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ecoinfr_state::reel2_opto_r))
 	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -781,11 +779,11 @@ void ecoinfr_state::ecoinfr(machine_config &config)
 	Z80(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ecoinfr_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ecoinfr_state::portmap);
-	TIMER(config , "ectimer" , 0).configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
+	TIMER(config , "ectimer").configure_periodic(FUNC(ecoinfr_state::ecoinfr_irq_timer), attotime::from_hz(250));
 
 	config.set_default_layout(layout_ecoinfr);
 
-	I8251(config, UPD8251_TAG, 0);
+	I8251(config, UPD8251_TAG);
 
 	REEL(config, m_reel[0], ECOIN_200STEP_REEL, 12, 24, 0x09, 7, 200*2);
 	m_reel[0]->optic_handler().set(FUNC(ecoinfr_state::reel_optic_cb<0>));

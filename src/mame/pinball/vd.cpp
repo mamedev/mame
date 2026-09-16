@@ -57,15 +57,15 @@ private:
 	void lamp_w(offs_t, u8);
 	void sol_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	bool m_ready = false;
 	u8 m_t_c = 0U;
 	u8 m_game = 0U;
 	u8 m_segment[5]{};
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	output_finder<48> m_digits;
 	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps
@@ -284,9 +284,6 @@ void vd_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_game));
@@ -315,14 +312,13 @@ void vd_state::vd(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ay8910_device &ay1(AY8910(config, "ay1", 2000000)); //?
-	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	ay1.port_a_read_callback().set_ioport("DSW2");
 	ay1.port_b_read_callback().set_ioport("DSW1");
 	ay8910_device &ay2(AY8910(config, "ay2", 2000000)); //?
-	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	ay2.port_b_read_callback().set_ioport("DSW3");
 
 	/* Video */
@@ -355,5 +351,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

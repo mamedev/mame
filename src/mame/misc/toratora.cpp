@@ -79,8 +79,8 @@ public:
 	void toratora(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -109,7 +109,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(toratora_timer);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -367,8 +367,8 @@ static INPUT_PORTS_START( toratora )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("pia1", pia6821_device, ca2_w)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("pia1", pia6821_device, ca1_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("pia1", FUNC(pia6821_device::ca2_w))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("pia1", FUNC(pia6821_device::ca1_w))
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("U13:!1,!2")
@@ -427,7 +427,7 @@ void toratora_state::toratora(machine_config &config)
 	m_pia[2]->ca2_handler().set(m_sn[1], FUNC(sn76477_device::vco_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(5.185_MHz_XTAL, 256+40, 0, 256, 256+31+4, 8, 248);
 	m_screen->set_screen_update(FUNC(toratora_state::screen_update));

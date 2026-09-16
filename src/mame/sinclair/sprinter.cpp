@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
+// thanks-to:Blade, TolikTrek, RomanRom2
 /*******************************************************************************************
 
 Sprinter Sp2000 (Peters Plus Ltd)
@@ -25,11 +26,23 @@ Hardware:
 Refs:
     https://web.archive.org/web/20030208004427/http://www.petersplus.com/sprinter/
 
+Emulation NOTES:
+Following manual configuration adjustments are recommended for better experience:
+- CDROM CDDA Sound is only connected to ata1:1
+- Input Settings > Keyboard Selection >
+        Microsoft Natural Keyboard [root:kbd:ms_naturl]: Enabled
+- Input Settings > Input Assignments (this system) > Microsoft 2-Button Serial Mouse (HLE) [root:rs232:microsoft_mouse]
+        Mouse X 3 Analog:                                Mouse X    (MOUSECODE_1_XAXIS)
+        Mouse X 3 Analog Inc:                            Mouse X -  (MOUSECODE_1_XAXIS_NEG_SWITCH)
+        Mouse X 3 Analog Dec:                            Mouse X +  (MOUSECODE_1_XAXIS_POS_SWITCH)
+        Mouse Y 3 Analog:                                Mouse Y    (MOUSECODE_1_YAXIS)
+        Mouse Y 3 Analog Inc:                            Mouse Y -  (MOUSECODE_1_YAXIS_NEG_SWITCH)
+        Mouse Y 3 Analog Dec:                            Mouse Y +  (MOUSECODE_1_YAXIS_POS_SWITCH)
+
 TODO:
 - ISA memory slots
 - fully untied from Spectrum parent
 - better rendering (currently not fully discovered) in Game Configuration
-- ? detect loading Configuration by checksum, not by presents in fastram
 
 *******************************************************************************************/
 
@@ -47,9 +60,10 @@ TODO:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -57,6 +71,7 @@ TODO:
 #include "tilemap.h"
 
 #include <algorithm>
+#include <iterator>
 
 #include "sprinter.lh"
 
@@ -82,7 +97,8 @@ public:
 	sprinter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_isa(*this, "isa%u", 0U)
+		, m_isa(*this, "isa8%u", 0U)
+		, m_irqs(*this, "irqs")
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
@@ -108,23 +124,30 @@ public:
 	INPUT_CHANGED_MEMBER(turbo_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
-	void map_io(address_map &map);
-	void map_mem(address_map &map);
-	void map_fetch(address_map &map);
+	void map_io(address_map &map) ATTR_COLD;
+	void map_mem(address_map &map) ATTR_COLD;
+	void map_fetch(address_map &map) ATTR_COLD;
 	u8 m1_r(offs_t offset);
+	void cio_dtrb_w(int state);
+	u8 joy_ctrl_r(int num);
+	void pio_b_w(int state);
 
 	void init_taps();
 
 	void update_memory();
 	void update_cpu();
+	void update_video(bool is312);
 
-	TIMER_CALLBACK_MEMBER(irq_on) override;
-	TIMER_CALLBACK_MEMBER(irq_off) override;
+	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
+	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(cbl_tick);
+	TIMER_CALLBACK_MEMBER(acc_tick);
+	TIMER_CALLBACK_MEMBER(wait_off);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -140,39 +163,36 @@ protected:
 private:
 	enum accel_state : u8
 	{
-		OFF        = 0,    // ld b,b
-		FILL,              // ld c,c
-		SET_BUFFER,        // ld d,d
-		FILL_VERT,         // ld e,e
-		DOUBLE,            // ld h,h
-		COPY,              // ld l,l
-		OFF_HALT,          // halt
-		COPY_VERT,         // ld a,a
-
 		MODE_AND   = 0xa6, // and (hl)
 		MODE_XOR   = 0xae, // xor (hl)
 		MODE_OR    = 0xb6, //  or (hl)
 		MODE_NOP   = 0xbe  //  cp (hl)
 	};
+	enum access_state : u8
+	{
+		ACCEL_OFF = 0,
+		ACCEL_GO,
+		ACCEL_ON
+	};
 
-	static constexpr XTAL X_SP                 = 42_MHz_XTAL; // TODO X1 after spectrumless
+	static inline constexpr XTAL X_SP                 = 42_MHz_XTAL; // TODO X1 after spectrumless
 
-	static constexpr u16  SPRINT_WIDTH         = 896;
-	static constexpr u16  SPRINT_BORDER_RIGHT  = 48;
-	static constexpr u16  SPRINT_SCREEN_XSIZE  = 640;
-	static constexpr u16  SPRINT_BORDER_LEFT   = 48;
-	static constexpr u16  SPRINT_XVIS          = SPRINT_BORDER_RIGHT + SPRINT_SCREEN_XSIZE + SPRINT_BORDER_LEFT;
+	static inline constexpr u16  SPRINT_WIDTH         = 896;
+	static inline constexpr u16  SPRINT_BORDER_RIGHT  = 48;
+	static inline constexpr u16  SPRINT_SCREEN_XSIZE  = 640;
+	static inline constexpr u16  SPRINT_BORDER_LEFT   = 48;
+	static inline constexpr u16  SPRINT_XVIS          = SPRINT_BORDER_RIGHT + SPRINT_SCREEN_XSIZE + SPRINT_BORDER_LEFT;
 
-	static constexpr u16  SPRINT_HEIGHT        = 320;
-	static constexpr u16  SPRINT_BORDER_TOP    = 16;
-	static constexpr u16  SPRINT_SCREEN_YSIZE  = 256;
-	static constexpr u16  SPRINT_BORDER_BOTTOM = 16;
-	static constexpr u16  SPRINT_YVIS          = SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE + SPRINT_BORDER_BOTTOM;
+	static inline constexpr u16  SPRINT_HEIGHT        = 320;
+	static inline constexpr u16  SPRINT_BORDER_TOP    = 16;
+	static inline constexpr u16  SPRINT_SCREEN_YSIZE  = 256;
+	static inline constexpr u16  SPRINT_BORDER_BOTTOM = 16;
+	static inline constexpr u16  SPRINT_YVIS          = SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE + SPRINT_BORDER_BOTTOM;
 
-	static constexpr u16 BANK_RAM_MASK         = 1 << 8;
-	static constexpr u16 BANK_FASTRAM_MASK     = 1 << 9;
-	static constexpr u16 BANK_ISA_MASK         = 1 << 10;
-	static constexpr u16 BANK_WRDISBL_MASK     = 1 << 12;
+	static inline constexpr u16 BANK_RAM_MASK         = 1 << 8;
+	static inline constexpr u16 BANK_FASTRAM_MASK     = 1 << 9;
+	static inline constexpr u16 BANK_ISA_MASK         = 1 << 10;
+	static inline constexpr u16 BANK_WRDISBL_MASK     = 1 << 12;
 
 	bool acc_ena()     const { return BIT(m_all_mode, 0); }
 	bool cbl_mode()    const { return BIT(m_cbl_xx, 7); }
@@ -188,23 +208,26 @@ private:
 
 	u8 bootstrap_r(offs_t offset);
 	void bootstrap_w(offs_t offset, u8 data);
-	u8 ram_r(offs_t offset);
-	void ram_w(offs_t offset, u8 data);
+	template <u8 Bank> u8 ram_r(offs_t offset);
+	template <u8 Bank> void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
 	void update_int(bool recalculate);
 	u8 isa_r(offs_t offset);
 	void isa_w(offs_t offset, u8 data);
+	void do_mem_wait(u8 cpu_taken);
 
+	void check_accel(bool is_read, offs_t offset, u8 &data);
 	void accel_control_r(u8 data);
-	void accel_r_tap(u16 offset, u8 &data);
-	void accel_w_tap(u16 offset, u8 &data);
+	void do_accel_block(bool is_read);
+	void accel_mem_r(offs_t offset);
+	void accel_mem_w(offs_t offset, u8 data);
 	u8 &accel_buffer(u8 idx);
 	void update_accel_buffer(u8 idx, u8 data);
 
 	u8 kbd_fe_r(offs_t offset);
 	void on_kbd_data(int state);
-	void do_cpu_wait(bool is_io = false);
 
+	required_device<input_merger_device> m_irqs;
 	required_device<ds12885_device> m_rtc;
 	required_device_array<ata_interface_device, 2> m_ata;
 	required_device<beta_disk_device> m_beta;
@@ -218,13 +241,11 @@ private:
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tilemap;
-	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	output_finder<> m_turbo_led;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -233,12 +254,20 @@ private:
 	u8 m_ram_pages[0x40] = {}; // 0xc0 - 0xff
 	u16 m_pages[4] = {}; // internal state for faster calculations
 
-	bool m_z80_m1;
+	bool    m_z80_m1;
+	offs_t  m_z80_addr;
+	u8      m_z80_data;
+	bool    m_z80_wait;
+	u8      m_wait_ticks_count;
 	std::list<std::pair<u16, u16>> m_ints;
+	u8      m_joy1_ctrl;
+	u8      m_joy2_ctrl;
 
 	u8 m_conf;
 	bool m_conf_loading;
 	bool m_starting;
+	u16 m_bitstream_count;
+	u32 m_bitstream_hash;
 	bool m_dos; // 0-on, 1-off
 	bool m_cash_on;
 
@@ -259,21 +288,23 @@ private:
 	u8 m_isa_addr_ext;
 	std::pair<s8, s8> m_hold;
 	u8 m_kbd_data_cnt;
+	bool m_in_out_cmd;
 
 	bool m_ata_selected; // 0-primary, 1-secondary
 	u8 m_ata_data_latch;
 
 	// Accelerator
-	bool m_skip_write;
 	u8 m_prf_d;
+	u8 m_rgacc;
 	u8 m_acc_cnt;
 	u8 m_accel_buffer[256] = {};
 	bool m_alt_acc;
 	u16 m_aagr;
 	u8 m_xcnt;
 	u8 m_xagr;
-	accel_state m_acc_dir;
+	u8 m_acc_dir;
 	accel_state m_fn_acc;
+	access_state m_access_state;
 
 	// Covox Blaster
 	u8 m_cbl_xx;
@@ -282,6 +313,8 @@ private:
 	u8 m_cbl_wa;
 	bool m_cbl_wae;
 	emu_timer *m_cbl_timer = nullptr;
+	emu_timer *m_acc_timer = nullptr;
+	emu_timer *m_wait_off_timer = nullptr;
 };
 
 void sprinter_state::update_memory()
@@ -354,6 +387,13 @@ void sprinter_state::update_cpu()
 	m_maincpu->set_clock_scale((m_turbo && m_turbo_hard) ? 6 : 1); // 1 - 21MHz, 0 - 3.5MHz
 }
 
+void sprinter_state::update_video(bool is312)
+{
+	const u16 vtotal = SPRINT_HEIGHT - (8 * is312);
+	m_screen->configure(SPRINT_WIDTH, vtotal, m_screen->visible_area(), attotime::from_ticks(SPRINT_WIDTH * vtotal, X_SP / 3));
+	update_int(true);
+}
+
 u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_conf)
@@ -369,7 +409,8 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 	const bool flash = BIT(screen.frame_number(), 4);
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom();)
 	{
-		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT;
+		const u16 scr_height = screen.height();
+		const u16 b8 = (scr_height + vpos - SPRINT_BORDER_TOP - m_hold.second) % scr_height;
 		for (u16 hpos = cliprect.left(); hpos <= cliprect.right();)
 		{
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
@@ -402,8 +443,8 @@ void sprinter_state::draw_tile(u8* mode, bitmap_ind16 &bitmap, const rectangle &
 	{
 		for (auto dx = cliprect.left(); dx <= cliprect.right(); dx++)
 		{
-			const u8 color = m_vram[(y + ((dy & 7) >> lowres)) * 1024 + x + ((dx & 15) >> (1 + lowres))];
-			*pix++ = pal + (BIT(mode[0], 5) ? color : ((dx & 1) ? (color & 0x0f) : (color >> 4)));
+			const u8 color = m_vram[(y + (((dy - m_hold.second) & 7) >> (lowres ? 1 : 0))) * 1024 + x + (((dx - m_hold.first) & 15) >> (1 + lowres))];
+			*pix++ = pal + (BIT(mode[0], 5) ? color : (((dx - m_hold.first) & 1) ? (color & 0x0f) : (color >> 4)));
 		}
 		pix += SPRINT_WIDTH - cliprect.width();
 	}
@@ -460,7 +501,8 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 {
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT) >> 3;
+		const u16 scr_height = screen.height();
+		const u8 b = ((scr_height + vpos - SPRINT_BORDER_TOP - m_hold.second) % scr_height) >> 3;
 		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH) >> 4;
 		std::pair<u8, u8> scroll = lookback_scroll(a, b);
 
@@ -477,7 +519,7 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 				scroll = {mode[3] & 0x0f, mode[3] >> 4};
 				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - m_hold.first) % SPRINT_WIDTH;
 			}
-			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - m_hold.second) % SPRINT_HEIGHT;
+			const u16 b8 = (scr_height + vpos + scroll.second - SPRINT_BORDER_TOP - m_hold.second) % scr_height;
 
 			if (mode == nullptr)
 			{
@@ -531,15 +573,15 @@ u8 sprinter_state::dcp_r(offs_t offset)
 
 	if (!machine().side_effects_disabled())
 	{
-		do_cpu_wait(true);
 		if (((offset & 0x7f) == 0x7b))
 		{
 			m_cash_on = BIT(offset, 7);
 			update_memory();
 		}
+		do_mem_wait(4);
 	}
 
-	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (BIT(m_pn, 5) << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
 	u8 data = 0xff;
 	switch (dcpp)
@@ -561,7 +603,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		data = m_beta->data_r();
 		break;
 	case 0x15:
-		data = m_beta->state_r();
+		data = m_beta->state_r() & joy_ctrl_r(1);
 		break;
 
 	case 0x1c:
@@ -646,8 +688,6 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	if (m_starting)
 		return;
 
-	do_cpu_wait(true);
-
 	if ((offset & 0xbf) == 0x3c)
 	{
 		m_rom_sys = BIT(~offset, 6);
@@ -661,8 +701,9 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_sys_pg |= BIT(m_rom_rg, 4);
 		update_memory();
 	}
+	do_mem_wait(4);
 
-	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (BIT(m_pn, 5) << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
 	if ((dcpp >= 0xc0) && (dcpp < 0xf0))
 		m_ram_pages[dcpp - 0xc0] = data;
@@ -684,6 +725,8 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_beta->param_w(data);
 		break;
 	case 0x16:
+	case 0x17:
+		m_beta->turbo_w(dcpp & 1);
 		if (data & 2)
 			m_beta->disable();
 		else
@@ -692,9 +735,13 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 
 	case 0x1b:
 		if (data & 0x80)
-			; // RESET
+		{
+			// RESET
+		}
 		if (data & 0x40)
-			; // AEN
+		{
+			// AEN
+		}
 		m_isa_addr_ext = data & 0x3f;
 		break;
 
@@ -725,14 +772,14 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0x2b: // HDD2 - primary
 		m_ata_selected = 0;
 		break;
+	case 0x2c: // 320
+	case 0x2d: // 312
+		update_video(dcpp & 1);
+		break;
 	case 0x2e:
-		if (m_conf)
-			machine().schedule_hard_reset();
-		else
-		{
-			m_conf_loading = 1;
-			machine().schedule_soft_reset();
-		}
+		m_conf = 0;
+		m_conf_loading = 1;
+		machine().schedule_soft_reset();
 		break;
 
 	case 0x88:
@@ -752,7 +799,16 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_cbl_wa = 0;
 		m_cbl_wae = cbl_mode16();
 		const u8 divs[16] = {13, 9, 0, 0, 0, 0, 0, 0, 27, 19, 13, 9, 6, 4, 3, 1};
-		const attotime rate = (cbl_mode() && divs[m_cbl_xx & 15]) ? attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192) : attotime::never;
+		attotime rate;
+		if (cbl_mode() && divs[m_cbl_xx & 15])
+		{
+			rate = attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192);
+		}
+		else
+		{
+			rate = attotime::never;
+			m_irqs->in_clear<2>();
+		}
 		m_cbl_timer->adjust(rate, 0, rate);
 		break;
 	}
@@ -773,14 +829,15 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0xc0: // 1FFD
 	case 0xc8:
 		m_sc = data;
-		if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
+		if (BIT(m_cnf, 6)) m_sc = 0; // CNF_SC_CLEAN
 		update_memory();
 		break;
 	case 0xc1: // 7FFD
 	case 0xc9:
 		m_pn = data;
-		if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
-		if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
+		if (BIT(~m_cnf, 7)) m_pn &= 0x3f; // CNF_PN[7..6]_CLEAN
+		if (BIT(~m_cnf, 7) && BIT(m_cnf, 5)) m_pn &= 0xdf; // CNF_PN[5]_CLEAN
+		if (BIT(m_cnf, 5)) m_pn &= 0xe0;  // CNF_PN[4..0]_CLEAN
 		update_memory();
 		break;
 	case 0xc2:
@@ -818,9 +875,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		if (BIT(data, 2))
 		{
 			m_cnf = data;
-			if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
-			if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
-			if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
+			if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_CLEAN
+			if (BIT(~m_cnf, 7)) m_pn &= 0x3f; // CNF_PN[7..6]_CLEAN
+			if (BIT(~m_cnf, 7) && BIT(m_cnf, 5)) m_pn &= 0xdf; // CNF_PN[5]_CLEAN
+			if (BIT(m_cnf, 5)) m_pn &= 0xe0;  // CNF_PN[4..0]_CLEAN
 		}
 
 		update_memory();
@@ -859,167 +917,222 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 void sprinter_state::accel_control_r(u8 data)
 {
 	const bool is_prefix = (data == 0xcb) || (data == 0xdd) || (data == 0xed) || (data == 0xfd);
-	if (!is_prefix && !m_prf_d) // neither prefix nor prefixed
+	if (acc_ena() && !is_prefix && !m_prf_d) // neither prefix nor prefixed
 	{
 		if ((((data & 0x1b) == 0x00) || ((data & 0x1b) == 0x09) || ((data & 0x1b) == 0x12) || ((data & 0x1b) == 0x1b))
 			&& (((data & 0xe4) == 0x40) || ((data & 0xe4) == 0x64)))
 		{
-			m_acc_dir = ((data & 7) == OFF_HALT) ? OFF : static_cast<accel_state>(data & 7);
+			switch(data & 7)
+			{
+				case 0: m_acc_dir = 0b00000000; break; // LD B,B
+				case 1: m_acc_dir = 0b00100101; break; // LD C,C % % fill by constant
+				case 2: m_acc_dir = 0b00001001; break; // LD D,D % % load count accelerator
+				case 3: m_acc_dir = 0b00010101; break; // LD E,E % % fill by constant VERTICAL
+				case 4: m_acc_dir = 0b01000001; break; // LD H,H % % double byte fn
+				case 5: m_acc_dir = 0b00100111; break; // LD L,L % % copy line
+				case 6: m_acc_dir = 0b00000000; break; // HALT
+				case 7: m_acc_dir = 0b00010111; break; // LD A,A % % copy line VERTICAL
+			}
 			m_fn_acc = MODE_NOP;
 		}
-		else {
+		else
+		{
 			const accel_state state_candidate = static_cast<accel_state>(data);
 			switch(state_candidate)
 			{
-			case MODE_AND:
-			case MODE_XOR:
-			case MODE_OR:
-				m_fn_acc = state_candidate;
-				break;
-			default:
-				break;
+				case MODE_AND:
+				case MODE_XOR:
+				case MODE_OR:
+					m_fn_acc = state_candidate;
+					break;
+				default:
+					break;
 			}
 		}
 	}
 	m_prf_d = is_prefix;
 }
 
-void sprinter_state::accel_r_tap(u16 offset, u8 &data)
+TIMER_CALLBACK_MEMBER(sprinter_state::acc_tick)
 {
-	const std::string_view m{(m_fn_acc == MODE_AND) ? "&" : (m_fn_acc == MODE_OR) ? "|" : (m_fn_acc == MODE_XOR) ? "^" : ""};
-	if (m_acc_dir == SET_BUFFER)
+	assert(m_access_state == ACCEL_GO);
+	m_acc_cnt = m_rgacc;
+	m_access_state = ACCEL_ON;
+
+	const bool is_read = param & 1;
+	int ticks42 = 0;
+	bool is_block_op = BIT(m_acc_dir, 2);
+	while (m_access_state != ACCEL_OFF)
 	{
-		m_acc_cnt = data;
-		LOGACCEL("Accel buffer: %d\n", m_acc_cnt);
-	}
-	else if (m_pages[offset >> 14] & BANK_RAM_MASK) // block ops RAM only
-	{
-		const u16 acc_cnt = m_acc_cnt ? m_acc_cnt : 256;
-		if (m_acc_dir == COPY)
+		if (is_block_op)
+			do_accel_block(is_read);
+
+		if (BIT(m_acc_dir, 3)) // buffer size
 		{
-			LOGACCEL("Accel rCOPY: %s%02x\n", m, offset);
-			for (auto i = 0; i < acc_cnt; i++)
-			{
-				if (i && !machine().side_effects_disabled())
-					do_cpu_wait();
-				const u16 addr = offset + i;
-				data = (m_pages[addr >> 14] & BANK_RAM_MASK) ? ram_r(addr) : 0xff;
-				update_accel_buffer(i, data);
-			}
+			m_rgacc = m_z80_data;
+			LOGACCEL("Accel buffer: %d\n", m_rgacc ? m_rgacc : 256);
 		}
-		else if (m_acc_dir == COPY_VERT)
+		else if (BIT(m_acc_dir, 6) && !is_read) // double writes
 		{
-			LOGACCEL("Accel rCOPY_GR: %s%02x (%x)\n", m, offset, m_port_y);
-			for (auto i = 0; i < acc_cnt; i++)
-			{
-				if (i && !machine().side_effects_disabled())
-					do_cpu_wait();
-				data = ram_r(offset);
-				update_accel_buffer(i, data);
-				m_port_y++;
-			}
+			accel_mem_w(m_z80_addr ^ 1, m_z80_data);
+			ticks42 += 6;
 		}
-		else if (m_acc_dir == FILL_VERT)
-			m_port_y += acc_cnt;
-	}
+
+		if (m_acc_cnt == 1 || !is_block_op)
+		{
+			m_access_state = ACCEL_OFF;
+		}
+		else
+		{
+			ticks42 += 6;
+			m_acc_cnt--;
+		}
+	};
+
+	if (is_block_op)
+		m_wait_off_timer->adjust(attotime::from_ticks(ticks42, X_SP), is_read);
+	else
+		// non block ops call method directly without timer
+		m_maincpu->adjust_icount(-(ticks42 >> 1));
 }
 
-void sprinter_state::accel_w_tap(u16 offset, u8 &data)
+TIMER_CALLBACK_MEMBER(sprinter_state::wait_off)
 {
-	if (m_acc_dir == SET_BUFFER)
+	const bool is_read = param & 1;
+	if (!is_read)
+		m_z80_wait = false;
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+}
+
+void sprinter_state::check_accel(bool is_read, offs_t offset, u8 &data)
+{
+	if (is_read && m_in_out_cmd && !m_z80_m1)
 	{
-		m_acc_cnt = data;
-		LOGACCEL("Accel buffer: %d\n", m_acc_cnt);
+		const bool is_ram = m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK;
+		if (data == 0x1f && is_ram)
+			data = 0x0f;
+		m_in_out_cmd = false;
 	}
-	else if (m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK) // block ops RAM only
+
+	const bool accel_go_case = m_access_state == ACCEL_OFF && !m_z80_m1 && m_acc_dir && acc_ena();
+	if (accel_go_case)
 	{
-		const u16 acc_cnt = m_acc_cnt ? m_acc_cnt : 256;
-		if (m_acc_dir == FILL)
+		if (!m_z80_wait)
 		{
-			LOGACCEL("Accel wFILL: %02x\n", offset);
-			for (auto i = 0; i < acc_cnt; i++)
+			m_access_state = ACCEL_GO;
+			m_z80_addr = offset;
+			m_z80_data = data;
+
+			if (BIT(m_acc_dir, 2)) // block operation
 			{
-				const u16 addr = offset + i;
-				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
-					ram_w(addr, data);
+				// fastram doesn't apply waits, hence m_wait_cycles_count is not updated
+				if (is_read && (~m_pages[BIT(offset, 14, 2)] & BANK_FASTRAM_MASK))
+					m_maincpu->adjust_icount(m_wait_ticks_count);
+
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_acc_timer->adjust(attotime::zero, is_read);
+				m_z80_wait = true;
+
+				if (is_read)
+					m_maincpu->defer_access();
 			}
-		}
-		else if (m_acc_dir == FILL_VERT)
-		{
-			LOGACCEL("Accel wFILL_VERT: %02x (%x)\n", offset, m_port_y);
-			for (auto i = 0; i < acc_cnt; i++)
+			else
 			{
-				ram_w(offset, data);
-				m_port_y++;
-			}
-		}
-		else if (m_acc_dir == DOUBLE)
-		{
-			ram_w(offset, data);
-			ram_w(offset ^ 1, data);
-		}
-		else if (m_acc_dir == COPY)
-		{
-			LOGACCEL("Accel wCOPY: %02x\n", offset);
-			for (auto i = 0; i < acc_cnt; i++)
-			{
-				const u16 addr = offset + i;
-				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
-				{
-					data = accel_buffer(i);
-					ram_w(addr, data);
-				}
-			}
-		}
-		else if (m_acc_dir == COPY_VERT)
-		{
-			LOGACCEL("Accel wCOPY_VERT: %02x (%x)\n", offset, m_port_y);
-			for (auto i = 0; i < acc_cnt; i++)
-			{
-				data = accel_buffer(i);
-				ram_w(offset, data);
-				m_port_y++;
+				acc_tick(is_read);
 			}
 		}
 		else
-			return;
+		{
+			// deferred read
+			assert(is_read);
+			data = m_z80_data;
+			m_z80_wait = false;
+		}
+	}
+}
 
-		m_skip_write = true;
+void sprinter_state::do_accel_block(bool is_read)
+{
+	const bool ram_wr = BIT(m_acc_dir, 1);
+	if (is_read)
+	{
+		accel_mem_r(m_z80_addr);
+		if (ram_wr)
+			update_accel_buffer(m_acc_cnt, m_z80_data);
+	}
+	else
+	{
+		if (ram_wr)
+		{
+			m_z80_data = accel_buffer(m_acc_cnt);
+
+			const u8 pg = m_pages[BIT(m_z80_addr, 14, 2)];
+			if (pg == 0xfd)
+			{
+				if (!cbl_mode16())
+				{
+					m_cbl_data[m_cbl_wa++] = (m_z80_data << 8);
+				}
+				else
+				{
+					if (m_cbl_wae)
+						m_cbl_data[m_cbl_wa] = m_z80_data;
+					else
+					{
+						m_cbl_data[m_cbl_wa] |= ((m_z80_data ^ 0x80) << 8);
+						m_cbl_wa++;
+					}
+					m_cbl_wae = !m_cbl_wae;
+				}
+			}
+		}
+		accel_mem_w(m_z80_addr, m_z80_data);
+	}
+
+	if (BIT(m_acc_dir, 4)) // graph line
+		m_port_y++;
+	else
+		m_z80_addr++;
+}
+
+void sprinter_state::accel_mem_r(offs_t offset)
+{
+	if (m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK)
+	{
+		m_z80_data = m_program.read_byte(offset);
+	}
+}
+
+void sprinter_state::accel_mem_w(offs_t offset, u8 data)
+{
+	if (m_pages[BIT(offset, 14, 2)] & BANK_RAM_MASK)
+	{
+		m_program.write_byte(offset, data);
 	}
 }
 
 u8 &sprinter_state::accel_buffer(u8 idx)
 {
-	u8 ram_adr = m_acc_cnt - idx;
 	if (m_alt_acc)
 	{
-		ram_adr = m_xcnt;
+		idx = m_xcnt;
 		const u16 xcnt_agr = ((m_xcnt << 8) | m_xagr) + m_aagr;
 		m_xcnt = xcnt_agr >> 8;
 		m_xagr = xcnt_agr & 0xff;
 	}
 
-	return m_accel_buffer[ram_adr];
+	return m_accel_buffer[idx];
 }
 
 void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 {
 	switch (m_fn_acc)
 	{
-	case MODE_AND:
-		accel_buffer(idx) &= data;
-		break;
-	case MODE_OR:
-		accel_buffer(idx) |= data;
-		break;
-	case MODE_XOR:
-		accel_buffer(idx) ^= data;
-		break;
-	case MODE_NOP:
-		accel_buffer(idx) = data;
-		break;
-	default:
-		assert(false);
+		case MODE_AND: accel_buffer(idx) &= data; break;
+		case MODE_OR:  accel_buffer(idx) |= data; break;
+		case MODE_XOR: accel_buffer(idx) ^= data; break;
+		case MODE_NOP: accel_buffer(idx) = data; break;
+		default: assert(false); break;
 	}
 }
 
@@ -1033,46 +1146,62 @@ u8 sprinter_state::bootstrap_r(offs_t offset)
 
 void sprinter_state::bootstrap_w(offs_t offset, u8 data)
 {
-	if (m_conf_loading)
+	if (!m_conf_loading)
 	{
-		m_conf_loading = 0;
-		m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram (which is Game Config)
-		m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
-		machine().schedule_soft_reset();
+		m_program.write_byte(0x10000 | u16(offset), data);
 	}
 	else
-		m_program.write_byte(0x10000 | u16(offset), data);
-}
-
-u8 sprinter_state::ram_r(offs_t offset)
-{
-	const u8 bank = BIT(offset, 14, 2);
-	return ((m_pages[bank] & 0xf0) == 0x50)
-		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
-		: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
-}
-
-void sprinter_state::ram_w(offs_t offset, u8 data)
-{
-	if (m_skip_write)
 	{
-		m_skip_write = false;
-		return;
+		m_fastram[offset & 0xffff] = data;
+		m_bitstream_hash += data << (8 * (m_bitstream_count % 4));
+		if (++m_bitstream_count > 0xfff)
+		{
+			m_conf_loading = 0;
+			m_conf = !(m_maincpu->csbr_r() & 0x0f); // cs0 disabled => loader reads config from fastram
+			m_conf &= m_bitstream_hash == 0x3861cfa4; // Game Config
+			m_ram_pages[0x2e] = m_conf ? 0x41 : 0x00;
+			machine().schedule_soft_reset();
+		}
 	}
-	do_cpu_wait();
+}
 
-	const u8 bank = BIT(offset, 14, 2);
-	const u8 page = m_pages[bank] & 0xff;
-	if ((bank == 3) && (m_sc == 0x10) && (m_pages[3] == (BANK_RAM_MASK | 0xa0)))
+template <u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
+{
+	static_assert(Bank < 4, "unexpected bank number");
+
+	if (!machine().side_effects_disabled())
+		do_mem_wait(3);
+
+	return ((m_pages[Bank] & 0xf0) == 0x50)
+		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
+		: reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset & 0x3fff];
+}
+
+template <u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
+{
+	static_assert(Bank < 4, "unexpected bank number");
+	if (m_access_state == ACCEL_GO)
+		return;
+
+	do_mem_wait(3);
+
+	offset = (Bank << 14) | (offset & 0x3fff);
+	const u8 page = m_pages[Bank] & 0xff;
+	if ((Bank == 3) && (m_sc == 0x10) && (m_pages[3] == (BANK_RAM_MASK | 0xa0)))
 		machine().schedule_soft_reset();
 
 	if ((page & 0xf0) == 0x50)
 	{
+		const bool transparent = BIT(page, 3);
+		if (transparent && (data == 0xff))
+			return;
+
 		const u32 vaddr = m_port_y * 1024 + (offset & 0x3ff);
-		if (BIT(~page, 2))
+		const bool vram_only = BIT(page, 2);
+		if (!vram_only)
 			m_ram->pointer()[(0x50 << 14) + vaddr] = data;
-		if (!(BIT(page, 3) && (data == 0xff)))
-			vram_w(vaddr, data);
+
+		vram_w(vaddr, data);
 	}
 	else
 	{
@@ -1088,24 +1217,7 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 				vram_w(vxa, data);
 			}
 		}
-		else if ((m_acc_dir != OFF) && (page == 0xfd))
-		{
-			if (!cbl_mode16())
-				m_cbl_data[m_cbl_wa++] = (data << 8);
-			else
-			{
-				if (m_cbl_wae)
-					m_cbl_data[m_cbl_wa] = data;
-				else
-				{
-					m_cbl_data[m_cbl_wa] |= ((data ^ 0x80) << 8);
-					m_cbl_wa++;
-				}
-				m_cbl_wae = !m_cbl_wae;
-			}
-		}
-
-		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
+		reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset & 0x3fff] = data;
 	}
 }
 
@@ -1135,9 +1247,15 @@ u8 sprinter_state::isa_r(offs_t offset)
 {
 	const u8 ctrl = m_ram_pages[m_pg3];
 	if ((ctrl & 0xf9) == 0xd0)
+	{
+		if (!machine().side_effects_disabled())
+			do_mem_wait(3);
+
 		return BIT(ctrl, 2) // D:2 0-mem, 1-io
 			? m_isa[BIT(ctrl, 1)]->io_r((m_isa_addr_ext << 14) | offset)
-			: m_isa[BIT(ctrl, 1)]->mem_r((m_isa_addr_ext << 14) | offset);
+			// as far as no connected memory yet, pull up and avoid log about unmapped mem
+			: 0xff; //m_isa[BIT(ctrl, 1)]->mem_r((m_isa_addr_ext << 14) | offset);
+	}
 
 	return 0xff;
 }
@@ -1147,21 +1265,28 @@ void sprinter_state::isa_w(offs_t offset, u8 data)
 	const u8 ctrl = m_ram_pages[m_pg3];
 	if ((ctrl & 0xf9) == 0xd0)
 	{
+		do_mem_wait(3);
+
 		if (BIT(ctrl, 2))
 			m_isa[BIT(ctrl, 1)]->io_w((m_isa_addr_ext << 14) | offset, data);
 		else
-			m_isa[BIT(ctrl, 1)]->mem_w((m_isa_addr_ext << 14) | offset, data);
+			// as far as no connected memory yet, nop write and avoid log about unmapped mem
+			/*m_isa[BIT(ctrl, 1)]->mem_w((m_isa_addr_ext << 14) | offset, data)*/;
 	}
 }
 
 void sprinter_state::update_int(bool recalculate)
 {
-	if (recalculate || m_ints.empty())
+	if (recalculate)
+		m_ints.clear();
+
+	const u8 height = m_screen->height() / 8;
+	if (m_ints.empty())
 	{
-		for (auto scr_b = 0; scr_b <= 39; scr_b++)
+		for (auto scr_b = 0; scr_b < height; scr_b++)
 		{
 			bool pre_int = false;
-			const u8 b = (scr_b + 40 - 2) % 40; // 2-top border
+			const u8 b = (scr_b + height - 2) % height; // 2-top border
 			for (auto scr_a = 0; scr_a <= 55; scr_a++)
 			{
 				const u8 a = (scr_a + 56 - 6) % 56; // 3-left border, 3-teared blank?
@@ -1193,10 +1318,59 @@ u8 sprinter_state::m1_r(offs_t offset)
 	u8 data = m_program.read_byte(offset);
 	m_z80_m1 = 0;
 
-	if (!machine().side_effects_disabled() && acc_ena())
+	if (!machine().side_effects_disabled())
+	{
+		m_in_out_cmd = !m_prf_d && (data & 0xf7) == 0xd3; // d3/db - only non-prefixed
 		accel_control_r(data);
+	}
 
 	return data;
+}
+
+void sprinter_state::cio_dtrb_w(int state)
+{
+	if ((state ^ m_joy1_ctrl) & 1)
+	{
+		++m_joy1_ctrl;
+	}
+}
+
+void sprinter_state::pio_b_w(int state)
+{
+	if (((m_maincpu->pb_r() >> 7) ^ m_joy2_ctrl) & 1)
+	{
+		++m_joy2_ctrl;
+	}
+}
+
+u8 sprinter_state::joy_ctrl_r(int num)
+{
+	const bool is_joy2 = num == 2;
+	u16 joy_data = is_joy2 ? m_io_joy2->read() : m_io_joy1->read();
+	switch (is_joy2 ? m_joy2_ctrl : m_joy1_ctrl)
+	{
+		case 0b001:
+			joy_data = (joy_data >> 6) | 0x03;
+			break;
+		case 0b101:
+			joy_data = (joy_data >> 6) | 0x0f;
+			break;
+		case 0b110:
+			joy_data = joy_data >> 12;
+			break;
+		case 0b111:
+			joy_data = (joy_data >> 6) & 0x30;
+			break;
+		default:
+			break;
+	}
+
+	joy_data |= 0xc0;
+	if (is_joy2)
+	{
+		joy_data ^= 0xff;
+	}
+	return joy_data;
 }
 
 void sprinter_state::map_fetch(address_map &map)
@@ -1229,13 +1403,17 @@ void sprinter_state::map_fetch(address_map &map)
 void sprinter_state::map_mem(address_map &map)
 {
 	map(0x00000, 0x3ffff).rw(FUNC(sprinter_state::bootstrap_r), FUNC(sprinter_state::bootstrap_w));  // bootstrap
-	map(0x10000, 0x1ffff).rw(FUNC(sprinter_state::ram_r), FUNC(sprinter_state::ram_w));
 
+	map(0x10000, 0x13fff).rw(FUNC(sprinter_state::ram_r<0>), FUNC(sprinter_state::ram_w<0>));
 	map(0x10000, 0x13fff).view(m_bank_view0);
 	m_bank_view0[0](0x10000, 0x13fff).nopw(); // RAM RO
 	m_bank_view0[1](0x10000, 0x13fff).nopw().bankr(m_bank_rom[0]);
 	m_bank_view0[2](0x10000, 0x13fff).bankrw(m_bank0_fastram);
 
+	map(0x14000, 0x17fff).rw(FUNC(sprinter_state::ram_r<1>), FUNC(sprinter_state::ram_w<1>));
+	map(0x18000, 0x1bfff).rw(FUNC(sprinter_state::ram_r<2>), FUNC(sprinter_state::ram_w<2>));
+
+	map(0x1c000, 0x1ffff).rw(FUNC(sprinter_state::ram_r<3>), FUNC(sprinter_state::ram_w<3>));
 	map(0x1c000, 0x1ffff).view(m_bank_view3);
 	m_bank_view3[0](0x1c000, 0x1ffff).rw(FUNC(sprinter_state::isa_r), FUNC(sprinter_state::isa_w)); // ISA
 }
@@ -1253,18 +1431,30 @@ void sprinter_state::init_taps()
 	{
 		if (!machine().side_effects_disabled())
 		{
-			if (!(m_pages[BIT(offset, 14, 2)] & (BANK_FASTRAM_MASK | BANK_ISA_MASK))) // ROM+RAM
-				do_cpu_wait();
-			if(!m_z80_m1 && acc_ena() && (m_acc_dir != OFF))
-				accel_r_tap(offset, data);
+			check_accel(true, offset, data);
 		}
 	});
 	prg.install_write_tap(0x10000, 0x1ffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!(m_pages[BIT(offset, 14, 2)] & 0xff00)) // ROM only, RAM(w) applies waits manually
-			do_cpu_wait();
-		if (!m_z80_m1 && acc_ena() && (m_acc_dir != OFF))
-			accel_w_tap(offset, data);
+		if (!machine().side_effects_disabled())
+		{
+			check_accel(false, offset, data);
+		}
+	});
+
+	m_maincpu->space(AS_IO).install_write_tap(0x0000, 0xffff, "cpu_io_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		// Internal z84 ports are not accessible through IO map, hence they need special case here
+		// Keep these in ascending order
+		constexpr u8 z84_int[] = {
+			0x10, 0x11, 0x12, 0x13,
+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			0xee, 0xef,
+			0xf0, 0xf1, 0xf4
+		};
+		const auto found = std::lower_bound(std::begin(z84_int), std::end(z84_int), offset);
+		if ((found != std::end(z84_int)) && (*found == offset))
+			dcp_w(offset, data);
 	});
 }
 
@@ -1275,14 +1465,20 @@ void sprinter_state::machine_start()
 
 	spectrum_128_state::machine_start();
 
-	m_turbo_led.resolve();
-
 	save_item(NAME(m_ram_pages));
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));
+	save_item(NAME(m_z80_addr));
+	save_item(NAME(m_z80_data));
+	save_item(NAME(m_z80_wait));
+	save_item(NAME(m_wait_ticks_count));
+	save_item(NAME(m_joy1_ctrl));
+	save_item(NAME(m_joy2_ctrl));
 	save_item(NAME(m_conf));
 	save_item(NAME(m_conf_loading));
 	save_item(NAME(m_starting));
+	save_item(NAME(m_bitstream_count));
+	save_item(NAME(m_bitstream_hash));
 	save_item(NAME(m_dos));
 	save_item(NAME(m_cash_on));
 	save_item(NAME(m_cnf));
@@ -1300,20 +1496,23 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_rgmod));
 	save_item(NAME(m_pg3));
 	save_item(NAME(m_isa_addr_ext));
-	//save_item(NAME(m_hold));
+	save_item(NAME(m_hold.first));
+	save_item(NAME(m_hold.second));
 	save_item(NAME(m_kbd_data_cnt));
+	save_item(NAME(m_in_out_cmd));
 	save_item(NAME(m_ata_selected));
 	save_item(NAME(m_ata_data_latch));
-	save_item(NAME(m_skip_write));
 	save_item(NAME(m_prf_d));
+	save_item(NAME(m_rgacc));
 	save_item(NAME(m_acc_cnt));
 	save_item(NAME(m_accel_buffer));
 	save_item(NAME(m_alt_acc));
 	save_item(NAME(m_aagr));
 	save_item(NAME(m_xcnt));
 	save_item(NAME(m_xagr));
-	//save_item(NAME(m_acc_dir));
-	//save_item(NAME(m_fn_acc));
+	save_item(NAME(m_acc_dir));
+	save_item(NAME(m_fn_acc));
+	save_item(NAME(m_access_state));
 	save_item(NAME(m_cbl_xx));
 	save_item(NAME(m_cbl_data));
 	save_item(NAME(m_cbl_cnt));
@@ -1323,14 +1522,13 @@ void sprinter_state::machine_start()
 	m_beta->enable();
 
 	// reconfigure ROMs
-	m_rom = memregion("maincpu");
-	m_bank_rom[0]->configure_entries(0, m_rom->bytes() / 0x4000, m_rom->base(), 0x4000);
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
 	m_bank0_fastram->configure_entries(0, m_fastram.bytes() / 0x4000, m_fastram.target(), 0x4000);
 	for (auto i = 0; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES
@@ -1350,10 +1548,15 @@ void sprinter_state::machine_start()
 
 void sprinter_state::machine_reset()
 {
-	m_cbl_timer->adjust(attotime::never);
+	m_acc_timer->reset();
+	m_cbl_timer->reset();
+	m_wait_off_timer->reset();
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	spectrum_128_state::machine_reset();
 
+	m_z80_wait = false;
+	m_wait_ticks_count = 0;
 	m_starting = 1;
 	m_dos = 1; // off
 	m_rom_sys = 0;
@@ -1366,10 +1569,11 @@ void sprinter_state::machine_reset()
 	m_rom_rg = 0x00;
 	m_cash_on = 0;
 	m_isa_addr_ext = 0;
+	m_joy1_ctrl = m_joy2_ctrl = 0;
 
-	m_skip_write = false;
+	m_access_state = ACCEL_OFF;
 	m_prf_d = false;
-	m_acc_dir = OFF;
+	m_acc_dir = 0;
 	m_alt_acc = 0;
 
 	m_cbl_xx = 0;
@@ -1378,16 +1582,28 @@ void sprinter_state::machine_reset()
 	m_ata_selected = 0;
 
 	m_kbd_data_cnt = 0;
+	m_in_out_cmd = false;
 	m_turbo_hard = 1;
 
 	if (m_conf_loading)
 	{
+		m_bitstream_count = 0;
+		m_bitstream_hash = 0;
 		m_bank_rom[0]->set_entry(0x0c);
 		m_bank_view0.select(1);
 		m_bank_view3.disable();
 	}
 	else
+	{
 		update_memory();
+		update_video(0);
+	}
+}
+
+void sprinter_state::device_post_load()
+{
+	spectrum_128_state::device_post_load();
+	m_ints.clear();
 }
 
 static const gfx_layout sprinter_charlayout =
@@ -1430,16 +1646,24 @@ void sprinter_state::video_start()
 
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprinter_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
-	m_contention_pattern = {};
 	init_taps();
 
+	m_acc_timer = timer_alloc(FUNC(sprinter_state::acc_tick), this);
 	m_cbl_timer = timer_alloc(FUNC(sprinter_state::cbl_tick), this);
+	m_wait_off_timer = timer_alloc(FUNC(sprinter_state::wait_off), this);
 }
 
 static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("dvdrom", ATAPI_DVDROM);
+}
+
+static void cdrom_config(device_t *device)
+{
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakers", 0.5, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakers", 0.5, 1);
 }
 
 u8 sprinter_state::kbd_fe_r(offs_t offset)
@@ -1486,31 +1710,39 @@ void sprinter_state::on_kbd_data(int state)
 		m_kbd_data_cnt++;
 		m_kbd_data_cnt %= 11;
 		if (!m_kbd_data_cnt)
-			irq_on(0);
+		{
+			m_irqs->in_set<1>();
+			m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+		}
 	}
 }
 
-void sprinter_state::do_cpu_wait(bool is_io)
+void sprinter_state::do_mem_wait(u8 cpu_taken = 0)
 {
-	if ((m_turbo && m_turbo_hard))
+	m_wait_ticks_count = 0;
+	if (m_turbo && m_turbo_hard && !m_z80_wait)
 	{
-		u8 count = is_io ? 4 : 3;
-		const u8 over = m_maincpu->total_cycles() % count;
-		count = count + (over ? (count - over) : 0);
-		m_maincpu->adjust_icount(-count);
+		u8 over = m_maincpu->total_cycles() % 6;
+		over = over ? (6 - over) : 0;
+		m_wait_ticks_count = over + 6 - cpu_taken;
+
+		m_maincpu->adjust_icount(-m_wait_ticks_count);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_off_timer->adjust(attotime::from_ticks(26, m_maincpu->clock()));
+	m_irqs->in_set<0>();
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+
+	m_joy1_ctrl = m_joy2_ctrl = 0;
 	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_irqs->in_clear<0>(); // screen
+	m_irqs->in_clear<1>(); // keyboard
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1527,8 +1759,8 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
 	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(attotime::never);
+		m_cbl_wa = m_cbl_cnt ^ 0x80;
+		m_irqs->in_set<2>();
 	}
 }
 
@@ -1544,12 +1776,12 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)  PORT_CHAR(UCHAR_SHIFT_1) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
 																	 PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    $      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR('$')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)       PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 																	 PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line0")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line0") PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line0") PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_SLASH)  PORT_CODE(KEYCODE_SLASH_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IO_LINE1") /* 0xFDFE */
@@ -1660,10 +1892,10 @@ INPUT_PORTS_START( sprinter )
 
 
 	PORT_START("mouse_input1")
-	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(60)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_INVERT PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_INVERT PORT_SENSITIVITY(60)
 
 	PORT_START("mouse_input3")
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1671,44 +1903,86 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
+	PORT_START("JOY1")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0104, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_8WAY
+	PORT_BIT(0x0208, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1UP) PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_8WAY
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON2) PORT_NAME("%p B")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON5) PORT_NAME("%p C")
+	PORT_BIT(0x00c0, IP_ACTIVE_LOW,  IPT_UNUSED)
 
-	//PORT_START("NMI")
-	//PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F11)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON1) PORT_NAME("%p A")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_BUTTON8)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON8) PORT_NAME("%p Start")
+
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON7) PORT_NAME("%p Select")
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON3) PORT_NAME("%p X")
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON4) PORT_NAME("%p Y")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON6) PORT_NAME("%p Z")
+
+	PORT_START("JOY2")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH) PORT_8WAY
+	PORT_BIT(0x0104, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1DOWN) PORT_CODE(JOYCODE_Y_DOWN_SWITCH) PORT_8WAY
+	PORT_BIT(0x0208, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_PLAYER(2) PORT_CODE(JOYCODE_HAT1UP) PORT_CODE(JOYCODE_Y_UP_SWITCH) PORT_8WAY
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON2) PORT_NAME("%p B")
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON5) PORT_NAME("%p C")
+	PORT_BIT(0x00c0, IP_ACTIVE_LOW,  IPT_UNUSED)
+
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON1) PORT_NAME("%p A")
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_BUTTON8)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON8) PORT_NAME("%p Start")
+
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON7) PORT_NAME("%p Select")
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_BUTTON3)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON3) PORT_NAME("%p X")
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_BUTTON4)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON4) PORT_NAME("%p Y")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON6) PORT_NAME("%p Z")
+
 
 	PORT_START("TURBO")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TURBO") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sprinter_state::turbo_changed), 0)
 INPUT_PORTS_END
 
 void sprinter_state::sprinter(machine_config &config)
 {
 	spectrum_128(config);
 	config.device_remove("palette");
+	config.device_remove("exp");
+	config.device_remove("dma");
 	config.set_default_layout(layout_sprinter);
 
 	m_ram->set_default_size("64M");
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
-	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
+	m_maincpu->irqack_cb().set(m_irqs, FUNC(input_merger_any_high_device::in_clear<2>));
+	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<1>));
+	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<0>));
 
-	ISA8(config, m_isa[0], 0);
+	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
+	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "cdrom", false);
+	m_ata[0]->slot(1).set_option_machine_config("cdrom", cdrom_config);
+	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
+
+	BETA_DISK(config, m_beta);
+
+	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace(m_isa[0], isa8_device::AS_ISA_IO);
-	ZXBUS_SLOT(config, "zxbus2isa", 0, "zxbus", zxbus_cards, nullptr);
+	ISA8_SLOT(config, "isa0", 0, m_isa[0], pc_isa8_cards, "zxbus_adapter", false); // FIXME: determine ISA bus clock
 
-	ISA8(config, m_isa[1], 0);
+	ISA8(config, m_isa[1], X_SP / 5);
 	m_isa[1]->set_custom_spaces();
-	ISA8_SLOT(config, "isa8", 0, m_isa[1], pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isa[1], pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
 
 	PALETTE(config, "palette", palette_device::BLACK).set_entries(256 * 8);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR
@@ -1719,6 +1993,9 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_clk_trg<0>(X_SP / 48);
 	m_maincpu->set_clk_trg<1>(X_SP / 48);
 	m_maincpu->set_clk_trg<2>(X_SP / 48);
+	m_maincpu->out_dtrb_callback().set(FUNC(sprinter_state::cio_dtrb_w)); // joy1 ctrl
+	m_maincpu->out_pb_callback().set(FUNC(sprinter_state::pio_b_w)); // joy2 ctrl
+	m_maincpu->in_pa_callback().set([this]() { return joy_ctrl_r(2); });
 
 	rs232_port_device &m_rs232(RS232_PORT(config, "rs232", default_rs232_devices, "microsoft_mouse"));
 	m_rs232.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
@@ -1730,23 +2007,17 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
 	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
 
-	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
-	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
-	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
+	SPEAKER(config.replace(), "speakers", 2).front();
 
-	BETA_DISK(config, m_beta, 0);
+	config.device_remove("ay_slot");
+	AY8910(config, "ay8912", X_SP / 24)
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(1, "speakers", 0.25, 0)
+		.add_route(1, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	ay8910_device &ay8910(AY8910(config.replace(), "ay8912", X_SP / 24));
-	ay8910.add_route(0, "lspeaker", 0.50);
-	ay8910.add_route(1, "lspeaker", 0.25);
-	ay8910.add_route(1, "rspeaker", 0.25);
-	ay8910.add_route(2, "rspeaker", 0.50);
-
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 0);
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 1);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_sprinter);
 }
@@ -1754,27 +2025,35 @@ void sprinter_state::sprinter(machine_config &config)
 
 ROM_START( sprinter )
 	ROM_REGION(0x040000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v3.04.253")
+	ROM_DEFAULT_BIOS("v3.04")
 
-	ROM_SYSTEM_BIOS(0, "v2.13.251", "BIOS v2.13, SETUP v251") // 11.10.2002
-	ROMX_LOAD( "sp2k-2.13.251.rom", 0x000000, 0x40000, CRC(6495575f) SHA1(a9ca06b27e7c5b2b5b9ff8fc2d19ee24ed64c258), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "v2.13", "Firmware v2.13, 23.01.2002") // dd.mm.yyyy
+	ROMX_LOAD( "sp2k-2.13.rom", 0x000000, 0x40000, CRC(6495575f) SHA1(a9ca06b27e7c5b2b5b9ff8fc2d19ee24ed64c258), ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS(1, "v2.17.252", "BIOS v2.17, SETUP v252") // 03.03.2002
-	ROMX_LOAD( "sp2k-2.17.252.rom", 0x000000, 0x40000, CRC(3c7f1025) SHA1(d5c3d10b3b67f9ef87d3ce8a52ae3c33b95b9171), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "v2.17", "Firmware v2.17, 03.03.2002")
+	ROMX_LOAD( "sp2k-2.17.rom", 0x000000, 0x40000, CRC(3c7f1025) SHA1(d5c3d10b3b67f9ef87d3ce8a52ae3c33b95b9171), ROM_BIOS(1))
 
-	ROM_SYSTEM_BIOS(2, "v3.00.253", "BIOS v3.00, SETUP v253") // 04.10.2002
-	ROMX_LOAD( "sp2k-3.00.253.rom", 0x000000, 0x40000, CRC(193de3da) SHA1(428dcb1253a88e7b5aedcd68b5bf6d2487592e10), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "v3.00", "Firmware v3.00, 07.04.2002")
+	ROMX_LOAD( "sp2k-3.00.rom", 0x000000, 0x40000, CRC(193de3da) SHA1(428dcb1253a88e7b5aedcd68b5bf6d2487592e10), ROM_BIOS(2))
 
-	ROM_SYSTEM_BIOS(3, "v3.03.253", "BIOS v3.03, SETUP v253") // 02.05.2003
-	ROMX_LOAD( "sp2k-3.03.253.rom", 0x000000, 0x40000, CRC(fe26f578) SHA1(ef6d0fe4ec1bae7bda572a4fb3b9497a8910b885), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(3, "v3.03", "Firmware v3.03, 13.05.2003")
+	ROMX_LOAD( "sp2k-3.03.rom", 0x000000, 0x40000, CRC(fe26f578) SHA1(ef6d0fe4ec1bae7bda572a4fb3b9497a8910b885), ROM_BIOS(3))
 
-	ROM_SYSTEM_BIOS(4, "v3.04.253", "BIOS v3.04, SETUP v253") // 06.16.2003
-	ROMX_LOAD( "sp2k-3.04.253.rom", 0x000000, 0x40000, CRC(1729cb5c) SHA1(fb4c9f80651aa87526f141839fb4d6cb86b654c7), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "v3.04", "Firmware v3.04, 17.06.2003")
+	ROMX_LOAD( "sp2k-3.04.rom", 0x000000, 0x40000, CRC(1729cb5c) SHA1(fb4c9f80651aa87526f141839fb4d6cb86b654c7), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(5, "v3.05", "Firmware v3.05, 01.09.2022")
+	ROMX_LOAD( "sp2k-3.05.rom", 0x000000, 0x40000, CRC(fe1c2685) SHA1(10e4e29bdc058cd4380837fb8831ce4f5977f6b8), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(6, "v3.06", "Firmware v3.06, 25.06.2025")
+	ROMX_LOAD( "sp2k-3.06.rom", 0x000000, 0x40000, CRC(187f4382) SHA1(717ed28c59f9533a9b3f9d24098b536a0d3c1573), ROM_BIOS(6))
 ROM_END
-
 } // Anonymous namespace
+
+ALLOW_SAVE_TYPE(sprinter_state::accel_state);
+ALLOW_SAVE_TYPE(sprinter_state::access_state);
 
 
 /*    YEAR  NAME        PARENT   COMPAT MACHINE   INPUT      CLASS           INIT        COMPANY                 FULLNAME           FLAGS */
 // 1996 - Sp97 Prototype
-COMP( 2000, sprinter,   spec128, 0,     sprinter, sprinter,  sprinter_state, empty_init, "Peters Plus, Ivan Mak", "Sprinter Sp2000", 0)
+COMP( 2000, sprinter,   spec128, 0,     sprinter, sprinter,  sprinter_state, empty_init, "Peters Plus, Ivan Mak", "Sprinter Sp2000", MACHINE_SUPPORTS_SAVE)

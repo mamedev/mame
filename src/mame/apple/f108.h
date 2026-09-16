@@ -26,10 +26,14 @@ public:
 	f108_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// interface routines
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
-	template <typename... T> void set_primetimeii_tag(T &&... args) { m_primetimeii.set_tag(std::forward<T>(args)...); }
+	template <typename... T> void set_primetimeii_tag(T &&... args) {
+		m_primetimeii.set_tag(std::forward<T>(args)...);
+		m_ncr1.lookup()->irq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_irq_w));
+		m_ncr1.lookup()->drq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_drq_w));
+	}
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
 
@@ -37,9 +41,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 

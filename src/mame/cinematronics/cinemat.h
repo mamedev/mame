@@ -5,6 +5,7 @@
     Cinematronics vector hardware
 
 *************************************************************************/
+
 #ifndef MAME_CINEMATRONICS_CINEMAT_H
 #define MAME_CINEMATRONICS_CINEMAT_H
 
@@ -15,8 +16,7 @@
 #include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
-#include "video/vector.h"
-#include "screen.h"
+#include "vector.h"
 
 class cinemat_state : public driver_device
 {
@@ -27,7 +27,6 @@ public:
 		, m_ay1(*this, "ay1")
 		, m_outlatch(*this, "outlatch")
 		, m_vector(*this, "vector")
-		, m_screen(*this, "screen")
 		, m_rambase(*this, "rambase")
 		, m_inputs(*this, "INPUTS")
 		, m_switches(*this, "SWITCHES")
@@ -36,20 +35,13 @@ public:
 		, m_analog_y(*this, "ANALOGY")
 		, m_led(*this, "led")
 		, m_pressed(*this, "pressed%u", 0U)
-		, m_coin_detected(0)
-		, m_coin_last_reset(0)
-		, m_mux_select(0)
-		, m_gear(0)
 		, m_vector_color(255, 255, 255)
-		, m_lastx(0)
-		, m_lasty(0)
 	{ }
 
 	required_device<ccpu_cpu_device> m_maincpu;
 	optional_device<ay8910_device> m_ay1;
 	required_device<ls259_device> m_outlatch;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 	optional_shared_ptr<s16> m_rambase;
 
 	required_ioport m_inputs;
@@ -61,13 +53,15 @@ public:
 	output_finder<> m_led;
 	output_finder<10> m_pressed;
 
-	u8 m_coin_detected;
-	u8 m_coin_last_reset;
-	u8 m_mux_select;
-	u8 m_gear;
+	emu_timer *m_watchdog;
+	u8 m_coin_detected = 0;
+	u8 m_coin_last_reset = 0;
+	u8 m_mux_select = 0;
+	u8 m_gear = 0;
 	rgb_t m_vector_color;
-	s16 m_lastx;
-	s16 m_lasty;
+	s16 m_lastx = 0;
+	s16 m_lasty = 0;
+
 	u8 inputs_r(offs_t offset);
 	u8 switches_r(offs_t offset);
 	u8 coin_input_r();
@@ -79,8 +73,7 @@ public:
 	u8 joystick_read();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_speedfrk();
-	u32 screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	u32 screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_configuration();
 	void cinemat_vector_callback(s16 sx, s16 sy, s16 ex, s16 ey, u8 shift);
 	void ripoff(machine_config &config);
 	void wotw(machine_config &config);
@@ -106,8 +99,8 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void speedfrk_start_led_w(int state);
 
@@ -118,12 +111,12 @@ protected:
 	void cinemat_jmi_16k(machine_config &config);
 	void cinemat_jmi_32k(machine_config &config);
 
-	void program_map_4k(address_map &map);
-	void program_map_8k(address_map &map);
-	void program_map_16k(address_map &map);
-	void program_map_32k(address_map &map);
-	void data_map(address_map &map);
-	void io_map(address_map &map);
+	void program_map_4k(address_map &map) ATTR_COLD;
+	void program_map_8k(address_map &map) ATTR_COLD;
+	void program_map_16k(address_map &map) ATTR_COLD;
+	void program_map_32k(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -192,14 +185,14 @@ protected:
 
 	void demon_sound(machine_config &config);
 
-	void demon_sound_map(address_map &map);
-	void demon_sound_ports(address_map &map);
+	void demon_sound_map(address_map &map) ATTR_COLD;
+	void demon_sound_ports(address_map &map) ATTR_COLD;
 
 private:
-	u8 m_sound_fifo[16]{};
-	u8 m_sound_fifo_in = 0U;
-	u8 m_sound_fifo_out = 0U;
-	u8 m_last_portb_write = 0U;
+	u8 m_sound_fifo[16] = { };
+	u8 m_sound_fifo_in = 0;
+	u8 m_sound_fifo_out = 0;
+	u8 m_last_portb_write = 0;
 };
 
 
@@ -222,8 +215,8 @@ protected:
 
 	void qb3_sound(machine_config &config);
 
-	void data_map_qb3(address_map &map);
-	void io_map_qb3(address_map &map);
+	void data_map_qb3(address_map &map) ATTR_COLD;
+	void io_map_qb3(address_map &map) ATTR_COLD;
 
 private:
 	int m_qb3_lastx = 0;

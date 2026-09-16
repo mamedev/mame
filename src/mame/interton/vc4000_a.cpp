@@ -39,14 +39,11 @@ void vc4000_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void vc4000_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void vc4000_sound_device::sound_stream_update(sound_stream &stream)
 {
-	int i;
-	auto &buffer = outputs[0];
-
-	for (i = 0; i < buffer.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		buffer.put(i, (m_reg[0] && m_pos <= m_size / 2) ? 1.0 : 0.0);
+		stream.put(0, i, (m_reg[0] && m_pos <= m_size / 2) ? 1.0 : 0.0);
 		if (m_pos <= m_size)
 			m_pos++;
 		if (m_pos > m_size)

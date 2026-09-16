@@ -5,6 +5,8 @@
 
 Mahjong Kyou Jidai (麻雀狂時代)     (c)1986 Sanritsu
 
+Sanritsu C1-00113 PCB
+
 CPU: Z80
 I/O: NEC D8255AC*2
 Sound: SN76489*2 CUSTOM
@@ -13,10 +15,10 @@ OSC: 10MHz ??MHz
 driver by Nicola Salmoria
 
 TODO:
-- Complete dip switches.
+- Complete DIP switches.
 
 - Several imperfections with sprites rendering:
-  - some sprites are misplaced by 1pixel vertically
+  - some sprites are misplaced by 1 pixel vertically
   - during the tile distribution at the beginning of a match, there's something
     wrong with the stacks moved around, they are misaligned and something is
     missing.
@@ -24,6 +26,8 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "mahjong.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -62,17 +66,17 @@ public:
 		m_adpcmrom(*this, "adpcm"),
 		m_videoram(*this, "videoram"),
 		m_mainbank(*this, "mainbank"),
-		m_row(*this, "ROW.%u", 0)
+		m_row(*this, "KEY%u", 0)
 	{ }
 
 	void mjkjidai(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
+	ioport_value keyboard_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -85,7 +89,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_memory_bank m_mainbank;
 
-	required_ioport_array<12> m_row;
+	required_ioport_array<10> m_row;
 
 	uint16_t m_adpcm_pos = 0;
 	uint32_t m_adpcm_end = 0;
@@ -104,12 +108,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -235,8 +237,6 @@ uint32_t mjkjidai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 void mjkjidai_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_pos = (data & 0x07) * 0x1000 * 2;
@@ -258,17 +258,16 @@ void mjkjidai_state::adpcm_int(int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
+ioport_value mjkjidai_state::keyboard_r()
 {
-	int res = 0x3f;
+	ioport_value const sel1 = bitswap<6>(~m_keyb, 6, 7, 8, 9, 10, 11);
+	ioport_value const sel2 = bitswap<6>(~m_keyb, 0, 1, 2, 3, 4, 5);
 
-	for (int i = 0; i < 12; i++)
+	ioport_value res = 0x3f;
+	for (int i = 0; i < 5; i++)
 	{
-		if (~m_keyb & (0x800 >> i))
-		{
-			res = m_row[i]->read();
-			break;
-		}
+		if (((m_row[i]->read() & sel1) != sel1) || ((m_row[i + 5]->read() & sel2) != sel2))
+			res &= ~(1 << i);
 	}
 
 	return res;
@@ -366,85 +365,11 @@ static INPUT_PORTS_START( mjkjidai )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYBOARD")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(mjkjidai_state, keyboard_r)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(mjkjidai_state::keyboard_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // reinitialize NVRAM and reset the game
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("ROW.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ROW.11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x3e, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE(mahjong_matrix_2p)
 INPUT_PORTS_END
 
 
@@ -521,7 +446,7 @@ void mjkjidai_state::mjkjidai(machine_config &config)
 	ppi2.in_pc_callback().set_ioport("DSW2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

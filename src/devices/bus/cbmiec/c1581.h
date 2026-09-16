@@ -42,13 +42,13 @@ protected:
 	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_srq(int state) override;
@@ -63,7 +63,7 @@ private:
 		LED_ACT
 	};
 
-	void update_iec();
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 
 	void cnt_w(int state);
 	void sp_w(int state);
@@ -72,7 +72,7 @@ private:
 	uint8_t cia_pb_r();
 	void cia_pb_w(uint8_t data);
 
-	void c1581_mem(address_map &map);
+	void c1581_mem(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -83,11 +83,14 @@ private:
 	required_ioport m_address;
 	output_finder<2> m_leds;
 
-	int m_data_out;             // serial data out
-	int m_atn_ack;              // attention acknowledge
-	int m_fast_ser_dir;         // fast serial direction
-	int m_sp_out;               // fast serial data out
-	int m_cnt_out;              // fast serial clock out
+	bool m_data_out;             // serial data out
+	bool m_atn_ack;              // attention acknowledge
+	bool m_ser_dir;         	 // fast serial direction
+	bool m_sp_out;               // fast serial data out
+	bool m_cnt_out;              // fast serial clock out
+	bool m_iec_clk;              // IEC clock line state
+	
+	emu_timer *m_iec_sync_timer;
 };
 
 
@@ -100,7 +103,7 @@ public:
 	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

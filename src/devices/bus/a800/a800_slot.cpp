@@ -4,8 +4,6 @@
 
 Atari A800/A5200/XEGS cart slot emulation
 
-<fill me>
-
 References:
 - Altirra HW reference manual 2022-07-07 edition, chapter 8;
 - https://github.com/atari800/atari800/blob/master/DOC/cart.txt
@@ -17,6 +15,7 @@ References:
 #include "a800_slot.h"
 
 #include "hashfile.h"
+#include "multibyte.h"
 
 
 //**************************************************************************
@@ -417,7 +416,7 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
 
-	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))
+	switch (get_u32be(&header[4]))
 	{
 		case 1:
 			type = A800_8K;
@@ -514,7 +513,7 @@ int a800_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			type = A5200_BBSB;
 			break;
 		default:
-			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0));
+			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", get_u32be(&header[4]));
 			break;
 	}
 
@@ -531,7 +530,7 @@ int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 	if (strncmp((const char *)header, "CART", 4))
 		fatalerror("Invalid header detected!\n");
 
-	switch ((header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0))
+	switch (get_u32be(&header[4]))
 	{
 		case 1:
 			type = A800_8K;
@@ -628,7 +627,7 @@ int a5200_cart_slot_device::identify_cart_type(const uint8_t *header) const
 			type = A5200_BBSB;
 			break;
 		default:
-			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", (header[4] << 24) + (header[5] << 16) +  (header[6] << 8) + (header[7] << 0));
+			osd_printf_info("Cart type \"%d\" is currently unsupported.\n", get_u32be(&header[4]));
 			break;
 	}
 
@@ -654,9 +653,8 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		// check whether there is an header, to identify the cart type
 		if ((len % 0x1000) == 0x10)
 		{
-			size_t actual;
 			uint8_t head[0x10];
-			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
+			/*auto const [err, actual] =*/ read(*hook.image_file(), &head[0], 0x10); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
@@ -700,9 +698,8 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 		int type = A5200_8K;
 		if ((len % 0x1000) == 0x10)
 		{
-			size_t actual;
 			uint8_t head[0x10];
-			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
+			/*auto const [err, actual] =*/ read(*hook.image_file(), &head[0], 0x10); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		else
@@ -742,7 +739,7 @@ template <unsigned Bank> uint8_t a800_cart_slot_device::read_cart(offs_t offset)
 
 template <unsigned Bank> void a800_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
-	return m_space_mem->write_byte(offset | Bank << 13, data);
+	m_space_mem->write_byte(offset | Bank << 13, data);
 }
 
 // Instantiate maps

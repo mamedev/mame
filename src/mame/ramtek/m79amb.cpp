@@ -85,12 +85,9 @@ public:
 		m_exp_lamp(*this, "EXP_LAMP")
 	{ }
 
-	void m79amb(machine_config &config);
+	void m79amb(machine_config &config) ATTR_COLD;
 
-	void init_m79amb();
-
-protected:
-	void machine_start() override;
+	void init_m79amb() ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -115,7 +112,7 @@ private:
 	uint8_t inta_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -142,12 +139,6 @@ void m79amb_state::_8003_w(uint8_t data)
 	m_discrete->write(M79AMB_TANK_TRUCK_JEEP_EN, data & 0x08);
 	m_discrete->write(M79AMB_WHISTLE_B_EN, data & 0x10);
 	m_discrete->write(M79AMB_WHISTLE_A_EN, data & 0x20);
-}
-
-void m79amb_state::machine_start()
-{
-	m_self_test.resolve();
-	m_exp_lamp.resolve();
 }
 
 void m79amb_state::videoram_w(offs_t offset, uint8_t data)
@@ -230,7 +221,7 @@ static INPUT_PORTS_START( m79amb )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ))
 
 	PORT_START("8002")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
@@ -276,7 +267,7 @@ void m79amb_state::m79amb(machine_config &config)
 	m_maincpu->in_inta_func().set(FUNC(m79amb_state::inta_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(19.6608_MHz_XTAL / 4, 320, 0, 256, 262, 32, 256);
 	screen.set_screen_update(FUNC(m79amb_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);

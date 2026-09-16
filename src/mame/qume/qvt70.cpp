@@ -35,10 +35,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -59,8 +61,8 @@ public:
 	void qvt70(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -68,8 +70,8 @@ private:
 	required_memory_bank_array<2> m_rambank;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
@@ -391,7 +393,7 @@ void qvt70_state::qvt70(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &qvt70_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &qvt70_state::io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(70);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(qvt70_state::screen_update));

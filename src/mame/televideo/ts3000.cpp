@@ -27,8 +27,8 @@ public:
 	void ts3000(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 //  required_device<cpu_device> m_maincpu;
 };
@@ -61,4 +61,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 198?, ts3000, 0, 0, ts3000, ts3000, ts3000_state, empty_init, "Televideo", "TS-3000", MACHINE_IS_SKELETON )
+COMP( 198?, ts3000, 0, 0, ts3000, ts3000, ts3000_state, empty_init, "Televideo", "TS-3000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

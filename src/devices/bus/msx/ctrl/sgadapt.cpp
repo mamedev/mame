@@ -49,8 +49,8 @@ public:
 	virtual void pin_8_w(int state) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<sms_control_port_device> m_port;

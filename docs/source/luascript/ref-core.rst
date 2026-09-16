@@ -116,6 +116,38 @@ t.nsec (read-only)
     interval.
 
 
+.. _luascript-ref-outputproxy:
+
+Output proxy
+------------
+
+Wraps MAME’s ``output_proxy`` class, which can be used to get or set the value
+of an output.
+
+Instantiation
+~~~~~~~~~~~~~
+
+manager.machine.devices[tag]:output(name)
+    Gets a proxy to an output by name relative to a device.  The output will not
+    be created if it does not already exist.
+
+Methods
+~~~~~~~
+
+output:exists()
+    Returns a Boolean indicating whether the output exists.
+output:name()
+    Returns the output’s name if it exists, or ``nil`` otherwise.
+output:get()
+    Returns the current value of the output if it exists, or a value stored by
+    the output proxy if the output does no exist.
+output:set(val)
+    Sets the value of the output if it exists, or stores the value in the output
+    proxy if the output does not exist.  Note that if the output does not exist,
+    the new value will not be reflected by other output proxies created with the
+    same device and name
+
+
 .. _luascript-ref-mameman:
 
 MAME machine manager
@@ -197,6 +229,8 @@ machine:popmessage([msg])
 machine:logerror(msg)
     Writes the message to the machine error log.  This may be displayed in a
     debugger window, written to a file, or written to the standard error output.
+machine:side_effects_disabled()
+    Returns a Boolean indicating whether side effects are disabled.
 
 Properties
 ~~~~~~~~~~
@@ -404,9 +438,8 @@ sound.debugger_mute (read/write)
 sound.system_mute (read/write)
     A Boolean indicating whether sound output is muted at the request of the
     emulated system.
-sound.attenuation (read/write)
-    The output volume attenuation in decibels.  Should generally be a negative
-    integer or zero.
+sound.volume (read/write)
+    The output volume in decibels.  Should generally be a negative or zero.
 sound.recording (read-only)
     A Boolean indicating whether sound output is currently being recorded to a
     WAV file.
@@ -425,29 +458,6 @@ Instantiation
 
 manager.machine.output
     Gets the output manager for the current emulation session.
-
-Methods
-~~~~~~~
-
-output:set_value(name, val)
-    Sets the specified output value.  The value must be an integer.  The output
-    will be created if it does not already exist.
-output:set_indexed_value(prefix, index, val)
-    Appends the index (formatted as a decimal integer) to the prefix and sets
-    the value of the corresponding output.  The value must be an integer.  The
-    output will be created if it does not already exist.
-output:get_value(name)
-    Returns the value of the specified output, or zero if it doesn’t exist.
-output:get_indexed_value(prefix, index)
-    Appends the index (formatted as a decimal integer) to the prefix and returns
-    the value of the corresponding output, or zero if it doesn’t exist.
-output:name_to_id(name)
-    Gets the per-session unique integer ID for the specified output, or zero if
-    it doesn’t exist.
-output:id_to_name(id)
-    Gets the name for the output with the specified per-session unique ID, or
-    ``nil`` if it doesn’t exist.  This method has O(n) complexity, so avoid
-    calling it when performance is important.
 
 
 .. _luascript-ref-paramman:
@@ -587,9 +597,6 @@ driver.is_bios_root (read-only)
 driver.requires_artwork (read-only)
     A Boolean indicating whether the system requires external artwork to be
     usable.
-driver.clickable_artwork (read-only)
-    A Boolean indicating whether the system requires clickable artwork features
-    to be usable.
 driver.unofficial (read-only)
     A Boolean indicating whether this is an unofficial but common user
     modification to a system.

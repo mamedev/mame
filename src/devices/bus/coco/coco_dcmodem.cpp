@@ -46,7 +46,7 @@ namespace
 		}
 
 		// optional information overrides
-		virtual void device_add_mconfig(machine_config &config) override;
+		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 		// callbacks
 		void uart_irq_w(int state)
@@ -63,7 +63,7 @@ namespace
 					write8sm_delegate(*m_uart, FUNC(mos6551_device::write)));
 		}
 
-		virtual const tiny_rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 		// CoCo cartridge level overrides
 		virtual u8 *get_cart_base() override
@@ -92,7 +92,7 @@ namespace
 
 void coco_dc_modem_device::device_add_mconfig(machine_config &config)
 {
-	MOS6551(config, m_uart, 0);
+	MOS6551(config, m_uart);
 	m_uart->set_xtal(1.8432_MHz_XTAL);
 	m_uart->irq_handler().set(FUNC(coco_dc_modem_device::uart_irq_w));
 	m_uart->txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));

@@ -17,8 +17,8 @@ public:
 	s100_vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override;
 
 	uint8_t s100_sinp_r(offs_t offset) override;
@@ -39,6 +39,7 @@ private:
 	uint8_t m_sector;
 	uint8_t m_fdd_sector_counter;
 	bool m_read;
+	bool m_fdd_writing;
 	bool m_busy;
 	emu_timer *m_motor_on_timer;
 	attotime m_last_sector_pulse; // fdd

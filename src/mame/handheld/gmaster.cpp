@@ -42,7 +42,7 @@ BTANB:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "sound/spkrdev.h"
 #include "video/sed1520.h"
 
@@ -71,7 +71,7 @@ public:
 	void gmaster(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<upd78c11_device> m_maincpu;
@@ -80,6 +80,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
 
+	u8 m_chipsel = 0;
+
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void portb_w(u8 data);
@@ -87,9 +89,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template<int N> SED1520_UPDATE_CB(screen_update_cb);
 
-	void main_map(address_map &map);
-
-	u8 m_chipsel = 0;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 void gmaster_state::machine_start()
@@ -173,7 +173,7 @@ void gmaster_state::main_map(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
 	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w)).share("ram");
-	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0xffff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	// 0xff00-0xffff is internal RAM
 }
 
@@ -229,7 +229,7 @@ void gmaster_state::gmaster(machine_config &config)
 	m_maincpu->pc_out_cb().set(FUNC(gmaster_state::portc_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(80, 64);
 	m_screen->set_visarea(0, 64-1-3, 0, 64-1);

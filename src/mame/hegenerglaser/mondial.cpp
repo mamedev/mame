@@ -4,6 +4,9 @@
 
 Mephisto Mondial
 
+The chess engine is Nona by Frans Morsch, the first time his program was included
+in a chess computer.
+
 Hardware notes:
 - G65SC02-1 @ 2MHz
 - 2KB RAM(TC5517AP), 16KB ROM
@@ -20,7 +23,7 @@ TODO:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
@@ -36,19 +39,19 @@ namespace {
 class mondial_state : public driver_device
 {
 public:
-	mondial_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_board(*this, "board")
-		, m_led_pwm(*this, "led_pwm")
-		, m_beeper(*this, "beeper")
-		, m_keys(*this, "KEY.%u", 0)
+	mondial_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_beeper(*this, "beeper"),
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	void mondial(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -57,13 +60,13 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<2> m_keys;
 
-	void mondial_mem(address_map &map);
+	u8 m_inp_mux = 0;
+
+	void mondial_mem(address_map &map) ATTR_COLD;
 
 	void control_w(u8 data);
 	u8 irq_ack_r();
 	u8 input_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
 };
 
 void mondial_state::machine_start()
@@ -145,7 +148,7 @@ static INPUT_PORTS_START( mondial )
 
 	PORT_START("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("PLAY")       PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")        PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")       PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
@@ -163,10 +166,10 @@ INPUT_PORTS_END
 void mondial_state::mondial(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 2000000);
+	G65SC02(config, m_maincpu, 2'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial_state::mondial_mem);
 
-	const attotime irq_period = attotime::from_hz(2000000 / 0x1000);
+	const attotime irq_period = attotime::from_hz(2'000'000 / 0x1000);
 	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_assert), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
@@ -206,4 +209,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, mondial,  0,      0,      mondial, mondial, mondial_state, empty_init, "Hegener + Glaser", "Mephisto Mondial", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, mondial,  0,      0,      mondial, mondial, mondial_state, empty_init, "Hegener + Glaser", "Mephisto Mondial", MACHINE_SUPPORTS_SAVE )

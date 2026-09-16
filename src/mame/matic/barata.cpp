@@ -35,7 +35,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "speaker.h"
 
 #include "barata.lh"
@@ -55,18 +55,20 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
+	void barata(machine_config &config) ATTR_COLD;
+
 	void fpga_w(uint8_t data);
 	void port0_w(uint8_t data);
 	void port2_w(uint8_t data);
 	uint8_t port2_r();
-	void barata(machine_config &config);
+
 private:
-	unsigned char row_selection = 0;
 	void fpga_send(unsigned char cmd);
-	virtual void machine_start() override { m_digits.resolve(); m_lamps.resolve(); }
+
 	required_device<i8051_device> m_maincpu;
 	output_finder<4> m_digits;
 	output_finder<16> m_lamps;
+	unsigned char row_selection = 0;
 };
 
 /************************

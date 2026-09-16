@@ -591,7 +591,7 @@ ioport_constructor io992_device::device_input_ports() const
 
 ti992_expport_device::ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI992_EXPPORT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
+		device_single_card_slot_interface<ti992_expport_attached_device>(mconfig, *this),
 		m_connected(nullptr)
 {
 }
@@ -610,7 +610,7 @@ void ti992_expport_device::write(offs_t offset, uint8_t data)
 
 void ti992_expport_device::device_config_complete()
 {
-	m_connected = static_cast<ti992_expport_attached_device*>(subdevices().first());
+	m_connected = get_card_device();
 }
 
 /*
@@ -652,7 +652,7 @@ void ti992_expram_device::write(offs_t offset, uint8_t value)
 
 void ti992_expram_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("32k");
 	m_ram->set_default_value(0);
 }

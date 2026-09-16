@@ -52,12 +52,12 @@ private:
 	void lights_a_w(u8 data);
 	void lights_b_w(u8 data);
 
-	void main_io_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8035_device> m_soundcpu;
@@ -278,8 +278,28 @@ ROM_START(supstarfa)
 	ROM_LOAD("2532.ic4", 0x0000, 0x1000, BAD_DUMP CRC(b6ef3c7a) SHA1(aabb6f8569685fc3a917a7bb5ebfcc4b20086b15)) // D6 stuck high and probably totally garbage
 ROM_END
 
+ROM_START(supstarfb)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("super.ic19", 0x0000, 0x4000, CRC(51697aff) SHA1(d10c6456716ca49cce590996e7271b8cd7026f38))
+	// IC14 for second program ROM is unpopulated
+
+	ROM_REGION(0x1000, "soundcpu", 0)
+	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(d6d7eee2) SHA1(60e497c8845320eea01662d894d0b16349ebb7e4))
+ROM_END
+
+ROM_START(supstarfc)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("27128prg.ic19", 0x0000, 0x4000, CRC(77c43e87) SHA1(efdf60b53ac105985ca6d4eeb6ed48b893bb7ad8))
+	// IC14 for second program ROM is unpopulated
+
+	ROM_REGION(0x1000, "soundcpu", 0)
+	ROM_LOAD("2532.ic4", 0x0000, 0x1000, CRC(d6d7eee2) SHA1(60e497c8845320eea01662d894d0b16349ebb7e4))
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1986, supstarf,  0,        supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, supstarfa, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, supstarf,  0,        supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, supstarfa, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, supstarfb, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, supstarfc, supstarf, supstarf, supstarf, supstarf_state, empty_init, ROT0, "Recreativos Franco", "Super Star (Recreativos Franco, set 4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

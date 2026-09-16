@@ -37,6 +37,6 @@ void hmb20_device::device_add_mconfig(machine_config &config)
 	// TODO: OPM mixing
 	YM2151(config, m_opm, hmb20_x1_clock);
 //  m_opm->irq_handler().set(FUNC(hmb20_device::int4_w));
-	m_opm->add_route(ALL_OUTPUTS, "^^lspeaker", 0.50);
-	m_opm->add_route(ALL_OUTPUTS, "^^rspeaker", 0.50);
+	m_opm->add_route(ALL_OUTPUTS, "^^speaker", 0.50, 0);
+	m_opm->add_route(ALL_OUTPUTS, "^^speaker", 0.50, 1);
 }

@@ -2,52 +2,45 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * Sony NEWS R3000 systems.
+ * Sony NEWS R3000 single-processor systems.
  *
  * Sources:
  *   - https://github.com/robohack/ucb-csrg-bsd/blob/master/sys/news3400/
  *   - https://www.mmcc.it/resources/docs/NWS-3410_3460_ServiceManual_MMCC.PDF
  *   - https://www.mmcc.it/resources/docs/Sony_NEWS_NWS-3260_ROM_Monitor_User_Guide_r2.pdf
+ *   - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
- *   - lcd controller
- *   - screen params
+ *   - LCD controller
+ *   - screen timing parameters
  *   - floppy density/eject
- *   - centronics port
+ *   - Centronics port
  *   - sound
  *   - other models, including slots/cards
  */
 
 #include "emu.h"
 
-#include "cpu/mips/mips1.h"
-
-// memory
-#include "machine/ram.h"
-
-// various hardware
-#include "machine/timekpr.h"
-#include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
 #include "dmac_0448.h"
 #include "news_hid.h"
-#include "machine/cxd1185.h"
+#include "news_lcdfb.h"
 
-// video
-#include "screen.h"
-
-// audio
-#include "sound/spkrdev.h"
-#include "speaker.h"
-
-// busses and connectors
-#include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
-
+#include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
+#include "machine/am79c90.h"
+#include "machine/cxd1185.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/timekpr.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+#include "sound/spkrdev.h"
+
+#include "speaker.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -68,7 +61,7 @@ public:
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
 		, m_hid(*this, "hid")
-		, m_scsi(*this, "scsi:7:cxd1185")
+		, m_scsi(*this, "cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
 		, m_led(*this, "led%u", 0U)
@@ -77,11 +70,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	// machine config
 	void common(machine_config &config);
@@ -164,48 +157,31 @@ public:
 	void nws3260(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	void nws3260_map(address_map &map) ATTR_COLD;
 
-	void nws3260_map(address_map &map);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
-
-	required_device<screen_device> m_lcd;
+	required_device<news_lcd_device> m_lcd;
 	required_shared_ptr<u32> m_vram;
-
-	bool m_lcd_enable = false;
-	bool m_lcd_dim = false;
 };
 
-class nws3410_state : public news_r3k_base_state
+class news_r3k_desktop_state : public news_r3k_base_state
 {
 public:
 	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
-	nws3410_state(machine_config const &mconfig, device_type type, char const *tag)
+	news_r3k_desktop_state(machine_config const &mconfig, device_type type, char const *tag)
 		: news_r3k_base_state(mconfig, type, tag)
 	{
 	}
 
 	void nws3410(machine_config &config);
+	void nws3720(machine_config &config);
 
 protected:
-	void nws3410_map(address_map &map);
+	void desktop_cpu_map(address_map &map) ATTR_COLD;
 };
-
-void nws3260_state::machine_start()
-{
-	news_r3k_base_state::machine_start();
-
-	save_item(NAME(m_lcd_enable));
-	save_item(NAME(m_lcd_dim));
-	m_lcd_enable = false;
-	m_lcd_dim = false;
-}
 
 void news_r3k_base_state::machine_start()
 {
-	m_led.resolve();
-
 	m_net_ram = std::make_unique<u16[]>(8192);
 	save_pointer(NAME(m_net_ram), 8192);
 
@@ -243,15 +219,20 @@ void nws3260_state::nws3260_map(address_map &map)
 {
 	cpu_map(map);
 	map(0x10000000, 0x101fffff).rom().region("krom", 0);
-	map(0x10000000, 0x10000003).lw32([this] (u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
-	map(0x10100000, 0x10100003).lw32([this] (u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
+	map(0x10000003, 0x10000003).w(m_lcd, FUNC(news_lcd_device::lcd_enable_w));
+	map(0x10100003, 0x10100003).w(m_lcd, FUNC(news_lcd_device::lcd_dim_w));
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
-	map(0x1ff60000, 0x1ff6001b).lw8([this] (offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
+	map(0x1ff60000, 0x1ff6001b).m(m_lcd, FUNC(news_lcd_device::map_lctc));
 }
 
-void nws3410_state::nws3410_map(address_map &map)
+void news_r3k_desktop_state::desktop_cpu_map(address_map &map)
 {
 	cpu_map(map);
+
+	// LCD framebuffer memory regions - without bus errors, the framebuffer probe logic in NEWS-OS will think there is an LCD attached
+	// While this doesn't break anything, it does cause the device to be exposed when it isn't present.
+	map(0x10000000, 0x1021ffff).r(FUNC(news_r3k_desktop_state::bus_error));
+	map(0x1ff50000, 0x1ff6001b).r(FUNC(news_r3k_desktop_state::bus_error));
 }
 
 void news_r3k_base_state::cpu_map(address_map &map)
@@ -270,7 +251,7 @@ void news_r3k_base_state::cpu_map(address_map &map)
 	// 1fcc0000 // cstrobe?
 	// 1fcc0002 // sccstatus0?
 	map(0x1fcc0003, 0x1fcc0003).rw(FUNC(news_r3k_base_state::debug_r), FUNC(news_r3k_base_state::debug_w));
-	// 1fcc0007 // sccvect?
+	map(0x1fcc0007, 0x1fcc0007).lr8([this] () { return m_scc->m1_r(); }, "sccvect_r");
 
 	map(0x1fd00000, 0x1fd00007).m(m_hid, FUNC(news_hid_hle_device::map));
 	map(0x1fd40000, 0x1fd40003).noprw(); // FIXME: ignore buzzer for now
@@ -323,7 +304,7 @@ static INPUT_PORTS_START(nws3260)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(nws3410)
+static INPUT_PORTS_START(nws_r3k_desktop)
 	PORT_START("SW2")
 	PORT_DIPNAME(0x07000000, 0x02000000, "Console") PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(0x00000000, "Serial")
@@ -345,30 +326,6 @@ static INPUT_PORTS_START(nws3410)
 	PORT_DIPSETTING(0x00000000, "9600")
 	PORT_DIPSETTING(0x80000000, "1200")
 INPUT_PORTS_END
-
-u32 nws3260_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
-{
-	if (!m_lcd_enable)
-		return 0;
-
-	rgb_t const black = rgb_t::black();
-	rgb_t const white = m_lcd_dim ? rgb_t(191, 191, 191) : rgb_t::white();
-
-	u32 const *pixel_pointer = m_vram;
-
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
-		{
-			u32 const pixel_data = *pixel_pointer++;
-
-			for (unsigned i = 0; i < 32; i++)
-				bitmap.pix(y, x + i) = BIT(pixel_data, 31 - i) ? black : white;
-		}
-	}
-
-	return 0;
-}
 
 void news_r3k_base_state::inten_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -469,12 +426,13 @@ void news_r3k_base_state::debug_w(u8 data)
 static void news_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("cdrom", NSCSI_CDROM_NEWS);
+	device.option_add("tape", NSCSI_TAPE_NEWS);
 }
 
 void news_r3k_base_state::common(machine_config &config)
 {
-	DMAC_0448(config, m_dma, 0);
+	DMAC_0448(config, m_dma);
 	m_dma->set_bus(m_cpu, 0);
 	m_dma->out_int_cb().set(FUNC(news_r3k_base_state::irq_w<DMA>));
 	m_dma->dma_r_cb<1>().set(m_fdc, FUNC(upd72067_device::dma_r));
@@ -503,7 +461,7 @@ void news_r3k_base_state::common(machine_config &config)
 	m_scc->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
 	m_scc->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 
-	AM7990(config, m_net);
+	AM7990(config, m_net, 20_MHz_XTAL / 2);
 	m_net->intr_out().set(FUNC(news_r3k_base_state::irq_w<LANCE>)).invert();
 	m_net->dma_in().set([this](offs_t offset) { return m_net_ram[offset >> 1]; });
 	m_net->dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset >> 1]); });
@@ -516,6 +474,8 @@ void news_r3k_base_state::common(machine_config &config)
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
 	// inquiry content for hard disk is "HITACHI DK312C          CS01"
+	// HD CHDs will be treated as MO disks using the inquiry content "SONY    SMO-C501        1.00"
+	// The CHS for converting a raw MO dump for 282MByte per side disks is 18678,1,31 per NEWS-OS 4's disktab file
 	NSCSI_CONNECTOR(config, "scsi:0", news_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", news_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", news_scsi_devices, nullptr);
@@ -525,26 +485,24 @@ void news_r3k_base_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185).clock(16_MHz_XTAL).machine_config(
-		[this] (device_t *device)
-		{
-			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
+	CXD1185(config, m_scsi, 16_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
+	m_scsi->drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
+	m_scsi->port_out_cb().set(
+							  [this] (u8 data)
+							  {
+								  LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
+							  });
 
-			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
-			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
-			adapter.port_out_cb().set(
-				[this] (u8 data)
-				{
-					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
-				});
-
-			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
-			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
-		});
+	m_dma->dma_r_cb<0>().set(m_scsi, FUNC(cxd1185_device::dma_r));
+	m_dma->dma_w_cb<0>().set(m_scsi, FUNC(cxd1185_device::dma_w));
 
 	NEWS_HID_HLE(config, m_hid);
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_base_state::irq_w<KBD>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r3k_base_state::irq_w<MOUSE>));
+
+	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS3000");
 }
 
 void nws3260_state::nws3260(machine_config &config)
@@ -561,16 +519,15 @@ void nws3260_state::nws3260(machine_config &config)
 	common(config);
 
 	// Integrated LCD panel
-	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
-	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
-	m_lcd->set_screen_update(FUNC(nws3260_state::screen_update));
+	NEWS_LCD(config, m_lcd);
+	m_lcd->set_vram(m_vram);
 }
 
-void nws3410_state::nws3410(machine_config &config)
+void news_r3k_desktop_state::nws3410(machine_config &config)
 {
 	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
-	m_cpu->set_addrmap(AS_PROGRAM, &nws3410_state::nws3410_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &news_r3k_desktop_state::desktop_cpu_map);
 
 	// Per the service manual, one or more NWA-029 4MB expansion kits can be used to increase from the base 8M up to 16M
 	RAM(config, m_ram);
@@ -581,9 +538,24 @@ void nws3410_state::nws3410(machine_config &config)
 	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
 }
 
+void news_r3k_desktop_state::nws3720(machine_config &config)
+{
+	R3000A(config, m_cpu, 20_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010Av4);
+	m_cpu->set_addrmap(AS_PROGRAM, &news_r3k_desktop_state::desktop_cpu_map);
+
+	// 16MB expandable to 128MB (unknown increments)
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("128MB");
+	common(config);
+
+	m_serial[0]->set_default_option("terminal"); // No framebuffer emulation yet
+}
+
 ROM_START(nws3260)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3260", "NWS-3260 v2.0A")
+	ROM_SYSTEM_BIOS(0, "nws3260", "SONY NET WORK STATION R3000 Monitor Release 2.0A")
 	ROMX_LOAD("mpu-16__ver.2.0a__1990_sony.ic64", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
 
 	// 2 x MB834200A-20 (4Mb mask ROM)
@@ -609,16 +581,26 @@ ROM_END
 
 ROM_START(nws3410)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "nws3410", "NWS-3410 v2.0")
+	ROM_SYSTEM_BIOS(0, "nws3410", "SONY NET WORK STATION R3000 Monitor Release 2.0")
 	ROMX_LOAD("sony_nws-3410_mpu-12_v2_rom.bin", 0x00000, 0x20000, CRC(48a726c4) SHA1(5c6e9e6bccaaa3d63bc136355a436c17c49c9876), ROM_BIOS(0))
 
 	ROM_REGION32_BE(0x100, "idrom", 0)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(661e2516) SHA1(f0dca34174747321dad6f48c466e1c549b797d2e) BAD_DUMP)
 ROM_END
 
+ROM_START(nws3720)
+	ROM_REGION32_BE(0x20000, "eprom", 0)
+	ROM_SYSTEM_BIOS(0, "nws3720", "SONY NET WORK STATION R3000 Monitor Release 2.0A")
+	ROMX_LOAD("sony_nws-3720.bin", 0x00000, 0x20000, CRC(61222991) SHA1(076fab0ad0682cd7dacc7094e42efe8558cbaaa1), ROM_BIOS(0))
+
+	ROM_REGION32_BE(0x100, "idrom", 0)
+	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(6ec5860e) SHA1(612d2c2f149b34551b5fd9392dd6f9b1612417b5) BAD_DUMP)
+ROM_END
+
 } // anonymous namespace
 
 
-/*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT         COMPANY  FULLNAME    FLAGS */
-COMP(1991, nws3260, 0,      0,      nws3260, nws3260, nws3260_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
-COMP(1991, nws3410, 0,      0,      nws3410, nws3410, nws3410_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+/*   YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT            CLASS                   INIT         COMPANY  FULLNAME    FLAGS */
+COMP(1991, nws3260, 0,       0,      nws3260, nws3260,         nws3260_state,          init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)
+COMP(1991, nws3410, 0,       0,      nws3410, nws_r3k_desktop, news_r3k_desktop_state, init_common, "Sony",  "NWS-3410", MACHINE_NO_SOUND)
+COMP(1991, nws3720, 0,       0,      nws3720, nws_r3k_desktop, news_r3k_desktop_state, init_common, "Sony",  "NWS-3720", MACHINE_NO_SOUND)

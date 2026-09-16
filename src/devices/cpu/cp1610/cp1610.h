@@ -5,7 +5,7 @@
  *   cp1610.h
  *   Portable General Instruments CP1610 emulator interface
  *
- *   Copyright Frank Palazzolo, all rights reserved.
+ *   Copyright Frank Palazzolo
  *
  *****************************************************************************/
 
@@ -36,13 +36,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == CP1610_INT_INTR; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;

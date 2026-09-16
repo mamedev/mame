@@ -13,9 +13,6 @@ by Nick Toop. These credits are in the ROM data.
 Mark VI/Philidor was released a year later, it was a plug-in module for the Mark V.
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
-When using the MAME sensorboard interface with MK VI, reset the board by pressing
-CLEAR before RESET, needed when starting a new game.
-
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
 - 16KB RAM (8*HM4716AP-4N)
@@ -53,7 +50,7 @@ TODO:
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -80,14 +77,14 @@ public:
 	{ }
 
 	// machine configs
-	void mark5(machine_config &config);
-	void mark6(machine_config &config);
+	void mark5(machine_config &config) ATTR_COLD;
+	void mark6(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(cb_enable) { if (!newval) m_display[3]->clear(); }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -96,14 +93,25 @@ private:
 	optional_region_ptr<u8> m_cb_rom;
 	optional_device_array<pwm_display_device, 3+1> m_display;
 	required_device_array<hlcd0538_device, 3> m_lcd;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<7+2> m_inputs;
 	output_finder<3, 8, 34> m_out_x;
 
+	u8 m_dac_data = 0;
+	u8 m_lcd_lcd = 0;
+	u8 m_lcd_rowsel = 0;
+	u8 m_cb_mux = 0;
+
+	attotime m_board_init_time;
+	emu_timer *m_irqtimer;
+
+	void init_board(u8 data);
+	bool board_active() { return machine().time() > m_board_init_time; }
+
 	// address maps
-	void mark5_map(address_map &map);
-	void mark6_map(address_map &map);
+	void mark5_map(address_map &map) ATTR_COLD;
+	void mark6_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void nvram_w(offs_t offset, u8 data);
@@ -121,19 +129,18 @@ private:
 	template<int N> void pwm_output_w(offs_t offset, u8 data);
 	template<int N> void lcd_output_w(u64 data);
 
-	u8 m_dac_data = 0;
-	u8 m_lcd_lcd = 0;
-	u8 m_lcd_rowsel = 0;
-	u8 m_cb_mux = 0;
-
-	emu_timer *m_irqtimer = nullptr;
 	TIMER_CALLBACK_MEMBER(interrupt);
 	void write_lcd(int state);
 };
 
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
+
 void mark5_state::machine_start()
 {
-	m_out_x.resolve();
 	m_irqtimer = timer_alloc(FUNC(mark5_state::interrupt), this);
 
 	// register for savestates
@@ -141,11 +148,19 @@ void mark5_state::machine_start()
 	save_item(NAME(m_lcd_lcd));
 	save_item(NAME(m_lcd_rowsel));
 	save_item(NAME(m_cb_mux));
+	save_item(NAME(m_board_init_time));
 }
 
 void mark5_state::machine_reset()
 {
 	reset_irq_w(0);
+}
+
+void mark5_state::init_board(u8 data)
+{
+	// ccmk6 expects an empty chessboard after a cold boot
+	if (~data & 1)
+		m_board_init_time = machine().time() + attotime::from_msec(1500);
 }
 
 
@@ -271,7 +286,7 @@ void mark5_state::cb_w(u8 data)
 
 u8 mark5_state::cb_r()
 {
-	if (~m_inputs[6]->read() & 0x20)
+	if (~m_inputs[6]->read() & 0x20 || !board_active())
 		return 0xff;
 
 	// read chessboard sensors
@@ -317,11 +332,11 @@ void mark5_state::mark6_map(address_map &map)
 
 static INPUT_PORTS_START( mark5 )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Enter Position")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("Enter Position")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Draw")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Peripheral")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Next Simult")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Next Simult")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Swap")
 
 	PORT_START("IN.1")
@@ -342,8 +357,8 @@ static INPUT_PORTS_START( mark5 )
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("F / 6 / King")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / 7 / Black")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / 8 / White")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G / 7 / White")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H / 8 / Black")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Yes / 9 / CB")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Backward")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Forward")
@@ -397,7 +412,7 @@ static INPUT_PORTS_START( mark6 )
 	PORT_INCLUDE( mark5 )
 
 	PORT_MODIFY("IN.6")
-	PORT_CONFNAME( 0x20, 0x20, "Sensory Board" ) PORT_CHANGED_MEMBER(DEVICE_SELF, mark5_state, cb_enable, 0)
+	PORT_CONFNAME( 0x20, 0x20, "Sensory Board" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mark5_state::cb_enable), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -432,10 +447,9 @@ void mark5_state::mark5(machine_config &config)
 	for (int i = 0; i < 3; i++)
 		m_display[i]->set_bri_maximum(0.1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(942/1.5, 1080/1.5);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_saitek_mark5);
 
@@ -453,6 +467,7 @@ void mark5_state::mark6(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().append(FUNC(mark5_state::init_board));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 
@@ -501,5 +516,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, ccmk5, 0,      0,      mark5,   mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, ccmk6, ccmk5,  0,      mark6,   mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, ccmk5, 0,      0,      mark5,   mark5, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark V", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, ccmk6, ccmk5,  0,      mark6,   mark6, mark5_state, empty_init, "SciSys / Philidor Software", "Chess Champion: Mark VI/Philidor", MACHINE_SUPPORTS_SAVE )

@@ -20,12 +20,22 @@
 #include <cstring>
 #include <iterator>
 #include <limits>
+#include <new>
 #include <type_traits>
 
 
 namespace util {
 
 namespace {
+
+// this gets around tautological comparison warnings when std::uint64_t is at least as large as long
+
+template <typename T, typename U>
+constexpr bool is_in_range(U value)
+{
+	return std::numeric_limits<T>::max() >= value;
+}
+
 
 // helper for holding a block of memory and deallocating it (or not) as necessary
 
@@ -120,14 +130,14 @@ public:
 	{
 	}
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		do_read(this->m_pointer, buffer, length, actual);
 		this->m_pointer += actual;
 		return std::error_condition();
 	}
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		do_read(offset, buffer, length, actual);
 		return std::error_condition();
@@ -197,7 +207,7 @@ public:
 		std::error_condition err;
 		if (0 > endpos)
 			err.assign(errno, std::generic_category());
-		else if (std::numeric_limits<std::uint64_t>::max() < static_cast<unsigned long>(endpos))
+		else if (!is_in_range<std::uint64_t>(static_cast<unsigned long>(endpos)))
 			err = std::errc::file_too_large;
 		else
 			result = static_cast<unsigned long>(endpos);
@@ -239,7 +249,7 @@ public:
 	{
 	}
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		if (m_dangling_write)
 		{
@@ -270,7 +280,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		actual = 0U;
 
@@ -338,7 +348,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		if (m_dangling_read)
 		{
@@ -361,7 +371,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		actual = 0U;
 
@@ -409,7 +419,7 @@ public:
 		set_filler(fill);
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		actual = 0U;
 
@@ -473,7 +483,7 @@ public:
 		return std::error_condition();
 	}
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
 		actual = 0U;
 
@@ -634,18 +644,12 @@ public:
 	{
 	}
 
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		// TODO: should the client have to deal with reading less than expected even if EOF isn't hit?
-		if (std::numeric_limits<std::uint32_t>::max() < length)
-		{
-			actual = 0U;
-			return std::errc::invalid_argument;
-		}
-
 		// actual length not valid on error
+		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
 		std::uint32_t count;
-		std::error_condition err = file().read(buffer, m_pointer, std::uint32_t(length), count);
+		std::error_condition err = file().read(buffer, m_pointer, chunk, count);
 		if (!err)
 		{
 			m_pointer += count;
@@ -658,18 +662,12 @@ public:
 		return err;
 	}
 
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		// TODO: should the client have to deal with reading less than expected even if EOF isn't hit?
-		if (std::numeric_limits<std::uint32_t>::max() < length)
-		{
-			actual = 0U;
-			return std::errc::invalid_argument;
-		}
-
 		// actual length not valid on error
+		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
 		std::uint32_t count;
-		std::error_condition err = file().read(buffer, offset, std::uint32_t(length), count);
+		std::error_condition err = file().read(buffer, offset, chunk, count);
 		if (!err)
 			actual = std::size_t(count);
 		else
@@ -696,46 +694,146 @@ public:
 		return file().flush();
 	}
 
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		actual = 0U;
-		while (length)
+		// actual length not valid on error
+		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
+		std::uint32_t count;
+		std::error_condition err = file().write(buffer, m_pointer, chunk, count);
+		if (!err)
 		{
-			// actual length not valid on error
-			std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
-			std::uint32_t written;
-			std::error_condition err = file().write(buffer, m_pointer, chunk, written);
-			if (err)
-				return err;
-			m_pointer += written;
-			buffer = reinterpret_cast<std::uint8_t const *>(buffer) + written;
-			length -= written;
-			actual += written;
+			actual = std::size_t(count);
+			m_pointer += count;
 		}
-		return std::error_condition();
+		else
+		{
+			actual = 0U;
+		}
+		return err;
 	}
 
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept override
 	{
-		actual = 0U;
-		while (length)
-		{
-			// actual length not valid on error
-			std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
-			std::uint32_t written;
-			std::error_condition err = file().write(buffer, offset, chunk, written);
-			if (err)
-				return err;
-			offset += written;
-			buffer = reinterpret_cast<std::uint8_t const *>(buffer) + written;
-			length -= written;
-			actual += written;
-		}
-		return std::error_condition();
+		// actual length not valid on error
+		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
+		std::uint32_t count;
+		std::error_condition err = file().write(buffer, offset, chunk, count);
+		if (!err)
+			actual = std::size_t(count);
+		else
+			actual = 0U;
+		return err;
 	}
 };
 
 } // anonymous namespace
+
+
+// helper functions for common patterns
+
+std::pair<std::error_condition, std::size_t> read(read_stream &stream, void *buffer, std::size_t length) noexcept
+{
+	std::size_t actual = 0;
+	do
+	{
+		std::size_t count;
+		std::error_condition err = stream.read_some(buffer, length, count);
+		actual += count;
+		if (!err)
+		{
+			if (!count)
+				break;
+		}
+		else if (std::errc::interrupted != err)
+		{
+			return std::make_pair(err, actual);
+		}
+		buffer = reinterpret_cast<std::uint8_t *>(buffer) + count;
+		length -= count;
+	}
+	while (length);
+	return std::make_pair(std::error_condition(), actual);
+}
+
+std::tuple<std::error_condition, std::unique_ptr<std::uint8_t []>, std::size_t> read(read_stream &stream, std::size_t length) noexcept
+{
+	std::unique_ptr<std::uint8_t []> buffer(new (std::nothrow) std::uint8_t [length]);
+	if (!buffer)
+		return std::make_tuple(std::errc::not_enough_memory, std::move(buffer), std::size_t(0));
+	auto [err, actual] = read(stream, buffer.get(), length);
+	return std::make_tuple(err, std::move(buffer), actual);
+}
+
+std::pair<std::error_condition, std::size_t> read_at(random_read &stream, std::uint64_t offset, void *buffer, std::size_t length) noexcept
+{
+	std::size_t actual = 0;
+	do
+	{
+		std::size_t count;
+		std::error_condition err = stream.read_some_at(offset, buffer, length, count);
+		actual += count;
+		if (!err)
+		{
+			if (!count)
+				break;
+		}
+		else if (std::errc::interrupted != err)
+		{
+			return std::make_pair(err, actual);
+		}
+		offset += count;
+		buffer = reinterpret_cast<std::uint8_t *>(buffer) + count;
+		length -= count;
+	}
+	while (length);
+	return std::make_pair(std::error_condition(), actual);
+}
+
+std::tuple<std::error_condition, std::unique_ptr<std::uint8_t []>, std::size_t> read_at(random_read &stream, std::uint64_t offset, std::size_t length) noexcept
+{
+	std::unique_ptr<std::uint8_t []> buffer(new (std::nothrow) std::uint8_t [length]);
+	if (!buffer)
+		return std::make_tuple(std::errc::not_enough_memory, std::move(buffer), std::size_t(0));
+	auto [err, actual] = read_at(stream, offset, buffer.get(), length);
+	return std::make_tuple(err, std::move(buffer), actual);
+}
+
+std::pair<std::error_condition, std::size_t> write(write_stream &stream, void const *buffer, std::size_t length) noexcept
+{
+	std::size_t actual = 0;
+	do
+	{
+		std::size_t written;
+		std::error_condition const err = stream.write_some(buffer, length, written);
+		assert(written || err || !length);
+		actual += written;
+		if (err && (std::errc::interrupted != err))
+			return std::make_pair(err, actual);
+		buffer = reinterpret_cast<std::uint8_t const *>(buffer) + written;
+		length -= written;
+	}
+	while (length);
+	return std::make_pair(std::error_condition(), actual);
+}
+
+std::pair<std::error_condition, std::size_t> write_at(random_write &stream, std::uint64_t offset, void const *buffer, std::size_t length) noexcept
+{
+	std::size_t actual = 0;
+	do
+	{
+		std::size_t written;
+		std::error_condition const err = stream.write_some_at(offset, buffer, length, written);
+		assert(written || err || !length);
+		actual += written;
+		if (err && (std::errc::interrupted != err))
+			return std::make_pair(err, actual);
+		offset += written;
+		buffer = reinterpret_cast<std::uint8_t const *>(buffer) + written;
+		length -= written;
+	}
+	while (length);
+	return std::make_pair(std::error_condition(), actual);
+}
 
 
 // creating RAM read adapters

@@ -122,7 +122,7 @@ uint32_t sh_disassembler::op0000(std::ostream &stream, uint32_t pc, uint16_t opc
 			util::stream_format(stream, "MOV.L   @(R0,%s),%s", regname[Rm], regname[Rn]);
 			break;
 		case 15:
-			util::stream_format(stream, "MAC.L   @%s+,@%s+", regname[Rn], regname[Rm]);
+			util::stream_format(stream, "MAC.L   @%s+,@%s+", regname[Rm], regname[Rn]);
 			break;
 		}
 	}

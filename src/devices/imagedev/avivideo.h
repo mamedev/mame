@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_AVIVIDEO_H
-#define MAME_DEVICES_IMAGEDEV_AVIVIDEO_H
+#ifndef MAME_IMAGEDEV_AVIVIDEO_H
+#define MAME_IMAGEDEV_AVIVIDEO_H
 
 #pragma once
 
@@ -51,8 +51,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(frame_timer);
 
@@ -69,4 +69,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(IMAGE_AVIVIDEO, avivideo_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_AVIVIDEO_H
+#endif // MAME_IMAGEDEV_AVIVIDEO_H

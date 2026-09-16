@@ -42,7 +42,7 @@
 class hlcd0438_device : public device_t
 {
 public:
-	hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hlcd0438_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	auto write_segs() { return m_write_segs.bind(); } // BP pin in offset, SEG pins in data
@@ -57,7 +57,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(toggle_lcd);
 

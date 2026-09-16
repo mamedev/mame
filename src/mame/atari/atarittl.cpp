@@ -197,7 +197,7 @@ void atarikee_state::atarikee(machine_config &config)
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_atarikee);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
 	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
@@ -212,13 +212,13 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 {
 	/* basic machine hardware */
 	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK).set_source(netlist_stuntcyc);
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "START1.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(SC_VIDCLOCK);
 	m_video->set_horz_params(SC_HTOTAL-84,SC_HTOTAL-64,SC_HTOTAL-16, SC_HTOTAL);
@@ -233,7 +233,7 @@ void tank_state::tank(machine_config &config)
 {
 	/* basic machine hardware */
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(tank));
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1lup",   "P1_LEFT_UP.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1ldown", "P1_LEFT_DOWN.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1rup",   "P1_RIGHT_UP.POS", 0);
@@ -248,7 +248,7 @@ void tank_state::tank(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:coin2",   "COIN2.POS", 0);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(TANK_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of back porch
@@ -266,7 +266,7 @@ void gtrak10_state::gtrak10(machine_config &config)
 	/* basic machine hardware */
 	NETLIST_CPU(config, "maincpu", netlist::config::DEFAULT_CLOCK()).set_source(netlist_gtrak10);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0").set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1lup",    "P1_LEFT_UP.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:p1lleft",  "P1_LEFT_LEFT.POS", 0);
@@ -295,7 +295,7 @@ void gtrak10_state::gtrak10(machine_config &config)
 	   Vert Back Porch  =   ?
 	*/
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(GTRAK10_VIDCLOCK);
 	//                    Length of active video,   end of front-porch,   end of sync signal,  end of line/frame
@@ -635,39 +635,39 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(1975,  antiairc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
-GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)
-GAME(1974,  gtrak10,   0,        gtrak10,   gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1974,  gtrak10a,  gtrak10,  atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older) [TTL]",     MACHINE_IS_SKELETON)
-GAME(1974,  gtrak20,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer [TTL]",    MACHINE_IS_SKELETON)
-GAME(1976,  indy4,     0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4 [TTL]",           MACHINE_IS_SKELETON)
-GAME(1975,  indy800,   0,        atarikee,        0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800 [TTL]",         MACHINE_IS_SKELETON)
-GAME(1975,  jetfight,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  jetfighta, jetfight, atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2) [TTL]",      MACHINE_IS_SKELETON)
-GAME(1976,  lemans,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans [TTL]",          MACHINE_IS_SKELETON)
-GAME(1976,  outlaw,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
-GAME(1974,  qwakttl,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack [TTL]",      MACHINE_IS_SKELETON)
-GAME(1975,  sharkjaw,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
-GAME(1975,  steeplec,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,        stuntcyc, stuntcyc, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
-GAME(1974,  tank,      0,        tank,         tank, tank_state,     empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(1975,  tankii,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
+GAME(1975,  antiairc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1974,  gtrak10,   0,        gtrak10,   gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1974,  gtrak10a,  gtrak10,  atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1974,  gtrak20,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1976,  indy4,     0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1975,  indy800,   0,        atarikee,        0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1975,  jetfight,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1975,  jetfighta, jetfight, atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1976,  lemans,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Le Mans",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1976,  outlaw,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Outlaw",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1974,  qwakttl,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Qwak!/Quack",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1975,  sharkjaw,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Horror Games",    "Shark JAWS",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1975,  steeplec,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Steeplechase",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1976,  stuntcyc,  0,        stuntcyc, stuntcyc, stuntcyc_state, empty_init, ROT0,  "Atari",        "Stunt Cycle",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1974,  tank,      0,        tank,         tank, tank_state,     empty_init, ROT0,  "Atari/Kee",    "Tank/Tank Cocktail",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1975,  tankii,    0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Tank II",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // MISSING ROM DUMPS
-//GAME(1975,  astrotrf,  steeplec, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Astroturf [TTL]",        MACHINE_IS_SKELETON)
+//GAME(1975,  astrotrf,  steeplec, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Astroturf",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // 100% TTL
-//GAME(1974,  coupfran,  worldcup, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari Europe", "Coup Franc [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  coupdmnd,  worldcup, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari France", "Coup du Monde [TTL]",    MACHINE_IS_SKELETON)
-//GAME(1975,  crossfir,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Crossfire [TTL]",        MACHINE_IS_SKELETON)
-//GAME(1973,  eliminat,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Elimination! [TTL]",     MACHINE_IS_SKELETON)
-//GAME(1975,  goaliv,    0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Goal IV [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1973,  gotchaat,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Gotcha [TTL]",           MACHINE_IS_SKELETON) //?
-//GAME(1973,  gotchaatc, 0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Gotcha Color [TTL]",     MACHINE_IS_SKELETON) //?
-//GAME(1975,  hiway,     0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Hi-Way/Highway [TTL]",   MACHINE_IS_SKELETON)
-//GAME(1974,  pinpong,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pin Pong [TTL]",         MACHINE_IS_SKELETON)
-//GAME(1975,  pursuit,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pursuit [TTL]",          MACHINE_IS_SKELETON)
-//GAME(1974,  quadpong,  eliminat, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Quadrapong [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1973,  spacrace,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Space Race [TTL]",       MACHINE_IS_SKELETON)
-//GAME(1974,  touchme,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Touch-Me [TTL]",         MACHINE_IS_SKELETON) //?
-//GAME(1974,  worldcup,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "World Cup/World Cup Football [TTL]",   MACHINE_IS_SKELETON)
+//GAME(1974,  coupfran,  worldcup, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari Europe", "Coup Franc",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1974,  coupdmnd,  worldcup, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari France", "Coup du Monde",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1975,  crossfir,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Crossfire",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1973,  eliminat,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Elimination!",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1975,  goaliv,    0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Goal IV",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1973,  gotchaat,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Gotcha",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING) //?
+//GAME(1973,  gotchaatc, 0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Gotcha Color",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING) //?
+//GAME(1975,  hiway,     0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Hi-Way/Highway",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1974,  pinpong,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pin Pong",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1975,  pursuit,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Pursuit",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1974,  quadpong,  eliminat, atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Quadrapong",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1973,  spacrace,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Space Race",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//GAME(1974,  touchme,   0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "Touch-Me",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING) //?
+//GAME(1974,  worldcup,  0,        atarikee, 0, atarikee_state, empty_init, ROT0,  "Atari",        "World Cup/World Cup Football",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

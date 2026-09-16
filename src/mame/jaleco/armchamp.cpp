@@ -49,17 +49,17 @@ public:
 	void armchamp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	static constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
 
 	uint32_t screen_update_armchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg(address_map &map);
-	void main_io(address_map &map);
+	void main_prg(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void vram_w(offs_t offset, uint8_t data);
@@ -409,7 +409,7 @@ void armchamp_state::armchamp(machine_config &config)
 	m_ppi[1]->in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

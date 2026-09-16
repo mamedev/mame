@@ -264,8 +264,8 @@ protected:
 	required_ioport m_b;
 	required_device<screen_device> m_screen;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t dispon_r();
 	void keylatch_w(uint8_t data);
@@ -279,8 +279,8 @@ protected:
 	/* keyboard state */
 	uint8_t m_keylatch = 0;
 
-	void studio2_io_map(address_map &map);
-	void studio2_map(address_map &map);
+	void studio2_io_map(address_map &map) ATTR_COLD;
+	void studio2_map(address_map &map) ATTR_COLD;
 };
 
 class visicom_state : public studio2_state
@@ -300,11 +300,11 @@ private:
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void dma_w(offs_t offset, uint8_t data);
-	void visicom_io_map(address_map &map);
-	void visicom_map(address_map &map);
+	void visicom_io_map(address_map &map) ATTR_COLD;
+	void visicom_map(address_map &map) ATTR_COLD;
 };
 
 class mpt02_state : public studio2_state
@@ -321,8 +321,8 @@ public:
 private:
 	required_device<cdp1864_device> m_cti;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void dma_w(offs_t offset, uint8_t data);
 	int rdata_r();
@@ -332,8 +332,8 @@ private:
 	/* video state */
 	required_shared_ptr<uint8_t> m_color_ram;
 	uint8_t m_color = 0;
-	void mpt02_io_map(address_map &map);
-	void mpt02_map(address_map &map);
+	void mpt02_io_map(address_map &map) ATTR_COLD;
+	void mpt02_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -449,7 +449,7 @@ static INPUT_PORTS_START( studio2 )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B 9") PORT_CODE(KEYCODE_3_PAD)
 
 	PORT_START("CLEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Clear") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED_MEMBER(DEVICE_SELF, studio2_state, reset_w, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Clear") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(studio2_state::reset_w), 0)
 INPUT_PORTS_END
 
 /* Video */
@@ -691,7 +691,7 @@ void studio2_state::studio2(machine_config &config)
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	CDP1861(config, m_vdc, 1760000).set_screen(m_screen);
 	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
@@ -718,7 +718,7 @@ void visicom_state::visicom(machine_config &config)
 	m_maincpu->dma_wr_cb().set(FUNC(visicom_state::dma_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(visicom_state::screen_update));
 
 	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(m_screen);
@@ -753,7 +753,7 @@ void mpt02_state::mpt02(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(m_screen);
 	m_cti->inlace_cb().set_constant(0);
 	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);

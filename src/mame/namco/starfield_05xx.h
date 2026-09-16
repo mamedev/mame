@@ -7,7 +7,7 @@
 class starfield_05xx_device : public device_t
 {
 public:
-	starfield_05xx_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
+	starfield_05xx_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
 	void enable_starfield(uint8_t on);
 	void set_scroll_speed(uint8_t index_x, uint8_t index_y);
@@ -16,8 +16,8 @@ public:
 	void draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t get_next_lfsr_state(uint16_t lfsr);

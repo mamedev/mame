@@ -60,10 +60,7 @@ public:
 	vsmile_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: vsmile_ctrl_port_device(mconfig, tag, owner, 0U)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	vsmile_ctrl_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
 	virtual ~vsmile_ctrl_port_device();
@@ -74,8 +71,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_vsmile_ctrl_interface *m_device;
@@ -99,7 +96,7 @@ protected:
 	vsmile_ctrl_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// UART simulation helpers
 	bool is_tx_empty() const { return m_tx_fifo_empty; }

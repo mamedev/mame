@@ -1,7 +1,7 @@
 // OpenArchive.h
 
-#ifndef __OPEN_ARCHIVE_H
-#define __OPEN_ARCHIVE_H
+#ifndef ZIP7_INC_OPEN_ARCHIVE_H
+#define ZIP7_INC_OPEN_ARCHIVE_H
 
 #include "../../../Windows/PropVariant.h"
 
@@ -10,7 +10,7 @@
 #include "Property.h"
 #include "DirItem.h"
 
-#ifndef _SFX
+#ifndef Z7_SFX
 
 #define SUPPORT_ALT_STREAMS
 
@@ -34,7 +34,7 @@ struct COptionalOpenProperties
 };
 */
 
-#ifdef _SFX
+#ifdef Z7_SFX
 #define OPEN_PROPS_DECL
 #else
 #define OPEN_PROPS_DECL const CObjectVector<CProperty> *props;
@@ -243,7 +243,7 @@ struct CReadArcItem
   bool MainIsDir;
   UInt32 ParentIndex; // use it, if IsAltStream
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   bool _use_baseParentFolder_mode;
   int _baseParentFolder;
   #endif
@@ -254,7 +254,7 @@ struct CReadArcItem
     WriteToAltStreamIfColon = false;
     #endif
 
-    #ifndef _SFX
+    #ifndef Z7_SFX
     _use_baseParentFolder_mode = false;
     _baseParentFolder = -1;
     #endif
@@ -270,7 +270,7 @@ class CArc
   HRESULT CheckZerosTail(const COpenOptions &op, UInt64 offset);
   HRESULT OpenStream2(const COpenOptions &options);
 
-  #ifndef _SFX
+  #ifndef Z7_SFX
   // parts.Back() can contain alt stream name "nams:AltName"
   HRESULT GetItem_PathToParent(UInt32 index, UInt32 parent, UStringVector &parts) const;
   #endif
@@ -285,8 +285,17 @@ public:
   CMyComPtr<IArchiveGetRawProps> GetRawProps;
   CMyComPtr<IArchiveGetRootProps> GetRootProps;
 
-  CArcErrorInfo ErrorInfo; // for OK archives
-  CArcErrorInfo NonOpen_ErrorInfo; // ErrorInfo for mainArchive (false OPEN)
+  bool IsParseArc;
+
+  bool IsTree;
+  bool IsReadOnly;
+  
+  bool Ask_Deleted;
+  bool Ask_AltStream;
+  bool Ask_Aux;
+  bool Ask_INode;
+
+  bool IgnoreSplit; // don't try split handler
 
   UString Path;
   UString filePath;
@@ -305,7 +314,9 @@ public:
   // bool OkPhySize_Defined;
   UInt64 FileSize;
   UInt64 AvailPhySize; // PhySize, but it's reduced if exceed end of file
-  // bool offsetDefined;
+
+  CArcErrorInfo ErrorInfo; // for OK archives
+  CArcErrorInfo NonOpen_ErrorInfo; // ErrorInfo for mainArchive (false OPEN)
 
   UInt64 GetEstmatedPhySize() const { return PhySize_Defined ? PhySize : FileSize; }
 
@@ -313,18 +324,6 @@ public:
   Int64 GetGlobalOffset() const { return (Int64)ArcStreamOffset + Offset; } // it's global offset of archive
 
   // AString ErrorFlagsText;
-
-  bool IsParseArc;
-
-  bool IsTree;
-  bool IsReadOnly;
-  
-  bool Ask_Deleted;
-  bool Ask_AltStream;
-  bool Ask_Aux;
-  bool Ask_INode;
-
-  bool IgnoreSplit; // don't try split handler
 
   // void Set_ErrorFlagsText();
 
@@ -340,8 +339,6 @@ public:
     {}
 
   HRESULT ReadBasicProps(IInArchive *archive, UInt64 startPos, HRESULT openRes);
-
-  // ~CArc();
 
   HRESULT Close()
   {

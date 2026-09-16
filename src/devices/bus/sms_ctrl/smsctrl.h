@@ -53,10 +53,7 @@ public:
 	sms_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt) :
 		sms_control_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	sms_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -91,7 +88,7 @@ public:
 	void out_w(u8 data, u8 mem_mask);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	optional_device<screen_device> m_screen;

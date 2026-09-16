@@ -270,8 +270,10 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "romload.h"
 #include "mfmhd.h"
+
+#include "romload.h"
+
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
@@ -420,7 +422,7 @@ std::pair<std::error_condition, std::string> mfm_harddisk_device::call_load()
 	/* open the CHD file */
 	if (loaded_through_softlist())
 	{
-		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
+		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv"));
 	}
 	else
 	{
@@ -455,7 +457,7 @@ std::pair<std::error_condition, std::string> mfm_harddisk_device::call_load()
 	if (state)
 		return std::make_pair(state, "Failed to read CHD metadata");
 
-	LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata.c_str());
+	LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata);
 
 	// Parse the metadata
 	mfmhd_layout_params param;
@@ -832,7 +834,9 @@ bool mfm_harddisk_device::read(attotime &from_when, const attotime &limit, uint1
 	if (track==nullptr)
 	{
 		// What shall we do in this case?
-		throw emu_fatalerror("Cannot read CHD image");
+		// throw emu_fatalerror("Cannot read CHD image");   // a bit too harsh, just return a constant 0
+		cdata = 0;
+		return false;
 	}
 
 	// Get a copy for later debug output
@@ -871,7 +875,8 @@ bool mfm_harddisk_device::write(attotime &from_when, const attotime &limit, uint
 	if (track==nullptr)
 	{
 		// What shall we do in this case?
-		throw emu_fatalerror("Cannot read CHD image");
+		// throw emu_fatalerror("Cannot read CHD image"); // a bit too harsh, just return without doing anything
+		return false;
 	}
 
 	int bytepos = 0;
@@ -1152,6 +1157,11 @@ uint16_t* mfmhd_trackimage_cache::get_trackimage(int cylinder, int head)
 		// Then look it up again, which will move it to the front
 
 		// previous points to the second to last element
+
+		// If still null, the cache was never initialized, which means there is no drive image
+		if (previous == nullptr)
+			return nullptr;
+
 		current = previous->next;
 		if (TRACE_CACHE) m_machine.logerror("[%s:cache] evict line (c=%d,h=%d)\n", m_mfmhd->tag(), current->cylinder, current->head);
 

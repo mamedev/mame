@@ -30,16 +30,16 @@ public:
 	void sound_command_w(u8 data);
 
 protected:
-	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void adpcm_fifo_w(u8 data);
 
-	void zsu_io(address_map &map);
-	void zsu_map(address_map &map);
+	void zsu_io(address_map &map) ATTR_COLD;
+	void zsu_map(address_map &map) ATTR_COLD;
 
 	void ay1_porta_w(u8 data);
 
@@ -83,15 +83,15 @@ class cedar_magnet_sound_device : public efo_zsu_device, public cedar_magnet_boa
 {
 public:
 	// construction/destruction
-	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
 private:
-	void cedar_magnet_sound_map(address_map &map);
+	void cedar_magnet_sound_map(address_map &map) ATTR_COLD;
 
 	void ay0_porta_w(u8 data);
 };

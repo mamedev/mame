@@ -62,9 +62,9 @@ public:
 	void init_pcw();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	int m_boot = 0;
@@ -164,9 +164,9 @@ private:
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
 	void pcw_printer_fire_pins(uint16_t pins);
-	void pcw9512_io(address_map &map);
-	void pcw_io(address_map &map);
-	void pcw_map(address_map &map);
+	void pcw9512_io(address_map &map) ATTR_COLD;
+	void pcw_io(address_map &map) ATTR_COLD;
+	void pcw_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_AMSTRAD_PCW_H

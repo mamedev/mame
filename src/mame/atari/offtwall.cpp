@@ -68,7 +68,7 @@ public:
 	void init_offtwalc();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -92,11 +92,9 @@ private:
 	uint16_t unknown_verify_r(offs_t offset);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 
 /*************************************
@@ -136,7 +134,6 @@ const atari_motion_objects_config offtwall_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -174,23 +171,28 @@ uint32_t offtwall_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// not yet verified
-					pf[x] = mo[x];
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// not yet verified
+							pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 
-
-// machine
 
 
 /*************************************
@@ -216,8 +218,8 @@ void offtwall_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// bit 4 resets the sound CPU
-		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(data & 0x10))
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+		if (BIT(~data, 4))
 			m_jsa->reset();
 	}
 
@@ -265,8 +267,11 @@ void offtwall_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t offtwall_state::bankswitch_r(offs_t offset)
 {
 	// this is the table lookup; the bank is determined by the address that was requested
-	m_bank_offset = (offset & 3) * 0x1000;
-	LOGBANKSW("Bankswitch index %d -> %04X\n", offset, m_bank_offset);
+	if (!machine().side_effects_disabled())
+	{
+		m_bank_offset = (offset & 3) * 0x1000;
+		LOGBANKSW("Bankswitch index %d -> %04X\n", offset, m_bank_offset);
+	}
 
 	return m_bankswitch_base[offset];
 }
@@ -275,7 +280,8 @@ uint16_t offtwall_state::bankswitch_r(offs_t offset)
 uint16_t offtwall_state::bankrom_r(address_space &space, offs_t offset)
 {
 	// this is the banked ROM read
-	logerror("Banked ROM read: %06X: %04X\n", m_maincpu->pcbase(), offset);
+	if (!machine().side_effects_disabled())
+		logerror("Banked ROM read: %06X: %04X\n", m_maincpu->pcbase(), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
 	    ROM bank area, we need to return the correct value to give the proper checksum */
@@ -319,29 +325,32 @@ uint16_t offtwall_state::spritecache_count_r(offs_t offset)
 	// if this read is coming from $99f8 or $9992, it's in the sprite copy loop
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
 	{
-		uint16_t *data = &m_spritecache_count[-0x100];
-		int const oldword = m_spritecache_count[0];
-		int count = oldword >> 8;
-		int width = 0;
-
-		// compute the current total width
-		for (int i = 0; i < count; i++)
-			width += 1 + ((data[i * 4 + 1] >> 4) & 7);
-
-		// if we're less than 39, keep adding dummy sprites until we hit it
-		if (width <= 38)
+		if (!machine().side_effects_disabled())
 		{
-			while (width <= 38)
-			{
-				data[count * 4 + 0] = (42 * 8) << 7;
-				data[count * 4 + 1] = ((30 * 8) << 7) | (7 << 4);
-				data[count * 4 + 2] = 0;
-				width += 8;
-				count++;
-			}
+			uint16_t *data = &m_spritecache_count[-0x100];
+			int const oldword = m_spritecache_count[0];
+			int count = oldword >> 8;
+			int width = 0;
 
-			// update the final count in memory
-			m_spritecache_count[0] = (count << 8) | (oldword & 0xff);
+			// compute the current total width
+			for (int i = 0; i < count; i++)
+				width += 1 + ((data[i * 4 + 1] >> 4) & 7);
+
+			// if we're less than 39, keep adding dummy sprites until we hit it
+			if (width <= 38)
+			{
+				while (width <= 38)
+				{
+					data[count * 4 + 0] = (42 * 8) << 7;
+					data[count * 4 + 1] = ((30 * 8) << 7) | (7 << 4);
+					data[count * 4 + 2] = 0;
+					width += 8;
+					count++;
+				}
+
+				// update the final count in memory
+				m_spritecache_count[0] = (count << 8) | (oldword & 0xff);
+			}
 		}
 	}
 
@@ -459,7 +468,7 @@ static INPUT_PORTS_START( offtwall )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")  // tested before writing to 260040
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260012")
@@ -524,12 +533,12 @@ void offtwall_state::offtwall(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_offtwall);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	ATARI_VAD(config, m_vad, 0, "screen");
+	ATARI_VAD(config, m_vad, "screen");
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(offtwall_state::get_playfield_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 62, 64).set_info_callback(FUNC(offtwall_state::get_playfield_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses a VAD chip to generate video signals */
@@ -540,7 +549,7 @@ void offtwall_state::offtwall(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

@@ -24,15 +24,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	void exidy440_audio_map(address_map &map);
+	void exidy440_audio_map(address_map &map) ATTR_COLD;
 
 	/* channel_data structure holds info about each 6844 DMA channel */
 	struct m6844_channel_data
@@ -86,9 +85,6 @@ private:
 	sound_stream *m_stream;
 	sound_channel_data m_sound_channel[4];
 
-	/* debugging */
-	FILE *m_debuglog;
-
 	/* channel frequency is configurable */
 	int m_channel_frequency[4];
 
@@ -104,7 +100,7 @@ private:
 	void fir_filter(int32_t *input, int16_t *output, int count);
 
 	void add_and_scale_samples(int ch, int32_t *dest, int samples, int volume);
-	void mix_to_16(write_stream_view &dest_left, write_stream_view &dest_right);
+	void mix_to_16(sound_stream &stream);
 
 	uint8_t sound_command_r();
 	uint8_t sound_volume_r(offs_t offset);

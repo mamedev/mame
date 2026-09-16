@@ -35,23 +35,20 @@ public:
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, U &&opts, const char *dflt)
 		: archimedes_podule_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1, 1))
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_exp.set_tag(std::forward<T>(bus_tag));
 	}
 	archimedes_podule_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device<archimedes_exp_device> m_exp;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_PODULE_SLOT, archimedes_podule_slot_device)
 
 
@@ -92,8 +89,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
@@ -111,12 +108,12 @@ private:
 	address_space *m_ioc;
 	address_space *m_memc;
 
-	void ioc_map(address_map &map);
-	void memc_map(address_map &map);
+	void ioc_map(address_map &map) ATTR_COLD;
+	void memc_map(address_map &map) ATTR_COLD;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device)
 
 

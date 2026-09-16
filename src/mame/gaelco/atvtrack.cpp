@@ -132,9 +132,9 @@ protected:
 	void ioport_w(offs_t offset, u64 data);
 	u32 gpu_r(offs_t offset);
 	void gpu_w(offs_t offset, u32 data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	u32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline u32 decode64_32(offs_t offset64, u64 data, u64 mem_mask, offs_t &offset32);
 	[[maybe_unused]] void logbinary(u32 data, int high, int low);
@@ -143,18 +143,18 @@ protected:
 	int m_nandcommand[4]{}, m_nandoffset[4]{}, m_nandaddressstep = 0, m_nandaddress[4]{};
 	u32 m_area1_data[4]{};
 
-	required_device<sh4_device> m_maincpu;
-	required_device<sh4_device> m_subcpu;
+	required_device<sh7750s_device> m_maincpu;
+	required_device<sh7750s_device> m_subcpu;
 
 	u16 gpu_irq_pending = 0;
 	u16 gpu_irq_mask = 0;
 	void gpu_irq_test();
 	void gpu_irq_set(int);
 
-	void atvtrack_main_map(address_map &map);
-	void atvtrack_main_port(address_map &map);
-	void atvtrack_sub_map(address_map &map);
-	void atvtrack_sub_port(address_map &map);
+	void atvtrack_main_map(address_map &map) ATTR_COLD;
+	void atvtrack_main_port(address_map &map) ATTR_COLD;
+	void atvtrack_sub_map(address_map &map) ATTR_COLD;
+	void atvtrack_sub_port(address_map &map) ATTR_COLD;
 
 	bool m_slaverun = false;
 };
@@ -169,11 +169,11 @@ public:
 	void smashdrv(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void smashdrv_main_map(address_map &map);
-	void smashdrv_main_port(address_map &map);
+	void smashdrv_main_map(address_map &map) ATTR_COLD;
+	void smashdrv_main_port(address_map &map) ATTR_COLD;
 };
 
 void atvtrack_state::logbinary(u32 data, int high=31, int low=0)
@@ -208,9 +208,7 @@ inline u32 atvtrack_state::decode64_32(offs_t offset64, u64 data, u64 mem_mask, 
 
 u64 atvtrack_state::control_r(offs_t offset, u64 mem_mask)
 {
-	u32 addr;
-
-	addr = 0;
+	offs_t addr = 0;
 	decode64_32(offset, 0, mem_mask, addr);
 	if (addr == (0x00020000-0x00020000)/4)
 		return -1;
@@ -221,11 +219,9 @@ u64 atvtrack_state::control_r(offs_t offset, u64 mem_mask)
 
 void atvtrack_state::control_w(offs_t offset, u64 data, u64 mem_mask)
 {
-	u32 addr, dat; //, old;
-
-	addr = 0;
-	dat = decode64_32(offset, data, mem_mask, addr);
-//  old = m_area1_data[addr];
+	offs_t addr = 0;
+	u32 dat = decode64_32(offset, data, mem_mask, addr);
+	//u32 old = m_area1_data[addr];
 	m_area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
 		if ((data & 4) && m_slaverun)
@@ -576,7 +572,7 @@ INPUT_PORTS_END
 void atvtrack_state::atvtrack(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, ATV_CPU_CLOCK);
+	SH7750S(config, m_maincpu, ATV_CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 1);
 	m_maincpu->set_md(2, 0);
@@ -591,7 +587,7 @@ void atvtrack_state::atvtrack(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_main_port);
 	m_maincpu->set_force_no_drc(true);
 
-	SH4LE(config, m_subcpu, ATV_CPU_CLOCK);
+	SH7750S(config, m_subcpu, ATV_CPU_CLOCK);
 	m_subcpu->set_md(0, 1);
 	m_subcpu->set_md(1, 1);
 	m_subcpu->set_md(2, 0);
@@ -607,7 +603,7 @@ void atvtrack_state::atvtrack(machine_config &config)
 	m_subcpu->set_force_no_drc(true);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
 	screen.set_size(640, 480);
@@ -647,6 +643,13 @@ ROM_START( atvtracka )
 	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
 ROM_END
 
+/* Gaelco Football uses a small I/O PCB for connecting the balls (you control the game by kicking a real ball):
+    -ADXL250JQC single/dual axis accelerometer.
+    -PIC16C710.
+    -8L05A linear voltage regulator.
+    -UA741C single operational amplifier.
+    -16 MHz osc.
+*/
 ROM_START( gfootbal )
 	ROM_REGION( 0x4200000, "nand", ROMREGION_ERASEFF) // NAND roms, contain additional data hence the sizes
 	ROM_LOAD32_BYTE("k9f2808u0b.ic15",  0x00000000, 0x01080000, CRC(876ca493) SHA1(d888be59d924fe23e725c6a8aa9609e9abcab608) )
@@ -656,6 +659,9 @@ ROM_START( gfootbal )
 
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
 	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
+
+	ROM_REGION( 0x20000, "io", ROMREGION_ERASEFF)
+	ROM_LOAD("4r_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
 ROM_END
 
 /*
@@ -738,9 +744,9 @@ ROM_END
 
 GAME( 2002, atvtrack,  0,        atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco",           "ATV Track (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, atvtracka, atvtrack, atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco",           "ATV Track (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, gfootbal,  0,        atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco / Zigurat", "Gaelco Football", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, gfootbal,  0,        atvtrack, atvtrack, atvtrack_state, empty_init, ROT0, "Gaelco / Zigurat", "Gaelco Football",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // almost identical PCB, FlashROM mapping and master registers addresses different
-GAME( 2000, smashdrv,  0,        smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco",                       "Smashing Drive (World)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, smashdrvb, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Brent Sales license)", "Smashing Drive (UK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrv,  0,        smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco",                       "Smashing Drive (World)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, smashdrvb, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Brent Sales license)", "Smashing Drive (UK)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, smashdrvs, smashdrv, smashdrv, atvtrack, smashdrv_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Smashing Drive (Spain, Portugal)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

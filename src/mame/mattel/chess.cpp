@@ -5,6 +5,18 @@
 
 Mattel Computer Chess
 
+Teletape Productions was a small company founded by Julio Kaplan, the chess
+engine is by them. This was 2 years before he founded Heuristic Software and
+worked almost exclusively for SciSys/Saitek.
+
+The power switch has a SAVE setting, this keeps the LCD chips powered on, and
+the program reads the chessboard position from LCD RAM on the next boot. To save
+a game in progress, make sure to press CLEAR before powering off. It does not
+save the level setting.
+
+There is no button to start a new game. The user is meant to switch power off/on.
+In MAME, reset (or exit/restart) while the save switch is off.
+
 Hardware notes:
 - INS8050 CPU @ 6MHz (4KB internal ROM, 256 bytes internal RAM)
 - 2*HLCD0569(also seen with 2*HLCD0601, functionally same?)
@@ -16,9 +28,11 @@ assumed to be an unlicensed clone.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "video/hlcd0515.h"
-#include "screen.h"
+
+#include "screen_svg.h"
 
 // internal artwork
 #include "mchess.lh"
@@ -39,11 +53,9 @@ public:
 
 	void mchess(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -52,7 +64,8 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<2, 8, 22> m_out_x;
 
-	void update_reset(ioport_value state);
+	u8 m_inp_mux = 0;
+	u8 m_lcd_control = 0;
 
 	// I/O handlers
 	template<int Sel> void lcd_output_w(offs_t offset, u32 data);
@@ -60,16 +73,10 @@ private:
 	u8 input_r();
 	void lcd_w(u8 data);
 	u8 lcd_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_lcd_control = 0;
 };
 
 void mchess_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_lcd_control));
@@ -77,14 +84,12 @@ void mchess_state::machine_start()
 
 void mchess_state::machine_reset()
 {
-	update_reset(m_inputs[3]->read());
-}
-
-void mchess_state::update_reset(ioport_value state)
-{
-	// battery is disconnected from CPU VCC pin when power switch is in SAVE mode
-	// (at reboot, the game will read the chessboard positions from LCD RAM)
-	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	// clear nvram if SAVE is off
+	if (~m_inputs[3]->read() & 1)
+	{
+		m_lcd[0]->nvram_reset();
+		m_lcd[1]->nvram_reset();
+	}
 }
 
 
@@ -96,12 +101,10 @@ void mchess_state::update_reset(ioport_value state)
 template<int Sel>
 void mchess_state::lcd_output_w(offs_t offset, u32 data)
 {
-	int enabled = ~m_inputs[3]->read() & m_lcd_control & 1;
-
 	// output to x.y.z where x = chip, y = row, z = col
 	// up to 22 columns used
 	for (int i = 0; i < 22; i++)
-		m_out_x[Sel][offset][i] = BIT(data, i) & enabled;
+		m_out_x[Sel][offset][i] = BIT(data, i) & m_lcd_control;
 }
 
 void mchess_state::input_w(u8 data)
@@ -181,7 +184,7 @@ static INPUT_PORTS_START( mchess )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Take Back")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, mchess_state, reset_switch, 0) PORT_NAME("Save Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_NAME("Save Switch")
 INPUT_PORTS_END
 
 
@@ -202,13 +205,15 @@ void mchess_state::mchess(machine_config &config)
 	// video hardware
 	HLCD0569(config, m_lcd[0], 500); // C=0.01uF
 	m_lcd[0]->write_cols().set(FUNC(mchess_state::lcd_output_w<0>));
+	m_lcd[0]->nvram_enable_backup(true);
+
 	HLCD0569(config, m_lcd[1], 500); // C=0.01uF
 	m_lcd[1]->write_cols().set(FUNC(mchess_state::lcd_output_w<1>));
+	m_lcd[1]->nvram_enable_backup(true);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(977, 1080);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_mchess);
 }
@@ -236,4 +241,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, mchess, 0,      0,      mchess,  mchess, mchess_state, empty_init, "Mattel Electronics", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, mchess, 0,      0,      mchess,  mchess, mchess_state, empty_init, "Mattel Electronics / Teletape Productions", "Computer Chess (Mattel)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

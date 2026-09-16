@@ -60,16 +60,17 @@ public:
 protected:
 	a2bus_thunderclock_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual bool take_c800() const override { return true; }
 
 	required_device<upd1990a_device> m_upd1990ac;
 	required_region_ptr<uint8_t> m_rom;

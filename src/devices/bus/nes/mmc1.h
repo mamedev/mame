@@ -26,7 +26,7 @@ protected:
 	nes_sxrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void update_regs(int reg);
 	void set_prg(int prg_base, int prg_mask);

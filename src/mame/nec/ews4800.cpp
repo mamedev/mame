@@ -47,7 +47,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_scc(*this, "scc%u", 0U)
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:ncr53c96")
+		, m_scsi(*this, "ncr53c96")
 		, m_net(*this, "net")
 	{
 	}
@@ -59,11 +59,11 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	u16 lance_r(offs_t offset, u16 mem_mask = 0xffff);
 	void lance_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
@@ -146,18 +146,12 @@ void ews4800_state::ews4800_310(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", ews4800_scsi_devices, nullptr);
 
 	// scsi host adapter (NCR53C96)
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C94).clock(24_MHz_XTAL).machine_config(
-		[](device_t *device)
-		{
-			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
-
-			adapter.set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
-			//adapter.irq_handler_cb()
-			//adapter.drq_handler_cb()
-		});
+	NCR53C94(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
 
 	// ethernet
-	AM7990(config, m_net);
+	AM7990(config, m_net, 10'000'000); // clock is a guess
 	//m_net->intr_out()
 	m_net->dma_in().set(FUNC(ews4800_state::lance_r));
 	m_net->dma_out().set(FUNC(ews4800_state::lance_w));
@@ -179,4 +173,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR   NAME         PARENT  COMPAT  MACHINE      INPUT  CLASS          INIT  COMPANY  FULLNAME       FLAGS */
-COMP(1993,  ews4800_310, 0,      0,      ews4800_310, 0,     ews4800_state, init, "NEC",   "EWS4800/310", MACHINE_IS_SKELETON)
+COMP(1993,  ews4800_310, 0,      0,      ews4800_310, 0,     ews4800_state, init, "NEC",   "EWS4800/310", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

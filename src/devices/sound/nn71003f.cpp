@@ -23,6 +23,8 @@ void nn71003f_device::device_start()
 	save_item(NAME(m_ss));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_mosi));
+
+	stream_alloc(0, 2, 48000);
 }
 
 void nn71003f_device::device_reset()
@@ -78,7 +80,7 @@ void nn71003f_device::clk_w(int state)
 	logerror("clk_w %d\n", state);
 }
 
-void nn71003f_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void nn71003f_device::sound_stream_update(sound_stream &stream)
 {
 }
 

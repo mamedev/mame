@@ -115,6 +115,7 @@
 #include <iterator>
 #include <limits>
 #include <string>
+#include <tuple>
 #include <type_traits>
 
 //#define VERBOSE 1
@@ -483,16 +484,22 @@ bool huc3_device::nvram_read(util::read_stream &file)
 {
 	if (m_has_battery)
 	{
-		// read previous machine time (seconds since epoch), seconds counter, and register contents
-		u64 machinesecs;
+		std::error_condition err;
 		std::size_t actual;
-		if (file.read(&machinesecs, sizeof(machinesecs), actual) || (sizeof(machinesecs) != actual))
+
+		// read previous machine time (seconds since epoch)
+		u64 machinesecs;
+		std::tie(err, actual) = read(file, &machinesecs, sizeof(machinesecs));
+		if (err || (sizeof(machinesecs) != actual))
 			return false;
 		m_machine_seconds = big_endianize_int64(machinesecs);
 
-		if (file.read(&m_seconds, sizeof(m_seconds), actual) || (sizeof(m_seconds) != actual))
+		// read seconds counter and register contents
+		std::tie(err, actual) = read(file, &m_seconds, sizeof(m_seconds));
+		if (err || (sizeof(m_seconds) != actual))
 			return false;
-		if (file.read(&m_registers[0], sizeof(m_registers), actual) || (sizeof(m_registers) != actual))
+		std::tie(err, actual) = read(file, &m_registers[0], sizeof(m_registers));
+		if (err || (sizeof(m_registers) != actual))
 			return false;
 	}
 	else
@@ -509,12 +516,16 @@ bool huc3_device::nvram_write(util::write_stream &file)
 	system_time current;
 	machine().current_datetime(current);
 	u64 const machinesecs(big_endianize_int64(s64(std::make_signed_t<decltype(current.time)>(current.time))));
+	std::error_condition err;
 	std::size_t written;
-	if (file.write(&machinesecs, sizeof(machinesecs), written) || (sizeof(machinesecs) != written))
+	std::tie(err, written) = write(file, &machinesecs, sizeof(machinesecs));
+	if (err)
 		return false;
-	if (file.write(&m_seconds, sizeof(m_seconds), written) || (sizeof(m_seconds) != written))
+	std::tie(err, written) = write(file, &m_seconds, sizeof(m_seconds));
+	if (err)
 		return false;
-	if (file.write(&m_registers[0], sizeof(m_registers), written) || (sizeof(m_registers) != written))
+	std::tie(err, written) = write(file, &m_registers[0], sizeof(m_registers));
+	if (err)
 		return false;
 	return true;
 }

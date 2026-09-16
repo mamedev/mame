@@ -46,15 +46,15 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<i8272a_device> m_fdc;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t unk_r();
 	void tc_w(uint8_t data);
 	void ctl_w(uint8_t data);
 
-	void ax20_io(address_map &map);
-	void ax20_map(address_map &map);
+	void ax20_io(address_map &map) ATTR_COLD;
+	void ax20_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t ax20_state::unk_r()
@@ -143,7 +143,7 @@ void ax20_state::ax20(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ax20_state::ax20_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(ax20_state::screen_update));

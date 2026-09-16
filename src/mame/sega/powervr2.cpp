@@ -15,11 +15,13 @@
 
 #include "emu.h"
 #include "powervr2.h"
-#include "dc.h"
 
-#include "cpu/sh/sh4.h"
-#include "video/rgbutil.h"
+#include "screen.h"
 #include "rendutil.h"
+#include "video/rgbutil.h"
+
+#include "corefloat.h"
+#include "endianness.h"
 
 #define LOG_WARN        (1U << 1) // Show warnings
 #define LOG_TA_CMD      (1U << 2) // Show TA CORE commands
@@ -424,8 +426,8 @@ uint32_t powervr2_device::tex_r_yuv_n(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (t->stride*yt + (xt & ~1))*2;
-	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp));
-	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp+2));
+	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp));
+	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp+2));
 	return cv_yuv(c1, c2, xt);
 }
 
@@ -434,8 +436,8 @@ uint32_t powervr2_device::tex_r_yuv_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (dilated1[t->cd][xt & ~1] + dilated0[t->cd][yt]) * 2;
-	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp));
-	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp+4));
+	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp));
+	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp+4));
 	return cv_yuv(c1, c2, xt);
 }
 
@@ -444,10 +446,10 @@ uint32_t powervr2_device::tex_r_yuv_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp));
-	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp+4));
+	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp));
+	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp+4));
 	return cv_yuv(c1, c2, xt);
 }
 #endif
@@ -457,7 +459,7 @@ uint32_t powervr2_device::tex_r_1555_n(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (t->stride*yt + xt) * 2;
-	return cv_1555z(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_1555z(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_1555_tw(texinfo *t, float x, float y)
@@ -465,16 +467,16 @@ uint32_t powervr2_device::tex_r_1555_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt]) * 2;
-	return cv_1555(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_1555(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	return cv_1555(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_1555(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_565_n(texinfo *t, float x, float y)
@@ -482,7 +484,7 @@ uint32_t powervr2_device::tex_r_565_n(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (t->stride*yt + xt) * 2;
-	return cv_565z(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_565z(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_565_tw(texinfo *t, float x, float y)
@@ -490,16 +492,16 @@ uint32_t powervr2_device::tex_r_565_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt]) * 2;
-	return cv_565(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_565(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_565_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	return cv_565(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_565(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_4444_n(texinfo *t, float x, float y)
@@ -507,7 +509,7 @@ uint32_t powervr2_device::tex_r_4444_n(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (t->stride*yt + xt) * 2;
-	return cv_4444z(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_4444z(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_4444_tw(texinfo *t, float x, float y)
@@ -515,16 +517,16 @@ uint32_t powervr2_device::tex_r_4444_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt]) * 2;
-	return cv_4444(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_4444(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
-	return cv_4444(*(uint16_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_4444(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_p4_1555_tw(texinfo *t, float x, float y)
@@ -533,7 +535,7 @@ uint32_t powervr2_device::tex_r_p4_1555_tw(texinfo *t, float x, float y)
 	int yt = t->v_func(y, t->sizey);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = ((reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	int c = ((reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return cv_1555(palette[t->palbase + c]);
 }
 
@@ -541,9 +543,9 @@ uint32_t powervr2_device::tex_r_p4_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] & 0xf;
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_1555(palette[t->palbase + c]);
 }
 
@@ -553,7 +555,7 @@ uint32_t powervr2_device::tex_r_p4_565_tw(texinfo *t, float x, float y)
 	int yt = t->v_func(y, t->sizey);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = ((reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	int c = ((reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return cv_565(palette[t->palbase + c]);
 }
 
@@ -561,9 +563,9 @@ uint32_t powervr2_device::tex_r_p4_565_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] & 0xf;
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_565(palette[t->palbase + c]);
 }
 
@@ -573,7 +575,7 @@ uint32_t powervr2_device::tex_r_p4_4444_tw(texinfo *t, float x, float y)
 	int yt = t->v_func(y, t->sizey);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = ((reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	int c = ((reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return cv_4444(palette[t->palbase + c]);
 }
 
@@ -581,9 +583,9 @@ uint32_t powervr2_device::tex_r_p4_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] & 0xf;
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] & 0xf;
 	return cv_4444(palette[t->palbase + c]);
 }
 
@@ -593,7 +595,7 @@ uint32_t powervr2_device::tex_r_p4_8888_tw(texinfo *t, float x, float y)
 	int yt = t->v_func(y, t->sizey);
 	int off = dilated1[t->cd][xt] + dilated0[t->cd][yt];
 	int addrp = t->address + (off >> 1);
-	int c = ((reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
+	int c = ((reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] >> ((off & 1) << 2)) & 0xf;
 	return palette[t->palbase + c];
 }
 
@@ -601,9 +603,9 @@ uint32_t powervr2_device::tex_r_p4_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)] & 0xf;
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)] & 0xf;
 	return palette[t->palbase + c];
 }
 
@@ -612,7 +614,7 @@ uint32_t powervr2_device::tex_r_p8_1555_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return cv_1555(palette[t->palbase + c]);
 }
 
@@ -620,9 +622,9 @@ uint32_t powervr2_device::tex_r_p8_1555_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return cv_1555(palette[t->palbase + c]);
 }
 
@@ -631,7 +633,7 @@ uint32_t powervr2_device::tex_r_p8_565_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return cv_565(palette[t->palbase + c]);
 }
 
@@ -639,9 +641,9 @@ uint32_t powervr2_device::tex_r_p8_565_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return cv_565(palette[t->palbase + c]);
 }
 
@@ -650,7 +652,7 @@ uint32_t powervr2_device::tex_r_p8_4444_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return cv_4444(palette[t->palbase + c]);
 }
 
@@ -658,9 +660,9 @@ uint32_t powervr2_device::tex_r_p8_4444_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return cv_4444(palette[t->palbase + c]);
 }
 
@@ -669,7 +671,7 @@ uint32_t powervr2_device::tex_r_p8_8888_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + dilated1[t->cd][xt] + dilated0[t->cd][yt];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return palette[t->palbase + c];
 }
 
@@ -677,9 +679,9 @@ uint32_t powervr2_device::tex_r_p8_8888_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 3];
-	int c = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(addrp)];
+	int c = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(addrp)];
 	return palette[t->palbase + c];
 }
 
@@ -998,7 +1000,6 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 void powervr2_device::startrender_w(address_space &space, uint32_t data)
 {
-	dc_state *state = machine().driver_data<dc_state>();
 	auto profile = g_profiler.start(PROFILER_USER1);
 
 	LOGTACMD("Start render, region=%08x, params=%08x\n", region_base, param_base);
@@ -1078,7 +1079,7 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			LOGIRQ("[%d] ISP end of render start %d in %d cycles\n",
 				screen().frame_number(), screen().vpos(), isp_completion
 			);
-			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(isp_completion));
+			endofrender_timer_isp->adjust(m_cpu->cycles_to_attotime(isp_completion));
 			break;
 		}
 	}
@@ -1274,10 +1275,10 @@ void powervr2_device::spg_control_w(offs_t offset, uint32_t data, uint32_t mem_m
 	update_screen_format();
 
 	if((spg_control & 0xc0) == 0xc0)
-		popmessage("SPG undocumented pixel clock mode 11, contact MAME/MESSdev");
+		popmessage("SPG undocumented pixel clock mode 11");
 
 	if((spg_control & 0xd0) == 0x10)
-		popmessage("SPG enabled VGA mode with interlace, contact MAME/MESSdev");
+		popmessage("SPG enabled VGA mode with interlace");
 }
 
 uint32_t powervr2_device::spg_hblank_r()
@@ -1618,7 +1619,7 @@ void powervr2_device::update_screen_format()
 	//int32_t vo_vert_start_pos_f1 = vo_starty & 0x3ff;
 	int pclk = spg_clks[(spg_control >> 6) & 3] * (((spg_control & 0x10) >> 4)+1);
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
+	attotime refresh = attotime::from_ticks(spg_hsize * spg_vsize, pclk);
 
 	rectangle visarea = screen().visible_area();
 
@@ -2202,8 +2203,6 @@ TIMER_CALLBACK_MEMBER(powervr2_device::yuv_convert_end)
 
 void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 {
-	dc_state *state = machine().driver_data<dc_state>();
-
 	yuv_fifo[ta_yuv_index] = data;
 	ta_yuv_index++;
 
@@ -2234,10 +2233,10 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 				y0 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)];
 				y1 = yuv_fifo[0x80+((x&8) ? 0x40 : 0x00)+((y&8) ? 0x80 : 0x00)+(x&6)+((y&7)*8)+1];
 
-				*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr)) = u;
-				*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr+1)) = y0;
-				*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr+2)) = v;
-				*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_texture_ram)) + BYTE8_XOR_LE(dst_addr+3)) = y1;
+				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr)) = u;
+				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr+1)) = y0;
+				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr+2)) = v;
+				*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + BYTE8_XOR_LE(dst_addr+3)) = y1;
 			}
 		}
 
@@ -2250,7 +2249,7 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 			{
 				ta_yuv_v_ptr = 0;
 				// TODO: actual timings
-				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime((ta_yuv_u_size/16)*(ta_yuv_v_size/16)*0x180));
+				yuv_timer_end->adjust(m_cpu->cycles_to_attotime((ta_yuv_u_size/16)*(ta_yuv_v_size/16)*0x180));
 			}
 		}
 	}
@@ -2886,12 +2885,9 @@ void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const 
 
 	memset(wbuffer, 0x00, sizeof(wbuffer));
 
-	dc_state *state = machine().driver_data<dc_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-
 	// TODO: read ISP/TSP command from isp_background_t instead of assuming Gourad-shaded
 	// full-screen polygon.
-	uint32_t c=space.read_dword(0x05000000+(param_base&0xf00000)+((isp_backgnd_t&0xfffff8)>>1)+(3+3)*4);
+	uint32_t c=m_cpu_space->read_dword(0x05000000+(param_base&0xf00000)+((isp_backgnd_t&0xfffff8)>>1)+(3+3)*4);
 	bitmap.fill(c, cliprect);
 
 	// TODO: modifier volumes
@@ -3466,7 +3462,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_y = y + ystart_f1;
 
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
-						uint32_t c=*((reinterpret_cast<uint16_t *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
+						uint32_t c=*((reinterpret_cast<uint16_t *>(&dc_framebuffer_ram[0])) + (WORD2_XOR_LE(addrp) >> 1));
 
 						uint32_t b = (c & 0x001f) << 3;
 						uint32_t g = (c & 0x03e0) >> 2;
@@ -3491,7 +3487,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_y = y + ystart_f1;
 
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
-						uint32_t c=*((reinterpret_cast<uint16_t *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
+						uint32_t c=*((reinterpret_cast<uint16_t *>(&dc_framebuffer_ram[0])) + (WORD2_XOR_LE(addrp) >> 1));
 
 						uint32_t b = (c & 0x001f) << 3;
 						uint32_t g = (c & 0x03e0) >> 2;
@@ -3517,7 +3513,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_x = x*2+0 + hstart;
 						int res_y = y + ystart_f1;
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
-						uint32_t c=*((reinterpret_cast<uint16_t *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
+						uint32_t c=*((reinterpret_cast<uint16_t *>(&dc_framebuffer_ram[0])) + (WORD2_XOR_LE(addrp) >> 1));
 
 						uint32_t b = (c & 0x001f) << 3;
 						uint32_t g = (c & 0x07e0) >> 3;
@@ -3543,7 +3539,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_x = x + hstart;
 						int res_y = y + ystart_f1;
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
-						uint32_t c=*((reinterpret_cast<uint16_t *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 1));
+						uint32_t c=*((reinterpret_cast<uint16_t *>(&dc_framebuffer_ram[0])) + (WORD2_XOR_LE(addrp) >> 1));
 
 						uint32_t b = (c & 0x001f) << 3;
 						uint32_t g = (c & 0x07e0) >> 3;
@@ -3571,11 +3567,11 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
 
-						uint32_t b =*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp));
+						uint32_t b =*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_framebuffer_ram[0])) + BYTE8_XOR_LE(addrp));
 
-						uint32_t g =*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp+1));
+						uint32_t g =*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_framebuffer_ram[0])) + BYTE8_XOR_LE(addrp+1));
 
-						uint32_t r =*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp+2));
+						uint32_t r =*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_framebuffer_ram[0])) + BYTE8_XOR_LE(addrp+2));
 
 						if (cliprect.contains(res_x, res_y))
 							*fbaddr = b | (g<<8) | (r<<16);
@@ -3597,11 +3593,11 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_y = y + ystart_f1;
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
 
-						uint32_t b =*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp));
+						uint32_t b =*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_framebuffer_ram[0])) + BYTE8_XOR_LE(addrp));
 
-						uint32_t g =*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp+1));
+						uint32_t g =*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_framebuffer_ram[0])) + BYTE8_XOR_LE(addrp+1));
 
-						uint32_t r =*(uint8_t *)((reinterpret_cast<uint8_t *>(dc_framebuffer_ram)) + BYTE8_XOR_LE(addrp+2));
+						uint32_t r =*(uint8_t *)((reinterpret_cast<uint8_t *>(&dc_framebuffer_ram[0])) + BYTE8_XOR_LE(addrp+2));
 
 						if (cliprect.contains(res_x, res_y))
 							*fbaddr = b | (g<<8) | (r<<16);
@@ -3625,7 +3621,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_y = y + ystart_f1;
 
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
-						uint32_t c =*((reinterpret_cast<uint32_t *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 2));
+						uint32_t c =*((reinterpret_cast<uint32_t *>(&dc_framebuffer_ram[0])) + (WORD2_XOR_LE(addrp) >> 2));
 
 						uint32_t b = (c & 0x0000ff) >> 0;
 						uint32_t g = (c & 0x00ff00) >> 8;
@@ -3650,7 +3646,7 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 						int res_x = x + hstart;
 						int res_y = y + ystart_f1;
 						uint32_t *fbaddr=&bitmap.pix(res_y, res_x);
-						uint32_t c =*((reinterpret_cast<uint32_t *>(dc_framebuffer_ram)) + (WORD2_XOR_LE(addrp) >> 2));
+						uint32_t c =*((reinterpret_cast<uint32_t *>(&dc_framebuffer_ram[0])) + (WORD2_XOR_LE(addrp) >> 2));
 
 						uint32_t b = (c & 0x0000ff) >> 0;
 						uint32_t g = (c & 0x00ff00) >> 8;
@@ -3838,7 +3834,6 @@ TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 // TODO: very inaccurate
 void powervr2_device::pvr_dma_execute(address_space &space)
 {
-	dc_state *state = machine().driver_data<dc_state>();
 	uint32_t src,dst,size;
 	dst = m_pvr_dma.pvr_addr;
 	src = m_pvr_dma.sys_addr;
@@ -3884,7 +3879,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	// TODO: accurate timing
-	dma_irq_timer->adjust(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4));
+	dma_irq_timer->adjust(m_cpu->cycles_to_attotime(m_pvr_dma.size/4));
 }
 
 INPUT_PORTS_START( powervr2 )
@@ -3905,7 +3900,12 @@ ioport_constructor powervr2_device::device_input_ports() const
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, POWERVR2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, maple_trigger_cb(*this)
 	, irq_cb(*this)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, dc_texture_ram(*this, finder_base::DUMMY_TAG)
+	, dc_framebuffer_ram(*this, finder_base::DUMMY_TAG)
+	, m_cpu_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_mamedebug(*this, "PVR_DEBUG")
 {
 }
@@ -4082,10 +4082,6 @@ void powervr2_device::device_reset()
 	endofrender_timer_tsp->adjust(attotime::never);
 	endofrender_timer_video->adjust(attotime::never);
 	yuv_timer_end->adjust(attotime::never);
-
-	dc_state *state = machine().driver_data<dc_state>();
-	dc_texture_ram = state->dc_texture_ram.target();
-	dc_framebuffer_ram = state->dc_framebuffer_ram.target();
 }
 
 /* called by TIMER_ADD_PERIODIC, in driver sections (controlled by SPG, that's a PVR sub-device) */
@@ -4094,13 +4090,12 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 	int vbin_line = spg_vblank_int & 0x3ff;
 	int vbout_line = (spg_vblank_int >> 16) & 0x3ff;
 	uint8_t interlace_on = ((spg_control & 0x10) >> 4);
-	dc_state *state = machine().driver_data<dc_state>();
 
 	vbin_line <<= interlace_on;
 	vbout_line <<= interlace_on;
 
 	if(vbin_line-(1+interlace_on) == vpos)
-		state->m_maple->maple_hw_trigger();
+		maple_trigger_cb(1);
 
 	if(vbin_line == vpos)
 	{

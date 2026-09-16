@@ -14,16 +14,16 @@ public:
 	// construction/destruction
 	a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void cart_map(address_map &map) override;
-	virtual void cctl_map(address_map &map) override;
+	virtual void cart_map(address_map &map) override ATTR_COLD;
+	virtual void cctl_map(address_map &map) override ATTR_COLD;
 
 	// RD4 tied to +5V, assume always enabled
 	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(1, 1); }
 
 private:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<nvram_device> m_nvram;
 	std::unique_ptr<uint8_t[]> m_nvram_ptr;

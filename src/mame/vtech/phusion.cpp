@@ -40,7 +40,7 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void phusion_map(address_map &map);
+	void phusion_map(address_map &map) ATTR_COLD;
 
 	required_device<cr16b_device> m_maincpu;
 };
@@ -69,14 +69,14 @@ void phusion_state::phusion(machine_config &config)
 
 	TC58FVT800(config, "flash");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(160, 160);
 	screen.set_visarea(0, 160-1, 0, 160-1);
 	screen.set_screen_update(FUNC(phusion_state::screen_update));
 
-	SPEAKER(config, "speaker", 0).front_center();
+	SPEAKER(config, "speaker").front_center();
 }
 
 ROM_START( phusion )
@@ -88,4 +88,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 2000, phusion, 0, 0, phusion, phusion, phusion_state, empty_init, "VTech", "Phusion", MACHINE_IS_SKELETON )
+SYST( 2000, phusion, 0, 0, phusion, phusion, phusion_state, empty_init, "VTech", "Phusion", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

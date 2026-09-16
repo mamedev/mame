@@ -53,6 +53,11 @@ public:
 	uint8_t data_r(offs_t offset);
 	void data_w(offs_t offset, uint8_t data);
 
+	uint8_t port60_r(offs_t offset) { return data_r(0); }
+	void port60_w(offs_t offset, uint8_t data) { data_w(0, data); }
+	uint8_t port64_r(offs_t offset) { return data_r(4); }
+	void port64_w(offs_t offset, uint8_t data) { data_w(4, data); }
+
 	void write_out2(int state);
 
 	void at_8042_set_outport(uint8_t data, int initial);
@@ -65,9 +70,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_timer);
 

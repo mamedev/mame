@@ -66,7 +66,7 @@ public:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<nb1413m3_device> m_nb1413m3;
@@ -83,7 +83,7 @@ protected:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_blitter_destx = 0;
@@ -121,7 +121,7 @@ private:
 	void romsel_w(uint8_t data);
 	uint16_t blitter_src_addr_r();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class threeds_state : public pastelg_common_state
@@ -136,7 +136,7 @@ public:
 	void threeds(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_ioport_array<5> m_p1_keys;
@@ -151,11 +151,9 @@ private:
 	void output_w(uint8_t data);
 	uint8_t rom_readback_r();
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // pastelg specific methods
 
@@ -441,8 +439,6 @@ uint32_t pastelg_common_state::screen_update(screen_device &screen, bitmap_ind16
 }
 
 
-// machine
-
 void threeds_state::machine_start()
 {
 	save_item(NAME(m_mux_data));
@@ -605,7 +601,7 @@ static INPUT_PORTS_START( pastelg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -640,7 +636,7 @@ static INPUT_PORTS_START( threeds )
 	PORT_DIPSETTING (     0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (     0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING (     0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING (     0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING (     0x00, DEF_STR( 1C_10C ) )
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x01,   0x01, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWB:1")
@@ -741,7 +737,7 @@ static INPUT_PORTS_START( threeds )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -781,7 +777,7 @@ void pastelg_state::pastelg(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -833,13 +829,13 @@ void threeds_state::threeds(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &threeds_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(threeds_state::irq0_line_assert));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("blitter");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -948,7 +944,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, pastelg,  0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu",         "Pastel Gal (Japan 851224)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pastelg,  0,       pastelg, pastelg, pastelg_state, empty_init, ROT0, "Nichibutsu",         "Pastel Gal (Japan 851224)",                       MACHINE_SUPPORTS_SAVE ) // パステルギャル
 GAME( 1985, threeds,  0,       threeds, threeds, threeds_state, empty_init, ROT0, "Nichibutsu",         "Three Ds - Three Dealers Casino House (set 1)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, threedsa, threeds, threeds, threeds, threeds_state, empty_init, ROT0, "Nichibutsu",         "Three Ds - Three Dealers Casino House (set 2)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galds,    threeds, threeds, galds,   threeds_state, empty_init, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", MACHINE_SUPPORTS_SAVE )

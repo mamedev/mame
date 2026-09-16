@@ -82,11 +82,14 @@ public:
 		m_led(*this, "led")
 	{ }
 
-	void shtzone(machine_config &config);
+	void shtzone(machine_config &config) ATTR_COLD;
+
+	ioport_value gun_tl_p1_r();
+	ioport_value gun_tl_p2_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -105,7 +108,7 @@ private:
 	uint8_t cart_r(offs_t offset);
 	void int_callback(int state);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -191,25 +194,35 @@ void shtzone_state::prg_map(address_map &map)
 	map(0xdc00, 0xdc00).portr("IN1");
 }
 
+ioport_value shtzone_state::gun_tl_p1_r()
+{
+	return BIT(m_port_ctrl1->in_r(), 4);
+}
+
+ioport_value shtzone_state::gun_tl_p2_r()
+{
+	return BIT(m_port_ctrl2->in_r(), 4);
+}
 
 static INPUT_PORTS_START( shtzone )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // called Select button 1 in test mode
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // " 2
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // " 3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // " 4
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) // " 5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW)
+	PORT_SERVICE_NO_TOGGLE(0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does nothing in test mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) // called gun 1 in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) // " 2
+	// directly tied from Light Phaser TL pins
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(shtzone_state::gun_tl_p1_r))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(shtzone_state::gun_tl_p2_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // does nothing in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // active high or nothing on screen (?)
 
@@ -286,8 +299,6 @@ void shtzone_state::machine_start()
 {
 	sms_state::machine_start();
 
-	m_led.resolve();
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_selected_cart));
 }
@@ -320,7 +331,7 @@ void shtzone_state::shtzone(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10.738_MHz_XTAL / 2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);
@@ -339,6 +350,9 @@ void shtzone_state::shtzone(machine_config &config)
 
 	for (int i = 1; i < 5; i++)
 		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);
+
+	m_port_ctrl1->set_default_option("lphaser");
+	m_port_ctrl2->set_default_option("lphaser");
 
 	m_has_bios_full = false;
 	m_has_pwr_led = false;

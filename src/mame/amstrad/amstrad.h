@@ -90,7 +90,7 @@ public:
 	optional_device<cpc_expansion_slot_device> m_exp; // not on a GX4000; accessed by a static function in machine/amstrad.cpp
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -110,6 +110,7 @@ private:
 	int m_plus_irq_cause = 0;
 
 	emu_timer *m_pc2_low_timer = nullptr;
+	bool m_in_pc2_strobe = false;
 	emu_timer *m_video_update_timer = nullptr;
 	emu_timer *m_set_resolution_timer = nullptr;
 
@@ -263,8 +264,8 @@ private:
 
 	void write_centronics_busy(int state);
 
-	void amstrad_io(address_map &map);
-	void amstrad_mem(address_map &map);
+	void amstrad_io(address_map &map) ATTR_COLD;
+	void amstrad_mem(address_map &map) ATTR_COLD;
 
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;

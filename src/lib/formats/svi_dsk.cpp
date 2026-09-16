@@ -80,11 +80,12 @@ bool svi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sectors[i].actual_size = sector_size;
 				sectors[i].size = sector_size >> 8;
 				sectors[i].deleted = false;
-				sectors[i].bad_crc = false;
+				sectors[i].bad_data_crc = false;
+				sectors[i].bad_addr_crc = false;
+				sectors[i].weak = false;
 				sectors[i].data = &sector_data[sector_offset];
 
-				size_t actual;
-				io.read(sectors[i].data, sector_size, actual);
+				/*auto const [err, actual] =*/ read(io, sectors[i].data, sector_size); // FIXME: check for errors and premature EOF
 
 				sector_offset += sector_size;
 			}
@@ -113,8 +114,7 @@ bool svi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	for (int i = 0; i < 18; i++)
 	{
-		size_t actual;
-		io.write(sectors[i + 1].data(), 128, actual);
+		/*auto const [err, actual] =*/ write(io, sectors[i + 1].data(), 128); // FIXME: check for errors
 	}
 
 	// rest are mfm tracks
@@ -130,8 +130,7 @@ bool svi_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 			for (int i = 0; i < 17; i++)
 			{
-				size_t actual;
-				io.write(sectors[i + 1].data(), 256, actual);
+				/*auto const [err, actual] =*/ write(io, sectors[i + 1].data(), 256); // FIXME: check for errors
 			}
 		}
 	}

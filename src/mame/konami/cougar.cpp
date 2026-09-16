@@ -51,9 +51,9 @@ public:
 	void cougar(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<sh7751r_device> m_maincpu;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 void cougar_state::program_map(address_map &map)
@@ -67,20 +67,19 @@ INPUT_PORTS_END
 
 void cougar_state::cougar(machine_config &config)
 {
-	SH4LE(config, m_maincpu, 20_MHz_XTAL);
+	SH7751R(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cougar_state::program_map);
 	m_maincpu->set_force_no_drc(true);
 
 	RTC4543(config, "rtc", 32.768_kHz_XTAL);
 
-	//SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 /***************************************************************************
@@ -111,4 +110,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2008, spinfev,  0,   cougar, cougar, cougar_state, empty_init, ROT0, "Konami", "Spin Fever",  MACHINE_IS_SKELETON ) // 'GPB-JB-F01 2008-04-17' and 'SPIN FEVER (GSGPB)  BOOT SCRIPT' strings in HDD
+GAME( 2008, spinfev,  0,   cougar, cougar, cougar_state, empty_init, ROT0, "Konami", "Spin Fever",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'GPB-JB-F01 2008-04-17' and 'SPIN FEVER (GSGPB)  BOOT SCRIPT' strings in HDD

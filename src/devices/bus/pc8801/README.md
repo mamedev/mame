@@ -1,6 +1,9 @@
 # PC-8801 EXPansion bus
 
 ## List of known cards
+
+### PC-8001 / PC-8801
+
 - NEC PC-8801-10
   > MIDI interface
 - NEC PC-8801-11
@@ -25,6 +28,8 @@
 - NEC PC-8801-30
 - NEC PC-8801-31
   > -31 is CD-ROM SCSI i/f (built-in for MC, optional for MA+), -30 is virtually same to PC Engine CD-ROM² drive
+- NEC PC-8801SR-01
+  > connects an external PC-80S31/K or an image scanner (PC-IN501, PC-IN502, PC-IN503, PC-IN503H, PC-IN511). Pre-SR machines can use only latter, otherwise disables built-in FDC
 - NEC PC-8864
   > Network board mapping at $a0-$a3
 - HAL PCG-8100
@@ -37,3 +42,20 @@
   > earlier version of HIBIKI-8800 board with no MIDI? cfr. GH [#10703](https://github.com/mamedev/mame/issues/10703)
 - JMB-X1
   > "Sound Board X", 2x OPM + 1x SSG. Used by NRTDRV88J, more info at GH [#8709](https://github.com/mamedev/mame/issues/8709)
+
+### PC-88VA
+
+- NEC PC-88VA-01
+- NEC PC-88VA-02
+  > 256KB of expansion RAM. -01 is the base with two -02 option slots
+- NEC PC-88VA-11
+- NEC PC-88VA-11K
+  > Video board, -11 is the VA version while -11K is the VA2/VA3
+- NEC PC-88VA-12
+  > Sound Board 2
+- NEC PC-88VA-21
+  > 5 inch HDD option
+- NEC PC-88VA-22
+  > 9.3MB Microfloppy disk interface board for PC-88T31 external unit.
+- PC-88VA-91
+  > Adds the equivalent of a VA2/VA3 option ROMs for regular VA

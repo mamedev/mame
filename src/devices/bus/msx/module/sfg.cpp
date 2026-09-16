@@ -25,8 +25,8 @@ protected:
 	msx_cart_sfg_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -63,12 +63,11 @@ void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
 	// YM3012 (DAC)
 	// YM2148 (MKS)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ym2151_device &ym2151(YM2151(config, m_ym2151, DERIVED_CLOCK(1, 1)));  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
 	ym2151.irq_handler().set(FUNC(msx_cart_sfg_device::ym2151_irq_w));
-	ym2151.add_route(0, "lspeaker", 0.80);
-	ym2151.add_route(1, "rspeaker", 0.80);
+	ym2151.add_route(0, "speaker", 0.80, 0);
+	ym2151.add_route(1, "speaker", 0.80, 1);
 
 	YM2148(config, m_ym2148, XTAL(4'000'000));
 	m_ym2148->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
@@ -145,7 +144,7 @@ public:
 	msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 msx_cart_sfg01_device::msx_cart_sfg01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -171,8 +170,8 @@ public:
 	msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 msx_cart_sfg05_device::msx_cart_sfg05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -186,8 +185,8 @@ void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
 
 	ym2164_device &ym2164(YM2164(config.replace(), m_ym2151, DERIVED_CLOCK(1, 1)));
 	ym2164.irq_handler().set(FUNC(msx_cart_sfg05_device::ym2151_irq_w));
-	ym2164.add_route(0, "lspeaker", 0.80);
-	ym2164.add_route(1, "rspeaker", 0.80);
+	ym2164.add_route(0, "speaker", 0.80, 0);
+	ym2164.add_route(1, "speaker", 0.80, 1);
 }
 
 ROM_START(msx_sfg05)

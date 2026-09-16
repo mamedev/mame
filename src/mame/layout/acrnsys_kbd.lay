@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+	<element name="red_led" defstate="0">
+		<disk state="0">
+			<color red="0.20" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="label_caps">
+		<text string="caps">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_shift">
+		<text string="shift">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_lock">
+		<text string="lock">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_power">
+		<text string="power">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="label_on">
+		<text string="on">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Keyboard LED's">
+		<bounds left="0" right="400" top="0" bottom="330" />
+		<screen index="0">
+			<bounds left="0" right="400" top="0" bottom="300" />
+		</screen>
+
+		<element name="label_caps" ref="label_caps">
+			<bounds x="10" y="305" width="24" height="7" />
+		</element>
+
+		<element name="label_lock" ref="label_lock">
+			<bounds x="10" y="312" width="24" height="7" />
+		</element>
+
+		<element name="caps_led" ref="red_led">
+			<bounds x="20" y="320" width="5" height="5" />
+		</element>
+
+		<element name="label_shift" ref="label_shift">
+			<bounds x="40" y="305" width="24" height="7" />
+		</element>
+
+		<element name="label_lock" ref="label_lock">
+			<bounds x="40" y="312" width="24" height="7" />
+		</element>
+
+		<element name="shift_lock_led" ref="red_led">
+			<bounds x="50" y="320" width="5" height="5" />
+		</element>
+
+		<element name="label_power" ref="label_power">
+			<bounds x="70" y="305" width="24" height="7" />
+		</element>
+
+		<element name="label_on" ref="label_on">
+			<bounds x="70" y="312" width="24" height="7" />
+		</element>
+
+		<element name="power_led" ref="red_led">
+			<bounds x="80" y="320" width="5" height="5" />
+		</element>
+	</view>
+
+</mamelayout>

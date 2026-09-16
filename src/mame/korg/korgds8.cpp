@@ -38,7 +38,7 @@ public:
 	void korg707(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -52,7 +52,7 @@ private:
 	void line_mute_w(u8 data);
 	void led_data_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void palette_init_ds8(palette_device &palette);
 
@@ -219,7 +219,7 @@ void korg_ds8_state::ds8(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_card, generic_plain_slot, nullptr, "ds8_card");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -229,16 +229,15 @@ void korg_ds8_state::ds8(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(korg_ds8_state::palette_init_ds8), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 40);
 	lcdc.set_pixel_update_cb(FUNC(korg_ds8_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2164_device &fm(YM2164(config, "fm", 3.579545_MHz_XTAL)); // YM2164 + YM3012
-	fm.add_route(0, "lspeaker", 1.00);
-	fm.add_route(1, "rspeaker", 1.00);
+	fm.add_route(0, "speaker", 1.00, 0);
+	fm.add_route(1, "speaker", 1.00, 1);
 }
 
 void korg_ds8_state::korg707(machine_config &config)
@@ -267,5 +266,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_IS_SKELETON)
-SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, ds8,     0, 0, ds8,     ds8, korg_ds8_state, empty_init, "Korg", "DS-8 Digital Synthesizer",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, korg707, 0, 0, korg707, ds8, korg_ds8_state, empty_init, "Korg", "707 Performing Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

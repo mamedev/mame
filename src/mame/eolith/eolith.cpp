@@ -104,8 +104,8 @@
 #include "eolith_speedup.h"
 
 #include "cpu/e132xs/e132xs.h"
-#include "cpu/mcs51/mcs51.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/qs1000.h"
@@ -160,7 +160,7 @@ private:
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_data_map(address_map &map) ATTR_COLD;
 	void sound_prg_map(address_map &map) ATTR_COLD;
 
 	void patch_mcu_protection(uint32_t address) ATTR_COLD;
@@ -253,8 +253,6 @@ uint32_t eolith_state::screen_update_eolith(screen_device &screen, bitmap_ind16 
 void eolith_state::machine_start()
 {
 	eolith_e1_speedup_state_base::machine_start();
-
-	m_led.resolve();
 
 	// Configure the sound ROM banking
 	m_sndbank->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
@@ -407,7 +405,7 @@ void eolith_state::sound_prg_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void eolith_state::sound_io_map(address_map &map)
+void eolith_state::sound_data_map(address_map &map)
 {
 	map(0x0000, 0x7fff).bankr("sound_bank");
 	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
@@ -425,10 +423,10 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith_state, speedup_vblank_r)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(eolith_state::speedup_vblank_r))
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -461,9 +459,9 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( linkypip )
@@ -666,7 +664,7 @@ static INPUT_PORTS_START( stealsee )
 	PORT_INCLUDE(common)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith_state, stealsee_speedup_vblank_r)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(eolith_state::stealsee_speedup_vblank_r))
 INPUT_PORTS_END
 
 
@@ -690,14 +688,15 @@ INPUT_PORTS_END
 
 void eolith_state::eolith45(machine_config &config)
 {
-	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	// TODO: turning off single instruction mode makes Raccoon World slow due to constant recompilation
+	E132(config, m_maincpu, 45_MHz_XTAL).set_single_instruction_mode(true);         // E1-32N (PQFP)
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
 	/* Sound CPU */
 	I8032(config, m_soundcpu, XTAL(12'000'000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
-	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
+	m_soundcpu->set_addrmap(AS_DATA, &eolith_state::sound_data_map);
 	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
 	m_soundcpu->port_out_cb<3>().set(FUNC(eolith_state::sound_p3_w));
 	config.set_perfect_quantum(m_soundcpu); // HACK: ensure serial sync between Sound CPU and QS1000
@@ -711,7 +710,7 @@ void eolith_state::eolith45(machine_config &config)
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(512, 262);
@@ -722,8 +721,7 @@ void eolith_state::eolith45(machine_config &config)
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
@@ -732,8 +730,8 @@ void eolith_state::eolith45(machine_config &config)
 	m_qs1000->p1_in().set(FUNC(eolith_state::qs1000_p1_r));
 	m_qs1000->p1_out().set(FUNC(eolith_state::qs1000_p1_w));
 	m_qs1000->p3_in().set(FUNC(eolith_state::qs1000_p3_r));
-	m_qs1000->add_route(0, "lspeaker", 1.0);
-	m_qs1000->add_route(1, "rspeaker", 1.0);
+	m_qs1000->add_route(0, "speaker", 1.0, 0);
+	m_qs1000->add_route(1, "speaker", 1.0, 1);
 }
 
 void eolith_state::eolith50(machine_config &config)

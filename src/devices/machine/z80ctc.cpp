@@ -77,12 +77,17 @@ DEFINE_DEVICE_TYPE(Z80CTC_CHANNEL, z80ctc_channel_device, "z80ctc_channel", "Z80
 //-------------------------------------------------
 
 z80ctc_device::z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, Z80CTC, tag, owner, clock)
+	: z80ctc_device(mconfig, Z80CTC, tag, owner, clock)
+{
+}
+
+z80ctc_device::z80ctc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
+	, m_channel(*this, "ch%u", 0U)
 	, m_intr_cb(*this)
 	, m_zc_cb(*this)
 	, m_vector(0)
-	, m_channel(*this, "ch%u", 0U)
 {
 }
 
@@ -363,7 +368,11 @@ u8 z80ctc_channel_device::read()
 		if(!m_timer->remaining().is_never())
 			return u8((m_timer->remaining().as_double() / period.as_double()) + 1.0);
 		else
-			return 0;
+		{
+			// value read-back is required by x1turbo for YM internal board detection.
+			// cfr. x1turbo40 argus wpiset 0x704,1,rw
+			return m_down;
+		}
 	}
 }
 
@@ -428,6 +437,11 @@ void z80ctc_channel_device::write(u8 data)
 			m_timer->adjust(attotime::never);
 		}
 
+		// counter -> timer without reset keeps the old time constant and starts the timer
+		bool const start_timer =
+				(m_mode & MODE) == MODE_COUNTER && (data & MODE) == MODE_TIMER &&
+				(data & RESET) == 0 && (data & CONSTANT) != CONSTANT_LOAD;
+
 		// if we're being reset, clear out any pending timers for this channel
 		if ((data & RESET) == RESET_ACTIVE)
 		{
@@ -440,6 +454,25 @@ void z80ctc_channel_device::write(u8 data)
 		// set the new mode
 		m_mode = data;
 		LOG("Channel mode = %02x\n", data);
+
+		if (start_timer)
+		{
+			// automatic trigger starts counting immediately
+			if ((m_mode & TRIGGER) == TRIGGER_AUTO)
+			{
+				attotime curperiod = period();
+				m_timer->adjust(curperiod, 0, curperiod);
+			}
+
+			// else wait for the trigger
+			else
+			{
+				m_mode |= WAITING_FOR_TRIG;
+				m_timer->adjust(clocks_to_attotime(1));
+			}
+
+			m_down = m_tconst;
+		}
 
 		// clearing this bit resets the interrupt state regardless of M1 activity (or lack thereof)
 		if ((data & INTERRUPT) == INTERRUPT_OFF && (m_int_state & Z80_DAISY_INT))

@@ -63,18 +63,19 @@ public:
 	u32 iobus_r(offs_t offset, u32 mem_mask = ~0);
 	void go_w(int state);
 
+	void set_branch_hack(bool is_hack) { m_branch_hack = is_hack; }
+
 protected:
 	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp, address_map_constructor io_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 1; }
-	virtual u32 execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
@@ -88,7 +89,8 @@ protected:
 	void flags_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void matrix_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void matrix_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void endian_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	uint32_t pc_r(offs_t offset);
 	void pc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 status_r();
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -137,6 +139,7 @@ protected:
 	bool        m_isdsp;
 	int         m_icount;
 	int         m_bankswitch_icount;
+	bool        m_branch_hack;
 	devcb_write_line m_cpu_interrupt;
 	memory_access<24, 2, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<24, 2, 0, ENDIANNESS_BIG>::specific m_program;
@@ -235,7 +238,7 @@ protected:
 	void init_tables();
 
 	// I/O internal regs
-	void io_common_map(address_map &map);
+	void io_common_map(address_map &map) ATTR_COLD;
 	// TODO: the m_io* stubs are conventionally given for allowing a correct register setup from vanilla 68k.
 	// This is yet another reason about needing a bus device dispatcher for this system.
 	u32 m_io_end;
@@ -272,7 +275,7 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void execute_run() override;
@@ -289,15 +292,14 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void modulo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void dsp_end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void dsp_endian_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 high_accum_r();
 };
 

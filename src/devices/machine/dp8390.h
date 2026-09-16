@@ -35,8 +35,8 @@ protected:
 	dp8390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, TYPE varian, u32 bandwidth);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TYPE const m_variant;
 
@@ -112,7 +112,7 @@ public:
 class dp8390d_device : public dp8390_device
 {
 public:
-	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dp8390d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition

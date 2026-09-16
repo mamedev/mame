@@ -71,11 +71,11 @@ private:
 	int m_rougien_gfxbank2 = 0;
 
 	/* sound-related */
-	uint8_t    m_adpcm_idle = 0;
-	int      m_adpcm_data = 0;
-	uint8_t    m_adpcm_trigger = 0;
-	uint8_t    m_adpcm_rom_sel = 0;
-	bool       m_ay8910_enable[2];
+	uint8_t m_adpcm_idle = 0;
+	int m_adpcm_data = 0;
+	uint8_t m_adpcm_trigger = 0;
+	uint8_t m_adpcm_rom_sel = 0;
+	bool m_ay8910_enable[2] = { };
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -100,8 +100,6 @@ private:
 	void mermaid_videoram2_w(offs_t offset, uint8_t data);
 	void mermaid_videoram_w(offs_t offset, uint8_t data);
 	void mermaid_colorram_w(offs_t offset, uint8_t data);
-	void flip_screen_x_w(int state);
-	void flip_screen_y_w(int state);
 	void mermaid_bg_scroll_w(offs_t offset, uint8_t data);
 	void mermaid_fg_scroll_w(offs_t offset, uint8_t data);
 	void bg_mask_w(int state);
@@ -111,9 +109,9 @@ private:
 	uint8_t mermaid_collision_r();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void common_palette(palette_device &palette) const;
 	void mermaid_palette(palette_device &palette) const;
 	void rougien_palette(palette_device &palette) const;
@@ -123,7 +121,7 @@ private:
 	uint8_t collision_check( rectangle& rect );
 	void collision_update();
 	void rougien_adpcm_int(int state);
-	void mermaid_map(address_map &map);
+	void mermaid_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SANRITSU_MERMAID_H

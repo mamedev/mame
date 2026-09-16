@@ -32,7 +32,7 @@
 #include "machine/adc0808.h"
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
-#include "video/vector.h"
+#include "vector.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -186,17 +186,17 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	/* Bit 6 is VG_HALT */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_starwars_device, done_r)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", FUNC(avg_starwars_device::done_r))
 	/* Bit 7 is MATH_RUN - see machine/starwars.c */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(starwars_state, matrix_flag_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(starwars_state::matrix_flag_r))
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x02, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPSETTING(    0x01, "7" )
 	PORT_DIPSETTING(    0x02, "8" )
 	PORT_DIPSETTING(    0x03, "9" )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("10D:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("10D:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, "Moderate" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
@@ -255,11 +255,19 @@ static INPUT_PORTS_START( esb )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("10D:3,4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x0c, "Moderate" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x30, 0x30, "Jedi-Letter Mode" )  PORT_DIPLOCATION("10D:5,6")
 	PORT_DIPSETTING(    0x00, "Level Only" )
 	PORT_DIPSETTING(    0x10, "Level" )
 	PORT_DIPSETTING(    0x20, "Increment Only" )
 	PORT_DIPSETTING(    0x30, "Increment" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("10D:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) // "No Music In Attract Mode" switch 'on'
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) ) // "Music In Attract Mode" switch 'off'
 INPUT_PORTS_END
 
 
@@ -311,14 +319,11 @@ void starwars_state::starwars(machine_config &config)
 	outlatch.q_out_cb<7>().set(FUNC(starwars_state::recall_w)); // NVRAM array recall
 
 	/* video hardware */
-	VECTOR(config, "vector", 0);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 250, 0, 280);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(CLOCK_3KHZ / 12 / 6);
+	vector.set_visarea(0, 250, 0, 280);
 
-	avg_device &avg(AVG_STARWARS(config, "avg", 0));
+	avg_device &avg(AVG_STARWARS(config, "avg"));
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x0000);
 
@@ -560,11 +565,11 @@ void starwars_state::init_esb()
  *
  *************************************/
 
-GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 1)", 0 ) // newest
-GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 2)", 0 )
-GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 3)", 0 ) // oldest
+GAME( 1983, starwars,  0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari",       "Star Wars (Atari, set 1)", 0 ) // newest
+GAME( 1983, starwars1, starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari",       "Star Wars (Atari, set 2)", 0 )
+GAME( 1983, starwarso, starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari",       "Star Wars (Atari, set 3)", 0 ) // oldest
 // is there an even older starwars set with 136021-106.1m ?
 
-GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
+GAME( 1983, tomcatsw,  tomcat,   starwars, starwars, starwars_state, init_starwars, ROT0, "Atari",       "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
 
-GAME( 1985, esb,      0,        esb,      esb,      starwars_state, init_esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )
+GAME( 1985, esb,       0,        esb,      esb,      starwars_state, init_esb,      ROT0, "Atari Games", "The Empire Strikes Back", 0 )

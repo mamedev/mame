@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_AUDIO_NES_VT_APU_H
-#define MAME_AUDIO_NES_VT_APU_H
+#ifndef MAME_SOUND_NES_APU_VT_H
+#define MAME_SOUND_NES_APU_VT_H
 
 #pragma once
 
@@ -17,10 +17,10 @@ public:
 	nes_apu_vt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 };
 
-#endif // MAME_AUDIO_NES_VT_APU_H
+#endif // MAME_SOUND_NES_APU_VT_H

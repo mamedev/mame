@@ -28,7 +28,7 @@ public:
 	~fdc37c93x_device() {}
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void set_sysopt_pin(int value) { sysopt_pin = value; }
 	auto gp20_reset() { return m_gp20_reset_callback.bind(); }
@@ -78,13 +78,13 @@ public:
 	void kbdp21_gp25_gatea20_w(int state);
 	void kbdp20_gp20_reset_w(int state);
 
-	void unmap_fdc(address_map &map);
-	void map_lpt(address_map &map);
-	void map_serial1(address_map &map);
-	void map_serial2(address_map &map);
-	void map_rtc(address_map &map);
-	void map_keyboard(address_map &map);
-	void unmap_keyboard(address_map &map);
+	void unmap_fdc(address_map &map) ATTR_COLD;
+	void map_lpt(address_map &map) ATTR_COLD;
+	void map_serial1(address_map &map) ATTR_COLD;
+	void map_serial2(address_map &map) ATTR_COLD;
+	void map_rtc(address_map &map) ATTR_COLD;
+	void map_keyboard(address_map &map) ATTR_COLD;
+	void unmap_keyboard(address_map &map) ATTR_COLD;
 
 	// to access io ports
 	uint8_t read(offs_t offset);
@@ -102,8 +102,8 @@ protected:
 	fdc37c93x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;

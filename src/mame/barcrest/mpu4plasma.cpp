@@ -39,7 +39,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mpu4plasma_map(address_map &map);
+	void mpu4plasma_map(address_map &map) ATTR_COLD;
 };
 
 #include "mpu4plasma.lh"
@@ -87,9 +87,9 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 	m68000_device &plasmacpu(M68000(config, "plasmacpu", 10000000));
 	plasmacpu.set_addrmap(AS_PROGRAM, &mpu4plasma_state::mpu4plasma_map);
 
-	SCC8530N(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
+	SCC8530(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -99,7 +99,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(0x200);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);
@@ -173,7 +173,7 @@ ROM_END
 #define M4APACH_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
 	ROM_LOAD16_BYTE( "a6ppl.p0", 0x00000, 0x020000, CRC(350da2df) SHA1(a390e0c7e1e624c17f0e254e0b99ef9dbf56269d) ) \
-	ROM_LOAD16_BYTE( "a6ppl.p1", 0x00001, 0x020000, CRC(63038aba) SHA1(8ec4e02109e872460a9598e469b59919cc5450dd) ) \
+	ROM_LOAD16_BYTE( "a6ppl.p1", 0x00001, 0x020000, CRC(63038aba) SHA1(8ec4e02109e872460a9598e469b59919cc5450dd) )
 
 ROM_START( m4apach )
 	ROM_REGION( 0x10000, "maincpu", 0 )

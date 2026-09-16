@@ -41,17 +41,16 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
-	void acefruit(machine_config &config);
+	void acefruit(machine_config &config) ATTR_COLD;
 
-	void init_sidewndr();
+	void init_sidewndr() ATTR_COLD;
 
 	template <int Mask> int sidewndr_payout_r();
 	template <int Mask> int starspnr_coinage_r();
 	template <int Mask> int starspnr_payout_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(refresh_tick);
 
@@ -67,8 +66,8 @@ private:
 	INTERRUPT_GEN_MEMBER(vblank);
 	void update_irq(int vpos);
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -88,14 +87,14 @@ private:
 
 void acefruit_state::update_irq(int vpos)
 {
-	int row = vpos / 8;
+	const int row = vpos / 8;
 
-	for( int col = 0; col < 32; col++ )
+	for (int col = 0; col < 32; col++)
 	{
-		int tile_index = ( col * 32 ) + row;
-		int color = m_colorram[ tile_index ];
+		const int tile_index = (col * 32) + row;
+		const int color = m_colorram[tile_index];
 
-		switch( color )
+		switch (color)
 		{
 		case 0x0c:
 			m_maincpu->set_input_line(0, HOLD_LINE);
@@ -106,20 +105,14 @@ void acefruit_state::update_irq(int vpos)
 
 TIMER_CALLBACK_MEMBER(acefruit_state::refresh_tick)
 {
-	int vpos = m_screen->vpos();
+	const int vpos = m_screen->vpos();
 
 	m_screen->update_partial(vpos);
 	update_irq(vpos);
 
-	vpos = ((vpos / 8) + 1) * 8;
+	const int next_vpos = ((vpos / 8) + 1) * 8;
 
-	m_refresh_timer->adjust(m_screen->time_until_pos(vpos));
-}
-
-void acefruit_state::machine_start()
-{
-	m_lamps.resolve();
-	m_solenoids.resolve();
+	m_refresh_timer->adjust(m_screen->time_until_pos(next_vpos));
 }
 
 void acefruit_state::video_start()
@@ -129,46 +122,46 @@ void acefruit_state::video_start()
 
 INTERRUPT_GEN_MEMBER(acefruit_state::vblank)
 {
-	device.execute().set_input_line(0, HOLD_LINE );
-	m_refresh_timer->adjust( attotime::zero );
+	device.execute().set_input_line(0, HOLD_LINE);
+	m_refresh_timer->adjust(attotime::zero);
 }
 
 uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int startrow = cliprect.min_y / 8;
-	int endrow = cliprect.max_y / 8;
+	const int startrow = cliprect.min_y / 8;
+	const int endrow = cliprect.max_y / 8;
 
-	for( int row = startrow; row <= endrow; row++ )
+	for (int row = startrow; row <= endrow; row++)
 	{
 		int spriterow = 0;
 		int spriteindex = 0;
 		int spriteparameter = 0;
 
-		for( int col = 0; col < 32; col++ )
+		for (int col = 0; col < 32; col++)
 		{
-			int tile_index = ( col * 32 ) + row;
-			int code = m_videoram[ tile_index ];
-			int color = m_colorram[ tile_index ];
+			const int tile_index = (col * 32) + row;
+			const int code = m_videoram[tile_index];
+			const int color = m_colorram[tile_index];
 
-			if( color < 0x4 )
+			if (color < 0x4)
 			{
 				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
 			}
-			else if( color >= 0x5 && color <= 0x7 )
+			else if (color >= 0x5 && color <= 0x7)
 			{
-				static const int spriteskip[] = { 1, 2, 4 };
-				int spritesize = spriteskip[ color - 5 ];
-				gfx_element *gfx =  m_gfxdecode->gfx(0);
+				constexpr int spriteskip[] = { 1, 2, 4 };
+				const int spritesize = spriteskip[color - 5];
+				gfx_element &gfx = *m_gfxdecode->gfx(0);
 
-				for( int x = 0; x < 16; x++ )
+				for (int x = 0; x < 16; x++)
 				{
-					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
-					const uint8_t *gfxdata = gfx->get_data(sprite);
+					const int sprite = (m_spriteram[(spriteindex / 64) % 6] & 0xf) ^ 0xf;
+					uint8_t const *const gfxdata = gfx.get_data(sprite);
 
-					for( int y = 0; y < 8; y++ )
+					for (int y = 0; y < 8; y++)
 					{
-						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
-						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
+						uint16_t &dst = bitmap.pix(y + (row * 8), x + (col * 16));
+						dst = gfxdata[((spriterow + y) * gfx.rowbytes()) + ((spriteindex % 64) >> 1)];
 					}
 
 					spriteindex += spritesize;
@@ -176,30 +169,30 @@ uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 			else
 			{
-				for( int x = 0; x < 16; x++ )
+				for (int x = 0; x < 16; x++)
 				{
-					for( int y = 0; y < 8; y++ )
+					for (int y = 0; y < 8; y++)
 					{
-						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
-						*( dst ) = 0;
+						uint16_t &dst = bitmap.pix(y + (row * 8), x + (col * 16));
+						dst = 0;
 					}
 				}
 
-				if( color == 0x8 )
+				if (color == 0x8)
 				{
-					if( spriteparameter == 0 )
+					if (spriteparameter == 0)
 					{
 						spriteindex = code & 0xf;
 					}
 					else
 					{
-						spriterow = ( ( code >> 0 ) & 0x3 ) * 8;
-						spriteindex += ( ( code >> 2 ) & 0x1 ) * 16;
+						spriterow = ((code >> 0) & 0x3) * 8;
+						spriteindex += ((code >> 2) & 0x1) * 16;
 					}
 
 					spriteparameter = !spriteparameter;
 				}
-				else if( color == 0xc )
+				else if (color == 0xc)
 				{
 					/* irq generated in update_irq() */
 				}
@@ -242,7 +235,7 @@ int acefruit_state::starspnr_payout_r()
 
 void acefruit_state::colorram_w(offs_t offset, uint8_t data)
 {
-	m_colorram[ offset ] = data & 0xf;
+	m_colorram[offset] = data & 0xf;
 }
 
 void acefruit_state::coin_w(uint8_t data)
@@ -252,7 +245,22 @@ void acefruit_state::coin_w(uint8_t data)
 
 void acefruit_state::sound_w(uint8_t data)
 {
-	/* TODO: ? */
+	/* TODO:
+	PCB pictures suggest that the sound hardware has the part numbers scraped
+	off.  There's a 14 pin package that looks involved.
+
+	Pin 36 10V on P2 seems to go to possibly a low voltage reset circuit
+	(mentioned in the manual) at the top left of the board H 13.
+
+	Pin 35 (sound output) seems to go to the TIP120 transistor at position F2 on
+	the board.  The emitter is connected to ground, and the collector goes to
+	pin 35 of P2. The base is connected to pin 8 of the 14 pin IC located at H3
+	on the board near the crystal via the 1K resistor just above the transistor.
+
+	7048 maybe?
+
+	*/
+
 }
 
 void acefruit_state::lamp_w(offs_t offset, uint8_t data)
@@ -264,30 +272,32 @@ void acefruit_state::lamp_w(offs_t offset, uint8_t data)
 void acefruit_state::solenoid_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
+	{
 		m_solenoids[i] = BIT(data, i);
+	}
 }
 
 void acefruit_state::palette_init(palette_device &palette) const
 {
 	/* sprites */
-	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 1, rgb_t(0x00, 0x00, 0xff) );
-	palette.set_pen_color( 2, rgb_t(0x00, 0xff, 0x00) );
-	palette.set_pen_color( 3, rgb_t(0xff, 0x7f, 0x00) );
-	palette.set_pen_color( 4, rgb_t(0xff, 0x00, 0x00) );
-	palette.set_pen_color( 5, rgb_t(0xff, 0xff, 0x00) );
-	palette.set_pen_color( 6, rgb_t(0xff, 0xff, 0xff) );
-	palette.set_pen_color( 7, rgb_t(0x7f, 0x3f, 0x1f) );
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(3, rgb_t(0xff, 0x7f, 0x00));
+	palette.set_pen_color(4, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(5, rgb_t(0xff, 0xff, 0x00));
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(7, rgb_t(0x7f, 0x3f, 0x1f));
 
 	/* tiles */
-	palette.set_pen_color( 8, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 9, rgb_t(0xff, 0xff, 0xff) );
-	palette.set_pen_color( 10, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 11, rgb_t(0x00, 0x00, 0xff) );
-	palette.set_pen_color( 12, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 13, rgb_t(0x00, 0xff, 0x00) );
-	palette.set_pen_color( 14, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 15, rgb_t(0xff, 0x00, 0x00) );
+	palette.set_pen_color(8, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(9, rgb_t(0xff, 0xff, 0xff) );
+	palette.set_pen_color(10, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(11, rgb_t(0xff, 0x00, 0x00) );
+	palette.set_pen_color(12, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(13, rgb_t(0x00, 0xff, 0x00) );
+	palette.set_pen_color(14, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0xff) );
 }
 
 void acefruit_state::main_map(address_map &map)
@@ -324,14 +334,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Stop Nudge/Nudge Up or Down" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              /* "Cash in" */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* active low or high?? */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) /* active low or high?? */
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")   // 1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Sidewind" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )              /* "Cash in" */
-	PORT_DIPNAME( 0x08, 0x00, "Accountacy System Texts" )
+	PORT_DIPNAME( 0x08, 0x00, "Accountancy System Texts" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -340,14 +350,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, sidewndr_payout_r<0x00>)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::sidewndr_payout_r<0x00>))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")   // 3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold/Nudge 1" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME( "Accountancy System" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )              /* "50P in" */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, sidewndr_payout_r<0x01>)
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::sidewndr_payout_r<0x01>))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")   // 4
@@ -395,6 +405,7 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x03, "86%" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( spellbnd )
 	PORT_INCLUDE(sidewndr)
 
@@ -413,7 +424,7 @@ static INPUT_PORTS_START( spellbnd )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel" )          /* see IN4 bit 0 in "Accountancy System" mode */
 
 	PORT_MODIFY("IN4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME( "Clear Data" )     /* in "Accountancy System" mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME( "Clear Data" )     /* in "Accountancy System" mode */
 	/* Similar to 'sidewndr' but different addresses */
 	PORT_DIPNAME( 0x04, 0x04, "Lamp 11 always ON" )         /* code at 0x072a - write lamp status at 0x00ff */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -445,7 +456,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	/* tested at 0xef77 after IN5 bit 1 and before IN2 bit 2 - after coins are tested - table at 0xefa5 (3 bytes) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* active low or high?? */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) /* active low or high?? */
 
 	PORT_START("IN1")   // 1
 	/* tested at 0xe77c - call from 0x012c */
@@ -454,7 +465,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect/Cancel" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x03>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_coinage_r<0x03>)) /* to be confirmed */
 
 	PORT_START("IN2")   // 2
 	/* tested at 0xe83c */
@@ -464,7 +475,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xef82 after IN5 bit 1 and after IN1 bit 3 - after coins are tested - table at 0xefa8 (3 bytes) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN3 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x01>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_coinage_r<0x01>)) /* to be confirmed */
 	/* tested at 0x1b0f */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -473,7 +484,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xe8ea and 0xecbe */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeeba with IN2 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x00>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_coinage_r<0x00>)) /* to be confirmed */
 	/* tested at 0x0178 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -484,7 +495,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xed86 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_coinage_r<0x02>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_coinage_r<0x02>)) /* to be confirmed */
 
 	PORT_START("IN5")   // 5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold 3" )
@@ -493,7 +504,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xec6f */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN6 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x00>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_payout_r<0x00>)) /* to be confirmed */
 	/* tested at 0xe312 and 0xe377 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -502,7 +513,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xee42, 0xee5e and 0xeff5 before IN1 bit 0 - invalid code after 0xf000 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN7 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x01>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_payout_r<0x01>)) /* to be confirmed */
 	/* tested at 0xe8dd and 0xec1c */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -514,7 +525,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xedcb */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0x1d60 with IN5 bit 3 and IN6 bit 3 - table at 0x1d90 (8 * 3 bytes) */
-	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(acefruit_state, starspnr_payout_r<0x02>) /* to be confirmed */
+	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::starspnr_payout_r<0x02>)) /* to be confirmed */
 	/* tested at 0xec2a */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -522,13 +533,13 @@ static INPUT_PORTS_START( starspnr )
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x02, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x03, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_25C ) )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x0c, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_25C ) )
 
 	PORT_START("PAYOUT")    // fake port to handle settings via multiple input ports
 	PORT_DIPNAME( 0x07, 0x07, "Payout %" )
@@ -596,7 +607,7 @@ void acefruit_state::acefruit(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_acefruit);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
@@ -609,12 +620,13 @@ void acefruit_state::acefruit(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
+
 }
 
 void acefruit_state::init_sidewndr()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	/* replace "ret nc" ( 0xd0 ) with "di" */
+	/* replace "ret nc" (0xd0) with "di" */
 	ROM[0] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
@@ -624,6 +636,20 @@ void acefruit_state::init_sidewndr()
   Game driver(s)
 
 ***************************************************************************/
+
+ROM_START( flshback )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h9.bin",     0x000000, 0x000800, CRC(158717a1) SHA1(8dd498853e5e74aafb52bb1dd3fcf07a387c3fb3) )
+	ROM_LOAD( "h10.bin",    0x000800, 0x000800, CRC(1f35df6e) SHA1(b371b6bc34d082a4740af34b2f285a2f3c6fd5e6) )
+	ROM_LOAD( "h11.bin",    0x001000, 0x000800, CRC(7db05abe) SHA1(81d01569050b4145f9f30075b0f7164873734b23) )
+	ROM_LOAD( "h12.bin",    0x001800, 0x000800, CRC(5506468a) SHA1(00c0188f227e9be109bf512295798f0059f73216) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* 8k for graphics */
+	ROM_LOAD( "h5.bin",    0x000000, 0x000800, CRC(198da32c) SHA1(bf6c4ddcda0503095d310e08057dd88154952ef4) )
+	ROM_LOAD( "h6.bin",    0x000800, 0x000800, CRC(e777130f) SHA1(3421c6f399e5ec749f1908f6b4ebff7761c6c5d9) )
+	ROM_LOAD( "h7.bin",    0x001000, 0x000800, CRC(bfed5b8f) SHA1(f95074e8809297eec67da9d7e33ae1dd1c5eabc0) )
+	ROM_LOAD( "h8.bin",    0x001800, 0x000800, CRC(562079ab) SHA1(4f1ee028d43b831d2d43352e2a0f2ddc6c212f69) )
+ROM_END
 
 ROM_START( sidewndr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -753,6 +779,7 @@ ROM_END
 
 GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
 GAMEL( 1981?, spellbnd, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAME(  1982?, flshback, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Flashback",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(  1982?, starspnr, 0, acefruit, starspnr, acefruit_state, empty_init,    ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(  1982?, acefruit, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
 // not dumped: Magnum?

@@ -9,10 +9,12 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_CVS_CTRL_CTRL_H
-#define MAME_BUS_CVS_CTRL_CTRL_H
+#ifndef MAME_BUS_VCS_CTRL_CTRL_H
+#define MAME_BUS_VCS_CTRL_CTRL_H
 
 #pragma once
+
+#include "screen.h"
 
 
 //**************************************************************************
@@ -43,6 +45,26 @@ public:
 protected:
 	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
 
+	// true if time_until_lightpen_pos() below can actually time anything for this port
+	bool has_lightpen_timing() const;
+
+	// time until the port's video chip's raster position matches a light pen/gun
+	// crosshair (0-255 across the visible picture, matching IPT_LIGHTGUN_X/Y's default
+	// range); prefers a driver-supplied chip-native timing callback (see
+	// vcs_control_port_device::set_lightpen_time_callback), falling back to a generic
+	// screen_device-based estimate
+	attotime time_until_lightpen_pos(int x255, int y255) const;
+
+	// true if the rendered picture near a light pen/gun crosshair (0-255 across the
+	// visible picture, same convention as time_until_lightpen_pos()) is currently
+	// bright, weighted by how recently the beam illuminated each point (CRT phosphor
+	// persistence rather than the beam's raw current position) - same technique as
+	// the NES/Vs./PC-10 zapper photodiode (bus/nes_ctrl/zapper_sensor.h). Real photo-
+	// diode-based sensors only fire when actually pointed at something lit, so this
+	// is what should gate whether a sensor pulse/latch actually happens, rather than
+	// firing unconditionally once per frame regardless of what's on screen.
+	bool light_detected(int x255, int y255) const;
+
 	vcs_control_port_device *m_port;
 };
 
@@ -58,15 +80,26 @@ public:
 	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
 		: vcs_control_port_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	// device_delegate returning the time until a chip's own raster position matches a
+	// light pen crosshair (0-255 across the visible picture, see vcs_lightpen_device);
+	// lets a driver hook up a video chip's native raster timing (e.g. mos6566_device::
+	// time_until_lightpen_pos) when the generic screen_device-based estimate isn't
+	// accurate enough (legacy chip cores whose internal raster counters aren't phase-
+	// locked to the screen device's hpos()/vpos())
+	using lightpen_time_delegate = device_delegate<attotime (int, int)>;
+
 	// static configuration helpers
 	auto trigger_wr_callback() { return m_write_trigger.bind(); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_lightpen_time_callback(T &&... args) { m_lightpen_time_cb.set(std::forward<T>(args)...); }
+
+	// for peripherals that need to know the beam position (e.g. light pens)
+	optional_device<screen_device> m_screen;
+	lightpen_time_delegate m_lightpen_time_cb;
 
 	// computer interface
 
@@ -94,8 +127,8 @@ public:
 	void trigger_w(int state) { m_write_trigger(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	device_vcs_control_port_interface *m_device;
 
@@ -109,10 +142,10 @@ inline void device_vcs_control_port_interface::trigger_w(int state)
 }
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device)
 
 void vcs_control_port_devices(device_slot_interface &device);
 void a800_control_port_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_CVS_CTRL_CTRL_H
+#endif // MAME_BUS_VCS_CTRL_CTRL_H

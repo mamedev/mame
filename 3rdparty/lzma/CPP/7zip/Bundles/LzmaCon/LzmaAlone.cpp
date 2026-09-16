@@ -1,10 +1,8 @@
-// LzmaAlone.cpp
+  // LzmaAlone.cpp
 
 #include "StdAfx.h"
 
 // #include <stdio.h>
-
-#include "../../../../C/CpuArch.h"
 
 #if (defined(_WIN32) || defined(OS2) || defined(MSDOS)) && !defined(UNDER_CE)
 #include <fcntl.h>
@@ -14,16 +12,17 @@
 #define MY_SET_BINARY_MODE(file)
 #endif
 
-#include "../../../Common/MyWindows.h"
-#include "../../../Common/MyInitGuid.h"
-
+#include "../../../../C/CpuArch.h"
 #include "../../../../C/7zVersion.h"
 #include "../../../../C/Alloc.h"
 #include "../../../../C/Lzma86.h"
 
+#include "../../../Common/MyWindows.h"
+#include "../../../Common/MyInitGuid.h"
+
 #include "../../../Windows/NtCheck.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../../Windows/System.h"
 #endif
 
@@ -41,6 +40,8 @@
 #include "../../UI/Console/BenchCon.h"
 #include "../../UI/Console/ConsoleClose.h"
 
+extern
+bool g_LargePagesMode;
 bool g_LargePagesMode = false;
 
 using namespace NCommandLineParser;
@@ -58,13 +59,13 @@ static const char * const kHelpString =
     "  b : Benchmark\n"
     "<switches>\n"
     "  -a{N}  : set compression mode : [0, 1] : default = 1 (max)\n"
-    "  -d{N}  : set dictionary size : [12, 30] : default = 24 (16 MiB)\n"
+    "  -d{N}  : set dictionary size : [12, 31] : default = 24 (16 MiB)\n"
     "  -fb{N} : set number of fast bytes : [5, 273] : default = 128\n"
     "  -mc{N} : set number of cycles for match finder\n"
     "  -lc{N} : set number of literal context bits : [0, 8] : default = 3\n"
     "  -lp{N} : set number of literal pos bits : [0, 4] : default = 0\n"
     "  -pb{N} : set number of pos bits : [0, 4] : default = 2\n"
-    "  -mf{M} : set match finder: [hc4, bt2, bt3, bt4] : default = bt4\n"
+    "  -mf{M} : set match finder: [hc4, hc5, bt2, bt3, bt4, bt5] : default = bt4\n"
     "  -mt{N} : set number of CPU threads\n"
     "  -eos   : write end of stream marker\n"
     "  -si    : read data from stdin\n"
@@ -219,20 +220,17 @@ static void PrintHelp()
   Print(kHelpString);
 }
 
-class CProgressPrint:
-  public ICompressProgressInfo,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_COM_1(
+  CProgressPrint,
+  ICompressProgressInfo
+)
   UInt64 _size1;
   UInt64 _size2;
 public:
   CProgressPrint(): _size1(0), _size2(0) {}
 
   void ClosePrint();
-
-  MY_UNKNOWN_IMP1(ICompressProgressInfo)
-
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };
 
 #define BACK_STR \
@@ -248,7 +246,7 @@ void CProgressPrint::ClosePrint()
   Print(kBackSpaces);
 }
 
-STDMETHODIMP CProgressPrint::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize)
+Z7_COM7F_IMF(CProgressPrint::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize))
 {
   if (NConsoleClose::TestBreakSignal())
     return E_ABORT;
@@ -272,7 +270,7 @@ STDMETHODIMP CProgressPrint::SetRatioInfo(const UInt64 *inSize, const UInt64 *ou
 }
 
 
-MY_ATTR_NORETURN
+Z7_ATTR_NORETURN
 static void IncorrectCommand()
 {
   throw "Incorrect command";
@@ -316,7 +314,7 @@ static int Error_HRESULT(const char *s, HRESULT res)
   else
   {
     char temp[32];
-    ConvertUInt32ToHex(res, temp);
+    ConvertUInt32ToHex((UInt32)res, temp);
     PrintErr("Error code = 0x");
     PrintErr_LF(temp);
   }
@@ -357,7 +355,7 @@ static int main2(int numArgs, const char *args[])
   CParser parser;
   try
   {
-    if (!parser.ParseStrings(kSwitchForms, ARRAY_SIZE(kSwitchForms), commandStrings))
+    if (!parser.ParseStrings(kSwitchForms, Z7_ARRAY_SIZE(kSwitchForms), commandStrings))
     {
       PrintError2(parser.ErrorMessage, parser.ErrorLine);
       return 1;
@@ -374,8 +372,8 @@ static int main2(int numArgs, const char *args[])
     return 0;
   }
 
-  bool stdInMode = parser[NKey::kStdIn].ThereIs;
-  bool stdOutMode = parser[NKey::kStdOut].ThereIs;
+  const bool stdInMode = parser[NKey::kStdIn].ThereIs;
+  const bool stdOutMode = parser[NKey::kStdOut].ThereIs;
 
   if (!stdOutMode)
     PrintTitle();
@@ -396,7 +394,16 @@ static int main2(int numArgs, const char *args[])
     UInt32 dictLog;
     const UString &s = parser[NKey::kDict].PostStrings[0];
     dictLog = GetNumber(s);
-    dict = 1 << dictLog;
+    if (dictLog >= 32)
+      throw "unsupported dictionary size";
+    // we only want to use dictionary sizes that are powers of 2,
+    // because 7-zip only recognizes such dictionary sizes in the lzma header.#if 0
+#if 0
+    if (dictLog == 32)
+      dict = (UInt32)3840 << 20;
+    else
+#endif
+    dict = (UInt32)1 << dictLog;
     dictDefined = true;
     AddProp(props2, "d", s);
   }
@@ -414,7 +421,7 @@ static int main2(int numArgs, const char *args[])
 
   UInt32 numThreads = (UInt32)(Int32)-1;
 
-  #ifndef _7ZIP_ST
+  #ifndef Z7_ST
   
   if (parser[NKey::kMultiThread].ThereIs)
   {
@@ -503,7 +510,7 @@ static int main2(int numArgs, const char *args[])
     const UString &outputName = params[paramIndex++];
     outStreamSpec = new COutFileStream;
     outStream = outStreamSpec;
-    if (!outStreamSpec->Create(us2fs(outputName), true))
+    if (!outStreamSpec->Create_ALWAYS(us2fs(outputName)))
     {
       PrintError2("Cannot open output file", outputName);
       return 1;
@@ -524,7 +531,7 @@ static int main2(int numArgs, const char *args[])
 
   if (encodeMode && !dictDefined)
   {
-    dict = 1 << kDictSizeLog;
+    dict = (UInt32)1 << kDictSizeLog;
     if (fileSizeDefined)
     {
       unsigned i;
@@ -676,7 +683,7 @@ static int main2(int numArgs, const char *args[])
       NCoderPropID::kMatchFinderCycles,
     };
 
-    const unsigned kNumPropsMax = ARRAY_SIZE(propIDs);
+    const unsigned kNumPropsMax = Z7_ARRAY_SIZE(propIDs);
 
     PROPVARIANT props[kNumPropsMax];
     for (int p = 0; p < 6; p++)
@@ -757,7 +764,7 @@ static int main2(int numArgs, const char *args[])
       throw "SetDecoderProperties error";
     
     UInt64 unpackSize = 0;
-    for (int i = 0; i < 8; i++)
+    for (unsigned i = 0; i < 8; i++)
       unpackSize |= ((UInt64)header[kPropertiesSize + i]) << (8 * i);
 
     bool unpackSizeDefined = (unpackSize != (UInt64)(Int64)-1);
@@ -792,7 +799,7 @@ static int main2(int numArgs, const char *args[])
   return 0;
 }
 
-int MY_CDECL main(int numArgs, const char *args[])
+int Z7_CDECL main(int numArgs, const char *args[])
 {
   NConsoleClose::CCtrlHandlerSetter ctrlHandlerSetter;
 

@@ -77,8 +77,8 @@ public:
 	void mk98(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -100,8 +100,8 @@ private:
 	uint8_t video_register_r();
 	void video_register_w(uint8_t data);
 
-	void mk98_io(address_map &map);
-	void mk98_map(address_map &map);
+	void mk98_io(address_map &map) ATTR_COLD;
+	void mk98_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_p_videoram;
 
@@ -443,10 +443,10 @@ void mk98_state::mk98(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mk98_state::mk98_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(mk98pic_device::inta_cb));
 
-	pit8254_device &pit8254(PIT8254(config, "pit8254", 0));
+	pit8254_device &pit8254(PIT8254(config, "pit8254"));
 	pit8254.set_clk<0>(16000000/2/8); // FIXME unknown clock
 
-	MK98PIC(config, m_pic8259, 0);
+	MK98PIC(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
@@ -465,7 +465,7 @@ void mk98_state::mk98(machine_config &config)
 	serport0.ri_handler().set(uart0, FUNC(ins8250_device::ri_w));
 	serport0.cts_handler().set(uart0, FUNC(ins8250_device::cts_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	SCREEN(config, m_screen).set_lcd().set_color(rgb_t::white());
 	m_screen->set_screen_update(FUNC(mk98_state::screen_update));
 	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
 	m_screen->set_palette("palette");
@@ -485,4 +485,4 @@ ROM_END
 
 
 //    YEAR  NAME   PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT         COMPANY         FULLNAME  FLAGS
-COMP( 1998, mk98,  0,       0,      mk98,    0,     mk98_state,  empty_init,  "Elektronika",  "MK-98",  MACHINE_IS_SKELETON)
+COMP( 1998, mk98,  0,       0,      mk98,    0,     mk98_state,  empty_init,  "Elektronika",  "MK-98",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

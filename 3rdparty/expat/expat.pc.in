@@ -3,9 +3,11 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: @_EXPAT_OUTPUT_NAME@
+Name: @PACKAGE_NAME@
 Version: @PACKAGE_VERSION@
 Description: expat XML parser
-URL: http://www.libexpat.org
-Libs: -L${libdir} -l@_EXPAT_OUTPUT_NAME@
+URL: https://libexpat.github.io/
+Libs: -L${libdir} -l@PACKAGE_NAME@
+Libs.private: @LIBM@
 Cflags: -I${includedir}
+Cflags.private: -DXML_STATIC

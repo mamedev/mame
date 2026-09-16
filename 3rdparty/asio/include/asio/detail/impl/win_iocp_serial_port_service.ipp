@@ -2,7 +2,7 @@
 // detail/impl/win_iocp_serial_port_service.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -26,6 +26,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 win_iocp_serial_port_service::win_iocp_serial_port_service(
@@ -46,6 +47,7 @@ asio::error_code win_iocp_serial_port_service::open(
   if (is_open(impl))
   {
     ec = asio::error::already_open;
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -61,6 +63,7 @@ asio::error_code win_iocp_serial_port_service::open(
     DWORD last_error = ::GetLastError();
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -75,6 +78,7 @@ asio::error_code win_iocp_serial_port_service::open(
     ::CloseHandle(handle);
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -101,6 +105,7 @@ asio::error_code win_iocp_serial_port_service::open(
     ::CloseHandle(handle);
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -119,6 +124,7 @@ asio::error_code win_iocp_serial_port_service::open(
     ::CloseHandle(handle);
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -143,6 +149,7 @@ asio::error_code win_iocp_serial_port_service::do_set_option(
     DWORD last_error = ::GetLastError();
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -154,6 +161,7 @@ asio::error_code win_iocp_serial_port_service::do_set_option(
     DWORD last_error = ::GetLastError();
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -176,6 +184,7 @@ asio::error_code win_iocp_serial_port_service::do_get_option(
     DWORD last_error = ::GetLastError();
     ec = asio::error_code(last_error,
         asio::error::get_system_category());
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
@@ -183,6 +192,7 @@ asio::error_code win_iocp_serial_port_service::do_get_option(
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

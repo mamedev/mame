@@ -40,7 +40,7 @@ public:
 	void hazl1420(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p1_w(u8 data);
@@ -56,9 +56,9 @@ private:
 	void crtc_lbre_w(int state);
 	void crtc_vblank_w(int state);
 
-	void prog_map(address_map &map);
-	void io_map(address_map &map);
-	void bank_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void bank_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -374,7 +374,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	m_crtc->lbre_callback().set(FUNC(hazl1420_state::crtc_lbre_w));
 	m_crtc->vblank_callback().set(FUNC(hazl1420_state::crtc_vblank_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();

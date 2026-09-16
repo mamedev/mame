@@ -356,7 +356,7 @@ void amu880_state::amu880(machine_config &config)
 	TIMER(config, "keyboard").configure_periodic(FUNC(amu880_state::keyboard_tick), attotime::from_hz(1500));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(amu880_state::screen_update));
 	screen.set_raw(9000000, 576, 0*6, 64*6, 320, 0*10, 24*10);
 

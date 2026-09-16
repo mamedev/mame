@@ -39,12 +39,12 @@ public:
 	void potgold580(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
-	void potgold_map(address_map &map);
+	void potgold_map(address_map &map) ATTR_COLD;
 
 	required_device<tms34010_device> m_maincpu;
 };
@@ -85,7 +85,7 @@ void potgold_state::potgold(machine_config &config)
 	m_maincpu->set_pixels_per_clock(1);
 	m_maincpu->set_scanline_rgb32_callback(FUNC(potgold_state::scanline_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(22.1184_MHz_XTAL / 2, 444, 0, 320, 233, 0, 200);
 	screen.set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
@@ -137,5 +137,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_IS_SKELETON )
-GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_IS_SKELETON )
+GAME( 200?, potgoldu,    0,        potgold,    potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v400x?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, potgoldu580, potgoldu, potgold580, potgold, potgold_state, empty_init, ROT0, "U.S. Games, Inc.",  "Pot O' Gold (U.S. Games, v580F)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

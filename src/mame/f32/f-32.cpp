@@ -78,7 +78,7 @@ public:
 
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 	required_device<hyperstone_device>  m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -98,7 +98,7 @@ public:
 
 protected:
 	uint32_t input_port_1_r();
-	void mosaicf2_io(address_map &map);
+	void mosaicf2_io(address_map &map) ATTR_COLD;
 };
 
 class royalpk2_state : public fe132_state
@@ -114,15 +114,13 @@ public:
 
 	void royalpk2(machine_config &config);
 
-	int hopper_r();
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void royalpk2_io(address_map &map);
-	void royalpk2_map(address_map &map);
-	void oki_map(address_map &map);
+	void royalpk2_io(address_map &map) ATTR_COLD;
+	void royalpk2_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	void protection_seed_w(offs_t offset, uint32_t data);
 	uint32_t protection_response_r();
@@ -180,17 +178,17 @@ uint32_t mosaicf2_state::input_port_1_r()
 
 void mosaicf2_state::mosaicf2_io(address_map &map)
 {
-	map(0x4003, 0x4003).r("oki", FUNC(okim6295_device::read));
-	map(0x4813, 0x4813).r("ymsnd", FUNC(ym2151_device::status_r));
-	map(0x5000, 0x5003).portr("P1");
-	map(0x5200, 0x5203).r(FUNC(mosaicf2_state::input_port_1_r));
-	map(0x5400, 0x5403).portr("EEPROMIN");
-	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
-	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));
-	map(0x6813, 0x6813).w("ymsnd", FUNC(ym2151_device::address_w));
-	map(0x7000, 0x7003).portw("EEPROMCLK");
-	map(0x7200, 0x7203).portw("EEPROMCS");
-	map(0x7400, 0x7403).portw("EEPROMOUT");
+	map(0x1000, 0x1000).umask32(0x000000ff).r("oki", FUNC(okim6295_device::read));
+	map(0x1204, 0x1204).umask32(0x000000ff).r("ymsnd", FUNC(ym2151_device::status_r));
+	map(0x1400, 0x1400).portr("P1");
+	map(0x1480, 0x1480).r(FUNC(mosaicf2_state::input_port_1_r));
+	map(0x1500, 0x1500).portr("EEPROMIN");
+	map(0x1800, 0x1800).umask32(0x000000ff).w("oki", FUNC(okim6295_device::write));
+	map(0x1a00, 0x1a00).umask32(0x000000ff).w("ymsnd", FUNC(ym2151_device::data_w));
+	map(0x1a04, 0x1a04).umask32(0x000000ff).w("ymsnd", FUNC(ym2151_device::address_w));
+	map(0x1c00, 0x1c00).portw("EEPROMCLK");
+	map(0x1c80, 0x1c80).portw("EEPROMCS");
+	map(0x1d00, 0x1d00).portw("EEPROMOUT");
 }
 
 
@@ -213,7 +211,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000400, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00007800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -225,16 +223,16 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 
 	PORT_START( "EEPROMCLK" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
 
 	PORT_START( "EEPROMCS" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
 
@@ -243,7 +241,7 @@ INPUT_PORTS_END
 void mosaicf2_state::mosaicf2(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XN(config, m_maincpu, XTAL(20'000'000)*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 20_MHz_XTAL*4); // E1-32XN (PQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaicf2_state::common_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaicf2_state::mosaicf2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaicf2_state::irq0_line_hold));
@@ -253,7 +251,7 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	m_eeprom->write_time(attotime::from_usec(1));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
@@ -264,16 +262,15 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.7897725 MHz */
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -306,28 +303,28 @@ static INPUT_PORTS_START( royalpk2 )
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Credit Pay Out") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Income") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Income Clear") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Medal Clear") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Operator Gift") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(royalpk2_state, hopper_r)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("Over Flow") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Medal Empty") PORT_CODE(KEYCODE_L)
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 
 	PORT_START( "EEPROMCLK" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
 
 	PORT_START( "EEPROMCS" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
 void royalpk2_state::royalpk2_map(address_map &map)
@@ -338,43 +335,38 @@ void royalpk2_state::royalpk2_map(address_map &map)
 	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
 }
 
-int royalpk2_state::hopper_r()
-{
-	return m_hopper->line_r() ? 0 : 1;
-}
-
 void royalpk2_state::royalpk2_io(address_map &map)
 {
-	// map(0x4000, 0x41ff).readonly().share("nvram"); // seems to expect to read NVRAM from here
+	//map(0x1000, 0x107f).readonly().share("nvram"); // seems to expect to read NVRAM from here
 
-	map(0x4603, 0x4603).r("oki", FUNC(okim6295_device::read));
+	map(0x1180, 0x1180).umask32(0x000000ff).r("oki", FUNC(okim6295_device::read));
 
-	map(0x4800, 0x4803).portr("P1");
-	map(0x4900, 0x4903).portr("SYSTEM_P2");
+	map(0x1200, 0x1200).portr("P1");
+	map(0x1240, 0x1240).portr("SYSTEM_P2");
 
-	map(0x4a00, 0x4a03).portr("EEPROMIN");
+	map(0x1280, 0x1280).portr("EEPROMIN");
 
-	map(0x4b00, 0x4b03).r(FUNC(royalpk2_state::protection_response_r));
+	map(0x12c0, 0x12c0).r(FUNC(royalpk2_state::protection_response_r));
 
-	map(0x6000, 0x61ff).ram().share("nvram");
+	map(0x1800, 0x187f).ram().share("nvram");
 
-	map(0x6603, 0x6603).w("oki", FUNC(okim6295_device::write));
+	map(0x1980, 0x1980).umask32(0x000000ff).w("oki", FUNC(okim6295_device::write));
 
-	map(0x6800, 0x6803).portw("EEPROMCLK");
-	map(0x6900, 0x6903).portw("EEPROMCS");
-	map(0x6a00, 0x6a03).portw("EEPROMOUT");
+	map(0x1a00, 0x1a00).portw("EEPROMCLK");
+	map(0x1a40, 0x1a40).portw("EEPROMCS");
+	map(0x1a80, 0x1a80).portw("EEPROMOUT");
 
-	// map(0x6b00, 0x6b03).nopw(); // bits 8, 9, 10 and 13, 14 used
+	//map(0x1ac0, 0x1ac0).nopw(); // bits 8, 9, 10 and 13, 14 used
 
-	map(0x6c03, 0x6c03).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry(data & 0x03); })); // TODO: double check this
+	map(0x1b00, 0x1b00).lw32(NAME([this] (uint32_t data) { m_okibank->set_entry(data & 0x03); })); // TODO: double check this
 
-	map(0x6d00, 0x6d03).w(FUNC(royalpk2_state::protection_seed_w));
+	map(0x1b40, 0x1b40).w(FUNC(royalpk2_state::protection_seed_w));
 
-	map(0x7000, 0x7003).w(FUNC(royalpk2_state::outputs_w<0>));
-	map(0x7100, 0x7103).w(FUNC(royalpk2_state::outputs_w<1>));
-	map(0x7200, 0x7203).w(FUNC(royalpk2_state::outputs_w<2>));
-	map(0x7300, 0x7303).w(FUNC(royalpk2_state::outputs_w<3>));
-	map(0x7400, 0x7403).w(FUNC(royalpk2_state::outputs_w<4>));
+	map(0x1c00, 0x1c00).w(FUNC(royalpk2_state::outputs_w<0>));
+	map(0x1c40, 0x1c40).w(FUNC(royalpk2_state::outputs_w<1>));
+	map(0x1c80, 0x1c80).w(FUNC(royalpk2_state::outputs_w<2>));
+	map(0x1cc0, 0x1cc0).w(FUNC(royalpk2_state::outputs_w<3>));
+	map(0x1d00, 0x1d00).w(FUNC(royalpk2_state::outputs_w<4>));
 }
 
 void royalpk2_state::oki_map(address_map &map)
@@ -388,8 +380,6 @@ void royalpk2_state::machine_start()
 	save_item(NAME(m_protection_index));
 	save_item(NAME(m_protection_response_byte));
 	save_item(NAME(m_protection_response_bit));
-
-	m_lamps.resolve();
 
 	for (int i = 0; i < 31; i++)
 		m_lamps[i] = 0;
@@ -477,10 +467,10 @@ void royalpk2_state::royalpk2(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
@@ -491,17 +481,16 @@ void royalpk2_state::royalpk2(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 //  ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
-//  ymsnd.add_route(0, "lspeaker", 1.0);
-//  ymsnd.add_route(1, "rspeaker", 1.0);
+//  ymsnd.add_route(0, "speaker", 1.0);
+//  ymsnd.add_route(1, "speaker", 1.0);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.7897725 MHz */
 	oki.set_addrmap(0, &royalpk2_state::oki_map);
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	// there is a 16c550 for communication
 }
@@ -520,7 +509,7 @@ EEPROM: 93C46 (controlled through FPGA)
 F-E1-32-009
 +------------------------------------------------------------------+
 |            VOL                               +---------+         |
-+-+                              YM3812        |   SND   |         |
++-+                              YM3012        |   SND   |         |
   |                                            +---------+         |
 +-+                              YM2151            OKI6295         |
 |                                                                  |

@@ -71,14 +71,14 @@ public:
 	void vector3(machine_config &config);
 
 private:
-	void vector3_io(address_map &map);
-	void vector3_mem(address_map &map);
+	void vector3_io(address_map &map) ATTR_COLD;
+	void vector3_mem(address_map &map) ATTR_COLD;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 };
 
 
@@ -147,9 +147,9 @@ void vector3_state::vector3(machine_config &config)
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart2", FUNC(i8251_device::write_rxc));
 
-	I8251(config, "uart0", 0);
+	I8251(config, "uart0");
 
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	uart1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -159,7 +159,7 @@ void vector3_state::vector3(machine_config &config)
 	rs232a.dsr_handler().set("uart1", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 
-	i8251_device &uart2(I8251(config, "uart2", 0));
+	i8251_device &uart2(I8251(config, "uart2"));
 	uart2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
@@ -170,7 +170,7 @@ void vector3_state::vector3(machine_config &config)
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
 
 	I8255A(config, "ppi");
-	PIT8253(config, "pit", 0);
+	PIT8253(config, "pit");
 }
 
 /* ROM definition */

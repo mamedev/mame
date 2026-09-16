@@ -1,13 +1,11 @@
-// license:BSD-3-Clause
-// copyright-holders:Angelo Salese, David Haywood
+// license: BSD-3-Clause
+// copyright-holders: Angelo Salese, David Haywood
+// thanks-to: Charles MacDonald
 /*******************************************************************************************
 
 Night Gal (c) 1984 Nichibutsu
 
 a.k.a. same Jangou blitter but with NCS CPU for displaying graphics as protection.
-
-driver by David Haywood & Angelo Salese
-many thanks to Charles MacDonald for the schematics / documentation of this HW.
 
 TODO:
  - Fix Sweet Gal/Sexy Gal/Sexy Gal Tropical layer clearances (more protection?);
@@ -32,15 +30,14 @@ TODO:
 #include "sound/dac.h"
 #include "sound/ymopn.h"
 #include "video/jangou_blitter.h"
-#include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video/resnet.h"
 
 
 namespace {
-
-#define MASTER_CLOCK    XTAL(19'968'000)
 
 class nightgal_state : public driver_device
 {
@@ -52,40 +49,33 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
+		m_palette(*this, "palette"),
+		m_blitter(*this, "blitter"),
 		m_io_cr_clear(*this, "CR_CLEAR"),
 		m_io_coins(*this, "COINS"),
-		m_io_pl1_1(*this, "PL1_1"),
-		m_io_pl1_2(*this, "PL1_2"),
-		m_io_pl1_3(*this, "PL1_3"),
-		m_io_pl1_4(*this, "PL1_4"),
-		m_io_pl1_5(*this, "PL1_5"),
-		m_io_pl1_6(*this, "PL1_6"),
-		m_io_pl2_1(*this, "PL2_1"),
-		m_io_pl2_2(*this, "PL2_2"),
-		m_io_pl2_3(*this, "PL2_3"),
-		m_io_pl2_4(*this, "PL2_4"),
-		m_io_pl2_5(*this, "PL2_5"),
-		m_io_pl2_6(*this, "PL2_6"),
+		m_io_pl1(*this, "PL1_%u", 1U),
+		m_io_pl2(*this, "PL2_%u", 1U),
 		m_io_system(*this, "SYSTEM"),
 		m_io_dswa(*this, "DSWA"),
 		m_io_dswb(*this, "DSWB"),
-		m_io_dswc(*this, "DSWC"),
-		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter")
+		m_io_dswc(*this, "DSWC")
 	{ }
 
-	void ngalsumr(machine_config &config);
-	void sexygal(machine_config &config);
-	void sweetgal(machine_config &config);
-	void sgaltrop(machine_config &config);
-	void royalqn(machine_config &config);
+	void ngalsumr(machine_config &config) ATTR_COLD;
+	void sexygal(machine_config &config) ATTR_COLD;
+	void sweetgal(machine_config &config) ATTR_COLD;
+	void sgaltrop(machine_config &config) ATTR_COLD;
+	void royalqn(machine_config &config) ATTR_COLD;
 
-	void init_ngalsumr();
-	void init_royalqn();
+	void init_ngalsumr() ATTR_COLD;
+	void init_royalqn() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	emu_timer *m_z80_wait_ack_timer;
-
 	required_shared_ptr<uint8_t> m_comms_ram;
 	optional_shared_ptr<uint8_t> m_sound_ram;
 
@@ -93,6 +83,32 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<palette_device> m_palette;
+	required_device<jangou_blitter_device> m_blitter;
+
+	required_ioport m_io_cr_clear;
+	required_ioport m_io_coins;
+	required_ioport_array<6> m_io_pl1;
+	required_ioport_array<6> m_io_pl2;
+	required_ioport m_io_system;
+	required_ioport m_io_dswa;
+	required_ioport m_io_dswb;
+	required_ioport m_io_dswc;
+
+	emu_timer *m_z80_wait_ack_timer = nullptr;
+
+	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
+
+	/* video-related */
+	uint8_t m_blit_raw_data[3] {};
+
+	/* misc */
+	uint8_t m_nsc_latch = 0;
+	uint8_t m_z80_latch = 0;
+	uint8_t m_mux_data = 0;
+	uint8_t m_pal_bank = 0;
+
+	uint8_t m_sexygal_audioff = 0;
 
 	/* memory */
 	//void sexygal_nsc_true_blitter_w(uint8_t data);
@@ -113,60 +129,24 @@ private:
 
 	void ngalsumr_prot_latch_w(uint8_t data);
 	uint8_t ngalsumr_prot_value_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void nightgal_palette(palette_device &palette) const;
-	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette_cb(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void common_nsc_map(address_map &map);
-	void common_sexygal_io(address_map &map);
-	void royalqn_io(address_map &map);
-	void royalqn_map(address_map &map);
-	void royalqn_nsc_map(address_map &map);
-	void sexygal_audio_map(address_map &map);
-	void sexygal_io(address_map &map);
-	void sexygal_map(address_map &map);
-	void sexygal_nsc_map(address_map &map);
-	void sgaltrop_io(address_map &map);
-	void sgaltrop_nsc_map(address_map &map);
-	void sweetgal_map(address_map &map);
+	void common_nsc_map(address_map &map) ATTR_COLD;
+	void common_sexygal_io(address_map &map) ATTR_COLD;
+	void royalqn_io(address_map &map) ATTR_COLD;
+	void royalqn_map(address_map &map) ATTR_COLD;
+	void royalqn_nsc_map(address_map &map) ATTR_COLD;
+	void sexygal_audio_map(address_map &map) ATTR_COLD;
+	void sexygal_io(address_map &map) ATTR_COLD;
+	void sexygal_map(address_map &map) ATTR_COLD;
+	void sexygal_nsc_map(address_map &map) ATTR_COLD;
+	void sgaltrop_io(address_map &map) ATTR_COLD;
+	void sgaltrop_nsc_map(address_map &map) ATTR_COLD;
+	void sweetgal_map(address_map &map) ATTR_COLD;
 
-	required_ioport m_io_cr_clear;
-	required_ioport m_io_coins;
-	required_ioport m_io_pl1_1;
-	required_ioport m_io_pl1_2;
-	required_ioport m_io_pl1_3;
-	required_ioport m_io_pl1_4;
-	required_ioport m_io_pl1_5;
-	required_ioport m_io_pl1_6;
-	required_ioport m_io_pl2_1;
-	required_ioport m_io_pl2_2;
-	required_ioport m_io_pl2_3;
-	required_ioport m_io_pl2_4;
-	required_ioport m_io_pl2_5;
-	required_ioport m_io_pl2_6;
-	required_ioport m_io_system;
-	required_ioport m_io_dswa;
-	required_ioport m_io_dswb;
-	required_ioport m_io_dswc;
-	required_device<palette_device> m_palette;
-	required_device<jangou_blitter_device> m_blitter;
 	void z80_wait_assert_cb();
 	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
-
-	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
-
-	/* video-related */
-	uint8_t m_blit_raw_data[3];
-
-	/* misc */
-	uint8_t m_nsc_latch;
-	uint8_t m_z80_latch;
-	uint8_t m_mux_data;
-	uint8_t m_pal_bank;
-
-	uint8_t m_sexygal_audioff;
 };
 
 void nightgal_state::video_start()
@@ -174,7 +154,7 @@ void nightgal_state::video_start()
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(256, 256);
 }
 
-uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nightgal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
@@ -189,12 +169,12 @@ uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_in
 		}
 	}
 
-	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(),0,0, cliprect);
+	copybitmap(bitmap, *m_tmp_bitmap, flip_screen(), flip_screen(), 0, 0, cliprect);
 	return 0;
 }
 
 // guess: use the same resistor values as Crazy Climber (needs checking on the real HW)
-void nightgal_state::nightgal_palette(palette_device &palette) const
+void nightgal_state::palette_cb(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
@@ -304,46 +284,37 @@ void nightgal_state::royalqn_comm_w(offs_t offset, uint8_t data)
 
 void nightgal_state::mux_w(uint8_t data)
 {
-	m_mux_data = ~data;
-	//printf("%02x\n", m_mux_data);
+	m_mux_data = data;
 }
 
 uint8_t nightgal_state::input_1p_r()
 {
-	uint8_t cr_clear = m_io_cr_clear->read();
+	uint8_t data = 0xff;
 
-	switch (m_mux_data)
-	{
-		case 0x01: return m_io_pl1_1->read() | cr_clear;
-		case 0x02: return m_io_pl1_2->read() | cr_clear;
-		case 0x04: return m_io_pl1_3->read() | cr_clear;
-		case 0x08: return m_io_pl1_4->read() | cr_clear;
-		case 0x10: return m_io_pl1_5->read() | cr_clear;
-		case 0x20: return m_io_pl1_6->read() | cr_clear;
-	}
-	//printf("%04x\n", m_mux_data);
+	// mahjong inputs depending on mux
+	for (unsigned i = 0; i < 6; i++)
+		if (BIT(m_mux_data, i) == 0)
+			data &= m_io_pl1[i]->read();
 
-	return (m_io_pl1_1->read() & m_io_pl1_2->read() & m_io_pl1_3->read() &
-			m_io_pl1_4->read() & m_io_pl1_5->read() & m_io_pl1_6->read()) | cr_clear;
+	// credit clear buttons are always read
+	data &= m_io_cr_clear->read();
+
+	return data;
 }
 
 uint8_t nightgal_state::input_2p_r()
 {
-	uint8_t coin_port = m_io_coins->read();
+	uint8_t data = 0xff;
 
-	switch (m_mux_data)
-	{
-		case 0x01: return m_io_pl2_1->read() | coin_port;
-		case 0x02: return m_io_pl2_2->read() | coin_port;
-		case 0x04: return m_io_pl2_3->read() | coin_port;
-		case 0x08: return m_io_pl2_4->read() | coin_port;
-		case 0x10: return m_io_pl2_5->read() | coin_port;
-		case 0x20: return m_io_pl2_6->read() | coin_port;
-	}
-	//printf("%04x\n", m_mux_data);
+	// mahjong inputs depending on mux
+	for (unsigned i = 0; i < 6; i++)
+		if (BIT(m_mux_data, i) == 0)
+			data &= m_io_pl2[i]->read();
 
-	return (m_io_pl2_1->read() & m_io_pl2_2->read() & m_io_pl2_3->read() &
-			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
+	// coin inputs are always read
+	data &= m_io_coins->read();
+
+	return data;
 }
 
 void nightgal_state::output_w(uint8_t data)
@@ -399,7 +370,8 @@ uint8_t nightgal_state::sexygal_unknown_sound_r()
 void nightgal_state::sexygal_audioff_w(uint8_t data)
 {
 	// causes an irq
-	m_audiocpu->set_input_line(0, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+	if (m_audiocpu)
+		m_audiocpu->set_input_line(0, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 4 used, audio cpu reset line?
 	// bit 5 used only for access to shared RAM?
@@ -534,14 +506,12 @@ void nightgal_state::royalqn_nsc_map(address_map &map)
 
 static INPUT_PORTS_START( sexygal )
 	PORT_START("CR_CLEAR")
-	PORT_DIPNAME( 0x40, 0x40, "Credit Clear-1" )//button
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Credit Clear-2" )//button
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM ) // multiplexed mahjong inputs
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear P1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear P2")
 
 	PORT_START("COINS")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM ) // multiplexed mahjong inputs
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) //player-1 side
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) //player-2 side
 
@@ -552,6 +522,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL1_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
@@ -560,6 +531,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_CODE(KEYCODE_3)//rate button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL1_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
@@ -568,6 +540,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //another D button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL1_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
@@ -575,6 +548,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED ) //another opt 1 button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL1_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
@@ -583,11 +557,13 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 3")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Option 4")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL1_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1P Pass") //???
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL2_1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
@@ -596,6 +572,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL2_2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
@@ -604,6 +581,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_CODE(KEYCODE_4) PORT_PLAYER(2)//rate button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL2_3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
@@ -612,6 +590,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //another D button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL2_4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
@@ -619,6 +598,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED ) //another opt 1 button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL2_5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
@@ -627,11 +607,13 @@ static INPUT_PORTS_START( sexygal )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 3") PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Option 4") PORT_PLAYER(2)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("PL2_6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2P Pass") PORT_PLAYER(2) //???
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_CUSTOM )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("Option 0 - Payout")
@@ -762,7 +744,7 @@ static INPUT_PORTS_START( sexygal )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", FUNC(jangou_blitter_device::status_r))
 INPUT_PORTS_END
 
 void nightgal_state::machine_start()
@@ -787,31 +769,28 @@ void nightgal_state::machine_reset()
 
 void nightgal_state::royalqn(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK / 8);        /* ? MHz */
+	Z80(config, m_maincpu, 19.968_MHz_XTAL / 8);        /* ? MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_map);
 	m_maincpu->set_addrmap(AS_IO, &nightgal_state::royalqn_io);
 	m_maincpu->set_vblank_int("screen", FUNC(nightgal_state::irq0_line_hold));
 
-	NSC8105(config, m_subcpu, MASTER_CLOCK / 8);
+	NSC8105(config, m_subcpu, 19.968_MHz_XTAL / 8);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_nsc_map);
 
 	config.set_perfect_quantum(m_maincpu);
 
-	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
+	JANGOU_BLITTER(config, m_blitter, 19.968_MHz_XTAL/4);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK/4,320,0,256,264,16,240);
-	screen.set_screen_update(FUNC(nightgal_state::screen_update_nightgal));
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(19.968_MHz_XTAL/4,320,0,256,264,16,240);
+	screen.set_screen_update(FUNC(nightgal_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(nightgal_state::nightgal_palette), 0x20);
+	PALETTE(config, m_palette, FUNC(nightgal_state::palette_cb), 0x20);
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK / 8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 19.968_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
 	aysnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
@@ -821,14 +800,13 @@ void nightgal_state::sexygal(machine_config &config)
 {
 	royalqn(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_map);
 	m_maincpu->set_addrmap(AS_IO, &nightgal_state::sexygal_io);
 
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_nsc_map);
 	m_subcpu->set_vblank_int("screen", FUNC(nightgal_state::irq0_line_hold));
 
-	NSC8105(config, m_audiocpu, MASTER_CLOCK / 8);
+	NSC8105(config, m_audiocpu, 19.968_MHz_XTAL / 8);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nightgal_state::sexygal_audio_map);
 
 	clock_device &sampleclk(CLOCK(config, "sampleclk", 6000)); // quite a wild guess
@@ -838,7 +816,7 @@ void nightgal_state::sexygal(machine_config &config)
 
 	config.device_remove("aysnd");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK / 8));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 19.968_MHz_XTAL / 8));
 	ymsnd.port_a_read_callback().set(FUNC(nightgal_state::input_1p_r));
 	ymsnd.port_b_read_callback().set(FUNC(nightgal_state::input_2p_r));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.40);
@@ -1116,6 +1094,34 @@ ROM_START( sweetgal )
 	ROM_LOAD( "sg.7e", 0x00, 0x20, CRC(5786a035) SHA1(29d95a6fb076d64ca217206fcadde51993830a88) )
 ROM_END
 
+ROM_START( sweetgala ) // this one has a smaller capacity sub board, with only half the samples
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10.3n", 0x00000, 0x04000, CRC(a8c34206) SHA1(c3ca3172aef56a115ab6d6211ead13b4d80c7dcc) )
+	ROM_LOAD( "11.3p", 0x04000, 0x04000, CRC(47ddf125) SHA1(a5c662f3492d9ae8dc5edab77292542ee12324ab) )
+
+	ROM_REGION( 0x2000, "subrom", 0 )
+	ROM_LOAD( "1.3a",  0x0000, 0x2000, CRC(5342c757) SHA1(b4ff84c45bd2c6a6a468f1d0daaf5b19c4dbf8fe) )
+
+	ROM_REGION( 0x6000, "samples", 0 )
+	ROM_LOAD( "12.sub",  0x00000, 0x04000, CRC(e49b024d) SHA1(848ad59916c53e2cc45224b6a80e391678cb425d) )
+	ROM_LOAD( "13.sub",  0x04000, 0x02000, CRC(6acce0b0) SHA1(8fc5fdbc5c6676335b08f21bb17e23e46ef46de2) )
+
+	ROM_REGION( 0x40000, "gfx", 0 )
+	ROM_LOAD( "2.3c",  0x00000, 0x04000, CRC(3a3d78f7) SHA1(71e35529f30c43ee8ec2363f85fe17042f1d304e) )
+	ROM_LOAD( "3.3d",  0x04000, 0x04000, CRC(c6f9b884) SHA1(32d6fe1906a3f1f528f30dbd3f89971b2ea1925b) )
+	// all ROMs below match sexygal
+	ROM_LOAD( "4.3e",  0x08000, 0x04000, CRC(f1cdbedb) SHA1(caacf2887a3a05e498d57d570a1e9873f95a5d5f) )
+	ROM_LOAD( "5.3f",  0x0c000, 0x04000, CRC(76569186) SHA1(79cb32c1f1a96f90d59f331a01ca548936933b87) )
+	ROM_LOAD( "6.3h",  0x10000, 0x04000, CRC(8b6268e4) SHA1(c57bb7fe8f079d8f202f370cd7bdce1cf0596ede) )
+	ROM_LOAD( "7.3jk", 0x14000, 0x04000, CRC(c88f68b8) SHA1(512019f465c298ba8fbf0f6c285a9b0d6c8f7411) )
+	ROM_LOAD( "8.3kl", 0x18000, 0x04000, CRC(4631e092) SHA1(961b10b556defe9e4ba84180149bb2ef4042dbe9) )
+	ROM_LOAD( "9.3m",  0x1c000, 0x04000, CRC(198df711) SHA1(adf9531ee7058db2314811aba7568bd332632947) )
+	ROM_FILL(          0x20000, 0x20000, 0x11 )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "sg.7e", 0x00, 0x20, CRC(5786a035) SHA1(29d95a6fb076d64ca217206fcadde51993830a88) )
+ROM_END
+
 /*
 
 Night Gal Summer (JPN Ver.)
@@ -1226,7 +1232,7 @@ ROM loading is mostly guessed just to get dumps in
 
 */
 
-ROM_START(sgaltrop)
+ROM_START( sgaltrop )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "10.3s", 0x0000, 0x4000, CRC(f252d959) SHA1(a1747d1f0c248ae8d9e304ee017b8195fff9c4a2) )
 	ROM_LOAD( "9.3r",  0x4000, 0x4000, CRC(834b62b6) SHA1(43fb7733d734158082126ee4f15c022c8bd53106) )
@@ -1256,6 +1262,38 @@ ROM_START(sgaltrop)
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "gt.7f", 0x00, 0x20, CRC(59e36d6e) SHA1(2e0f3d4809ec727518e6ec883f67ede8831681bf) )
 ROM_END
+
+ROM_START( sgaltropa )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "m10.3s", 0x0000, 0x4000, CRC(81377872) SHA1(d0c3d81b170ef468bf74f4dd82ef3348359ac511) )
+	ROM_LOAD( "m9.3r",  0x4000, 0x4000, CRC(af9fc41e) SHA1(ebb44a5f51cf82ce9aef88f1c9fd85168d75f21b) )
+
+	ROM_REGION( 0x4000, "subrom", 0 )
+	ROM_LOAD( "m1dot.3a", 0x0000, 0x4000, CRC(e3c0afa4) SHA1(a2d7046966abffeb94670feb744e855e4722fa02) )
+
+	ROM_REGION( 0xc000, "samples", 0 )
+	ROM_LOAD( "m2.3b", 0x4000, 0x4000, CRC(1723d18d) SHA1(8447c8838941559e5496d2e0834884c27a46375c) )
+	ROM_LOAD( "m3.3c", 0x8000, 0x4000, CRC(cdb2057b) SHA1(e60b46813e082ede0694f28f0c2c7a7fdf323ac9) )
+
+	ROM_REGION( 0x80000, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "m4.3e", 0x00000, 0x08000, CRC(e10a3c91) SHA1(f77f85527afd59d57cd9cf1deb68c22e35722c78) )
+	ROM_LOAD( "m7.3k", 0x10000, 0x08000, CRC(bd76eb88) SHA1(43cc8269a539153601619381c5dd0c50dd8d6a00) )
+	ROM_LOAD( "m5.3f", 0x20000, 0x08000, CRC(c18c06fc) SHA1(18e57a5016eecf5da4a09b9182c99ee82f11c22c) )
+	// next two are unconfirmed
+	ROM_LOAD( "m6.3h", 0x30000, 0x08000, CRC(571e5f93) SHA1(ef9e27a2121a0d63ac9aa5e4168c73c39d06c60a) )
+	ROM_RELOAD(        0x08000, 0x08000 ) // attract mode, after a demo match
+	ROM_LOAD( "m8.3n", 0x40000, 0x08000, CRC(5029a16f) SHA1(a89ac8283b3e487d9be5f1a8a1e37ba0bf0cd654) )
+	ROM_RELOAD(        0x18000, 0x08000 ) // gal select
+	// debug code, to be removed at some point
+	ROM_FILL(          0x28000, 0x08000, 0x33 )
+	ROM_FILL(          0x38000, 0x08000, 0x44 )
+	ROM_FILL(          0x48000, 0x08000, 0x55 )
+	ROM_FILL(          0x50000, 0x30000, 0x66 )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "gt.7f", 0x00, 0x20, CRC(59e36d6e) SHA1(2e0f3d4809ec727518e6ec883f67ede8831681bf) )
+ROM_END
+
 
 void nightgal_state::init_royalqn()
 {
@@ -1328,14 +1366,16 @@ void nightgal_state::init_ngalsumr()
 
 
 /* Type 1 HW */
-GAME( 1984, nightgal, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ngtbunny, 0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalngt, ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night [BET] (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, royalqn,  0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen [BET] (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, nightgal,  0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Gal (Japan 840920 AG 1-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ナイトギャル
+GAME( 1984, ngtbunny,  0,        royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Night Bunny (Japan 840601 MRN 2-10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ナイトバニー
+GAME( 1984, royalngt,  ngtbunny, royalqn,  sexygal, nightgal_state, empty_init,    ROT0, "Royal Denshi", "Royal Night (Japan 840220 RN 2-00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ロイヤルナイト
+GAME( 1984, royalqn,   0,        royalqn,  sexygal, nightgal_state, init_royalqn,  ROT0, "Royal Denshi", "Royal Queen (Japan 841010 RQ 0-07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // ロイヤルクイーン
 /* Type 2 HW */
-GAME( 1985, sexygal,  0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sweetgal, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sexygal,   0,        sexygal,  sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal (Japan 850501 SXG 1-00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // セクシーギャル
+GAME( 1985, sweetgal,  sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850510 SWG 1-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // スイートギャル
+GAME( 1985, sweetgala, sexygal,  sweetgal, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sweet Gal (Japan 850410 SG 0-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // スイートギャル
 /* Type 3 HW */
-GAME( 1985, ngalsumr, 0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer [BET] (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // protection
+GAME( 1985, ngalsumr,  0,        ngalsumr, sexygal, nightgal_state, init_ngalsumr, ROT0, "Nichibutsu",   "Night Gal Summer (Japan 850702 NGS 0-01)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // ナイトギャルサマー
 /* Type 4 HW */
-GAME( 1985, sgaltrop, 0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical [BET] (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sgaltrop,  0,        sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 850805 SXG T-02)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sgaltropa, sgaltrop, sgaltrop, sexygal, nightgal_state, empty_init,    ROT0, "Nichibutsu",   "Sexy Gal Tropical (Japan 850715 SXG T-01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

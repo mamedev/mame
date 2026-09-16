@@ -82,7 +82,7 @@ emu::detail::device_registrar const registered_device_types;
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+device_t::device_t(const machine_config &mconfig, device_type type, std::string_view tag, device_t *owner, u32 clock)
 	: m_type(type)
 	, m_owner(owner)
 	, m_next(nullptr)
@@ -106,10 +106,19 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	, m_started(false)
 	, m_auto_finder_list(nullptr)
 {
-	if (owner != nullptr)
-		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
+	if (owner)
+	{
+		if (owner->owner())
+			m_tag = owner->tag();
+		else
+			m_tag.clear();
+		m_tag += ":";
+		m_tag += tag;
+	}
 	else
-		m_tag.assign(":");
+	{
+		m_tag = ":";
+	}
 	set_clock(clock);
 }
 
@@ -368,7 +377,7 @@ void device_t::set_unscaled_clock(u32 clock, bool sync_on_new_clock_domain)
 		return;
 
 	m_unscaled_clock = clock;
-	m_clock = m_unscaled_clock * m_clock_scale;
+	m_clock = m_unscaled_clock * m_clock_scale + 0.5;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
 
 	// recalculate all derived clocks
@@ -393,7 +402,7 @@ void device_t::set_clock_scale(double clockscale)
 		return;
 
 	m_clock_scale = clockscale;
-	m_clock = m_unscaled_clock * m_clock_scale;
+	m_clock = m_unscaled_clock * m_clock_scale + 0.5;
 	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
 
 	// recalculate all derived clocks
@@ -544,11 +553,10 @@ void device_t::start()
 	// complain if nothing was registered by the device
 	state_registrations = machine().save().registration_count() - state_registrations;
 	device_execute_interface *exec;
-	device_sound_interface *sound;
-	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
+	if ((state_registrations == 0) && interface(exec))
 	{
 		logerror("Device did not register any state to save!\n");
-		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
+		if (!(type().emulation_flags() & flags::SAVE_UNSUPPORTED))
 			fatalerror("Device '%s' did not register any state to save!\n", tag());
 	}
 
@@ -646,7 +654,7 @@ void device_t::pre_save()
 void device_t::post_load()
 {
 	// recompute clock-related parameters if something changed
-	u32 const scaled_clock = m_unscaled_clock * m_clock_scale;
+	u32 const scaled_clock = m_unscaled_clock * m_clock_scale + 0.5;
 	if (m_clock != scaled_clock)
 	{
 		m_clock = scaled_clock;
@@ -1001,9 +1009,9 @@ device_resolver_base *device_t::register_auto_finder(device_resolver_base &autod
 //-------------------------------------------------
 
 device_interface::device_interface(device_t &device, const char *type)
-	: m_interface_next(nullptr),
-		m_device(device),
-		m_type(type)
+	: m_interface_next(nullptr)
+	, m_device(device)
+	, m_type(type)
 {
 	device_interface **tailptr;
 	for (tailptr = &device.interfaces().m_head; *tailptr != nullptr; tailptr = &(*tailptr)->m_interface_next) { }

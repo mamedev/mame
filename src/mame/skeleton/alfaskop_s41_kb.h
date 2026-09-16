@@ -24,10 +24,10 @@ public:
 	void rst_line_w(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	required_device<m6802_cpu_device> m_mcu;
 	required_device<mc6846_device> m_mc6846;
@@ -42,7 +42,7 @@ protected:
 	uint8_t m_p1;
 	uint8_t m_leds;
 
-	void alfaskop_s41_kb_mem(address_map &map);
+	void alfaskop_s41_kb_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SKELETON_ALFASKOP_S41_KB_H

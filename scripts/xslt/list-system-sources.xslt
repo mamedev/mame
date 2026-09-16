@@ -42,7 +42,7 @@ skeleton/palestra.cpp
 nintendo/popeye.cpp
 alliedl/aleisttl.cpp
 misc/usbilliards.cpp
-midway/sspeedr.cpp
+taito/sspeedr.cpp
 ramtek/starcrus.cpp
 skeleton/testpat.cpp
 misc/a1supply.cpp

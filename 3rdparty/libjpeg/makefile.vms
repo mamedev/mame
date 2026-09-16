@@ -125,12 +125,14 @@ $!
 $! Run the self-test
 $!
 $ mcr sys$disk:[]djpeg -dct int -ppm -outfile testout.ppm testorig.jpg
+$ mcr sys$disk:[]djpeg -dct int -gif -outfile testout.gif testorig.jpg
 $ mcr sys$disk:[]djpeg -dct int -bmp -colors 256 -outfile testout.bmp testorig.jpg
 $ mcr sys$disk:[]cjpeg -dct int      -outfile testout.jpg testimg.ppm
 $ mcr sys$disk:[]djpeg -dct int -ppm -outfile testoutp.ppm testprog.jpg
 $ mcr sys$disk:[]cjpeg -dct int -progressive -opt -outfile testoutp.jpg testimg.ppm
 $ mcr sys$disk:[]jpegtran -outfile testoutt.jpg testprog.jpg
 $ Backup /Compare/Log testimg.ppm testout.ppm
+$ Backup /Compare/Log testimg.gif testout.gif
 $ Backup /Compare/Log testimg.bmp testout.bmp
 $ Backup /Compare/Log testimg.jpg testout.jpg
 $ Backup /Compare/Log testimg.ppm testoutp.ppm

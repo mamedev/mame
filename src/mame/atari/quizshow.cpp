@@ -58,15 +58,14 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
+	ioport_value tape_headpos_r();
 	DECLARE_INPUT_CHANGED_MEMBER(category_select);
 	void init_quizshow();
 	void quizshow(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<s2650_device> m_maincpu;
@@ -78,7 +77,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 	output_finder<11> m_lamps;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
@@ -271,7 +270,7 @@ void quizshow_state::mem_map(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(quizshow_state::tape_headpos_r)
+ioport_value quizshow_state::tape_headpos_r()
 {
 	return 1 << m_tape_head_pos;
 }
@@ -287,7 +286,7 @@ INPUT_CHANGED_MEMBER(quizshow_state::category_select)
 
 static INPUT_PORTS_START( quizshow )
 	PORT_START("IN0") // ADR strobe 0
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(quizshow_state, tape_headpos_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(quizshow_state::tape_headpos_r))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -352,7 +351,7 @@ static INPUT_PORTS_START( quizshow )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("CAT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, quizshow_state, category_select, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Category Select") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(quizshow_state::category_select), 0)
 
 INPUT_PORTS_END
 
@@ -411,7 +410,7 @@ void quizshow_state::quizshow(machine_config &config)
 	TIMER(config, "clock_timer").configure_periodic(FUNC(quizshow_state::clock_timer_cb), attotime::from_hz(PIXEL_CLOCK / (HTOTAL * 8))); // 8V
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(quizshow_state::screen_update));
 	m_screen->set_palette("palette");

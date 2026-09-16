@@ -83,7 +83,7 @@ INPUT_PORTS_START(a1200_us_keyboard)
 
 	// FIXME: split compact mode into a separate device without the numeric keypad
 	PORT_START("IRQ")
-	PORT_CONFNAME(0x01, 0x01, "Layout") PORT_CHANGED_MEMBER(DEVICE_SELF, a1200_kbd_device, layout_changed, 0)
+	PORT_CONFNAME(0x01, 0x01, "Layout") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a1200_kbd_device::layout_changed), 0)
 	PORT_CONFSETTING(0x01, "Full Size")
 	PORT_CONFSETTING(0x00, "Compact")
 INPUT_PORTS_END
@@ -195,8 +195,6 @@ ioport_constructor a1200_kbd_device::device_input_ports() const
 
 void a1200_kbd_device::device_start()
 {
-	m_led_kbd_caps.resolve();
-
 	save_item(NAME(m_row_drive));
 	save_item(NAME(m_host_kdat));
 	save_item(NAME(m_mpu_kdat));

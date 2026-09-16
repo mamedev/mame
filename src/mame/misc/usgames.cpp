@@ -53,12 +53,12 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void usg32(machine_config &config);
-	void usg185(machine_config &config);
+	void usg32(machine_config &config) ATTR_COLD;
+	void usg185(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,8 +79,8 @@ private:
 
 	void palette(palette_device &palette) const;
 
-	void usg185_map(address_map &map);
-	void usgames_map(address_map &map);
+	void usg185_map(address_map &map) ATTR_COLD;
+	void usgames_map(address_map &map) ATTR_COLD;
 	MC6845_UPDATE_ROW(update_row);
 };
 
@@ -136,8 +136,6 @@ MC6845_UPDATE_ROW(usgames_state::update_row)
 
 void usgames_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_rombank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -230,7 +228,7 @@ static INPUT_PORTS_START( usg32 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) // +12 Volts?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("UNK1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -311,7 +309,7 @@ void usgames_state::usg32(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*8, 32*8);

@@ -315,7 +315,7 @@ void wpc_dot_state::wpc_dot(machine_config &config)
 	M6809(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_dot_state::wpc_dot_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_dot_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_dot_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_dot_state::rombank_w));
@@ -331,7 +331,7 @@ void wpc_dot_state::wpc_dot(machine_config &config)
 	m_wpcsnd->reply_callback().set(FUNC(wpc_dot_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_native_aspect();
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 128-1, 0, 32-1);
@@ -695,22 +695,22 @@ ROM_START(tfdmd_l3)
 ROM_END
 
 
-GAME(1991,  tfdmd_l3,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "WPC Test Fixture: DMD (L-3)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  gi_l9,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-9)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  gi_l3,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  gi_l4,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  gi_l6,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-6)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  gi_l8,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-8)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  hshot_p8,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Midway",       "Hot Shot Basketball (P-8)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  hurr_l2,    0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Hurricane (L-2)",                              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  pz_f4,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (F-4)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  pz_l1,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-1)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  pz_l2,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-2)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  pz_l3,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-3)",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  sf_l1,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Slugfest (L-1)",                               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  t2_l8,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-8)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  t2_l6,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-6)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  t2_p2f,     t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (P-2F) Profanity",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  t2_l4,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-4)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  t2_l3,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-3)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1991,  t2_l2,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-2)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  tfdmd_l3,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "WPC Test Fixture: DMD (L-3)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l9,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-9)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l3,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-3)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l4,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-4)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l6,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-6)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  gi_l8,      gi_l9,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "Gilligan's Island (L-8)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  hshot_p8,   0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Midway",       "Hot Shot Basketball (P-8)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  hurr_l2,    0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Hurricane (L-2)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_f4,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (F-4)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_l1,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-1)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_l2,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-2)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  pz_l3,      pz_f4,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Bally",        "The Party Zone (L-3)",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  sf_l1,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Slugfest (L-1)",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l8,      0,      wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-8)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l6,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-6)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_p2f,     t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (P-2F) Profanity",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l4,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-4)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l3,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-3)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1991,  t2_l2,      t2_l8,  wpc_dot,    wpc_dot, wpc_dot_state, init_wpc_dot, ROT0, "Williams",     "Terminator 2: Judgment Day (L-2)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

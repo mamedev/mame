@@ -56,7 +56,7 @@ public:
 		P6
 	} pins;
 
-	tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_int_line(int pin_number, int state);
 
@@ -89,9 +89,9 @@ public:
 	void update_clock();
 
 private:
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(decrement_tick);
 

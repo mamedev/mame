@@ -514,7 +514,7 @@ void spiders_state::spiders(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -553,7 +553,7 @@ void spiders_state::spiders(machine_config &config)
 	m_pia[3]->writepb_handler().set(FUNC(spiders_state::spiders_audio_b_w));
 	m_pia[3]->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
-	ttl74123_device &ic60(TTL74123(config, "ic60", 0));
+	ttl74123_device &ic60(TTL74123(config, "ic60"));
 	ic60.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
 	ic60.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
 	ic60.set_capacitor_value(CAP_U(0.01));          /* capacitor connected to Cext and RCext */
@@ -667,4 +667,4 @@ ROM_END
 GAME( 1981, spiders,  0,       spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 1981, spiders2, spiders, spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 1981, spiders3, spiders, spiders, spiders, spiders_state, empty_init, ROT270, "Sigma Enterprises Inc.", "Spiders (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, empty_init, ROT270, "bootleg",                 "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1981, spinner,  spiders, spiders, spiders, spiders_state, empty_init, ROT270, "bootleg",                "Spinner", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

@@ -26,7 +26,7 @@ class vastar_video_device : public device_t, public device_gfx_interface, public
 {
 public:
 	// construction/destruction
-	vastar_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vastar_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_bg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_bg_codebase = code; m_bg_attrbase = attr;  m_bg_colbase = col;  }
 	void set_fg_bases(uint16_t code, uint16_t attr, uint16_t col) { m_fg_codebase = code; m_fg_attrbase = attr;  m_fg_colbase = col;  }
@@ -56,9 +56,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// shared memory finders

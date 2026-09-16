@@ -2,16 +2,15 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled by
-Data East, they titled it "Cosmo Gang".
+『コズモギャングス』 (COSMOGANGS) by Namco, 1990. USA distribution was handled
+by Data East, they titled it "Cosmo Gang".
 
 It is an electromechanical arcade lightgun game. There is no screen, feedback
 is with motorized elements, lamps and 7segs, and of course sounds and music.
 
-To shoot the targets in MAME, either enable -mouse and click on one of the
-pink aliens(left mouse button doubles as gun trigger by default).
-Or, configure the gun aim inputs and share them with the trigger. For example
-use Z,X,C,V,B for the gun aims, and "Z or X or C or V or B" for the trigger.
+To shoot the targets in MAME, either click on one of the pink aliens, or assign
+the gun aim inputs and share them with the trigger. For example use Z,X,C,V,B
+for the gun aims, and "Z or X or C or V or B" for the trigger.
 
 TODO:
 - dump/add Japanese version
@@ -61,7 +60,6 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 #include "machine/pit8253.h"
 #include "machine/ripple_counter.h"
 #include "machine/ticket.h"
-#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
@@ -115,12 +113,11 @@ public:
 		m_cg_count(*this, "cg_count%u", 0U)
 	{ }
 
-	// machine configs
-	void cgang(machine_config &config);
+	void cgang(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -149,9 +146,26 @@ private:
 	output_finder<5> m_en_count;
 	output_finder<5> m_cg_count;
 
+	int m_watchdog_clk = 0;
+	int m_main_irq = 0;
+	int m_main_firq = 0;
+	u8 m_door_motor_on = 0;
+	int m_door_motor_pos = 0;
+	u8 m_cg_motor_on = 0;
+	u8 m_cg_motor_dir = 0;
+
+	int m_cg_motor_clk[5] = { };
+	int m_cg_motor_pos[5] = { };
+	int m_en_pos[5] = { };
+
+	emu_timer *m_door_timer;
+	emu_timer *m_sol_filter[5];
+
+	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
+
 	// address maps
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void main_irq_w(int state);
@@ -160,7 +174,7 @@ private:
 	void main_firq_clear_w(u8 data);
 	template<int N> void motor_clock_w(int state);
 	void cg_motor_tick(int i);
-	TIMER_DEVICE_CALLBACK_MEMBER(door_motor_tick);
+	TIMER_CALLBACK_MEMBER(door_motor_tick);
 	void refresh_motor_output();
 
 	u8 ppi1_b_r();
@@ -183,21 +197,6 @@ private:
 	void ppi5_a_w(u8 data);
 	void ppi5_b_w(u8 data);
 	u8 ppi5_c_r();
-
-	int m_watchdog_clk = 0;
-	int m_main_irq = 0;
-	int m_main_firq = 0;
-	u8 m_door_motor_on = 0;
-	int m_door_motor_pos = 0;
-	u8 m_cg_motor_on = 0;
-	u8 m_cg_motor_dir = 0;
-
-	int m_cg_motor_clk[5] = { };
-	int m_cg_motor_pos[5] = { };
-	int m_en_pos[5] = { };
-
-	emu_timer *m_sol_filter[5];
-	TIMER_CALLBACK_MEMBER(output_sol) { m_en_sol[param >> 1] = param & 1; }
 };
 
 void cgang_state::machine_start()
@@ -205,17 +204,8 @@ void cgang_state::machine_start()
 	for (int i = 0; i < 5; i++)
 		m_sol_filter[i] = timer_alloc(FUNC(cgang_state::output_sol), this);
 
-	// resolve outputs
-	m_gun_lamps.resolve();
-	m_spot_lamps.resolve();
-	m_misc_lamps.resolve();
-	m_ufo_lamps.resolve();
-	m_ufo_sol.resolve();
-	m_en_sol.resolve();
-	m_cg_sol.resolve();
-	m_door_count.resolve();
-	m_en_count.resolve();
-	m_cg_count.resolve();
+	m_door_timer = timer_alloc(FUNC(cgang_state::door_motor_tick), this);
+	m_door_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	// register for savestates
 	save_item(NAME(m_watchdog_clk));
@@ -332,7 +322,7 @@ void cgang_state::cg_motor_tick(int i)
 	refresh_motor_output();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cgang_state::door_motor_tick)
+TIMER_CALLBACK_MEMBER(cgang_state::door_motor_tick)
 {
 	if (m_door_motor_on & 2 && m_door_motor_pos < DOOR_MOTOR_LIMIT)
 		m_door_motor_pos++;
@@ -745,7 +735,7 @@ void cgang_state::cgang(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cgang_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(cgang_state::nmi_line_pulse), attotime::from_hz(8_MHz_XTAL/4 / 0x1000));
 
-	PIT8253(config, m_pit[0], 0);
+	PIT8253(config, m_pit[0]);
 	m_pit[0]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[0]->set_clk<2>(4_MHz_XTAL/4);
@@ -753,7 +743,7 @@ void cgang_state::cgang(machine_config &config)
 	m_pit[0]->out_handler<1>().set(FUNC(cgang_state::motor_clock_w<1>));
 	m_pit[0]->out_handler<2>().set(FUNC(cgang_state::motor_clock_w<2>));
 
-	PIT8253(config, m_pit[1], 0);
+	PIT8253(config, m_pit[1]);
 	m_pit[1]->set_clk<0>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<1>(4_MHz_XTAL/4);
 	m_pit[1]->set_clk<2>(4_MHz_XTAL/4);
@@ -806,9 +796,7 @@ void cgang_state::cgang(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog); // HA1835P
 	m_watchdog->set_time(attotime::from_msec(100)); // approximation
 
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-
-	TIMER(config, "door_motor").configure_periodic(FUNC(cgang_state::door_motor_tick), attotime::from_msec(1));
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(3000));
 
 	// video hardware
 	PWM_DISPLAY(config, m_digits).set_size(10, 7);
@@ -860,5 +848,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MONITOR  COMPANY, FULLNAME, FLAGS
-GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0,    "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME   PARENT  MACHINE  INPUT  CLASS        INIT        MNTR  COMPANY, FULLNAME, FLAGS
+GAME( 1990, cgang, 0,      cgang,   cgang, cgang_state, empty_init, ROT0, "Namco (Data East license)", "Cosmo Gang (US)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

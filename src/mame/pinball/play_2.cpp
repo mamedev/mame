@@ -31,7 +31,8 @@ Adjustments:
 Status:
 - antar, storm, evlfight, attack, blkfever: Working
 - Mad Race: J is the outhole. Working, no sound.
-- Zira, Cerberus: not working
+- Zira: not working
+- Cerberus: not working (can't even coin up)
 - Hold down the outhole key (usually X), when starting a game.
 
 ToDo:
@@ -43,6 +44,7 @@ ToDo:
 
 #include "emu.h"
 #include "genpin.h"
+#include "efo_sound3.h"
 
 #include "cpu/cop400/cop400.h"
 #include "cpu/cosmac/cosmac.h"
@@ -69,14 +71,19 @@ public:
 		, m_4020(*this, "4020")
 		, m_1863(*this, "1863")
 		, m_snd_off(*this, "snd_off")
+		, m_sound3(*this, "sound3")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void play_2(machine_config &config);
+	void play_2(machine_config &config) ATTR_COLD;
+	void sound3(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
 	void port01_w(u8 data);
 	void port02_w(u8 data);
 	u8 port04_r();
@@ -90,8 +97,8 @@ protected:
 	void clock2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(snd_off_callback) { m_1863->set_output_gain(0, 0.00); }
 
-	void play_2_io(address_map &map);
-	void play_2_map(address_map &map);
+	void play_2_io(address_map &map) ATTR_COLD;
+	void play_2_map(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u8 m_kbdrow = 0U;
@@ -101,14 +108,13 @@ protected:
 	u8 m_old_solenoids[8]{};
 	u8 m_soundlatch = 0U;
 	bool m_snd_on = false;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
 	required_device<ripple_counter_device> m_4020;
 	required_device<cdp1863_device> m_1863;
 	required_device<timer_device> m_snd_off;
+	optional_device<efo_sound3_device> m_sound3;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<55> m_digits;
 	output_finder<56> m_io_outputs;   // 8 solenoids + 48 lamps
@@ -122,11 +128,11 @@ public:
 		, m_ay(*this, "ay")
 	{ }
 
-	void zira(machine_config &config);
-	void init_zira();
+	void zira(machine_config &config) ATTR_COLD;
+	void init_zira() ATTR_COLD;
 
 private:
-	void zira_sound_map(address_map &map);
+	void zira_sound_map(address_map &map) ATTR_COLD;
 	void sound_d_w(u8 data);
 	void sound_g_w(u8 data);
 	u8 psg_r();
@@ -238,9 +244,6 @@ void play_2_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_resetcnt));
 	save_item(NAME(m_disp_sw));
@@ -254,6 +257,7 @@ void play_2_state::machine_start()
 void play_2_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -332,6 +336,8 @@ void play_2_state::port07_w(u8 data)
 {
 	u8 t = 30;
 	m_soundlatch = BIT(data, 4, 3); // Zira, Cerberus
+	if (m_sound3.found())
+		m_sound3->input_w(m_soundlatch);
 	m_4013b->clear_w(0);
 	m_4013b->clear_w(1);
 	// Solenoids
@@ -454,11 +460,11 @@ void play_2_state::play_2(machine_config &config)
 	CLOCK(config, "xpoint", 60).signal_handler().set(FUNC(play_2_state::clock2_w)); // crossing-point detector
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	TTL7474(config, m_4013a, 0);
+	TTL7474(config, m_4013a);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w)); // TODO: also CKD for display
 
-	TTL7474(config, m_4013b, 0);
+	TTL7474(config, m_4013b);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w));
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // int is reversed in mame
 
@@ -470,7 +476,7 @@ void play_2_state::play_2(machine_config &config)
 	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
-	CDP1863(config, m_1863, 0);
+	CDP1863(config, m_1863);
 	m_1863->set_clock2(2.95_MHz_XTAL / 8);
 	m_1863->add_route(ALL_OUTPUTS, "mono", 0.75);
 	TIMER(config, m_snd_off).configure_generic(FUNC(play_2_state::snd_off_callback));
@@ -496,6 +502,12 @@ void zira_state::init_zira()
 	/* setup COP402 memory banking */
 	membank("bank1")->configure_entries(0, 2, memregion("cop402")->base(), 0x400);
 	membank("bank1")->set_entry(0);
+}
+
+void play_2_state::sound3(machine_config &config)
+{
+	play_2(config);
+	EFO_SOUND3(config, m_sound3);
 }
 
 /* PLAYMATIC MPU-2 ALTERNATE ROMS =======================================================================
@@ -611,7 +623,7 @@ ROM_START(cerberup)
 	ROM_LOAD("cerb9.9",        0x0800, 0x0800, CRC(0fd41156) SHA1(95d1bf42c82f480825e3d907ae3c87b5f994fd2a))
 	ROM_LOAD("cerb10.10",      0x1000, 0x0800, CRC(785602e0) SHA1(f38df3156cd14ab21752dbc849c654802079eb33))
 
-	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_REGION(0x2000, "sound3:rom", 0)
 	ROM_LOAD("cerb.snd",       0x0000, 0x2000, CRC(8af53a23) SHA1(a80b57576a1eb1b4544b718b9abba100531e3942))
 ROM_END
 
@@ -631,12 +643,12 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (set 2)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",              MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, cerberup,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979, antar,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (Playmatic, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979, antar2,    antar, play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Antar (Playmatic, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979, storm,     0,     play_2, play_2, play_2_state, empty_init, ROT0, "SegaSA / Sonic", "Storm",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980, evlfight,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Evil Fight",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980, attack,    0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Attack",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980, blkfever,  0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Black Fever",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982, cerberup,  0,     sound3, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Cerberus (Pinball)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1985, madrace,   0,     play_2, play_2, play_2_state, empty_init, ROT0, "Playmatic",      "Mad Race",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980, zira,      0,     zira,   play_2, zira_state,   init_zira,  ROT0, "Playmatic",      "Zira",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

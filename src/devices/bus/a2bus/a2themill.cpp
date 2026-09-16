@@ -68,7 +68,7 @@ ioport_constructor a2bus_themill_device::device_input_ports() const
 
 void a2bus_themill_device::device_add_mconfig(machine_config &config)
 {
-	MC6809E(config, m_6809, 1021800);   // 6809E runs at ~1 MHz as per Stellation Two's print ads
+	MC6809E(config, m_6809, A2BUS_1M_CLOCK);   // 6809E runs at ~1 MHz as per Stellation Two's print ads
 	m_6809->set_addrmap(AS_PROGRAM, &a2bus_themill_device::m6809_mem);
 }
 
@@ -106,6 +106,11 @@ void a2bus_themill_device::device_start()
 }
 
 void a2bus_themill_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_themill_device::reset_from_bus()
 {
 	m_bEnabled = false;
 	m_flipAddrSpace = false;
@@ -329,9 +334,4 @@ void a2bus_themill_device::dma_w(offs_t offset, uint8_t data)
 			slot_dma_write(offset, data);
 		}
 	}
-}
-
-bool a2bus_themill_device::take_c800()
-{
-	return false;
 }

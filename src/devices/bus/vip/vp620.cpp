@@ -38,7 +38,7 @@ void vp620_device::kb_w(uint8_t data)
 
 void vp620_device::device_add_mconfig(machine_config &config)
 {
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(vp620_device::kb_w));
 }
 

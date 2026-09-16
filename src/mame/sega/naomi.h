@@ -58,9 +58,9 @@ public:
 	void init_naomigd();
 	void init_naomigd_mp();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(suchie3_mp_r);
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
+	ioport_value naomi_mp_r();
+	ioport_value suchie3_mp_r();
+	template <int P> ioport_value naomi_kb_r();
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	uint64_t naomi2_biose_idle_skip_r();
@@ -84,8 +84,8 @@ protected:
 	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();
 
-	void naomi_map(address_map &map);
-	void naomi_port(address_map &map);
+	void naomi_map(address_map &map) ATTR_COLD;
+	void naomi_port(address_map &map) ATTR_COLD;
 
 	void set_drc_options();
 };
@@ -114,7 +114,7 @@ private:
 	required_shared_ptr<uint64_t> m_elan_ram;
 	required_device<powervr2_device> m_powervr2_slave;
 
-	void naomi2_map(address_map &map);
+	void naomi2_map(address_map &map) ATTR_COLD;
 
 	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 

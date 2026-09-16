@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert,Mark Garlanger
 /*********************************************************************
 
     h8_cas.h
 
-    Format code for Heathkit H8 H8T cassette images
+    Format code for Heathkit H8/H88 H8T cassette images
 
 *********************************************************************/
 #ifndef MAME_FORMATS_H8_CAS_H

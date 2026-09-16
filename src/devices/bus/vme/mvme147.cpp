@@ -598,7 +598,7 @@ void vme_mvme147_card_device::device_add_mconfig(machine_config &config)
 	M68030(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme147_card_device::mvme147_mem);
 
-	M48T02(config, "m48t18", 0); /* t08 differs only in accepted voltage levels compared to t18 */
+	M48T02(config, "m48t18"); /* t08 differs only in accepted voltage levels compared to t18 */
 
 	/* Terminal Port config */
 	SCC85C30(config, m_sccterm, SCC_CLOCK);

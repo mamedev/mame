@@ -1,7 +1,7 @@
 // 7zOut.h
 
-#ifndef __7Z_OUT_H
-#define __7Z_OUT_H
+#ifndef ZIP7_INC_7Z_OUT_H
+#define ZIP7_INC_7Z_OUT_H
 
 #include "7zCompressionMode.h"
 #include "7zEncode.h"
@@ -14,35 +14,46 @@
 namespace NArchive {
 namespace N7z {
 
+const unsigned k_StartHeadersRewriteSize = 32;
+
 class CWriteBufferLoc
 {
   Byte *_data;
-  size_t _size;
-  size_t _pos;
+  Byte *_dataLim;
+  Byte *_dataBase;
 public:
-  CWriteBufferLoc(): _size(0), _pos(0) {}
+  // CWriteBufferLoc(): _data(NULL), _dataLim(NULL), _dataBase(NULL) {}
   void Init(Byte *data, size_t size)
   {
     _data = data;
-    _size = size;
-    _pos = 0;
+    _dataBase = data;
+    _dataLim = data + size;
+  }
+  
+  Byte *GetDest_and_Update(size_t size)
+  {
+    Byte *dest = _data;
+    if (size > (size_t)(_dataLim - dest))
+      throw 1;
+    _data = dest + size;
+    return dest;
   }
   void WriteBytes(const void *data, size_t size)
   {
     if (size == 0)
       return;
-    if (size > _size - _pos)
-      throw 1;
-    memcpy(_data + _pos, data, size);
-    _pos += size;
+    Byte *dest = GetDest_and_Update(size);
+    memcpy(dest, data, size);
   }
   void WriteByte(Byte b)
   {
-    if (_size == _pos)
+    Byte *dest = _data;
+    if (dest == _dataLim)
       throw 1;
-    _data[_pos++] = b;
+    *dest++ = b;
+    _data = dest;
   }
-  size_t GetPos() const { return _pos; }
+  size_t GetPos() const { return (size_t)(_data - _dataBase); }
 };
 
 
@@ -240,22 +251,26 @@ struct CArchiveDatabaseOut: public COutFolders
 
 class COutArchive
 {
-  UInt64 _prefixHeaderPos;
-
   HRESULT WriteDirect(const void *data, UInt32 size) { return WriteStream(SeqStream, data, size); }
   
   UInt64 GetPos() const;
   void WriteBytes(const void *data, size_t size);
   void WriteBytes(const CByteBuffer &data) { WriteBytes(data, data.Size()); }
   void WriteByte(Byte b);
-  void WriteUInt32(UInt32 value);
-  void WriteUInt64(UInt64 value);
+  void WriteByte_ToStream(Byte b)
+  {
+    _outByte.WriteByte(b);
+    // _crc = CRC_UPDATE_BYTE(_crc, b);
+  }
+  // void WriteUInt32(UInt32 value);
+  // void WriteUInt64(UInt64 value);
   void WriteNumber(UInt64 value);
   void WriteID(UInt64 value) { WriteNumber(value); }
 
   void WriteFolder(const CFolder &folder);
   HRESULT WriteFileHeader(const CFileItem &itemInfo);
-  void WriteBoolVector(const CBoolVector &boolVector);
+  void Write_BoolVector(const CBoolVector &boolVector);
+  void Write_BoolVector_numDefined(const CBoolVector &boolVector, unsigned numDefined);
   void WritePropBoolVector(Byte id, const CBoolVector &boolVector);
 
   void WriteHashDigests(const CUInt32DefVector &digests);
@@ -277,7 +292,8 @@ class COutArchive
 
   void SkipToAligned(unsigned pos, unsigned alignShifts);
   void WriteAlignedBools(const CBoolVector &v, unsigned numDefined, Byte type, unsigned itemSizeShifts);
-  void WriteUInt64DefVector(const CUInt64DefVector &v, Byte type);
+  void Write_UInt32DefVector_numDefined(const CUInt32DefVector &v, unsigned numDefined);
+  void Write_UInt64DefVector_type(const CUInt64DefVector &v, Byte type);
 
   HRESULT EncodeStream(
       DECL_EXTERNAL_CODECS_LOC_VARS
@@ -290,44 +306,39 @@ class COutArchive
   
   bool _countMode;
   bool _writeToStream;
-  size_t _countSize;
-  UInt32 _crc;
-  COutBuffer _outByte;
-  CWriteBufferLoc _outByte2;
-
-  #ifdef _7Z_VOL
+  bool _useAlign;
+  #ifdef Z7_7Z_VOL
   bool _endMarker;
   #endif
+  // UInt32 _crc;
+  size_t _countSize;
+  CWriteBufferLoc _outByte2;
+  COutBuffer _outByte;
+  UInt64 _signatureHeaderPos;
+  CMyComPtr<IOutStream> Stream;
 
-  bool _useAlign;
-
-  HRESULT WriteSignature();
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   HRESULT WriteFinishSignature();
-  #endif
-  HRESULT WriteStartHeader(const CStartHeader &h);
-  #ifdef _7Z_VOL
   HRESULT WriteFinishHeader(const CFinishHeader &h);
   #endif
-  CMyComPtr<IOutStream> Stream;
-public:
+  HRESULT WriteStartHeader(const CStartHeader &h);
 
-  COutArchive() { _outByte.Create(1 << 16); }
+public:
   CMyComPtr<ISequentialOutStream> SeqStream;
-  HRESULT Create(ISequentialOutStream *stream, bool endMarker);
+
+  // COutArchive();
+  HRESULT Create_and_WriteStartPrefix(ISequentialOutStream *stream /* , bool endMarker */);
   void Close();
-  HRESULT SkipPrefixArchiveHeader();
   HRESULT WriteDatabase(
       DECL_EXTERNAL_CODECS_LOC_VARS
       const CArchiveDatabaseOut &db,
       const CCompressionMethodMode *options,
       const CHeaderOptions &headerOptions);
 
-  #ifdef _7Z_VOL
+  #ifdef Z7_7Z_VOL
   static UInt32 GetVolHeadersSize(UInt64 dataSize, int nameLength = 0, bool props = false);
   static UInt64 GetVolPureSize(UInt64 volSize, int nameLength = 0, bool props = false);
   #endif
-
 };
 
 }}

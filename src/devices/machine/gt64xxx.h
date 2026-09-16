@@ -28,7 +28,7 @@ public:
 	void set_be(int be) { m_be = be; }
 	void set_autoconfig(int autoconfig) { m_autoconfig = autoconfig; }
 	void set_irq_num(int irq_num) { m_irq_num = irq_num; }
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 	void set_simm_size(int index, int size) { m_simm_size[index] = size; }
 	void set_simm0_size(int size) { m_simm_size[0] = size; }
 	void set_simm1_size(int size) { m_simm_size[1] = size; }
@@ -73,8 +73,8 @@ protected:
 
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 
 private:
@@ -119,7 +119,7 @@ private:
 	required_memory_region m_romRegion;
 	optional_memory_region m_updateRegion;
 
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
 	void map_cpu_space();
 
@@ -148,7 +148,7 @@ private:
 	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
 	TIMER_CALLBACK_MEMBER(perform_dma);
-	address_space* dma_decode_address(uint32_t &addr);
+	address_space* dma_decode_address(offs_t &addr);
 };
 
 // Supports R4600/4650/4700/R5000 CPUs

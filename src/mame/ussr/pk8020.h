@@ -20,7 +20,14 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
+#include "screen.h"
+
+
+static constexpr int TEXT_RAM_BASE = 0x40000;
+static constexpr int GRAPHICS_RAM_BASE = 0x10000;
+static constexpr int GRAPHICS_PAGE_SIZE = 0xc000;
 
 
 class pk8020_state : public driver_device
@@ -43,14 +50,15 @@ public:
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_port(*this, "LINE%u", 0U)
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 	{ }
 
 	void pk8020(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -71,17 +79,20 @@ private:
 	void pk8020_palette(palette_device &palette) const;
 	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
-	uint8_t ppi_porta_r();
+	uint8_t iop1_porta_r();
 	void floppy_control_w(uint8_t data);
-	void ppi_2_portc_w(uint8_t data);
+	void iop2_portc_w(uint8_t data);
 	void pit_out0(int state);
+
+	emu_timer *m_timer;
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
 	static const char *plm_select_name(uint8_t data);
 	void log_bank_select(uint8_t bank, offs_t start, offs_t end, uint8_t rdecplm, uint8_t wdecplm);
 
-	void pk8020_io(address_map &map);
-	void pk8020_mem(address_map &map);
-	void devices_map(address_map &map);
+	void pk8020_io(address_map &map) ATTR_COLD;
+	void pk8020_mem(address_map &map) ATTR_COLD;
+	void devices_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_bank_select = 0;
 	uint8_t m_color = 0;
@@ -94,6 +105,7 @@ private:
 	uint8_t m_video_page_access = 0;
 	uint8_t m_sound_gate = 0;
 	uint8_t m_sound_level = 0;
+	int m_printer_busy = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pls100_device> m_decplm;
@@ -110,6 +122,7 @@ private:
 	required_region_ptr<uint8_t> m_region_gfx1;
 	required_ioport_array<16> m_io_port;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 #endif // MAME_USSR_PK8020_H

@@ -10,7 +10,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -51,15 +51,15 @@ protected:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 
-	void rom_map(address_map &map);
+	void rom_map(address_map &map) ATTR_COLD;
 
 	required_device<address_map_bank_device> m_rombank;
 	memory_region *m_cart_region;
@@ -581,7 +581,7 @@ void leapfrog_iquest_state::leapfrog_base(machine_config &config)
 	//I8052(config, m_maincpu, 96000000/10); // unknown clock
 	I8032(config, m_maincpu, 96000000/10); // unknown clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapfrog_iquest_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &leapfrog_iquest_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &leapfrog_iquest_state::ext_map);
 	m_maincpu->port_in_cb<0>().set(FUNC(leapfrog_iquest_state::port0_r));
 	m_maincpu->port_out_cb<0>().set(FUNC(leapfrog_iquest_state::port0_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(leapfrog_iquest_state::port1_r));
@@ -598,7 +598,7 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 {
 	leapfrog_iquest_state::leapfrog_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(90, 64);
@@ -617,7 +617,7 @@ void leapfrog_turboextreme_state::leapfrog_turboex(machine_config &config)
 {
 	leapfrog_iquest_state::leapfrog_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64, 32); // unknown resolution, lower than iquest
@@ -636,7 +636,7 @@ void leapfrog_turbotwistmath_state::leapfrog_turbotwistmath(machine_config &conf
 {
 	leapfrog_iquest_state::leapfrog_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
@@ -655,7 +655,7 @@ void leapfrog_turbotwistspelling_state::leapfrog_turbotwistspelling(machine_conf
 {
 	leapfrog_iquest_state::leapfrog_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
@@ -674,7 +674,7 @@ void leapfrog_turbotwistvocabulator_state::leapfrog_turbotwistvocabulator(machin
 {
 	leapfrog_iquest_state::leapfrog_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
@@ -694,7 +694,7 @@ void leapfrog_turbotwistbrainquest_state::leapfrog_turbotwistbrainquest(machine_
 {
 	leapfrog_iquest_state::leapfrog_base(config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
@@ -751,21 +751,21 @@ ROM_END
 
 //    year, name,        parent,    compat, machine,                         input,            class,                                init,       company,    fullname,                         flags
 // it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
-CONS( 2004, iquest,      0,         0,      leapfrog_iquest,                 leapfrog_iquest,  leapfrog_iquest_state,                empty_init, "LeapFrog", "IQuest 4.0 (US)",                MACHINE_IS_SKELETON )
+CONS( 2004, iquest,      0,         0,      leapfrog_iquest,                 leapfrog_iquest,  leapfrog_iquest_state,                empty_init, "LeapFrog", "IQuest 4.0 (US)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2004, turboex,     0,         0,      leapfrog_turboex,                leapfrog_iquest,  leapfrog_turboextreme_state,          empty_init, "LeapFrog", "Turbo Extreme (US)",             MACHINE_IS_SKELETON )
+CONS( 2004, turboex,     0,         0,      leapfrog_turboex,                leapfrog_iquest,  leapfrog_turboextreme_state,          empty_init, "LeapFrog", "Turbo Extreme (US)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // from a silver unit with orange lettering (there are different case styles, it is unknown if the software changed)
-CONS( 2002, ttwistm,     0,         0,      leapfrog_turbotwistmath,         leapfrog_iquest,  leapfrog_turbotwistmath_state,        empty_init, "LeapFrog", "Turbo Twist Math (US)",          MACHINE_IS_SKELETON )
+CONS( 2002, ttwistm,     0,         0,      leapfrog_turbotwistmath,         leapfrog_iquest,  leapfrog_turbotwistmath_state,        empty_init, "LeapFrog", "Turbo Twist Math (US)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Brain Quest / Fact Blaster are compatible with the same cartridges
-CONS( 200?, ttwistfb,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Fact Blaster (US)",  MACHINE_IS_SKELETON )
-CONS( 2002, ttwistbq,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Brain Quest (US)",   MACHINE_IS_SKELETON )
+CONS( 200?, ttwistfb,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Fact Blaster (US)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, ttwistbq,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Brain Quest (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // from a green unit with blue edges
-CONS( 2000, ttwistsp,    0,         0,      leapfrog_turbotwistspelling,     leapfrog_iquest,  leapfrog_turbotwistspelling_state,    empty_init, "LeapFrog", "Turbo Twist Spelling (US)",      MACHINE_IS_SKELETON )
+CONS( 2000, ttwistsp,    0,         0,      leapfrog_turbotwistspelling,     leapfrog_iquest,  leapfrog_turbotwistspelling_state,    empty_init, "LeapFrog", "Turbo Twist Spelling (US)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2001, ttwistvc,    0,         0,      leapfrog_turbotwistvocabulator,  leapfrog_iquest,  leapfrog_turbotwistvocabulator_state, empty_init, "LeapFrog", "Turbo Twist Vocabulator (US)",   MACHINE_IS_SKELETON )
+CONS( 2001, ttwistvc,    0,         0,      leapfrog_turbotwistvocabulator,  leapfrog_iquest,  leapfrog_turbotwistvocabulator_state, empty_init, "LeapFrog", "Turbo Twist Vocabulator (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Undumped units
 

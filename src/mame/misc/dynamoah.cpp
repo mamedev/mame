@@ -13,7 +13,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/eepromser.h"
 
 #define VERBOSE 0
@@ -39,8 +39,8 @@ private:
 	uint8_t ext_r(offs_t offset);
 	void ext_w(offs_t offset, uint8_t data);
 
-	void i8031_mem(address_map &map);
-	void i8031_ext_mem(address_map &map);
+	void i8031_mem(address_map &map) ATTR_COLD;
+	void i8031_ext_mem(address_map &map) ATTR_COLD;
 };
 
 void dynamoah_state::p1_w(uint8_t data)
@@ -81,7 +81,7 @@ void dynamoah_state::dynamoah(machine_config &config)
 	i80c31_device &maincpu(I80C31(config, "maincpu", 6'144'000)); // SC80C31BCCN40
 	// clock needs verification, being the XTAL value from a different board
 	maincpu.set_addrmap(AS_PROGRAM, &dynamoah_state::i8031_mem);
-	maincpu.set_addrmap(AS_IO, &dynamoah_state::i8031_ext_mem);
+	maincpu.set_addrmap(AS_DATA, &dynamoah_state::i8031_ext_mem);
 	maincpu.port_in_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
 	maincpu.port_in_cb<1>().append_constant(0x7f).mask(0x7f);
 	maincpu.port_out_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);
@@ -122,5 +122,5 @@ void dynamoah_state::security_decrypt()
 } // anonymous namespace
 
 
-GAME( 199?, dynamoah,  0,        dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.12?, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, dynamoaha, dynamoah, dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.03, encrypted)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, dynamoah,  0,        dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.12?, encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, dynamoaha, dynamoah, dynamoah, dynamoah, dynamoah_state, security_decrypt, ROT0, "Dynamo", "Air Hockey (6.03, encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

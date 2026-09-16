@@ -41,8 +41,8 @@
 #define LOGTODO(...)      LOGMASKED(LOG_TODO,   __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC,   __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device, "trident_vga",  "Trident TGUI9860")
-DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000")
+DEFINE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_device, "tgui9680_vga", "Trident TGUI9860 VGA i/f")
+DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000 VGA i/f")
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -53,8 +53,8 @@ trident_vga_device::trident_vga_device(const machine_config &mconfig, device_typ
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::sequencer_map), this));
 }
 
-tgui9860_device::tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: trident_vga_device(mconfig, TRIDENT_VGA, tag, owner, clock)
+tgui9680_device::tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: trident_vga_device(mconfig, TGUI9680_VGA, tag, owner, clock)
 {
 	m_version = 0xd3;   // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
 }
@@ -574,7 +574,7 @@ void trident_vga_device::device_start()
 	save_pointer(tri.accel_pattern,"Pattern Data", 0x80);
 	save_pointer(tri.lutdac_reg,"LUTDAC registers", 0x100);
 
-	m_vblank_timer = timer_alloc(FUNC(vga_device::vblank_timer_cb), this);
+	m_vblank_timer = timer_alloc(FUNC(trident_vga_device::vblank_timer_cb), this);
 	svga.ignore_chain4 = true;
 	memset(&tri, 0, sizeof(tri));
 }
@@ -812,12 +812,10 @@ uint32_t trident_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 uint16_t trident_vga_device::offset()
 {
-	uint16_t off = svga_device::offset();
-
+	// don't know if this is right, but Eggs Playing Chicken switches off doubleword mode, but expects the same offset length
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
-		return vga.crtc.offset << 3;  // don't know if this is right, but Eggs Playing Chicken switches off doubleword mode, but expects the same offset length
-	else
-		return off;
+		return vga.crtc.offset << 3;
+	return svga_device::offset();
 }
 
 int trident_vga_device::calculate_clock()

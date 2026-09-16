@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(BBC_JOYPORT_SLOT, bbc_joyport_slot_device, "bbc_joyport_slot"
 //  device_bbc_joyport_interface - constructor
 //-------------------------------------------------
 
-device_bbc_joyport_interface::device_bbc_joyport_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "bbcjoyport")
+device_bbc_joyport_interface::device_bbc_joyport_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "bbcjoyport")
+	, m_slot(dynamic_cast<bbc_joyport_slot_device *>(device.owner()))
 {
-	m_slot = dynamic_cast<bbc_joyport_slot_device *>(device.owner());
 }
 
 

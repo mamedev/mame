@@ -18,11 +18,12 @@ Stephh's notes :
   - When the "Cabinet" Dip Switch is set to "Cocktail", the screen status
     depends on which player is the main wrestler on the ring :
 
-      * player 1 : normal screen
-      * player 2 : inverted screen
+    * player 1 : normal screen
+    * player 2 : inverted screen
 
 TODO:
-        * fix hi-score (reset) bug
+  - fix hi-score (reset) bug
+  - verify vcount chain (exact interrupt timing and vblank flag on DSW1.7)
 
 ***************************************************************************/
 
@@ -30,6 +31,7 @@ TODO:
 
 #include "cpu/m6502/m6502.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "video/resnet.h"
@@ -51,6 +53,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
@@ -61,14 +64,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -89,7 +93,7 @@ private:
 	void control_w(uint8_t data);
 	void flipscreen_w(uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(v8_timer_irq);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -97,12 +101,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // TODO: fix or confirm resnet implementation
 // schematics say emitter circuit with 47 ohm pullup and 470 ohm pulldown but this results in a bad palette
@@ -110,9 +112,9 @@ static const res_net_info tagteam_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
 	{
-		{ RES_NET_AMP_EMITTER, 4700, 0, 3, { 4700, 3300, 1500 } },
-		{ RES_NET_AMP_EMITTER, 4700, 0, 3, { 4700, 3300, 1500 } },
-		{ RES_NET_AMP_EMITTER, 4700, 0, 2, {       3300, 1500 } }
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 4700, 3300, 1500 } },
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 4700, 3300, 1500 } },
+		{ RES_NET_AMP_NONE, 0, 0, 2, {       3300, 1500 } }
 	}
 };
 
@@ -133,6 +135,8 @@ void tagteam_state::palette(palette_device &palette) const
 	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
 	palette.set_pen_colors(0x00, rgb);
+
+	palette.palette()->normalize_range(0, 31);
 }
 
 
@@ -249,20 +253,17 @@ void tagteam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
-		code, color,
-		flipx, flipy,
-		sx, sy, 0);
+			code, color,
+			flipx, flipy,
+			sx, sy, 0);
 
 		// Wrap around
-
 		code = m_videoram[offs + 0x20] + 256 * spritebank;
 		color = m_palettebank;
 		sy += (flip_screen() ? -256 : 256);
 
-
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -276,8 +277,6 @@ uint32_t tagteam_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void tagteam_state::machine_start()
 {
@@ -334,8 +333,8 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tagteam_state, coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tagteam_state, coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tagteam_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tagteam_state::coin_inserted), 0)
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL PORT_8WAY
@@ -366,7 +365,7 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_DIPSETTING(    0x40, "Upright, Dual Controls" )
 	PORT_DIPSETTING(    0x20, "Cocktail, Single Controls" ) // IMPOSSIBLE !
 	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )     // "Cocktail, Dual Controls"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1")
@@ -431,32 +430,35 @@ static GFXDECODE_START( gfx_tagteam )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(tagteam_state::v8_timer_irq)
 {
+	// 16 times per frame
+	if (param > 256)
+		return;
+
+	// same source for both interrupts
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	if (m_sound_nmi_mask)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 void tagteam_state::tagteam(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, XTAL(12'000'000) / 8);
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tagteam_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(tagteam_state::irq0_line_assert), attotime::from_hz(272 / 16 * 57)); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
-	M6502(config, m_audiocpu, XTAL(12'000'000) / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 2 / 6); // daughterboard gets 12mhz / 2 from mainboard, but how it's divided further is a guess
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tagteam_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(tagteam_state::sound_timer_irq), attotime::from_hz(272 / 16 * 57)); // same source as maincpu IRQ
+
+	TIMER(config, "v8").configure_scanline(FUNC(tagteam_state::v8_timer_irq), "screen", 8, 16); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57); // measured?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	screen.set_screen_update(FUNC(tagteam_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248); // confirmed from schematics; 57 Hz measured?
+	m_screen->set_screen_update(FUNC(tagteam_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tagteam);
 	PALETTE(config, m_palette, FUNC(tagteam_state::palette), 32);
@@ -467,10 +469,10 @@ void tagteam_state::tagteam(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	AY8910(config, "ay1", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
-	AY8910(config, "ay2", XTAL(12'000'000) / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 }
 
 

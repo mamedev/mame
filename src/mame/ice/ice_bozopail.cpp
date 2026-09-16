@@ -41,8 +41,8 @@ public:
 	void ice_bozo(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void bank_w(u8 data);
 	void sndl_w(u8 data);
@@ -51,7 +51,7 @@ private:
 	void load_w(u8 data);
 	u8 pa_r();
 
-	void ice_bozo_map(address_map &map);
+	void ice_bozo_map(address_map &map) ATTR_COLD;
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<dac_word_interface> m_dac;

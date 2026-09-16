@@ -9,7 +9,7 @@
 class dp8510_device : public device_t
 {
 public:
-	dp8510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dp8510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	static const char *const BITBLT_OP[];
 	static const int FIFO_SIZE = 16;
@@ -46,8 +46,8 @@ public:
 	u8 pixel_r(const offs_t pixel_address) const;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u16 logic_unit(const u16 src, const u16 dst) const;
 

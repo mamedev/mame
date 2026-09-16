@@ -7,6 +7,10 @@
 
 #include "debug/debugvw.h"
 
+#ifdef __aarch64__
+#include <arm_acle.h> // QtCore/qyieldcpu.h uses __yield() without #including this, causing an error
+#endif
+
 #include <QtWidgets/QAbstractScrollArea>
 #include <QtWidgets/QMenu>
 

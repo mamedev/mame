@@ -236,9 +236,9 @@ public:
 	void init_bus();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -257,8 +257,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void cru_map(address_map &map);
-	void prg_map(address_map &map);
+	void cru_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -588,7 +588,7 @@ void tmspoker_state::tmspoker(machine_config &config)
 	LS259(config, m_outlatch[3]);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

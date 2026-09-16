@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SPECTRUM_USPEECH, spectrum_uspeech_device, "spectrum_uspeech", "Spectrum Currah \xC2\xB5Speech")
+DEFINE_DEVICE_TYPE(SPECTRUM_USPEECH, spectrum_uspeech_device, "spectrum_uspeech", u8"Spectrum Currah µSpeech")
 
 
 //-------------------------------------------------
@@ -94,7 +94,7 @@ void spectrum_uspeech_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_uspeech_device::romcs()
+bool spectrum_uspeech_device::romcs()
 {
 	return m_romcs;
 }

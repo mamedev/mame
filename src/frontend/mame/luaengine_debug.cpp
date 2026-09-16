@@ -19,6 +19,8 @@
 #include "debug/textbuf.h"
 #include "debugger.h"
 
+#include <span>
+
 
 namespace {
 
@@ -91,7 +93,7 @@ public:
 
 	symbol_table_wrapper(lua_engine &host, running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
 		: m_host(host)
-		, m_table(machine, parent ? &parent->table() : nullptr, device)
+		, m_table(machine, symbol_table::BUILTIN_GLOBALS, parent ? &parent->table() : nullptr, device)
 		, m_parent(parent)
 	{
 	}
@@ -293,18 +295,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 						maxparams,
 						[this, cb = sol::protected_function(m_lua_state, execute)] (int numparams, u64 const *paramlist) -> u64
 						{
-							// TODO: C++20 will make this obsolete
-							class helper
-							{
-							private:
-								u64 const *b, *e;
-							public:
-								helper(int n, u64 const *p) : b(p), e(p + n) { }
-								auto begin() const { return b; }
-								auto end() const { return e; }
-							};
-
-							auto status(invoke(cb, sol::as_args(helper(numparams, paramlist))));
+							auto status(invoke(cb, sol::as_args(std::span<u64 const>(paramlist, paramlist + numparams))));
 							if (status.valid())
 							{
 								auto result = status.get<std::optional<u64> >();
@@ -339,7 +330,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 			});
 	symbol_table_type.set_function("read_memory", &symbol_table_wrapper::read_memory);
 	symbol_table_type.set_function("write_memory", &symbol_table_wrapper::write_memory);
-	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return standard_tag_object_ptr_map<symbol_entry>(st.table().entries()); });
+	symbol_table_type["entries"] = sol::property([] (symbol_table_wrapper const &st) { return make_tag_object_ptr_map(st.table().entries()); });
 	symbol_table_type["parent"] = sol::property(&symbol_table_wrapper::parent);
 
 
@@ -422,9 +413,9 @@ void lua_engine::initialize_debug(sol::table &emu)
 			});
 	device_debug_type.set_function("go", &device_debug::go);
 	device_debug_type.set_function("bpset",
-			[] (device_debug &dev, offs_t address, char const *cond, char const *act)
+			[] (device_debug &dev, offs_t address, std::optional<char const *> cond, std::optional<std::string_view> act)
 			{
-				int result(dev.breakpoint_set(address, cond, act));
+				int result(dev.breakpoint_set(address, cond ? *cond : nullptr, act ? *act : std::string_view()));
 				dev.device().machine().debug_view().update_all(DVT_DISASSEMBLY);
 				dev.device().machine().debug_view().update_all(DVT_BREAK_POINTS);
 				return result;
@@ -457,10 +448,10 @@ void lua_engine::initialize_debug(sol::table &emu)
 				return table;
 			});
 	device_debug_type.set_function("wpset",
-			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, char const *cond, char const *act)
+			[] (device_debug &dev, addr_space &sp, std::string const &type, offs_t addr, offs_t len, std::optional<char const *> cond, std::optional<std::string_view> act)
 			{
 				read_or_write const wptype = s_read_or_write_parser(type);
-				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond, act));
+				int result(dev.watchpoint_set(sp.space, wptype, addr, len, cond ? *cond : nullptr, act ? *act : std::string_view()));
 				dev.device().machine().debug_view().update_all(DVT_WATCH_POINTS);
 				return result;
 			});

@@ -1,6 +1,13 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca
+**********************************************
+
+  Hot Chilli control panel.
+  Realistic clickable buttons-lamps.
+
+**********************************************
 -->
 <mamelayout version="2">
 
@@ -51,7 +58,7 @@ license:CC0-1.0
 
 	<element name="play_1l" defstate="0">
 		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.25" blue="0.0" /></rect>
 		<text string="PLAY 1 L">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
@@ -60,7 +67,7 @@ license:CC0-1.0
 
 	<element name="play_3l" defstate="0">
 		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.25" blue="0.0" /></rect>
 		<text string="PLAY 3 L">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
@@ -69,7 +76,7 @@ license:CC0-1.0
 
 	<element name="play_5l" defstate="0">
 		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.25" blue="0.0" /></rect>
 		<text string="PLAY 5 L">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
@@ -78,7 +85,7 @@ license:CC0-1.0
 
 	<element name="play_7l" defstate="0">
 		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.25" blue="0.0" /></rect>
 		<text string="PLAY 7 L">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
@@ -87,7 +94,7 @@ license:CC0-1.0
 
 	<element name="play_9l" defstate="0">
 		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.0" green="0.3" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.25" blue="0.0" /></rect>
 		<text string="PLAY 9 L">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
@@ -96,12 +103,29 @@ license:CC0-1.0
 
 	<element name="collect" defstate="0">
 		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><color red="0.3" green="0.3" blue="0.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.2" blue="0.0" /></rect>
 		<text string="COLLECT">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.1" y="0.15" width="0.8" height="0.7" />
 		</text>
 	</element>
+
+
+	<element name="bet_b" defstate="0">
+		<rect state="1"><color red="0.7" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.2" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="play_b" defstate="0">
+		<rect state="1"><color red="0.0" green="0.7" blue="0.0" /></rect>
+		<rect state="0"><color red="0.0" green="0.15" blue="0.0" /></rect>
+	</element>
+
+	<element name="collect_b" defstate="0">
+		<rect state="1"><color red="0.7" green="0.7" blue="0.0" /></rect>
+		<rect state="0"><color red="0.15" green="0.15" blue="0.0" /></rect>
+	</element>
+
 
 	<element name="cpanel">
 		<rect>
@@ -115,39 +139,85 @@ license:CC0-1.0
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />
 		</screen>
+
 		<element ref="cpanel"><bounds left="0" right="640" top="480" bottom="530" /></element>
-		<element name="lamp8" ref="bet_1" inputtag="IN2" inputmask="0x01">
+
+		<element name="lamp8" ref="bet_b" inputtag="IN2" inputmask="0x01">
 			<bounds x="4" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp9" ref="bet_2" inputtag="IN2" inputmask="0x02">
+		<element name="lamp8" ref="bet_1" inputtag="IN2" inputmask="0x01">
+			<bounds x="7" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp9" ref="bet_b" inputtag="IN2" inputmask="0x02">
 			<bounds x="62" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp10" ref="bet_3" inputtag="IN2" inputmask="0x04">
+		<element name="lamp9" ref="bet_2" inputtag="IN2" inputmask="0x02">
+			<bounds x="65" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp10" ref="bet_b" inputtag="IN2" inputmask="0x04">
 			<bounds x="120" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp11" ref="bet_5" inputtag="IN2" inputmask="0x08">
+		<element name="lamp10" ref="bet_3" inputtag="IN2" inputmask="0x04">
+			<bounds x="123" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp11" ref="bet_b" inputtag="IN2" inputmask="0x08">
 			<bounds x="178" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp12" ref="bet_10" inputtag="IN2" inputmask="0x10">
+		<element name="lamp11" ref="bet_5" inputtag="IN2" inputmask="0x08">
+			<bounds x="181" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp12" ref="bet_b" inputtag="IN2" inputmask="0x10">
 			<bounds x="236" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp32" ref="play_1l" inputtag="IN4" inputmask="0x01">
+		<element name="lamp12" ref="bet_10" inputtag="IN2" inputmask="0x10">
+			<bounds x="239" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp32" ref="play_b" inputtag="IN4" inputmask="0x01">
 			<bounds x="294" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp33" ref="play_3l" inputtag="IN4" inputmask="0x02">
+		<element name="lamp32" ref="play_1l" inputtag="IN4" inputmask="0x01">
+			<bounds x="297" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp33" ref="play_b" inputtag="IN4" inputmask="0x02">
 			<bounds x="352" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp34" ref="play_5l" inputtag="IN4" inputmask="0x04">
+		<element name="lamp33" ref="play_3l" inputtag="IN4" inputmask="0x02">
+			<bounds x="355" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp34" ref="play_b" inputtag="IN4" inputmask="0x04">
 			<bounds x="410" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp35" ref="play_7l" inputtag="IN4" inputmask="0x08">
+		<element name="lamp34" ref="play_5l" inputtag="IN4" inputmask="0x04">
+			<bounds x="413" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp35" ref="play_b" inputtag="IN4" inputmask="0x08">
 			<bounds x="468" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp36" ref="play_9l" inputtag="IN4" inputmask="0x10">
+		<element name="lamp35" ref="play_7l" inputtag="IN4" inputmask="0x08">
+			<bounds x="471" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp36" ref="play_b" inputtag="IN4" inputmask="0x10">
 			<bounds x="526" y="490" width="54" height="28" />
 		</element>
-		<element name="lamp10" ref="collect" inputtag="IN0" inputmask="0x40">
+		<element name="lamp36" ref="play_9l" inputtag="IN4" inputmask="0x10">
+			<bounds x="529" y="493" width="48" height="22" />
+		</element>
+
+		<element name="lamp10" ref="collect_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="584" y="490" width="54" height="28" />
 		</element>
+		<element name="lamp10" ref="collect" inputtag="IN0" inputmask="0x40">
+			<bounds x="587" y="493" width="48" height="22" />
+		</element>
+
 	</view>
 </mamelayout>

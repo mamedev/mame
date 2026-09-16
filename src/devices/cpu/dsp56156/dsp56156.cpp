@@ -250,8 +250,6 @@ void dsp56156_device::alu_init()
 
 void dsp56156_device::device_start()
 {
-	memset(&m_core, 0, sizeof(m_core));
-
 	m_core.device = this;
 	m_core.program_ram = m_program_ram;
 
@@ -263,7 +261,7 @@ void dsp56156_device::device_start()
 	/* HACK - You're not in bootstrap mode upon bootup */
 	m_core.bootstrap_mode = BOOTSTRAP_OFF;
 
-	/* Clear the irq states */
+	/* Clear the IRQ states */
 	m_core.modA_state = false;
 	m_core.modB_state = false;
 	m_core.modC_state = false;
@@ -465,6 +463,7 @@ void dsp56156_device::execute_run()
 	/* If reset line is asserted, do nothing */
 	if (m_core.reset_state)
 	{
+		debugger_wait_hook();
 		m_core.icount = 0;
 		return;
 	}
@@ -472,6 +471,7 @@ void dsp56156_device::execute_run()
 	/* HACK - if you're in bootstrap mode, simply pretend you ate up all your cycles waiting for data. */
 	if (m_core.bootstrap_mode != BOOTSTRAP_OFF)
 	{
+		debugger_wait_hook();
 		m_core.icount = 0;
 		return;
 	}

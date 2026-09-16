@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<!-- 2012-05-26: Initial version.  [R. Belmont / VFDGen 0.1] -->
+<!-- 2025-10-19: Combine led14seg with dot and underline.  [Christian Brunschen] -->
+
+<mamelayout version="2">
+
+  <!-- The VFD elements -->
+  <element name="segments" defstate="0">
+	<led14seg>
+	  <color red="0.45" green="1.0" blue="0.95" />
+	</led14seg>
+  </element>
+
+  <element name="dot" defstate="0">
+	<disk statemask="0x4000" state="0"><color red="0.06" green="0.12" blue="0.10" /></disk>
+	<disk statemask="0x4000" state="0x4000"><color red="0.45" green="1.00" blue="0.95" /></disk>
+  </element>
+
+  <element name="underline" defstate="0">
+	<rect statemask="0x8000" state="0"><color red="0.06" green="0.12" blue="0.10" /></rect>
+	<rect statemask="0x8000" state="0x8000"><color red="0.45" green="1.00" blue="0.95" /></rect>
+  </element>
+
+  <group name="vfd_cell">
+	<bounds x="0" y="0" width="342" height="572" />
+	<element ref="segments" name="~input~"><bounds x="50" y="69" width="214" height="311" /></element>
+	<element ref="dot" name="~input~"><bounds x="253" y="337" width="42" height="42" /></element>
+	<element ref="underline" name="~input~"><bounds x="43" y="441" width="183" height="25" /></element>
+  </group>
+
+  <element name="vfd_background">
+	<rect>
+	  <color red="0.0" green="0.0" blue="0.0" />
+	</rect>
+  </element>
+
+	<view name="Default Layout">
+
+	<element ref="vfd_background">
+		<bounds x="0" y="0" width="13680" height="1144" />
+	</element>
+
+	<!-- VFDs -->
+	<repeat count="2">
+		<param name="s" start="0" increment="40" />
+		<param name="y" start="0" increment="572" />
+		<repeat count="40">
+			<param name="n" start="~s~" increment="1" />
+			<param name="x" start="0" increment="342" />
+
+			<param name="input" value="vfd~n~" />
+			<group ref="vfd_cell">
+				<bounds x="~x~" y="~y~" width="342" height="572" />
+			</group>
+
+		</repeat>
+	</repeat>
+
+	</view>
+
+</mamelayout>

@@ -17,11 +17,11 @@ public:
 	isa8_pcmidi_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void set_host_irq(bool state);
@@ -30,7 +30,7 @@ private:
 	void status_w(u8 data);
 	void mpu_p3_w(u8 data);
 
-	void mpu_map(address_map &map);
+	void mpu_map(address_map &map) ATTR_COLD;
 
 	required_device<z8_device> m_mpu;
 	required_device<generic_latch_8_device> m_cmdlatch;

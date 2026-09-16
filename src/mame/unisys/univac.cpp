@@ -158,7 +158,7 @@ public:
 	void uts20(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 ram_r(offs_t offset);
@@ -185,10 +185,10 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	void uts10_io_map(address_map &map);
-	void uts10_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+	void uts10_io_map(address_map &map) ATTR_COLD;
+	void uts10_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
@@ -587,7 +587,7 @@ void univac_state::uts20(machine_config &config)
 	latch_e0.q_out_cb<6>().set(FUNC(univac_state::porte6_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(univac_state::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_uts);

@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "z84c015.h"
 
+#include "z80.inc"
+
 DEFINE_DEVICE_TYPE(Z84C015, z84c015_device, "z84c015", "Zilog Z84C015")
 
 void z84c015_device::internal_io_map(address_map &map) const
@@ -58,6 +60,26 @@ u32 z84c015_device::translate_memory_address(u16 addr)
 		? 0x10000
 		: (BIT(m_mcr, 1) && ((csbr >> 4) >= at) && (at > (csbr & 0x0f))) // cs1
 			? 0x20000 : 0) | addr;
+}
+
+u8 z84c015_device::data_read(u16 addr)
+{
+	return m_data.read_interruptible(translate_memory_address(addr));
+}
+
+void z84c015_device::data_write(u16 addr, u8 value)
+{
+	m_data.write_interruptible(translate_memory_address(addr), value);
+}
+
+u8 z84c015_device::opcode_read()
+{
+	return m_opcodes.read_byte(translate_memory_address(PC));
+}
+
+u8 z84c015_device::arg_read()
+{
+	return m_args.read_byte(translate_memory_address(PC));
 }
 
 //-------------------------------------------------

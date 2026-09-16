@@ -22,8 +22,14 @@ public:
 	{
 		set_maincpu_tag(std::forward<T>(cpu_tag));
 	}
+	template <typename T>
+	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: maple_dc_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag))
+	{
+		set_maincpu_tag(std::forward<T>(cpu_tag));
+	}
 
-	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_maincpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 	auto irq_callback() { return irq_cb.bind(); }
 
@@ -39,7 +45,7 @@ public:
 	void sb_msys_w(uint32_t data);
 	void sb_mdapro_w(uint32_t data); // 5f6c8c
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	void end_of_reply();
 	void register_port(int port, maple_device *device);
@@ -47,8 +53,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(dma_timer_tick);
 
@@ -66,7 +72,7 @@ private:
 
 	maple_device *devices[4];
 
-	required_device<sh4_device> cpu;
+	required_device<sh7091_device> cpu;
 	emu_timer *timer;
 
 	uint32_t mdstar, mden, mdst, msys;

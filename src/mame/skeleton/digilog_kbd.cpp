@@ -9,7 +9,7 @@
 
     Manufactured 1983 by Maxi-Switch Co. / Maxikey
 
-    TOOD:
+    TODO:
     - Shift Lock and Caps Lock
     - Unknown keys
     - LED artwork

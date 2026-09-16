@@ -337,17 +337,19 @@ void saturn_device::execute_run()
 {
 	do
 	{
-		m_oldpc = m_pc;
-
-		debugger_instruction_hook(m_pc);
-
 		if ( m_sleeping )
 		{
+			debugger_wait_hook();
+
 			/* advance time when sleeping */
 			m_icount -= 100;
 		}
 		else
 		{
+			m_oldpc = m_pc;
+
+			debugger_instruction_hook(m_pc);
+
 			/* takes irq */
 			if ( m_pending_irq && (!m_in_irq) )
 				saturn_take_irq();

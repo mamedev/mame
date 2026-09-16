@@ -12,6 +12,8 @@
 
 #include "ioprocs.h"
 
+#include <tuple>
+
 
 trd_format::trd_format() : wd177x_format(formats)
 {
@@ -51,16 +53,19 @@ int trd_format::find_size(util::random_read &io, uint32_t form_factor, const std
 		{
 			index = i; // at least size match, save it for the case if there will be no exact matches
 
+			std::error_condition err;
 			size_t actual;
 			uint8_t sectdata[0x100];
 			if (f.encoding == floppy_image::MFM)
-				io.read_at(0x800, sectdata, 0x100, actual);
+				std::tie(err, actual) = read_at(io, 0x800, sectdata, 0x100);
 			else
 			{
-				io.read_at(0x100, sectdata, 0x100, actual);
+				std::tie(err, actual) = read_at(io, 0x100, sectdata, 0x100);
 				for (int i = 0; i < 0x100; i++)
 					sectdata[i] ^= 0xff;
 			}
+			if (err || (0x100 != actual))
+				continue;
 
 			uint8_t disktype = sectdata[0xe3]; // 16 - DS80, 17 - DS40, 18 - SS80, 19 - SS40
 			if (disktype < 0x16 || disktype > 0x19)

@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
+TILE_GET_INFO_MEMBER(razmataz_state::razmataz_get_fg_tile_info)
 {
 	int code = m_videoram[tile_index];
 	int color = m_color_codes[code] & 0x0f;
@@ -148,9 +148,9 @@ void zaxxon_state::video_start()
 }
 
 
-VIDEO_START_MEMBER(zaxxon_state,razmataz)
+VIDEO_START_MEMBER(razmataz_state,razmataz)
 {
-	video_start_common(tilemap_get_info_delegate(*this, FUNC(zaxxon_state::razmataz_get_fg_tile_info)));
+	video_start_common(tilemap_get_info_delegate(*this, FUNC(razmataz_state::razmataz_get_fg_tile_info)));
 }
 
 
@@ -455,7 +455,7 @@ uint32_t zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 
 }
 
 
-uint32_t zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t razmataz_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect, false);
 	draw_sprites(bitmap, cliprect, 0x140, 0x180);
@@ -463,7 +463,7 @@ uint32_t zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-uint32_t zaxxon_state::screen_update_ixion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t razmataz_state::screen_update_ixion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect, false);
 	// On Ixion the fg tilemap is used to blank out erased tiles. The sprites must appear above these

@@ -219,6 +219,9 @@ public:
 class device_resolver_base
 {
 public:
+	device_resolver_base(device_resolver_base const &) = delete;
+	device_resolver_base &operator=(device_resolver_base const &) = delete;
+
 	/// \brief Destructor
 	///
 	/// Destruction via base class pointer and dynamic type behaviour
@@ -477,7 +480,7 @@ public:
 	/// target during configuration.  This needs to be cleared to ensure
 	/// the correct target is found if a device further up the hierarchy
 	/// subsequently removes or replaces devices.
-	virtual void end_configuration() override { assert(!m_resolved); m_target = nullptr; }
+	virtual void end_configuration() override ATTR_COLD { assert(!m_resolved); m_target = nullptr; }
 
 	/// \brief Get pointer to target object
 	///
@@ -614,7 +617,7 @@ public:
 	/// \param [in] device Reference to anticipated target device.
 	/// \return The same reference supplied by the caller.
 	template <typename T>
-	std::enable_if_t<std::is_convertible<T *, DeviceClass *>::value, T &> operator=(T &device)
+	T &operator=(T &device) requires std::is_convertible_v<T *, DeviceClass *>
 	{
 		assert(!this->m_resolved);
 		assert(is_expected_tag(device));
@@ -633,8 +636,8 @@ private:
 	/// \param [in] device Reference to device.
 	/// \return True if supplied device matches the configured target
 	///   tag, or false otherwise.
-	template <typename T>
-	std::enable_if_t<emu::detail::is_device_implementation<T>::value, bool> is_expected_tag(T const &device) const
+	template <emu::detail::device_implementation_class T>
+	bool is_expected_tag(T const &device) const
 	{
 		return this->m_base.get().subtag(this->m_tag) == device.tag();
 	}
@@ -643,8 +646,8 @@ private:
 	/// \param [in] device Reference to interface/mixin.
 	/// \return True if supplied mixin matches the configured target
 	///   tag, or false otherwise.
-	template <typename T>
-	std::enable_if_t<emu::detail::is_device_interface<T>::value, bool> is_expected_tag(T const &interface) const
+	template <emu::detail::device_interface_class T>
+	bool is_expected_tag(T const &interface) const
 	{
 		return this->m_base.get().subtag(this->m_tag) == interface.device().tag();
 	}
@@ -660,7 +663,7 @@ private:
 	///   or nullptr otherwise.
 	/// \return True if the device is optional or if a matching device
 	///   is found, false otherwise.
-	virtual bool findit(validity_checker *valid) override
+	virtual bool findit(validity_checker *valid) override ATTR_COLD
 	{
 		if (!valid)
 		{
@@ -732,7 +735,7 @@ private:
 	///   or nullptr otherwise.
 	/// \return True if the memory region is optional or if a matching
 	///   memory region is found, false otherwise.
-	virtual bool findit(validity_checker *valid) override;
+	virtual bool findit(validity_checker *valid) override ATTR_COLD;
 };
 
 /// \brief Optional memory region finder
@@ -788,7 +791,7 @@ public:
 	///   or nullptr otherwise.
 	/// \return True if the memory bank is optional, a matching memory
 	///   bank is found or this is a dry run, false otherwise.
-	virtual bool findit(validity_checker *valid) override;
+	virtual bool findit(validity_checker *valid) override ATTR_COLD;
 };
 
 /// \brief Optional memory bank finder
@@ -849,8 +852,8 @@ public:
 	memory_bank *operator->() const { assert(m_target); return m_target; }
 
 protected:
-	virtual bool findit(validity_checker *valid) override;
-	virtual void end_configuration() override;
+	virtual bool findit(validity_checker *valid) override ATTR_COLD;
+	virtual void end_configuration() override ATTR_COLD;
 
 	/// \brief Pointer to target object
 	///
@@ -929,7 +932,7 @@ private:
 	///   or nullptr otherwise.
 	/// \return True if the I/O port is optional, a matching I/O port is
 	///   is found or this is a dry run, false otherwise.
-	virtual bool findit(validity_checker *valid) override;
+	virtual bool findit(validity_checker *valid) override ATTR_COLD;
 };
 
 /// \brief Optional I/O port finder
@@ -1044,7 +1047,7 @@ private:
 	///   or nullptr otherwise.
 	/// \return True if the address space is optional, a matching
 	///   address space is found or this is a dry run, false otherwise.
-	virtual bool findit(validity_checker *valid) override;
+	virtual bool findit(validity_checker *valid) override ATTR_COLD;
 
 	int m_spacenum;
 	u8 m_data_width;
@@ -1126,7 +1129,7 @@ private:
 	///   or nullptr otherwise.
 	/// \return True if the memory region is optional or a matching
 	///   memory region is found, or false otherwise.
-	virtual bool findit(validity_checker *valid) override
+	virtual bool findit(validity_checker *valid) override ATTR_COLD
 	{
 		if (valid)
 			return this->validate_memregion(Required);
@@ -1252,7 +1255,7 @@ private:
 	///   or nullptr otherwise.
 	/// \return True if the memory share is optional or a matching
 	///   memory share is found, or false otherwise.
-	virtual bool findit(validity_checker *valid) override
+	virtual bool findit(validity_checker *valid) override ATTR_COLD
 	{
 		if (valid)
 			return true;
@@ -1396,8 +1399,8 @@ public:
 	PointerType const *cend() const { return target() + length(); }
 
 protected:
-	virtual bool findit(validity_checker *valid) override;
-	virtual void end_configuration() override;
+	virtual bool findit(validity_checker *valid) override ATTR_COLD;
+	virtual void end_configuration() override ATTR_COLD;
 
 	/// \brief Pointer to target object
 	///

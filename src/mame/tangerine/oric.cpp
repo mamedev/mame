@@ -88,16 +88,16 @@ public:
 	void psg_a_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(update_tape);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
 
 	void oric_common(machine_config &config);
 	void oric(machine_config &config);
 	void prav8d(machine_config &config);
-	void oric_mem(address_map &map);
+	void oric_mem(address_map &map) ATTR_COLD;
 
 protected:
 	required_device<m6502_device> m_maincpu;
@@ -158,11 +158,11 @@ public:
 
 	static void floppy_formats(format_registration &fr);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void telstrat(machine_config &config);
-	void telestrat_mem(address_map &map);
+	void telestrat_mem(address_map &map) ATTR_COLD;
 protected:
 	enum {
 		P_IRQEN  = 0x01,
@@ -453,7 +453,7 @@ void telestrat_state::machine_start()
 {
 	machine_start_common();
 	m_fdc_irq = m_fdc_drq = m_fdc_hld = false;
-	m_acia_irq = false;
+	m_acia_irq = m_via2_irq = false;
 
 	save_item(NAME(m_port_314));
 	save_item(NAME(m_via2_a));
@@ -648,7 +648,7 @@ static INPUT_PORTS_START(oric)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)           PORT_CHAR('8') PORT_CHAR('*')
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_state, nmi_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(oric_state::nmi_pressed), 0)
 
 	/* vsync cable hardware. This is a simple cable connected to the video output
 	to the monitor/television. The sync signal is connected to the cassette input
@@ -748,7 +748,7 @@ static INPUT_PORTS_START(prav8d)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)                                   PORT_CHAR('8') PORT_CHAR('(')
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_state, nmi_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(oric_state::nmi_pressed), 0)
 
 	/* vsync cable hardware. This is a simple cable connected to the video output
 	to the monitor/television. The sync signal is connected to the cassette input
@@ -791,7 +791,7 @@ void oric_state::oric_common(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 64*6, 0, 40*6, 312, 0, 28*8); // 260 lines in 60 Hz mode
 	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
 	screen.screen_vblank().set(FUNC(oric_state::vblank_w));
@@ -815,7 +815,7 @@ void oric_state::oric_common(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	/* cassette */
-	CASSETTE(config, m_cassette, 0);
+	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(oric_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -863,7 +863,7 @@ void telestrat_state::telstrat(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &telestrat_state::telestrat_mem);
 
 	/* acia */
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 
@@ -967,8 +967,8 @@ ROM_END
 ROM_START(prav8d)
 	ROM_REGION(0x4000, "maincpu", 0)   /* 0x10000 + 0x04000 + 0x00100 + 0x00200 */
 	ROM_LOAD( "pravetzt.rom", 0, 0x4000, CRC(58079502) SHA1(7afc276cb118adff72e4f16698f94bf3b2c64146) )
-//  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
-//  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
+//  ROM_LOAD( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+//  ROM_LOAD( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 ROM_START(prav8dd)
@@ -977,8 +977,8 @@ ROM_START(prav8dd)
 	ROMX_LOAD( "8d.rom",       0, 0x4000, CRC(b48973ef) SHA1(fd47c977fc215a3b577596a7483df53e8a1e9c83), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "radosoft", "RadoSoft Disk ROM, 1992")
 	ROMX_LOAD( "pravetzd.rom", 0, 0x4000, CRC(f8d23821) SHA1(f87ad3c5832773b6e0614905552a80c98dc8e2a5), ROM_BIOS(1) )
-//  ROM_LOAD_OPTIONAL( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
-//  ROM_LOAD_OPTIONAL( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
+//  ROM_LOAD( "8ddoslo.rom", 0x014000, 0x0100, CRC(0c82f636) SHA1(b29d151a0dfa3c7cd50439b51d0a8f95559bc2b6) )
+//  ROM_LOAD( "8ddoshi.rom", 0x014100, 0x0200, CRC(66309641) SHA1(9c2e82b3c4d385ade6215fcb89f8b92e6fd2bf4b) )
 ROM_END
 
 } // anonymous namespace

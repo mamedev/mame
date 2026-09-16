@@ -25,7 +25,6 @@ public:
 	{
 		DEFAULT_ALL_0,
 		DEFAULT_ALL_1,
-		DEFAULT_RANDOM,
 		DEFAULT_CUSTOM,
 		DEFAULT_NONE
 	};
@@ -51,7 +50,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -62,13 +61,13 @@ protected:
 	void determine_final_base();
 
 	// configuration state
-	optional_memory_region      m_region;
-	default_value               m_default_value;
-	init_delegate         m_custom_handler;
+	optional_memory_region  m_region;
+	default_value           m_default_value;
+	init_delegate           m_custom_handler;
 
 	// runtime state
-	void *                      m_base;
-	size_t                      m_length;
+	void *                  m_base;
+	size_t                  m_length;
 };
 
 DECLARE_DEVICE_TYPE(NVRAM, nvram_device)

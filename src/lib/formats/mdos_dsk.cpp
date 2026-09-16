@@ -55,6 +55,8 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
+#include <tuple>
+
 
 mdos_format::mdos_format() : wd177x_format(formats)
 {
@@ -77,10 +79,10 @@ const char *mdos_format::extensions() const noexcept
 
 int mdos_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	int type = find_size(io, form_factor, variants);
+	int const type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE;
+		return FIFID_SIZE | FIFID_STRUCT;
 
 	return 0;
 }
@@ -115,18 +117,22 @@ int mdos_format::parse_date_field(const uint8_t *str)
 
 int mdos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
+	std::error_condition err;
 	size_t actual;
+
 	uint64_t size;
 	if (io.length(size))
 		return -1;
 
+	// Look at the disk ID sector.
 	disk_id_sector info;
-	// Look at the disk id sector.
-	io.read_at(0, &info, sizeof(struct disk_id_sector), actual);
+	std::tie(err, actual) = read_at(io, 0, &info, sizeof(disk_id_sector));
+	if (err || (sizeof(disk_id_sector) != actual))
+		return -1;
 
 	LOG_FORMATS("MDOS floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / 128, (uint32_t)size % 128, form_factor);
 
-	// The 'unused' area is not necessarily zero filled and is ignoded
+	// The 'unused' area is not necessarily zero filled and is ignored
 	// in the identification of a MDOS format image.
 
 	// Expect an ASCII id, version, revision, and 'user name' strings.
@@ -146,9 +152,9 @@ int mdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		return -1;
 
 	// The date should be the numeric day, month and year.
-	int month = parse_date_field(info.date);
-	int day = parse_date_field(info.date + 2);
-	int year = parse_date_field(info.date + 4);
+	int const month = parse_date_field(info.date);
+	int const day = parse_date_field(info.date + 2);
+	int const year = parse_date_field(info.date + 4);
 
 	LOG_FORMATS(" day %d, month %d, year %d\n", day, month, year);
 	if (day < 1 || day > 32 || month < 1 || month > 12 || year < 0)
@@ -182,8 +188,12 @@ int mdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 	// the extent of the disk are free or available.
 
 	uint8_t cluster_allocation[128], cluster_available[128];
-	io.read_at(1 * 128, &cluster_allocation, sizeof(cluster_allocation), actual);
-	io.read_at(2 * 128, &cluster_available, sizeof(cluster_available), actual);
+	std::tie(err, actual) = read_at(io, 1 * 128, &cluster_allocation, sizeof(cluster_allocation));
+	if (err || (sizeof(cluster_allocation) != actual))
+		return -1;
+	std::tie(err, actual) = read_at(io, 2 * 128, &cluster_available, sizeof(cluster_available));
+	if (err || (sizeof(cluster_available) != actual))
+		return -1;
 
 	for (int cluster = 0; cluster < sizeof(cluster_allocation) * 8; cluster++) {
 		if (cluster * 4 * 128 + 4 * 128 > size) {
@@ -202,7 +212,7 @@ int mdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		}
 	}
 
-	for (int i=0; formats[i].form_factor; i++) {
+	for (int i = 0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		LOG_FORMATS(" checking format %d with form factor %02x, %d sectors, %d heads\n",
 				i, f.form_factor, f.sector_count, f.head_count);

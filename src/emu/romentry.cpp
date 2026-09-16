@@ -13,6 +13,8 @@
 
 #include "strformat.h"
 
+#include <locale>
+
 
 /***************************************************************************
     HELPERS
@@ -32,12 +34,12 @@ static std::string hashdata_from_tiny_rom_entry(const tiny_rom_entry &ent)
 	case ROMENTRYTYPE_FILL:
 	case ROMENTRYTYPE_COPY:
 		// for these types, tiny_rom_entry::hashdata is an integer typecasted to a pointer
-		result = string_format("0x%x", (unsigned)(uintptr_t)ent.hashdata);
+		result = string_format(std::locale::classic(), "0x%x", uintptr_t(ent.hashdata));
 		break;
 
 	default:
-		if (ent.hashdata != nullptr)
-			result.assign(ent.hashdata);
+		if (ent.hashdata)
+			result = ent.hashdata;
 		break;
 	}
 	return result;
@@ -67,7 +69,7 @@ rom_entry::rom_entry(std::string &&name, std::string &&hashdata, u32 offset, u32
 //-------------------------------------------------
 
 rom_entry::rom_entry(const tiny_rom_entry &ent)
-	: m_name(ent.name != nullptr ? ent.name : "")
+	: m_name(ent.name ? ent.name : "")
 	, m_hashdata(hashdata_from_tiny_rom_entry(ent))
 	, m_offset(ent.offset)
 	, m_length(ent.length)

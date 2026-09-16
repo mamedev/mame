@@ -23,7 +23,7 @@
 #include "machine/watchdog.h"
 #include "machine/x2212.h"
 #include "sound/ay8910.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -40,32 +40,34 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_nvram(*this, "nvram"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_vectorram(*this, "vectorram"),
 		m_sticky(*this, "STICKY"),
-		m_stickz(*this, "STICKZ")
+		m_stickz(*this, "STICKZ"),
+		m_inputs(*this, "INPUTS"),
+		m_dial(*this, "DIAL")
 	{ }
 
 	void aztarac(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<x2212_device> m_nvram;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_vectorram;
 
 	required_ioport m_sticky;
 	required_ioport m_stickz;
+	required_ioport m_inputs;
+	required_ioport m_dial;
 
 	uint8_t m_sound_status = 0;
 	uint32_t m_xcenter = 0;
@@ -84,12 +86,10 @@ private:
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
 
 	inline void read_vectorram(int addr, int *x, int *y, int *c);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// audio
 
 uint8_t aztarac_state::sound_r()
 {
@@ -129,8 +129,6 @@ INTERRUPT_GEN_MEMBER(aztarac_state::snd_timed_irq)
 		device.execute().set_input_line(0,HOLD_LINE);
 }
 
-
-// video
 
 #define AVECTOR(x, y, color, intensity) \
 m_vector->add_point(m_xcenter + ((x) << 16), m_ycenter - ((y) << 16), color, intensity)
@@ -213,7 +211,7 @@ void aztarac_state::ubr_w(uint8_t data)
 
 void aztarac_state::video_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	int xmin = visarea.min_x;
 	int ymin = visarea.min_y;
@@ -224,8 +222,6 @@ void aztarac_state::video_start()
 	m_ycenter = ((ymax + ymin) / 2) << 16;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -286,9 +282,9 @@ void aztarac_state::main_map(address_map &map)
 	map(0x021000, 0x021001).w(FUNC(aztarac_state::nvram_store_w));
 	map(0x022000, 0x0221ff).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
 	map(0x027000, 0x027001).r(FUNC(aztarac_state::joystick_r));
-	map(0x027004, 0x027005).portr("INPUTS");
+	map(0x027004, 0x027005).portr(m_inputs);
 	map(0x027009, 0x027009).rw(FUNC(aztarac_state::sound_r), FUNC(aztarac_state::sound_w));
-	map(0x02700c, 0x02700d).portr("DIAL");
+	map(0x02700c, 0x02700d).portr(m_dial);
 	map(0x02700e, 0x02700f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0xff8000, 0xffafff).ram().share(m_vectorram);
 	map(0xffb000, 0xffb001).nopr();
@@ -369,13 +365,10 @@ void aztarac_state::aztarac(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	VECTOR(config, m_vector, 0);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 1024-1, 0, 768-1);
-	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
-	m_screen->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(40);
+	m_vector->set_visarea(0, 1024-1, 0, 768-1);
+	m_vector->screen_vblank().set(FUNC(aztarac_state::video_interrupt));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

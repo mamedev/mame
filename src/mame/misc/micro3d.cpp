@@ -8,7 +8,7 @@
 
     Games supported:
         * F-15 Strike Eagle [3 sets]
-        * B.O.T.S.S. - Battle of the Solar System [2 sets]
+        * B.O.T.S.S.: Battle of the Solar System [2 sets]
         * Tank Battle (prototype)
         * Super Tank Attack (prototype)
 
@@ -27,9 +27,10 @@
 #include "emu.h"
 #include "micro3d.h"
 #include "micro3d_a.h"
+
 #include "cpu/am29000/am29000.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "bus/rs232/rs232.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
@@ -80,7 +81,7 @@ static INPUT_PORTS_START( micro3d )
 	PORT_DIPSETTING(    0x0000, DEF_STR(On) )
 
 	PORT_START("SOUND_SW")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Sound PCB Test SW") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("VOLUME")
 	PORT_ADJUSTER(100, "Volume")
@@ -108,17 +109,17 @@ static INPUT_PORTS_START( f15se )
 	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_START("JOYSTICK_Y")
-	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss )
 	PORT_INCLUDE( micro3d )
 
 	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(micro3d_state, botss_hwchk_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(micro3d_state::botss_hwchk_r))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
@@ -135,10 +136,10 @@ static INPUT_PORTS_START( botss )
 	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_START("JOYSTICK_Y")
-	PORT_BIT(0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0xf5a, 0x0a6) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
 
 	PORT_START("THROTTLE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Throttle")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_NAME("Throttle")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botss11 )
@@ -154,8 +155,8 @@ static INPUT_PORTS_START( botss11 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
 	PORT_START("INPUTS_C_D")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle up")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Throttle Up")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Throttle Down")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
@@ -208,18 +209,24 @@ void micro3d_state::hostmem(address_map &map)
 {
 	map(0x000000, 0x143fff).rom();
 	map(0x200000, 0x20ffff).ram().share("nvram");
-	map(0x800000, 0x83ffff).ram().share("shared_ram");
+	map(0x800000, 0x83ffff).ram().share(m_shared_ram);
 	map(0x900000, 0x900001).w(FUNC(micro3d_state::host_drmath_int_w));
 	map(0x920000, 0x920001).portr("INPUTS_C_D");
 	map(0x940000, 0x940001).portr("INPUTS_A_B");
-	map(0x960000, 0x960001).w(FUNC(micro3d_state::micro3d_reset_w));
+	map(0x960000, 0x960001).w(FUNC(micro3d_state::reset_w));
 	map(0x980001, 0x980001).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
 	map(0x9a0000, 0x9a0007).rw(m_vgb, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
-	map(0x9c0000, 0x9c0001).noprw();                 /* Lamps */
+	map(0x9c0000, 0x9c0001).noprw(); // Lamps
 	map(0x9e0000, 0x9e002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0003f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
-	map(0xa20000, 0xa20001).r(FUNC(micro3d_state::micro3d_encoder_h_r));
-	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::micro3d_encoder_l_r));
+	map(0xa20000, 0xa20001).r(FUNC(micro3d_state::encoder_h_r));
+	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::encoder_l_r));
+}
+
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 
@@ -231,12 +238,12 @@ void micro3d_state::hostmem(address_map &map)
 
 void micro3d_state::vgbmem(address_map &map)
 {
-	map(0x00000000, 0x007fffff).ram().share("sprite_vram");
+	map(0x00000000, 0x007fffff).ram().share(m_sprite_vram);
 	map(0x00800000, 0x00bfffff).ram();
 	map(0x00c00000, 0x00c0000f).portr("VGB_SW");
-	map(0x00e00000, 0x00e0000f).w(FUNC(micro3d_state::micro3d_xfer3dk_w));
+	map(0x00e00000, 0x00e0000f).w(FUNC(micro3d_state::xfer3dk_w));
 	map(0x02000000, 0x0200ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // clut
-	map(0x02600000, 0x0260000f).w(FUNC(micro3d_state::micro3d_creg_w));
+	map(0x02600000, 0x0260000f).w(FUNC(micro3d_state::creg_w));
 	map(0x02c00000, 0x02c0003f).r(FUNC(micro3d_state::vgb_uart_r)).umask16(0x00ff);
 	map(0x02e00000, 0x02e0003f).w(FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
 	map(0x03800000, 0x03dfffff).rom().region("tms_gfx", 0);
@@ -259,18 +266,19 @@ void micro3d_state::drmath_prg(address_map &map)
 void micro3d_state::drmath_data(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("drmath", 0);
-	map(0x00800000, 0x0083ffff).rw(FUNC(micro3d_state::micro3d_shared_r), FUNC(micro3d_state::micro3d_shared_w));
 	map(0x00400000, 0x004fffff).ram();
 	map(0x00500000, 0x005fffff).ram();
+	map(0x00800000, 0x0083ffff).rw(FUNC(micro3d_state::shared_r), FUNC(micro3d_state::shared_w));
 	map(0x00a00000, 0x00a00003).w(FUNC(micro3d_state::drmath_int_w));
-	map(0x01000000, 0x01000003).w(FUNC(micro3d_state::micro3d_mac1_w));
-	map(0x01000004, 0x01000007).rw(FUNC(micro3d_state::micro3d_mac2_r), FUNC(micro3d_state::micro3d_mac2_w));
-	map(0x01200000, 0x01203fff).ram().share("mac_sram");
-	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
+	map(0x01000000, 0x01000003).w(FUNC(micro3d_state::mac1_w));
+	map(0x01000004, 0x01000007).rw(FUNC(micro3d_state::mac2_r), FUNC(micro3d_state::mac2_w));
+	map(0x01200000, 0x01203fff).ram().share(m_mac_sram);
+	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::pipe_r), FUNC(micro3d_state::fifo_w));
 	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
-	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
+	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::alt_fifo_w));
 	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 }
+
 
 /*************************************
  *
@@ -283,19 +291,13 @@ void micro3d_state::soundmem_prg(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void micro3d_state::soundmem_io(address_map &map)
+void micro3d_state::soundmem_data(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0xfd00, 0xfd01).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfe00, 0xfe00).w(FUNC(micro3d_state::micro3d_upd7759_w));
-	map(0xff00, 0xff00).w(FUNC(micro3d_state::micro3d_snd_dac_a));
-	map(0xff01, 0xff01).w(FUNC(micro3d_state::micro3d_snd_dac_b));
-}
-
-void micro3d_state::cpu_space_map(address_map &map)
-{
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
+	map(0xfe00, 0xfe00).w(FUNC(micro3d_state::upd7759_w));
+	map(0xff00, 0xff00).w(FUNC(micro3d_state::snd_dac_a));
+	map(0xff01, 0xff01).w(FUNC(micro3d_state::snd_dac_b));
 }
 
 
@@ -309,7 +311,7 @@ void micro3d_state::micro3d(machine_config &config)
 {
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &micro3d_state::hostmem);
-	m_maincpu->set_vblank_int("screen", FUNC(micro3d_state::micro3d_vblank));
+	m_maincpu->set_vblank_int("screen", FUNC(micro3d_state::vblank));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &micro3d_state::cpu_space_map);
 
 	TMS34010(config, m_vgb, 40_MHz_XTAL);
@@ -325,19 +327,19 @@ void micro3d_state::micro3d(machine_config &config)
 	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
 	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
-	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc8530_device &scc(SCC8530(config, "scc", 32_MHz_XTAL / 2 / 2));
 	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	I80C31(config, m_audiocpu, 11.0592_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
-	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
-	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_r));
-	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_w));
-	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_r));
-	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_w));
+	m_audiocpu->set_addrmap(AS_DATA, &micro3d_state::soundmem_data);
+	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::sound_p1_r));
+	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::sound_p1_w));
+	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::sound_p3_r));
+	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::sound_p3_w));
 
 	MC68681(config, m_duart, 3.6864_MHz_XTAL);
-	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->irq_cb().set_inputline("maincpu", M68K_IRQ_3);
 	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
 	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
 	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
@@ -355,7 +357,7 @@ void micro3d_state::micro3d(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400);
 	screen.set_screen_update("vgb", FUNC(tms34010_device::tms340x0_ind16));
 	screen.set_palette(m_palette);
@@ -379,24 +381,23 @@ void micro3d_state::micro3d(machine_config &config)
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 
 	ym2151_device &ym2151(YM2151(config, "ym2151", 3.579545_MHz_XTAL));
-	ym2151.add_route(0, "lspeaker", 0.35);
-	ym2151.add_route(1, "rspeaker", 0.35);
+	ym2151.add_route(0, "speaker", 0.35, 0);
+	ym2151.add_route(1, "speaker", 0.35, 1);
 
-	MICRO3D_SOUND(config, m_noise_1);
-	m_noise_1->add_route(0, "lspeaker", 1.0);
-	m_noise_1->add_route(1, "rspeaker", 1.0);
+	MICRO3D_SOUND(config, m_noise[0]);
+	m_noise[0]->add_route(0, "speaker", 1.0, 0);
+	m_noise[0]->add_route(1, "speaker", 1.0, 1);
 
-	MICRO3D_SOUND(config, m_noise_2);
-	m_noise_2->add_route(0, "lspeaker", 1.0);
-	m_noise_2->add_route(1, "rspeaker", 1.0);
+	MICRO3D_SOUND(config, m_noise[1]);
+	m_noise[1]->add_route(0, "speaker", 1.0, 0);
+	m_noise[1]->add_route(1, "speaker", 1.0, 1);
 }
 
 void micro3d_state::botss11(machine_config &config)
@@ -413,7 +414,7 @@ void micro3d_state::botss11(machine_config &config)
  *************************************/
 
 ROM_START( f15se )
-	/* Host PCB (MPG DW-00011C-0011-01) */
+	// Host PCB (MPG DW-00011C-0011-01)
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "110-00001-600.u67", 0x000001, 0x20000, CRC(da507ec7) SHA1(24fb80aa7157a97b53a6efa8f2477aacd0cd621f) )
 	ROM_LOAD16_BYTE( "110-00001-601.u91", 0x000000, 0x20000, CRC(f47648c6) SHA1(a5eac6fcde52ebf750cfcdcf151fcbd859146296) )
@@ -427,7 +428,7 @@ ROM_START( f15se )
 	ROM_LOAD16_BYTE( "110-00001-009.u95", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
 	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
-	/* Dr Math PCB (MPG 010-00002-001) */
+	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )
 	ROM_LOAD64_BYTE( "110-00001-222.u134", 0x00000, 0x08000, CRC(1aa391a4) SHA1(8bf80c0d0d9a85cbec9d8e18f6b5fc83989c86ce) )
 	ROM_LOAD64_BYTE( "110-00001-225.u126", 0x00001, 0x08000, CRC(bf6eb5a1) SHA1(94320581917ce36ae50ea0ecb53af9e12999e2b1) )
@@ -444,7 +445,7 @@ ROM_START( f15se )
 	ROM_LOAD16_BYTE( "110-00001-016.u167", 0x40001, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
 	ROM_LOAD16_BYTE( "110-00001-017.u160", 0x40000, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
 
-	/* Video Graphics PCB (MPG DW-010-00003-001) */
+	// Video Graphics PCB (MPG DW-010-00003-001)
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
 	ROM_LOAD16_BYTE( "110-00002-101.u101", 0x00000, 0x20000, CRC(e99fac71) SHA1(98d1d2134fabc1bad637cbe42cbe9cdc20b32126) )
 	ROM_LOAD16_BYTE( "110-00002-104.u97",  0x00001, 0x20000, CRC(78b9b7c7) SHA1(4bce993dd3aea126e3a9d42ee8c68b8ab47fdba7) )
@@ -457,7 +458,7 @@ ROM_START( f15se )
 	ROM_LOAD16_BYTE( "110-00002-103.u114", 0x80000, 0x20000, CRC(4d8e8f54) SHA1(d8a23b5fd00ab919dc6d63fc72824d1293073813) )
 	ROM_LOAD16_BYTE( "110-00002-102.u108", 0x80001, 0x20000, CRC(f6488e31) SHA1(d2f9304cc59f5523007592ae76ddd56107cc29e8) )
 
-	/* Sound PCB (MPG 010-00018-002) */
+	// Sound PCB (MPG 010-00018-002)
 	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "110-00004-001.u2", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
 
@@ -466,7 +467,7 @@ ROM_START( f15se )
 ROM_END
 
 ROM_START( f15se22 )
-	/* Host PCB (MPG DW-00011C-0011-01) */
+	// Host PCB (MPG DW-00011C-0011-01)
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "host.u67",          0x000001, 0x20000, CRC(8f495ceb) SHA1(90998ad67e76928ed1a6cae56038b98d1aa2e7b0) )
 	ROM_LOAD16_BYTE( "host.u91",          0x000000, 0x20000, CRC(dfae5ec3) SHA1(29306eed5047e39a0a2350e61ab7126a84cb710b) )
@@ -478,9 +479,9 @@ ROM_START( f15se22 )
 	ROM_LOAD16_BYTE( "110-00001-007.u94", 0x0c0000, 0x20000, CRC(36e06cba) SHA1(5ffee5da6f475978be10fa5e1a2c24f00497ea5f) )
 	ROM_LOAD16_BYTE( "110-00001-008.u71", 0x100001, 0x20000, CRC(d96fd4e2) SHA1(001af758da437e955b4ee914eabeb9739ebc4454) )
 	ROM_LOAD16_BYTE( "110-00001-009.u95", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
-	ROM_FILL(                    0x140000, 0x40000, 0xff )
+	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
-	/* Dr Math PCB (MPG 010-00002-001) */
+	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )
 	ROM_LOAD64_BYTE( "122.dth", 0x00000, 0x08000, CRC(9d2032cf) SHA1(8430816756ea92bbe86b94eaa24a6071bf0ef879) )
 	ROM_LOAD64_BYTE( "125.dth", 0x00001, 0x08000, CRC(7718487c) SHA1(609106f55601f84095b64ce2484107779da89149) )
@@ -497,7 +498,7 @@ ROM_START( f15se22 )
 	ROM_LOAD16_BYTE( "110-00001-016.u167", 0x40001, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
 	ROM_LOAD16_BYTE( "110-00001-017.u160", 0x40000, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
 
-	/* Video Graphics PCB (MPG DW-010-00003-001) */
+	// Video Graphics PCB (MPG DW-010-00003-001)
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
 	ROM_LOAD16_BYTE( "110-00002-101.u101", 0x00000, 0x20000, CRC(e99fac71) SHA1(98d1d2134fabc1bad637cbe42cbe9cdc20b32126) )
 	ROM_LOAD16_BYTE( "110-00002-104.u97",  0x00001, 0x20000, CRC(78b9b7c7) SHA1(4bce993dd3aea126e3a9d42ee8c68b8ab47fdba7) )
@@ -510,7 +511,7 @@ ROM_START( f15se22 )
 	ROM_LOAD16_BYTE( "110-00002-103.u114", 0x80000, 0x20000, CRC(4d8e8f54) SHA1(d8a23b5fd00ab919dc6d63fc72824d1293073813) )
 	ROM_LOAD16_BYTE( "110-00002-102.u108", 0x80001, 0x20000, CRC(f6488e31) SHA1(d2f9304cc59f5523007592ae76ddd56107cc29e8) )
 
-	/* Sound PCB (MPG 010-00018-002) */
+	// Sound PCB (MPG 010-00018-002)
 	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "110-00004-001.u2", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
 
@@ -519,7 +520,7 @@ ROM_START( f15se22 )
 ROM_END
 
 ROM_START( f15se21 )
-	/* Host PCB (MPG DW-00011C-0011-01) */
+	// Host PCB (MPG DW-00011C-0011-01)
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "110-00001-500.u67", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
 	ROM_LOAD16_BYTE( "110-00001-501.u91", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
@@ -533,7 +534,7 @@ ROM_START( f15se21 )
 	ROM_LOAD16_BYTE( "110-00001-009.u95", 0x100000, 0x20000, CRC(33e3b473) SHA1(66deda79ba94f0ed722b399b3fc6062dcdd1a6c9) )
 	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
-	/* Video Graphics PCB (MPG DW-010-00003-001) */
+	// Video Graphics PCB (MPG DW-010-00003-001)
 	ROM_REGION16_LE( 0x40000, "tms34010", 0 )
 	ROM_LOAD16_BYTE( "001.vgb", 0x000000, 0x20000, CRC(810c142d) SHA1(d37e5ecd716dda65d43cec7bca524c59d3dc9803) )
 	ROM_LOAD16_BYTE( "004.vgb", 0x000001, 0x20000, CRC(b69e1260) SHA1(1a2b69ea7c96b0293b24d87ea46bd4b1d4c56a66) )
@@ -546,7 +547,7 @@ ROM_START( f15se21 )
 	ROM_LOAD16_BYTE( "110-00002-103.u114", 0x80000, 0x20000, CRC(4d8e8f54) SHA1(d8a23b5fd00ab919dc6d63fc72824d1293073813) )
 	ROM_LOAD16_BYTE( "110-00002-102.u108", 0x80001, 0x20000, CRC(f6488e31) SHA1(d2f9304cc59f5523007592ae76ddd56107cc29e8) )
 
-	/* Dr Math PCB (MPG 010-00002-001) */
+	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )
 	ROM_LOAD64_BYTE( "122.dth", 0x00000, 0x08000, CRC(9d2032cf) SHA1(8430816756ea92bbe86b94eaa24a6071bf0ef879) )
 	ROM_LOAD64_BYTE( "125.dth", 0x00001, 0x08000, CRC(7718487c) SHA1(609106f55601f84095b64ce2484107779da89149) )
@@ -563,7 +564,7 @@ ROM_START( f15se21 )
 	ROM_LOAD16_BYTE( "110-00001-016.u167", 0x40001, 0x20000, CRC(5db4f677) SHA1(25a6fe4c562e4fa4225aa4687dd41920b614e591) )
 	ROM_LOAD16_BYTE( "110-00001-017.u160", 0x40000, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
 
-	/* Sound PCB (MPG 010-00018-002) */
+	// Sound PCB (MPG 010-00018-002)
 	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "110-00004-001.u2", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
 
@@ -572,7 +573,7 @@ ROM_START( f15se21 )
 ROM_END
 
 ROM_START( botss )
-	/* Host PCB (MPG DW-00011C-0011-01) */
+	// Host PCB (MPG DW-00011C-0011-01)
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "110-00153-100.u67", 0x000001, 0x20000, CRC(338aa9c3) SHA1(3d10329a5df80ab1761fd3953eb3872a72f26bef) )
 	ROM_LOAD16_BYTE( "110-00153-101.u91", 0x000000, 0x20000, CRC(3278279e) SHA1(570935988c776283cdcd5aa13d71a75f0a466099) )
@@ -586,7 +587,7 @@ ROM_START( botss )
 	ROM_LOAD16_BYTE( "110-00013-009.u95", 0x100000, 0x20000, CRC(6c595d1e) SHA1(89fdc30166ba1e9706798547195bdf6875a02e96) )
 	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
-	/* Dr Math PCB (MPG 010-00002-001) */
+	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )
 	ROM_LOAD64_BYTE( "110-00013-122.u134", 0x000000, 0x08000, CRC(bf60c487) SHA1(5ce80e89d9a24b627b0e97bf36a4e71c2eff4324) )
 	ROM_LOAD64_BYTE( "110-00013-125.u126", 0x000001, 0x08000, CRC(b0dccf4a) SHA1(e8bfd622c006985b724cdbd3ad14c33e9ed27c6c) )
@@ -607,7 +608,7 @@ ROM_START( botss )
 	ROM_LOAD16_BYTE( "110-00023-201.u101", 0x000000, 0x20000, CRC(7dc05f7d) SHA1(4d202b229cf4690d92491311e9ff14034b19c35c) )
 	ROM_LOAD16_BYTE( "110-00023-204.u97",  0x000001, 0x20000, CRC(925fd08a) SHA1(fb06413debbffcd63b018f374f25b0d8e419c739) )
 
-	/* Video Graphics PCB (MPG DW-010-00002-002) */
+	// Video Graphics PCB (MPG DW-010-00002-002)
 	ROM_REGION16_LE( 0xc0000, "tms_gfx", 0 )
 	ROM_LOAD16_BYTE( "110-00023-205.u124", 0x000000, 0x20000, CRC(5482e0c4) SHA1(492afac1862f2899cd734d1e57ca978ed6a906d5) )
 	ROM_LOAD16_BYTE( "110-00023-206.u121", 0x000001, 0x20000, CRC(a55e5d19) SHA1(86fbcb425103ae9fff381357339af349848fc3f2) )
@@ -616,7 +617,7 @@ ROM_START( botss )
 	ROM_LOAD16_BYTE( "110-00023-203.u114", 0x080000, 0x20000, CRC(b1dacbb1) SHA1(323531b6919eed4a963d6aad871f1fd34203e698) )
 	ROM_LOAD16_BYTE( "110-00023-202.u108", 0x080001, 0x20000, CRC(ac0d3179) SHA1(f4c67d59d913ead0f8a6d42e2ca66857ebf01602) )
 
-	/* Sound PCB (MPG 010-00018-002) */
+	// Sound PCB (MPG 010-00018-002)
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "110-00014-001.u2", 0x000000, 0x08000, CRC(307fcb6d) SHA1(0cf63a39ac8920be6532974311804529d7218545) )
 
@@ -624,16 +625,16 @@ ROM_START( botss )
 	ROM_LOAD( "110-00013-001.u17", 0x000000, 0x40000, CRC(015a0b17) SHA1(f229c9aa59f0e6b25b818f9513997a8685e33982) )
 
 	ROM_REGION( 0x10000, "plds", 0 )
-	/* Host */
-	ROM_LOAD( "120-00001-306.u77", 0x000000, 0x00310, CRC(60282a45) SHA1(8621b64fa00fa556c09d7d1566480cd442a8e655) ) /* AmPAL23S8-20 */
+	// Host
+	ROM_LOAD( "120-00001-306.u77", 0x000000, 0x00310, CRC(60282a45) SHA1(8621b64fa00fa556c09d7d1566480cd442a8e655) ) // AmPAL23S8-20
 
-	/* Dr. Math */
-	ROM_LOAD( "mac1_u173_a.bin", 0x000000, 0x014c7, CRC(78040232) SHA1(c9adc1db76b4ee5ee08f4a11caae77993b23cc30) ) /* EPS448 */
-	ROM_LOAD( "mac2_u166_a.bin", 0x000000, 0x014c7, CRC(c85c4c66) SHA1(fab07ad0611de7d2c2af9b6fa262d574e238bd9f) ) /* EPS448 */
+	// Dr. Math
+	ROM_LOAD( "mac1_u173_a.bin", 0x000000, 0x014c7, CRC(78040232) SHA1(c9adc1db76b4ee5ee08f4a11caae77993b23cc30) ) // EPS448
+	ROM_LOAD( "mac2_u166_a.bin", 0x000000, 0x014c7, CRC(c85c4c66) SHA1(fab07ad0611de7d2c2af9b6fa262d574e238bd9f) ) // EPS448
 ROM_END
 
 ROM_START( botss11 )
-	/* Host PCB (MPG DW-00011C-0011-02) */
+	// Host PCB (MPG DW-00011C-0011-02)
 	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "110-00013-300.u67", 0x000001, 0x20000, CRC(7f74362a) SHA1(41611ba8e6eb5d6b3dfe88e1cede7d9fb5472e40) )
 	ROM_LOAD16_BYTE( "110-00013-301.u91", 0x000000, 0x20000, CRC(a8100d1e) SHA1(69d3cac6f67563c0796560f7b874d7660720027d) )
@@ -647,7 +648,7 @@ ROM_START( botss11 )
 	ROM_LOAD16_BYTE( "110-00013-109.u95", 0x100000, 0x20000, CRC(6c595d1e) SHA1(89fdc30166ba1e9706798547195bdf6875a02e96) )
 	ROM_FILL(                             0x140000, 0x40000, 0xff )
 
-	/* Dr Math PCB (MPG 010-00002-001) */
+	// Dr Math PCB (MPG 010-00002-001)
 	ROM_REGION32_BE( 0x100000, "drmath", 0 )
 	ROM_LOAD64_BYTE( "110-00013-122.u134", 0x000000, 0x08000, CRC(bf60c487) SHA1(5ce80e89d9a24b627b0e97bf36a4e71c2eff4324) )
 	ROM_LOAD64_BYTE( "110-00013-125.u126", 0x000001, 0x08000, CRC(b0dccf4a) SHA1(e8bfd622c006985b724cdbd3ad14c33e9ed27c6c) )
@@ -668,7 +669,7 @@ ROM_START( botss11 )
 	ROM_LOAD16_BYTE( "110-00023-101.u101", 0x000000, 0x20000, CRC(6aada23d) SHA1(85dbf9b20e4f17cb21922637763654d6cae80dfd) )
 	ROM_LOAD16_BYTE( "110-00023-104.u97",  0x000001, 0x20000, CRC(715cac9d) SHA1(2aa0c563dc1fe4d02fa1ecbaed16f720f899fdc4) )
 
-	/* Video Graphics PCB (MPG DW-010-00002-002) */
+	// Video Graphics PCB (MPG DW-010-00002-002)
 	ROM_REGION16_LE( 0xc0000, "tms_gfx", 0 )
 	ROM_LOAD16_BYTE( "110-00023-105.u124", 0x000000, 0x20000, CRC(5482e0c4) SHA1(492afac1862f2899cd734d1e57ca978ed6a906d5) )
 	ROM_LOAD16_BYTE( "110-00023-106.u121", 0x000001, 0x20000, CRC(a55e5d19) SHA1(86fbcb425103ae9fff381357339af349848fc3f2) )
@@ -677,7 +678,7 @@ ROM_START( botss11 )
 	ROM_LOAD16_BYTE( "110-00023-103.u114", 0x080000, 0x20000, CRC(4e486e70) SHA1(04ee16cfadd43dbe9ed5bd8330c21a718d63a8f4) )
 	ROM_LOAD16_BYTE( "110-00023-102.u108", 0x080001, 0x20000, CRC(441e8490) SHA1(6cfe30cea3fa297b71e881fbddad6d65a96e4386) )
 
-	/* Sound PCB (MPG 010-00018-002) */
+	// Sound PCB (MPG 010-00018-002)
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "110-00014-001.u2", 0x000000, 0x08000, CRC(307fcb6d) SHA1(0cf63a39ac8920be6532974311804529d7218545) )
 

@@ -129,10 +129,7 @@ public:
 		: univ_slot_device(mconfig, tag, owner, clock)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 	univ_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 

@@ -77,9 +77,9 @@ public:
 	void mikie(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -106,18 +106,15 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void palettebank_w(uint8_t data);
-	void flipscreen_w(int state);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -211,12 +208,6 @@ void mikie_state::palettebank_w(uint8_t data)
 	}
 }
 
-void mikie_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-	machine().tilemap().mark_all_dirty();
-}
-
 TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)
 {
 	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x20) << 3);
@@ -253,11 +244,10 @@ void mikie_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			flipy = !flipy;
 		}
 
-
 		m_gfxdecode->gfx(gfxbank)->transpen(bitmap, cliprect,
-		code, color,
-		flipx, flipy,
-		sx, sy, 0);
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -268,8 +258,6 @@ uint32_t mikie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	return 0;
 }
-
-// machine
 
 /*************************************
  *
@@ -291,7 +279,7 @@ void mikie_state::sh_irqtrigger_w(int state)
 	if (state)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+		m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 	}
 }
 
@@ -474,13 +462,13 @@ void mikie_state::mikie(machine_config &config)
 	mainlatch.q_out_cb<1>().set(FUNC(mikie_state::coin_counter_w<1>)); // COIN2
 	mainlatch.q_out_cb<2>().set(FUNC(mikie_state::sh_irqtrigger_w)); // SOUNDON
 	mainlatch.q_out_cb<3>().set_nop(); // END (not used?)
-	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flipscreen_w)); // FLIP
+	mainlatch.q_out_cb<6>().set(FUNC(mikie_state::flip_screen_set)); // FLIP
 	mainlatch.q_out_cb<7>().set(FUNC(mikie_state::irq_mask_w)); // INT
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -621,7 +609,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Shinnyuushain Tooru-kun",      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mikiek,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "bootleg", "Shin-ip Sawon - Seok Dol-i",   MACHINE_SUPPORTS_SAVE ) // 新入社員 - 石돌이 (신입사원 - 석돌이)
-GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie (High School Graffiti)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikie,   0,     mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiej,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Shinnyuu Shain Tooru-kun (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mikiek,  mikie, mikie, mikie, mikie_state, empty_init, ROT270, "bootleg", "Shin-ip Sawon - Seok Dol-i (Korea)", MACHINE_SUPPORTS_SAVE ) // 新入社員 - 石돌이 (신입사원 - 석돌이)
+GAME( 1984, mikiehs, mikie, mikie, mikie, mikie_state, empty_init, ROT270, "Konami",  "Mikie (High School Graffiti)",       MACHINE_SUPPORTS_SAVE )

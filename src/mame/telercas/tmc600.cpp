@@ -34,7 +34,7 @@ HP14782-1
 |-------------------------------------------------------------------------------------------|
 
 Notes:
-    All IC's shown. TMCP-300 and TMC-700 expansions have been installed.
+    All IC's shown. TMCP-300 (audio output) and TMC-700 (RF video/printer) expansions have been installed.
 
     ROM0-5  - Toshiba TMM2732DI 4Kx8 EPROM
     ROM6    - Hitachi HN462732G 4Kx8 EPROM
@@ -48,6 +48,16 @@ Notes:
     CDP1870 - RCA CDP1870CE Video Interface System (VIS) Color Video (DOT XTAL at 5.6260MHz, CHROM XTAL at 8.867238MHz)
     CN1     - RF connector [TMC-700]
     CN2     - 10x2 pin printer connector [TMC-700]
+                    GND   1  2  D0
+                    GND   3  4  D1
+                    GND   5  6  D2
+                    GND   7  8  D3
+                    GND   9 10  D4
+                    GND  11 12  D5
+                    GND  13 14  D6
+                    GND  15 16  D7
+                    GND  17 18  BUSY
+                    GND  19 20  _STROBE
     CN3     - 32x3 pin EURO connector
     CN4     - DIN5D tape connector
                 1   input (500 mV / 47 Kohm)
@@ -70,7 +80,7 @@ Notes:
                 3   mono audio output
                 4   N/C
                 5   mono audio output
-    CN8     - 10x2 pin keyboard connector
+    CN8     - 10x2 pin keyboard connector PCB header
     SW1     - RUN/STOP switch (left=run, right=stop)
     SW2     - internal speaker/external audio switch [TMCP-300]
     P1      - color phase lock adjustment potentiometer
@@ -84,20 +94,235 @@ Notes:
     K2      - RF channel adjustment variable inductor (VHF I) [TMC-700]
     LS1     - loudspeaker
 
-*/
+    Designed by Hannu Peiponen and Timo Virtaneva.
 
-/*
 
-    TODO
+KB-76
 
-    - connect expansion bus
+|---------------------------------------------------------------------------------------------|
+|                                          |--CN1--|                                LED1      |
+|                                                                                             |
+| DEL   1!  2"  3#  4$  5%  6&  7'  8(  9)  0   -=  ^~  @\  BREAK       7   8   9   UP  ESC   |
+|                                                                                             |
+|   CTRL  Q   W   E   R   T   Y   U   I   O   P   Å   ;+  RETURN        4   5   6   RT  SW1   |
+|                                                                                             |
+|    SHIFT  A   S   D   F   G   H   J   K   L   Ö   Ä   :*  LINE        1   2   3   DN  CTRL  |
+|    LOCK                                                   FEED                              |
+|    SHIFT    Z   X   C   V   B   N   M   ,<  .>  /?  SHIFT             ,   0   .   LT  ALT   |
+|                                                                                       MODE  |
+|                          SPACE                                                              |
+|                                                                                             |
+|---------------------------------------------------------------------------------------------|
+
+Notes:
+
+    SW*     - RAFI RS 76 M (mould .516 / code 145 502) switch
+	SW1		- unmarked key
+    LED1    - red power on LED
+    CN1     - 10x2 pin keyboard connector PCB header, bottom side of PCB
 
 */
 
 #include "emu.h"
-#include "tmc600.h"
 
-#include "utf8.h"
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/tmc600/euro.h"
+#include "machine/cdp1852.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "sound/cdp1869.h"
+#include "sound/flt_rc.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
+#define SCREEN_TAG          "screen"
+#define CDP1802_TAG         "cdp1802"
+#define CDP1869_TAG         "cdp1869"
+#define CDP1852_KB_TAG      "cdp1852_kb"
+#define CDP1852_BUS_TAG     "cdp1852_bus"
+#define CDP1852_TMC700_TAG  "cdp1852_printer"
+#define CENTRONICS_TAG      "centronics"
+
+namespace {
+
+class tmc600_state : public driver_device
+{
+public:
+	tmc600_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_vis(*this, CDP1869_TAG),
+		m_bwio(*this, CDP1852_KB_TAG),
+		m_cassette(*this, "cassette"),
+		m_centronics(*this, "centronics"),
+		m_bus(*this, "bus"),
+		m_ram(*this, RAM_TAG),
+		m_char_rom(*this, "chargen"),
+		m_page_ram(*this, "page_ram"),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
+		m_run(*this, "RUN"),
+		m_key_row(*this, "Y%u", 0)
+	{ }
+
+	void tmc600(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1869_device> m_vis;
+	required_device<cdp1852_device> m_bwio;
+	required_device<cassette_image_device> m_cassette;
+	required_device<centronics_device> m_centronics;
+	required_device<tmc600_eurobus_slot_device> m_bus;
+	required_device<ram_device> m_ram;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_shared_ptr<uint8_t> m_page_ram;
+	memory_share_creator<uint8_t> m_color_ram;
+	required_ioport m_run;
+	required_ioport_array<8> m_key_row;
+
+	virtual void video_start() override ATTR_COLD;
+
+	uint8_t  rtc_r();
+	void printer_w(uint8_t data);
+	void vismac_register_w(uint8_t data);
+	void vismac_data_w(uint8_t data);
+	void page_ram_w(offs_t offset, uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	void sc_w(uint8_t data);
+	void out3_w(uint8_t data);
+	void prd_w(int state);
+
+	uint8_t get_color(uint16_t pma);
+
+	// video state
+	int m_vismac_reg_latch = 0;     // video register latch
+	int m_vismac_color_latch = 0;   // color latch
+	bool m_blink = false;                // cursor blink
+	int m_frame = 0;
+	bool m_rtc_int = false;
+	u8 m_out3 = 0;
+
+	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
+	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
+
+	void cdp1869_page_ram(address_map &map) ATTR_COLD;
+	void tmc600_io_map(address_map &map) ATTR_COLD;
+	void tmc600_map(address_map &map) ATTR_COLD;
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+};
+
+
+//**************************************************************************
+//  Video interface
+//**************************************************************************
+
+void tmc600_state::vismac_register_w(uint8_t data)
+{
+	m_vismac_reg_latch = data >> 4;
+}
+
+void tmc600_state::vismac_data_w(uint8_t data)
+{
+	uint16_t ma = m_maincpu->get_memory_address();
+
+	switch (m_vismac_reg_latch & 0x07)
+	{
+	case 2: m_vismac_color_latch = data & 0x0f; break;
+	case 3: m_vis->out3_w(data); break;
+	case 4: m_vis->out4_w(ma); break;
+	case 5: m_vis->out5_w(ma); break;
+	case 6: m_vis->out6_w(ma); break;
+	case 7: m_vis->out7_w(ma); break;
+	}
+}
+
+uint8_t tmc600_state::get_color(uint16_t pma)
+{
+	uint16_t pageaddr = pma & 0x3ff;
+	uint8_t color = m_color_ram[pageaddr];
+
+	if (BIT(color, 3) && m_blink)
+	{
+		color ^= 0x07;
+	}
+
+	return color;
+}
+
+void tmc600_state::page_ram_w(offs_t offset, uint8_t data)
+{
+	m_page_ram[offset] = data;
+	m_color_ram[offset] = m_vismac_color_latch;
+}
+
+void tmc600_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x3ff).mirror(0x400).ram().share("page_ram").w(FUNC(tmc600_state::page_ram_w));
+}
+
+CDP1869_CHAR_RAM_READ_MEMBER( tmc600_state::tmc600_char_ram_r )
+{
+	uint16_t pageaddr = pma & 0x3ff;
+	uint8_t color = get_color(pageaddr);
+	uint16_t charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
+	uint8_t cdb = m_char_rom[charaddr] & 0x3f;
+
+	int ccb0 = BIT(color, 2);
+	int ccb1 = BIT(color, 1);
+
+	return (ccb1 << 7) | (ccb0 << 6) | cdb;
+}
+
+CDP1869_PCB_READ_MEMBER( tmc600_state::tmc600_pcb_r )
+{
+	uint16_t pageaddr = pma & 0x3ff;
+	uint8_t color = get_color(pageaddr);
+
+	return BIT(color, 0);
+}
+
+void tmc600_state::prd_w(int state)
+{
+	m_maincpu->ef1_w(state);
+
+	if (!state) {
+		m_frame++;
+
+		switch (m_frame) {
+		case 8:
+			m_maincpu->int_w(CLEAR_LINE);
+			break;
+
+		case 16:
+			m_maincpu->int_w(m_rtc_int);
+			m_blink = !m_blink;
+			m_frame = 0;
+			break;
+		}
+	}
+}
+
+void tmc600_state::video_start()
+{
+	// state saving
+	save_item(NAME(m_vismac_reg_latch));
+	save_item(NAME(m_vismac_color_latch));
+	save_item(NAME(m_blink));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_rtc_int));
+	save_item(NAME(m_out3));
+}
+
+//**************************************************************************
+//  I/O
+//**************************************************************************
 
 uint8_t tmc600_state::rtc_r()
 {
@@ -121,11 +346,66 @@ void tmc600_state::printer_w(uint8_t data)
 	m_centronics->write_strobe(1);
 }
 
-/* Memory Maps */
+int tmc600_state::ef2_r()
+{
+	return m_cassette->input() < 0;
+}
+
+int tmc600_state::ef3_r()
+{
+	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
+}
+
+void tmc600_state::q_w(int state)
+{
+	m_cassette->output(state ? +1.0 : -1.0);
+}
+
+void tmc600_state::sc_w(uint8_t data)
+{
+	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
+		m_maincpu->int_w(CLEAR_LINE);
+	}
+}
+
+void tmc600_state::out3_w(uint8_t data)
+{
+	m_out3 = data;
+}
+
+QUICKLOAD_LOAD_MEMBER(tmc600_state::quickload_cb)
+{
+	int size = image.length();
+
+	if (size < 16)
+		return std::make_pair(image_error::INVALIDLENGTH, "Image is too short");
+
+	if ((size - 16) > (m_ram->size() - 0x300))
+		return std::make_pair(image_error::INVALIDLENGTH, "Image is larger than RAM");
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	image.fseek(0x5, SEEK_SET);
+	image.fread(program.get_write_ptr(0x6181), 4); // DEFUS and EOP
+	image.fread(program.get_write_ptr(0x6192), 4); // STRING and ARRAY
+
+	image.fseek(0x9, SEEK_SET);
+	image.fread(program.get_write_ptr(0x6199), 2); // EOD
+
+	image.fseek(0xf, SEEK_SET);
+	image.fread(program.get_write_ptr(0x6300), size); // program
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 void tmc600_state::tmc600_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
+	map(0x0000, 0x5fff).rom().nopw();
 	map(0x6000, 0x7fff).ram();
 	map(0xf400, 0xf7ff).m(m_vis, FUNC(cdp1869_device::char_map));
 	map(0xf800, 0xffff).m(m_vis, FUNC(cdp1869_device::page_map));
@@ -136,11 +416,13 @@ void tmc600_state::tmc600_io_map(address_map &map)
 	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
 	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
 	map(0x05, 0x05).rw(FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
-//  map(0x06, 0x06).w(FUNC(tmc600_state::floppy_w);
 	map(0x07, 0x07).w(FUNC(tmc600_state::vismac_register_w));
 }
 
-/* Input Ports */
+
+//**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
 
 static INPUT_PORTS_START( tmc600 )
 	PORT_START("Y0")
@@ -197,9 +479,9 @@ static INPUT_PORTS_START( tmc600 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x85") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00C5)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x84") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x96") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'Å')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'Ä')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'Ö')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END),3)
 
@@ -217,51 +499,42 @@ static INPUT_PORTS_START( tmc600 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("(unknown)") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CHAR(10)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_TOGGLE PORT_WRITE_LINE_DEVICE_MEMBER(CDP1802_TAG, cosmac_device, clear_w)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Run/Stop") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_TOGGLE PORT_WRITE_LINE_DEVICE_MEMBER(CDP1802_TAG, FUNC(cosmac_device::clear_w))
 INPUT_PORTS_END
 
-/* CDP1802 Interface */
 
-int tmc600_state::ef2_r()
+//**************************************************************************
+//  MACHINE DRIVERS
+//**************************************************************************
+
+static const gfx_layout tmc600_charlayout =
 {
-	return m_cassette->input() < 0;
-}
+	6, 9,                   // 6 x 9 characters
+	256,                    // 256 characters
+	1,                      // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
+	{ 2, 3, 4, 5, 6, 7 },
+	// y offsets
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8 },
+	8*8                     // every char takes 8 x 8 bytes
+};
 
-int tmc600_state::ef3_r()
-{
-	return !BIT(m_key_row[(m_out3 >> 3) & 0x07]->read(), m_out3 & 0x07);
-}
-
-void tmc600_state::q_w(int state)
-{
-	m_cassette->output(state ? +1.0 : -1.0);
-}
-
-void tmc600_state::sc_w(uint8_t data)
-{
-	if (data == COSMAC_STATE_CODE_S3_INTERRUPT) {
-		m_maincpu->int_w(CLEAR_LINE);
-	}
-}
-
-void tmc600_state::out3_w(uint8_t data)
-{
-	m_out3 = data;
-}
-
-/* Machine Drivers */
+static GFXDECODE_START( gfx_tmc600 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
+GFXDECODE_END
 
 void tmc600_state::tmc600(machine_config &config)
 {
 	// CPU
-	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, 3.57_MHz_XTAL));
+	cdp1802_device &cpu(CDP1802(config, CDP1802_TAG, XTAL(3'579'545)));
 	cpu.set_addrmap(AS_PROGRAM, &tmc600_state::tmc600_map);
 	cpu.set_addrmap(AS_IO, &tmc600_state::tmc600_io_map);
 	cpu.wait_cb().set_constant(1);
@@ -272,19 +545,33 @@ void tmc600_state::tmc600(machine_config &config)
 	cpu.tpb_cb().set(CDP1852_KB_TAG, FUNC(cdp1852_device::clock_w));
 	cpu.tpb_cb().append(CDP1852_TMC700_TAG, FUNC(cdp1852_device::clock_w));
 
-	// sound and video hardware
-	tmc600_video(config);
+	// video hardware
+	GFXDECODE(config, "gfxdecode", CDP1869_TAG":palette", gfx_tmc600);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	CDP1869(config, m_vis, XTAL(3'579'545), &tmc600_state::cdp1869_page_ram);
+	m_vis->add_pal_screen(config, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL);
+	m_vis->set_color_clock(cdp1869_device::COLOR_CLK_PAL);
+	m_vis->set_pcb_read_callback(FUNC(tmc600_state::tmc600_pcb_r));
+	m_vis->set_char_ram_read_callback(FUNC(tmc600_state::tmc600_char_ram_r));
+	m_vis->pal_ntsc_callback().set_constant(1);
+	m_vis->prd_callback().set(FUNC(tmc600_state::prd_w));
+	m_vis->set_screen(SCREEN_TAG);
+	// the SOUND pin is coupled through a capacitor, and its R/2R ladder has an
+	// output impedance of 2.5R (R ~ 2 kOhm), giving a first order high pass at
+	// ~3.2 kHz as measured from a recording of the real machine
+	m_vis->add_route(ALL_OUTPUTS, "sndfilter", 0.1);
+	FILTER_RC(config, "sndfilter").set_rc(filter_rc_device::HIGHPASS, 5000, 0, 0, CAP_N(10)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// keyboard output latch
 	CDP1852(config, m_bwio); // clock is CDP1802 TPB
 	m_bwio->mode_cb().set_constant(1);
 	m_bwio->do_cb().set(FUNC(tmc600_state::out3_w));
 
-#if 0
 	// address bus demux for expansion bus
 	cdp1852_device &demux(CDP1852(config, CDP1852_BUS_TAG)); // clock is expansion bus TPA
 	demux.mode_cb().set_constant(0);
-#endif
 
 	// printer output latch
 	cdp1852_device &prtout(CDP1852(config, CDP1852_TMC700_TAG)); // clock is CDP1802 TPB
@@ -299,14 +586,27 @@ void tmc600_state::tmc600(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
+	// quickload
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "tmc600"));
+	quickload.set_load_callback(FUNC(tmc600_state::quickload_cb));
+	quickload.set_interface("tmc600_quik");
+
 	// expansion bus connector
 	TMC600_EUROBUS_SLOT(config, m_bus, tmc600_eurobus_cards, nullptr);
+	m_bus->set_memspace(CDP1802_TAG, AS_PROGRAM);
+	m_bus->set_iospace(CDP1802_TAG, AS_IO);
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("8K");
+
+	// software lists
+	SOFTWARE_LIST(config, "quik_list").set_original("tmc600_quik");
 }
 
-/* ROMs */
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 #if 0
 ROM_START( tmc600s1 )
@@ -342,7 +642,12 @@ ROM_START( tmc600s2 )
 	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
 ROM_END
 
-/* System Drivers */
+} // anonymous namespace
+
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
+
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
-//COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_NOT_WORKING )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_SUPPORTS_SAVE )

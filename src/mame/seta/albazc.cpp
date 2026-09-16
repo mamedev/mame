@@ -45,7 +45,7 @@ private:
 	void out_2_w(uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<x1_001_device> m_sprites;
@@ -53,8 +53,6 @@ private:
 };
 
 
-
-// video
 
 void albazc_state::palette(palette_device &palette) const
 {
@@ -167,7 +165,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_START("IN2")   // 0xe002
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME("Data Clear")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // "Medal In"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r)) // "Medal In"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ext In 2")
@@ -184,7 +182,7 @@ static INPUT_PORTS_START( hanaroku )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Flip_Screen ) )  // Stored at 0xc03a
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -229,10 +227,10 @@ void albazc_state::hanaroku(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

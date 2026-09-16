@@ -85,12 +85,13 @@ void ide_device::device_reset()
 
 uint8_t ide_device::read(offs_t offset)
 {
+	PAIR16 data; data.w = 0xffff;
 	if (offset < 8) {
-		return command_r(offset);
+		command_r(offset, data);
 	} else if (offset == 14 || offset == 15) {
-		return control_r(offset & 7);
+		control_r(offset & 7, data);
 	}
-	return 0xff;
+	return data.b.l;
 }
 
 void ide_device::write(offs_t offset, uint8_t data)
@@ -104,7 +105,7 @@ void ide_device::write(offs_t offset, uint8_t data)
 
 void ide_device::map(address_map &map)
 {
-	map(0x00, 0x0f).rw(FUNC(ide_device::read), FUNC(ide_device::write));
+	map(0x00, 0x0f).mirror(0xff00).rw(FUNC(ide_device::read), FUNC(ide_device::write));
 }
 
 } // namespace bus::epson_qx

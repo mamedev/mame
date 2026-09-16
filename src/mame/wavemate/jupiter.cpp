@@ -63,10 +63,10 @@ public:
 	void init_jupiter2();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void jupiter2_mem(address_map &map);
+	void jupiter2_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia0;
@@ -89,7 +89,7 @@ public:
 	void init_jupiter3();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,8 +98,8 @@ private:
 	uint8_t key_r();
 	uint8_t ff_r();
 
-	void jupiter3_io(address_map &map);
-	void jupiter3_mem(address_map &map);
+	void jupiter3_io(address_map &map) ATTR_COLD;
+	void jupiter3_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0U;
 	required_device<cpu_device> m_maincpu;
@@ -335,7 +335,7 @@ void jupiter3_state::jupiter3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jupiter3_state::jupiter3_io);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(jupiter3_state::screen_update));
@@ -350,7 +350,7 @@ void jupiter3_state::jupiter3(machine_config &config)
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram

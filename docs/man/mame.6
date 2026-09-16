@@ -578,25 +578,17 @@ Enable cropping of artwork to the game screen area only. This
 option can also be controlled via the Video Options menu in the user
 interface. The default is OFF (\-noartwork_crop).
 .TP
-.B \-[no]use_backdrops, \-[no]backdrop
-Enables/disables the display of backdrops. The default is ON
-(\-use_backdrops).
+.B \-fallback_artwork \fIartworkname
+Specifies fallback artwork if no external artwork or internal driver layout
+is defined. If external artwork for the system is present or a layout is
+included in the driver for the system, then that will take precedence.
 .TP
-.B \-[no]use_overlays, \-[no]overlay
-Enables/disables the display of overlays. The default is ON
-(\-use_overlays).
+.B \-override_artwork \fIartworkname
+Specifies override artwork for external artwork and internal driver layout.
 .TP
-.B \-[no]use_bezels, \-[no]bezel
-Enables/disables the display of bezels. The default is ON
-(\-use_bezels).
-.TP
-.B \-[no]use_cpanels, \-[no]cpanel
-Enables/disables the display of cpanels. The default is ON
-(\-use_bezels).
-.TP
-.B \-[no]use_marquees, \-[no]marquee
-Enables/disables the display of marquees. The default is ON
-(\-use_bezels).
+.B \-artwork_font, \-artfont \fIfontname
+Specifies the name of a font file to use for artwork text elements.
+The specifics are the same as the \-uifont option.
 .\"
 .\" *******************************************************
 .SS Screen options
@@ -745,7 +737,7 @@ Default is OFF (\-nosyncrefresh).
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .B NOTE:
-All the options in this group are available only with softare video
+All the options in this group are available only with software video
 rendering subsystem, i.e \fB\-video soft\fR.
 .TP
 .B \-prescale\fR [\fIvalue\fR]
@@ -907,7 +899,7 @@ Split full screen image across monitors. Default is OFF (\-nouseallheads).
 .SS Sound options
 .\" *******************************************************
 .TP
-.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIdsound\fR|\fIxaudio2\fR|\fInone\fR]
+.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIwasapi\fR|\fIxaudio2\fR|\fInone\fR]
 Specifies which sound subsystem to use for audio output:
 .br
 \fBsdl\fR  uses the Simple DirectMedia Layer audio output system
@@ -916,17 +908,18 @@ Specifies which sound subsystem to use for audio output:
 \fBportaudio\fR  uses the PortAudio library which supports low-latency
 output and multiple audio APIs.
 .br
-\fBcoreaudio\fR  uses the Core Audio API which supports low-latency
-output and AudioUnit effects (only available on macOS).
+\fBcoreaudio\fR  uses the CoreAudio API (supports AudioUnit effects, only
+available on macOS).
 .br
-\fBdsound\fR  uses the DirectSound API (only available on Windows).
+\fBwasapi\fR  uses the Windows Audio Session API (WASAPI) (only available
+on Windows).
 .br
-\fBxaudio2\fR  uses the XAudio2 API which supports low-latency output
-(only available on Windows).
+\fBxaudio2\fR  uses the XAudio2 API (does not support sound input, only
+available on Windows).
 .br
 \fBnone\fR  produces no audio output.
 .br
-Default is 'dsound' on Windows, 'coreaudio' on macOS or 'sdl' on other
+Default is 'wasapi' on Windows, 'coreaudio' on macOS or 'sdl' on other
 platforms.
 .TP
 .B \-samplerate, \-srf \fIvalue
@@ -938,32 +931,27 @@ cause higher audio quality but slower emulation speed. The default is
 .B \-[no]samples
 Use samples if available. The default is ON (\-samples).
 .TP
-.B \-[no]compressor
-Enable audio compressor. It temporarily reduces the overall volume when
-the audio output is overdriven. The default is ON (\-compressor).
-.TP
 .B \-volume, \-vol \fIvalue
 Sets the startup volume. It can later be changed with the user interface
-(see Keys section). The volume is an attenuation in dB: e.g.,
+(see Keys section). The volume is in dB: e.g.,
 "\-volume \-12" will start with \-12dB attenuation. The default is 0.
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-audio_latency \fIvalue
+.B \-audio_latency, \-alat \fIvalue
 This controls the amount of latency built into the audio streaming.
-The exact behavior depends on the selected audio output module (see
-the \-sound option).  Smaller values provide less audio delay while
-requiring better system performance.  Higher values increase audio
-delay but may help avoid buffer under-runs and audio interruptions.
-The default is 1.
+Smaller values provide less audio delay while requiring better system
+performance.  Higher values increase audio delay but may help avoid
+buffer under-runs and audio interruptions.  The default is 0 and will
+pick a sane duration.
 .\"
 .\" *******************************************************
 .SS Input options
 .\" *******************************************************
 .TP
 .B \-[no]coin_lockout, \-[no]coinlock
-Enables simulation of the "coin lockout" feature that is implmeneted
+Enables simulation of the "coin lockout" feature that is implemented
 on a number of game PCBs. It was up to the operator whether or not
 the coin lockout outputs were actually connected to the coin
 mechanisms. If this feature is enabled, then attempts to enter a coin
@@ -1172,7 +1160,7 @@ information. The default is OFF (\-noverbose).
 .TP
 .B \-[no]update_in_pause
 Enables updating the screen bitmap while the game is paused. This is
-useful for debuggin in some scenarios (and gets in the way in others).
+useful for debugging in some scenarios (and gets in the way in others).
 Default is OFF (\-noupdate_in_pause).
 .TP
 .B \-[no]debug, \-[no]d
@@ -1257,9 +1245,6 @@ the OSD\-determined default font).
 .TP
 .B \-ui \fIsimple\fR|\fIcabinet
 Type of UI.
-.TP
-.B \-ramsize, \-ram \fIvalue
-Size of RAM (if supported by driver).
 .TP
 .B \-[no]confirm_quit
 Display confirm quit screen on exit. Default is ON (\-confirm_quit).

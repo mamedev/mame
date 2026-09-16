@@ -66,12 +66,10 @@ public:
 		, m_dac(*this, "dac")
 		, m_dac2(*this, "dac2")
 		, m_digits(*this, "digit%d", 0U)
-		{ }
+	{ }
 
-	void barni(machine_config &config);
-	void audiocpu_map(address_map &map);
-	void maincpu_map(address_map &map);
-	void subcpu_map(address_map &map);
+	void barni(machine_config &config) ATTR_COLD;
+
 private:
 	u8 soundcmd_r();
 	u8 set_firq();
@@ -81,11 +79,15 @@ private:
 	void pias1_pb_w(u8);
 	void pias2_pb_w(u8);
 	void showseg(u8, u8);
+
+	void audiocpu_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
+
 	u8 m_via_pa = 0U;
 	u8 m_bitcount = 0U;
 	u8 m_soundcmd = 0U;
-	//void machine_reset() override;
-	void machine_start() override { m_digits.resolve(); }
+	//void machine_reset() override ATTR_COLD;
 	required_device<mc6809e_device> m_maincpu;
 	required_device<mc6809e_device> m_subcpu;
 	required_device<m6802_cpu_device> m_audiocpu;
@@ -310,5 +312,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, champion, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Champion 85",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1985, redbarnp, 0, barni, barni, barni_state, empty_init, ROT0, "Barni", "Red Baron (Pinball)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

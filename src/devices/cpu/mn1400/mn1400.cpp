@@ -136,5 +136,6 @@ void mn1400_cpu_device::execute_one()
 
 			}
 			break; // 0xfc
-	}
+
+	} // 0xf0
 }

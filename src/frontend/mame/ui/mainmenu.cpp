@@ -12,6 +12,8 @@
 #include "ui/mainmenu.h"
 
 #include "ui/about.h"
+#include "ui/audioeffects.h"
+#include "ui/audiomix.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/confswitch.h"
@@ -40,6 +42,7 @@
 #include "dinetwork.h"
 #include "dipty.h"
 #include "emuopts.h"
+#include "sound.h"
 
 
 namespace ui {
@@ -51,11 +54,12 @@ enum : unsigned {
 	BOOKKEEPING,
 	GAME_INFO,
 	WARN_INFO,
-	IMAGE_MENU_IMAGE_INFO,
 	IMAGE_MENU_FILE_MANAGER,
 	TAPE_CONTROL,
 	SLOT_DEVICES,
 	NETWORK_DEVICES,
+	AUDIO_MIXER,
+	AUDIO_EFFECTS,
 	SLIDERS,
 	VIDEO_TARGETS,
 	CROSSHAIR,
@@ -65,8 +69,7 @@ enum : unsigned {
 	BARCODE_READ,
 	PTY_INFO,
 	EXTERNAL_DATS,
-	ADD_FAVORITE,
-	REMOVE_FAVORITE,
+	FAVORITE,
 	ABOUT,
 	QUIT_GAME,
 	DISMISS,
@@ -81,8 +84,8 @@ enum : unsigned {
     menu_main constructor/destructor
 -------------------------------------------------*/
 
-menu_main::menu_main(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_main::menu_main(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 	, m_phase(machine_phase::PREINIT)
 {
 	set_needs_prev_menu_item(false);
@@ -123,22 +126,17 @@ void menu_main::populate()
 
 	item_append(_("menu-main", "System Information"), 0, (void *)GAME_INFO);
 
-	if (ui().found_machine_warnings())
+	if (ui().machine_info().has_warnings())
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
-		if (image.user_loadable())
-		{
-			item_append(_("menu-main", "Media Image Information"), 0, (void *)IMAGE_MENU_IMAGE_INFO);
-			break;
-		}
-
-	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
+	{
 		if (image.user_loadable() || image.has_preset_images_selection())
 		{
-			item_append(_("menu-main", "File Manager"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
+			item_append(_("menu-main", "Media Control"), 0, (void *)IMAGE_MENU_FILE_MANAGER);
 			break;
 		}
+	}
 
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Tape Control"), 0, (void *)TAPE_CONTROL);
@@ -158,7 +156,16 @@ void menu_main::populate()
 	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Network Devices"), 0, (void*)NETWORK_DEVICES);
 
-	item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
+	if (!machine().sound().no_sound() && sound_interface_enumerator(machine().root_device()).first() != nullptr)
+	{
+		item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
+
+		item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
+	}
+
+	// FIXME: should also check for OSD sliders (same for tilde menu)
+	if (!ui().get_slider_list().empty())
+		item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
 
 	item_append(_("menu-main", "Video Options"), 0, (void *)VIDEO_TARGETS);
 
@@ -166,7 +173,7 @@ void menu_main::populate()
 		item_append(_("menu-main", "Crosshair Options"), 0, (void *)CROSSHAIR);
 
 	if (machine().options().cheat())
-		item_append(_("menu-main", "Cheat"), 0, (void *)CHEAT);
+		item_append(_("menu-main", "Cheat Options"), 0, (void *)CHEAT);
 
 	if (machine_phase::RESET <= m_phase)
 	{
@@ -180,9 +187,9 @@ void menu_main::populate()
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!mame_machine_manager::instance()->favorite().is_favorite(machine()))
-		item_append(_("menu-main", "Add To Favorites"), 0, (void *)ADD_FAVORITE);
+		item_append(_("menu-main", "Add To Favorites"), 0, (void *)FAVORITE);
 	else
-		item_append(_("menu-main", "Remove From Favorites"), 0, (void *)REMOVE_FAVORITE);
+		item_append(_("menu-main", "Remove From Favorites"), 0, (void *)FAVORITE);
 
 	item_append(menu_item_type::SEPARATOR);
 
@@ -190,7 +197,7 @@ void menu_main::populate()
 
 	item_append(menu_item_type::SEPARATOR);
 
-//  item_append(_("menu-main", "Quit from System"), 0, (void *)QUIT_GAME);
+//  item_append(_("menu-main", "Quit From System"), 0, (void *)QUIT_GAME);
 
 	if (machine_phase::INIT == m_phase)
 	{
@@ -216,105 +223,110 @@ bool menu_main::handle(event const *ev)
 		switch (uintptr_t(ev->itemref))
 		{
 		case INPUT_OPTIONS:
-			menu::stack_push<menu_input_options>(ui(), container());
+			menu::stack_push<menu_input_options>(ui(), target());
 			break;
 
 		case SETTINGS_DIP_SWITCHES:
-			menu::stack_push<menu_settings_dip_switches>(ui(), container());
+			menu::stack_push<menu_settings_dip_switches>(ui(), target());
 			break;
 
 		case SETTINGS_DRIVER_CONFIG:
-			menu::stack_push<menu_settings_machine_config>(ui(), container());
+			menu::stack_push<menu_settings_machine_config>(ui(), target());
 			break;
 
 		case BOOKKEEPING:
-			menu::stack_push<menu_bookkeeping>(ui(), container());
+			menu::stack_push<menu_bookkeeping>(ui(), target());
 			break;
 
 		case GAME_INFO:
-			menu::stack_push<menu_game_info>(ui(), container());
+			menu::stack_push<menu_game_info>(ui(), target());
 			break;
 
 		case WARN_INFO:
-			menu::stack_push<menu_warn_info>(ui(), container());
-			break;
-
-		case IMAGE_MENU_IMAGE_INFO:
-			menu::stack_push<menu_image_info>(ui(), container());
+			menu::stack_push<menu_warn_info>(ui(), target());
 			break;
 
 		case IMAGE_MENU_FILE_MANAGER:
-			menu::stack_push<menu_file_manager>(ui(), container(), nullptr);
+			menu::stack_push<menu_file_manager>(ui(), target(), std::string());
 			break;
 
 		case TAPE_CONTROL:
-			menu::stack_push<menu_tape_control>(ui(), container(), nullptr);
+			menu::stack_push<menu_tape_control>(ui(), target(), nullptr);
 			break;
 
 		case PTY_INFO:
-			menu::stack_push<menu_pty_info>(ui(), container());
+			menu::stack_push<menu_pty_info>(ui(), target());
 			break;
 
 		case SLOT_DEVICES:
-			menu::stack_push<menu_slot_devices>(ui(), container());
+			menu::stack_push<menu_slot_devices>(ui(), target());
 			break;
 
 		case NETWORK_DEVICES:
-			menu::stack_push<menu_network_devices>(ui(), container());
+			menu::stack_push<menu_network_devices>(ui(), target());
+			break;
+
+		case AUDIO_MIXER:
+			menu::stack_push<menu_audio_mixer>(ui(), target());
+			break;
+
+		case AUDIO_EFFECTS:
+			menu::stack_push<menu_audio_effects>(ui(), target());
 			break;
 
 		case SLIDERS:
-			menu::stack_push<menu_sliders>(ui(), container(), false);
+			menu::stack_push<menu_sliders>(ui(), target(), false);
 			break;
 
 		case VIDEO_TARGETS:
-			menu::stack_push<menu_video_targets>(ui(), container());
+			menu::stack_push<menu_video_targets>(ui(), target());
 			break;
 
 		case CROSSHAIR:
-			menu::stack_push<menu_crosshair>(ui(), container());
+			menu::stack_push<menu_crosshair>(ui(), target());
 			break;
 
 		case CHEAT:
-			menu::stack_push<menu_cheat>(ui(), container());
+			menu::stack_push<menu_cheat>(ui(), target());
 			break;
 
 		case PLUGINS:
-			menu::stack_push<menu_plugin>(ui(), container());
+			menu::stack_push<menu_plugin>(ui(), target());
 			break;
 
 		case SELECT_GAME:
 			if (machine().options().ui() == emu_options::UI_SIMPLE)
-				menu::stack_push<simple_menu_select_game>(ui(), container(), nullptr);
+				menu::stack_push<simple_menu_select_game>(ui(), target(), nullptr);
 			else
-				menu::stack_push<menu_select_game>(ui(), container(), nullptr);
+				menu::stack_push<menu_select_game>(ui(), target(), nullptr);
 			break;
 
 		case ABOUT:
-			menu::stack_push<menu_about>(ui(), container());
+			menu::stack_push<menu_about>(ui(), target());
 			break;
 
 		case BIOS_SELECTION:
-			menu::stack_push<menu_bios_selection>(ui(), container());
+			menu::stack_push<menu_bios_selection>(ui(), target());
 			break;
 
 		case BARCODE_READ:
-			menu::stack_push<menu_barcode_reader>(ui(), container(), nullptr);
+			menu::stack_push<menu_barcode_reader>(ui(), target(), nullptr);
 			break;
 
 		case EXTERNAL_DATS:
-			menu::stack_push<menu_dats_view>(ui(), container());
+			menu::stack_push<menu_dats_view>(ui(), target());
 			break;
 
-		case ADD_FAVORITE:
-			mame_machine_manager::instance()->favorite().add_favorite(machine());
+		case FAVORITE:
+		{
+			favorite_manager &mfav = mame_machine_manager::instance()->favorite();
+			if (mfav.is_favorite(machine()))
+				mfav.remove_favorite(machine());
+			else
+				mfav.add_favorite(machine());
 			reset(reset_options::REMEMBER_REF);
 			break;
-
-		case REMOVE_FAVORITE:
-			mame_machine_manager::instance()->favorite().remove_favorite(machine());
-			reset(reset_options::REMEMBER_REF);
-			break;
+		}
 
 		case QUIT_GAME:
 			stack_pop();

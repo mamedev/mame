@@ -6,6 +6,10 @@
 
 *************************************************************************/
 
+#include "vicdual_a.h"
+#include "vicdual-97271p.h"
+#include "vicdual-97269pb.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/pit8253.h"
 #include "machine/timer.h"
@@ -13,10 +17,8 @@
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+
 #include "screen.h"
-#include "vicdual_a.h"
-#include "vicdual-97271p.h"
-#include "vicdual-97269pb.h"
 
 class vicdual_state : public driver_device
 {
@@ -27,7 +29,6 @@ public:
 		m_samples(*this, "samples"),
 		m_discrete(*this, "discrete"),
 		m_coinstate_timer(*this, "coinstate"),
-		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
 		m_vicdual_sound(*this, "vicdual_sound"),
 		m_proms(*this, "proms"),
@@ -83,7 +84,6 @@ protected:
 	optional_device<samples_device> m_samples;
 	optional_device<discrete_sound_device> m_discrete;
 	required_device<timer_device> m_coinstate_timer;
-	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
 	optional_device<vicdual_audio_device_base> m_vicdual_sound;
 	optional_memory_region m_proms;
@@ -142,25 +142,20 @@ protected:
 	uint8_t invinco_io_r(offs_t offset);
 	void invinco_io_w(offs_t offset, uint8_t data);
 
-	/*----------- defined in audio/vicdual.cpp -----------*/
-	void headon_audio_w(uint8_t data);
-	void invho2_audio_w(uint8_t data);
-
-	/*----------- defined in audio/depthch.cpp -----------*/
 	void depthch_audio_w(uint8_t data);
-
-	/*----------- defined in audio/invinco.cpp -----------*/
 	void invinco_audio_w(uint8_t data);
-
-	/*----------- defined in audio/pulsar.cpp -----------*/
 	void pulsar_audio_1_w(uint8_t data);
 	void pulsar_audio_2_w(uint8_t data);
+
+	//----------- defined in audio/vicdual.cpp -----------
+	void headon_audio_w(uint8_t data);
+	void invho2_audio_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
 	DECLARE_MACHINE_START(samurai);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -169,34 +164,34 @@ protected:
 	int is_cabinet_color();
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen);
 
-	void alphaho_io_map(address_map &map);
-	void brdrline_io_map(address_map &map);
-	void carhntds_dualgame_map(address_map &map);
-	void carhntds_io_map(address_map &map);
-	void depthch_io_map(address_map &map);
-	void depthch_map(address_map &map);
-	void digger_io_map(address_map &map);
-	void frogs_io_map(address_map &map);
-	void frogs_map(address_map &map);
-	void headon2_io_map(address_map &map);
-	void headon2_map(address_map &map);
-	void headon_io_map(address_map &map);
-	void headon_map(address_map &map);
-	void headonn_io_map(address_map &map);
-	void heiankyo_io_map(address_map &map);
-	void invds_io_map(address_map &map);
-	void invho2_io_map(address_map &map);
-	void invinco_io_map(address_map &map);
-	void invinco_map(address_map &map);
-	void pulsar_io_map(address_map &map);
-	void safari_io_map(address_map &map);
-	void safari_map(address_map &map);
-	void samurai_io_map(address_map &map);
-	void samurai_map(address_map &map);
-	void spacetrk_io_map(address_map &map);
-	void sspacaho_io_map(address_map &map);
-	void sspaceat_io_map(address_map &map);
-	void vicdual_dualgame_map(address_map &map);
+	void alphaho_io_map(address_map &map) ATTR_COLD;
+	void brdrline_io_map(address_map &map) ATTR_COLD;
+	void carhntds_dualgame_map(address_map &map) ATTR_COLD;
+	void carhntds_io_map(address_map &map) ATTR_COLD;
+	void depthch_io_map(address_map &map) ATTR_COLD;
+	void depthch_map(address_map &map) ATTR_COLD;
+	void digger_io_map(address_map &map) ATTR_COLD;
+	void frogs_io_map(address_map &map) ATTR_COLD;
+	void frogs_map(address_map &map) ATTR_COLD;
+	void headon2_io_map(address_map &map) ATTR_COLD;
+	void headon2_map(address_map &map) ATTR_COLD;
+	void headon_io_map(address_map &map) ATTR_COLD;
+	void headon_map(address_map &map) ATTR_COLD;
+	void headonn_io_map(address_map &map) ATTR_COLD;
+	void heiankyo_io_map(address_map &map) ATTR_COLD;
+	void invds_io_map(address_map &map) ATTR_COLD;
+	void invho2_io_map(address_map &map) ATTR_COLD;
+	void invinco_io_map(address_map &map) ATTR_COLD;
+	void invinco_map(address_map &map) ATTR_COLD;
+	void pulsar_io_map(address_map &map) ATTR_COLD;
+	void safari_io_map(address_map &map) ATTR_COLD;
+	void safari_map(address_map &map) ATTR_COLD;
+	void samurai_io_map(address_map &map) ATTR_COLD;
+	void samurai_map(address_map &map) ATTR_COLD;
+	void spacetrk_io_map(address_map &map) ATTR_COLD;
+	void sspacaho_io_map(address_map &map) ATTR_COLD;
+	void sspaceat_io_map(address_map &map) ATTR_COLD;
+	void vicdual_dualgame_map(address_map &map) ATTR_COLD;
 };
 
 class tranqgun_state : public vicdual_state
@@ -210,17 +205,17 @@ public:
 	void tranqgun(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void tranqgun_io_map(address_map &map);
+	void tranqgun_io_map(address_map &map) ATTR_COLD;
 	void tranqgun_io_w(offs_t offset, uint8_t data);
 
 	uint8_t tranqgun_prot_r(offs_t offset);
 	void tranqgun_prot_w(offs_t offset, uint8_t data);
 
-	void brdrlinet_dualgame_map(address_map &map);
-	void tranqgun_dualgame_map(address_map &map);
+	void brdrlinet_dualgame_map(address_map &map) ATTR_COLD;
+	void tranqgun_dualgame_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_tranqgun_prot_return = 0;
 
@@ -234,31 +229,44 @@ public:
 	nsub_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vicdual_state(mconfig, type, tag),
 		m_s97269pb(*this,"s97269pb"),
-		m_s97271p(*this,"s97271p")
+		m_s97271p(*this,"s97271p"),
+		m_nsub_coinage_timer(*this, "nsub_coin")
 	{ }
 
 	void nsub(machine_config &config);
+	void nsubc(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<s97269pb_device> m_s97269pb;
 	required_device<s97271p_device> m_s97271p;
+	optional_device<timer_device> m_nsub_coinage_timer;
 
 	int m_nsub_coin_counter = 0;
 	int m_nsub_play_counter = 0;
+	uint8_t m_prot_value = 0;
 
 	uint8_t nsub_io_r(offs_t offset);
 	void nsub_io_w(offs_t offset, uint8_t data);
 
+	void nsubc_io_w(offs_t offset, uint8_t data);
+
+	void nsubc_prot_w(uint8_t data);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
 
-	DECLARE_MACHINE_START(nsub);
-	DECLARE_MACHINE_RESET(nsub);
+	DECLARE_MACHINE_START(nsubc);
 
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
-	void nsub_io_map(address_map &map);
-	void nsub_map(address_map &map);
+	void nsub_io_map(address_map &map) ATTR_COLD;
+	void nsubc_io_map(address_map &map) ATTR_COLD;
+	void nsub_map(address_map &map) ATTR_COLD;
+	void nsubc_map(address_map &map) ATTR_COLD;
 };
 
 class carnival_state : public vicdual_state
@@ -279,22 +287,21 @@ public:
 	void carnivalb_audio(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8035_device> m_audiocpu;
 	optional_device<ay8910_device> m_psg;
 	optional_device<pit8253_device> m_pit;
 	optional_device_array<dac_bit_interface, 3> m_dac;
 
-	void carnival_io_map(address_map &map);
-	void mboard_map(address_map &map);
+	void carnival_io_map(address_map &map) ATTR_COLD;
+	void mboard_map(address_map &map) ATTR_COLD;
 
-	int m_musicData = 0;
-	int m_musicBus = 0;
+	int m_musicdata = 0;
+	int m_musicbus = 0;
 
 	void carnival_io_w(offs_t offset, uint8_t data);
 
-	/*----------- defined in audio/carnival.cpp -----------*/
 	void carnival_audio_1_w(uint8_t data);
 	void carnival_audio_2_w(uint8_t data);
 	int carnival_music_port_t1_r();
@@ -315,13 +322,13 @@ public:
 	void carnivalh(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t carnivalh_prot_r(offs_t offset);
 	void carnivalh_prot_w(offs_t offset, uint8_t data);
 
-	void carnivalh_dualgame_map(address_map &map);
+	void carnivalh_dualgame_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_previousaddress = 0;
 	uint8_t m_previousvalue = 0;

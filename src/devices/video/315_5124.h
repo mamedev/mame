@@ -92,15 +92,15 @@ protected:
 
 	// device-level overrides
 	virtual void device_post_load() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
 	void sega315_5124_palette(palette_device &palette) const;
 
-	void sega315_5124(address_map &map);
+	void sega315_5124(address_map &map) ATTR_COLD;
 
 	virtual int screen_hpos() { return screen().hpos() / ((m_hcounter_divide == 0) ? 1 : m_hcounter_divide); }
 	void set_display_settings();
@@ -216,7 +216,7 @@ public:
 protected:
 	sega315_5246_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual u16 name_row_mode4(u16 row) override;
 	virtual u16 tile1_select_mode4(u16 tile_number) override;
@@ -240,8 +240,8 @@ public:
 protected:
 	sega315_5377_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void vblank_end(int vpos) override;
 	virtual void update_palette() override;
@@ -262,7 +262,7 @@ public:
 protected:
 	sega315_5313_mode4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 cram_size, u8 palette_offset, u8 reg_num_mask, int max_sprite_zoom_hcount, int max_sprite_zoom_vcount, const u8 *line_timing);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void update_palette() override;
 	virtual void write_memory(u8 data) override;

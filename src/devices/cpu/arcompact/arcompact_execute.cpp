@@ -98,16 +98,18 @@ void arcompact_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(m_pc);
-
 		if (!m_delayactive)
 		{
 			check_interrupts();
 		}
 
 		// make sure CPU isn't in 'SLEEP' mode
-		if (!debugreg_check_ZZ())
+		if (debugreg_check_ZZ())
+			debugger_wait_hook();
+		else
 		{
+			debugger_instruction_hook(m_pc);
+
 			if (m_delayactive)
 			{
 				uint16_t op = READ16((m_pc + 0));

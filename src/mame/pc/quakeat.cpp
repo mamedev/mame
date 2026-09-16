@@ -78,23 +78,26 @@ HDD image contains remnants of an Actua Soccer Arcade installation.
 */
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/i82443bx_host.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_usb.h"
-#include "machine/w83977tf.h"
+
 #include "bus/isa/isa_cards.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
-#include "video/clgd546x_laguna.h"
+#include "bus/pci/pci_slot.h"
+#include "cpu/i386/i386.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "machine/pci.h"
+#include "machine/w83977tf.h"
+#include "video/voodoo_pci.h"
 
+// TODO: change me up to agp_slot
+#define PCI_AGP_ID "pci:01.0:00.0"
 
 namespace {
 
@@ -104,6 +107,7 @@ public:
 	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_voodoo(*this, PCI_AGP_ID)
 	{ }
 
 	void ga6la7(machine_config &config);
@@ -111,10 +115,11 @@ public:
 
 private:
 	required_device<pentium2_device> m_maincpu;
+	optional_device<voodoo_banshee_pci_device> m_voodoo;
 
-	void ga6la7_map(address_map &map);
-	void ga6la7_io(address_map &map);
-	void quake_map(address_map &map);
+	void ga6la7_map(address_map &map) ATTR_COLD;
+	void ga6la7_io(address_map &map) ATTR_COLD;
+	void quake_map(address_map &map) ATTR_COLD;
 
 	static void winbond_superio_config(device_t *device);
 };
@@ -127,13 +132,6 @@ void quakeat_state::ga6la7_map(address_map &map)
 void quakeat_state::ga6la7_io(address_map &map)
 {
 	map.unmap_value_high();
-}
-
-// temp, to be removed
-void quakeat_state::quake_map(address_map &map)
-{
-	map(0x000e0000, 0x000fffff).rom().region("pc_bios", 0);
-	map(0xfffe0000, 0xffffffff).rom().region("pc_bios", 0);
 }
 
 
@@ -177,7 +175,7 @@ void quakeat_state::ga6la7(machine_config &config)
 	I82443LX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443LX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
@@ -187,7 +185,7 @@ void quakeat_state::ga6la7(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
@@ -195,18 +193,27 @@ void quakeat_state::ga6la7(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	// TODO: really has a Voodoo Banshee instead
-	CIRRUS_GD5465_LAGUNA3D(config, "pci:01.0:00.0", 0);
+	VOODOO_BANSHEE_X86_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	m_voodoo->set_fbmem(8);
+	m_voodoo->set_status_cycles(1000);
+//  subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
+
+	// TODO: fix legacy raw setup here
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_banshee_pci_device::screen_update));
 }
 
 void quakeat_state::quake(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 233'000'000); /* Pentium II, 233MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &quakeat_state::quake_map);
-//  m_maincpu->set_disable();
-
-	PCI_ROOT(config, "pci", 0);
-	// ...
+	ga6la7(config);
+	// TODO: has problems mapping a VGA
+	// (different legacy control method?)
+//  config.device_remove(PCI_AGP_ID);
+//  config.device_remove("screen");
+//  PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 ROM_START( ga6la7 )
@@ -216,7 +223,7 @@ ROM_END
 
 ROM_START(quake)
 	// 4N4XL0X0.86A.0011.P05
-	ROM_REGION32_LE(0x20000, "pc_bios", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x20000, "pci:07.0", 0)  /* motherboard bios */
 	// TODO: compressed
 //  ROM_LOAD("p05-0011.bio", 0x000000, 0x10000, NO_DUMP )
 //  ROM_CONTINUE( 0x1ffff-0xa0, 0xa0 )
@@ -224,6 +231,7 @@ ROM_START(quake)
 
 	// Hitachi DK237A-21 A/A0A0, IDE/ATA 2.5" 2.1GB 4000 RPM
 	// WS03131880
+	// TODO: fix mapping
 	DISK_REGION( "disks" )
 	// wrong chs 263,255,63
 //  DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
@@ -236,5 +244,5 @@ ROM_END
 
 COMP( 1999, ga6la7,  0,  0, ga6la7, 0, quakeat_state, empty_init, "Gigabyte", "GA-6LA7", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // errors out with ISA state 0x05 (keyboard), then wants flash ROM i/f to work properly
 
-GAME( 1998, quake,  0,      quake,  quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_IS_SKELETON )
+GAME( 1998, quake,  0,      quake,  quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 // Actua Soccer Arcade

@@ -40,14 +40,12 @@ public:
 private:
 	required_device<hd6303x_cpu_device> m_maincpu;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
 void unktop_state::program_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
-	map(0x0040, 0x00ff).ram(); // internal RAM
 	//map(0x6000, 0x6000).w();
 	//map(0x6800, 0x6800).w();
 	//map(0x7800, 0x7800).r();
@@ -96,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 19??, unktop, 0, unktop, unktop, unktop_state, empty_init, ROT0, "<unknown>", "unknown Top game", MACHINE_IS_SKELETON )
+GAME( 19??, unktop, 0, unktop, unktop, unktop_state, empty_init, ROT0, "<unknown>", "unknown Top game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -85,15 +85,15 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s4(machine_config &config);
-	void s9(machine_config &config);
-	void s11(machine_config &config);
+	void s4(machine_config &config) ATTR_COLD;
+	void s9(machine_config &config) ATTR_COLD;
+	void s11(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void dig0_w(u8 data);
 	void dig1_w(u8 data);
@@ -126,9 +126,9 @@ private:
 	void pia30_ca2_w(int state) { } //ST4
 	void pia30_cb2_w(int state) { } //ST3
 	void irq_w(int state);
-	void s4_map(address_map &map);
-	void s9_map(address_map &map);
-	void s11_map(address_map &map);
+	void s4_map(address_map &map) ATTR_COLD;
+	void s9_map(address_map &map) ATTR_COLD;
+	void s11_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( s4 )
 	PORT_START("X7")  // not used
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, shuffle_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(shuffle_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
@@ -435,8 +435,6 @@ void shuffle_state::irq_w(int state)
 void shuffle_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_irq_in_progress));
 	save_item(NAME(m_strobe));
@@ -448,6 +446,7 @@ void shuffle_state::machine_start()
 void shuffle_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -515,7 +514,7 @@ void shuffle_state::s4(machine_config &config)
 
 	// Add the soundcard
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S4_SOUND(config, m_s4sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S4_SOUND(config, m_s4sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s9(machine_config &config)
@@ -537,7 +536,7 @@ void shuffle_state::s9(machine_config &config)
 	m_pia21->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<9>));
 	m_pia21->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<10>));
 
-	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S9_SOUND(config, m_s9sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void shuffle_state::s11(machine_config &config)
@@ -564,7 +563,7 @@ void shuffle_state::s11(machine_config &config)
 	m_pia34->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<13>));
 	m_pia34->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<14>));
 
-	WILLIAMS_S11_SOUND(config, m_s11sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S11_SOUND(config, m_s11sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -787,13 +786,13 @@ GAME( 1978, arist_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Willi
 GAME( 1979, taurs_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams", "Taurus (Shuffle) (L-1)",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kingt_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "King Tut (Shuffle) (L-1)",        MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, omni_l1,  0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Omni (Shuffle) (L-1)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Big Strike (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Triple Strike (Shuffle) (L-1)",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Big Strike (Shuffle) (L-1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tstrk_l1, 0,        s4,  s4, shuffle_state, empty_init, ROT0, "Williams/United", "Triple Strike (Shuffle) (L-1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, szone_l5, 0,        s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-5)",     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, szone_l2, szone_l5, s9,  s9, shuffle_state, empty_init, ROT0, "Williams/United", "Strike Zone (Shuffle) (L-2)",     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, alcat_l7, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Alley Cats (Shuffle) (L-7)",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tts_l2,   0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tts_l1,   tts_l2,   s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tts_l2,   0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tts_l1,   tts_l2,   s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, gmine_l2, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)",              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, tdawg_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, shfin_l1, 0,        s11, s9, shuffle_state, empty_init, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)",            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

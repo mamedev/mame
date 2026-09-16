@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
 
-#pragma once
+#ifndef MAME_CPU_I386_CYCLES_H
+#define MAME_CPU_I386_CYCLES_H
 
-#ifndef __CYCLES_H__
-#define __CYCLES_H__
+#pragma once
 
 struct X86_CYCLE_TABLE
 {
@@ -340,4 +340,4 @@ static const X86_CYCLE_TABLE x86_cycle_table[] =
 	{ CYCLES_CMPXCHG_REG_MEM_F, { {  0,  0 },  { 10, 10 },  { 10, 10 },  { 10, 10 } }       },
 };
 
-#endif /* __CYCLES_H__ */
+#endif // MAME_CPU_I386_CYCLES_H

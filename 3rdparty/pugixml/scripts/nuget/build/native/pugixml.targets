@@ -2,26 +2,27 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Default initializers for properties">
     <Linkage-pugixml Condition="'$(Linkage-pugixml)' == ''">dynamic</Linkage-pugixml>
+    <Configuration-pugixml Condition="$(Configuration.ToLower().IndexOf('debug')) != -1">Debug</Configuration-pugixml>
+    <Configuration-pugixml Condition="$(Configuration.ToLower().IndexOf('debug')) == -1">Release</Configuration-pugixml>
   </PropertyGroup>
   <ItemGroup>
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)\pugixml-propertiesui.xml" />
   </ItemGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Linkage-pugixml)' == 'header'">PUGIXML_HEADER_ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="$(Configuration.ToLower().IndexOf('debug')) != -1">
+  <ItemGroup Condition="'$(Linkage-pugixml)' == 'source'">
+    <ClCompile Include="$(MSBuildThisFileDirectory)include\pugixml.cpp"/>
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Linkage-pugixml)' != 'header' AND '$(Linkage-pugixml)' != 'source'">
     <Link>
-      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib/$(Platform)\$(PlatformToolset.Split('_')[0])\$(Linkage-pugixml)\Debug\pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="$(Configuration.ToLower().IndexOf('debug')) == -1">
-    <Link>
-      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib/$(Platform)\$(PlatformToolset.Split('_')[0])\$(Linkage-pugixml)\Release\pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib/$(Platform)\$(PlatformToolset.Split('_')[0])\$(Linkage-pugixml)\$(Configuration-pugixml)\pugixml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

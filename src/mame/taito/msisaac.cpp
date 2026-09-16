@@ -74,9 +74,9 @@ public:
 	void msisaac(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -135,12 +135,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -354,8 +352,6 @@ uint32_t msisaac_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 {
@@ -791,7 +787,7 @@ void msisaac_state::msisaac(machine_config &config)
 #endif
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -867,4 +863,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, msisaac, 0, msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0, msisaac, msisaac, msisaac_state, empty_init, ROT270, "Taito", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -1,13 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-    Cosmodog / Namco Rockin' Bowl-o-Rama.
+Cosmodog / Namco Rockin' Bowl-o-Rama.
 
-    PC hardware running Linux:
-    -Motherboard: Elitegroup P4M800PRO-M478 v1.0.
-    -CPU: Celeron, socket 478, 800/533MHz
-    -Video: R9600PRO 256M DDR AGP.
-    -Boot from USB flash drive.
+PC hardware running Linux:
+- Motherboard: Elitegroup P4M800PRO-M478 v1.0.
+- CPU: Celeron, socket 478, 800/533MHz
+- Video: R9600PRO 256M DDR AGP a.k.a. PowerColor R96 a.k.a. ATi Radeon 9600 Pro
+- Boot from USB flash drive.
+- VIA P4M800 Pro
+- VIA VT8237
+- Realtek ALC655
+- VIA VT6103L
+- ITE IT8705F Super I/O
 
  Additional I/O board that serves also as protection (labeled "HYdra V2.3"),
  connected via RS-232 (DB9):
@@ -52,7 +57,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void rbowlorama_map(address_map &map);
+	void rbowlorama_map(address_map &map) ATTR_COLD;
 };
 
 void rbowlorama_state::rbowlorama_map(address_map &map)
@@ -71,7 +76,7 @@ void rbowlorama_state::rbowlorama(machine_config &config)
 	PENTIUM4(config, m_maincpu, 120'000'000); // Celeron, socket 478, 800/533MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rbowlorama_state::rbowlorama_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 
@@ -141,4 +146,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2008, rbowlorama, 0, rbowlorama, rbowlorama, rbowlorama_state, empty_init, ROT0, "Namco / Cosmodog", "Rockin' Bowl-O-Rama (v2.1.1)", MACHINE_IS_SKELETON )
+GAME(2008, rbowlorama, 0, rbowlorama, rbowlorama, rbowlorama_state, empty_init, ROT0, "Namco / Cosmodog", "Rockin' Bowl-O-Rama (v2.1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

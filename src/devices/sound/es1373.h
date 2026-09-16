@@ -11,7 +11,7 @@
 class es1373_device : public pci_device, public device_sound_interface
 {
 public:
-	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -22,11 +22,11 @@ public:
 	void reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(delayed_stream_update);
 
@@ -52,13 +52,13 @@ private:
 
 	void transfer_pci_audio(chan_info& chan, int type);
 	uint32_t calc_size(const uint8_t &format);
-	void send_audio_out(chan_info& chan, uint32_t intr_mask, write_stream_view &outL, write_stream_view &outR);
+	void send_audio_out(chan_info& chan, uint32_t intr_mask, sound_stream &stream);
 
 	emu_timer *m_timer;
 	address_space *m_memory_space;
 	devcb_write_line m_irq_handler;
 	int m_irq_num;
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	uint16_t m_ac97_regs[0x80];
 	uint32_t m_es_regs[0x10];
 	uint32_t m_sound_cache[0x40];

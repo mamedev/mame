@@ -68,11 +68,11 @@ public:
 	void gpworld(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
-	void mainmem(address_map &map);
-	void mainport(address_map &map);
+	void mainmem(address_map &map) ATTR_COLD;
+	void mainport(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_stop);
 
@@ -459,7 +459,7 @@ INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback)
 	if (m_nmi_enable)
 	{
 		m_laserdisc->data_w(m_ldp_write_latch);
-		m_ldp_read_latch = m_laserdisc->status_r();
+		m_ldp_read_latch = m_laserdisc->data_r();
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 
@@ -493,10 +493,10 @@ void gpworld_state::gpworld(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gpworld_state::vblank_callback));
 
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(512, 256, FUNC(gpworld_state::screen_update));
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
@@ -505,8 +505,7 @@ void gpworld_state::gpworld(machine_config &config)
 	PALETTE(config, m_palette).set_entries(1024);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

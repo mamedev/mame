@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/pcd8544.h"
+#include "pcd8544.h"
 
 #include "screen.h"
 

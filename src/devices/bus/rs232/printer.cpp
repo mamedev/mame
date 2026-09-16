@@ -35,7 +35,7 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, devi
 
 void serial_printer_device::device_add_mconfig(machine_config &config)
 {
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 	m_printer->online_callback().set(FUNC(serial_printer_device::printer_online));
 }
 

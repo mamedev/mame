@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_AMIGA_KEYBOARD_H
-#define MAME_BUS_AMIGA_KEYBOARD_H
+#ifndef MAME_BUS_AMIGA_KEYBOARD_KEYBOARD_H
+#define MAME_BUS_AMIGA_KEYBOARD_KEYBOARD_H
 
 #pragma once
 
@@ -35,10 +35,7 @@ public:
 	amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: amiga_keyboard_bus_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 	virtual ~amiga_keyboard_bus_device();
@@ -58,8 +55,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	device_amiga_keyboard_interface *m_kbd;
@@ -93,4 +90,4 @@ void amiga_keyboard_devices(device_slot_interface &device);
 void a500_keyboard_devices(device_slot_interface &device);
 void a600_keyboard_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_AMIGA_KEYBOARD_H
+#endif // MAME_BUS_AMIGA_KEYBOARD_KEYBOARD_H

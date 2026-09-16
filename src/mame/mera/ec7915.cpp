@@ -30,8 +30,8 @@ public:
 	void ec7915(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_chargen;
@@ -68,7 +68,7 @@ void ec7915_state::ec7915(machine_config &config)
 
 	//I8214(config, "picu", 2000000); // CEMI UCY74S414
 
-	PIT8253(config, "pit", 0); // КР580ВИ53
+	PIT8253(config, "pit"); // КР580ВИ53
 
 	I8251(config, "usart", 2000000); // КР580ВВ51А
 	// 8251 usage appears to prefer synchronous communications
@@ -95,4 +95,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(198?, ec7915, 0, 0, ec7915, ec7915, ec7915_state, empty_init, "Mera-Elzab", "EC-7915 (EC-7950)", MACHINE_IS_SKELETON)
+COMP(198?, ec7915, 0, 0, ec7915, ec7915, ec7915_state, empty_init, "Mera-Elzab", "EC-7915 (EC-7950)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

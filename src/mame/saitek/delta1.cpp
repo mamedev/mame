@@ -31,6 +31,7 @@ In the Delta-1 ROM is even some fragmented code remaining of the message:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/timer.h"
@@ -48,6 +49,7 @@ public:
 	delta1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_smi(*this, "smi"),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -59,17 +61,25 @@ public:
 	void delta1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
+	u8 m_mux_data = 0;
+	u8 m_led_select = 0;
+	u8 m_inp_mux = 0;
+	u8 m_7seg_data = 0;
+	bool m_7seg_rc = false;
+	bool m_blink = false;
+
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 
@@ -78,13 +88,6 @@ private:
 	void mux_w(u8 data);
 	void digit_w(u8 data);
 	u8 input_r();
-
-	u8 m_mux_data = 0;
-	u8 m_led_select = 0;
-	u8 m_inp_mux = 0;
-	u8 m_7seg_data = 0;
-	bool m_7seg_rc = false;
-	bool m_blink = false;
 };
 
 void delta1_state::machine_start()
@@ -106,8 +109,6 @@ void delta1_state::machine_start()
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// 3850 ports
 
 void delta1_state::update_display()
 {
@@ -166,7 +167,7 @@ void delta1_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(delta1_state::input_r), FUNC(delta1_state::mux_w));
 	map(0x01, 0x01).w(FUNC(delta1_state::digit_w));
-	map(0x0c, 0x0f).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -205,7 +206,7 @@ static INPUT_PORTS_START( delta1 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("RESET") // not on matrix
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, delta1_state, reset_button, 0) PORT_NAME("New Game")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(delta1_state::reset_button), 0) PORT_NAME("New Game")
 INPUT_PORTS_END
 
 
@@ -217,13 +218,13 @@ INPUT_PORTS_END
 void delta1_state::delta1(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 2000000); // LC circuit, measured 2MHz
+	F8(config, m_maincpu, 2'000'000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &delta1_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &delta1_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("f3853", FUNC(f3853_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_smi, FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2000000));
-	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	F3853(config, m_smi, 2'000'000);
+	m_smi->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -253,4 +254,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1980, ccdelta1, 0,      0,      delta1,  delta1, delta1_state, empty_init, "SciSys / Novag", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1980, ccdelta1, 0,      0,      delta1,  delta1, delta1_state, empty_init, "SciSys / Novag Industries", "Chess Champion: Delta-1", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

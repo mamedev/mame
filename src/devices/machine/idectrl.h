@@ -133,7 +133,7 @@ public:
 	void bmdma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void set_irq(int state) override;
 	virtual void set_dmarq(int state) override;

@@ -258,8 +258,9 @@ const char *cqm_format::extensions() const noexcept
 int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[3];
-	size_t actual;
-	io.read_at(0, h, 3, actual);
+	auto const [err, actual] = read_at(io, 0, h, 3);
+	if (err || (3 != actual))
+		return 0;
 
 	if (h[0] == 'C' && h[1] == 'Q' && h[2] == 0x14)
 		return FIFID_SIGN;
@@ -269,11 +270,10 @@ int cqm_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
 	const int max_size = 4*1024*1024; // 4MB ought to be large enough for any floppy
 	std::vector<uint8_t> imagebuf(max_size);
 	uint8_t header[CQM_HEADER_SIZE];
-	io.read_at(0, header, CQM_HEADER_SIZE, actual);
+	read_at(io, 0, header, CQM_HEADER_SIZE); // FIXME: check for errors and premature EOF
 
 	int sector_size      = get_u16le(&header[0x03]);
 	int sector_per_track = get_u16le(&header[0x10]);
@@ -317,8 +317,9 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t cqm_size;
 	if (io.length(cqm_size))
 		return false;
-	std::vector<uint8_t> cqmbuf(cqm_size);
-	io.read_at(0, &cqmbuf[0], cqm_size, actual);
+	auto const [err, cqmbuf, actual] = read_at(io, 0, cqm_size);
+	if (err || (actual != cqm_size))
+		return false;
 
 	// decode the RLE data
 	for (int s = 0, pos = CQM_HEADER_SIZE + comment_size; pos < cqm_size; )
@@ -350,14 +351,16 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		{
 			for(int sector = 0; sector < sector_per_track; sector++)
 			{
-				sects[sector].track       = track;
-				sects[sector].head        = head;
-				sects[sector].sector      = sector_base + sector;
-				sects[sector].size        = ssize;
-				sects[sector].deleted     = false;
-				sects[sector].bad_crc     = false;
-				sects[sector].actual_size = sector_size;
-				sects[sector].data        = &imagebuf[pos];
+				sects[sector].track        = track;
+				sects[sector].head         = head;
+				sects[sector].sector       = sector_base + sector;
+				sects[sector].size         = ssize;
+				sects[sector].deleted      = false;
+				sects[sector].bad_data_crc = false;
+				sects[sector].bad_addr_crc = false;
+				sects[sector].weak         = false;
+				sects[sector].actual_size  = sector_size;
+				sects[sector].data         = &imagebuf[pos];
 				pos += sector_size;
 			}
 
@@ -365,16 +368,6 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 
 	return true;
-}
-
-bool cqm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
-{
-	return false;
-}
-
-bool cqm_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const cqm_format FLOPPY_CQM_FORMAT;

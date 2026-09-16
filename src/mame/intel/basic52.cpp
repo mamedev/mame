@@ -23,7 +23,7 @@ Sound: BASIC-31 has sound, and BASIC-52 doesn't. The sound command is PWM.
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/i8255.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/rs232.h"
@@ -47,13 +47,13 @@ public:
 	void basic31(machine_config &config);
 
 private:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	void port1_w(u8 data);
 	uint8_t port3_r();
 	void port3_w(u8 data);
 	void rx_w(int state);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t m_port3 = 0U;
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<rs232_port_device> m_serial;
@@ -121,7 +121,7 @@ void basic52_state::basic31(machine_config &config)
 	/* basic machine hardware */
 	I8031(config, m_maincpu, XTAL(11'059'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &basic52_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &basic52_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(basic52_state::port1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(basic52_state::port3_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::port3_r));
@@ -129,7 +129,7 @@ void basic52_state::basic31(machine_config &config)
 	RS232_PORT(config, m_serial, serial_devices, "terminal");
 	m_serial->rxd_handler().set(FUNC(basic52_state::rx_w));
 
-	I8255(config, "ppi8255", 0);
+	I8255(config, "ppi8255");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -142,7 +142,7 @@ void basic52_state::basic52(machine_config &config)
 	/* basic machine hardware */
 	I8052(config.replace(), m_maincpu, XTAL(11'059'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &basic52_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &basic52_state::io_map);
 	m_maincpu->port_out_cb<3>().set(FUNC(basic52_state::port3_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::port3_r));
 }

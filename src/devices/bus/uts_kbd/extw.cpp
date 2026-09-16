@@ -52,8 +52,6 @@ uts_extw_keyboard_device::uts_extw_keyboard_device(const machine_config &mconfig
 
 void uts_extw_keyboard_device::device_start()
 {
-	m_shift_led.resolve();
-
 	save_item(NAME(m_p1_output));
 	save_item(NAME(m_p2_output));
 	save_item(NAME(m_shift_register));
@@ -151,7 +149,7 @@ static INPUT_PORTS_START(uts_extw)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CHAR('b') PORT_CHAR('B') PORT_CODE(KEYCODE_B)
 
 	PORT_START("KEY4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SOE \xe2\x96\xb6  Tab Set") PORT_CODE(KEYCODE_LALT) // ▶
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"SOE \u25b6  Tab Set") PORT_CODE(KEYCODE_LALT) // ▶
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Insert in Line  Insert in Disp") PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CODE(KEYCODE_INSERT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete in Line  Delete in Disp") PORT_CHAR(UCHAR_MAMEKEY(DEL)) PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor to Home") PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_CODE(KEYCODE_HOME) // ↖

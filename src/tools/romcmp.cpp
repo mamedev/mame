@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles,Nicola Salmoria
 /***************************************************************************
 
-    romcmp.c
+    romcmp.cpp
 
     ROM comparison utility program.
 
@@ -21,7 +21,6 @@
 
 
 #define MAX_FILES 1000
-
 
 
 /* compare modes when one file is twice as long as the other */
@@ -559,7 +558,10 @@ static int load_files(int i, int *found, const char *path)
 				else
 				{
 					if (zip->decompress(file.buf.get(), file.size))
+					{
+						printf("%s: Decompression failed\n", file.name.c_str());
 						file.free();
+					}
 				}
 
 				file.listed = 0;

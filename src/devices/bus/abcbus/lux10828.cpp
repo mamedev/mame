@@ -74,11 +74,7 @@ Notes:
 
 /*
 
-    TODO:
-
-    - needs mid-instruction wait state support from Z80 core
-    - inverted A4/5/6/7 chip select
-    - copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
+    Copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
 
         06F8: ld   a,$2F                    ; SEEK
         06FA: out  ($BC),a
@@ -314,14 +310,16 @@ void luxor_55_10828_device::fdc_intrq_w(int state)
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
 
-	//if (state) m_maincpu->wait_w(CLEAR_LINE);
+	// release the CPU from the wait state
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 void luxor_55_10828_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
-	//if (state) m_maincpu->wait_w(CLEAR_LINE);
+	// release the CPU from the wait state
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 
@@ -658,6 +656,26 @@ void luxor_55_10828_device::status_w(uint8_t data)
 
 
 //-------------------------------------------------
+//  fdc_wait - stall the CPU while _WAIT ENABLE is
+//  asserted and the FDC has no service request
+//  pending
+//-------------------------------------------------
+
+bool luxor_55_10828_device::fdc_wait()
+{
+	if (m_wait_enable || m_fdc_irq || m_fdc_drq)
+		return false;
+
+	// the FDC is not ready, hold the CPU in wait states until INTRQ or DRQ is
+	// asserted and repeat the bus cycle once it has been released
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	m_maincpu->retry_access();
+
+	return true;
+}
+
+
+//-------------------------------------------------
 //  fdc_r -
 //-------------------------------------------------
 
@@ -666,22 +684,10 @@ uint8_t luxor_55_10828_device::fdc_r(offs_t offset)
 	if (machine().side_effects_disabled())
 		return 0xff;
 
-	uint8_t data = 0xff;
+	if (fdc_wait())
+		return 0xff;
 
-	if (m_wait_enable)
-	{
-		data = m_fdc->read(offset);
-	}
-	else if (!m_fdc_irq && !m_fdc_drq)
-	{
-		//m_maincpu->wait_w(ASSERT_LINE);
-	}
-	else
-	{
-		data = m_fdc->read(offset);
-	}
-
-	return data;
+	return m_fdc->read(offset);
 }
 
 
@@ -694,10 +700,8 @@ void luxor_55_10828_device::fdc_w(offs_t offset, uint8_t data)
 	if (machine().side_effects_disabled())
 		return;
 
-	m_fdc->write(offset, data);
+	if (fdc_wait())
+		return;
 
-	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
-	{
-		//m_maincpu->wait_w(ASSERT_LINE);
-	}
+	m_fdc->write(offset, data);
 }

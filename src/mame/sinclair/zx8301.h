@@ -63,10 +63,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void zx8301(address_map &map);
+	void zx8301(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

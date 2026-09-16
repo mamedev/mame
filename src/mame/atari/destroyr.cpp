@@ -56,10 +56,10 @@ public:
 	void destroyr(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void misc_w(uint8_t data);
 	void cursor_load_w(uint8_t data);
@@ -290,8 +290,8 @@ void destroyr_state::main_map(address_map &map)
 	map(0x1000, 0x1007).mirror(0xff0).w("outlatch", FUNC(f9334_device::write_d0));
 	map(0x1008, 0x1008).mirror(0xff7).w(FUNC(destroyr_state::misc_w));
 	map(0x2000, 0x2000).mirror(0xfff).portr("IN2");
-	map(0x3000, 0x30ff).mirror(0xf00).writeonly().share("alpha_nuram");
-	map(0x4000, 0x401f).mirror(0xfe0).writeonly().share("major_obj_ram");
+	map(0x3000, 0x30ff).mirror(0xf00).nopr().writeonly().share("alpha_nuram");
+	map(0x4000, 0x401f).mirror(0xfe0).nopr().writeonly().share("major_obj_ram");
 	map(0x5000, 0x5000).mirror(0xff8).w(FUNC(destroyr_state::cursor_load_w));
 	map(0x5001, 0x5001).mirror(0xff8).w(FUNC(destroyr_state::interrupt_ack_w));
 	map(0x5002, 0x5007).mirror(0xff8).writeonly().share("minor_obj_ram");
@@ -322,7 +322,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,3")
@@ -489,7 +489,7 @@ void destroyr_state::destroyr(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 263, 0, 240);
 	m_screen->set_screen_update(FUNC(destroyr_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -570,5 +570,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
-GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O1)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (Atari, version O2)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
+GAMEL( 1977, destroyr1, destroyr, destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (Atari, version O1)", MACHINE_SUPPORTS_SAVE, layout_destroyr )

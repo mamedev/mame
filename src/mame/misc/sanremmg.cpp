@@ -33,7 +33,6 @@ M30624FG (M16C/62A family) needs CPU core and dumping of internal ROM
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -51,14 +50,14 @@ public:
 	void sanremmg(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
 	uint32_t screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sanremmg_map(address_map &map);
+	void sanremmg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -88,7 +87,7 @@ void sanremmg_state::sanremmg(machine_config &config)
 	ARM7(config, m_maincpu, 50000000); // wrong, this is an M30624FG (M16C/62A family) with 256K internal ROM, no CPU core available
 	m_maincpu->set_addrmap(AS_PROGRAM, &sanremmg_state::sanremmg_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -144,6 +143,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )
-GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_IS_SKELETON )
-GAME( 2002, elsygame, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy game", MACHINE_IS_SKELETON ) // Fruit Diamont (sic)?
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, elsypokr, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy poker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, elsygame, 0,        sanremmg,  sanremmg, sanremmg_state, empty_init,  ROT0, "Electro System (Elsy)", "unknown Elsy game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Fruit Diamont (sic)?

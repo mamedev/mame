@@ -127,7 +127,7 @@ public:
 	void gamemach(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -138,8 +138,12 @@ private:
 	optional_device_array<netlist_mame_logic_input_device, 8> m_sound_nl;
 	required_ioport_array<2> m_inputs;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	u16 m_mux = 0;
+	u8 m_seg_data = 0;
+	u8 m_sound_data = 0;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void mux1_w(u8 data);
@@ -149,10 +153,6 @@ private:
 	void sound_w(u8 data);
 	void discrete_w(u8 data);
 	u8 sound_r();
-
-	u16 m_mux = 0;
-	u8 m_seg_data = 0;
-	u8 m_sound_data = 0;
 };
 
 void gm_state::machine_start()

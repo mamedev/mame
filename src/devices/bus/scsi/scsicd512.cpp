@@ -10,7 +10,7 @@
 #include "scsicd512.h"
 
 DEFINE_DEVICE_TYPE(RRD45, dec_rrd45_device, "rrd45", "DEC RRD45")
-DEFINE_DEVICE_TYPE(XM3301, toshiba_xm3301_device, "xm3301", "Toshiba XM-3301TA CD-ROM")
+DEFINE_DEVICE_TYPE(XM3301TA, toshiba_xm3301ta_device, "xm3301ta", "Toshiba XM-3301TA CD-ROM")
 DEFINE_DEVICE_TYPE(XM5301SUN, toshiba_xm5301_sun_device, "xm5301sun", "Toshiba XM-5301B Sun 4x CD-ROM")
 DEFINE_DEVICE_TYPE(XM5401SUN, toshiba_xm5401_sun_device, "xm5401sun", "Toshiba XM-5401B Sun 4x CD-ROM")
 DEFINE_DEVICE_TYPE(XM5701, toshiba_xm5701_device, "xm5701", "Toshiba XM-5701B 12x CD-ROM")
@@ -76,8 +76,8 @@ dec_rrd45_device::dec_rrd45_device(const machine_config &mconfig, const char *ta
 {
 }
 
-toshiba_xm3301_device::toshiba_xm3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	scsicd512_device(mconfig, XM3301, tag, owner, "TOSHIBA ", "CD-ROM XM-3301TA", "0272", 0x88)
+toshiba_xm3301ta_device::toshiba_xm3301ta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	scsicd512_device(mconfig, XM3301TA, tag, owner, "TOSHIBA ", "CD-ROM XM-3301TA", "0272", 0x88)
 {
 }
 

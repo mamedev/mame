@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef MAME_TOOLS_IMGTOOL_FILTER_H
+#define MAME_TOOLS_IMGTOOL_FILTER_H
+
+#pragma once
 
 #include "library.h"
 
@@ -34,30 +36,30 @@ enum
 	FILTINFO_STR_EXTENSION
 };
 
-extern const filter_getinfoproc filters[];
+extern const imgtool::filter_getinfoproc filters[];
 
-filter_getinfoproc filter_lookup(const char *name);
-
-/* ----------------------------------------------------------------------- */
-
-int64_t filter_get_info_int(filter_getinfoproc get_info, uint32_t state);
-void *filter_get_info_ptr(filter_getinfoproc get_info, uint32_t state);
-void *filter_get_info_fct(filter_getinfoproc get_info, uint32_t state);
-const char *filter_get_info_string(filter_getinfoproc get_info, uint32_t state);
+imgtool::filter_getinfoproc filter_lookup(const char *name);
 
 /* ----------------------------------------------------------------------- */
 
-extern void filter_eoln_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_cocobas_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_dragonbas_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_macbinary_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_vzsnapshot_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_vzbas_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_thombas5_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_thombas7_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_thombas128_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_thomcrypt_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_bml3bas_getinfo(uint32_t state, union filterinfo *info);
-extern void filter_hp9845data_getinfo(uint32_t state, union filterinfo *info);
+int64_t filter_get_info_int(imgtool::filter_getinfoproc get_info, uint32_t state);
+void *filter_get_info_ptr(imgtool::filter_getinfoproc get_info, uint32_t state);
+void *filter_get_info_fct(imgtool::filter_getinfoproc get_info, uint32_t state);
+const char *filter_get_info_string(imgtool::filter_getinfoproc get_info, uint32_t state);
 
-#endif /* FILTER_H */
+/* ----------------------------------------------------------------------- */
+
+extern void filter_eoln_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_cocobas_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_dragonbas_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_macbinary_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_vzsnapshot_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_vzbas_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_thombas5_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_thombas7_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_thombas128_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_thomcrypt_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_bml3bas_getinfo(uint32_t state, imgtool::filterinfo *info);
+extern void filter_hp9845data_getinfo(uint32_t state, imgtool::filterinfo *info);
+
+#endif // MAME_TOOLS_IMGTOOL_FILTER_H

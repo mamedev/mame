@@ -2,7 +2,7 @@
 // ssl/detail/io.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,6 +17,7 @@
 
 #include "asio/detail/config.hpp"
 
+#include <limits>
 #include "asio/detail/base_from_cancellation_state.hpp"
 #include "asio/detail/handler_tracking.hpp"
 #include "asio/ssl/detail/engine.hpp"
@@ -26,8 +27,17 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 namespace detail {
+
+struct transfer_unlimited
+{
+  std::size_t operator()(const asio::error_code& ec, std::size_t) const
+  {
+    return ec ? 0 : (std::numeric_limits<std::size_t>::max)();
+  }
+};
 
 template <typename Stream, typename Operation>
 std::size_t io(Stream& next_layer, stream_core& core,
@@ -43,8 +53,8 @@ std::size_t io(Stream& next_layer, stream_core& core,
     // the underlying transport.
     if (core.input_.size() == 0)
     {
-      core.input_ = asio::buffer(core.input_buffer_,
-          next_layer.read_some(core.input_buffer_, io_ec));
+      core.input_ = asio::buffer(core.input_buffer(),
+          next_layer.read_some(core.input_buffer(), io_ec));
       if (!ec)
         ec = io_ec;
     }
@@ -60,7 +70,8 @@ std::size_t io(Stream& next_layer, stream_core& core,
     // Get output data from the engine and write it to the underlying
     // transport.
     asio::write(next_layer,
-        core.engine_.get_output(core.output_buffer_), io_ec);
+        core.engine_.get_output(core.output_buffer()),
+        transfer_unlimited(), io_ec);
     if (!ec)
       ec = io_ec;
 
@@ -72,24 +83,28 @@ std::size_t io(Stream& next_layer, stream_core& core,
     // Get output data from the engine and write it to the underlying
     // transport.
     asio::write(next_layer,
-        core.engine_.get_output(core.output_buffer_), io_ec);
+        core.engine_.get_output(core.output_buffer()),
+        transfer_unlimited(), io_ec);
     if (!ec)
       ec = io_ec;
 
     // Operation is complete. Return result to caller.
     core.engine_.map_error_code(ec);
+    op.complete_sync(ec);
     return bytes_transferred;
 
   default:
 
     // Operation is complete. Return result to caller.
     core.engine_.map_error_code(ec);
+    op.complete_sync(ec);
     return bytes_transferred;
 
   } while (!ec);
 
   // Operation failed. Return result to caller.
   core.engine_.map_error_code(ec);
+  op.complete_sync(ec);
   return 0;
 }
 
@@ -107,11 +122,10 @@ public:
       start_(0),
       want_(engine::want_nothing),
       bytes_transferred_(0),
-      handler_(ASIO_MOVE_CAST(Handler)(handler))
+      handler_(static_cast<Handler&&>(handler))
   {
   }
 
-#if defined(ASIO_HAS_MOVE)
   io_op(const io_op& other)
     : asio::detail::base_from_cancellation_state<Handler>(other),
       next_layer_(other.next_layer_),
@@ -127,20 +141,18 @@ public:
 
   io_op(io_op&& other)
     : asio::detail::base_from_cancellation_state<Handler>(
-        ASIO_MOVE_CAST(
-          asio::detail::base_from_cancellation_state<Handler>)(
-            other)),
+        static_cast<
+          asio::detail::base_from_cancellation_state<Handler>&&>(other)),
       next_layer_(other.next_layer_),
       core_(other.core_),
-      op_(ASIO_MOVE_CAST(Operation)(other.op_)),
+      op_(static_cast<Operation&&>(other.op_)),
       start_(other.start_),
       want_(other.want_),
       ec_(other.ec_),
       bytes_transferred_(other.bytes_transferred_),
-      handler_(ASIO_MOVE_CAST(Handler)(other.handler_))
+      handler_(static_cast<Handler&&>(other.handler_))
   {
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   void operator()(asio::error_code ec,
       std::size_t bytes_transferred = ~std::size_t(0), int start = 0)
@@ -176,8 +188,8 @@ public:
 
             // Start reading some data from the underlying transport.
             next_layer_.async_read_some(
-                asio::buffer(core_.input_buffer_),
-                ASIO_MOVE_CAST(io_op)(*this));
+                asio::buffer(core_.input_buffer()),
+                static_cast<io_op&&>(*this));
           }
           else
           {
@@ -185,7 +197,7 @@ public:
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             // Wait until the current read operation completes.
-            core_.pending_read_.async_wait(ASIO_MOVE_CAST(io_op)(*this));
+            core_.pending_read_.async_wait(static_cast<io_op&&>(*this));
           }
 
           // Yield control until asynchronous operation completes. Control
@@ -209,8 +221,8 @@ public:
 
             // Start writing all the data to the underlying transport.
             asio::async_write(next_layer_,
-                core_.engine_.get_output(core_.output_buffer_),
-                ASIO_MOVE_CAST(io_op)(*this));
+                core_.engine_.get_output(core_.output_buffer()),
+                transfer_unlimited(), static_cast<io_op&&>(*this));
           }
           else
           {
@@ -218,7 +230,7 @@ public:
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             // Wait until the current write operation completes.
-            core_.pending_write_.async_wait(ASIO_MOVE_CAST(io_op)(*this));
+            core_.pending_write_.async_wait(static_cast<io_op&&>(*this));
           }
 
           // Yield control until asynchronous operation completes. Control
@@ -238,8 +250,8 @@ public:
                   __FILE__, __LINE__, Operation::tracking_name()));
 
             next_layer_.async_read_some(
-                asio::buffer(core_.input_buffer_, 0),
-                ASIO_MOVE_CAST(io_op)(*this));
+                asio::buffer(core_.input_buffer(), 0),
+                static_cast<io_op&&>(*this));
 
             // Yield control until asynchronous operation completes. Control
             // resumes at the "default:" label below.
@@ -252,7 +264,7 @@ public:
           }
         }
 
-        default:
+        /* fall-through */ default:
         if (bytes_transferred == ~std::size_t(0))
           bytes_transferred = 0; // Timer cancellation, no data transferred.
         else if (!ec_)
@@ -264,7 +276,7 @@ public:
 
           // Add received data to the engine's input.
           core_.input_ = asio::buffer(
-              core_.input_buffer_, bytes_transferred);
+              core_.input_buffer(), bytes_transferred);
           core_.input_ = core_.engine_.put_input(core_.input_);
 
           // Release any waiting read operations.
@@ -302,7 +314,7 @@ public:
 
           // Fall through to call handler.
 
-        default:
+        /* fall-through */ default:
 
           // Pass the result to the handler.
           op_.call_handler(handler_,
@@ -331,63 +343,12 @@ public:
 };
 
 template <typename Stream, typename Operation, typename Handler>
-inline asio_handler_allocate_is_deprecated
-asio_handler_allocate(std::size_t size,
-    io_op<Stream, Operation, Handler>* this_handler)
-{
-#if defined(ASIO_NO_DEPRECATED)
-  asio_handler_alloc_helpers::allocate(size, this_handler->handler_);
-  return asio_handler_allocate_is_no_longer_used();
-#else // defined(ASIO_NO_DEPRECATED)
-  return asio_handler_alloc_helpers::allocate(
-      size, this_handler->handler_);
-#endif // defined(ASIO_NO_DEPRECATED)
-}
-
-template <typename Stream, typename Operation, typename Handler>
-inline asio_handler_deallocate_is_deprecated
-asio_handler_deallocate(void* pointer, std::size_t size,
-    io_op<Stream, Operation, Handler>* this_handler)
-{
-  asio_handler_alloc_helpers::deallocate(
-      pointer, size, this_handler->handler_);
-#if defined(ASIO_NO_DEPRECATED)
-  return asio_handler_deallocate_is_no_longer_used();
-#endif // defined(ASIO_NO_DEPRECATED)
-}
-
-template <typename Stream, typename Operation, typename Handler>
 inline bool asio_handler_is_continuation(
     io_op<Stream, Operation, Handler>* this_handler)
 {
   return this_handler->start_ == 0 ? true
-    : asio_handler_cont_helpers::is_continuation(this_handler->handler_);
-}
-
-template <typename Function, typename Stream,
-    typename Operation, typename Handler>
-inline asio_handler_invoke_is_deprecated
-asio_handler_invoke(Function& function,
-    io_op<Stream, Operation, Handler>* this_handler)
-{
-  asio_handler_invoke_helpers::invoke(
-      function, this_handler->handler_);
-#if defined(ASIO_NO_DEPRECATED)
-  return asio_handler_invoke_is_no_longer_used();
-#endif // defined(ASIO_NO_DEPRECATED)
-}
-
-template <typename Function, typename Stream,
-    typename Operation, typename Handler>
-inline asio_handler_invoke_is_deprecated
-asio_handler_invoke(const Function& function,
-    io_op<Stream, Operation, Handler>* this_handler)
-{
-  asio_handler_invoke_helpers::invoke(
-      function, this_handler->handler_);
-#if defined(ASIO_NO_DEPRECATED)
-  return asio_handler_invoke_is_no_longer_used();
-#endif // defined(ASIO_NO_DEPRECATED)
+    : ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
+        this_handler->handler_);
 }
 
 template <typename Stream, typename Operation, typename Handler>
@@ -411,13 +372,20 @@ struct associator<Associator,
   : Associator<Handler, DefaultCandidate>
 {
   static typename Associator<Handler, DefaultCandidate>::type get(
-      const ssl::detail::io_op<Stream, Operation, Handler>& h,
-      const DefaultCandidate& c = DefaultCandidate()) ASIO_NOEXCEPT
+      const ssl::detail::io_op<Stream, Operation, Handler>& h) noexcept
+  {
+    return Associator<Handler, DefaultCandidate>::get(h.handler_);
+  }
+
+  static auto get(const ssl::detail::io_op<Stream, Operation, Handler>& h,
+      const DefaultCandidate& c) noexcept
+    -> decltype(Associator<Handler, DefaultCandidate>::get(h.handler_, c))
   {
     return Associator<Handler, DefaultCandidate>::get(h.handler_, c);
   }
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

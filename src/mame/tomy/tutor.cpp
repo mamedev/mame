@@ -182,16 +182,14 @@ A=AMA, P=PRO, these keys don't exist, and so the games cannot be played.
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#include "utf8.h"
-
 
 namespace {
 
 class tutor_state : public driver_device
 {
 public:
-	tutor_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tutor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_cass(*this, "cassette"),
@@ -199,6 +197,8 @@ public:
 		m_cent_data_out(*this, "cent_data_out"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
+		m_io_line(*this, "LINE%u", 0U),
+		m_io_line_alt(*this, "LINE%u_alt", 4U),
 		m_bank1_switching(0)
 	{
 	}
@@ -207,8 +207,8 @@ public:
 	void tutor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tms9995_device> m_maincpu;
@@ -218,6 +218,8 @@ private:
 	optional_device<output_latch_device> m_cent_data_out;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
+	optional_ioport_array<8> m_io_line;
+	optional_ioport_array<2> m_io_line_alt;
 	memory_region *m_cart_rom;
 
 	int m_tape_interrupt_enable;
@@ -240,9 +242,9 @@ private:
 	void write_centronics_busy(int state);
 	[[maybe_unused]] void test_w(offs_t offset, uint8_t data);
 
-	void pyuutajr_mem(address_map &map);
-	void tutor_io(address_map &map);
-	void tutor_memmap(address_map &map);
+	void pyuutajr_mem(address_map &map) ATTR_COLD;
+	void tutor_io(address_map &map) ATTR_COLD;
+	void tutor_memmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -303,17 +305,12 @@ void tutor_state::machine_reset()
 
 uint8_t tutor_state::key_r(offs_t offset)
 {
-	char port[12];
-	uint8_t value;
-
-	snprintf(port, std::size(port), "LINE%d", (offset & 0x007e) >> 3);
-	value = ioport(port)->read();
+	uint8_t value = m_io_line[(offset & 0x0038) >> 3]->read();
 
 	/* hack for ports overlapping with joystick */
 	if (offset >= 32 && offset < 48)
 	{
-		snprintf(port, std::size(port), "LINE%d_alt", (offset & 0x007e) >> 3);
-		value |= ioport(port)->read();
+		value |= m_io_line_alt[(offset & 0x0008) >> 3]->read();
 	}
 
 	return BIT(value, offset & 7);
@@ -379,7 +376,7 @@ void tutor_state::tutor_mapper_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		if (!(offset & 1))
+		if (~offset & 1)
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		break;
 	}
@@ -487,7 +484,7 @@ uint8_t tutor_state::tutor_printer_r(offs_t offset)
 		break;
 
 	default:
-		if (! (offset & 1))
+		if (~offset & 1)
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		reply = 0;
 		break;
@@ -511,7 +508,7 @@ void tutor_state::tutor_printer_w(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		if (! (offset & 1))
+		if (~offset & 1)
 			logerror("unknown port in %s %d\n", __FILE__, __LINE__);
 		break;
 	}
@@ -742,10 +739,10 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_COMMA)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT)  // ←
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP)    // ↑
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN)  // ↓
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) // →
 
 	PORT_START("LINE3")
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -764,7 +761,7 @@ void tutor_state::tutor(machine_config &config)
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// Sound
 	SPEAKER(config, "sound_out").front_center();
@@ -777,14 +774,13 @@ void tutor_state::tutor(machine_config &config)
 
 	// Cassette
 	SPEAKER(config, "cass_out").front_center();
-	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "cass_out", 0.25);
+	CASSETTE(config, "cassette").add_route(ALL_OUTPUTS, "cass_out", 0.25);
 
 	// Cartridge slot
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "tutor_cart", "bin");
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("tutor");
-
 }
 
 void tutor_state::pyuutajr(machine_config &config)

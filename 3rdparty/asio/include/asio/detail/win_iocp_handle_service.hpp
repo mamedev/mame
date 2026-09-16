@@ -2,7 +2,7 @@
 // detail/win_iocp_handle_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -36,6 +36,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class win_iocp_handle_service :
@@ -110,6 +111,10 @@ public:
   ASIO_DECL asio::error_code close(implementation_type& impl,
       asio::error_code& ec);
 
+  // Release ownership of a handle.
+  ASIO_DECL native_handle_type release(implementation_type& impl,
+      asio::error_code& ec);
+
   // Get the native handle representation.
   native_handle_type native_handle(const implementation_type& impl) const
   {
@@ -148,7 +153,7 @@ public:
       const ConstBufferSequence& buffers,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -178,7 +183,7 @@ public:
       uint64_t offset, const ConstBufferSequence& buffers,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -229,7 +234,7 @@ public:
       const MutableBufferSequence& buffers,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -261,7 +266,7 @@ public:
       uint64_t offset, const MutableBufferSequence& buffers,
       Handler& handler, const IoExecutor& io_ex)
   {
-    typename associated_cancellation_slot<Handler>::type slot
+    associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
 
     // Allocate and construct an operation to wrap the handler.
@@ -339,6 +344,27 @@ private:
   // destroyed.
   ASIO_DECL void close_for_destruction(implementation_type& impl);
 
+  // The type of a NtSetInformationFile function pointer.
+  typedef LONG (NTAPI *nt_set_info_fn)(HANDLE, ULONG_PTR*, void*, ULONG, ULONG);
+
+  // Helper function to get the NtSetInformationFile function pointer. If no
+  // NtSetInformationFile pointer has been obtained yet, one is obtained using
+  // GetProcAddress and the pointer is cached. Returns a null pointer if
+  // NtSetInformationFile is not available.
+  ASIO_DECL nt_set_info_fn get_nt_set_info();
+
+  // Helper function to emulate InterlockedCompareExchangePointer functionality
+  // for:
+  // - very old Platform SDKs; and
+  // - platform SDKs where MSVC's /Wp64 option causes spurious warnings.
+  ASIO_DECL void* interlocked_compare_exchange_pointer(
+      void** dest, void* exch, void* cmp);
+
+  // Helper function to emulate InterlockedExchangePointer functionality for:
+  // - very old Platform SDKs; and
+  // - platform SDKs where MSVC's /Wp64 option causes spurious warnings.
+  ASIO_DECL void* interlocked_exchange_pointer(void** dest, void* val);
+
   // Helper class used to implement per operation cancellation.
   class iocp_op_cancellation : public operation
   {
@@ -382,6 +408,9 @@ private:
   // handlers.
   win_iocp_io_context& iocp_service_;
 
+  // Pointer to NtSetInformationFile implementation.
+  void* nt_set_info_;
+
   // Mutex to protect access to the linked list of implementations.
   mutex mutex_;
 
@@ -390,6 +419,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

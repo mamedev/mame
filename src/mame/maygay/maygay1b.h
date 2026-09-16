@@ -5,23 +5,22 @@
 
 #pragma once
 
-#include "awpvid.h"       //Fruit Machines Only
 
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"   // vfd
-#include "machine/steppers.h"   // stepper motor
+#include "machine/steppers.h" // stepper motor
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/okim6376.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
+#include "video/roc10937.h" // vfd
 
 
 class maygay1b_state : public driver_device
@@ -41,7 +40,7 @@ public:
 		m_sw2_port(*this, "SW2"),
 		m_kbd_ports(*this, { "SW1", "SW2", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", }),
 		m_bank1(*this, "bank1"),
-		m_reels(*this, "reel%u", 0U),
+		m_reels(*this, "reel%u", 1U),
 		m_meters(*this, "meters"),
 		m_oki_region(*this, "msm6376"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -49,14 +48,14 @@ public:
 	{
 	}
 
-	void maygay_m1_no_oki(machine_config &config);
-	void maygay_m1(machine_config &config);
-	void maygay_m1_nec(machine_config &config);
-	void maygay_m1_empire(machine_config &config);
+	void maygay_m1_no_oki(machine_config &config) ATTR_COLD;
+	void maygay_m1(machine_config &config) ATTR_COLD;
+	void maygay_m1_nec(machine_config &config) ATTR_COLD;
+	void maygay_m1_empire(machine_config &config) ATTR_COLD;
 
-	void init_m1();
-	void init_m1common();
-	void init_m1nec();
+	void init_m1() ATTR_COLD;
+	void init_m1common() ATTR_COLD;
+	void init_m1nec() ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -137,12 +136,12 @@ private:
 
 	uint8_t m_main_to_mcu;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
-	void m1_memmap(address_map &map);
-	void m1_nec_memmap(address_map &map);
+	void m1_memmap(address_map &map) ATTR_COLD;
+	void m1_nec_memmap(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN( maygay_m1 );

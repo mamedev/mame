@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert
 #ifndef MAME_CPU_M6502_M5074X_H
 #define MAME_CPU_M6502_M5074X_H
 
@@ -21,11 +21,6 @@ class m5074x_device :  public m740_device
 
 	enum
 	{
-		M5074X_INT1_LINE = INPUT_LINE_IRQ0
-	};
-
-	enum
-	{
 		TIMER_1 = 0,
 		TIMER_2,
 		TIMER_X,
@@ -36,11 +31,16 @@ class m5074x_device :  public m740_device
 	};
 
 public:
+	enum
+	{
+		M5074X_INT1_LINE = INPUT_LINE_IRQ0
+	};
+
 	const address_space_config m_program_config;
 
-	template <std::size_t Bit> auto read_p() { return m_read_p[Bit].bind(); }
-	template <std::size_t Bit> auto write_p() { return m_write_p[Bit].bind(); }
-	template <std::size_t Bit> void set_pullups(u8 mask) { m_pullups[Bit] = mask; }
+	template <std::size_t Port> auto read_p() { return m_read_p[Port].bind(); }
+	template <std::size_t Port> auto write_p() { return m_write_p[Port].bind(); }
+	template <std::size_t Port> void set_pullups(u8 mask) { m_pullups[Port] = mask; }
 
 	uint8_t ports_r(offs_t offset);
 	void ports_w(offs_t offset, uint8_t data);
@@ -54,8 +54,8 @@ protected:
 	m5074x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_execute_interface overrides (TODO: /8 in M50740A/41/52/57/58 SLW mode)
@@ -96,7 +96,7 @@ protected:
 	m50740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	void m50740_map(address_map &map);
+	void m50740_map(address_map &map) ATTR_COLD;
 };
 
 class m50741_device : public m5074x_device
@@ -108,7 +108,7 @@ protected:
 	m50741_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 private:
-	void m50741_map(address_map &map);
+	void m50741_map(address_map &map) ATTR_COLD;
 };
 
 class m50753_device : public m5074x_device
@@ -122,7 +122,7 @@ public:
 		M50753_INT2_LINE = INPUT_LINE_IRQ1
 	};
 
-	template <std::size_t Bit> auto ad_in() { return m_ad_in[Bit].bind(); }
+	template <std::size_t Port> auto ad_in() { return m_ad_in[Port].bind(); }
 
 	auto read_in_p() { return m_in_p.bind(); }
 
@@ -130,15 +130,15 @@ protected:
 	m50753_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual TIMER_CALLBACK_MEMBER(adc_complete) override;
 
 private:
-	void m50753_map(address_map &map);
+	void m50753_map(address_map &map) ATTR_COLD;
 
 	uint8_t ad_r();
 	uint8_t in_r();

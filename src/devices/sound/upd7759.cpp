@@ -684,19 +684,19 @@ int upd775x_device::busy_r()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void upd775x_device::sound_stream_update(sound_stream &stream)
 {
-	constexpr stream_buffer::sample_t sample_scale = 128.0 / 32768.0;
-	stream_buffer::sample_t sample = stream_buffer::sample_t(m_sample) * sample_scale;
+	constexpr sound_stream::sample_t sample_scale = 128.0 / 32768.0;
+	sound_stream::sample_t sample = sound_stream::sample_t(m_sample) * sample_scale;
 	int32_t clocks_left = m_clocks_left;
 	uint32_t step = m_step;
 	uint32_t pos = m_pos;
 
 	u32 index = 0;
 	if (m_state != STATE_IDLE)
-		for ( ; index < outputs[0].samples(); index++)
+		for ( ; index < stream.samples(); index++)
 		{
-			outputs[0].put(index, sample);
+			stream.put(0, index, sample);
 
 			pos += step;
 
@@ -716,14 +716,14 @@ void upd775x_device::sound_stream_update(sound_stream &stream, std::vector<read_
 						break;
 
 					clocks_left = m_clocks_left;
-					sample = stream_buffer::sample_t(m_sample) * sample_scale;
+					sample = sound_stream::sample_t(m_sample) * sample_scale;
 				}
 			}
 		}
 
 	// if we got out early, just zap the rest of the buffer
-	for (; index < outputs[0].samples(); index++)
-		outputs[0].put(index, 0);
+	for (; index < stream.samples(); index++)
+		stream.put(0, index, 0);
 
 	m_clocks_left = clocks_left;
 	m_pos = pos;

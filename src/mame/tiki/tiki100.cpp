@@ -390,11 +390,11 @@ static INPUT_PORTS_START( tiki100 )
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xB8 \xC3\x98") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00f8) PORT_CHAR(0x00d8)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'ø') PORT_CHAR(U'Ø')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_CHAR('?')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xA5 \xC3\x85") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\xA6 \xC3\x86") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00e6) PORT_CHAR(0x00c6)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'å') PORT_CHAR(U'Å')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'æ') PORT_CHAR(U'Æ')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HJELP")
 
 	PORT_START("Y8")
@@ -675,7 +675,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 void tiki100_state::busrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, state);
 	m_exp->busak_w(state);
 }
 
@@ -683,8 +683,6 @@ void tiki100_state::busrq_w(int state)
 
 void tiki100_state::machine_start()
 {
-	m_leds.resolve();
-
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
@@ -717,12 +715,12 @@ void tiki100_state::tiki100(machine_config &config)
 
 	/* video hardware */
 	TIMER(config, "scantimer").configure_scanline(FUNC(tiki100_state::scanline_start), "screen", 0, 1);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL, 1280, 0, 1024, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(tiki100_state::screen_update));
 	PALETTE(config, m_palette).set_entries(16);
 
-	TIKI100_BUS(config, m_exp, 0);
+	TIKI100_BUS(config, m_exp);
 	m_exp->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));

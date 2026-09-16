@@ -13,6 +13,7 @@
 
 #include "emufwd.h"
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -57,7 +58,7 @@ public:
 	static bool draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
-	static void sound_hook();
+	static void sound_hook(const std::map<std::string, std::vector<std::pair<const float *, int>>> &sound); // Can't use sound_stream::sample_t sadly
 	static void layout_script_cb(layout_file &file, const char *script);
 	static bool standalone();
 };

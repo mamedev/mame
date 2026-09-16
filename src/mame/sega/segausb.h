@@ -30,8 +30,13 @@ public:
 	{
 		m_maincpu.set_tag(maincpu_tag);
 	}
+	template <typename T> usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&maincpu_tag)
+		: usb_sound_device(mconfig, tag, owner, 0, std::forward<T>(maincpu_tag))
+	{
+		m_maincpu.set_tag(std::forward<T>(maincpu_tag));
+	}
 
-	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	usb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	uint8_t status_r();
 	void data_w(uint8_t data);
@@ -43,9 +48,9 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER( increment_t1_clock_timer_cb );
 
-	void usb_map(address_map &map);
-	void usb_map_rom(address_map &map);
-	void usb_portmap(address_map &map);
+	void usb_map(address_map &map) ATTR_COLD;
+	void usb_map_rom(address_map &map) ATTR_COLD;
+	void usb_portmap(address_map &map) ATTR_COLD;
 
 #if (ENABLE_SEGAUSB_NETLIST)
 	TIMER_DEVICE_CALLBACK_MEMBER( gos_timer );
@@ -53,16 +58,16 @@ public:
 
 protected:
 
-	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	usb_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 #if (!ENABLE_SEGAUSB_NETLIST)
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 #endif
 
 private:
@@ -179,12 +184,17 @@ public:
 	{
 		m_maincpu.set_tag(maincpu_tag);
 	}
+	template <typename T> usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&maincpu_tag)
+		: usb_rom_sound_device(mconfig, tag, owner, 0, maincpu_tag)
+	{
+		m_maincpu.set_tag(maincpu_tag);
+	}
 
-	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	usb_rom_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device)

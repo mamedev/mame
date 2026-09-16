@@ -183,7 +183,7 @@ void wpc_flip1_state::wpc_flip1(machine_config &config)
 	M6809(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_flip1_state::wpc_flip1_map);
 
-	WPCASIC(config, m_wpc, 0);
+	WPCASIC(config, m_wpc);
 	m_wpc->irq_callback().set(FUNC(wpc_flip1_state::irq_w));
 	m_wpc->firq_callback().set(FUNC(wpc_flip1_state::firq_w));
 	m_wpc->bank_write().set(FUNC(wpc_flip1_state::rombank_w));
@@ -199,7 +199,7 @@ void wpc_flip1_state::wpc_flip1(machine_config &config)
 	m_wpcsnd->reply_callback().set(FUNC(wpc_flip1_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_native_aspect();
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 128-1, 0, 32-1);
@@ -285,12 +285,12 @@ ROM_END
 /*--------------
 /  Game drivers
 /---------------*/
-GAME(1992,  taf_l5,  0,       wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-5)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_p2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (Prototype) (P-2)",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_l1,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-1)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_l2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-2)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_l3,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-3)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_l4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-4)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_l7,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (Prototype L-5) (L-7)",    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_l6,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-6)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  taf_h4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (H-4)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l5,  0,       wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-5)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_p2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (Prototype) (P-2)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l1,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-1)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l2,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-2)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l3,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-3)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-4)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l7,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (Prototype L-5) (L-7)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_l6,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (L-6)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  taf_h4,  taf_l5,  wpc_flip1,  wpc_flip1, wpc_flip1_state, init_wpc_flip1, ROT0, "Bally",    "The Addams Family (H-4)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -96,7 +96,7 @@ static INPUT_PORTS_START( model1io2 )
 	PORT_DIPNAME(0x20, 0x20, "MODE") // JP3
 	PORT_DIPSETTING(   0x00, DEF_STR(On))
 	PORT_DIPSETTING(   0x20, DEF_STR(Off))
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // eeprom nc
 INPUT_PORTS_END
 
@@ -180,7 +180,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom); // 93C45
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	msm6253_device &adc(MSM6253(config, "adc", 32_MHz_XTAL / 16 / 4));
 	adc.set_input_cb<0>(FUNC(model1io2_device::analog0_r));
@@ -189,7 +189,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 	adc.set_input_cb<3>(FUNC(model1io2_device::analog3_r));
 
 	// diagnostic LCD display
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*20+1, 19);
@@ -199,7 +199,7 @@ void model1io2_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(model1io2_device::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(model1io2_device::lcd_pixel_update));
 }
@@ -237,9 +237,6 @@ model1io2_device::model1io2_device(const machine_config &mconfig, const char *ta
 
 void model1io2_device::device_start()
 {
-	// resolve outputs
-	m_led_comm_err.resolve();
-
 	// register for save states
 	save_item(NAME(m_secondary_controls));
 	save_item(NAME(m_lcd_data));

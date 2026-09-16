@@ -289,11 +289,6 @@ void warpwarp_state::ball_on_w(int state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void warpwarp_state::inv_w(int state)
-{
-	flip_screen_set(state);
-}
-
 
 /* Color Games I/O */
 
@@ -781,10 +776,10 @@ void warpwarp_state::geebee(machine_config &config)
 	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
 	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::geebee_bgw_w));
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
-	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224);
 	screen.set_screen_update(FUNC(warpwarp_state::screen_update));
 	screen.set_palette(m_palette);
@@ -851,12 +846,12 @@ void warpwarp_state::bombbee(machine_config &config)
 	m_latch->q_out_cb<4>().set(FUNC(warpwarp_state::lock_out_w));
 	m_latch->q_out_cb<5>().set(FUNC(warpwarp_state::counter_w));
 	m_latch->q_out_cb<6>().set(FUNC(warpwarp_state::ball_on_w));
-	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::inv_w));
+	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224);
 	screen.set_screen_update(FUNC(warpwarp_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1092,10 +1087,10 @@ GAMEL( 1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_gee
 GAMEL( 1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, init_geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
 GAMEL( 1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, init_geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 
-GAME(  1979, sos,        0,        sos,      sos,       warpwarp_state, init_sos,      ROT90, "K.K. Tokki (Namco license)", "SOS Game", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1980, navarone,   0,        navarone, navarone,  warpwarp_state, init_navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )
+GAME(  1979, sos,        0,        sos,      sos,       warpwarp_state, init_sos,      ROT90, "K.K. Tokki (Namco license)", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // aka SOS Game (SOSゲーム)
+GAMEL( 1980, navarone,   0,        navarone, navarone,  warpwarp_state, init_navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone ) // aka Navalone
 GAME(  1980, kaitein,    kaitei,   kaitei,   kaitein,   warpwarp_state, init_kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
-GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // " - aka "Atrantis"
+GAME(  1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, init_kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // " - aka Atrantis
 
 /* Color games */
 GAME(  1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, init_bombbee,  ROT90, "Namco", "Bomb Bee", MACHINE_SUPPORTS_SAVE )

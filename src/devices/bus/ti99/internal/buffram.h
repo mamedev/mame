@@ -9,8 +9,8 @@
 
 *******************************************************************************/
 
-#ifndef MAME_BUS_TI99_INTERNAL_BRAM_H
-#define MAME_BUS_TI99_INTERNAL_BRAM_H
+#ifndef MAME_BUS_TI99_INTERNAL_BUFFRAM_H
+#define MAME_BUS_TI99_INTERNAL_BUFFRAM_H
 
 #pragma once
 
@@ -30,7 +30,7 @@ public:
 	void set_buffered(bool on) { nvram_enable_backup(on); }
 
 private:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// derived class overrides
 	virtual void nvram_default() override;
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(BUFF_RAM, bus::ti99::internal, buffered_ram_device)
 
-#endif // MAME_BUS_TI99_INTERNAL_BRAM_H
+#endif // MAME_BUS_TI99_INTERNAL_BUFFRAM_H

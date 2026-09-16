@@ -122,7 +122,7 @@ private:
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
 
-	void dgnalpha_io1(address_map &map);
+	void dgnalpha_io1(address_map &map) ATTR_COLD;
 
 	required_device<pia6821_device> m_pia_2;
 	required_device<ay8912_device> m_ay8912;
@@ -144,7 +144,7 @@ private:
 void dragon_alpha_state::dgnalpha_io1(address_map &map)
 {
 	// $FF20-$FF3F
-	map(0x00, 0x03).mirror(0x10).r(PIA1_TAG, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
+	map(0x00, 0x03).mirror(0x10).r(m_pia_1, FUNC(pia6821_device::read)).w(FUNC(coco12_state::ff20_write));
 	map(0x04, 0x07).mirror(0x10).rw(m_pia_2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08, 0x0b).mirror(0x10).rw(FUNC(dragon_alpha_state::modem_r), FUNC(dragon_alpha_state::modem_w));
 	map(0x0c, 0x0c).mirror(0x10).rw(m_fdc, FUNC(wd2797_device::data_r), FUNC(wd2797_device::data_w));
@@ -335,13 +335,13 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_nmis).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// cartridge
-	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), &dragon_alpha_state::dragon_cart, nullptr));
-	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
-	cartslot.nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
-	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	COCOCART_SLOT(config, m_cococart, DERIVED_CLOCK(1, 1), &dragon_alpha_state::dragon_cart, nullptr);
+	m_cococart->cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded
+	m_cococart->nmi_callback().set(m_nmis, FUNC(input_merger_device::in_w<0>));
+	m_cococart->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	// acia
-	mos6551_device &acia(MOS6551(config, "acia", 0));
+	mos6551_device &acia(MOS6551(config, "acia"));
 	acia.set_xtal(1.8432_MHz_XTAL);
 
 	// floppy
@@ -358,7 +358,7 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 	AY8912(config, m_ay8912, 4_MHz_XTAL/4);
 	m_ay8912->port_a_read_callback().set(FUNC(dragon_alpha_state::psg_porta_read));
 	m_ay8912->port_a_write_callback().set(FUNC(dragon_alpha_state::psg_porta_write));
-	m_ay8912->add_route(ALL_OUTPUTS, "speaker", 0.75);
+	m_ay8912->add_route(ALL_OUTPUTS, m_mux, 0.75, mc14529_device::y_sound_input(3));
 
 	// pia 2
 	PIA6821(config, m_pia_2);
@@ -373,13 +373,13 @@ void dragon_alpha_state::dgnalpha(machine_config &config)
 }
 
 ROM_START(dgnalpha)
-	ROM_REGION(0x10000,"maincpu",0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("boot10")
 	ROM_SYSTEM_BIOS(0, "boot10", "Boot v1.0")
 	ROMX_LOAD("alpha_bt_10.rom", 0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "boot04", "Boot v0.4")
 	ROMX_LOAD("alpha_bt_04.rom", 0x2000,  0x2000, CRC(d6172b56) SHA1(69ea376dbc7418f69e9e809b448d22a4de012344), ROM_BIOS(1))
-	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
+	ROM_LOAD("alpha_ba.rom",    0x4000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
 
 } // anonymous namespace

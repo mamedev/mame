@@ -100,7 +100,7 @@ uint8_t spectrum_mikroplus_device::iorq_r(offs_t offset)
 	return data;
 }
 
-int spectrum_mikroplus_device::romcs()
+bool spectrum_mikroplus_device::romcs()
 {
 	return 1;
 }

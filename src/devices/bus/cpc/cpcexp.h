@@ -97,10 +97,7 @@ public:
 	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
 		: cpc_expansion_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	virtual ~cpc_expansion_slot_device();
 
@@ -128,7 +125,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_cpu;
 

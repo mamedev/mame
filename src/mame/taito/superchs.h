@@ -32,7 +32,7 @@ public:
 	void init_superchs();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	struct schs_tempsprite
@@ -68,9 +68,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_ioport m_volume;
-	void chase3_cpub_map(address_map &map);
-	void superchs_cpub_map(address_map &map);
-	void superchs_map(address_map &map);
+	void chase3_cpub_map(address_map &map) ATTR_COLD;
+	void superchs_cpub_map(address_map &map) ATTR_COLD;
+	void superchs_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TAITO_SUPERCHS_H

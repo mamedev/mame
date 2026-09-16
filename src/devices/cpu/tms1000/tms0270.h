@@ -21,10 +21,10 @@ public:
 
 protected:
 	// overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void write_o_reg(u8 index) override { tms1k_base_device::write_o_reg(index); }
 	virtual u8 read_k_input() override;

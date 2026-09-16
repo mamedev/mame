@@ -43,15 +43,15 @@ public:
 	void tim100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 dma_r(offs_t offset);
 	void sod_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
-	void mem_map(address_map &map);
-	void mem_xfer_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void mem_xfer_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_charmap;
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -95,9 +95,8 @@ INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
-	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
@@ -142,16 +141,18 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	for (uint8_t i = 0; i < 2; i++)
 	{
+		using namespace i8275_attributes;
 		uint8_t pixels = m_charmap[(i * 0x1000) | (linecount & 15) | (charcode << 4)];
-		if (vsp)
+		if (BIT(attrcode, VSP))
 			pixels = 0;
 
-		if (lten)
+		if (BIT(attrcode, LTEN))
 			pixels = 0xff;
 
-		if (rvv)
+		if (BIT(attrcode, RVV))
 			pixels ^= 0xff;
 
+		bool hlgt = BIT(attrcode, HLGT);
 		bitmap.pix(y, x++) = palette[BIT(pixels, 7) ? (hlgt ? 2 : 1) : 0];
 		bitmap.pix(y, x++) = palette[BIT(pixels, 6) ? (hlgt ? 2 : 1) : 0];
 		bitmap.pix(y, x++) = palette[BIT(pixels, 5) ? (hlgt ? 2 : 1) : 0];
@@ -179,7 +180,7 @@ void tim100_state::tim100(machine_config &config)
 	m_maincpu->out_sod_func().set(FUNC(tim100_state::sod_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
 	screen.set_raw(9'600'000, 600, 0, 480, 320, 0, 272);
 
@@ -194,7 +195,7 @@ void tim100_state::tim100(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(3);
 
-	i8251_device &uart_u17(I8251(config, "uart_u17", 0));
+	i8251_device &uart_u17(I8251(config, "uart_u17"));
 	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart_u17.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart_u17.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -206,13 +207,13 @@ void tim100_state::tim100(machine_config &config)
 	rs232.cts_handler().set("uart_u17", FUNC(i8251_device::write_cts));
 	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	i8251_device &uart_u18(I8251(config, "uart_u18", 0));
+	i8251_device &uart_u18(I8251(config, "uart_u18"));
 	uart_u18.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart_u18.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart_u18.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 	uart_u18.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
-	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "loopback"));
 	rs232a.rxd_handler().set("uart_u18", FUNC(i8251_device::write_rxd));
 	rs232a.dsr_handler().set("uart_u18", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart_u18", FUNC(i8251_device::write_cts));
@@ -246,4 +247,4 @@ ROM_END
 
 } // Anonymous namespace
 
-COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, tim100, 0, 0, tim100, tim100, tim100_state, empty_init, "Mihajlo Pupin Institute", "TIM-100", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

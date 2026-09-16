@@ -14,9 +14,6 @@ TODO:
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
   timer to IN.3 to score +100)
-- solution release year, most chips on the PCB were from 1984, but this one
-  was dumped from a licensed product branded for the VWR company, so it
-  could be later than the initial release
 
 *******************************************************************************/
 
@@ -28,7 +25,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -74,8 +71,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cop400_cpu_device> m_maincpu;
@@ -543,10 +540,9 @@ void einvaderc_state::einvaderc(machine_config &config)
 	m_maincpu->write_l().set(FUNC(einvaderc_state::write_l));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(919, 1080);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(10, 8);
 	m_display->set_segmask(7, 0x7f);
@@ -600,7 +596,7 @@ public:
 	int motor_switch_r();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_motor_pos_out;
@@ -618,9 +614,6 @@ private:
 void lchicken_state::machine_start()
 {
 	hh_cop400_state::machine_start();
-
-	m_motor_pos_out.resolve();
-	m_motor_on_out.resolve();
 
 	// register for savestates
 	save_item(NAME(m_motor_pos));
@@ -694,7 +687,7 @@ static INPUT_PORTS_START( lchicken )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(lchicken_state, motor_switch_r)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(lchicken_state::motor_switch_r))
 INPUT_PORTS_END
 
 // config
@@ -926,7 +919,7 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_cop400_state::reset_button), 0)
 INPUT_PORTS_END
 
 // config
@@ -1109,21 +1102,22 @@ class mbaskb2_state : public hh_cop400_state
 public:
 	mbaskb2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cop400_state(mconfig, type, tag),
-		m_subcpu(*this, "subcpu"),
-		m_on_timer(*this, "on_timer")
+		m_subcpu(*this, "subcpu")
 	{ }
 
 	void mbaskb2(machine_config &config);
 	void msoccer2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(switch_r);
+	ioport_value switch_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cop400_cpu_device> m_subcpu;
-	required_device<timer_device> m_on_timer;
+
+	attotime m_on_time;
 
 	void update_display();
 	void shared_write_l(u8 data);
@@ -1133,10 +1127,16 @@ private:
 	u8 sub_read_in();
 };
 
+void mbaskb2_state::machine_start()
+{
+	hh_cop400_state::machine_start();
+	save_item(NAME(m_on_time));
+}
+
 void mbaskb2_state::machine_reset()
 {
 	hh_cop400_state::machine_reset();
-	m_on_timer->adjust(attotime::from_msec(5));
+	m_on_time = machine().time() + attotime::from_msec(5);
 }
 
 // handlers
@@ -1181,11 +1181,11 @@ u8 mbaskb2_state::sub_read_in()
 
 // inputs
 
-CUSTOM_INPUT_MEMBER(mbaskb2_state::switch_r)
+ioport_value mbaskb2_state::switch_r()
 {
 	// The power switch is off-1-2, and the game relies on power-on starting at 1,
 	// otherwise msoccer2 boots up to what looks like a factory test mode.
-	return (m_inputs[3]->read() & 1) | (m_on_timer->enabled() ? 1 : 0);
+	return (machine().time() < m_on_time && ~m_inputs[4]->read() & 1) ? 1 : (m_inputs[3]->read() & 1);
 }
 
 static INPUT_PORTS_START( mbaskb2 )
@@ -1204,12 +1204,15 @@ static INPUT_PORTS_START( mbaskb2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Defense: Man")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Defense: Zone")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Defense: Press")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mbaskb2_state, switch_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(mbaskb2_state::switch_r))
 
 	PORT_START("IN.3")
 	PORT_CONFNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
 	PORT_CONFSETTING(    0x01, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
+
+	PORT_START("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msoccer2 )
@@ -1219,6 +1222,11 @@ static INPUT_PORTS_START( msoccer2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Low/High Kick")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Score")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Teammate")
+
+	PORT_MODIFY("IN.4")
+	PORT_CONFNAME( 0x01, 0x00, "Factory Test" ) PORT_CONDITION("IN.3", 0x01, EQUALS, 0x00)
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 // config
@@ -1246,8 +1254,6 @@ void mbaskb2_state::mbaskb2(machine_config &config)
 	m_subcpu->read_cko().set(m_maincpu, FUNC(cop400_cpu_device::sk_r));
 
 	config.set_perfect_quantum(m_maincpu);
-
-	TIMER(config, "on_timer").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
@@ -1375,10 +1381,9 @@ void lafootb_state::lafootb(machine_config &config)
 	m_maincpu->write_sk().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &mask(SCREEN(config, "mask", SCREEN_TYPE_SVG));
+	screen_svg_device &mask(SCREEN_SVG(config, "mask"));
 	mask.set_refresh_hz(60);
 	mask.set_size(1920, 864);
-	mask.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0x4, 0x7f);
@@ -2274,157 +2279,6 @@ ROM_END
 
 /*******************************************************************************
 
-  SCAT specialist calculators
-  * COP404LSN-5 MCU (no internal ROM)
-  * 2KB EPROM (ETC2716Q)
-  * 8-digit 7seg led display
-
-  SCAT = aka South Carolina(SC) Applied Technology, Inc.
-
-  Known products, assumed to be all on the same hardware:
-  - The Dimension (aka Feet & Inch Calculator)
-  - The Solution
-  - Metalmate
-
-  CKI was measured ~1.469MHz, but D0 was measured ~77.44Hz so that means real
-  clock speed is a bit higher than CKI measurement, and the clock divider is 32.
-
-*******************************************************************************/
-
-class scat_state : public hh_cop400_state
-{
-public:
-	scat_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_cop400_state(mconfig, type, tag)
-	{ }
-
-	void scat(machine_config &config);
-
-private:
-	void main_map(address_map &map);
-
-	void update_display();
-	void write_d(u8 data);
-	void write_g(u8 data);
-	void write_l(u8 data);
-	u8 read_in();
-};
-
-// handlers
-
-void scat_state::update_display()
-{
-	m_display->matrix(~(m_d | m_g << 4), bitswap<8>(m_l,0,1,2,3,4,5,6,7));
-}
-
-void scat_state::write_d(u8 data)
-{
-	// D: select digit, input mux (low)
-	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
-	m_d = data;
-	update_display();
-}
-
-void scat_state::write_g(u8 data)
-{
-	// G: select digit, input mux (high)
-	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
-	m_g = data;
-	update_display();
-}
-
-void scat_state::write_l(u8 data)
-{
-	// L: digit segment data
-	m_l = data;
-	update_display();
-}
-
-u8 scat_state::read_in()
-{
-	// IN: multiplexed inputs
-	return read_inputs(6, 0xf);
-}
-
-void scat_state::main_map(address_map &map)
-{
-	map(0x0000, 0x07ff).rom();
-}
-
-// inputs
-
-static INPUT_PORTS_START( solution )
-	PORT_START("IN.0") // D0 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / Enter")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+ / ppm")
-
-	PORT_START("IN.1") // D1 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Atoms / Mole")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Atomic Wt.")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("- / %")
-
-	PORT_START("IN.2") // D2 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Density Wntd.")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Orig. Density")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Eq. Wt.")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / Normal")
-
-	PORT_START("IN.3") // D3 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Conc. Wntd.")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / Orig. Conc.")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Fmla. Wt.")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷ / Molar")
-
-	PORT_START("IN.4") // G0 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Milli.")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Micro.")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Gram")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Liter")
-
-	PORT_START("IN.5") // G1 port IN
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Known Vol.")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Known Wt.")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Dil. Wntd.")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
-INPUT_PORTS_END
-
-// config
-
-void scat_state::scat(machine_config &config)
-{
-	// basic machine hardware
-	COP404L(config, m_maincpu, 1500000); // R/C OSC via MM74C14N
-	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &scat_state::main_map);
-	m_maincpu->write_d().set(FUNC(scat_state::write_d));
-	m_maincpu->write_g().set(FUNC(scat_state::write_g));
-	m_maincpu->write_l().set(FUNC(scat_state::write_l));
-	m_maincpu->read_in().set(FUNC(scat_state::read_in));
-
-	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(8, 8);
-	m_display->set_segmask(0xff, 0xff);
-	config.set_default_layout(layout_scat);
-
-	// no sound!
-}
-
-// roms
-
-ROM_START( solution )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "etc2716q", 0x0000, 0x0800, CRC(cf990f88) SHA1(6d505fdc94028cbdf6445df9e9451156a9d5f372) ) // no custom label
-ROM_END
-
-
-
-
-
-/*******************************************************************************
-
   Select Merchandise Video Challenger
   * COP420 MCU label COP420-TDX/N
   * 6-digit 7seg led display, 3 other leds, 4-bit sound
@@ -2522,6 +2376,213 @@ void vidchal_state::vidchal(machine_config &config)
 ROM_START( vidchal )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420-tdx_n", 0x0000, 0x0400, CRC(c9bd041c) SHA1(ab0dcaf4741620fa4c28ab75337a23d646af7626) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  SCAT specialist calculators (SCAT = South Carolina(SC) Applied Technology, Inc.)
+
+  SCAT The Dimension (aka Feet & Inch Calculator, FI-21)
+  * COP404LSN-5 MCU (no internal ROM)
+  * 2KB EPROM (27C16)
+  * 8-digit 7seg led display
+
+  CKI was measured ~1.469MHz (on The Solution), but D0 was measured ~77.44Hz so
+  that means real clock speed is a bit higher than CKI measurement, and the clock
+  divider is 32.
+
+*******************************************************************************/
+
+class scat_state : public hh_cop400_state
+{
+public:
+	scat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void scat(machine_config &config);
+
+private:
+	void main_map(address_map &map) ATTR_COLD;
+
+	void update_display();
+	void write_d(u8 data);
+	void write_g(u8 data);
+	void write_l(u8 data);
+	u8 read_in();
+};
+
+// handlers
+
+void scat_state::update_display()
+{
+	m_display->matrix(~(m_d | m_g << 4), bitswap<8>(m_l,0,1,2,3,4,5,6,7));
+}
+
+void scat_state::write_d(u8 data)
+{
+	// D: select digit, input mux (low)
+	m_inp_mux = (m_inp_mux & 0x30) | (data & 0xf);
+	m_d = data;
+	update_display();
+}
+
+void scat_state::write_g(u8 data)
+{
+	// G: select digit, input mux (high)
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 4 & 0x30);
+	m_g = data;
+	update_display();
+}
+
+void scat_state::write_l(u8 data)
+{
+	// L: digit segment data
+	m_l = data;
+	update_display();
+}
+
+u8 scat_state::read_in()
+{
+	// IN: multiplexed inputs
+	return read_inputs(6, 0xf);
+}
+
+void scat_state::main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
+
+// inputs
+
+static INPUT_PORTS_START( dimension )
+	PORT_START("IN.0") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(". / FT/IN/FR")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+
+	PORT_START("IN.1") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1 / 1/8")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / 1/4")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / 3/8")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.2") // D2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / 1/2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / 5/8")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / 3/4")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // D3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / 7/8")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"×")
+
+	PORT_START("IN.4") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME(u8"π")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"\u221ax") // U+221A = √
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME(u8"x²")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
+
+	PORT_START("IN.5") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("FDM")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("STO")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("RCL")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+INPUT_PORTS_END
+
+// config
+
+void scat_state::scat(machine_config &config)
+{
+	// basic machine hardware
+	COP404L(config, m_maincpu, 1500000); // R/C OSC via MM74C14N
+	m_maincpu->set_config(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &scat_state::main_map);
+	m_maincpu->write_d().set(FUNC(scat_state::write_d));
+	m_maincpu->write_g().set(FUNC(scat_state::write_g));
+	m_maincpu->write_l().set(FUNC(scat_state::write_l));
+	m_maincpu->read_in().set(FUNC(scat_state::read_in));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
+	config.set_default_layout(layout_scat);
+
+	// no sound!
+}
+
+// roms
+
+ROM_START( dimension )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "nmc27c16q", 0x0000, 0x0800, CRC(9123e684) SHA1(f593b7bcd1b0217d3b7bce23a58271e651aa7b2e) ) // no custom label
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  SCAT The Solution
+  * same hardware as The Dimension, but some added wires and cut traces
+
+*******************************************************************************/
+
+// class/handlers: uses the ones in scat_state
+
+// inputs
+
+static INPUT_PORTS_START( solution )
+	PORT_START("IN.0") // D0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / Enter")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+ / ppm")
+
+	PORT_START("IN.1") // D1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Atoms / Mole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Atomic Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("- / %")
+
+	PORT_START("IN.2") // D2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Density Wntd.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Orig. Density")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Eq. Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / Normal")
+
+	PORT_START("IN.3") // D3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Conc. Wntd.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / Orig. Conc.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Fmla. Wt.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷ / Molar")
+
+	PORT_START("IN.4") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Milli.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Micro.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Gram")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Liter")
+
+	PORT_START("IN.5") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Known Vol.")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Known Wt.")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("Dil. Wntd.")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("CE/C")
+INPUT_PORTS_END
+
+// roms
+
+ROM_START( solution )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "etc2716q", 0x0000, 0x0800, CRC(cf990f88) SHA1(6d505fdc94028cbdf6445df9e9451156a9d5f372) ) // no custom label
 ROM_END
 
 
@@ -2759,7 +2820,7 @@ static INPUT_PORTS_START( lilcomp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Code 2")
 
 	PORT_START("IN.3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_cop400_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_cop400_state::power_button), true)
 INPUT_PORTS_END
 
 // config
@@ -2805,7 +2866,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME        PARENT     COMPAT  MACHINE     INPUT       CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, ctstein,    0,         0,      ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ctstein,    0,         0,      ctstein,    ctstein,    ctstein_state,   empty_init, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, h2hbaskbc,  h2hbaskb,  0,      h2hbaskbc,  h2hbaskbc,  h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, h2hhockeyc, h2hhockey, 0,      h2hhockeyc, h2hhockeyc, h2hbaskbc_state, empty_init, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
@@ -2813,11 +2874,11 @@ SYST( 1980, h2hsoccerc, 0,         0,      h2hsoccerc, h2hsoccerc, h2hbaskbc_sta
 
 SYST( 1981, einvaderc,  einvader,  0,      einvaderc,  einvaderc,  einvaderc_state, empty_init, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
+SYST( 1980, lchicken,   0,         0,      lchicken,   lchicken,   lchicken_state,  empty_init, "LJN Toys", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 
-SYST( 1979, funjacks,   0,         0,      funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1979, funrlgl,    0,         0,      funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, funtag,     0,         0,      funtag,     funtag,     funtag_state,    empty_init, "Mattel Electronics", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, funjacks,   0,         0,      funjacks,   funjacks,   funjacks_state,  empty_init, "Mattel Electronics", "Funtronics: Jacks", MACHINE_SUPPORTS_SAVE )
+SYST( 1979, funrlgl,    0,         0,      funrlgl,    funrlgl,    funrlgl_state,   empty_init, "Mattel Electronics", "Funtronics: Red Light Green Light", MACHINE_SUPPORTS_SAVE )
+SYST( 1980, funtag,     0,         0,      funtag,     funtag,     funtag_state,    empty_init, "Mattel Electronics", "Funtronics: Tag", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, mbaskb2,    0,         0,      mbaskb2,    mbaskb2,    mbaskb2_state,   empty_init, "Mattel Electronics", "Basketball 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
 SYST( 1979, msoccer2,   0,         0,      msoccer2,   msoccer2,   mbaskb2_state,   empty_init, "Mattel Electronics", "Soccer 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
 SYST( 1980, lafootb,    0,         0,      lafootb,    lafootb,    lafootb_state,   empty_init, "Mattel Electronics", "Look Alive! Football", MACHINE_SUPPORTS_SAVE )
@@ -2826,17 +2887,18 @@ SYST( 1981, mdallas,    0,         0,      mdallas,    mdallas,    mdallas_state
 SYST( 1980, minspace,   0,         0,      minspace,   minspace,   minspace_state,  empty_init, "Mego", "Invasion From Space (patent)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 SYST( 1980, plus1,      0,         0,      plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
-SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, bshipg,     bship,     0,      bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, Rev. G)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+SYST( 1981, lightfgt,   0,         0,      lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight: The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, bshipg,     bship,     0,      bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, rev. G)", MACHINE_SUPPORTS_SAVE ) // ***
 
 SYST( 1979, qkracera,   qkracer,   0,      qkracera,   qkracera,   qkracera_state,  empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1982, copspa,     0,         0,      mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "COPS Pocket Assistant", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, solution,   0,         0,      scat,       solution,   scat_state,      empty_init, "SCAT", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1983, dimension,  0,         0,      scat,       dimension,  scat_state,      empty_init, "South Carolina Applied Technology", "The Dimension", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1984, solution,   0,         0,      scat,       solution,   scat_state,      empty_init, "South Carolina Applied Technology", "The Solution", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 SYST( 1987, vidchal,    0,         0,      vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
-SYST( 1981, comparca,   comparc,   0,      comparca,   comparca,   comparca_state,  empty_init, "Tandy Corporation", "Computerized Arcade (COP421 version, model 60-2159A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the games: ***
+SYST( 1981, comparca,   comparc,   0,      comparca,   comparca,   comparca_state,  empty_init, "Tandy Corporation", "Computerized Arcade (COP421 version, model 60-2159A)", MACHINE_SUPPORTS_SAVE ) // some of the games: ***
 
 SYST( 1989, lilcomp,    0,         0,      lilcomp,    lilcomp,    lilcomp_state,   empty_init, "Texas Instruments", "My Little Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

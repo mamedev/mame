@@ -30,7 +30,7 @@ void bbc_sprite_device::device_add_mconfig(machine_config &config)
 	m_vdp->set_screen("screen");
 	m_vdp->set_vram_size(0x4000);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 //**************************************************************************

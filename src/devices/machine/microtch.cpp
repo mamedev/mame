@@ -34,9 +34,9 @@ _________________________________________________________________
 
 JP1 = ADDRESS / INTERRUPT (A1, A2, A3, A4, A5, A6, I2, I3, I4, I5, I10, I11, I12, I15)
 JP2 = TEST (T1, T2, T3, T4, T5, T6)
-Y1 = XTAL R11APB18
+Y1 = XTAL R11APB18 maked A11.059 on some boards
 U3 = MicroTouch Excalibur
-U4 = 80C32
+U4 = 80C32 (SAB80C32, P80C32EBAA, etc.)
 U11 = 93C46S Serial EEPROM
 P1 = RS-232
 
@@ -56,6 +56,8 @@ COM8 3F0-3F7 ON  : ON  :  : ON
 
 #include "emu.h"
 #include "microtch.h"
+
+#include "cpu/mcs51/i8052.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -133,6 +135,33 @@ void microtouch_device::send_format_decimal_packet(int x, int y)
 	m_tx_buffer[m_tx_buffer_num++] = 0x0d;
 }
 
+void microtouch_device::send_format_hex_packet(int x, int y)
+{
+	int hexx, hexy;
+
+	hexx = x / 16;
+	if (hexx > 0x3ff)
+		hexx = 0x3ff;
+	hexy = y / 16;
+	if (hexy > 0x3ff)
+		hexy = 0x3ff;
+
+	// header byte
+	m_tx_buffer[m_tx_buffer_num++] = 0x01;
+	// x coordinate in decimal mode
+	m_tx_buffer[m_tx_buffer_num++] = ntoc(hexx / 0x100);
+	m_tx_buffer[m_tx_buffer_num++] = ntoc((hexx / 0x10) % 0x10);
+	m_tx_buffer[m_tx_buffer_num++] = ntoc(hexx % 0x10);
+	// comma (separator)
+	m_tx_buffer[m_tx_buffer_num++] = ',';
+	// y coordinate in decimal mode
+	m_tx_buffer[m_tx_buffer_num++] = ntoc(hexy / 0x100);
+	m_tx_buffer[m_tx_buffer_num++] = ntoc((hexy / 0x10) % 0x10);
+	m_tx_buffer[m_tx_buffer_num++] = ntoc(hexy % 0x10);
+	// terminator
+	m_tx_buffer[m_tx_buffer_num++] = 0x0d;
+}
+
 void microtouch_device::send_touch_packet()
 {
 	int tx = m_touchx->read();
@@ -149,6 +178,9 @@ void microtouch_device::send_touch_packet()
 				break;
 			case FORMAT_DECIMAL:
 				send_format_decimal_packet(tx, ty);
+				break;
+			case FORMAT_HEX:
+				send_format_hex_packet(tx, ty);
 				break;
 			case FORMAT_UNKNOWN:
 				break;
@@ -199,6 +231,9 @@ TIMER_CALLBACK_MEMBER(microtouch_device::update_output)
 					break;
 				case FORMAT_DECIMAL:
 					send_format_decimal_packet(m_last_x, m_last_y);
+					break;
+				case FORMAT_HEX:
+					send_format_hex_packet(m_last_x, m_last_y);
 					break;
 				case FORMAT_UNKNOWN:
 					break;
@@ -292,6 +327,10 @@ void microtouch_device::rcv_complete()
 		{
 			m_format = FORMAT_DECIMAL;
 		}
+		else if (check_command("FH", m_rx_buffer_ptr, m_rx_buffer))
+		{
+			m_format = FORMAT_HEX;
+		}
 		else if (check_command("OI", m_rx_buffer_ptr, m_rx_buffer))
 		{
 			// output identity - SMT3, ver 01.00
@@ -350,7 +389,7 @@ INPUT_CHANGED_MEMBER(microtouch_device::touch)
 
 // BIOS not hooked up
 ROM_START(microtouch)
-	ROM_REGION(0x10000, "bios", 0)
+	ROM_REGION(0x10000, "u1", 0)
 	ROM_SYSTEM_BIOS(0, "microtouch_5_6", "MicroTouch Rev.5.6") // "Excalibur", ISA card
 	ROMX_LOAD("microtouch_5604010_rev_5.6.u1", 0x0000, 0x10000, CRC(d19ee080) SHA1(c695405ec8c2ac4408a63bacfc68a5a4b878928c), ROM_BIOS(0)) // 27c512
 	ROM_SYSTEM_BIOS(1, "microtouch_5_5", "MicroTouch Rev.5.5") // "Kahuna", daughterboard integrated on monitor
@@ -361,7 +400,7 @@ ROM_END
 
 static INPUT_PORTS_START(microtouch)
 	PORT_START("TOUCH")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch screen") PORT_CHANGED_MEMBER(DEVICE_SELF, microtouch_device, touch, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch screen") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(microtouch_device::touch), 0)
 	PORT_START("TOUCH_X")
 	PORT_BIT(0x3fff, 0x2000, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 	PORT_START("TOUCH_Y")
@@ -371,6 +410,18 @@ INPUT_PORTS_END
 ioport_constructor microtouch_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(microtouch);
+}
+
+void microtouch_device::device_add_mconfig(machine_config &config)
+{
+	auto &mcu(I8032(config, "u4", 11.0592_MHz_XTAL)); // REV5.6 card has a crystal marked A11.059 - assume it's the common type
+	mcu.set_addrmap(AS_PROGRAM, &microtouch_device::u4_program);
+	mcu.set_disable();
+}
+
+void microtouch_device::u4_program(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("u1", 0);
 }
 
 void microtouch_device::tra_callback()

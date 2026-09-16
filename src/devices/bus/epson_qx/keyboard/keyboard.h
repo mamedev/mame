@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_EPSON_QX_KEYBOARD_H
-#define MAME_BUS_EPSON_QX_KEYBOARD_H
+#ifndef MAME_BUS_EPSON_QX_KEYBOARD_KEYBOARD_H
+#define MAME_BUS_EPSON_QX_KEYBOARD_KEYBOARD_H
 
 #pragma once
 
@@ -31,10 +31,7 @@ public:
 	keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: keyboard_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0U);
 
@@ -49,8 +46,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	keyboard_device *m_kbd;
@@ -67,9 +64,9 @@ public:
 
 protected:
 	keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	void mcu_p1_w(uint8_t data);
 	void mcu_p2_w(uint8_t data);
 
@@ -89,7 +86,7 @@ class qx10_keyboard_hasci : public keyboard_device
 {
 public:
 	qx10_keyboard_hasci(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const internal_layout &layout() const override;
 };
 
@@ -97,7 +94,7 @@ class qx10_keyboard_ascii : public keyboard_device
 {
 public:
 	qx10_keyboard_ascii(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const internal_layout &layout() const override;
 };
 
@@ -111,4 +108,4 @@ DECLARE_DEVICE_TYPE_NS(EPSON_QX_KEYBOARD_PORT, bus::epson_qx::keyboard, keyboard
 DECLARE_DEVICE_TYPE_NS(QX10_KEYBOARD_HASCI, bus::epson_qx::keyboard, qx10_keyboard_hasci)
 DECLARE_DEVICE_TYPE_NS(QX10_KEYBOARD_ASCII, bus::epson_qx::keyboard, qx10_keyboard_ascii)
 
-#endif
+#endif // MAME_BUS_EPSON_QX_KEYBOARD_KEYBOARD_H

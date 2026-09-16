@@ -884,7 +884,7 @@ void lockon_state::video_start()
 	save_pointer(NAME(m_obj_pal_ram), 2048);
 }
 
-uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lockon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* If screen output is disabled, fill with black */
 	if (!BIT(m_ctrl_reg, 7))
@@ -905,7 +905,7 @@ uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void lockon_state::screen_vblank_lockon(int state)
+void lockon_state::screen_vblank(int state)
 {
 	// on falling edge
 	if (!state)

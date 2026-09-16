@@ -14,6 +14,8 @@
 #include "m88000.h"
 #include "m88000d.h"
 
+#include <bit>
+
 #define LOG_EXCEPTION (1U << 1)
 
 //#define VERBOSE       (LOG_GENERAL|LOG_EXCEPTION)
@@ -148,8 +150,8 @@ mc88100_device::mc88100_device(const machine_config &mconfig, const char *tag, d
 	: cpu_device(mconfig, MC88100, tag, owner, clock)
 	, m_code_config("code", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
-	, m_cmmu_d(*this, finder_base::DUMMY_TAG)
-	, m_cmmu_i(*this, finder_base::DUMMY_TAG)
+	, m_cmmu_code(nullptr)
+	, m_cmmu_data(nullptr)
 	, m_sb(0)
 	, m_r{ 0 }
 	, m_cr{ 0 }
@@ -183,13 +185,13 @@ bool mc88100_device::memory_translate(int spacenum, int intention, offs_t &addre
 	{
 	case TR_READ:
 	case TR_WRITE:
-		if (m_cmmu_d)
-			return m_cmmu_d->translate(intention, address, m_cr[PSR] & PSR_MODE);
+		if (m_cmmu_data)
+			return m_cmmu_data(address).translate(intention, address, m_cr[PSR] & PSR_MODE);
 		break;
 
 	case TR_FETCH:
-		if (m_cmmu_i)
-			return m_cmmu_i->translate(intention, address, m_cr[PSR] & PSR_MODE);
+		if (m_cmmu_code)
+			return m_cmmu_code(address).translate(intention, address, m_cr[PSR] & PSR_MODE);
 		break;
 	}
 
@@ -198,7 +200,7 @@ bool mc88100_device::memory_translate(int spacenum, int intention, offs_t &addre
 
 void mc88100_device::device_start()
 {
-	space(AS_PROGRAM).specific(m_inst_space);
+	space(AS_PROGRAM).specific(m_code_space);
 
 	if (has_configured_map(AS_DATA))
 		space(AS_DATA).specific(m_data_space);
@@ -655,7 +657,7 @@ void mc88100_device::execute(u32 const inst)
 			{
 				unsigned const offset = inst & 31;
 
-				m_r[D] = rotr_32(m_r[S1], offset);
+				m_r[D] = std::rotr(m_r[S1], offset);
 			}
 			break;
 
@@ -761,7 +763,7 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + m_r[S2];
 
 				// compute carry out
-				if (carry(m_r[S1], m_r[S2], data))
+				if (data < m_r[S1])
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -774,10 +776,11 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x318: // addu.cio: unsigned integer add with carry in and out (register)
 			{
-				u32 const data = m_r[S1] + m_r[S2] + bool(m_cr[PSR] & PSR_C);
+				u32 const sum1 = m_r[S1] + m_r[S2];
+				u32 const data = sum1 + bool(m_cr[PSR] & PSR_C);
 
 				// compute carry out
-				if (carry(m_r[S1], m_r[S2], data))
+				if (sum1 < m_r[S1] || data < sum1)
 					m_cr[PSR] |= PSR_C;
 				else
 					m_cr[PSR] &= ~PSR_C;
@@ -793,26 +796,26 @@ void mc88100_device::execute(u32 const inst)
 				u32 const data = m_r[S1] + ~m_r[S2] + 1;
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + 1, data))
-					m_cr[PSR] |= PSR_C;
-				else
+				if (m_r[S1] < m_r[S2])
 					m_cr[PSR] &= ~PSR_C;
+				else
+					m_cr[PSR] |= PSR_C;
 
 				m_r[D] = data;
 			}
 			break;
 		case 0x330: // subu.ci: unsigned integer subtract with borrow in (register)
-			m_r[D] = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
+			m_r[D] = m_r[S1] + ~m_r[S2] + bool(m_cr[PSR] & PSR_C);
 			break;
 		case 0x338: // subu.cio: unsigned integer subtract with borrow in and out (register)
 			{
-				u32 const data = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
+				u32 const data = m_r[S1] + ~m_r[S2] + bool(m_cr[PSR] & PSR_C);
 
 				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + !bool(m_cr[PSR] & PSR_C), data))
-					m_cr[PSR] |= PSR_C;
-				else
+				if (m_r[S1] < m_r[S2] || (m_r[S1] == m_r[S2] && data))
 					m_cr[PSR] &= ~PSR_C;
+				else
+					m_cr[PSR] |= PSR_C;
 
 				m_r[D] = data;
 			}
@@ -840,7 +843,8 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1] + m_r[S2];
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 					m_r[D] = data;
 				else
 					exception(E_INT_OVERFLOW);
@@ -850,10 +854,11 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1] + m_r[S2];
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 				{
 					// compute carry out
-					if (carry(m_r[S1], m_r[S2], data))
+					if (data < m_r[S1])
 						m_cr[PSR] |= PSR_C;
 					else
 						m_cr[PSR] &= ~PSR_C;
@@ -868,7 +873,8 @@ void mc88100_device::execute(u32 const inst)
 			{
 				u32 const data = m_r[S1] + m_r[S2] + bool(m_cr[PSR] & PSR_C);
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 					m_r[D] = data;
 				else
 					exception(E_INT_OVERFLOW);
@@ -876,12 +882,14 @@ void mc88100_device::execute(u32 const inst)
 			break;
 		case 0x398: // add.cio: integer add with carry in and out (register)
 			{
-				u32 const data = m_r[S1] + m_r[S2] + bool(m_cr[PSR] & PSR_C);
+				u32 const sum1 = m_r[S1] + m_r[S2];
+				u32 const data = sum1 + bool(m_cr[PSR] & PSR_C);
 
-				if (!overflow(m_r[S1], m_r[S2], data))
+				// check overflow
+				if (BIT((m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
 				{
 					// compute carry out
-					if (carry(m_r[S1], m_r[S2], data))
+					if (sum1 < m_r[S1] || data < sum1)
 						m_cr[PSR] |= PSR_C;
 					else
 						m_cr[PSR] &= ~PSR_C;
@@ -893,35 +901,63 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x3a0: // sub: integer subtract (register)
-			m_r[D] = m_r[S1] + ~m_r[S2] + 1;
+			{
+				u32 const data = m_r[S1] + ~m_r[S2] + 1;
+
+				// check overflow
+				if (BIT(~(m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
+					m_r[D] = data;
+				else
+					exception(E_INT_OVERFLOW);
+			}
 			break;
 		case 0x3a8: // sub.co: integer subtract with borrow out (register)
 			{
 				u32 const data = m_r[S1] + ~m_r[S2] + 1;
 
-				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + 1, data))
-					m_cr[PSR] |= PSR_C;
-				else
-					m_cr[PSR] &= ~PSR_C;
+				// check overflow
+				if (BIT(~(m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
+				{
+					// compute borrow out
+					if (m_r[S1] < m_r[S2])
+						m_cr[PSR] &= ~PSR_C;
+					else
+						m_cr[PSR] |= PSR_C;
 
-				m_r[D] = data;
+					m_r[D] = data;
+				}
+				else
+					exception(E_INT_OVERFLOW);
 			}
 			break;
 		case 0x3b0: // sub.ci: integer subtract with borrow in (register)
-			m_r[D] = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
+			{
+				u32 const data = m_r[S1] + ~m_r[S2] + bool(m_cr[PSR] & PSR_C);
+
+				// check overflow
+				if (BIT(~(m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
+					m_r[D] = data;
+				else
+					exception(E_INT_OVERFLOW);
+			}
 			break;
 		case 0x3b8: // sub.cio: integer subtract with borrow in and out (register)
 			{
-				u32 const data = m_r[S1] + ~m_r[S2] + !bool(m_cr[PSR] & PSR_C);
+				u32 const data = m_r[S1] + ~m_r[S2] + bool(m_cr[PSR] & PSR_C);
 
-				// compute borrow out
-				if (carry(m_r[S1], ~m_r[S2] + !bool(m_cr[PSR] & PSR_C), data))
-					m_cr[PSR] |= PSR_C;
+				// check overflow
+				if (BIT(~(m_r[S1] ^ m_r[S2]) | ~(m_r[S1] ^ data), 31))
+				{
+					// compute borrow out
+					if (m_r[S1] < m_r[S2] || (m_r[S1] == m_r[S2] && data))
+						m_cr[PSR] &= ~PSR_C;
+					else
+						m_cr[PSR] |= PSR_C;
+
+					m_r[D] = data;
+				}
 				else
-					m_cr[PSR] &= ~PSR_C;
-
-				m_r[D] = data;
+					exception(E_INT_OVERFLOW);
 			}
 			break;
 		case 0x3c0: // div: signed integer divide (register)
@@ -992,18 +1028,18 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x540: // rot: rotate (register)
-			m_r[D] = rotr_32(m_r[S1], m_r[S2]);
+			m_r[D] = std::rotr(m_r[S1], m_r[S2]);
 			break;
 		case 0x740: // ff1: find first bit set
 			{
-				unsigned const count = count_leading_zeros_32(m_r[S2]);
+				unsigned const count = std::countl_zero(m_r[S2]);
 
 				m_r[D] = (count == 32) ? count : 31 - count;
 			}
 			break;
 		case 0x760: // ff0: find first bit clear
 			{
-				unsigned const count = count_leading_ones_32(m_r[S2]);
+				unsigned const count = std::countl_one(m_r[S2]);
 
 				m_r[D] = (count == 32) ? count : 31 - count;
 			}
@@ -1394,7 +1430,7 @@ void mc88100_device::exception(unsigned vector, bool const trap)
 	m_fip = m_cr[VBR] | (vector << 3) | IP_V;
 
 	// notify debugger
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 	{
 		if (vector == E_INTERRUPT)
 			debug()->interrupt_hook(INPUT_LINE_IRQ0, m_xip & IP_A);
@@ -1448,16 +1484,6 @@ u32 mc88100_device::cmp(u32 const src1, u32 const src2) const
 	}
 
 	return result;
-}
-
-bool mc88100_device::carry(u32 const src1, u32 const src2, u32 const dest) const
-{
-	return BIT((src1 & src2) ^ ((src1 ^ src2) & ~dest), 31);
-}
-
-bool mc88100_device::overflow(u32 const src1, u32 const src2, u32 const dest) const
-{
-	return (BIT(src2, 31) == BIT(src1, 31)) && (BIT(dest, 31) != BIT(src2, 31));
 }
 
 enum fcmp_mask : u32
@@ -1525,19 +1551,19 @@ void mc88100_device::fset(unsigned const td, unsigned const d, float64_t const d
 
 void mc88100_device::fetch(u32 &address, u32 &inst)
 {
-	if (m_cmmu_i)
+	if (m_cmmu_code)
 	{
-		std::optional<u32> data = m_cmmu_i->read<u32>(address & IP_A, m_cr[PSR] & PSR_MODE);
+		std::optional<u32> data = m_cmmu_code(address & IP_A).read<u32>(address & IP_A, m_cr[PSR] & PSR_MODE);
 		if (data.has_value())
 			inst = data.value();
 		else
 			address |= IP_E;
 	}
 	else
-		inst = m_inst_space.read_dword(address & IP_A);
+		inst = m_code_space.read_dword(address & IP_A);
 }
 
-template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::ld(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1552,11 +1578,11 @@ template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned co
 			address &= ~(sizeof(T) - 1);
 	}
 
-	if (m_cmmu_d)
+	if (m_cmmu_data)
 	{
 		if constexpr (sizeof(T) < 8)
 		{
-			std::optional<T> const data = m_cmmu_d->read<typename std::make_unsigned<T>::type>(address, (m_cr[PSR] & PSR_MODE) && !Usr);
+			std::optional<T> const data = m_cmmu_data(address).read<typename std::make_unsigned<T>::type>(address, (m_cr[PSR] & PSR_MODE) && !Usr);
 
 			if (data.has_value() && reg)
 				m_r[reg] = std::is_signed<T>() ? s32(data.value()) : data.value();
@@ -1585,8 +1611,8 @@ template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned co
 		}
 		else
 		{
-			std::optional<u32> const hi = m_cmmu_d->read<u32>(address + 0, (m_cr[PSR] & PSR_MODE) && !Usr);
-			std::optional<u32> const lo = m_cmmu_d->read<u32>(address + 4, (m_cr[PSR] & PSR_MODE) && !Usr);
+			std::optional<u32> const hi = m_cmmu_data(address + 0).read<u32>(address + 0, (m_cr[PSR] & PSR_MODE) && !Usr);
+			std::optional<u32> const lo = m_cmmu_data(address + 4).read<u32>(address + 4, (m_cr[PSR] & PSR_MODE) && !Usr);
 			if (lo.has_value() && hi.has_value())
 			{
 				if (reg != 0)
@@ -1658,7 +1684,7 @@ template <typename T, bool Usr> void mc88100_device::ld(u32 address, unsigned co
 	}
 }
 
-template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::st(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
@@ -1673,11 +1699,11 @@ template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned co
 			address &= ~(sizeof(T) - 1);
 	}
 
-	if (m_cmmu_d)
+	if (m_cmmu_data)
 	{
 		if constexpr (sizeof(T) < 8)
 		{
-			if (!m_cmmu_d->write(address, T(m_r[reg]), (m_cr[PSR] & PSR_MODE) && !Usr))
+			if (!m_cmmu_data(address).write(address, T(m_r[reg]), (m_cr[PSR] & PSR_MODE) && !Usr))
 			{
 				m_cr[DMT0] = DMT_EN<T>(address) | DMT_WRITE | DMT_VALID;
 				m_cr[DMT1] = 0;
@@ -1701,8 +1727,8 @@ template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned co
 		else
 		{
 			bool result = true;
-			result &= m_cmmu_d->write(address + 0, m_r[(reg + 0) & 31], (m_cr[PSR] & PSR_MODE) && !Usr);
-			result &= m_cmmu_d->write(address + 4, m_r[(reg + 1) & 31], (m_cr[PSR] & PSR_MODE) && !Usr);
+			result &= m_cmmu_data(address + 0).write(address + 0, m_r[(reg + 0) & 31], (m_cr[PSR] & PSR_MODE) && !Usr);
+			result &= m_cmmu_data(address + 4).write(address + 4, m_r[(reg + 1) & 31], (m_cr[PSR] & PSR_MODE) && !Usr);
 
 			if (!result)
 			{
@@ -1748,13 +1774,17 @@ template <typename T, bool Usr> void mc88100_device::st(u32 address, unsigned co
 	}
 }
 
-template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned const reg)
+template <typename T, bool Usr> void mc88100_device::xmem(offs_t address, unsigned const reg)
 {
 	// alignment check
 	if (address & (sizeof(T) - 1))
 	{
 		if (!(m_cr[PSR] & PSR_MXM))
+		{
 			exception(E_MISALIGNED);
+
+			return;
+		}
 		else
 			address &= ~(sizeof(T) - 1);
 	}
@@ -1762,10 +1792,10 @@ template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned 
 	// save source value
 	T const src = m_r[reg];
 
-	if (m_cmmu_d)
+	if (m_cmmu_data)
 	{
 		// read destination
-		std::optional<T> const dst = m_cmmu_d->read<T>(address, (m_cr[PSR] & PSR_MODE) && !Usr);
+		std::optional<T> const dst = m_cmmu_data(address).read<T>(address, (m_cr[PSR] & PSR_MODE) && !Usr, true);
 		if (dst.has_value())
 		{
 			// update register
@@ -1773,7 +1803,7 @@ template <typename T, bool Usr> void mc88100_device::xmem(u32 address, unsigned 
 				m_r[reg] = dst.value();
 
 			// write destination
-			if (m_cmmu_d->write<T>(address, src, (m_cr[PSR] & PSR_MODE) && !Usr))
+			if (m_cmmu_data(address).write<T>(address, src, (m_cr[PSR] & PSR_MODE) && !Usr, true))
 				return;
 		}
 

@@ -30,9 +30,9 @@
     04  IN2
 
     write:
-    00  SN76496 #1
-    01  SN76496 #2
-    02  SN76496 #3
+    00  SN76489A #1
+    01  SN76489A #2
+    02  SN76489A #3
     03  MSM5205 address write
     04  bit 0   = NMI enable
         bit 1   = flipscreen
@@ -50,13 +50,13 @@
 ****************************************************************************
 
     Robo Wres 2001
-    Sega, (198x, possibly 1986?)
+    Sega, 1986
 
     Top Board
     =========
     PCB No: 834-5990 SEGA 1986
     CPU   : NEC D315-5179 (Z80?)
-    SOUND : OKI MSM5205 + Resonator 384kHz, SN76489 (x3)
+    SOUND : OKI MSM5205 + Resonator 384kHz, SN76489AN (x3)
     RAM   : MB8128 (x1)
     OTHER : Volume Pot (x2, labelled VOICE and SOUND)
     PALs  : (x1, near EPR-7542.15D, labelled 315-5056)
@@ -195,9 +195,9 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 protected:
 	// memory pointers
@@ -238,8 +238,8 @@ protected:
 	void adpcm_int(int state);
 
 	void common(machine_config &config);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
 };
 
 class appoooh_state : public base_state
@@ -278,7 +278,7 @@ private:
 
 	void palette(palette_device &palette) const;
 
-	void decrypted_opcodes_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -314,10 +314,9 @@ void appoooh_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[pen], 6);
-		bit2 = BIT(color_prom[pen], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[pen], 6);
+		bit1 = BIT(color_prom[pen], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -344,10 +343,9 @@ void robowres_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[pen], 6);
-		bit2 = BIT(color_prom[pen], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[pen], 6);
+		bit1 = BIT(color_prom[pen], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -443,7 +441,7 @@ void base_state::draw_sprites(bitmap_ind16 &dest_bmp, const rectangle &cliprect,
 		int sx    = sprite[offs + 3];
 		int flipx = sprite[offs + 1] & 0x01;
 
-		if(sx >= 248)
+		if (sx >= 248)
 			sx -= 256;
 
 		if (flipy)
@@ -454,10 +452,9 @@ void base_state::draw_sprites(bitmap_ind16 &dest_bmp, const rectangle &cliprect,
 		}
 
 		gfx->transpen(dest_bmp, cliprect,
-		code,
-		color,
-		flipx, flipy,
-		sx, sy, 0);
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -558,9 +555,9 @@ void robowres_state::decrypted_opcodes_map(address_map &map)
 void base_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
-	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
-	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::write));
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489a_device::write));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489a_device::write));
+	map(0x02, 0x02).w("sn3", FUNC(sn76489a_device::write));
 	map(0x03, 0x03).portr("DSW1").w(FUNC(base_state::adpcm_w));
 	map(0x04, 0x04).portr("BUTTON3").w(FUNC(base_state::out_w));
 	map(0x05, 0x05).w(FUNC(base_state::scroll_w)); // unknown
@@ -581,7 +578,7 @@ static INPUT_PORTS_START( appoooh )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
 	PORT_START("P2")
@@ -597,7 +594,7 @@ static INPUT_PORTS_START( appoooh )
 	PORT_START("BUTTON3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN )   // probably unused
 
 	PORT_START("DSW1")
@@ -716,9 +713,9 @@ void base_state::common(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
-	SN76489(config, "sn2", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
-	SN76489(config, "sn3", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
+	SN76489A(config, "sn1", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
+	SN76489A(config, "sn2", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
+	SN76489A(config, "sn3", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.30); // divider unknown
 
 	MSM5205(config, m_msm, 384000);
 	m_msm->vck_callback().set(FUNC(base_state::adpcm_int));
@@ -731,7 +728,7 @@ void appoooh_state::appoooh(machine_config &config)
 	common(config);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -751,7 +748,7 @@ void robowres_state::robowres(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &robowres_state::decrypted_opcodes_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

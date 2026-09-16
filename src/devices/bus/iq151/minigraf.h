@@ -22,12 +22,12 @@ public:
 	iq151_minigraf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// iq151cart_interface overrides
 	virtual void read(offs_t offset, uint8_t &data) override;

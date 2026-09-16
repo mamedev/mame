@@ -28,6 +28,7 @@ links {
 linkoptions {
 	"-framework QuartzCore",
 	"-framework OpenGL",
+	"-framework GameController",
 }
 if os_version>=101100 then
 	linkoptions {
@@ -58,7 +59,6 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 	qtdebuggerbuild()
 
 project ("osd_" .. _OPTIONS["osd"])
-	targetsubdir(_OPTIONS["target"] .."_" .._OPTIONS["subtarget"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
@@ -103,6 +103,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.h",
 		MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.mm",
 		MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.h",
+		MAME_DIR .. "src/osd/modules/debugger/osx/exceptionpointsview.mm",
+		MAME_DIR .. "src/osd/modules/debugger/osx/exceptionpointsview.h",
 		MAME_DIR .. "src/osd/modules/debugger/osx/memoryview.mm",
 		MAME_DIR .. "src/osd/modules/debugger/osx/memoryview.h",
 		MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.mm",
@@ -130,15 +132,17 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/mac/windowcontroller.h",
 		MAME_DIR .. "src/osd/mac/mamefswindow.mm",
 		MAME_DIR .. "src/osd/mac/mamefswindow.h",
-		MAME_DIR .. "src/osd/mac/oglview.mm",
-		MAME_DIR .. "src/osd/mac/oglview.h",
+		MAME_DIR .. "src/osd/mac/macglcontext.mm",
+		MAME_DIR .. "src/osd/mac/macglcontext.h",
+		MAME_DIR .. "src/osd/modules/input/input_macgame.mm",
+		MAME_DIR .. "src/osd/modules/input/input_macjoy.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawmacsoft.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
 	}
 
 
 project ("ocore_" .. _OPTIONS["osd"])
-	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
@@ -154,9 +158,12 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/mac",
+		ext_includedir("asio"),
 	}
 
 	files {
+		MAME_DIR .. "src/osd/asio.cpp",
+		MAME_DIR .. "src/osd/asio.h",
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/osdfile.h",

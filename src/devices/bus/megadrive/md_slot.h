@@ -52,11 +52,11 @@ enum
 	SSF2,                        /* Super Street Fighter 2 */
 	CM_2IN1,                     /* CodeMasters 2in1 : Psycho Pinball + Micro Machines */
 	GAME_KANDUME,                /* Game no Kandume Otokuyou */
-	RADICA,                      /* Radica TV games.. these probably should be a separate driver since they are a separate 'console' */
+//  RADICA,                      /* Radica TV games, handled in sega/megadriv_rad.cpp */
 
 	TILESMJ2,                    /* 16 Mahjong Tiles II */
 	BUGSLIFE,                    /* A Bug's Life */
-	CHINFIGHT3,                  /* Chinese Fighters 3 */
+//  CHINFIGHT3,                  /* Chinese Fighters 3 */
 	ELFWOR,                      /* Linghuan Daoshi Super Magician */
 	KAIJU,                       /* Pokemon Stadium */
 	KOF98,                       /* King of Fighters '98 */
@@ -82,6 +82,8 @@ enum
 	TC2000,                      /* TC 2000 (Argentina, protected) */
 	TEKKENSP,                    /* Tekken Special */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
+
+	TITAN,
 
 	// when loading from fullpath, we need to treat SRAM in custom way
 	SEGA_SRAM_FULLPATH,
@@ -198,7 +200,7 @@ protected:
 	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 // ======================> md_cart_slot_device
@@ -211,10 +213,7 @@ public:
 	md_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: md_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -234,10 +233,7 @@ public:
 	pico_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: pico_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -256,10 +252,7 @@ public:
 	copera_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: copera_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -269,7 +262,7 @@ public:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MD_CART_SLOT,     md_cart_slot_device)
 DECLARE_DEVICE_TYPE(PICO_CART_SLOT,   pico_cart_slot_device)
 DECLARE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device)

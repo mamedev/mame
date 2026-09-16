@@ -18,7 +18,7 @@
 #define LOG_MAP    (1U << 3) // log full remaps
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
-//#define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
@@ -144,6 +144,7 @@ void sis5513_ide_device::device_reset()
 	pci_device::device_reset();
 
 	command = 0x0000;
+	command_mask = 5;
 	status = 0x0000;
 	pclass = 0x01018a;
 	m_ide_ctrl0 = 0;
@@ -168,7 +169,7 @@ inline bool sis5513_ide_device::ide2_mode()
 	return (pclass & 0xc) == 0xc;
 }
 
-// In compatible mode BARs with legacy addresses but can values written can still be readout.
+// In compatible mode BARs with legacy addresses but values written can still be readout.
 // In practice we need to override writes and make sure we flush remapping accordingly
 inline void sis5513_ide_device::flush_ide_mode()
 {

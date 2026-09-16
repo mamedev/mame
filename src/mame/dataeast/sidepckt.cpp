@@ -135,7 +135,7 @@ Additional notes:
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
 #include "sound/ymopn.h"
@@ -166,10 +166,10 @@ public:
 	void sidepcktb(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void bootleg_main_map(address_map &map);
+	void bootleg_main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -199,7 +199,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class sidepckt_mcu_state : public sidepckt_state
@@ -213,7 +213,7 @@ public:
 	void sidepckt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<i8751_device> m_mcu;
@@ -229,11 +229,9 @@ private:
 	uint8_t mcu_p2_r();
 	void mcu_p3_w(uint8_t data);
 
-	void original_main_map(address_map &map);
+	void original_main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void sidepckt_state::palette(palette_device &palette) const
 {
@@ -386,8 +384,6 @@ uint32_t sidepckt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 //**************************************************************************
 //  PROTECTION MCU
@@ -620,7 +616,7 @@ void sidepckt_state::sidepcktb(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidepckt_state::sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58); // VERIFY: May be 55 or 56
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

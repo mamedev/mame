@@ -28,13 +28,13 @@ public:
 	spectrum_intf2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual int romcs() override;
+	virtual bool romcs() override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 

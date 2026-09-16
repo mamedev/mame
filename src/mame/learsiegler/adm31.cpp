@@ -51,8 +51,8 @@ public:
 	void adm31(machine_config &mconfig);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -61,7 +61,7 @@ private:
 	u8 kbd_scan_r();
 	void kbd_status_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<acia6850_device, 2> m_acia;
@@ -78,8 +78,6 @@ private:
 
 void adm31_state::machine_start()
 {
-	m_caps_lamp.resolve();
-
 	save_item(NAME(m_kbd_scan));
 }
 
@@ -491,7 +489,7 @@ void adm31_state::adm31(machine_config &config)
 	m_brg->ft_handler().set(m_acia[1], FUNC(acia6850_device::write_rxc));
 	m_brg->ft_handler().append(m_acia[1], FUNC(acia6850_device::write_txc));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(19.584_MHz_XTAL, 1020, 0, 800, 320, 0, 288);
 	screen.set_screen_update(FUNC(adm31_state::screen_update));
 
@@ -515,4 +513,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1978, adm31, 0, 0, adm31, adm31, adm31_state, empty_init, "Lear Siegler", "ADM-31 Data Display Terminal", MACHINE_IS_SKELETON)
+COMP(1978, adm31, 0, 0, adm31, adm31, adm31_state, empty_init, "Lear Siegler", "ADM-31 Data Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

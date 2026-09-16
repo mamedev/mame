@@ -13,6 +13,7 @@
 
 #include "cbmiec.h"
 #include "cpu/m6502/m6500_1.h"
+#include "machine/alpsdpg23.h"
 
 
 
@@ -30,29 +31,33 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state) override;
-	void cbm_iec_clk(int state) override;
-	void cbm_iec_data(int state) override;
 	void cbm_iec_reset(int state) override;
 
 private:
-	void port_w(u8 data);
-	u8 select_r();
-	void led_w(u8 data);
-	void pen_w(u8 data);
-	void motor_w(u8 data);
-
 	required_device<m6500_1_device> m_mcu;
+	required_device<alps_dpg23_device> m_plotter;
+	required_ioport m_pb;
+	output_finder<> m_led;
 
-	u8 m_pa_data;
+	uint8_t pa_r();
+	void pa_w(uint8_t data);
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
+	uint8_t pc_r();
+
+	void update_iec_data();
+
+	bool m_attn_ack = true;
+	bool m_nrfd = true;
 };
 
 

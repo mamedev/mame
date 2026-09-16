@@ -58,7 +58,7 @@ public:
 		, m_async(*this, { "console_port", "seriala", "mouse_port", "serialb" })
 		, m_duscc(*this, "duscc")
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:ncr53c700")
+		, m_scsi(*this, "ncr53c700")
 		, m_speaker(*this, "speaker")
 		, m_leds(*this, "CR%u", 1U)
 		, m_mbus(*this, "mbus")
@@ -72,13 +72,13 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 
-	void pit_timer(int param) { LOG("pit_timer<%d> expired\n", param); }
+	void pit_timer(s32 param) { LOG("pit_timer<%d> expired\n", param); }
 
 	template <unsigned N> u32 pit_cnt_r() { return m_pit[N]->enabled() ? m_pit[N]->elapsed().as_ticks(m_cpu->clock()) : 0; }
 	template <unsigned N> u32 pit_sts_r() { return m_pit_cmd[N]; }
@@ -112,7 +112,7 @@ private:
 	required_device_array<rs232_port_device, 4> m_async;
 	required_device<duscc68562_device> m_duscc;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c7xx_device> m_scsi;
+	required_device<ncr53c700_device> m_scsi;
 	required_device<speaker_sound_device> m_speaker;
 
 	output_finder<3> m_leds;
@@ -129,8 +129,6 @@ private:
 
 void aviion88k_state::machine_start()
 {
-	m_leds.resolve();
-
 	for (emu_timer *&pit : m_pit)
 		pit = timer_alloc(FUNC(aviion88k_state::pit_timer), this);
 }
@@ -235,7 +233,7 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	MK48T12(config, m_novram);
 
 	// uart - keyboard interface
-	SCN2661A(config, m_uart, 0);
+	SCN2661A(config, m_uart);
 
 	// keyboard connector
 	PC_KBDC(config, m_kbdc, pc_at_keyboards, nullptr);
@@ -276,7 +274,8 @@ void aviion88k_state::aviion_4600(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", aviion88k_scsi_devices, nullptr);
 
 	// scsi host adapter (NCR53C700)
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c700", NCR53C7XX).clock(66'000'000);
+	NCR53C700(config, m_scsi, 66'000'000);
+	m_scsibus->set_external_device(7, m_scsi);
 
 	// TODO: ethernet (AM79C900)
 
@@ -300,4 +299,4 @@ ROM_END
 } // anonymous namespace
 
 /*   YEAR   NAME         PARENT  COMPAT  MACHINE      INPUT  CLASS            INIT  COMPANY         FULLNAME       FLAGS */
-COMP(1991,  aviion_4600, 0,      0,      aviion_4600, 0,     aviion88k_state, init, "Data General", "AViiON 4600", MACHINE_IS_SKELETON)
+COMP(1991,  aviion_4600, 0,      0,      aviion_4600, 0,     aviion88k_state, init, "Data General", "AViiON 4600", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

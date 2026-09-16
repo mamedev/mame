@@ -16,7 +16,9 @@
 #include "machine/atahle.h"
 #include "machine/t10spc.h"
 
-class atapi_hle_device : public ata_hle_device_base, public virtual t10spc
+class atapi_hle_device : public device_t,
+	public device_ata_hle_interface,
+	public virtual t10spc
 {
 public:
 	enum atapi_features_flag_t
@@ -46,19 +48,23 @@ public:
 		PACKET_COMMAND_RESPONSE_DRQ_50US
 	};
 
+	void set_is_ready(bool state);
+
 protected:
 	atapi_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual int sector_length() override { return ATAPI_BUFFER_LENGTH; }
 	virtual void process_buffer() override;
 	virtual void fill_buffer() override;
-	virtual bool is_ready() override { return false; }
+	virtual bool is_ready() override { return m_is_ready; }
 	virtual void signature() override;
 	virtual void process_command() override;
 	virtual void finished_command() override;
+	virtual bool is_packet_device() override { return true; }
+	virtual bool always_respond() override { return false; }
 
 	virtual void identify_packet_device() = 0;
 
@@ -70,6 +76,7 @@ private:
 
 	int m_packet;
 	int m_data_size;
+	bool m_is_ready;
 
 	static constexpr int ATAPI_BUFFER_LENGTH = 0xf800;
 };

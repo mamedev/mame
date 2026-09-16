@@ -17,8 +17,7 @@ they run fine on the older B&W video hardware. For example, doing a ROM swap
 on the older Space Fever.
 
 TODO:
-- spacefev sound pitch for laser fire and enemy explosion is wrong, see:
-  https://www.youtube.com/watch?v=mGMUPNqlyuw
+- spacefev sound pitch for laser fire and enemy explosion is wrong
 
 ----------------------------------------------------------------------------
 
@@ -1169,7 +1168,7 @@ void spacefev_state::spacefev(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &spacefev_state::main_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1193,7 +1192,7 @@ void sheriff_state::sheriff(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1226,7 +1225,7 @@ void helifire_state::helifire(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &helifire_state::main_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20.160_MHz_XTAL / 4, 320, 0, 256, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));
@@ -1259,7 +1258,7 @@ ROM_START( spacefev )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
-	ROM_END
+ROM_END
 
 ROM_START( spacefevo )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -1276,7 +1275,7 @@ ROM_START( spacefevo )
 
 	ROM_REGION( 0x0020, "proms", 0 ) // for color video hw
 	ROM_LOAD( "f5-i-.bin",   0x0000, 0x0020, CRC(c5914ec1) SHA1(198875fcab36d09c8726bb21e2fdff9882f6721a) ) // "F5?C"
-	ROM_END
+ROM_END
 
 ROM_START( spacefevo2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )

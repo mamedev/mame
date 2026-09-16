@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="touchpadcursor">
+		<image>
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1" height="1" viewBox="0 0 1 1">
+					<g fill="none" stroke="#2222cc" stroke-width="0.06" stroke-opacity="1">
+						<circle cx="0.5" cy="0.5" r="0.1" />
+						<circle cx="0.5" cy="0.5" r="0.47" />
+						<line x1="0.03" y1="0.5" x2="0.4" y2="0.5" />
+						<line x1="0.6" y1="0.5" x2="0.97" y2="0.5" />
+						<line x1="0.5" y1="0.03" x2="0.5" y2="0.4" />
+						<line x1="0.5" y1="0.6" x2="0.5" y2="0.97" />
+						<line />
+					</g>
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="touchpad_area">
+		<rect><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+	<element name="overlay">
+		<rect><color alpha="0" /></rect>
+	</element>
+	<element name="touchpad">
+		<rect><color alpha="0" /></rect>
+	</element>
+
+	<view name="default">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+		<element id="touchpad_area" ref="touchpad_area">
+			<bounds x="0.094" y="3.25" width="3.8" height="2.75" />
+		</element>
+		<element id="overlay" ref="overlay">
+			<bounds x="0" y="3.1" width="4" height="3" />
+		</element>
+		<element id="touchpad" ref="touchpad">
+			<bounds x="0.094" y="3.25" width="3.8" height="2.75" />
+		</element>
+		<element id="touchpadcursor" ref="touchpadcursor">
+			<!-- will be positioned by script -->
+			<bounds x="0" y="3.1" width="0.2" height="0.2" />
+			<color alpha="0.7" />
+		</element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+				function ()
+					-- get overlay, if any
+					local overlay_image = file.device:memregion('cardslot:overlay')
+					file.elements['overlay']:set_draw_callback(
+							function (state, bitmap)
+								if overlay_image ~= nil then
+									-- TODO: reduce temporary memory usage when I/O classes are exposed to Lua
+									local data = overlay_image:read(0, overlay_image.size)
+									local image = emu.bitmap_argb32.load(data)
+									image:resample(bitmap)
+								end
+							end)
+
+					local touchpad = file.views['default'].items['touchpad']
+
+					-- recompute target touchpad cursor size and area when necessary
+					local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
+					file.views['default']:set_recomputed_callback(
+							function ()
+								local lbounds = touchpad.bounds
+								curwidth = lbounds.width / 16
+								curheight = (lbounds.height / 16) * (3.8 / 2.75)
+								curxoffs = lbounds.x0 - (curwidth * 0.5)
+								curyoffs = lbounds.y0 - (curheight * 0.5)
+								curxscale = lbounds.width / 255
+								curyscale = lbounds.height / 255
+							end)
+
+					-- animate the position of the touchpad cursor
+					local touchpadx = file.device:ioport('TOUCHPADX')
+					local touchpady = file.device:ioport('TOUCHPADY')
+					file.views['default'].items['touchpadcursor']:set_bounds_callback(
+							function ()
+								local x = curxoffs + (touchpadx:read() * curxscale)
+								local y = curyoffs + (touchpady:read() * curyscale)
+								return emu.render_bounds(x, y, x + curwidth, y + curheight)
+							end)
+				end)
+	]]></script>
+</mamelayout>

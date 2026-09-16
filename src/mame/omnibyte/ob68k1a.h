@@ -52,12 +52,12 @@ private:
 	required_device<rs232_port_device> m_rs232b;
 	required_device<ram_device> m_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
-	void ob68k1a_mem(address_map &map);
+	void ob68k1a_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_OMNIBYTE_OB68K1A_H

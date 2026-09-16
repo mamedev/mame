@@ -48,12 +48,12 @@ private:
 	uint8_t latch_1f001_r();
 	void latch_1f001_w(u8 data);
 	void kbd_put(u8 data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	uint8_t m_term_data = 0U;
 	uint8_t m_latch_1e001 = 0U;
 	uint8_t m_latch_1f001 = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_shared_ptr<uint16_t> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -123,7 +123,7 @@ void ms9540_state::ms9540(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms9540_state::mem_map);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(ms9540_state::kbd_put));
 }
 

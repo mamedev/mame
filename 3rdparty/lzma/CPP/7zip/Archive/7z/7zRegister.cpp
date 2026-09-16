@@ -22,6 +22,6 @@ REGISTER_ARC_IO_DECREMENT_SIG(
   | NArcInfoFlags::kMTime_Default
   , TIME_PREC_TO_ARC_FLAGS_MASK(NFileTimeType::kWindows)
   | TIME_PREC_TO_ARC_FLAGS_TIME_DEFAULT(NFileTimeType::kWindows)
-  , NULL);
+  , NULL)
 
 }}

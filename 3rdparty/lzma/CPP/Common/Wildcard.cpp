@@ -125,8 +125,8 @@ static bool EnhancedMaskTest(const wchar_t *mask, const wchar_t *name)
 {
   for (;;)
   {
-    wchar_t m = *mask;
-    wchar_t c = *name;
+    const wchar_t m = *mask;
+    const wchar_t c = *name;
     if (m == 0)
       return (c == 0);
     if (m == '*')
@@ -255,7 +255,8 @@ ForDir   nonrec         [0, M)                   same as ForBoth-File
 
 bool CItem::AreAllAllowed() const
 {
-  return ForFile && ForDir && WildcardMatching && PathParts.Size() == 1 && PathParts.Front() == L"*";
+  return ForFile && ForDir && WildcardMatching
+      && PathParts.Size() == 1 && PathParts.Front().IsEqualTo("*");
 }
 
 bool CItem::CheckPath(const UStringVector &pathParts, bool isFile) const
@@ -526,12 +527,10 @@ int CCensor::FindPairForPrefix(const UString &prefix) const
 
 bool IsDriveColonName(const wchar_t *s)
 {
-  wchar_t c = s[0];
-  return c != 0
-    && s[1] == ':'
-    && s[2] == 0
-    && ((c >= 'a' && c <= 'z')
-     || (c >= 'A' && c <= 'Z'));
+  unsigned c = s[0];
+  c |= 0x20;
+  c -= 'a';
+  return c <= (unsigned)('z' - 'a') && s[1] == ':' && s[2] == 0;
 }
 
 unsigned GetNumPrefixParts_if_DrivePath(UStringVector &pathParts)
@@ -544,7 +543,7 @@ unsigned GetNumPrefixParts_if_DrivePath(UStringVector &pathParts)
   {
     if (pathParts.Size() < 4
         || !pathParts[1].IsEmpty()
-        || pathParts[2] != L"?")
+        || !pathParts[2].IsEqualTo("?"))
       return 0;
     testIndex = 3;
   }
@@ -576,11 +575,11 @@ static unsigned GetNumPrefixParts(const UStringVector &pathParts)
     return 1;
   if (pathParts.Size() == 2)
     return 2;
-  if (pathParts[2] == L".")
+  if (pathParts[2].IsEqualTo("."))
     return 3;
 
   unsigned networkParts = 2;
-  if (pathParts[2] == L"?")
+  if (pathParts[2].IsEqualTo("?"))
   {
     if (pathParts.Size() == 3)
       return 3;
@@ -644,7 +643,7 @@ void CCensor::AddItem(ECensorPathMode pathMode, bool include, const UString &pat
   if (pathParts.Size() >= 3
       && pathParts[0].IsEmpty()
       && pathParts[1].IsEmpty()
-      && pathParts[2] == L"?")
+      && pathParts[2].IsEqualTo("?"))
     ignoreWildcardIndex = 2;
   // #endif
 
@@ -667,7 +666,7 @@ void CCensor::AddItem(ECensorPathMode pathMode, bool include, const UString &pat
       for (unsigned i = numPrefixParts; i < pathParts.Size(); i++)
       {
         const UString &part = pathParts[i];
-        if (part == L".." || part == L".")
+        if (part.IsEqualTo("..") || part.IsEqualTo("."))
           dotsIndex = (int)i;
       }
 

@@ -10,15 +10,15 @@
 class nb1414m4_device : public device_t, public device_video_interface
 {
 public:
-	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, uint16_t &scrolly, tilemap_t *tilemap);
 	void vblank_trigger();
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void dma(uint16_t src, uint16_t dst, uint16_t size, uint8_t condition, uint8_t *vram);

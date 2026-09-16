@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
+#include "multibyte.h"
+
 static char digit[] = "0123456789abcdef";
 
 static void dprintdec(int64_t val, bool zeropad, int size)
@@ -175,32 +177,31 @@ void dprintoct(uint64_t val, bool zeropad, int pos)
 #define Ioct    30
 #define Loct    63
 
-static uint64_t dprintf_get_arg64(uint8_t *buf, uint32_t &curr)
+static uint64_t dprintf_get_arg64(const uint8_t *buf, uint32_t &curr)
 {
 	curr = (curr + 3) & ~3;
-	const uint64_t ret = ((uint64_t)buf[curr+0] << 56) | ((uint64_t)buf[curr+1] << 48) | ((uint64_t)buf[curr+2] << 40) | ((uint64_t)buf[curr+3] << 32) |
-						 ((uint64_t)buf[curr+4] << 24) | ((uint64_t)buf[curr+5] << 16) | ((uint64_t)buf[curr+6] << 8)  |            buf[curr+7];
+	const uint64_t ret = get_u64be(&buf[curr]);
 	curr += 8;
 	return ret;
 }
 
-static uint32_t dprintf_get_arg32(uint8_t *buf, uint32_t &curr)
+static uint32_t dprintf_get_arg32(const uint8_t *buf, uint32_t &curr)
 {
 	curr = (curr + 3) & ~3;
-	const uint32_t ret = ((uint32_t)buf[curr+0] << 24) | ((uint32_t)buf[curr+1] << 16) | ((uint32_t)buf[curr+2] << 8) | buf[curr+3];
+	const uint32_t ret = get_u32be(&buf[curr]);
 	curr += 4;
 	return ret;
 }
 
-static uint16_t dprintf_get_arg16(uint8_t *buf, uint32_t &curr)
+static uint16_t dprintf_get_arg16(const uint8_t *buf, uint32_t &curr)
 {
 	curr = (curr + 1) & ~1;
-	const uint16_t ret = ((uint16_t)buf[curr+0] << 8) | buf[curr+1];
+	const uint16_t ret = get_u16be(&buf[curr]);
 	curr += 2;
 	return ret;
 }
 
-static uint8_t dprintf_get_arg8(uint8_t *buf, uint32_t &curr)
+static uint8_t dprintf_get_arg8(const uint8_t *buf, uint32_t &curr)
 {
 	const uint8_t ret = buf[curr++];
 	return ret;
@@ -213,18 +214,9 @@ void mips3_device::do_o2_dprintf(uint32_t fmt_addr, uint32_t a1, uint32_t a2, ui
 	int idx = 0;
 	uint8_t byte_val = 0;
 	fmt_addr &= 0x1fffffff;
-	argbuf[0] = (uint8_t)(a1 >> 24);
-	argbuf[1] = (uint8_t)(a1 >> 16);
-	argbuf[2] = (uint8_t)(a1 >>  8);
-	argbuf[3] = (uint8_t)a1;
-	argbuf[4] = (uint8_t)(a2 >> 24);
-	argbuf[5] = (uint8_t)(a2 >> 16);
-	argbuf[6] = (uint8_t)(a2 >>  8);
-	argbuf[7] = (uint8_t)a2;
-	argbuf[8] = (uint8_t)(a3 >> 24);
-	argbuf[9] = (uint8_t)(a3 >> 16);
-	argbuf[10] = (uint8_t)(a3 >>  8);
-	argbuf[11] = (uint8_t)a3;
+	put_u32be(&argbuf[0], a1);
+	put_u32be(&argbuf[4], a2);
+	put_u32be(&argbuf[8], a3);
 	stack &= 0x1fffffff;
 	for (int i = 0; i < 4096-12; i++)
 	{

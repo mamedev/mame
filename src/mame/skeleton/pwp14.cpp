@@ -56,12 +56,12 @@ public:
 	void pwp14(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update_pwp14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pwp14_io(address_map &map);
-	void pwp14_mem(address_map &map);
+	void pwp14_io(address_map &map) ATTR_COLD;
+	void pwp14_mem(address_map &map) ATTR_COLD;
 	void bankswitch_w(offs_t offset, uint8_t data);
 	void set_bank();
 	u8 typewriter_r(offs_t offset);
@@ -224,7 +224,7 @@ void pwp14_state::pwp14(machine_config &config)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);

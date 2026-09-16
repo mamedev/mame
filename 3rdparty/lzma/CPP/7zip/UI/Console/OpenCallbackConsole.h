@@ -1,7 +1,7 @@
 // OpenCallbackConsole.h
 
-#ifndef __OPEN_CALLBACK_CONSOLE_H
-#define __OPEN_CALLBACK_CONSOLE_H
+#ifndef ZIP7_INC_OPEN_CALLBACK_CONSOLE_H
+#define ZIP7_INC_OPEN_CALLBACK_CONSOLE_H
 
 #include "../../../Common/StdOutStream.h"
 
@@ -17,12 +17,12 @@ protected:
   CStdOutStream *_so;
   CStdOutStream *_se;
 
-  bool _totalFilesDefined;
-  // bool _totalBytesDefined;
   // UInt64 _totalFiles;
   UInt64 _totalBytes;
+  bool _totalFilesDefined;
+  // bool _totalBytesDefined;
 
-  bool NeedPercents() const { return _percent._so != NULL; }
+  bool NeedPercents() const { return _percent._so && !_percent.DisablePrint; }
 
 public:
 
@@ -35,12 +35,12 @@ public:
   }
 
   COpenCallbackConsole():
+      _totalBytes(0),
       _totalFilesDefined(false),
       // _totalBytesDefined(false),
-      _totalBytes(0),
       MultiArcMode(false)
       
-      #ifndef _NO_CRYPTO
+      #ifndef Z7_NO_CRYPTO
       , PasswordIsDefined(false)
       // , PasswordWasAsked(false)
       #endif
@@ -49,16 +49,21 @@ public:
 
   virtual ~COpenCallbackConsole() {}
   
-  void Init(CStdOutStream *outStream, CStdOutStream *errorStream, CStdOutStream *percentStream)
+  void Init(
+      CStdOutStream *outStream,
+      CStdOutStream *errorStream,
+      CStdOutStream *percentStream,
+      bool disablePercents)
   {
     _so = outStream;
     _se = errorStream;
     _percent._so = percentStream;
+    _percent.DisablePrint = disablePercents;
   }
 
-  INTERFACE_IOpenCallbackUI(;)
+  Z7_IFACE_IMP(IOpenCallbackUI)
   
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   bool PasswordIsDefined;
   // bool PasswordWasAsked;
   UString Password;

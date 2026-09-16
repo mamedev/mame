@@ -24,9 +24,9 @@
 
 namespace osd::debugger::win {
 
+class debugger_preferences;
 class debugview_info;
 class debugwin_info;
-class ui_metrics;
 
 
 class debugger_windows_interface
@@ -36,10 +36,13 @@ public:
 
 	virtual running_machine &machine() const = 0;
 
-	virtual ui_metrics &metrics() const = 0;
+	virtual debugger_preferences const &preferences() const = 0;
 	virtual void set_color_theme(int index) = 0;
 	virtual bool get_save_window_arrangement() const = 0;
 	virtual void set_save_window_arrangement(bool save) = 0;
+	virtual bool get_group_windows() const = 0;
+	virtual bool get_group_windows_setting() const = 0;
+	virtual void set_group_windows_setting(bool group) = 0;
 
 	virtual bool const &waiting_for_debugger() const = 0;
 	virtual bool seq_pressed() const = 0;

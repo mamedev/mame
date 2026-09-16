@@ -14,7 +14,7 @@ exorterm155_terminal_device::exorterm155_terminal_device(const machine_config &m
 
 void exorterm155_terminal_device::device_add_mconfig(machine_config &config)
 {
-	EXORTERM155(config, m_exorterm155, 0);
+	EXORTERM155(config, m_exorterm155);
 	m_exorterm155->rs232_conn_txd_handler().set(FUNC(exorterm155_terminal_device::output_rxd));
 	m_exorterm155->rs232_conn_rts_handler().set(FUNC(exorterm155_terminal_device::route_term_rts));
 	m_exorterm155->rs232_conn_dtr_handler().set(FUNC(exorterm155_terminal_device::route_term_dtr));
@@ -23,7 +23,7 @@ void exorterm155_terminal_device::device_add_mconfig(machine_config &config)
 INPUT_PORTS_START(exorterm155_terminal)
 
 	PORT_START("FLOW_CONTROL")
-	PORT_CONFNAME(0x1, 1, "Flow Control") PORT_CHANGED_MEMBER(DEVICE_SELF, exorterm155_terminal_device, flow_control, 0)
+	PORT_CONFNAME(0x1, 1, "Flow Control") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exorterm155_terminal_device::flow_control), 0)
 	PORT_CONFSETTING(0x00, "None")
 	PORT_CONFSETTING(0x01, "Terminal DTR to remote CTS")
 

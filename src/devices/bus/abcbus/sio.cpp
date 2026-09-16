@@ -30,6 +30,14 @@ Notes:
 
 */
 
+/*
+
+    TODO:
+
+    - ROM mapping
+
+*/
+
 #include "emu.h"
 #include "sio.h"
 
@@ -79,7 +87,7 @@ const tiny_rom_entry *abc_sio_device::device_rom_region() const
 void abc_sio_device::device_add_mconfig(machine_config &config)
 {
 	Z80CTC(config, m_ctc, XTAL(4'915'200));
-	Z80DART(config, m_sio, 0);
+	Z80DART(config, m_sio);
 }
 
 
@@ -142,7 +150,7 @@ uint8_t abc_sio_device::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
+	if (offset >= 0x4000 && offset < 0x5000)
 	{
 		data = m_rom->base()[offset & 0xfff];
 	}

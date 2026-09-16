@@ -50,12 +50,6 @@ else
 	}
 end
 
-if _OPTIONS["USE_WAYLAND"]=="1" then
-	defines {
-		"SDLMAME_USE_WAYLAND",
-	}
-end
-
 if _OPTIONS["NO_USE_XINPUT"]=="1" then
 	defines {
 		"USE_XINPUT=0",
@@ -134,23 +128,13 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"UNICODE",
 			"_UNICODE",
-			"_WIN32_WINNT=0x0501",
+			"_WIN32_WINNT=0x0A00",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
 		}
 
 	configuration { }
 
-elseif _OPTIONS["targetos"]=="linux" then
-	if _OPTIONS["QT_HOME"]~=nil then
-		buildoptions {
-			"-I" .. backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_INSTALL_HEADERS"),
-		}
-	else
-		buildoptions {
-			backtick(pkgconfigcmd() .. " --cflags Qt5Widgets"),
-		}
-	end
 elseif _OPTIONS["targetos"]=="macosx" then
 	defines {
 		"SDLMAME_MACOSX",
@@ -179,4 +163,3 @@ configuration { "netbsd" }
 	}
 
 configuration { }
-

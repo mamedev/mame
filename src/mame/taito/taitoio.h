@@ -19,7 +19,7 @@
 class tc0040ioc_device : public device_t
 {
 public:
-	tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0040ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -38,9 +38,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -62,7 +62,7 @@ DECLARE_DEVICE_TYPE(TC0040IOC, tc0040ioc_device)
 class tc0220ioc_device : public device_t
 {
 public:
-	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0220ioc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -77,9 +77,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -101,7 +101,7 @@ DECLARE_DEVICE_TYPE(TC0220IOC, tc0220ioc_device)
 class tc0510nio_device : public device_t
 {
 public:
-	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0510nio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -120,9 +120,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -144,7 +144,7 @@ DECLARE_DEVICE_TYPE(TC0510NIO, tc0510nio_device)
 class tc0640fio_device : public device_t
 {
 public:
-	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tc0640fio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto read_0_callback() { return m_read_0_cb.bind(); }
 	auto read_1_callback() { return m_read_1_cb.bind(); }
@@ -162,9 +162,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	private:
 	// internal state

@@ -112,7 +112,7 @@ DEFINE_DEVICE_TYPE(PINSND88, pinsnd88_device, "pinsnd88", "Williams Pin Sound '8
 
 pinsnd88_device::pinsnd88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig,PINSND88,tag,owner,clock)
-	, device_mixer_interface(mconfig, *this, 2) // 2 channels
+	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_dac(*this, "dac")
 	, m_ym2151(*this, "ym2151")
@@ -208,16 +208,16 @@ void pinsnd88_device::device_add_mconfig(machine_config &config)
 
 	// TODO: analog filters and "volume" controls for the two channels
 	AD7224(config, m_dac, 0);
-	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, AUTO_ALLOC_INPUT, 0); // 470K
-	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.41/2.0, 0); // 470K
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.5/2.0, 1); // 330K
 
 	GENERIC_LATCH_8(config, m_inputlatch);
 	m_inputlatch->data_pending_callback().set_inputline(m_cpu, M6809_IRQ_LINE);
 
 	YM2151(config, m_ym2151, XTAL(3'579'545)); // "3.58 MHz" on schematics and parts list
 	m_ym2151->irq_handler().set_inputline(m_cpu, M6809_FIRQ_LINE); // IRQ is not true state, but neither is the M6809_FIRQ_LINE so we're fine.
-	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.59/2.0, AUTO_ALLOC_INPUT, 0); // 330K
-	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.5/2.0, AUTO_ALLOC_INPUT, 1); // 330K
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.59/2.0, 0); // 330K
+	m_ym2151->add_route(ALL_OUTPUTS, *this, 0.5/2.0, 1); // 330K
 }
 
 void pinsnd88_device::device_start()

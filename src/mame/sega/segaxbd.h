@@ -15,7 +15,7 @@
 #include "sega16sp.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 #include "machine/i8251.h"
@@ -33,7 +33,7 @@ class segaxbd_state : public device_t
 {
 public:
 	// construction/destruction
-	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void xboard_base_mconfig(machine_config &config);
 
@@ -69,19 +69,19 @@ protected:
 	// palette helpers
 	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void smgp_airdrive_map(address_map &map);
-	void smgp_airdrive_portmap(address_map &map);
-	void smgp_comm_map(address_map &map);
-	void smgp_comm_portmap(address_map &map);
-	void smgp_sound2_map(address_map &map);
-	void smgp_sound2_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-	void sub_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void smgp_airdrive_map(address_map &map) ATTR_COLD;
+	void smgp_airdrive_portmap(address_map &map) ATTR_COLD;
+	void smgp_comm_map(address_map &map) ATTR_COLD;
+	void smgp_comm_portmap(address_map &map) ATTR_COLD;
+	void smgp_sound2_map(address_map &map) ATTR_COLD;
+	void smgp_sound2_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
-	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device overrides
 //  virtual void machine_reset();
@@ -143,18 +143,18 @@ protected:
 	optional_ioport_array<4> m_mux_ports;
 	output_finder<4> m_lamps;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
 class segaxbd_regular_state :  public segaxbd_state
 {
 public:
-	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -162,19 +162,19 @@ protected:
 class segaxbd_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class segaxbd_aburner2_state :  public segaxbd_state
 {
 public:
-	segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_aburner2_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 //  virtual void device_start();
 //  virtual void device_reset();
 };
@@ -182,58 +182,58 @@ protected:
 class segaxbd_lastsurv_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_lastsurv_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class segaxbd_lastsurv_state :  public segaxbd_state
 {
 public:
-	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_lastsurv_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
 class segaxbd_smgp_fd1094_state :  public segaxbd_state
 {
 public:
-	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_smgp_fd1094_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
 class segaxbd_smgp_state :  public segaxbd_state
 {
 public:
-	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_smgp_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
 class segaxbd_rascot_state :  public segaxbd_state
 {
 public:
-	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segaxbd_rascot_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t commram_r(offs_t offset);
 	void commram_w(offs_t offset, uint8_t data);
 	void commram_bank_w(uint8_t data);
 
-	void sub_map(address_map &map);
-	void comm_map(address_map &map);
+	void sub_map(address_map &map) ATTR_COLD;
+	void comm_map(address_map &map) ATTR_COLD;
 
 	required_device<mb8421_device> m_commram;
 	required_device<i8251_device> m_usart;

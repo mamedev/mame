@@ -11,13 +11,14 @@
 
 #include "emu.h"
 
+#include "psxcd.h"
+
 #include "bus/psx/ctlrport.h"
 #include "bus/psx/parallel.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 #include "cpu/psx/psx.h"
 #include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
-#include "psxcd.h"
 #include "machine/ram.h"
 #include "sound/spu.h"
 #include "video/psx.h"
@@ -27,6 +28,9 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "endianness.h"
+#include "multibyte.h"
+
 #include <zlib.h>
 
 
@@ -35,12 +39,17 @@ namespace {
 class psx1_state : public driver_device
 {
 public:
-	psx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+	psx1_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "maincpu:ram"),
+		m_gpu(*this, "gpu"),
+		m_spu(*this, "spu"),
+		m_ram(*this, "ram"),
+		m_gpu_ram(*this, "gpu_ram"),
+		m_spu_ram(*this, "spu_ram"),
 		m_parallel(*this, "parallel"),
-		m_psxcd(*this, "psxcd")
+		m_psxcd(*this, "psxcd"),
+		m_cd_softlist(*this, "cd_list")
 	{
 	}
 
@@ -62,13 +71,18 @@ private:
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
+	required_device<psxgpu_device> m_gpu;
+	required_device<spu_device> m_spu;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 
-	void psx_map(address_map &map);
-	void subcpu_map(address_map &map);
+	void psx_map(address_map &map) ATTR_COLD;
+	void subcpu_map(address_map &map) ATTR_COLD;
 
 	required_device<psx_parallel_slot_device> m_parallel;
 	required_device<psxcd_device> m_psxcd;
+	required_device<software_list_device> m_cd_softlist;
 };
 
 
@@ -228,8 +242,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 1:
 				/* read bytes */
 				{
-					unsigned int address = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
-					unsigned int size = buffer[offset + 4] | (buffer[offset + 5] << 8) | (buffer[offset + 6] << 16) | (buffer[offset + 7] << 24);
+					uint32_t address = get_u32le(&buffer[offset]);
+					uint32_t size = get_u32le(&buffer[offset + 4]);
 
 					uint8_t *ram_pointer = m_ram->pointer();
 					uint32_t ram_size = m_ram->size();
@@ -251,7 +265,7 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 2:
 				/* run address: not tested */
 				{
-					unsigned int v = buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24);
+					uint32_t v = get_u32le(&buffer[offset]);
 
 					offset += 4;
 
@@ -262,8 +276,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 3:
 				/* set reg to longword */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16) | (buffer[offset + 5] << 24);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint32_t v = get_u32le(&buffer[offset + 2]);
 
 					offset += 6;
 
@@ -274,8 +288,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 4:
 				/* set reg to word: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint16_t v = get_u16le(&buffer[offset + 2]);
 
 					offset += 4;
 
@@ -286,8 +300,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 5:
 				/* set reg to byte: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2];
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint8_t v = buffer[offset + 2];
 
 					offset += 3;
 
@@ -298,8 +312,8 @@ int psx1_state::load_cpe(std::vector<uint8_t> buffer)
 			case 6:
 				/* set reg to 3-byte: not tested */
 				{
-					unsigned int r = buffer[offset] | (buffer[offset + 1] << 8);
-					unsigned int v = buffer[offset + 2] | (buffer[offset + 3] << 8) | (buffer[offset + 4] << 16);
+					uint16_t r = get_u16le(&buffer[offset]);
+					uint32_t v = get_u24le(&buffer[offset + 2]);
 
 					offset += 5;
 
@@ -496,11 +510,13 @@ void psx1_state::subcpu_map(address_map &map)
 void psx1_state::psx_base(machine_config &config)
 {
 	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
+	m_maincpu->set_ram(m_ram);
 	m_maincpu->cd_read().set(m_psxcd, FUNC(psxcd_device::read));
 	m_maincpu->cd_write().set(m_psxcd, FUNC(psxcd_device::write));
-	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers", 0));
+	RAM(config, m_ram).set_bits(32).set_default_size("2M").set_extra_options("2M,4M,8M,16M").set_default_value(0);
+
+	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers"));
 	controllers.rxd().set("maincpu:sio0", FUNC(psxsio0_device::write_rxd));
 	controllers.dsr().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
 	PSX_CONTROLLER_PORT(config, "port1", psx_controllers, "digital_pad");
@@ -511,14 +527,24 @@ void psx1_state::psx_base(machine_config &config)
 	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
 	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	m_gpu->set_cpu(m_maincpu);
+	m_gpu->set_ram(m_gpu_ram);
+	m_gpu->set_screen("screen");
+
+	RAM(config, m_gpu_ram).set_bits(16).set_default_size("1M").set_extra_options("1M,2M").set_default_value(0);
+
+	SCREEN(config, "screen");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
-	spu.add_route(0, "lspeaker", 1.00);
-	spu.add_route(1, "rspeaker", 1.00);
+	SPEAKER(config, "speaker", 2).front();
+
+	SPU(config, m_spu, 67.7376_MHz_XTAL / 2);
+	m_spu->set_cpu(m_maincpu);
+	m_spu->set_ram(m_spu_ram);
+	m_spu->add_route(0, "speaker", 1.00, 0);
+	m_spu->add_route(1, "speaker", 1.00, 1);
+
+	RAM(config, m_spu_ram).set_bits(16).set_default_size("512K").set_extra_options("512K,1M,2M,4M").set_default_value(0);
 
 	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 
@@ -529,33 +555,44 @@ void psx1_state::psx_base(machine_config &config)
 	subdevice<psxdma_device>("maincpu:dma")->install_read_handler(3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this));
 	subdevice<psxdma_device>("maincpu:dma")->install_write_handler(3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this));
 
-	SOFTWARE_LIST(config, "cd_list").set_original("psx");
+	SOFTWARE_LIST(config, m_cd_softlist).set_original("psx");
 }
 
 void psx1_state::psj(machine_config &config)
 {
-	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530CQ(config, m_maincpu, 67.7376_MHz_XTAL);
 
 	/* TODO: visible area and refresh rate */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_vclkn(53.693175_MHz_XTAL);
+	m_gpu->set_vclkp(53.693175_MHz_XTAL);
 
 	psx_base(config);
+
+	m_cd_softlist->set_filter("NTSC-J");
 }
 
 void psx1_state::psu(machine_config &config)
 {
 	psj(config);
+
 	HD63705Z0(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // FIXME: actually MC68HC05G6
+
+	m_cd_softlist->set_filter("NTSC-U");
 }
 
 void psx1_state::pse(machine_config &config)
 {
-	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
+	CXD8530AQ(config, m_maincpu, 67.7376_MHz_XTAL);
 
 	/* TODO: visible area and refresh rate */
-	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
+	CXD8561Q(config, m_gpu, 67.7376_MHz_XTAL / 2);
+	m_gpu->set_vclkn(53.203424_MHz_XTAL);
+	m_gpu->set_vclkp(53.203424_MHz_XTAL);
 
 	psx_base(config);
+
+	m_cd_softlist->set_filter("PAL-E");
 }
 
 ROM_START( psj )

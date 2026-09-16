@@ -124544,6 +124544,7 @@ void m68008_device::stop_i16u_df8() // 4e72 ffff
 	m_au = m_au - 2;
 	m_icount -= 2;
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
+	debugger_wait_hook();
 	return;
 }
 
@@ -124638,9 +124639,6 @@ void m68008_device::rte_df8() // 4e73 ffff
 			m_inst_substate = 10;
 		return;
 	}
-	m_sr = m_new_sr;
-	update_user_super();
-	update_interrupt();
 	m_edb |= m_program8.read_interruptible(m_aob | 1);
 	m_icount -= 4;
 	if(m_icount <= 0) {

@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include "pccard.h"
+#include "bus/pccard/pccard.h"
 
 
 class rf5c296_device : public device_t
 {
 public:
-	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
 	template <typename T> void set_pccard(T &&tag) { m_pccard.set_tag(std::forward<T>(tag)); }
@@ -23,7 +23,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	void reg_w(uint8_t reg, uint8_t data);

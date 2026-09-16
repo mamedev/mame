@@ -60,8 +60,8 @@ public:
 	// construction/destruction
 	virtual ~device_a800_cart_interface();
 
-	virtual void cart_map(address_map &map);
-	virtual void cctl_map(address_map &map);
+	virtual void cart_map(address_map &map) ATTR_COLD;
+	virtual void cctl_map(address_map &map) ATTR_COLD;
 
 	// TODO: remove all of this
 	void rom_alloc(uint32_t size);
@@ -109,10 +109,7 @@ public:
 	a800_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: a800_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~a800_cart_slot_device();
@@ -142,7 +139,7 @@ protected:
 	//a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -169,7 +166,7 @@ public:
 	// construction/destruction
 	virtual ~device_a5200_cart_interface();
 
-	virtual void cart_map(address_map &map);
+	virtual void cart_map(address_map &map) ATTR_COLD;
 
 	// TODO: remove all of this
 	void rom_alloc(uint32_t size);
@@ -203,10 +200,7 @@ public:
 	a5200_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: a5200_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a5200_cart_slot_device();
@@ -225,7 +219,7 @@ public:
 	void write_cart(offs_t offset, u8 data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -236,7 +230,7 @@ private:
 	int m_type;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device)
 DECLARE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device)
 

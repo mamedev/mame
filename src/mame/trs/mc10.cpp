@@ -79,7 +79,7 @@ protected:
 	mc10cart_slot_device &mc10cart() { return *m_mc10cart; }
 
 private:
-	void mc10_mem(address_map &map);
+	void mc10_mem(address_map &map) ATTR_COLD;
 
 	optional_device<mc6847_base_device> m_mc6847;
 	required_device<dac_bit_interface> m_dac;
@@ -109,8 +109,8 @@ protected:
 	required_device<ef9345_device> m_ef9345;
 
 private:
-	void alice32_mem(address_map &map);
-	void alice90_mem(address_map &map);
+	void alice32_mem(address_map &map) ATTR_COLD;
+	void alice90_mem(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -509,9 +509,11 @@ void mc10_state::mc10_video(machine_config &config)
 	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K,20K,32K");
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_raw(3.579545_MHz_XTAL * 2, 456, 0, 320, 262, 0, 240);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update("mc6847", FUNC(mc6847_base_device::screen_update));
 
-	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL(3'579'545)));
+	mc6847_device &vdg(MC6847(config, "mc6847", XTAL(3'579'545)));
 	vdg.set_screen("screen");
 	vdg.input_callback().set(FUNC(mc10_state::mc6847_videoram_r));
 }
@@ -552,14 +554,14 @@ void alice32_state::alice32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alice32_state::alice32_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
 	screen.set_size(336, 270);
 	screen.set_visarea(00, 336-1, 00, 270-1);
 	PALETTE(config, "palette").set_entries(8);
 
-	EF9345(config, m_ef9345, 0);
+	EF9345(config, m_ef9345);
 	m_ef9345->set_screen("screen");
 	m_ef9345->set_palette_tag("palette");
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(alice32_state::alice32_scanline), "screen", 0, 10);

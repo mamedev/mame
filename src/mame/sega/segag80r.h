@@ -34,8 +34,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
-		m_sn1(*this, "sn1"),
-		m_sn2(*this, "sn2"),
+		m_sn(*this, "sn%u", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundbrd(*this, "soundbrd"),
@@ -75,18 +74,12 @@ public:
 
 	uint8_t m_sound_state[2]{};
 	uint8_t m_sound_rate = 0;
-	uint16_t m_sound_addr = 0;
-	uint8_t m_sound_data = 0;
-	uint8_t m_square_state = 0;
-	uint8_t m_square_count = 0;
-	inline void sega005_update_sound_data();
 
 private:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	optional_device<sn76496_device> m_sn1;
-	optional_device<sn76496_device> m_sn2;
+	optional_device_array<sn76496_device, 2> m_sn;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<monsterb_sound_device> m_soundbrd;
@@ -152,14 +145,13 @@ private:
 
 	void usb_ram_w(offs_t offset, uint8_t data);
 	void sindbadm_misc_w(uint8_t data);
-	void sindbadm_sn1_SN76496_w(uint8_t data);
-	void sindbadm_sn2_SN76496_w(uint8_t data);
+	template <int N> void sindbadm_sn_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
 	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
@@ -179,45 +171,19 @@ private:
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 
-	void g80r_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void main_ppi8255_portmap(address_map &map);
-	void sega_315_opcodes_map(address_map &map);
-	void sindbadm_portmap(address_map &map);
-	void sindbadm_sound_map(address_map &map);
+	void g80r_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void main_ppi8255_portmap(address_map &map) ATTR_COLD;
+	void sega_315_opcodes_map(address_map &map) ATTR_COLD;
+	void sindbadm_portmap(address_map &map) ATTR_COLD;
+	void sindbadm_sound_map(address_map &map) ATTR_COLD;
 
 	emu_timer *m_vblank_latch_clear_timer = nullptr;
 };
 
 
-/*----------- defined in audio/segag80r.c -----------*/
-
-
-class sega005_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	emu_timer *m_sega005_sound_timer;
-	sound_stream *m_sega005_stream;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-private:
-	// internal state
-	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
-};
-
-DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
-
-/*----------- defined in video/segag80r.c -----------*/
+/*----------- defined in segag80r_v.cpp -----------*/
 
 #define G80_BACKGROUND_NONE         0
 #define G80_BACKGROUND_SPACEOD      1

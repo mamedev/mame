@@ -1,40 +1,172 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+
+	<element name="hl" defstate="0">
+		<rect state="1"><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.12" /></disk>
+	</element>
+
 	<element name="digit" defstate="0">
-		<led7seg>
-			<color red="0.75" green="0" blue="0.0" />
-		</led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
-	<element name="red_led" defstate="0">
-		<disk state="1">
-			<color red="0.75" green="0.0" blue="0.0" />
+	<element name="switch" defstate="0">
+		<disk>
+			<bounds x="0" y="0" width="1" height="1" />
+			<color red="0.12" green="0.12" blue="0.12" />
 		</disk>
+		<disk>
+			<bounds x="0" y="1" width="1" height="1" />
+			<color red="0.12" green="0.12" blue="0.12" />
+		</disk>
+		<rect>
+			<bounds x="0" y="0.5" width="1" height="1" />
+			<color red="0.12" green="0.12" blue="0.12" />
+		</rect>
 		<disk state="0">
-			<color red="0.09375" green="0.0" blue="0.0" />
+			<bounds x="0" y="1" width="1" height="1" />
+			<color red="0.4" green="0.4" blue="0.4" />
+		</disk>
+		<disk state="1">
+			<bounds x="0" y="0" width="1" height="1" />
+			<color red="0.4" green="0.4" blue="0.4" />
 		</disk>
 	</element>
 
-	<view name="Standard">
-		<!-- Led address display -->
-		<element name="digit0" ref="digit">
-			<bounds x="0" y="0" width="18" height="24" />
-		</element>
-		<element name="digit1" ref="digit">
-			<bounds x="18" y="0" width="18" height="24" />
-		</element>
-		<!-- OUT led -->
-		<element name="led0" ref="red_led">
-			<bounds x="40" y="5" width="5" height="5" />
-		</element>
+	<element name="text_l1"><text string="RUN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l2"><text string="LOAD"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l3"><text string="MP"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l4"><text string="INPUT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l5"><text string="DISPLAY" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l6"><text string="Q"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="text_b0"><text string="0"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b1"><text string="1"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b2"><text string="2"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b3"><text string="3"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b4"><text string="4"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b5"><text string="5"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b6"><text string="6"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b7"><text string="7"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b8"><text string="8"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b9"><text string="9"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_ba"><text string="A"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_bb"><text string="B"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_bc"><text string="C"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_bd"><text string="D"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_be"><text string="E"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_bf"><text string="F"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_bi"><text string="I"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+
+
+<!-- led panel -->
+
+	<group name="digits">
+		<element name="digit0" ref="digit"><bounds x="0" y="0" width="0.82" height="1" /></element>
+		<element name="digit1" ref="digit"><bounds x="1" y="0" width="0.82" height="1" /></element>
+	</group>
+
+	<group name="leds">
+		<bounds x="-0.55" y="0.2" width="2.05" height="1.3" />
+		<element ref="nothing"><bounds x="-0.55" y="0.2" width="2.05" height="1.3" /></element>
+
+		<group ref="digits"><bounds xc="0" yc="1" width="1" height="0.65" /></group>
+		<element name="led0" ref="led"><bounds left="1.15" right="1.45" top="0.675" bottom="0.975" /></element>
+
+		<element ref="text_l5"><bounds x="-0.5" y="0.25" width="1" height="0.25" /></element>
+		<element ref="text_l6"><bounds x="1.15" y="0.25" width="0.3" height="0.25" /></element>
+	</group>
+
+
+<!-- button panel -->
+
+	<group name="buttons">
+		<bounds x="-0.5" y="-0.5" width="6.2" height="4" />
+		<element ref="nothing"><bounds x="-0.5" y="-0.5" width="5.7" height="4" /></element>
+
+		<repeat count="4">
+			<param name="y" start="0" increment="1" />
+			<repeat count="4">
+				<param name="x" start="0" increment="1" />
+				<element ref="white"><bounds xc="~x~" yc="~y~" width="0.9" height="0.9" /></element>
+			</repeat>
+		</repeat>
+
+		<element ref="text_bc"><bounds xc="0" yc="0" width="1" height="0.8" /></element>
+		<element ref="text_bd"><bounds xc="1" yc="0" width="1" height="0.8" /></element>
+		<element ref="text_be"><bounds xc="2" yc="0" width="1" height="0.8" /></element>
+		<element ref="text_bf"><bounds xc="3" yc="0" width="1" height="0.8" /></element>
+		<element ref="text_b8"><bounds xc="0" yc="1" width="1" height="0.8" /></element>
+		<element ref="text_b9"><bounds xc="1" yc="1" width="1" height="0.8" /></element>
+		<element ref="text_ba"><bounds xc="2" yc="1" width="1" height="0.8" /></element>
+		<element ref="text_bb"><bounds xc="3" yc="1" width="1" height="0.8" /></element>
+		<element ref="text_b4"><bounds xc="0" yc="2" width="1" height="0.8" /></element>
+		<element ref="text_b5"><bounds xc="1" yc="2" width="1" height="0.8" /></element>
+		<element ref="text_b6"><bounds xc="2" yc="2" width="1" height="0.8" /></element>
+		<element ref="text_b7"><bounds xc="3" yc="2" width="1" height="0.8" /></element>
+		<element ref="text_b0"><bounds xc="0" yc="3" width="1" height="0.8" /></element>
+		<element ref="text_b1"><bounds xc="1" yc="3" width="1" height="0.8" /></element>
+		<element ref="text_b2"><bounds xc="2" yc="3" width="1" height="0.8" /></element>
+		<element ref="text_b3"><bounds xc="3" yc="3" width="1" height="0.8" /></element>
+
+		<element ref="hl" inputtag="X1" inputmask="0x08"><bounds xc="0" yc="0" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X2" inputmask="0x08"><bounds xc="1" yc="0" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X3" inputmask="0x08"><bounds xc="2" yc="0" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X4" inputmask="0x08"><bounds xc="3" yc="0" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X1" inputmask="0x04"><bounds xc="0" yc="1" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X2" inputmask="0x04"><bounds xc="1" yc="1" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X3" inputmask="0x04"><bounds xc="2" yc="1" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X4" inputmask="0x04"><bounds xc="3" yc="1" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X1" inputmask="0x02"><bounds xc="0" yc="2" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X2" inputmask="0x02"><bounds xc="1" yc="2" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X3" inputmask="0x02"><bounds xc="2" yc="2" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X4" inputmask="0x02"><bounds xc="3" yc="2" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X1" inputmask="0x01"><bounds xc="0" yc="3" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X2" inputmask="0x01"><bounds xc="1" yc="3" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X3" inputmask="0x01"><bounds xc="2" yc="3" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+		<element ref="hl" inputtag="X4" inputmask="0x01"><bounds xc="3" yc="3" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+
+		<element ref="switch" inputtag="SPECIAL" inputmask="0x01"><bounds xc="4.3" yc="0" width="0.45" height="0.9" /></element>
+		<element ref="switch" inputtag="SPECIAL" inputmask="0x02"><bounds xc="4.3" yc="1" width="0.45" height="0.9" /></element>
+		<element ref="switch" inputtag="SPECIAL" inputmask="0x04"><bounds xc="4.3" yc="2" width="0.45" height="0.9" /></element>
+
+		<element ref="white"><bounds xc="4.3" yc="3" width="0.9" height="0.9" /></element>
+		<element ref="text_bi"><bounds xc="4.3" yc="3" width="1" height="0.8" /></element>
+		<element ref="hl" inputtag="SPECIAL" inputmask="0x08"><bounds xc="4.3" yc="3" width="0.9" height="0.9" /><color alpha="0.2" /></element>
+
+		<element ref="text_l1"><bounds xc="5.2" yc="0" width="1" height="0.25" /></element>
+		<element ref="text_l2"><bounds xc="5.2" yc="1" width="1" height="0.25" /></element>
+		<element ref="text_l3"><bounds xc="5.2" yc="2" width="1" height="0.25" /></element>
+		<element ref="text_l4"><bounds xc="5.2" yc="3" width="1" height="0.25" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<group ref="leds"><bounds x="1.95" y="0" width="2.05" height="1.3" /></group>
+
+		<collection name="Keypad">
+			<element ref="nothing"><bounds x="-0.2" y="1.3" width="0.1" height="4.4" /></element>
+			<group ref="buttons"><bounds x="0" y="1.5" width="6.2" height="4" /></group>
+		</collection>
+
+		<collection name="CDP1861" visible="no">
+			<screen index="0"><bounds x="6.3" y="0" width="7.6" height="5.7" /></screen>
+		</collection>
 	</view>
 
-	<view name="CDP1861">
-		<screen index="0">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
-	</view>
 </mamelayout>

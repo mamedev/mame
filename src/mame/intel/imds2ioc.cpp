@@ -337,9 +337,10 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 	uint8_t const chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 	uint16_t pixels;
 
-	if (lten) {
+	using namespace i8275_attributes;
+	if (BIT(attrcode, LTEN)) {
 		pixels = ~0;
-	} else if (vsp != 0 || (linecount & 8) != 0) {
+	} else if (BIT(attrcode, VSP) || (linecount & 8) != 0) {
 		pixels = 0; // VSP is gated with LC3
 	} else {
 		// See hardware ref. manual, pg 58 for the very peculiar way of generating character images
@@ -373,7 +374,7 @@ I8275_DRAW_CHARACTER_MEMBER(imds2ioc_device::crtc_display_pixels)
 		pixels = exp_pix_l | exp_pix_r;
 	}
 
-	if (rvv) {
+	if (BIT(attrcode, RVV)) {
 		pixels = ~pixels;
 	}
 
@@ -587,7 +588,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	m_ioccrtc->irq_wr_callback().set_inputline(m_ioccpu, I8085_INTR_LINE);
 	m_ioccrtc->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("ioccrtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_imds2);
@@ -604,7 +605,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	m_iocdma->out_iow_cb<1>().set("iocfdc", FUNC(i8271_device::data_w));
 	m_iocdma->out_iow_cb<2>().set(m_ioccrtc, FUNC(i8275_device::dack_w));
 
-	PIT8253(config, m_ioctimer, 0);
+	PIT8253(config, m_ioctimer);
 	m_ioctimer->set_clk<0>(IOC_XTAL_Y1 / 4);
 	m_ioctimer->out_handler<0>().set(m_ioctimer, FUNC(pit8253_device::write_clk2));
 	m_ioctimer->out_handler<2>().set(FUNC(imds2ioc_device::beep_timer_w));

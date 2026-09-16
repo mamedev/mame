@@ -32,7 +32,7 @@ void ultra14f_device::device_start()
 void ultra14f_device::uscpu_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region("firmware", 0);
-	map(0x00e000, 0x00e00f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map));
+	map(0x00e000, 0x00e00f).m("scsic", FUNC(ncr53cf94_device::map));
 	map(0x3f8000, 0x3fffff).ram();
 }
 
@@ -47,7 +47,7 @@ void ultra14f_device::device_add_mconfig(machine_config &config)
 	M68008FN(config, m_uscpu, 40_MHz_XTAL / 4); // custom-marked as USC080-5-10A
 	m_uscpu->set_addrmap(AS_PROGRAM, &ultra14f_device::uscpu_map);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -55,8 +55,10 @@ void ultra14f_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53CF94) // Emulex FAS216 or similar custom-marked as USC060-6-40B
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	auto &scsic(NCR53CF94(config, "scsic", 40_MHz_XTAL)); // Emulex FAS216 or similar custom-marked as USC060-6-40B
+	scsi.set_external_device(7, scsic);
+	scsic.irq_handler_cb().set_inputline(m_uscpu, M68K_IRQ_1);
 
 	DP8473(config, m_fdc, 24_MHz_XTAL); // custom-marked as USC020-1-24
 }

@@ -27,10 +27,7 @@ public:
 	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&a1bus_tag, U &&opts, const char *dflt)
 		: a1bus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_a1bus.set_tag(std::forward<T>(a1bus_tag));
 	}
 	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -39,14 +36,14 @@ protected:
 	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<a1bus_device> m_a1bus;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device)
 
 
@@ -55,7 +52,7 @@ class a1bus_device : public device_t
 {
 public:
 	// construction/destruction
-	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
@@ -78,8 +75,8 @@ protected:
 	a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal state
 	required_address_space m_space;
@@ -91,7 +88,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(A1BUS, a1bus_device)
 
 // ======================> device_a1bus_card_interface
@@ -103,8 +100,6 @@ class device_a1bus_card_interface : public device_interface
 public:
 	// construction/destruction
 	virtual ~device_a1bus_card_interface();
-
-	device_a1bus_card_interface *next() const { return m_next; }
 
 	// inline configuration
 	void set_a1bus(a1bus_device *a1bus, const char *slottag) { m_a1bus = a1bus; m_a1bus_slottag = slottag; }
@@ -128,7 +123,6 @@ private:
 	optional_device<a1bus_device> m_a1bus_finder;
 	a1bus_device *m_a1bus;
 	const char *m_a1bus_slottag;
-	device_a1bus_card_interface *m_next;
 };
 
 #endif  // MAME_BUS_A1BUS_A1BUS_H

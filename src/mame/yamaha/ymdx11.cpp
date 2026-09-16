@@ -35,7 +35,7 @@ public:
 	void dx11(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -43,7 +43,7 @@ private:
 
 	void cartridge_bank_w(u8 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6301y_cpu_device> m_maincpu;
 	required_device<hd6301y_cpu_device> m_subcpu;
@@ -76,8 +76,6 @@ void yamaha_dx11_state::cartridge_bank_w(u8 data)
 
 void yamaha_dx11_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_maincpu, FUNC(hd6301y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram();
 	map(0x1400, 0x1400).mirror(0x3ff).w(FUNC(yamaha_dx11_state::cartridge_bank_w));
 	map(0x1800, 0x1801).mirror(0x3fe).rw("opz", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x1c00, 0x1c01).mirror(0x3fe).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
@@ -104,7 +102,7 @@ void yamaha_dx11_state::dx11(machine_config &config)
 
 	M58990(config, m_adc, 8_MHz_XTAL / 16); // M58990P-1; divider not verified (actually clocked by P26 output of sub CPU)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -115,17 +113,16 @@ void yamaha_dx11_state::dx11(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx11_state::palette_init), 2);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx11_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2414_device &opz(YM2414(config, "opz", 3.579545_MHz_XTAL));
 	//opz.irq_handler().set_inputline(m_maincpu, hd6301y_cpu_device::IRQ2_LINE); // IRQ = P51
-	opz.add_route(0, "lspeaker", 0.60);
-	opz.add_route(1, "rspeaker", 0.60);
+	opz.add_route(0, "speaker", 0.60, 0);
+	opz.add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START(dx11)
@@ -139,4 +136,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, dx11, 0, 0, dx11, dx11, yamaha_dx11_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)
+SYST(1988, dx11, 0, 0, dx11, dx11, yamaha_dx11_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

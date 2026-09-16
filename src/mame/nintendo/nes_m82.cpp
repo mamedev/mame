@@ -47,8 +47,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(m82_game_select);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -69,8 +69,8 @@ private:
 	u8 m82_in0_r();
 	u8 m82_in1_r();
 	void m82_in0_w(u8 data);
-	void m82_map(address_map &map);
-	void m82_ppu_map(address_map &map);
+	void m82_map(address_map &map) ATTR_COLD;
+	void m82_ppu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -152,7 +152,7 @@ void m82_state::m82_ppu_map(address_map &map)
 
 static INPUT_PORTS_START( nes_m82 )
 	PORT_START("CN13")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game Select") PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m82_state, m82_game_select, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Game Select") PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(m82_state::m82_game_select), 0)
 
 	PORT_START("CN12")
 	PORT_CONFNAME( 0x0f, 0x08, "Play Time Limit" )
@@ -199,7 +199,7 @@ void m82_state::nes_m82(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m82_state::m82_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, VISIBLE_SCREEN_WIDTH, ppu2c0x_device::NTSC_SCANLINES_PER_FRAME, 0, VISIBLE_SCREEN_HEIGHT);
 	m_screen->set_screen_update(m_ppu, FUNC(ppu2c0x_device::screen_update));
 

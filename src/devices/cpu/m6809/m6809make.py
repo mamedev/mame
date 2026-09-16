@@ -51,9 +51,9 @@ while count < len(lines):
 	next_line_is_return = (count + 1 == len(lines)) or lines[count+1].strip() == "return;"
 
 	# Check to see if the next line is a dispatch followed by return
-	next_line_is_dispatch_and_return = (count + 1 < len(lines)) and re.match('([A-Za-z0-9\t ]+\:)*\s*\%', lines[count+1]) and lines[count+2].strip() == "return;"
+	next_line_is_dispatch_and_return = (count + 1 < len(lines)) and re.match('([A-Za-z0-9\t ]+\\:)*\\s*\\%', lines[count+1]) and lines[count+2].strip() == "return;"
 
-	if re.match('([A-Za-z0-9\t ]+\:)*\s*\%', line):
+	if re.match('([A-Za-z0-9\t ]+\\:)*\\s*\\%', line):
 		# This is a dispatch - find the '%'
 		percent_pos = line.find("%")
 		dispatch = line[percent_pos+1:].strip("\t\n; ")

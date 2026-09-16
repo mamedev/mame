@@ -249,7 +249,7 @@ void isa8_myb3k_fdc471x_device_base::myb3k_fdc_command(uint8_t data)
 	if (has_motor_control)
 		LOGCMD(" - Motor %s\n", motor_on ? "ON" : "OFF");
 
-	auto floppy_connector = m_floppy_connectors[selected_drive];
+	auto &floppy_connector = m_floppy_connectors[selected_drive];
 	floppy_image_device *floppy = nullptr;
 
 	if (floppy_connector.found())
@@ -291,7 +291,7 @@ uint8_t isa8_myb3k_fdc4712_device::myb3k_fdc_status()
 {
 	uint8_t status = isa8_myb3k_fdc471x_device_base::myb3k_fdc_status();
 
-	auto floppy_connector = m_floppy_connectors[selected_drive];
+	auto &floppy_connector = m_floppy_connectors[selected_drive];
 	floppy_image_device *floppy = nullptr;
 
 	if (floppy_connector.found())

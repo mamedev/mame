@@ -82,7 +82,7 @@ public:
 	void jackpot(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -99,9 +99,9 @@ private:
 	void attr_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -244,7 +244,7 @@ void jackpot_state::jackpot(machine_config &config) // clocks not verified
 	uart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	// reset by the CRTC with 384x256, 55.93 Hz (tentative)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

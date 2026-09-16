@@ -15,6 +15,7 @@
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/buffer.h"
+#include "machine/i8087.h"
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
@@ -46,6 +47,7 @@ public:
 	pc1512_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, I8086_TAG),
+		m_ndp(*this, I8087_TAG),
 		m_dmac(*this, I8237A5_TAG),
 		m_pic(*this, I8259A2_TAG),
 		m_pit(*this, I8253_TAG),
@@ -66,6 +68,7 @@ public:
 		m_status2(0),
 		m_port61(0),
 		m_nmi_enable(0),
+		m_ndp_int(0),
 		m_kb_bits(0),
 		m_kbclk(1),
 		m_kbdata(1),
@@ -80,7 +83,8 @@ public:
 		m_speaker_drive(0)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
+	required_device<i8087_device> m_ndp;
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8253_device> m_pit;
@@ -96,8 +100,8 @@ public:
 	required_device<isa8_device> m_bus;
 	required_ioport m_lk;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void update_speaker();
 	void update_fdc_int();
@@ -111,6 +115,8 @@ public:
 	void mouse_w(offs_t offset, uint8_t data);
 	void dma_page_w(offs_t offset, uint8_t data);
 	void nmi_mask_w(uint8_t data);
+	void ndp_int_w(int state);
+	void update_nmi();
 	uint8_t printer_r(offs_t offset);
 	void printer_w(offs_t offset, uint8_t data);
 	void kbdata_w(int state);
@@ -152,6 +158,7 @@ public:
 
 	// interrupt state
 	int m_nmi_enable;
+	int m_ndp_int;
 
 	// keyboard state
 	uint8_t m_kbd = 0;
@@ -194,19 +201,19 @@ public:
 class pc1512_state : public pc1512_base_state
 {
 public:
-	pc1512_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc1512_base_state(mconfig, type, tag)
-		, m_vdu(*this, AMS40041_TAG)
+	pc1512_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc1512_base_state(mconfig, type, tag),
+		m_vdu(*this, AMS40041_TAG)
 	{ }
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void pc1512hd(machine_config &config);
 	void pc1512(machine_config &config);
 	void pc1512dd(machine_config &config);
-	void pc1512_io(address_map &map);
-	void pc1512_mem(address_map &map);
+	void pc1512_io(address_map &map) ATTR_COLD;
+	void pc1512_mem(address_map &map) ATTR_COLD;
 
 	required_device<ams40041_device> m_vdu;
 };
@@ -214,13 +221,13 @@ public:
 class pc1640_state : public pc1512_base_state
 {
 public:
-	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc1512_base_state(mconfig, type, tag)
-		, m_sw(*this, "SW")
-		, m_opt(0)
+	pc1640_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc1512_base_state(mconfig, type, tag),
+		m_sw(*this, "SW"),
+		m_opt(0)
 	{ }
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t io_r(offs_t offset);
 	uint8_t printer_r(offs_t offset);
@@ -231,8 +238,8 @@ public:
 	void pc1640hd(machine_config &config);
 	void pc1640(machine_config &config);
 	void pc1640dd(machine_config &config);
-	void pc1640_io(address_map &map);
-	void pc1640_mem(address_map &map);
+	void pc1640_io(address_map &map) ATTR_COLD;
+	void pc1640_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_AMSTRAD_PC1512_H

@@ -100,16 +100,26 @@ public:
 		m_segs(*this, "seg%u", 0U)
 	{ }
 
-	void ti74(machine_config &config);
-	void ti95(machine_config &config);
+	void ti74(machine_config &config) ATTR_COLD;
+	void ti95(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
+	required_device<tms70c46_device> m_maincpu;
+	required_memory_bank m_sysbank;
+	required_device<generic_slot_device> m_cart;
+	required_ioport_array<8> m_key_matrix;
+	required_ioport m_battery_inp;
+	output_finder<80> m_segs;
+
+	u8 m_key_select = 0;
+	u8 m_power = 0;
+
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_battery_status(int state);
 
@@ -121,17 +131,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
-	void main_map(address_map &map);
-
-	required_device<tms70c46_device> m_maincpu;
-	required_memory_bank m_sysbank;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
-	output_finder<80> m_segs;
-
-	u8 m_key_select = 0;
-	u8 m_power = 0;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -142,8 +142,6 @@ private:
 
 void ti74_state::machine_start()
 {
-	m_segs.resolve();
-
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
@@ -328,7 +326,7 @@ INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
 
 static INPUT_PORTS_START( ti74 )
 	PORT_START("BATTERY")
-	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti74_state, battery_status_changed, 0)
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti74_state::battery_status_changed), 0)
 	PORT_CONFSETTING(    0x00, "Low" )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
@@ -338,8 +336,8 @@ static INPUT_PORTS_START( ti74 )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M') PORT_NAME("m  M  Frac")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K') PORT_NAME("k  K  Frq")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_NAME(u8"i  I  \u221ax" /* √ */)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190     \u2190" /* ← */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I') PORT_NAME(u8"i  I  \u221ax") // U+221A = √
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_NAME(u8"\u2190     \u2190") // U+2190 = ←
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') PORT_NAME(u8"u  U  x²")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J') PORT_NAME("j  J  nCr")
@@ -349,7 +347,7 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('%')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_NAME("l  L  (x,y)")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O') PORT_NAME("o  O  1/x")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192     EE" /* → */ )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_NAME(u8"\u2192     EE" ) // U+2192 = →
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_NAME("y  Y  log")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H') PORT_NAME("h  H  nPr")
@@ -359,7 +357,7 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_CHAR('\'') PORT_NAME(u8"SPACE  '  Δ%")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':') PORT_NAME(u8";  :  Σ+")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P') PORT_NAME(u8"p  P  yˣ")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('(') PORT_NAME(u8"\u2191  (" /* ↑ */)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CHAR('(') PORT_NAME(u8"\u2191  (") // U+2191 = ↑
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_NAME("t  T  ln(x)")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G') PORT_NAME("g  G  n!")
@@ -369,8 +367,8 @@ static INPUT_PORTS_START( ti74 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_CHAR('=') PORT_NAME("ENTER  =")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(END)) PORT_NAME("CLR  UCL  CE/C")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(')') PORT_NAME(u8"\u2193  )" /* ↓ */)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME(u8"RUN     x\u2194y" /* ↔ */)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(')') PORT_NAME(u8"\u2193  )") // U+2193 = ↓
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME(u8"RUN     x\u2194y") // U+2194 = ↔
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_NAME(u8"r  R  π")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F') PORT_NAME("f  F  P>R")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C') PORT_NAME("c  C  RCL")
@@ -418,7 +416,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ti95 )
 	PORT_START("BATTERY")
-	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti74_state, battery_status_changed, 0)
+	PORT_CONFNAME( 0x01, 0x01, "Battery Status" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ti74_state::battery_status_changed), 0)
 	PORT_CONFSETTING(    0x00, "Low" )
 	PORT_CONFSETTING(    0x01, DEF_STR( Normal ) )
 
@@ -480,7 +478,7 @@ static INPUT_PORTS_START( ti95 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INCR  Y  CH")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME(u8"x²  H")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("FLAGS  N")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME(u8"\u2190  DEL" /* ← */)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME(u8"\u2190  DEL") // U+2190 = ←
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_NAME("RCL  O  FH")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_NAME("INV  P")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_NAME("7  }  nPr")
@@ -488,9 +486,9 @@ static INPUT_PORTS_START( ti95 )
 	PORT_START("IN.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_NAME("F5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_NAME("EXC  U  DH")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME(u8"\u221ax  J" /* √ */)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME(u8"\u221ax  J") // U+221A = √
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("TESTS  M")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME(u8"\u2192  INS" /* → */)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME(u8"\u2192  INS") // U+2192 = →
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME(u8"yˣ  L")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_4) PORT_CHAR('4' ) PORT_NAME("4     IND")
@@ -524,7 +522,7 @@ void ti74_state::ti74(machine_config &config)
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(6*31+1, 9*1+1+1);
@@ -536,7 +534,7 @@ void ti74_state::ti74(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // OSC = 91K resistor
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update));
 
@@ -557,7 +555,7 @@ void ti74_state::ti95(machine_config &config)
 	NVRAM(config, "sysram.ic3", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(200, 20);
@@ -569,7 +567,7 @@ void ti74_state::ti95(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(ti74_state::ti74_palette), 3);
 
-	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780_device &hd44780(HD44780(config, "hd44780", 270'000)); // OSC = 91K resistor
 	hd44780.set_lcd_size(2, 16);
 	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update));
 
@@ -620,4 +618,5 @@ ROM_END
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 SYST( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

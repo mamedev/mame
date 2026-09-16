@@ -52,16 +52,16 @@ public:
 	void dmax8000(machine_config &config);
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	void port0c_w(u8 data);
 	void port0d_w(u8 data);
 	void port14_w(u8 data);
 	void port40_w(u8 data);
 	void fdc_drq_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -194,7 +194,7 @@ void dmax8000_state::dmax8000(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(dmax8000_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	MM58174(config, "rtc", 0);
+	MM58174(config, "rtc");
 }
 
 

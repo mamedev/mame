@@ -22,7 +22,7 @@ class tvc_sound_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tvc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto sndint_wr_callback() { return m_write_sndint.bind(); }
 
@@ -31,9 +31,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(trigger_int);
 

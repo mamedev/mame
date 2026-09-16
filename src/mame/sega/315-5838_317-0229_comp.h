@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Samuel Neves, Peter Wilhelmsen, Morten Shearman Kirkegaard
-#ifndef MAME_SEGA_315_5838_371_0229_COMP_H
-#define MAME_SEGA_315_5838_371_0229_COMP_H
+#ifndef MAME_SEGA_315_5838_317_0229_COMP_H
+#define MAME_SEGA_315_5838_317_0229_COMP_H
 
 #pragma once
 
@@ -16,7 +16,7 @@ class sega_315_5838_comp_device :  public device_t,
 {
 public:
 	// construction/destruction
-	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t data_r();
 
@@ -36,8 +36,8 @@ public:
 	void set_hack_mode(int mode) { m_hackmode = mode; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t source_word_r();
@@ -78,4 +78,4 @@ private:
 #endif
 };
 
-#endif // MAME_SEGA_315_5838_371_0229_COMP_H
+#endif // MAME_SEGA_315_5838_317_0229_COMP_H

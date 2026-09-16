@@ -2,7 +2,11 @@
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
-    Atari Cannonball (prototype) driver
+Atari Cannonball (prototype) driver
+
+TODO:
+- half of the graphics are missing due to undumped ROM
+- often hits illegal opcode 0x02, harmless leftover from devkit?
 
 ***************************************************************************/
 
@@ -48,15 +52,15 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void cball_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cball(machine_config &config);
-	void cpu_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -252,9 +256,8 @@ void cball_state::cball(machine_config &config)
 	M6800(config, m_maincpu, XTAL(12'096'000) / 16); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cball_state::cpu_map);
 
-
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 262);
 	m_screen->set_visarea(0, 255, 0, 223);

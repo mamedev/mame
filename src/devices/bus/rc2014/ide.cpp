@@ -24,8 +24,8 @@ protected:
 	rc2014_ide_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint8_t ppi_pa_r() { return m_data.b.l; }
 	uint8_t ppi_pb_r() { return m_data.b.h; }
@@ -56,7 +56,7 @@ void rc2014_ide_base::device_start()
 
 void rc2014_ide_base::device_add_mconfig(machine_config &config)
 {
-	I8255(config, m_ppi, 0);
+	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(rc2014_ide_base::ppi_pa_r));
 	m_ppi->in_pb_callback().set(FUNC(rc2014_ide_base::ppi_pb_r));
 	m_ppi->out_pa_callback().set(FUNC(rc2014_ide_base::ppi_pa_w));
@@ -79,8 +79,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void ppi_pc_w(uint8_t data) override;
 private:
@@ -210,8 +210,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void ppi_pc_w(uint8_t data) override;
 private:

@@ -63,8 +63,8 @@ public:
 	void multi16(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -78,8 +78,8 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void multi16_io(address_map &map);
-	void multi16_map(address_map &map);
+	void multi16_io(address_map &map) ATTR_COLD;
+	void multi16_map(address_map &map) ATTR_COLD;
 };
 
 MC6845_UPDATE_ROW(multi16_state::crtc_update_row)
@@ -165,7 +165,7 @@ void multi16_state::multi16(machine_config &config)
 	PIT8253(config, m_pit);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16000000, 848, 0, 640, 518, 0, 400); // unknown clock
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

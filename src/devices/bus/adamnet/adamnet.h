@@ -26,7 +26,7 @@ class adamnet_device : public device_t
 {
 public:
 	// construction/destruction
-	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adamnet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void add_device(device_t *target);
 
@@ -39,9 +39,9 @@ public:
 	void reset_w(int state);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 private:
 	class daisy_entry
@@ -79,16 +79,13 @@ public:
 		: adamnet_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		set_bus(std::forward<T>(bus));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
-	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adamnet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<adamnet_device> m_bus;
@@ -114,7 +111,7 @@ protected:
 };
 
 
-// device type definitions
+// device type declarations
 DECLARE_DEVICE_TYPE(ADAMNET,      adamnet_device)
 DECLARE_DEVICE_TYPE(ADAMNET_SLOT, adamnet_slot_device)
 

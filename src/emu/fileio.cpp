@@ -14,17 +14,19 @@
 #include "util/path.h"
 #include "util/unzip.h"
 
+#include <tuple>
+
 //#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
 
-template path_iterator::path_iterator(char *&, int);
-template path_iterator::path_iterator(char * const &, int);
-template path_iterator::path_iterator(char const *&, int);
-template path_iterator::path_iterator(char const * const &, int);
-template path_iterator::path_iterator(std::vector<std::string> &, int);
-template path_iterator::path_iterator(const std::vector<std::string> &, int);
+template path_iterator::path_iterator(char *&);
+template path_iterator::path_iterator(char * const &);
+template path_iterator::path_iterator(char const *&);
+template path_iterator::path_iterator(char const * const &);
+template path_iterator::path_iterator(std::vector<std::string> &);
+template path_iterator::path_iterator(const std::vector<std::string> &);
 
 template emu_file::emu_file(std::string &, u32);
 template emu_file::emu_file(const std::string &, u32);
@@ -269,7 +271,7 @@ util::hash_collection &emu_file::hashes(std::string_view types)
 	// load the ZIP file if needed
 	if (compressed_file_ready())
 		return m_hashes;
-	if (m_file == nullptr)
+	if (!m_file)
 		return m_hashes;
 
 	// if we have ZIP data, just hash that directly
@@ -531,9 +533,10 @@ u32 emu_file::read(void *buffer, u32 length)
 		return 0;
 
 	// read the data if we can
+	std::error_condition err;
 	size_t actual = 0;
 	if (m_file)
-		m_file->read(buffer, length, actual);
+		std::tie(err, actual) = util::read(*m_file, buffer, length);
 
 	return actual;
 }
@@ -601,36 +604,12 @@ u32 emu_file::write(const void *buffer, u32 length)
 {
 	// FIXME: need better interface to report errors
 	// write the data if we can
+	std::error_condition err;
 	size_t actual = 0;
 	if (m_file)
-		m_file->write(buffer, length, actual);
+		std::tie(err, actual) = util::write(*m_file, buffer, length);
 
 	return actual;
-}
-
-
-//-------------------------------------------------
-//  puts - write a line to a text file
-//-------------------------------------------------
-
-int emu_file::puts(std::string_view s)
-{
-	// write the data if we can
-	if (m_file)
-		return m_file->puts(s);
-
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  vfprintf - vfprintf to a text file
-//-------------------------------------------------
-
-int emu_file::vprintf(util::format_argument_pack<char> const &args)
-{
-	// write the data if we can
-	return m_file ? m_file->vprintf(args) : 0;
 }
 
 
@@ -638,11 +617,14 @@ int emu_file::vprintf(util::format_argument_pack<char> const &args)
 //  flush - flush file buffers
 //-------------------------------------------------
 
-void emu_file::flush()
+std::error_condition emu_file::flush()
 {
 	// flush the buffers if we can
 	if (m_file)
-		m_file->flush();
+		return m_file->flush();
+
+	// TODO: should this be invalid argument instead?
+	return std::error_condition();
 }
 
 

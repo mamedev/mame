@@ -58,6 +58,7 @@ uint16_t i386_device::i386_shift_rotate16(uint8_t modrm, uint32_t value, uint8_t
 				break;
 		}
 	} else {
+		shift &= 31;
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm16, i8 */
@@ -114,21 +115,18 @@ uint16_t i386_device::i386_shift_rotate16(uint8_t modrm, uint32_t value, uint8_t
 				break;
 			case 4:         /* SHL/SAL rm16, i8 */
 			case 6:
-				shift &= 31;
 				dst = src << shift;
 				m_CF = (shift <= 16) && (src & (1 << (16-shift)));
 				SetSZPF16(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 5:         /* SHR rm16, i8 */
-				shift &= 31;
 				dst = src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:         /* SAR rm16, i8 */
-				shift &= 31;
 				dst = (int16_t)src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF16(dst);
@@ -1225,9 +1223,9 @@ void i386_device::i386_lodsw()             // Opcode 0xad
 {
 	uint32_t eas;
 	if( m_segment_prefix ) {
-		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
+		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0, 2);
 	} else {
-		eas = i386_translate(DS, m_address_size ? REG32(ESI) : REG16(SI), 0 );
+		eas = i386_translate(DS, m_address_size ? REG32(ESI) : REG16(SI), 0, 2);
 	}
 	REG16(AX) = READ16(eas);
 	BUMP_SI(2);
@@ -1424,11 +1422,11 @@ void i386_device::i386_movsw()             // Opcode 0xa5
 	uint32_t eas, ead;
 	uint16_t v;
 	if( m_segment_prefix ) {
-		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
+		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0, 2);
 	} else {
-		eas = i386_translate(DS, m_address_size ? REG32(ESI) : REG16(SI), 0 );
+		eas = i386_translate(DS, m_address_size ? REG32(ESI) : REG16(SI), 0, 2);
 	}
-	ead = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 1 );
+	ead = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 1, 2);
 	v = READ16(eas);
 	WRITE16(ead, v);
 	BUMP_SI(2);
@@ -2944,7 +2942,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 							m_CF = 1;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -2965,7 +2963,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 				if( src ) {
 					remainder = quotient % (int32_t)(int16_t)src;
 					result = quotient / (int32_t)(int16_t)src;
-					if( result > 0xffff ) {
+					if( result > 0x7fff || result < -0x8000 ) {
 						/* TODO: Divide error */
 					} else {
 						REG16(DX) = (uint16_t)remainder;
@@ -2976,7 +2974,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 							m_CF = 1;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -3150,7 +3148,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 		case 1:         /* STR */
@@ -3167,7 +3165,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 		case 2:         /* LLDT */
@@ -3193,7 +3191,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 
@@ -3215,7 +3213,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 				seg.selector = m_task.segment;
 				i386_load_protected_mode_segment(&seg,nullptr);
 
-				uint32_t addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
+				offs_t addr = ((seg.selector & 4) ? m_ldtr.base : m_gdtr.base) + (seg.selector & ~7) + 5;
 				i386_translate_address(TR_READ, false, &addr, nullptr);
 				m_program->write_byte(addr, (seg.flags & 0xff) | 2);
 
@@ -3225,7 +3223,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 
@@ -3260,19 +3258,23 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 						{  // check if conforming, these are always readable, regardless of privilege
 							if(!(seg.flags & 0x04))
 							{
-								// if not conforming, then we must check privilege levels (TODO: current privilege level check)
-								if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+								// if not conforming, then we must check privilege levels
+								if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
 									result = 0;
 							}
 						}
 					}
+					else
+					{
+						if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
+							result = 0;
+					}
 				}
-				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
 				SetZF(result);
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 				LOGMASKED(LOG_PM_EVENTS, "i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3308,14 +3310,13 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 							result = 0;
 					}
 				}
-				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
-				if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+				if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
 					result = 0;
 				SetZF(result);
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 				LOGMASKED(LOG_PM_EVENTS, "i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3612,7 +3613,7 @@ void i386_device::i386_lar_r16_rm16()  // Opcode 0x0f 0x02
 	else
 	{
 		// illegal opcode
-		i386_trap(6,0, 0);
+		i386_trap(6,0);
 		LOGMASKED(LOG_PM_EVENTS, "i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
 	}
 }
@@ -3677,7 +3678,7 @@ void i386_device::i386_lsl_r16_rm16()  // Opcode 0x0f 0x03
 		}
 	}
 	else
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 }
 
 void i386_device::i386_bound_r16_m16_m16() // Opcode 0x62
@@ -3702,7 +3703,7 @@ void i386_device::i386_bound_r16_m16_m16() // Opcode 0x62
 	if ((val < low) || (val > high))
 	{
 		CYCLES(CYCLES_BOUND_OUT_RANGE);
-		i386_trap(5, 0, 0);
+		i386_trap(5, 0);
 	}
 	else
 	{
@@ -3751,18 +3752,21 @@ bool i386_device::i386_load_far_pointer16(int s)
 {
 	uint8_t modrm = FETCH();
 	uint16_t selector;
+	bool fault = false;
 
 	if( modrm >= 0xc0 ) {
 		//LOGMASKED(LOG_PM_EVENTS, "i386: load_far_pointer16 NYI\n"); // don't log, NT will use this a lot
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 		return false;
 	} else {
 		uint32_t ea = GetEA(modrm,0);
-		STORE_REG16(modrm, READ16(ea + 0));
+		uint16_t val = READ16(ea + 0);
 		selector = READ16(ea + 2);
-		i386_sreg_load(selector,s,nullptr);
+		i386_sreg_load(selector,s,&fault);
+		if(!fault)
+			STORE_REG16(modrm, val);
 	}
-	return true;
+	return !fault;
 }
 
 void i386_device::i386_lds16()             // Opcode 0xc5

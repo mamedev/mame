@@ -10,6 +10,7 @@
 #include "asic65.h"
 
 #include <algorithm>
+#include <numbers>
 
 #define LOG_ASIC        (1U << 1)
 
@@ -267,12 +268,12 @@ u16 asic65_device::read()
 
 		case OP_SIN:    /* sin */
 			if (m_param_index >= 1)
-				result = (int)(16384. * sin(M_PI * (double)(s16)m_param[0] / 32768.));
+				result = (int)(16384. * sin(std::numbers::pi * (double)(s16)m_param[0] / 32768.));
 			break;
 
 		case OP_COS:    /* cos */
 			if (m_param_index >= 1)
-				result = (int)(16384. * cos(M_PI * (double)(s16)m_param[0] / 32768.));
+				result = (int)(16384. * cos(std::numbers::pi * (double)(s16)m_param[0] / 32768.));
 			break;
 
 		case OP_ATAN:   /* vector angle */
@@ -281,7 +282,7 @@ u16 asic65_device::read()
 				s32 xint = (s32)((m_param[0] << 16) | m_param[1]);
 				s32 yint = (s32)((m_param[2] << 16) | m_param[3]);
 				double a = atan2((double)yint, (double)xint);
-				result = (s16)(a * 32768. / M_PI);
+				result = (s16)(a * 32768. / std::numbers::pi);
 			}
 			break;
 
@@ -475,7 +476,7 @@ u16 asic65_device::io_r()
 
 /*************************************
  *
- *  Read/write handlers for TMS32015
+ *  Read/write handlers for TMS320C15
  *
  *************************************/
 
@@ -528,7 +529,7 @@ int asic65_device::get_bio()
 
 /*************************************
  *
- *  Address maps for TMS32015
+ *  Address maps for TMS320C15
  *
  *************************************/
 
@@ -552,7 +553,7 @@ void asic65_device::asic65_io_map(address_map &map)
 void asic65_device::device_add_mconfig(machine_config &config)
 {
 	/* ASIC65 */
-	TMS32010(config, m_ourcpu, 20000000);
+	TMS320C10(config, m_ourcpu, 20'000'000);
 	m_ourcpu->set_addrmap(AS_PROGRAM, &asic65_device::asic65_program_map);
 	m_ourcpu->set_addrmap(AS_IO, &asic65_device::asic65_io_map);
 	m_ourcpu->bio().set(FUNC(asic65_device::get_bio));

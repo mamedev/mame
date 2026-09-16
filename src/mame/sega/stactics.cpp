@@ -83,17 +83,17 @@ public:
 		m_fake(*this, "FAKE")
 	{ }
 
-	void stactics(machine_config &config);
+	void stactics(machine_config &config) ATTR_COLD;
 
 	int frame_count_d3_r();
 	int shot_standby_r();
 	int not_shot_arrive_r();
 	int motor_not_ready_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
+	ioport_value get_rng();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t vert_pos_r();
@@ -122,7 +122,7 @@ private:
 	void update_artwork();
 	void move_motor();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_outlatch;
@@ -166,8 +166,6 @@ private:
 	uint8_t  m_palette_bank = 0;
 };
 
-
-// video
 
 /****************************************************************************
 
@@ -513,17 +511,6 @@ void stactics_state::update_artwork()
 
 void stactics_state::video_start()
 {
-	m_base_lamps.resolve();
-	m_beam_leds_left.resolve();
-	m_beam_leds_right.resolve();
-	m_score_digits.resolve();
-	m_credit_leds.resolve();
-	m_barrier_leds.resolve();
-	m_round_leds.resolve();
-	m_barrier_lamp.resolve();
-	m_start_lamp.resolve();
-	m_sight_led.resolve();
-
 	m_y_scroll_d = 0;
 	m_y_scroll_e = 0;
 	m_y_scroll_f = 0;
@@ -567,8 +554,6 @@ uint32_t stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -649,7 +634,7 @@ void stactics_state::move_motor()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_rng)
+ioport_value stactics_state::get_rng()
 {
 	// this is a 555 timer, but cannot read one of the resistor values
 	return machine().rand() & 0x07;
@@ -737,7 +722,7 @@ static INPUT_PORTS_START( stactics )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, motor_not_ready_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(stactics_state::motor_not_ready_r))
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -766,8 +751,8 @@ static INPUT_PORTS_START( stactics )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(stactics_state, get_rng)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, frame_count_d3_r)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(stactics_state::get_rng))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(stactics_state::frame_count_d3_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
@@ -777,7 +762,7 @@ static INPUT_PORTS_START( stactics )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, shot_standby_r)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(stactics_state::shot_standby_r))
 	PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "6" )
@@ -789,7 +774,7 @@ static INPUT_PORTS_START( stactics )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, not_shot_arrive_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(stactics_state::not_shot_arrive_r))
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -856,7 +841,7 @@ void stactics_state::stactics(machine_config &config)
 	lamplatch.q_out_cb<6>().set(FUNC(stactics_state::barrier_lamp_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	screen.set_raw(15.46848_MHz_XTAL / 3, 328, 0, 256, 262, 0, 232);
 	screen.set_screen_update(FUNC(stactics_state::screen_update));

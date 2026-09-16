@@ -144,8 +144,8 @@ public:
 	void lwriter2nt(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// A guess based on not very much
@@ -174,7 +174,7 @@ private:
 	TIMER_CALLBACK_MEMBER(pb6_tick);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	//void scc_int(int state);
-	void maincpu_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
@@ -654,13 +654,13 @@ void lwriter_state::lwriter(machine_config &config)
 	M68000(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwriter_state::maincpu_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(30);
 	m_screen->set_size(FB_WIDTH, FB_HEIGHT);
 	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
 
-	SCC8530N(config, m_scc, CPU_CLK);
+	SCC8530(config, m_scc, CPU_CLK);
 	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);
 	/* Port A */
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -815,6 +815,6 @@ ROM_END
 
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT    STATE          INIT        COMPANY            FULLNAME             FLAGS */
-CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_IS_SKELETON)
-CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_IS_SKELETON)
-CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_IS_SKELETON)
+CONS( 1985, lwriter,     0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 1986, lwriterplus, 0,      0,      lwriter,    lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter Plus",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 1988, lwriter2nt,  0,      0,      lwriter2nt, lwriter, lwriter_state, empty_init, "Apple Computer",  "LaserWriter II NT", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

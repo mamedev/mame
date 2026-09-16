@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
+#ifndef MAME_CPU_I386_I386PRIV_H
+#define MAME_CPU_I386_I386PRIV_H
+
 #pragma once
 
-#ifndef __I386_H__
-#define __I386_H__
-
 #include "i386dasm.h"
+
+#include "endianness.h"
 
 //#define DEBUG_MISSING_OPCODE
 
@@ -297,11 +299,11 @@ extern int i386_parity_table[256];
 #define FAULT_THROW(fault,error) { throw (uint64_t)(fault | (uint64_t)error << 32); }
 #define PF_THROW(error) { m_cr[2] = address; FAULT_THROW(FAULT_PF,error); }
 
-#define PROTECTED_MODE      (m_cr[0] & 0x1)
+#define PROTECTED_MODE      (m_cr[0] & CR0_PE)
 #define STACK_32BIT         (m_sreg[SS].d)
 #define V8086_MODE          (m_VM)
 #define NESTED_TASK         (m_NT)
-#define WP                  (m_cr[0] & 0x10000)
+#define WP                  (m_cr[0] & CR0_WP)
 
 #define SetOF_Add32(r,s,d)  (m_OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x80000000) ? 1: 0)
 #define SetOF_Add16(r,s,d)  (m_OF = (((r) ^ (s)) & ((r) ^ (d)) & 0x8000) ? 1 : 0)
@@ -324,14 +326,14 @@ extern int i386_parity_table[256];
 #define SetSZPF16(x)        {m_ZF = ((uint16_t)(x)==0);  m_SF = ((x)&0x8000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
 #define SetSZPF32(x)        {m_ZF = ((uint32_t)(x)==0);  m_SF = ((x)&0x80000000) ? 1 : 0; m_PF = i386_parity_table[x & 0xFF]; }
 
-#define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].low)))
+#define MMX(n)              (*((MMX_REG *)(&m_x87_reg[(n)].signif)))
 #define XMM(n)              m_sse_reg[(n)]
 
-#define FLAG_DIRTY     0x100 // VTLB flag
+#define FLAG_DIRTY          0x100 // VTLB flag
 #define CYCLES_NUM(x)       (m_cycles -= (x))
 
 #define FAULT(fault,error)  {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
-#define FAULT_EXP(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,trap_level+1,error); return;}
+#define FAULT_EXP(fault,error) {m_ext = 1; FAULT_THROW(fault, (error)); return;}
 
 /***********************************************************************************/
 
@@ -724,4 +726,4 @@ enum X86_CYCLES
 #define OP_4BYTE3AF2    0x00400000
 #define OP_4BYTE38F3    0x00200000
 
-#endif /* __I386_H__ */
+#endif // MAME_CPU_I386_I386PRIV_H

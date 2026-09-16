@@ -75,10 +75,10 @@ public:
 	void rs232_dcd_w(int state);
 
 	void cgenie(machine_config &config);
-	void cgenie_io(address_map &map);
-	void cgenie_mem(address_map &map);
+	void cgenie_io(address_map &map) ATTR_COLD;
+	void cgenie_mem(address_map &map) ATTR_COLD;
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -219,7 +219,7 @@ static INPUT_PORTS_START( cgenie )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("L.P.") // marked as "L.P." in the manual, lightpen?
 
 	PORT_START("RST")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F5) PORT_NAME("Rst") PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, cgenie_state, rst_callback, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F5) PORT_NAME("Rst") PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cgenie_state::rst_callback), 0)
 INPUT_PORTS_END
 
 
@@ -444,7 +444,7 @@ void cgenie_state::cgenie(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cgenie_state::cgenie_io);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 

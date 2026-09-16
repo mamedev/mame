@@ -41,8 +41,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -60,7 +60,7 @@ private:
 	int m_x, m_y;
 	required_device<palette_device> m_palette;
 
-	void hd66421(address_map &map);
+	void hd66421(address_map &map) ATTR_COLD;
 
 	void hd66421_palette(palette_device &palette) const;
 };

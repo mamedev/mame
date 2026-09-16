@@ -30,13 +30,13 @@ public:
 protected:
 	vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(bus_error_off);
 
@@ -85,10 +85,10 @@ private:
 	void set_bus_error(uint32_t address, bool write, uint32_t mem_mask);
 	void update_030_irq(int irq, line_state state);
 
-	void hcpu30_mem(address_map &map);
-	void hcpu30_os_mem(address_map &map);
-	void cpu_space_map(address_map &map);
-	void oscpu_space_map(address_map &map);
+	void hcpu30_mem(address_map &map) ATTR_COLD;
+	void hcpu30_os_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
+	void oscpu_space_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_BUS_VME_HCPU30_H

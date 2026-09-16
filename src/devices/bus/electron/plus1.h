@@ -35,11 +35,11 @@ protected:
 	electron_plus1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t expbus_r(offs_t offset) override;
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
@@ -62,7 +62,7 @@ protected:
 class electron_ap1_device : public electron_plus1_device
 {
 public:
-	electron_ap1_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	electron_ap1_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	// optional information overrides
@@ -73,16 +73,16 @@ protected:
 class electron_ap6_device : public electron_plus1_device
 {
 public:
-	electron_ap6_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	electron_ap6_device(const machine_config &mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry* device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t expbus_r(offs_t offset) override;
 	virtual void expbus_w(offs_t offset, uint8_t data) override;

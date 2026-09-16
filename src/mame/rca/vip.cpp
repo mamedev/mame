@@ -450,10 +450,10 @@ static INPUT_PORTS_START( vip )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("F TW") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, vip_state, reset_w, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vip_state::reset_w), 0)
 
 	PORT_START("BEEPER")
-	PORT_CONFNAME( 0x01, 0x01, "Internal Speaker" ) PORT_CHANGED_MEMBER(DEVICE_SELF, vip_state, beeper_w, 0)
+	PORT_CONFNAME( 0x01, 0x01, "Internal Speaker" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vip_state::beeper_w), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -620,8 +620,6 @@ void vip_state::machine_start()
 		ram[addr] = machine().rand() & 0xff;
 	}
 
-	m_leds.resolve();
-
 	// turn on power LED
 	m_leds[LED_POWER] = 1;
 
@@ -740,7 +738,7 @@ void vip_state::vip(machine_config &config)
 	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
 	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_screen_update(FUNC(vip_state::screen_update));
 
 	// sound hardware

@@ -28,8 +28,8 @@ public:
 
 protected:
 	tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	TIMER_CALLBACK_MEMBER(update_timers);
@@ -78,7 +78,7 @@ private:
 	devcb_read8           m_dsp_io_r_cb;
 	devcb_write8          m_dsp_io_w_cb;
 
-	void internal_map(address_map &map);
+	void internal_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(S_SMP, s_smp_device)

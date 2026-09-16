@@ -71,7 +71,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_SPECMATE, spectrum_specmate_device, "spectrum_specma
 
 INPUT_PORTS_START( specmate )
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Freeze Button") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_specmate_device, freeze_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Freeze Button") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_specmate_device::freeze_button), 0)
 INPUT_PORTS_END
 
 
@@ -151,9 +151,9 @@ void spectrum_specmate_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_specmate_device::romcs()
+bool spectrum_specmate_device::romcs()
 {
-	return m_romcs | m_exp->romcs();
+	return m_romcs || m_exp->romcs();
 }
 
 void spectrum_specmate_device::pre_opcode_fetch(offs_t offset)

@@ -14,7 +14,7 @@
 #include "econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/scsi/scsi.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/buffer.h"
@@ -41,13 +41,13 @@ protected:
 	econet_e01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_econet_interface overrides
 	virtual void econet_data(int state) override;
@@ -81,7 +81,7 @@ private:
 
 	static void floppy_formats_afs(format_registration &fr);
 
-	required_device<m65c02_device> m_maincpu;
+	required_device<r65c102_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
 	required_device<mc6854_device> m_adlc;
 	required_device<mc146818_device> m_rtc;
@@ -93,6 +93,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
+	required_ioport m_flap;
 
 	output_finder<> m_led;
 
@@ -100,7 +101,7 @@ private:
 	inline void network_irq_enable(int enabled);
 	inline void hdc_irq_enable(int enabled);
 
-	void e01_mem(address_map &map);
+	void e01_mem(address_map &map) ATTR_COLD;
 
 	// interrupt state
 	int m_adlc_ie;

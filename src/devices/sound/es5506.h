@@ -78,13 +78,13 @@ protected:
 	es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void update_irq_state();
 	void update_internal_irq_state();
@@ -114,7 +114,7 @@ protected:
 	void generate_ulaw(es550x_voice *voice, s32 *dest);
 	void generate_pcm(es550x_voice *voice, s32 *dest);
 	inline void generate_irq(es550x_voice *voice, int v);
-	virtual void generate_samples(std::vector<write_stream_view> &outputs) {}
+	virtual void generate_samples(sound_stream &stream) {}
 
 	inline void update_index(es550x_voice *voice) { m_voice_index = voice->index; }
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) { return 0; }
@@ -167,8 +167,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -189,7 +189,7 @@ protected:
 	virtual void update_envelopes(es550x_voice *voice) override;
 	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
-	virtual void generate_samples(std::vector<write_stream_view> &outputs) override;
+	virtual void generate_samples(sound_stream &stream) override;
 
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_index(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
 
@@ -224,7 +224,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -243,7 +243,7 @@ protected:
 	virtual void update_envelopes(es550x_voice *voice) override;
 	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
 	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
-	virtual void generate_samples(std::vector<write_stream_view> &outputs) override;
+	virtual void generate_samples(sound_stream &stream) override;
 
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_index(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
 

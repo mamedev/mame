@@ -234,8 +234,8 @@ static unsigned const SCSI_RST_HOLD   = 25'000;
 DEFINE_DEVICE_TYPE(DC7061, dc7061_device, "dc7061", "DEC DC7061 SII")
 
 dc7061_device::dc7061_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: nscsi_device(mconfig, DC7061, tag, owner, clock)
-	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+	: device_t(mconfig, DC7061, tag, owner, clock)
+	, nscsi_device_interface(mconfig, *this)
 	, m_sys_int(*this)
 	, m_dma_r(*this, 0)
 	, m_dma_w(*this)
@@ -301,12 +301,12 @@ void dc7061_device::device_reset()
 	m_state = IDLE;
 
 	// clear scsi bus
-	scsi_bus->data_w(scsi_refid, 0);
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+	m_scsi_bus->data_w(m_scsi_refid, 0);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 
 	// monitor all control lines
 	m_scsi_ctrl = 0;
-	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
 
 	// clear output lines
 	set_irq(false);
@@ -314,7 +314,7 @@ void dc7061_device::device_reset()
 
 void dc7061_device::scsi_ctrl_changed()
 {
-	u32 const ctrl = scsi_bus->ctrl_r();
+	u32 const ctrl = m_scsi_bus->ctrl_r();
 
 	if (VERBOSE & LOG_SCSI)
 	{
@@ -345,8 +345,8 @@ void dc7061_device::scsi_ctrl_changed()
 		m_state_timer->enable(false);
 
 		// clear scsi bus
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 	}
 	else if (!(m_scsi_ctrl & S_REQ) && (ctrl & S_REQ))
 	{
@@ -443,7 +443,7 @@ u16 dc7061_device::cstat_r() { LOGMASKED(LOG_REGR, "cstat_r 0x%04x (%s)\n", m_cs
 
 u16 dc7061_device::dstat_r()
 {
-	u16 const data = m_dstat | (scsi_bus->ctrl_r() & S_PHASE_MASK);
+	u16 const data = m_dstat | (m_scsi_bus->ctrl_r() & S_PHASE_MASK);
 
 	LOGMASKED(LOG_REGR, "dstat_r 0x%04x (%s)\n", data, machine().describe_context());
 
@@ -495,7 +495,7 @@ void dc7061_device::comm_w(u16 data)
 	LOGMASKED(LOG_REGW, "comm_w 0x%04x (%s)\n", data, machine().describe_context());
 	m_comm = data & COMM_MSK;
 
-	set_dstat((scsi_bus->ctrl_r() & S_PHASE_MASK) == (m_comm & COMM_PHM) ? 0 : DSTAT_MIS, DSTAT_MIS);
+	set_dstat((m_scsi_bus->ctrl_r() & S_PHASE_MASK) == (m_comm & COMM_PHM) ? 0 : DSTAT_MIS, DSTAT_MIS);
 
 	switch (data & COMM_CMD)
 	{
@@ -507,8 +507,8 @@ void dc7061_device::comm_w(u16 data)
 		LOG("disconnect\n");
 		set_cstat(0, CSTAT_CON | CSTAT_SIP | CSTAT_LST); // CHECK:
 
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ATN | S_SEL | S_BSY); // CHECK:
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN | S_SEL | S_BSY); // CHECK:
 		break;
 	case CMD_REQ:
 		LOG("request data\n");
@@ -556,7 +556,7 @@ int dc7061_device::state_step()
 
 	case ARB_BUS_FREE:
 		LOGMASKED(LOG_ARB, "arbitration: waiting for bus free\n");
-		if (!(scsi_bus->ctrl_r() & (S_SEL | S_BSY | S_RST)))
+		if (!(m_scsi_bus->ctrl_r() & (S_SEL | S_BSY | S_RST)))
 		{
 			m_state = ARB_START;
 			delay = SCSI_BUS_FREE;
@@ -568,12 +568,12 @@ int dc7061_device::state_step()
 		delay = SCSI_ARB_DELAY;
 
 		// assert own ID and BSY
-		scsi_bus->data_w(scsi_refid, oid);
-		scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+		m_scsi_bus->data_w(m_scsi_refid, oid);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 		break;
 	case ARB_EVALUATE:
 		// check if SEL asserted, or if there's a higher ID on the bus
-		if ((scsi_bus->ctrl_r() & S_SEL) || (scsi_bus->data_r() & ~((oid - 1) | oid)))
+		if ((m_scsi_bus->ctrl_r() & S_SEL) || (m_scsi_bus->data_r() & ~((oid - 1) | oid)))
 		{
 			LOGMASKED(LOG_ARB, "arbitration: lost\n");
 			set_cstat(CSTAT_LST, CSTAT_LST);
@@ -582,8 +582,8 @@ int dc7061_device::state_step()
 			delay = SCSI_BUS_FREE; // FIXME: how long?
 
 			// clear data and BSY
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_BSY);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_BSY);
 		}
 		else
 		{
@@ -601,8 +601,8 @@ int dc7061_device::state_step()
 		delay = SCSI_BUS_SKEW * 2;
 
 		// assert own and target ID and SEL
-		scsi_bus->data_w(scsi_refid, oid | tid);
-		scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
+		m_scsi_bus->data_w(m_scsi_refid, oid | tid);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_SEL, S_SEL);
 		break;
 	case SEL_DELAY:
 		LOGMASKED(LOG_SEL, "selection: BSY cleared\n");
@@ -611,12 +611,12 @@ int dc7061_device::state_step()
 
 		// clear BSY, optionally assert ATN
 		if (m_comm & COMM_ATN)
-			scsi_bus->ctrl_w(scsi_refid, S_ATN, S_BSY | S_ATN);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ATN, S_BSY | S_ATN);
 		else
-			scsi_bus->ctrl_w(scsi_refid, 0, S_BSY);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_BSY);
 		break;
 	case SEL_WAIT_BSY:
-		if (scsi_bus->ctrl_r() & S_BSY)
+		if (m_scsi_bus->ctrl_r() & S_BSY)
 		{
 			LOGMASKED(LOG_SEL, "selection: BSY asserted by target\n");
 			m_state = SEL_COMPLETE;
@@ -627,7 +627,7 @@ int dc7061_device::state_step()
 			LOGMASKED(LOG_SEL, "selection: timed out\n");
 			m_state = IDLE;
 
-			//scsi_bus->ctrl_w(scsi_refid, 0, S_ATN | S_SEL);
+			//m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN | S_SEL);
 		}
 		break;
 	case SEL_COMPLETE:
@@ -636,26 +636,26 @@ int dc7061_device::state_step()
 		set_cstat(CSTAT_SCH | CSTAT_CON, CSTAT_SCH | CSTAT_CON | CSTAT_SIP);
 
 		// clear data and SEL
-		scsi_bus->data_w(scsi_refid, 0);
-		scsi_bus->ctrl_w(scsi_refid, 0, S_SEL);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
 		break;
 
 	case XFR_PIO:
 		// TODO: phase match
 		set_dstat(0, DSTAT_TBE);
-		if (scsi_bus->ctrl_r() & S_REQ)
-			m_state = (scsi_bus->ctrl_r() & S_INP) ? XFR_PIO_IN : XFR_PIO_OUT;
+		if (m_scsi_bus->ctrl_r() & S_REQ)
+			m_state = (m_scsi_bus->ctrl_r() & S_INP) ? XFR_PIO_IN : XFR_PIO_OUT;
 		break;
 	case XFR_PIO_OUT:
 		LOGMASKED(LOG_PIO, "xfr pio out: data 0x%02x\n", m_data);
 		m_state = XFR_PIO_OUT_ACK;
 
 		// assert data and ACK
-		scsi_bus->data_w(scsi_refid, m_data);
-		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+		m_scsi_bus->data_w(m_scsi_refid, m_data);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		break;
 	case XFR_PIO_OUT_ACK:
-		if (!(scsi_bus->ctrl_r() & S_REQ))
+		if (!(m_scsi_bus->ctrl_r() & S_REQ))
 		{
 			LOGMASKED(LOG_PIO, "xfr pio out: data ACK\n");
 
@@ -663,19 +663,19 @@ int dc7061_device::state_step()
 			set_dstat(DSTAT_DNE, DSTAT_DNE);
 
 			// clear data and ACK
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		}
 		break;
 
 	case XFR_DMA:
 		// TODO: phase match
-		if (scsi_bus->ctrl_r() & S_REQ)
-			m_state = (scsi_bus->ctrl_r() & S_INP) ? XFR_DMA_IN_REQ : XFR_DMA_OUT;
+		if (m_scsi_bus->ctrl_r() & S_REQ)
+			m_state = (m_scsi_bus->ctrl_r() & S_INP) ? XFR_DMA_IN_REQ : XFR_DMA_OUT;
 		break;
 	case XFR_DMA_IN_REQ:
 		{
-			u8 const data = scsi_bus->data_r();
+			u8 const data = m_scsi_bus->data_r();
 			LOGMASKED(LOG_DMA, "xfr dma in: data 0x%02x\n", data);
 
 			if (m_dstat & DSTAT_OBB)
@@ -690,7 +690,7 @@ int dc7061_device::state_step()
 			m_dstat ^= DSTAT_OBB;
 
 			// assert ACK
-			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		}
 		break;
 	default:

@@ -16,6 +16,8 @@
 class ti990_10_device : public cpu_device
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	ti990_10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ti990_10_device();
 
@@ -26,9 +28,8 @@ protected:
 	void        device_reset() override;
 
 	// device_execute_interface overrides
-	uint32_t      execute_min_cycles() const noexcept override;
-	uint32_t      execute_max_cycles() const noexcept override;
-	uint32_t      execute_input_lines() const noexcept override;
+	uint32_t    execute_min_cycles() const noexcept override;
+	uint32_t    execute_max_cycles() const noexcept override;
 	void        execute_set_input(int irqline, int state) override;
 	void        execute_run() override;
 

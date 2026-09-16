@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -127,9 +128,8 @@ license:CC0-1.0
 		<rect>
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
-		<text string="SCORE">
+		<text string=" SCORE ">
 			<color red="0.85" green="0.85" blue="0.85" />
-			<bounds x="0.03" y="0" width="0.94" height="1" />
 		</text>
 	</element>
 
@@ -137,9 +137,8 @@ license:CC0-1.0
 		<rect>
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
-		<text string="LEVEL">
+		<text string=" LEVEL ">
 			<color red="0.85" green="0.85" blue="0.85" />
-			<bounds x="0.03" y="0" width="0.94" height="1" />
 		</text>
 	</element>
 
@@ -147,9 +146,8 @@ license:CC0-1.0
 		<rect>
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
-		<text string="REACTION TIME">
+		<text string=" REACTION TIME ">
 			<color red="0.85" green="0.85" blue="0.85" />
-			<bounds x="0.02" y="0" width="0.96" height="1" />
 		</text>
 	</element>
 
@@ -157,9 +155,8 @@ license:CC0-1.0
 		<rect>
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
-		<text string="AVERAGE">
+		<text string=" AVERAGE ">
 			<color red="0.85" green="0.85" blue="0.85" />
-			<bounds x="0.03" y="0" width="0.94" height="1" />
 		</text>
 	</element>
 
@@ -167,8 +164,7 @@ license:CC0-1.0
 		<rect>
 			<color red="0.0" green="0.22" blue="0.22" />
 		</rect>
-		<text string="TODAY'S BEST">
-			<bounds x="0.025" y="0" width="0.95" height="1" />
+		<text string=" TODAY'S BEST ">
 			<color red="0.85" green="0.85" blue="0.85" />
 		</text>
 	</element>
@@ -202,8 +198,7 @@ license:CC0-1.0
 	</element>
 
 
-
-
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="0" right="147" top="0" bottom="100" />
@@ -211,9 +206,7 @@ license:CC0-1.0
 			<bounds left="0" right="147" top="0" bottom="100" />
 		</element>
 
-
-<!-- today's highscores -->
-
+		<!-- today's highscores -->
 		<element ref="static_yellow">
 			<bounds x="97" y="5" width="45" height="75" />
 		</element>
@@ -226,7 +219,7 @@ license:CC0-1.0
 		</element>
 
 		<element ref="text_1">
-			<bounds x="97.5" y="21" width="10" height="5" />
+			<bounds x="98" y="21" width="10" height="5" />
 		</element>
 		<element ref="static_black">
 			<bounds x="109" y="9" width="22" height="17" />
@@ -240,7 +233,7 @@ license:CC0-1.0
 		</element>
 
 		<element ref="text_2">
-			<bounds x="97.5" y="46" width="10" height="5" />
+			<bounds x="98" y="46" width="10" height="5" />
 		</element>
 		<element ref="static_black">
 			<bounds x="109" y="34" width="22" height="17" />
@@ -254,7 +247,7 @@ license:CC0-1.0
 		</element>
 
 		<element ref="text_3">
-			<bounds x="97.5" y="71" width="10" height="5" />
+			<bounds x="98" y="71" width="10" height="5" />
 		</element>
 		<element ref="static_black">
 			<bounds x="109" y="59" width="22" height="17" />
@@ -267,9 +260,7 @@ license:CC0-1.0
 			<bounds x="120" y="60" width="10" height="15" />
 		</element>
 
-
-<!-- reaction time -->
-
+		<!-- reaction time -->
 		<element ref="static_yellow">
 			<bounds x="5" y="70" width="90" height="25" />
 		</element>
@@ -312,9 +303,7 @@ license:CC0-1.0
 			<bounds x="70" y="75" width="10" height="15" />
 		</element>
 
-
-<!-- score -->
-
+		<!-- score -->
 		<element ref="static_yellow">
 			<bounds x="5" y="5" width="90" height="40" />
 		</element>
@@ -323,7 +312,7 @@ license:CC0-1.0
 		</element>
 
 		<element ref="text_score">
-			<bounds x="43" y="3" width="15" height="5" />
+			<bounds x="42.5" y="3" width="15" height="5" />
 		</element>
 
 		<element ref="static_black">
@@ -337,9 +326,7 @@ license:CC0-1.0
 			<bounds x="50" y="10" width="20" height="30" />
 		</element>
 
-
-<!-- level -->
-
+		<!-- level -->
 		<element ref="static_yellow">
 			<bounds x="5" y="47" width="90" height="21" />
 		</element>
@@ -348,7 +335,7 @@ license:CC0-1.0
 		</element>
 
 		<element ref="text_level">
-			<bounds x="43" y="45" width="13" height="5" />
+			<bounds x="43" y="45" width="14" height="5" />
 		</element>
 
 		<element name="lamp0" ref="level1">
@@ -367,9 +354,7 @@ license:CC0-1.0
 			<bounds x="80" y="52.5" width="10" height="10" />
 		</element>
 
-
-<!-- gameover -->
-
+		<!-- gameover -->
 		<element ref="static_yellow">
 			<bounds x="97" y="82" width="45" height="13" />
 		</element>
@@ -380,7 +365,6 @@ license:CC0-1.0
 		<element name="lamp5" ref="text_gameover">
 			<bounds x="99" y="86" width="41" height="5" />
 		</element>
-
 
 	</view>
 </mamelayout>

@@ -106,6 +106,10 @@ public:
 	{
 	}
 
+	void chexx(machine_config &config) ATTR_COLD;
+	void unkbubsc(machine_config &config) ATTR_COLD;
+
+protected:
 	// handlers
 	uint8_t via_a_in();
 	uint8_t via_b_in();
@@ -122,18 +126,17 @@ public:
 
 	void lamp_w(uint8_t data);
 
-	void chexx(machine_config &config);
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
+	void unkbubsc_mem(address_map &map) ATTR_COLD;
 
-protected:
 	TIMER_CALLBACK_MEMBER(update);
 
 	// digitalker
 	void digitalker_set_bank(uint8_t bank);
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -170,7 +173,7 @@ public:
 protected:
 	void ay_w(offs_t offset, uint8_t data);
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 
 	required_device<ay8910_device> m_aysnd; // only faceoffh
 	uint8_t m_ay_cmd = 0;
@@ -276,6 +279,13 @@ void chexx_state::mem(address_map &map)
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
+void chexx_state::unkbubsc_mem(address_map &map)
+{
+	mem(map);
+
+	map(0xf000, 0xffff).rom().region("maincpu", 0);
+}
+
 void chexx_state::lamp_w(uint8_t data)
 {
 	m_lamp = data;
@@ -352,10 +362,6 @@ INPUT_PORTS_END
 
 void chexx_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-	m_lamps.resolve();
-
 	m_update_timer = timer_alloc(FUNC(chexx_state::update), this);
 }
 
@@ -446,6 +452,13 @@ void chexx_state::chexx(machine_config &config)
 	m_digitalker->add_route(ALL_OUTPUTS, "mono", 0.16);
 }
 
+void chexx_state::unkbubsc(machine_config &config)
+{
+	chexx(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &chexx_state::unkbubsc_mem);
+}
+
 void faceoffh_state::faceoffh(machine_config &config)
 {
 	chexx(config);
@@ -475,14 +488,14 @@ ROM_START( chexx83 )
 	// bank switched (from samples region)
 
 	ROM_REGION( 0x10000, "samples", ROMREGION_ERASE00 )
-	ROM_LOAD( "chexx83.u12", 0x0000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u13", 0x2000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u14", 0x4000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u15", 0x6000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u16", 0x8000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u17", 0xa000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u18", 0xc000, 0x2000, NO_DUMP )
-	ROM_LOAD( "chexx83.u19", 0xe000, 0x2000, NO_DUMP )
+	ROM_LOAD( "sjlb.u19", 0x0000, 0x2000, CRC(059b3725) SHA1(5837bee1ef34ce19a3101b851ca55029776e4b3e) )
+	ROM_LOAD( "sjlc.u18", 0x2000, 0x2000, CRC(679da4e1) SHA1(01a5b9dd132c1b0de97c153d7de226f5bf357338) )
+	ROM_LOAD( "sjld.u17", 0x4000, 0x2000, CRC(f8461b33) SHA1(717a8842e0ce9ba94dd59504a324bede4844e389) )
+	ROM_LOAD( "sjlf.u16", 0x6000, 0x2000, CRC(156c91e0) SHA1(6017d4b5609b214a6e66dcd76493a7d1442c04d4) )
+	ROM_LOAD( "sjlg.u15", 0x8000, 0x2000, CRC(19904604) SHA1(633c211a9a822cdf597a6f3c221ae9c8d6482e82) )
+	ROM_LOAD( "sjlh.u14", 0xa000, 0x2000, CRC(c3386d51) SHA1(7882e88db55ba914be81075e4b2d76e246c34d3b) )
+	ROM_LOAD( "sjlj.u13", 0xc000, 0x2000, CRC(cc3473b5) SHA1(325d16b64a0d09091768d0bfae16517505b00d03) )
+	ROM_LOAD( "sjlk.u12", 0xe000, 0x2000, CRC(f8ff29df) SHA1(681501d5692fcb741af7bf830fa18907d2fa283f) )
 ROM_END
 
 // Same PCB as 'chexx83'
@@ -566,10 +579,33 @@ ROM_START( faceoffh )
 	ROM_FILL(         0xe000, 0x2000, 0xff ) // unpopulated
 ROM_END
 
-} // Anonymous namespace
+// SOCCER CPU PCB: SY6502A, R6522AP, B8303DIGITALKER, bank of 4 DIP switches, 4 MHz XTAL
+ROM_START( unkbubsc )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "9.5d", 0x0000, 0x1000, CRC(2efe2cb6) SHA1(f4c34c9145528cc308ccf8002e7f638c2c578bee) )
+
+	ROM_REGION( 0x4000, "digitalker", ROMREGION_ERASE00 )
+	// bank switched (from samples region)
+
+	ROM_REGION( 0x10000, "samples", 0 )
+	ROM_LOAD( "1.2a", 0x0000, 0x2000, CRC(059b3725) SHA1(5837bee1ef34ce19a3101b851ca55029776e4b3e) )    // digitalker header
+	ROM_LOAD( "2.2b", 0x2000, 0x2000, CRC(679da4e1) SHA1(01a5b9dd132c1b0de97c153d7de226f5bf357338) )
+
+	ROM_LOAD( "3.2c", 0x4000, 0x2000, CRC(f8461b33) SHA1(717a8842e0ce9ba94dd59504a324bede4844e389) )    // digitalker header
+	ROM_LOAD( "4.2d", 0x6000, 0x2000, CRC(156c91e0) SHA1(6017d4b5609b214a6e66dcd76493a7d1442c04d4) )
+
+	ROM_LOAD( "5.3a", 0x8000, 0x2000, CRC(19904604) SHA1(633c211a9a822cdf597a6f3c221ae9c8d6482e82) )    // digitalker header
+	ROM_LOAD( "6.3b", 0xa000, 0x2000, CRC(c3386d51) SHA1(7882e88db55ba914be81075e4b2d76e246c34d3b) )
+
+	ROM_LOAD( "7.3c", 0xc000, 0x2000, CRC(cc3473b5) SHA1(325d16b64a0d09091768d0bfae16517505b00d03) )
+	ROM_LOAD( "8.3d", 0xe000, 0x2000, CRC(f8ff29df) SHA1(681501d5692fcb741af7bf830fa18907d2fa283f) )
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1983, chexx83,    0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1983, faceoffh,   chexx83,   faceoffh, chexx83, faceoffh_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, chexx83,    0,         chexx,    chexx83, chexx_state,    empty_init, ROT0, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, faceoffh,   chexx83,   faceoffh, chexx83, faceoffh_state, empty_init, ROT0, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT0, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT0, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, unkbubsc,   0,         unkbubsc, chexx83, chexx_state,    empty_init, ROT0, "<unknown>",                                           "unknown bubble soccer game",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

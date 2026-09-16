@@ -34,8 +34,8 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -122,7 +122,7 @@ void qvt103_state::qvt103(machine_config &config)
 	z80dart_device &dart(Z80DART(config, "dart", 29.376_MHz_XTAL / 9));
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(29.376_MHz_XTAL * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300);
 	//screen.set_raw(29.376_MHz_XTAL, 170 * 9, 0, 132 * 9, 320, 0, 300);
 	screen.set_screen_update(FUNC(qvt103_state::screen_update));
@@ -162,4 +162,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1983, qvt103, 0, 0, qvt103, qvt103, qvt103_state, empty_init, "Qume", "QVT-103", MACHINE_IS_SKELETON )
+COMP( 1983, qvt103, 0, 0, qvt103, qvt103, qvt103_state, empty_init, "Qume", "QVT-103", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

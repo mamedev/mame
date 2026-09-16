@@ -14,6 +14,8 @@
 
 #include "cpu/mips/ps2vu.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(SONYIOP_DMA, iop_dma_device, "iopdma", "PlayStation 2 IOP DMAC")
 
@@ -72,8 +74,8 @@ void iop_dma_device::device_start()
 
 void iop_dma_device::device_reset()
 {
-	memset(m_channels, 0, sizeof(channel_t) * 16);
-	memset(m_int_ctrl, 0, sizeof(intctrl_t) * 2);
+	std::fill(std::begin(m_channels), std::end(m_channels), channel_t());
+	std::fill(std::begin(m_int_ctrl), std::end(m_int_ctrl), intctrl_t{ 0, 0, false });
 	m_dpcr[0] = 0;
 	m_dpcr[1] = 0;
 	m_dicr[0] = 0;

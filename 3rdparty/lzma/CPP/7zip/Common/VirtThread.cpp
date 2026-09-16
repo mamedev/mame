@@ -11,7 +11,7 @@ static THREAD_FUNC_DECL CoderThread(void *p)
     CVirtThread *t = (CVirtThread *)p;
     t->StartEvent.Lock();
     if (t->Exit)
-      return 0;
+      return THREAD_FUNC_RET_ZERO;
     t->Execute();
     t->FinishedEvent.Set();
   }
@@ -19,8 +19,8 @@ static THREAD_FUNC_DECL CoderThread(void *p)
 
 WRes CVirtThread::Create()
 {
-  RINOK_WRes(StartEvent.CreateIfNotCreated_Reset());
-  RINOK_WRes(FinishedEvent.CreateIfNotCreated_Reset());
+  RINOK_WRes(StartEvent.CreateIfNotCreated_Reset())
+  RINOK_WRes(FinishedEvent.CreateIfNotCreated_Reset())
   // StartEvent.Reset();
   // FinishedEvent.Reset();
   Exit = false;

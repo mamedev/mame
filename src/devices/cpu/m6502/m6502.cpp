@@ -56,8 +56,20 @@ void m6502_device::init()
 		// specific group 1-14 or 15-31
 		if(space(AS_PROGRAM).addr_width() > 14) {
 			space(AS_PROGRAM).specific(mintf->program);
+			space(AS_PROGRAM).specific(mintf->m_program);
+			mintf->m_cprogram = mintf->m_program;
+			if (has_space(AS_OPCODES))
+				space(AS_OPCODES).specific(mintf->m_csprogram);
+			else
+				mintf->m_csprogram = mintf->m_program;
 		} else {
 			space(AS_PROGRAM).specific(mintf->program14);
+			space(AS_PROGRAM).specific(mintf->m_program14);
+			mintf->m_cprogram14 = mintf->m_program14;
+			if (has_space(AS_OPCODES))
+				space(AS_OPCODES).specific(mintf->m_csprogram14);
+			else
+				mintf->m_csprogram14 = mintf->m_program14;
 		}
 	}
 
@@ -293,11 +305,6 @@ uint32_t m6502_device::execute_min_cycles() const noexcept
 uint32_t m6502_device::execute_max_cycles() const noexcept
 {
 	return 10;
-}
-
-uint32_t m6502_device::execute_input_lines() const noexcept
-{
-	return NMI_LINE+1;
 }
 
 bool m6502_device::execute_input_edge_triggered(int inputnum) const noexcept

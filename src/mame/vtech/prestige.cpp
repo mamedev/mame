@@ -137,7 +137,13 @@ public:
 	void gl7007sl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	uint32_t m_extra_program_offset;
+	uint16_t m_num_rom_entries;
+	uint16_t m_rom_bank_mask;
+
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual void setup_extra_program_offset();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -185,9 +191,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 
-	void glcolor_io(address_map &map);
-	void prestige_io(address_map &map);
-	void prestige_mem(address_map &map);
+	void glcolor_io(address_map &map) ATTR_COLD;
+	void prestige_io(address_map &map) ATTR_COLD;
+	void prestige_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -203,21 +209,21 @@ void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0:
-		m_bank1->set_entry(data & 0x3f);
+		m_bank1->set_entry(data & m_rom_bank_mask);
 		break;
 
 	case 1:
 		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02) && (m_cart_type->read() == 0x02 || m_cart->exists()))
-			m_bank2->set_entry(0x40 + (data & 0x1f));
+			m_bank2->set_entry(m_num_rom_entries + (data & 0x1f));
 		else
-			m_bank2->set_entry(data & 0x3f);
+			m_bank2->set_entry(data & m_rom_bank_mask);
 		break;
 
 	case 2:
 		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04) && (m_cart_type->read() == 0x02 || m_cart->exists()))
-			m_bank3->set_entry(0x40 + (data & 0x1f));
+			m_bank3->set_entry(m_num_rom_entries + (data & 0x1f));
 		else
-			m_bank3->set_entry(data & 0x3f);
+			m_bank3->set_entry(data & m_rom_bank_mask);
 		break;
 
 	case 3:
@@ -394,7 +400,7 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")  PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")  PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e")  PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xca\xbb")   PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2018")   PORT_CODE(KEYCODE_OPENBRACE) // U+2018 = ‘
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g")  PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")  PORT_CODE(KEYCODE_COMMA)
@@ -412,7 +418,7 @@ INPUT_PORTS_START( prestige )
 	PORT_START("KEY.2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Up (KB)")  PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")  PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("'")  PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"´") PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t")  PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j")  PORT_CODE(KEYCODE_J)
@@ -422,7 +428,7 @@ INPUT_PORTS_START( prestige )
 	PORT_START("KEY.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mouse Left (KB)")    PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")  PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc2\xa1")   PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"¡") PORT_CODE(KEYCODE_CLOSEBRACE)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y")  PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")  PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k")  PORT_CODE(KEYCODE_K)
@@ -445,9 +451,9 @@ INPUT_PORTS_START( prestige )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i")  PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s")  PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xc3\xb1")   PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"ñ") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b")  PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help")   PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_PGUP)
 
 	PORT_START("KEY.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("??") PORT_CODE(KEYCODE_F10)
@@ -664,6 +670,10 @@ IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 
 void prestige_state::machine_start()
 {
+	setup_extra_program_offset();
+	m_num_rom_entries = memregion("maincpu")->bytes() / 0x4000;
+	m_rom_bank_mask = m_num_rom_entries - 1;
+
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
@@ -675,19 +685,28 @@ void prestige_state::machine_start()
 	}
 	else
 	{
-		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
+		/*
+		    Each internal ROM also includes an extra program, activated by a
+		    blank cartridge that works as a jumper (pins 14 and 18 are shorted):
+
+		    - [snotec] Lucky Check Fortune Telling (ラッキーチェックうらない)
+		    - [snotecex] Super Cassette: Guessing Card Game / Jungle Cruise (スーパーカセット あてっこ カードゲーム / ジャングル クルーズ)
+		    - [snotecu, snotecug] Super AquaMate (スーパーアクアメイト)
+		    - [snotecut] Little Sorcery (リトルソーサリー)
+		*/
+		cart = rom + m_extra_program_offset;
 	}
 	uint8_t *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
-	m_bank1->configure_entries(0, 64, rom,  0x4000);
-	m_bank1->configure_entries(64,32, cart, 0x4000);
-	m_bank2->configure_entries(0, 64, rom,  0x4000);
-	m_bank2->configure_entries(64,32, cart, 0x4000);
-	m_bank3->configure_entries(0, 64, rom,  0x4000);
-	m_bank3->configure_entries(64,32, cart, 0x4000);
-	m_bank4->configure_entries(0, 4,  ram,  0x2000);
-	m_bank5->configure_entries(0, 4,  ram,  0x2000);
+	m_bank1->configure_entries(0,                 m_num_rom_entries, rom,  0x4000);
+	m_bank1->configure_entries(m_num_rom_entries, 32,                cart, 0x4000);
+	m_bank2->configure_entries(0,                 m_num_rom_entries, rom,  0x4000);
+	m_bank2->configure_entries(m_num_rom_entries, 32,                cart, 0x4000);
+	m_bank3->configure_entries(0,                 m_num_rom_entries, rom,  0x4000);
+	m_bank3->configure_entries(m_num_rom_entries, 32,                cart, 0x4000);
+	m_bank4->configure_entries(0,                 4,                 ram,  0x2000);
+	m_bank5->configure_entries(0,                 4,                 ram,  0x2000);
 
 	m_bank1->set_entry(0);
 	m_bank2->set_entry(0);
@@ -706,6 +725,11 @@ void prestige_state::machine_start()
 
 	//pointer to the videoram
 	m_vram = ram;
+}
+
+void prestige_state::setup_extra_program_offset()
+{
+	m_extra_program_offset = 0x40000;
 }
 
 void prestige_state::prestige_palette(palette_device &palette) const
@@ -781,7 +805,7 @@ void prestige_state::prestige_base(machine_config &config)
 	TIMER(config, "irq_timer").configure_periodic(FUNC(prestige_state::irq_timer), attotime::from_hz(200));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(prestige_state::screen_update_1bpp));
@@ -859,6 +883,21 @@ void prestige_state::gl7007sl(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
+class snotecut_state : public prestige_state
+{
+public:
+	snotecut_state(const machine_config &mconfig, device_type type, const char *tag)
+		: prestige_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void setup_extra_program_offset() override;
+};
+
+void snotecut_state::setup_extra_program_offset()
+{
+	m_extra_program_offset = 0x100000;
+}
 
 /* ROM definition */
 ROM_START( gl6000sl )
@@ -911,12 +950,17 @@ ROM_END
 
 ROM_START( snotecu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("27-6100-00.u1", 0x00000, 0x100000, CRC(b2f979d5) SHA1(d2a76e99351971d1fb4cf4df9fe5741a606eb844))
+	ROM_LOAD( "27-6100-00.u1", 0x00000, 0x100000, CRC(b2f979d5) SHA1(d2a76e99351971d1fb4cf4df9fe5741a606eb844) )
 ROM_END
 
 ROM_START( snotecug )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("27-6100-02.u1", 0x00000, 0x100000, CRC(1e14e6ea) SHA1(3e3b8dbea5f559ff98f525e3c7029b9d55e5515b))
+	ROM_LOAD( "27-6100-02.u1", 0x00000, 0x100000, CRC(1e14e6ea) SHA1(3e3b8dbea5f559ff98f525e3c7029b9d55e5515b) )
+ROM_END
+
+ROM_START( snotecut )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "27-6429-00.u1", 0x00000, 0x200000, CRC(16b1a0d6) SHA1(72f467e2f3bef4995d0eadb8387a88b0d9fa2893) )
 ROM_END
 
 ROM_START( glmcolor )
@@ -938,17 +982,18 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                                FLAGS
-COMP( 1994, glcolor,  0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Color (Germany)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, glscolor, glcolor, 0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Super Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, pcscolor, 0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "PC Super Color (Spain)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, snotec,   0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club (Japan)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club EX (Japan)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ (Japan)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, snotecug, snotecu, 0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ girlish (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 199?, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME                                   FLAGS
+COMP( 1994, glcolor,  0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Color (Germany)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, glscolor, glcolor, 0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "Genius Leader Super Color (Germany)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, pcscolor, 0,       0,      glcolor,  glcolor,  prestige_state, empty_init, "VTech",  "PC Super Color (Spain)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, snotec,   0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club (Japan)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, snotecex, 0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", "Super Note Club EX (Japan)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty_init, "VTech",  "Genius Leader Magic Color (Germany)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ (Japan)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, snotecug, snotecu, 0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ girlish (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, snotecut, snotecu, 0,      snotec,   glcolor,  snotecut_state, empty_init, "Bandai", u8"Super Note Club µ teen's time (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 199?, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

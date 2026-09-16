@@ -336,7 +336,7 @@ public:
 	void eto(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	// memory pointers
 	required_memory_bank m_audiobank;
@@ -354,10 +354,12 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void z80_map(address_map &map);
+	rgb_t color_xbgr555(u16 data);
+
+	void z80_map(address_map &map) ATTR_COLD;
 
 private:
-	void eto_map(address_map &map);
+	void eto_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -375,8 +377,8 @@ public:
 	void asuka(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -395,8 +397,8 @@ private:
 	void msm5205_stop_w(u8 data);
 	void msm5205_vck(int state);
 
-	void asuka_map(address_map &map);
-	void z80_map(address_map &map);
+	void asuka_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -421,8 +423,8 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void main_map(address_map &map);
-	void z80_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void z80_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -437,7 +439,7 @@ public:
 	void cadash(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -450,9 +452,11 @@ private:
 	void share_w(offs_t offset, u16 data);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void main_map(address_map &map);
-	void sub_io(address_map &map);
-	void sub_map(address_map &map);
+	rgb_t color_xbgr444(u16 data);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_io(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -470,6 +474,16 @@ void base_state::fixed_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_
 {
 	sprite_colbank = (sprite_ctrl & 0x3c) << 2;
 	pri_mask = 0xf0; // sprites over top bg layer
+}
+
+rgb_t base_state::color_xbgr555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+rgb_t cadash_state::color_xbgr444(u16 data)
+{
+	return rgb_t(pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 
@@ -589,7 +603,7 @@ void bonzeadv_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x0fffff).rom();
 	map(0x10c000, 0x10ffff).ram();
-	map(0x200000, 0x200007).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
+	map(0x200000, 0x200007).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0x390000, 0x390001).portr("DSWA");
 	map(0x3a0000, 0x3a0001).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x3b0000, 0x3b0001).portr("DSWB");
@@ -609,7 +623,7 @@ void msm_state::asuka_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x1076f0, 0x1076f1).nopr(); // Mofflott init does dummy reads here
-	map(0x200000, 0x20000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
+	map(0x200000, 0x20000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0x3a0000, 0x3a0003).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0x3e0000, 0x3e0001).nopr();
 	map(0x3e0001, 0x3e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
@@ -631,16 +645,16 @@ void cadash_state::main_map(address_map &map)
 	map(0x100000, 0x107fff).ram();
 	map(0x800000, 0x800fff).rw(FUNC(cadash_state::share_r), FUNC(cadash_state::share_w));    // network RAM
 	map(0x900000, 0x90000f).rw("tc0220ioc", FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
-	map(0xa00000, 0xa0000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_4bpg_word_w));
+	map(0xa00000, 0xa0000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0xb00000, 0xb03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  // sprite RAM
 	map(0xc00000, 0xc0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    // tilemaps
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 }
 
 void base_state::eto_map(address_map &map)
-{ // N.B. tc100scn mirror overlaps spriteram
+{
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x10000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
+	map(0x100000, 0x10000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));
 	map(0x200000, 0x203fff).ram();
 	map(0x300000, 0x30000f).rw("tc0220ioc", FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x400000, 0x40000f).r("tc0220ioc", FUNC(tc0220ioc_device::read)).umask16(0x00ff);   // service mode mirror
@@ -648,7 +662,7 @@ void base_state::eto_map(address_map &map)
 	map(0x4e0000, 0x4e0001).nopr();
 	map(0x4e0001, 0x4e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x4e0003, 0x4e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w));
+	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w)); // N.B. tc100scn mirror overlaps spriteram
 	map(0xc00000, 0xc03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  // sprite RAM
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    // tilemaps
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -1102,7 +1116,7 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1111,28 +1125,30 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	screen.screen_vblank().set(FUNC(bonzeadv_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(bonzeadv_state::fixed_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(bonzeadv_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(0, "mono", 0.75);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
-	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt", 0));
-	tc0140syt.set_master_tag(m_maincpu);
-	tc0140syt.set_slave_tag(m_audiocpu);
+	tc0140syt_device &tc0140syt(TC0140SYT(config, "tc0140syt"));
+	tc0140syt.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	tc0140syt.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void msm_state::asuka(machine_config &config)
@@ -1147,7 +1163,7 @@ void msm_state::asuka(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1156,7 +1172,7 @@ void msm_state::asuka(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1165,16 +1181,18 @@ void msm_state::asuka(machine_config &config)
 	screen.screen_vblank().set(FUNC(msm_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(msm_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(msm_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1190,12 +1208,12 @@ void msm_state::asuka(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void cadash_state::cadash(machine_config &config)
@@ -1214,7 +1232,7 @@ void cadash_state::cadash(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1223,7 +1241,7 @@ void cadash_state::cadash(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1232,17 +1250,19 @@ void cadash_state::cadash(machine_config &config)
 	screen.screen_vblank().set(FUNC(cadash_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_usebuffer(true);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(cadash_state::fixed_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(cadash_state::color_xbgr444));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1253,9 +1273,9 @@ void cadash_state::cadash(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void msm_state::mofflott(machine_config &config)
@@ -1270,7 +1290,7 @@ void msm_state::mofflott(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1279,7 +1299,7 @@ void msm_state::mofflott(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1288,16 +1308,18 @@ void msm_state::mofflott(machine_config &config)
 	screen.screen_vblank().set(FUNC(msm_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(msm_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(msm_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1313,12 +1335,12 @@ void msm_state::mofflott(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);      // 8 kHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 void base_state::eto(machine_config &config)
@@ -1333,7 +1355,7 @@ void base_state::eto(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
+	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc"));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
 	tc0220ioc.read_1_callback().set_ioport("DSWB");
 	tc0220ioc.read_2_callback().set_ioport("IN0");
@@ -1342,7 +1364,7 @@ void base_state::eto(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1351,16 +1373,18 @@ void base_state::eto(machine_config &config)
 	screen.screen_vblank().set(FUNC(base_state::screen_vblank));
 	screen.set_palette("tc0110pcr");
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_offsets(0, 8);
 	m_pc090oj->set_palette("tc0110pcr");
 	m_pc090oj->set_colpri_callback(FUNC(base_state::variable_colpri_cb));
 
-	TC0100SCN(config, m_tc0100scn, 0);
+	TC0100SCN(config, m_tc0100scn);
 	m_tc0100scn->set_offsets(1, 0);
 	m_tc0100scn->set_palette("tc0110pcr");
 
-	TC0110PCR(config, "tc0110pcr", 0);
+	tc0110pcr_device &tc0110pcr(TC0110PCR(config, "tc0110pcr"));
+	tc0110pcr.set_shift(0);
+	tc0110pcr.set_color_callback(FUNC(base_state::color_xbgr555));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1371,9 +1395,9 @@ void base_state::eto(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -1466,6 +1490,33 @@ ROM_START( jigkmgri )
 	ROM_REGION( 0x100000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "b41-09-1.17", 0x00000, 0x10000, CRC(af821fbc) SHA1(55bc13742033a31c92d6268d6b8344062ca78633) )
 	ROM_LOAD16_BYTE( "b41-11-1.26", 0x00001, 0x10000, CRC(823fff00) SHA1(b8b8cafbe860136c202d8d9f3ed5a54e2f4df363) )
+	ROM_LOAD16_BYTE( "b41-10.16",   0x20000, 0x10000, CRC(4ca94d77) SHA1(69a9f6bcb6d5e4132eed50860bdfe8d6b6d914cd) )
+	ROM_LOAD16_BYTE( "b41-12.25",   0x20001, 0x10000, CRC(40d9c1fc) SHA1(6f03d263e10559988aaa2be00d9bbf55f2fb864e) )
+	// 0x040000 - 0x7ffff is intentionally empty
+	ROM_LOAD16_WORD_SWAP( "b41-01.15", 0x80000, 0x80000, CRC(5d072fa4) SHA1(6ffe1b8531381eb6dd3f1fec18c91294a6aca9f6) )
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_b41-05.43", 0x0000, 0x2000, CRC(75c52553) SHA1(87bbaefab90e7d43f63556fbae3e937baf9d397b) )
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "b41-03.1",  0x00000, 0x80000, CRC(736d35d0) SHA1(7d41a7d71e117714bbd2cdda2953589cda6e763a) ) // Tiles (8 x 8)
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) // Sprites (16 x 16)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // banked
+
+	// no ADPCM-A samples
+
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
+	ROM_LOAD( "b41-04.48",  0x00000, 0x80000, CRC(c668638f) SHA1(07238a6cb4d93ffaf6351657163b5d80f0dbf688) )
+ROM_END
+
+ROM_START( jigkmgria )
+	ROM_REGION( 0x100000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_BYTE( "b41-09.17",   0x00000, 0x10000, CRC(06818710) SHA1(b8045f4e15246231a5645d22bb965953f7fb47a3) )
+	ROM_LOAD16_BYTE( "b41-11.26",   0x00001, 0x10000, CRC(33c4c2f4) SHA1(3f1e76932d8f7e06e976b968a711177d25254bef) )
 	ROM_LOAD16_BYTE( "b41-10.16",   0x20000, 0x10000, CRC(4ca94d77) SHA1(69a9f6bcb6d5e4132eed50860bdfe8d6b6d914cd) )
 	ROM_LOAD16_BYTE( "b41-12.25",   0x20001, 0x10000, CRC(40d9c1fc) SHA1(6f03d263e10559988aaa2be00d9bbf55f2fb864e) )
 	// 0x040000 - 0x7ffff is intentionally empty
@@ -1682,6 +1733,10 @@ ROM_START( mofflott )
 
 	ROM_REGION( 0x10000, "msm", 0 )
 	ROM_LOAD( "c17-06.bin", 0x00000, 0x10000, CRC(5c332125) SHA1(408f42df18b38347c8a4e177a9484162a66877e1) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal20l8acns-b88-11.ic32", 0x0000, 0x0144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "pal16l8acn-b88-05.ic43",  0x0200, 0x0104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
 ROM_START( cadash )
@@ -1997,6 +2052,32 @@ ROM_START( cadashs ) // no labels on the program ROMs
 	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
 ROM_END
 
+ROM_START( cadashso ) // Taito PCB: K1100526A / J1100218A
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "conchimatic_c_31.ic11", 0x00000, 0x20000, CRC(091e71de) SHA1(b4b7346538866866ab92b59fad00d0ba7747d115) )
+	ROM_LOAD16_BYTE( "conchimatic_c_33.ic15", 0x00001, 0x20000, CRC(64722757) SHA1(c59dd101d7b2bd3c23672faeac53a5ffcd25cfc3) )
+	ROM_LOAD16_BYTE( "conchimatic_c_30.ic10", 0x40000, 0x20000, CRC(f7572e71) SHA1(7471bc8e0773b2cf0f8b3a89bfcc4388a5c21ef1) )
+	ROM_LOAD16_BYTE( "conchimatic_c_32.ic14", 0x40001, 0x20000, CRC(3947b8b5) SHA1(10a692d0f881923002db7855293a406d089e6441) )
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) // SCR tiles (8 x 8)
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) // Sprites (16 x 16)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) // banked
+
+	ROM_REGION( 0x08000, "subcpu", 0 )  // HD64180RP8 code (link)
+	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "pal16l8b-c21-09.ic34",   0x0000, 0x0104, CRC(4b296700) SHA1(79d6c8fb13e30795d9c1f49885ada658f9722b68) )
+	ROM_LOAD( "pal16l8b-c21-10.ic45",   0x0200, 0x0104, CRC(35642f00) SHA1(a04403536b0ef7e8e7251dfc47274a6c8772fd2d) )
+	ROM_LOAD( "pal16l8b-c21-11-1.ic46", 0x0400, 0x0104, CRC(f4791e24) SHA1(7e3bbffec7b8f9171e6e09706e5622fef3c99ca0) )
+	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
+ROM_END
+
 ROM_START( galmedes ) // Taito PCB: K1100388A / J1100169A
 	ROM_REGION( 0x100000, "maincpu", 0 )     // 1024k for 68000 code
 	ROM_LOAD16_BYTE( "gm-prg1.ic23", 0x00000, 0x20000, CRC(32a70753) SHA1(3bd094b7ae600dbc87ba74e8b2d6b86a68346f4f) )
@@ -2137,7 +2218,7 @@ ROM_START( eto )
 	ROM_LOAD16_BYTE( "eto-1.ic23",  0x00000, 0x20000, CRC(44286597) SHA1(ac37e5edbf9d187f60232adc5e9ebed45b3d2fe2) )
 	ROM_LOAD16_BYTE( "eto-0.ic8",   0x00001, 0x20000, CRC(57b79370) SHA1(25f83eada982ef654260fe92016d42a90005a05c) )
 	// 0x40000 - 0x7ffff is intentionally empty
-	ROM_LOAD16_WORD( "eto-2.ic30",    0x80000, 0x80000, CRC(12f46fb5) SHA1(04db8b6ccd0051668bd2930275efa0265c0cfd2b) )    // Fix ROM
+	ROM_LOAD16_WORD( "eto-2.ic30",  0x80000, 0x80000, CRC(12f46fb5) SHA1(04db8b6ccd0051668bd2930275efa0265c0cfd2b) )    // Fix ROM
 
 	ROM_REGION( 0x80000, "tc0100scn", 0 )
 	ROM_LOAD16_WORD_SWAP( "eto-4.ic3", 0x00000, 0x80000, CRC(a8768939) SHA1(a2cbbd3e10ed48ba32a680b2e40ea03900cf33fa) )   // Sprites (16 x 16)
@@ -2147,6 +2228,26 @@ ROM_START( eto )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "eto-5.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) // banked
+ROM_END
+
+// Possible prototype or test version
+// Smaller program (ends at 0x01eee4, while eto ends at 0x020952)
+// Smaller data (ends at 0x0a74aa, while eto ends at 0x0fdd94)
+ROM_START( etoa )
+	ROM_REGION( 0x100000, "maincpu", 0 )     // 1024k for 68000 code
+	ROM_LOAD16_BYTE( "pe.ic23",  0x00000, 0x20000, CRC(36a6a742) SHA1(32d49842cb46c8acfc44fbbf8da54e25541c2a13) )
+	ROM_LOAD16_BYTE( "po.ic8",   0x00001, 0x20000, CRC(bc86f328) SHA1(ff746e7f17e62c09af2e1011583ee1aedce782d4) )
+	// 0x40000 - 0x7ffff is intentionally empty
+	ROM_LOAD16_WORD( "pd.ic30",  0x80000, 0x80000, CRC(39e6a0f3) SHA1(f75d4313db5f292c5fd8f86f4e6871ee244d30d3) )    // Fix ROM
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "sc.ic3", 0x00000, 0x80000, CRC(a8768939) SHA1(a2cbbd3e10ed48ba32a680b2e40ea03900cf33fa) )   // Sprites (16 x 16)
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "ob.ic6", 0x00000, 0x80000, CRC(dd247397) SHA1(53a7bf877fd7e5f3daf295a698f4012447b6f113) )   // SCR tiles (8 x 8)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sd.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) // banked
 ROM_END
 
 
@@ -2161,37 +2262,41 @@ void base_state::init_earthjkr()
 } // Anonymous namespace
 
 
-GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito America Corporation", "Bonze Adventure (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype, newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvp2,bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito",         "Bonze Adventure (World, rev 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito",         "Bonze Adventure (World)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito America", "Bonze Adventure (US, rev 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito",         "Jigoku Meguri (Japan, rev 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jigkmgria, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito",         "Jigoku Meguri (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito",         "Bonze Adventure (World, prototype, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvp2,bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito",         "Bonze Adventure (World, prototype, older)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, asuka,     0,        asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, asukaj,    asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan, version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, asukaja,   asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asuka,     0,        asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito",         "Asuka & Asuka (World)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaj,    asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito",         "Asuka & Asuka (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaja,   asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito",         "Asuka & Asuka (Japan)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mofflott,  0,        mofflott, mofflott,  msm_state,      empty_init,    ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mofflott,  0,        mofflott, mofflott,  msm_state,      empty_init,    ROT270, "Taito",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cadash,    0,        cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashu,   cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashu1,  cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America Corporation", "Cadash (US, version 1?)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashi,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashf,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashg,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashgo,  cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashp,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
-GAME( 1989, cadashs,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Spain, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadash,    0,        cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (World)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Japan, rev 2)",     MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Japan, rev 1)",     MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Japan)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu,   cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America", "Cadash (US, rev 2)",        MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu1,  cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America", "Cadash (US, rev 1?)",       MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashi,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Italy)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashf,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (France)",           MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashg,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Germany, rev 1)",   MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashgo,  cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Germany)",          MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashp,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashs,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Spain, rev 1)",     MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashso,  cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito",         "Cadash (Spain)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 
-GAME( 1992, galmedes,  0,        asuka,    galmedes,  msm_state,      empty_init,    ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, galmedes,  0,        asuka,    galmedes,  msm_state,      empty_init,    ROT270, "Visco",         "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        asuka,    earthjkr,  msm_state,      init_earthjkr, ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // sets 1 + 2 + 3 have ROMSTAR (US?) license and no region disclaimer if you change the dipswitch
-GAME( 1993, earthjkra, earthjkr, asuka,    earthjkr,  msm_state,      empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrb, earthjkr, asuka,    earthjkr,  msm_state,      empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp, msm_state,      empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
+// sets 1 + 2 + 3 have ROMSTAR (US?) license and no region disclaimer if you change the dipswitch
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr,  msm_state,      init_earthjkr, ROT270, "Visco",         "U.N. Defense Force: Earth Joker (US / Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkra, earthjkr, asuka,    earthjkr,  msm_state,      empty_init,    ROT270, "Visco",         "U.N. Defense Force: Earth Joker (US / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrb, earthjkr, asuka,    earthjkr,  msm_state,      empty_init,    ROT270, "Visco",         "U.N. Defense Force: Earth Joker (US / Japan, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp, msm_state,      empty_init,    ROT270, "Visco",         "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, eto,       0,        eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, eto,       0,        eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",         "Kokontouzai Eto Monogatari (Japan)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, etoa,      eto,      eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",         "Kokontouzai Eto Monogatari (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )

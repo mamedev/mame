@@ -20,7 +20,7 @@ endif
 
 ifdef ST_MODE
 
-LOCAL_FLAGS_ST = -D_7ZIP_ST
+LOCAL_FLAGS_ST = -DZ7_ST
 
 ifdef IS_MINGW
 MT_OBJS = \
@@ -38,14 +38,12 @@ endif
 
 
 
-LOCAL_FLAGS_WIN=
+LOCAL_FLAGS_SYS=
 
 ifdef IS_MINGW
 
-LOCAL_FLAGS_WIN = \
-  -D_7ZIP_LARGE_PAGES \
-  -DWIN_LONG_PATH \
-  -DSUPPORT_DEVICE_FILE \
+LOCAL_FLAGS_SYS = \
+  -DZ7_DEVICE_FILE \
 
 SYS_OBJS = \
   $O/FileSystem.o \
@@ -64,9 +62,9 @@ endif
 
 
 LOCAL_FLAGS = \
-  $(LOCAL_FLAGS_WIN) \
+  $(LOCAL_FLAGS_SYS) \
   $(LOCAL_FLAGS_ST) \
-  -DEXTERNAL_CODECS \
+  -DZ7_EXTERNAL_CODECS \
 
 
 
@@ -147,6 +145,7 @@ WIN_OBJS = \
   $O/LimitedStreams.o \
   $O/MethodId.o \
   $O/MethodProps.o \
+  $O/MultiOutStream.o \
   $O/OffsetStream.o \
   $O/OutBuffer.o \
   $O/ProgressUtils.o \

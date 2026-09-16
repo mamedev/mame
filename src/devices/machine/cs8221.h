@@ -32,19 +32,27 @@ public:
 		set_biostag(biostag);
 	}
 
-	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *cputag, const char *isatag, const char *biostag)
+		: cs8221_device(mconfig, tag, owner, 0, cputag, isatag, biostag)
+	{
+		set_cputag(cputag);
+		set_isatag(isatag);
+		set_biostag(biostag);
+	}
+
+	cs8221_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	void set_cputag(const char *tag) { m_cputag = tag; }
 	void set_isatag(const char *tag) { m_isatag = tag; }
 	void set_biostag(const char *tag) { m_biostag = tag; }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 

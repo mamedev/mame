@@ -74,7 +74,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 201?, sc6dndem,  0,         bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9561082)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 201?, sc6dndema, sc6dndem,  bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9561082, protocol)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 201?, sc6dndemb, sc6dndem,  bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9560933)",           MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 201?, sc6dndemc, sc6dndem,  bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9560933, protocol)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 201?, sc6dndem,  0,         bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9561082)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 201?, sc6dndema, sc6dndem,  bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9561082, protocol)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 201?, sc6dndemb, sc6dndem,  bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9560933)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 201?, sc6dndemc, sc6dndem,  bfm_sc6, bfm_sc6, bfm_sc6_state, empty_init, ROT0, "BFM", "Deal or No Deal Easy Money (Scorpion 6, 9560933, protocol)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

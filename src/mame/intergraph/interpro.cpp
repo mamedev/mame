@@ -138,11 +138,11 @@
  * 2700 Sapphire (SMT128 rev 0, SMT104 rev A)
  *
  *   Ref   Part                      Function
- *   U31   Zilog Z85C30 SCC          Keyboard and console serial controller
- *   U32   Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
+ *   U31   Zilog Z85C30 SCC          Serial controller for serial port 0 and 1
+ *   U32   Zilog Z85230 ESCC         Keyboard and console serial controller
  *   U34   Xilinx XC3020-70          Plotter control FPGA?
  *   U35   128 kB EPROM (MPRGZ530A)  Boot ROM
- *   U43?  (MPRGM610P)               Bitstream for XC3020?
+ *   U43   GAL16V8B (MPRGM610P)      Bitstream for XC3020?
  *   U44   Intel 82596SX-20          Ethernet controller
  *   U68   CYID21603 TC150G89AF
  *   U67   Intel N28F010             128Kx8 flash memory (Y226 0C30 4291)
@@ -155,11 +155,11 @@
  *   U91   Intel N82077SL-1          Floppy drive controller
  *   U96   29.0 MHz crystal
  *   U97   40.0 MHz crystal
- *   U112? (MPRGZ260E)               node ID prom?
+ *   U112  82s123 (MPRG4230A)        node ID prom?
  *   U113  Dallas DS12887            RTC and NVRAM
- *   U117?                           diagnostic 7-segment LED?
- *   U118? ()
- *   U155  CYID212?4 TC140G54AF?
+ *   U117  [empty]                   diagnostic 7-segment LED?
+ *   U118  82S123 (MPRGZ260F)
+ *   U155  CYID21704 TC140G54AF
  *
  * 6000 (PCB765 rev B, PCB82409 rev D)
  *
@@ -347,14 +347,13 @@ public:
 	void ioga(machine_config &config);
 	void interpro_serial(machine_config &config);
 	void interpro(machine_config &config);
-	static void interpro_scsi_adapter(device_t *device);
 	static void interpro_cdrom(device_t *device);
-	void interpro_boot_map(address_map &map);
-	void interpro_common_map(address_map &map);
+	void interpro_boot_map(address_map &map) ATTR_COLD;
+	void interpro_common_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	output_finder<> m_diag_led;
 	emu_timer *m_reset_timer = nullptr;
@@ -371,7 +370,7 @@ public:
 		: interpro_state(mconfig, type, tag)
 		, m_d_cammu(*this, "cammu_d")
 		, m_i_cammu(*this, "cammu_i")
-		, m_scsi(*this, "scsi:7:host")
+		, m_scsi(*this, "host")
 		, m_bus(*this, "slot")
 	{
 	}
@@ -416,14 +415,14 @@ public:
 
 	void emerald(machine_config &config);
 	void ip6000(machine_config &config);
-	void interpro_82586_map(address_map &map);
-	void emerald_base_map(address_map &map);
-	void emerald_main_map(address_map &map);
-	void emerald_io_map(address_map &map);
+	void interpro_82586_map(address_map &map) ATTR_COLD;
+	void emerald_base_map(address_map &map) ATTR_COLD;
+	void emerald_main_map(address_map &map) ATTR_COLD;
+	void emerald_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 m_ctrl1 = 0;
@@ -439,7 +438,7 @@ public:
 		, m_i_cammu(*this, "cammu_i")
 		, m_kbd_port(*this, "kbd")
 		, m_mse_port(*this, "mse")
-		, m_scsi(*this, "scsi:7:host")
+		, m_scsi(*this, "host")
 		, m_bus(*this, "slot")
 	{
 	}
@@ -486,14 +485,14 @@ public:
 
 	void turquoise(machine_config &config);
 	void ip2000(machine_config &config);
-	void interpro_82586_map(address_map &map);
-	void turquoise_base_map(address_map &map);
-	void turquoise_main_map(address_map &map);
-	void turquoise_io_map(address_map &map);
+	void interpro_82586_map(address_map &map) ATTR_COLD;
+	void turquoise_base_map(address_map &map) ATTR_COLD;
+	void turquoise_main_map(address_map &map) ATTR_COLD;
+	void turquoise_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 m_ctrl1 = 0;
@@ -506,7 +505,7 @@ public:
 	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
 		, m_mmu(*this, "cammu")
-		, m_scsi(*this, "scsi:7:host")
+		, m_scsi(*this, "host")
 		, m_arbga(*this, "arbga")
 		, m_flash_lsb(*this, "flash_lsb")
 		, m_flash_msb(*this, "flash_msb")
@@ -551,14 +550,14 @@ public:
 
 	void sapphire(machine_config &config);
 
-	void interpro_82596_map(address_map &map);
-	void sapphire_base_map(address_map &map);
-	void sapphire_main_map(address_map &map);
-	void sapphire_io_map(address_map &map);
+	void interpro_82596_map(address_map &map) ATTR_COLD;
+	void sapphire_base_map(address_map &map) ATTR_COLD;
+	void sapphire_main_map(address_map &map) ATTR_COLD;
+	void sapphire_io_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u16 m_ctrl1 = 0;
@@ -610,8 +609,6 @@ protected:
 
 void interpro_state::machine_start()
 {
-	m_diag_led.resolve();
-
 	save_item(NAME(m_error));
 	save_item(NAME(m_status));
 	save_item(NAME(m_led));
@@ -1121,16 +1118,6 @@ static void interpro_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
-void interpro_state::interpro_scsi_adapter(device_t *device)
-{
-	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
-
-	adapter.set_clock(24_MHz_XTAL);
-
-	adapter.irq_handler_cb().set(":ioga", FUNC(interpro_ioga_device::ir0_w));
-	adapter.drq_handler_cb().set(":ioga", FUNC(interpro_ioga_device::drq_scsi));
-}
-
 void interpro_state::interpro_cdrom(device_t *device)
 {
 	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
@@ -1144,8 +1131,6 @@ void interpro_state::ioga(machine_config &config)
 
 	// ioga dma and serial dma channels
 	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
-	m_ioga->dma_r_callback<1>().set("scsi:7:host", FUNC(ncr53c90a_device::dma_r));
-	m_ioga->dma_w_callback<1>().set("scsi:7:host", FUNC(ncr53c90a_device::dma_w));
 	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_r));
 	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
@@ -1240,8 +1225,8 @@ void emerald_state::emerald(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
-	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
+	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1249,11 +1234,10 @@ void emerald_state::emerald(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C90A);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("host", interpro_scsi_adapter);
+	NCR53C90A(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::ir0_w));
+	m_scsi->drq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::drq_scsi));
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -1264,6 +1248,8 @@ void emerald_state::emerald(machine_config &config)
 	EMERALD_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
+	m_ioga->dma_r_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_w));
 
 	// srx bus
 	SRX_BUS(config, m_bus, 0);
@@ -1306,7 +1292,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1323,11 +1309,10 @@ void turquoise_state::turquoise(machine_config &config)
 	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C90A);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("host", interpro_scsi_adapter);
+	NCR53C90A(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::ir0_w));
+	m_scsi->drq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::drq_scsi));
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -1338,6 +1323,8 @@ void turquoise_state::turquoise(machine_config &config)
 	TURQUOISE_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
+	m_ioga->dma_r_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_w));
 
 	// cbus bus
 	CBUS_BUS(config, m_bus, 0);
@@ -1373,7 +1360,7 @@ void sapphire_state::sapphire(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 1
-	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	// srx arbiter gate array
 	INTERPRO_ARBGA(config, m_arbga, 0);
@@ -1384,11 +1371,10 @@ void sapphire_state::sapphire(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C94);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("host", interpro_scsi_adapter);
+	NCR53C94(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::ir0_w));
+	m_scsi->drq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::drq_scsi));
 
 	// ethernet controller
 	I82596_LE16(config, m_eth, 20_MHz_XTAL);
@@ -1399,6 +1385,8 @@ void sapphire_state::sapphire(machine_config &config)
 	SAPPHIRE_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
+	m_ioga->dma_r_callback<1>().set(m_scsi, FUNC(ncr53c94_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(m_scsi, FUNC(ncr53c94_device::dma_w));
 
 	// flash memory
 	INTEL_28F010(config, m_flash_lsb);
@@ -1618,42 +1606,67 @@ ROM_START(ip2400)
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2500)
 	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
-	// FIXME: undumped - probably identical to ip2700 eprom
+	// FIXME: undumped - probably identical to ip2700 EPROM
 	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa) BAD_DUMP, ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip2700)
 	// feature[0] & 0x04: supports RETRY if clear
 	ROM_REGION32_LE(0x80, "idprom", 0)
-	ROM_LOAD32_BYTE("msmt1280.bin", 0x0, 0x20, CRC(32d833af) SHA1(7225c5f5670fe49d86556a2cb453ae6fe09e3e19))
+	ROM_LOAD("mprgz260f_9310270_82s123.u118", 0x000, 0x020, CRC(bef9a02b) SHA1(5a50f8922fc0a7ae5f7934ccc1e178f3c8ec8489))
 
 	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro/InterServe 27x0 EPROM")
-	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
+	ROMX_LOAD("mprgz530a_9311290.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("y226_0c3_1210.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("y225_0c3_1211.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD("mprgm610p_9311290_gal16v8b.u43", 0x000, 0x117, CRC(9b825384) SHA1(7d531394a046e2507844423a7fea834730843ce3))
+	ROM_LOAD("y215_0c31_1230_gal22v10.u72",    0x000, 0x2e5, CRC(eb24fd27) SHA1(e5b8a32617e2ed73f61ddc4fe07cb9aa6065186b))
+	ROM_LOAD("y216_0d31_1290_gal16v8.u58",     0x000, 0x117, CRC(6c67101f) SHA1(4b7ec3a12d10fe56cbd4b0ab2ab6ac89331575bf))
+	ROM_LOAD("y279_0a31_1291_gal20v8.u57",     0x000, 0x157, CRC(1b4e3d4f) SHA1(8b5108d9332f29bb4f91825e5d37818c1787413f))
+	ROM_LOAD("y277_0a31_1300_gal22v10.u70",    0x000, 0x2e5, CRC(51b0fc4a) SHA1(6ecc9aebf46f060d8886c76c8d33f717aabfa768))
+	ROM_LOAD("y472_0a31_1300_gal22v10.u56",    0x000, 0x2e5, CRC(92d12cc3) SHA1(591c781744f62a69d3ac1dc6dbfd740693d8b036))
+	ROM_LOAD("y515_0a31_1300_gal22v10.u69",    0x000, 0x2e5, CRC(ee95d0d8) SHA1(3111ad9c6cde9c1213edd3c13adb237cdb22746f))
+	ROM_LOAD("y283_0a31_1290_gal20v8.u80",     0x000, 0x157, CRC(c3290b00) SHA1(c107c779fd886ec138f0835d24bb84ea4fc3f909))
+	ROM_LOAD("y224_0b31_1300_gal20v8.u75",     0x000, 0x157, CRC(57c0a723) SHA1(6040c1ce92d4e46a2a0b98303263d91067901577))
+	ROM_LOAD("y219_0b31_1300_gal16v8.u66",     0x000, 0x117, CRC(3306bcb0) SHA1(239460760f1d187fb6e2e3c49d9608eafe383c0c))
+	ROM_LOAD("y221_0a31_1290_gal16v8.u82",     0x000, 0x117, CRC(fc8923d6) SHA1(fabeb0c5f8fcf3dcbbaa21964a058340dfebb063))
+	ROM_LOAD("y222_0a31_1290_gal16v8.u74",     0x000, 0x117, CRC(d812cf9d) SHA1(0541d5c6acd6713f2dcb9d17f367e6e4cc649543))
+	ROM_LOAD("y218_0b31_1180_gal22v10.u65",    0x000, 0x2e5, CRC(706a8018) SHA1(143e468b1d93949d316b987a9f61a1b4eb93063d))
+
+	ROM_REGION(0x020, "proms", 0)
+	ROM_LOAD("mprg4230a_9311300_82s123.u112", 0x000, 0x020, CRC(8633fa2c) SHA1(e93fb6a65c78202a79c94adbf05d438fc6774333))
+	ROM_LOAD("mprgy920f_9305070_82s123.u71",  0x000, 0x020, CRC(4fec770c) SHA1(25bfb863336315975568f137e7e76bdc8101ab02))
+
+	ROM_REGION(0x080, "nvram", 0)
+	ROM_LOAD("ds12887.u113", 0x000, 0x080, CRC(108116fb) SHA1(9cc538bf1ad784e8f1a1d02ae24fb13370f1a533))
+
+	ROM_REGION(0x11b9, "scprom", 0)
+	ROM_LOAD("h300_pb29_xc1736d.u64", 0x0000, 0x11b9, CRC(e9ad2194) SHA1(d8dbecad5f2cdbf19b821b500a8db6a64303b322))
 ROM_END
 
 ROM_START(ip2800)
@@ -1665,10 +1678,10 @@ ROM_START(ip2800)
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("y226.u67", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u67", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("y225.u76", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6000)
@@ -1696,10 +1709,10 @@ ROM_START(ip6400)
 	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("flash.lsb", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("flash.lsb", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("flash.msb", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("flash.msb", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6700)
@@ -1711,10 +1724,10 @@ ROM_START(ip6700)
 	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("y226.u130", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("y225.u117", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 ROM_START(ip6800)
@@ -1726,21 +1739,21 @@ ROM_START(ip6800)
 	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
-	ROM_LOAD_OPTIONAL("y225.u117", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
+	ROM_LOAD("y226.u130", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))
 
 	ROM_REGION(0x20000, "flash_msb", 0)
-	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
+	ROM_LOAD("y225.u117", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
 }
 
-/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS                INIT        COMPANY        FULLNAME                    FLAGS */
-COMP( 1990,  ip2000,  0,      0,      ip2000,  0,     turquoise_state,     init_common,"Intergraph",  "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip2400,  0,      0,      ip2400,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 24x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2500,  0,      0,      ip2500,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 25x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2700,  0,      0,      ip2700,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 27x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1994,  ip2800,  0,      0,      ip2800,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 28x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1990,  ip6000,  0,      0,      ip6000,  0,     emerald_state,       init_common,"Intergraph",  "InterPro/InterServe 60x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip6400,  0,      0,      ip6400,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 64x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6700,  0,      0,      ip6700,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 67x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6800,  0,      0,      ip6800,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 68x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS                INIT         COMPANY        FULLNAME                    FLAGS
+COMP( 1990, ip2000, 0,      0,      ip2000,  0,     turquoise_state,     init_common, "Intergraph", "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992, ip2400, 0,      0,      ip2400,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 24x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip2500, 0,      0,      ip2500,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 25x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip2700, 0,      0,      ip2700,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 27x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1994, ip2800, 0,      0,      ip2800,  0,     cbus_sapphire_state, init_common, "Intergraph", "InterPro/InterServe 28x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1990, ip6000, 0,      0,      ip6000,  0,     emerald_state,       init_common, "Intergraph", "InterPro/InterServe 60x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992, ip6400, 0,      0,      ip6400,  0,     srx_sapphire_state,  init_common, "Intergraph", "InterPro/InterServe 64x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip6700, 0,      0,      ip6700,  0,     srx_sapphire_state,  init_common, "Intergraph", "InterPro/InterServe 67x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993, ip6800, 0,      0,      ip6800,  0,     srx_sapphire_state,  init_common, "Intergraph", "InterPro/InterServe 68x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

@@ -736,7 +736,7 @@ void fitfight_state::fitfight(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fitfight);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -760,7 +760,7 @@ void fitfight_state::bbprot(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prot);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);

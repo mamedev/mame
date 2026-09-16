@@ -21,7 +21,7 @@
 //  LOCALIZATION SUPPORT
 //**************************************************************************
 
-#define _(...) lang_translate(__VA_ARGS__)
+#define _(...) (::util::lang_translate(__VA_ARGS__))
 
 #define N_(msg) (msg)
 #define N_p(ctx, msg) (msg)
@@ -37,6 +37,20 @@ std::string_view lang_translate(std::string_view message);
 char const *lang_translate(char const *context, char const *message);
 std::string_view lang_translate(char const *context, std::string_view message);
 std::string_view lang_translate(std::string_view context, std::string_view message);
+
+// allow UTF-8 messages to be used as keys transparently
+inline char const *lang_translate(char8_t const *message)
+{ return lang_translate(reinterpret_cast<char const *>(message)); }
+inline std::string_view lang_translate(std::u8string_view message)
+{ return lang_translate(std::string_view(reinterpret_cast<char const *>(message.data()), message.size())); }
+
+// allow UTF-8 messages to be used as keys transparently (with context)
+inline char const *lang_translate(char const *context, char8_t const *message)
+{ return lang_translate(context, reinterpret_cast<char const *>(message)); }
+inline std::string_view lang_translate(char const *context, std::u8string_view message)
+{ return lang_translate(context, std::string_view(reinterpret_cast<char const *>(message.data()), message.size())); }
+inline std::string_view lang_translate(std::string_view context, std::u8string_view message)
+{ return lang_translate(context, std::string_view(reinterpret_cast<char const *>(message.data()), message.size())); }
 
 } // namespace util
 

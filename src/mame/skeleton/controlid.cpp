@@ -29,7 +29,7 @@
 //       .  0  OK  DOWN-ARROW
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "video/nt7534.h"
 #include "emupal.h"
 #include "screen.h"
@@ -48,7 +48,7 @@ public:
 	void controlidx628(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p0_w(uint8_t data);
@@ -59,7 +59,7 @@ private:
 	void p3_w(uint8_t data);
 	void controlidx628_palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<nt7534_device> m_lcdc;
 
@@ -84,7 +84,7 @@ void controlidx628_state::machine_start()
 * Memory map information *
 *************************/
 
-void controlidx628_state::io_map(address_map &map)
+void controlidx628_state::data_map(address_map &map)
 {
 	map(0x8000, 0xffff).ram();
 }
@@ -151,7 +151,7 @@ void controlidx628_state::controlidx628(machine_config &config)
 {
 	// basic machine hardware
 	at89s52_device &maincpu(AT89S52(config, "maincpu", XTAL(11'059'200)));
-	maincpu.set_addrmap(AS_IO, &controlidx628_state::io_map);
+	maincpu.set_addrmap(AS_DATA, &controlidx628_state::data_map);
 	maincpu.port_out_cb<0>().set(FUNC(controlidx628_state::p0_w));
 	maincpu.port_in_cb<1>().set(FUNC(controlidx628_state::p1_r));
 	maincpu.port_out_cb<1>().set(FUNC(controlidx628_state::p1_w));
@@ -160,7 +160,7 @@ void controlidx628_state::controlidx628(machine_config &config)
 	maincpu.port_out_cb<3>().set(FUNC(controlidx628_state::p3_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(132, 65);

@@ -124,13 +124,13 @@ INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
+ioport_value astrof_state::astrof_p1_controls_r()
 {
 	return ioport("P1")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
+ioport_value astrof_state::astrof_p2_controls_r()
 {
 	uint32_t ret;
 
@@ -146,7 +146,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
+ioport_value astrof_state::tomahawk_controls_r()
 {
 	uint32_t ret;
 
@@ -499,7 +499,6 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
 
-
 	/* the red background circuit is disabled */
 	m_red_on = false;
 
@@ -627,8 +626,8 @@ static INPUT_PORTS_START( astrof )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p1_controls_r)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p2_controls_r)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p1_controls_r))
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p2_controls_r))
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -661,7 +660,7 @@ static INPUT_PORTS_START( astrof )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -670,8 +669,8 @@ static INPUT_PORTS_START( astrof )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,service_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::service_coin_inserted), 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -682,8 +681,8 @@ static INPUT_PORTS_START( abattle )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p1_controls_r)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p2_controls_r)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p1_controls_r))
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p2_controls_r))
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -716,7 +715,7 @@ static INPUT_PORTS_START( abattle )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -725,8 +724,8 @@ static INPUT_PORTS_START( abattle )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,service_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::service_coin_inserted), 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -737,8 +736,8 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p1_controls_r)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p2_controls_r)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p1_controls_r))
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p2_controls_r))
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -768,7 +767,7 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_DIPSETTING(    0x20, "2500" )
 	PORT_DIPSETTING(    0x30, "3000" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW:7" )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -777,8 +776,8 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,service_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::service_coin_inserted), 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -788,8 +787,8 @@ static INPUT_PORTS_START( spfghmk22 )
 	PORT_START("IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p1_controls_r)
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, astrof_p2_controls_r)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p1_controls_r))
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::astrof_p2_controls_r))
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -823,7 +822,7 @@ static INPUT_PORTS_START( spfghmk22 )
 	PORT_DIPNAME( 0x40, 0x00, "Kill Saucer after Invaders" ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )              /* if saucer lands, game is over */
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -832,8 +831,8 @@ static INPUT_PORTS_START( spfghmk22 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,service_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::service_coin_inserted), 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -842,7 +841,7 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_INCLUDE( astrof_common )
 
 	PORT_START("IN")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(astrof_state, tomahawk_controls_r)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(astrof_state::tomahawk_controls_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -882,7 +881,7 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("CAB")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("SW:8")
@@ -891,8 +890,8 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, astrof_state,service_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::coin_inserted), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(astrof_state::service_coin_inserted), 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -923,8 +922,7 @@ void astrof_state::base(machine_config &config)
 	TIMER(config, "vblank").configure_scanline(FUNC(astrof_state::irq_callback), "screen", VBSTART, 0);
 
 	/* video hardware */
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 }
 
@@ -951,7 +949,6 @@ void astrof_state::abattle(machine_config &config)
 	astrof(config);
 
 	/* basic machine hardware */
-
 	MCFG_MACHINE_START_OVERRIDE(astrof_state,abattle)
 	MCFG_MACHINE_RESET_OVERRIDE(astrof_state,abattle)
 }
@@ -1049,6 +1046,20 @@ ROM_START( astrof3 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+// from an original Taito PCB with silkscreen
+ROM_START( astroft )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "as_19.bin",       0xd000, 0x0800, CRC(fa9e5607) SHA1(246a3591196939ecca9088f44035cceb4ee3531e) )
+	ROM_LOAD( "as_18.bin",       0xd800, 0x0800, CRC(1c104d3d) SHA1(20015808ad87421e90c0eac806bb39dee5226b51) )
+	ROM_LOAD( "as_17.bin",       0xe000, 0x0800, CRC(20dc4d50) SHA1(cfb3d98677f213e21593116db4804f965e6467f9) )
+	ROM_LOAD( "as_16.bin",       0xe800, 0x0800, CRC(4b488aa5) SHA1(fd5177b99215ec6bb73b0bb0cd0ef7745168636f) )
+	ROM_LOAD( "as_15.bin",       0xf000, 0x0800, CRC(47fbe257) SHA1(0aa01be624c701822463060a0be943d5b7788b38) )
+	ROM_LOAD( "as_14.bin",       0xf800, 0x0800, CRC(91476301) SHA1(2f47ab248538e5fe7462486f395072dec8af1012) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s288.bin",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
 // Famaresa "500" PCB set (500-001, 500-002, 500-003 and 500-004).
@@ -1481,27 +1492,28 @@ void astrof_state::init_asterion()
  *
  *************************************/
 
-GAME( 1979, astrof,    0,        astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 1)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astrof2,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 2)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astrof3,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",             "Astro Fighter (set 3)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",    "Astro Fighter (Famaresa bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, astroff2,  astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",    "Astro Fighter (Famaresa bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",      "Astro Battle (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)", "Astro Fire",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_asterion, ROT90, "bootleg? (Olympia)",    "Asterion",                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (newer, CB)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",               "Astro Combat (older, PZ)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",       "Astro Combat (unencrypted)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, acombat4,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg (Proel)",       "Astro Combat (encrypted)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof,    0,        astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",                "Astro Fighter (set 1)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof2,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",                "Astro Fighter (set 2)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astrof3,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East",                "Astro Fighter (set 3)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroft,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "Data East (Taito license)","Astro Fighter (Taito)",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroff,   astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",       "Astro Fighter (Famaresa bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, astroff2,  astrof,   astrof,   astrof,    astrof_state, empty_init,    ROT90, "bootleg (Famaresa)",       "Astro Fighter (Famaresa bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, abattle,   astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",         "Astro Battle (set 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, abattle2,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg? (Sidam)",         "Astro Battle (set 2)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, afire,     astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg (Rene Pierre)",    "Astro Fire",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, asterion,  astrof,   abattle,  abattle,   astrof_state, init_asterion, ROT90, "bootleg? (Olympia)",       "Asterion",                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat,   astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",                  "Astro Combat (newer, CB)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombato,  astrof,   abattle,  abattle,   astrof_state, init_afire,    ROT90, "bootleg",                  "Astro Combat (older, PZ)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat3,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (Proel)",          "Astro Combat (unencrypted)",              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, acombat4,  astrof,   abattle,  abattle,   astrof_state, init_abattle,  ROT90, "bootleg (Proel)",          "Astro Combat (encrypted)",                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, strfight,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (VGG)",         "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbtl, ROT90, "bootleg (SG-Florence)", "Super Star Battle",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, strfight,  astrof,   abattle,  abattle,   astrof_state, init_acombat3, ROT90, "bootleg (VGG)",            "Star Fighter (bootleg of Astro Fighter)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbtl, ROT90, "bootleg (SG-Florence)",    "Super Star Battle",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, spfghmk2,  0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spfghmk22, spfghmk2, spfghmk2, spfghmk22, astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spfghmk2,  0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",                "Space Fighter Mark II (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spfghmk22, spfghmk2, spfghmk2, spfghmk22, astrof_state, empty_init,    ROT90, "Data East",                "Space Fighter Mark II (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, satsf3d,   0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",             "Saturn: Space Fighter 3D",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, satsf3d,   0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",                "Saturn: Space Fighter 3D",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, tomahawk,  0,        tomahawk, tomahawk,  astrof_state, empty_init,    ROT90, "Data East",             "Tomahawk 777 (rev 5)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tomahawk1, tomahawk, tomahawk, tomahawk1, astrof_state, empty_init,    ROT90, "Data East",             "Tomahawk 777 (rev 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tomahawk,  0,        tomahawk, tomahawk,  astrof_state, empty_init,    ROT90, "Data East",                "Tomahawk 777 (rev 5)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tomahawk1, tomahawk, tomahawk, tomahawk1, astrof_state, empty_init,    ROT90, "Data East",                "Tomahawk 777 (rev 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

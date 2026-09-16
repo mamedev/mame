@@ -61,11 +61,11 @@ public:
 	void k2000(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void k2000_map(address_map &map);
-	void bank_map_1m(address_map &map);
+	void k2000_map(address_map &map) ATTR_COLD;
+	void bank_map_1m(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	// required_device<cpu_device> m_scanner;
@@ -368,8 +368,7 @@ void k2000_state::k2000(machine_config &config)
 
 	LM24014H(config, "lcd");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void k2000_state::k2000_palette(palette_device &palette) const

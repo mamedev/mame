@@ -3,6 +3,15 @@
 #include "emu.h"
 #include "flt_rc.h"
 
+#include <numbers>
+
+// enable this to display the filter cutoff upon being recalculated
+#define LOG_CALC        (1U << 1)
+
+#define LOG_ALL         (LOG_CALC)
+
+//#define VERBOSE         (LOG_GENERAL)
+#include "logmacro.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(FILTER_RC, filter_rc_device, "filter_rc", "RC Filter")
@@ -55,34 +64,32 @@ void filter_rc_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_rc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void filter_rc_device::sound_stream_update(sound_stream &stream)
 {
-	auto &src = inputs[0];
-	auto &dst = outputs[0];
-	stream_buffer::sample_t memory = m_memory;
+	sound_stream::sample_t memory = m_memory;
 
-	if (m_last_sample_rate != m_stream->sample_rate())
+	if (m_last_sample_rate != stream.sample_rate())
 	{
 		recalc();
-		m_last_sample_rate = m_stream->sample_rate();
+		m_last_sample_rate = stream.sample_rate();
 	}
 
 	switch (m_type)
 	{
 		case LOWPASS_3R:
 		case LOWPASS:
-			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+			for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 			{
-				memory += (src.get(sampindex) - memory) * m_k;
-				dst.put(sampindex, memory);
+				memory += (stream.get(0, sampindex) - memory) * m_k;
+				stream.put(0, sampindex, memory);
 			}
 			break;
 		case HIGHPASS:
 		case AC:
-			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+			for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 			{
-				dst.put(sampindex, src.get(sampindex) - memory);
-				memory += (src.get(sampindex) - memory) * m_k;
+				stream.put(0, sampindex, stream.get(0, sampindex) - memory);
+				memory += (stream.get(0, sampindex) - memory) * m_k;
 			}
 			break;
 	}
@@ -133,5 +140,6 @@ void filter_rc_device::recalc()
 
 	/* Cut Frequency = 1/(2*Pi*Req*C) */
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
+	LOGMASKED(LOG_CALC,"flt_rc: recalc(): cutoff frequency is now %f\n", 1.0 / (2.0 * std::numbers::pi * Req * m_C));
 	m_k = 1.0 - exp(-1 / (Req * m_C) / m_stream->sample_rate());
 }

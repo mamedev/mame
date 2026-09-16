@@ -6747,12 +6747,9 @@ namespace sol {
 		/// one.
 		///
 		/// \group emplace
-		template <class... Args>
-		T& emplace(Args&&... args) noexcept {
-			static_assert(std::is_constructible<T, Args&&...>::value, "T must be constructible with Args");
-
-			*this = nullopt;
-			this->construct(std::forward<Args>(args)...);
+		T& emplace(T& arg) noexcept {
+			m_value = &arg;
+			return **this;
 		}
 
 		/// Swaps this optional with the other.
@@ -19416,7 +19413,13 @@ namespace sol { namespace function_detail {
 		}
 
 		template <bool is_yielding, bool no_trampoline>
-		static int call(lua_State* L) noexcept(std::is_nothrow_copy_assignable_v<T>) {
+		static int call(lua_State* L)
+#if SOL_IS_ON(SOL_COMPILER_CLANG)
+		// apparent regression in clang 18 - llvm/llvm-project#91362
+#else
+			noexcept(std::is_nothrow_copy_assignable_v<T>)
+#endif
+		{
 			int nr;
 			if constexpr (no_trampoline) {
 				nr = real_call(L);
@@ -19456,7 +19459,13 @@ namespace sol { namespace function_detail {
 		}
 
 		template <bool is_yielding, bool no_trampoline>
-		static int call(lua_State* L) noexcept(std::is_nothrow_copy_assignable_v<T>) {
+		static int call(lua_State* L)
+#if SOL_IS_ON(SOL_COMPILER_CLANG)
+		// apparent regression in clang 18 - llvm/llvm-project#91362
+#else
+			noexcept(std::is_nothrow_copy_assignable_v<T>)
+#endif
+		{
 			int nr;
 			if constexpr (no_trampoline) {
 				nr = real_call(L);

@@ -71,7 +71,7 @@ public:
 	void beta(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint8_t riot_pa_r();
 	void riot_pa_w(uint8_t data);
@@ -83,7 +83,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(led_refresh);
 
-	void beta_mem(address_map &map);
+	void beta_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -159,7 +159,7 @@ static INPUT_PORTS_START( beta )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, beta_state, trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(beta_state::trigger_reset), 0)
 INPUT_PORTS_END
 
 /* M6532 Interface */
@@ -318,9 +318,6 @@ DEVICE_IMAGE_UNLOAD_MEMBER(beta_state::unload_beta_eprom)
 
 void beta_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	m_led_refresh_timer = timer_alloc(FUNC(beta_state::led_refresh), this);
 
 	m_eprom_rom.resize(0x800);

@@ -65,7 +65,7 @@ PAL frame timing
 */
 
 #include "emu.h"
-#include "video/315_5124.h"
+#include "315_5124.h"
 
 
 /****************************************************************************
@@ -125,7 +125,7 @@ static constexpr u8 line_315_5124[8] = { 24, 24, 26, 28 /* not verified */, 21, 
 static constexpr u8 line_315_5377[8] = { 26, 26, 27, 28 /* not verified */, 24, 28, 26, 62 };
 
 #define DISPLAY_DISABLED_HPOS 24 /* not verified, works if above 18 (for 'pstrike2') and below 25 (for 'fantdizzy') */
-#define DISPLAY_CB_HPOS       2  /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
+#define DISPLAY_CB_HPOS       14 /* fixes 'roadrash' (SMS game) title scrolling, due to line counter reload timing */
 
 #define DRAW_TIME_GG         111      /* 26 + 2 + 14 + 8 + 13 + 96/2 */
 #define DRAW_TIME_SMS         63      /* 26 + 2 + 14 + 8 + 13 */
@@ -257,7 +257,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_hcounter_divide(1)
 	, m_cram_size(cram_size)
 	, m_line_timing(line_timing)
@@ -2094,7 +2094,7 @@ void sega315_5124_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette_lut, FUNC(sega315_5124_device::sega315_5124_palette), SEGA315_5124_PALETTE_SIZE);
 
-	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 3)).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	SEGAPSG(config, m_snsnd, DERIVED_CLOCK(1, 3)).add_route(ALL_OUTPUTS, *this, 1.0, 0);
 }
 
 void sega315_5246_device::device_add_mconfig(machine_config &config)
@@ -2121,8 +2121,8 @@ void sega315_5377_device::device_add_mconfig(machine_config &config)
 	m_palette_lut->set_init(FUNC(sega315_5377_device::sega315_5377_palette));
 
 	GAMEGEAR(config.replace(), m_snsnd, DERIVED_CLOCK(1, 3));
-	m_snsnd->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_snsnd->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_snsnd->add_route(0, *this, 1.0, 0);
+	m_snsnd->add_route(1, *this, 1.0, 1);
 }
 
 //-------------------------------------------------

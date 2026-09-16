@@ -135,11 +135,6 @@ void _1942_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1942_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(0);
-
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(  6,   6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 void _1942p_state::video_start()
@@ -148,11 +143,6 @@ void _1942p_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1942_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(3);
-
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(  6,   6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 
@@ -162,20 +152,20 @@ void _1942p_state::video_start()
 
 ***************************************************************************/
 
-void _1942_state::_1942_fgvideoram_w(offs_t offset, uint8_t data)
+void _1942_state::fgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-void _1942_state::_1942_bgvideoram_w(offs_t offset, uint8_t data)
+void _1942_state::bgvideoram_w(offs_t offset, uint8_t data)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
 
 
-void _1942_state::_1942_palette_bank_w(uint8_t data)
+void _1942_state::palette_bank_w(uint8_t data)
 {
 	if (m_palette_bank != data)
 	{
@@ -184,14 +174,14 @@ void _1942_state::_1942_palette_bank_w(uint8_t data)
 	}
 }
 
-void _1942_state::_1942_scroll_w(offs_t offset, uint8_t data)
+void _1942_state::scroll_w(offs_t offset, uint8_t data)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
 
 
-void _1942_state::_1942_c804_w(uint8_t data)
+void _1942_state::control_w(uint8_t data)
 {
 	/* bit 7: flip screen
 	   bit 4: cpu B reset
@@ -235,7 +225,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		const rectangle cliprecty(cliprect.min_x, cliprect.max_x, y, y);
 		uint8_t objdata[4];
-		uint8_t v = flip_screen() ? ~(y - 1 - 6) : y - 1 - 6;
+		uint8_t v = flip_screen() ? ~(y - 1) : y - 1;
 		for (int h = 496; h >= 128; h -= 16)
 		{
 			const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
@@ -247,9 +237,9 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			for (int i = 0; i < 4; i++)
 				objdata[i] = m_spriteram[obj_idx | i];
 
-			int code = (objdata[0] & 0x7f) + ((objdata[1] & 0x20) << 2) + ((objdata[0] & 0x80) << 1);
+			int code = (objdata[0] & 0x7f) | (BIT(objdata[1], 5) << 7) | (BIT(objdata[0], 7) << 8);
 			int col = objdata[1] & 0x0f;
-			int sx = objdata[3] - 0x10 * (objdata[1] & 0x10);
+			int sx = objdata[3] - (BIT(objdata[1], 4) << 8);
 			int sy = objdata[2];
 			int dir = 1;
 
@@ -257,7 +247,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			uint8_t v2c = (uint8_t)(~v) + (flip_screen() ? 0x01 : 0xff);
 			uint8_t lvbeta = v2c + valpha;
 			uint8_t vbeta = ~lvbeta;
-			bool vleq = vbeta <= ((~valpha) & 0xff);
+			bool vleq = vbeta <= (~valpha & 0xff);
 			bool vinlen = true;
 			uint8_t vlen = objdata[1] >> 6;
 			switch (vlen & 3)
@@ -284,17 +274,14 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				dir = -1;
 			}
 
-			/* handle double / quadruple height */
-			int i = (objdata[1] & 0xc0) >> 6;
-			if (i == 2)
-				i = 3;
+			// draw sprite rows (16*16, 16*32, 16*64, or 16*256)
+			const int row = (vlen == 3) ? 16 : (1 << vlen);
+			code &= ~(row - 1);
 
 			if (!vinzone)
 			{
-				do
-				{
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx+128, sy + 6 + 16 * i * dir, 15);
-				} while (i-- > 0);
+				for (int i = 0; i < row; i++)
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
 			}
 		}
 	}
@@ -313,11 +300,9 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		int code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 3] & 0x20)
-					+ 2 * (m_spriteram[offs] & 0x80);
+		int code = (m_spriteram[offs] & 0x7f) | (BIT(m_spriteram[offs + 3], 5) << 7) | (BIT(m_spriteram[offs], 7) << 8);
 		int col = m_spriteram[offs + 3] & 0x0f;
-
-		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
+		int sx = m_spriteram[offs + 2] - (BIT(m_spriteram[offs + 3], 4) << 8);
 		int sy = m_spriteram[offs + 1];
 
 		if (flip_screen())
@@ -329,7 +314,6 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			sy = 240 - sy;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, col, flip_screen(), flip_screen(), sx+128, sy+6, 15);
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, col, flip_screen(), flip_screen(), sx, sy, 15);
 	}
-
 }

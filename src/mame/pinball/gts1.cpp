@@ -125,8 +125,8 @@ public:
 	void p2(machine_config &config); // multi-mode sound card
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 gts1_solenoid_r(offs_t offset);
@@ -143,9 +143,9 @@ private:
 	void gts1_do_w(u8 data);
 	void nvram_w();
 
-	void gts1_map(address_map &map);
-	void gts1_data(address_map &map);
-	void gts1_io(address_map &map);
+	void gts1_map(address_map &map) ATTR_COLD;
+	void gts1_data(address_map &map) ATTR_COLD;
+	void gts1_io(address_map &map) ATTR_COLD;
 
 	required_device<pps4_2_device> m_maincpu;
 	required_region_ptr<u8> m_pm;
@@ -394,10 +394,6 @@ INPUT_PORTS_END
 
 void gts1_state::machine_start()
 {
-	m_digit8.resolve();
-	m_digit7.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_nvram_addr));
 	save_item(NAME(m_nvram_data));
@@ -752,24 +748,24 @@ void gts1_state::p0(machine_config & config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* A1753CE 2048 x 8 ROM (000-7ff), 128 x 4 RAM (00-7f) and 16 I/O lines (20 ... 2f) */
-	ra17xx_device &u5(RA17XX(config, "u5", 0));
+	ra17xx_device &u5(RA17XX(config, "u5"));
 	u5.iord_cb().set(FUNC(gts1_state::gts1_switches_r));
 	u5.iowr_cb().set(FUNC(gts1_state::gts1_switches_w));
 	u5.set_cpu_tag(m_maincpu);
 
 	/* A1752CF 2048 x 8 ROM (800-fff), 128 x 4 RAM (80-ff) and 16 I/O lines (40 ... 4f) */
-	ra17xx_device &u4(RA17XX(config, "u4", 0));
+	ra17xx_device &u4(RA17XX(config, "u4"));
 	u4.iord_cb().set(FUNC(gts1_state::gts1_solenoid_r));
 	u4.iowr_cb().set(FUNC(gts1_state::gts1_solenoid_w));
 	u4.set_cpu_tag(m_maincpu);
 
 	/* 10696 General Purpose Input/Output */
-	r10696_device &u2(R10696(config, "u2", 0));
+	r10696_device &u2(R10696(config, "u2"));
 	u2.iord_cb().set(FUNC(gts1_state::gts1_nvram_r));
 	u2.iowr_cb().set(FUNC(gts1_state::gts1_nvram_w));
 
 	/* 10696 General Purpose Input/Output */
-	r10696_device &u3(R10696(config, "u3", 0));
+	r10696_device &u3(R10696(config, "u3"));
 	u3.iord_cb().set(FUNC(gts1_state::gts1_lamp_apm_r));
 	u3.iowr_cb().set(FUNC(gts1_state::gts1_lamp_apm_w));
 
@@ -801,8 +797,8 @@ void gts1_state::p2(machine_config &config)
 
 #define GTS1_BIOS \
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345) ) \
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
+	ROM_LOAD("a1752cf.u5", 0x0000, 0x0800, CRC(614a3bd9) SHA1(febca18fb6f96037ca82e515dd161dfcb0e4c776) ) \
+	ROM_LOAD("a1753ce.u4", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
 
 
 ROM_START( gts1 )
@@ -990,9 +986,7 @@ ROM_START(sinbad)
 ROM_END
 
 ROM_START(sinbadn)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("412no1.cpu", 0x0000, 0x0400, CRC(f5373f5f) SHA1(027840501416ff01b2adf07188c7d667adf3ad5f))
@@ -1074,13 +1068,13 @@ ROM_END
 } // Anonymous namespace
 
 GAME(1977,  gts1,     0,      p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                             MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(19??,  sys1test, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // chimes
 GAME(1977,  cleoptra, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  sinbad,   gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1978,  sinbadn,  sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  jokrpokr, gts1,   p0,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker (Gottlieb)",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // NE555 beeper
 GAME(1978,  dragon,   gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -1091,14 +1085,14 @@ GAME(1978,  charlies, gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gott
 GAME(1979,  pinpool,  gts1,   p1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // sound card
-GAME(1979,  totem,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  hulk,     gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979,  geniep,   gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  buckrgrs, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  torch,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  roldisco, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  astannie, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  totem,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  hulk,     gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  geniep,   gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  buckrgrs, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  torch,    gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  roldisco, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  astannie, gts1,   p2,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // other manufacturer
-GAME(1984,  sahalove, sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986,  hexagone, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1984,  sahalove, sinbad, p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986,  hexagone, gts1,   p0,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

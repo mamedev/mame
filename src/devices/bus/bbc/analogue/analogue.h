@@ -31,6 +31,7 @@
 
 #pragma once
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -49,25 +50,27 @@ public:
 	bbc_analogue_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
 		: bbc_analogue_slot_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	bbc_analogue_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	// callbacks
 	auto lpstb_handler() { return m_lpstb_handler.bind(); }
 
 	void lpstb_w(int state) { m_lpstb_handler(state); }
 
-	uint8_t ch_r(int channel);
+	uint16_t ch_r(offs_t channel);
 	uint8_t pb_r();
+	void pb_w(uint8_t data);
+
+	optional_device<screen_device> m_screen;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_analogue_interface *m_card;
 
@@ -81,13 +84,16 @@ private:
 class device_bbc_analogue_interface : public device_interface
 {
 public:
-	virtual uint8_t ch_r(int channel) { return 0x00; }
+	virtual uint16_t ch_r(offs_t channel) { return 0x00; }
 	virtual uint8_t pb_r() { return 0x30; }
+	virtual void pb_w(uint8_t data) { }
 
 protected:
 	device_bbc_analogue_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_analogue_slot_device *m_slot;
+	screen_device *screen() { return m_slot->m_screen; }
+
+	bbc_analogue_slot_device *const m_slot;
 };
 
 
@@ -95,5 +101,6 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device)
 
 void bbc_analogue_devices(device_slot_interface &device);
+void bbc_analogue_devices_no_lightpen(device_slot_interface &device);
 
 #endif // MAME_BUS_BBC_ANALOGUE_ANALOGUE_H

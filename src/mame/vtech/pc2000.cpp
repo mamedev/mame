@@ -68,8 +68,8 @@ public:
 	void gl2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t key_matrix_r(offs_t offset);
 	void key_matrix_w(uint8_t data);
@@ -81,11 +81,11 @@ protected:
 	void pc2000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pc2000_io(address_map &map);
-	void pc2000_mem(address_map &map);
+	void pc2000_io(address_map &map) ATTR_COLD;
+	void pc2000_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<hd44780_device> m_lcdc;
+	optional_device<hd44780_base_device> m_lcdc;
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beep;
 	required_device<generic_slot_device> m_cart;
@@ -117,16 +117,23 @@ public:
 	{ }
 
 	void gl3000s(machine_config &config);
+	void gl5000(machine_config &config);
 
 protected:
-	void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void gl3000s_io(address_map &map);
+	void gl3000s_io(address_map &map) ATTR_COLD;
+	void gl5000_io(address_map &map) ATTR_COLD;
 
 private:
-	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x);
+	int sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x, int max_y);
 	SED1520_UPDATE_CB(screen_update_right);
 	SED1520_UPDATE_CB(screen_update_left);
+	SED1520_UPDATE_CB(gl5000_screen_update_right);
+	SED1520_UPDATE_CB(gl5000_screen_update_left);
+
+	uint8_t rombank1_r();
+	uint8_t rombank2_r();
 
 	required_device<sed1520_device> m_lcdc_r;
 	required_device<sed1520_device> m_lcdc_l;
@@ -147,7 +154,7 @@ public:
 	void gl4000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	HD44780_PIXEL_UPDATE(gl4000_pixel_update);
 };
 
@@ -219,17 +226,6 @@ void pc2000_state::pc2000_io(address_map &map)
 }
 
 
-void gl3000s_state::machine_start()
-{
-	pc2000_state::machine_start();
-
-	m_lev_out.resolve();
-	m_try_out.resolve();
-	m_tick_out.resolve();
-	m_time_out.resolve();
-	m_points_out.resolve();
-}
-
 uint32_t gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0);
@@ -238,9 +234,9 @@ uint32_t gl3000s_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x)
+int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc, int start_x, int max_y)
 {
-	for (int y=0; y<2; y++)
+	for (int y=0; y<max_y; y++)
 	{
 		int row_pos = 0;
 		for (int x=0; x<61; x++)
@@ -264,7 +260,7 @@ int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &
 SED1520_UPDATE_CB(gl3000s_state::screen_update_right)
 {
 	if (lcd_on)
-		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119);
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119, 2);
 
 	bitmap.fill(0, cliprect);
 	return 0;
@@ -331,12 +327,29 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 	}
 
 	if (lcd_on)
-		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58);
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58, 2);
 
 	bitmap.fill(0, cliprect);
 	return 0;
 }
 
+SED1520_UPDATE_CB(gl3000s_state::gl5000_screen_update_left)
+{
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119, 4);
+
+	bitmap.fill(0, cliprect);
+	return 0;
+}
+
+SED1520_UPDATE_CB(gl3000s_state::gl5000_screen_update_right)
+{
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58, 4);
+
+	bitmap.fill(0, cliprect);
+	return 0;
+}
 
 void gl3000s_state::gl3000s_io(address_map &map)
 {
@@ -347,6 +360,24 @@ void gl3000s_state::gl3000s_io(address_map &map)
 	map(0x08, 0x09).rw(m_lcdc_r, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
 	map(0x0a, 0x0b).rw(m_lcdc_l, FUNC(sed1520_device::read), FUNC(sed1520_device::write));
 	map(0x10, 0x11).rw(FUNC(gl3000s_state::key_matrix_r), FUNC(gl3000s_state::key_matrix_w));
+}
+
+uint8_t gl3000s_state::rombank1_r()
+{
+	return m_bank1->entry();
+}
+
+uint8_t gl3000s_state::rombank2_r()
+{
+	return m_bank2->entry();
+}
+
+void gl3000s_state::gl5000_io(address_map &map)
+{
+	gl3000s_io(map);
+	map(0x01, 0x01).r(FUNC(gl3000s_state::rombank1_r));
+	map(0x03, 0x03).r(FUNC(gl3000s_state::rombank2_r));
+	map(0x12, 0x12).nopr(); // ?
 }
 
 /* Input ports */
@@ -544,7 +575,7 @@ static INPUT_PORTS_START( gl3000s )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_NAME("\xc3\x84")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR(U'Ä')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)
 
@@ -560,10 +591,10 @@ static INPUT_PORTS_START( gl3000s )
 
 	PORT_START("IN5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)  PORT_NAME("\xc3\x9f")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)  PORT_CHAR(U'ß')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_NAME("\xc3\x96")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR(U'Ö')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
@@ -572,7 +603,7 @@ static INPUT_PORTS_START( gl3000s )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_NAME("\xc3\x9c")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'Ü')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
@@ -598,7 +629,7 @@ static INPUT_PORTS_START( gl3000s )
 
 	PORT_START("IN9")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Textverarbeitung")   PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Buchstabenschl" "\xc3\xbc" "ssel")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Buchstabenschlüssel")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Bruch / Prozentrechnen") PORT_CODE(KEYCODE_DEL)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Subtraktion")        PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0xe1, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -619,7 +650,7 @@ static INPUT_PORTS_START( gl3000s )
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("INC")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Pr" "\xc3\xa4" "teritum")   PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Präteritum")   PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Synonyme")       PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tipp Dich Fit")  PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Super Schlau-Quiz")  PORT_CODE(KEYCODE_0_PAD)
@@ -633,16 +664,16 @@ static INPUT_PORTS_START( gl3000s )
 	PORT_BIT(0xe1, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("INE")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wortr" "\xc3\xa4" "tsel")       PORT_CODE(KEYCODE_F8)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Verdrehte S" "\xc3\xa4" "tze")  PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Blitz-S" "\xc3\xa4" "tze")      PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Worträtsel")       PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Verdrehte Sätze")  PORT_CODE(KEYCODE_F7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Blitz-Sätze")      PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Geschichte-Quiz")    PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0xe1, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("INF")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Verr" "\xc3\xbc" "ckte R" "\xc3\xa4" "tsel")  PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wortarten")                  PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wortschlange")               PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Verrückte Rätsel")  PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wortarten")           PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wortschlange")        PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Naturwissenschaften-Quiz")   PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0xe1, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
@@ -656,6 +687,18 @@ void pc2000_state::machine_start()
 	m_bank0->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank1->configure_entries(0, 0x10, bios, 0x4000);
 	m_bank2->configure_entries(0, 0x10, bios, 0x4000);
+	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
+}
+
+void gl3000s_state::machine_start()
+{
+	uint8_t *bios = memregion("bios")->base();
+	memory_region *cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
+	uint8_t *cart = (cart_region != nullptr) ? cart_region->base() : memregion("bios")->base();
+
+	m_bank0->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank1->configure_entries(0, 0x20, bios, 0x4000);
+	m_bank2->configure_entries(0, 0x20, bios, 0x4000);
 	m_bank2->configure_entries(0x80, 0x10, cart, 0x4000);
 }
 
@@ -722,12 +765,12 @@ void pc2000_state::pc2000gen(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(pc2000_state::irq0_line_hold), attotime::from_hz(50));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	m_screen->set_size(120, 18); //2x20 chars
-	m_screen->set_visarea(0, 120-1, 0, 18-1);
+	m_screen->set_visarea_full();
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(pc2000_state::pc2000_palette), 2);
@@ -745,14 +788,17 @@ void pc2000_state::pc2000gen(machine_config &config)
 void pc2000_state::pc2000(machine_config &config)
 {
 	pc2000gen(config);
-	HD44780(config, m_lcdc, 0);
+
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 }
 
 void pc2000_state::pc2000eur(machine_config &config)
 {
 	pc2000gen(config);
-	SED1278_0B(config, m_lcdc, 0);
+
+	SED1278(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
+	m_lcdc->set_default_bios_tag("0b");
 	m_lcdc->set_lcd_size(2, 20);
 }
 
@@ -792,7 +838,7 @@ void gl3000s_state::gl3000s(machine_config &config)
 	SED1520(config, "sed1520_r").set_screen_update_cb(FUNC(gl3000s_state::screen_update_right)); // right panel is 61 pixels (59-119)
 
 	m_screen->set_size(120, 24);
-	m_screen->set_visarea(0, 120-1, 0, 24-1);
+	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(gl3000s_state::screen_update));
 
 	config.set_default_layout(layout_gl3000s);
@@ -802,12 +848,26 @@ void gl3000s_state::gl3000s(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
+void gl3000s_state::gl5000(machine_config &config)
+{
+	gl3000s(config);
+
+	m_maincpu->set_addrmap(AS_IO, &gl3000s_state::gl5000_io);
+	m_maincpu->remove_periodic_int(); // IM 2 vectored, not understood yet
+
+	m_screen->set_size(120, 40);
+	m_screen->set_visarea_full();
+
+	subdevice<sed1520_device>("sed1520_l")->set_screen_update_cb(FUNC(gl3000s_state::gl5000_screen_update_left));
+	subdevice<sed1520_device>("sed1520_r")->set_screen_update_cb(FUNC(gl3000s_state::gl5000_screen_update_right));
+}
+
 void gl4004_state::gl4000(machine_config &config)
 {
 	pc2000(config);
 
 	m_screen->set_size(120, 36); // 4x20 chars
-	m_screen->set_visarea(0, 120-1, 0, 36-1);
+	m_screen->set_visarea_full();
 
 	m_lcdc->set_lcd_size(4, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(gl4004_state::gl4000_pixel_update));
@@ -887,18 +947,12 @@ ROM_START( lexipcm )
 	ROM_LOAD( "epoxy.u3", 0x00000, 0x100000, CRC(0a410790) SHA1(be04d5f74208a2f3b200daed75e04e966f64b545) )
 ROM_END
 
-ROM_START( primusex ) // Z84C0006PEC + 2x CP82C55A + V05040INS (?) with 80x48 pixel LCD
-	ROM_REGION( 0x80000, "bios", 0 )
-	ROM_LOAD( "mtrom.u11", 0x000000, 0x080000, CRC(b35f8e80) SHA1(aa79175f0e590201b62ba1c19492833064e69f71))
-ROM_END
-
-} // anonymous expert
+} // anonymous namespace
 
 
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT    CLASS         INIT        COMPANY                    FULLNAME                                  FLAGS
-COMP( 198?, primusex, 0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Yeno",                    "Primus Expert mit Stimme",               MACHINE_IS_SKELETON )
 COMP( 1993, pc2000,   0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
 COMP( 1993, pc2000s,  pc2000, 0,     pc2000eur, pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000 (Spain)",               MACHINE_NOT_WORKING )
 COMP( 1993, gl2000,   0,      0,     gl2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 2000",                     MACHINE_NOT_WORKING )
@@ -907,9 +961,9 @@ COMP( 1995, gl2000p,  gl2000, 0,     gl2000,    pc2000,  pc2000_state, empty_ini
 COMP( 1996, gl3000s,  0,      0,     gl3000s,   gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 3000S (Germany)",          MACHINE_NOT_WORKING )
 COMP( 1994, gl4000,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4000 Quadro (Germany)",    MACHINE_NOT_WORKING )
 COMP( 1996, gl4004,   0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader 4004 Quadro L (Germany)",  MACHINE_NOT_WORKING )
-COMP( 1997, gl5000,   0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_IS_SKELETON )
-COMP( 1997, gl5005x,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_IS_SKELETON )
-COMP( 1997, glpn,     0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_IS_SKELETON )
-COMP( 1998, gmtt ,    0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_IS_SKELETON )
-COMP( 2001, gbs5505x, 0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1999, lexipcm,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_IS_SKELETON )
+COMP( 1997, gl5000,   0,      0,     gl5000,    gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader 5000 (Germany)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1997, gl5005x,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius Leader 5005X (Germany)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1997, glpn,     0,      0,     gl5000,    gl3000s, gl3000s_state,empty_init, "Video Technology",        "Genius Leader Power Notebook (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1998, gmtt ,    0,      0,     gl4000,    pc2000,  gl4004_state, empty_init, "Video Technology",        "Genius Master Table Top (Germany)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2001, gbs5505x, 0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "Genius BrainStation 5505X (Germany)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1999, lexipcm,  0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Lexibook",                "LexiPC Mega 2000 (Germany)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

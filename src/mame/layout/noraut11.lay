@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca, Grull Osgo.
+
+  noraut/dphl 11 buttons-lamps
+  control panel
+
 -->
 <mamelayout version="2">
 	<element name="L0" defstate="0">
@@ -190,41 +195,40 @@ license:CC0-1.0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<element name="lamp0" ref="L0">
-			<bounds x="3.05" y="3.28" width="0.40" height="0.20" />
-		</element>
-		<element name="lamp1" ref="L1">
-			<bounds x="3.05" y="3.03" width="0.40" height="0.20" />
-		</element>
-
-		<element name="lamp2" ref="L2">
+		<element name="lamp2" ref="L2" inputtag="IN1" inputmask="0x04">
 			<bounds x="0.05" y="3.05" width="0.40" height="0.40" />
 		</element>
-		<element name="lamp3" ref="L3">
+		<element name="lamp3" ref="L3" inputtag="IN1" inputmask="0x08">
 			<bounds x="0.55" y="3.05" width="0.40" height="0.40" />
 		</element>
-		<element name="lamp4" ref="L4">
+		<element name="lamp4" ref="L4" inputtag="IN1" inputmask="0x10">
 			<bounds x="1.05" y="3.05" width="0.40" height="0.40" />
 		</element>
-		<element name="lamp5" ref="L5">
+		<element name="lamp5" ref="L5" inputtag="IN1" inputmask="0x20">
 			<bounds x="1.55" y="3.05" width="0.40" height="0.40" />
 		</element>
-		<element name="lamp6" ref="L6">
+		<element name="lamp6" ref="L6" inputtag="IN1" inputmask="0x40">
 			<bounds x="2.05" y="3.05" width="0.40" height="0.40" />
 		</element>
 
-
-		<element name="lamp8" ref="L8">
-			<bounds x="2.55" y="3.28" width="0.40" height="0.20" />
-		</element>
-		<element name="lamp9" ref="L9">
+		<element name="lamp9" ref="L9" inputtag="IN0" inputmask="0x02">
 			<bounds x="2.55" y="3.03" width="0.40" height="0.20" />
 		</element>
+		<element name="lamp8" ref="L8" inputtag="IN0" inputmask="0x01">
+			<bounds x="2.55" y="3.28" width="0.40" height="0.20" />
+		</element>
 
-		<element name="lamp10" ref="L10">
+		<element name="lamp1" ref="L1" inputtag="IN1" inputmask="0x02">
+			<bounds x="3.05" y="3.03" width="0.40" height="0.20" />
+		</element>
+		<element name="lamp0" ref="L0" inputtag="IN1" inputmask="0x01">
+			<bounds x="3.05" y="3.28" width="0.40" height="0.20" />
+		</element>
+
+		<element name="lamp10" ref="L10" inputtag="IN0" inputmask="0x20">
 			<bounds x="3.55" y="3.03" width="0.40" height="0.20" />
 		</element>
-		<element name="lamp11" ref="L11">
+		<element name="lamp11" ref="L11" inputtag="IN0" inputmask="0x40">
 			<bounds x="3.55" y="3.28" width="0.40" height="0.20" />
 		</element>
 

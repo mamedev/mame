@@ -65,7 +65,7 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include "osdcore.h" // osd_printf_*, little_endianize_int32
+#include "osdcore.h" // osd_printf_*
 
 #include <zlib.h>
 
@@ -101,8 +101,9 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 
 	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [ioerr, actual] = read_at(io, 0, &img[0], size);
+	if (ioerr || (actual != size))
+		return 0;
 
 	int err;
 	std::vector<uint8_t> gz_ptr(8);
@@ -126,7 +127,7 @@ int apd_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		err = inflateEnd(&d_stream);
 		if (err != Z_OK) return 0;
 
-		img = gz_ptr;
+		img = std::move(gz_ptr);
 	}
 
 	if (!memcmp(&img[0], APD_HEADER, sizeof(APD_HEADER))) {
@@ -143,8 +144,9 @@ bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		return false;
 
 	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [ioerr, actual] = read_at(io, 0, &img[0], size);
+	if (ioerr || (actual != size))
+		return false;
 
 	int err;
 	std::vector<uint8_t> gz_ptr;
@@ -184,9 +186,9 @@ bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	int data = 0x7d0;
 	for (int track = 0; track < 166; track++) {
-		uint32_t sdlen = little_endianize_int32(*(uint32_t *)(&img[(track * 12) + 8 + 0x0]));
-		uint32_t ddlen = little_endianize_int32(*(uint32_t *)(&img[(track * 12) + 8 + 0x4]));
-		uint32_t qdlen = little_endianize_int32(*(uint32_t *)(&img[(track * 12) + 8 + 0x8]));
+		uint32_t sdlen = get_u32le(&img[(track * 12) + 8 + 0x0]);
+		uint32_t ddlen = get_u32le(&img[(track * 12) + 8 + 0x4]);
+		uint32_t qdlen = get_u32le(&img[(track * 12) + 8 + 0x8]);
 
 		if (sdlen > 0) {
 			generate_track_from_bitstream(track / 2, track % 2, &img[data], sdlen, image);
@@ -204,11 +206,6 @@ bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	image.set_variant(floppy_image::DSDD);
 
 	return true;
-}
-
-bool apd_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const apd_format FLOPPY_APD_FORMAT;

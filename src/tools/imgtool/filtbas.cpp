@@ -32,7 +32,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : NULL)))
+#define EOLN (CRLF == 1 ? "\r" : (CRLF == 2 ? "\n" : (CRLF == 3 ? "\r\n" : nullptr)))
 
 
 
@@ -1033,58 +1033,58 @@ static const char *const basic_10[] = /* "BASIC 1.0" - supported by pet */
 	"LEFT$",          /* 0xc8 */
 	"RIGHT$",         /* 0xc9 */
 	"MID$",           /* 0xca */
-	NULL,               /* 0xcb */
-	NULL,               /* 0xcc */
-	NULL,               /* 0xcd */
-	NULL,               /* 0xce */
-	NULL,               /* 0xcf */
-	NULL,               /* 0xd0 */
-	NULL,               /* 0xd1 */
-	NULL,               /* 0xd2 */
-	NULL,               /* 0xd3 */
-	NULL,               /* 0xd4 */
-	NULL,               /* 0xd5 */
-	NULL,               /* 0xd6 */
-	NULL,               /* 0xd7 */
-	NULL,               /* 0xd8 */
-	NULL,               /* 0xd9 */
-	NULL,               /* 0xda */
-	NULL,               /* 0xdb */
-	NULL,               /* 0xdc */
-	NULL,               /* 0xdd */
-	NULL,               /* 0xde */
-	NULL,               /* 0xdf */
-	NULL,               /* 0xe0 */
-	NULL,               /* 0xe1 */
-	NULL,               /* 0xe2 */
-	NULL,               /* 0xe3 */
-	NULL,               /* 0xe4 */
-	NULL,               /* 0xe5 */
-	NULL,               /* 0xe6 */
-	NULL,               /* 0xe7 */
-	NULL,               /* 0xe8 */
-	NULL,               /* 0xe9 */
-	NULL,               /* 0xea */
-	NULL,               /* 0xeb */
-	NULL,               /* 0xec */
-	NULL,               /* 0xed */
-	NULL,               /* 0xee */
-	NULL,               /* 0xef */
-	NULL,               /* 0xf0 */
-	NULL,               /* 0xf1 */
-	NULL,               /* 0xf2 */
-	NULL,               /* 0xf3 */
-	NULL,               /* 0xf4 */
-	NULL,               /* 0xf5 */
-	NULL,               /* 0xf6 */
-	NULL,               /* 0xf7 */
-	NULL,               /* 0xf8 */
-	NULL,               /* 0xf9 */
-	NULL,               /* 0xfa */
-	NULL,               /* 0xfb */
-	NULL,               /* 0xfc */
-	NULL,               /* 0xfd */
-	NULL,               /* 0xfe */
+	nullptr,          /* 0xcb */
+	nullptr,          /* 0xcc */
+	nullptr,          /* 0xcd */
+	nullptr,          /* 0xce */
+	nullptr,          /* 0xcf */
+	nullptr,          /* 0xd0 */
+	nullptr,          /* 0xd1 */
+	nullptr,          /* 0xd2 */
+	nullptr,          /* 0xd3 */
+	nullptr,          /* 0xd4 */
+	nullptr,          /* 0xd5 */
+	nullptr,          /* 0xd6 */
+	nullptr,          /* 0xd7 */
+	nullptr,          /* 0xd8 */
+	nullptr,          /* 0xd9 */
+	nullptr,          /* 0xda */
+	nullptr,          /* 0xdb */
+	nullptr,          /* 0xdc */
+	nullptr,          /* 0xdd */
+	nullptr,          /* 0xde */
+	nullptr,          /* 0xdf */
+	nullptr,          /* 0xe0 */
+	nullptr,          /* 0xe1 */
+	nullptr,          /* 0xe2 */
+	nullptr,          /* 0xe3 */
+	nullptr,          /* 0xe4 */
+	nullptr,          /* 0xe5 */
+	nullptr,          /* 0xe6 */
+	nullptr,          /* 0xe7 */
+	nullptr,          /* 0xe8 */
+	nullptr,          /* 0xe9 */
+	nullptr,          /* 0xea */
+	nullptr,          /* 0xeb */
+	nullptr,          /* 0xec */
+	nullptr,          /* 0xed */
+	nullptr,          /* 0xee */
+	nullptr,          /* 0xef */
+	nullptr,          /* 0xf0 */
+	nullptr,          /* 0xf1 */
+	nullptr,          /* 0xf2 */
+	nullptr,          /* 0xf3 */
+	nullptr,          /* 0xf4 */
+	nullptr,          /* 0xf5 */
+	nullptr,          /* 0xf6 */
+	nullptr,          /* 0xf7 */
+	nullptr,          /* 0xf8 */
+	nullptr,          /* 0xf9 */
+	nullptr,          /* 0xfa */
+	nullptr,          /* 0xfb */
+	nullptr,          /* 0xfc */
+	nullptr,          /* 0xfd */
+	nullptr,          /* 0xfe */
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
@@ -1166,57 +1166,57 @@ static const char *const basic_20[] = /* "BASIC 2.0" - supported by vic20 & clon
 	"RIGHT$",         /* 0xc9 */
 	"MID$",           /* 0xca */
 	"GO",             /* 0xcb */
-	NULL,               /* 0xcc */
-	NULL,               /* 0xcd */
-	NULL,               /* 0xce */
-	NULL,               /* 0xcf */
-	NULL,               /* 0xd0 */
-	NULL,               /* 0xd1 */
-	NULL,               /* 0xd2 */
-	NULL,               /* 0xd3 */
-	NULL,               /* 0xd4 */
-	NULL,               /* 0xd5 */
-	NULL,               /* 0xd6 */
-	NULL,               /* 0xd7 */
-	NULL,               /* 0xd8 */
-	NULL,               /* 0xd9 */
-	NULL,               /* 0xda */
-	NULL,               /* 0xdb */
-	NULL,               /* 0xdc */
-	NULL,               /* 0xdd */
-	NULL,               /* 0xde */
-	NULL,               /* 0xdf */
-	NULL,               /* 0xe0 */
-	NULL,               /* 0xe1 */
-	NULL,               /* 0xe2 */
-	NULL,               /* 0xe3 */
-	NULL,               /* 0xe4 */
-	NULL,               /* 0xe5 */
-	NULL,               /* 0xe6 */
-	NULL,               /* 0xe7 */
-	NULL,               /* 0xe8 */
-	NULL,               /* 0xe9 */
-	NULL,               /* 0xea */
-	NULL,               /* 0xeb */
-	NULL,               /* 0xec */
-	NULL,               /* 0xed */
-	NULL,               /* 0xee */
-	NULL,               /* 0xef */
-	NULL,               /* 0xf0 */
-	NULL,               /* 0xf1 */
-	NULL,               /* 0xf2 */
-	NULL,               /* 0xf3 */
-	NULL,               /* 0xf4 */
-	NULL,               /* 0xf5 */
-	NULL,               /* 0xf6 */
-	NULL,               /* 0xf7 */
-	NULL,               /* 0xf8 */
-	NULL,               /* 0xf9 */
-	NULL,               /* 0xfa */
-	NULL,               /* 0xfb */
-	NULL,               /* 0xfc */
-	NULL,               /* 0xfd */
-	NULL,               /* 0xfe */
+	nullptr,          /* 0xcc */
+	nullptr,          /* 0xcd */
+	nullptr,          /* 0xce */
+	nullptr,          /* 0xcf */
+	nullptr,          /* 0xd0 */
+	nullptr,          /* 0xd1 */
+	nullptr,          /* 0xd2 */
+	nullptr,          /* 0xd3 */
+	nullptr,          /* 0xd4 */
+	nullptr,          /* 0xd5 */
+	nullptr,          /* 0xd6 */
+	nullptr,          /* 0xd7 */
+	nullptr,          /* 0xd8 */
+	nullptr,          /* 0xd9 */
+	nullptr,          /* 0xda */
+	nullptr,          /* 0xdb */
+	nullptr,          /* 0xdc */
+	nullptr,          /* 0xdd */
+	nullptr,          /* 0xde */
+	nullptr,          /* 0xdf */
+	nullptr,          /* 0xe0 */
+	nullptr,          /* 0xe1 */
+	nullptr,          /* 0xe2 */
+	nullptr,          /* 0xe3 */
+	nullptr,          /* 0xe4 */
+	nullptr,          /* 0xe5 */
+	nullptr,          /* 0xe6 */
+	nullptr,          /* 0xe7 */
+	nullptr,          /* 0xe8 */
+	nullptr,          /* 0xe9 */
+	nullptr,          /* 0xea */
+	nullptr,          /* 0xeb */
+	nullptr,          /* 0xec */
+	nullptr,          /* 0xed */
+	nullptr,          /* 0xee */
+	nullptr,          /* 0xef */
+	nullptr,          /* 0xf0 */
+	nullptr,          /* 0xf1 */
+	nullptr,          /* 0xf2 */
+	nullptr,          /* 0xf3 */
+	nullptr,          /* 0xf4 */
+	nullptr,          /* 0xf5 */
+	nullptr,          /* 0xf6 */
+	nullptr,          /* 0xf7 */
+	nullptr,          /* 0xf8 */
+	nullptr,          /* 0xf9 */
+	nullptr,          /* 0xfa */
+	nullptr,          /* 0xfb */
+	nullptr,          /* 0xfc */
+	nullptr,          /* 0xfd */
+	nullptr,          /* 0xfe */
 	"{PI}"            /* 0xff - A single character shaped as greek lowercase 'PI' */
 };
 
@@ -2971,7 +2971,7 @@ static imgtoolerr_t cocobas_writefile(imgtool::partition &partition, const char 
 	return basic_writefile(&cocobas_tokens, partition, filename, fork, sourcef, opts);
 }
 
-void filter_cocobas_getinfo(uint32_t state, union filterinfo *info)
+void filter_cocobas_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch(state)
 	{
@@ -3017,7 +3017,7 @@ static imgtoolerr_t dragonbas_writefile(imgtool::partition &partition, const cha
 	return basic_writefile(&dragonbas_tokens, partition, filename, fork, sourcef, opts);
 }
 
-void filter_dragonbas_getinfo(uint32_t state, union filterinfo *info)
+void filter_dragonbas_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch(state)
 	{
@@ -3064,7 +3064,7 @@ static imgtoolerr_t vzbas_writefile(imgtool::partition &partition, const char *f
 	return basic_writefile(&vzbas_tokens, partition, filename, fork, sourcef, opts);
 }
 
-void filter_vzbas_getinfo(uint32_t state, union filterinfo *info)
+void filter_vzbas_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch(state)
 	{
@@ -3110,7 +3110,7 @@ static imgtoolerr_t bml3bas_writefile(imgtool::partition &partition, const char 
 	return basic_writefile(&bml3bas_tokens, partition, filename, fork, sourcef, opts);
 }
 
-void filter_bml3bas_getinfo(uint32_t state, union filterinfo *info)
+void filter_bml3bas_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch(state)
 	{

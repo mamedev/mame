@@ -36,9 +36,12 @@
 #include "emu.h"
 #include "8lc.h"
 
+#include "video/tms34061.h"
+
 #include "emupal.h"
 #include "screen.h"
-#include "video/tms34061.h"
+
+#include "endianness.h"
 
 #define LOG_REGISTERS (1U << 1)
 #define LOG_RAMDAC (1U << 2)
@@ -66,13 +69,13 @@ protected:
 	required_ioport m_monitor_config;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	u32 registers_r(offs_t offset, u32 mem_mask);
 	void registers_w(offs_t offset, u32 data, u32 mem_mask);
@@ -105,13 +108,13 @@ INPUT_PORTS_END
 
 void lcpds_cv8lc_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(80'000'000, 1312, 0, 1024, 802, 0, 768);
 	m_screen->set_screen_update(FUNC(lcpds_cv8lc_device::screen_update));
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(10); // VRAM address is (row << rowshift) | col
 	m_tms34061->set_vram_size(0xc0000);
 	m_tms34061->set_screen(m_screen);
@@ -132,12 +135,12 @@ ioport_constructor lcpds_cv8lc_device::device_input_ports() const
 //  LIVE DEVICE
 //**************************************************************************
 
-lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	lcpds_cv8lc_device(mconfig, PDSLC_COLORVUE8LC, tag, owner, clock)
 {
 }
 
-lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+lcpds_cv8lc_device::lcpds_cv8lc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_tms34061(*this, "tms34061"),
@@ -193,9 +196,9 @@ void lcpds_cv8lc_device::device_reset()
 	m_display_enable = 0;
 }
 
-uint32_t lcpds_cv8lc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 lcpds_cv8lc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]);
+	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
 	const pen_t *pens = m_palette->pens();
 
 	m_tms34061->get_display_state();
@@ -349,7 +352,7 @@ void lcpds_cv8lc_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 			if ((m_hres != 0) && (m_vres != 0) && (m_htotal != 0) && (m_vtotal != 0))
 			{
 				rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-				m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+				m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 			}
 		}
 	}

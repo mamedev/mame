@@ -58,13 +58,13 @@ protected:
 	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -97,8 +97,8 @@ private:
 	void _8a_w(uint8_t data);
 	uint8_t _9a_r(offs_t offset);
 
-	void luxor_55_21046_io(address_map &map);
-	void luxor_55_21046_mem(address_map &map);
+	void luxor_55_21046_io(address_map &map) ATTR_COLD;
+	void luxor_55_21046_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
@@ -129,8 +129,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -144,8 +144,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -159,8 +159,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -174,8 +174,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 
@@ -189,8 +189,8 @@ public:
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 

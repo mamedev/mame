@@ -251,7 +251,6 @@ FS 0 to F
 #include "machine/input_merger.h"
 #include "machine/mc14411.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "video/pwm.h"
 
 // MEK68R2
@@ -338,8 +337,8 @@ private:
 	int stop_pia_cb1_r();
 	void stop_pia_cb2_w(int state);
 
-	void mekd4_stop_mem(address_map &map);
-	void mekd4_mem(address_map &map);
+	void mekd4_stop_mem(address_map &map) ATTR_COLD;
+	void mekd4_mem(address_map &map) ATTR_COLD;
 
 	address_space *m_banked_space;
 
@@ -351,8 +350,8 @@ private:
 	uint8_t m_ram_page; // aka RAP0, RAP1, RAP2
 	uint8_t m_segment;
 	uint8_t m_digit;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<pia6821_device> m_stop_pia;
@@ -473,17 +472,17 @@ static INPUT_PORTS_START(mekd4)
 	// jumpered to logical low if not driven by the RS232 device. There is
 	// +12 and -12V available at this connector for this purpose.
 	PORT_START("RS232_CTS_ROUTE")
-	PORT_CONFNAME(0x1, 0, "RS232 CTS") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, rs232_cts_route_change, 0)
+	PORT_CONFNAME(0x1, 0, "RS232 CTS") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::rs232_cts_route_change), 0)
 	PORT_CONFSETTING(0, "Jumper low")
 	PORT_CONFSETTING(1, "Pass through")
 	PORT_START("RS232_DCD_ROUTE")
-	PORT_CONFNAME(0x1, 0, "RS232 DCD") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, rs232_dcd_route_change, 0)
+	PORT_CONFNAME(0x1, 0, "RS232 DCD") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::rs232_dcd_route_change), 0)
 	PORT_CONFSETTING(0, "Jumper low")
 	PORT_CONFSETTING(1, "Pass through")
 
 	// RESET is not wired to the key matrix.
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RS") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, mekd4_state, reset_key_w)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("RS") PORT_WRITE_LINE_MEMBER(FUNC(mekd4_state::reset_key_w))
 
 	// PORT_CODEs are not assigned to the keypad to allow it on screen at
 	// the same time as the terminal or CRT console which also receive
@@ -492,36 +491,36 @@ static INPUT_PORTS_START(mekd4)
 	// machine. If MAME someday allows the keyboard input focus to be
 	// switched then this might be redesigned.
 	PORT_START("COL0")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("M")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("FS")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("7")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("4")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("0")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("M")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("FS")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("0")
 
 	PORT_START("COL1")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("EX")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("FC")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("8")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("5")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("F")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("EX")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("FC")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("8")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("5")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("F")
 
 	PORT_START("COL2")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("RD")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("P/L")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("9")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("6")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("E")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("RD")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("P/L")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("9")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("6")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("E")
 
 	PORT_START("COL3")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("GO")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("T/B")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("A")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("B")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("C")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd4_state, keypad_changed, 0) PORT_NAME("D")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("GO")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("T/B")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("A")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("B")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("C")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mekd4_state::keypad_changed), 0) PORT_NAME("D")
 
 	// MEK68R2
 
@@ -960,7 +959,7 @@ void mekd4_state::mekd4(machine_config &config)
 	MC6809(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mekd4_state::mekd4_stop_mem);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);
@@ -982,7 +981,7 @@ void mekd4_state::mekd4(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// IRQ is not connected. RTS, CTS, and DCD are available.
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
@@ -1024,7 +1023,7 @@ void mekd4_state::mekd4(machine_config &config)
 
 	// MEK68R2
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
 	m_screen->set_refresh_hz(50);
 	m_screen->set_size(80 * 8 + 80 * 10, 20 * 12 + 100);
@@ -1052,7 +1051,7 @@ void mekd4_state::mekd4(machine_config &config)
 	m_r2_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_r2_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(mekd4_state::kbd_put));
 }
 

@@ -113,6 +113,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -136,8 +138,8 @@ public:
 	void beathead(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -182,13 +184,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-// video
 
 /*************************************
  *
@@ -357,8 +357,6 @@ uint32_t beathead_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -594,7 +592,7 @@ void beathead_state::beathead(machine_config &config)
 	TIMER(config, m_scan_timer).configure_generic(FUNC(beathead_state::scanline_callback));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(beathead_state::screen_update));
@@ -609,7 +607,7 @@ void beathead_state::beathead(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
 }

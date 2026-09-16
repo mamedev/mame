@@ -45,8 +45,8 @@ public:
 	void fs3216(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(crt_update_row);
@@ -78,11 +78,11 @@ private:
 	u8 fdc_ram_r(offs_t offset);
 	void fdc_ram_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
-	void clb_map(address_map &map);
-	void fc7_map(address_map &map);
-	void wdcpu_prog_map(address_map &map);
-	void wdcpu_bank_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void clb_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
+	void wdcpu_prog_map(address_map &map) ATTR_COLD;
+	void wdcpu_bank_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_clb;
@@ -505,7 +505,7 @@ void fs3216_state::fs3216(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(14.58_MHz_XTAL, 900, 0, 720, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
@@ -566,4 +566,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1982, fs3216, 0, 0, fs3216, fs3216, fs3216_state, empty_init, "Fortune Systems", "Fortune 32:16", MACHINE_IS_SKELETON)
+COMP(1982, fs3216, 0, 0, fs3216, fs3216, fs3216_state, empty_init, "Fortune Systems", "Fortune 32:16", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

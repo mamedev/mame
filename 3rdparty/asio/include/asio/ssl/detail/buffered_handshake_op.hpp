@@ -2,7 +2,7 @@
 // ssl/detail/buffered_handshake_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 namespace detail {
 
@@ -29,7 +30,7 @@ template <typename ConstBufferSequence>
 class buffered_handshake_op
 {
 public:
-  static ASIO_CONSTEXPR const char* tracking_name()
+  static constexpr const char* tracking_name()
   {
     return "ssl::stream<>::async_buffered_handshake";
   }
@@ -51,12 +52,16 @@ public:
         asio::buffer_sequence_end(buffers_));
   }
 
+  void complete_sync(asio::error_code&) const
+  {
+  }
+
   template <typename Handler>
   void call_handler(Handler& handler,
       const asio::error_code& ec,
       const std::size_t& bytes_transferred) const
   {
-    ASIO_MOVE_OR_LVALUE(Handler)(handler)(ec, bytes_transferred);
+    static_cast<Handler&&>(handler)(ec, bytes_transferred);
   }
 
 private:
@@ -112,6 +117,7 @@ private:
 
 } // namespace detail
 } // namespace ssl
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

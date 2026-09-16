@@ -5,6 +5,7 @@
 Mephisto Risc 1MB/II (stylized "risc")
 
 The chess engine in Mephisto Risc is also compatible with Tasc's The ChessMachine,
+it is more or less equivalent to Gideon 3.0 (Risc 1MB) and Gideon 3.1 (Risc II),
 see ROM defs for details. "Main" CPU is slow, but all the chess calculations are
 done with the ARM.
 
@@ -19,10 +20,10 @@ Hardware notes:
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay2.h"
+#include "mboard.h"
+#include "mdisplay2.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/74259.h"
 #include "machine/chessmachine.h"
 #include "machine/nvram.h"
@@ -36,18 +37,18 @@ namespace {
 class risc_state : public driver_device
 {
 public:
-	risc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_chessm(*this, "chessm")
-		, m_rombank(*this, "rombank")
-		, m_keys(*this, "KEY")
+	risc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_chessm(*this, "chessm"),
+		m_rombank(*this, "rombank"),
+		m_keys(*this, "KEY")
 	{ }
 
 	void mrisc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -55,7 +56,7 @@ private:
 	required_memory_bank m_rombank;
 	required_ioport m_keys;
 
-	void mrisc_mem(address_map &map);
+	void mrisc_mem(address_map &map) ATTR_COLD;
 
 	u8 keys_r(offs_t offset);
 	u8 chessm_r();
@@ -128,14 +129,11 @@ static INPUT_PORTS_START( mrisc )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("TRN / Pawn")      PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO / Knight")   PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM / Bishop")    PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / Rook")      PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / Rook")      PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("LEV / Queen")     PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("FCT / King")      PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL / New Game")   PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
 INPUT_PORTS_END
 
 
@@ -147,7 +145,7 @@ INPUT_PORTS_END
 void risc_state::mrisc(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
+	G65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc_state::mrisc_mem);
 
 	const attotime irq_period = attotime::from_hz(10_MHz_XTAL / 0x4000);
@@ -180,14 +178,21 @@ void risc_state::mrisc(machine_config &config)
 ROM_START( mrisc )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c74f, concatenate those sections and make a .bin file,
-	// then it will work on ChessMachine software. It identifies as R E B E L ver. HG-021 03-04-92
-	ROM_LOAD("meph-risci-v1-2.bin", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5) )
+	// then it will work on ChessMachine software. It identifies as R E B E L version HG-021, 03-04-92
+	ROM_LOAD("meph-risci-v1-2", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5) )
+ROM_END
+
+ROM_START( mrisca )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c6db, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L version HG-020, 14-03-92
+	ROM_LOAD("risc_1mb_rebel", 0x00000, 0x20000, CRC(f00b43ab) SHA1(8e9f3c99331b104af2008db1f0538ebaa97bc1e9) )
 ROM_END
 
 ROM_START( mrisc2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1cb7f, concatenate those sections and make a .bin file,
-	// then it will work on ChessMachine software. It identifies as R E B E L ver. 2.31 22-07-93, world champion Madrid 1992
+	// then it will work on ChessMachine software. It identifies as R E B E L version 2.31, 22-07-93, world champion Madrid 1992
 	ROM_LOAD("risc_2.31", 0x00000, 0x20000, CRC(9ecf9cd3) SHA1(7bfc628183037a172242c9589f15aca218d8fb12) )
 ROM_END
 
@@ -200,5 +205,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB (v1.2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, mrisca,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB (v1.0)", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1994, mrisc2,  0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II", MACHINE_SUPPORTS_SAVE )

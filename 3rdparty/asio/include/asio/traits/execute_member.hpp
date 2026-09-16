@@ -2,7 +2,7 @@
 // traits/execute_member.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,17 +18,14 @@
 #include "asio/detail/config.hpp"
 #include "asio/detail/type_traits.hpp"
 
-#if defined(ASIO_HAS_DECLTYPE) \
-  && defined(ASIO_HAS_NOEXCEPT) \
-  && defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#if defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 # define ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT 1
-#endif // defined(ASIO_HAS_DECLTYPE)
-       //   && defined(ASIO_HAS_NOEXCEPT)
-       //   && defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+#endif // defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace traits {
 
 template <typename T, typename F, typename = void>
@@ -42,8 +39,8 @@ namespace detail {
 
 struct no_execute_member
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = false);
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = false);
+  static constexpr bool is_valid = false;
+  static constexpr bool is_noexcept = false;
 };
 
 #if defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
@@ -55,31 +52,31 @@ struct execute_member_trait : no_execute_member
 
 template <typename T, typename F>
 struct execute_member_trait<T, F,
-  typename void_type<
+  void_t<
     decltype(declval<T>().execute(declval<F>()))
-  >::type>
+  >>
 {
-  ASIO_STATIC_CONSTEXPR(bool, is_valid = true);
+  static constexpr bool is_valid = true;
 
   using result_type = decltype(
     declval<T>().execute(declval<F>()));
 
-  ASIO_STATIC_CONSTEXPR(bool, is_noexcept = noexcept(
-    declval<T>().execute(declval<F>())));
+  static constexpr bool is_noexcept =
+    noexcept(declval<T>().execute(declval<F>()));
 };
 
 #else // defined(ASIO_HAS_DEDUCED_EXECUTE_MEMBER_TRAIT)
 
 template <typename T, typename F, typename = void>
 struct execute_member_trait :
-  conditional<
-    is_same<T, typename decay<T>::type>::value
-      && is_same<F, typename decay<F>::type>::value,
+  conditional_t<
+    is_same<T, decay_t<T>>::value
+      && is_same<F, decay_t<F>>::value,
     no_execute_member,
     traits::execute_member<
-      typename decay<T>::type,
-      typename decay<F>::type>
-  >::type
+      decay_t<T>,
+      decay_t<F>>
+  >
 {
 };
 
@@ -101,6 +98,7 @@ struct execute_member :
 };
 
 } // namespace traits
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

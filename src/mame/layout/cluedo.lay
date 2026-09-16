@@ -1,0 +1,1248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+license: CC0-1.0
+-->
+<mamelayout version="2">
+
+	<!-- undefined lamp - used for lamps with undefined locations and purposes -->
+	<element name="undefined_lamp">
+		<disk state="1"><color red="1.0" green="1.0" blue="0.2" /></disk>
+		<disk state="0"><color red="0.1" green="0.1" blue="0.0" /></disk>
+	</element>
+
+	<!-- Cluedo? sign -->
+	<element name="space_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+	</element>
+	<element name="c_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="C">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="l_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="l">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="u_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="u">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="e_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="e">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="d_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="d">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="o_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="o">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="question_mark_char">
+		<rect state="1"><color red="1.00" green="0.87" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.43" blue="0.00" /></rect>
+		<text string="?">
+			<color red="0.45" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+
+	<!-- Accusation lamps -->
+	<element name="suspect_accusation">
+		<text string="SUSPECT" state="1">
+			<color red="1.00" green="0.00" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="SUSPECT" state="0">
+			<color red="0.10" green="0.00" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="murderer">
+		<text string="MURDERER" state="1">
+			<color red="1.00" green="0.00" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="MURDERER" state="0">
+			<color red="0.10" green="0.00" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="weapon_accusation">
+		<text string="WEAPON" state="1">
+			<color red="1.00" green="0.92" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="WEAPON" state="0">
+			<color red="0.05" green="0.04" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="room_accusation">
+		<text string="ROOM" state="1">
+			<color red="0.00" green="0.63" blue="0.87" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="ROOM" state="0">
+			<color red="0.00" green="0.03" blue="0.04" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="murdered">
+		<text string="MURDERED" state="1">
+			<color red="0.80" green="0.00" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+				</text>
+		<text string="MURDERED" state="0">
+			<color red="0.05" green="0.00" blue="0.00" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+				</text>
+	</element>
+	<element name="next_accusation_arrow">
+		<text string="&#x2192;" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+		<text string="&#x2192;" state="0">
+			<color red="0.05" green="0.03" blue="0.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="murder_cards">
+		<text string="MURDER CARDS" state="1">
+			<color red="0.13" green="0.61" blue="0.32" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="MURDER CARDS" state="0">
+			<color red="0.01" green="0.03" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="pays_double">
+		<text string="PAYS DOUBLE" state="1">
+			<color red="1.00" green="0.00" blue="0.17" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="PAYS DOUBLE" state="0">
+			<color red="0.05" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="1pound_award">
+		<text string="&#xA3;1" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="&#xA3;1" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="2pound_award">
+		<text string="&#xA3;2" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="&#xA3;2" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="4pound_award">
+		<text string="&#xA3;4" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="&#xA3;4" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="6pound_award">
+		<text string="&#xA3;6" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="&#xA3;6" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="8pound_award">
+		<text string="&#xA3;8" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="&#xA3;8" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="10pound_award">
+		<text string="&#xA3;10" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="&#xA3;10" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+
+	<element name="super">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.00" green="0.10" blue="0.00" /></rect>
+		<text string="SUPER">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="try_again">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.00" green="0.10" blue="0.00" /></rect>
+		<text string="TRY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="AGAIN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<!-- Token Spaces -->
+	<element name="rev_green_token">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="130" height="170">
+				<!-- body -->
+				<path d="M10 160  L120 160  L75 110  L75 65  L55 65  L55 110  Z" fill="#088442" stroke="#000000" stroke-width="2" />
+				<!-- head -->
+				<circle cx="65" cy="40" r="30" fill="#088442" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+	<element name="mrs_peacock_token">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="130" height="170">
+				<!-- body -->
+				<path d="M10 160  L120 160  L75 110  L75 65  L55 65  L55 110  Z" fill="#00a0dd" stroke="#000000" stroke-width="2" />
+				<!-- head -->
+				<circle cx="65" cy="40" r="30" fill="#00a0dd" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+	<element name="prof_plum_token">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="130" height="170">
+				<!-- body -->
+				<path d="M10 160  L120 160  L75 110  L75 65  L55 65  L55 110  Z" fill="#c50067" stroke="#000000" stroke-width="2" />
+				<!-- head -->
+				<circle cx="65" cy="40" r="30" fill="#c50067" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+	<element name="miss_scarlett_token">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="130" height="170">
+				<!-- body -->
+				<path d="M10 160  L120 160  L75 110  L75 65  L55 65  L55 110  Z" fill="#c60021" stroke="#000000" stroke-width="2" />
+				<!-- head -->
+				<circle cx="65" cy="40" r="30" fill="#c60021" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+	<element name="col_mustard_token">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="130" height="170">
+				<!-- body -->
+				<path d="M10 160  L120 160  L75 110  L75 65  L55 65  L55 110  Z" fill="#ffeb00" stroke="#000000" stroke-width="2" />
+				<!-- head -->
+				<circle cx="65" cy="40" r="30" fill="#ffeb00" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+	<element name="mrs_white_token">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="130" height="170">
+				<!-- body -->
+				<path d="M10 160  L120 160  L75 110  L75 65  L55 65  L55 110  Z" fill="#ffffff" stroke="#000000" stroke-width="2" />
+				<!-- head -->
+				<circle cx="65" cy="40" r="30" fill="#ffffff" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+
+	<!-- Start Spaces -->
+	<element name="start_rev_green">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.02" width="0.90" height="0.40" />
+		</text>
+		<text string="REV.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.45" width="0.90" height="0.20" />
+		</text>
+		<text string="GREEN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.70" width="0.90" height="0.20" />
+		</text>
+	</element>
+	<element name="start_mrs_peacock">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.02" width="0.90" height="0.40" />
+		</text>
+		<text string="MRS,">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.45" width="0.90" height="0.20" />
+		</text>
+		<text string="PEACOCK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.70" width="0.90" height="0.20" />
+		</text>
+	</element>
+	<element name="start_prof_plum">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.02" width="0.90" height="0.40" />
+		</text>
+		<text string="PROF.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.45" width="0.90" height="0.20" />
+		</text>
+		<text string="PLUM">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.70" width="0.90" height="0.20" />
+		</text>
+	</element>
+	<element name="start_miss_scarlett">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.02" width="0.90" height="0.40" />
+		</text>
+		<text string="MISS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.45" width="0.90" height="0.20" />
+		</text>
+		<text string="SCARLETT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.70" width="0.90" height="0.20" />
+		</text>
+	</element>
+	<element name="start_col_mustard">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.02" width="0.90" height="0.40" />
+		</text>
+		<text string="COL.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.45" width="0.90" height="0.20" />
+		</text>
+		<text string="MUSTARD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.70" width="0.90" height="0.20" />
+		</text>
+	</element>
+	<element name="start_mrs_white">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.02" width="0.90" height="0.40" />
+		</text>
+		<text string="MRS.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.45" width="0.90" height="0.20" />
+		</text>
+		<text string="WHITE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.70" width="0.90" height="0.20" />
+		</text>
+	</element>
+
+	<!-- Suspect cards - each have two lights - top and bottom -->
+	<element name="suspect_rev_green_top">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.50" /></rect>
+		<rect state="0"><color red="0.00" green="0.26" blue="0.13" /></rect>
+		<text string="REV.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_rev_green_bottom">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.50" /></rect>
+		<rect state="0"><color red="0.00" green="0.26" blue="0.13" /></rect>
+		<text string="GREEN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.15" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_mrs_peacock_top">
+		<rect state="1"><color red="0.00" green="0.65" blue="0.87" /></rect>
+		<rect state="0"><color red="0.00" green="0.32" blue="0.43" /></rect>
+		<text string="MISS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_mrs_peacock_bottom">
+		<rect state="1"><color red="0.00" green="0.65" blue="0.87" /></rect>
+		<rect state="0"><color red="0.00" green="0.32" blue="0.43" /></rect>
+		<text string="PEACOCK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.15" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_prof_plum_top">
+		<rect state="1"><color red="0.58" green="0.00" blue="0.70" /></rect>
+		<rect state="0"><color red="0.29" green="0.00" blue="0.35" /></rect>
+		<text string="PROF.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_prof_plum_bottom">
+		<rect state="1"><color red="0.58" green="0.00" blue="0.70" /></rect>
+		<rect state="0"><color red="0.29" green="0.00" blue="0.35" /></rect>
+		<text string="PLUM">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.15" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_miss_scarlett_top">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.16" /></rect>
+		<rect state="0"><color red="0.39" green="0.00" blue="0.06" /></rect>
+		<text string="MISS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_miss_scarlett_bottom">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.16" /></rect>
+		<rect state="0"><color red="0.39" green="0.00" blue="0.06" /></rect>
+		<text string="SCARLETT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.15" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_col_mustard_top">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.47" blue="0.00" /></rect>
+		<text string="COL.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_col_mustard_bottom">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.47" blue="0.00" /></rect>
+		<text string="MUSTARD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.15" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_mrs_white_top">
+		<rect state="1"><color red="0.91" green="0.94" blue="0.94" /></rect>
+		<rect state="0"><color red="0.30" green="0.31" blue="0.31" /></rect>
+		<text string="MRS.">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.40" />
+		</text>
+	</element>
+	<element name="suspect_mrs_white_bottom">
+		<rect state="1"><color red="0.91" green="0.94" blue="0.94" /></rect>
+		<rect state="0"><color red="0.30" green="0.31" blue="0.31" /></rect>
+		<text string="WHITE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.15" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="regular_space">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+	</element>
+
+	<element name="secret_passage">
+		<rect state="1"><color red="1.00" green="0.86" blue="0.43" /></rect>
+		<rect state="0"><color red="0.68" green="0.58" blue="0.29" /></rect>
+		<text string="SECRET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="PASSAGE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<!-- Room spaces - each room has 2 lamps and text.
+	         The text cannot properly fit within the two lamps, therefore, the
+	         text is in its own element.  -->
+	<element name="room_lamp">
+		<rect state="1"><color red="1.00" green="0.93" blue="0.44" /></rect>
+		<rect state="0"><color red="0.75" green="0.61" blue="0.29" /></rect>
+	</element>
+
+	<element name="conservatory_text">
+		<text string="CONSERVATORY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="hall_text">
+		<text string="HALL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="lounge_text">
+		<text string="LOUNGE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="billiard_room_text">
+		<text string="BILLIARD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+		<text string="ROOM">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.8" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="study_text">
+		<text string="STUDY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="library_text">
+		<text string="LIBRARY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="dining_room_text">
+		<text string="DINING">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.2" width="0.90" height="0.40" />
+		</text>
+		<text string="ROOM">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.8" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="kitchen_text">
+		<text string="KITCHEN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.8" width="0.90" height="0.40" />
+		</text>
+	</element>
+
+	<element name="investigation_square">
+		<rect state="1"><color red="1.00" green="0.81" blue="0.00" /></rect>
+		<rect state="0"><color red="0.75" green="0.55" blue="0.00" /></rect>
+		<image><data>
+			<![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" width="170" height="170">
+				<!-- handle -->
+				<path d="M30 160  L63.54 99" stroke="#000000" stroke-width="5" />
+				<!-- loop -->
+				<circle cx="85" cy="60" r="45" fill="#ffef84" fill-opacity="0.3" stroke="#000000" stroke-width="2" />
+				</svg>
+			]]>
+		</data></image>
+	</element>
+
+
+	<view name="Game Board">
+		<screen index="0">
+			<bounds x="220" y="80" width="300" height="225" />
+		</screen>
+
+		<!--
+		      Game board
+		      Goes Clockwise, starting with the CONSERVATORY and ending with the space just below it
+		  -->
+
+		<!-- Conservatory -->
+		<element name="lamp169" ref="room_lamp" state="0">
+			<bounds x="110" y="10" width="51" height="39" />
+		</element>
+		<element name="lamp170" ref="room_lamp" state="0">
+			<bounds x="160" y="10" width="49" height="39" />
+		</element>
+		<element ref="conservatory_text" state="0">
+			<bounds x="110" y="10" width="99" height="19" />
+		</element>
+
+		<!-- START REV. GREEN -->
+		<element name="lamp168" ref="start_rev_green" state="0">
+			<bounds x="210" y="0" width="19" height="19" />
+		</element>
+		<!-- Rev. Green Token -->
+		<element name="lamp167" ref="rev_green_token" state="0">
+			<bounds x="210" y="20" width="19" height="19" />
+		</element>
+
+		<element name="lamp166" ref="regular_space" state="0">
+			<bounds x="230" y="20" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp165" ref="investigation_square" state="0">
+			<bounds x="250" y="20" width="19" height="19" />
+		</element>
+
+		<element name="lamp164" ref="regular_space" state="0">
+			<bounds x="270" y="20" width="19" height="19" />
+		</element>
+		<element name="lamp163" ref="regular_space" state="0">
+			<bounds x="290" y="20" width="19" height="19" />
+		</element>
+		<element name="lamp162" ref="regular_space" state="0">
+			<bounds x="310" y="20" width="19" height="19" />
+		</element>
+
+		<!-- Hall -->
+		<element name="lamp160" ref="room_lamp" state="0">
+			<bounds x="330" y="10" width="51" height="39" />
+		</element>
+		<element name="lamp161" ref="room_lamp" state="0">
+			<bounds x="380" y="10" width="49" height="39" />
+		</element>
+		<element ref="hall_text" state="0">
+			<bounds x="330" y="20" width="99" height="19" />
+		</element>
+
+		<element name="lamp158" ref="regular_space" state="0">
+			<bounds x="430" y="20" width="19" height="19" />
+		</element>
+		<element name="lamp157" ref="regular_space" state="0">
+			<bounds x="450" y="20" width="19" height="19" />
+		</element>
+
+		<!-- START MRS. PEACOCK -->
+		<element name="lamp156" ref="start_mrs_peacock" state="0">
+			<bounds x="470" y="0" width="19" height="19" />
+		</element>
+		<!-- Mrs. Peacock Token -->
+		<element name="lamp155" ref="mrs_peacock_token" state="0">
+			<bounds x="470" y="20" width="19" height="19" />
+		</element>
+
+		<element name="lamp154" ref="regular_space" state="0">
+			<bounds x="490" y="20" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp153" ref="investigation_square" state="0">
+			<bounds x="510" y="20" width="19" height="19" />
+		</element>
+
+		<!-- Lounge -->
+		<element name="lamp150" ref="room_lamp" state="0">
+			<bounds x="530" y="10" width="51" height="39" />
+		</element>
+		<element name="lamp151" ref="room_lamp" state="0">
+			<bounds x="580" y="10" width="49" height="39" />
+		</element>
+		<element ref="lounge_text" state="0">
+			<bounds x="530" y="20" width="79" height="19" />
+		</element>
+
+		<element name="lamp149" ref="regular_space" state="0">
+			<bounds x="570" y="50" width="19" height="19" />
+		</element>
+		<element name="lamp148" ref="regular_space" state="0">
+			<bounds x="570" y="70" width="19" height="19" />
+		</element>
+		<element name="lamp147" ref="regular_space" state="0">
+			<bounds x="570" y="90" width="19" height="19" />
+		</element>
+		<element name="lamp146" ref="regular_space" state="0">
+			<bounds x="570" y="110" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp145" ref="investigation_square" state="0">
+			<bounds x="570" y="130" width="19" height="19" />
+		</element>
+		<element name="lamp144" ref="regular_space" state="0">
+			<bounds x="570" y="150" width="19" height="19" />
+		</element>
+
+		<!-- Billiard Room -->
+		<element name="lamp141" ref="room_lamp" state="0">
+			<bounds x="530" y="170" width="51" height="39" />
+		</element>
+		<element name="lamp142" ref="room_lamp" state="0">
+			<bounds x="580" y="170" width="49" height="39" />
+		</element>
+		<element ref="billiard_room_text" state="0">
+			<bounds x="530" y="170" width="99" height="39" />
+		</element>
+
+		<element name="lamp140" ref="regular_space" state="0">
+			<bounds x="570" y="210" width="19" height="19" />
+		</element>
+		<element name="lamp137" ref="regular_space" state="0">
+			<bounds x="570" y="230" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp136" ref="investigation_square" state="0">
+			<bounds x="570" y="250" width="19" height="19" />
+		</element>
+
+		<element name="lamp135" ref="regular_space" state="0">
+			<bounds x="570" y="270" width="19" height="19" />
+		</element>
+
+		<!-- START PROF PLUM -->
+		<element name="lamp134" ref="start_prof_plum" state="0">
+			<bounds x="590" y="290" width="19" height="19" />
+		</element>
+		<!-- Prof Plum Token -->
+		<element name="lamp133" ref="prof_plum_token" state="0">
+			<bounds x="570" y="290" width="19" height="19" />
+		</element>
+
+		<!-- Study -->
+		<element name="lamp130" ref="room_lamp" state="0">
+			<bounds x="580" y="310" width="49" height="39" />
+		</element>
+		<element name="lamp131" ref="room_lamp" state="0">
+			<bounds x="530" y="310" width="51" height="39" />
+		</element>
+		<element ref="study_text" state="0">
+			<bounds x="530" y="320" width="79" height="19" />
+		</element>
+
+		<element name="lamp129" ref="regular_space" state="0">
+			<bounds x="510" y="320" width="19" height="19" />
+		</element>
+		<element name="lamp128" ref="regular_space" state="0">
+			<bounds x="490" y="320" width="19" height="19" />
+		</element>
+
+		<!-- START MISS SCARLETT -->
+		<element name="lamp127" ref="start_miss_scarlett" state="0">
+			<bounds x="470" y="340" width="19" height="19" />
+		</element>
+		<!-- Miss Scarlett Token -->
+		<element name="lamp126" ref="miss_scarlett_token" state="0">
+			<bounds x="470" y="320" width="19" height="19" />
+		</element>
+
+		<element name="lamp125" ref="regular_space" state="0">
+			<bounds x="450" y="320" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp124" ref="investigation_square" state="0">
+			<bounds x="430" y="320" width="19" height="19" />
+		</element>
+
+		<element name="lamp123" ref="regular_space" state="0">
+			<bounds x="410" y="320" width="19" height="19" />
+		</element>
+
+		<!-- Library -->
+		<element name="lamp121" ref="room_lamp" state="0">
+			<bounds x="360" y="310" width="49" height="39" />
+		</element>
+		<element name="lamp122" ref="room_lamp" state="0">
+			<bounds x="310" y="310" width="51" height="39" />
+		</element>
+		<element ref="library_text" state="0">
+			<bounds x="310" y="320" width="99" height="19" />
+		</element>
+
+		<!-- START COL MUSTARD -->
+		<element name="lamp119" ref="start_col_mustard" state="0">
+			<bounds x="290" y="340" width="19" height="19" />
+		</element>
+		<!-- Col Mustard Token -->
+		<element name="lamp120" ref="col_mustard_token" state="0">
+			<bounds x="290" y="320" width="19" height="19" />
+		</element>
+		<element name="lamp118" ref="regular_space" state="0">
+			<bounds x="270" y="320" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp117" ref="investigation_square" state="0">
+			<bounds x="250" y="320" width="19" height="19" />
+		</element>
+
+		<element name="lamp116" ref="regular_space" state="0">
+			<bounds x="230" y="320" width="19" height="19" />
+		</element>
+		<element name="lamp115" ref="regular_space" state="0">
+			<bounds x="210" y="320" width="19" height="19" />
+		</element>
+
+		<!-- Dining Room -->
+		<element name="lamp112" ref="room_lamp" state="0">
+			<bounds x="160" y="310" width="49" height="39" />
+		</element>
+		<element name="lamp113" ref="room_lamp" state="0">
+			<bounds x="110" y="310" width="51" height="39" />
+		</element>
+		<element ref="dining_room_text" state="0">
+			<bounds x="110" y="310" width="99" height="39" />
+		</element>
+
+		<element name="lamp189" ref="regular_space" state="0">
+			<bounds x="150" y="290" width="19" height="19" />
+		</element>
+		<element name="lamp188" ref="regular_space" state="0">
+			<bounds x="150" y="270" width="19" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp187" ref="investigation_square" state="0">
+			<bounds x="150" y="250" width="19" height="19" />
+		</element>
+		<element name="lamp186" ref="regular_space" state="0">
+			<bounds x="150" y="230" width="19" height="19" />
+		</element>
+
+		<!-- START MRS WHITE -->
+		<element name="lamp185" ref="start_mrs_white" state="0">
+			<bounds x="130" y="210" width="19" height="19" />
+		</element>
+		<!-- Mrs White token -->
+		<element name="lamp184" ref="mrs_white_token" state="0">
+			<bounds x="150" y="210" width="19" height="19" />
+		</element>
+
+		<element name="lamp183" ref="regular_space" state="0">
+			<bounds x="150" y="190" width="19" height="19" />
+		</element>
+
+		<!-- Kitchen -->
+		<element name="lamp181" ref="room_lamp" state="0">
+			<bounds x="160" y="150" width="49" height="39" />
+		</element>
+		<element name="lamp182" ref="room_lamp" state="0">
+			<bounds x="110" y="150" width="51" height="39" />
+		</element>
+		<element ref="kitchen_text" state="0">
+			<bounds x="110" y="160" width="99" height="19" />
+		</element>
+
+		<!-- Magnifying Glass -->
+		<element name="lamp180" ref="investigation_square" state="0">
+			<bounds x="150" y="130" width="19" height="19" />
+		</element>
+
+		<element name="lamp179" ref="regular_space" state="0">
+			<bounds x="150" y="110" width="19" height="19" />
+		</element>
+		<element name="lamp178" ref="regular_space" state="0">
+			<bounds x="150" y="90" width="19" height="19" />
+		</element>
+		<element name="lamp177" ref="regular_space" state="0">
+			<bounds x="150" y="70" width="19" height="19" />
+		</element>
+		<element name="lamp176" ref="regular_space" state="0">
+			<bounds x="150" y="50" width="19" height="19" />
+		</element>
+
+
+		<!--
+		    6 Suspects
+
+		    Suspect LAYOUT:
+
+		    GREEN      PEACOCK
+		    WHITE      PLUM
+		    MUSTARD    SCARLET
+		-->
+
+		<!-- Rev. Green - Suspect -->
+		<element name="lamp173" ref="suspect_rev_green_top" state="0">
+			<bounds x="180" y="55" width="30" height="21" />
+		</element>
+		<element name="lamp172" ref="suspect_rev_green_bottom" state="0">
+			<bounds x="180" y="75" width="30" height="20" />
+		</element>
+
+		<!-- Mrs. White - Suspect -->
+		<element name="lamp191" ref="suspect_mrs_white_top" state="0">
+			<bounds x="180" y="265" width="30" height="21" />
+		</element>
+		<element name="lamp190" ref="suspect_mrs_white_bottom" state="0">
+			<bounds x="180" y="285" width="30" height="20" />
+		</element>
+
+		<!-- Col. Mustard - Suspect -->
+		<element name="lamp49" ref="suspect_col_mustard_top" state="0">
+			<bounds x="150" y="370" width="30" height="21" />
+		</element>
+		<element name="lamp48" ref="suspect_col_mustard_bottom" state="0">
+			<bounds x="150" y="390" width="30" height="20" />
+		</element>
+
+		<!-- Mrs. Peacock - Suspect -->
+		<element name="lamp6" ref="suspect_mrs_peacock_top" state="0">
+			<bounds x="530" y="55" width="30" height="21" />
+		</element>
+		<element name="lamp7" ref="suspect_mrs_peacock_bottom" state="0">
+			<bounds x="530" y="75" width="30" height="20" />
+		</element>
+
+		<!-- Prof Plum - Suspect -->
+		<element name="lamp138" ref="suspect_prof_plum_top" state="0">
+			<bounds x="530" y="265" width="30" height="21" />
+		</element>
+		<element name="lamp139" ref="suspect_prof_plum_bottom" state="0">
+			<bounds x="530" y="285" width="30" height="20" />
+		</element>
+
+		<!-- Miss Scarlett - Suspect -->
+		<element name="lamp103" ref="suspect_miss_scarlett_top" state="0">
+			<bounds x="560" y="370" width="30" height="21" />
+		</element>
+		<element name="lamp104" ref="suspect_miss_scarlett_bottom" state="0">
+			<bounds x="560" y="390" width="30" height="20" />
+		</element>
+
+
+		<!--
+		         Accusation lamps
+		  -->
+
+		<!-- first accusation -->
+		<element name="lamp52" ref="suspect_accusation" state="0">
+			<bounds x="215" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp51" ref="weapon_accusation" state="0">
+			<bounds x="215" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp50" ref="room_accusation" state="0">
+			<bounds x="215" y="380" width="30" height="10" />
+		</element>
+
+		<!--
+		       lamp99:  This lamp does not appear on any online images of the game.
+		        In-game, this lamp starts flashing when all other lamps flash when the player either solves the murder or is murdered.
+		        When the player solves the murder, the lamp turns off after the lamp-flashing ends.
+		        When the player solves the murder, the lamp remains on after the lamp-flashing ends and other lamps are turned off.
+		        During the lamp test, this lamp is tested between the 'Murder Cards' lamp
+		        and before the thir accusation's 'Pays Double' lamp.
+		-->
+		<element name="lamp99" ref="murdered" state="0">
+			<bounds x="215" y="400" width="30" height="10" />
+		</element>
+
+		<!-- second accusation -->
+		<element name="lamp53" ref="next_accusation_arrow" state="0">
+			<bounds x="245" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp56" ref="suspect_accusation" state="0">
+			<bounds x="255" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp55" ref="weapon_accusation" state="0">
+			<bounds x="255" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp54" ref="room_accusation" state="0">
+			<bounds x="255" y="380" width="30" height="10" />
+		</element>
+
+		<!-- third accusation -->
+		<element name="lamp57" ref="next_accusation_arrow" state="0">
+			<bounds x="285" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp62" ref="suspect_accusation" state="0">
+			<bounds x="295" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp61" ref="weapon_accusation" state="0">
+			<bounds x="295" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp60" ref="room_accusation" state="0">
+			<bounds x="295" y="380" width="30" height="10" />
+		</element>
+		<element name="lamp59" ref="pays_double" state="0">
+			<bounds x="295" y="400" width="30" height="10" />
+		</element>
+		<element name="lamp58" ref="1pound_award" state="0">
+			<bounds x="295" y="410" width="30" height="10" />
+		</element>
+
+		<!-- fourth accusation -->
+		<element name="lamp64" ref="next_accusation_arrow" state="0">
+			<bounds x="325" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp69" ref="suspect_accusation" state="0">
+			<bounds x="335" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp68" ref="weapon_accusation" state="0">
+			<bounds x="335" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp67" ref="room_accusation" state="0">
+			<bounds x="335" y="380" width="30" height="10" />
+		</element>
+		<element name="lamp66" ref="pays_double" state="0">
+			<bounds x="335" y="400" width="30" height="10" />
+		</element>
+		<element name="lamp65" ref="2pound_award" state="0">
+			<bounds x="335" y="410" width="30" height="10" />
+		</element>
+
+		<!-- fifth accusation -->
+		<element name="lamp70" ref="next_accusation_arrow" state="0">
+			<bounds x="365" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp75" ref="suspect_accusation" state="0">
+			<bounds x="375" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp74" ref="weapon_accusation" state="0">
+			<bounds x="375" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp73" ref="room_accusation" state="0">
+			<bounds x="375" y="380" width="30" height="10" />
+		</element>
+		<element name="lamp72" ref="pays_double" state="0">
+			<bounds x="375" y="400" width="30" height="10" />
+		</element>
+		<element name="lamp71" ref="4pound_award" state="0">
+			<bounds x="375" y="410" width="30" height="10" />
+		</element>
+
+		<!-- sixth accusation -->
+		<element name="lamp76" ref="next_accusation_arrow" state="0">
+			<bounds x="405" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp84" ref="suspect_accusation" state="0">
+			<bounds x="415" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp83" ref="weapon_accusation" state="0">
+			<bounds x="415" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp82" ref="room_accusation" state="0">
+			<bounds x="415" y="380" width="30" height="10" />
+		</element>
+		<element name="lamp81" ref="pays_double" state="0">
+			<bounds x="415" y="400" width="30" height="10" />
+		</element>
+		<element name="lamp80" ref="6pound_award" state="0">
+			<bounds x="415" y="410" width="30" height="10" />
+		</element>
+
+		<!-- seventh accusation -->
+		<element name="lamp85" ref="next_accusation_arrow" state="0">
+			<bounds x="445" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp90" ref="suspect_accusation" state="0">
+			<bounds x="455" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp89" ref="weapon_accusation" state="0">
+			<bounds x="455" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp88" ref="room_accusation" state="0">
+			<bounds x="455" y="380" width="30" height="10" />
+		</element>
+		<element name="lamp87" ref="pays_double" state="0">
+			<bounds x="455" y="400" width="30" height="10" />
+		</element>
+		<element name="lamp86" ref="8pound_award" state="0">
+			<bounds x="455" y="410" width="30" height="10" />
+		</element>
+
+		<!-- murder -->
+		<element name="lamp91" ref="next_accusation_arrow" state="0">
+			<bounds x="485" y="365" width="10" height="20" />
+		</element>
+		<element name="lamp102" ref="murderer" state="0">
+			<bounds x="495" y="360" width="30" height="10" />
+		</element>
+		<element name="lamp101" ref="weapon_accusation" state="0">
+			<bounds x="495" y="370" width="30" height="10" />
+		</element>
+		<element name="lamp100" ref="room_accusation" state="0">
+			<bounds x="495" y="380" width="30" height="10" />
+		</element>
+		<element name="lamp97" ref="murder_cards" state="0">
+			<bounds x="495" y="390" width="30" height="10" />
+		</element>
+		<element name="lamp98" ref="pays_double" state="0">
+			<bounds x="495" y="400" width="30" height="10" />
+		</element>
+		<element name="lamp96" ref="10pound_award" state="0">
+			<bounds x="495" y="410" width="30" height="10" />
+		</element>
+
+
+		<!--
+		    Cluedo? sign
+		  -->
+		<element name="lamp22" ref="space_char" state="0">
+			<bounds x="310" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp23" ref="c_char" state="0">
+			<bounds x="325" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp24" ref="l_char" state="0">
+			<bounds x="340" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp25" ref="u_char" state="0">
+			<bounds x="355" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp26" ref="e_char" state="0">
+			<bounds x="370" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp27" ref="d_char" state="0">
+			<bounds x="385" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp28" ref="o_char" state="0">
+			<bounds x="400" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp29" ref="question_mark_char" state="0">
+			<bounds x="415" y="55" width="16" height="20" />
+		</element>
+		<element name="lamp30" ref="space_char" state="0">
+			<bounds x="430" y="55" width="16" height="20" />
+		</element>
+
+		<!--
+		    Super Try Again and Try Again
+		  -->
+		<element name="lamp8" ref="super" state="0">
+			<bounds x="480" y="45" width="20" height="11" />
+		</element>
+		<element name="lamp9" ref="try_again" state="0">
+			<bounds x="480" y="55" width="20" height="10" />
+		</element>
+
+		<!--
+		    4 Secret passages
+		-->
+		<!-- Conservatory secret passage -->
+		<element name="lamp171" ref="secret_passage" state="0">
+			<bounds x="110" y="30" width="19" height="19" />
+		</element>
+
+		<!-- Lounge secret passage -->
+		<element name="lamp152" ref="secret_passage" state="0">
+			<bounds x="610" y="10" width="19" height="19" />
+		</element>
+
+		<!-- Study secret passage -->
+		<element name="lamp132" ref="secret_passage" state="0">
+			<bounds x="610" y="330" width="19" height="19" />
+		</element>
+
+		<!-- Dining Room secret passage -->
+		<element name="lamp114" ref="secret_passage" state="0">
+			<bounds x="190" y="310" width="19" height="19" />
+		</element>
+
+		<!-- Lamps with undefined physical locations and/or purpose
+
+		    Among the lamps below, lamp14 is the only lamp that is part of the game's lamp diagnostic test.
+
+		    lamp11: This is the first lamp that lights up when the machine boots
+		            This light never turns off
+
+		    lamp14/lamp15: These are the second set of lamps that light up when the machine boots
+		            The lights typically stay on.  They turn off when collecting money from the bank.  After turning off, they remain off until either money is inserted or a game is started.
+		            Both lamps turn on and off at the same time, except when the lamp test is activated.
+		            During a lamp test, lamp15 is always off.
+		            During a lamp test, lamp14 is the first lamp that is tested, just before the Conservatory lamp169.
+
+		    lamp224/lamp225/lamp226: these are the third set of lamps that light up when the machine boots
+		            The lights blink on and off while collecting money from the bank.  Afterwhich, they turn back on.
+		  -->
+
+		<element name="lamp11" ref="undefined_lamp" state="0">
+			<bounds x="122" y="370" width="7" height="7" />
+		</element>
+		<element name="lamp14" ref="undefined_lamp" state="0">
+			<bounds x="118" y="378" width="7" height="7" />
+		</element>
+		<element name="lamp15" ref="undefined_lamp" state="0">
+			<bounds x="126" y="378" width="7" height="7" />
+		</element>
+		<element name="lamp224" ref="undefined_lamp" state="0">
+			<bounds x="114" y="386" width="7" height="7" />
+		</element>
+		<element name="lamp225" ref="undefined_lamp" state="0">
+			<bounds x="122" y="386" width="7" height="7" />
+		</element>
+		<element name="lamp226" ref="undefined_lamp" state="0">
+			<bounds x="130" y="386" width="7" height="7" />
+		</element>
+	</view>
+</mamelayout>

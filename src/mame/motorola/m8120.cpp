@@ -36,4 +36,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR   NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
-COMP( 1991,  m8120, 0,      0,      m8120,   0,     m8120_state, empty_init, "Motorola", "M8120",  MACHINE_IS_SKELETON )
+COMP( 1991,  m8120, 0,      0,      m8120,   0,     m8120_state, empty_init, "Motorola", "M8120",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

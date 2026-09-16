@@ -141,9 +141,9 @@ public:
 	void divebomb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_spritecpu;
@@ -185,16 +185,14 @@ private:
 	template<int Chip> void rozcpu_wrap_enable_w(uint8_t data);
 	template<int Chip> void rozcpu_enable_w(uint8_t data);
 	void rozcpu_pal_w(uint8_t data);
-	void fgcpu_iomap(address_map &map);
-	void fgcpu_map(address_map &map);
-	void rozcpu_iomap(address_map &map);
-	void rozcpu_map(address_map &map);
-	void spritecpu_iomap(address_map &map);
-	void spritecpu_map(address_map &map);
+	void fgcpu_iomap(address_map &map) ATTR_COLD;
+	void fgcpu_map(address_map &map) ATTR_COLD;
+	void rozcpu_iomap(address_map &map) ATTR_COLD;
+	void rozcpu_map(address_map &map) ATTR_COLD;
+	void spritecpu_iomap(address_map &map) ATTR_COLD;
+	void spritecpu_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -223,15 +221,15 @@ TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
 
 K051316_CB_MEMBER(divebomb_state::zoom_callback_1)
 {
-	*code |= (*color & 0x03) << 8;
-	*color = 0 + ((m_roz_pal >> 4) & 3);
+	code |= (color & 0x03) << 8;
+	color = 0 + ((m_roz_pal >> 4) & 3);
 }
 
 
 K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
 {
-	*code |= (*color & 0x03) << 8;
-	*color = 4 + (m_roz_pal & 3);
+	code |= (color & 0x03) << 8;
+	color = 4 + (m_roz_pal & 3);
 }
 
 
@@ -368,8 +366,6 @@ uint32_t divebomb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -662,21 +658,20 @@ GFXDECODE_END
 
 void divebomb_state::divebomb(machine_config &config)
 {
-	static constexpr XTAL XTAL1 = XTAL(24'000'000);
-
-	Z80(config, m_fgcpu, XTAL1 / 4); // ?
+	// basic machine hardware
+	Z80(config, m_fgcpu, 24_MHz_XTAL / 4); // ?
 	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::fgcpu_map);
 	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::fgcpu_iomap);
 
-	Z80(config, m_spritecpu, XTAL1 / 4); // ?
+	Z80(config, m_spritecpu, 24_MHz_XTAL / 4); // ?
 	m_spritecpu->set_addrmap(AS_PROGRAM, &divebomb_state::spritecpu_map);
 	m_spritecpu->set_addrmap(AS_IO, &divebomb_state::spritecpu_iomap);
 
-	Z80(config, m_rozcpu, XTAL1 / 4); // ?
+	Z80(config, m_rozcpu, 24_MHz_XTAL / 4); // ?
 	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::rozcpu_map);
 	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::rozcpu_iomap);
 
-	config.set_perfect_quantum(m_fgcpu);
+	config.set_maximum_quantum(attotime::from_hz(m_fgcpu->clock() / 4));
 
 	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 
@@ -690,22 +685,22 @@ void divebomb_state::divebomb(machine_config &config)
 	GENERIC_LATCH_8(config, m_roz2fg_latch);
 	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_bpp(8);
 	m_k051316[0]->set_wrap(0);
-	m_k051316[0]->set_offsets(-88, -16);
+	m_k051316[0]->set_offsets(8, -16);
 	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_wrap(0);
-	m_k051316[1]->set_offsets(-88, -16);
+	m_k051316[1]->set_offsets(8, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -723,12 +718,12 @@ void divebomb_state::divebomb(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
-	SN76489(config, "sn0", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn1", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn2", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn3", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn4", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
-	SN76489(config, "sn5", XTAL1 / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn0", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn3", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn4", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn5", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 

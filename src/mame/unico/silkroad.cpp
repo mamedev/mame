@@ -154,8 +154,8 @@ public:
 	void silkroad(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -178,12 +178,10 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu_map(address_map &map);
-	void oki_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /* Sprites probably need to be delayed
    Some scroll layers may need to be offset slightly?
@@ -292,8 +290,6 @@ uint32_t silkroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void silkroad_state::okibank_w(uint8_t data)
 {
@@ -451,7 +447,7 @@ void silkroad_state::silkroad(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(silkroad_state::irq4_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -463,19 +459,18 @@ void silkroad_state::silkroad(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000).set_membits(16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 1056000)
 	oki1.set_addrmap(0, &silkroad_state::oki_map);
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.45);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.45);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.45, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.45, 1);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000) / 16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified (was 2112000)
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.45);
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.45);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.45, 0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.45, 1);
 }
 
 

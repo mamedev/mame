@@ -22,10 +22,10 @@ public:
 	void update_serial(int state);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
@@ -41,7 +41,7 @@ private:
 	required_ioport m_rs232_stopbits;
 	required_ioport m_flow;
 
-	uint8_t m_input_buffer[ 1024 ];
+	uint8_t m_input_buffer[1024];
 	uint32_t m_input_count;
 	uint32_t m_input_index;
 	emu_timer *m_timer_poll;

@@ -81,8 +81,9 @@ bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		image.set_variant(floppy_image::DSDD);
 		for (int track=0; track < tracks; track++) {
 			for (int side=0; side < 2; side++) {
-				size_t actual;
-				io.read_at((track*2 + side)*512*11, sectdata, 512*11, actual);
+				auto const [err, actual] = read_at(io, (track*2 + side)*512*11, sectdata, 512*11);
+				if (err || (512*11 != actual))
+					return false;
 				generate_track(amiga_11, track, side, sectors, 11, 100000, image);
 			}
 		}
@@ -90,8 +91,9 @@ bool adf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		image.set_variant(floppy_image::DSHD);
 		for (int track=0; track < tracks; track++) {
 			for (int side=0; side < 2; side++) {
-				size_t actual;
-				io.read_at((track*2 + side)*512*22, sectdata, 512*22, actual);
+				auto const [err, actual] = read_at(io, (track*2 + side)*512*22, sectdata, 512*22);
+				if (err || (512*22 != actual))
+					return false;
 				generate_track(amiga_22, track, side, sectors, 22, 200000, image);
 			}
 		}
@@ -151,8 +153,8 @@ bool adf_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 						*dest++ = val;
 					}
 
-					size_t actual;
-					io.write_at((track*2 + side) * data_track_size, sectdata, data_track_size, actual);
+					// FIXME: check for errors
+					/*auto const [err, actual] =*/ write_at(io, (track*2 + side) * data_track_size, sectdata, data_track_size);
 				}
 		}
 	}

@@ -9,23 +9,23 @@
 
 #pragma once
 
-#include "cpu/tms32010/tms32010.h"
-#include "machine/74259.h"
-#include "video/mc6845.h"
-#include "video/bufsprite.h"
+#include "toaplan_dsp.h"
 #include "toaplan_scu.h"
+
+#include "machine/74259.h"
+#include "video/bufsprite.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class twincobr_state : public driver_device
 {
 public:
 	twincobr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_sharedram(*this, "sharedram"),
-		m_spriteram8(*this, "spriteram8"),
-		m_spriteram16(*this, "spriteram16"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
 		m_spritegen(*this, "scu"),
@@ -33,20 +33,33 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_mainlatch(*this, "mainlatch"),
-		m_coinlatch(*this, "coinlatch")
+		m_coinlatch(*this, "coinlatch"),
+		m_sharedram(*this, "sharedram"),
+		m_spriteram8(*this, "spriteram8"),
+		m_spriteram16(*this, "spriteram16")
 	{ }
 
-	void twincobr(machine_config &config);
-	void twincobrw(machine_config &config);
-	void fsharkbt(machine_config &config);
-	void fshark(machine_config &config);
-	void fnshark(machine_config &config);
+	void init_fsharkbt() ATTR_COLD;
 
-	void init_twincobr();
+	void twincobr(machine_config &config) ATTR_COLD;
+	void twincobrw(machine_config &config) ATTR_COLD;
+	void fsharkbt(machine_config &config) ATTR_COLD;
+	void fshark(machine_config &config) ATTR_COLD;
+	void fnshark(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<toaplan_dsp_device> m_dsp;
+	required_device<toaplan_scu_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_coinlatch;
 
 	optional_shared_ptr<u8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -54,12 +67,6 @@ protected:
 
 	u32 m_fg_rom_bank = 0;
 	u32 m_bg_ram_bank = 0;
-	int m_intenable = 0;
-	int m_dsp_bio = 0;
-	int m_fsharkbt_8741 = 0;
-	int m_dsp_execute = 0;
-	u32 m_dsp_addr_w = 0;
-	u32 m_main_ram_seg = 0;
 	std::unique_ptr<u16[]> m_bgvideoram16;
 	std::unique_ptr<u16[]> m_fgvideoram16;
 	std::unique_ptr<u16[]> m_txvideoram16;
@@ -75,23 +82,21 @@ protected:
 	s32 m_txoffs = 0;
 	s32 m_fgoffs = 0;
 	s32 m_bgoffs = 0;
-	s32 m_display_on = 0;
+	bool m_display_on = false;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
 
-	void twincobr_dsp_addrsel_w(u16 data);
-	u16 twincobr_dsp_r();
-	void twincobr_dsp_w(u16 data);
-	void wardner_dsp_addrsel_w(u16 data);
-	u16 wardner_dsp_r();
-	void wardner_dsp_w(u16 data);
-	void twincobr_dsp_bio_w(u16 data);
+	bool m_intenable = false;
+	s32 m_fsharkbt_8741 = 0;
+
+	virtual void dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr);
+	virtual u16 dsp_host_read_cb(u32 seg, u32 addr);
+	virtual bool dsp_host_write_cb(u32 seg, u32 addr, u16 data);
+
 	u16 fsharkbt_dsp_r();
 	void fsharkbt_dsp_w(u16 data);
-	int twincobr_bio_r();
 	void int_enable_w(int state);
-	void dsp_int_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);
 	void coin_lockout_1_w(int state);
@@ -134,23 +139,12 @@ protected:
 	void bg_ram_bank_w(int state);
 	void fg_rom_bank_w(int state);
 	void log_vram();
-	void driver_savestate();
-	required_device<cpu_device> m_maincpu;
-	required_device<tms32010_device> m_dsp;
-	required_device<toaplan_scu_device> m_spritegen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<ls259_device> m_mainlatch;
-	required_device<ls259_device> m_coinlatch;
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
-	void fnshark_sound_io_map(address_map &map);
-	void fsharkbt_i8741_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void fnshark_sound_io_map(address_map &map) ATTR_COLD;
+	void fsharkbt_i8741_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TOAPLAN_TWINCOBR_H

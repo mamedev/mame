@@ -113,7 +113,7 @@ public:
 	void trvmadns(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -126,14 +126,12 @@ private:
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_paletteram;
 
-	void cpu_map(address_map &map);
-	void romboard_map(address_map &map);
-	void io_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void romboard_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void unknown_w(uint8_t data);
 	void lamps_w(uint8_t data);
-
-	void postload();
 
 	void gfxram_w(offs_t offset, uint8_t data);
 	void palette_w(offs_t offset, uint8_t data);
@@ -299,13 +297,7 @@ void trvmadns_state::lamps_w(uint8_t data)
 
 void trvmadns_state::machine_start()
 {
-	machine().save().register_postload(save_prepost_delegate(FUNC(trvmadns_state::postload), this));
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trvmadns_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-}
-
-void trvmadns_state::postload()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 
@@ -319,7 +311,7 @@ void trvmadns_state::trvmadns(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &trvmadns_state::cpu_map);
 	m_maincpu->set_addrmap(AS_IO, &trvmadns_state::io_map);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(AS_PROGRAM, &trvmadns_state::romboard_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(21);
@@ -328,7 +320,7 @@ void trvmadns_state::trvmadns(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 261, 0, 240); // 5 MHz?
 	screen.set_screen_update(FUNC(trvmadns_state::screen_update));
 	screen.set_palette(m_palette);
@@ -439,5 +431,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY             FULLNAME                                  FLAGS
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+GAME( 1985, trvmadns,  0,        trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, empty_init, ROT0,     "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

@@ -495,11 +495,6 @@ uint32_t st6228_device::execute_max_cycles() const noexcept
 	return 5;
 }
 
-uint32_t st6228_device::execute_input_lines() const noexcept
-{
-	return 0;
-}
-
 void st6228_device::execute_set_input(int inputnum, int state)
 {
 	logerror("%s: Unimplemented: execute_set_input line %d = %d\n", machine().describe_context(), inputnum, state);

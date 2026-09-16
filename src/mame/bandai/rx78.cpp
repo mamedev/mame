@@ -4,8 +4,6 @@
 
 Gundam RX-78 (c) 1983 Bandai
 
-Driver by Angelo Salese & Robbbert.
-
 TODO:
 - implement printer;
 - Implement 2nd cart slot
@@ -113,10 +111,10 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void rx78_io(address_map &map);
-	void rx78_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void rx78_io(address_map &map) ATTR_COLD;
+	void rx78_mem(address_map &map) ATTR_COLD;
 
 	u8 m_vram_read_bank = 0U;
 	u8 m_vram_write_bank = 0U;
@@ -461,7 +459,7 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_vram), 0xc000);
 	save_item(NAME(m_vram_read_bank));
 	save_item(NAME(m_vram_write_bank));
-	save_pointer(NAME(m_pal_reg), 7);
+	save_item(NAME(m_pal_reg));
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
 	save_item(NAME(m_background));
@@ -526,7 +524,7 @@ void rx78_state::rx78(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_refresh_hz(60);
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 //  screen.set_size(192, 184);

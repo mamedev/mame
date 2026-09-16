@@ -123,10 +123,10 @@ private:
 	u32 screen_update_bcs3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bcs3a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bcs3_io(address_map &map);
-	void bcs3_mem(address_map &map);
-	void bcs3a_mem(address_map &map);
-	void machine_start() override;
+	void bcs3_io(address_map &map) ATTR_COLD;
+	void bcs3_mem(address_map &map) ATTR_COLD;
+	void bcs3a_mem(address_map &map) ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	bool m_cassbit = 0;
 	u8 s_curs = 0U;
 	u8 s_init = 0U;
@@ -442,7 +442,7 @@ void bcs3_state::bcs3(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(28*8, 12*10);
@@ -483,7 +483,7 @@ void bcs3_state::bcs3b(machine_config &config)
 	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(40*8, 24*10);

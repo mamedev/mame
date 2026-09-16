@@ -12,6 +12,7 @@
 
 #include "isa.h"
 
+#include "machine/eepromser.h"
 #include "video/ati_mach32.h"
 #include "video/ati_mach8.h"
 #include "video/pc_vga_ati.h"
@@ -35,18 +36,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void io_isa_map(address_map &map);
+	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<ati_vga_device> m_vga;
 	required_device<mach8_device> m_8514;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 class isa16_vga_gfxultrapro_device :
@@ -61,17 +63,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void io_isa_map(address_map &map);
+	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<mach32_device> m_vga;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 class isa16_vga_mach64_device :
@@ -86,16 +89,17 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void io_isa_map(address_map &map);
+	void io_isa_map(address_map &map) ATTR_COLD;
 private:
 	required_device<mach64_device> m_vga;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 

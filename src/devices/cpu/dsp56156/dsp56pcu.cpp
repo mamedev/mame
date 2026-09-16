@@ -100,7 +100,7 @@ uint8_t SE_bit(const dsp56156_core* cpustate) { return ((SP & 0x0010) != 0); }
 ***************************************************************************/
 void pcu_init(dsp56156_core* cpustate, device_t *device)
 {
-	/* Init the irq table */
+	/* Init the IRQ table */
 	dsp56156_irq_table_init();
 
 	/* save states - dsp56156_pcu members */
@@ -322,7 +322,7 @@ void dsp56156_set_irq_source(uint8_t irq_num, uint16_t iv, const char* source)
 }
 
 /* Construct a table containing pertient IRQ information */
-void dsp56156_irq_table_init(void)
+void dsp56156_irq_table_init()
 {
 	/* 1-14 + 1-18 */
 	/* TODO: Cull host command stuff appropriately */

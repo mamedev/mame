@@ -68,8 +68,8 @@ protected:
 	tc0100scn_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	int          m_gfxlayout;
@@ -110,11 +110,11 @@ private:
 class tc0100scn_device : public tc0100scn_base_device
 {
 public:
-	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// decoding info
@@ -125,11 +125,11 @@ private:
 class tc0620scc_device : public tc0100scn_base_device
 {
 public:
-	tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	tc0620scc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// decoding info

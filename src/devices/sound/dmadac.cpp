@@ -158,7 +158,7 @@ void dmadac_set_volume(dmadac_sound_device **devlist, uint8_t num_channels, uint
 void dmadac_sound_device::set_volume(uint16_t volume)
 {
 	m_channel->update();
-	m_volume = stream_buffer::sample_t(volume) * (1.0 / 256.0);
+	m_volume = sound_stream::sample_t(volume) * (1.0 / 256.0);
 }
 
 DEFINE_DEVICE_TYPE(DMADAC, dmadac_sound_device, "dmadac", "DMA-driven DAC")
@@ -178,22 +178,18 @@ dmadac_sound_device::dmadac_sound_device(const machine_config &mconfig, const ch
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void dmadac_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dmadac_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &output = outputs[0];
 	uint32_t curout = m_bufout;
 	uint32_t curin = m_bufin;
 
-	/* feed as much as we can */
+	/* feed as much as we can, leave the rest as silence */
 	int sampindex;
-	for (sampindex = 0; curout != curin && sampindex < output.samples(); sampindex++)
+	for (sampindex = 0; curout != curin && sampindex < stream.samples(); sampindex++)
 	{
-		output.put(sampindex, stream_buffer::sample_t(m_buffer[curout]) * m_volume);
+		stream.put(0, sampindex, sound_stream::sample_t(m_buffer[curout]) * m_volume);
 		curout = (curout + 1) % BUFFER_SIZE;
 	}
-
-	/* fill the rest with silence */
-	output.fill(0, sampindex);
 
 	/* save the new output pointer */
 	m_bufout = curout;

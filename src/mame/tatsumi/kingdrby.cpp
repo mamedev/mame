@@ -106,12 +106,12 @@ public:
 	{
 	}
 
-	void kingdrbb(machine_config &config);
-	void cowrace(machine_config &config);
-	void kingdrby(machine_config &config);
+	void kingdrbb(machine_config &config) ATTR_COLD;
+	void cowrace(machine_config &config) ATTR_COLD;
+	void kingdrby(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void sc0_vram_w(offs_t offset, uint8_t data);
@@ -130,18 +130,18 @@ private:
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
 	void kingdrby_palette(palette_device &palette) const;
 	void kingdrbb_palette(palette_device &palette) const;
-	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void cowrace_sound_io(address_map &map);
-	void cowrace_sound_map(address_map &map);
-	void master_io_map(address_map &map);
-	void master_map(address_map &map);
-	void slave_1986_map(address_map &map);
-	void slave_io_map(address_map &map);
-	void slave_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void cowrace_sound_io(address_map &map) ATTR_COLD;
+	void cowrace_sound_map(address_map &map) ATTR_COLD;
+	void master_io_map(address_map &map) ATTR_COLD;
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_1986_map(address_map &map) ATTR_COLD;
+	void slave_io_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_sound_cmd = 0;
 	required_shared_ptr<uint8_t> m_vram;
@@ -220,8 +220,6 @@ void kingdrby_state::video_start()
 	m_sc0w_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingdrby_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
 
 	m_sc1_tilemap->set_transparent_pen(0);
-
-	m_digits.resolve();
 }
 
 static const uint8_t hw_sprite[16] =
@@ -274,7 +272,7 @@ void kingdrby_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t kingdrby_state::screen_update_kingdrby(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t kingdrby_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
@@ -560,7 +558,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN1")   // ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -743,7 +741,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")   // ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -915,10 +913,9 @@ void kingdrby_state::kingdrby_palette(palette_device &palette) const
 	{
 		int bit0, bit1, bit2;
 
-		bit0 = 0;
-		bit1 = BIT(color_prom[0], 1);
-		bit2 = BIT(color_prom[0], 0);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[0], 1);
+		bit1 = BIT(color_prom[0], 0);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		bit0 = BIT(color_prom[0], 4);
 		bit1 = BIT(color_prom[0], 3);
@@ -949,10 +946,9 @@ void kingdrby_state::kingdrbb_palette(palette_device &palette) const
 	{
 		int bit0, bit1, bit2;
 
-		bit0 = 0;
-		bit1 = BIT(prom[i], 1);
-		bit2 = BIT(prom[i], 0);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(prom[i], 1);
+		bit1 = BIT(prom[i], 0);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		bit0 = BIT(prom[i], 4);
 		bit1 = BIT(prom[i], 3);
@@ -1005,12 +1001,12 @@ void kingdrby_state::kingdrby(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingdrby);
 	PALETTE(config, m_palette, FUNC(kingdrby_state::kingdrby_palette), 0x200);
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 224-1);    /* controlled by CRTC */
-	screen.set_screen_update(FUNC(kingdrby_state::screen_update_kingdrby));
+	screen.set_screen_update(FUNC(kingdrby_state::screen_update));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CLK_1/32));  /* 53.333 Hz. guess */
 	crtc.set_screen("screen");

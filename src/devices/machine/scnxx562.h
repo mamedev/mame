@@ -58,7 +58,7 @@ class duscc_channel : public device_t, public device_serial_interface
 	friend class duscc_device;
 
 public:
-	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	duscc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read register handlers
 	uint8_t do_dusccreg_cmr1_r();
@@ -150,8 +150,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	virtual void tra_callback() override;
@@ -590,9 +590,9 @@ protected:
 	duscc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// internal interrupt management
 	void check_interrupts();

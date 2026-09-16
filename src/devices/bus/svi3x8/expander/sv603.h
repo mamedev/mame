@@ -21,8 +21,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sv603_device
-
 class sv603_device : public device_t, public device_svi_expander_interface
 {
 public:
@@ -38,10 +36,10 @@ public:
 	template<int N> void joy_irq_w(int state);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_memory_region m_bios;
@@ -50,7 +48,7 @@ private:
 	required_device<colecovision_cartridge_slot_device> m_cart;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(SV603, sv603_device)
 
 #endif // MAME_BUS_SVI3X8_EXPANDER_SV603_H

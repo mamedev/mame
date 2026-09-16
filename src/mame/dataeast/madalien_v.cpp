@@ -353,7 +353,7 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_madalien )
-	GFXDECODE_ENTRY( nullptr,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
+	GFXDECODE_RAM( nullptr,  0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, headlightlayout,   0, 1 )
 GFXDECODE_END
@@ -361,7 +361,7 @@ GFXDECODE_END
 
 void madalien_state::madalien_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256);
 	screen.set_screen_update(FUNC(madalien_state::screen_update_madalien));
 	screen.set_palette(m_palette);

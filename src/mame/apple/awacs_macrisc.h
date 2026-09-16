@@ -42,10 +42,10 @@ protected:
 	static const u8 divider[4];
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	devcb_read32 m_output_cb;
 	devcb_write32 m_input_cb;
@@ -53,6 +53,7 @@ protected:
 	sound_stream *m_stream;
 
 	u32 m_registers[16];
+	u32 m_snd_control;
 	u8 m_active;
 	u16 m_phase;
 };
@@ -66,7 +67,7 @@ public:
 	virtual void write_macrisc(offs_t offset, u32 data) override;
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 // device type definition

@@ -91,9 +91,9 @@ public:
 	void fdc_config(device_t *device);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void vsync_changed(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hsync_changed);
@@ -157,8 +157,8 @@ private:
 	void p1_ppi2_portb_w(uint8_t data);
 	uint8_t p1_ppi2_portc_r();
 
-	void poisk1_io(address_map &map);
-	void poisk1_map(address_map &map);
+	void poisk1_io(address_map &map) ATTR_COLD;
+	void poisk1_map(address_map &map) ATTR_COLD;
 };
 
 /*
@@ -429,7 +429,7 @@ void p1_state::video_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_video.videoram_base = std::make_unique<uint8_t[]>(0x8000);
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;
@@ -657,7 +657,7 @@ INPUT_PORTS_END
 void p1_state::poisk1(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 5000000);
+	I8088(config, m_maincpu, 5'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &p1_state::poisk1_map);
 	m_maincpu->set_addrmap(AS_IO, &p1_state::poisk1_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
@@ -684,7 +684,7 @@ void p1_state::poisk1(machine_config &config)
 	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w)); // 61h
 	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r)); // 62h and 3DAh
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
@@ -694,11 +694,11 @@ void p1_state::poisk1(machine_config &config)
 	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
 	m_isabus->iochrdy_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa2", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa3", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
-	ISA8_SLOT(config, "isa4", 0, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	// TODO: confirm ISA bus clock
+	ISA8_SLOT(config, "isa1", 5'000'000, m_isabus, p1_isa8_cards, "fdc", false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa2", 5'000'000, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa3", 5'000'000, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
+	ISA8_SLOT(config, "isa4", 5'000'000, m_isabus, p1_isa8_cards, nullptr, false).set_option_machine_config("fdc", [this](device_t *device) { fdc_config(device); });
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -706,7 +706,7 @@ void p1_state::poisk1(machine_config &config)
 	// fake hsync
 	TIMER(config, "scantimer").configure_scanline(FUNC(p1_state::hsync_changed), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);
 	m_screen->set_screen_update(FUNC(p1_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(p1_state::vsync_changed));

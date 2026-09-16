@@ -40,7 +40,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/r10788.h"
+#include "r10788.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

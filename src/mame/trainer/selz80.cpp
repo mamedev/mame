@@ -62,12 +62,12 @@ protected:
 	void digit_w(uint8_t data);
 	uint8_t kbd_r();
 
-	void selz80_io(address_map &map);
+	void selz80_io(address_map &map) ATTR_COLD;
 
 	u8 m_digit = 0U;
 	u8 m_seg = 0U;
 	void setup_baud();
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<u8> m_p_ram;
 	required_ioport_array<4> m_io_keyboard;
@@ -75,8 +75,8 @@ protected:
 	required_device<pwm_display_device> m_display;
 
 private:
-	void selz80_mem(address_map &map);
-	void machine_reset() override;
+	void selz80_mem(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 };
 
@@ -87,8 +87,8 @@ public:
 	void dagz80(machine_config &config);
 
 private:
-	void dagz80_mem(address_map &map);
-	void machine_reset() override;
+	void dagz80_mem(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 };
 
 void dagz80_state::dagz80_mem(address_map &map)
@@ -252,7 +252,7 @@ void selz80_state::selz80(machine_config &config)
 	m_clock->signal_handler().set("uart", FUNC(i8251_device::write_txc));
 	m_clock->signal_handler().append("uart", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart(I8251(config, "uart", 0));
+	i8251_device &uart(I8251(config, "uart"));
 	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));

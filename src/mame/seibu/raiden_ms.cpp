@@ -239,8 +239,8 @@ public:
 	void init_raidenm();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -268,13 +268,13 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void raidenm_map(address_map &map);
-	void raidenm_sub_map(address_map &map);
+	void raidenm_map(address_map &map) ATTR_COLD;
+	void raidenm_sub_map(address_map &map) ATTR_COLD;
 
 	u8 sound_status_r();
 	void adpcm_w(u8 data);
 	void ym_w(offs_t offset, u8 data);
-	void audio_map(address_map& map);
+	void audio_map(address_map &map) ATTR_COLD;
 	void adpcm_int(int state);
 	bool m_audio_select;
 	u8 m_adpcm_data;
@@ -282,6 +282,7 @@ private:
 	void unk_snd_dffx_w(offs_t offset, u8 data);
 	void soundlatch_w(u8 data);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
 	void descramble_16x16tiles(uint8_t* src, int len);
@@ -642,30 +643,37 @@ static GFXDECODE_START( gfx_raiden_ms )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 16 )
 GFXDECODE_END
 
+IRQ_CALLBACK_MEMBER(raiden_ms_state::vector_r)
+{
+	// both CPUs points at the same vector
+	return 0xc8 / 4;
+}
+
 void raiden_ms_state::vblank_irq(int state)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
-		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(0, HOLD_LINE);
 	}
 }
-
 
 void raiden_ms_state::raidenm(machine_config &config)
 {
 	// Basic machine hardware
 	V30(config, m_maincpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(raiden_ms_state::vector_r));
 
 	V30(config, m_subcpu, 20_MHz_XTAL / 2); // divisor unknown
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::raidenm_sub_map);
+	m_subcpu->set_irq_acknowledge_callback(FUNC(raiden_ms_state::vector_r));
 
 	Z80(config, m_audiocpu, XTAL(4'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &raiden_ms_state::audio_map);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
@@ -779,7 +787,7 @@ ROM_START( raidenm )
 	ROM_LOAD( "msraid_4-3-3_p0403_pal16r8.ic29",    0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) ) // yes, same as the first one
 	ROM_LOAD( "msraid_51-3_503_gal16v8.ic46",       0x000, 0x117, CRC(11470ea1) SHA1(cfcafbcc7e55be717348f895df61e144fdd0cc9b) )
 	ROM_LOAD( "msraid_6-1_645b_gal16v8a.ic7",       0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "msraid_6-1_686_ga16v8.ic13",         0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "msraid_6-1_686_ga16v8.ic13",         0x000, 0x117, CRC(7ab7c6d2) SHA1(0703455c967838a0b7058035b9682556c27f016d) )
 	ROM_LOAD( "msraid_6-1-8086-1_645c_gal16v8.u33", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "msraid_6-1-8086-1_645d_gal16v8.u27", 0x000, 0x117, NO_DUMP )
 ROM_END

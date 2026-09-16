@@ -28,8 +28,8 @@ public:
 	void cbnt2039(machine_config &config);
 
 private:
-	void bcp_prog_map(address_map &map);
-	void bcp_data_map(address_map &map);
+	void bcp_prog_map(address_map &map) ATTR_COLD;
+	void bcp_data_map(address_map &map) ATTR_COLD;
 
 	required_device<dp8344_device> m_bcp;
 };
@@ -68,4 +68,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1993, cbnt2039, 0, 0, cbnt2039, cbnt2039, cbnt2039_state, empty_init, "Cablenet", "2039 Controller", MACHINE_IS_SKELETON)
+COMP(1993, cbnt2039, 0, 0, cbnt2039, cbnt2039, cbnt2039_state, empty_init, "Cablenet", "2039 Controller", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

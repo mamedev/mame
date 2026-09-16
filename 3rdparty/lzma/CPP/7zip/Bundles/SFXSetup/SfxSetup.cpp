@@ -2,8 +2,9 @@
 
 #include "StdAfx.h"
 
-#include "../../../Common/MyWindows.h"
+#include "../../../../C/DllSecur.h"
 
+#include "../../../Common/MyWindows.h"
 #include "../../../Common/MyInitGuid.h"
 
 #include "../../../Common/CommandLineParser.h"
@@ -23,93 +24,84 @@
 
 #include "ExtractEngine.h"
 
-#include "../../../../C/DllSecur.h"
-
 #include "resource.h"
 
 using namespace NWindows;
 using namespace NFile;
 using namespace NDir;
 
+extern
 HINSTANCE g_hInstance;
+HINSTANCE g_hInstance;
+extern
+bool g_DisableUserQuestions;
+bool g_DisableUserQuestions;
 
 static CFSTR const kTempDirPrefix = FTEXT("7zS");
 
-#define _SHELL_EXECUTE
+#define MY_SHELL_EXECUTE
 
-static bool ReadDataString(CFSTR fileName, LPCSTR startID,
-    LPCSTR endID, AString &stringResult)
+static const char kStartID[] = { ',','!','@','I','n','s','t','a','l','l','@','!','U','T','F','-','8','!' };
+static const char kEndID[]   = { ',','!','@','I','n','s','t','a','l','l','E','n','d','@','!' };
+
+static bool ReadDataString(CFSTR fileName, AString &stringResult)
 {
-  stringResult.Empty();
+  // stringResult.Empty(); // (stringResult) is empty already
   NIO::CInFile inFile;
   if (!inFile.Open(fileName))
     return false;
-  const size_t kBufferSize = (1 << 12);
+  const size_t kBufferSize = 1 << 12;
 
   Byte buffer[kBufferSize];
-  const unsigned signatureStartSize = MyStringLen(startID);
-  const unsigned signatureEndSize = MyStringLen(endID);
+  const size_t startSize1 = sizeof(kStartID) - 1;
+  const size_t endSize1 = sizeof(kEndID) - 1;
   
   size_t numBytesPrev = 0;
-  bool writeMode = false;
-  UInt64 posTotal = 0;
+  bool scanMode = true;
+  UInt32 posTotal = 0;
   for (;;)
   {
-    if (posTotal > (1 << 20))
-      return (stringResult.IsEmpty());
     const size_t numReadBytes = kBufferSize - numBytesPrev;
     size_t processedSize;
     if (!inFile.ReadFull(buffer + numBytesPrev, numReadBytes, processedSize))
       return false;
     if (processedSize == 0)
-      return true;
-    const size_t numBytesInBuffer = numBytesPrev + processedSize;
-    UInt32 pos = 0;
+      break;
+    numBytesPrev += processedSize;
+    size_t pos = 0;
     for (;;)
     {
-      if (writeMode)
+      if (!scanMode)
       {
-        if (pos + signatureEndSize > numBytesInBuffer)
+        if (pos + endSize1 >= numBytesPrev)
           break;
-        if (memcmp(buffer + pos, endID, signatureEndSize) == 0)
-          return true;
-        char b = buffer[pos];
+        const Byte b = buffer[pos++];
         if (b == 0)
           return false;
-        stringResult += b;
-        pos++;
+        if (b == ';' && memcmp(buffer + pos, kEndID + 1, endSize1) == 0)
+          return true;
+        stringResult += (char)b;
       }
       else
       {
-        if (pos + signatureStartSize > numBytesInBuffer)
+        if (pos + startSize1 >= numBytesPrev)
           break;
-        if (memcmp(buffer + pos, startID, signatureStartSize) == 0)
+        const Byte b = buffer[pos++];
+        if (b == ';' && memcmp(buffer + pos, kStartID + 1, startSize1) == 0)
         {
-          writeMode = true;
-          pos += signatureStartSize;
+          scanMode = false;
+          pos += startSize1;
         }
-        else
-          pos++;
       }
     }
-    numBytesPrev = numBytesInBuffer - pos;
-    posTotal += pos;
+    posTotal += (UInt32)pos;
+    if (posTotal > (1 << 21))
+      break;
+    numBytesPrev -= pos;
     memmove(buffer, buffer + pos, numBytesPrev);
   }
+  return scanMode;
 }
-
-static char kStartID[] = { ',','!','@','I','n','s','t','a','l','l','@','!','U','T','F','-','8','!', 0 };
-static char kEndID[]   = { ',','!','@','I','n','s','t','a','l','l','E','n','d','@','!', 0 };
-
-struct CInstallIDInit
-{
-  CInstallIDInit()
-  {
-    kStartID[0] = ';';
-    kEndID[0] = ';';
-  };
-} g_CInstallIDInit;
-
 
 #if defined(_WIN32) && defined(_UNICODE) && !defined(_WIN64) && !defined(UNDER_CE)
 #define NT_CHECK_FAIL_ACTION ShowErrorMessage(L"Unsupported Windows version"); return 1;
@@ -118,11 +110,11 @@ struct CInstallIDInit
 static void ShowErrorMessageSpec(const UString &name)
 {
   UString message = NError::MyFormatMessage(::GetLastError());
-  int pos = message.Find(L"%1");
+  const int pos = message.Find(L"%1");
   if (pos >= 0)
   {
-    message.Delete(pos, 2);
-    message.Insert(pos, name);
+    message.Delete((unsigned)pos, 2);
+    message.Insert((unsigned)pos, name);
   }
   ShowErrorMessage(NULL, message);
 }
@@ -146,7 +138,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   // InitCommonControls();
 
   UString archiveName, switches;
-  #ifdef _SHELL_EXECUTE
+  #ifdef MY_SHELL_EXECUTE
   UString executeFile, executeParameters;
   #endif
   NCommandLineParser::SplitCommandLine(GetCommandLineW(), archiveName, switches);
@@ -164,7 +156,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   }
 
   AString config;
-  if (!ReadDataString(fullPath, kStartID, kEndID, config))
+  if (!ReadDataString(fullPath, config))
   {
     if (!assumeYes)
       ShowErrorMessage(L"Can't load config info");
@@ -183,23 +175,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
         ShowErrorMessage(L"Config failed");
       return 1;
     }
-    UString friendlyName = GetTextConfigValue(pairs, "Title");
-    UString installPrompt = GetTextConfigValue(pairs, "BeginPrompt");
-    UString progress = GetTextConfigValue(pairs, "Progress");
+    const UString friendlyName = GetTextConfigValue(pairs, "Title");
+    const UString installPrompt = GetTextConfigValue(pairs, "BeginPrompt");
+    const UString progress = GetTextConfigValue(pairs, "Progress");
     if (progress.IsEqualTo_Ascii_NoCase("no"))
       showProgress = false;
-    int index = FindTextConfigItem(pairs, "Directory");
+    const int index = FindTextConfigItem(pairs, "Directory");
     if (index >= 0)
       dirPrefix = pairs[index].String;
     if (!installPrompt.IsEmpty() && !assumeYes)
     {
-      if (MessageBoxW(0, installPrompt, friendlyName, MB_YESNO |
+      if (MessageBoxW(NULL, installPrompt, friendlyName, MB_YESNO |
           MB_ICONQUESTION) != IDYES)
         return 0;
     }
     appLaunched = GetTextConfigValue(pairs, "RunProgram");
     
-    #ifdef _SHELL_EXECUTE
+    #ifdef MY_SHELL_EXECUTE
     executeFile = GetTextConfigValue(pairs, "ExecuteFile");
     executeParameters = GetTextConfigValue(pairs, "ExecuteParameters");
     #endif
@@ -216,7 +208,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   CCodecs *codecs = new CCodecs;
   CMyComPtr<IUnknown> compressCodecsInfo = codecs;
   {
-    HRESULT result = codecs->Load();
+    const HRESULT result = codecs->Load();
     if (result != S_OK)
     {
       ShowErrorMessage(L"Cannot load codecs");
@@ -225,7 +217,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   }
 
   const FString tempDirPath = tempDir.GetPath();
-  // tempDirPath = L"M:\\1\\"; // to test low disk space
+  // tempDirPath = "M:\\1\\"; // to test low disk space
   {
     bool isCorrupt = false;
     UString errorMessage;
@@ -245,7 +237,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
         {
           if (errorMessage.IsEmpty())
             errorMessage = NError::MyFormatMessage(result);
-          ::MessageBoxW(0, errorMessage, NWindows::MyLoadString(IDS_EXTRACTION_ERROR_TITLE), MB_ICONERROR);
+          ::MessageBoxW(NULL, errorMessage, NWindows::MyLoadString(IDS_EXTRACTION_ERROR_TITLE), MB_ICONERROR);
         }
       }
       return 1;
@@ -258,8 +250,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     return 1;
   #endif
   
-  HANDLE hProcess = 0;
-#ifdef _SHELL_EXECUTE
+  HANDLE hProcess = NULL;
+#ifdef MY_SHELL_EXECUTE
   if (!executeFile.IsEmpty())
   {
     CSysString filePath (GetSystemString(executeFile));
@@ -280,7 +272,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
       executeParameters += switches;
     }
 
-    CSysString parametersSys (GetSystemString(executeParameters));
+    const CSysString parametersSys (GetSystemString(executeParameters));
     if (parametersSys.IsEmpty())
       execInfo.lpParameters = NULL;
     else
@@ -288,7 +280,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 
     execInfo.lpDirectory = NULL;
     execInfo.nShow = SW_SHOWNORMAL;
-    execInfo.hProcess = 0;
+    execInfo.hProcess = NULL;
     /* BOOL success = */ ::ShellExecuteEx(&execInfo);
     UINT32 result = (UINT32)(UINT_PTR)execInfo.hInstApp;
     if (result <= 32)
@@ -304,7 +296,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
   {
     if (appLaunched.IsEmpty())
     {
-      appLaunched = L"setup.exe";
+      appLaunched = "setup.exe";
       if (!NFind::DoesFileExist_FollowLink(us2fs(appLaunched)))
       {
         if (!assumeYes)
@@ -319,7 +311,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
       appLaunched.Replace(L"%%T" WSTRING_PATH_SEPARATOR, fs2us(s2));
     }
     
-    UString appNameForError = appLaunched; // actually we need to rtemove parameters also
+    const UString appNameForError = appLaunched; // actually we need to rtemove parameters also
 
     appLaunched.Replace(L"%%T", fs2us(tempDirPath));
 
@@ -330,20 +322,21 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     }
     STARTUPINFO startupInfo;
     startupInfo.cb = sizeof(startupInfo);
-    startupInfo.lpReserved = 0;
-    startupInfo.lpDesktop = 0;
-    startupInfo.lpTitle = 0;
+    startupInfo.lpReserved = NULL;
+    startupInfo.lpDesktop = NULL;
+    startupInfo.lpTitle = NULL;
     startupInfo.dwFlags = 0;
     startupInfo.cbReserved2 = 0;
-    startupInfo.lpReserved2 = 0;
+    startupInfo.lpReserved2 = NULL;
     
     PROCESS_INFORMATION processInformation;
     
-    CSysString appLaunchedSys (GetSystemString(dirPrefix + appLaunched));
+    const CSysString appLaunchedSys (GetSystemString(dirPrefix + appLaunched));
     
-    BOOL createResult = CreateProcess(NULL, (LPTSTR)(LPCTSTR)appLaunchedSys,
-      NULL, NULL, FALSE, 0, NULL, NULL /*tempDir.GetPath() */,
-      &startupInfo, &processInformation);
+    const BOOL createResult = CreateProcess(NULL,
+        appLaunchedSys.Ptr_non_const(),
+        NULL, NULL, FALSE, 0, NULL, NULL /*tempDir.GetPath() */,
+        &startupInfo, &processInformation);
     if (createResult == 0)
     {
       if (!assumeYes)
@@ -357,7 +350,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
     ::CloseHandle(processInformation.hThread);
     hProcess = processInformation.hProcess;
   }
-  if (hProcess != 0)
+  if (hProcess)
   {
     WaitForSingleObject(hProcess, INFINITE);
     ::CloseHandle(hProcess);

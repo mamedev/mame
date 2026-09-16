@@ -100,3 +100,5 @@
 #define IDS_PROP_GROUP_ID         1100
 #define IDS_PROP_DEVICE_MAJOR     1101
 #define IDS_PROP_DEVICE_MINOR     1102
+#define IDS_PROP_DEV_MAJOR        1103
+#define IDS_PROP_DEV_MINOR        1104

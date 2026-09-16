@@ -29,13 +29,12 @@ protected:
 	scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 23+8; } // max opcode + interrupt
-	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -50,17 +49,18 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	PAIR    m_PC;
-	PAIR    m_P1;
-	PAIR    m_P2;
-	PAIR    m_P3;
-	uint8_t   m_AC;
-	uint8_t   m_ER;
-	uint8_t   m_SR;
+	PAIR16  m_PC;
+	PAIR16  m_P1;
+	PAIR16  m_P2;
+	PAIR16  m_P3;
+	uint8_t m_AC;
+	uint8_t m_ER;
+	uint8_t m_SR;
 
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
-	int                 m_icount;
+
+	int                m_icount;
 
 	devcb_write8       m_flag_out_func;
 	devcb_write_line   m_sout_func;
@@ -75,7 +75,7 @@ private:
 	inline uint8_t RM(uint32_t a);
 	inline void WM(uint32_t a, uint8_t v);
 	inline void illegal(uint8_t opcode);
-	inline PAIR *GET_PTR_REG(int num);
+	inline PAIR16 *GET_PTR_REG(int num);
 	inline void BIN_ADD(uint8_t val);
 	inline void DEC_ADD(uint8_t val);
 	inline uint16_t GET_ADDR(uint8_t code);

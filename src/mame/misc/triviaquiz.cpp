@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Best, Ivan Vangelista
+// copyright-holders:Dirk Best
 /*
     Trivia Quiz by Intermatic Manufacturing Ltd.
     1985
@@ -52,15 +52,15 @@ public:
 	void triviaquiz(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
 
-	void prg_map(address_map &map);
-	void romboard_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void romboard_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -153,7 +153,7 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &triviaquiz_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &triviaquiz_state::io_map);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_addrmap(AS_PROGRAM, &triviaquiz_state::romboard_map);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(20);
@@ -165,7 +165,7 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000); // verified
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /***************************************************************************

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -21,34 +22,13 @@ license:CC0-1.0
 	<element name="disk_red"><disk><color red="0.9" green="0.1" blue="0.15" /></disk></element>
 	<element name="disk_green"><disk><color red="0.2" green="0.9" blue="0.3" /></disk></element>
 
-	<element name="text_b1">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="START"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
-	<element name="text_b2">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="LAST"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="HIGH"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
-	<element name="text_b4">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="SKILL"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
-	<element name="text_s1">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="1"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
-	<element name="text_s2">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="2"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
-	<element name="text_s3">
-		<rect><color red="0.7" green="0.72" blue="0.75" /></rect>
-		<text string="3"><color red="0.02" green="0.02" blue="0.02" /></text>
-	</element>
+	<element name="text_b1"><text string="START"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b2"><text string="LAST"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b3"><text string="HIGH"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_b4"><text string="SKILL"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_s1"><text string="1"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_s2"><text string="2"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_s3"><text string="3"><color red="0.02" green="0.02" blue="0.02" /></text></element>
 
 	<element name="switch1" defstate="0">
 		<text string=" "><color red="0" green="0" blue="0" /></text>
@@ -86,8 +66,7 @@ license:CC0-1.0
 		<element name="digit0" ref="digit"><bounds x="5.15" y="5.6" width="1" height="1.5" /></element>
 		<element name="digit1" ref="digit"><bounds x="6.15" y="5.6" width="1" height="1.5" /></element>
 
-	<!-- bezel (also allow clicking it) -->
-
+		<!-- bezel (also allow clicking it) -->
 		<element ref="static_gray"><bounds x="1.4" y="7.7" width="9.5" height="12.4" /></element>
 		<element ref="static_black"><bounds x="1.7" y="9.7" width="8.9" height="8.9" /></element>
 
@@ -101,8 +80,7 @@ license:CC0-1.0
 		<element ref="hl" inputtag="IN.1" inputmask="0x04"><bounds x="2" y="14.3" width="4" height="4" /><color alpha="0" /></element>
 		<element ref="hl" inputtag="IN.1" inputmask="0x08"><bounds x="6.3" y="14.3" width="4" height="4" /><color alpha="0" /></element>
 
-	<!-- smooth edges -->
-
+		<!-- smooth edges -->
 		<element ref="static_gray"><bounds x="1.5" y="9.3" width="1.55" height="1.55" /></element>
 		<element ref="disk_black"><bounds x="1.7" y="9.7" width="2.6" height="2.6" /></element>
 		<repeat count="10">
@@ -143,8 +121,7 @@ license:CC0-1.0
 			<element ref="disk_green"><bounds x="~x~" y="~y~" width="2" height="2" /></element>
 		</repeat>
 
-	<!-- middle buttons, leds -->
-
+		<!-- middle buttons, leds -->
 		<element ref="static_black"><bounds x="4.15" y="12.65" width="1.6" height="1.1" /></element>
 		<element ref="static_black"><bounds x="6.55" y="12.65" width="1.6" height="1.1" /></element>
 		<element ref="static_black"><bounds x="4.15" y="14.55" width="1.6" height="1.1" /></element>
@@ -165,8 +142,7 @@ license:CC0-1.0
 		<element name="5.a" ref="led"><bounds x="2.5" y="17.0" width="0.8" height="0.8" /></element>
 		<element name="6.a" ref="led"><bounds x="9.0" y="17.0" width="0.8" height="0.8" /></element>
 
-	<!-- upper buttons -->
-
+		<!-- upper buttons -->
 		<element ref="text_b1"><bounds x="1.8" y="7.8" width="1.5" height="0.5" /></element>
 		<element ref="text_b2"><bounds x="4.2" y="7.8" width="1.5" height="0.5" /></element>
 		<element ref="text_b3"><bounds x="6.6" y="7.8" width="1.5" height="0.5" /></element>
@@ -187,8 +163,7 @@ license:CC0-1.0
 		<element ref="hl" inputtag="IN.0" inputmask="0x04"><bounds x="6.6" y="8.4" width="1.5" height="1" /><color alpha="0.25" /></element>
 		<element ref="hl" inputtag="IN.0" inputmask="0x08"><bounds x="9.0" y="8.4" width="1.5" height="1" /><color alpha="0.25" /></element>
 
-	<!-- bottom switch -->
-
+		<!-- bottom switch -->
 		<element ref="text_s1"><bounds x="7.55" y="19.45" width="0.6" height="0.5" /></element>
 		<element ref="text_s2"><bounds x="8.00" y="19.45" width="0.6" height="0.5" /></element>
 		<element ref="text_s3"><bounds x="8.45" y="19.45" width="0.6" height="0.5" /></element>

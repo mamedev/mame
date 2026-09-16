@@ -46,7 +46,7 @@ public:
 
 	void set_fixed_ram(bool fixed) { this->set_fixed(fixed); this->set_user_loadable(!fixed); }
 
-	virtual bool present() { return is_loaded() || loaded_through_softlist() || !user_loadable(); }
+	virtual bool present();
 
 	uint32_t get_rom_size();
 	uint32_t get_slot_size() const { return m_slot_size; }
@@ -56,12 +56,12 @@ protected:
 	bbc_romslot_device(const machine_config &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint32_t m_slot_size;
 
 private:
-	device_bbc_rom_interface*   m_cart;
+	device_bbc_rom_interface *m_cart;
 };
 
 // ======================> bbc_romslot16_device
@@ -74,10 +74,7 @@ public:
 	bbc_romslot16_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option)
 		: bbc_romslot16_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 		m_slot_size = 0x4000;
 	}
 
@@ -94,10 +91,7 @@ public:
 	bbc_romslot32_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, char const *default_option)
 		: bbc_romslot32_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 		m_slot_size = 0x8000;
 	}
 
@@ -147,7 +141,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(BBC_ROMSLOT16, bbc_romslot16_device)
 DECLARE_DEVICE_TYPE(BBC_ROMSLOT32, bbc_romslot32_device)
 

@@ -1,7 +1,7 @@
 // StreamBinder.h
 
-#ifndef __STREAM_BINDER_H
-#define __STREAM_BINDER_H
+#ifndef ZIP7_INC_STREAM_BINDER_H
+#define ZIP7_INC_STREAM_BINDER_H
 
 #include "../../Windows/Synchronization.h"
 

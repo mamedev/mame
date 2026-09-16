@@ -2,12 +2,24 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    Sega Lindbergh skeleton driver
+Sega Lindbergh
 
-    TODO:
-    - tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
-    - Apparently there's no way to avoid a dead lock at 0xfd085, perhaps
-      tied to the aforementioned?
+TODO:
+- tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
+- Update: assigning intr_pin to UHCI causes the script below to not work anymore.
+- Pinpoint root cause of all of the following debug breakpoints
+  https://github.com/mamedev/mame/files/8766682/lindbergh_megahack.txt
+- bp fffffff0,1,{eip-=0x12 ;g} (spurious execution parse of below)
+- bp f4f1c,1,{eip+=2;g}
+- bp 78adb,1,{eip+=2;g}
+- bp f6bb3,1,{eip+=2;g}
+- bp 7518f,1,{eip+=2;g}
+- bp e7a22,1,{eip+=3;g}
+- bp e7abf,1,{eip+=3;g}
+- bp 79068,1,{eip+=2;g}
+- bp 78aed,1,{eip+=2;g}
+- BIOS detects CPU as ":)", 5M of System RAM, throws errors 0270 (RTC),
+  CMOS bad (0251) and PCI resource conflict on SATA.
 
 ***************************************************************************
 
@@ -380,8 +392,8 @@ public:
 	void lindbergh(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 lindbergh_state::lindbergh_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
@@ -400,25 +412,26 @@ void lindbergh_state::lindbergh(machine_config &config)
 {
 	PENTIUM4(config, "maincpu", 28000000U*5); /* Actually Celeron D at 2,8 GHz */
 
-	PCI_ROOT                (config, "pci",           0);
+	PCI_ROOT                (config, "pci");
 	I82875P_HOST            (config, "pci:00.0",      0,                   0x103382c0, "maincpu", 512*1024*1024);
-	I82875P_AGP             (config, "pci:01.0",      0);
+	I82875P_AGP             (config, "pci:01.0");
 	GEFORCE_7600GS          (config, "pci:01.0:00.0", 0,                   0x10de02e1);
 	I82875P_OVERFLOW        (config, "pci:06.0",      0,                   0x103382c0);
 	PCI_BRIDGE              (config, "pci:1c.0",      0, 0x808625ae, 0x02);
 	I82541                  (config, "pci:1c.0:00.0", 0,                   0x103382c0);
-	USB_UHCI                (config, "pci:1d.0",      0, 0x808625a9, 0x02, 0x103382c0);
-	USB_UHCI                (config, "pci:1d.1",      0, 0x808625aa, 0x02, 0x103382c0);
+	// TODO: function 1 claims PIRQD# but uses value 0x02?
+	USB_UHCI                (config, "pci:1d.0",      0, 0x808625a9, 0x02, 0x103382c0, 0x01);
+	USB_UHCI                (config, "pci:1d.1",      0, 0x808625aa, 0x02, 0x103382c0, 0x02);
 	I6300ESB_WATCHDOG       (config, "pci:1d.4",      0,                   0x103382c0);
 	APIC                    (config, "pci:1d.5",      0, 0x808625ac, 0x02, 0x103382c0);
 	USB_EHCI                (config, "pci:1d.7",      0, 0x808625ad, 0x02, 0x103382c0);
 	PCI_BRIDGE              (config, "pci:1e.0",      0, 0x8086244e, 0x0a);
 	SB0400                  (config, "pci:1e.0:02.0", 0,                   0x11021101);
-	SEGA_LINDBERGH_BASEBOARD(config, "pci:1e.0:03.0", 0);
-	I6300ESB_LPC            (config, "pci:1f.0",      0);
-	LPC_ACPI                (config, "pci:1f.0:acpi", 0);
-	LPC_RTC                 (config, "pci:1f.0:rtc",  0);
-	LPC_PIT                 (config, "pci:1f.0:pit",  0);
+	SEGA_LINDBERGH_BASEBOARD(config, "pci:1e.0:03.0");
+	I6300ESB_LPC            (config, "pci:1f.0");
+	LPC_ACPI                (config, "pci:1f.0:acpi");
+	LPC_RTC                 (config, "pci:1f.0:rtc");
+	LPC_PIT                 (config, "pci:1f.0:pit");
 	SATA                    (config, "pci:1f.2",      0, 0x808625a3, 0x02, 0x103382c0);
 	SMBUS                   (config, "pci:1f.3",      0, 0x808625a4, 0x02, 0x103382c0);
 	AC97                    (config, "pci:1f.5",      0, 0x808625a6, 0x02, 0x103382c0);
@@ -580,7 +593,7 @@ ROM_START(hotdex)
 	ROM_LOAD("317-0550-jpn.bin", 0, 0x2000, CRC(7e247f13) SHA1(d416b0e7742b32eb31443967e84ef93fc9e56dfb))
 
 	DISK_REGION("dvd")
-	DISK_IMAGE_READONLY("hotdex", 0, NO_DUMP)
+	DISK_IMAGE_READONLY("dvp-0063", 0, NO_DUMP)
 ROM_END
 
 ROM_START(primevah)
@@ -608,6 +621,9 @@ ROM_START(hummerxt)
 
 	ROM_REGION(0x2000, ":pic", 0) // PIC security id unknown
 	ROM_LOAD("hummerextreme.bin", 0, 0x2000, CRC(524bc69a) SHA1(c79b6bd384196c169e40e623f4c80c8b9eb11f81))
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY("dvp-0079", 0, NO_DUMP)
 ROM_END
 
 ROM_START(lbvbiosu)
@@ -620,7 +636,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1999, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
+GAME(2005, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
 GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
 GAME(2005, vf5,       lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

@@ -31,10 +31,10 @@ public:
 	void cruwrite(offs_t offset, uint8_t data) override { }
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	bool    access_enabled(offs_t offset);

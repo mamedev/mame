@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett, Anonymous
+// copyright-holders:Philip Bennett, Paul Arnold
 /******************************************************************************
 
     Bell-Fruit Cobra I/II and Viper Hardware
@@ -113,6 +113,8 @@
 #include "machine/i2cmem.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
+#include "machine/rescap.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "sound/ymopl.h"
@@ -155,14 +157,14 @@ union ADDR_REG
 };
 
 /* Blitter register flag bits */
-#define CMD_RUN         0x01
-#define CMD_COLST       0x02
-#define CMD_PARRD       0x04        /* Never used? */
-#define CMD_SRCUP       0x08
-#define CMD_DSTUP       0x10
-#define CMD_LT0         0x20
-#define CMD_LT1         0x40
-#define CMD_LINEDRAW    0x80
+static constexpr uint8_t CMD_RUN         = 0x01;
+static constexpr uint8_t CMD_COLST       = 0x02;
+static constexpr uint8_t CMD_PARRD       = 0x04;        /* Never used? */
+static constexpr uint8_t CMD_SRCUP       = 0x08;
+static constexpr uint8_t CMD_DSTUP       = 0x10;
+static constexpr uint8_t CMD_LT0         = 0x20;
+static constexpr uint8_t CMD_LT1         = 0x40;
+static constexpr uint8_t CMD_LINEDRAW    = 0x80;
 
 
 /* All unconfirmed */
@@ -172,20 +174,20 @@ union ADDR_REG
 #define SRCDST_A_1      0x80        /* This might be correct for line drawing? */
 
 /* These appear to be correct */
-#define MODE_SSIGN      0x80
-#define MODE_DSIGN      0x40
-#define MODE_YFRAC      0x20
-#define MODE_BITTOBYTE  0x04
-#define MODE_PALREMAP   0x10
+static constexpr uint8_t MODE_SSIGN      = 0x80;
+static constexpr uint8_t MODE_DSIGN      = 0x40;
+static constexpr uint8_t MODE_YFRAC      = 0x20;
+static constexpr uint8_t MODE_BITTOBYTE  = 0x04;
+static constexpr uint8_t MODE_PALREMAP   = 0x10;
 
-#define CMPFUNC_LT      0x01
-#define CMPFUNC_EQ      0x02
-#define CMPFUNC_GT      0x04
-#define CMPFUNC_BEQ     0x08
-#define CMPFUNC_LOG0    0x10
-#define CMPFUNC_LOG1    0x20
-#define CMPFUNC_LOG2    0x40
-#define CMPFUNC_LOG3    0x80
+static constexpr uint8_t CMPFUNC_LT      = 0x01;
+static constexpr uint8_t CMPFUNC_EQ      = 0x02;
+static constexpr uint8_t CMPFUNC_GT      = 0x04;
+static constexpr uint8_t CMPFUNC_BEQ     = 0x08;
+static constexpr uint8_t CMPFUNC_LOG0    = 0x10;
+static constexpr uint8_t CMPFUNC_LOG1    = 0x20;
+static constexpr uint8_t CMPFUNC_LOG2    = 0x40;
+static constexpr uint8_t CMPFUNC_LOG3    = 0x80;
 
 /*
     Blitter state
@@ -194,26 +196,26 @@ struct bf_blitter_t
 {
 	ADDR_REG    program;
 
-	uint8_t       control = 0;
-	uint8_t       status = 0;
+	uint8_t     control = 0;
+	uint8_t     status = 0;
 
-	uint8_t       command = 0;
+	uint8_t     command = 0;
 	ADDR_REG    source;
 	ADDR_REG    dest;
-	uint8_t       modectl = 0;
-	uint8_t       compfunc = 0;
-	uint8_t       outercnt = 0;
+	uint8_t     modectl = 0;
+	uint8_t     compfunc = 0;
+	uint8_t     outercnt = 0;
 
-	uint8_t       innercnt = 0;
-	uint8_t       step = 0;
-	uint8_t       pattern = 0;
+	uint8_t     innercnt = 0;
+	uint8_t     step = 0;
+	uint8_t     pattern = 0;
 };
 
 #define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
 
 struct fdc_t
 {
-	uint8_t   MSR = 0;
+	uint8_t MSR = 0;
 
 	int     side = 0;
 	int     track = 0;
@@ -231,8 +233,8 @@ struct fdc_t
 	int     cmd_cnt = 0;
 	int     res_len = 0;
 	int     res_cnt = 0;
-	uint8_t   cmd[10]{};
-	uint8_t   results[8]{};
+	uint8_t cmd[10]{};
+	uint8_t results[8]{};
 };
 
 
@@ -294,8 +296,8 @@ protected:
 	void m6809_data_irq(int state);
 	void data_acia_tx_w(int state);
 	void write_acia_clock(int state);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
@@ -304,14 +306,14 @@ protected:
 	void reset_fdc();
 	void exec_w_phase(uint8_t data);
 	void init_ram();
-	void command_phase(struct fdc_t &fdc, uint8_t data);
+	void command_phase(fdc_t &fdc, uint8_t data);
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z80_bank(int num, int data);
 
-	void m6809_prog_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void z80_prog_map(address_map &map);
+	void m6809_prog_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void z80_prog_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_bank_data[4]{};
@@ -339,7 +341,7 @@ private:
 	uint8_t m_col7bit[256]{};
 	uint8_t m_col6bit[256]{};
 	struct bf_blitter_t m_blitter;
-	struct fdc_t m_fdc;
+	fdc_t m_fdc;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<acia6850_device> m_acia6850_0;
@@ -1058,7 +1060,7 @@ enum command
 
 void bfcobra_state::reset_fdc()
 {
-	memset(&m_fdc, 0, sizeof(m_fdc));
+	m_fdc = fdc_t();
 
 	m_fdc.MSR = 0x80;
 	m_fdc.phase = COMMAND;
@@ -1075,71 +1077,70 @@ uint8_t bfcobra_state::fdctrl_r()
 
 uint8_t bfcobra_state::fddata_r()
 {
-	struct fdc_t &fdc = m_fdc;
-	#define BPS     1024
-	#define SPT     10
-	#define BPT     1024*10
+	constexpr int BPS = 1024;
+	constexpr int SPT = 10;
+	constexpr int BPT = BPS * SPT;
 
 	uint8_t val = 0;
 
-	if (fdc.phase == EXECUTION_R)
+	if (m_fdc.phase == EXECUTION_R)
 	{
-		switch (fdc.cmd[0] & 0x1f)
+		switch (m_fdc.cmd[0] & 0x1f)
 		{
 			/* Specify */
 			case READ_DATA:
 			{
-				if (fdc.setup_read)
+				if (m_fdc.setup_read)
 				{
-					fdc.track = fdc.cmd[2];
-					fdc.side = fdc.cmd[3];
-					fdc.sector = fdc.cmd[4];
-					fdc.number = fdc.cmd[5];
-					fdc.stop_track = fdc.cmd[6];
-					//int GPL = fdc.cmd[7];
-					//int DTL = fdc.cmd[8];
+					m_fdc.track = m_fdc.cmd[2];
+					m_fdc.side = m_fdc.cmd[3];
+					m_fdc.sector = m_fdc.cmd[4];
+					m_fdc.number = m_fdc.cmd[5];
+					m_fdc.stop_track = m_fdc.cmd[6];
+					//int GPL = m_fdc.cmd[7];
+					//int DTL = m_fdc.cmd[8];
 
-					fdc.setup_read = 0;
-					fdc.byte_pos = 0;
+					m_fdc.setup_read = 0;
+					m_fdc.byte_pos = 0;
 				}
 
-				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memregion("user2")->base() + fdc.offset);
+				m_fdc.offset = (BPT * m_fdc.track*2) + (m_fdc.side ? BPT : 0) + (BPS * (m_fdc.sector-1)) + m_fdc.byte_pos++;
+				val = *(memregion("user2")->base() + m_fdc.offset);
 
 				/* Move on to next sector? */
-				if (fdc.byte_pos == 1024)
+				if (m_fdc.byte_pos == 1024)
 				{
-					fdc.byte_pos = 0;
+					m_fdc.byte_pos = 0;
 
-					if (fdc.sector == fdc.stop_track || ++fdc.sector == 11)
+					if (m_fdc.sector == m_fdc.stop_track || ++m_fdc.sector == 11)
 					{
 						/* End of read operation */
-						fdc.MSR = 0xd0;
-						fdc.phase = RESULTS;
+						m_fdc.MSR = 0xd0;
+						m_fdc.phase = RESULTS;
 
-						fdc.results[0] = 0;
-						fdc.results[1] = 0;
-						fdc.results[2] = 0;
+						m_fdc.results[0] = 0;
+						m_fdc.results[1] = 0;
+						m_fdc.results[2] = 0;
 
-						fdc.results[3] = 0;
-						fdc.results[4] = 0;
-						fdc.results[5] = 0;
-						fdc.results[6] = 0;
+						m_fdc.results[3] = 0;
+						m_fdc.results[4] = 0;
+						m_fdc.results[5] = 0;
+						m_fdc.results[6] = 0;
 					}
 				}
 				break;
 			}
 		}
 	}
-	else if (fdc.phase == RESULTS)
+	else if (m_fdc.phase == RESULTS)
 	{
-		val = fdc.results[fdc.res_cnt++];
+		val = m_fdc.results[m_fdc.res_cnt++];
 
-		if (fdc.res_cnt == fdc.res_len)
+		if (m_fdc.res_cnt == m_fdc.res_len)
 		{
-			fdc.phase = COMMAND;
-			fdc.res_cnt = 0;
-			fdc.MSR &= ~0x40;
+			m_fdc.phase = COMMAND;
+			m_fdc.res_cnt = 0;
+			m_fdc.MSR &= ~0x40;
 		}
 	}
 
@@ -1148,12 +1149,11 @@ uint8_t bfcobra_state::fddata_r()
 
 void bfcobra_state::fdctrl_w(uint8_t data)
 {
-	struct fdc_t &fdc = m_fdc;
-	switch (fdc.phase)
+	switch (m_fdc.phase)
 	{
 		case COMMAND:
 		{
-			command_phase(fdc, data);
+			command_phase(m_fdc, data);
 			break;
 		}
 		case EXECUTION_W:
@@ -1168,7 +1168,7 @@ void bfcobra_state::fdctrl_w(uint8_t data)
 	}
 }
 
-void bfcobra_state::command_phase(struct fdc_t &fdc, uint8_t data)
+void bfcobra_state::command_phase(fdc_t &fdc, uint8_t data)
 {
 	if (fdc.cmd_cnt == 0)
 	{
@@ -1343,8 +1343,6 @@ void bfcobra_state::ramdac_map(address_map &map)
     /IRQ provided by EF68850P at IC38
     /FIRQ connected to meter current sensing circuitry
 
-    TODO: Calculate watchdog timer period.
-
 ***************************************************************************/
 
 /* TODO */
@@ -1453,7 +1451,7 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 //  map(0x3600, 0x3600).noprw();
 	map(0x3801, 0x3801).rw(FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
 	map(0x8000, 0xffff).rom();
-	map(0xf000, 0xf000).nopw();    /* Watchdog */
+	map(0xf000, 0xf000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
 static INPUT_PORTS_START( bfcobra )
@@ -1461,7 +1459,7 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin: 10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin: 20p")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin: 50p")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Coin: 1 pound")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME(u8"Coin: £1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Green Test?") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Red Test?")
@@ -1473,9 +1471,9 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bonus") PORT_CODE(KEYCODE_F)
-//  PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-//  PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("<A")
@@ -1488,7 +1486,7 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Front Door? (resets)") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1504,25 +1502,128 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0xFF, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("STROBE6")
-	PORT_DIPNAME( 0x01, 0x00, "DIL09" )
+	PORT_DIPNAME( 0x01, 0x00, "DIL10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIL10" )
+	PORT_DIPNAME( 0x02, 0x00, "DIL11" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIL11" )
+	PORT_DIPNAME( 0x04, 0x00, "DIL12" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIL12" )
+	PORT_DIPNAME( 0x08, 0x00, "DIL13" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIL13" )
+	PORT_DIPNAME( 0x10, 0x00, "DIL14" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIL14" )
+	PORT_DIPNAME( 0x20, 0x00, "DIL15" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIL15" )
+	PORT_DIPNAME( 0x40, 0x00, "DIL16" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE7")
+	PORT_DIPNAME( 0x01, 0x00, "DIL02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL03" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL05" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL06" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL07" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("JOYSTICK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( brainbox2 )
+	PORT_START("STROBE0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_NAME("Coin: 10p")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )   PORT_NAME("Coin: 20p")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )   PORT_NAME("Coin: 50p")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 )   PORT_NAME(u8"Coin: £1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Green Test") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START("STROBE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Collect") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+
+	PORT_START("STROBE2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 )  PORT_NAME("<A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 )  PORT_NAME("<B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 )  PORT_NAME("<C")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 )  PORT_NAME("C>")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON9 )  PORT_NAME("B>")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("A>")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE4")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Fitted") PORT_CODE(KEYCODE_H) PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Front Door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("STROBE6")
+	PORT_DIPNAME( 0x01, 0x00, "DIL10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL11" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL12" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL13" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL14" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL15" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL16" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1682,11 +1783,13 @@ void bfcobra_state::bfcobra(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bfcobra_state::m6809_prog_map);
 	m_audiocpu->set_periodic_int(FUNC(bfcobra_state::timer_irq), attotime::from_hz(1000));
 
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* TODO */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 256);
@@ -1695,7 +1798,7 @@ void bfcobra_state::bfcobra(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
 	ramdac.set_split_read(1);
 
@@ -1706,21 +1809,21 @@ void bfcobra_state::bfcobra(machine_config &config)
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* ACIAs */
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->txd_handler().set(m_acia6850_1, FUNC(acia6850_device::write_rxd));
 	m_acia6850_0->irq_handler().set(FUNC(bfcobra_state::z80_acia_irq));
 
-	ACIA6850(config, m_acia6850_1, 0);
+	ACIA6850(config, m_acia6850_1);
 	m_acia6850_1->txd_handler().set(m_acia6850_0, FUNC(acia6850_device::write_rxd));
 
-	ACIA6850(config, m_acia6850_2, 0);
+	ACIA6850(config, m_acia6850_2);
 	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
 	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
 	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
-	METERS(config, m_meters, 0).set_number(8);
+	METERS(config, m_meters).set_number(8);
 }
 
 /***************************************************************************
@@ -1753,9 +1856,9 @@ public:
 	void bfcobjam_with_dmd(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t m_bank_data[4]{};
@@ -1822,9 +1925,9 @@ private:
 	inline uint8_t* blitter_get_addr(uint32_t addr);
 	inline void z8s180_bank(int num, int data);
 
-	void ramdac_map(address_map &map);
-	void z8s180_io_map(address_map &map);
-	void z8s180_prog_map(address_map &map);
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void z8s180_io_map(address_map &map) ATTR_COLD;
+	void z8s180_prog_map(address_map &map) ATTR_COLD;
 };
 
 void bfcobjam_state::init_bfcobjam()
@@ -2763,7 +2866,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &bfcobjam_state::z8s180_io_map);
 
 	/* TODO */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(512, 256);
@@ -2772,7 +2875,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 	ramdac.set_addrmap(0, &bfcobjam_state::ramdac_map);
 	ramdac.set_split_read(1);
 
@@ -2786,7 +2889,7 @@ void bfcobjam_state::bfcobjam(machine_config &config)
 
 
 	/* ACIAs */
-	ACIA6850(config, m_acia6850_0, 0);
+	ACIA6850(config, m_acia6850_0);
 	m_acia6850_0->irq_handler().set(FUNC(bfcobjam_state::z8s180_acia_irq));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
@@ -2802,7 +2905,7 @@ void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 	UPD7759(config, m_aux_upd7759);
 	m_aux_upd7759->add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	BFM_DM01(config, m_dm01, 0);
+	BFM_DM01(config, m_dm01);
 }
 
 /***************************************************************************
@@ -2814,25 +2917,44 @@ void bfcobjam_state::bfcobjam_with_dmd(machine_config &config)
 
 ***************************************************************************/
 
+// Version 1.2
 ROM_START( inquiztr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
 	ROM_REGION( 0x20000, "user1", 0 )
-	ROM_LOAD( "9576002.bin", 0x00000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
-
-	ROM_REGION( 0x20000, "altuser1", 0 )
-	ROM_LOAD( "9576028.bin", 0x10000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
-
-		// these look quite different.. (like they belong together) but booting with these gives a checksum error (banking?)
-	ROM_LOAD( "inqvypp1", 0x00000, 0x010000, CRC(9bac8c6e) SHA1(15e24d60c2f3997e637694f60daa552b22628766) )
-	ROM_LOAD( "inqvypp2", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
+	ROM_LOAD( "inqv1.2", 0x00000, 0x10000, CRC(5b8c8a04) SHA1(af5328fee79c370f45bff36f534aaf50964b6900) )
+	ROM_LOAD( "9576002.bin", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
 
 	ROM_REGION( 0x1c2000, "user2", 0 )
 	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
 ROM_END
 
+// Alternate Version 1.2
+ROM_START( inquiztr12a )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "9576028.bin", 0x00000, 0x10000, CRC(2d85682c) SHA1(baec47bff4b8beef5afbb737dc57b22bf93ebcf8) )
+	ROM_LOAD( "9576002.bin", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
+
+	ROM_REGION( 0x1c2000, "user2", 0 )
+	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
+ROM_END
+
+// Version 1.1
+ROM_START( inquiztr11 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
+
+	ROM_REGION( 0x20000, "user1", 0 )
+	ROM_LOAD( "95760001.bin", 0x00000, 0x010000, CRC(314aa59e) SHA1(b65daa58465a789274d542b3ffd5e2f9129f24f9) )
+	ROM_LOAD( "9576002.bin", 0x10000, 0x010000, CRC(f9cd196c) SHA1(0ac31d87462cbee6f41e19aefe740d876910bdf5) )
+
+	ROM_REGION( 0x1c2000, "user2", 0 )
+	ROM_LOAD( "inqdisk.img", 0x000000, 0x1c2000, NO_DUMP )
+ROM_END
 
 
 ROM_START( escounts )
@@ -2977,15 +3099,34 @@ ROM_START( brkball )
 	ROM_LOAD("ledv1.bin",  0x00000, 0x10000, CRC(ea918cb9) SHA1(9e7047613cf1cb4b9a7fefb8a02d8479a7b09e6a))
 ROM_END
 
+ROM_START( brainbox2 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "brainbox2-roma-114.bin", 0x08000, 0x8000, CRC(ecd2a1d1) SHA1(f9e77fb63f20748f644ab270b56a68e9e53b77f9) )
+
+	ROM_REGION( 0x200000, "user1", 0 )
+	ROM_LOAD( "brainbox2-rom0-228.bin", 0x000000, 0x80000, CRC(bf4e37b2) SHA1(6368f186cd40d8da83646e3d4bc1e46c0a76fb01) )
+	ROM_LOAD( "brainbox2-rom1-229.bin", 0x080000, 0x80000, CRC(a937de4e) SHA1(5b3cfe31cdc5b95f0813194bafd3d9a029e7acf5) )
+	ROM_LOAD( "brainbox2-rom2-230.bin", 0x100000, 0x80000, CRC(2fc1588f) SHA1(f973692c6902eeaca47ddc4db85d3651e9a96355) )
+	ROM_LOAD( "brainbox2-rom3-331.bin", 0x180000, 0x80000, CRC(c6e326f4) SHA1(c0fb2f262a0554e3314bf7729f95d98c8affa236) )
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD( "brainbox-snd1-231.bin", 0x00000, 0x10000, CRC(38768cbc) SHA1(858ee49ee3cd7b616050584549122b17128fe71c) )
+	ROM_LOAD( "brainbox-snd2-232.bin", 0x10000, 0x10000, CRC(131db39d) SHA1(3cd329d608a3af6fd8148294ccb6871fe525e59c) )
+ROM_END
+
+
 } // Anonymous namespace
 
 
-GAME( 1989, inquiztr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor",                              MACHINE_NOT_WORKING )
-GAME( 1990, escounts, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0,   bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos, bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos, bfcobra,          bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1994, brkball,  0,   bfcobjam_with_dmd,brkball, bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
+GAME( 1989, inquiztr,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2)",                       MACHINE_NOT_WORKING )
+GAME( 1989, inquiztr12a, inquiztr,   bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.2, alt)",                  MACHINE_NOT_WORKING )
+GAME( 1989, inquiztr11,  inquiztr,   bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Inquizitor (V1.1)",                       MACHINE_NOT_WORKING )
+GAME( 1990, escounts,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Every Second Counts (39-360-053)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Treble Top (39-360-070)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,     0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Beeline (39-360-075)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr,    0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "Quizvaders (39-360-078)",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,         0,          bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,        qos,        bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,        qos,        bfcobra,          bfcobra,   bfcobra_state, init_bfcobra, ROT0, "BFM",      "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1994, brkball,     0,          bfcobjam_with_dmd,brkball,   bfcobjam_state,init_bfcobjam,ROT0, "BFM/ATOD", "Break Ball",                              MACHINE_IMPERFECT_GRAPHICS, layout_brkball )
+GAME( 1993, brainbox2,   0,          bfcobra,          brainbox2, bfcobra_state, init_bfcobra, ROT0, "BFM",      "Brain Box II (Set 114)",                  MACHINE_IMPERFECT_GRAPHICS )

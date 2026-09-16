@@ -10,7 +10,15 @@ class powervr2_device : public device_t,
 {
 public:
 	powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_texture_ram(T &&tag) { dc_texture_ram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_framebuffer_ram(T &&tag) { dc_framebuffer_ram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu_space(T &&tag, int no) { m_cpu_space.set_tag(std::forward<T>(tag), no); }
+
+	auto maple_trigger_callback() { return maple_trigger_cb.bind(); }
 	auto irq_callback() { return irq_cb.bind(); }
+
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	enum { NUM_BUFFERS = 4 };
@@ -32,8 +40,8 @@ public:
 		ERR_PVRIF_ILL_ADDR_IRQ
 	};
 
-	void ta_map(address_map &map);
-	void pd_dma_map(address_map &map);
+	void ta_map(address_map &map) ATTR_COLD;
+	void pd_dma_map(address_map &map) ATTR_COLD;
 
 	struct {
 		uint32_t pvr_addr;
@@ -179,9 +187,6 @@ public:
 	uint32_t blend_mode, srcselect,dstselect,fogcontrol,colorclamp, use_alpha;
 	uint32_t ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	uint32_t depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
-
-	uint64_t *dc_texture_ram;
-	uint64_t *dc_framebuffer_ram;
 
 	uint64_t *pvr2_texture_ram;
 	uint64_t *pvr2_framebuffer_ram;
@@ -338,12 +343,17 @@ public:
 		inline uint32_t sample_textured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 private:
+	devcb_write_line maple_trigger_cb;
 	devcb_write8 irq_cb;
+	required_device<device_execute_interface> m_cpu; // TODO: only used for timing hacks - do timing properly
+	required_shared_ptr<uint64_t> dc_texture_ram;
+	required_shared_ptr<uint64_t> dc_framebuffer_ram;
+	required_address_space m_cpu_space;
 	required_ioport m_mamedebug;
 
 	// Core registers

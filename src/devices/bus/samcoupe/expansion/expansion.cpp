@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SAMCOUPE_EXPANSION, samcoupe_expansion_device, "samcoupe_expansion", "SAM Coupe Expansion Bus")
+DEFINE_DEVICE_TYPE(SAMCOUPE_EXPANSION, samcoupe_expansion_device, "samcoupe_expansion", u8"SAM Coupé Expansion Bus")
 
 
 //**************************************************************************

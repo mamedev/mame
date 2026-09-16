@@ -107,7 +107,7 @@ Port B, bit 1
 #include "cpu/avr8/avr8.h"
 #include "video/pwm.h"
 #include "sound/dac.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 
@@ -128,8 +128,8 @@ public:
 	void pensebem2017(machine_config &config);
 
 private:
-	void prg_map(address_map &map);
-	void data_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
@@ -144,14 +144,14 @@ private:
 	uint8_t m_port_d = 0;
 	uint8_t m_port_e = 0;
 
-	required_device<avr8_device> m_maincpu;
+	required_device<atmega168_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_keyb_rows;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 void pensebem2017_state::machine_start()
@@ -241,23 +241,23 @@ static INPUT_PORTS_START( pensebem2017 )
 
 	PORT_START("ROW1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Adicao") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Subtracao") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Adição") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Subtração") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"÷") PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"×") PORT_CODE(KEYCODE_ASTERISK)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 
 	PORT_START("ROW2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Multiplicacao") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Aritmetica") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Divisao") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Adivinhe o Número") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Número do Meio") PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Memória Tons") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Siga-me") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Operacao") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Multiplicação") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Aritmética") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Divisão") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Adivinhe o Número") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Número do Meio") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Memória Tons") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Siga-me") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME(u8"Operação") PORT_CODE(KEYCODE_Y)
 
 	PORT_START("ROW3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
@@ -281,17 +281,16 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 	m_maincpu->set_high_fuses(0xdd);
 	m_maincpu->set_extended_fuses(0xf9);
 	m_maincpu->set_lock_bits(0x0f);
-	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(pensebem2017_state::port_b_r));
-	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(pensebem2017_state::port_b_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(pensebem2017_state::port_c_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(pensebem2017_state::port_d_w));
-	m_maincpu->gpio_out<AVR8_IO_PORTE>().set(FUNC(pensebem2017_state::port_e_w));
+	m_maincpu->gpio_in<atmega168_device::GPIOB>().set(FUNC(pensebem2017_state::port_b_r));
+	m_maincpu->gpio_out<atmega168_device::GPIOB>().set(FUNC(pensebem2017_state::port_b_w));
+	m_maincpu->gpio_out<atmega168_device::GPIOC>().set(FUNC(pensebem2017_state::port_c_w));
+	m_maincpu->gpio_out<atmega168_device::GPIOD>().set(FUNC(pensebem2017_state::port_d_w));
+	m_maincpu->gpio_out<atmega168_device::GPIOE>().set(FUNC(pensebem2017_state::port_e_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(1490, 1080);
-	screen.set_visarea_full();
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 
@@ -301,7 +300,7 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 }
 
 ROM_START( pbem2017 )
-	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("sept2017")
 
 	/* September 2017 release */

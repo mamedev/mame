@@ -656,7 +656,7 @@ static INPUT_PORTS_START( newbrain )
 
 	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("* \xC2\xA3") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('*') PORT_CHAR(0x00A3)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('*') PORT_CHAR(U'£')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
 
@@ -732,8 +732,6 @@ int newbrain_state::get_pwrup_t()
 
 void newbrain_state::machine_start()
 {
-	m_digits.resolve();
-
 	// initialize timers
 	m_reset_timer = timer_alloc(FUNC(newbrain_state::clear_reset), this);
 	m_power_timer = timer_alloc(FUNC(newbrain_state::power_on), this);

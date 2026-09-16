@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_FCKEYBOARD_H
-#define MAME_BUS_NES_CTRL_FCKEYBOARD_H
+#ifndef MAME_BUS_NES_CTRL_FCKEYBRD_H
+#define MAME_BUS_NES_CTRL_FCKEYBRD_H
 
 #pragma once
 
@@ -33,10 +33,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cassette_image_device> m_cassette;
@@ -48,4 +48,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_FCKEYBOARD, nes_fckeybrd_device)
 
-#endif // MAME_BUS_NES_CTRL_FCKEYBOARD_H
+#endif // MAME_BUS_NES_CTRL_FCKEYBRD_H

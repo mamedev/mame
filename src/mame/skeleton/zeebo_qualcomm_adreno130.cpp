@@ -56,12 +56,12 @@ public:
 	void zeebo(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void zeebo_arm11_map(address_map &map);
+	void zeebo_arm11_map(address_map &map) ATTR_COLD;
 
 	void copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest);
 	void bootstrap();
@@ -125,7 +125,7 @@ void zeebo_game_state::zeebo(machine_config &config)
 	ARM11(config, m_maincpu, 528000000); // 528 MHz ARM11 based SoC
 	m_maincpu->set_addrmap(AS_PROGRAM, &zeebo_game_state::zeebo_arm11_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
@@ -144,4 +144,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_IS_SKELETON )
+CONS( 2009, zeebo,      0,       0,      zeebo, zeebo, zeebo_game_state, empty_init, "Zeebo Inc.", "Zeebo (Brazil)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -48,7 +48,7 @@ static constexpr std::uint64_t FOUR_GB = std::uint64_t(1) << 32;
  * @brief   A constant that defines maximum sound channels.
  */
 
-static constexpr unsigned MAX_SOUND_CHANNELS = 2;
+static constexpr unsigned MAX_SOUND_CHANNELS = 16;
 
 /**
  * @def SOUND_BUFFER_MSEC

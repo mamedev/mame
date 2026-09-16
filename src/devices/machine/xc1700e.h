@@ -20,7 +20,7 @@ protected:
 	base_xc1700e_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 capacity);
 
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// device configuration

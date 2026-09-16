@@ -131,7 +131,7 @@ public:
 	void stadhero(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -155,12 +155,10 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void audio_map(address_map &map);
-	void main_map(address_map &map);
+	void audio_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /******************************************************************************/
 
@@ -171,8 +169,8 @@ uint32_t stadhero_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_spritegen->set_flip_screen(flip);
 	m_pf1_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_tilegen->deco_bac06_pf_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spriteram, 0x800 / 2);
+	m_tilegen->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, 0x800 / 2);
 	m_pf1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -208,8 +206,6 @@ void stadhero_state::video_start()
 
 /******************************************************************************/
 
-// machine
-
 /******************************************************************************/
 
 void stadhero_state::int_ack_w(uint16_t data)
@@ -231,9 +227,9 @@ void stadhero_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x200000, 0x2007ff).ram().w(FUNC(stadhero_state::pf1_data_w)).share(m_pf1_data);
-	map(0x240000, 0x240007).w(m_tilegen, FUNC(deco_bac06_device::pf_control_0_w)); // text layer
-	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::pf_control_1_w));
-	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::pf_data_r), FUNC(deco_bac06_device::pf_data_w));
+	map(0x240000, 0x240007).w(m_tilegen, FUNC(deco_bac06_device::ctrlreg_w)); // text layer
+	map(0x240010, 0x240017).w(m_tilegen, FUNC(deco_bac06_device::scrollreg_w));
+	map(0x260000, 0x261fff).rw(m_tilegen, FUNC(deco_bac06_device::vram_r), FUNC(deco_bac06_device::vram_w));
 	map(0x30c000, 0x30c001).portr("INPUTS");
 	map(0x30c002, 0x30c002).lr8(NAME([this] () { return uint8_t(m_coin->read()); }));
 	map(0x30c003, 0x30c003).r(FUNC(stadhero_state::mystery_r));
@@ -319,7 +315,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -360,6 +356,9 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gfx_stadhero )
 	GFXDECODE_ENTRY( "chars",   0, charlayout,     0, 16 ) // 8x8
 	GFXDECODE_ENTRY( "tiles",   0, tile_3bpp,    512, 16 ) // 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_stadhero_spr )
 	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 256, 16 ) // 16x16
 GFXDECODE_END
 
@@ -376,8 +375,8 @@ void stadhero_state::stadhero(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stadhero_state::audio_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(58));
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
@@ -387,16 +386,17 @@ void stadhero_state::stadhero(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_stadhero);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	DECO_BAC06(config, m_tilegen, 0);
+	DECO_BAC06(config, m_tilegen);
 	m_tilegen->set_gfx_region_wide(1, 1, 2);
 	m_tilegen->set_gfxdecode_tag(m_gfxdecode);
+	m_tilegen->set_has_bank(true);
 
-	DECO_MXC06(config, m_spritegen, 0);
+	DECO_MXC06(config, m_spritegen, "palette", gfx_stadhero_spr);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 16));

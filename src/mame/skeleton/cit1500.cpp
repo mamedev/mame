@@ -56,7 +56,7 @@ public:
 	void cit1500(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78053_device> m_cit1500;
 };
@@ -79,7 +79,7 @@ void cit1500_state::cit1500(machine_config &config)
 
 	//UPD7225(config, "cit1400");
 
-	//SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	//SCREEN(config, "screen").set_lcd();
 
 	//DS1302(config, "ds1302", 32.768_kHz_XTAL);
 }
@@ -112,5 +112,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(2001, trmavia, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TRMA VIA", MACHINE_IS_SKELETON)
-SYST(2000, teletup, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TeleTUP", MACHINE_IS_SKELETON)
+SYST(2001, trmavia, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TRMA VIA", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(2000, teletup, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TeleTUP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

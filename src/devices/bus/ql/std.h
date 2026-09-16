@@ -29,7 +29,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_ql_rom_cartridge_card_interface overrides
 	virtual uint8_t read(offs_t offset, uint8_t data) override;

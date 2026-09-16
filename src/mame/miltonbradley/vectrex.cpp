@@ -18,7 +18,7 @@ Bruce Tomlin (hardware info)
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -102,12 +102,10 @@ void vectrex_base_state::vectrex_base(machine_config &config)
 	MC6809(config, m_maincpu, 6_MHz_XTAL); // 68A09
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 399, 0, 299);
-	m_screen->set_screen_update(FUNC(vectrex_base_state::screen_update));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(60);
+	m_vector->set_visarea(0, 399, 0, 299);
+	m_vector->set_vector_update(FUNC(vectrex_base_state::vector_update));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -135,7 +133,7 @@ void vectrex_state::vectrex(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &vectrex_state::vectrex_map);
 
-	vectrex_cart_slot_device &slot(VECTREX_CART_SLOT(config, "cartslot", 0));
+	vectrex_cart_slot_device &slot(VECTREX_CART_SLOT(config, "cartslot"));
 	vectrex_cart(slot);
 
 	/* software lists */

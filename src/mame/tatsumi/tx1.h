@@ -66,21 +66,21 @@ public:
 	void buggybjr(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	struct math_t
 	{
-		uint16_t  cpulatch;
-		uint16_t  promaddr;
-		uint16_t  inslatch;
-		uint32_t  mux;
-		uint16_t  ppshift;
-		uint32_t  i0ff;
-		uint16_t  retval;
-		uint16_t  muxlatch;   // TX-1
-		int     dbgaddr;
-		int     dbgpc = 0;
+		uint16_t    cpulatch = 0;
+		uint16_t    promaddr = 0;
+		uint16_t    inslatch = 0;
+		uint32_t    mux = 0;
+		uint16_t    ppshift = 0;
+		uint32_t    i0ff = 0;
+		uint16_t    retval = 0;
+		uint16_t    muxlatch = 0;   // TX-1
+		int         dbgaddr = 0;
+		int         dbgpc = 0;
 
 		uint16_t get_datarom_addr() const;
 		uint16_t get_bb_datarom_addr() const;
@@ -234,13 +234,14 @@ private:
 	uint32_t screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_tx1(int state);
 	void screen_vblank_buggyboy(int state);
+	IRQ_CALLBACK_MEMBER(vector_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	void buggybjr_main(address_map &map);
-	void buggyboy_main(address_map &map);
-	void buggyboy_math(address_map &map);
-	void tx1_main(address_map &map);
-	void tx1_math(address_map &map);
+	void buggybjr_main(address_map &map) ATTR_COLD;
+	void buggyboy_main(address_map &map) ATTR_COLD;
+	void buggyboy_math(address_map &map) ATTR_COLD;
+	void tx1_main(address_map &map) ATTR_COLD;
+	void tx1_math(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TATSUMI_TX1_H

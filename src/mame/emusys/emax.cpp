@@ -29,7 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
-		, m_hdc(*this, "scsi:7:hdc")
+		, m_hdc(*this, "hdc")
 		, m_lcdc(*this, "lcdc")
 	{
 	}
@@ -51,10 +51,10 @@ private:
 	void palette_init(palette_device &palette);
 	void scsihd(machine_config &config);
 
-	void emax_periphs(address_map &map);
-	void emax_map(address_map &map);
-	void emaxp_map(address_map &map);
-	void emax2_map(address_map &map);
+	void emax_periphs(address_map &map) ATTR_COLD;
+	void emax_map(address_map &map) ATTR_COLD;
+	void emaxp_map(address_map &map) ATTR_COLD;
+	void emax2_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8254_device> m_ctc;
@@ -188,7 +188,7 @@ void emax_state::palette_init(palette_device &palette)
 
 void emax_state::scsihd(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -196,7 +196,9 @@ void emax_state::scsihd(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("hdc", NCR5380);
+
+	NCR5380(config, m_hdc);
+	scsi.set_external_device(7, m_hdc);
 }
 
 void emax_state::emax(machine_config &config)
@@ -215,14 +217,14 @@ void emax_state::emax(machine_config &config)
 
 	ACIA6850(config, "acia"); // MC68A50P
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(emax_state::pixel_update));
 
@@ -241,7 +243,7 @@ void emax_state::emaxp(machine_config &config)
 
 void emax_state::emax2(machine_config &config)
 {
-	NS32016(config, m_maincpu, 20_MHz_XTAL / 2); // NS32CG16V-10 (FIXME)
+	NS32CG16(config, m_maincpu, 20_MHz_XTAL / 2); // NS32CG16V-10
 	m_maincpu->set_addrmap(AS_PROGRAM, &emax_state::emax2_map);
 
 	EEPROM_93C06_16BIT(config, "eeprom"); // NMC93C06N
@@ -255,14 +257,14 @@ void emax_state::emax2(machine_config &config)
 
 	scsihd(config);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(emax_state::pixel_update));
 
@@ -308,6 +310,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, emax,  0,    0, emax,  emax,  emax_state, empty_init, "E-mu Systems", "Emax Digital Sampling Keyboard", MACHINE_IS_SKELETON)
-SYST(198?, emaxp, emax, 0, emaxp, emax,  emax_state, empty_init, "E-mu Systems", "Emax Plus Digital Sampling Keyboard", MACHINE_IS_SKELETON)
-SYST(1989, emax2, 0,    0, emax2, emax2, emax_state, empty_init, "E-mu Systems", "Emax II 16-Bit Digital Sound System", MACHINE_IS_SKELETON)
+SYST(1986, emax,  0,    0, emax,  emax,  emax_state, empty_init, "E-mu Systems", "Emax Digital Sampling Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(198?, emaxp, emax, 0, emaxp, emax,  emax_state, empty_init, "E-mu Systems", "Emax Plus Digital Sampling Keyboard", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, emax2, 0,    0, emax2, emax2, emax_state, empty_init, "E-mu Systems", "Emax II 16-Bit Digital Sound System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

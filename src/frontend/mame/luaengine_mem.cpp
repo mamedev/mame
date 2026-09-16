@@ -11,6 +11,10 @@
 #include "emu.h"
 #include "luaengine.ipp"
 
+#include "endianness.h"
+
+#include <cstring>
+
 
 namespace {
 
@@ -26,7 +30,7 @@ T region_read(memory_region &region, offs_t address)
 	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
-		int addr = region.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		int addr = (region.endianness() == ENDIANNESS_LITTLE) ? (address + sizeof(T) - 1 - i) : (address + i);
 		if (addr < region.bytes())
 		{
 			if constexpr (sizeof(T) > 1)
@@ -52,7 +56,7 @@ void region_write(memory_region &region, offs_t address, T val)
 	const offs_t lowmask = region.bytewidth() - 1;
 	for (int i = 0; i < sizeof(T); i++)
 	{
-		int addr = region.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		int addr = (region.endianness() == ENDIANNESS_BIG) ? (address + sizeof(T) - 1 - i) : (address + i);
 		if (addr < region.bytes())
 		{
 			if (region.endianness() == ENDIANNESS_BIG)
@@ -130,7 +134,7 @@ void share_write(memory_share &share, offs_t address, T val)
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value)
 {
 	const char *typestr;
-	switch(value)
+	switch (value)
 	{
 	case AMH_NONE:
 		typestr = "none";
@@ -723,9 +727,9 @@ void lua_engine::initialize_memory(sol::table &emu)
 
 
 	auto memory_type = sol().registry().new_usertype<memory_manager>("memory", sol::no_constructor);
-	memory_type["banks"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_bank>(mm.banks()); });
-	memory_type["regions"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_region>(mm.regions()); });
-	memory_type["shares"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_share>(mm.shares()); });
+	memory_type["banks"] = sol::property([] (memory_manager &mm) { return make_tag_object_ptr_map(mm.banks()); });
+	memory_type["regions"] = sol::property([] (memory_manager &mm) { return make_tag_object_ptr_map(mm.regions()); });
+	memory_type["shares"] = sol::property([] (memory_manager &mm) { return make_tag_object_ptr_map(mm.shares()); });
 
 
 	auto bank_type = sol().registry().new_usertype<memory_bank>("membank", sol::no_constructor);
@@ -734,6 +738,21 @@ void lua_engine::initialize_memory(sol::table &emu)
 
 
 	auto region_type = sol().registry().new_usertype<memory_region>("region", sol::no_constructor);
+	region_type.set_function(
+			"read",
+			[] (memory_region &region, sol::this_state s, offs_t offset, offs_t length)
+			{
+				// TODO: should this do something special if the offset isn't a multiple of the byte width?
+				buffer_helper buf(s);
+				const offs_t limit = std::min<offs_t>(region.bytes(), offset + length);
+				const offs_t copyable = (limit > offset) ? (limit - offset) : 0;
+				auto space = buf.prepare(copyable);
+				if (copyable)
+					std::memcpy(space.get(), &region.as_u8(offset), copyable);
+				space.add(copyable);
+				buf.push();
+				return sol::make_reference(s, sol::stack_reference(s, -1));
+			});
 	region_type.set_function("read_i8", &region_read<s8>);
 	region_type.set_function("read_u8", &region_read<u8>);
 	region_type.set_function("read_i16", &region_read<s16>);

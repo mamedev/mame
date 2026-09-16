@@ -54,13 +54,13 @@ private:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 	uint8_t m_term_data = 0U;
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -280,7 +280,7 @@ void zrt80_state::zrt80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &zrt80_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -307,7 +307,7 @@ void zrt80_state::zrt80(machine_config &config)
 	INS8250(config, m_8250, 2457600);
 	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(zrt80_state::kbd_put));
 }
 

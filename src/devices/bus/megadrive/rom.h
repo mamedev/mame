@@ -89,8 +89,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_bank[16];
@@ -110,8 +110,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	int m_base;
@@ -132,8 +132,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_bank;
@@ -166,8 +166,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	int m_bank;
@@ -247,8 +247,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_prot1_data, m_prot2_data;
@@ -268,8 +268,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_reg[3];
@@ -326,8 +326,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_bank;
@@ -347,8 +347,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_bank_addr, m_bank_size, m_old_bank_addr;
@@ -428,8 +428,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint32_t m_latch0, m_latch1;
@@ -476,8 +476,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_latch;
@@ -497,8 +497,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_retvalue;
@@ -519,54 +519,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t m_reg;
-};
-
-// ======================> md_rom_topf_device
-
-class md_rom_topf_device : public md_std_rom_device
-{
-public:
-	// construction/destruction
-	md_rom_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// reading and writing
-	virtual uint16_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	uint16_t m_latch;
-	uint8_t m_bank[3];
-};
-
-// ======================> md_rom_radica_device
-
-class md_rom_radica_device : public md_std_rom_device
-{
-public:
-	// construction/destruction
-	md_rom_radica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// reading and writing
-	virtual uint16_t read(offs_t offset) override;
-	virtual uint16_t read_a13(offs_t offset) override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	uint8_t m_bank;
 };
 
 // ======================> md_rom_beggarp_device
@@ -584,8 +541,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_mode, m_lock;
@@ -606,8 +563,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_mode;
@@ -629,8 +586,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_mode, m_lock, m_ram_enable, m_base;
@@ -671,8 +628,6 @@ DECLARE_DEVICE_TYPE(MD_ROM_SQUIR,    md_rom_squir_device)
 DECLARE_DEVICE_TYPE(MD_ROM_SRAM_ARG96, md_rom_sram_arg96_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TC2000,   md_rom_tc2000_device)
 DECLARE_DEVICE_TYPE(MD_ROM_TEKKENSP, md_rom_tekkensp_device)
-DECLARE_DEVICE_TYPE(MD_ROM_TOPF,     md_rom_topf_device)
-DECLARE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device)
 DECLARE_DEVICE_TYPE(MD_ROM_BEGGARP,  md_rom_beggarp_device)
 DECLARE_DEVICE_TYPE(MD_ROM_WUKONG,   md_rom_wukong_device)
 DECLARE_DEVICE_TYPE(MD_ROM_STARODYS, md_rom_starodys_device)

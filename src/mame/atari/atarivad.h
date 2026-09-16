@@ -34,7 +34,13 @@ public:
 	{
 		set_screen(std::forward<T>(screen_tag));
 	}
-	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&screen_tag)
+		: atari_vad_device(mconfig, tag, owner, 0, std::forward<T>(screen_tag))
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
+	atari_vad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration helpers
 	auto scanline_int_cb() { return m_scanline_int_cb.bind(); }
@@ -59,8 +65,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal helpers

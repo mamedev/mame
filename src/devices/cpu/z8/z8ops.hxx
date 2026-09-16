@@ -777,7 +777,7 @@ INSTRUCTION( swap_IR1 )         { mode_IR1(swap) }
 
 INSTRUCTION( ccf )              { m_flags ^= Z8_FLAGS_C; }
 INSTRUCTION( di )               { m_imr &= ~Z8_IMR_ENABLE; }
-INSTRUCTION( ei )               { m_imr |= Z8_IMR_ENABLE; m_irq_initialized = true; }
+INSTRUCTION( ei )               { m_imr |= Z8_IMR_ENABLE; if (!m_irq_initialized) LOGMASKED(LOG_IRQ, "(%04X): IRQs first enabled\n", m_ppc); m_irq_initialized = true; }
 INSTRUCTION( nop )              { /* no operation */ }
 INSTRUCTION( rcf )              { set_flag_c(0); }
 INSTRUCTION( scf )              { set_flag_c(1); }

@@ -93,11 +93,11 @@ private:
 	MC6845_UPDATE_ROW(pyl601a_update_row);
 	uint8_t selectedline(uint16_t data);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	static void floppy_formats(format_registration &fr);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_rom_page = 0U;
 	uint32_t m_vdisk_addr = 0U;
@@ -561,7 +561,7 @@ void pyl601_state::pyl601(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pyl601_state::pyl601_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 200);

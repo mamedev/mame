@@ -89,8 +89,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
@@ -110,8 +110,8 @@ private:
 	u8 global_bank_mask() const { return BIT(m_bmr, 4) ? 7 : (2 << (m_bmr & 3)) - 1; }
 
 	// internal maps
-	void ram_map(address_map &map);
-	void io_map(address_map &map);
+	void ram_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	// address spaces
 	address_space_config m_program_config;

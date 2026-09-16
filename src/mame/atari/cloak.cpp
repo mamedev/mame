@@ -125,12 +125,12 @@
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "video/resnet.h"
 
 
 namespace {
@@ -138,8 +138,8 @@ namespace {
 class cloak_state : public driver_device
 {
 public:
-	cloak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cloak_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -153,7 +153,7 @@ public:
 	void cloak(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -188,12 +188,10 @@ private:
 	void set_pen(int i);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
+	void master_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -381,8 +379,6 @@ uint32_t cloak_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-// machine
-
 /*************************************
  *
  *  Output ports
@@ -486,7 +482,7 @@ static INPUT_PORTS_START( cloak )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )     // player 2 controls, not used
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -591,7 +587,7 @@ void cloak_state::cloak(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);

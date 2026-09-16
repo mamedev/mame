@@ -80,9 +80,9 @@ public:
 	void init_logicpro();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ protected:
 	u8 m_fg_page_reg = 0;
 
 	void common_init();
-	void base_main_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices
@@ -138,7 +138,7 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_bg_page(int page, int value);
 	void set_fg_page(int page, int value);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class deniamb_state : public deniamc_state
@@ -161,13 +161,11 @@ private:
 
 	void oki_rom_bank_w(u8 data);
 
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void deniamc_state::common_init()
 {
@@ -536,8 +534,6 @@ u32 deniamc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-// machine
-
 void deniamb_state::oki_rom_bank_w(u8 data)
 {
 	m_oki->set_rom_bank((data >> 6) & 1);
@@ -545,7 +541,7 @@ void deniamb_state::oki_rom_bank_w(u8 data)
 
 void deniamc_state::oki_rom_bank_w(u8 data)
 {
-	if ((data & 0xfe) != 0) popmessage("OKI bank was not 0 or 1! contact MAMEDEV!");
+	if ((data & 0xfe) != 0) popmessage("OKI bank %02x", data);
 	m_oki->set_rom_bank(data & 0x01);
 }
 
@@ -714,7 +710,7 @@ void deniamc_state::deniam16c(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(deniamb_state::irq4_line_assert));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

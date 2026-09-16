@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -34,8 +34,8 @@ public:
 	void init_sslam();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_audiocpu;
@@ -80,14 +80,12 @@ protected:
 	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);
-	DECLARE_VIDEO_START(sslam);
-	DECLARE_VIDEO_START(powerbls);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(music_playback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sslam_play(int track, int data);
 
-	void sslam_program_map(address_map &map);
+	void sslam_program_map(address_map &map) ATTR_COLD;
 };
 
 class powerbls_state : public sslam_state
@@ -102,10 +100,10 @@ public:
 	void init_powerbls();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void powerbls_map(address_map &map);
+	void powerbls_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_powerbls_bg_tile_info);
 

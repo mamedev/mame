@@ -3,18 +3,19 @@
 // 20MB HDD image CHS 512,5,17
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
-#include "cpu/i8089/i8089.h"
-#include "machine/ram.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/i8255.h"
-#include "machine/z80sio.h"
-#include "machine/wd_fdc.h"
 #include "acs8600_ics.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/i8089/i8089.h"
+#include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
-#include "bus/rs232/rs232.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80sio.h"
 
 
 namespace {
@@ -74,15 +75,15 @@ private:
 	void ics_attn_w(offs_t offset, u8 data);
 	IRQ_CALLBACK_MEMBER(inta);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void code_mem(address_map &map);
-	void cpu_io(address_map &map);
-	void cpu_mem(address_map &map);
-	void dmac_io(address_map &map);
-	void dmac_mem(address_map &map);
-	void extra_mem(address_map &map);
-	void stack_mem(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	void code_mem(address_map &map) ATTR_COLD;
+	void cpu_io(address_map &map) ATTR_COLD;
+	void cpu_mem(address_map &map) ATTR_COLD;
+	void dmac_io(address_map &map) ATTR_COLD;
+	void dmac_mem(address_map &map) ATTR_COLD;
+	void extra_mem(address_map &map) ATTR_COLD;
+	void stack_mem(address_map &map) ATTR_COLD;
 
 	u16 xlate_r(offs_t offset, u16 mem_mask, int permbit);
 	void xlate_w(offs_t offset, u16 data, u16 mem_mask, int permbit);
@@ -535,7 +536,7 @@ u16 altos8600_state::xlate_r(offs_t offset, u16 mem_mask, int permbit)
 		seterr(offset, mem_mask, 0x800);
 	else if(m_user && !BIT(flags, permbit))
 		seterr(offset, mem_mask, 1 << permbit);
-	return ((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)];
+	return m_ram->pointer<u16>()[(page << 11) | (offset & 0x7ff)];
 
 }
 
@@ -557,7 +558,7 @@ void altos8600_state::xlate_w(offs_t offset, u16 data, u16 mem_mask, int permbit
 		seterr(offset, mem_mask, 1 << permbit);
 	else if(m_user && BIT(flags, 3) && ((offset & 0x7ff) < 64))
 		seterr(offset, mem_mask, 8);
-	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
+	COMBINE_DATA(m_ram->pointer<u16>() + ((page << 11) | (offset & 0x7ff)));
 	m_mmuflags[offset >> 11] |= 4;
 }
 
@@ -629,7 +630,7 @@ u16 altos8600_state::dmacram_r(offs_t offset, u16 mem_mask)
 		return m_bios->as_u16(offset & 0xfff);
 	if(!BIT(flags, 10))
 		seterr(offset, mem_mask, 0x400);
-	return ((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)];
+	return m_ram->pointer<u16>()[(page << 11) | (offset & 0x7ff)];
 
 }
 
@@ -642,7 +643,7 @@ void altos8600_state::dmacram_w(offs_t offset, u16 data, u16 mem_mask)
 		seterr(offset, mem_mask, 0x40);
 		return;
 	}
-	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
+	COMBINE_DATA(m_ram->pointer<u16>() + ((page << 11) | (offset & 0x7ff)));
 	m_mmuflags[offset >> 11] |= 4;
 }
 
@@ -743,16 +744,16 @@ void altos8600_state::altos8600(machine_config &config)
 	m_dmac->sintr1().set(FUNC(altos8600_state::sintr1_w));
 	m_dmac->sintr2().set(m_pic[1], FUNC(pic8259_device::ir4_w));
 
-	PIC8259(config, m_pic[0], 0);
+	PIC8259(config, m_pic[0]);
 	m_pic[0]->out_int_callback().set_inputline(m_maincpu, 0);
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(altos8600_state::get_slave_ack));
 
-	PIC8259(config, m_pic[1], 0);
+	PIC8259(config, m_pic[1]);
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
-	PIC8259(config, m_pic[2], 0);
+	PIC8259(config, m_pic[2]);
 	m_pic[2]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir3_w));
 	m_pic[2]->in_sp_callback().set_constant(0);
 
@@ -779,7 +780,7 @@ void altos8600_state::altos8600(machine_config &config)
 
 	I8255A(config, "ppi", 0);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<0>(1228800);
 	pit.out_handler<0>().set(m_uart8274, FUNC(i8274_device::rxca_w));
 	pit.out_handler<0>().append(m_uart8274, FUNC(i8274_device::txca_w));
@@ -796,7 +797,7 @@ void altos8600_state::altos8600(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	ACS8600_ICS(config, m_ics, 0);
+	ACS8600_ICS(config, m_ics);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme
 	m_ics->irq1_callback().set(m_pic[0], FUNC(pic8259_device::ir5_w));
 	m_ics->irq2_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));

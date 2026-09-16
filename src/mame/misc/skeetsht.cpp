@@ -59,13 +59,13 @@ private:
 	void ay8910_w(uint8_t data);
 	void tms_irq(int state);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<mc68hc11_cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
-	void hc11_pgm_map(address_map &map);
-	void tms_program_map(address_map &map);
+	void hc11_pgm_map(address_map &map) ATTR_COLD;
+	void tms_program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -240,7 +240,7 @@ void skeetsht_state::skeetsht(machine_config &config)
 	TLC34076(config, m_tlc34076, 0);
 	m_tlc34076->set_bits(tlc34076_device::TLC34076_6_BIT);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300); // FIXME
 	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 

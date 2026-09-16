@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
+
 #include "emu.h"
 #include "h8_dma.h"
 
@@ -67,26 +70,30 @@ void h8gen_dma_device::set_input(int inputnum, int state)
 
 void h8gen_dma_device::start_stop_test()
 {
+	bool changed = false;
 	u8 chnmap = active_channels();
 	for(int i=0; i != 8; i++) {
 		if(BIT(chnmap, i)) {
-			if(!(m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE))
+			if(!(m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE)) {
 				m_dmach[i >> 1]->start(i & 1);
+				changed = true;
+			}
 
 		} else {
 			if(m_dmach[i >> 1] && (m_dmach[i >> 1]->m_state[i & 1].m_flags & h8_dma_state::ACTIVE)) {
 				logerror("forced abort %d\n", i);
-				exit(0);
+				m_dmach[i >> 1]->abort(i & 1);
+				changed = true;
 			}
 		}
 	}
+	if(changed)
+		m_cpu->update_active_dma_channel();
 }
 
 
 
-
 // DMA channel, common code
-
 
 h8gen_dma_channel_device::h8gen_dma_channel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -102,9 +109,11 @@ void h8gen_dma_channel_device::device_start()
 	save_item(STRUCT_MEMBER(m_state, m_incs));
 	save_item(STRUCT_MEMBER(m_state, m_incd));
 	save_item(STRUCT_MEMBER(m_state, m_count));
+	save_item(STRUCT_MEMBER(m_state, m_bcount));
 	save_item(STRUCT_MEMBER(m_state, m_flags));
 	save_item(STRUCT_MEMBER(m_state, m_id));
 	save_item(STRUCT_MEMBER(m_state, m_trigger_vector));
+
 	save_item(NAME(m_mar));
 	save_item(NAME(m_ioar));
 	save_item(NAME(m_etcr));
@@ -140,7 +149,6 @@ void h8gen_dma_channel_device::set_dreq(int state)
 	m_dreq = state;
 
 	// Only subchannel B/1 can react to dreq.
-
 	if(m_dreq) {
 		if(((m_state[1].m_flags & (h8_dma_state::ACTIVE|h8_dma_state::SUSPENDED)) == (h8_dma_state::ACTIVE|h8_dma_state::SUSPENDED)) && (m_state[1].m_trigger_vector == DREQ_LEVEL || m_state[1].m_trigger_vector == DREQ_EDGE)) {
 			m_state[1].m_flags &= ~h8_dma_state::SUSPENDED;
@@ -319,7 +327,7 @@ void h8gen_dma_channel_device::start(int submodule)
 	m_state[submodule].m_incs = m_state[submodule].m_flags & h8_dma_state::SOURCE_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::SOURCE_DECREMENT ? -step : step;
 	m_state[submodule].m_incd = m_state[submodule].m_flags & h8_dma_state::DEST_IDLE ? 0 :  m_state[submodule].m_flags & h8_dma_state::DEST_DECREMENT ? -step : step;
 
-	logerror("%c: setup src=%s%s dst=%s%s count=%x bcount=%x trigger=%s%s%s%s%s%s%s%s%s\n",
+	logerror("%c: setup src=%s%s dst=%s%s count=%x bcount=%x trigger=%s%s%s%s%s%s%s%s%s%s\n",
 			 'A' + submodule,
 			 m_state[submodule].m_source & 0x80000000 ? util::string_format("dack%d", m_state[submodule].m_source & 1) : util::string_format("%06x", m_state[submodule].m_source),
 			 m_state[submodule].m_incs > 0 ? util::string_format("+%x", m_state[submodule].m_incs) : m_state[submodule].m_incs < 0 ? util::string_format("-%x", -m_state[submodule].m_incs) : "",
@@ -356,7 +364,7 @@ void h8gen_dma_channel_device::count_done(int submodule)
 			m_state[submodule].m_source = m_mar[0];
 		m_state[submodule].m_count = m_etcr[0] & 0xff00 ? m_etcr[0] >> 8 : 0x100;
 
-		m_state[submodule].m_bcount --;
+		m_state[submodule].m_bcount--;
 		if(m_state[submodule].m_bcount == 1)
 			m_state[submodule].m_flags &= ~h8_dma_state::BLOCK;
 
@@ -547,7 +555,10 @@ void h8h_dma_channel_device::dtcrb_w(u8 data)
 
 void h8h_dma_channel_device::dma_done(int submodule)
 {
-	m_dtcr[submodule] &= ~0x80;
+	if(m_state[submodule].m_flags & h8_dma_state::FAE)
+		m_dtcr[0] &= ~0x80;
+	else
+		m_dtcr[submodule] &= ~0x80;
 	h8gen_dma_channel_device::dma_done(submodule);
 }
 

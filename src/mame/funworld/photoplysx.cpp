@@ -43,7 +43,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void photoplaysx_map(address_map &map);
+	void photoplaysx_map(address_map &map) ATTR_COLD;
 };
 
 void photoplaysx_state::photoplaysx_map(address_map &map)
@@ -61,7 +61,7 @@ void photoplaysx_state::photoplaysx(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // Actually an Intel CELERON 2 GHz / 128 / 400 (SL6VR)
 	m_maincpu->set_addrmap(AS_PROGRAM, &photoplaysx_state::photoplaysx_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 
@@ -100,5 +100,5 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 2004,  photopsxsp,  0,          photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (Spanish)",         MACHINE_IS_SKELETON )
-GAME( 2004?, photopsxusp, photopsxsp, photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (update, Spanish)", MACHINE_IS_SKELETON )
+GAME( 2004,  photopsxsp,  0,          photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (Spanish)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004?, photopsxusp, photopsxsp, photoplaysx, photoplaysx, photoplaysx_state, empty_init, ROT0, "Funworld", "Photo Play Spirit Xtreme (update, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

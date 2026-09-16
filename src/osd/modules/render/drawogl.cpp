@@ -34,6 +34,7 @@ typedef uint64_t HashT;
 #elif defined(OSD_MAC)
 #define GL_SILENCE_DEPRECATION (1)
 #include "osdmac.h"
+#include "macglcontext.h"
 #else
 #include "osdsdl.h"
 #include "sdlglcontext.h"
@@ -49,7 +50,11 @@ typedef uint64_t HashT;
 
 // standard SDL headers
 #define TOBEMIGRATED 1
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #endif // !defined(OSD_WINDOWS && !defined(OSD_MAC)
 
@@ -65,9 +70,6 @@ typedef uint64_t HashT;
 
 #include <cstring>
 #include <cstdio>
-
-#include <sys/types.h>
-#include <sys/sysctl.h>
 
 #ifndef APIENTRY
 #define APIENTRY
@@ -297,7 +299,7 @@ public:
 #endif
 	virtual render_primitive_list *get_primitives() override
 	{
-		osd_dim nd = window().get_size();
+		osd_dim nd = window().get_size_pixels();
 		if (nd != m_blit_dim)
 		{
 			m_blit_dim = nd;
@@ -316,8 +318,8 @@ public:
 #endif
 
 private:
-	static const uint32_t HASH_SIZE = ((1 << 10) + 1);
-	static const uint32_t OVERFLOW_SIZE = (1 << 10);
+	static const uint32_t HASH_SIZE = ((1 << 18) + 1);
+	static const uint32_t OVERFLOW_SIZE = (1 << 12);
 
 	void destroy_all_textures();
 
@@ -751,8 +753,7 @@ int renderer_ogl::create()
 #if defined(OSD_WINDOWS)
 	m_gl_context.reset(new win_gl_context(dynamic_cast<win_window_info &>(window()).platform_window()));
 #elif defined(OSD_MAC)
-// TODO
-//  m_gl_context.reset(new mac_gl_context(dynamic_cast<mac_window_info &>(window()).platform_window()));
+	m_gl_context.reset(new mac_gl_context(dynamic_cast<mac_window_info &>(window()).platform_window()));
 #else
 	m_gl_context.reset(new sdl_gl_context(dynamic_cast<sdl_window_info &>(window()).platform_window()));
 #endif
@@ -1159,7 +1160,7 @@ int renderer_ogl::draw(const int update)
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -1240,42 +1241,7 @@ int renderer_ogl::draw(const int update)
 		//   |_________|
 		// (0,h)     (w,h)
 
-		GLsizei iScale = 1;
-
-		/*
-		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
-		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
-		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
-		*/
-		#if defined(SDLMAME_MACOSX) && !defined(OSD_MAC)
-		SDL_version sdlVers;
-		SDL_GetVersion(&sdlVers);
-		// Only do this if SDL is not at least 2.0.11.
-		if ((sdlVers.major == 2) && (sdlVers.minor == 0) && (sdlVers.patch < 11))
-		#endif
-		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
-		{
-			// now get the Darwin kernel version
-			int dMaj, dMin, dPatch;
-			char versStr[64];
-			dMaj = dMin = dPatch = 0;
-			size_t size = sizeof(versStr);
-			int retVal = sysctlbyname("kern.osrelease", versStr, &size, NULL, 0);
-			if (retVal == 0)
-			{
-			  sscanf(versStr, "%d.%d.%d", &dMaj, &dMin, &dPatch);
-			  // 10.15 Catalina is Darwin version 19
-			  if (dMaj >= 19)
-			  {
-				  // do the workaround for Retina being forced on
-				  osd_printf_verbose("OpenGL: enabling Retina workaround\n");
-				  iScale = 2;
-			  }
-			}
-		}
-		#endif
-
-		glViewport(0.0, 0.0, (GLsizei) m_width * iScale, (GLsizei) m_height * iScale);
+		glViewport(0.0, 0.0, (GLsizei) m_width, (GLsizei) m_height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glOrtho(0.0, (GLdouble) m_width, (GLdouble) m_height, 0.0, 0.0, -1.0);

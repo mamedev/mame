@@ -49,4 +49,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1979, perq, 0, 0, perq, perq, perq_state, empty_init, "Three Rivers Company Corporation", "PERQ 1A", MACHINE_IS_SKELETON )
+COMP( 1979, perq, 0, 0, perq, perq, perq_state, empty_init, "Three Rivers Company Corporation", "PERQ 1A", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

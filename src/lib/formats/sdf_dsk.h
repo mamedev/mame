@@ -28,7 +28,6 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
-	virtual bool supports_save() const noexcept override;
 
 protected:
 	static constexpr int HEADER_SIZE  = 512;

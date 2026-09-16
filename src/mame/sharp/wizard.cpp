@@ -62,7 +62,6 @@ More info:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arm7/arm7.h" // wrong, needs CPU core
-#include "cpu/arm7/arm7core.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -85,11 +84,11 @@ public:
 	void iq7000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -141,7 +140,7 @@ void wizard_state::iq7000(machine_config &config)
 	ARM9(config, m_maincpu, 240000000); // actually Sharp SC62015B02, currently unemulated
 	m_maincpu->set_addrmap(AS_PROGRAM, &wizard_state::main_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // all wrong, TBD
+	screen_device &screen(SCREEN(config, "screen").set_lcd()); // all wrong, TBD
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(wizard_state::screen_update));
 	screen.set_size(96, 64);
@@ -162,4 +161,4 @@ ROM_END
 } // Anonymous namespace
 
 
-CONS( 1988, iq7000, 0, 0, iq7000, iq7000, wizard_state, empty_init, "Sharp", "IQ-7000", MACHINE_IS_SKELETON )
+CONS( 1988, iq7000, 0, 0, iq7000, iq7000, wizard_state, empty_init, "Sharp", "IQ-7000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -16,7 +16,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
@@ -62,15 +62,15 @@ public:
 		, m_rv(*this, "RV")
 	{ }
 
-	void fireball(machine_config &config);
+	void fireball(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void fireball_map(address_map &map);
-	void fireball_io_map(address_map &map);
+	void fireball_map(address_map &map) ATTR_COLD;
+	void fireball_data_map(address_map &map) ATTR_COLD;
 
 	void io_00_w(uint8_t data);
 	uint8_t io_00_r();
@@ -296,7 +296,7 @@ void fireball_state::fireball_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-void fireball_state::fireball_io_map(address_map &map)
+void fireball_state::fireball_data_map(address_map &map)
 {
 	map(0x00, 0x01).rw(FUNC(fireball_state::io_00_r), FUNC(fireball_state::io_00_w));
 	map(0x02, 0x03).rw(FUNC(fireball_state::io_02_r), FUNC(fireball_state::io_02_w));
@@ -443,16 +443,7 @@ INPUT_PORTS_END
 
 void fireball_state::machine_start()
 {
-	m_digits.resolve();
-	m_hopper.resolve();
-	m_gameover.resolve();
-	m_title.resolve();
-	m_credit.resolve();
-	m_ss.resolve();
-	m_c_lock.resolve();
-	m_sv.resolve();
-	m_fbv.resolve();
-	m_rv.resolve();
+	// TODO: savestates
 }
 
 void fireball_state::machine_reset()
@@ -510,14 +501,14 @@ void fireball_state::fireball(machine_config &config)
 	// basic machine hardware
 	I8031(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fireball_state::fireball_map);
-	m_maincpu->set_addrmap(AS_IO, &fireball_state::fireball_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &fireball_state::fireball_data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(fireball_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(fireball_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(fireball_state::p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(fireball_state::p3_w));
 
 	// 9ms from scope reading 111Hz take care of this in the handler
-	TIMER(config, "int_0", 0).configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
+	TIMER(config, "int_0").configure_periodic(FUNC(fireball_state::int_0), attotime::from_hz(555));
 
 	EEPROM_X24C44_16BIT(config, "eeprom");
 

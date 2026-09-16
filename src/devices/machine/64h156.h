@@ -78,6 +78,7 @@ public:
 	auto atn_callback() { return m_write_atn.bind(); }
 	auto sync_callback() { return m_write_sync.bind(); }
 	auto byte_callback() { return m_write_byte.bind(); }
+	auto yb_wr_cb() { return m_write_yb.bind(); }
 
 	uint8_t yb_r();
 	void yb_w(uint8_t data);
@@ -99,16 +100,19 @@ public:
 	void ds_w(int ds);
 
 	void set_floppy(floppy_image_device *floppy);
+	void disable(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 
 private:
+	static constexpr unsigned WRITE_BATCH_SIZE = 32;
+
 	enum {
 		IDLE,
 		RUNNING,
@@ -117,37 +121,39 @@ private:
 
 	struct live_info {
 		attotime tm;
-		int state, next_state;
-		int sync;
-		int byte;
-		int ds;
-		int oe;
-		int soe;
-		int accl;
-		uint8_t accl_yb;
+		int state = 0, next_state = 0;
+		int sync = 0;
+		int byte = 0;
+		int ds = 0;
+		int oe = 0;
+		int soe = 0;
+		int accl = 0;
+		uint8_t accl_yb = 0;
 
 		attotime edge;
-		uint16_t shift_reg;
-		int cycle_counter;
-		int cell_counter;
-		int bit_counter;
-		int zero_counter;
-		int cycles_until_random_flux;
+		uint16_t shift_reg = 0;
+		int cycle_counter = 0;
+		int cell_counter = 0;
+		int bit_counter = 0;
+		int filter_counter = 0;
+		int zero_counter = 0;
+		int cycles_until_random_flux = 0;
+		uint32_t xorshift = 0;
 
-		uint8_t yb;
-		uint8_t shift_reg_write;
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
+		uint8_t yb = 0;
+		uint8_t shift_reg_write = 0;
+		unsigned write_transition_count = 0;
 	};
 
 	devcb_write_line m_write_atn;
 	devcb_write_line m_write_sync;
 	devcb_write_line m_write_byte;
+	devcb_write8 m_write_yb;
 
 	floppy_image_device *m_floppy;
 
 	int m_mtr;
+	bool m_disabled;
 	int m_accl;
 	int m_stp;
 	int m_ds;
@@ -176,6 +182,8 @@ private:
 	void live_run(const attotime &limit = attotime::never);
 	void get_next_edge(const attotime &when);
 	int get_next_bit(attotime &tm, const attotime &limit);
+	uint32_t next_rand();
+	void update_stepper(int stp);
 };
 
 

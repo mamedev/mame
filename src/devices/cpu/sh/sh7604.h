@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller, R. Belmont
 
+// sh7604, sh2 variant
+
 #ifndef MAME_CPU_SH_SH7604_H
 #define MAME_CPU_SH_SH7604_H
 
@@ -13,14 +15,14 @@
 #define SH2_FTCSR_READ_CB(name)  void name(uint32_t data)
 
 
-class sh2_sh7604_device : public sh2_device
+class sh7604_device : public sh2_device
 {
 public:
 	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_kludge_delegate;
 	typedef device_delegate<int (uint32_t src, uint32_t dst, uint32_t data, int size)> dma_fifo_data_available_delegate;
 	typedef device_delegate<void (uint32_t data)> ftcsr_read_delegate;
 
-	sh2_sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sh7604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 
@@ -33,10 +35,10 @@ public:
 	void sh2_notify_dma_data_available();
 
 protected:
-	sh2_sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines);
+	sh7604_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void sh2_exception(const char *message, int irqline) override;
 
@@ -53,7 +55,7 @@ private:
 		CCLRA = 0x01
 	};
 
-	void sh7604_map(address_map &map);
+	void sh7604_map(address_map &map) ATTR_COLD;
 
 	uint32_t sh2_internal_a5();
 
@@ -117,6 +119,17 @@ private:
 
 	uint32_t dvcr_r();
 	void dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
+	// UBC
+	uint16_t barah_r();
+	void barah_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t baral_r();
+	void baral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t barbh_r();
+	void barbh_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t barbl_r();
+	void barbl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// DMAC
 	template <int Channel> uint32_t vcrdma_r();
@@ -204,6 +217,10 @@ private:
 	uint8_t m_rstcsr;
 	uint16_t m_wtcw[2];
 
+	// UBC
+	uint16_t m_barah, m_baral;
+	uint16_t m_barbh, m_barbl;
+
 	// DMAC
 	struct
 	{
@@ -257,6 +274,6 @@ private:
 	void sh2_recalc_irq();
 };
 
-DECLARE_DEVICE_TYPE(SH2_SH7604, sh2_sh7604_device)
+DECLARE_DEVICE_TYPE(SH7604, sh7604_device)
 
 #endif // MAME_CPU_SH_SH7604_H

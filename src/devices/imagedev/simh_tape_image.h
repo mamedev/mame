@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Mietek Bak
 
-#ifndef MAME_DEVICES_IMAGEDEV_SIMH_TAPE_IMAGE_H
-#define MAME_DEVICES_IMAGEDEV_SIMH_TAPE_IMAGE_H
+#ifndef MAME_IMAGEDEV_SIMH_TAPE_IMAGE_H
+#define MAME_IMAGEDEV_SIMH_TAPE_IMAGE_H
 
 #pragma once
 
@@ -39,8 +39,8 @@ protected:
 
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// state
 	std::unique_ptr<simh_tape_file> m_file; // tape image file
@@ -49,4 +49,4 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////////
 
-#endif // MAME_DEVICES_IMAGEDEV_SIMH_TAPE_IMAGE_H
+#endif // MAME_IMAGEDEV_SIMH_TAPE_IMAGE_H

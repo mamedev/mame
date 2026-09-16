@@ -50,7 +50,7 @@ void a2bus_softcard3_device::z80_io(address_map &map)
 
 void a2bus_softcard3_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_z80, 1021800*2);   // Z80 runs at 2M based on comment in the manual
+	Z80(config, m_z80, A2BUS_1M_CLOCK*2);   // Z80 runs at 2M based on comment in the manual
 	m_z80->set_addrmap(AS_PROGRAM, &a2bus_softcard3_device::z80_mem);
 	m_z80->set_addrmap(AS_IO, &a2bus_softcard3_device::z80_io);
 	TIMER(config, "timer").configure_generic(FUNC(a2bus_softcard3_device::timercallback));
@@ -94,6 +94,11 @@ void a2bus_softcard3_device::device_start()
 }
 
 void a2bus_softcard3_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_softcard3_device::reset_from_bus()
 {
 	m_bEnabled = false;
 	m_reset = false;
@@ -218,9 +223,4 @@ void a2bus_softcard3_device::dma_w(offs_t offset, uint8_t data)
 	{
 		slot_dma_write((offset & 0xff) + (m_prom[offset >> 8] << 8), data);
 	}
-}
-
-bool a2bus_softcard3_device::take_c800()
-{
-	return false;
 }

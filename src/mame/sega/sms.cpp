@@ -398,7 +398,7 @@ void gamegear_state::gg_io(address_map &map)
 static INPUT_PORTS_START( sms )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", sega315_5124_device, n_nmi_in_write)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", FUNC(sega315_5124_device::n_nmi_in_write))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sg1000m3 )
@@ -596,7 +596,7 @@ void sms_state::sms2_ntsc(machine_config &config)
 {
 	sms_ntsc_base(config);
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -618,15 +618,15 @@ void sms1_state::sms1_ntsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_ntsc_raw_params(*m_left_lcd, XTAL(10'738'635)/2);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_ntsc_raw_params(*m_right_lcd, XTAL(10'738'635)/2);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -688,7 +688,7 @@ void sms_state::sms2_pal(machine_config &config)
 	sms_pal_base(config);
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -709,15 +709,15 @@ void sms1_state::sms1_pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PAL/10);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PAL/10);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -757,7 +757,7 @@ void sms_state::sms3_paln(machine_config &config)
 	sms_paln_base(config);
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -778,15 +778,15 @@ void sms1_state::sms1_paln(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PALN/2);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PALN/2);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -827,7 +827,7 @@ void sms_state::sms3_br(machine_config &config)
 	sms_br_base(config);
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -849,15 +849,15 @@ void sms1_state::sms1_br(machine_config &config)
 
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_ntsc_raw_params(*m_left_lcd, MASTER_CLOCK_PALM/2);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_ntsc_raw_params(*m_right_lcd, MASTER_CLOCK_PALM/2);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -970,13 +970,12 @@ void gamegear_state::gamegear(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_LCD);
+	SCREEN(config, m_main_scr).set_lcd();
 	screen_gg_raw_params(*m_main_scr, MASTER_CLOCK_GG/6);
 	m_main_scr->set_screen_update(FUNC(gamegear_state::screen_update_gamegear));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* VDP chip of the Gamegear 2 ASIC version */
 	SEGA315_5377(config, m_vdp, MASTER_CLOCK_GG/3);
@@ -984,15 +983,15 @@ void gamegear_state::gamegear(machine_config &config)
 	m_vdp->set_is_pal(false);
 	m_vdp->n_int().set_inputline(m_maincpu, 0);
 	m_vdp->vblank().set(FUNC(gamegear_state::gg_pause_callback));
-	m_vdp->add_route(0, "lspeaker", 1.00);
-	m_vdp->add_route(1, "rspeaker", 1.00);
+	m_vdp->add_route(0, "speaker", 1.00, 0);
+	m_vdp->add_route(1, "speaker", 1.00, 1);
 
 	/* cartridge */
 	GAMEGEAR_CART_SLOT(config, "slot", gg_cart, nullptr).set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gamegear");
 
-	GAMEGEAR_IO_PORT(config, m_gg_ioport, 0);
+	GAMEGEAR_IO_PORT(config, m_gg_ioport);
 	m_gg_ioport->set_in_handler(m_port_gg_ext, FUNC(sms_control_port_device::in_r));
 	m_gg_ioport->set_out_handler(m_port_gg_ext, FUNC(sms_control_port_device::out_w));
 	m_gg_ioport->hl_handler().set(FUNC(gamegear_state::gg_nmi));
@@ -1261,19 +1260,19 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY    FULLNAME                              FLAGS */
 CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sg1000m3_state, empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
-CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms1_state,     empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
-CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms1_state,     empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
+CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms1_state,     empty_init,    "Sega",    "Master System",                      MACHINE_SUPPORTS_SAVE )
+CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms1_state,     empty_init,    "Sega",    "Master System (PAL)" ,               MACHINE_SUPPORTS_SAVE )
 CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, empty_init,    "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )
 CONS( 1987, smsj,     sms,      0,      smsj,      smsj,     sms1_state,     empty_init,    "Sega",    "Master System (Japan)",              MACHINE_SUPPORTS_SAVE )
 CONS( 1990, sms,      0,        0,      sms2_ntsc, sms,      sms_state,      empty_init,    "Sega",    "Master System II",                   MACHINE_SUPPORTS_SAVE )
 CONS( 1990, smspal,   sms,      0,      sms2_pal,  sms,      sms_state,      empty_init,    "Sega",    "Master System II (PAL)",             MACHINE_SUPPORTS_SAVE )
-CONS( 1989, sms1krfm, sms,      0,      smsj,      smsj,     sms1_state,     empty_init,    "Samsung", "Gam*Boy I (Korea) (FM)",             MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms1kr,   sms,      0,      sms1_kr,   smsj,     sms1_state,     empty_init,    "Samsung", "Gam*Boy I (Korea)",                  MACHINE_SUPPORTS_SAVE )
+CONS( 1989, sms1krfm, sms,      0,      smsj,      smsj,     sms1_state,     empty_init,    "Samsung", "Gam*Boy (Korea) (FM)",               MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms1kr,   sms,      0,      sms1_kr,   smsj,     sms1_state,     empty_init,    "Samsung", "Gam*Boy (Korea)",                    MACHINE_SUPPORTS_SAVE )
 CONS( 1991, smskr,    sms,      0,      sms2_kr,   sms,      sms_state,      empty_init,    "Samsung", "Gam*Boy II (Korea)",                 MACHINE_SUPPORTS_SAVE )
-CONS( 1989, sms1br,   sms,      0,      sms1_br,   sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System I (Brazil)",           MACHINE_SUPPORTS_SAVE )
+CONS( 1989, sms1br,   sms,      0,      sms1_br,   sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System (Brazil)",             MACHINE_SUPPORTS_SAVE )
 CONS( 1991, sms2br,   sms,      0,      sms1_br,   sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System II (Brazil)",          MACHINE_SUPPORTS_SAVE )
 CONS( 1992, smsbr,    sms,      0,      sms3_br,   sms,      sms_state,      empty_init,    "Tec Toy", "Master System III Compact (Brazil)", MACHINE_SUPPORTS_SAVE )
-CONS( 19??, sms1paln, sms,      0,      sms1_paln, sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System I (PAL-N)",            MACHINE_SUPPORTS_SAVE )
+CONS( 19??, sms1paln, sms,      0,      sms1_paln, sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System (PAL-N)",              MACHINE_SUPPORTS_SAVE )
 CONS( 19??, sms2paln, sms,      0,      sms1_paln, sms1,     sms1_state,     empty_init,    "Tec Toy", "Master System II (PAL-N)",           MACHINE_SUPPORTS_SAVE )
 CONS( 19??, smspaln,  sms,      0,      sms3_paln, sms,      sms_state,      empty_init,    "Tec Toy", "Master System III Compact (PAL-N)",  MACHINE_SUPPORTS_SAVE )
 

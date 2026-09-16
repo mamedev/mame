@@ -32,6 +32,9 @@ noinst_PROGRAMS = \
 	executors/pipeline \
 	executors/priority_scheduler \
 	iostreams/http_client \
+	operations/c_callback_wrapper \
+	operations/callback_wrapper \
+	operations/composed_1 \
 	operations/composed_1 \
 	operations/composed_2 \
 	operations/composed_3 \
@@ -41,6 +44,7 @@ noinst_PROGRAMS = \
 	operations/composed_7 \
 	operations/composed_8 \
   parallel_group/parallel_sort \
+  parallel_group/ranged_wait_for_all \
   parallel_group/wait_for_all \
   parallel_group/wait_for_one \
   parallel_group/wait_for_one_error \
@@ -70,6 +74,8 @@ executors_fork_join_SOURCES = executors/fork_join.cpp
 executors_pipeline_SOURCES = executors/pipeline.cpp
 executors_priority_scheduler_SOURCES = executors/priority_scheduler.cpp
 iostreams_http_client_SOURCES = iostreams/http_client.cpp
+operations_c_callback_wrapper_SOURCES = operations/c_callback_wrapper.cpp
+operations_callback_wrapper_SOURCES = operations/callback_wrapper.cpp
 operations_composed_1_SOURCES = operations/composed_1.cpp
 operations_composed_2_SOURCES = operations/composed_2.cpp
 operations_composed_3_SOURCES = operations/composed_3.cpp
@@ -79,6 +85,7 @@ operations_composed_6_SOURCES = operations/composed_6.cpp
 operations_composed_7_SOURCES = operations/composed_7.cpp
 operations_composed_8_SOURCES = operations/composed_8.cpp
 parallel_group_parallel_sort_SOURCES = parallel_group/parallel_sort.cpp
+parallel_group_ranged_wait_for_all_SOURCES = parallel_group/ranged_wait_for_all.cpp
 parallel_group_wait_for_all_SOURCES = parallel_group/wait_for_all.cpp
 parallel_group_wait_for_one_SOURCES = parallel_group/wait_for_one.cpp
 parallel_group_wait_for_one_error_SOURCES = parallel_group/wait_for_one_error.cpp

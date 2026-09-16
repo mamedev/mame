@@ -34,7 +34,7 @@ class pc1512_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto clock_wr_callback() { return m_write_clock.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
@@ -46,13 +46,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_timer_tick);
 

@@ -50,7 +50,7 @@ void sh7014_bsc_device::map(address_map &map)
 {
 	map(0x00, 0x01).rw(FUNC(sh7014_bsc_device::bcr1_r), FUNC(sh7014_bsc_device::bcr1_w));
 	map(0x02, 0x03).rw(FUNC(sh7014_bsc_device::bcr2_r), FUNC(sh7014_bsc_device::bcr2_w));
-	map(0x04, 0x05).rw(FUNC(sh7014_bsc_device::wcr1_r), FUNC(sh7014_bsc_device::wcr1_w));;
+	map(0x04, 0x05).rw(FUNC(sh7014_bsc_device::wcr1_r), FUNC(sh7014_bsc_device::wcr1_w));
 	map(0x06, 0x07).rw(FUNC(sh7014_bsc_device::wcr2_r), FUNC(sh7014_bsc_device::wcr2_w));
 	map(0x0a, 0x0b).rw(FUNC(sh7014_bsc_device::dcr_r), FUNC(sh7014_bsc_device::dcr_w));
 	map(0x0c, 0x0d).rw(FUNC(sh7014_bsc_device::rtcsr_r), FUNC(sh7014_bsc_device::rtcsr_w));

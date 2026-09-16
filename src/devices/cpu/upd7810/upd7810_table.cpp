@@ -78,7 +78,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_op48[256] =
 	{&upd7810_device::RLD,           2,17, 8,L0|L1}, /* 38: 0100 1000 0011 1000                      */
 	{&upd7810_device::RRD,           2,17, 8,L0|L1}, /* 39: 0100 1000 0011 1001                      */
 	{&upd7810_device::NEGA,          2, 8, 8,L0|L1}, /* 3a: 0100 1000 0011 1010                      */
-	{&upd7810_device::HALT,          2,12, 8,L0|L1}, /* 3b: 0100 1000 0011 1011                      */ /* Mnemonic should be HLT? Note the timing differs between the upd7810 and upd78c10: 7810 takes 11 cycles, 78c10 takes 12; both take 8 when skipped */
+	{&upd7810_device::HLT,           2,12, 8,L0|L1}, /* 3b: 0100 1000 0011 1011                      */ /* Note the timing differs between the upd7810 and upd78c10: 7810 takes 11 cycles, 78c10 takes 12; both take 8 when skipped */
 	{&upd7810_device::illegal2,      2, 8, 8,L0|L1}, /* 3c: 0100 1000 0011 1100                      */
 	{&upd7810_device::DIV_A,         2,59, 8,L0|L1}, /* 3d: 0100 1000 0011 1101                      */
 	{&upd7810_device::DIV_B,         2,59, 8,L0|L1}, /* 3e: 0100 1000 0011 1110                      */
@@ -3605,7 +3605,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_op74_7801[256] =
 const struct upd7810_device::opcode_s upd7810_device::s_opXX_7801[256] =
 {
 	/* 0x00 - 0x1F */
-	{&upd7810_device::NOP,           1, 4, 4,L0|L1}, {&upd7810_device::HALT,          1, 6, 6,L0|L1},
+	{&upd7810_device::NOP,           1, 4, 4,L0|L1}, {&upd7810_device::HLT,           1, 6, 6,L0|L1},
 	{&upd7810_device::INX_SP,        1, 7, 7,L0|L1}, {&upd7810_device::DCX_SP,        1, 7, 7,L0|L1},
 	{&upd7810_device::LXI_S_w,       3,10,10,L0|L1}, {&upd7810_device::ANIW_wa_xx,    3,16,16,L0|L1},
 	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::ANI_A_xx,      2, 7, 7,L0|L1},
@@ -4855,7 +4855,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_op74_78c05[256] =
 const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c05[256] =
 {
 	/* 0x00 - 0x1F */
-	{&upd7810_device::NOP,           1, 4, 4,L0|L1}, {&upd7810_device::HALT,          1, 6, 6,L0|L1},
+	{&upd7810_device::NOP,           1, 4, 4,L0|L1}, {&upd7810_device::HLT,           1, 6, 6,L0|L1},
 	{&upd7810_device::INX_SP,        1, 7, 7,L0|L1}, {&upd7810_device::DCX_SP,        1, 7, 7,L0|L1},
 	{&upd7810_device::LXI_S_w,       3,10,10,L0|L1}, {&upd7810_device::ANIW_wa_xx,    3,16,16,L0|L1},
 	{&upd7810_device::illegal,       1, 4, 4,L0|L1}, {&upd7810_device::ANI_A_xx,      2, 7, 7,L0|L1},
@@ -6106,7 +6106,7 @@ const struct upd7810_device::opcode_s upd7810_device::s_op74_78c06[256] =
 const struct upd7810_device::opcode_s upd7810_device::s_opXX_78c06[256] =
 {
 	/* 0x00 - 0x1F */
-	{&upd7810_device::NOP,           1, 6, 6,L0|L1}, {&upd7810_device::HALT,          1, 6, 6,L0|L1},
+	{&upd7810_device::NOP,           1, 6, 6,L0|L1}, {&upd7810_device::HLT,           1, 6, 6,L0|L1},
 	{&upd7810_device::INX_SP,        1, 9, 9,L0|L1}, {&upd7810_device::DCX_SP,        1, 9, 9,L0|L1},
 	{&upd7810_device::LXI_S_w,       3,16,16,L0|L1}, {&upd7810_device::ANIW_wa_xx,    3,22,22,L0|L1},
 	{&upd7810_device::illegal,       1, 6, 6,L0|L1}, {&upd7810_device::ANI_A_xx,      2,11,11,L0|L1},

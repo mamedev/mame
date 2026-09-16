@@ -92,10 +92,7 @@ public:
 	a78_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
 		: a78_cart_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a78_cart_slot_device();
@@ -127,11 +124,11 @@ public:
 
 private:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	std::pair<std::error_condition, std::string> verify_header(const char *header);
+	std::pair<std::error_condition, std::string> verify_header(const uint8_t *header);
 	int validate_header(int head, bool log) const;
-	void internal_header_logging(uint8_t *header, uint32_t len);
+	void internal_header_logging(const uint8_t *header, uint32_t len);
 
 	device_a78_cart_interface *m_cart;
 	int m_type;

@@ -33,6 +33,8 @@
 #include "emu.h"
 #include "ds1207.h"
 
+#include <tuple>
+
 #define LOG_LINES    (1U << 1)
 #define LOG_STATE    (1U << 2)
 #define LOG_DATA     (1U << 3)
@@ -138,28 +140,62 @@ void ds1207_device::nvram_default()
 
 bool ds1207_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.read(m_unique_pattern, sizeof(m_unique_pattern), actual) && actual == sizeof(m_unique_pattern);
-	result = result && !file.read(m_identification, sizeof(m_identification), actual) && actual == sizeof(m_identification);
-	result = result && !file.read(m_security_match, sizeof(m_security_match), actual) && actual == sizeof(m_security_match);
-	result = result && !file.read(m_secure_memory, sizeof(m_secure_memory), actual) && actual == sizeof(m_secure_memory);
-	result = result && !file.read(m_days_left, sizeof(m_days_left), actual) && actual == sizeof(m_days_left);
-	result = result && !file.read(m_start_time, sizeof(m_start_time), actual) && actual == sizeof(m_start_time);
-	result = result && !file.read(&m_device_state, sizeof(m_device_state), actual) && actual == sizeof(m_device_state);
-	return result;
+
+	std::tie(err, actual) = read(file, m_unique_pattern, sizeof(m_unique_pattern));
+	if (err || (sizeof(m_unique_pattern) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_identification, sizeof(m_identification));
+	if (err || (sizeof(m_identification) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_security_match, sizeof(m_security_match));
+	if (err || (sizeof(m_security_match) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_secure_memory, sizeof(m_secure_memory));
+	if (err || (sizeof(m_secure_memory) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_days_left, sizeof(m_days_left));
+	if (err || (sizeof(m_days_left) != actual))
+		return false;
+	std::tie(err, actual) = read(file, m_start_time, sizeof(m_start_time));
+	if (err || (sizeof(m_start_time) != actual))
+		return false;
+	std::tie(err, actual) = read(file, &m_device_state, sizeof(m_device_state));
+	if (err || (sizeof(m_device_state) != actual))
+		return false;
+
+	return true;
 }
 
 bool ds1207_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	bool result = !file.write(m_unique_pattern, sizeof(m_unique_pattern), actual) && actual == sizeof(m_unique_pattern);
-	result = result && !file.write(m_identification, sizeof(m_identification), actual) && actual == sizeof(m_identification);
-	result = result && !file.write(m_security_match, sizeof(m_security_match), actual) && actual == sizeof(m_security_match);
-	result = result && !file.write(m_secure_memory, sizeof(m_secure_memory), actual) && actual == sizeof(m_secure_memory);
-	result = result && !file.write(m_days_left, sizeof(m_days_left), actual) && actual == sizeof(m_days_left);
-	result = result && !file.write(m_start_time, sizeof(m_start_time), actual) && actual == sizeof(m_start_time);
-	result = result && !file.write(&m_device_state, sizeof(m_device_state), actual) && actual == sizeof(m_device_state);
-	return result;
+
+	std::tie(err, actual) = write(file, m_unique_pattern, sizeof(m_unique_pattern));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_identification, sizeof(m_identification));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_security_match, sizeof(m_security_match));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_secure_memory, sizeof(m_secure_memory));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_days_left, sizeof(m_days_left));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, m_start_time, sizeof(m_start_time));
+	if (err)
+		return false;
+	std::tie(err, actual) = write(file, &m_device_state, sizeof(m_device_state));
+	if (err)
+		return false;
+
+	return true;
 }
 
 void ds1207_device::new_state(uint8_t state)
@@ -216,7 +252,7 @@ void ds1207_device::write_rst(int state)
 	if(m_rst != this_state)
 	{
 		m_rst = this_state;
-		LOGLINES("%s: DS1270 rst=%d\n", machine().describe_context(), m_rst);
+		LOGLINES("%s: DS1207 rst=%d\n", machine().describe_context(), m_rst);
 
 		if(m_rst)
 		{
@@ -227,15 +263,15 @@ void ds1207_device::write_rst(int state)
 			switch(m_state)
 			{
 				case STATE_WRITE_IDENTIFICATION:
-					LOGSTATE("%s: DS1270 reset during write identification (bit=%u)\n", machine().describe_context(), m_bit);
+					LOGSTATE("%s: DS1207 reset during write identification (bit=%u)\n", machine().describe_context(), m_bit);
 					break;
 
 				case STATE_WRITE_SECURITY_MATCH:
-					LOGSTATE("%s: DS1270 reset during write security match (bit=%u)\n", machine().describe_context(), m_bit);
+					LOGSTATE("%s: DS1207 reset during write security match (bit=%u)\n", machine().describe_context(), m_bit);
 					break;
 
 				case STATE_WRITE_SECURE_MEMORY:
-					LOGSTATE("%s: DS1270 reset during write secure memory (bit=%u)\n", machine().describe_context(), m_bit);
+					LOGSTATE("%s: DS1207 reset during write secure memory (bit=%u)\n", machine().describe_context(), m_bit);
 					break;
 			}
 
@@ -251,7 +287,7 @@ void ds1207_device::write_clk(int state)
 	if(m_clk != this_state)
 	{
 		m_clk = this_state;
-		LOGLINES("%s: DS1270 clk=%d (bit=%u)\n", machine().describe_context(), m_clk, m_bit);
+		LOGLINES("%s: DS1207 clk=%d (bit=%u)\n", machine().describe_context(), m_clk, m_bit);
 
 		if(m_clk)
 		{
@@ -265,7 +301,7 @@ void ds1207_device::write_clk(int state)
 
 				if(m_bit == 24)
 				{
-					LOGDATA("%s: DS1270 -> command %02x %02x %02x (%02x %02x)\n", machine().describe_context(),
+					LOGDATA("%s: DS1207 -> command %02x %02x %02x (%02x %02x)\n", machine().describe_context(),
 							   m_command[ 0 ], m_command[ 1 ], m_command[ 2 ], m_unique_pattern[ 0 ], m_unique_pattern[ 1 ]);
 
 					if(m_command[ 2 ] == m_unique_pattern[ 1 ] && (m_command[ 1 ] & ~3) == m_unique_pattern[ 0 ])
@@ -354,7 +390,7 @@ void ds1207_device::write_clk(int state)
 
 				if(m_bit == 64)
 				{
-					LOGDATA("%s: DS1270 <- identification %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
+					LOGDATA("%s: DS1207 <- identification %02x %02x %02x %02x %02x %02x %02x %02x\n", machine().describe_context(),
 							   m_identification[ 0 ], m_identification[ 1 ], m_identification[ 2 ], m_identification[ 3 ],
 							   m_identification[ 4 ], m_identification[ 5 ], m_identification[ 6 ], m_identification[ 7 ]);
 
@@ -498,7 +534,7 @@ void ds1207_device::write_dq(int state)
 	{
 		m_dqw = this_state;
 
-		LOGLINES("%s: DS1270 dqw=%u\n", machine().describe_context(), m_dqw);
+		LOGLINES("%s: DS1207 dqw=%u\n", machine().describe_context(), m_dqw);
 	}
 }
 
@@ -506,11 +542,11 @@ int ds1207_device::read_dq()
 {
 	if(m_dqr == DQ_HIGH_IMPEDANCE)
 	{
-		LOGLINES("%s: DS1270 dqr=high impedance\n", machine().describe_context());
+		LOGLINES("%s: DS1207 dqr=high impedance\n", machine().describe_context());
 		return 0;
 	}
 
-	LOGLINES("%s: DS1270 dqr=%d (bit=%u)\n", machine().describe_context(), m_dqr, m_bit);
+	LOGLINES("%s: DS1207 dqr=%d (bit=%u)\n", machine().describe_context(), m_dqr, m_bit);
 	return m_dqr;
 }
 

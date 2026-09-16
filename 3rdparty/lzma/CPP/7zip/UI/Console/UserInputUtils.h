@@ -1,7 +1,7 @@
 // UserInputUtils.h
 
-#ifndef __USER_INPUT_UTILS_H
-#define __USER_INPUT_UTILS_H
+#ifndef ZIP7_INC_USER_INPUT_UTILS_H
+#define ZIP7_INC_USER_INPUT_UTILS_H
 
 #include "../../../Common/StdOutStream.h"
 

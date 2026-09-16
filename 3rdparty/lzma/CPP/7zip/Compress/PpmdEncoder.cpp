@@ -24,7 +24,7 @@ void CEncProps::Normalize(int level)
   const unsigned kMult = 16;
   if (MemSize / kMult > ReduceSize)
   {
-    for (unsigned i = 16; i <= 31; i++)
+    for (unsigned i = 16; i < 32; i++)
     {
       UInt32 m = (UInt32)1 << i;
       if (ReduceSize <= m / kMult)
@@ -52,7 +52,7 @@ CEncoder::~CEncoder()
   Ppmd7_Free(&_ppmd, &g_BigAlloc);
 }
 
-STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *coderProps, UInt32 numProps)
+Z7_COM7F_IMF(CEncoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *coderProps, UInt32 numProps))
 {
   int level = -1;
   CEncProps props;
@@ -109,7 +109,7 @@ STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIA
 
     if (prop.vt != VT_UI4)
       return E_INVALIDARG;
-    UInt32 v = (UInt32)prop.ulVal;
+    const UInt32 v = (UInt32)prop.ulVal;
     switch (propID)
     {
       case NCoderPropID::kOrder:
@@ -127,17 +127,17 @@ STDMETHODIMP CEncoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIA
   return S_OK;
 }
 
-STDMETHODIMP CEncoder::WriteCoderProperties(ISequentialOutStream *outStream)
+Z7_COM7F_IMF(CEncoder::WriteCoderProperties(ISequentialOutStream *outStream))
 {
   const UInt32 kPropSize = 5;
   Byte props[kPropSize];
   props[0] = (Byte)_props.Order;
-  SetUi32(props + 1, _props.MemSize);
+  SetUi32(props + 1, _props.MemSize)
   return WriteStream(outStream, props, kPropSize);
 }
 
-HRESULT CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 * /* inSize */, const UInt64 * /* outSize */, ICompressProgressInfo *progress))
 {
   if (!_inBuf)
   {
@@ -160,7 +160,7 @@ HRESULT CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outS
   for (;;)
   {
     UInt32 size;
-    RINOK(inStream->Read(_inBuf, kBufSize, &size));
+    RINOK(inStream->Read(_inBuf, kBufSize, &size))
     if (size == 0)
     {
       // We don't write EndMark in PPMD-7z.
@@ -179,13 +179,13 @@ HRESULT CEncoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outS
     */
 
     Ppmd7z_EncodeSymbols(&_ppmd, buf, lim);
-    RINOK(_outStream.Res);
+    RINOK(_outStream.Res)
 
     processed += size;
     if (progress)
     {
       const UInt64 outSize = _outStream.GetProcessed();
-      RINOK(progress->SetRatioInfo(&processed, &outSize));
+      RINOK(progress->SetRatioInfo(&processed, &outSize))
     }
   }
 }

@@ -39,10 +39,10 @@ public:
 	{
 	}
 
-	void adacp150(machine_config &config);
+	void adacp150(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -52,10 +52,10 @@ private:
 	void bcp_ram_w(offs_t offset, u8 data);
 	void output_control_w(u8 data);
 
-	void z80_mem_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void bcp_prog_map(address_map &map);
-	void bcp_data_map(address_map &map);
+	void z80_mem_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
+	void bcp_prog_map(address_map &map) ATTR_COLD;
+	void bcp_data_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<dp8344_device> m_bcp;
@@ -67,8 +67,6 @@ private:
 
 void adacp150_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_lcdc->rw_w(0);
 
 	save_item(NAME(m_bcp_cmd));
@@ -209,14 +207,14 @@ void adacp150_state::adacp150(machine_config &config)
 	rs232_port_device &host(RS232_PORT(config, "host", default_rs232_devices, nullptr));
 	host.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 16);
 	screen.set_visarea(0, 16*6-1, 0, 16-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(adacp150_state::pixel_update));
 

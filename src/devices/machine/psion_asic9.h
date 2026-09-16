@@ -34,6 +34,8 @@ public:
 	auto col_cb() { return m_col_cb.bind(); }
 	auto port_ab_r() { return m_port_ab_r.bind(); }
 	auto port_ab_w() { return m_port_ab_w.bind(); }
+	auto port_cd_r() { return m_port_cd_r.bind(); }
+	auto port_cd_w() { return m_port_cd_w.bind(); }
 	auto pcm_in() { return m_pcm_in.bind(); }
 	auto pcm_out() { return m_pcm_out.bind(); }
 
@@ -62,19 +64,22 @@ public:
 protected:
 	psion_asic9_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	virtual uint32_t ram_device_size(uint8_t device_type);
+	virtual uint8_t get_ram_type(uint32_t ram_size);
 
 private:
 	required_device<cpu_device> m_v30;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	static constexpr int AS_A9_RAM = AS_OPCODES + 1;
 	static constexpr int AS_A9_ROM = AS_OPCODES + 2;
@@ -104,7 +109,6 @@ private:
 	offs_t translate_address(offs_t offset);
 
 	uint8_t m_ram_type;
-	uint32_t ram_device_size(uint8_t device_type);
 	void configure_ram(uint8_t device_type = 0);
 	void configure_rom();
 
@@ -123,9 +127,10 @@ private:
 	bool m_a9_protection_mode;
 	uint32_t m_a9_protection_upper;
 	uint32_t m_a9_protection_lower;
+	uint16_t m_a9_port_ab_data;
+	uint16_t m_a9_port_cd_data;
 	uint16_t m_a9_port_ab_ddr;
-	uint8_t m_a9_port_c_ddr;
-	uint8_t m_a9_port_d_ddr;
+	uint16_t m_a9_port_cd_ddr;
 	uint8_t m_a9_psel_6000;
 	uint8_t m_a9_psel_7000;
 	uint8_t m_a9_psel_8000;
@@ -142,6 +147,8 @@ private:
 	devcb_write8 m_col_cb;
 	devcb_read16 m_port_ab_r;
 	devcb_write16 m_port_ab_w;
+	devcb_read16 m_port_cd_r;
+	devcb_write16 m_port_cd_w;
 	devcb_read8 m_pcm_in;
 	devcb_write8 m_pcm_out;
 
@@ -169,6 +176,10 @@ class psion_asic9mx_device : public psion_asic9_device
 public:
 	// construction/destruction
 	psion_asic9mx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual uint32_t ram_device_size(uint8_t device_type) override;
+	virtual uint8_t get_ram_type(uint32_t ram_size) override;
 };
 
 

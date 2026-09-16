@@ -99,7 +99,7 @@ HRESULT CHashCallbackConsole::SetCompleted(const UInt64 *completeValue)
 static void AddMinuses(AString &s, unsigned num)
 {
   for (unsigned i = 0; i < num; i++)
-    s += '-';
+    s.Add_Minus();
 }
 
 static void AddSpaces_if_Positive(AString &s, int num)
@@ -314,7 +314,7 @@ HRESULT CHashCallbackConsole::SetOperationResult(UInt64 fileSize, const CHashBun
     else
     {
       UString temp (_fileName);
-      _so->Normalize_UString(temp);
+      _so->Normalize_UString_Path(temp);
       _so->Convert_UString_to_AString(temp, s);
     }
     PrintResultLine(fileSize, hb.Hashers, k_HashCalc_Index_Current, showHash, s);

@@ -20,10 +20,7 @@ public:
 	sun_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: sun_mouse_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	sun_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sun_mouse_port_device();
@@ -39,8 +36,8 @@ protected:
 	sun_mouse_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_config_complete() override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	int m_rxd;
 

@@ -4,6 +4,7 @@
 
   Bingo Roll / Bell Star
 
+   TODO: Hook up i8256
 
 ************************************************************************
 
@@ -507,9 +508,10 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/gen_latch.h"
+#include "machine/i8256.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
@@ -537,7 +539,7 @@ public:
 	void vip2000(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint16_t> m_blit_ram;
@@ -549,13 +551,13 @@ private:
 
 	void vip2000_outputs_w(uint16_t data);
 
-	void bingor2_map(address_map &map);
-	void bingor_io(address_map &map);
-	void bingor_map(address_map &map);
-	void slave_io(address_map &map);
-	void slave_map(address_map &map);
-	void vip2000_io(address_map &map);
-	void vip2000_map(address_map &map);
+	void bingor2_map(address_map &map) ATTR_COLD;
+	void bingor_io(address_map &map) ATTR_COLD;
+	void bingor_map(address_map &map) ATTR_COLD;
+	void slave_data(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
+	void vip2000_io(address_map &map) ATTR_COLD;
+	void vip2000_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -653,7 +655,7 @@ void bingor_state::slave_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void bingor_state::slave_io(address_map &map)
+void bingor_state::slave_data(address_map &map)
 {
 	map(0x0000, 0x0000).r("toslave", FUNC(generic_latch_8_device::read)).w("fromslave", FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xcfff).ram();
@@ -759,7 +761,7 @@ void bingor_state::bingor(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_bingor);
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);
@@ -797,11 +799,11 @@ void bingor_state::vip2000(machine_config &config)
 
 	I80C31(config, m_slavecpu, XTAL(11'059'200));
 	m_slavecpu->set_addrmap(AS_PROGRAM, &bingor_state::slave_map);
-	m_slavecpu->set_addrmap(AS_IO, &bingor_state::slave_io);
+	m_slavecpu->set_addrmap(AS_DATA, &bingor_state::slave_data);
 
 	MSM6242(config, "rtc", XTAL(32'768));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(400, 300);

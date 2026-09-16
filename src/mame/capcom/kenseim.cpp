@@ -18,7 +18,6 @@
     to figure it out? * the big mole appears to be worth 2 points so that one we can identify
 
 
-
   Additional 'DRIVE BOARD' PCB
 
   --------------------------------------------------------------------------------------------------------------|
@@ -141,9 +140,11 @@ GND | 20
 // note: I've kept this code out of cps1.cpp as there is likely to be a substantial amount of game specific code here once all the extra hardware is emulated
 
 #include "emu.h"
+#include "cps1.h"
+
 #include "cpu/z80/tmpz84c011.h"
 #include "machine/mb89363b.h"
-#include "cps1.h"
+
 #include "kenseim.lh"
 
 
@@ -157,7 +158,7 @@ public:
 		m_to_68k_cmd_low(0),
 		m_to_68k_cmd_d9(0),
 		m_to_68k_cmd_req(0),
-		m_to_68k_cmd_LVm(0),
+		m_to_68k_cmd_lvm(0),
 		m_from68k_ack(0),
 		m_from68k_st4(0),
 		m_from68k_st3(0),
@@ -169,8 +170,8 @@ public:
 	{
 		for (int i = 0; i < 6; i++)
 		{
-			mole_state_a[i] = 0x00;
-			mole_state_b[i] = 0x00;
+			mole_state_a[i] = 0;
+			mole_state_b[i] = 0;
 		}
 	}
 
@@ -178,27 +179,27 @@ public:
 
 	void init_kenseim();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(cmd_5678_r);
+	ioport_value cmd_1234_r();
+	ioport_value cmd_5678_r();
 	int cmd_9_r();
 	int cmd_req_r();
-	int cmd_LVm_r();
+	int cmd_lvm_r();
 
 private:
 	void mole_up(int side, int mole)
 	{
 		if (side == 0)
-			mole_state_a[mole] = 80;
+			mole_state_a[mole] = 1;
 		else
-			mole_state_b[mole] = 80;
+			mole_state_b[mole] = 1;
 	}
 
 	void mole_down(int side, int mole)
 	{
 		if (side == 0)
-			mole_state_a[mole] = 0x00;
+			mole_state_a[mole] = 0;
 		else
-			mole_state_b[mole] = 0x00;
+			mole_state_b[mole] = 0;
 	}
 
 	void update_moles()
@@ -210,48 +211,39 @@ private:
 			m_moleb[i] = mole_state_b[i];
 	}
 
-	/* kenseim */
 	void cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	// certain
-
-	void mb8936_portc_w(uint8_t data); // 20x LEDs
-
-
-
-	// uncertain
 	void cpu_portc_w(uint8_t data); // 4 bit out (lamps, coinlock etc.?)
-
-	uint8_t cpu_portd_r();  // 4 bit in (comms flags from 68k)
-
+	uint8_t cpu_portd_r(); // 4 bit in (comms flags from 68k)
 	void cpu_portd_w(uint8_t data); // 4 bit out (command flags to 68k?)
 	void cpu_porte_w(uint8_t data); // 8 bit out (command to 68k?)
 
 	void mb8936_porta_w(uint8_t data); // maybe molesa output? (6-bits?)
 	void mb8936_portb_w(uint8_t data); // maybe molesb output? (6-bits?)
+	void mb8936_portc_w(uint8_t data); // 20x LEDs
 	void mb8936_portf_w(uint8_t data); // maybe strobe output?
 
 	void set_leds(uint32_t ledstates);
 
-	void kenseim_io_map(address_map &map);
-	void kenseim_map(address_map &map);
+	void kenseim_io_map(address_map &map) ATTR_COLD;
+	void kenseim_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
 	uint8_t m_to_68k_cmd_req;
-	uint8_t m_to_68k_cmd_LVm;
+	uint8_t m_to_68k_cmd_lvm;
 
-	int m_from68k_ack;
-	int m_from68k_st4;
-	int m_from68k_st3;
-	int m_from68k_st2;
+	int32_t m_from68k_ack;
+	int32_t m_from68k_st4;
+	int32_t m_from68k_st3;
+	int32_t m_from68k_st2;
 
-	int m_led_latch = 0;
-	int m_led_serial_data = 0;
-	int m_led_clock = 0;
+	uint8_t m_led_latch = 0;
+	uint32_t m_led_serial_data = 0;
+	uint8_t m_led_clock = 0;
 
-	int mole_state_a[6]{};
-	int mole_state_b[6]{};
+	uint8_t mole_state_a[6]{};
+	uint8_t mole_state_b[6]{};
 	output_finder<20> m_lamps;
 	output_finder<2> m_startlamp;
 	output_finder<6> m_molea;
@@ -265,7 +257,7 @@ private:
 
 void kenseim_state::set_leds(uint32_t ledstates)
 {
-	for (int i=0; i<20; i++)
+	for (int i = 0; i < 20; i++)
 		m_lamps[i] = BIT(ledstates, i);
 }
 
@@ -274,13 +266,13 @@ void kenseim_state::mb8936_portc_w(uint8_t data)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
-//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context().c_str(), data);
+	//printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context().c_str(), data);
 
-	if (data & 0x08)
+	if (BIT(data, 3))
 	{
-		if (data & 0x02)
+		if (BIT(data, 1))
 		{
-			if (data & 0x04)
+			if (BIT(data, 2))
 			{
 				// send and reset? maybe?
 				//printf("led write reset?\n");
@@ -288,7 +280,7 @@ void kenseim_state::mb8936_portc_w(uint8_t data)
 				set_leds(m_led_serial_data);
 				m_led_serial_data = 0;
 			}
-			else if (!(m_led_clock & 0x02))
+			else if (!m_led_clock)
 			{
 				//printf("write data bit %d\n", m_led_latch & 1);
 				m_led_serial_data = (m_led_serial_data << 1) | (m_led_latch & 1);
@@ -301,9 +293,8 @@ void kenseim_state::mb8936_portc_w(uint8_t data)
 			//printf("set latch %02x\n", m_led_latch);
 		}
 
-		m_led_clock = data & 0x02;
+		m_led_clock = BIT(data, 1);
 	}
-
 }
 
 
@@ -311,10 +302,9 @@ void kenseim_state::mb8936_porta_w(uint8_t data) // maybe molesa output? (6-bits
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context().c_str(), data);
 
-
 	for (int i = 0; i < 6; i++)
 	{
-		int bit = (data >> i) & 1;
+		const bool bit = BIT(data, i);
 
 		if (bit)
 			mole_down(0, i);
@@ -323,7 +313,6 @@ void kenseim_state::mb8936_porta_w(uint8_t data) // maybe molesa output? (6-bits
 	}
 
 	update_moles();
-
 }
 
 void kenseim_state::mb8936_portb_w(uint8_t data) // maybe molesb output? (6-bits?)
@@ -332,7 +321,7 @@ void kenseim_state::mb8936_portb_w(uint8_t data) // maybe molesb output? (6-bits
 
 	for (int i = 0; i < 6; i++)
 	{
-		int bit = (data >> i) & 1;
+		const bool bit = BIT(data, i);
 
 		if (bit)
 			mole_down(1, i);
@@ -341,7 +330,6 @@ void kenseim_state::mb8936_portb_w(uint8_t data) // maybe molesb output? (6-bits
 	}
 
 	update_moles();
-
 }
 
 void kenseim_state::mb8936_portf_w(uint8_t data)
@@ -366,20 +354,18 @@ void kenseim_state::cpu_portc_w(uint8_t data)
 
 
 
-
-
 /*******************************
   Comms
  ******************************/
 
 /* 68k side COMMS reads */
 
-CUSTOM_INPUT_MEMBER(kenseim_state::cmd_1234_r)
+ioport_value kenseim_state::cmd_1234_r()
 {
 	return (m_to_68k_cmd_low & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::cmd_5678_r)
+ioport_value kenseim_state::cmd_5678_r()
 {
 	return (m_to_68k_cmd_low & 0xf0) >> 4;
 }
@@ -394,9 +380,9 @@ int kenseim_state::cmd_req_r()
 	return m_to_68k_cmd_req;
 }
 
-int kenseim_state::cmd_LVm_r()
+int kenseim_state::cmd_lvm_r()
 {
-	return m_to_68k_cmd_LVm;
+	return m_to_68k_cmd_lvm;
 }
 
 /* 68k side COMMS writes */
@@ -413,10 +399,10 @@ void kenseim_state::cps1_kensei_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 		// bit 15 = CPS-A custom reset?
 
-		m_from68k_ack = (data & 0x0100) >> 8;
-		m_from68k_st4 = (data & 0x0200) >> 9;
-		m_from68k_st2 = (data & 0x0400) >> 10;
-		m_from68k_st3 = (data & 0x0800) >> 11;
+		m_from68k_ack = BIT(data, 8);
+		m_from68k_st4 = BIT(data, 9);
+		m_from68k_st2 = BIT(data, 10);
+		m_from68k_st3 = BIT(data, 11);
 	}
 }
 
@@ -442,9 +428,9 @@ void kenseim_state::cpu_portd_w(uint8_t data)
 	// d1: REQ
 	// d2: LVm
 	// d3: N/C
-	m_to_68k_cmd_d9 = data >> 0 & 1;
-	m_to_68k_cmd_req = data >> 1 & 1;
-	m_to_68k_cmd_LVm = data >> 2 & 1;
+	m_to_68k_cmd_d9 = BIT(data, 0);
+	m_to_68k_cmd_req = BIT(data, 1);
+	m_to_68k_cmd_lvm = BIT(data, 2);
 }
 
 void kenseim_state::cpu_porte_w(uint8_t data)
@@ -452,10 +438,6 @@ void kenseim_state::cpu_porte_w(uint8_t data)
 	// DT1-DT8
 	m_to_68k_cmd_low = data;
 }
-
-
-
-
 
 
 
@@ -505,7 +487,7 @@ void kenseim_state::kenseim(machine_config &config)
 	ppi_x2.in_pe().set_ioport("MOLEB");
 	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 }
 
 static INPUT_PORTS_START( kenseim )
@@ -513,10 +495,10 @@ static INPUT_PORTS_START( kenseim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_9_r) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_9_r)) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_req_r) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_LVm_r) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_req_r)) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(kenseim_state::cmd_lvm_r)) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
@@ -525,7 +507,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
 //  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kenseim_state, cmd_5678_r)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(kenseim_state::cmd_5678_r))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
@@ -535,7 +517,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
 //  PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
 //  PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kenseim_state, cmd_1234_r)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(kenseim_state::cmd_1234_r))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c
@@ -697,17 +679,6 @@ ROM_END
 void kenseim_state::init_kenseim()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16s_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
-
-	init_cps1();
-
-	m_led_serial_data = 0;
-	m_led_clock = 0;
-	m_led_latch = 0;
-
-	m_lamps.resolve();
-	m_startlamp.resolve();
-	m_molea.resolve();
-	m_moleb.resolve();
 }
 
 } // anonymous namespace
@@ -715,4 +686,4 @@ void kenseim_state::init_kenseim()
 
 // 1994.04.18 is from extra PCB rom, Siguma or Sigma? (Siguma is in the ROM)
 // the CPS1 board roms contain "M O G U R A   9 2 0 9 2 4" strings suggesting that part of the code was developed earlier
-GAMEL( 1994, kenseim, 0, kenseim, kenseim, kenseim_state, init_kenseim, ROT0, "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", MACHINE_CLICKABLE_ARTWORK, layout_kenseim )
+GAMEL( 1994, kenseim, 0, kenseim, kenseim, kenseim_state, init_kenseim, ROT0, "Capcom / Togo / Sigma", "Ken Sei Mogura: Street Fighter II (Japan 940418, Ver 1.00)", 0, layout_kenseim )

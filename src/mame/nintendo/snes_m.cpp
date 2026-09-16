@@ -541,9 +541,7 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 		case JOY3H:
 		case JOY4L:
 		case JOY4H:
-//#ifdef MAME_DEBUG
-			logerror( "Write to read-only register: %X value: %X", offset, data );
-//#endif /* MAME_DEBUG */
+			logerror( "Write to read-only register: %X value: %X\n", offset, data );
 			return;
 	}
 
@@ -727,7 +725,8 @@ uint8_t snes_state::snes_r_bank1(offs_t offset)
 			}
 			else
 			{
-				logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %X\n", m_maincpu->pc(), offset);
+				if (!machine().side_effects_disabled())
+					logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %X\n", m_maincpu->pc(), offset);
 				value = snes_open_bus_r();                              /* Reserved */
 			}
 		}
@@ -774,7 +773,8 @@ uint8_t snes_state::snes_r_bank2(offs_t offset)
 				}
 				else
 				{
-					logerror("(PC=%06x) snes_r_bank2: Unmapped external chip read: %X\n", m_maincpu->pc(), offset);
+					if (!machine().side_effects_disabled())
+						logerror("(PC=%06x) snes_r_bank2: Unmapped external chip read: %X\n", m_maincpu->pc(), offset);
 					value = snes_open_bus_r();                              /* Reserved */
 				}
 			}

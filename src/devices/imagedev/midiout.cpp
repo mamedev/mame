@@ -10,7 +10,9 @@
 
 #include "emu.h"
 #include "midiout.h"
+
 #include "osdepend.h"
+
 
 /***************************************************************************
     IMPLEMENTATION
@@ -57,11 +59,9 @@ void midiout_device::device_reset()
 
 std::pair<std::error_condition, std::string> midiout_device::call_load()
 {
-	m_midi = machine().osd().create_midi_device();
-
-	if (!m_midi->open_output(filename()))
+	m_midi = machine().osd().create_midi_output(filename());
+	if (!m_midi)
 	{
-		m_midi.reset();
 		return std::make_pair(image_error::UNSPECIFIED, std::string());
 	}
 
@@ -74,11 +74,7 @@ std::pair<std::error_condition, std::string> midiout_device::call_load()
 
 void midiout_device::call_unload()
 {
-	if (m_midi)
-	{
-		m_midi->close();
-		m_midi.reset();
-	}
+	m_midi.reset();
 }
 
 void midiout_device::rcv_complete()    // Rx completed receiving byte

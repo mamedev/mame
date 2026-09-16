@@ -6,7 +6,7 @@
 
     OS-dependent code interface.
 
-*******************************************************************c********/
+***************************************************************************/
 #ifndef MAME_OSD_LIB_OSDOBJ_COMMON_H
 #define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
@@ -16,7 +16,6 @@
 #include "osdepend.h"
 
 #include "modules/osdmodule.h"
-#include "modules/output/output_module.h"
 
 #include "emuopts.h"
 
@@ -43,6 +42,7 @@
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_DEBUGGER_HOST         "debugger_host"
 #define OSDOPTION_DEBUGGER_PORT         "debugger_port"
 #define OSDOPTION_DEBUGGER_FONT         "debugger_font"
 #define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
@@ -80,13 +80,6 @@
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
-#define OSDOPTION_PA_API                "pa_api"
-#define OSDOPTION_PA_DEVICE             "pa_device"
-#define OSDOPTION_PA_LATENCY            "pa_latency"
-
-#define OSDOPTION_AUDIO_OUTPUT          "audio_output"
-#define OSDOPTION_AUDIO_EFFECT          "audio_effect"
-
 #define OSDOPTION_MIDI_PROVIDER         "midiprovider"
 
 #define OSDOPTION_NETWORK_PROVIDER      "networkprovider"
@@ -94,6 +87,7 @@
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
+#define OSDOPTION_BGFX_VECTORCRT        "bgfx_vectorcrt"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
 #define OSDOPTION_BGFX_LUT              "bgfx_lut"
@@ -119,6 +113,7 @@ public:
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+	const char *debugger_host() const { return value(OSDOPTION_DEBUGGER_HOST); }
 	int debugger_port() const { return int_value(OSDOPTION_DEBUGGER_PORT); }
 	const char *debugger_font() const { return value(OSDOPTION_DEBUGGER_FONT); }
 	float debugger_font_size() const { return float_value(OSDOPTION_DEBUGGER_FONT_SIZE); }
@@ -165,25 +160,17 @@ public:
 
 	// sound options
 	const char *sound() const { return value(OSDOPTION_SOUND); }
-	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
-
-	// CoreAudio specific options
-	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
-	const char *audio_effect(int index) const { return value(util::string_format("%s%d", OSDOPTION_AUDIO_EFFECT, index)); }
+	float audio_latency() const { return float_value(OSDOPTION_AUDIO_LATENCY); }
 
 	// BGFX specific options
 	const char *bgfx_path() const { return value(OSDOPTION_BGFX_PATH); }
 	const char *bgfx_backend() const { return value(OSDOPTION_BGFX_BACKEND); }
 	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
+	bool bgfx_vectorcrt() const { return bool_value(OSDOPTION_BGFX_VECTORCRT); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
-
-	// PortAudio options
-	const char *pa_api() const { return value(OSDOPTION_PA_API); }
-	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
-	float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
 	static const options_entry s_option_entries[];
 };
@@ -195,6 +182,7 @@ class font_module;
 class input_module;
 class midi_module;
 class monitor_module;
+class netdev_module;
 class osd_watchdog;
 class osd_window;
 class output_module;
@@ -221,9 +209,19 @@ public:
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
 
 	// audio overridables
-	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) override;
-	virtual void set_mastervolume(int attenuation) override;
 	virtual bool no_sound() override;
+	virtual bool sound_external_per_channel_volume() override;
+	virtual bool sound_split_streams_per_source() override;
+	virtual uint32_t sound_get_generation() override;
+	virtual osd::audio_info sound_get_information() override;
+	virtual uint32_t sound_stream_sink_open(uint32_t node, std::string name, uint32_t rate) override;
+	virtual uint32_t sound_stream_source_open(uint32_t node, std::string name, uint32_t rate) override;
+	virtual void sound_stream_set_volumes(uint32_t id, const std::vector<float> &db) override;
+	virtual void sound_stream_close(uint32_t id) override;
+	virtual void sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) override;
+	virtual void sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) override;
+	virtual void sound_begin_update() override;
+	virtual void sound_end_update() override;
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
@@ -232,13 +230,21 @@ public:
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 
-	// command option overrides
-	virtual bool execute_command(const char *command) override;
-
+	// font interface
 	virtual osd_font::ptr font_alloc() override;
 	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override;
 
-	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
+	// command option overrides
+	virtual bool execute_command(const char *command) override;
+
+	// MIDI interface
+	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override;
+	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) override;
+	virtual std::vector<osd::midi_port_info> list_midi_ports() override;
+
+	// network interface
+	virtual std::unique_ptr<osd::network_device> open_network_device(int id, osd::network_handler &handler) override;
+	virtual std::vector<osd::network_device_info> list_network_devices() override;
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
@@ -266,8 +272,6 @@ public:
 	bool verbose() const { return m_print_verbose; }
 	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
 
-	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
-
 	virtual void process_events() = 0;
 	virtual bool has_focus() const = 0;
 
@@ -276,16 +280,13 @@ public:
 protected:
 	virtual bool input_init();
 
-	virtual void build_slider_list() { }
-	virtual void update_slider_list() { }
-
 	void poll_input_modules(bool relative_reset);
 
 	static std::list<std::unique_ptr<osd_window> > s_window_list;
 
 private:
 	// internal state
-	running_machine *   m_machine;
+	running_machine *m_machine;
 	osd_options& m_options;
 
 	bool m_print_verbose;
@@ -316,6 +317,7 @@ protected:
 	sound_module*   m_sound;
 	debug_module*   m_debugger;
 	midi_module*    m_midi;
+	netdev_module*  m_network;
 	input_module*   m_keyboard_input;
 	input_module*   m_mouse_input;
 	input_module*   m_lightgun_input;

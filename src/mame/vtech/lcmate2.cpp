@@ -61,7 +61,7 @@ public:
 	void lcmate2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,8 +74,8 @@ private:
 	void speaker_w(u8 data);
 	void bankswitch_w(u8 data);
 	void lcmate2_palette(palette_device &palette) const;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void lcmate2_state::speaker_w(u8 data)
@@ -244,7 +244,7 @@ void lcmate2_state::lcmate2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lcmate2_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
@@ -255,7 +255,7 @@ void lcmate2_state::lcmate2(machine_config &config)
 	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

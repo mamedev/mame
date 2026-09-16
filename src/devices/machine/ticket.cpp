@@ -2,25 +2,17 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ticket.c
+    ticket.cpp
 
     Generic ticket dispensing device.
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ticket.h"
+#include "ticket.h"
 
-
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define DEBUG_TICKET 0
-
-#define VERBOSE (DEBUG_TICKET)
+//#define VERBOSE 1
 #include "logmacro.h"
-
 
 
 //**************************************************************************
@@ -34,47 +26,58 @@ DEFINE_DEVICE_TYPE(HOPPER, hopper_device, "coin_hopper", "Coin Hopper")
 
 
 //**************************************************************************
+//  INPUT PORTS
+//**************************************************************************
+
+static INPUT_PORTS_START( ticket )
+	PORT_START("TEST")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Sensor Test")
+INPUT_PORTS_END
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  ticket_dispenser_device - constructor
+//  constructor
 //-------------------------------------------------
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_motor_sense(TICKET_MOTOR_ACTIVE_LOW)
-	, m_status_sense(TICKET_STATUS_ACTIVE_LOW)
 	, m_period(attotime::from_msec(100))
 	, m_hopper_type(false)
-	, m_motoron(0)
-	, m_ticketdispensed(0)
-	, m_ticketnotdispensed(0)
-	, m_status(0)
-	, m_power(0)
-	, m_timer(nullptr)
+	, m_io_test(*this, "TEST")
+	, m_dispense_handler(*this)
 	, m_output(*this, tag) // TODO: change to "tag:status"
-	, m_dispense_handler(*this) // TODO: can we use m_output for this?
+	, m_timer(nullptr)
+	, m_status(false)
+	, m_power(false)
 {
 }
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ticket_dispenser_device(mconfig, TICKET_DISPENSER, tag, owner, clock)
 {
+	m_hopper_type = false;
 }
 
 hopper_device::hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ticket_dispenser_device(mconfig, HOPPER, tag, owner, clock)
 {
+	m_hopper_type = true;
 }
 
+
 //-------------------------------------------------
-//  ~ticket_dispenser_device - destructor
+//  destructor
 //-------------------------------------------------
 
 ticket_dispenser_device::~ticket_dispenser_device()
 {
 }
+
 
 
 //**************************************************************************
@@ -87,7 +90,7 @@ ticket_dispenser_device::~ticket_dispenser_device()
 
 int ticket_dispenser_device::line_r()
 {
-	return m_status ? 1 : 0;
+	return (m_status || BIT(m_io_test->read(), 0)) ? 1 : 0;
 }
 
 
@@ -97,29 +100,23 @@ int ticket_dispenser_device::line_r()
 
 void ticket_dispenser_device::motor_w(int state)
 {
-	// On an activate signal, start dispensing!
-	if (bool(state) == m_motoron)
+	// On rising edge, start dispensing!
+	if (state && !m_power)
 	{
-		if (!m_power)
-		{
-			LOG("%s: Ticket Power On\n", machine().describe_context());
-			m_timer->adjust(m_period);
-			m_power = true;
-			m_status = m_ticketnotdispensed;
-		}
+		LOG("%s: Ticket Power On\n", machine().describe_context());
+		m_timer->adjust(m_period);
+		m_power = true;
+		m_status = false;
 	}
-	else
+	else if (!state && m_power)
 	{
-		if (m_power)
+		if (!m_hopper_type || !m_status)
 		{
-			if (m_hopper_type == false || m_status == m_ticketnotdispensed)
-			{
-				LOG("%s: Ticket Power Off\n", machine().describe_context());
-				m_timer->adjust(attotime::never);
-				m_output = 0;
-			}
-			m_power = false;
+			LOG("%s: Ticket Power Off\n", machine().describe_context());
+			m_timer->adjust(attotime::never);
+			m_output = 0;
 		}
+		m_power = false;
 	}
 }
 
@@ -129,32 +126,28 @@ void ticket_dispenser_device::motor_w(int state)
 //**************************************************************************
 
 //-------------------------------------------------
+//  device_input_ports
+//-------------------------------------------------
+
+ioport_constructor ticket_dispenser_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(ticket);
+}
+
+
+//-------------------------------------------------
 //  device_start - handle device startup
 //-------------------------------------------------
 
 void ticket_dispenser_device::device_start()
 {
-	m_motoron = (m_motor_sense == TICKET_MOTOR_ACTIVE_HIGH);
-	m_ticketdispensed = (m_status_sense == TICKET_STATUS_ACTIVE_HIGH);
-	m_ticketnotdispensed = !m_ticketdispensed;
-
 	m_timer = timer_alloc(FUNC(ticket_dispenser_device::update_output_state), this);
 
-	m_output.resolve();
+	m_status = false;
+	m_power = false;
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_power));
-}
-
-
-//-------------------------------------------------
-//  device_reset - handle device startup
-//-------------------------------------------------
-
-void ticket_dispenser_device::device_reset()
-{
-	m_status = m_ticketnotdispensed;
-	m_power = false;
 }
 
 
@@ -164,32 +157,34 @@ void ticket_dispenser_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(ticket_dispenser_device::update_output_state)
 {
+	bool status = m_status;
+
 	// if we still have power, keep toggling ticket states
 	if (m_power)
 	{
-		m_status = !m_status;
-		LOG("Ticket Status Changed to %02X\n", m_status);
+		status = !m_status;
+		LOG("Ticket Status Changed to %u\n", status);
 		m_timer->adjust(m_period);
 	}
 	else if (m_hopper_type)
 	{
-		m_status = !m_status;
-		LOG("%s: Ticket Power Off\n", machine().describe_context());
+		status = !m_status;
+		LOG("Ticket Power Off\n");
 		m_timer->adjust(attotime::never);
-		m_output = 0;
 	}
 
 	// update output status
-	m_output = m_status == m_ticketdispensed;
+	m_output = status;
 
-	if (m_hopper_type)
+	if (status != m_status)
 	{
-		m_dispense_handler(m_status);
-	}
-	// if we just dispensed, increment global count
-	if (m_status == m_ticketdispensed)
-	{
-		machine().bookkeeping().increment_dispensed_tickets(1);
-		LOG("Ticket Dispensed\n");
+		m_dispense_handler(m_status = status);
+
+		// if we just dispensed, increment global count
+		if (status)
+		{
+			machine().bookkeeping().increment_dispensed_tickets(1);
+			LOG("Ticket Dispensed\n");
+		}
 	}
 }

@@ -39,6 +39,8 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
+#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
+
 #include "by17.lh"
 #include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
@@ -72,9 +74,9 @@ public:
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	void init_by17();
-	void init_matahari();
-	void init_pwerplay();
+	void init_by17() ATTR_COLD;
+	void init_matahari() ATTR_COLD;
+	void init_pwerplay() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -82,11 +84,11 @@ public:
 	template <int Param> int saucer_x3();
 	template <int Param> int drop_target_x2();
 
-	void by17(machine_config &config);
+	void by17(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_u10a = 0U;
@@ -139,7 +141,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 
-	void by17_map(address_map &map);
+	void by17_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -156,8 +158,8 @@ void by17_state::by17_map(address_map &map)
 
 static INPUT_PORTS_START( by17 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_CHANGED_MEMBER(DEVICE_SELF, by17_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity")  PORT_CHANGED_MEMBER(DEVICE_SELF, by17_state, activity_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::self_test), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::activity_button), 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x1f, 0x02, "Coin Slot 1")                PORT_DIPLOCATION("SW0:!1,!2,!3,!4,!5") // same as 03
@@ -180,7 +182,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
 	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
 	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
@@ -223,7 +225,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x11, DEF_STR( 2C_8C ))
 	PORT_DIPSETTING(    0x12, DEF_STR( 1C_9C ))
 	PORT_DIPSETTING(    0x13, "2 Coins/9 Credits")
-	PORT_DIPSETTING(    0x14, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x15, "2 Coins/10 Credits")
 	PORT_DIPSETTING(    0x16, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x17, "2 Coins/11 Credits")
@@ -284,7 +286,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ))
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_9C ))
-	PORT_DIPSETTING(    0x0a, "1 Coin/10 Credits")
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_10C ))
 	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits")
 	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits")
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
@@ -314,7 +316,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, outhole_x0<0x07>)  //  PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::outhole_x0<0x07>))  //  PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -324,7 +326,7 @@ static INPUT_PORTS_START( by17 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP13")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP14")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP15")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT2 ) PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )   PORT_NAME("Slam Tilt") PORT_CODE(KEYCODE_EQUALS)
 
 	// custom
 	PORT_START("X2")
@@ -398,17 +400,17 @@ static INPUT_PORTS_START( matahari )
 	PORT_DIPSETTING(    0x80, "Replay")
 
 	PORT_MODIFY("X2")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x20>)  // PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x21>)  // PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x22>)  // PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x23>)  // PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x24>)  // PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x25>)  // PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x26>)  // PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x27>)  // PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x20>))  // PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x21>))  // PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x22>))  // PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x23>))  // PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x24>))  // PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x25>))  // PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x26>))  // PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x27>))  // PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, saucer_x3<0x37>)   // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::saucer_x3<0x37>))   // PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwerplay )
@@ -450,17 +452,17 @@ static INPUT_PORTS_START( pwerplay )
 	PORT_DIPSETTING(    0xc0, "Extra Ball / Replay")
 
 	PORT_MODIFY("X2")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x20>)  // PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x21>)  // PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x22>)  // PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x23>)  // PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x24>)  // PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x25>)  // PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x26>)  // PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, drop_target_x2<0x27>)  // PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x20>))  // PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x21>))  // PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x22>))  // PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x23>))  // PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x24>))  // PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x25>))  // PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x26>))  // PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x27>))  // PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(by17_state, saucer_x3<0x37>)   // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::saucer_x3<0x37>))   // PORT_CODE(KEYCODE_Q)
 INPUT_PORTS_END
 
 
@@ -959,10 +961,6 @@ void by17_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_lamps.resolve();
-	m_digits.resolve();
-	m_solenoids.resolve();
-
 	save_item(NAME(m_u10a));
 	save_item(NAME(m_u10b));
 	save_item(NAME(m_u11a));
@@ -1153,15 +1151,15 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1976, bowarrowa, bowarrow, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 22)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1977, freedom,   0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1977, nightrdr,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1977, nightr20,  nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",            MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1978, blackjck,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1977, evelknie,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1976, bowarrow,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 23)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1976, bowarrowa, bowarrow, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Bow & Arrow (Prototype, rev. 22)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, freedom,   0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Freedom",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, nightrdr,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 21)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, nightr20,  nightrdr, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Night Rider (rev. 20)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1978, blackjck,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Black Jack (Pinball)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, evelknie,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Evel Knievel",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1978, matahari,  0,        by17, matahari, by17_state, init_matahari, ROT0, "Bally", "Mata Hari",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_by17_matahari)
-GAME(  1977, eightbll,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(  1977, eightblo,  eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, eightbll,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 20)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1977, eightblo,  eightbll, by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Eight Ball (rev. 17)",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1978, pwerplay,  0,        by17, pwerplay, by17_state, init_pwerplay, ROT0, "Bally", "Power Play (Pinball)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_by17_pwerplay)
-GAME(  1978, stk_sprs,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Strikes and Spares",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(  1978, stk_sprs,  0,        by17, by17,     by17_state, init_by17,     ROT0, "Bally", "Strikes and Spares",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

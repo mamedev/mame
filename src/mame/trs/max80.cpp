@@ -113,8 +113,8 @@ public:
 	void max80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -132,7 +132,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	TIMER_DEVICE_CALLBACK_MEMBER(beep_timer);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_size_store = 0U;
 	bool m_fdc_drq = 0;
@@ -454,7 +454,7 @@ void max80_state::max80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &max80_state::mem_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2000)); // not accurate
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

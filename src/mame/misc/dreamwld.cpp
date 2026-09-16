@@ -105,7 +105,7 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
 #include "emu.h"
 #include "cpu/m68000/m68020.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
@@ -142,9 +142,9 @@ public:
 	void dreamwld(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory pointers */
@@ -193,10 +193,10 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void baryon_map(address_map &map);
-	void dreamwld_map(address_map &map);
-	void oki1_map(address_map &map);
-	void oki2_map(address_map &map);
+	void baryon_map(address_map &map) ATTR_COLD;
+	void dreamwld_map(address_map &map) ATTR_COLD;
+	void oki1_map(address_map &map) ATTR_COLD;
+	void oki2_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -809,7 +809,7 @@ void dreamwld_state::baryon(machine_config &config)
 	//config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.793);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(512,256);

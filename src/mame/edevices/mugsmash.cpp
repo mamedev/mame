@@ -84,7 +84,7 @@ public:
 	void mugsmash(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
@@ -106,12 +106,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -230,8 +228,6 @@ uint32_t mugsmash_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void mugsmash_state::reg2_w(offs_t offset, uint16_t data)
 {
@@ -496,7 +492,7 @@ void mugsmash_state::mugsmash(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mugsmash_state::sound_map);
 
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -508,20 +504,19 @@ void mugsmash_state::mugsmash(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x300);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 1.00);   // music
-	ymsnd.add_route(1, "rspeaker", 1.00);
+	ymsnd.add_route(0, "speaker", 1.00, 0);   // music
+	ymsnd.add_route(1, "speaker", 1.00, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'122'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50); // sound fx
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0); // sound fx
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 ROM_START( mugsmash )

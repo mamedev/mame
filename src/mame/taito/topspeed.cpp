@@ -169,6 +169,7 @@ From JP manual
 #include "sound/ymopm.h"
 
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 
@@ -206,12 +207,12 @@ public:
 
 	void topspeed(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
+	ioport_value gas_pedal_r();
+	ioport_value brake_pedal_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<u16> m_spritemap;
@@ -267,14 +268,12 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void cpua_map(address_map &map);
-	void cpub_map(address_map &map);
-	void z80_io(address_map &map);
-	void z80_prg(address_map &map);
+	void cpua_map(address_map &map) ATTR_COLD;
+	void cpub_map(address_map &map) ATTR_COLD;
+	void z80_io(address_map &map) ATTR_COLD;
+	void z80_prg(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /****************************************************************************
 
@@ -555,8 +554,6 @@ u32 topspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-// machine
-
 /**********************************************************
                        CPU CONTROL
 **********************************************************/
@@ -591,13 +588,13 @@ u8 topspeed_state::input_bypass_r()
 	}
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::gas_pedal_r)
+ioport_value topspeed_state::gas_pedal_r()
 {
 	static constexpr u8 retval[8] = { 0, 1, 3, 2, 6, 7, 5, 4 };
 	return retval[m_gas->read() & 7];
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::brake_pedal_r)
+ioport_value topspeed_state::brake_pedal_r()
 {
 	static constexpr u8 retval[8] = { 0, 1, 3, 2, 6, 7, 5, 4 };
 	return retval[m_brake->read() & 7];
@@ -719,7 +716,7 @@ void topspeed_state::volume_w(offs_t offset, u8 data)
 		case 0x600: filter = m_filter1r;    break; // YM-2151 R
 	}
 
-	filter->flt_volume_set_volume(data / 255.0f);
+	filter->set_gain(data / 255.0f);
 }
 
 void topspeed_state::z80ctc_to0(int state)
@@ -858,7 +855,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(topspeed_state, brake_pedal_r) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(topspeed_state::brake_pedal_r)) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN1")
@@ -867,7 +864,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(topspeed_state, gas_pedal_r) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(topspeed_state::gas_pedal_r)) PORT_CONDITION("DSWA", 0x03, NOTEQUALS, 0x02)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x03, EQUALS, 0x02)
 
 	PORT_START("IN2")   // Unused
@@ -908,8 +905,11 @@ static const gfx_layout tile16x8_layout =
 
 static GFXDECODE_START( gfx_topspeed )
 	GFXDECODE_ENTRY( "sprites", 0x0, tile16x8_layout,      0, 256 ) // Sprite parts
-	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 	// Road Lines gfxdecodable ?
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_topspeed_tmap )
+	GFXDECODE_ENTRY( "pc080sn", 0x0, gfx_8x8x4_packed_msb, 0, 512 ) // Playfield
 GFXDECODE_END
 
 
@@ -963,21 +963,17 @@ void topspeed_state::topspeed(machine_config &config)
 	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(16'000'000) / 4));
 	ctc.zc_callback<0>().set(FUNC(topspeed_state::z80ctc_to0));
 
-	PC080SN(config, m_pc080sn[0], 0);
-	m_pc080sn[0]->set_gfx_region(1);
+	PC080SN(config, m_pc080sn[0], "palette", gfx_topspeed_tmap);
 	m_pc080sn[0]->set_offsets(0, 8);
-	m_pc080sn[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	PC080SN(config, m_pc080sn[1], 0);
-	m_pc080sn[1]->set_gfx_region(1);
+	PC080SN(config, m_pc080sn[1], "palette", gfx_topspeed_tmap);
 	m_pc080sn[1]->set_offsets(0, 8);
-	m_pc080sn[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
-	TC0040IOC(config, m_tc0040ioc, 0);
+	TC0040IOC(config, m_tc0040ioc);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
 	m_tc0040ioc->read_1_callback().set_ioport("DSWB");
 	m_tc0040ioc->read_2_callback().set_ioport("IN0");
@@ -986,7 +982,7 @@ void topspeed_state::topspeed(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.0532); // Measured on real hardware
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -998,8 +994,7 @@ void topspeed_state::topspeed(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -1016,12 +1011,12 @@ void topspeed_state::topspeed(machine_config &config)
 	m_msm[1]->set_prescaler_selector(msm5205_device::SEX_4B);   // Slave mode, 4-bit
 	m_msm[1]->add_route(ALL_OUTPUTS, "filter3", 1.0);
 
-	FILTER_VOLUME(config, "filter1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "filter1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter1l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "filter1r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	FILTER_VOLUME(config, "filter2").add_route(ALL_OUTPUTS, "lspeaker", 1.0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	FILTER_VOLUME(config, "filter3").add_route(ALL_OUTPUTS, "lspeaker", 1.0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "filter3").add_route(ALL_OUTPUTS, "speaker", 1.0, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -1170,6 +1165,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1987, topspeed,  0,        topspeed, topspeed, topspeed_state, empty_init, ROT0, "Taito Corporation Japan",                     "Top Speed (World)",     MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu, topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",        MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl,  topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito Corporation",                           "Full Throttle (Japan)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed,  0,        topspeed, topspeed, topspeed_state, empty_init, ROT0, "Taito",                           "Top Speed (World, rev 1)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu, topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito America (Romstar license)", "Top Speed (US)",           MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl,  topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito",                           "Full Throttle (Japan)",    MACHINE_SUPPORTS_SAVE, layout_topspeed )

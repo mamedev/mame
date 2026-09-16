@@ -165,6 +165,7 @@ void mac_keyboard_devices(device_slot_interface &device)
 	device.option_add("gb",    MACKBD_M0110B);
 	device.option_add("fr",    MACKBD_M0110F);
 	device.option_add("it",    MACKBD_M0110T);
+	device.option_add("jp",    MACKBD_M0110J);
 
 	device.option_add("pad",   MACKBD_M0120);
 	device.option_add("eupad", MACKBD_M0120P);

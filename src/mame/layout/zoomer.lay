@@ -1,0 +1,309 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="pencursor">
+		<image state="1">
+			<data><![CDATA[
+				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1" height="1" viewBox="0 0 1 1">
+					<g fill="none" stroke="#6666ff" stroke-width="0.06" stroke-opacity="1">
+						<circle cx="0.5" cy="0.5" r="0.1" />
+						<circle cx="0.5" cy="0.5" r="0.47" />
+						<line x1="0.03" y1="0.5" x2="0.4" y2="0.5" />
+						<line x1="0.6" y1="0.5" x2="0.97" y2="0.5" />
+						<line x1="0.5" y1="0.03" x2="0.5" y2="0.4" />
+						<line x1="0.5" y1="0.6" x2="0.5" y2="0.97" />
+					</g>
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="panel">
+		<rect>
+			<color red="0.3" green="0.3" blue="0.3" />
+			<bounds x="0" y="0" width="10" height="1.5" />
+		</rect>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="0.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Launcher">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="0.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="1.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Address">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="1.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Book">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="1.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="2.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Date">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="2.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Book">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="2.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="3.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Note">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="3.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Book">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="3.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="4.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Pocket">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="4.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Quicken">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="4.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="5.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="World">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="5.5" yc="0.60" width="0.9" height="0.3" />
+		</text>
+		<text string="Clock">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="5.5" yc="0.90" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="6.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Calculator">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="6.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="7.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Menu">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="7.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="8.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Keyboard">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="8.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+
+		<rect>
+			<color red="0.8" green="0.8" blue="0.8" />
+			<bounds x="9.05" y="0.05" width="0.9" height="1.4" />
+		</rect>
+		<text string="Help">
+			<color red="0" green="0" blue="0" />
+			<bounds xc="9.5" yc="0.75" width="0.9" height="0.3" />
+		</text>
+	</element>
+
+	<view name="Default View">
+		<screen id="screen" index="0">
+			<bounds x="0" y="0" width="256" height="320" />
+		</screen>
+
+		<element id="panel" ref="panel">
+			<bounds x="0" y="320" width="256" height="38" />
+		</element>
+
+		<element id="cursor" ref="pencursor">
+			<!-- will be positioned by script -->
+			<bounds x="0" y="320" width="20" height="20" />
+			<color alpha="0.7" />
+		</element>
+	</view>
+
+	<view name="Touch-Enabled" showpointers="yes">
+		<screen id="screen" index="0">
+			<bounds x="0" y="0" width="256" height="320" />
+		</screen>
+
+		<element id="panel" ref="panel">
+			<bounds x="0" y="320" width="256" height="38" />
+		</element>
+	</view>
+
+	<script>
+	<![CDATA[
+		local function init_default()
+			local view = file.views['Default View']
+			local cursor = view.items['cursor']
+
+			local penx = file.device:ioport('PEN_X')
+			local peny = file.device:ioport('PEN_Y')
+
+			-- recompute target pen cursor size and area when necessary
+			local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
+			view:set_recomputed_callback(
+					function ()
+						local bounds = view.items['panel'].bounds
+
+						curwidth = bounds.height * 2 / 3
+						curheight = curwidth
+						curxoffs = bounds.x0 - (curwidth * 0.5)
+						curyoffs = bounds.y0 - (curheight * 0.5)
+						curxscale = bounds.width / penx:field(0x3ff).maxvalue
+						curyscale = bounds.height / (peny:field(0x3ff).maxvalue - 320)
+					end)
+
+			-- animate the position of the pen cursor
+			cursor:set_element_state_callback(
+					function ()
+						if peny:read() >= 320 then return 1 end
+						return 0
+					end)
+			cursor:set_bounds_callback(
+					function ()
+						local x = curxoffs + (penx:read() * curxscale)
+						local y = curyoffs + ((peny:read() - 320) * curyscale)
+						return emu.render_bounds(x, y, x + curwidth, y + curheight)
+					end)
+		end
+
+		local function init_touch()
+			-- get the touchscreen I/O port fields
+			local btn_field = file.device:ioport('PEN'):field(0x01)
+			local x_field = file.device:ioport('PEN_X'):field(0x3ff)
+			local y_field = file.device:ioport('PEN_Y'):field(0x3ff)
+
+			local x_min = x_field.minvalue
+			local x_max = x_field.maxvalue
+			local y_min = y_field.minvalue
+			local y_max = y_field.maxvalue
+
+			-- for mapping coordinates
+			local view = file.views['Touch-Enabled']
+			local screen = view.items['screen']
+			local panel  = view.items['panel']
+
+			local floor = math.floor
+			local bounds = emu.render_bounds()
+			local x_scale, y_scale
+
+			-- pointer state
+			local ptr_id = nil
+			local inside = false
+
+			local function release_touch()
+				btn_field:clear_value()
+				x_field:clear_value()
+				y_field:clear_value()
+			end
+
+			local function recomputed()
+				bounds.x0 = screen.bounds.x0
+				bounds.y0 = screen.bounds.y0
+				bounds.x1 = panel.bounds.x1
+				bounds.y1 = panel.bounds.y1
+
+				x_scale = (x_max - x_min + 1) / bounds.width
+				y_scale = (y_max - y_min + 1) / bounds.height
+			end
+
+			local function check_pointer(x, y)
+				if bounds:includes(x, y) then
+					inside = true
+					local ix = x_min + floor(x * x_scale)
+					if ix < x_min then
+						ix = x_min
+					elseif ix > x_max then
+						ix = x_max
+					end
+					local iy = y_min + floor(y * y_scale)
+					if iy < y_min then
+						iy = y_min
+					elseif iy > y_max then
+						iy = y_max
+					end
+					btn_field:set_value(1)
+					x_field:set_value(ix)
+					y_field:set_value(iy)
+				elseif inside then
+					inside = false
+					release_touch()
+				end
+			end
+
+			local function forget_pointer()
+				if inside then
+					release_touch()
+				end
+				ptr_id = nil
+				inside = false
+			end
+
+			local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+				if ptr_id == id then
+					if (btn & 0x01) == 0 then
+						forget_pointer()
+					else
+						check_pointer(x, y)
+					end
+				elseif (not ptr_id) and ((dn & 0x01) ~= 0) then
+					ptr_id = id
+					check_pointer(x, y)
+				end
+			end
+
+			local function pointer_lost(type, id, dev, x, y, up, cnt)
+				if ptr_id == id then
+					forget_pointer()
+				end
+			end
+
+			-- attach callbacks to view
+			view:set_recomputed_callback(recomputed)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_lost)
+			view:set_pointer_aborted_callback(pointer_lost)
+			view:set_forget_pointers_callback(forget_pointer)
+		end
+
+		file:set_resolve_tags_callback(
+				function ()
+					init_default()
+					init_touch()
+				end)
+	]]>
+	</script>
+</mamelayout>

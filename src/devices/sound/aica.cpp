@@ -436,8 +436,6 @@ void aica_device::StopSlot(AICA_SLOT *slot,int keyoff)
 
 void aica_device::Init()
 {
-	int i;
-
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = 0;
 	m_MidiR = m_MidiW = 0;
 	m_MidiOutR = m_MidiOutW = 0;
@@ -448,14 +446,14 @@ void aica_device::Init()
 	m_timerB = timer_alloc(FUNC(aica_device::timerB_cb), this);
 	m_timerC = timer_alloc(FUNC(aica_device::timerC_cb), this);
 
-	for (i = 0; i < 0x400; ++i)
+	for (int i = 0; i < 0x400; ++i)
 	{
 		float envDB = ((float)(3 * (i - 0x3ff))) / 32.0f;
 		float scale = (float)(1 << SHIFT);
 		m_EG_TABLE[i] = (s32)(powf(10.0f, envDB / 20.0f) * scale);
 	}
 
-	for (i = 0; i < 0x20000; ++i)
+	for (int i = 0; i < 0x20000; ++i)
 	{
 		int iTL  = (i >> 0x0) & 0xff;
 		int iPAN = (i >> 0x8) & 0x1f;
@@ -507,7 +505,7 @@ void aica_device::Init()
 
 	m_ARTABLE[0] = m_DRTABLE[0] = 0;    //Infinite time
 	m_ARTABLE[1] = m_DRTABLE[1] = 0;    //Infinite time
-	for (i=2; i < 64; ++i)
+	for (int i=2; i < 64; ++i)
 	{
 		double step,scale;
 		double t = ARTimes[i];   //In ms
@@ -528,7 +526,7 @@ void aica_device::Init()
 	ClockChange();
 
 	// make sure all the slots are off
-	for (i = 0; i < 64; ++i)
+	for (int i = 0; i < 64; ++i)
 	{
 		m_Slots[i].slot = i;
 		m_Slots[i].active = 0;
@@ -1236,11 +1234,11 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	return sample;
 }
 
-void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr)
+void aica_device::DoMasterSamples(sound_stream &stream)
 {
 	int i;
 
-	for (int s = 0; s < bufl.samples(); ++s)
+	for (int s = 0; s < stream.samples(); ++s)
 	{
 		s32 smpl = 0, smpr = 0;
 
@@ -1281,7 +1279,7 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 		{
 			if (EFSDL(i + 16)) // 16,17 for EXTS
 			{
-				m_DSP.EXTS[i] = s16(inputs[i].get(s) * 32767.0);
+				m_DSP.EXTS[i] = s16(stream.get(i, s) * 32767.0);
 				u32 Enc = ((EFPAN(i + 16)) << 0x8) | ((EFSDL(i + 16)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1299,9 +1297,9 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 			smpr = clip16(smpr >> 3);
 		}
 
-		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		stream.put_int(0, s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 		// TODO: diverges with SCSP, also wut?
-		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		stream.put_int(1, s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
 
@@ -1387,9 +1385,9 @@ void aica_device::exec_dma()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void aica_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void aica_device::sound_stream_update(sound_stream &stream)
 {
-	DoMasterSamples(inputs, outputs[0], outputs[1]);
+	DoMasterSamples(stream);
 }
 
 //-------------------------------------------------
@@ -1554,7 +1552,6 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	, m_MidiR(0)
 	, m_mcieb(0)
 	, m_mcipd(0)
-
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
 	std::fill(std::begin(m_EFSPAN), std::end(m_EFSPAN), 0);
@@ -1571,7 +1568,7 @@ aica_device::aica_device(const machine_config &mconfig, const char *tag, device_
 	std::fill(std::begin(m_ARTABLE), std::end(m_ARTABLE), 0);
 	std::fill(std::begin(m_DRTABLE), std::end(m_DRTABLE), 0);
 
-	memset(&m_DSP, 0, sizeof(m_DSP));
+	m_DSP.init();
 
 	std::fill(std::begin(m_EG_TABLE), std::end(m_EG_TABLE), 0);
 	std::fill(std::begin(m_PLFO_TRI), std::end(m_PLFO_TRI), 0);

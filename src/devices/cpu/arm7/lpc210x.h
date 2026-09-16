@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_CPU_ARM7_LPC2103_H
-#define MAME_CPU_ARM7_LPC2103_H
+#ifndef MAME_CPU_ARM7_LPC210X_H
+#define MAME_CPU_ARM7_LPC210X_H
 
 #pragma once
 
 #include "arm7.h"
-#include "arm7core.h"
+
 #include "machine/vic_pl192.h"
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -65,12 +66,12 @@ public:
 	// todo, use an appropriate flash type instead
 	uint8_t m_flash[0x8000]; // needs to be public because the harmony/melody device injects contents with memcpy, yuck
 
-	void lpc2103_map(address_map &map);
+	void lpc2103_map(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -86,4 +87,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(LPC2103, lpc210x_device)
 
-#endif // MAME_CPU_ARM7_LPC2103_H
+#endif // MAME_CPU_ARM7_LPC210X_H

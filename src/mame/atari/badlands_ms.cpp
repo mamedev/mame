@@ -2,13 +2,12 @@
 // copyright-holders:
 
 /*
-    Bad Lands(Modular System)
+    Bad Lands (Modular System)
 
     As with most of the 'Modular System' setups, the hardware is heavily modified from the original
     and consists of a multi-board stack in a cage, hence different driver.
 
-    This set was assembled from a stack of loose PCBs, so for this game the Modular System cage contains
-    at least 6 main boards and 1 sub board, but may be more.
+    For this game the Modular System cage contains 6 main boards and 1 sub board.
 
     MOD-6/1 - MC68000P10, 4 ROMs, RAMs, 20 MHz XTAL.
     MOD 1/4 - Sound board (Z8400BB1, 2 x YM2203C). 2 8-dips banks + small sub board with OKI M5205.
@@ -51,7 +50,7 @@ public:
 	void badlandsm(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -59,7 +58,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -128,7 +127,7 @@ void badlands_ms_state::badlandsm(machine_config &config)
 	Z80(config, "audiocpu", 20_MHz_XTAL / 5).set_disable(); // divisor unknown
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(256, 256);
@@ -189,7 +188,7 @@ ROM_START( badlandsm )
 	ROM_LOAD( "mod_21_1_210_82s129.ic4",       0x220, 0x100, CRC(d3e676aa) SHA1(241a9f9df88e8f796ca8c773ae7930f6e7ce4db8) )
 
 	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
-	ROM_LOAD( "mod-6-1_cpu_644_gal16v8.ic13", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "mod-6-1_cpu_644_gal16v8.ic13", 0x000, 0x117, CRC(180a4125) SHA1(bc056d08d3f330cdba4edfdd1544be828e63c2d1) )
 	ROM_LOAD( "mod-6-1_cpu_643_gal16v8.ic7",  0x000, 0x117, CRC(d05b2c26) SHA1(51b718554bfba96a3c9e7b3a000fc80679044cb3) )
 	ROM_LOAD( "mod-4-3_403_gal16v8.ic29",     0x000, 0x117, CRC(c136de93) SHA1(116f6d3b456d20621ab07a005c1421f57569915c) )
 	ROM_LOAD( "mod-51-1_50503_pal16r6.ic46",  0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
@@ -200,4 +199,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, badlandsm, badlands, badlandsm, badlandsm, badlands_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Bad Lands (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, badlandsm, badlands, badlandsm, badlandsm, badlands_ms_state, empty_init, ROT0, "bootleg (Gaelco / Ervisa)", "Bad Lands (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

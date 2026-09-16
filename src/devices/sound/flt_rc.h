@@ -107,18 +107,18 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	void recalc();
 
 private:
 	sound_stream*  m_stream;
-	stream_buffer::sample_t m_k;
-	stream_buffer::sample_t m_memory;
+	sound_stream::sample_t m_k;
+	sound_stream::sample_t m_memory;
 	int            m_type;
 	int            m_last_sample_rate;
 	double         m_R1;

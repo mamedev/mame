@@ -72,8 +72,8 @@ public:
 	void init_hyprduel();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void subcpu_control_w(uint16_t data);
@@ -88,18 +88,18 @@ private:
 
 	void i4220_config(machine_config &config);
 
-	void hyprduel_map(address_map &map);
-	void hyprduel_map2(address_map &map);
-	void magerror_map(address_map &map);
-	void magerror_map2(address_map &map);
+	void hyprduel_map(address_map &map) ATTR_COLD;
+	void hyprduel_map2(address_map &map) ATTR_COLD;
+	void magerror_map(address_map &map) ATTR_COLD;
+	void magerror_map2(address_map &map) ATTR_COLD;
 
 	/* memory pointers */
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;
 
 	/* misc */
 	emu_timer *m_vblank_end_timer = nullptr;
-	int       m_subcpu_resetline = 0;
-	int       m_cpu_trigger = 0;
+	bool      m_subcpu_resetline = false;
+	int32_t   m_cpu_trigger = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -157,7 +157,7 @@ void hyprduel_state::subcpu_control_w(uint16_t data)
 			if (!m_subcpu_resetline)
 			{
 				m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-				m_subcpu_resetline = 1;
+				m_subcpu_resetline = true;
 			}
 			break;
 
@@ -165,7 +165,7 @@ void hyprduel_state::subcpu_control_w(uint16_t data)
 			if (m_subcpu_resetline)
 			{
 				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				m_subcpu_resetline = 0;
+				m_subcpu_resetline = false;
 			}
 			m_maincpu->spin_until_interrupt();
 			break;
@@ -298,7 +298,7 @@ void hyprduel_state::magerror_map2(address_map &map)
 
 static INPUT_PORTS_START( hyprduel )
 	PORT_START("SERVICE")
-	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x8000, IP_ACTIVE_LOW ) // another test mode in hyprduel (specific?), with bootup
 	PORT_DIPNAME( 0x4000, 0x0000, "Show Warning" )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -326,9 +326,9 @@ static INPUT_PORTS_START( hyprduel )
 	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Start Up Mode" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Start Up Mode" ) // Devs forgot to naming status of this option? same purpose as magerror
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) ) // Game mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) ) // Test mode
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -366,8 +366,8 @@ static INPUT_PORTS_START( hyprduel )
 	PORT_START("SYSTEM")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test")
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(  0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -390,7 +390,7 @@ void hyprduel_state::machine_reset()
 {
 	/* start with cpu2 halted */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_subcpu_resetline = 1;
+	m_subcpu_resetline = true;
 	m_cpu_trigger = 0;
 }
 
@@ -409,7 +409,7 @@ void hyprduel_state::i4220_config(machine_config &config)
 	m_vdp->set_blit_irq_level(2);
 	m_vdp->set_spriteram_buffered(true); // sprites are 1 frame delayed
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_refresh_hz(60); // Unknown/Unverified
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));

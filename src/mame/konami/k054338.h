@@ -23,17 +23,22 @@
 #define K338_CTL_CLIPSL     0x20
 
 
-class k054338_device : public device_t,
-						public device_video_interface
+class k054338_device : public device_t, public device_video_interface
 {
 public:
-	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
-		: k054338_device(mconfig, tag, owner, clock)
+	template <typename T> k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag) :
+		k054338_device(mconfig, tag, owner, clock)
+	{
+		m_k055555.set_tag(std::forward<T>(mixer_tag));
+	}
+	template <typename T, std::enable_if_t<!std::is_integral_v<std::remove_reference_t<T>>, int> = 0>
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&mixer_tag) :
+		k054338_device(mconfig, tag, owner, 0, std::forward<T>(mixer_tag))
 	{
 		m_k055555.set_tag(std::forward<T>(mixer_tag));
 	}
 
-	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_alpha_invert(int alpha_inv) { m_alpha_inv = alpha_inv; }
@@ -50,12 +55,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state
-	uint16_t      m_regs[32];
+	uint16_t    m_regs[32];
 	int         m_shd_rgb[9];
 	int         m_alpha_inv;
 

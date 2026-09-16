@@ -44,14 +44,14 @@ public:
 	void leapfrog_didj(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void didj_arm9_map(address_map &map);
+	void didj_arm9_map(address_map &map) ATTR_COLD;
 
 	required_device<arm9_cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart;
@@ -93,15 +93,14 @@ void magiceyes_vr3520f_game_state::leapfrog_didj(machine_config &config)
 	ARM9(config, m_maincpu, 533000000); // 533 MHz ARM926TEJ (clocked at @ 393 MHz for the Didj?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &magiceyes_vr3520f_game_state::didj_arm9_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(magiceyes_vr3520f_game_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_didj_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -121,4 +120,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2008, didj,      0,       0,      leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_IS_SKELETON )
+CONS( 2008, didj, 0, 0, leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

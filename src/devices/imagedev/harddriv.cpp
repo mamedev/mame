@@ -21,6 +21,7 @@
 #include "harddisk.h"
 #include "romload.h"
 
+#include "multibyte.h"
 #include "opresolv.h"
 
 
@@ -37,7 +38,7 @@ static char const *const hd_option_spec =
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(HARDDISK, harddisk_image_device, "harddisk_image", "Harddisk")
+DEFINE_DEVICE_TYPE(HARDDISK, harddisk_image_device, "harddisk_image", "Hard disk")
 
 //-------------------------------------------------
 //  harddisk_image_base_device - constructor
@@ -147,10 +148,8 @@ std::pair<std::error_condition, std::string> harddisk_image_device::call_create(
 
 	// create the CHD file
 	chd_codec_type compression[4] = { CHD_CODEC_NONE };
-	util::core_file::ptr proxy;
-	std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
-	if (!err)
-		err = m_origchd.create(std::move(proxy), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
+	std::error_condition err;
+	err = m_origchd.create(image_core_file(), uint64_t(totalsectors) * uint64_t(sectorsize), hunksize, sectorsize, compression);
 	if (err)
 		return std::make_pair(err, std::string());
 
@@ -195,7 +194,7 @@ static std::error_condition open_disk_diff(emu_options &options, const char *nam
 	std::string fname = std::string(name).append(".dif");
 
 	/* try to open the diff */
-	//printf("Opening differencing image file: %s\n", fname.c_str());
+	//logerror("Opening differencing image file: %s\n", fname);
 	emu_file diff_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE);
 	std::error_condition filerr = diff_file.open(fname);
 	if (!filerr)
@@ -203,12 +202,12 @@ static std::error_condition open_disk_diff(emu_options &options, const char *nam
 		std::string fullpath(diff_file.fullpath());
 		diff_file.close();
 
-		//printf("Opening differencing image file: %s\n", fullpath.c_str());
+		//logerror("Opening differencing image file: %s\n", fullpath);
 		return diff_chd.open(fullpath, true, &source);
 	}
 
 	/* didn't work; try creating it instead */
-	//printf("Creating differencing image: %s\n", fname.c_str());
+	//logerror("Creating differencing image: %s\n", fname);
 	diff_file.set_openflags(OPEN_FLAG_READ | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	filerr = diff_file.open(fname);
 	if (!filerr)
@@ -217,7 +216,7 @@ static std::error_condition open_disk_diff(emu_options &options, const char *nam
 		diff_file.close();
 
 		/* create the CHD */
-		//printf("Creating differencing image file: %s\n", fupointllpath.c_str());
+		//logerror("Creating differencing image file: %s\n", fupointllpath);
 		chd_codec_type compression[4] = { CHD_CODEC_NONE };
 		std::error_condition err = diff_chd.create(fullpath, source.logical_bytes(), source.hunk_bytes(), compression, source);
 		if (err)
@@ -246,7 +245,7 @@ std::error_condition harddisk_image_device::internal_load_hd()
 	// open the CHD file
 	if (loaded_through_softlist())
 	{
-		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
+		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv"));
 	}
 	else
 	{
@@ -256,21 +255,14 @@ std::error_condition harddisk_image_device::internal_load_hd()
 
 		if (!memcmp("MComprHD", header, 8))
 		{
-			util::core_file::ptr proxy;
-			err = util::core_file::open_proxy(image_core_file(), proxy);
-			if (!err)
-				err = m_origchd.open(std::move(proxy), true);
-
+			err = m_origchd.open(image_core_file(), true);
 			if (!err)
 			{
 				m_chd = &m_origchd;
 			}
 			else if (err == chd_file::error::FILE_NOT_WRITEABLE)
 			{
-				err = util::core_file::open_proxy(image_core_file(), proxy);
-				if (!err)
-					err = m_origchd.open(std::move(proxy), false);
-
+				err = m_origchd.open(image_core_file(), false);
 				if (!err)
 				{
 					err = open_disk_diff(device().machine().options(), basename_noext(), m_origchd, m_diffchd);
@@ -286,48 +278,59 @@ std::error_condition harddisk_image_device::internal_load_hd()
 	if (m_chd)
 	{
 		// open the hard disk file
-		m_hard_disk_handle.reset(new hard_disk_file(m_chd));
-		if (m_hard_disk_handle)
-			return std::error_condition();
+		try
+		{
+			m_hard_disk_handle.reset(new hard_disk_file(m_chd));
+			if (m_hard_disk_handle)
+				return std::error_condition();
+		}
+		catch (...)
+		{
+			err = image_error::INVALIDIMAGE;
+		}
+	}
+	else if (!is_open())
+	{
+		err = image_error::UNSPECIFIED;
 	}
 	else
 	{
-		if (is_open())
+		uint32_t skip = 0;
+
+		if (!memcmp(header, "2IMG", 4)) // check for 2MG format
 		{
-			uint32_t skip = 0;
-
-			// check for 2MG format
-			if (!memcmp(header, "2IMG", 4))
+			skip = get_u32le(&header[0x18]);
+			osd_printf_verbose("harddriv: detected 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+		}
+		else if (is_filetype("hdi")) // check for HDI format
+		{
+			skip = get_u32le(&header[0x8]);
+			uint32_t data_size = get_u32le(&header[0xc]);
+			if (data_size == length() - skip)
 			{
-				skip = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
-				osd_printf_verbose("harddriv: detected 2MG, creator is %c%c%c%c, data at %08x\n", header[4], header[5], header[6], header[7], skip);
+				osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);
 			}
-			// check for HDI format
-			else if (is_filetype("hdi"))
+			else
 			{
-				skip = header[0x8] | (header[0x9] << 8) | (header[0xa] << 16) | (header[0xb] << 24);
-				uint32_t data_size = header[0xc] | (header[0xd] << 8) | (header[0xe] << 16) | (header[0xf] << 24);
-				if (data_size == length() - skip)
-				{
-					osd_printf_verbose("harddriv: detected Anex86 HDI, data at %08x\n", skip);
-				}
-				else
-				{
-					skip = 0;
-				}
+				skip = 0;
 			}
+		}
 
+		try
+		{
 			m_hard_disk_handle.reset(new hard_disk_file(image_core_file(), skip));
 			if (m_hard_disk_handle)
 				return std::error_condition();
 		}
-
-		return image_error::UNSPECIFIED;
+		catch (...)
+		{
+			err = image_error::INVALIDIMAGE;
+		}
 	}
 
 	/* if we had an error, close out the CHD */
-	m_origchd.close();
 	m_diffchd.close();
+	m_origchd.close();
 	m_chd = nullptr;
 
 	if (err)

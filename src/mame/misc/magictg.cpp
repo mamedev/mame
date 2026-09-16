@@ -161,9 +161,9 @@ public:
 	void magictg(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<mips3_device>       m_mips;
@@ -238,10 +238,10 @@ private:
 
 	void zr36120_reset();
 
-	void adsp_data_map(address_map &map);
-	void adsp_io_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void magictg_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_io_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
+	void magictg_map(address_map &map) ATTR_COLD;
 
 	uint32_t pci_dev0_r(int function, int reg, uint32_t mem_mask);
 	void pci_dev0_w(int function, int reg, uint32_t data, uint32_t mem_mask);
@@ -501,7 +501,7 @@ uint32_t magictg_state::zr36120_r(offs_t offset)
 	}
 	else
 	{
-		/* Post office */
+		// PostOffice reads
 		res = 0;//mame_rand(machine);//m_zr36120.as_regs[0x48/4];
 	}
 	logerror("PINKEYE_R[%x]\n", offset);
@@ -529,6 +529,9 @@ void magictg_state::zr36120_w(offs_t offset, uint32_t data)
 	}
 	else
 	{
+		// PostOffice writes
+		// - Takes 32 PCI clocks for time out to happen compared to 64 in ZR36067
+		// - Has 4 guests instead of 8
 		uint32_t guest = (data >> 20) & 3;
 		uint32_t g_data = data & 0xff;
 		uint32_t g_reg = (data >> 16) & 7;
@@ -925,11 +928,10 @@ void magictg_state::magictg(machine_config &config)
 	m_adsp->set_addrmap(AS_DATA, &magictg_state::adsp_data_map);
 	m_adsp->set_addrmap(AS_IO, &magictg_state::adsp_io_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
 	pcibus.set_device(0, FUNC(magictg_state::pci_dev0_r), FUNC(magictg_state::pci_dev0_w));
@@ -954,7 +956,7 @@ void magictg_state::magictg(machine_config &config)
 	m_voodoo[1]->set_screen("screen");
 	m_voodoo[1]->set_cpu(m_mips);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(1024, 1024);

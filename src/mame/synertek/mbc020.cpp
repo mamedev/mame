@@ -51,7 +51,7 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(update_cb);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
@@ -142,7 +142,7 @@ void mbc020_state::mbc020(machine_config &config)
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	acia.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 1016, 0, 640, 263, 0, 225);
 	screen.set_screen_update("crtc", FUNC(sy6545_1_device::screen_update));
 

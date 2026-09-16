@@ -60,7 +60,7 @@ protected:
 
 	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
 
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// Link to the inbound Hexbus (if not null, see Oso chip)
 	hexbus_device *m_hexbus_inbound;
@@ -142,16 +142,13 @@ class hexbus_device : public device_t, public device_single_card_slot_interface<
 {
 public:
 	template <typename U>
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: hexbus_device(mconfig, tag, owner, clock)
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, U &&opts, const char *dflt)
+		: hexbus_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 
-	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hexbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Used to establish the reverse link (inbound)
 	void set_chain_element(hexbus_chained_device* chain) { m_chain_element = chain; }
@@ -161,7 +158,7 @@ public:
 	void write(int dir, uint8_t data);
 
 protected:
-	void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	device_hexbus_interface *m_next_dev;
 
 private:

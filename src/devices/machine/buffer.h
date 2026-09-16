@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_DEVICES_MACHINE_BUFFER_H
-#define MAME_DEVICES_MACHINE_BUFFER_H
+#ifndef MAME_MACHINE_BUFFER_H
+#define MAME_MACHINE_BUFFER_H
+
+#pragma once
 
 class input_buffer_device : public device_t
 {
@@ -20,11 +22,11 @@ public:
 	void write_bit7(int state) { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint8_t m_input_data;
 };
 
 DECLARE_DEVICE_TYPE(INPUT_BUFFER, input_buffer_device)
 
-#endif // MAME_DEVICES_MACHINE_BUFFER_H
+#endif // MAME_MACHINE_BUFFER_H

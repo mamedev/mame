@@ -107,7 +107,7 @@ DEVICE_IMAGE_LOAD_MEMBER(spectrum_intf2_device::cart_load)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-int spectrum_intf2_device::romcs()
+bool spectrum_intf2_device::romcs()
 {
 	if (m_cart && m_cart->exists())
 		return 1;

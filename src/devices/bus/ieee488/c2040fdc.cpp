@@ -6,15 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - write protect
-    - separate read/write methods
-
-*/
-
 #include "emu.h"
 #include "c2040fdc.h"
 
@@ -93,8 +84,6 @@ c2040_fdc_device::c2040_fdc_device(const machine_config &mconfig, const char *ta
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 	cur_live.drv_sel = m_drv_sel;
 }
 
@@ -182,41 +171,40 @@ void c2040_fdc_device::live_start()
 
 void c2040_fdc_device::checkpoint()
 {
-	get_next_edge(machine().time());
+	if (cur_live.rw_sel) {
+		get_next_edge(machine().time());
+	}
 	checkpoint_live = cur_live;
 }
 
 void c2040_fdc_device::rollback()
 {
 	cur_live = checkpoint_live;
-	get_next_edge(cur_live.tm);
+	if (cur_live.rw_sel) {
+		get_next_edge(cur_live.tm);
+	}
 }
 
 void c2040_fdc_device::start_writing(const attotime &tm)
 {
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+	if(get_floppy())
+		get_floppy()->write_start(tm);
 }
 
 void c2040_fdc_device::stop_writing(const attotime &tm)
 {
-	commit(tm);
-	cur_live.write_start_time = attotime::never;
+	if(get_floppy())
+		get_floppy()->write_end(tm);
 }
 
 bool c2040_fdc_device::write_next_bit(bool bit, const attotime &limit)
 {
-	if(cur_live.write_start_time.is_never()) {
-		cur_live.write_start_time = cur_live.tm;
-		cur_live.write_position = 0;
-	}
-
 	attotime etime = cur_live.tm + m_period;
 	if(etime > limit)
 		return true;
 
-	if(bit && cur_live.write_position < std::size(cur_live.write_buffer))
-		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
+	if(bit && get_floppy() && !get_floppy()->wpt_r())
+		get_floppy()->write_flux_change(cur_live.tm - m_period);
 
 	if (LOG) logerror("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
 
@@ -225,16 +213,8 @@ bool c2040_fdc_device::write_next_bit(bool bit, const attotime &limit)
 
 void c2040_fdc_device::commit(const attotime &tm)
 {
-	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
-		return;
-
-	if (LOG) logerror("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
-
 	if(get_floppy())
-		get_floppy()->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
-
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+		get_floppy()->write_flush(tm);
 }
 
 void c2040_fdc_device::live_delay(int state)
@@ -281,8 +261,6 @@ void c2040_fdc_device::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 
 	cur_live.ready = 1;
 	cur_live.sync = 1;
@@ -300,6 +278,9 @@ void c2040_fdc_device::live_run(const attotime &limit)
 			bool syncpoint = false;
 
 			if (cur_live.tm > limit)
+				return;
+
+			if ((cur_live.tm + m_period) > limit)
 				return;
 
 			int bit = get_next_bit(cur_live.tm, limit);
@@ -332,7 +313,7 @@ void c2040_fdc_device::live_run(const attotime &limit)
 					!(BIT(cur_live.cell_counter, 3) || BIT(cur_live.cell_counter, 2)), cur_live.shift_reg, cur_live.rw_sel, cur_live.mode_sel);
 
 				// write bit
-				if (!cur_live.rw_sel) { // TODO WPS
+				if (!cur_live.rw_sel && !get_floppy()->wpt_r()) {
 					write_next_bit(BIT(cur_live.shift_reg_write, 9), limit);
 				}
 
@@ -394,8 +375,6 @@ void c2040_fdc_device::live_run(const attotime &limit)
 			}
 
 			if (syncpoint) {
-				commit(cur_live.tm);
-
 				cur_live.tm += m_period;
 				live_delay(RUNNING_SYNCPOINT);
 				return;
@@ -427,6 +406,9 @@ void c2040_fdc_device::get_next_edge(const attotime &when)
 
 int c2040_fdc_device::get_next_bit(attotime &tm, const attotime &limit)
 {
+	if (!cur_live.rw_sel)
+		return 0;
+
 	attotime next = tm + m_period;
 
 	int bit = (cur_live.edge.is_never() || cur_live.edge >= next) ? 0 : 1;
@@ -435,7 +417,7 @@ int c2040_fdc_device::get_next_bit(attotime &tm, const attotime &limit)
 		get_next_edge(next);
 	}
 
-	return bit && cur_live.rw_sel;
+	return bit;
 }
 
 uint8_t c2040_fdc_device::read()

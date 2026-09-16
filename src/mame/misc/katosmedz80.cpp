@@ -272,14 +272,25 @@ public:
 		m_pos(*this, "mpos%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(arm_sensors_r);
+	ioport_value arm_sensors_r();
+
 	void dnbanban(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	void port8_w(uint8_t data);
+
+	void ppi0_b_w(uint8_t data);
+	void ppi0_c_w(uint8_t data);
+	void ppi1_b_w(uint8_t data);
+	void ppi1_c_w(uint8_t data);
+
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<pwm_display_device> m_digits_pwm;
@@ -289,16 +300,6 @@ private:
 	output_finder<8> m_ledsp6;
 	output_finder<8> m_ledsp8;
 	output_finder<4> m_pos;
-
-	void program_map(address_map &map);
-	void io_map(address_map &map);
-
-	void port8_w(uint8_t data);
-
-	void ppi0_b_w(uint8_t data);
-	void ppi0_c_w(uint8_t data);
-	void ppi1_b_w(uint8_t data);
-	void ppi1_c_w(uint8_t data);
 
 	u16 m_var[4] = { };
 	u8 m_pre[4] = { };
@@ -312,14 +313,6 @@ private:
 
 void katosmedz80_state::machine_start()
 {
-	// resolve handlers
-	m_ledsp2.resolve();
-	m_ledsp3.resolve();
-	m_ledsp5.resolve();
-	m_ledsp6.resolve();
-	m_ledsp8.resolve();
-	m_pos.resolve();
-
 	// register for savestates
 	save_item(NAME(m_var));
 	save_item(NAME(m_pre));
@@ -372,7 +365,7 @@ void katosmedz80_state::io_map(address_map &map)
 
 */
 
-CUSTOM_INPUT_MEMBER(katosmedz80_state::arm_sensors_r)
+ioport_value katosmedz80_state::arm_sensors_r()
 {
 	return m_sensors;
 }
@@ -528,7 +521,7 @@ static INPUT_PORTS_START( dnbanban )
     x--- ----    Arm 4 Hit microswitch
 
 */
-	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(katosmedz80_state, arm_sensors_r)
+	PORT_BIT( 0x55, IP_ACTIVE_HIGH, IPT_CUSTOM )PORT_CUSTOM_MEMBER(FUNC(katosmedz80_state::arm_sensors_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1) PORT_NAME("Hit Arm 1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2) PORT_NAME("Hit Arm 2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3) PORT_NAME("Hit Arm 3")
@@ -554,7 +547,7 @@ static INPUT_PORTS_START( dnbanban )
 
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1)     PORT_NAME("Coin In")          // COIN IN (related error E5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Coin")     // Service COIN (related error E6)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_NAME("Door Switch")  // DOOR (related error E7)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_DOOR )    PORT_NAME("Door Switch")      // DOOR (related error E7)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")  // to figure out...
 
 	PORT_START("IN2")

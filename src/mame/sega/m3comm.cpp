@@ -308,6 +308,10 @@ void m3comm_device::ioregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 	case 0x88 / 2:
 		COMBINE_DATA(&m_status0);
+		// HACK: workaround for srally2
+		// writes here as handshake without touching the reset register,
+		// expecting the comm CPU to actually be live for clearance.
+		m_commcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		break;
 	case 0x8A / 2:
 		COMBINE_DATA(&m_status1);

@@ -94,6 +94,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/tmp68301.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
@@ -102,7 +103,9 @@ TODO:
 #include "machine/msm6242.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
+#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -141,8 +144,7 @@ public:
 	void x180ii(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -210,9 +212,9 @@ private:
 
 	// machine
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
-	void joystand_map(address_map &map);
-	void x180ii_map(address_map &map);
-	void cart_map(address_map &map);
+	void joystand_map(address_map &map) ATTR_COLD;
+	void x180ii_map(address_map &map) ATTR_COLD;
+	void cart_map(address_map &map) ATTR_COLD;
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -638,16 +640,6 @@ static GFXDECODE_START( gfx_x180ii )
 GFXDECODE_END
 
 
-void joystand_state::machine_start()
-{
-	m_blocker.resolve();
-	m_error_lamp.resolve();
-	m_photo_lamp.resolve();
-	m_ok_button_led.resolve();
-	m_cancel_button_led.resolve();
-}
-
-
 void joystand_state::joystand(machine_config &config)
 {
 	// basic machine hardware
@@ -658,7 +650,7 @@ void joystand_state::joystand(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_cartflash_bankdev).set_map(&joystand_state::cart_map).set_options(ENDIANNESS_BIG, 16, 24, 0x800000); // TODO: address bit per carts?
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(joystand_state::screen_update));
 	screen.set_size(0x200, 0x100);
@@ -689,7 +681,7 @@ void joystand_state::joystand(machine_config &config)
 void joystand_state::x180ii(machine_config &config)
 {
 	// basic machine hardware
-	TMP68301(config, m_maincpu, XTAL(16'000'000)); // actually TMP68303F
+	TMP68303(config, m_maincpu, XTAL(16'000'000)); // TMP68303F
 	m_maincpu->set_addrmap(AS_PROGRAM, &joystand_state::x180ii_map);
 	m_maincpu->parallel_r_cb().set(FUNC(joystand_state::eeprom_r));
 	m_maincpu->parallel_w_cb().set(FUNC(joystand_state::eeprom_w));
@@ -699,7 +691,7 @@ void joystand_state::x180ii(machine_config &config)
 	I8255(config, "ppi1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify this
+	screen_device &screen(SCREEN(config, "screen")); // TODO: verify this
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(joystand_state::screen_update_x180ii));
 	screen.set_size(0x200, 0x100);
@@ -776,6 +768,28 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( x180 ) // YUVO PCC180C PCB + JSR-1A REV.B riser PCB. Similar to the joystand one, even most IC locations match. It has 2x D71055C.
+	ROM_REGION( 0x100000, "maincpu", 0 ) // on riser PCB
+	ROM_LOAD16_BYTE( "msvol1a.even.u5", 0x00000, 0x80000, CRC(f79c476c) SHA1(c49a8ccbe494d39635fda58ba379cea6714a1ec2) )
+	ROM_LOAD16_BYTE( "msvol1b.odd.u6",  0x00001, 0x80000, CRC(dd46fd51) SHA1(60832cb90d5335cd55422e56c8482ac7c88f70ff) )
+
+	ROM_REGION( 0x600000, "tiles", 0 ) // on riser PCB
+	ROM_LOAD( "e28f016sa.u3", 0x000000, 0x200000, CRC(cbb9ca7f) SHA1(3e7679142ce9c87d654f3fb2b53c560a145d2150) )
+	ROM_LOAD( "e28f016sa.u2", 0x200000, 0x200000, CRC(308666c1) SHA1(68c8617b5c0514bc57d1c98a9d73bc310542bf8b) )
+	ROM_LOAD( "e28f016sa.u1", 0x400000, 0x200000, CRC(4e478f0a) SHA1(627947a6c26a9ab61bb1f61389e8ba1ce64b3d56) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "x180-sej1.ver1.00.ic14", 0x00000, 0x80000, CRC(86a0801b) SHA1(a252ed786bf51b963feb6ff253303ea3b67d8fcf) )
+	ROM_LOAD( "x180-sej2.ver1.00.ic13", 0x80000, 0x80000, CRC(92f73edb) SHA1(541a671d0e1648d8ddb42abe0e851ea9c68c718f) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "93c46-x16.ic16", 0x00, 0x80, NO_DUMP )
+
+	ROM_REGION( 0x117, "pld", 0 )
+	ROM_LOAD( "map.ic4", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "xct.ic5", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 ROM_START( x180ii ) // YUVO PCC180C PCB. Similar to the joystand one, even most IC locations match. It has 2x D71055C.
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "x180ii-mpj-e.ver1.00.ic3",  0x00000, 0x80000, CRC(20343837) SHA1(44306e93d3c333f9e418c42d44433fe5654cad40) )
@@ -801,5 +815,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private",           MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, x180ii,   0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private",                   MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, x180,     0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game (set 1)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs
+GAME( 1997, x180ii,   0, x180ii,   joystand, joystand_state, empty_init, ROT0, "Yuvo", "unknown Yuvo Joy Stand game (set 2)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE ) // has Joy Stand sample in Oki ROMs

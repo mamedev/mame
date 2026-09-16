@@ -27,8 +27,6 @@ DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Por
 
 void epson_pf10_device::cpu_mem(address_map &map)
 {
-	map(0x0000, 0x001f).m("maincpu", FUNC(hd6303y_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); /* 192 bytes internal ram */
 	map(0x0800, 0x0fff).ram(); /* external 2k ram */
 	map(0x1000, 0x17ff).rw(FUNC(epson_pf10_device::fdc_r), FUNC(epson_pf10_device::fdc_w));
 	map(0x1800, 0x1fff).w(FUNC(epson_pf10_device::fdc_tc_w));
@@ -62,7 +60,7 @@ static void pf10_floppies(device_slot_interface &device)
 
 void epson_pf10_device::device_add_mconfig(machine_config &config)
 {
-	HD6303Y(config, m_cpu, XTAL(4'915'200)); // HD63A03XF
+	HD6303X(config, m_cpu, XTAL(4'915'200)); // HD63A03XF
 	m_cpu->set_addrmap(AS_PROGRAM, &epson_pf10_device::cpu_mem);
 	m_cpu->in_p1_cb().set(FUNC(epson_pf10_device::port1_r));
 	m_cpu->out_p1_cb().set(FUNC(epson_pf10_device::port1_w));
@@ -128,7 +126,7 @@ void epson_pf10_device::device_reset()
 
 TIMER_CALLBACK_MEMBER( epson_pf10_device::serial_clk_tick )
 {
-	m_cpu->m6801_clock_serial();
+	m_cpu->clock_serial();
 }
 
 

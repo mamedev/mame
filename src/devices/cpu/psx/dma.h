@@ -21,7 +21,7 @@ public:
 	typedef delegate<void (uint32_t *, uint32_t, int32_t)> read_delegate;
 	typedef delegate<void (uint32_t *, uint32_t, int32_t)> write_delegate;
 
-	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	//configuration helpers
 	auto irq() { return m_irq_handler.bind(); }
@@ -36,9 +36,8 @@ public:
 	size_t m_ramsize;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_post_load() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	struct psx_dma_channel

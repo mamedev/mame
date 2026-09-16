@@ -38,9 +38,9 @@ protected:
 	void melodypia_portb_w(u8 data);
 	u8 melodypsg1_portb_r();
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_device<cpu_device>     m_melodycpu;
 	required_device<pia6821_device> m_melodypia;
@@ -48,7 +48,7 @@ protected:
 	required_device<ay8910_device>  m_melodypsg2;
 
 	u8  m_melody_command;
-	void zac1b111xx_melody_base_map(address_map &map);
+	void zac1b111xx_melody_base_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -61,13 +61,13 @@ public:
 	void sound_w(u8 data);
 	void reset_w(int state);
 
-	void zac1b11107_melody_map(address_map &map);
+	void zac1b11107_melody_map(address_map &map) ATTR_COLD;
 protected:
 	// PSG output handlers
 	void melodypsg1_porta_w(u8 data);
 	void melodypsg2_porta_w(u8 data);
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
@@ -88,8 +88,8 @@ public:
 	void melody_command_w(u8 data);
 	DECLARE_INPUT_CHANGED_MEMBER(p1_changed);
 
-	void zac1b11142_audio_map(address_map &map);
-	void zac1b11142_melody_map(address_map &map);
+	void zac1b11142_audio_map(address_map &map) ATTR_COLD;
+	void zac1b11142_melody_map(address_map &map) ATTR_COLD;
 protected:
 	// melody section handlers
 	void ay_4g_porta_w(u8 data);
@@ -102,10 +102,10 @@ protected:
 	// input ports don't push
 	INTERRUPT_GEN_MEMBER(input_poll);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line                m_acs_cb;
 

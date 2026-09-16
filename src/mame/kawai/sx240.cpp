@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 
@@ -31,10 +31,10 @@ private:
 	void asn_w(u8 data);
 	void g_w(u8 data);
 
-	void master_prog(address_map &map);
-	void master_ext(address_map &map);
-	void slave_prog(address_map &map);
-	void slave_ext(address_map &map);
+	void master_prog(address_map &map) ATTR_COLD;
+	void master_ext(address_map &map) ATTR_COLD;
+	void slave_prog(address_map &map) ATTR_COLD;
+	void slave_ext(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_master;
 	required_device<mcs51_cpu_device> m_slave;
@@ -103,7 +103,7 @@ void kawai_sx240_state::sx240(machine_config &config)
 {
 	I8031(config, m_master, 12_MHz_XTAL);
 	m_master->set_addrmap(AS_PROGRAM, &kawai_sx240_state::master_prog);
-	m_master->set_addrmap(AS_IO, &kawai_sx240_state::master_ext);
+	m_master->set_addrmap(AS_DATA, &kawai_sx240_state::master_ext);
 
 	NVRAM(config, "ram0", nvram_device::DEFAULT_ALL_0); // HM6116ALSP-20 (I9) + battery
 	NVRAM(config, "ram1", nvram_device::DEFAULT_ALL_0); // HM6116ALSP-20 (I10) + battery
@@ -112,7 +112,7 @@ void kawai_sx240_state::sx240(machine_config &config)
 
 	I8031(config, m_slave, 12_MHz_XTAL);
 	m_slave->set_addrmap(AS_PROGRAM, &kawai_sx240_state::slave_prog);
-	m_slave->set_addrmap(AS_IO, &kawai_sx240_state::slave_ext);
+	m_slave->set_addrmap(AS_DATA, &kawai_sx240_state::slave_ext);
 
 	PIT8253(config, "pit0"); // MSM82C53-5 (I25)
 	PIT8253(config, "pit1"); // MSM82C53-5 (I26)
@@ -141,4 +141,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1984, sx240, 0, 0, sx240, sx240, kawai_sx240_state, empty_init, "Kawai Musical Instrument Manufacturing", "SX-240 8-Voice Programmable Polyphonic Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

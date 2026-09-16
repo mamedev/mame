@@ -18,9 +18,14 @@ public:
 	void start_audio(uint32_t startlba, uint32_t numblocks);
 	void stop_audio();
 	void pause_audio(int pause);
+	void scan_forward();
+	void scan_reverse();
+	void cancel_scan();
 	int16_t get_channel_sample(int channel);
 
+	void set_audio_lba(uint32_t lba);
 	uint32_t get_audio_lba();
+	void set_audio_length(uint32_t sectors);
 	int audio_active();
 	int audio_paused();
 	int audio_ended();
@@ -29,20 +34,20 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	void get_audio_data(write_stream_view &bufL, write_stream_view &bufR);
+	void get_audio_data(sound_stream &stream);
 
 	required_device<cdrom_image_device> m_disc;
 
 	// internal state
 	sound_stream *      m_stream;
 
-	int8_t                m_audio_playing, m_audio_pause, m_audio_ended_normally;
+	int8_t                m_audio_playing, m_audio_pause, m_audio_ended_normally, m_audio_scan, m_audio_scan_direction;
 	uint32_t              m_audio_lba, m_audio_length;
 
 	std::unique_ptr<uint8_t[]>   m_audio_cache;

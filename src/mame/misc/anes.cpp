@@ -5,12 +5,16 @@
 Sanma - San-nin Uchi Mahjong (Japan) by ANES
 Ton Puu Mahjong (Japan) by ANES
 
+Charmy Dash (Japan) by ANES
+
 TODO:
 - refine blitter emulation;
 - flip screen;
 - player 2 inputs;
 - verify sanma dips translations;
+- move Charmy Dash to separate driver (if warranted).
 
+Main components of the PCB used for mahjong games:
 - 1x Z0840008PSC Z80 CPU
 - 1x 16.000 XTAL near the Z80
 - 1x YM2413 sound chip
@@ -21,6 +25,19 @@ TODO:
 - 1x HM6265LK-70
 - 1x unknown 160 pin device labeled "ANES ORIGINAL SEAL NO. A199." for tonpuu, "ANES ORIGINAL SEAL NO. A446." for sanma
 - 4x banks of 8 DIP switches
+
+Main components of the PCB used for horse racing games:
+- 1x Z0840008PSC Z80 CPU
+- 1x HM6265LK-70
+- 4x CY7C109-20VC SRAM
+- 2x CY7C199-15VC SRAM
+- 1x 32.00000MHz XTAL near the Z80
+- 1x unknown 240 pin device labeled "ANES ORIGINAL SEAL NO. D117"
+- 1x PIC16F84A-20P MCU
+- 1x OKI M9810B
+- 1x 17S40C configuration bitstream
+- 1x volume pot
+- no banks of DIP switches
 */
 
 #include "emu.h"
@@ -50,11 +67,11 @@ public:
 	{
 	}
 
-	void anes(machine_config &config);
+	void anes(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void vram_offset_w(offs_t offset, uint8_t data);
@@ -93,7 +110,7 @@ private:
 
 	void rombank_w(uint8_t data);
 	void matrix_w(uint8_t data);
-	uint8_t key_r(offs_t offset);
+	uint8_t key_r();
 	uint8_t m1_rom_r(offs_t offset);
 
 	void palette_enable_w(uint8_t data);
@@ -108,9 +125,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
-	void opcodes_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
+	void opcodes_map(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
@@ -261,7 +278,7 @@ void anes_state::matrix_w(uint8_t data)
 		logerror("%s: Unknown mux bit written %02X\n", machine().describe_context(), data);
 }
 
-uint8_t anes_state::key_r(offs_t offset)
+uint8_t anes_state::key_r()
 {
 	uint8_t data = 0xff;
 
@@ -509,14 +526,14 @@ static INPUT_PORTS_START( anes )
 
 	PORT_START("SW3") // port 0x12
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW3:1,2,3")
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x38, 0x38, "Bonus Chance" )          PORT_DIPLOCATION("SW3:4,5,6")
 	PORT_DIPSETTING(    0x38, "10" )
 	PORT_DIPSETTING(    0x18, "5" )
@@ -637,14 +654,14 @@ static INPUT_PORTS_START( sanma )
 
 	PORT_MODIFY("SW3") // port 0x12
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW3:1,2,3")
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x38, 0x38, "Notes" )          PORT_DIPLOCATION("SW3:4,5,6")
 	PORT_DIPSETTING(    0x00, "10 Notes/1 Credit" )
 	PORT_DIPSETTING(    0x20, "5 Notes/1 Credit" )
@@ -752,7 +769,7 @@ void anes_state::anes(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: set_raw
+	SCREEN(config, m_screen); // TODO: set_raw
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -794,8 +811,26 @@ ROM_START( tonpuu )
 	ROM_LOAD( "17128epc.u41", 0x0000, 0x4001, NO_DUMP )
 ROM_END
 
+ROM_START( chardash )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD( "anes_c13.u10", 0x00000, 0x80000, CRC(9d23bded) SHA1(7ddf8947c8f8c4e974e0cdbfc7956dcc6ebbde5c) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x8080, "pic", 0 )
+	ROM_LOAD( "pic16f84_code.bin", 0x000, 0x800, NO_DUMP )
+	ROM_LOAD( "pic16f84_data.bin", 0x800, 0x080, NO_DUMP )
+
+	ROM_REGION(0x200000, "blitter", 0)
+	ROM_LOAD( "anes_e21.u16", 0x000000, 0x100000, CRC(2db77530) SHA1(a1e7f1b4c34999342a75b459f63f790526da9ca0) )
+	ROM_LOAD( "anes_e22.u17", 0x100000, 0x100000, CRC(ba10631e) SHA1(5f1e69171b9d1ddf6a12d549d5a402acd09fa3bf) )
+
+	ROM_REGION(0x100000, "oki", 0)
+	ROM_LOAD( "anes_m11.u29", 0x000000, 0x100000, CRC(66316c40) SHA1(d253299dd4da3c680b41fef709377e974dc7a969) )
+	// u30 not populated
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2001, sanma,  0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong [BET] (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
-GAME( 200?, tonpuu, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX [BET] (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )
+GAME( 2001, sanma,    0, anes, sanma,  anes_state, empty_init, ROT0, "ANES", "Sanma - San-nin Uchi Mahjong (Japan, version 2.60)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // flyer says 2000, manual says 2001 version 2.60
+GAME( 1997, tonpuu,   0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Ton Puu Mahjong Version 2.0 RX (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE  )
+GAME( 2002, chardash, 0, anes, tonpuu, anes_state, empty_init, ROT0, "ANES", "Charmy Dash (Japan)",                                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE  )

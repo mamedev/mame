@@ -49,7 +49,7 @@ public:
 	virtual void pin_8_w(int state) override { m_pin8 = state ? 1 : 0; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(xpd_1lr); }
 
 private:

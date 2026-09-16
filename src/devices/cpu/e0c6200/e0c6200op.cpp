@@ -116,6 +116,11 @@ void e0c6200_cpu_device::do_branch(int condition)
 		m_pc = m_jpc | (m_op & 0xff);
 }
 
+void e0c6200_cpu_device::op_illegal()
+{
+	logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
+}
+
 
 // common opcodes (simpler ones are handled directly)
 // note: it is implied that all opcodes below except RRC take 7 clock cycles (5 already deducted)

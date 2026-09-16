@@ -24,22 +24,27 @@ class huc6271_device : public device_t,
 {
 public:
 	// construction/destruction
-	huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O operations
-	//void data_transfer(uint32_t offset, uint32_t data);
-	void regs(address_map &map);
+	//void data_transfer(u32 offset, u32 data);
+	void amap(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
 	const address_space_config      m_data_space_config;
 
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
+
+	u16 m_hscroll;
+	u16 m_control;
+	u16 m_back_y, m_back_u, m_back_v;
+	u16 m_hsync;
 };
 
 

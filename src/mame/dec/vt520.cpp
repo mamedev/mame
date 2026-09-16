@@ -9,7 +9,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
+#include "cpu/mcs51/i80c52.h"
 //#include "machine/mc68681.h"
 #include "machine/ram.h"
 #include "emupal.h"
@@ -32,13 +33,13 @@ public:
 
 private:
 	uint8_t vt520_some_r();
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_rom;
-	void vt520_io(address_map &map);
-	void vt520_mem(address_map &map);
+	void vt520_data(address_map &map) ATTR_COLD;
+	void vt520_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -60,7 +61,7 @@ uint8_t vt520_state::vt520_some_r()
 	return 0x40;
 }
 
-void vt520_state::vt520_io(address_map &map)
+void vt520_state::vt520_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x7ffb, 0x7ffb).r(FUNC(vt520_state::vt520_some_r));
@@ -92,10 +93,10 @@ void vt520_state::vt420(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(43'320'000) / 3); // SCN8031HCFN40 (divider not verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt520_state::vt520_mem);
-	m_maincpu->set_addrmap(AS_IO, &vt520_state::vt520_io);
+	m_maincpu->set_addrmap(AS_DATA, &vt520_state::vt520_data);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(802, 480);
@@ -111,10 +112,10 @@ void vt520_state::vt520(machine_config &config)
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, XTAL(20'000'000)); // Philips P80C32IBPN
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt520_state::vt520_mem);
-	m_maincpu->set_addrmap(AS_IO, &vt520_state::vt520_io);
+	m_maincpu->set_addrmap(AS_DATA, &vt520_state::vt520_data);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(802, 480);
@@ -156,7 +157,7 @@ ROM_END
 
 /* Driver */
 
-COMP( 1990, vt420, 0, 0, vt420, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
-//COMP( 1993, vt510, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
-COMP( 1994, vt520, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
-//COMP( 1994, vt525, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1990, vt420, 0, 0, vt420, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1993, vt510, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1994, vt520, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+//COMP( 1994, vt525, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

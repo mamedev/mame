@@ -55,7 +55,7 @@ class geneve_gate_array_device : public device_t
 	// friend class genmod_decoder_device;
 
 public:
-	geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Set the internal state and output lines according to the address
 	void setaddress(offs_t offset, uint8_t busctrl);
@@ -81,9 +81,12 @@ public:
 	int csr_out();
 	int csw_out();
 	int rtcen_out();
-	int romen_out();
-	int ramen_out();
-	int ramenx_out();
+
+	int romen_out();   // Boot EPROM access
+	int ramen_out();   // Stock SRAM access
+	int ramenx_out();  // 32K expanded SRAM access
+	int ramenu_out();  // Full 384K SRAM access
+
 	int snden_out();
 	int dben_out();
 	int gaready_out();
@@ -113,7 +116,7 @@ public:
 	int  get_function() { return m_debug? m_decdebug.function : m_decoded.function; }
 
 private:
-	geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 	void    common_reset();
 
 	// Mapper function
@@ -154,6 +157,7 @@ private:
 		MPEPROM,
 		MPSRAM,
 		MPSRAMX,
+		MPSRAMU,
 		MBOX,
 
 		CARTPROT
@@ -161,7 +165,7 @@ private:
 	} decfunct_t;
 
 	void    device_start() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// Wait state creation
 	bool    m_have_waitstate;
@@ -250,7 +254,7 @@ private:
 class geneve_pal_device : public device_t
 {
 public:
-	geneve_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	geneve_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void gaready_in(int state);
 	void csw_in(int state);
@@ -263,7 +267,7 @@ public:
 	auto ready_cb() { return m_ready.bind(); }
 
 private:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void set_ready();
 
 	// Pins
@@ -289,7 +293,7 @@ private:
 class genmod_decoder_device : public device_t
 {
 public:
-	genmod_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	genmod_decoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Set the internal state and output lines according to the address
 	void set_function(int func, int page);
@@ -304,7 +308,7 @@ public:
 	void sndready_in(int state);
 
 private:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 	// Emulation-specific: Is the debugger active?
 	bool    m_debug;

@@ -13,7 +13,10 @@
 
 #include "ui/menu.h"
 
+#include <functional>
 #include <list>
+#include <string>
+#include <string_view>
 
 
 namespace ui {
@@ -25,14 +28,21 @@ class menu_software_parts : public menu
 public:
 	enum class result
 	{
-		INVALID = -1,
-		EMPTY = 0x2000,
+		EMPTY,
 		FMGR,
 		SWLIST,
 		ENTRY
 	};
 
-	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
+	using handler_function = std::function<void (result, software_part const *)>;
+
+	menu_software_parts(
+			mame_ui_manager &mui,
+			render_target &target,
+			software_info const &info,
+			char const *interface,
+			bool other_opt,
+			handler_function &&handler);
 	virtual ~menu_software_parts() override;
 
 private:
@@ -47,12 +57,11 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	// variables
+	handler_function const  m_handler;
 	entry_list              m_entries;
-	const software_info *   m_info;
-	const char *            m_interface;
-	const software_part **  m_selected_part;
+	software_info const &   m_info;
+	char const *const       m_interface;
 	bool                    m_other_opt;
-	result &                m_result;
 };
 
 
@@ -61,7 +70,14 @@ private:
 class menu_software_list : public menu
 {
 public:
-	menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result);
+	using handler_function = std::function<void (std::string_view)>;
+
+	menu_software_list(
+			mame_ui_manager &mui,
+			render_target &target,
+			software_list_device &swlist,
+			char const *interface,
+			handler_function &&handler);
 	virtual ~menu_software_list() override;
 
 protected:
@@ -81,18 +97,18 @@ private:
 	};
 
 	// variables
-	software_list_device *          m_swlist; // currently selected list
-	const char *                    m_interface;
-	std::string &                   m_result;
-	std::list<entry_info>           m_entrylist;
-	std::string                     m_search;
-	bool                            m_ordered_by_shortname;
+	handler_function const  m_handler;
+	software_list_device &  m_swlist; // currently selected list
+	char const *const       m_interface;
+	std::list<entry_info>   m_entrylist;
+	std::string             m_search;
+	bool                    m_ordered_by_shortname;
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
 	// functions
-	void append_software_entry(const software_info &swinfo);
+	void append_software_entry(software_info const &swinfo);
 	void update_search(void *selectedref);
 };
 
@@ -102,14 +118,20 @@ private:
 class menu_software : public menu
 {
 public:
-	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
+	using handler_function = std::function<void (software_list_device *)>;
+
+	menu_software(
+			mame_ui_manager &mui,
+			render_target &target,
+			char const *interface,
+			handler_function &&handler);
 	virtual ~menu_software() override;
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
 private:
-	const char *                    m_interface;
-	software_list_device **         m_result;
+	char const *const       m_interface;
+	handler_function const  m_handler;
 };
 
 } // namespace ui

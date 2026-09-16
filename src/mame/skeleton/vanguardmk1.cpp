@@ -21,7 +21,7 @@ public:
 	void vanguardmk1(machine_config &config);
 
 private:
-	void mcu_map(address_map &map);
+	void mcu_map(address_map &map) ATTR_COLD;
 };
 
 void vanguardmk1_state::mcu_map(address_map &map)
@@ -48,4 +48,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2004?, vngrdmk1, 0, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, "EOD Performance Inc.", "Vanguard MK1", MACHINE_IS_SKELETON_MECHANICAL )
+SYST( 2004?, vngrdmk1, 0, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, "EOD Performance Inc.", "Vanguard MK1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

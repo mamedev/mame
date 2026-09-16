@@ -78,15 +78,14 @@ protected:
 	pic17c4x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size, address_map_constructor data_map);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
-	virtual u32 execute_input_lines() const noexcept override { return 6; } // for now
 	virtual bool execute_input_edge_triggered(int linenum) const noexcept override { return linenum == INT_LINE || linenum == T0CKI_LINE; }
 	virtual void execute_set_input(int linenum, int state) override;
 
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 
 	virtual void increment_timers() override;
 
@@ -163,7 +162,7 @@ protected:
 	pic17c43_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size);
 
 private:
-	void data_map(address_map &map);
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 class pic17c44_device : public pic17c43_device

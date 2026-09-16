@@ -7,7 +7,7 @@
 
 CDynLimBuf::CDynLimBuf(size_t limit) throw()
 {
-  _chars = 0;
+  _chars = NULL;
   _pos = 0;
   _size = 0;
   _sizeLimit = limit;

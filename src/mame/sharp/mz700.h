@@ -3,7 +3,7 @@
 /******************************************************************************
  *  Sharp MZ700
  *
- *  Reference: http://sharpmz.computingmuseum.com
+ *  Reference: https://original.sharpmz.org/
  *
  ******************************************************************************/
 #ifndef MAME_SHARP_MZ700_H
@@ -50,8 +50,8 @@ public:
 	void init_mz700();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t mz700_e008_r();
 	void mz700_e008_w(uint8_t data);
@@ -62,7 +62,6 @@ protected:
 	void mz700_bank_4_w(uint8_t data);
 	void mz700_bank_5_w(uint8_t data);
 	void mz700_bank_6_w(uint8_t data);
-	DECLARE_MACHINE_RESET(mz700);
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
@@ -75,9 +74,9 @@ protected:
 	void write_centronics_busy(int state);
 	void write_centronics_perror(int state);
 
-	void mz700_banke(address_map &map);
-	void mz700_io(address_map &map);
-	void mz700_mem(address_map &map);
+	void mz700_banke(address_map &map) ATTR_COLD;
+	void mz700_io(address_map &map) ATTR_COLD;
+	void mz700_mem(address_map &map) ATTR_COLD;
 
 	int m_mz700 = 0;                /* 1 if running on an mz700 */
 
@@ -137,7 +136,7 @@ public:
 	void init_mz800();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t mz800_bank_0_r();
@@ -149,9 +148,6 @@ private:
 	void mz800_read_format_w(uint8_t data);
 	void mz800_display_mode_w(uint8_t data);
 	void mz800_scroll_border_w(uint8_t data);
-	uint8_t mz800_ramdisk_r();
-	void mz800_ramdisk_w(uint8_t data);
-	void mz800_ramaddr_w(uint8_t data);
 	void mz800_palette_w(uint8_t data);
 	void mz800_cgram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -159,15 +155,13 @@ private:
 	void mz800_z80pio_port_a_w(uint8_t data);
 	void pio_port_a_w(uint8_t data);
 
-	void mz800_bankf(address_map &map);
-	void mz800_io(address_map &map);
-	void mz800_mem(address_map &map);
+	void mz800_bankf(address_map &map) ATTR_COLD;
+	void mz800_io(address_map &map) ATTR_COLD;
+	void mz800_mem(address_map &map) ATTR_COLD;
 
 	required_device_array<msx_general_purpose_port_device, 2> m_joy;
 
 	std::unique_ptr<uint8_t[]> m_cgram;
-
-	uint16_t m_mz800_ramaddr = 0;
 };
 
 #endif // MAME_SHARP_MZ700_H

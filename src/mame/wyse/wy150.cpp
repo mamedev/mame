@@ -14,7 +14,7 @@
 ************************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/nvram.h"
 #include "screen.h"
 
@@ -33,14 +33,14 @@ public:
 	void wy150(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void driver_start() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 };
@@ -76,11 +76,11 @@ void wy150_state::wy150(machine_config &config)
 {
 	i80c32_device &maincpu(I80C32(config, "maincpu", 11_MHz_XTAL)); // Philips P80C32SBPN (e.g.)
 	maincpu.set_addrmap(AS_PROGRAM, &wy150_state::prog_map);
-	maincpu.set_addrmap(AS_IO, &wy150_state::ext_map);
+	maincpu.set_addrmap(AS_DATA, &wy150_state::ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 8464 or 5564 or similar (e.g. Winbond W2465-70LL) + battery
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(48_MHz_XTAL, 1530, 0, 1200, 523, 0, 416); // 31.372 kHz horizontal
 	//m_screen->set_raw(48_MHz_XTAL, 1530, 0, 1188, 402, 0, 338);
 	// TBD: WY-160 should have different parameters (has 76 Hz refresh rate rather than 78 Hz)
@@ -128,7 +128,7 @@ void wy150_state::driver_start()
 } // anonymous namespace
 
 
-COMP(1991, wy150, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-150 (v1.0)", MACHINE_IS_SKELETON)
-COMP(1992, wy120, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-120 (v1.4)", MACHINE_IS_SKELETON)
-COMP(1994, wy160, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-160 (v1.7)", MACHINE_IS_SKELETON)
-COMP(1994, wy325, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-325 (v3.2)", MACHINE_IS_SKELETON)
+COMP(1991, wy150, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-150 (v1.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1992, wy120, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-120 (v1.4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1994, wy160, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-160 (v1.7)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1994, wy325, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-325 (v3.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

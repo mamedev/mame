@@ -2,7 +2,7 @@
 // detail/null_mutex.hpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,14 +17,13 @@
 
 #include "asio/detail/config.hpp"
 
-#if !defined(ASIO_HAS_THREADS)
-
 #include "asio/detail/noncopyable.hpp"
 #include "asio/detail/scoped_lock.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class null_mutex
@@ -43,6 +42,12 @@ public:
   {
   }
 
+  // Try to lock the mutex.
+  bool try_lock()
+  {
+    return true;
+  }
+
   // Lock the mutex.
   void lock()
   {
@@ -55,10 +60,9 @@ public:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
-
-#endif // !defined(ASIO_HAS_THREADS)
 
 #endif // ASIO_DETAIL_NULL_MUTEX_HPP

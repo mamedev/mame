@@ -362,10 +362,8 @@ This is an example opening tag for a top-level ``mamelayout`` element:
     <mamelayout version="2">
 
 In general, children of the top-level ``mamelayout`` element are processed in
-reading order from top to bottom.  The exception is that, for historical
-reasons, views are processed last.  This means views see the final values of all
-parameters at the end of the ``mamelayout`` element, and may refer to elements
-and groups that appear after them.
+reading order from top to bottom.  Elements and groups must be defined before
+they can be used.
 
 The following elements are allowed inside the top-level ``mamelayout`` element:
 
@@ -511,12 +509,13 @@ image
     layout file.  Image file formats are detected by examining the content of
     the files, file name extensions are ignored.
 text
-    Draws text in using the UI font in the specified colour.  The text to draw
-    must be supplied using a ``string`` attribute.  An ``align`` attribute may
-    be supplied to set text alignment.  If present, the ``align`` attribute must
-    be an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and
-    2 (two) means right-aligned.  If the ``align`` attribute is absent, the text
-    will be centred.
+    Draws text in the specified colour, using the artwork font.  The text to
+    draw must be supplied using a ``string`` attribute.  An ``align`` attribute
+    may be supplied to set text alignment.  If present, the ``align`` attribute
+    must be an integer, where 0 (zero) means centred, 1 (one) means
+    left-aligned, 2 (two) means right-aligned, and 3 (three) means that the text
+    will be stretched horizontally to fill its bounds.  If the ``align``
+    attribute is absent, the text will be centred.
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
@@ -557,17 +556,18 @@ led16segsc
     additional bits correspond to the decimal point and comma tail.  Unlit
     segments are drawn at low intensity (0x20/0xff).
 simplecounter
-    Displays the numeric value of the element’s state using the system font in
-    the specified colour.  The value is formatted in decimal notation.  A
+    Displays the numeric value of the element’s state in the specified colour,
+    using the artwork font.  The value is formatted in decimal notation.  A
     ``digits`` attribute may be supplied to specify the minimum number of digits
     to display.  If present, the ``digits`` attribute must be a positive
     integer; if absent, a minimum of two digits will be displayed.  A
     ``maxstate`` attribute may be supplied to specify the maximum state value to
     display.  If present, the ``maxstate`` attribute must be a non-negative
-    number; if absent it defaults to 999.  An ``align`` attribute may be supplied
-    to set text alignment.  If present, the ``align`` attribute must be an
-    integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 2
-    (two) means right-aligned; if absent, the text will be centred.
+    number; if absent it defaults to 999.  An ``align`` attribute may be
+    supplied to set text alignment.  If present, the ``align`` attribute must be
+    an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 3
+    (three) means that the text will be stretched horizontally to fill its
+    bounds.  If the ``align`` attribute is absent, the text will be centred.
 
 An example element that draws a static left-aligned text string:
 
@@ -684,11 +684,12 @@ This is an example of a valid opening tag for a ``view`` element:
     <view name="Control panel">
 
 A view creates a nested parameter scope inside the parameter scope of the
-top-level ``mamelayout`` element.  For historical reasons, ``view`` elements are
-processed *after* all other child elements of the top-level ``mamelayout``
-element.  This means a view can reference elements and groups that appear after
-it in the file, and parameters from the enclosing scope will have their final
-values from the end of the ``mamelayout`` element.
+top-level ``mamelayout`` element.
+
+A ``view`` element may have a ``showpointers`` attribute to set whether mouse
+and pen pointers should be shown for the view.  If present, the value must be
+either ``yes`` or ``no``.  If the ``showpointers`` attribute is not present, pen
+and mouse pointers are shown for views that contain items bound to I/O ports.
 
 The following child elements are allowed inside a ``view`` element:
 
@@ -1188,7 +1189,7 @@ Clickable items
 If a view item (``element`` or ``screen`` element) has ``inputtag`` and
 ``inputmask`` attribute values that correspond to a digital switch field in the
 emulated system, clicking the element will activate the switch.  The switch
-will remain active as long as the mouse button is held down and the pointer is
+will remain active as long as the primary button is held down and the pointer is
 within the item’s current bounds.  (Note that the bounds may change depending on
 the item’s animation state, see :ref:`layfile-interact-itemanim`).
 
@@ -1196,6 +1197,12 @@ The ``inputtag`` attribute specifies the tag path of an I/O port relative to the
 device that caused the layout file to be loaded.  The ``inputmask`` attribute
 must be an integer specifying the bits of the I/O port field that the item
 should activate.  This sample shows instantiation of clickable buttons:
+
+The ``clickthrough`` attribute controls whether clicks can pass through the view
+item to other view items drawn below it.  The ``clickthrough`` attribute must be
+``yes`` or ``no`` if present.  The default is ``no`` (clicks do not pass
+through) for view items with ``inputtag`` and ``inputmask`` attributes, and
+``yes`` (clicks pass through) for other view items.
 
 .. code-block:: XML
 
@@ -1209,9 +1216,8 @@ should activate.  This sample shows instantiation of clickable buttons:
         <bounds x="1.775" y="5.375" width="1.0" height="1.0" />
     </element>
 
-When handling mouse input, MAME treats all layout elements as being rectangular,
-and only activates the first clickable item whose area includes the location of
-the mouse pointer.
+When handling pointer input, MAME treats all layout elements as being
+rectangular.
 
 
 .. _layfile-interact-elemstate:
@@ -1385,8 +1391,8 @@ layouts, MAME automatically generates views based on the machine configuration.
 The following views will be automatically generated:
 
 * If the system has no screens and no viable views were found in the internal
-  and external layouts, MAME will load a view that shows the message “No screens
-  attached to the system”.
+  and external layouts, MAME will load a view that shows the message “No visual
+  output.”
 * For each emulated screen, MAME will generate a view showing the screen at its
   physical aspect ratio with rotation applied.
 * For each emulated screen where the configured pixel aspect ratio doesn’t match
@@ -1461,33 +1467,36 @@ Example layout files
 These layout files demonstrate various artwork system features.  They are all
 internal layouts included in MAME.
 
-`sstrangr.lay <https://git.redump.net/mame/tree/src/mame/layout/sstrangr.lay?h=mame0235>`_
+`sstrangr.lay <https://git.redump.net/mame/tree/src/mame/layout/sstrangr.lay?h=mame0261>`_
     A simple case of using translucent colour overlays to visually separate and
     highlight elements on a black and white screen.
-`seawolf.lay <https://git.redump.net/mame/tree/src/mame/layout/seawolf.lay?h=mame0235>`_
+`seawolf.lay <https://git.redump.net/mame/tree/src/mame/layout/seawolf.lay?h=mame0261>`_
     This system uses lamps for key gameplay elements.  Blending modes are used
     for the translucent colour overlay placed over the monitor, and the lamps
     reflected in front of the monitor.  Also uses collections to allow parts of
     the layout to be disabled selectively.
-`armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0235>`_
+`armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0261>`_
     This game’s monitor is viewed directly through a translucent colour overlay
     rather than being reflected from inside the cabinet.  This means the overlay
     reflects ambient light as well as affecting the colour of the video image.
     The shapes on the overlay are drawn using embedded SVG images.
-`tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0235>`_
+`tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0261>`_
     A multi-segment alphanumeric display and keypad.  The keys are clickable,
     and provide visual feedback when pressed.
-`esq2by16.lay <https://git.redump.net/mame/tree/src/mame/layout/esq2by16.lay?h=mame0235>`_
+`esq2by16.lay <https://git.redump.net/mame/tree/src/mame/layout/esq2by16.lay?h=mame0261>`_
     Builds up a multi-line dot matrix character display.  Repeats are used to
     avoid repetition for the rows in a character, characters in a line, and
     lines in a page.  Group colors allow a single element to be used for all
     four display colours.
-`cgang.lay <https://git.redump.net/mame/tree/src/mame/layout/cgang.lay?h=mame0235>`_
+`cgang.lay <https://git.redump.net/mame/tree/src/mame/layout/cgang.lay?h=mame0261>`_
     Animates the position of element items to simulate an electromechanical
     shooting gallery game.  Also demonstrates effective use of components to
     build up complex graphics.
-`unkeinv.lay <https://git.redump.net/mame/tree/src/mame/layout/unkeinv.lay?h=mame0235>`_
+`minspace.lay <https://git.redump.net/mame/tree/src/mame/layout/minspace.lay?h=mame0261>`_
     Shows the position of a slider control with LEDs on it.
-`md6802.lay <https://git.redump.net/mame/tree/src/mame/layout/md6802.lay?h=mame0235>`_
+`md6802.lay <https://git.redump.net/mame/tree/src/mame/layout/md6802.lay?h=mame0261>`_
     Effectively using groups as a procedural programming language to build up an
     image of a trainer board.
+`beena.lay <https://git.redump.net/mame/tree/src/mame/layout/beena.lay?h=mame0261>`_
+    Using event-based scripting to dynamically position elements and draw element
+    content programmatically.

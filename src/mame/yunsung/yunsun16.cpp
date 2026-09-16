@@ -119,9 +119,9 @@ protected:
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -131,7 +131,7 @@ protected:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -171,9 +171,9 @@ private:
 
 	void sound_command_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -188,20 +188,18 @@ public:
 	void shocking(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_memory_bank m_okibank;
 
 	void sound_bank_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -394,8 +392,6 @@ uint32_t yunsun16_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
 
@@ -912,7 +908,7 @@ void magicbub_state::magicbub(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &magicbub_state::sound_port_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0); // TODO: completely inaccurate
 	m_screen->set_screen_update(FUNC(magicbub_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -922,19 +918,18 @@ void magicbub_state::magicbub(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(16'000'000) / 4));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -949,7 +944,7 @@ void shocking_state::shocking(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &shocking_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0); // TODO: completely inaccurate
 	m_screen->set_screen_update(FUNC(shocking_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -959,12 +954,11 @@ void shocking_state::shocking(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	oki.set_addrmap(0, &shocking_state::oki_map);
 }
 

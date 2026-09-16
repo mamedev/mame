@@ -19,6 +19,8 @@
 #include <cstdlib>
 #include <memory>
 #include <system_error>
+#include <tuple>
+#include <utility>
 
 
 // FIXME: make a proper place for OSD forward declarations
@@ -56,7 +58,7 @@ public:
 	/// \param [out] actual Number of bytes actually read.  Will always
 	///   be less than or equal to the requested length.
 	/// \return An error condition if reading stopped due to an error.
-	virtual std::error_condition read(void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+	virtual std::error_condition read_some(void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
 };
 
 
@@ -100,7 +102,7 @@ public:
 	/// \param [out] actual Number of bytes actually written.  Will
 	///   always be less than or equal to the requested length.
 	/// \return An error condition if writing stopped due to an error.
-	virtual std::error_condition write(void const *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+	virtual std::error_condition write_some(void const *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
 };
 
 
@@ -184,7 +186,7 @@ public:
 	///   be less than or equal to the requested length.
 	/// \return An error condition if seeking failed or reading stopped
 	///   due to an error.
-	virtual std::error_condition read_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+	virtual std::error_condition read_some_at(std::uint64_t offset, void *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
 };
 
 
@@ -214,7 +216,7 @@ public:
 	///   always be less than or equal to the requested length.
 	/// \return An error condition if seeking failed or writing stopped
 	///   due to an error.
-	virtual std::error_condition write_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
+	virtual std::error_condition write_some_at(std::uint64_t offset, void const *buffer, std::size_t length, std::size_t &actual) noexcept = 0;
 };
 
 
@@ -228,6 +230,123 @@ class random_read_write : public read_write_stream, public virtual random_read, 
 public:
 	using ptr = std::unique_ptr<random_read_write>;
 };
+
+
+/// \brief Read from the current position in the stream
+///
+/// Reads up to the specified number of bytes from the stream into the
+/// supplied buffer, continuing if interrupted by asynchronous signals.
+/// May read less than the requested number of bytes if the end of the
+/// stream is reached or an error occurs.  If the stream supports
+/// seeking, reading starts at the current position in the stream, and
+/// the current position is incremented by the number of bytes read.
+/// The operation may not be atomic if it is interrupted before the
+/// requested number of bytes is read.
+/// \param [in] stream The stream to read from.
+/// \param [out] buffer Destination buffer.  Must be large enough to
+///   hold the requested number of bytes.
+/// \param [in] length Maximum number of bytes to read.
+/// \return A pair containing an error condition if reading stopped due
+///   to an error, and the actual number of bytes read.
+std::pair<std::error_condition, std::size_t> read(read_stream &stream, void *buffer, std::size_t length) noexcept;
+
+/// \brief Allocate memory and read from the current position in the
+///   stream
+///
+/// Allocates the specified number of bytes and then reads up to that
+/// number of bytes from the stream into the newly allocated buffer,
+/// continuing if interrupted by asynchronous signals.  May read less
+/// than the requested number of bytes if the end of the stream is
+/// reached or an error occurs.  If the stream supports seeking,
+/// reading starts at the current position in the stream, and the
+/// current position is incremented by the number of bytes read.  The
+/// operation may not be atomic if it is interrupted before the
+/// requested number of bytes is read.  No data will be read if
+/// allocation fails.
+/// \param [in] stream The stream to read from.
+///   hold the requested number of bytes.
+/// \param [in] length Maximum number of bytes to read.
+/// \return A tuple containing an error condition if allocation failed
+///   or reading stopped due to an error, the allocated buffer, and the
+///   actual number of bytes read.
+std::tuple<std::error_condition, std::unique_ptr<std::uint8_t []>, std::size_t> read(read_stream &stream, std::size_t length) noexcept;
+
+/// \brief Read from the specified position
+///
+/// Reads up to the specified number of bytes from the stream into the
+/// supplied buffer, continuing if interrupted by asynchronous signals.
+/// May read less than the requested number of bytes if the end of the
+/// stream is reached or an error occurs.  If seeking is supported,
+/// reading starts at the specified position and the current position is
+/// unaffected.  The operation may not be atomic if it is interrupted
+/// before the requested number of bytes is read.
+/// \param [in] stream The stream to read from.
+/// \param [in] offset The position to start reading from, specified as
+///   a number of bytes from the beginning of the stream.
+/// \param [out] buffer Destination buffer.  Must be large enough to
+///   hold the requested number of bytes.
+/// \param [in] length Maximum number of bytes to read.
+/// \return A pair containing an error condition if reading stopped due
+///   to an error, and the actual number of bytes read.
+std::pair<std::error_condition, std::size_t> read_at(random_read &stream, std::uint64_t offset, void *buffer, std::size_t length) noexcept;
+
+/// \brief Allocate memory and read from the specified position
+///
+/// Allocates the specified number of bytes and then reads up to that
+/// number of bytes from the stream into the newly allocated buffer,
+/// continuing if interrupted by asynchronous signals.  May read less
+/// than the requested number of bytes if the end of the stream is
+/// reached or an error occurs.  If seeking is supported, reading
+/// starts at the specified position and the current position is
+/// unaffected.  The operation may not be atomic if it is interrupted
+/// before the requested number of bytes is read.  No data will be read
+/// if allocation fails.
+/// \param [in] stream The stream to read from.
+/// \param [in] offset The position to start reading from, specified as
+///   a number of bytes from the beginning of the stream.
+/// \param [out] buffer Destination buffer.  Must be large enough to
+///   hold the requested number of bytes.
+/// \param [in] length Maximum number of bytes to read.
+/// \return A tuple containing an error condition if allocation failed
+///   or reading stopped due to an error, the allocated buffer, and the
+///   actual number of bytes read.
+std::tuple<std::error_condition, std::unique_ptr<std::uint8_t []>, std::size_t> read_at(random_read &stream, std::uint64_t offset, std::size_t length) noexcept;
+
+/// \brief Write at the current position in the stream
+///
+/// Writes up to the specified number of bytes from the supplied
+/// buffer to the stream, continuing if interrupted by asynchronous
+/// signals.  May write less than the requested number of bytes if an
+/// error occurs.  If the stream supports seeking, writing starts at the
+/// current position in the stream, and the current position is
+/// incremented by the number of bytes written.  The operation may not
+/// be atomic if it is interrupted before the requested number of bytes
+/// is written.
+/// \param [in] stream The stream to write to.
+/// \param [in] buffer Buffer containing the data to write.  Must
+///   contain at least the specified number of bytes.
+/// \param [in] length Number of bytes to write.
+/// \return A pair containing an error condition if writing stopped due
+///   to an error, and the actual number of bytes written.
+std::pair<std::error_condition, std::size_t> write(write_stream &stream, void const *buffer, std::size_t length) noexcept;
+
+/// \brief Write at specified position
+///
+/// Writes up to the specified number of bytes from the supplied buffer,
+/// continuing if interrupted by asynchronous signals.  If seeking is
+/// supported, writing starts at the specified position and the current
+/// position is unaffected.   May write less than the requested number
+/// of bytes if an error occurs.  The operation may not be atomic if it
+/// is interrupted before the requested number of bytes is written.
+/// \param [in] stream The stream to write to.
+/// \param [in] offset The position to start writing at, specified as a
+///   number of bytes from the beginning of the stream.
+/// \param [in] buffer Buffer containing the data to write.  Must
+///   contain at least the specified number of bytes.
+/// \param [in] length Number of bytes to write.
+/// \return A pair containing an error condition if writing stopped due
+///   to an error, and the actual number of bytes written.
+std::pair<std::error_condition, std::size_t> write_at(random_write &stream, std::uint64_t offset, void const *buffer, std::size_t length) noexcept;
 
 /// \}
 

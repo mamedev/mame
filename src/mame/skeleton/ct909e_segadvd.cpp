@@ -36,14 +36,14 @@ public:
 	void megatrix(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void uart1_data_w(u32 data);
 	u32 uart1_status_r();
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -98,14 +98,13 @@ void ct909e_megatrix_state::megatrix(machine_config &config)
 	m_maincpu->set_addrmap(0x19, &ct909e_megatrix_state::mem_map);
 	m_maincpu->set_addrmap(0x1b, &ct909e_megatrix_state::mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(ct909e_megatrix_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START( megatrix )
@@ -116,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_IS_SKELETON )
+CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

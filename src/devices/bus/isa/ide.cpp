@@ -50,8 +50,8 @@ void isa16_ide_device::ide_interrupt(int state)
 void isa16_ide_device::cdrom_headphones(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^lheadphone", 1.0);
-	cdda->add_route(1, "^^rheadphone", 1.0);
+	cdda->add_route(0, "^^headphone", 1.0, 0);
+	cdda->add_route(1, "^^headphone", 1.0, 1);
 }
 
 static INPUT_PORTS_START( ide )
@@ -76,8 +76,7 @@ void isa16_ide_device::device_add_mconfig(machine_config &config)
 	IDE_CONTROLLER(config, m_ide).options(ata_devices, "hdd", nullptr, false);
 	m_ide->irq_handler().set(FUNC(isa16_ide_device::ide_interrupt));
 
-	SPEAKER(config, "lheadphone").front_left();
-	SPEAKER(config, "rheadphone").front_right();
+	SPEAKER(config, "headphone", 2).front();
 
 	m_ide->slot(0).set_option_machine_config("cdrom", cdrom_headphones);
 	m_ide->slot(1).set_option_machine_config("cdrom", cdrom_headphones);
@@ -124,11 +123,17 @@ void isa16_ide_device::device_start()
 void isa16_ide_device::device_reset()
 {
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
-	if (m_is_primary) {
-		m_isa->install_device(0x01f0, 0x01f7, *this, &isa16_ide_device::map);
-		m_isa->install_device(0x03f0, 0x03f7, *this, &isa16_ide_device::alt_map);
-	} else {
-		m_isa->install_device(0x0170, 0x0177, *this, &isa16_ide_device::map);
-		m_isa->install_device(0x0370, 0x0377, *this, &isa16_ide_device::alt_map);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_ide_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		const u16 base_reg = m_is_primary ? 0x1f0 : 0x170;
+
+		// $1f0 / $3f0 or $170 / $370
+		m_isa->install_device(base_reg | 0x000, base_reg | 0x007, *this, &isa16_ide_device::map);
+		m_isa->install_device(base_reg | 0x200, base_reg | 0x207, *this, &isa16_ide_device::alt_map);
 	}
 }

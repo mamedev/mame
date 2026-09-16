@@ -3,7 +3,6 @@
 /*******************************************************************************
 
 Applied Concepts Destiny Prodigy
-Like most other chess computers by ACI, it was also distributed by Chafitz.
 
 The chess engine is Morphy, which in turn is based on Sargon 2.5.
 
@@ -68,11 +67,13 @@ The keypad is connected to the 12 pin KPDCN connector left to right KP1:
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/sensorboard.h"
 #include "video/pwm.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -97,7 +98,7 @@ public:
 	void prodigy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -108,7 +109,12 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_inputs;
 
-	void main_map(address_map &map);
+	u8 m_select = 0;
+	u8 m_led_data = 0;
+	u8 m_shift_data = 0;
+	u8 m_shift_clock = 0;
+
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -118,11 +124,6 @@ private:
 
 	void shift_clock_w(int state);
 	void shift_data_w(int state);
-
-	u8 m_select = 0;
-	u8 m_led_data = 0;
-	u8 m_shift_data = 0;
-	u8 m_shift_clock = 0;
 };
 
 void prodigy_state::machine_start()
@@ -304,4 +305,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, prodigy, 0,      0,      prodigy, prodigy, prodigy_state, empty_init, "Applied Concepts", "Destiny Prodigy", MACHINE_SUPPORTS_SAVE )

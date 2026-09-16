@@ -9,8 +9,8 @@
 #include "machine/nscsi_bus.h"
 
 class dc7061_device
-	: public nscsi_device
-	, public nscsi_slot_card_interface
+	: public device_t
+	, public nscsi_device_interface
 {
 public:
 	dc7061_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -21,12 +21,12 @@ public:
 	auto dma_w() { return m_dma_w.bind(); }
 
 	// register access
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ncsci_device implementation
 	virtual void scsi_ctrl_changed() override;

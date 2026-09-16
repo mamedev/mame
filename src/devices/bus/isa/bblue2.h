@@ -35,12 +35,12 @@ public:
 	void lpt_irq(int state);
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 
 private:
@@ -56,8 +56,8 @@ private:
 	required_ioport m_h2;
 	required_device<ram_device> m_ram;
 
-	void z80_program_map(address_map &map);
-	void z80_io_map(address_map &map);
+	void z80_program_map(address_map &map) ATTR_COLD;
+	void z80_io_map(address_map &map) ATTR_COLD;
 
 	bool m_devices_installed;
 };

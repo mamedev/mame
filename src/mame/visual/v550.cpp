@@ -45,12 +45,12 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void pvtc_char_map(address_map &map);
-	void pvtc_attr_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void pvtc_char_map(address_map &map) ATTR_COLD;
+	void pvtc_attr_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -138,7 +138,7 @@ void v550_state::v550(machine_config &config)
 	v550_keyboard_device &keyboard(V550_KEYBOARD(config, "keyboard"));
 	keyboard.txd_callback().set(m_usart, FUNC(i8251_device::write_rxd));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(34.846_MHz_XTAL, 19 * 102, 0, 19 * 80, 295, 0, 272);
 	m_screen->set_screen_update(FUNC(v550_state::screen_update));
 
@@ -168,4 +168,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_IS_SKELETON )
+COMP( 1982, v550, 0, 0, v550, v550, v550_state, empty_init, "Visual Technology", "Visual 550", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

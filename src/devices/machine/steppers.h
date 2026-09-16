@@ -69,6 +69,9 @@ public:
 	/* update a motor */
 	int update(uint8_t pattern);
 
+	/* update the reel position/scroll outputs */
+	void draw();
+
 	/* get current position in half steps */
 	int get_position()          { return m_step_pos; }
 	/* get current absolute position in half steps */
@@ -82,8 +85,8 @@ protected:
 	stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t m_pattern;      /* coil pattern */
 	uint8_t m_old_pattern;  /* old coil pattern */
@@ -101,6 +104,9 @@ protected:
 	void update_optic();
 	virtual void advance_phase();
 	devcb_write_line m_optic_cb;
+
+	output_finder<> m_output_pos;
+	output_finder<> m_output_scroll;
 };
 
 class reel_device : public stepper_device
@@ -112,7 +118,7 @@ public:
 	reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void advance_phase() override;
 
 	void set_reel_type(uint8_t type)

@@ -56,7 +56,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/rstbuf.h"
+#include "rstbuf.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(RST_POS_BUFFER, rst_pos_buffer_device, "rst_pos_buffer", "RST Interrupt Buffer (positive modification)")

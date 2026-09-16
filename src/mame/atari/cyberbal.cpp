@@ -57,7 +57,7 @@ protected:
 	{ }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -94,7 +94,7 @@ public:
 	void cyberbal2p(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<screen_device> m_screen;
@@ -110,7 +110,7 @@ private:
 	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// memory maps
-	void cyberbal2p_map(address_map &map);
+	void cyberbal2p_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -136,8 +136,8 @@ public:
 	void cyberbalt(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	optional_device<atari_slapstic_device> m_slapstic;
@@ -164,13 +164,11 @@ private:
 	uint32_t screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// memory maps
-	void main_map(address_map &map);
-	void tournament_map(address_map &map);
-	void extra_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void tournament_map(address_map &map) ATTR_COLD;
+	void extra_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -236,7 +234,6 @@ const atari_motion_objects_config cyberbal_base_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x600,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0,0,0x07f8,0 }}, // mask for the link
@@ -388,18 +385,24 @@ uint32_t cyberbal_base_state::update_one_screen(screen_device &screen, bitmap_in
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = curmob.bitmap();
-	for (const sparse_dirty_rect *rect = curmob.first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	curmob.iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// not verified: logic is all controlled in a PAL
-					pf[x] = mo[x];
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// not verified: logic is all controlled in a PAL
+							pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	curalpha.draw(screen, bitmap, cliprect, 0, 0);
@@ -422,8 +425,6 @@ uint32_t cyberbal2p_state::screen_update_cyberbal2p(screen_device &screen, bitma
 	return update_one_screen(screen, bitmap, cliprect, *m_mob, *m_playfield, *m_alpha);
 }
 
-
-// machine
 
 /*************************************
  *
@@ -631,7 +632,7 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("lscreen")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("lscreen", FUNC(screen_device::vblank))
 
 	PORT_START("IN2")       // fake port for screen switching
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -660,7 +661,7 @@ static INPUT_PORTS_START( cyberbal2p )
 	PORT_START("IN2")       // fc4000
 	PORT_BIT( 0x1fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -672,24 +673,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout pfanlayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0,0, 4,4, 8,8, 12,12, 16,16, 20,20, 24,24, 28,28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
 static const gfx_layout pfanlayout_interleaved =
 {
-	16,8,
+	8,8,
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 1, 2, 3 },
-	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4,RGN_FRAC(1,2)+4, 0,0, 4,4, RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+12,RGN_FRAC(1,2)+12, 8,8, 12,12 },
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4, RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+12, 8, 12 },
 	{ 0*8, 2*8, 4*8, 6*8, 8*8, 10*8, 12*8, 14*8 },
 	16*8
 };
@@ -707,15 +697,15 @@ static const gfx_layout molayout =
 };
 
 static GFXDECODE_START( gfx_cyberbal )
-	GFXDECODE_ENTRY( "tiles",   0, pfanlayout,     0, 128 )
-	GFXDECODE_ENTRY( "sprites", 0, molayout,   0x600, 16 )
-	GFXDECODE_ENTRY( "chars",   0, pfanlayout, 0x780, 8 )
+	GFXDECODE_SCALE( "tiles",   0, gfx_8x8x4_packed_msb,     0, 128, 2, 1 )
+	GFXDECODE_ENTRY( "sprites", 0, molayout,             0x600, 16 )
+	GFXDECODE_SCALE( "chars",   0, gfx_8x8x4_packed_msb, 0x780, 8,   2, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_interleaved )
-	GFXDECODE_ENTRY( "tiles",   0, pfanlayout_interleaved,     0, 128 )
+	GFXDECODE_SCALE( "tiles",   0, pfanlayout_interleaved,     0, 128, 2, 1 )
 	GFXDECODE_ENTRY( "sprites", 0, molayout,               0x600, 16 )
-	GFXDECODE_ENTRY( "chars",   0, pfanlayout_interleaved, 0x780, 8 )
+	GFXDECODE_SCALE( "chars",   0, pfanlayout_interleaved, 0x780, 8,   2, 1 )
 GFXDECODE_END
 
 
@@ -765,7 +755,7 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_mob2->set_config(cyberbal_state::s_mob_config);
 	m_mob2->set_gfxdecode("gfxdecode");
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -774,7 +764,7 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_lscreen->set_palette("lpalette");
 	m_lscreen->screen_vblank().set(FUNC(cyberbal_state::video_int_write_line)); // or is it "right?" har, har!
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	m_rscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -783,14 +773,13 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_rscreen->set_palette("rpalette");
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_SAC(config, m_sac);
 	m_sac->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 	m_sac->test_read_cb().set_ioport("IN0").bit(15);
-	m_sac->add_route(0, "lspeaker", 1.0);
-	m_sac->add_route(1, "rspeaker", 1.0);
+	m_sac->add_route(0, "speaker", 1.0, 0);
+	m_sac->add_route(1, "speaker", 1.0, 1);
 }
 
 void cyberbal_state::cyberbalt(machine_config &config)
@@ -828,7 +817,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	m_mob->set_config(cyberbal2p_state::s_mob_config);
 	m_mob->set_gfxdecode("gfxdecode");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -840,7 +829,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(15);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

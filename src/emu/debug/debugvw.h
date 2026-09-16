@@ -35,7 +35,8 @@ enum debug_view_type
 	DVT_LOG,
 	DVT_BREAK_POINTS,
 	DVT_WATCH_POINTS,
-	DVT_REGISTER_POINTS
+	DVT_REGISTER_POINTS,
+	DVT_EXCEPTION_POINTS
 };
 
 
@@ -276,10 +277,10 @@ public:
 	void set_context(symbol_table *context);
 	void set_default_base(int base) { m_parsed.set_default_base(base); }
 
-private:
-	// internal helpers
+	// helpers
 	bool recompute();
 
+private:
 	// internal state
 	running_machine &   m_machine;              // reference to the machine
 	bool                m_dirty;                // true if the expression needs to be re-evaluated

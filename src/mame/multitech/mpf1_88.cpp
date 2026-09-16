@@ -55,8 +55,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -76,8 +76,8 @@ private:
 
 	void lcd_palette(palette_device &palette) const;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t ipd_port_r();
 	void opd_port1_w(uint8_t data);
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( mpf1_88 )
 	PORT_BIT( 0xdf, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1_88_state, trigger_res, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_NAME("RESET") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpf1_88_state::trigger_res), 0)
 INPUT_PORTS_END
 
 
@@ -294,8 +294,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_88_state::key_nmi)
 
 void mpf1_88_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->pointer());
 
 	// register for state saving
@@ -328,7 +326,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 
 	TIMER(config, "nmi_timer").configure_periodic(FUNC(mpf1_88_state::key_nmi), attotime::from_msec(15));
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
+	auto &screen = SCREEN(config, "screen").set_lcd();
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(132, 28);
@@ -338,7 +336,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mpf1_88_state::lcd_palette), 3);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(mpf1_88_state::lcd_pixel_update));
 	lcdc.set_function_set_at_any_time(true);
@@ -368,6 +366,7 @@ void mpf1_88_state::mpf1_88(machine_config &config)
 	isa8_device &isa8(ISA8(config, "isa", 3.579545_MHz_XTAL/2));
 	isa8.set_memspace(m_maincpu, AS_PROGRAM);
 	isa8.set_iospace(m_maincpu, AS_IO);
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "isa", mpf1_88_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa2", 0, "isa", mpf1_88_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, "isa", mpf1_88_isa8_cards, nullptr, false);

@@ -42,13 +42,11 @@ public:
 		m_led(*this, "LED_BZ%u", 0U)
 	{ }
 
-	void sentx6p(machine_config &config);
+	void sentx6p(machine_config &config) ATTR_COLD;
 
-	void init_sentx6p();
-	void init_sentx6puk();
-	void init_sentx6pd();
-
-	void mem_map_2m_texas(address_map &map);
+	void init_sentx6p() ATTR_COLD;
+	void init_sentx6puk() ATTR_COLD;
+	void init_sentx6pd() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
 	{
@@ -69,8 +67,9 @@ public:
 	}
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void mem_map_2m_texas(address_map &map) ATTR_COLD;
 
 private:
 	uint16_t sentx_porta_r();
@@ -288,57 +287,31 @@ static INPUT_PORTS_START( sentx6p )
 	// these are presuambly read through the UART as the LCD screens are driven by it, currently not hooked up
 	// using PORT_CHANGED_MEMBER because we assume the controller latches them for sending as inputs are only read every few frames
 	PORT_START("CTRL1")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 0)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 0)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::select_latch), 0)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::ok_latch), 0)
 
 	PORT_START("CTRL2")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 1)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 1)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::select_latch), 1)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::ok_latch), 1)
 
 	PORT_START("CTRL3")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 2)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::select_latch), 2)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::ok_latch), 2)
 
 	PORT_START("CTRL4")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 3)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 3)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::select_latch), 3)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::ok_latch), 3)
 
 	PORT_START("CTRL5")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 4)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 4)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::select_latch), 4)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::ok_latch), 4)
 
 	PORT_START("CTRL6")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 5)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 5)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::select_latch), 5)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sentx6p_state::ok_latch), 5)
 
 INPUT_PORTS_END
 
-
-void sentx6p_state::machine_start()
-{
-	spg2xx_game_state::machine_start();
-
-	m_suite1.resolve();
-	m_suite2.resolve();
-	m_number1.resolve();
-	m_number2.resolve();
-
-	m_select_fold.resolve();
-	m_select_check.resolve();
-	m_select_bet.resolve();
-	m_select_call.resolve();
-	m_select_raise.resolve();
-	m_select_allin.resolve();
-
-	m_option_fold.resolve();
-	m_option_check.resolve();
-	m_option_bet.resolve();
-	m_option_call.resolve();
-	m_option_raise.resolve();
-	m_option_allin.resolve();
-
-	m_led.resolve();
-}
 
 void sentx6p_state::machine_reset()
 {
@@ -726,8 +699,8 @@ void sentx6p_state::init_sentx6pd()
 } // anonymous namespace
 
 
-CONS( 2004, sentx6p,    0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6p,   "Senario",               "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a US version, values in USD
-CONS( 2004, sentx6puk,  sentx6p,     0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6puk, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,   0,       0, sentx6p, sentx6p, sentx6p_state, init_sentx6p,   "Senario",               "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a US version, values in USD
+CONS( 2004, sentx6puk, sentx6p, 0, sentx6p, sentx6p, sentx6p_state, init_sentx6puk, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
 
-CONS( 2004, sentx6pd,   0,           0,        sentx6p,     sentx6p, sentx6p_state, init_sentx6pd,  "Senario",               "Deluxe TV Poker - Texas Hold'em, Blackjack & Video Poker (US)", MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, sentx6pd,  0,       0, sentx6p, sentx6p, sentx6p_state, init_sentx6pd,  "Senario",               "Deluxe TV Poker - Texas Hold'em, Blackjack & Video Poker (US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Deluxe version wasn't released outside of US?

@@ -87,7 +87,7 @@ public:
 	void spdamjes(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -151,4 +151,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(19??, spdamjes, 0, spdamjes, spdamjes, spdamjes_state, empty_init, ROT0, "T-90", "Sport Damjes 1", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(19??, spdamjes, 0, spdamjes, spdamjes, spdamjes_state, empty_init, ROT0, "T-90", "Sport Damjes 1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

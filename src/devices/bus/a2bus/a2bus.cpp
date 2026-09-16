@@ -20,7 +20,7 @@
     /INH  32  19  N.C.
     -12V  33  18  R/W
      -5V  34  17  A15
-    N.C.  35  16  A14
+    CREF  35  16  A14
       7M  36  15  A13
       Q3  37  14  A12
      PH1  38  13  A11
@@ -35,7 +35,7 @@
       D2  47   4  A2
       D1  48   3  A1
       D0  49   2  A0
-    -12V  50   1  /IOSEL
+    +12V  50   1  /IOSEL
 
      (front of computer)
 
@@ -52,21 +52,45 @@
            it will cause bus contention.
     -12V - negative 12 volts DC power
      -5V - negative 5 volts DC power
+    CREF - 3.58 MHz color reference signal, only present on slot 7 of PAL models.
+           IIgs redefines this exclusively for slot 3 as M2B0, Mega II bank 0 select.
       7M - 7 MHz clock (1/4th of the master clock on the IIgs, 1/2 on 8-bit IIs)
       Q3 - 2 MHz asymmetrical clock
      PH1 - 6502 phase 1 clock
+  USER 1 - On the II and II+, this officially unspecified signal is tied to an unmarked jumper
+           pad that, if connected, disables /DEVSEL and /IOSEL for all slots when pulled low.
+           On the IIe, this is µPSYNC, output high by the 6502 during opcode fetch cycles.
+           On the IIgs, this is /M2SEL, output low when the 128K Mega II RAM area is accessed.
+     PH0 - 6502 phase 0 clock.  The phase 2 or E clock input required by 6800 or 6500 family
+           peripherals must be regenerated from this signal using additional logic.
  /DEVSEL - asserted on an access to C0nX, where n = the slot number plus 8.
    D0-D7 - 8-bit data bus
+    +12V - 12 volts DC power
      +5V - 5 volts DC power
  DMA OUT - see DMA IN
  INT OUT - see INT IN
     /DMA - pulling this low disconnects the 6502 from the bus and halts it
      RDY - 6502 RDY input.  Pulling this low when PH1 is active will halt the
            6502 and latch the current address bus value.
-  /IOSTB - asserted on an access between C800 and CFFF.
+  /IOSTB - asserted on an access between C800 and CFFF.  To avoid contention,
+           all cards should relinquish the use of this space upon any access
+           to CFFF.
   A0-A15 - 16-bit address bus
   /IOSEL - asserted on accesses to CnXX where n is the slot number.
            Not present on slot 0.
+
+  Though most card firmwares are programmed to work in any slot from 1 to 7,
+  Apple II operating systems often associate slot numbers with particular
+  interface types.  Some of the conventional patterns are as follows:
+
+  - Slot 0 is reserved for a "language" RAM or firmware card (mapping its
+    memory by asserting /INH rather than using /IOSEL and /IOSTB).
+  - Slot 1 is standard for parallel or serial printer interfaces.
+  - Slot 2 can be used for generic parallel or serial I/O.
+  - Slot 3 is generally used by 80-column display interfaces.
+  - Slot 4 or Slot 7 may be used by Z80 coprocessor cards.
+  - Slot 5 may be a secondary disk controller.
+  - Slot 6 is normally occupied by the primary bootable disk controller.
 
 ***************************************************************************/
 
@@ -144,7 +168,8 @@ a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, cons
 	, m_out_nmi_cb(*this)
 	, m_out_inh_cb(*this)
 	, m_out_dma_cb(*this)
-	, m_slot_irq_mask(0), m_slot_nmi_mask(0)
+	, m_in_open_bus_cb(*this, 0xff)
+	, m_slot_irq_mask(0), m_slot_nmi_mask(0), m_dma_bank(0)
 {
 }
 
@@ -158,6 +183,9 @@ void a2bus_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_slot_irq_mask = m_slot_nmi_mask = 0;
+	m_dma_bank = 0;
+
+	save_item(NAME(m_dma_bank));
 }
 
 //-------------------------------------------------
@@ -195,7 +223,7 @@ void a2bus_device::reset_bus()
 		auto card = get_a2bus_card(slot);
 		if (card != nullptr)
 		{
-			card->bus_reset();
+			card->reset_from_bus();
 		}
 	}
 }
@@ -245,12 +273,23 @@ void a2bus_device::set_dma_line(int state)
 
 uint8_t a2bus_device::dma_r(uint16_t offset)
 {
-	return m_maincpu_space->read_byte(offset);
+	return m_maincpu_space->read_byte((uint32_t(m_dma_bank) << 16) | offset);
 }
 
 void a2bus_device::dma_w(uint16_t offset, uint8_t data)
 {
-	m_maincpu_space->write_byte(offset, data);
+	m_maincpu_space->write_byte((uint32_t(m_dma_bank) << 16) | offset, data);
+}
+
+// Cards that hold the Apple in wait states until they're ready use this
+void a2bus_device::defer_host_access()
+{
+	cpu_device &cpu = downcast<cpu_device &>(m_maincpu_space->device());
+
+	if (cpu.cpu_is_interruptible())
+	{
+		cpu.defer_access();
+	}
 }
 
 void a2bus_device::recalc_inh(int slot)
@@ -321,4 +360,50 @@ void device_a2bus_card_interface::interface_pre_start()
 
 		m_a2bus->add_a2bus_card(m_slot, this);
 	}
+}
+
+
+uint8_t device_a2bus_card_interface::read_c0nx(uint8_t offset)
+{
+	if (!device().machine().side_effects_disabled())
+		device().logerror("a2bus: unhandled read at C0n%x\n", offset);
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_c0nx(uint8_t offset, uint8_t data)
+{
+	device().logerror("a2bus: unhandled write %02x to C0n%x\n", data, offset);
+}
+
+uint8_t device_a2bus_card_interface::read_cnxx(uint8_t offset)
+{
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_cnxx(uint8_t offset, uint8_t data)
+{
+	device().logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset);
+}
+
+uint8_t device_a2bus_card_interface::read_c800(uint16_t offset)
+{
+	if (!device().machine().side_effects_disabled())
+		device().logerror("a2bus: unhandled read at %04x\n", offset + 0xc800);
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_c800(uint16_t offset, uint8_t data)
+{
+	device().logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800);
+}
+
+uint8_t device_a2bus_card_interface::read_inh_rom(uint16_t offset)
+{
+	if (!device().machine().side_effects_disabled())
+		device().logerror("a2bus: unhandled read at C0n%x\n", offset);
+	return get_open_bus();
+}
+
+void device_a2bus_card_interface::write_inh_rom(uint16_t offset, uint8_t data)
+{
 }

@@ -2,7 +2,7 @@
 // detail/descriptor_ops.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,16 +19,18 @@
 
 #if !defined(ASIO_WINDOWS) \
   && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+  && !defined(ASIO_CYGWIN_W32_SOCKETS)
 
 #include <cstddef>
 #include "asio/error.hpp"
 #include "asio/error_code.hpp"
+#include "asio/detail/cstdint.hpp"
 #include "asio/detail/socket_types.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 namespace descriptor_ops {
 
@@ -55,7 +57,7 @@ inline void get_last_error(
 {
   if (!is_error_condition)
   {
-    ec.assign(0, ec.category());
+    asio::error::clear(ec);
   }
   else
   {
@@ -65,6 +67,9 @@ inline void get_last_error(
 }
 
 ASIO_DECL int open(const char* path, int flags,
+    asio::error_code& ec);
+
+ASIO_DECL int open(const char* path, int flags, unsigned mode,
     asio::error_code& ec);
 
 ASIO_DECL int close(int d, state_type& state,
@@ -105,6 +110,42 @@ ASIO_DECL bool non_blocking_write1(int d,
     const void* data, std::size_t size,
     asio::error_code& ec, std::size_t& bytes_transferred);
 
+#if defined(ASIO_HAS_FILE)
+
+ASIO_DECL std::size_t sync_read_at(int d, state_type state,
+    uint64_t offset, buf* bufs, std::size_t count, bool all_empty,
+    asio::error_code& ec);
+
+ASIO_DECL std::size_t sync_read_at1(int d, state_type state,
+    uint64_t offset, void* data, std::size_t size,
+    asio::error_code& ec);
+
+ASIO_DECL bool non_blocking_read_at(int d, uint64_t offset,
+    buf* bufs, std::size_t count, asio::error_code& ec,
+    std::size_t& bytes_transferred);
+
+ASIO_DECL bool non_blocking_read_at1(int d, uint64_t offset,
+    void* data, std::size_t size, asio::error_code& ec,
+    std::size_t& bytes_transferred);
+
+ASIO_DECL std::size_t sync_write_at(int d, state_type state,
+    uint64_t offset, const buf* bufs, std::size_t count, bool all_empty,
+    asio::error_code& ec);
+
+ASIO_DECL std::size_t sync_write_at1(int d, state_type state,
+    uint64_t offset, const void* data, std::size_t size,
+    asio::error_code& ec);
+
+ASIO_DECL bool non_blocking_write_at(int d,
+    uint64_t offset, const buf* bufs, std::size_t count,
+    asio::error_code& ec, std::size_t& bytes_transferred);
+
+ASIO_DECL bool non_blocking_write_at1(int d,
+    uint64_t offset, const void* data, std::size_t size,
+    asio::error_code& ec, std::size_t& bytes_transferred);
+
+#endif // defined(ASIO_HAS_FILE)
+
 ASIO_DECL int ioctl(int d, state_type& state, long cmd,
     ioctl_arg_type* arg, asio::error_code& ec);
 
@@ -124,6 +165,7 @@ ASIO_DECL int poll_error(int d,
 
 } // namespace descriptor_ops
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
@@ -134,6 +176,6 @@ ASIO_DECL int poll_error(int d,
 
 #endif // !defined(ASIO_WINDOWS)
        //   && !defined(ASIO_WINDOWS_RUNTIME)
-       //   && !defined(__CYGWIN__)
+       //   && !defined(ASIO_CYGWIN_W32_SOCKETS)
 
 #endif // ASIO_DETAIL_DESCRIPTOR_OPS_HPP

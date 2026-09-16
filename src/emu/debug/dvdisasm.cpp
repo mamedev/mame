@@ -9,10 +9,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugvw.h"
 #include "dvdisasm.h"
+
+#include "debugbuf.h"
 #include "debugcpu.h"
-#include "debugger.h"
+
+#include <locale>
+
 
 //**************************************************************************
 //  DEBUG VIEW DISASM SOURCE
@@ -24,8 +27,9 @@
 
 debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
 	: debug_view_source(std::move(name), &device),
-		m_space(device.memory().space(AS_PROGRAM)),
-		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM)),
+		m_dev(&device.memory()),
+		m_space(AS_PROGRAM),
+		m_decrypted_space(device.memory().has_logical_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM),
 		m_pcbase(nullptr)
 {
 	const device_state_interface *state;
@@ -92,11 +96,11 @@ void debug_view_disasm::enumerate_sources()
 	// iterate over devices with disassembly interfaces
 	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
-		if (dasm.device().memory().space_config(AS_PROGRAM))
+		if (dasm.device().memory().has_logical_space(AS_PROGRAM))
 		{
 			m_source_list.emplace_back(
 					std::make_unique<debug_view_disasm_source>(
-						util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+						util::string_format(std::locale::classic(), "%s '%s'", dasm.device().name(), dasm.device().tag()),
 						dasm.device()));
 		}
 	}
@@ -121,7 +125,8 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 	{
 		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 		m_expression.set_context(&source.device()->debug()->symtable());
-		m_expression.set_default_base(source.space().is_octal() ? 8 : 16);
+		auto [dev, space] = source.space();
+		m_expression.set_default_base(dev->logical_space_config(space)->is_octal() ? 8 : 16);
 	}
 }
 
@@ -241,7 +246,9 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 {
 	// Consider that instructions are 64 bytes max
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	int shift = source.m_space.addr_shift();
+	auto [dev, space] = source.space();
+	const address_space_config *config = dev->logical_space_config(space);
+	int shift = config->addr_shift();
 
 	offs_t backwards_offset;
 	if(shift < 0)
@@ -253,7 +260,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 
 	m_dasm.clear();
 	m_recompute = false;
-	offs_t address = (pc - m_backwards_steps*backwards_offset) & source.m_space.logaddrmask();
+	offs_t address = (pc - m_backwards_steps*backwards_offset) & config->logaddrmask();
 	// Handle wrap at 0
 	if(address > pc)
 		address = 0;
@@ -323,7 +330,9 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 			m_topleft.y = 0;
 		}
 		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-		generate_from_address(buffer, m_expression.value() & source.m_space.logaddrmask());
+		auto [dev, space] = source.space();
+		const address_space_config *config = dev->logical_space_config(space);
+		generate_from_address(buffer, m_expression.value() & config->logaddrmask());
 		return;
 	}
 
@@ -394,25 +403,25 @@ void debug_view_disasm::view_update()
 //  print - print a string in the disassembly view
 //-------------------------------------------------
 
-void debug_view_disasm::print(int row, std::string text, int start, int end, u8 attrib)
+void debug_view_disasm::print(u32 row, std::string text, s32 start, s32 end, u8 attrib)
 {
-	int view_end = end - m_topleft.x;
+	s32 view_end = end - m_topleft.x;
 	if(view_end < 0)
 		return;
 
-	int string_0 = start - m_topleft.x;
+	s32 string_0 = start - m_topleft.x;
 	if(string_0 >= m_visible.x)
 		return;
 
-	int view_start = string_0 > 0 ? string_0 : 0;
+	s32 view_start = string_0 > 0 ? string_0 : 0;
 	debug_view_char *dest = &m_viewdata[row * m_visible.x + view_start];
 
 	if(view_end >= m_visible.x)
 		view_end = m_visible.x;
 
-	for(int pos = view_start; pos < view_end; pos++) {
-		int spos = pos - string_0;
-		if(spos >= int(text.size()))
+	for(s32 pos = view_start; pos < view_end; pos++) {
+		s32 spos = pos - string_0;
+		if(spos >= s32(text.size()))
 			*dest++ = { ' ', attrib };
 		else
 			*dest++ = { u8(text[spos]), attrib };
@@ -427,13 +436,15 @@ void debug_view_disasm::print(int row, std::string text, int start, int end, u8 
 void debug_view_disasm::redraw()
 {
 	// determine how many characters we need for an address and set the divider
-	int m_divider1 = 1 + m_dasm[0].m_tadr.size() + 1;
+	s32 divider1 = 1 + m_dasm[0].m_tadr.size() + 1;
 
 	// assume a fixed number of characters for the disassembly
-	int m_divider2 = m_divider1 + 1 + m_dasm_width + 1;
+	s32 divider2 = divider1 + 1 + m_dasm_width + 1;
 
 	// set the width of the third column to max comment length
-	m_total.x = m_divider2 + 1 + 50;        // DEBUG_COMMENT_MAX_LINE_LENGTH
+	m_total.x = divider2 + 1 + 50;        // DEBUG_COMMENT_MAX_LINE_LENGTH
+
+	const s32 max_visible_col = m_topleft.x + m_visible.x;
 
 	// loop over visible rows
 	for(u32 row = 0; row < m_visible.y; row++)
@@ -460,22 +471,22 @@ void debug_view_disasm::redraw()
 			if(m_dasm[effrow].m_is_visited)
 				attrib |= DCA_VISITED;
 
-			print(row, ' ' + m_dasm[effrow].m_tadr, 0, m_divider1, attrib | DCA_ANCILLARY);
-			print(row, ' ' + m_dasm[effrow].m_dasm, m_divider1, m_divider2, attrib);
+			print(row, ' ' + m_dasm[effrow].m_tadr, 0, divider1, attrib | DCA_ANCILLARY);
+			print(row, ' ' + m_dasm[effrow].m_dasm, divider1, divider2, attrib);
 
 			if(m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED) {
 				std::string text = ' ' +(m_right_column == DASM_RIGHTCOL_RAW ? m_dasm[effrow].m_topcodes : m_dasm[effrow].m_tparams);
-				print(row, text, m_divider2, m_visible.x, attrib | DCA_ANCILLARY);
-				if(int(text.size()) > m_visible.x - m_divider2) {
-					int base = m_total.x - 3;
-					if(base < m_divider2)
-						base = m_divider2;
-					print(row, "...", base, m_visible.x, attrib | DCA_ANCILLARY);
+				print(row, text, divider2, max_visible_col, attrib | DCA_ANCILLARY);
+				if(s32(text.size()) > max_visible_col - divider2) {
+					s32 base = max_visible_col - 3;
+					if(base < divider2)
+						base = divider2;
+					print(row, "...", base, max_visible_col, attrib | DCA_ANCILLARY);
 				}
 			} else if(!m_dasm[effrow].m_comment.empty())
-				print(row, " // " + m_dasm[effrow].m_comment, m_divider2, m_visible.x, attrib | DCA_COMMENT | DCA_ANCILLARY);
+				print(row, " // " + m_dasm[effrow].m_comment, divider2, max_visible_col, attrib | DCA_COMMENT | DCA_ANCILLARY);
 			else
-				print(row, "", m_divider2, m_visible.x, attrib | DCA_COMMENT | DCA_ANCILLARY);
+				print(row, "", divider2, max_visible_col, attrib | DCA_COMMENT | DCA_ANCILLARY);
 		}
 	}
 }
@@ -557,7 +568,9 @@ void debug_view_disasm::set_disasm_width(u32 width)
 void debug_view_disasm::set_selected_address(offs_t address)
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	address = address & source.m_space.logaddrmask();
+	auto [dev, space] = source.space();
+	const address_space_config *config = dev->logical_space_config(space);
+	address = address & config->logaddrmask();
 	for(int line = 0; line < m_total.y; line++)
 		if(m_dasm[line].m_address == address) {
 			m_cursor.y = line;

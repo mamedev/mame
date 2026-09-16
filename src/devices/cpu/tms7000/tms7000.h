@@ -60,13 +60,13 @@ public:
 	bool chip_is_family_70x2() const { return chip_get_family() == CHIP_FAMILY_70X2; }
 	bool chip_is_family_70cx2() const { return chip_get_family() == CHIP_FAMILY_70CX2; }
 
-	void tms7000_mem(address_map &map);
-	void tms7001_mem(address_map &map);
-	void tms7002_mem(address_map &map);
-	void tms7020_mem(address_map &map);
-	void tms7040_mem(address_map &map);
-	void tms7041_mem(address_map &map);
-	void tms7042_mem(address_map &map);
+	void tms7000_mem(address_map &map) ATTR_COLD;
+	void tms7001_mem(address_map &map) ATTR_COLD;
+	void tms7002_mem(address_map &map) ATTR_COLD;
+	void tms7020_mem(address_map &map) ATTR_COLD;
+	void tms7040_mem(address_map &map) ATTR_COLD;
+	void tms7041_mem(address_map &map) ATTR_COLD;
+	void tms7042_mem(address_map &map) ATTR_COLD;
 protected:
 	// chip info flags
 	static constexpr uint32_t CHIP_IS_CMOS        = 0x01;
@@ -78,15 +78,14 @@ protected:
 	tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + m_divider - 1) / m_divider; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * m_divider); }
 	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 49; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int extline, int state) override;
 
@@ -337,11 +336,11 @@ public:
 	uint8_t e_bus_data_r() { return machine().side_effects_disabled() ? 0xff : ((m_control & 0x20) ? 0xff : m_port_in_cb[4]()); }
 	void e_bus_data_w(uint8_t data) { if (~m_control & 0x20) m_port_out_cb[4](data); }
 
-	void tms70c46_mem(address_map &map);
+	void tms70c46_mem(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_control;

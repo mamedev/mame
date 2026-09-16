@@ -3,8 +3,7 @@
 
 /***************************************************************************
 
-X-Men
-
+Konami X-Men
 driver by Nicola Salmoria
 
 notes:
@@ -20,6 +19,8 @@ The board only has one of each gfx chip, the only additional chip not found
 on the 2/4p board is 053253. This chip is also on Run n Gun which is
 likewise a 2 screen game.
 
+Reverse-engineered schematics: https://github.com/jotego/jtbin/blob/master/sch/xmen.pdf
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -34,32 +35,22 @@ likewise a 2 screen game.
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "machine/k054321.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "layout/generic.h"
 
-
-// configurable logging
-#define LOG_EEPROMW     (1U << 1)
-#define LOG_SOUNDIRQ    (1U << 2)
-#define LOG_OKI         (1U << 3)
-
-//#define VERBOSE (LOG_GENERAL | LOG_EEPROMW | LOG_SOUNDIRQ | LOG_OKI)
-
+//#define VERBOSE 1
 #include "logmacro.h"
-
-#define LOGEEPROMW(...)     LOGMASKED(LOG_EEPROMW,     __VA_ARGS__)
-#define LOGSOUNDIRQ(...)    LOGMASKED(LOG_SOUNDIRQ,    __VA_ARGS__)
-#define LOGOKI(...)         LOGMASKED(LOG_OKI,         __VA_ARGS__)
 
 
 namespace {
@@ -75,23 +66,29 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
+		m_eeprom(*this, "eeprom"),
 		m_z80bank(*this, "z80bank"),
-		m_okibank(*this, "okibank"),
-		m_eeprom_out(*this, "EEPROMOUT")
+		m_okibank(*this, "okibank")
 	{ }
 
-	void xmen(machine_config &config);
-	void xmenabl(machine_config &config);
+	void xmen(machine_config &config) ATTR_COLD;
+	void xmenabl(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void base(machine_config &config) ATTR_COLD;
 
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
-	int m_layerpri[3]{};
-	bool m_tilemap_select;
+	int32_t m_layerpri[3]{};
+	bool m_tilemap_select = false;
+	bool m_irq5_enable = false;
+	bool m_sound_irq = false;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -100,22 +97,9 @@ protected:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
-
-	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void _18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void base(machine_config &config);
-	void sound_hardware(machine_config &config);
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 
 private:
-	optional_memory_bank m_z80bank;
-	optional_memory_bank m_okibank;
-
-	required_ioport m_eeprom_out;
-
-	// misc
-	uint8_t m_vblank_irq_mask = 0;
-
 	void sound_bankswitch_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -123,13 +107,14 @@ private:
 	K052109_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 
-	void base_main_map(address_map &map);
-	void bootleg_main_map(address_map &map);
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
-	void sound_map(address_map &map);
+	void base_main_map(address_map &map) ATTR_COLD;
+	void bootleg_main_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
-	void bootleg_sound_hardware(machine_config &config);
+	optional_memory_bank m_z80bank;
+	optional_memory_bank m_okibank;
 };
 
 class xmen6p_state : public xmen_state
@@ -141,27 +126,25 @@ public:
 		m_tilemap(*this, "tilemap%u", 0)
 	{ }
 
-	void xmen6p(machine_config &config);
+	void xmen6p(machine_config &config) ATTR_COLD;
 
-	int frame_r();
+	int field_r() { return (m_screen->frame_number() & 1) ^ m_screen->vblank(); }
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	std::unique_ptr<bitmap_ind16> m_screen_bitmap[2]; // 0 left screen, 1 right screen
-	required_shared_ptr_array<uint16_t, 2> m_spriteram;
-	required_shared_ptr_array<uint16_t, 4> m_tilemap;
-	uint16_t *m_k053247_ram;
-
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+
+	bitmap_ind16 m_screen_bitmap[2]; // 0 left screen, 1 right screen
+	required_shared_ptr_array<uint16_t, 2> m_spriteram;
+	required_shared_ptr_array<uint16_t, 4> m_tilemap;
+	uint16_t *m_k053247_ram;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -173,9 +156,9 @@ K052109_CB_MEMBER(xmen_state::tile_callback)
 {
 	// (color & 0x02) is flip y handled internally by the 052109
 	if (layer == 0)
-		*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+		color = m_layer_colorbase[layer] + ((color & 0xf0) >> 4);
 	else
-		*color = m_layer_colorbase[layer] + ((*color & 0x7c) >> 2);
+		color = m_layer_colorbase[layer] + ((color & 0x7c) >> 2);
 }
 
 /***************************************************************************
@@ -186,18 +169,18 @@ K052109_CB_MEMBER(xmen_state::tile_callback)
 
 K053246_CB_MEMBER(xmen_state::sprite_callback)
 {
-	int const pri = (*color & 0x00e0) >> 4;   // ???????
+	int const pri = (color & 0x00e0) >> 4;   // ???????
 
 	if (pri <= m_layerpri[2])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+		priority_mask = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		priority_mask = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x001f);
+	color = m_sprite_colorbase + (color & 0x001f);
 }
 
 
@@ -212,11 +195,8 @@ void xmen6p_state::video_start()
 {
 	m_k053246->k053247_get_ram(&m_k053247_ram);
 
-	m_screen_bitmap[0] = std::make_unique<bitmap_ind16>(64 * 8, 32 * 8);
-	m_screen_bitmap[1] = std::make_unique<bitmap_ind16>(64 * 8, 32 * 8);
-
-	save_item(NAME(*m_screen_bitmap[0]));
-	save_item(NAME(*m_screen_bitmap[1]));
+	m_screen->register_screen_bitmap(m_screen_bitmap[0]);
+	m_screen->register_screen_bitmap(m_screen_bitmap[1]);
 }
 
 
@@ -228,34 +208,37 @@ void xmen6p_state::video_start()
 
 uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI3, k053251_device::CI0, k053251_device::CI2 };
+	const int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI3);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI0);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI2);
 
-	m_k052109->tilemap_update();
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
 
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
+
+	// sort layers and draw
 	int layer[3];
-
-	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
-	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI0);
-	layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI2);
+	for (int i = 0; i < 3; i++)
+	{
+		layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(layer, m_layerpri);
 
 	screen.priority().fill(0, cliprect);
-	// note the '+1' in the background color!!!
-	bitmap.fill(16 * bg_colorbase + 1, cliprect);
+	bitmap.fill(16 * bg_colorbase + 1, cliprect); // note the '+1' in the background color!
+
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
-	/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-	pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
 	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
@@ -264,12 +247,12 @@ uint32_t xmen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 template <uint8_t Which>
 uint32_t xmen6p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 32 * 8; y++)
+	for (int y = 0; y < m_screen->height(); y++)
 	{
 		uint16_t *const line_dest = &bitmap.pix(y);
-		uint16_t const *const line_src = &m_screen_bitmap[Which]->pix(y);
+		uint16_t const *const line_src = &m_screen_bitmap[Which].pix(y);
 
-		for (int x = 12 * 8; x < 52 * 8; x++)
+		for (int x = 0; x < m_screen->width(); x++)
 			line_dest[x] = line_src[x];
 	}
 
@@ -282,14 +265,9 @@ void xmen6p_state::screen_vblank(int state)
 	// rising edge
 	if (state)
 	{
-		rectangle cliprect;
-
-		// const rectangle *visarea = m_screen->visible_area();
-		// cliprect = *visarea;
-		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
-
-		int index = m_screen->frame_number() & 1;
-		bitmap_ind16 *renderbitmap = m_screen_bitmap[index].get();
+		int index = field_r();
+		bitmap_ind16 &renderbitmap = m_screen_bitmap[index];
+		rectangle cliprect = m_screen->cliprect();
 
 		// copy the desired spritelist to the chip
 		memcpy(m_k053247_ram, m_spriteram[index], 0x1000);
@@ -301,90 +279,93 @@ void xmen6p_state::screen_vblank(int state)
 		index += m_tilemap_select ? 2 : 0;
 		for (int offset = 0; offset < (0xc000 / 2); offset++)
 		{
-			if (index == 0 || (offset != 0x1c80 && offset != 0x1e80))
+			if ((index == 0 || (offset != 0x1c00 && offset != 0x1c80 && offset != 0x1e80)) && offset != 0x1d00)
 				m_k052109->write(offset, m_tilemap[index][offset] & 0x00ff);
 		}
 
-		int const bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
+		// update color info and refresh tilemaps
+		static const int K053251_CI[3] = { k053251_device::CI3, k053251_device::CI0, k053251_device::CI2 };
+		const int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI4);
 		m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-		m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI3);
-		m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI0);
-		m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI2);
 
-		m_k052109->tilemap_update();
+		for (int i = 0; i < 3; i++)
+		{
+			int prev_colorbase = m_layer_colorbase[i];
+			m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
 
+			if (m_layer_colorbase[i] != prev_colorbase)
+				m_k052109->mark_tilemap_dirty(i);
+		}
+
+		m_k052109->update_scroll();
+
+		// sort layers and draw
 		int layer[3];
-
-		m_layerpri[0] = m_k053251->get_priority(k053251_device::CI3);
-		layer[0] = 0;
-		m_layerpri[1] = m_k053251->get_priority(k053251_device::CI0);
-		layer[1] = 1;
-		m_layerpri[2] = m_k053251->get_priority(k053251_device::CI2);
-		layer[2] = 2;
+		for (int i = 0; i < 3; i++)
+		{
+			layer[i] = i;
+			m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+		}
 
 		konami_sortlayers3(layer, m_layerpri);
 
 		m_screen->priority().fill(0, cliprect);
-		// note the '+1' in the background color!!!
-		renderbitmap->fill(16 * bg_colorbase + 1, cliprect);
-		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[0], 0, 1);
-		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[1], 0, 2);
-		m_k052109->tilemap_draw(*m_screen, *renderbitmap, cliprect, layer[2], 0, 4);
+		renderbitmap.fill(16 * bg_colorbase + 1, cliprect); // note the '+1' in the background color!
 
-		/* this isn't supported anymore and it is unsure if still needed; keeping here for reference
-		pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-		m_k053246->k053247_sprites_draw(*renderbitmap, cliprect);
+		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[0], 0, 1);
+		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[1], 0, 2);
+		m_k052109->tilemap_draw(*m_screen, renderbitmap, cliprect, layer[2], 0, 4);
+
+		m_k053246->k053247_sprites_draw(renderbitmap, cliprect);
 	}
 }
 
 
-// machine
-
 /***************************************************************************
 
-  EEPROM
+  Control
 
 ***************************************************************************/
 
-void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void xmen_state::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGEEPROMW("%06x: write %04x to 108000\n", m_maincpu->pc(), data);
+	LOG("%06x: write %04x mask %04x to 108000\n", m_maincpu->pc(), data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 	{
-		// bit 0 = coin counter
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		// bits 0/1 = coin counters
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // only for 2p version
 
-		// bit 2 is data
-		// bit 3 is clock (active high)
-		// bit 4 is cs (active low)
-		m_eeprom_out->write(data, 0xff);
+		// bit 2 = EEPROM data
+		// bit 3 = EEPROM clock (active high)
+		// bit 4 = EEPROM cs (active low)
+		m_eeprom->di_write(BIT(data, 2));
+		m_eeprom->cs_write(BIT(data, 4));
+		m_eeprom->clk_write(BIT(data, 3));
 
-		// bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?)
+		// bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA end)
+		m_irq5_enable = bool(BIT(data, 5));
+		if (!m_irq5_enable)
+			m_maincpu->set_input_line(5, CLEAR_LINE);
+
 		// bit 7 used in xmen6p to select other tilemap bank (see halfway level 5)
 		m_tilemap_select = BIT(data, 7);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		// bit 8 = enable sprite ROM reading
-		m_k053246->k053246_set_objcha_line((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
-		// bit 9 = enable char ROM reading through the video RAM
-		// bit 10 = sound irq, but with some kind of hold
-		m_k052109->set_rmrd_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
-		if (data & 0x400)
-		{
-			LOGSOUNDIRQ("tick!\n");
-			if (m_audiocpu)
-				m_audiocpu->set_input_line(0, HOLD_LINE);
-		}
-	}
-}
+		m_k053246->k053246_set_objcha_line(BIT(data, 8) ? ASSERT_LINE : CLEAR_LINE);
 
-void xmen_state::_18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		// bit 2 is interrupt enable
-		m_vblank_irq_mask = data & 0x04;
+		// bit 9 = enable char ROM reading through the video RAM
+		m_k052109->set_rmrd_line(BIT(data, 9) ? ASSERT_LINE : CLEAR_LINE);
+
+		// bit 10 = sound irq flip flop (actually through 054321)
+		if (m_audiocpu && !m_sound_irq && BIT(data, 10))
+			m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_sound_irq = BIT(data, 10);
+
+		// bit 11 = mute
+		machine().sound().system_mute(!BIT(data, 11));
 	}
 }
 
@@ -400,16 +381,15 @@ void xmen_state::base_main_map(address_map &map)
 	map(0x100000, 0x100fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
 	map(0x101000, 0x101fff).ram();
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(FUNC(xmen_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen_state::control_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_w));
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
 	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x10a002, 0x10a003).portr("P1_P3");
 	map(0x10a004, 0x10a005).portr("EEPROM");
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_r));
-	map(0x110000, 0x113fff).ram();     // main RAM
+	map(0x110000, 0x113fff).ram();
 	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write)).umask16(0x00ff);
-	map(0x18fa00, 0x18fa01).w(FUNC(xmen_state::_18fa00_w));
 }
 
 void xmen_state::main_map(address_map &map)
@@ -424,7 +404,7 @@ void xmen_state::bootleg_main_map(address_map &map)
 	base_main_map(map);
 
 	// map(0x103ffe, 0x103fff) // sound related, too?
-	map(0x10804d, 0x10804d).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry(data & 0x0f); LOGOKI("oki bank :%02x\n", data); })); // TODO: verify once oki ROM 1 is redumped / confirmed
+	map(0x10804d, 0x10804d).lw8(NAME([this] (uint8_t data) { m_okibank->set_entry((data + 3) & 0x0f); }));
 	map(0x10804f, 0x10804f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -441,7 +421,7 @@ void xmen_state::sound_map(address_map &map)
 
 void xmen_state::oki_map(address_map &map)
 {
-	map(0x00000, 0x2ffff).rom();
+	map(0x00000, 0x2ffff).rom().region("oki", 0);
 	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
@@ -454,7 +434,7 @@ void xmen6p_state::main_map(address_map &map)
 	map(0x102000, 0x102fff).ram().share(m_spriteram[1]); // right screen
 	map(0x103000, 0x103fff).ram();     // 6p - a buffer?
 	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x108000, 0x108001).w(FUNC(xmen6p_state::eeprom_w));
+	map(0x108000, 0x108001).w(FUNC(xmen6p_state::control_w));
 	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_w)); // sprites
 	map(0x108040, 0x10805f).m("k054321", FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);
@@ -466,7 +446,7 @@ void xmen6p_state::main_map(address_map &map)
 	map(0x110000, 0x113fff).ram();     // main RAM
 //  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:write)).umask16(0x00ff).share("tilemapleft");
 	map(0x18c000, 0x197fff).ram().share(m_tilemap[0]); // left screen
-	map(0x18fa00, 0x18fa01).w(FUNC(xmen6p_state::_18fa00_w));
+	map(0x18fa01, 0x18fa01).lw8(NAME([this] (uint8_t data) { m_k052109->write(0x1d00, data); })); // irq enable
 /*
     map(0x1ac000, 0x1af7ff).readonly();
     map(0x1ac000, 0x1af7ff).writeonly();
@@ -512,9 +492,13 @@ static INPUT_PORTS_START( xmen )
 	KONAMI16_MSB_UDLR(4, IPT_BUTTON3, IPT_COIN4 )
 
 	PORT_START("EEPROM")
-	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE4 )
+	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -522,11 +506,6 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xmen2p )
@@ -542,8 +521,8 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -551,17 +530,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
 INPUT_PORTS_END
-
-int xmen6p_state::frame_r()
-{
-	return m_screen->frame_number() & 1;
-}
 
 static INPUT_PORTS_START( xmen6p )
 	PORT_START("P1_P3")
@@ -578,8 +547,8 @@ static INPUT_PORTS_START( xmen6p )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::ready_read))
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -587,12 +556,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) // not verified
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) // not verified
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xmen6p_state, frame_r)  // screen indicator?
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xmen6p_state::field_r)) // screen indicator?
 INPUT_PORTS_END
 
 
@@ -607,14 +571,15 @@ void xmen_state::machine_start()
 	if (m_okibank)
 	{
 		m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
-		m_okibank->set_entry(0);
+		m_okibank->set_entry(3);
 	}
 
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_item(NAME(m_vblank_irq_mask));
 	save_item(NAME(m_tilemap_select));
+	save_item(NAME(m_irq5_enable));
+	save_item(NAME(m_sound_irq));
 }
 
 void xmen_state::machine_reset()
@@ -626,89 +591,74 @@ void xmen_state::machine_reset()
 	}
 
 	m_sprite_colorbase = 0;
-	m_vblank_irq_mask = 0;
+	control_w(0, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::scanline)
 {
 	int const scanline = param;
 
-	if (scanline == 240 && m_vblank_irq_mask) // vblank-out irq
-		m_maincpu->set_input_line(3, HOLD_LINE);
-
-	if (scanline == 0) // sprite DMA irq?
-		m_maincpu->set_input_line(5, HOLD_LINE);
-}
-
-void xmen_state::sound_hardware(machine_config &config)
-{
-	Z80(config, m_audiocpu, XTAL(16'000'000) / 2); // verified on PCB
-	m_audiocpu->set_addrmap(AS_PROGRAM, &xmen_state::sound_map);
-
-	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	K054321(config, "k054321", "lspeaker", "rspeaker");
-
-	YM2151(config, "ymsnd", XTAL(16'000'000) / 4).add_route(0, "lspeaker", 0.20).add_route(1, "rspeaker", 0.20);  // verified on PCB
-
-	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
-	k054539.add_route(0, "rspeaker", 1.00);
-	k054539.add_route(1, "lspeaker", 1.00);
-}
-
-void xmen_state::bootleg_sound_hardware(machine_config &config)
-{
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	okim6295_device &oki(OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_HIGH)); // clock and pin7 not verified
-	oki.set_addrmap(0, &xmen_state::oki_map);
-	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	if (scanline == 0)
+	{
+		// sprite DMA end irq
+		if (m_irq5_enable && m_k053246->k053246_is_irq_enabled())
+			m_maincpu->set_input_line(5, ASSERT_LINE);
+	}
 }
 
 void xmen_state::base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000)); // verified on PCB
+	M68000(config, m_maincpu, 16_MHz_XTAL); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xmen_state::scanline), "screen", 0, 1);
 
-	EEPROM_ER5911_8BIT(config, "eeprom");
+	EEPROM_ER5911_8BIT(config, m_eeprom);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.17);   // verified on PCB
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1 );   // correct, same issue of tmnt2
+	SCREEN(config, m_screen);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240); // correct, same issue as tmnt2
 	m_screen->set_screen_update(FUNC(xmen_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
-	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
+	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, -2);
 	m_k053246->set_palette("palette");
 
-	K053251(config, m_k053251, 0);
+	K053251(config, m_k053251);
 }
 
 void xmen_state::xmen(machine_config &config)
 {
 	base(config);
 
-	sound_hardware(config);
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 2); // verified on PCB
+	m_audiocpu->set_addrmap(AS_PROGRAM, &xmen_state::sound_map);
+
+	// sound hardware
+	SPEAKER(config, "speaker", 2).front();
+
+	K054321(config, "k054321", "speaker");
+
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4)); // verified on PCB
+	ymsnd.add_route(0, "speaker", 0.20, 1);
+	ymsnd.add_route(1, "speaker", 0.20, 0);
+
+	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
+	k054539.add_route(0, "speaker", 1.00, 1);
+	k054539.add_route(1, "speaker", 1.00, 0);
 }
 
 void xmen_state::xmenabl(machine_config &config)
@@ -717,7 +667,12 @@ void xmen_state::xmenabl(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &xmen_state::bootleg_main_map);
 
-	bootleg_sound_hardware(config);
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	okim6295_device &oki(OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_LOW)); // clock and pin7 not verified
+	oki.set_addrmap(0, &xmen_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void xmen6p_state::xmen6p(machine_config &config)
@@ -730,23 +685,13 @@ void xmen6p_state::xmen6p(machine_config &config)
 	// video hardware
 	config.set_default_layout(layout_dualhsxs);
 
-	config.device_remove("screen");
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(12*8, 48*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 320-32, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(xmen6p_state::screen_update<0>));
-	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(xmen6p_state::screen_vblank));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_refresh_hz(60);
-	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen2.set_size(64*8, 32*8);
-	screen2.set_visarea(16*8, 52*8-1, 2*8, 30*8-1);
+	screen_device &screen2(SCREEN(config, "screen2"));
+	screen2.set_raw(24_MHz_XTAL / 4, 384, 0+32, 320, 264, 16, 240);
 	screen2.set_screen_update(FUNC(xmen6p_state::screen_update<1>));
-	screen2.screen_vblank().set(FUNC(xmen6p_state::screen_vblank));
 	screen2.set_palette("palette");
 
 	m_k053246->set_screen(m_screen);
@@ -1220,26 +1165,26 @@ ROM_START( xmenabl )
 	ROM_LOAD16_BYTE( "rom1",  0x00000, 0x80000, CRC(c895fdc1) SHA1(e7e6908374310ef0e71d9541402a18818ea10134) )
 	ROM_LOAD16_BYTE( "rom2",  0x00001, 0x80000, CRC(50d56da7) SHA1(7ae0748f65d9de62be8c0cd1b41dceb1ea91ba3e) )
 
-	ROM_REGION( 0x200000, "k052109", 0 )    // tiles, k052109 non really present
+	ROM_REGION( 0x200000, "k052109", 0 )    // tiles, k052109 not really present
 	ROM_LOAD32_WORD( "gfx15l", 0x000000, 0x100000, CRC(6b649aca) SHA1(2595f314517738e8614facf578cc951a6c36a180) )
 	ROM_LOAD32_WORD( "gfx16l", 0x000002, 0x100000, CRC(c5dc8fc4) SHA1(9887cb002c8b72be7ce933cb397f00cdc5506c8c) )
 
-	ROM_REGION( 0x400000, "k053246", 0 )   // graphics (addressable by the main CPU), k053246 non really present
+	ROM_REGION( 0x400000, "k053246", 0 )   // graphics (addressable by the main CPU), k053246 not really present
 	ROM_LOAD64_WORD( "gfx2h",  0x000000, 0x100000, CRC(ea05d52f) SHA1(7f2c14f907355856fb94e3a67b73aa1919776835) ) // sprites
 	ROM_LOAD64_WORD( "gfx2l",  0x000002, 0x100000, CRC(96b91802) SHA1(641943557b59b91f0edd49ec8a73cef7d9268b32) )
 	ROM_LOAD64_WORD( "gfx1h",  0x000004, 0x100000, CRC(321ed07a) SHA1(5b00ed676daeea974bdce6701667cfe573099dad) )
 	ROM_LOAD64_WORD( "gfx1l",  0x000006, 0x100000, CRC(46da948e) SHA1(168ac9178ee5bad5931557fb549e1237971d7839) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "oki1", 0x00000, 0x80000, CRC(ded562e0) SHA1(e67daae3e8e4a3a4979d3debf085f9c332404dd4) ) // xx1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "oki1", 0x00000, 0x80000, CRC(2967436b) SHA1(44d4bf4c38e340169577098d958a09877067e119) )
 	ROM_LOAD( "oki2", 0x80000, 0x80000, CRC(74a12d1e) SHA1(b5e23e8efea2cf19385c081cfe8088bead132c21) )
 
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "xmen_aea.nv", 0x0000, 0x0080, CRC(d73d4f20) SHA1(b39906eb59ecf8f1e8141b467021e0a581186d47) )
 
 	ROM_REGION( 0x400, "plds", 0 )
-	ROM_LOAD( "gal16v8b", 0x000, 0x117, NO_DUMP ) // near the sprite hw and ROMs
-	ROM_LOAD( "gal16v8d", 0x200, 0x117, NO_DUMP ) // near the M6295
+	ROM_LOAD( "gal16v8b", 0x000, 0x117, CRC(af9802f9) SHA1(173466314d8672232fa6ed7ad7ec0a3b6aeae85a) ) // near the sprite hw and ROMs
+	ROM_LOAD( "gal16v8d", 0x200, 0x117, CRC(5f0f86a3) SHA1(bcc78bf37ed8f11f76759a50e7639bb9b063bc29) ) // near the M6295
 ROM_END
 
 } // anonymous namespace
@@ -1264,7 +1209,7 @@ GAME( 1992, xmenj,   xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Kon
 GAME( 1992, xmenja,  xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Konami",  "X-Men (4 Players ver JEA)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmena,   xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Konami",  "X-Men (4 Players ver AEA)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmenaa,  xmen, xmen,    xmen,   xmen_state,   empty_init, ROT0, "Konami",  "X-Men (4 Players ver ADA)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, xmenabl, xmen, xmenabl, xmen,   xmen_state,   empty_init, ROT0, "bootleg", "X-Men (4 Players ver AEA, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // sprites are wrong, one oki ROM may be bad or the banking not correct (or both)
+GAME( 1992, xmenabl, xmen, xmenabl, xmen,   xmen_state,   empty_init, ROT0, "bootleg", "X-Men (4 Players ver AEA, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // sprites are wrong
 
 GAME( 1992, xmen2pe, xmen, xmen,    xmen2p, xmen_state,   empty_init, ROT0, "Konami",  "X-Men (2 Players ver EAA)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1992, xmen2pu, xmen, xmen,    xmen2p, xmen_state,   empty_init, ROT0, "Konami",  "X-Men (2 Players ver UAB)",          MACHINE_SUPPORTS_SAVE )

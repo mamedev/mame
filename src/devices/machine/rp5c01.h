@@ -38,7 +38,7 @@ class rp5c01_device :   public device_t,
 {
 public:
 	// construction/destruction
-	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rp5c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto out_alarm_callback() { return m_out_alarm_cb.bind(); }
 	void remove_battery() { m_battery_backed = false; nvram_enable_backup(false); }
@@ -53,7 +53,7 @@ protected:
 	rp5c01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_leap_year() const override { return true; }

@@ -52,9 +52,9 @@ public:
 	void spartanxtec(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spartanxtec_palette(palette_device &palette) const;
@@ -65,9 +65,9 @@ private:
 	void sound_irq_ack(uint8_t data);
 	void irq_ack(uint8_t data);
 
-	void spartanxtec_map(address_map &map);
-	void spartanxtec_sound_io(address_map &map);
-	void spartanxtec_sound_map(address_map &map);
+	void spartanxtec_map(address_map &map) ATTR_COLD;
+	void spartanxtec_sound_io(address_map &map) ATTR_COLD;
+	void spartanxtec_sound_map(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_m62_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -377,7 +377,7 @@ void spartanxtec_state::spartanxtec(machine_config &config)
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790));
 	screen.set_size(64*8, 32*8);

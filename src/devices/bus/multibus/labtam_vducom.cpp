@@ -177,11 +177,6 @@ ioport_constructor labtam_8086cpu_device::device_input_ports() const
 	return INPUT_PORTS_NAME(labtam_8086cpu);
 }
 
-void labtam_vducom_device_base::device_resolve_objects()
-{
-	m_bus->int_callback<3>().set(m_pic, FUNC(pic8259_device::ir6_w));
-}
-
 void labtam_vducom_device_base::device_start()
 {
 	save_item(NAME(m_start));
@@ -251,6 +246,7 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 	 *  7   not connected
 	 */
 	m_pic->out_int_callback().set_inputline(m_cpu, INPUT_LINE_INT0);
+	int_callback<3>().set(m_pic, FUNC(pic8259_device::ir6_w));
 
 	UPD7201(config, m_com[0], 16_MHz_XTAL / 4);
 	m_com[0]->out_int_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
@@ -300,7 +296,7 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 	m_com[1]->out_rtsa_callback().set(m_serial[2], FUNC(rs232_port_device::write_rts));
 	m_com[1]->out_txda_callback().set(m_serial[2], FUNC(rs232_port_device::write_txd));
 
-	RS232_PORT(config, m_serial[3], default_rs232_devices, type() == LABTAM_VDUCOM ? "keyboard" : nullptr);
+	RS232_PORT(config, m_serial[3], default_rs232_devices, nullptr);
 	m_serial[3]->dcd_handler().set(m_com[1], FUNC(upd7201_device::dcdb_w));
 	m_serial[3]->cts_handler().set(m_com[1], FUNC(upd7201_device::ctsb_w));
 	m_serial[3]->rxd_handler().set(m_com[1], FUNC(upd7201_device::rxb_w));
@@ -312,9 +308,16 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 	X2212(config, m_nvram[1]);
 }
 
+static DEVICE_INPUT_DEFAULTS_START(keyboard_defaults)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_110)
+DEVICE_INPUT_DEFAULTS_END
+
 void labtam_vducom_device::device_add_mconfig(machine_config &config)
 {
 	labtam_vducom_device_base::device_add_mconfig(config);
+
+	m_serial[3]->set_default_option("keyboard");
+	m_serial[3]->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard_defaults));
 
 	MC6845(config, m_crtc, 16_MHz_XTAL / 16);
 	m_crtc->set_show_border_area(false);
@@ -325,7 +328,7 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(labtam_vducom_device::palette_init), 4);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL / 16, 62 * 16, 2 * 16, 52 * 16, 78 * 4, 3 * 4, 75 * 4);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -386,7 +389,7 @@ void labtam_vducom_device::palette_init(palette_device &palette)
 // interlace: one plane 800x600, 64k, (black, normal)
 MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
 {
-	required_shared_ptr<u16> const ram = m_ram[BIT(u7(), 2)];
+	auto const &ram = m_ram[BIT(u7(), 2)];
 	offs_t const offset = (start() >> 1) + ma * 4 + ra * 50;
 
 	for (unsigned x = 0; x < x_count; x++)

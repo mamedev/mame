@@ -7,8 +7,8 @@ Atari Europe Hit Parade series jukeboxes
 
 Atari Europe is unrelated to the modern Atari Europe, or Infogrames.
 It was a French jukebox company that was partially owned by Atari for a while
-in the mid-1970s. It gets a bit confusing, for more information, Google for
-Socodimex, Electro-Kicker, Europe Electronique.
+in the mid-1970s. It gets a bit confusing, for more information, search online
+for Socodimex, Electro-Kicker, Europe Electronique.
 
 There are probably more jukeboxes on similar hardware.
 
@@ -52,7 +52,7 @@ public:
 	void hitpar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<tms1k_base_device> m_maincpu;
@@ -60,12 +60,12 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<6> m_inputs;
 
+	u32 m_r = 0;
+	u16 m_o = 0;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
-
-	u32 m_r = 0;
-	u16 m_o = 0;
 };
 
 void hitpar_state::machine_start()

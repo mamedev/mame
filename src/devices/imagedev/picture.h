@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_PICTURE_H
-#define MAME_DEVICES_IMAGEDEV_PICTURE_H
+#ifndef MAME_IMAGEDEV_PICTURE_H
+#define MAME_IMAGEDEV_PICTURE_H
 
 #pragma once
 
@@ -45,7 +45,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	bitmap_argb32 m_picture;
@@ -55,4 +55,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(IMAGE_PICTURE, picture_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_PICTURE_H
+#endif // MAME_IMAGEDEV_PICTURE_H

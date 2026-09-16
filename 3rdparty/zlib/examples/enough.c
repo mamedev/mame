@@ -1,7 +1,7 @@
 /* enough.c -- determine the maximum size of inflate's Huffman code tables over
  * all possible valid and complete prefix codes, subject to a length limit.
- * Copyright (C) 2007, 2008, 2012, 2018 Mark Adler
- * Version 1.5  5 August 2018  Mark Adler
+ * Copyright (C) 2007, 2008, 2012, 2018, 2024 Mark Adler
+ * Version 1.6  29 July 2024  Mark Adler
  */
 
 /* Version history:
@@ -19,6 +19,7 @@
                      Clean up code indentation
    1.5   5 Aug 2018  Clean up code style, formatting, and comments
                      Show all the codes for the maximum, and only the maximum
+   1.6  29 Jul 2024  Avoid use of uintmax_t
  */
 
 /*
@@ -88,33 +89,32 @@
    need to be examined to cover all of the possible table memory usage cases
    for the default arguments of 286 symbols limited to 15-bit codes.
 
-   Note that the uintmax_t type is used for counting. It is quite easy to
+   Note that unsigned long long is used for counting. It is quite easy to
    exceed the capacity of an eight-byte integer with a large number of symbols
    and a large maximum code length, so multiple-precision arithmetic would need
    to replace the integer arithmetic in that case. This program will abort if
    an overflow occurs. The big_t type identifies where the counting takes
    place.
 
-   The uintmax_t type is also used for calculating the number of possible codes
-   remaining at the maximum length. This limits the maximum code length to the
-   number of bits in a long long minus the number of bits needed to represent
-   the symbols in a flat code. The code_t type identifies where the bit-pattern
-   counting takes place.
+   The unsigned long long type is also used for calculating the number of
+   possible codes remaining at the maximum length. This limits the maximum code
+   length to the number of bits in a long long minus the number of bits needed
+   to represent the symbols in a flat code. The code_t type identifies where
+   the bit-pattern counting takes place.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <stdint.h>
 #include <assert.h>
 
 #define local static
 
 // Special data types.
-typedef uintmax_t big_t;    // type for code counting
-#define PRIbig "ju"         // printf format for big_t
-typedef uintmax_t code_t;   // type for bit pattern counting
+typedef unsigned long long big_t;   // type for code counting
+#define PRIbig "llu"        // printf format for big_t
+typedef big_t code_t;       // type for bit pattern counting
 struct tab {                // type for been-here check
     size_t len;             // allocated length of bit vector in octets
     char *vec;              // allocated bit vector
@@ -486,7 +486,7 @@ local void enough(int syms) {
 // are 286, 9, and 15 respectively, for the deflate literal/length code. The
 // possible codes are counted for each number of coded symbols from two to the
 // maximum. The counts for each of those and the total number of codes are
-// shown. The maximum number of inflate table entires is then calculated across
+// shown. The maximum number of inflate table entries is then calculated across
 // all possible codes. Each new maximum number of table entries and the
 // associated sub-code (starting at root + 1 == 10 bits) is shown.
 //

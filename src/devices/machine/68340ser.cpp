@@ -15,7 +15,7 @@
 #define LOG_INT     (1U << 4)
 
 //#define VERBOSE  (LOG_SETUP|LOG_READ|LOG_SERIAL|LOG_INT)
-#define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
+//#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 

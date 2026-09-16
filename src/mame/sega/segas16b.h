@@ -5,6 +5,7 @@
     Sega System 16B hardware
 
 ***************************************************************************/
+
 #ifndef MAME_SEGA_SEGAS16B_H
 #define MAME_SEGA_SEGAS16B_H
 
@@ -16,7 +17,7 @@
 #include "sega16sp.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
@@ -111,6 +112,7 @@ public:
 	void init_generic_korean();
 	void init_generic_bootleg();
 	void init_lockonph();
+
 	// game-specific driver init
 	void init_isgsm();
 	void init_tturf_5704();
@@ -160,7 +162,7 @@ protected:
 
 	// other callbacks
 	void upd7759_generate_nmi(int state);
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	INTERRUPT_GEN_MEMBER(i8751_main_cpu_vblank);
 	void spin_68k_w(uint8_t data);
 
 	// video updates
@@ -172,24 +174,24 @@ protected:
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 
-	void decrypted_opcodes_map(address_map &map);
-	void decrypted_opcodes_map_fpointbla(address_map &map);
-	void decrypted_opcodes_map_x(address_map &map);
-	void fpointbl_map(address_map &map);
-	void fpointbl_sound_map(address_map &map);
-	void lockonph_map(address_map &map);
-	void lockonph_sound_iomap(address_map &map);
-	void lockonph_sound_map(address_map &map);
-	void map_fpointbla(address_map &map);
-	void mcu_io_map(address_map &map);
-	void sound_decrypted_opcodes_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-	void bootleg_sound_map(address_map &map);
-	void bootleg_sound_portmap(address_map &map);
-	void system16b_bootleg_map(address_map &map);
-	void system16b_map(address_map &map);
-	void system16c_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map_fpointbla(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map_x(address_map &map) ATTR_COLD;
+	void fpointbl_map(address_map &map) ATTR_COLD;
+	void fpointbl_sound_map(address_map &map) ATTR_COLD;
+	void lockonph_map(address_map &map) ATTR_COLD;
+	void lockonph_sound_iomap(address_map &map) ATTR_COLD;
+	void lockonph_sound_map(address_map &map) ATTR_COLD;
+	void map_fpointbla(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
+	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void bootleg_sound_map(address_map &map) ATTR_COLD;
+	void bootleg_sound_portmap(address_map &map) ATTR_COLD;
+	void system16b_bootleg_map(address_map &map) ATTR_COLD;
+	void system16b_map(address_map &map) ATTR_COLD;
+	void system16c_map(address_map &map) ATTR_COLD;
 
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -207,9 +209,9 @@ protected:
 	};
 
 	// device overrides
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(i8751_sync);
 	TIMER_CALLBACK_MEMBER(atomicp_sound_irq);
@@ -301,15 +303,16 @@ public:
 protected:
 	void sound_control_w(uint8_t data);
 	void dac_data_w(offs_t offset, uint8_t data);
-	INTERRUPT_GEN_MEMBER( soundirq_cb );
+	INTERRUPT_GEN_MEMBER(soundirq_cb);
+
 	bool m_nmi_enable;
 	uint16_t m_dac_data;
 
-	void dfjail_map(address_map &map);
-	void dfjail_sound_iomap(address_map &map);
+	void dfjail_map(address_map &map) ATTR_COLD;
+	void dfjail_sound_iomap(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<dac_word_interface> m_dac;
 };
@@ -324,13 +327,13 @@ public:
 		, m_steer(*this, "STEER")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+	ioport_value afighter_accel_r();
+	ioport_value afighter_handl_left_r();
+	ioport_value afighter_handl_right_r();
 
 private:
-	required_ioport     m_accel;
-	required_ioport     m_steer;
+	required_ioport m_accel;
+	required_ioport m_steer;
 };
 
 #endif // MAME_SEGA_SEGAS16B_H

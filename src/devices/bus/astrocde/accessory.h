@@ -30,10 +30,7 @@ public:
 		: astrocade_accessory_port_device(mconfig, tag, owner, 0U)
 	{
 		m_screen.set_tag(std::forward<T>(screen_tag));
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 	astrocade_accessory_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0U);
 	virtual ~astrocade_accessory_port_device();
@@ -42,8 +39,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	int m_ltpen;
 	devcb_write_line m_ltpen_handler;

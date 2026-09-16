@@ -37,9 +37,11 @@ SOUNDS["AY8910"] = true
 SOUNDS["CEM3394"] = true
 SOUNDS["DAC"] = true
 SOUNDS["DISCRETE"] = true
+SOUNDS["FLOPPYSOUND"] = true
 SOUNDS["HC55516"] = true
 SOUNDS["OKIM6295"] = true
 SOUNDS["SAMPLES"] = true
+SOUNDS["SN76496"] = true
 SOUNDS["TMS5220"] = true
 SOUNDS["VOTRAX_SC01"] = true
 SOUNDS["YM2151"] = true
@@ -114,6 +116,15 @@ function createProjects_mame_tiny(_target, _subtarget)
 	}
 
 files{
+	MAME_DIR .. "src/mame/bally/astrocde.cpp",
+	MAME_DIR .. "src/mame/bally/astrocde.h",
+	MAME_DIR .. "src/mame/bally/astrocde_v.cpp",
+	MAME_DIR .. "src/mame/bally/gridlee.cpp",
+	MAME_DIR .. "src/mame/bally/gridlee.h",
+	MAME_DIR .. "src/mame/bally/gridlee_a.cpp",
+	MAME_DIR .. "src/mame/bally/gridlee_v.cpp",
+	MAME_DIR .. "src/mame/shared/s11c_bg.cpp",
+	MAME_DIR .. "src/mame/shared/s11c_bg.h",
 	MAME_DIR .. "src/mame/exidy/nl_carpolo.cpp",
 	MAME_DIR .. "src/mame/exidy/nl_carpolo.h",
 	MAME_DIR .. "src/mame/exidy/carpolo.cpp",
@@ -143,21 +154,6 @@ files{
 	MAME_DIR .. "src/mame/exidy/victory.cpp",
 	MAME_DIR .. "src/mame/exidy/victory.h",
 	MAME_DIR .. "src/mame/exidy/victory_v.cpp",
-	MAME_DIR .. "src/mame/midway/astrocde.cpp",
-	MAME_DIR .. "src/mame/midway/astrocde.h",
-	MAME_DIR .. "src/mame/midway/astrocde_v.cpp",
-	MAME_DIR .. "src/mame/midway/gridlee.cpp",
-	MAME_DIR .. "src/mame/midway/gridlee.h",
-	MAME_DIR .. "src/mame/midway/gridlee_a.cpp",
-	MAME_DIR .. "src/mame/midway/gridlee_v.cpp",
-	MAME_DIR .. "src/mame/shared/s11c_bg.cpp",
-	MAME_DIR .. "src/mame/shared/s11c_bg.h",
-	MAME_DIR .. "src/mame/shared/williamssound.cpp",
-	MAME_DIR .. "src/mame/shared/williamssound.h",
-	MAME_DIR .. "src/mame/midway/williams.cpp",
-	MAME_DIR .. "src/mame/midway/williams.h",
-	MAME_DIR .. "src/mame/midway/williams_m.cpp",
-	MAME_DIR .. "src/mame/midway/williams_v.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_v.cpp",
@@ -167,9 +163,17 @@ files{
 	MAME_DIR .. "src/mame/gaelco/gaelco_wrally_sprites.h",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.cpp",
 	MAME_DIR .. "src/mame/gaelco/gaelco_ds5002fp.h",
-	MAME_DIR .. "src/mame/venture/looping.cpp",
-	MAME_DIR .. "src/mame/misc/supertnk.cpp",
 	MAME_DIR .. "src/mame/misc/goldnpkr.cpp",
+	MAME_DIR .. "src/mame/videogames/looping.cpp",
+	MAME_DIR .. "src/mame/videogames/supertnk.cpp",
+	MAME_DIR .. "src/mame/shared/williamssound.cpp",
+	MAME_DIR .. "src/mame/shared/williamssound.h",
+	MAME_DIR .. "src/mame/williams/williams.cpp",
+	MAME_DIR .. "src/mame/williams/williams.h",
+	MAME_DIR .. "src/mame/williams/williams_m.cpp",
+	MAME_DIR .. "src/mame/williams/williams_v.cpp",
+	MAME_DIR .. "src/mame/williams/williamsblitter.cpp",
+	MAME_DIR .. "src/mame/williams/williamsblitter.h",
 }
 end
 

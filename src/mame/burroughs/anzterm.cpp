@@ -371,7 +371,7 @@ private:
 	{
 		return 0;
 	}
-	void anzterm_mem(address_map &map);
+	void anzterm_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -419,13 +419,13 @@ void anzterm_state::anzterm(machine_config &config)
 	m6809_device &maincpu(M6809(config, "maincpu", 15974400/4));
 	maincpu.set_addrmap(AS_PROGRAM, &anzterm_state::anzterm_mem);
 
-	I8214(config, "pic.ic39", 0);
-	MC6854(config, "adlc.ic16", 0);
-	MC6854(config, "adlc.1c19", 0);
-	ACIA6850(config, "acia.ic17", 0);
-	ACIA6850(config, "acia.ic18", 0);
+	I8214(config, "pic.ic39");
+	MC6854(config, "adlc.ic16");
+	MC6854(config, "adlc.1c19");
+	ACIA6850(config, "acia.ic17");
+	ACIA6850(config, "acia.ic18");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(anzterm_state::screen_update));
 	screen.set_palette("palette");
 	screen.set_raw(15974400/4, 1024, 0, 104*8, 260, 0, 24*10); // this is totally wrong, it just stops a validation error
@@ -485,4 +485,4 @@ ROM_START( anzterm )
 	ROM_LOAD( "ebb-fea-v96-9-23-83-f43a.u11", 0x4000, 0x1000, CRC(0e572470) SHA1(966e5eeb0114589a7cab3c29a1db48cdd8634be5) )
 ROM_END
 
-COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, empty_init, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision
+COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, empty_init, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // year comes from sticker on bottom of case, it's more likely a 1983 revision

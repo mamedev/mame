@@ -42,9 +42,9 @@ public:
 	void battlane(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -76,11 +76,9 @@ private:
 	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_fg_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void battlane_state::palette_w(offs_t offset, uint8_t data)
 {
@@ -300,8 +298,6 @@ uint32_t battlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 /*************************************
  *
  *  Memory handlers
@@ -423,7 +419,7 @@ static INPUT_PORTS_START( battlane )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -566,7 +562,7 @@ void battlane_state::battlane(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32 * 8, 32 * 8);

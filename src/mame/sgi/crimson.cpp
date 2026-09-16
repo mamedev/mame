@@ -41,14 +41,14 @@ public:
 	void crimson(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	u8 nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, u8 data);
 	u8 duart_r(offs_t offset);
 	void duart_w(offs_t offset, u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<r4000be_device> m_maincpu;
 	required_device<nvram_device> m_nvram;

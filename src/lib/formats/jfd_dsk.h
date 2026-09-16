@@ -25,7 +25,6 @@ public:
 
 	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
-	virtual bool supports_save() const noexcept override;
 };
 
 extern const jfd_format FLOPPY_JFD_FORMAT;

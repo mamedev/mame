@@ -115,7 +115,7 @@ void alesis_state::hr16_mem(address_map &map)
 	map(0x0000, 0x7fff).mirror(0x8000).rom();
 }
 
-void alesis_state::hr16_io(address_map &map)
+void alesis_state::hr16_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0000).r(FUNC(alesis_state::kb_r));
@@ -132,7 +132,7 @@ void alesis_state::sr16_mem(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void alesis_state::sr16_io(address_map &map)
+void alesis_state::sr16_data(address_map &map)
 {
 	//map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
@@ -142,7 +142,7 @@ void alesis_state::sr16_io(address_map &map)
 	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
 }
 
-void alesis_state::mmt8_io(address_map &map)
+void alesis_state::mmt8_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("nvram");   // 2x32Kx8 SRAM, (battery-backed)
@@ -328,66 +328,9 @@ void alesis_state::alesis_palette(palette_device &palette) const
 
 void alesis_state::machine_start()
 {
-	m_digit.resolve();
-	m_pattern.resolve();
-	m_track_led.resolve();
-	m_patt_led.resolve();
-	m_song_led.resolve();
-	m_play_led.resolve();
-	m_record_led.resolve();
-	m_voice_led.resolve();
-	m_tune_led.resolve();
-	m_mix_led.resolve();
-	m_tempo_led.resolve();
-	m_midi_led.resolve();
-	m_part_led.resolve();
-	m_edit_led.resolve();
-	m_echo_led.resolve();
-	m_loop_led.resolve();
-	m_a_next.resolve();
-	m_b_next.resolve();
-	m_fill_next.resolve();
-	m_user_next.resolve();
-	m_play.resolve();
-	m_record.resolve();
-	m_compose.resolve();
-	m_perform.resolve();
-	m_song.resolve();
-	m_b.resolve();
-	m_a.resolve();
-	m_fill.resolve();
-	m_user.resolve();
-	m_edited.resolve();
-	m_set.resolve();
-	m_drum.resolve();
-	m_press_play.resolve();
-	m_metronome.resolve();
-	m_tempo.resolve();
-	m_page.resolve();
-	m_step_edit.resolve();
-	m_swing_off.resolve();
-	m_swing_62.resolve();
-	m_click_l1.resolve();
-	m_click_note.resolve();
-	m_click_l2.resolve();
-	m_click_3.resolve();
-	m_backup.resolve();
-	m_drum_set.resolve();
-	m_swing.resolve();
-	m_swing_58.resolve();
-	m_click_off.resolve();
-	m_click.resolve();
-	m_quantize_off.resolve();
-	m_quantize_3.resolve();
-	m_midi_setup.resolve();
-	m_record_setup.resolve();
-	m_quantize.resolve();
-	m_swing_54.resolve();
-	m_quantize_l1.resolve();
-	m_quantize_l2.resolve();
-	m_quantize_l3.resolve();
-	m_quantize_note.resolve();
-	m_setup.resolve();
+	save_item(NAME(m_kb_matrix));
+	save_item(NAME(m_leds));
+	save_item(NAME(m_lcd_digits));
 }
 
 void alesis_state::machine_reset()
@@ -411,13 +354,13 @@ void alesis_state::hr16(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
-	m_maincpu->set_addrmap(AS_IO, &alesis_state::hr16_io);
+	m_maincpu->set_addrmap(AS_DATA, &alesis_state::hr16_data);
 	m_maincpu->port_in_cb<1>().set_ioport("SELECT");
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::p3_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16, 9*2);
@@ -431,7 +374,7 @@ void alesis_state::hr16(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("hr16_cass");
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
@@ -446,7 +389,7 @@ void alesis_state::sr16(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::sr16_mem);
-	m_maincpu->set_addrmap(AS_IO, &alesis_state::sr16_io);
+	m_maincpu->set_addrmap(AS_DATA, &alesis_state::sr16_data);
 	m_maincpu->port_in_cb<1>().set_constant(0);
 
 	/* video hardware */
@@ -465,7 +408,7 @@ void alesis_state::mmt8(machine_config &config)
 	hr16(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &alesis_state::mmt8_io);
+	m_maincpu->set_addrmap(AS_DATA, &alesis_state::mmt8_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(alesis_state::kb_r));
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::mmt8_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::mmt8_p3_w));

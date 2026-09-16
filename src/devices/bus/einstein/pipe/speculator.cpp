@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "speculator.h"
 #include "machine/rescap.h"
-#include "sound/wave.h"
 #include "formats/tzx_cas.h"
 
 
@@ -27,7 +26,7 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 
 void einstein_speculator_device::device_add_mconfig(machine_config &config)
 {
-	TTL74123(config, m_ic5a, 0);
+	TTL74123(config, m_ic5a);
 	m_ic5a->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ic5a->set_resistor_value(RES_K(47));
 	m_ic5a->set_capacitor_value(CAP_P(560));
@@ -36,7 +35,7 @@ void einstein_speculator_device::device_add_mconfig(machine_config &config)
 	m_ic5a->set_clear_pin_value(0);
 	m_ic5a->out_cb().set(FUNC(einstein_speculator_device::ic5a_q_w));
 
-	TTL74123(config, m_ic5b, 0);
+	TTL74123(config, m_ic5b);
 	m_ic5b->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ic5b->set_resistor_value(RES_K(47));
 	m_ic5b->set_capacitor_value(CAP_P(560));
@@ -46,10 +45,10 @@ void einstein_speculator_device::device_add_mconfig(machine_config &config)
 	m_ic5b->out_cb().set(FUNC(einstein_speculator_device::ic5b_q_w));
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_formats(tzx_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->set_interface("spectrum_cass");

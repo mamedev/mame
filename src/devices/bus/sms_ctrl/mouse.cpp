@@ -59,7 +59,7 @@ protected:
 	sms_megamouse_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(sms_megamouse); }
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(next_step);

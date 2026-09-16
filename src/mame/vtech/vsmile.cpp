@@ -59,11 +59,6 @@ void vsmile_state::machine_start()
 {
 	vsmile_base_state::machine_start();
 
-	m_redled.resolve();
-	m_yellowled.resolve();
-	m_blueled.resolve();
-	m_greenled.resolve();
-
 	save_item(NAME(m_ctrl_rts));
 	save_item(NAME(m_ctrl_select));
 }
@@ -302,15 +297,14 @@ void vsmile_base_state::vsmile_base(machine_config &config)
 {
 	config.set_default_layout(layout_vsmile);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_BIG);
@@ -327,8 +321,8 @@ void vsmile_state::vsmile(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsmile_state::mem_map);
 	m_maincpu->set_force_no_drc(true);
 	m_maincpu->chip_select().set(FUNC(vsmile_state::chip_sel_w));
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->portb_in().set(FUNC(vsmile_state::portb_r));
 	m_maincpu->portb_out().set(FUNC(vsmile_state::portb_w));
 	m_maincpu->portc_in().set(FUNC(vsmile_state::portc_r));

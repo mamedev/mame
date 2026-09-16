@@ -8,7 +8,7 @@ Fidelity Sensory 12 Chess Challenger (SC12, SE12, 6086)
 RE information from netlist by Berger
 
 8*(8+1) buttons, 8+8+2 red LEDs
-DIN 41524C printer port
+DIN 41524C printer port (600 baud, 7 data bits, 1 stop bit, no parity)
 36-pin edge connector
 CPU is a R65C02P4, running at 4MHz*
 
@@ -47,6 +47,9 @@ If control Q4 is set, printer data can be read from I0.
 Similar to EAS, the new game command for SC12 is: RE -> A6 (or A8) -> CL.
 The newer model 6086 does not have this issue.
 
+Fidelity Electronics, Ltd. went bankrupt in early 1984. They were briefly Fidelity
+Computer Products, Inc. (FCP) afterwards, and then Fidelity International, Inc.
+
 TODO:
 - is SE12 program the same as SC12? just a faster CPU, and probably /4 divider?
 
@@ -57,6 +60,7 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/sensorboard.h"
@@ -79,6 +83,7 @@ class sc12_state : public fidel_clockdiv_state
 public:
 	sc12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -89,28 +94,27 @@ public:
 	void sc12(machine_config &config);
 	void sc12b(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	void set_cpu_freq();
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r(offs_t offset);
-
-	u8 m_inp_mux = 0;
 };
 
 void sc12_state::machine_start()
@@ -121,18 +125,11 @@ void sc12_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
-void sc12_state::machine_reset()
-{
-	set_cpu_freq();
-	fidel_clockdiv_state::machine_reset();
-}
-
-void sc12_state::set_cpu_freq()
+INPUT_CHANGED_MEMBER(sc12_state::change_cpu_freq)
 {
 	// known official CPU speeds: 3MHz, 3.57MHz, 4MHz
 	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
-	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
-	div_refresh();
+	m_maincpu->set_unscaled_clock(xtal[newval % 3]);
 }
 
 
@@ -154,8 +151,9 @@ void sc12_state::control_w(u8 data)
 	// d6,d7: led select (active low)
 	m_display->matrix(~data >> 6 & 3, sel & 0x1ff);
 
-	// d4,d5: printer
-	//..
+	// d4: set when reading printer busy flag from 0xa000
+	// d5: printer port data
+	m_rs232->write_txd(BIT(~data, 5));
 }
 
 u8 sc12_state::input_r(offs_t offset)
@@ -206,27 +204,27 @@ static INPUT_PORTS_START( sc12_base )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CODE(KEYCODE_N) PORT_NAME("RE")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
-	PORT_INCLUDE( fidel_clockdiv_2 )
+	PORT_INCLUDE( fidel_clockdiv_2 ) // default for 3MHz
 	PORT_INCLUDE( sc12_base )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sc12_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (SC12)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (SE12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6086)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
-	PORT_INCLUDE( fidel_clockdiv_4 )
+	PORT_INCLUDE( fidel_clockdiv_4 ) // default for >3MHz
 	PORT_INCLUDE( sc12_base )
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, sc12_state, switch_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x03, 0x02, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sc12_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "3MHz (SC12)" )
 	PORT_CONFSETTING(    0x01, "3.57MHz (SE12)" )
 	PORT_CONFSETTING(    0x02, "4MHz (6086)" )
@@ -248,6 +246,8 @@ void sc12_state::sc12(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(200));
@@ -268,8 +268,6 @@ void sc12_state::sc12(machine_config &config)
 void sc12_state::sc12b(machine_config &config)
 {
 	sc12(config);
-
-	// basic machine hardware
 	m_maincpu->set_clock(4_MHz_XTAL); // R65C02P4
 }
 
@@ -302,5 +300,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, fscc12,  0,      0,      sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-SYST( 1984, fscc12a, fscc12, 0,      sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+SYST( 1986, fscc12,  0,      0,      sc12b,   sc12b, sc12_state, empty_init, "Fidelity International", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, fscc12a, fscc12, 0,      sc12,    sc12,  sc12_state, empty_init, "Fidelity Computer Products", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE )

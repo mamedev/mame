@@ -2,7 +2,7 @@
 // deadline_timer.cpp
 // ~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,8 @@
 
 #include "unit_test.hpp"
 
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
+#if !defined(ASIO_NO_DEPRECATED) \
+  && defined(ASIO_HAS_BOOST_DATE_TIME)
 
 #include <boost/bind/bind.hpp>
 #include "archetypes/async_result.hpp"
@@ -268,18 +269,18 @@ struct custom_allocation_timer_handler
       typedef allocator<U> other;
     };
 
-    explicit allocator(int* count) ASIO_NOEXCEPT
+    explicit allocator(int* count) noexcept
       : count_(count)
     {
     }
 
-    allocator(const allocator& other) ASIO_NOEXCEPT
+    allocator(const allocator& other) noexcept
       : count_(other.count_)
     {
     }
 
     template <typename U>
-    allocator(const allocator<U>& other) ASIO_NOEXCEPT
+    allocator(const allocator<U>& other) noexcept
       : count_(other.count_)
     {
     }
@@ -316,7 +317,7 @@ struct custom_allocation_timer_handler
 
   typedef allocator<int> allocator_type;
 
-  allocator_type get_allocator() const ASIO_NOEXCEPT
+  allocator_type get_allocator() const noexcept
   {
     return allocator_type(count_);
   }
@@ -396,7 +397,6 @@ void deadline_timer_async_result_test()
   ioc.run();
 }
 
-#if defined(ASIO_HAS_MOVE)
 asio::deadline_timer make_timer(asio::io_context& ioc, int* count)
 {
   asio::deadline_timer t(ioc);
@@ -404,11 +404,9 @@ asio::deadline_timer make_timer(asio::io_context& ioc, int* count)
   t.async_wait(boost::bind(increment, count));
   return t;
 }
-#endif // defined(ASIO_HAS_MOVE)
 
 void deadline_timer_move_test()
 {
-#if defined(ASIO_HAS_MOVE)
   asio::io_context io_context1;
   asio::io_context io_context2;
   int count = 0;
@@ -426,7 +424,6 @@ void deadline_timer_move_test()
   io_context1.run();
 
   ASIO_CHECK(count == 2);
-#endif // defined(ASIO_HAS_MOVE)
 }
 
 ASIO_TEST_SUITE
@@ -439,10 +436,16 @@ ASIO_TEST_SUITE
   ASIO_TEST_CASE(deadline_timer_async_result_test)
   ASIO_TEST_CASE(deadline_timer_move_test)
 )
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
+
+#else // !defined(ASIO_NO_DEPRECATED)
+      //   && defined(ASIO_HAS_BOOST_DATE_TIME)
+
 ASIO_TEST_SUITE
 (
   "deadline_timer",
   ASIO_TEST_CASE(null_test)
 )
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
+
+#endif // !defined(ASIO_NO_DEPRECATED)
+       //   && defined(ASIO_HAS_BOOST_DATE_TIME)
+

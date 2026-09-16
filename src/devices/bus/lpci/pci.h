@@ -47,10 +47,7 @@ public:
 	pci_connector_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool fixed)
 		: pci_connector_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	pci_connector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~pci_connector_device();
@@ -58,7 +55,7 @@ public:
 	pci_device_interface *get_device();
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(PCI_CONNECTOR, pci_connector_device)
@@ -69,7 +66,7 @@ class pci_bus_device :  public device_t
 {
 public:
 	// construction/destruction
-	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pci_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -89,8 +86,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:

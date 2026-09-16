@@ -2,7 +2,7 @@
 // detail/impl/dev_poll_reactor.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 dev_poll_reactor::dev_poll_reactor(asio::execution_context& ctx)
@@ -66,7 +67,7 @@ void dev_poll_reactor::shutdown()
   timer_queues_.get_all_timers(ops);
 
   scheduler_.abandon_operations(ops);
-} 
+}
 
 void dev_poll_reactor::notify_fork(
     asio::execution_context::fork_event fork_ev)
@@ -148,15 +149,24 @@ void dev_poll_reactor::move_descriptor(socket_type,
 {
 }
 
+void dev_poll_reactor::call_post_immediate_completion(
+    operation* op, bool is_continuation, const void* self)
+{
+  static_cast<const dev_poll_reactor*>(self)->post_immediate_completion(
+      op, is_continuation);
+}
+
 void dev_poll_reactor::start_op(int op_type, socket_type descriptor,
     dev_poll_reactor::per_descriptor_data&, reactor_op* op,
-    bool is_continuation, bool allow_speculative)
+    bool is_continuation, bool allow_speculative,
+    void (*on_immediate)(operation*, bool, const void*),
+    const void* immediate_arg)
 {
   asio::detail::mutex::scoped_lock lock(mutex_);
 
   if (shutdown_)
   {
-    post_immediate_completion(op, is_continuation);
+    on_immediate(op, is_continuation, immediate_arg);
     return;
   }
 
@@ -169,7 +179,7 @@ void dev_poll_reactor::start_op(int op_type, socket_type descriptor,
         if (op->perform())
         {
           lock.unlock();
-          scheduler_.post_immediate_completion(op, is_continuation);
+          on_immediate(op, is_continuation, immediate_arg);
           return;
         }
       }
@@ -451,6 +461,7 @@ void dev_poll_reactor::cancel_ops_unlocked(socket_type descriptor,
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

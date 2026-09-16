@@ -6,8 +6,10 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2017-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -28,6 +30,8 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
 #include <stdio.h>
@@ -49,12 +53,12 @@ typedef struct allocation_entry {
 static AllocationEntry *alloc_head = NULL;
 static AllocationEntry *alloc_tail = NULL;
 
-static AllocationEntry *find_allocation(void *ptr);
+static AllocationEntry *find_allocation(const void *ptr);
 
 /* Allocate some memory and keep track of it. */
 void *
 tracking_malloc(size_t size) {
-  AllocationEntry *entry = malloc(sizeof(AllocationEntry));
+  AllocationEntry *const entry = malloc(sizeof(AllocationEntry));
 
   if (entry == NULL) {
     printf("Allocator failure\n");
@@ -82,7 +86,7 @@ tracking_malloc(size_t size) {
 }
 
 static AllocationEntry *
-find_allocation(void *ptr) {
+find_allocation(const void *ptr) {
   AllocationEntry *entry;
 
   for (entry = alloc_head; entry != NULL; entry = entry->next) {
@@ -162,12 +166,11 @@ tracking_realloc(void *ptr, size_t size) {
       alloc_tail = entry;
     }
   } else {
-    entry->allocation = realloc(ptr, size);
-    if (entry->allocation == NULL) {
-      /* Realloc semantics say the original is still allocated */
-      entry->allocation = ptr;
+    void *const reallocated = realloc(ptr, size);
+    if (reallocated == NULL) {
       return NULL;
     }
+    entry->allocation = reallocated;
   }
 
   entry->num_bytes = size;

@@ -16,7 +16,7 @@
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/m6800/m6801.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -44,9 +44,9 @@ protected:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	void videoram_w(u8 data);
 
-	virtual void machine_reset() override;
-	void banctec_mcu_mem(address_map &map);
-	void banctec_mem(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void banctec_mcu_mem(address_map &map) ATTR_COLD;
+	void banctec_mem(address_map &map) ATTR_COLD;
 
 private:
 	required_device<palette_device> m_palette;
@@ -150,7 +150,7 @@ void banctec_state::banctec(machine_config &config)
 // The U20 EPROM holds the image data for the character set.
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size((52+1)*8, (31+1)*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);

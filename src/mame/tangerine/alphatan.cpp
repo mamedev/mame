@@ -64,7 +64,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,7 +79,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport m_config;
 
-	void alphatan_map(address_map &map);
+	void alphatan_map(address_map &map) ATTR_COLD;
 
 	uint8_t saa5070_r(offs_t offset);
 	void saa5070_w(offs_t offset, uint8_t data);
@@ -200,7 +200,7 @@ void alphatan_state::alphatan(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	//m_screen->set_raw(6_MHz_XTAL, 768, 0, 480, 625, 0, 480);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));

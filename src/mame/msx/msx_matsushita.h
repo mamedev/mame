@@ -16,7 +16,7 @@ class msx_matsushita_device : public device_t,
 	public device_nvram_interface
 {
 public:
-	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto turbo_callback() { return m_turbo_out_cb.bind(); }
 
@@ -25,8 +25,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

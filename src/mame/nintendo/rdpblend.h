@@ -13,8 +13,10 @@
 
 ******************************************************************************/
 
-#ifndef _VIDEO_RDPBLEND_H_
-#define _VIDEO_RDPBLEND_H_
+#ifndef MAME_NINTENDO_RDPBLEND_H
+#define MAME_NINTENDO_RDPBLEND_H
+
+#pragma once
 
 #include "n64_v.h"
 
@@ -24,19 +26,15 @@ class n64_blender_t
 		typedef bool (n64_blender_t::*blender1)(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, rdp_span_aux* userdata, const rdp_poly_state& object);
 		typedef bool (n64_blender_t::*blender2)(color_t& blended_pixel, int dith, int adseed, int partialreject, int sel0, int sel1, rdp_span_aux* userdata, const rdp_poly_state& object);
 
-		n64_blender_t();
+		n64_blender_t(running_machine &machine, n64_rdp &rdp);
 
 		blender1            blend1[8];
 		blender2            blend2[8];
 
-		void                set_machine(running_machine& machine) { m_machine = &machine; }
-		void                set_processor(n64_rdp* rdp) { m_rdp = rdp; }
-
-		running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
+		running_machine &machine() const { return m_machine; }
 
 	private:
-		running_machine*    m_machine = nullptr;
-		n64_rdp*            m_rdp = nullptr;
+		running_machine&    m_machine;
 
 		int32_t min(const int32_t x, const int32_t min);
 		bool alpha_reject(rdp_span_aux* userdata, const rdp_poly_state& object);
@@ -69,4 +67,4 @@ class n64_blender_t
 		uint8_t               m_alpha_dither[256 * 8];
 };
 
-#endif // _VIDEO_RDPBLEND_H_
+#endif // MAME_NINTENDO_RDPBLEND_H

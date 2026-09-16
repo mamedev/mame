@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/m6805/m68705.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -27,12 +27,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_ay1(*this, "ay1")
 	{ }
-
-	void init_perestro();
-	void init_sqix();
-	void init_sqixr0();
-	void init_pbillian();
-	void init_hotsmash();
 
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
 
@@ -69,12 +63,11 @@ protected:
 	void superqix_bitmapram2_w(offs_t offset, uint8_t data);
 	void superqix_0410_w(uint8_t data);
 
-	DECLARE_VIDEO_START(superqix);
 	static rgb_t BBGGRRII(uint32_t raw);
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_init_common();
 };
@@ -89,6 +82,10 @@ public:
 	{
 	}
 
+	void init_perestro();
+	void init_sqix();
+	void init_sqixr0();
+
 	void sqix(machine_config &config);
 	void sqix_8031(machine_config &config);
 	void sqix_nomcu(machine_config &config);
@@ -97,8 +94,8 @@ public:
 	int frommcu_semaphore_input_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<ay8910_device>    m_ay2;
@@ -122,10 +119,9 @@ private:
 	void bootleg_flipscreen_w(uint8_t data);
 	uint8_t bootleg_in0_r();
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
-	DECLARE_MACHINE_RESET(superqix);
 
-	void sqix_port_map(address_map &map);
-	void sqix_8031_map(address_map &map);
+	void sqix_port_map(address_map &map) ATTR_COLD;
+	void sqix_8031_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_init_common() override;
 
@@ -157,14 +153,17 @@ public:
 	{
 	}
 
+	void init_pbillian();
+	void init_hotsmash();
+
 	void pbillian(machine_config &config);
 	void pbillianb(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
+	ioport_value pbillian_semaphore_input_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	u8 hotsmash_68705_porta_r();
@@ -178,14 +177,12 @@ private:
 
 	void vblank_irq(int state);
 
-	SAMPLES_START_CB_MEMBER(pbillian_sh_start);
-
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
 
 	u32 screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pbillian_port_map(address_map &map);
-	void pbillianb_port_map(address_map &map);
+	void pbillian_port_map(address_map &map) ATTR_COLD;
+	void pbillianb_port_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_init_common() override;
 

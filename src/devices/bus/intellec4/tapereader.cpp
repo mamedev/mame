@@ -34,7 +34,7 @@ public:
 	virtual char const *file_extensions() const noexcept override { return "bnpf,hex,lst,txt"; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 rom4_in() { return m_ready ? 0x07U : 0x0fU; }

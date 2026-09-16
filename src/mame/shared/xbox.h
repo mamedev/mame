@@ -19,12 +19,12 @@
 class xbox_pic16lc_device : public device_t, public smbus_interface
 {
 public:
-	xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_pic16lc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff];
@@ -39,12 +39,12 @@ DECLARE_DEVICE_TYPE(XBOX_PIC16LC, xbox_pic16lc_device)
 class xbox_cx25871_device : public device_t, public smbus_interface
 {
 public:
-	xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_cx25871_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 };
@@ -58,14 +58,14 @@ DECLARE_DEVICE_TYPE(XBOX_CX25871, xbox_cx25871_device)
 class xbox_eeprom_device : public device_t, public smbus_interface
 {
 public:
-	xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 	std::function<void(void)> hack_eeprom;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 };
@@ -79,7 +79,7 @@ DECLARE_DEVICE_TYPE(XBOX_EEPROM, xbox_eeprom_device)
 class xbox_superio_device : public device_t, public lpcbus_device_interface
 {
 public:
-	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xbox_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
 	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
 	virtual void set_host(int device_index, lpcbus_host_interface *host) override;
@@ -90,10 +90,10 @@ public:
 	void write_rs232(offs_t offset, uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
 
 	lpcbus_host_interface *lpchost = nullptr;
 	int lpcindex = 0;
@@ -134,7 +134,7 @@ protected:
 	void vblank_callback(int state);
 	uint32_t screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void maincpu_interrupt(int state);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 

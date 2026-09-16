@@ -47,8 +47,8 @@ public:
 	void dss1(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 klm782_ga1_r(offs_t offset);
 	void klm782_ga1_w(offs_t offset, u8 data);
@@ -88,8 +88,8 @@ private:
 	u8 kbd_r();
 	void kbd_w(u8 data);
 
-	void cpu1_map(address_map &map);
-	void cpu2_map(address_map &map);
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
 
 	void palette_init_dss1(palette_device &palette);
 
@@ -111,15 +111,15 @@ public:
 	korg_dssmsrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: korg_dss1_state(mconfig, type, tag)
 		, m_msrkcpu(*this, "msrkcpu")
-		, m_scsic(*this, "scsi:7:scsic")
+		, m_scsic(*this, "scsic")
 	{
 	}
 
 	void dssmsrk(machine_config &config);
 
 private:
-	void msrk_map(address_map &map);
-	void msrk_io_map(address_map &map);
+	void msrk_map(address_map &map) ATTR_COLD;
+	void msrk_io_map(address_map &map) ATTR_COLD;
 
 	u8 fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, u8 data);
@@ -401,8 +401,6 @@ void korg_dssmsrk_state::msrk_io_map(address_map &map)
 
 void korg_dss1_state::cpu2_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_cpu2, FUNC(hd6303x_cpu_device::hd6301x_io)); // FIXME: internalize this
-	map(0x0040, 0x00ff).ram(); // FIXME: internalize this
 	map(0x0100, 0x0100).mirror(0x3cff).w(FUNC(korg_dss1_state::da_lsb_w));
 	map(0x0200, 0x0200).mirror(0x3cff).w(FUNC(korg_dss1_state::da_msb_w));
 	map(0x0300, 0x0300).mirror(0x3cff).r(m_latch[0], FUNC(generic_latch_8_device::read));
@@ -458,7 +456,7 @@ void korg_dss1_state::klm780(machine_config &config)
 	GENERIC_LATCH_8(config, m_latch[1]);
 	m_latch[1]->data_pending_callback().set_inputline(m_cpu1, I8085_RST55_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -468,7 +466,7 @@ void korg_dss1_state::klm780(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(korg_dss1_state::palette_init_dss1), 2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 20);
 	m_lcdc->set_pixel_update_cb(FUNC(korg_dss1_state::lcd_pixel_update));
 }
@@ -530,7 +528,7 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	klm781(config);
 	klm782(config);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -538,11 +536,10 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53C80).machine_config([this] (device_t *device) {
-		auto &scsic = downcast<ncr53c80_device &>(*device); // 48-pin DIP
-		scsic.irq_handler().set_inputline(m_msrkcpu, INPUT_LINE_IRQ4);
-		scsic.drq_handler().set(m_msrkcpu, FUNC(v40_device::dreq_w<1>));
-	});
+	NCR53C80(config, m_scsic);
+	scsi.set_external_device(7, m_scsic);
+	m_scsic->irq_handler().set_inputline(m_msrkcpu, INPUT_LINE_IRQ4);
+	m_scsic->drq_handler().set(m_msrkcpu, FUNC(v40_device::dreq_w<1>));
 }
 
 
@@ -583,5 +580,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1986, dss1,    0,    0, dss1,    dss1, korg_dss1_state,    empty_init, "Korg",               "DSS-1 Digital Sampling Synthesizer",                        MACHINE_IS_SKELETON)
-SYST(1987, dssmsrk, dss1, 0, dssmsrk, dss1, korg_dssmsrk_state, empty_init, "Korg / Sound Logic", "DSS-1 Digital Sampling Synthesizer (Memory/SCSI Retrofit)", MACHINE_IS_SKELETON)
+SYST(1986, dss1,    0,    0, dss1,    dss1, korg_dss1_state,    empty_init, "Korg",               "DSS-1 Digital Sampling Synthesizer",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1987, dssmsrk, dss1, 0, dssmsrk, dss1, korg_dssmsrk_state, empty_init, "Korg / Sound Logic", "DSS-1 Digital Sampling Synthesizer (Memory/SCSI Retrofit)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

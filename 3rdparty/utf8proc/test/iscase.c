@@ -6,12 +6,13 @@ int read_range(FILE *f, utf8proc_int32_t *start, utf8proc_int32_t *end)
      size_t len = simple_getline(buf, f);
      size_t pos = skipspaces(buf, 0);
      unsigned char s[16];
+     size_t s_len;
      if (pos == len || buf[pos] == '#') return 0;
-     pos += encode(s, buf + pos) - 1;
+     pos += encode(s, &s_len, buf + pos) - 1;
      check(s[0], "invalid line %s in data", buf);
      utf8proc_iterate((utf8proc_uint8_t*) s, -1, start);
      if (buf[pos] == '.' && buf[pos+1] == '.') {
-          encode(s, buf + pos + 2);
+          encode(s, &s_len, buf + pos + 2);
           check(s[0], "invalid line %s in data", buf);
           utf8proc_iterate((utf8proc_uint8_t*) s, -1, end);
      }

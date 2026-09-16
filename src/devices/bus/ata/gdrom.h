@@ -30,8 +30,8 @@ protected:
 	virtual void signature() override;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 //  virtual bool set_features() override;
 	// TODO: how GDROM determines ready flag?
 	// cfr. dc.xml [GDROM READY] for a list of SW that wants this on.

@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***************************************************************************
 
-    Skeleton driver for Orla HK1000 music keyboard.
+    Skeleton driver for Orla HK1000 music keyboard and SE 41 module.
 
 ***************************************************************************/
 
@@ -10,6 +10,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/tms7000/tms7000.h"
 #include "cpu/upd7810/upd7810.h"
+#include "machine/6850acia.h"
 #include "machine/i8255.h"
 #include "sound/ymopl.h"
 
@@ -30,9 +31,9 @@ public:
 	void hk1000(machine_config &config);
 
 private:
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void slot_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void slot_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -58,8 +59,9 @@ void hk1000_state::sound_map(address_map &map)
 void hk1000_state::slot_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1001).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
-	map(0x8000, 0xffff).rom().region("slotpcb", 0);
+	map(0x8000, 0xffff).rom().region("slotpcb", 0x8000);
 }
 
 
@@ -78,6 +80,9 @@ void hk1000_state::hk1000(machine_config &config)
 
 	M6502(config, m_slotcpu, 2'000'000);
 	m_slotcpu->set_addrmap(AS_PROGRAM, &hk1000_state::slot_map);
+
+	acia6850_device &acia(ACIA6850(config, "acia"));
+	acia.irq_handler().set_inputline(m_slotcpu, INPUT_LINE_NMI);
 
 	YM3812(config, "ymsnd", 4'000'000);
 }
@@ -133,12 +138,26 @@ ROM_START(hk1000)
 	ROM_REGION(0x10000, "pcm", 0)
 	ROM_LOAD("timbri pcm_ti tms 27c512-20jl.bin", 0x00000, 0x10000, CRC(dd573584) SHA1(1d554e11dbcbab390d3fc995976daf122908bad0))
 
-	ROM_REGION(0x8000, "slotpcb", 0)
-	ROM_LOAD("akk hk v2_ti tms 27c512-20jl.bin", 0x0000, 0x8000, CRC(74f6461b) SHA1(b2c1b44842b8825123beaad4c0e6692a57e1a9ed))
-	ROM_CONTINUE(0x0000, 0x8000) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION(0x10000, "slotpcb", 0)
+	ROM_LOAD("akk hk v2_ti tms 27c512-20jl.bin", 0x00000, 0x10000, CRC(74f6461b) SHA1(b2c1b44842b8825123beaad4c0e6692a57e1a9ed)) // 0xxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
+ROM_START(se41)
+	ROM_REGION(0x8000, "mainpcb", 0)
+	ROM_LOAD("se41_v5.bin", 0x0000, 0x8000, CRC(d1d6c3db) SHA1(b4dcb73b280f373c72fad56ec90bec348cf5f133))
+
+	ROM_REGION(0x4000, "soundpcb", 0)
+	ROM_LOAD("se41_suono_exp.bin", 0x0000, 0x4000, CRC(6b0a5bd2) SHA1(a2cf74a5b8a33d84d1cf85ee13822e2fb20c87d0))
+
+	ROM_REGION(0x10000, "pcm", 0)
+	ROM_LOAD("se41_timbri_pcm.bin", 0x00000, 0x10000, CRC(dd573584) SHA1(1d554e11dbcbab390d3fc995976daf122908bad0))
+
+	ROM_REGION(0x10000, "slotpcb", 0)
+	ROM_LOAD("se41_arrang.bin", 0x00000, 0x10000, CRC(ab026b99) SHA1(ce2381c7b34c9d5fb5d231b20410003a171743c3))
 ROM_END
 
 } // anonymous namespace
 
 
-SYST(198?, hk1000, 0, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "HK1000", MACHINE_IS_SKELETON)
+SYST(198?, hk1000, 0, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "HK1000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(198?, se41, hk1000, 0, hk1000, hk1000, hk1000_state, empty_init, "Orla", "SE 41", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

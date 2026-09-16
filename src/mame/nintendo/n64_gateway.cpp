@@ -73,15 +73,15 @@ public:
 		n64_state(mconfig, type, tag)
 	{ }
 
-	void n64_lodgenet_map(address_map &map);
+	void n64_lodgenet_map(address_map &map) ATTR_COLD;
 	void n64_lodgenet(machine_config &config);
 
 private:
-	void n64_map(address_map &map);
+	void n64_map(address_map &map) ATTR_COLD;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void rsp_imem_map(address_map &map);
-	void rsp_dmem_map(address_map &map);
+	void rsp_imem_map(address_map &map) ATTR_COLD;
+	void rsp_dmem_map(address_map &map) ATTR_COLD;
 };
 
 void n64_gateway_state::n64_lodgenet_map(address_map &map)
@@ -334,20 +334,21 @@ void n64_gateway_state::n64_lodgenet(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(500000));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
 	m_screen->set_screen_update(FUNC(n64_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	N64PERIPH(config, m_rcp_periphs, 0);
+	N64PERIPH(config, m_rcp_periphs);
+	m_rcp_periphs->set_sram(m_sram);
+	m_rcp_periphs->set_rdram(m_rdram);
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));

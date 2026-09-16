@@ -25,7 +25,7 @@
 #include "machine/z80daisy.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -44,7 +44,6 @@ public:
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_soundlatch3(*this, "soundlatch3"),
@@ -59,7 +58,7 @@ public:
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(refresh_end);
 
@@ -70,7 +69,6 @@ private:
 	required_device<dac_bit_interface> m_dac1;
 	required_device<dac_bit_interface> m_dac2;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<generic_latch_8_device> m_soundlatch3;
@@ -100,9 +98,9 @@ private:
 
 	void refresh();
 
-	void memmap(address_map &map);
-	void sound_memmap(address_map &map);
-	void sound_portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -195,9 +193,9 @@ static INPUT_PORTS_START( cchasm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cchasm_state, set_coin_flag, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cchasm_state, set_coin_flag, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cchasm_state, set_coin_flag, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cchasm_state::set_coin_flag), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cchasm_state::set_coin_flag), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cchasm_state::set_coin_flag), 0)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test 1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) /* Test 2, not used in cchasm */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* Test 3, not used in cchasm */
@@ -420,7 +418,7 @@ void cchasm_state::refresh_control_w(offs_t offset, uint8_t data)
 
 void cchasm_state::machine_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_xcenter = visarea.xcenter() << 16;
 	m_ycenter = visarea.ycenter() << 16;
@@ -480,12 +478,9 @@ void cchasm_state::cchasm(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	VECTOR(config, m_vector, 0);
-	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
-	m_screen->set_refresh_hz(40);
-	m_screen->set_size(400, 300);
-	m_screen->set_visarea(0, 1024-1, 0, 768-1);
-	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
+	VECTOR(config, m_vector);
+	m_vector->set_refresh_hz(40);
+	m_vector->set_visarea(0, 1024-1, 0, 768-1);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

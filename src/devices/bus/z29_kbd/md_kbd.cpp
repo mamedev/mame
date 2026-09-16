@@ -42,11 +42,6 @@ md_keyboard_device::md_keyboard_device(const machine_config &mconfig, const char
 {
 }
 
-void md_keyboard_device::device_resolve_objects()
-{
-	m_leds.resolve();
-}
-
 void md_keyboard_device::device_start()
 {
 	save_item(NAME(m_14515b_select));

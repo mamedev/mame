@@ -23,8 +23,8 @@ public:
 	void digdug(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<er2055_device> m_earom;
@@ -52,7 +52,7 @@ private:
 	void earom_write(offs_t offset, uint8_t data);
 	void earom_control_w(uint8_t data);
 
-	void digdug_map(address_map &map);
+	void digdug_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_DIGDUG_H

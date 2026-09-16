@@ -109,11 +109,6 @@ void sp0250_device::device_reset()
 	load_values();
 }
 
-TIMER_CALLBACK_MEMBER(sp0250_device::delayed_stream_update)
-{
-	m_stream->update();
-}
-
 static uint16_t sp0250_ga(uint8_t v)
 {
 	return (v & 0x1f) << (v>>5);
@@ -125,7 +120,7 @@ static int16_t sp0250_gc(uint8_t v)
 	static const uint16_t coefs[128] =
 	{
 		  0,   9,  17,  25,  33,  41,  49,  57,  65,  73,  81,  89,  97, 105, 113, 121,
-		129, 137, 145, 153, 161, 169, 177, 185, 193, 201, 203, 217, 225, 233, 241, 249,
+		129, 137, 145, 153, 161, 169, 177, 185, 193, 201, 209, 217, 225, 233, 241, 249,
 		257, 265, 273, 281, 289, 297, 301, 305, 309, 313, 317, 321, 325, 329, 333, 337,
 		341, 345, 349, 353, 357, 361, 365, 369, 373, 377, 381, 385, 389, 393, 397, 401,
 		405, 409, 413, 417, 421, 425, 427, 429, 431, 433, 435, 437, 439, 441, 443, 445,
@@ -262,18 +257,16 @@ int8_t sp0250_device::next()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sp0250_device::sound_stream_update(sound_stream &stream)
 {
-	auto &output = outputs[0];
-
 	if (!m_pwm_mode)
 	{
-		for (int sampindex = 0; sampindex < output.samples(); sampindex++)
-			output.put_int(sampindex, next(), 128);
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+			stream.put_int(0, sampindex, next(), 128);
 	}
 	else
 	{
-		for (int sampindex = 0; sampindex < output.samples(); )
+		for (int sampindex = 0; sampindex < stream.samples(); )
 		{
 			// see where we're at in the current PWM cycle
 			if (m_pwm_index >= PWM_CLOCKS)
@@ -287,7 +280,7 @@ void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 			// determine the value to fill and the number of samples remaining
 			// until it changes
-			stream_buffer::sample_t value;
+			sound_stream::sample_t value;
 			int remaining;
 			if (m_pwm_index < m_pwm_count)
 			{
@@ -301,13 +294,13 @@ void sp0250_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			}
 
 			// clamp to the number of samples requested and advance the counters
-			if (remaining > output.samples() - sampindex)
-				remaining = output.samples() - sampindex;
+			if (remaining > stream.samples() - sampindex)
+				remaining = stream.samples() - sampindex;
 			m_pwm_index += remaining;
 
 			// fill the output
 			while (remaining-- != 0)
-				outputs[0].put(sampindex++, value);
+				stream.put(0, sampindex++, value);
 		}
 	}
 }

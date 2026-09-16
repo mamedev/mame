@@ -1,12 +1,23 @@
 // BrowseDialog.h
 
-#ifndef __BROWSE_DIALOG_H
-#define __BROWSE_DIALOG_H
+#ifndef ZIP7_INC_BROWSE_DIALOG_H
+#define ZIP7_INC_BROWSE_DIALOG_H
 
-#include "../../../Common/MyString.h"
+#include "../../../Windows/CommonDialog.h"
 
 bool MyBrowseForFolder(HWND owner, LPCWSTR title, LPCWSTR path, UString &resultPath);
-bool MyBrowseForFile(HWND owner, LPCWSTR title, LPCWSTR path, LPCWSTR filterDescription, LPCWSTR filter, UString &resultPath);
+
+struct CBrowseFilterInfo
+{
+  UStringVector Masks;
+  UString Description;
+};
+
+struct CBrowseInfo: public NWindows::CCommonDialogInfo
+{
+  bool BrowseForFile(const CObjectVector<CBrowseFilterInfo> &filters);
+};
+
 
 /* CorrectFsPath removes undesirable characters in names (dots and spaces at the end of file)
    But it doesn't change "bad" name in any of the following cases:

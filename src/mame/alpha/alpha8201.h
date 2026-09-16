@@ -25,18 +25,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
 private:
 	// devices/pointers
 	required_device<hmcs40_cpu_device> m_mcu;
 
 	// internal state
-	int m_bus = 0;                  // shared RAM bus direction
-	u16 m_mcu_address = 0;          // MCU side RAM address
-	u16 m_mcu_d = 0;                // MCU D output data
-	u8 m_mcu_r[4]{};              // MCU R0-R3 output data
+	int m_bus;                  // shared RAM bus direction
+	u16 m_mcu_address;          // MCU side RAM address
+	u16 m_mcu_d;                // MCU D output data
+	u8 m_mcu_r[4];              // MCU R0-R3 output data
 	std::unique_ptr<u8[]> m_shared_ram; // 1KB RAM
 
 	void mcu_update_address();

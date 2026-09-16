@@ -160,7 +160,7 @@ static INPUT_PORTS_START( avalnche )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* SLAM */
 	PORT_SERVICE( 0x20, IP_ACTIVE_HIGH)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )       /* Serve */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")           /* VBLANK */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))           /* VBLANK */
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x40, 0xb7) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -232,7 +232,7 @@ void avalnche_state::avalnche_base(machine_config &config)
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256);
 	screen.set_screen_update(FUNC(avalnche_state::screen_update_avalnche));
 }

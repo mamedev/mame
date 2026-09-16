@@ -2,7 +2,7 @@
 // ip/address_v6_range.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //                         Oliver Kowalke (oliver dot kowalke at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -22,6 +22,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ip {
 
 template <typename> class basic_address_range;
@@ -39,7 +40,7 @@ public:
   typedef basic_address_iterator<address_v6> iterator;
 
   /// Construct an empty range.
-  basic_address_range() ASIO_NOEXCEPT
+  basic_address_range() noexcept
     : begin_(address_v6()),
       end_(address_v6())
   {
@@ -47,68 +48,63 @@ public:
 
   /// Construct an range that represents the given range of addresses.
   explicit basic_address_range(const iterator& first,
-      const iterator& last) ASIO_NOEXCEPT
+      const iterator& last) noexcept
     : begin_(first),
       end_(last)
   {
   }
 
   /// Copy constructor.
-  basic_address_range(const basic_address_range& other) ASIO_NOEXCEPT
+  basic_address_range(const basic_address_range& other) noexcept
     : begin_(other.begin_),
       end_(other.end_)
   {
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move constructor.
-  basic_address_range(basic_address_range&& other) ASIO_NOEXCEPT
-    : begin_(ASIO_MOVE_CAST(iterator)(other.begin_)),
-      end_(ASIO_MOVE_CAST(iterator)(other.end_))
+  basic_address_range(basic_address_range&& other) noexcept
+    : begin_(static_cast<iterator&&>(other.begin_)),
+      end_(static_cast<iterator&&>(other.end_))
   {
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// Assignment operator.
   basic_address_range& operator=(
-      const basic_address_range& other) ASIO_NOEXCEPT
+      const basic_address_range& other) noexcept
   {
     begin_ = other.begin_;
     end_ = other.end_;
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE)
   /// Move assignment operator.
-  basic_address_range& operator=(
-      basic_address_range&& other) ASIO_NOEXCEPT
+  basic_address_range& operator=(basic_address_range&& other) noexcept
   {
-    begin_ = ASIO_MOVE_CAST(iterator)(other.begin_);
-    end_ = ASIO_MOVE_CAST(iterator)(other.end_);
+    begin_ = static_cast<iterator&&>(other.begin_);
+    end_ = static_cast<iterator&&>(other.end_);
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE)
 
   /// Obtain an iterator that points to the start of the range.
-  iterator begin() const ASIO_NOEXCEPT
+  iterator begin() const noexcept
   {
     return begin_;
   }
 
   /// Obtain an iterator that points to the end of the range.
-  iterator end() const ASIO_NOEXCEPT
+  iterator end() const noexcept
   {
     return end_;
   }
 
   /// Determine whether the range is empty.
-  bool empty() const ASIO_NOEXCEPT
+  bool empty() const noexcept
   {
     return begin_ == end_;
   }
 
   /// Find an address in the range.
-  iterator find(const address_v6& addr) const ASIO_NOEXCEPT
+  iterator find(const address_v6& addr) const noexcept
   {
     return addr >= *begin_ && addr < *end_ ? iterator(addr) : end_;
   }
@@ -122,6 +118,7 @@ private:
 typedef basic_address_range<address_v6> address_v6_range;
 
 } // namespace ip
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

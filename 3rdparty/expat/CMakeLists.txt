@@ -1,44 +1,57 @@
-# This file is copyrighted under the BSD-license for buildsystem files of KDE
-# copyright 2010, Patrick Spendrin <ps_ml@gmx.de>
+#                          __  __            _
+#                       ___\ \/ /_ __   __ _| |_
+#                      / _ \\  /| '_ \ / _` | __|
+#                     |  __//  \| |_) | (_| | |_
+#                      \___/_/\_\ .__/ \__,_|\__|
+#                               |_| XML parser
+#
+# Copyright (c) 2010      Patrick Spendrin <ps_ml@gmx.de>
+# Copyright (c) 2012      Karl Waclawek <karl@waclawek.net>
+# Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2016      Sergei Nikulov <sergey.nikulov@gmail.com>
+# Copyright (c) 2016      Björn Lindahl <bjorn.lindahl@foi.se>
+# Copyright (c) 2016      Tobias Taschner <github@tc84.de>
+# Copyright (c) 2016      Ben Boeckel <ben.boeckel@kitware.com>
+# Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
+# Copyright (c) 2017      Rolf Eike Beer <eike@sf-mail.de>
+# Copyright (c) 2017      Stephen Groat <stephen@groat.us>
+# Copyright (c) 2017      Franek Korta <fkorta@gmail.com>
+# Copyright (c) 2018      pedro-vicente <pedro.vicente@space-research.org>
+# Copyright (c) 2018      Frank Rast <frank.rast@gefeg.com>
+# Copyright (c) 2018      userwithuid <userwithuid@gmail.com>
+# Copyright (c) 2018      Yury Gribov <tetra2005@gmail.com>
+# Copyright (c) 2019      Kishore Kunche <kishore.kunche@intel.com>
+# Copyright (c) 2019      xantares <xantares09@hotmail.com>
+# Copyright (c) 2019      Mohammed Khajapasha <mohammed.khajapasha@intel.com>
+# Copyright (c) 2019      David Loffredo <loffredo@steptools.com>
+# Copyright (c) 2019      Bhargava Shastry <bhargava.shastry@ethereum.org>
+# Copyright (c) 2020      Maciej Sroczyński <macieksroczynski@poczta.fm>
+# Copyright (c) 2020      Gulliver <gulliver@traumkristalle.net>
+# Copyright (c) 2020      Thomas Beutlich <tc@tbeu.de>
+# Copyright (c) 2021      Alex Richardson <Alexander.Richardson@cl.cam.ac.uk>
+# Copyright (c) 2022      Johnny Jazeix <jazeix@gmail.com>
+# Copyright (c) 2022      Mark Brand <markbrand@google.com>
+# Copyright (c) 2022      David Faure <david.faure@kdab.com>
+# Copyright (c) 2025      Alfonso Gregory <gfunni234@gmail.com>
+# Copyright (c) 2026      Rosen Penev <rosenp@gmail.com>
+# Copyright (c) 2026      Gordon Messmer <gordon.messmer@gmail.com>
+# Copyright (c) 2026      Nick Begg <nick@stunttruck.net>
+# Unlike most of Expat,
+# this file is copyrighted under the BSD-license for buildsystem files of KDE.
 
-cmake_minimum_required(VERSION 3.1.3)
-
-# This allows controlling documented build time switches
-# when Expat is pulled in using the add_subdirectory function, e.g.
-#
-#   set(EXPAT_BUILD_DOCS OFF)
-#   set(EXPAT_BUILD_TOOLS OFF)
-#   add_subdirectory(${expat_SOURCE_DIR}/expat ${expat_BINARY_DIR})
-#
-# would disable compilation of the xmlwf CLI and its man page.
-# Without activating behaviour NEW for policy CMP0077 here,
-# a user with -Wdev enabled would see warning
-#
-#   Policy CMP0077 is not set: option() honors normal variables.  Run "cmake
-#   --help-policy CMP0077" for policy details.  Use the cmake_policy command to
-#   set the policy and suppress this warning.
-#
-#   For compatibility with older versions of CMake, option is clearing the
-#   normal variable 'EXPAT_BUILD_DOCS'.
-#
-# and effectively not be able to adjust option EXPAT_BUILD_DOCS.
-#
-# For more details please see:
-# - https://cmake.org/cmake/help/latest/policy/CMP0077.html
-# - https://github.com/libexpat/libexpat/pull/419
-#
-if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW)
-endif()
+cmake_minimum_required(VERSION 3.17.0)
 
 project(expat
     VERSION
-        2.2.10
+        2.8.3
     LANGUAGES
         C
 )
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)  # i.e. -std=c99 rather than default -std=gnu99
 
-set(PACKAGE_BUGREPORT "expat-bugs@libexpat.org")
+set(PACKAGE_BUGREPORT "https://github.com/libexpat/libexpat/issues")
 set(PACKAGE_NAME "expat")
 set(PACKAGE_VERSION "${PROJECT_VERSION}")
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
@@ -46,11 +59,6 @@ set(PACKAGE_TARNAME "${PACKAGE_NAME}")
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
-
-#
-# Detect use by means of add_subdirectory
-#
-get_directory_property(_EXPAT_PARENT_DIRECTORY PARENT_DIRECTORY)
 
 #
 # Configuration defaults
@@ -75,58 +83,159 @@ if(MSVC)
 else()
     set(_EXPAT_BUILD_PKGCONFIG_DEFAULT ON)
 endif()
+if(DEFINED BUILD_SHARED_LIBS)
+    set(_EXPAT_SHARED_LIBS_DEFAULT ${BUILD_SHARED_LIBS})
+else()
+    set(_EXPAT_SHARED_LIBS_DEFAULT ON)
+endif()
+
+# AIX has none(!) of the high quality entropy sources supported by Expat (e.g.
+# getentropy(3)) but, unlike UNIX, has /dev/urandom availability guaranteed.
+if(AIX)  # needs CMake >=4.0 (or explicit `-DAIX=ON`)
+    set(_EXPAT_DEV_URANDOM_DEFAULT ON)
+else()
+    set(_EXPAT_DEV_URANDOM_DEFAULT OFF)
+endif()
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE NoConfig)  # so that accessing EXPAT_*_POSTFIX will be waterproof
+endif()
+string(TOUPPER "${CMAKE_BUILD_TYPE}" _EXPAT_BUILD_TYPE_UPPER)
 
 #
 # Configuration
 #
-option(EXPAT_BUILD_TOOLS "build the xmlwf tool for expat library" ${_EXPAT_BUILD_TOOLS_DEFAULT})
-option(EXPAT_BUILD_EXAMPLES "build the examples for expat library" ON)
-option(EXPAT_BUILD_TESTS "build the tests for expat library" ON)
-option(EXPAT_SHARED_LIBS "build a shared expat library" ON)
-option(EXPAT_BUILD_DOCS "build man page for xmlwf" ${_EXPAT_BUILD_DOCS_DEFAULT})
-option(EXPAT_BUILD_FUZZERS "build fuzzers for the expat library" OFF)
-option(EXPAT_BUILD_PKGCONFIG "build pkg-config file" ${_EXPAT_BUILD_PKGCONFIG_DEFAULT})
-option(EXPAT_OSSFUZZ_BUILD "build fuzzers via ossfuzz for the expat library" OFF)
-if(UNIX OR _EXPAT_HELP)
-    option(EXPAT_WITH_LIBBSD "utilize libbsd (for arc4random_buf)" OFF)
-endif()
-option(EXPAT_ENABLE_INSTALL "install expat files in cmake install target" ON)
-set(EXPAT_CONTEXT_BYTES 1024 CACHE STRING "Define to specify how much context to retain around the current parse point")
+
+macro(expat_shy_set var default cache type desc)
+    # Macro expat_shy_set came into life because:
+    # - Expat was previously using an inconsistent mix of CMake's native set()
+    #   and option() to define public build time options.
+    # - option() is more friendly than set() with regard to configuring an
+    #   external project that is pulled in by means of add_subdirectory() --
+    #   see comments in issue #597 -- so we wanted to get away from set().
+    # - option() auto-converts non-bool values to bool when writing to the CMake
+    #   cache, so we needed something that supports non-bool better and hence
+    #   wanted to get away from plain option(), too.
+    #
+    # As a result, this function serves as a hybrid between CMake's regular set()
+    # and option(): from set() it takes support for non-bool types and the function
+    # name and signature whereas from option() (with policy CMP0077 mode NEW) it
+    # takes being shy when a value has previously been defined for that variable.
+    #
+    # So that resolves all need for set(.. FORCE) when pulling in Expat by means of
+    # add_subdirectory().
+    #
+    if(NOT ${cache} STREQUAL "CACHE")
+        message(SEND_ERROR "Macro usage is: expat_shy_set(var default CACHE type desc)")
+    endif()
+
+    if(DEFINED ${var})
+        # NOTE: The idea is to (ideally) only add to the cache if
+        #       there is no cache entry, yet.
+        if(NOT DEFINED "CACHE{${var}}")
+            set("${var}" "${${var}}" CACHE "${type}" "${desc}")
+        endif()
+    else()
+        set("${var}" "${default}" CACHE "${type}" "${desc}")
+    endif()
+endmacro()
+
+expat_shy_set(EXPAT_BUILD_TOOLS ${_EXPAT_BUILD_TOOLS_DEFAULT} CACHE BOOL "Build the xmlwf tool for expat library")
+expat_shy_set(EXPAT_BUILD_EXAMPLES ON CACHE BOOL "Build the examples for expat library")
+expat_shy_set(EXPAT_BUILD_TESTS ON CACHE BOOL "Build the tests for expat library")
+expat_shy_set(EXPAT_SHARED_LIBS ${_EXPAT_SHARED_LIBS_DEFAULT} CACHE BOOL "Build a shared expat library")
+expat_shy_set(EXPAT_BUILD_DOCS ${_EXPAT_BUILD_DOCS_DEFAULT} CACHE BOOL "Build man page for xmlwf")
+expat_shy_set(EXPAT_BUILD_FUZZERS OFF CACHE BOOL "Build fuzzers for the expat library")
+expat_shy_set(EXPAT_BUILD_PKGCONFIG ${_EXPAT_BUILD_PKGCONFIG_DEFAULT} CACHE BOOL "Build pkg-config file")
+expat_shy_set(EXPAT_OSSFUZZ_BUILD OFF CACHE BOOL "Build fuzzers via OSS-Fuzz for the expat library")
+mark_as_advanced(EXPAT_OSSFUZZ_BUILD)
+expat_shy_set(EXPAT_ENABLE_INSTALL ON CACHE BOOL "Install expat files in cmake install target")
+expat_shy_set(EXPAT_CONTEXT_BYTES 1024 CACHE STRING "Define to specify how much context to retain around the current parse point, 0 to disable")
 mark_as_advanced(EXPAT_CONTEXT_BYTES)
-option(EXPAT_DTD "Define to make parameter entity parsing functionality available" ON)
+expat_shy_set(EXPAT_SYMBOL_VERSIONING OFF CACHE BOOL "Define to provide symbol versioning for dependency generation")
+expat_shy_set(EXPAT_DTD ON CACHE BOOL "Define to make parameter entity parsing functionality available")
 mark_as_advanced(EXPAT_DTD)
-option(EXPAT_NS "Define to make XML Namespaces functionality available" ON)
+expat_shy_set(EXPAT_GE ON CACHE BOOL "Define to make general entity parsing functionality available")
+mark_as_advanced(EXPAT_GE)
+expat_shy_set(EXPAT_NS ON CACHE BOOL "Define to make XML Namespaces functionality available")
 mark_as_advanced(EXPAT_NS)
-option(EXPAT_WARNINGS_AS_ERRORS "Treat all compiler warnings as errors" OFF)
+expat_shy_set(EXPAT_WARNINGS_AS_ERRORS OFF CACHE BOOL "Treat all compiler warnings as errors")
 if(UNIX OR _EXPAT_HELP)
-    option(EXPAT_DEV_URANDOM "Define to include code reading entropy from `/dev/urandom'." ON)
-    set(EXPAT_WITH_GETRANDOM "AUTO" CACHE STRING
-            "Make use of getrandom function (ON|OFF|AUTO) [default=AUTO]")
-    set(EXPAT_WITH_SYS_GETRANDOM "AUTO" CACHE STRING
-            "Make use of syscall SYS_getrandom (ON|OFF|AUTO) [default=AUTO]")
+    expat_shy_set(EXPAT_DEV_URANDOM ${_EXPAT_DEV_URANDOM_DEFAULT} CACHE BOOL "Define to include code reading entropy from `/dev/urandom'.")
     mark_as_advanced(EXPAT_DEV_URANDOM)
 endif()
-set(EXPAT_CHAR_TYPE "char" CACHE STRING "Character type to use (char|ushort|wchar_t) [default=char]")
-option(EXPAT_ATTR_INFO "Define to allow retrieving the byte offsets for attribute names and values" OFF)
+if(UNIX OR WASI OR _EXPAT_HELP)
+    expat_shy_set(EXPAT_WITH_ARC4RANDOM "AUTO" CACHE STRING "Make use of arc4random function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_ARC4RANDOM)
+    expat_shy_set(EXPAT_WITH_ARC4RANDOM_BUF "AUTO" CACHE STRING "Make use of arc4random_buf function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_ARC4RANDOM_BUF)
+    expat_shy_set(EXPAT_WITH_GETENTROPY "AUTO" CACHE STRING "Make use of getentropy function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_GETENTROPY)
+endif()
+if(UNIX OR _EXPAT_HELP)
+    expat_shy_set(EXPAT_WITH_GETRANDOM "AUTO" CACHE STRING "Make use of getrandom function (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_GETRANDOM)
+    expat_shy_set(EXPAT_WITH_SYS_GETRANDOM "AUTO" CACHE STRING "Make use of syscall SYS_getrandom (ON|OFF|AUTO) [default=AUTO]")
+    mark_as_advanced(EXPAT_WITH_SYS_GETRANDOM)
+endif()
+expat_shy_set(EXPAT_CHAR_TYPE "char" CACHE STRING "Character type to use (char|ushort|wchar_t) [default=char]")
+expat_shy_set(EXPAT_ATTR_INFO OFF CACHE BOOL "Define to allow retrieving the byte offsets for attribute names and values")
 mark_as_advanced(EXPAT_ATTR_INFO)
-option(EXPAT_LARGE_SIZE "Make XML_GetCurrent* functions return <(unsigned) long long> rather than <(unsigned) long>" OFF)
+expat_shy_set(EXPAT_LARGE_SIZE OFF CACHE BOOL "Make XML_GetCurrent* functions return <(unsigned) long long> rather than <(unsigned) long>")
 mark_as_advanced(EXPAT_LARGE_SIZE)
-option(EXPAT_MIN_SIZE "Get a smaller (but slower) parser (in particular avoid multiple copies of the tokenizer)" OFF)
+expat_shy_set(EXPAT_MIN_SIZE OFF CACHE BOOL "Get a smaller (but slower) parser (in particular avoid multiple copies of the tokenizer)")
 mark_as_advanced(EXPAT_MIN_SIZE)
 if(MSVC OR _EXPAT_HELP)
-    set(EXPAT_MSVC_STATIC_CRT OFF CACHE BOOL "Use /MT flag (static CRT) when compiling in MSVC")
+    expat_shy_set(EXPAT_MSVC_STATIC_CRT OFF CACHE BOOL "Use /MT flag (static CRT) when compiling in MSVC")
+endif()
+if(NOT _EXPAT_HELP)
+    expat_shy_set(_EXPAT_M32 OFF CACHE BOOL "(Unofficial!) Produce 32bit code with -m32")
+    mark_as_advanced(_EXPAT_M32)
+    expat_shy_set(_EXPAT_MSVC_ASAN OFF CACHE BOOL "(Unofficial!) Activate AddressSanitizer with MSVC")
+    mark_as_advanced(_EXPAT_MSVC_ASAN)
+endif()
+
+if(EXPAT_BUILD_FUZZERS)
+    # We have to call enable_language() before modifying any CMAKE_CXX_* variables
+    enable_language(CXX)
+
+    set(CMAKE_CXX_STANDARD 17)  # for std::string_view for Abseil for libprotobuf-mutator
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)  # i.e. -std=c++11 rather than default -std=gnu++11
 endif()
 
 #
 # Environment checks
 #
-if(EXPAT_WITH_LIBBSD)
-    find_library(LIB_BSD NAMES bsd)
-    if(NOT LIB_BSD)
-        message(SEND_ERROR "EXPAT_WITH_LIBBSD option is enabled, but libbsd was not found")
-    else()
-        set(HAVE_LIBBSD TRUE)
+if(EXPAT_DTD AND NOT EXPAT_GE)
+    message(SEND_ERROR "Option EXPAT_DTD requires that EXPAT_GE is also enabled.")
+    message(SEND_ERROR "Please either enable option EXPAT_GE (recommended) or disable EXPAT_DTD also.")
+endif()
+
+if(MSVC)
+    # For the three types of MSVC version values, please see:
+    # - https://cmake.org/cmake/help/latest/variable/MSVC_VERSION.html
+    # - https://sourceforge.net/p/predef/wiki/Compilers/
+    # - https://en.wikipedia.org/wiki/Microsoft_Visual_Studio#History
+    set(_EXPAT_MSVC_REQUIRED_INT 1900)  # i.e. 14.0/2015(Update 2)/1900
+    set(_EXPAT_MSVC_SUPPORTED_INT 1930)
+    set(_EXPAT_MSVC_SUPPORTED_DISPLAY "Visual Studio 17.0/2022/${_EXPAT_MSVC_SUPPORTED_INT}")
+
+    if(MSVC_VERSION VERSION_LESS ${_EXPAT_MSVC_SUPPORTED_INT})
+        if(MSVC_VERSION VERSION_LESS ${_EXPAT_MSVC_REQUIRED_INT})
+            message(SEND_ERROR "MSVC_VERSION ${MSVC_VERSION} is TOO OLD to compile Expat without errors.")
+            message(SEND_ERROR "Please use officially supported ${_EXPAT_MSVC_SUPPORTED_DISPLAY} or later.  Thank you!")
+        else()
+            message(WARNING "MSVC_VERSION ${MSVC_VERSION} is NOT OFFICIALLY SUPPORTED by Expat.")
+            message(WARNING "Please use ${_EXPAT_MSVC_SUPPORTED_DISPLAY} or later.  Thank you!")
+        endif()
     endif()
+
+    # Stop MSVC from trying to decode the source files using
+    # the Windows system code page encoding that could e.g. be Windows-936
+    # on a Chinese Windows system rather than UTF-8.
+    # https://devblogs.microsoft.com/cppblog/new-options-for-managing-character-sets-in-the-microsoft-cc-compiler/
+    add_compile_options(/source-charset:utf-8)
 endif()
 
 macro(_expat_copy_bool_int source_ref dest_ref)
@@ -196,17 +305,24 @@ macro(evaluate_detection_results use_ref have_ref thing_lower thing_title)
 endmacro()
 
 if(NOT WIN32)
+    evaluate_detection_results(EXPAT_WITH_ARC4RANDOM HAVE_ARC4RANDOM "function arc4random" "Function arc4random")
+    evaluate_detection_results(EXPAT_WITH_ARC4RANDOM_BUF HAVE_ARC4RANDOM_BUF "function arc4random_buf" "Function arc4random_buf")
+    evaluate_detection_results(EXPAT_WITH_GETENTROPY HAVE_GETENTROPY "function getentropy" "Function getentropy")
     evaluate_detection_results(EXPAT_WITH_GETRANDOM HAVE_GETRANDOM "function getrandom" "Function getrandom")
     evaluate_detection_results(EXPAT_WITH_SYS_GETRANDOM HAVE_SYSCALL_GETRANDOM "syscall SYS_getrandom" "Syscall SYS_getrandom")
 endif()
 
 _expat_copy_bool_int(EXPAT_ATTR_INFO        XML_ATTR_INFO)
 _expat_copy_bool_int(EXPAT_DTD              XML_DTD)
+_expat_copy_bool_int(EXPAT_GE               XML_GE)
 _expat_copy_bool_int(EXPAT_LARGE_SIZE       XML_LARGE_SIZE)
 _expat_copy_bool_int(EXPAT_MIN_SIZE         XML_MIN_SIZE)
 _expat_copy_bool_int(EXPAT_NS               XML_NS)
 if(NOT WIN32)
     _expat_copy_bool_int(EXPAT_DEV_URANDOM  XML_DEV_URANDOM)
+endif()
+if(NOT EXPAT_CONTEXT_BYTES GREATER 0)  # in particular with -DEXPAT_CONTEXT_BYTES=OFF
+    set(EXPAT_CONTEXT_BYTES 0)
 endif()
 set(XML_CONTEXT_BYTES ${EXPAT_CONTEXT_BYTES})
 
@@ -217,126 +333,263 @@ macro(expat_install)
 endmacro()
 
 configure_file(expat_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/expat_config.h")
-add_definitions(-DHAVE_EXPAT_CONFIG_H)
 expat_install(FILES "${CMAKE_CURRENT_BINARY_DIR}/expat_config.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 
 set(EXTRA_COMPILE_FLAGS)
-if(FLAG_NO_STRICT_ALIASING)
-    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fno-strict-aliasing")
+if(FLAG_WSTRICT_ALIASING)
+    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wstrict-aliasing=3")
+endif()
+if(FLAG_WIMPLICIT_FALLTHROUGH)
+    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wimplicit-fallthrough")
 endif()
 if(FLAG_VISIBILITY)
-  add_definitions(-DXML_ENABLE_VISIBILITY=1)
+  if(EXPAT_SHARED_LIBS)
+     add_definitions(-DXML_ENABLE_VISIBILITY=1)
+  endif()
   set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fvisibility=hidden")
+endif()
+if(MINGW AND ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
+    # Without __USE_MINGW_ANSI_STDIO the compiler produces a false positive
+    set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wno-pedantic-ms-format")
 endif()
 if (EXPAT_WARNINGS_AS_ERRORS)
     if(MSVC)
         add_definitions(/WX)
     else()
         set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Werror")
+        if(MINGW)
+            # To avoid "error: unknown conversion type character ‘l’ in format [-Werror=format=]"
+            set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -Wno-format")
+        endif()
     endif()
 endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 
 if (MSVC)
-    if (EXPAT_MSVC_STATIC_CRT)
-        message("-- Using static CRT ${EXPAT_MSVC_STATIC_CRT}")
-        foreach(flag_var
-                CMAKE_CXX_FLAGS_DEBUG
-                CMAKE_CXX_FLAGS_RELEASE
-                CMAKE_CXX_FLAGS_MINSIZEREL
-                CMAKE_CXX_FLAGS_RELWITHDEBINFO
-                CMAKE_C_FLAGS_DEBUG
-                CMAKE_C_FLAGS_RELEASE
-                CMAKE_C_FLAGS_MINSIZEREL
-                CMAKE_C_FLAGS_RELWITHDEBINFO
-                )
-            string(REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-        endforeach()
+    cmake_policy(GET CMP0091 _policy_cmp0091_behavior)
+    if (NOT _policy_cmp0091_behavior STREQUAL NEW)
+        message(SEND_ERROR "Policy CMP0091 behavior is '${_policy_cmp0091_behavior}' rather than 'NEW', mis-compilation detected.")
     endif()
+
+    message(STATUS "-- Using static CRT ${EXPAT_MSVC_STATIC_CRT}")
+    if (EXPAT_MSVC_STATIC_CRT)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")  # .. without suffix "DLL": static
+    else()
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")  # i.e. CMake default behavior: shared
+    endif()
+endif()
+
+if(_EXPAT_M32 AND NOT MSVC)
+    foreach(flag_var
+            CMAKE_CXX_FLAGS_${_EXPAT_BUILD_TYPE_UPPER}
+            CMAKE_CXX_FLAGS_DEBUG
+            CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_CXX_FLAGS_MINSIZEREL
+            CMAKE_CXX_FLAGS_RELWITHDEBINFO
+            CMAKE_C_FLAGS_${_EXPAT_BUILD_TYPE_UPPER}
+            CMAKE_C_FLAGS_DEBUG
+            CMAKE_C_FLAGS_RELEASE
+            CMAKE_C_FLAGS_MINSIZEREL
+            CMAKE_C_FLAGS_RELWITHDEBINFO
+            )
+        set(${flag_var} "${${flag_var}} -m32")
+    endforeach()
+endif()
+
+if(_EXPAT_MSVC_ASAN)
+    add_compile_options(/fsanitize=address /Zi)
 endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -wd4996)
 endif()
-if(WIN32)
-    if(_EXPAT_UNICODE_WCHAR_T)
-        set(_POSTFIX_WIDE "w")
-    endif()
-
-    if(MSVC AND NOT EXPAT_SHARED_LIBS)
-        if(EXPAT_MSVC_STATIC_CRT)
-            set(_POSTFIX_CRT "MT")
-        else()
-            set(_POSTFIX_CRT "MD")
-        endif()
-    endif()
-
-    foreach(postfix_var
-            CMAKE_DEBUG_POSTFIX
-            CMAKE_RELEASE_POSTFIX
-            CMAKE_MINSIZEREL_POSTFIX
-            CMAKE_RELWITHDEBINFO_POSTFIX
-            )
-        if(postfix_var STREQUAL "CMAKE_DEBUG_POSTFIX")
-            set(_POSTFIX_DEBUG "d")
-        else()
-            set(_POSTFIX_DEBUG "")
-        endif()
-
-        set(${postfix_var} "${_POSTFIX_WIDE}${_POSTFIX_DEBUG}${_POSTFIX_CRT}" CACHE STRING "Windows binary postfix, e.g. libexpat<postfix=[w][d][MD|MT]>.lib")
-    endforeach()
-endif()
 
 #
 # C library
 #
-set(expat_SRCS
+set(_EXPAT_C_SOURCES
     lib/xmlparse.c
     lib/xmlrole.c
     lib/xmltok.c
 # NOTE: ISO C forbids an empty translation unit
+#   lib/xcsinc.c
 #   lib/xmltok_impl.c
 #   lib/xmltok_ns.c
 )
 
+if(HAVE_ARC4RANDOM)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_arc4random.c
+        lib/random_arc4random.h
+    )
+endif()
+
+if(HAVE_ARC4RANDOM_BUF)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_arc4random_buf.c
+        lib/random_arc4random_buf.h
+    )
+endif()
+
+if(EXPAT_DEV_URANDOM)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_dev_urandom.c
+        lib/random_dev_urandom.h
+    )
+endif()
+
+if(HAVE_GETENTROPY)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_getentropy.c
+        lib/random_getentropy.h
+    )
+endif()
+
+if(HAVE_GETRANDOM OR HAVE_SYSCALL_GETRANDOM)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_getrandom.c
+        lib/random_getrandom.h
+    )
+endif()
+
+if(WIN32)
+    set(_EXPAT_C_SOURCES
+        ${_EXPAT_C_SOURCES}
+        lib/random_rand_s.c
+        lib/random_rand_s.h
+    )
+endif()
+
 if(EXPAT_SHARED_LIBS)
     set(_SHARED SHARED)
-    if(MSVC)
-        set(expat_SRCS ${expat_SRCS} lib/libexpat.def)
+    if(EXPAT_DTD OR EXPAT_GE)
+        set(_EXPAT_DTD_OR_GE TRUE)
+    else()
+        set(_EXPAT_DTD_OR_GE FALSE)
+    endif()
+
+    if(WIN32)
+        macro(_expat_def_file_toggle source_var target_var)
+            if(${source_var})
+                set(${target_var} " ")  # i.e. not commented out, a single space
+            else()
+                set(${target_var} ";")  # i.e. commented out
+            endif()
+        endmacro()
+
+        _expat_def_file_toggle(_EXPAT_DTD_OR_GE _EXPAT_COMMENT_DTD_OR_GE)
+        _expat_def_file_toggle(EXPAT_ATTR_INFO _EXPAT_COMMENT_ATTR_INFO)
+
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/lib/libexpat.def.cmake" "${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.def")
+        set(_EXPAT_EXTRA_SOURCES ${_EXPAT_EXTRA_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.def")
+
+        # Add DLL version
+        string(REPLACE "." "," _EXPAT_DLL_VERSION ${PROJECT_VERSION}.0)
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/win32/version.rc.cmake" "${CMAKE_CURRENT_BINARY_DIR}/win32/version.rc")
+        set(_EXPAT_EXTRA_SOURCES ${_EXPAT_EXTRA_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/win32/version.rc")
+    else()
+        macro(_expat_map_file_toggle source_var target_var)
+            if(${source_var})
+                set(${target_var} " ")  # i.e. not commented out, a single space
+            else()
+                set(${target_var} "#")  # i.e. commented out
+            endif()
+        endmacro()
+
+        _expat_map_file_toggle(_EXPAT_DTD_OR_GE _EXPAT_COMMENT_DTD_OR_GE)
+        _expat_map_file_toggle(EXPAT_ATTR_INFO _EXPAT_COMMENT_ATTR_INFO)
+
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/lib/libexpat.map.in" "${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.map")
+        set(_EXPAT_EXTRA_SOURCES ${_EXPAT_EXTRA_SOURCES} "${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.map")
     endif()
 else()
     set(_SHARED STATIC)
 endif()
 
-# Avoid colliding with Expat.dll of Perl's XML::Parser::Expat
-if(WIN32 AND NOT MINGW)
-    set(_EXPAT_OUTPUT_NAME libexpat)  # CMAKE_*_POSTFIX applies, see above
-else()
-    if(_EXPAT_UNICODE)
-        set(_EXPAT_OUTPUT_NAME expatw)
+add_library(expat ${_SHARED} ${_EXPAT_C_SOURCES} ${_EXPAT_EXTRA_SOURCES})
+add_library(expat::expat ALIAS expat)
+if(_EXPAT_LIBM_FOUND)
+    target_link_libraries(expat m)
+endif()
+
+#
+# Library filename postfix
+#
+if(_EXPAT_UNICODE)
+    set(_POSTFIX_WIDE "w")
+endif()
+
+if(MSVC AND NOT EXPAT_SHARED_LIBS)
+    if(EXPAT_MSVC_STATIC_CRT)
+        set(_POSTFIX_CRT "MT")
     else()
-        set(_EXPAT_OUTPUT_NAME expat)
+        set(_POSTFIX_CRT "MD")
     endif()
 endif()
 
-add_library(expat ${_SHARED} ${expat_SRCS})
-if(EXPAT_WITH_LIBBSD)
-    target_link_libraries(expat ${LIB_BSD})
-endif()
+foreach(build_type_upper
+        ${_EXPAT_BUILD_TYPE_UPPER}
+        DEBUG
+        RELEASE
+        MINSIZEREL
+        RELWITHDEBINFO
+        )
+    if(WIN32 AND build_type_upper STREQUAL "DEBUG")
+        set(_POSTFIX_DEBUG "d")
+    else()
+        set(_POSTFIX_DEBUG "")  # needs a reset because of being looped
+    endif()
 
-set(LIBCURRENT 7)    # sync
-set(LIBREVISION 12)  # with
-set(LIBAGE 6)        # configure.ac!
+    expat_shy_set(EXPAT_${build_type_upper}_POSTFIX "${_POSTFIX_WIDE}${_POSTFIX_DEBUG}${_POSTFIX_CRT}" CACHE STRING "Library filename postfix for build type ${build_type_upper}; yields filenames libexpat<postfix=[w][d][MD|MT]>.(dll|dylib|lib|so)")
+    mark_as_advanced(EXPAT_${build_type_upper}_POSTFIX)
+    set_property(TARGET expat PROPERTY ${build_type_upper}_POSTFIX ${EXPAT_${build_type_upper}_POSTFIX})
+endforeach()
+
+set(LIBCURRENT 13)  # sync
+set(LIBREVISION 3)  # with
+set(LIBAGE 12)      # configure.ac!
 math(EXPR LIBCURRENT_MINUS_AGE "${LIBCURRENT} - ${LIBAGE}")
 
-set_property(TARGET expat PROPERTY OUTPUT_NAME "${_EXPAT_OUTPUT_NAME}")
 if(NOT WIN32)
     set_property(TARGET expat PROPERTY VERSION ${LIBCURRENT_MINUS_AGE}.${LIBAGE}.${LIBREVISION})
     set_property(TARGET expat PROPERTY SOVERSION ${LIBCURRENT_MINUS_AGE})
     set_property(TARGET expat PROPERTY NO_SONAME ${NO_SONAME})
+    if(EXPAT_SYMBOL_VERSIONING)
+        set_property(TARGET expat PROPERTY LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_BINARY_DIR}/lib/libexpat.map")
+    endif()
+
+    if(APPLE)
+        # NOTE: This intends to talk CMake into compatibility with GNU Libtool
+        math(EXPR _EXPAT_MACHO_COMPATIBILITY_VERSION "${LIBCURRENT} + 1")
+        set(_EXPAT_MACHO_CURRENT_VERSION "${_EXPAT_MACHO_COMPATIBILITY_VERSION}.${LIBREVISION}")
+        set_property(TARGET expat PROPERTY MACHO_COMPATIBILITY_VERSION ${_EXPAT_MACHO_COMPATIBILITY_VERSION})
+        set_property(TARGET expat PROPERTY MACHO_CURRENT_VERSION ${_EXPAT_MACHO_CURRENT_VERSION})
+    endif()
+endif()
+
+if(MINGW AND EXPAT_SHARED_LIBS)
+    set_target_properties(expat PROPERTIES SUFFIX "-${LIBCURRENT_MINUS_AGE}.dll")
+endif()
+
+if(WIN32 AND NOT MINGW)
+    # NOTE: This avoids a name collision with Expat.dll of Perl's XML::Parser::Expat
+    #       on Windows by resorting to filename libexpat.dll since Expat 1.95.3.
+    #       Everything but MSVC is already adding prefix "lib", automatically.
+    # NOTE: "set_property(TARGET expat PROPERTY PREFIX lib)" would only affect *.dll
+    #       files but not *.lib files, so we have to rely on property OUTPUT_NAME, instead.
+    #       Target property <CONFIG>_POSTFIX still applies.
+    set(_EXPAT_OUTPUT_NAME libexpat)
+    set_property(TARGET expat PROPERTY OUTPUT_NAME ${_EXPAT_OUTPUT_NAME})
+else()
+    set(_EXPAT_OUTPUT_NAME expat)
 endif()
 
 target_include_directories(expat
@@ -346,8 +599,8 @@ target_include_directories(expat
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-if(NOT EXPAT_SHARED_LIBS AND WIN32)
-    target_compile_definitions(expat PUBLIC -DXML_STATIC)
+if(WIN32 AND EXPAT_SHARED_LIBS)
+    target_compile_definitions(expat PRIVATE VER_FILEVERSION=${_EXPAT_DLL_VERSION})
 endif()
 
 expat_install(TARGETS expat EXPORT expat
@@ -361,12 +614,42 @@ expat_install(FILES lib/expat.h lib/expat_external.h DESTINATION ${CMAKE_INSTALL
 # pkg-config file
 #
 if(EXPAT_BUILD_PKGCONFIG)
-    set(prefix ${CMAKE_INSTALL_PREFIX})
-    set(exec_prefix "\${prefix}")
-    set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
-    set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
-    configure_file(expat.pc.in ${CMAKE_CURRENT_BINARY_DIR}/expat.pc @ONLY)
-    expat_install(FILES ${CMAKE_CURRENT_BINARY_DIR}/expat.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+    if(CMAKE_INSTALL_LIBDIR MATCHES "^/")
+        set(_expat_pkgconfig_libdir "${CMAKE_INSTALL_LIBDIR}")
+    else()
+        set(_expat_pkgconfig_libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
+    endif()
+
+    if(CMAKE_INSTALL_INCLUDEDIR MATCHES "^/")
+        set(_expat_pkgconfig_includedir "${CMAKE_INSTALL_INCLUDEDIR}")
+    else()
+        set(_expat_pkgconfig_includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+    endif()
+
+    set_target_properties(expat PROPERTIES
+        pkgconfig_prefix "${CMAKE_INSTALL_PREFIX}"
+        pkgconfig_exec_prefix "\${prefix}"
+        pkgconfig_libdir "${_expat_pkgconfig_libdir}"
+        pkgconfig_includedir "${_expat_pkgconfig_includedir}"
+        pkgconfig_version "${PACKAGE_VERSION}")
+
+    foreach(_build_type ${CMAKE_BUILD_TYPE} Debug Release RelWithDebInfo MinSizeRel)
+        string(TOLOWER "${_build_type}" _build_type_lower)
+        string(TOUPPER "${_build_type}" _build_type_upper)
+        set_property(TARGET expat PROPERTY "pkgconfig_${_build_type_lower}_name" "expat${EXPAT_${_build_type_upper}_POSTFIX}")
+        set_property(TARGET expat PROPERTY "pkgconfig_${_build_type_lower}_output_name" "${_EXPAT_OUTPUT_NAME}${EXPAT_${_build_type_upper}_POSTFIX}")
+        if(_EXPAT_LIBM_FOUND)
+            set_property(TARGET expat PROPERTY "pkgconfig_libm" "-lm")
+        else()
+            set_property(TARGET expat PROPERTY "pkgconfig_libm" "")
+        endif()
+    endforeach()
+
+    file(GENERATE
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/expat.pc
+        INPUT ${PROJECT_SOURCE_DIR}/expat.pc.cmake)
+
+    expat_install(FILES ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/expat.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 endif()
 
 #
@@ -374,20 +657,23 @@ endif()
 #
 if(EXPAT_BUILD_TOOLS)
     set(xmlwf_SRCS
-        xmlwf/xmlwf.c
-        xmlwf/xmlfile.c
         xmlwf/codepage.c
         xmlwf/readfilemap.c
+        xmlwf/xmlfile.c
+        xmlwf/xmlwf.c
     )
 
     add_executable(xmlwf ${xmlwf_SRCS})
     set_property(TARGET xmlwf PROPERTY RUNTIME_OUTPUT_DIRECTORY xmlwf)
     target_link_libraries(xmlwf expat)
+    if(_EXPAT_LIBM_FOUND)
+        target_link_libraries(xmlwf m)
+    endif()
     expat_install(TARGETS xmlwf DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     if(MINGW AND _EXPAT_UNICODE_WCHAR_T)
         # https://gcc.gnu.org/onlinedocs/gcc/x86-Windows-Options.html
-        set_target_properties(xmlwf PROPERTIES LINK_FLAGS -municode)
+        target_link_options(xmlwf PRIVATE -municode)
     endif()
 
     if(EXPAT_BUILD_DOCS)
@@ -409,13 +695,11 @@ endif()
 # C code examples
 #
 if(EXPAT_BUILD_EXAMPLES)
-    add_executable(elements examples/elements.c)
-    set_property(TARGET elements PROPERTY RUNTIME_OUTPUT_DIRECTORY examples)
-    target_link_libraries(elements expat)
-
-    add_executable(outline examples/outline.c)
-    set_property(TARGET outline PROPERTY RUNTIME_OUTPUT_DIRECTORY examples)
-    target_link_libraries(outline expat)
+    foreach(_target element_declarations elements outline)
+        add_executable(${_target} examples/${_target}.c)
+        set_property(TARGET ${_target} PROPERTY RUNTIME_OUTPUT_DIRECTORY examples)
+        target_link_libraries(${_target} expat)
+    endforeach()
 endif()
 
 #
@@ -423,15 +707,7 @@ endif()
 #
 if(EXPAT_BUILD_TESTS)
     ## these are unittests that can be run on any platform
-    enable_language(CXX)
     enable_testing()
-
-    set(test_SRCS
-        tests/chardata.c
-        tests/memcheck.c
-        tests/minicheck.c
-        tests/structdata.c
-    )
 
     if(NOT MSVC)
         if(MINGW)
@@ -448,17 +724,39 @@ if(EXPAT_BUILD_TESTS)
         endif()
     endfunction()
 
-    add_executable(runtests tests/runtests.c ${test_SRCS})
-    set_property(TARGET runtests PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
-    target_link_libraries(runtests expat)
-    expat_add_test(runtests $<TARGET_FILE:runtests>)
+    add_executable(runtests
+        tests/acc_tests.c
+        tests/alloc_tests.c
+        tests/basic_tests.c
+        tests/chardata.c
+        tests/common.c
+        tests/dummy.c
+        tests/handlers.c
+        tests/memcheck.c
+        tests/minicheck.c
+        tests/misc_tests.c
+        tests/ns_tests.c
+        tests/nsalloc_tests.c
+        tests/runtests.c
+        tests/structdata.c
+        ${_EXPAT_C_SOURCES}
+    )
 
-    add_executable(runtestspp tests/runtestspp.cpp ${test_SRCS})
-    set_property(TARGET runtestspp PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
-    target_link_libraries(runtestspp expat)
-    expat_add_test(runtestspp $<TARGET_FILE:runtestspp>)
+    target_compile_definitions(runtests PRIVATE -DXML_TESTING)
+    set_property(TARGET runtests PROPERTY RUNTIME_OUTPUT_DIRECTORY tests)
+    expat_add_test(runtests $<TARGET_FILE:runtests>)
+    if(_EXPAT_LIBM_FOUND)
+        target_link_libraries(runtests m)
+    endif()
+
+    add_executable(benchmark tests/benchmark/benchmark.c)
+    set_property(TARGET benchmark PROPERTY RUNTIME_OUTPUT_DIRECTORY tests/benchmark)
+    target_link_libraries(benchmark expat)
 endif()
 
+#
+# Fuzzers
+#
 if(EXPAT_BUILD_FUZZERS)
     if(NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
         message(SEND_ERROR
@@ -484,14 +782,14 @@ if(EXPAT_BUILD_FUZZERS)
         message(SEND_ERROR
             "OSS-Fuzz builds require the environment variable "
             "LIB_FUZZING_ENGINE to be set. If you are seeing this "
-            "warning, it points to a deeper problem in the ossfuzz "
+            "warning, it points to a deeper problem in the OSS-Fuzz "
             "build setup.")
     endif()
 
     set(encoding_types UTF-16 UTF-8 ISO-8859-1 US-ASCII UTF-16BE UTF-16LE)
     set(fuzz_targets xml_parse_fuzzer xml_parsebuffer_fuzzer)
 
-    add_library(fuzzpat STATIC ${expat_SRCS})
+    add_library(fuzzpat STATIC ${_EXPAT_C_SOURCES})
     if(NOT EXPAT_OSSFUZZ_BUILD)
         target_compile_options(fuzzpat PRIVATE -fsanitize=fuzzer-no-link)
     endif()
@@ -503,27 +801,102 @@ if(EXPAT_BUILD_FUZZERS)
             target_link_libraries(${target_name} fuzzpat)
             target_compile_definitions(${target_name}
                 PRIVATE ENCODING_FOR_FUZZING=${encoding_type})
-            if(NOT EXPAT_OSSFUZZ_BUILD)
-                target_compile_options(${target_name} PRIVATE -fsanitize=fuzzer-no-link)
-            endif()
-            # NOTE: Avoiding target_link_options here only because it needs CMake >=3.13
             if(EXPAT_OSSFUZZ_BUILD)
-                set_target_properties(${target_name} PROPERTIES LINK_FLAGS $ENV{LIB_FUZZING_ENGINE})
+                target_link_options(${target_name} PRIVATE $ENV{LIB_FUZZING_ENGINE})
                 set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE "CXX")
             else()
-                set_target_properties(${target_name} PROPERTIES LINK_FLAGS -fsanitize=fuzzer)
+                target_compile_options(${target_name} PRIVATE -fsanitize=fuzzer)
+                target_link_options(${target_name} PRIVATE -fsanitize=fuzzer)
             endif()
             set_property(
                 TARGET ${target_name} PROPERTY RUNTIME_OUTPUT_DIRECTORY fuzz)
         endforeach()
     endforeach()
+
+    find_package(Protobuf REQUIRED)
+
+    # Only include libprotobuf-mutator here so we don't build it in non-fuzz
+    # configurations.
+    include(ExternalProject)
+
+    set(ProtobufMutator_PREFIX libprotobuf-mutator)
+    set(ProtobufMutator_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ProtobufMutator_PREFIX}/src/${ProtobufMutator_PREFIX})
+    set(ProtobufMutator_BUILD_PATH ${ProtobufMutator_PATH}-build)
+    set(ProtobufMutator_INCLUDE_DIR ${ProtobufMutator_PATH})
+    set(ProtobufMutator_LIBRARIES ${ProtobufMutator_BUILD_PATH}/src/libfuzzer/libprotobuf-mutator-libfuzzer.a ${ProtobufMutator_BUILD_PATH}/src/libprotobuf-mutator.a)
+
+    ExternalProject_Add(
+        ${ProtobufMutator_PREFIX}
+        PREFIX ${ProtobufMutator_PREFIX}
+        GIT_REPOSITORY https://github.com/google/libprotobuf-mutator.git
+        GIT_TAG 57928f41ae52bb27666aa15b310130d086dac245  # v1.4-16-g57928f4
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        CMAKE_CACHE_ARGS
+            -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+            -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+            -DLIB_PROTO_MUTATOR_EXAMPLES:BOOL=OFF
+            -DLIB_PROTO_MUTATOR_TESTING:BOOL=OFF
+        BUILD_BYPRODUCTS ${ProtobufMutator_LIBRARIES}
+        UPDATE_COMMAND true
+        INSTALL_COMMAND true)
+
+    # Check for availability of protobuf compiler to avoid hard-to-understand
+    # errors from make(1) down the line as seen with CMake 3.25.1 on Debian
+    if(NOT Protobuf_PROTOC_EXECUTABLE)
+        message(SEND_ERROR
+            "The protobuf compiler (protoc) could not be found. "
+            "Is it installed and working properly?")
+    endif()
+
+    protobuf_generate_cpp(XML_LPM_FUZZER_PROTO_SRCS
+                          XML_LPM_FUZZER_PROTO_HDRS
+                          fuzz/xml_lpm_fuzzer.proto)
+
+    add_executable(xml_lpm_fuzzer
+                   fuzz/xml_lpm_fuzzer.cpp
+                   ${XML_LPM_FUZZER_PROTO_SRCS})
+    target_include_directories(xml_lpm_fuzzer PUBLIC ${ProtobufMutator_INCLUDE_DIR})
+    target_link_libraries(xml_lpm_fuzzer
+                          fuzzpat
+                          ${ProtobufMutator_LIBRARIES}
+                          ${Protobuf_LIBRARIES})
+    add_dependencies(xml_lpm_fuzzer ${ProtobufMutator_PREFIX})
+
+    if(EXPAT_OSSFUZZ_BUILD)
+        target_link_options(xml_lpm_fuzzer PRIVATE $ENV{LIB_FUZZING_ENGINE})
+    else()
+        target_compile_options(xml_lpm_fuzzer PRIVATE -fsanitize=fuzzer)
+        target_link_options(xml_lpm_fuzzer PRIVATE -fsanitize=fuzzer)
+    endif()
+    set_property(TARGET xml_lpm_fuzzer PROPERTY RUNTIME_OUTPUT_DIRECTORY fuzz)
 else()
     if(EXPAT_OSSFUZZ_BUILD)
         message(SEND_ERROR
-                "Attempting to perform an ossfuzz build without turning on the fuzzer build. "
+                "Attempting to perform an OSS-Fuzz build without turning on the fuzzer build. "
                 "This is likely in error - consider adding "
                 "-DEXPAT_BUILD_FUZZERS=ON to your cmake execution.")
     endif()
+endif()
+
+#
+# C/C++ config affecting multiple targets
+#
+if(WIN32)
+    set(_EXPAT_STATIC_TARGETS "")  # intended as "empty list"
+
+    if(EXPAT_BUILD_TESTS)
+        list(APPEND _EXPAT_STATIC_TARGETS runtests)
+    endif()
+    if(NOT EXPAT_SHARED_LIBS)
+        list(APPEND _EXPAT_STATIC_TARGETS expat)
+    endif()
+    if(EXPAT_BUILD_FUZZERS)
+        list(APPEND _EXPAT_STATIC_TARGETS fuzzpat)
+    endif()
+
+    foreach(_target ${_EXPAT_STATIC_TARGETS})
+        target_compile_definitions(${_target} PUBLIC -DXML_STATIC)
+    endforeach()
 endif()
 
 #
@@ -656,20 +1029,27 @@ elseif(EXPAT_CHAR_TYPE STREQUAL "wchar_t")
 else()
     set(_EXPAT_CHAR_TYPE_SUMMARY "ERROR")
 endif()
-string(TOUPPER "${CMAKE_BUILD_TYPE}" _EXPAT_BUILD_TYPE_UPPER)
+get_property(_EXPAT_GENERATOR_IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 message(STATUS "===========================================================================")
 message(STATUS "")
+message(STATUS "CMake version in use ......... ${CMAKE_VERSION}")
+message(STATUS "")
 message(STATUS "Configuration")
+message(STATUS "  Generator .................. ${CMAKE_GENERATOR}")
+if(_EXPAT_GENERATOR_IS_MULTI_CONFIG)
+    message(STATUS "  Build types ................ ${CMAKE_CONFIGURATION_TYPES}")
+else()
+    message(STATUS "  Build type ................. ${CMAKE_BUILD_TYPE}")
+endif()
 message(STATUS "  Prefix ..................... ${CMAKE_INSTALL_PREFIX}")
-message(STATUS "  Build type ................. ${CMAKE_BUILD_TYPE}")
 message(STATUS "  Shared libraries ........... ${EXPAT_SHARED_LIBS}")
 if(MSVC)
     message(STATUS "  Static CRT ................. ${EXPAT_MSVC_STATIC_CRT}")
 endif()
 message(STATUS "  Character type ............. ${_EXPAT_CHAR_TYPE_SUMMARY}")
-if(WIN32)
-    message(STATUS "  Binary postfix ............. ${CMAKE_${_EXPAT_BUILD_TYPE_UPPER}_POSTFIX}")
+if(NOT _EXPAT_GENERATOR_IS_MULTI_CONFIG)
+    message(STATUS "  Library name postfix ....... ${EXPAT_${_EXPAT_BUILD_TYPE_UPPER}_POSTFIX}")
 endif()
 message(STATUS "")
 message(STATUS "  Build documentation ........ ${EXPAT_BUILD_DOCS}")
@@ -685,6 +1065,7 @@ message(STATUS "    // Advanced options, changes not advised")
 message(STATUS "    Attributes info .......... ${EXPAT_ATTR_INFO}")
 message(STATUS "    Context bytes ............ ${EXPAT_CONTEXT_BYTES}")
 message(STATUS "    DTD support .............. ${EXPAT_DTD}")
+message(STATUS "    General entities ......... ${EXPAT_GE}")
 message(STATUS "    Large size ............... ${EXPAT_LARGE_SIZE}")
 message(STATUS "    Minimum size ............. ${EXPAT_MIN_SIZE}")
 message(STATUS "    Namespace support ........ ${EXPAT_NS}")
@@ -693,10 +1074,12 @@ message(STATUS "  Entropy sources")
 if(WIN32)
     message(STATUS "    rand_s ................... ON")
 else()
+    message(STATUS "    arc4random ............... ${HAVE_ARC4RANDOM}")
+    message(STATUS "    arc4random_buf ........... ${HAVE_ARC4RANDOM_BUF}")
+    message(STATUS "    getentropy ............... ${HAVE_GETENTROPY}")
     message(STATUS "    getrandom ................ ${HAVE_GETRANDOM}")
     message(STATUS "    syscall SYS_getrandom .... ${HAVE_SYSCALL_GETRANDOM}")
-    message(STATUS "    libbsd ................... ${EXPAT_WITH_LIBBSD}")
-    message(STATUS "    /dev/random .............. ${EXPAT_DEV_URANDOM}")
+    message(STATUS "    /dev/urandom ............. ${EXPAT_DEV_URANDOM}")
 endif()
 message(STATUS "")
 if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")

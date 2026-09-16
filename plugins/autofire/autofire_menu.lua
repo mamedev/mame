@@ -117,6 +117,7 @@ local function handle_main_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
 	if section == MENU_SECTIONS.CONTENT then
 		if event == 'select' then
+			initial_button = adjusted_index
 			main_selection_save = index
 			current_button = buttons[adjusted_index]
 			table.insert(menu_stack, MENU_TYPES.EDIT)
@@ -235,6 +236,9 @@ local function populate_edit_menu()
 	content_height = #menu
 
 	table.insert(menu, {'---', '', ''})
+	table.insert(menu, {_p('plugin-autofire', 'Delete'), '', ''})
+
+	table.insert(menu, {'---', '', ''})
 	table.insert(menu, {_p('plugin-autofire', 'Done'), '', ''})
 
 	local selection = configure_selection_save
@@ -248,8 +252,18 @@ end
 
 local function handle_edit_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
-	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'back') then
+	if (section == MENU_SECTIONS.FOOTER) and (adjusted_index == 2) and (event == 'select') then
+		table.remove(buttons, initial_button)
+		if initial_button > #buttons then
+			main_selection_save = main_selection_save - 1
+		end
+		initial_button = nil
 		configure_menu_active = false
+		table.remove(menu_stack)
+		return true
+	elseif ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'back') then
+		configure_menu_active = false
+		initial_button = nil
 		table.remove(menu_stack)
 		return true
 	elseif section == MENU_SECTIONS.CONTENT then
@@ -303,8 +317,13 @@ end
 
 local function populate_button_menu()
 	local function is_supported_input(ioport_field)
-		-- IPT_BUTTON1 through IPT_BUTTON16 in ioport_type enum (ioport.h)
-		return ioport_field.type >= 64 and ioport_field.type <= 79
+		if ioport_field.is_analog or ioport_field.is_toggle then
+			return false
+		elseif (ioport_field.type_class == 'config') or (ioport_field.type_class == 'dipswitch') then
+			return false
+		else
+			return true
+		end
 	end
 
 	local function action(field)

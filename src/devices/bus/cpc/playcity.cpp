@@ -31,12 +31,11 @@ void cpc_playcity_device::device_add_mconfig(machine_config &config)
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_ctc->intr_callback().set(FUNC(cpc_playcity_device::ctc_intr_cb));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	YMZ294(config, m_ymz1, DERIVED_CLOCK(1, 1));  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
-	m_ymz1->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_ymz1->add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 	YMZ294(config, m_ymz2, DERIVED_CLOCK(1, 1));
-	m_ymz2->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	m_ymz2->add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
 
 	// pass-through
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));

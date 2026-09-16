@@ -2,7 +2,7 @@
 // basic_socket_streambuf.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,51 +27,12 @@
 #include "asio/detail/memory.hpp"
 #include "asio/detail/throw_error.hpp"
 #include "asio/io_context.hpp"
-
-#if defined(ASIO_HAS_BOOST_DATE_TIME) \
-  && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-# include "asio/detail/deadline_timer_service.hpp"
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-      // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-# include "asio/steady_timer.hpp"
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
-       // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-
-#if !defined(ASIO_HAS_VARIADIC_TEMPLATES)
-
-# include "asio/detail/variadic_templates.hpp"
-
-// A macro that should expand to:
-//   template <typename T1, ..., typename Tn>
-//   basic_socket_streambuf* connect(T1 x1, ..., Tn xn)
-//   {
-//     init_buffers();
-//     typedef typename Protocol::resolver resolver_type;
-//     resolver_type resolver(socket().get_executor());
-//     connect_to_endpoints(
-//         resolver.resolve(x1, ..., xn, ec_));
-//     return !ec_ ? this : 0;
-//   }
-// This macro should only persist within this file.
-
-# define ASIO_PRIVATE_CONNECT_DEF(n) \
-  template <ASIO_VARIADIC_TPARAMS(n)> \
-  basic_socket_streambuf* connect(ASIO_VARIADIC_BYVAL_PARAMS(n)) \
-  { \
-    init_buffers(); \
-    typedef typename Protocol::resolver resolver_type; \
-    resolver_type resolver(socket().get_executor()); \
-    connect_to_endpoints( \
-        resolver.resolve(ASIO_VARIADIC_BYVAL_ARGS(n), ec_)); \
-    return !ec_ ? this : 0; \
-  } \
-  /**/
-
-#endif // !defined(ASIO_HAS_VARIADIC_TEMPLATES)
+#include "asio/steady_timer.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 // A separate base class is used to ensure that the io_context member is
@@ -113,16 +74,8 @@ protected:
 
 // Forward declaration with defaulted arguments.
 template <typename Protocol,
-#if defined(ASIO_HAS_BOOST_DATE_TIME) \
-  && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-    typename Clock = boost::posix_time::ptime,
-    typename WaitTraits = time_traits<Clock> >
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-      // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
     typename Clock = chrono::steady_clock,
-    typename WaitTraits = wait_traits<Clock> >
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
-       // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
+    typename WaitTraits = wait_traits<Clock>>
 class basic_socket_streambuf;
 
 #endif // !defined(ASIO_BASIC_SOCKET_STREAMBUF_FWD_DECL)
@@ -131,7 +84,7 @@ class basic_socket_streambuf;
 #if defined(GENERATING_DOCUMENTATION)
 template <typename Protocol,
     typename Clock = chrono::steady_clock,
-    typename WaitTraits = wait_traits<Clock> >
+    typename WaitTraits = wait_traits<Clock>>
 #else // defined(GENERATING_DOCUMENTATION)
 template <typename Protocol, typename Clock, typename WaitTraits>
 #endif // defined(GENERATING_DOCUMENTATION)
@@ -139,23 +92,10 @@ class basic_socket_streambuf
   : public std::streambuf,
     private detail::socket_streambuf_io_context,
     private detail::socket_streambuf_buffers,
-#if defined(ASIO_NO_DEPRECATED) || defined(GENERATING_DOCUMENTATION)
     private basic_socket<Protocol>
-#else // defined(ASIO_NO_DEPRECATED) || defined(GENERATING_DOCUMENTATION)
-    public basic_socket<Protocol>
-#endif // defined(ASIO_NO_DEPRECATED) || defined(GENERATING_DOCUMENTATION)
 {
 private:
-  // These typedefs are intended keep this class's implementation independent
-  // of whether it's using Boost.DateClock, Boost.Chrono or std::chrono.
-#if defined(ASIO_HAS_BOOST_DATE_TIME) \
-  && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-  typedef WaitTraits traits_helper;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-      // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
   typedef detail::chrono_time_traits<Clock, WaitTraits> traits_helper;
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
-       // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
 
 public:
   /// The protocol type.
@@ -168,22 +108,12 @@ public:
   typedef Clock clock_type;
 
 #if defined(GENERATING_DOCUMENTATION)
-  /// (Deprecated: Use time_point.) The time type.
-  typedef typename WaitTraits::time_type time_type;
-
   /// The time type.
   typedef typename WaitTraits::time_point time_point;
-
-  /// (Deprecated: Use duration.) The duration type.
-  typedef typename WaitTraits::duration_type duration_type;
 
   /// The duration type.
   typedef typename WaitTraits::duration duration;
 #else
-# if !defined(ASIO_NO_DEPRECATED)
-  typedef typename traits_helper::time_type time_type;
-  typedef typename traits_helper::duration_type duration_type;
-# endif // !defined(ASIO_NO_DEPRECATED)
   typedef typename traits_helper::time_type time_point;
   typedef typename traits_helper::duration_type duration;
 #endif
@@ -197,7 +127,6 @@ public:
     init_buffers();
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Construct a basic_socket_streambuf from the supplied socket.
   explicit basic_socket_streambuf(basic_stream_socket<protocol_type> s)
     : detail::socket_streambuf_io_context(0),
@@ -241,7 +170,6 @@ public:
     other.init_buffers();
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Destructor flushes buffered data.
   virtual ~basic_socket_streambuf()
@@ -265,7 +193,6 @@ public:
     return !ec_ ? this : 0;
   }
 
-#if defined(GENERATING_DOCUMENTATION)
   /// Establish a connection.
   /**
    * This function automatically establishes a connection based on the supplied
@@ -275,9 +202,6 @@ public:
    * @return \c this if a connection was successfully established, a null
    * pointer otherwise.
    */
-  template <typename T1, ..., typename TN>
-  basic_socket_streambuf* connect(T1 t1, ..., TN tn);
-#elif defined(ASIO_HAS_VARIADIC_TEMPLATES)
   template <typename... T>
   basic_socket_streambuf* connect(T... x)
   {
@@ -287,9 +211,6 @@ public:
     connect_to_endpoints(resolver.resolve(x..., ec_));
     return !ec_ ? this : 0;
   }
-#else
-  ASIO_VARIADIC_GENERATE(ASIO_PRIVATE_CONNECT_DEF)
-#endif
 
   /// Close the connection.
   /**
@@ -320,30 +241,6 @@ public:
   {
     return ec_;
   }
-
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use error().) Get the last error associated with the stream
-  /// buffer.
-  /**
-   * @return An \c error_code corresponding to the last error from the stream
-   * buffer.
-   */
-  const asio::error_code& puberror() const
-  {
-    return error();
-  }
-
-  /// (Deprecated: Use expiry().) Get the stream buffer's expiry time as an
-  /// absolute time.
-  /**
-   * @return An absolute time value representing the stream buffer's expiry
-   * time.
-   */
-  time_point expires_at() const
-  {
-    return expiry_time_;
-  }
-#endif // !defined(ASIO_NO_DEPRECATED)
 
   /// Get the stream buffer's expiry time as an absolute time.
   /**
@@ -382,33 +279,6 @@ public:
   {
     expiry_time_ = traits_helper::add(traits_helper::now(), expiry_time);
   }
-
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use expiry().) Get the stream buffer's expiry time relative
-  /// to now.
-  /**
-   * @return A relative time value representing the stream buffer's expiry time.
-   */
-  duration expires_from_now() const
-  {
-    return traits_helper::subtract(expires_at(), traits_helper::now());
-  }
-
-  /// (Deprecated: Use expires_after().) Set the stream buffer's expiry time
-  /// relative to now.
-  /**
-   * This function sets the expiry time associated with the stream. Stream
-   * operations performed after this time (where the operations cannot be
-   * completed using the internal buffers) will fail with the error
-   * asio::error::operation_aborted.
-   *
-   * @param expiry_time The expiry time to be used for the timer.
-   */
-  void expires_from_now(const duration& expiry_time)
-  {
-    expiry_time_ = traits_helper::add(traits_helper::now(), expiry_time);
-  }
-#endif // !defined(ASIO_NO_DEPRECATED)
 
 protected:
   int_type underflow()
@@ -559,9 +429,9 @@ protected:
 
 private:
   // Disallow copying and assignment.
-  basic_socket_streambuf(const basic_socket_streambuf&) ASIO_DELETED;
+  basic_socket_streambuf(const basic_socket_streambuf&) = delete;
   basic_socket_streambuf& operator=(
-      const basic_socket_streambuf&) ASIO_DELETED;
+      const basic_socket_streambuf&) = delete;
 
   void init_buffers()
   {
@@ -659,14 +529,7 @@ private:
   // Helper function to get the maximum expiry time.
   static time_point max_expiry_time()
   {
-#if defined(ASIO_HAS_BOOST_DATE_TIME) \
-  && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
-    return boost::posix_time::pos_infin;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-      // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
     return (time_point::max)();
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
-       // && defined(ASIO_USE_BOOST_DATE_TIME_FOR_SOCKET_IOSTREAM)
   }
 
   enum { putback_max = 8 };
@@ -674,13 +537,10 @@ private:
   time_point expiry_time_;
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
-
-#if !defined(ASIO_HAS_VARIADIC_TEMPLATES)
-# undef ASIO_PRIVATE_CONNECT_DEF
-#endif // !defined(ASIO_HAS_VARIADIC_TEMPLATES)
 
 #endif // !defined(ASIO_NO_IOSTREAM)
 

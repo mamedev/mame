@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="red_led" defstate="1">
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<view name="Default Layout">
+
+		<bounds left="0" top="0" right="400" bottom="69" />
+
+		<!-- LEDs -->
+		<repeat count="8">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="10" increment="44" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="10" width="34" height="49" />
+			</element>
+		</repeat>
+		<element name="led0" ref="red_led">
+			<bounds left="370" right="390" top="25" bottom="45" />
+		</element>
+	</view>
+
+</mamelayout>

@@ -22,12 +22,17 @@
 #include "emu.h"
 #include "a2sd.h"
 
+#include "machine/at28.h"
+#include "machine/spi_sdcard.h"
+
 #define LOG_SPI     (1U << 1)
 
-//#define VERBOSE (LOG_COMMAND)
+//#define VERBOSE (LOG_GENERAL)
 #define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
+
+namespace {
 
 /***************************************************************************
     PARAMETERS
@@ -41,16 +46,57 @@ static constexpr u8 C0N1_TC         = 0x80; // SPI transfer complete
 static constexpr u8 C0N3_CD         = 0x40; // card detect
 static constexpr u8 C0N3_BIT_SS     = 7;
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_A2SD, a2bus_a2sd_device, "a2sd", "Apple II SD Card")
-
 ROM_START( a2sd )
 	ROM_REGION(0x2000, "flash", ROMREGION_ERASE00)
 	ROM_LOAD( "appleiisd.bin", 0x000000, 0x000800, CRC(e82eea8a) SHA1(7e0acef01e622eeed6f8e87893d07c701bbef016) )
 ROM_END
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_a2sd_device:
+		public device_t,
+		public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_a2sd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_a2sd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// overrides of standard a2bus slot functions
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual u8 read_c800(uint16_t offset) override;
+	virtual void write_c800(uint16_t offset, u8 data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
+
+	// SPI 4-wire interface
+	void spi_miso_w(int state) { m_in_bit = state; }
+
+	TIMER_CALLBACK_MEMBER(shift_tick);
+
+private:
+	required_device<at28c64b_nvram_device> m_flash;
+	required_device<spi_sdcard_device> m_sdcard;
+
+	u8 m_datain, m_in_latch, m_out_latch;
+	u8 m_c0n1, m_c0n3;
+	int m_in_bit;
+
+	int m_shift_count;
+	emu_timer *m_shift_timer;
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -61,9 +107,10 @@ ROM_END
 //-------------------------------------------------
 void a2bus_a2sd_device::device_add_mconfig(machine_config &config)
 {
-	AT28C64B(config, m_flash, 0);
+	AT28C64B_NVRAM(config, m_flash, 0);
 
-	SPI_SDCARD(config, m_sdcard, 0);
+	SPI_SDCARD(config, m_sdcard);
+	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(a2bus_a2sd_device::spi_miso_w));
 }
 
@@ -112,6 +159,11 @@ void a2bus_a2sd_device::device_start()
 }
 
 void a2bus_a2sd_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_a2sd_device::reset_from_bus()
 {
 	m_shift_timer->adjust(attotime::never);
 	m_shift_count = 0;
@@ -277,3 +329,12 @@ void a2bus_a2sd_device::write_c800(u16 offset, u8 data)
 {
 	m_flash->write(offset + 0x100, data);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_A2SD, device_a2bus_card_interface, a2bus_a2sd_device, "a2sd", "Apple II SD Card")

@@ -2,28 +2,34 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
+PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
 
-    TODO:
-    - pc98lt: remove timer hack:
-        - definitely incorrect given the erratic cursor blinking in N88BASIC;
-    - identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
-    - merge from base pc98 class (WIP);
-    - when idle for some time buzzer farts until a key is pressed (?);
-    - add NVRAM saving:
-    - pinpoint NVRAM init switch source:
-        - first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7,
-          which initializes battery backup if on, but port C is in output mode there.
-          Somehow obf irq is on at boot if battery failed?
-    - power handling;
-    - pc98ha specifics:
-        - RTC is upd4991a (partially done), it's parallel instead of serial and incompatible with
-          everything else ugh;
-        - EMS fails at boot, it's never ever really checked;
-        - MSDOS cannot detect EMS properly, is there a flag somewhere?
-        - JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
-          most likely same as NeoGeo JEIDA 3.0 memory cards);
-        - optional docking station (for floppy device only or can mount other stuff too?);
+TODO:
+- compose common points from base pc98 class, decouple;
+- floppy boot for inufuto games (should autoboot, at least mazy.d88 boots in pc9801 with fdd_2dd
+  adapter);
+- memory card handling (needs a working SW);
+- identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
+- when idle for some time buzzer farts until a key is pressed (?);
+- add NVRAM saving:
+- pinpoint NVRAM init switch source:
+\- first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7,
+   which initializes battery backup if on, but port C is in output mode there.
+   Somehow obf irq is on at boot if battery failed?
+- power handling;
+
+TODO (pc98lt):
+- remove timer hack:
+\- definitely incorrect given the erratic cursor blinking in N88BASIC;
+
+TODO (pc98ha):
+- RTC is upd4991a (partially done), it's parallel instead of serial and incompatible with
+  everything else ugh;
+- EMS fails at boot, it's never ever really checked;
+- MSDOS cannot detect EMS properly, is there a flag somewhere?
+- JEIDA memory card interface (68pin cfr. "Super Daisenryaku HA",
+  most likely same as NeoGeo JEIDA 3.0 memory cards);
+- optional docking station (for floppy device only or can mount other stuff too?);
 
 **************************************************************************************************/
 
@@ -32,6 +38,7 @@
 
 void pc98lt_state::lt_palette(palette_device &palette) const
 {
+	// TODO: confirm values
 	palette.set_pen_color(0, 160, 168, 160);
 	palette.set_pen_color(1, 48, 56, 16);
 }
@@ -41,12 +48,12 @@ uint32_t pc98lt_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 16)
 		{
-			u16 pen = bitswap<16>(m_gvram[(y*640+x)/16], 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
+			u16 pen = bitswap<16>(m_gvram[(y * 640 + x) / 16], 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7);
 
 			for (int xi = 0; xi < 16; xi++)
 			{
 				u8 dot = (pen >> xi) & 1;
-				bitmap.pix(y, x+xi) = m_palette->pen(dot);
+				bitmap.pix(y, x + xi) = m_palette->pen(dot);
 			}
 		}
 
@@ -90,7 +97,7 @@ u8 pc98lt_state::floppy_mode_r(offs_t offset)
 {
 	// floppy "mode" identifies drive capabilities, if 2dd/2hd exclusive or mixed type.
 	// and to my understanding it doesn't really read from write reg ...
-	return (m_floppy_mode & 3) | 0x08;
+	return (m_floppy_mode & 3) | 0xe4;
 }
 
 void pc98lt_state::floppy_mode_w(offs_t offset, u8 data)
@@ -105,18 +112,37 @@ void pc98lt_state::floppy_mode_w(offs_t offset, u8 data)
 
 u8 pc98lt_state::fdc_ctrl_r(offs_t offset)
 {
-	// TODO: doesn't work as intended, bit 4 is supposedly if the drive has a disk in or not according to documentation.
-	int ret = (m_fdc->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
-	ret |= (m_fdc->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
-	return ret | 0x64;
+	int ret = 0x6c;
+	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
+
+	if (floppy0 && floppy0->exists())
+		ret |= 0x10;
+
+	if (floppy1 && floppy1->exists())
+		ret |= 0x10;
+
+	return ret;
 }
 
 void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
 {
-	m_fdc->reset_w(BIT(data, 7));
+	const int fdcrst = BIT(data, 7);
+
+	if (BIT(m_fdc_ctrl, 7) != fdcrst)
+		m_fdc->reset_w(BIT(data, 7));
+
+	const int ttrg = BIT(data, 0);
+
+	if( ttrg && !BIT(m_fdc_ctrl, 0) )
+	{
+		m_vfo_timer->adjust(attotime::from_msec(100), 1);
+	}
+	//else if (!ttrg && BIT(m_fdc_ctrl, 0) )
+	//  m_vfo_timer->adjust(attotime::never);
 
 	m_fdc_ctrl = data;
-	if(data & 0x40)
+	if(BIT(data, 6))
 	{
 		m_fdc->set_ready_line_connected(0);
 		m_fdc->ready_w(0);
@@ -124,8 +150,8 @@ void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
 	else
 		m_fdc->set_ready_line_connected(1);
 
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(!BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void pc98lt_state::lt_map(address_map &map)
@@ -149,10 +175,11 @@ void pc98lt_state::lt_io(address_map &map)
 {
 	map.unmap_value_high();
 //  map(0x0000, 0x001f) // PIC (bit 3 ON slave / master), V50 internal / <undefined>
-	map(0x0020, 0x002f).w(FUNC(pc98lt_state::rtc_w)).umask16(0x00ff);
-	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+	map(0x0020, 0x0020).w(FUNC(pc98lt_state::rtc_w));
+	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //  map(0x0070, 0x007f) // PIT, V50 internal
 
 	// floppy actually requires a docking station on PC98HA, density should be 2dd given the mapping
@@ -265,7 +292,7 @@ void pc98ha_state::ha_io(address_map &map)
 
 static INPUT_PORTS_START( pc98lt )
 	PORT_START("SYSB")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, upd1990a_device, data_out_r)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, FUNC(upd1990a_device::data_out_r))
 	PORT_DIPNAME( 0x02, 0x00, "SYSB" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
@@ -315,7 +342,7 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("PRNB")
-	PORT_DIPNAME( 0x01, 0x00, "PRNB" ) // checked on boot
+	PORT_DIPNAME( 0x01, 0x01, "PRNB" ) // checked on boot, should be 1 for 2DD format
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // CPUT LT/HA switch
@@ -331,7 +358,7 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(pc98lt_state, system_type_r)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(pc98lt_state::system_type_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc98ha )
@@ -381,6 +408,8 @@ void pc98lt_state::machine_start()
 	m_romdrv_bank->configure_entries( 0, 0x10,                 memregion("romdrv")->base(), 0x10000);
 	m_dict_bank->configure_entries(   0, 0x40,                 memregion("dict")->base(),    0x4000);
 
+	m_vfo_timer = timer_alloc(FUNC(pc98lt_state::vfo_timer_cb), this);
+
 	if (m_rtc != nullptr)
 	{
 		m_rtc->cs_w(1);
@@ -410,12 +439,55 @@ void pc98ha_state::machine_start()
 	save_pointer(NAME(m_ems_ram), ems_size);
 }
 
+void pc98lt_state::machine_reset()
+{
+	m_vfo_timer->adjust(attotime::never);
+	m_dack = -1;
+	m_fdc_ctrl = 0x80;
+}
+
 static void pc9801_floppies(device_slot_interface &device)
 {
-//  device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525hd", FLOPPY_525_HD);
 //  device.option_add("35hd", FLOPPY_35_HD);
 }
+
+void pc98lt_state::uart_irq_check()
+{
+	m_maincpu->set_input_line(4, m_uart_irq_pending & m_uart_irq_mask ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void pc98lt_state::tc_w(int state)
+{
+	switch(m_dack)
+	{
+		//case 2:
+		case 3:
+			m_fdc->tc_w(state);
+			break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pc98lt_state::vfo_timer_cb)
+{
+	int state = (int)param;
+
+	if(BIT(m_fdc_ctrl, 2) && state)
+	{
+		//m_maincpu->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
+		m_fdc_irqs->in_w<1>(ASSERT_LINE);
+		// TODO: arbitrary timing, unknown ack cycle
+		m_vfo_timer->adjust(attotime::from_usec(100), 0);
+	}
+	else if (!state)
+	{
+		m_fdc_irqs->in_w<1>(CLEAR_LINE);
+		//m_vfo_timer->adjust(attotime::from_msec(100), 1);
+	}
+
+}
+
 
 void pc98lt_state::lt_config(machine_config &config)
 {
@@ -426,36 +498,62 @@ void pc98lt_state::lt_config(machine_config &config)
 	// TODO: jumps off the weeds if divided by / 4 after timer check, DMA issue?
 //  m_maincpu->set_tclk(xtal / 4);
 	m_maincpu->set_tclk(xtal / 100);
-//  m_maincpu->tout2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 //  m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
-//  m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
-//  m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
-
+	m_maincpu->tout2_cb().set(m_sio_rs, FUNC(i8251_device::write_txc));
+	m_maincpu->tout2_cb().append(m_sio_rs, FUNC(i8251_device::write_rxc));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->out_hreq_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_maincpu->out_hreq_cb().append(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_eop_cb().set(FUNC(pc98lt_state::tc_w));
+//  m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
+//  m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_maincpu->in_ior_cb<3>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_maincpu->out_iow_cb<3>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
+	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_maincpu->out_dack_cb<0>().set([this] (int state) { if (!state) m_dack = 0; });
+	m_maincpu->out_dack_cb<1>().set([this] (int state) { if (!state) m_dack = 1; });
+	m_maincpu->out_dack_cb<2>().set([this] (int state) { if (!state) m_dack = 2; });
+	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3; });
 
-	PC9801_KBD(config, m_keyb, 53);
-	m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	pc9801_serial(config);
 
-	I8255(config, m_ppi_sys, 0);
+	I8251(config, m_sio_kbd);
+	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
+	m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_sio_kbd->write_cts(0);
+	m_sio_kbd->write_dsr(0);
+
+	clock_device &kbd_clock(CLOCK(config, "kbd_clock", 19'200));
+	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
+	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
+
+	PC98_KBD(config, m_keyb);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+
+	I8255(config, m_ppi_sys);
 	// PC98LT/HA has no dips, port A acts as a RAM storage
 	m_ppi_sys->in_pa_callback().set(m_ppi_sys, FUNC(i8255_device::pa_r));
 	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
 //  m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
-	I8255(config, m_ppi_prn, 0);
+	I8255(config, m_ppi_prn);
 	m_ppi_prn->in_pb_callback().set_ioport("PRNB");
 
 	UPD1990A(config, m_rtc);
 
 	UPD765A(config, m_fdc, 8'000'000, false, true);
-	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
-//  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
-	FLOPPY_CONNECTOR(config, "upd765:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	m_fdc->intrq_wr_callback().set(m_fdc_irqs, FUNC(input_merger_device::in_w<0>));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
+//  m_fdc->drq_wr_callback().append(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
+	FLOPPY_CONNECTOR(config, "fdc:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	INPUT_MERGER_ANY_HIGH(config, m_fdc_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
+
+
+	SCREEN(config, m_screen).set_lcd();
 	// TODO: copied verbatim from base PC98, verify clock et al.
 	m_screen->set_raw(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400);
 	m_screen->set_screen_update(FUNC(pc98lt_state::screen_update));

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -10,30 +11,12 @@ license:CC0-1.0
 	<element name="static_white"><rect><color red="0.81" green="0.82" blue="0.81" /></rect></element>
 	<element name="static_green"><rect><color red="0.03" green="0.7" blue="0.22" /></rect></element>
 
-	<element name="text_down">
-		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
-		<text string="DOWN"><color red="0.16" green="0.17" blue="0.16" /></text>
-	</element>
-	<element name="text_home">
-		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
-		<text string="HOME"><color red="0.16" green="0.17" blue="0.16" /></text>
-	</element>
-	<element name="text_yards">
-		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
-		<text string="YARDS TO GO"><color red="0.16" green="0.17" blue="0.16" /></text>
-	</element>
-	<element name="text_time">
-		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
-		<text string="TIME REMAINING"><color red="0.16" green="0.17" blue="0.16" /></text>
-	</element>
-	<element name="text_field">
-		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
-		<text string="FIELD POSITION"><color red="0.16" green="0.17" blue="0.16" /></text>
-	</element>
-	<element name="text_visitor">
-		<rect><color red="0.81" green="0.82" blue="0.81" /></rect>
-		<text string="VISITOR"><color red="0.16" green="0.17" blue="0.16" /></text>
-	</element>
+	<element name="text_down"><text string="DOWN"><color red="0.16" green="0.17" blue="0.16" /></text></element>
+	<element name="text_home"><text string="HOME"><color red="0.16" green="0.17" blue="0.16" /></text></element>
+	<element name="text_yards"><text string="YARDS TO GO"><color red="0.16" green="0.17" blue="0.16" /></text></element>
+	<element name="text_time"><text string="TIME REMAINING"><color red="0.16" green="0.17" blue="0.16" /></text></element>
+	<element name="text_field"><text string="FIELD POSITION"><color red="0.16" green="0.17" blue="0.16" /></text></element>
+	<element name="text_visitor"><text string="VISITOR"><color red="0.16" green="0.17" blue="0.16" /></text></element>
 
 	<element name="text_10"><text string="10"><color red="0.83" green="0.84" blue="0.83" /></text></element>
 	<element name="text_20"><text string="20"><color red="0.83" green="0.84" blue="0.83" /></text></element>
@@ -85,7 +68,7 @@ license:CC0-1.0
 
 		<element ref="text_down"><bounds x="-5" y="-39" width="74" height="14" /></element>
 		<element ref="text_field"><bounds x="71" y="-39" width="148" height="14" /></element>
-		<element ref="text_yards"><bounds x="221" y="-39" width="77" height="14" /></element>
+		<element ref="text_yards"><bounds x="223" y="-39" width="73" height="14" /></element>
 
 		<element ref="text_home"><bounds x="-5" y="100" width="74" height="14" /></element>
 		<element ref="text_time"><bounds x="71" y="100" width="148" height="14" /></element>

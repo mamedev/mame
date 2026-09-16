@@ -120,8 +120,8 @@ void kr1601rr1_device::nvram_default()
 
 bool kr1601rr1_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_earom, EAROM_SIZE, actual) && actual == EAROM_SIZE;
+	auto const [err, actual] = util::read(file, m_earom, EAROM_SIZE);
+	return !err && (actual == EAROM_SIZE);
 }
 
 //-------------------------------------------------
@@ -131,8 +131,8 @@ bool kr1601rr1_device::nvram_read(util::read_stream &file)
 
 bool kr1601rr1_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_earom, EAROM_SIZE, actual) && actual == EAROM_SIZE;
+	auto const [err, actual] = util::write(file, m_earom, EAROM_SIZE);
+	return !err;
 }
 
 //-------------------------------------------------

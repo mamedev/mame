@@ -24,7 +24,7 @@ constexpr uintptr_t ITEM_KBDEV_FIRST    = 0x00000200;
 } // anonymous namespace
 
 
-menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_target &target) : menu(mui, target)
 {
 	set_heading(_("menu-keyboard", "Keyboard Selection"));
 }

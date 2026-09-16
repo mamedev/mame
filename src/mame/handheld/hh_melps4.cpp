@@ -17,7 +17,7 @@ TODO:
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
@@ -39,8 +39,8 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<m58846_device> m_maincpu;
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_melps4_state::reset_button), 0)
 INPUT_PORTS_END
 
 // config
@@ -209,10 +209,9 @@ void cfrogger_state::cfrogger(machine_config &config)
 	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(500, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 16);
 
@@ -313,7 +312,7 @@ static INPUT_PORTS_START( gjungler )
 	PORT_CONFSETTING(    0x00, "B" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hh_melps4_state::reset_button), 0)
 INPUT_PORTS_END
 
 // config
@@ -331,10 +330,9 @@ void gjungler_state::gjungler(machine_config &config)
 	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 17);
 

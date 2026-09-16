@@ -25,10 +25,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_dac(); }
 	virtual void input_data1(int state) override { if (state) m_data |= 0x02; else m_data &= ~0x02; update_dac(); }
@@ -61,10 +61,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void input_strobe(int state) override { m_strobe = state; update_dac(); }
 	virtual void input_data0(int state) override { if (state) m_data |= 0x01; else m_data &= ~0x01; update_dac(); }

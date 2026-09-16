@@ -47,8 +47,8 @@
         SLCT  25  26  N/C
 
 ***********************************************************************/
-#ifndef MAME_BUS_A2BUS_GRAPPLERPLUS_H
-#define MAME_BUS_A2BUS_GRAPPLERPLUS_H
+#ifndef MAME_BUS_A2BUS_GRAPPLER_H
+#define MAME_BUS_A2BUS_GRAPPLER_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ DECLARE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, device_a2bus_card_interface)
 DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, device_a2bus_card_interface)
 DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, device_a2bus_card_interface)
 
-#endif // MAME_BUS_A2BUS_GRAPPLERPLUS_H
+#endif // MAME_BUS_A2BUS_GRAPPLER_H

@@ -126,8 +126,8 @@ public:
 	void apfimag(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t videoram_r(offs_t offset);
@@ -141,8 +141,8 @@ private:
 	uint8_t serial_r(offs_t offset);
 	void serial_w(offs_t offset, uint8_t data);
 
-	void apfimag_map(address_map &map);
-	void apfm1000_map(address_map &map);
+	void apfimag_map(address_map &map) ATTR_COLD;
+	void apfm1000_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_latch = 0U;
 	uint8_t m_keyboard_data = 0U;
@@ -548,12 +548,14 @@ void apf_state::apfm1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apf_state::apfm1000_map);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update(m_crtc, FUNC(mc6847_base_device::screen_update));
 
-	MC6847_NTSC(config, m_crtc, 3.579545_MHz_XTAL);
+	MC6847(config, m_crtc, 3.579545_MHz_XTAL);
 	m_crtc->fsync_wr_callback().set(m_pia0, FUNC(pia6821_device::cb1_w));
 	m_crtc->input_callback().set(FUNC(apf_state::videoram_r));
-	m_crtc->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1);
+	m_crtc->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1);
 	m_crtc->set_screen("screen");
 	// INTEXT = GND
 	// other lines not connected

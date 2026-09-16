@@ -28,30 +28,20 @@ void cedar_magnet_sprite_device::cedar_magnet_sprite_sub_ram_map(address_map &ma
 	map(0x00000, 0x3ffff).ram().share("ram");
 }
 
-u8 cedar_magnet_sprite_device::exzisus_hack_r(offs_t offset)
+u8 cedar_magnet_sprite_device::read_cpu_bus(int offset)
 {
-	//printf("exzisus_hack_r\n");
-	int pc = m_cpu->pc();
+	return m_ram[offset + (m_pio2_pb_data & 0x03) * 0x10000];
+}
 
-	// exzisus has startup code outside of the first 0x400 bytes
-	// but the main cpu only transfers 0x400 bytes of the code to the other banks?!
-	if ((pc >= 0x3e0) && (pc <= 0x800))
-	{
-		return m_ram[0x400 + offset];
-	}
-	else
-	{
-		return m_ram[0x400 + offset + (m_pio2_pb_data & 0x3) * 0x10000];
-	}
-
+void cedar_magnet_sprite_device::write_cpu_bus(int offset, u8 data)
+{
+	m_ram[offset + (m_pio2_pb_data & 0x03) * 0x10000] = data;
 }
 
 
 void cedar_magnet_sprite_device::cedar_magnet_sprite_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).m("sp_sub_ram", FUNC(address_map_bank_device::amap8));
-
-	map(0x00400, 0x007ff).r(FUNC(cedar_magnet_sprite_device::exzisus_hack_r));
 }
 
 void cedar_magnet_sprite_device::cedar_magnet_sprite_io(address_map &map)
@@ -69,7 +59,7 @@ void cedar_magnet_sprite_device::cedar_magnet_sprite_io(address_map &map)
 
 	map(0x8c, 0x8c).w(FUNC(cedar_magnet_sprite_device::sprite_port8c_w)); // written after 88 (possible data upload?)
 
-	map(0x9c, 0x9c).w(FUNC(cedar_magnet_sprite_device::sprite_port9c_w)); // ?
+	map(0x9c, 0x9c).w(FUNC(cedar_magnet_sprite_device::irq_ack_w));
 
 }
 
@@ -96,8 +86,8 @@ void cedar_magnet_sprite_device::do_blit()
 	if ((m_spritesize & 0x7f) == 0x03)
 		ysize = xsize = 64;
 
-	// m_spritesize
-	// m_pio0_pb_data
+	if (!xsize)
+		return;
 
 	int source = (m_spritecodehigh << 8) | m_spritecodelow;
 
@@ -106,7 +96,12 @@ void cedar_magnet_sprite_device::do_blit()
 
 	source &= ~0x3f;
 
-	for (int y = 0; y < ysize; y++)
+	// The source counter starts at the supplied offset and stops at the end
+	// of the selected size block.  Cocomania starts 32-pixel sprites at +0x100
+	// (row 8), drawing 24 rows; the next block can hold unrelated small sprites.
+	const int source_end = (source | (xsize * ysize - 1)) + 1;
+
+	for (int y = 0; y < ysize && source < source_end; y++)
 	{
 		for (int x = 0; x < xsize; x++)
 		{
@@ -192,11 +187,12 @@ void cedar_magnet_sprite_device::sprite_port8c_w(u8 data)
 	if (data!=0x00) printf("sprite_port8c_w write %04x %02x\n", address, data);
 }
 
-// possible watchdog?
-void cedar_magnet_sprite_device::sprite_port9c_w(u8 data)
+// The sprite program acknowledges the interrupt at the end of its handler.
+void cedar_magnet_sprite_device::irq_ack_w(u8 data)
 {
-//  printf("%s:sprite_port9c_w %02x\n", machine().describe_context().c_str(), data);
+	m_cpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
+
 
 void cedar_magnet_sprite_device::device_add_mconfig(machine_config &config)
 {
@@ -251,12 +247,12 @@ void cedar_magnet_sprite_device::pio0_pb_w(u8 data)
 
 void cedar_magnet_sprite_device::pio1_pa_w(u8 data)
 {
-	//printf("%s: pio1_pa_w %02x\n", machine().describe_context().c_str(), data);
+	m_scrollx = data;
 }
 
 void cedar_magnet_sprite_device::pio1_pb_w(u8 data)
 {
-	//printf("%s: pio1_pb_w %02x\n", machine().describe_context().c_str(), data);
+	m_scrolly = data;
 }
 
 
@@ -275,9 +271,11 @@ void cedar_magnet_sprite_device::pio2_pb_w(u8 data)
 
 	m_pio2_pb_data = data;
 	//printf("%s: ******************************************* BANK? **** pio2_pb_w %02x\n", machine().describe_context().c_str(), data);
-	// yes, it ends up banking the ram right out from under itself during startup execution...
-	// during this time the main cpu is waiting in a loop, after which it copies the startup code again, and reboots it.
-	m_sprite_ram_bankdev->set_bank(data & 0x03);
+	// The master bus and sprite CPU select their RAM banks independently.
+	// Startup uses 0x01/0x02/0x03 to let the master fill additional banks while
+	// the sprite CPU stays in bank zero.  Cocomania uses 0x05/0x0a/0x0f when
+	// both processors need to access the same additional bank.
+	m_sprite_ram_bankdev->set_bank((data >> 2) & 0x03);
 }
 
 
@@ -285,6 +283,9 @@ void cedar_magnet_sprite_device::device_start()
 {
 	m_framebuffer = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_framebuffer), 0x10000);
+	save_item(NAME(m_pio0_pb_data));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 }
 
 
@@ -303,20 +304,24 @@ u32 cedar_magnet_sprite_device::draw(screen_device &screen, bitmap_ind16 &bitmap
 //  printf("-----------------------------------------------------------------------------------------------------------\n");
 
 	int count = 0;
+	// PIO0 PB2 reverses the display counters; PIO1 supplies their presets.
+	const int flip = BIT(m_pio0_pb_data, 2) ? 0xff : 0;
 
-//  if (!(m_m_spritesize & 0x40))
-//      return 0;
+	// PIO0 PA6 enables sprite video, just as it does on the plane boards.
+	// Games keep it clear while preparing the next scene in the framebuffer.
+	if (!BIT(m_spritesize, 6))
+		return 0;
 
 	for (int y = 0; y < 256; y++)
 	{
-		uint16_t *const dst = &bitmap.pix((y) & 0xff);
+		uint16_t *const dst = &bitmap.pix(((y ^ flip) - m_scrolly) & 0xff);
 
 		for (int x = 0; x < 256; x++)
 		{
 			u8 pix = m_framebuffer[count];
 			count++;
 
-			if (pix) dst[(x) & 0xff] = pix + palbase * 0x100;
+			if (pix) dst[((x ^ flip) - m_scrollx) & 0xff] = pix + palbase * 0x100;
 		}
 	}
 

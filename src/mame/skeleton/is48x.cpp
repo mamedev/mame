@@ -31,10 +31,10 @@ public:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void bcp_inst_map(address_map &map);
-	void bcp_data_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void bcp_inst_map(address_map &map) ATTR_COLD;
+	void bcp_data_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<dp8344_device> m_bcp;
@@ -91,7 +91,7 @@ void is48x_state::is482(machine_config &config)
 
 	EEPROM_28256(config, "eeprom"); // AT28C256
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(60_MHz_XTAL / 2, 770, 0, 560, 532, 0, 475); // FIXME: vertical rate is supposed to be 75 Hz
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -110,4 +110,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(199?, is482, 0, 0, is482, is482, is48x_state, empty_init, "Decision Data", "IS-482 Workstation", MACHINE_IS_SKELETON)
+COMP(199?, is482, 0, 0, is482, is482, is48x_state, empty_init, "Decision Data", "IS-482 Workstation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

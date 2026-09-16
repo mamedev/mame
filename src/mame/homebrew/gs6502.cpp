@@ -27,7 +27,7 @@ public:
 	void gs6502(machine_config &config);
 
 private:
-	void gs6502_mem(address_map &map);
+	void gs6502_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
@@ -56,7 +56,7 @@ void gs6502_state::gs6502(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gs6502_state::gs6502_mem);
 
 	// Configure UART (via m_acia)
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	// should this be reverse polarity?
 	m_acia->irq_handler().set("rs232", FUNC(rs232_port_device::write_rts));

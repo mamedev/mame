@@ -34,7 +34,7 @@
     MACROS
 ***************************************************************************/
 
-template <typename T> inline std::enable_if_t<!std::is_pointer<T>::value, T const &> ROMENTRY_UNWRAP(T const &r) { return r; }
+template <typename T> inline T const &ROMENTRY_UNWRAP(T const &r) requires (!std::is_pointer<T>::value) { return r; }
 template <typename T> inline T const &ROMENTRY_UNWRAP(T const *r) { return *r; }
 
 /* ----- per-entry macros ----- */
@@ -73,7 +73,8 @@ template <typename T> inline bool ROMREGION_ISDISKDATA(T const &r)     { return 
 template <typename T> inline u32  ROM_GETOFFSET(T const &r)            { return ROMENTRY_UNWRAP(r).get_offset(); }
 template <typename T> inline u32  ROM_GETLENGTH(T const &r)            { return ROMENTRY_UNWRAP(r).get_length(); }
 template <typename T> inline u32  ROM_GETFLAGS(T const &r)             { return ROMENTRY_UNWRAP(r).get_flags(); }
-template <typename T> inline bool ROM_ISOPTIONAL(T const &r)           { return (ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
+// HACK: avoid warnings about deprecated ROM_OPTIONAL in every source file that includes this header
+template <typename T> inline bool ROM_ISOPTIONAL(T const &r)           { return (ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == /* ROM_OPTIONAL */ ROM_OPTIONALMASK; }
 template <typename T> inline u32  ROM_GETGROUPSIZE(T const &r)         { return ((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 8) + 1; }
 template <typename T> inline u32  ROM_GETSKIPCOUNT(T const &r)         { return (ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 12; }
 template <typename T> inline bool ROM_ISREVERSED(T const &r)           { return (ROM_GETFLAGS(r) & ROM_REVERSEMASK) == ROM_REVERSE; }
@@ -129,7 +130,8 @@ public:
 	constexpr u32         get_length()     const { return length; }
 	constexpr u32         get_flags()      const { return flags; }
 	constexpr char const *get_hashdata()   const { return hashdata; }
-	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
+	// HACK: avoid warnings about deprecated ROM_OPTIONAL in every source file that includes this header
+	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == /* ROM_OPTIONAL */ ROM_OPTIONALMASK; }
 	constexpr u32         get_groupsize()  const { return ((flags & ROM_GROUPMASK) >> 8) + 1; }
 	constexpr u32         get_skipcount()  const { return (flags & ROM_SKIPMASK) >> 12; }
 	constexpr bool        is_reversed()    const { return (flags & ROM_REVERSEMASK) == ROM_REVERSE; }
@@ -412,6 +414,9 @@ public:
 	/* return the number of warnings we generated */
 	int warnings() const { return m_warnings; }
 
+	/* return the number of present but bad ROMs */
+	int presentbad() const { return m_presentbad; }
+
 	std::string& software_load_warnings_message() { return m_softwarningstring; }
 
 	/* return the number of BAD_DUMP/NO_DUMP warnings we generated */
@@ -461,8 +466,9 @@ private:
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, memory_region &region, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(memory_region &region, const rom_entry *romp);
-	void copy_rom_data(memory_region &region, const rom_entry *romp);
+	void copy_rom_data(device_t &device, memory_region &region, const rom_entry *romp);
 	void process_rom_entries(
+			device_t &device,
 			const std::vector<std::string> &searchpath,
 			u8 bios,
 			memory_region &region,
@@ -487,6 +493,7 @@ private:
 	running_machine &   m_machine;            // reference to our machine
 
 	int                 m_warnings;           // warning count during processing
+	int                 m_presentbad;         // ROM files that are present bad have the wrong content
 	int                 m_knownbad;           // BAD_DUMP/NO_DUMP count during processing
 	int                 m_errors;             // error count during processing
 

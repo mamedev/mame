@@ -4,6 +4,10 @@
 
     Hudson/NEC HuC6202 Video Priority Controller
 
+    TODO:
+    - Verify window area calculation
+    - Verify overscan color
+
 **********************************************************************/
 
 #include "emu.h"
@@ -15,75 +19,72 @@
 DEFINE_DEVICE_TYPE(HUC6202, huc6202_device, "huc6202", "Hudson HuC6202 VPC")
 
 
-huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HUC6202, tag, owner, clock)
-	, m_next_pixel_0_cb(*this, 0)
-	, m_time_til_next_event_0_cb(*this, 1)
-	, m_vsync_changed_0_cb(*this)
-	, m_hsync_changed_0_cb(*this)
-	, m_read_0_cb(*this, 0)
-	, m_write_0_cb(*this)
-	, m_next_pixel_1_cb(*this, 0)
-	, m_time_til_next_event_1_cb(*this, 1)
-	, m_vsync_changed_1_cb(*this)
-	, m_hsync_changed_1_cb(*this)
-	, m_read_1_cb(*this, 0)
-	, m_write_1_cb(*this)
-	, m_window1(0), m_window2(0), m_io_device(0), m_map_index(0), m_map_dirty(0)
+	, m_next_pixel_cb(*this, 0)
+	, m_time_til_next_event_cb(*this, 1)
+	, m_read_cb(*this, 0)
+	, m_write_cb(*this)
+	, m_window{0}
+	, m_io_device(false)
+	, m_map_index(0)
+	, m_map_dirty(false)
+	, m_prio_map{0}
 {
 }
 
 
 u16 huc6202_device::next_pixel()
 {
-	uint16_t data = huc6270_device::HUC6270_BACKGROUND;
+	u16 data = huc6270_device::HUC6270_BACKGROUND;
 
-	uint16_t data_0 = m_next_pixel_0_cb();
-	uint16_t data_1 = m_next_pixel_1_cb();
+	u16 const data_0 = m_next_pixel_cb[0]();
+	u16 const data_1 = m_next_pixel_cb[1]();
 
-	if ( data_0 == huc6270_device::HUC6270_SPRITE && data_1 == huc6270_device::HUC6270_SPRITE )
+	if (data_0 == huc6270_device::HUC6270_SPRITE && data_1 == huc6270_device::HUC6270_SPRITE)
 	{
 		m_map_index = 0;
-		if ( m_map_dirty )
+		if (m_map_dirty)
 		{
-			int i;
-
-			for ( i = 0; i < 512; i++ )
+			for (int i = 0; i < 512; i++)
 			{
-				m_prio_map[ i ] = 0;
-				if ( m_window1 < 0x40 || i > m_window1 )
+				m_prio_map[i] = 0;
+				if (m_window[0] < 0x40 || i > m_window[0])
 				{
-					m_prio_map [ i ] |= 1;
+					m_prio_map[i] |= 1;
 				}
-				if ( m_window2 < 0x40 || i > m_window2 )
+				if (m_window[1] < 0x40 || i > m_window[1])
 				{
-					m_prio_map[ i ] |= 2;
+					m_prio_map[i] |= 2;
 				}
 			}
-			m_map_dirty = 0;
+			m_map_dirty = false;
 		}
 	}
 	else
 	{
-		uint8_t   prio_index = m_prio_map[ m_map_index ];
+		u8 const prio_index = m_prio_map[m_map_index];
+		bool const dev0_en = m_prio[prio_index].dev0_enabled && data_0 != huc6270_device::HUC6270_SPRITE;
+		bool const dev1_en = m_prio[prio_index].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE;
 
-		if ( m_prio[ prio_index ].dev0_enabled && data_0 != huc6270_device::HUC6270_SPRITE )
+		if (dev0_en)
 		{
-			if ( m_prio[ prio_index ].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE )
+			if (dev1_en)
 			{
-				switch ( m_prio[ prio_index ].prio_type )
+				switch (m_prio[prio_index].prio_type)
 				{
+				default:
 				case 0:     /* Back - BG1 SP1 BG0 SP0 - Front */
-					data = ( data_0 & 0x0F ) ? data_0 : data_1;
+					data = (data_0 & 0x0f) ? data_0 : data_1;
 					break;
 
 				case 1:     /* Back - BG1 BG0 SP1 SP0 - Front */
-					if ( data_0 > huc6270_device::HUC6270_SPRITE )
+					if (data_0 > huc6270_device::HUC6270_SPRITE)
 					{
 						/* Device 0 sprite */
 						data = data_0;
 					}
-					else if ( data_1 > huc6270_device::HUC6270_SPRITE )
+					else if (data_1 > huc6270_device::HUC6270_SPRITE)
 					{
 						/* Device 1 sprite */
 						data = data_1;
@@ -91,7 +92,7 @@ u16 huc6202_device::next_pixel()
 					else
 					{
 						/* Device 0 and 1 backgrounds */
-						data = ( data_0 & 0x0F ) ? data_0 : data_1;
+						data = (data_0 & 0x0f) ? data_0 : data_1;
 					}
 					break;
 
@@ -100,9 +101,9 @@ u16 huc6202_device::next_pixel()
 				                      BG1 + SP0 => BG1
 				                      SP0 + SP1 => SP0
 				            */
-					if ( data_1 > huc6270_device::HUC6270_SPRITE )
+					if (data_1 > huc6270_device::HUC6270_SPRITE)
 					{
-						if ( data_0 > huc6270_device::HUC6270_SPRITE )
+						if (data_0 > huc6270_device::HUC6270_SPRITE)
 						{
 							/* Device 1 sprite, device 0 sprite */
 							data = data_0;
@@ -110,12 +111,12 @@ u16 huc6202_device::next_pixel()
 						else
 						{
 							/* Device 1 sprite, device 0 background */
-							data = ( data_0 & 0x0F ) ? data_0 : data_1;
+							data = (data_0 & 0x0f) ? data_0 : data_1;
 						}
 					}
 					else
 					{
-						if ( data_0 > huc6270_device::HUC6270_SPRITE )
+						if (data_0 > huc6270_device::HUC6270_SPRITE)
 						{
 							/* Device 1 background, device 0 sprite */
 							data = data_1;
@@ -123,12 +124,9 @@ u16 huc6202_device::next_pixel()
 						else
 						{
 							/* Device 1 background, device 0 background */
-							data = ( data_0 & 0x0F ) ? data_0 : data_1;
+							data = (data_0 & 0x0f) ? data_0 : data_1;
 						}
 					}
-					break;
-
-				case 3:     /* ?? */
 					break;
 				}
 			}
@@ -141,7 +139,7 @@ u16 huc6202_device::next_pixel()
 		else
 		{
 			/* Only device 1 is enabled */
-			if ( m_prio[ prio_index ].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE )
+			if (dev1_en)
 			{
 				data = data_1;
 			}
@@ -154,65 +152,51 @@ u16 huc6202_device::next_pixel()
 
 u16 huc6202_device::time_until_next_event()
 {
-	uint16_t next_event_clocks_0 = m_time_til_next_event_0_cb();
-	uint16_t next_event_clocks_1 = m_time_til_next_event_1_cb();
+	u16 const next_event_clocks_0 = m_time_til_next_event_cb[0]();
+	u16 const next_event_clocks_1 = m_time_til_next_event_cb[1]();
 
-	return std::min( next_event_clocks_0, next_event_clocks_1 );
-}
-
-
-void huc6202_device::vsync_changed(int state)
-{
-	m_vsync_changed_0_cb( state );
-	m_vsync_changed_1_cb( state );
-}
-
-
-void huc6202_device::hsync_changed(int state)
-{
-	m_hsync_changed_0_cb( state );
-	m_hsync_changed_1_cb( state );
+	return std::min(next_event_clocks_0, next_event_clocks_1);
 }
 
 
 u8 huc6202_device::read(offs_t offset)
 {
-	uint8_t data = 0xFF;
+	u8 data = 0xff;
 
-	switch ( offset & 7 )
+	switch (offset & 7)
 	{
 		case 0x00:  /* Priority register #0 */
-			data = ( m_prio[0].prio_type << 2 ) |
-				( m_prio[0].dev0_enabled ? 0x01 : 0 ) |
-				( m_prio[0].dev1_enabled ? 0x02 : 0 ) |
-				( m_prio[1].prio_type << 6 ) |
-				( m_prio[1].dev0_enabled ? 0x10 : 0 ) |
-				( m_prio[1].dev1_enabled ? 0x20 : 0 );
+			data = (m_prio[0].prio_type << 2) |
+				(m_prio[0].dev0_enabled ? 0x01 : 0) |
+				(m_prio[0].dev1_enabled ? 0x02 : 0) |
+				(m_prio[1].prio_type << 6) |
+				(m_prio[1].dev0_enabled ? 0x10 : 0) |
+				(m_prio[1].dev1_enabled ? 0x20 : 0);
 			break;
 
 		case 0x01:  /* Priority register #1 */
-			data = ( m_prio[2].prio_type << 2 ) |
-				( m_prio[2].dev0_enabled ? 0x01 : 0 ) |
-				( m_prio[2].dev1_enabled ? 0x02 : 0 ) |
-				( m_prio[3].prio_type << 6 ) |
-				( m_prio[3].dev0_enabled ? 0x10 : 0 ) |
-				( m_prio[3].dev1_enabled ? 0x20 : 0 );
+			data = (m_prio[2].prio_type << 2) |
+				(m_prio[2].dev0_enabled ? 0x01 : 0) |
+				(m_prio[2].dev1_enabled ? 0x02 : 0) |
+				(m_prio[3].prio_type << 6) |
+				(m_prio[3].dev0_enabled ? 0x10 : 0) |
+				(m_prio[3].dev1_enabled ? 0x20 : 0);
 			break;
 
 		case 0x02:  /* Window 1 LSB */
-			data = m_window1 & 0xFF;
+			data = m_window[0] & 0xff;
 			break;
 
 		case 0x03:  /* Window 1 MSB */
-			data = ( m_window1 >> 8 ) & 0xFF;
+			data = (m_window[0] >> 8) & 0xff;
 			break;
 
 		case 0x04:  /* Window 2 LSB */
-			data = m_window2 & 0xFF;
+			data = m_window[1] & 0xff;
 			break;
 
 		case 0x05:  /* Window 2 MSB */
-			data = ( m_window2 >> 8 ) & 0xFF;
+			data = (m_window[1] >> 8) & 0xff;
 			break;
 	}
 
@@ -222,48 +206,48 @@ u8 huc6202_device::read(offs_t offset)
 
 void huc6202_device::write(offs_t offset, u8 data)
 {
-	switch ( offset & 7 )
+	switch (offset & 7)
 	{
 		case 0x00:  /* Priority register #0 */
-			m_prio[0].dev0_enabled = data & 0x01;
-			m_prio[0].dev1_enabled = data & 0x02;
-			m_prio[0].prio_type = ( data >> 2 ) & 0x03;
-			m_prio[1].dev0_enabled = data & 0x10;
-			m_prio[1].dev1_enabled = data & 0x20;
-			m_prio[1].prio_type = ( data >> 6 ) & 0x03;
+			m_prio[0].dev0_enabled = BIT(data, 0);
+			m_prio[0].dev1_enabled = BIT(data, 1);
+			m_prio[0].prio_type = (data >> 2) & 0x03;
+			m_prio[1].dev0_enabled = BIT(data, 4);
+			m_prio[1].dev1_enabled = BIT(data, 5);
+			m_prio[1].prio_type = (data >> 6) & 0x03;
 			break;
 
 		case 0x01:  /* Priority register #1 */
-			m_prio[2].dev0_enabled = data & 0x01;
-			m_prio[2].dev1_enabled = data & 0x02;
-			m_prio[2].prio_type = ( data >> 2 ) & 0x03;
-			m_prio[3].dev0_enabled = data & 0x10;
-			m_prio[3].dev1_enabled = data & 0x20;
-			m_prio[3].prio_type = ( data >> 6 ) & 0x03;
+			m_prio[2].dev0_enabled = BIT(data, 0);
+			m_prio[2].dev1_enabled = BIT(data, 1);
+			m_prio[2].prio_type = (data >> 2) & 0x03;
+			m_prio[3].dev0_enabled = BIT(data, 4);
+			m_prio[3].dev1_enabled = BIT(data, 5);
+			m_prio[3].prio_type = (data >> 6) & 0x03;
 			break;
 
 		case 0x02:  /* Window 1 LSB */
-			m_window1 = ( m_window1 & 0xFF00 ) | data;
-			m_map_dirty = 1;
+			m_window[0] = (m_window[0] & 0xff00) | data;
+			m_map_dirty = true;
 			break;
 
 		case 0x03:  /* Window 1 MSB */
-			m_window1 = ( ( m_window1 & 0x00FF ) | ( data << 8 ) ) & 0x3FF;
-			m_map_dirty = 1;
+			m_window[0] = ((m_window[0] & 0x00ff) | (data << 8)) & 0x3ff;
+			m_map_dirty = true;
 			break;
 
 		case 0x04:  /* Window 2 LSB */
-			m_window2 = ( m_window2 & 0xFF00 ) | data;
-			m_map_dirty = 1;
+			m_window[1] = (m_window[1] & 0xff00) | data;
+			m_map_dirty = true;
 			break;
 
 		case 0x05:  /* Window 2 MSB */
-			m_window2 = ( ( m_window2 & 0x00FF ) | ( data << 8 ) ) & 0x3FF;
-			m_map_dirty = 1;
+			m_window[1] = ((m_window[1] & 0x00ff) | (data << 8)) & 0x3ff;
+			m_map_dirty = true;
 			break;
 
 		case 0x06:  /* I/O select */
-			m_io_device = data & 0x01;
+			m_io_device = BIT(data, 0);
 			break;
 	}
 }
@@ -271,57 +255,33 @@ void huc6202_device::write(offs_t offset, u8 data)
 
 u8 huc6202_device::io_read(offs_t offset)
 {
-	if ( m_io_device )
-	{
-		return m_read_1_cb( offset );
-	}
-	else
-	{
-		return m_read_0_cb( offset );
-	}
+	return m_read_cb[m_io_device ? 1 : 0](offset);
 }
 
 
 void huc6202_device::io_write(offs_t offset, u8 data)
 {
-	if ( m_io_device )
-	{
-		m_write_1_cb( offset, data );
-	}
-	else
-	{
-		m_write_0_cb( offset, data );
-	}
+	m_write_cb[m_io_device ? 1 : 0](offset, data);
 }
 
 
 void huc6202_device::device_start()
 {
 	/* We want all our callbacks to be resolved */
-	assert(!m_next_pixel_0_cb.isunset());
-	assert(!m_time_til_next_event_0_cb.isunset());
-	assert(!m_read_0_cb.isunset());
-	assert(!m_write_0_cb.isunset());
-	assert(!m_next_pixel_1_cb.isunset());
-	assert(!m_time_til_next_event_1_cb.isunset());
-	assert(!m_read_1_cb.isunset());
-	assert(!m_write_1_cb.isunset());
+	assert(!m_next_pixel_cb[0].isunset());
+	assert(!m_time_til_next_event_cb[0].isunset());
+	assert(!m_read_cb[0].isunset());
+	assert(!m_write_cb[0].isunset());
+	assert(!m_next_pixel_cb[1].isunset());
+	assert(!m_time_til_next_event_cb[1].isunset());
+	assert(!m_read_cb[1].isunset());
+	assert(!m_write_cb[1].isunset());
 
 	/* Register save items */
-	save_item(NAME(m_prio[0].prio_type));
-	save_item(NAME(m_prio[0].dev0_enabled));
-	save_item(NAME(m_prio[0].dev1_enabled));
-	save_item(NAME(m_prio[1].prio_type));
-	save_item(NAME(m_prio[1].dev0_enabled));
-	save_item(NAME(m_prio[1].dev1_enabled));
-	save_item(NAME(m_prio[2].prio_type));
-	save_item(NAME(m_prio[2].dev0_enabled));
-	save_item(NAME(m_prio[2].dev1_enabled));
-	save_item(NAME(m_prio[3].prio_type));
-	save_item(NAME(m_prio[3].dev0_enabled));
-	save_item(NAME(m_prio[3].dev1_enabled));
-	save_item(NAME(m_window1));
-	save_item(NAME(m_window2));
+	save_item(STRUCT_MEMBER(m_prio, prio_type));
+	save_item(STRUCT_MEMBER(m_prio, dev0_enabled));
+	save_item(STRUCT_MEMBER(m_prio, dev1_enabled));
+	save_item(NAME(m_window));
 	save_item(NAME(m_io_device));
 	save_item(NAME(m_map_index));
 	save_item(NAME(m_map_dirty));
@@ -332,19 +292,19 @@ void huc6202_device::device_start()
 void huc6202_device::device_reset()
 {
 	m_prio[0].prio_type = 0;
-	m_prio[0].dev0_enabled = 1;
-	m_prio[0].dev1_enabled = 0;
+	m_prio[0].dev0_enabled = true;
+	m_prio[0].dev1_enabled = false;
 	m_prio[1].prio_type = 0;
-	m_prio[1].dev0_enabled = 1;
-	m_prio[1].dev1_enabled = 0;
+	m_prio[1].dev0_enabled = true;
+	m_prio[1].dev1_enabled = false;
 	m_prio[2].prio_type = 0;
-	m_prio[2].dev0_enabled = 1;
-	m_prio[2].dev1_enabled = 0;
+	m_prio[2].dev0_enabled = true;
+	m_prio[2].dev1_enabled = false;
 	m_prio[3].prio_type = 0;
-	m_prio[3].dev0_enabled = 1;
-	m_prio[3].dev1_enabled = 0;
-	m_map_dirty = 1;
-	m_window1 = 0;
-	m_window2 = 0;
-	m_io_device = 0;
+	m_prio[3].dev0_enabled = true;
+	m_prio[3].dev1_enabled = false;
+	m_map_dirty = true;
+	m_window[0] = 0;
+	m_window[1] = 0;
+	m_io_device = false;
 }

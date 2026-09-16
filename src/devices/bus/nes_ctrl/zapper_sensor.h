@@ -7,8 +7,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_NES_CTRL_ZAPPER_SENSOR
-#define MAME_BUS_NES_CTRL_ZAPPER_SENSOR
+#ifndef MAME_BUS_NES_CTRL_ZAPPER_SENSOR_H
+#define MAME_BUS_NES_CTRL_ZAPPER_SENSOR_H
 
 #pragma once
 
@@ -25,7 +25,7 @@ class nes_zapper_sensor_device : public device_t
 {
 public:
 	// construction/destruction
-	nes_zapper_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	nes_zapper_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
@@ -50,4 +50,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(NES_ZAPPER_SENSOR, nes_zapper_sensor_device)
 
-#endif // MAME_BUS_NES_CTRL_ZAPPER_SENSOR
+#endif // MAME_BUS_NES_CTRL_ZAPPER_SENSOR_H

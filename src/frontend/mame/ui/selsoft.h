@@ -29,7 +29,7 @@ namespace ui {
 class menu_select_software : public menu_select_launch
 {
 public:
-	menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system);
+	menu_select_software(mame_ui_manager &mui, render_target &target, ui_system_info const &system);
 	virtual ~menu_select_software() override;
 
 protected:
@@ -48,18 +48,19 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	// drawing
-	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
+	virtual void draw_left_panel(u32 flags) override;
 	virtual render_texture *get_icon_texture(int linenum, void *selectedref) override;
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const override;
+	virtual void show_config_menu(int index) override;
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
 	virtual std::string make_software_description(ui_software_info const &software, ui_system_info const *system) const override;
 
 	// filter navigation
-	virtual void filter_selected() override;
+	virtual void filter_selected(int index) override;
 
 	// toolbar
 	virtual void inkey_export() override { throw false; }

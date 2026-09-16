@@ -194,5 +194,5 @@ generic_fifo_u32_device::generic_fifo_u32_device(const machine_config &mconfig, 
 {
 }
 
-DEFINE_DEVICE_TYPE(GENERIC_FIFO_U32, generic_fifo_u32_device, "generic_fifo_u32_device", "Generic fifo, u32 values")
+DEFINE_DEVICE_TYPE(GENERIC_FIFO_U32, generic_fifo_u32_device, "generic_fifo_u32_device", "Generic FIFO, u32 values")
 

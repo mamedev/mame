@@ -54,7 +54,7 @@ INPUT_PORTS_END
 void c64dtv_state::c64dtv(machine_config &config)
 {
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(c64dtv_state::screen_update));
 	screen.set_size(640,480);
 	screen.set_visarea_full();
@@ -82,4 +82,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-CONS( 2005, c64dtv, 0, 0, c64dtv, c64dtv, c64dtv_state, empty_init, "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_IS_SKELETON )
+CONS( 2005, c64dtv, 0, 0, c64dtv, c64dtv, c64dtv_state, empty_init, "The Toy:Lobster Company", "Commodore 64 Direct-to-TV (Version 2 050711) (PAL)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

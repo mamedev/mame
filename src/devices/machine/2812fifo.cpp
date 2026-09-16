@@ -45,6 +45,10 @@ fifo2812_device::fifo2812_device(machine_config const &mconfig, char const *tag,
 	std::fill(std::begin(m_data), std::end(m_data), 0U);
 }
 
+fifo2812_device::~fifo2812_device()
+{
+}
+
 
 void fifo2812_device::mr_w(int state)
 {

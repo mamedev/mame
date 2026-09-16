@@ -17,5 +17,6 @@
 
 // device type declaration
 DECLARE_DEVICE_TYPE(A2BUS_APPLICARD, device_a2bus_card_interface)
+DECLARE_DEVICE_TYPE(A2BUS_ACE80, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_A2APPLICARD_H

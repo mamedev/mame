@@ -60,12 +60,12 @@ private:
 	IRQ_CALLBACK_MEMBER(int_ack);
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	static const rgb_t s_palette[16];
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<cpu_device> m_maincpu;

@@ -46,11 +46,11 @@ public:
 protected:
 	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	required_device<ata_interface_device> m_ata;
 
@@ -128,7 +128,7 @@ uint8_t a1bus_cffa_device::cffa_r(offs_t offset)
 			break;
 
 		case 0x8:
-			m_lastdata = m_ata->cs0_r((offset & 0xf) - 8, 0xff);
+			m_lastdata = m_ata->cs0_r((offset & 0xf) - 8);
 			return m_lastdata & 0x00ff;
 
 		case 0x9:
@@ -138,7 +138,7 @@ uint8_t a1bus_cffa_device::cffa_r(offs_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->cs0_r((offset & 0xf) - 8, 0xff);
+			return m_ata->cs0_r((offset & 0xf) - 8);
 	}
 
 	return 0xff;
@@ -163,7 +163,7 @@ void a1bus_cffa_device::cffa_w(offs_t offset, uint8_t data)
 
 
 		case 0x8:
-			m_ata->cs0_w((offset & 0xf) - 8, data, 0xff);
+			m_ata->cs0_w((offset & 0xf) - 8, data);
 			break;
 
 		case 0x9:
@@ -173,7 +173,7 @@ void a1bus_cffa_device::cffa_w(offs_t offset, uint8_t data)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			m_ata->cs0_w((offset & 0xf) - 8, data, 0xff);
+			m_ata->cs0_w((offset & 0xf) - 8, data);
 			break;
 
 	}

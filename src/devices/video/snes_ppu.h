@@ -310,8 +310,8 @@ protected:
 	std::unique_ptr<std::unique_ptr<uint16_t[]>[]> m_light_table; /* Luma ramp */
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	// 256 word CG RAM data (0x000-0x0ff), 8 group of direct colours (0x100-0x8ff), Fixed color (0x900)

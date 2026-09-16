@@ -92,14 +92,14 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void d6800_map(address_map &map);
+	void d6800_map(address_map &map) ATTR_COLD;
 
 	bool m_cb2 = 0;
 	bool m_cassold = 0;
 	uint8_t m_cass_data[4]{};
 	uint8_t m_portb = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia;
@@ -157,10 +157,10 @@ static INPUT_PORTS_START( d6800 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("FN") PORT_CODE(KEYCODE_LSHIFT)
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, d6800_state, reset_button, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RST") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(d6800_state::reset_button), 0)
 
 	PORT_START("VS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(d6800_state::reset_button)
@@ -377,7 +377,7 @@ void d6800_state::d6800(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(d6800_state::rtc_interrupt));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(64, 32);
 	screen.set_visarea_full();

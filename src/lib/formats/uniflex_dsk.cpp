@@ -53,8 +53,9 @@ int uniflex_format::find_size(util::random_read &io, uint32_t form_factor, const
 
 	// Look at the SIR sector, the second sector.
 	uint8_t sir[192];
-	size_t actual;
-	io.read_at(1 * 512, sir, sizeof(sir), actual);
+	auto const [err, actual] = read_at(io, 1 * 512, sir, sizeof(sir)); // FIXME: check for premature EOF
+	if (err)
+		return -1;
 
 	uint16_t fdn_block_count = get_u16be(&sir[0x10]);
 	uint32_t last_block_number = get_u24be(&sir[0x12]);

@@ -31,7 +31,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_device<ym2154_device> m_ryp4;
@@ -46,8 +46,6 @@ HD44780_PIXEL_UPDATE(rx15_state::pixel_update)
 
 void rx15_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6301x_cpu_device::hd6301x_io)); // TODO: internalize
-	map(0x0040, 0x00ff).ram(); // TODO: internalize
 	map(0x1000, 0x1000).nopr();
 	map(0x2000, 0x207f).rw(m_ryp4, FUNC(ym2154_device::read), FUNC(ym2154_device::write));
 	map(0x3000, 0x3001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
@@ -67,7 +65,7 @@ void rx15_state::rx15(machine_config &config)
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // M5M5118P-15L (one or both battery-backed?)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -77,16 +75,15 @@ void rx15_state::rx15(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 8);
 	lcdc.set_pixel_update_cb(FUNC(rx15_state::pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2154(config, m_ryp4, 2.7_MHz_XTAL);
-	m_ryp4->add_route(0, "lspeaker", 0.50);
-	m_ryp4->add_route(1, "rspeaker", 0.50);
+	m_ryp4->add_route(0, "speaker", 0.50, 0);
+	m_ryp4->add_route(1, "speaker", 0.50, 1);
 }
 
 ROM_START(rx15)
@@ -108,4 +105,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1984, rx15, 0, 0, rx15, rx15, rx15_state, empty_init, "Yamaha", "RX15 Digital Rhythm Programmer", MACHINE_IS_SKELETON)
+SYST(1984, rx15, 0, 0, rx15, rx15, rx15_state, empty_init, "Yamaha", "RX15 Digital Rhythm Programmer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

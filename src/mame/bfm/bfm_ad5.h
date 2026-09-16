@@ -20,8 +20,7 @@ public:
 	void bfm_ad5(machine_config &config);
 
 protected:
-	INTERRUPT_GEN_MEMBER(ad5_fake_timer_int);
-	void ad5_map(address_map &map);
+	void ad5_map(address_map &map) ATTR_COLD;
 
 private:
 	// devices

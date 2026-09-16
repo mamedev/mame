@@ -45,13 +45,13 @@ public:
 	void actions_atj2279b(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
-	void atj2279b_map(address_map &map);
+	void atj2279b_map(address_map &map) ATTR_COLD;
 
 	required_device<arm7_cpu_device> m_maincpu;
 };
@@ -82,15 +82,14 @@ void actions_atj2279b_state::actions_atj2279b(machine_config &config)
 	ARM7_BE(config, m_maincpu, 450'000'000); // Probably ATJ227X 450MHz, but this needs to be checked more closely
 	m_maincpu->set_addrmap(AS_PROGRAM, &actions_atj2279b_state::atj2279b_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(1280, 720);
 	screen.set_visarea(0, 1280-1, 0, 720-1); // resolution unconfirmed (possibly 1080p as well, but this is unlikely)
 	screen.set_screen_update(FUNC(actions_atj2279b_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START( rbitgen )
@@ -103,5 +102,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 2016, rbitgen,      0,       0,      actions_atj2279b, actions_atj2279b, actions_atj2279b_state, empty_init, "Retro-Bit", "Generations (Retro-Bit)", MACHINE_IS_SKELETON )
+//    Year  Name     Parent  Compat  Machine           Input             Class                   Init        Company      Fullname                   Flags
+CONS( 2016, rbitgen, 0,      0,      actions_atj2279b, actions_atj2279b, actions_atj2279b_state, empty_init, "Retro-Bit", "Generations (Retro-Bit)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

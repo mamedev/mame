@@ -37,18 +37,13 @@ public:
 	{
 	}
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void n64_machine_stop();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-
-	// Getters
-	n64_rdp* rdp() { return m_rdp.get(); }
-	uint32_t* rdram() { return m_rdram; }
-	uint32_t* sram() { return m_sram; }
 
 protected:
 	required_device<mips3_device> m_vr4300;
@@ -92,7 +87,12 @@ private:
 
 public:
 	// construction/destruction
-	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	n64_periphs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	template <typename T> void set_sram(T &&tag) { m_sram.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_rdram(T &&tag) { m_rdram.set_tag(std::forward<T>(tag)); }
+
+	void set_rdp(n64_rdp& rdp) { m_rdp = &rdp; }
 
 	uint32_t is64_r(offs_t offset);
 	void is64_w(offs_t offset, uint32_t data);
@@ -178,19 +178,19 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	n64_state* m_n64 = nullptr;
+	n64_rdp* m_rdp = nullptr;
 	address_space *m_mem_map = nullptr;
 	required_device<mips3_device> m_vr4300;
 	required_device<rsp_device> m_rsp;
 	required_shared_ptr<uint32_t> m_rsp_imem;
 	required_shared_ptr<uint32_t> m_rsp_dmem;
 
-	uint32_t *m_rdram = nullptr;
-	uint32_t *m_sram = nullptr;
+	optional_shared_ptr<uint32_t> m_sram;
+	required_shared_ptr<uint32_t> m_rdram;
 
 	void clear_rcp_interrupt(int interrupt);
 

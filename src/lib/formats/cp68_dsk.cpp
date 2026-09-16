@@ -51,6 +51,9 @@
 
 #include "ioprocs.h"
 
+#include <tuple>
+
+
 namespace
 {
 	class cp68_formats : public wd177x_format
@@ -115,8 +118,8 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 	std::error_condition ec;
 
 	// Look at the boot sector.
-	ec = io.read_at(128 * 0, &boot0, sizeof(boot0), actual);
-	if (ec || actual == 0)
+	std::tie(ec, actual) = read_at(io, 128 * 0, &boot0, sizeof(boot0));
+	if (ec || actual == 0) // FIXME: what's the actual minimum size boot sector to probe?
 		return -1;
 	uint8_t boot0_sector_id = 1;
 	//  uint8_t boot1_sector_id = 2;
@@ -125,8 +128,7 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 	// set the numbering of the first two sectors. If this is shown to not
 	// be practical in some common cases then a separate format variant
 	// might be needed.
-	if (boot0[0] == 0xbd && boot0[3] == 0x86)
-	{
+	if (boot0[0] == 0xbd && boot0[3] == 0x86) {
 		// Found a 6800 jsr and ldaa, looks like a CP68 6800 boot sector.
 		boot0_sector_id = 0;
 	}
@@ -135,8 +137,8 @@ int cp68_format::find_size(util::random_read &io, uint32_t form_factor, const st
 		const format &f = cp68_formats::formats[i];
 
 		// Look at the system information sector.
-		ec = io.read_at(f.sector_base_size * 2, &info, sizeof(struct cp68_formats::sysinfo_sector_cp68), actual);
-		if (ec || actual == 0)
+		std::tie(ec, actual) = read_at(io, f.sector_base_size * 2, &info, sizeof(struct cp68_formats::sysinfo_sector_cp68));
+		if (ec || actual == 0) // FIXME: what's the actual minimum sector size?
 			continue;
 
 		LOG_FORMATS("CP68 floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / f.sector_base_size, (uint32_t)size % f.sector_base_size, form_factor);

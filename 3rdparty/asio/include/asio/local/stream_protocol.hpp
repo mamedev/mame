@@ -2,7 +2,7 @@
 // local/stream_protocol.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace local {
 
 /// Encapsulates the flags needed for stream-oriented UNIX sockets.
@@ -42,24 +43,26 @@ namespace local {
  *
  * @par Concepts:
  * Protocol.
+ *
+ * @sa @ref overview_posix_local "UNIX domain sockets"
  */
 class stream_protocol
 {
 public:
   /// Obtain an identifier for the type of the protocol.
-  int type() const ASIO_NOEXCEPT
+  int type() const noexcept
   {
     return SOCK_STREAM;
   }
 
   /// Obtain an identifier for the protocol.
-  int protocol() const ASIO_NOEXCEPT
+  int protocol() const noexcept
   {
     return 0;
   }
 
   /// Obtain an identifier for the protocol family.
-  int family() const ASIO_NOEXCEPT
+  int family() const noexcept
   {
     return AF_UNIX;
   }
@@ -80,6 +83,7 @@ public:
 };
 
 } // namespace local
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

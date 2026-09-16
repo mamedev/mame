@@ -113,8 +113,8 @@ public:
 	void init_gyruss();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -155,16 +155,14 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template <uint8_t Which> void filter_w(uint8_t data);
 
-	void audio_cpu1_io_map(address_map &map);
-	void audio_cpu1_map(address_map &map);
-	void audio_cpu2_io_map(address_map &map);
-	void audio_cpu2_map(address_map &map);
-	void main_cpu1_map(address_map &map);
-	void main_cpu2_map(address_map &map);
+	void audio_cpu1_io_map(address_map &map) ATTR_COLD;
+	void audio_cpu1_map(address_map &map) ATTR_COLD;
+	void audio_cpu2_io_map(address_map &map) ATTR_COLD;
+	void audio_cpu2_map(address_map &map) ATTR_COLD;
+	void main_cpu1_map(address_map &map) ATTR_COLD;
+	void main_cpu2_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -245,7 +243,6 @@ void gyruss_state::palette(palette_device &palette) const
 
 void gyruss_state::spriteram_w(offs_t offset, uint8_t data)
 {
-//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
 }
@@ -321,8 +318,6 @@ uint32_t gyruss_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-// machine
-
 /* The timer clock which feeds the upper 4 bits of                      */
 /* AY-3-8910 port A is based on the same clock                          */
 /* feeding the sound CPU Z80.  It is a divide by                        */
@@ -377,7 +372,7 @@ void gyruss_state::filter_w(uint8_t data)
 void gyruss_state::sh_irqtrigger_w(uint8_t data)
 {
 	// writing to this register triggers IRQ on the sound CPU
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void gyruss_state::i8039_irq_w(uint8_t data)
@@ -482,20 +477,20 @@ static INPUT_PORTS_START( gyruss )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_2WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 1p shoot 2 - unused
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // 2p shoot 2 - unused
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -698,9 +693,9 @@ void gyruss_state::gyruss(machine_config &config)
 	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
 	static constexpr XTAL SOUND_CLOCK = XTAL(14'318'181);
 
-// Video timing
-// PCB measured: H = 15.50khz V = 60.56hz, +/- 0.01hz
-// --> VTOTAL should be OK, HTOTAL not 100% certain
+	// Video timing
+	// PCB measured: H = 15.50khz V = 60.56hz, +/- 0.01hz
+	// --> VTOTAL should be OK, HTOTAL not 100% certain
 	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 3;
 
 	static constexpr int HTOTAL  = 396;
@@ -737,7 +732,7 @@ void gyruss_state::gyruss(machine_config &config)
 	mainlatch.q_out_cb<5>().set(FUNC(gyruss_state::flipscreen_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gyruss_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -747,8 +742,7 @@ void gyruss_state::gyruss(machine_config &config)
 	PALETTE(config, m_palette, FUNC(gyruss_state::palette), 16*4+16*16, 32);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -792,8 +786,8 @@ void gyruss_state::gyruss(machine_config &config)
 	ay5.add_route(2, "discrete", 1.0, 14);
 
 	DISCRETE(config, m_discrete, sound_discrete);
-	m_discrete->add_route(0, "rspeaker", 1.0);
-	m_discrete->add_route(1, "lspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 1);
+	m_discrete->add_route(1, "speaker", 1.0, 0);
 }
 
 
@@ -809,6 +803,7 @@ ROM_START( gyruss )
 	ROM_LOAD( "gyrussk.1",    0x0000, 0x2000, CRC(c673b43d) SHA1(7c464fb154bac35dd6e2f547e157addeb8798194) )
 	ROM_LOAD( "gyrussk.2",    0x2000, 0x2000, CRC(a4ec03e4) SHA1(08c33ad7fcc2ad5e5787a1050284e3f8164f4618) )
 	ROM_LOAD( "gyrussk.3",    0x4000, 0x2000, CRC(27454a98) SHA1(030c7df225652ee20d5ef64d005eb011dc89a27d) )
+
 	// Diagnostic ROM, not populated. Checksums are from Shoestring's unofficial version.
 	// The game jumps to this location at startup if the first byte is 0x55.
 #if 0

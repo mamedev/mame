@@ -43,7 +43,6 @@
 
 #include "nl_jpmsru.h"
 
-#include "awpvid.h"
 #include "fruitsamples.h"
 
 #include "cpu/tms9900/tms9980a.h"
@@ -84,37 +83,38 @@ class jpmsru_state : public driver_device
 {
 public:
 	jpmsru_state(const machine_config &mconfig, device_type type, const char *tag) :
-			driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_inputs(*this, "IN%u", 0U),
-			m_reel(*this, "reel%u", 0U),
-			m_lamp(*this, "lamp%u", 0U),
-			m_digits(*this, "digit%u", 0U),
-			m_audio_in(*this, "nl_audio:in%u", 0U),
-			m_samples(*this, "samples"),
-			m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG),
-			m_dips(*this, "DIP%u", 0U)
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_inputs(*this, "IN%u", 0U),
+		m_reel(*this, "reel%u", 1U),
+		m_lamp(*this, "lamp%u", 0U),
+		m_digits(*this, "digit%u", 0U),
+		m_audio_in(*this, "nl_audio:in%u", 0U),
+		m_samples(*this, "samples"),
+		m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG),
+		m_dips(*this, "DIP%u", 0U)
 	{ }
 
-	void jpmsru_3k(machine_config &config);
-	void jpmsru_3k_busext(machine_config &config);
-	void jpmsru_4k(machine_config &config);
-	void jpmsru_6k(machine_config &config);
-	void ewn(machine_config &config);
-	void ewn2(machine_config &config);
-	void ndu(machine_config &config);
-	void dud(machine_config &config);
-	void lan(machine_config &config);
-	void super2(machine_config &config);
-	void ews(machine_config &config);
-	void lt(machine_config &config);
-	void sup2p(machine_config &config);
-	void lal(machine_config &config);
+	void jpmsru_3k(machine_config &config) ATTR_COLD;
+	void jpmsru_3k_busext(machine_config &config) ATTR_COLD;
+	void jpmsru_4k(machine_config &config) ATTR_COLD;
+	void jpmsru_6k(machine_config &config) ATTR_COLD;
+	void ewn(machine_config &config) ATTR_COLD;
+	void ewn2(machine_config &config) ATTR_COLD;
+	void ndu(machine_config &config) ATTR_COLD;
+	void dud(machine_config &config) ATTR_COLD;
+	void lan(machine_config &config) ATTR_COLD;
+	void super2(machine_config &config) ATTR_COLD;
+	void ews(machine_config &config) ATTR_COLD;
+	void lt(machine_config &config) ATTR_COLD;
+	void sup2p(machine_config &config) ATTR_COLD;
+	void lal(machine_config &config) ATTR_COLD;
 
 	template <unsigned N> int opto_r() { return m_opto[N]; }
+
 protected:
-	virtual void machine_start() override;
-	virtual void device_post_load() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	template <unsigned N> void opto_cb(int state) { m_opto[N] = state; }
 
@@ -148,20 +148,20 @@ protected:
 	void out_50p_lockout_w(offs_t offset, uint8_t data);
 	void out_logicext_w(offs_t offset, uint8_t data);
 
-	void jpmsru_3k_map(address_map &map);
-	void jpmsru_4k_map(address_map &map);
-	void jpmsru_6k_map(address_map &map);
-	void jpmsru_io(address_map &map);
-	void jpmsru_busext_io(address_map &map);
-	void outputs_ewn(address_map &map);
-	void outputs_ewn2(address_map &map);
-	void outputs_ndu(address_map &map);
-	void outputs_dud(address_map &map);
-	void outputs_lan(address_map &map);
-	void outputs_super2(address_map &map);
-	void outputs_ews(address_map &map);
-	void outputs_sup2p(address_map &map);
-	void outputs_lal(address_map &map);
+	void jpmsru_3k_map(address_map &map) ATTR_COLD;
+	void jpmsru_4k_map(address_map &map) ATTR_COLD;
+	void jpmsru_6k_map(address_map &map) ATTR_COLD;
+	void jpmsru_io(address_map &map) ATTR_COLD;
+	void jpmsru_busext_io(address_map &map) ATTR_COLD;
+	void outputs_ewn(address_map &map) ATTR_COLD;
+	void outputs_ewn2(address_map &map) ATTR_COLD;
+	void outputs_ndu(address_map &map) ATTR_COLD;
+	void outputs_dud(address_map &map) ATTR_COLD;
+	void outputs_lan(address_map &map) ATTR_COLD;
+	void outputs_super2(address_map &map) ATTR_COLD;
+	void outputs_ews(address_map &map) ATTR_COLD;
+	void outputs_sup2p(address_map &map) ATTR_COLD;
+	void outputs_lal(address_map &map) ATTR_COLD;
 
 	uint8_t m_int1;
 	uint8_t m_int2;
@@ -197,10 +197,10 @@ public:
 			m_dac(*this, "dac")
 	{ }
 
-	void lc(machine_config &config);
+	void lc(machine_config &config) ATTR_COLD;
 
 private:
-	void outputs_lc(address_map &map);
+	void outputs_lc(address_map &map) ATTR_COLD;
 
 	required_device<dac_1bit_device> m_dac;
 };
@@ -443,8 +443,7 @@ void jpmsru_state::reel_w(offs_t offset, uint8_t data)
 	if(bit == 3)
 	{
 		m_reel[reel]->update(m_reelbits[reel]);
-		const char reelnames[4][6] = { "reel1", "reel2", "reel3", "reel4" };
-		awp_draw_reel(machine(), reelnames[reel], *m_reel[reel]);
+		m_reel[reel]->draw();
 	}
 }
 
@@ -651,10 +650,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmsru_state::int2)
 static INPUT_PORTS_START( jpmsru_inputs )
 	PORT_START("IN0")
 	// Optos
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmsru_state, opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmsru_state, opto_r<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmsru_state, opto_r<2>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jpmsru_state, opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmsru_state::opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmsru_state::opto_r<1>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmsru_state::opto_r<2>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jpmsru_state::opto_r<3>))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// TTL inputs
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1220,7 +1219,7 @@ static INPUT_PORTS_START( j_lc )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x20, "Full" )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( j_lal )
@@ -1309,9 +1308,6 @@ INPUT_PORTS_END
 
 void jpmsru_state::machine_start()
 {
-	m_lamp.resolve();
-	m_digits.resolve();
-
 	save_item(NAME(m_reelbits));
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
@@ -1333,8 +1329,7 @@ void jpmsru_state::machine_start()
 
 void jpmsru_state::device_post_load()
 {
-	const char reelnames[4][6] = { "reel1", "reel2", "reel3", "reel4" };
-	for(int i = 0; i < 3; i++) awp_draw_reel(machine(), reelnames[i], *m_reel[i]);
+	for(int i = 0; i < 3; i++) m_reel[i]->draw();
 }
 
 // Base SRU with 3K ROM card

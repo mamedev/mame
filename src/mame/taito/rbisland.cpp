@@ -349,7 +349,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pc080sn(*this, "pc080sn"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -358,7 +357,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pc080sn_device> m_pc080sn;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
@@ -375,7 +373,7 @@ public:
 	void rbisland(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void counters_w(uint8_t data);
@@ -384,8 +382,8 @@ private:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cchip_irq_clear_cb);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<taito_cchip_device> m_cchip;
@@ -398,6 +396,7 @@ class jumping_state : public base_state
 public:
 	jumping_state(const machine_config &mconfig, device_type type, const char *tag) :
 		base_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
@@ -405,15 +404,18 @@ public:
 	void jumpingi(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t latch_r();
 	void spritectrl_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	// devices
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -422,8 +424,6 @@ private:
 	uint8_t m_sprite_ctrl = 0;
 };
 
-
-// video
 
 /***************************************************************************/
 
@@ -497,7 +497,7 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	for (int offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int const tile = m_spriteram[offs];
-		if (tile < m_gfxdecode->gfx(1)->elements())
+		if (tile < m_gfxdecode->gfx(0)->elements())
 		{
 			int sy = ((m_spriteram[offs + 1] - 0xfff1) ^ 0xffff) & 0x1ff;
 			if (sy > 400) sy = sy - 512;
@@ -520,8 +520,6 @@ uint32_t jumping_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 /***************************************************************************
                             MEMORY STRUCTURES
@@ -767,6 +765,9 @@ static const gfx_layout jumping_spritelayout =
 
 static GFXDECODE_START( gfx_jumping )
 	GFXDECODE_ENTRY( "sprites", 0, jumping_spritelayout, 0, 0x80 ) // OBJ 16x16
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_jumping_tmap )
 	GFXDECODE_ENTRY( "pc080sn", 0, jumping_tilelayout,   0, 0x80 ) // SCR 8x8
 GFXDECODE_END
 
@@ -825,7 +826,7 @@ void rbisland_state::rbisland(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough for the sound CPU to read all commands
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -833,14 +834,11 @@ void rbisland_state::rbisland(machine_config &config)
 	screen.set_screen_update(FUNC(rbisland_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rbisland);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(0);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
+	PC080SN(config, m_pc080sn, m_palette, gfx_rbisland);
 
-	PC090OJ(config, m_pc090oj, 0);
+	PC090OJ(config, m_pc090oj);
 	m_pc090oj->set_palette(m_palette);
 	m_pc090oj->set_colpri_callback(FUNC(rbisland_state::colpri_cb));
 
@@ -853,9 +851,9 @@ void rbisland_state::rbisland(machine_config &config)
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 }
 
 
@@ -873,7 +871,7 @@ void jumping_state::jumping(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));   // 10 CPU slices per frame - enough unless otherwise
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -884,10 +882,8 @@ void jumping_state::jumping(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jumping);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 2048);
 
-	PC080SN(config, m_pc080sn, 0);
-	m_pc080sn->set_gfx_region(1);
+	PC080SN(config, m_pc080sn, m_palette, gfx_jumping_tmap);
 	m_pc080sn->set_yinvert(1);
-	m_pc080sn->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1127,11 +1123,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito Corporation", "Rainbow Islands (new version)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito Corporation", "Rainbow Islands (old version)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbisland,  0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito",             "Rainbow Islands (rev 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rbislando, rbisland, rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito",             "Rainbow Islands",                 MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, jumping,   rbisland, jumping,  jumping,  jumping_state,  empty_init, ROT0, "bootleg",           "Jumping (set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, jumpinga,  rbisland, jumping,  jumping,  jumping_state,  empty_init, ROT0, "bootleg (Seyutu)",  "Jumping (set 2)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, jumpingi,  rbisland, jumpingi, jumping,  jumping_state,  empty_init, ROT0, "bootleg (Seyutu)",  "Jumping (set 3, Imnoe PCB)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, rbislande, 0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito Corporation", "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rbislande, 0,        rbisland, rbisland, rbisland_state, empty_init, ROT0, "Taito",             "Rainbow Islands - Extra Version", MACHINE_SUPPORTS_SAVE )

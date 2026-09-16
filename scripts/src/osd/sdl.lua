@@ -37,12 +37,6 @@ function maintargetosdoptions(_target,_subtarget)
 		end
 	end
 
-	if _OPTIONS["USE_WAYLAND"]=="1" then
-		links {
-			"wayland-egl"
-		}
-	end
-
 	if _OPTIONS["NO_USE_XINPUT"]~="1" then
 		links {
 			"Xext",
@@ -65,6 +59,8 @@ function maintargetosdoptions(_target,_subtarget)
 				links {
 					"SDL2main",
 					"SDL2",
+					"imm32",
+					"version",
 				}
 			configuration { "vs*" }
 				links {
@@ -89,6 +85,7 @@ function maintargetosdoptions(_target,_subtarget)
 		configuration { }
 
 		links {
+			"bcrypt",
 			"dinput8",
 			"psapi",
 		}
@@ -146,15 +143,6 @@ if not _OPTIONS["NO_X11"] then
 		_OPTIONS["NO_X11"] = "0"
 	end
 end
-
-newoption {
-	trigger = "USE_WAYLAND",
-	description = "Use Wayland",
-	allowed = {
-		{ "0",  "Do not use Wayland (use XWayland or X11)"  },
-		{ "1",  "Use Wayland" },
-	},
-}
 
 newoption {
 	trigger = "NO_USE_XINPUT",
@@ -229,12 +217,7 @@ end
 
 BASE_TARGETOS       = "unix"
 SDLOS_TARGETOS      = "unix"
-if _OPTIONS["targetos"]=="linux" then
-elseif _OPTIONS["targetos"]=="openbsd" then
-elseif _OPTIONS["targetos"]=="netbsd" then
-elseif _OPTIONS["targetos"]=="haiku" then
-elseif _OPTIONS["targetos"]=="asmjs" then
-elseif _OPTIONS["targetos"]=="windows" then
+if _OPTIONS["targetos"]=="windows" then
 	BASE_TARGETOS       = "win32"
 	SDLOS_TARGETOS      = "win32"
 elseif _OPTIONS["targetos"]=="macosx" then
@@ -329,7 +312,6 @@ project ("qtdbg_" .. _OPTIONS["osd"])
 	qtdebuggerbuild()
 
 project ("osd_" .. _OPTIONS["osd"])
-	targetsubdir(_OPTIONS["target"] .."_" .._OPTIONS["subtarget"])
 	uuid (os.uuid("osd_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
@@ -372,6 +354,8 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogview.h",
+			MAME_DIR .. "src/osd/modules/debugger/osx/exceptionpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/exceptionpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/disassemblyview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/errorlogviewer.h",
@@ -407,7 +391,6 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 project ("ocore_" .. _OPTIONS["osd"])
-	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
@@ -423,9 +406,12 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/osd/sdl",
+		ext_includedir("asio"),
 	}
 
 	files {
+		MAME_DIR .. "src/osd/asio.cpp",
+		MAME_DIR .. "src/osd/asio.h",
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
 		MAME_DIR .. "src/osd/osdfile.h",
@@ -465,5 +451,3 @@ project ("ocore_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/file/stdfile.cpp",
 		}
 	end
-
-

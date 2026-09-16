@@ -34,16 +34,16 @@ public:
 	void korgz3(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void p5_w(u8 data);
 	u8 adc_port_r();
 	void adc_port_w(u8 data);
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void synth_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void synth_map(address_map &map) ATTR_COLD;
 
 	required_device<v30_device> m_maincpu;
 	required_device<hd6301y_cpu_device> m_synthcpu;
@@ -96,8 +96,6 @@ void korgz3_state::io_map(address_map &map)
 
 void korgz3_state::synth_map(address_map &map)
 {
-	map(0x0000, 0x0027).m(m_synthcpu, FUNC(hd6301y_cpu_device::hd6301y_io));
-	map(0x0040, 0x013f).ram();
 	map(0x2000, 0x2000).nopr();
 	map(0x3800, 0x3801).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x4000, 0x7fff).ram().share("nvram");
@@ -130,12 +128,11 @@ void korgz3_state::korgz3(machine_config &config)
 
 	M58990(config, m_adc, 1'000'000); // M58990P-1
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2414_device &ymsnd(YM2414(config, "ymsnd", 3'579'545)); // YM2414B
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START(korgz3)
@@ -150,4 +147,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1988, korgz3, 0, 0, korgz3, korgz3, korgz3_state, empty_init, "Korg", "Z3 Guitar Synthesizer", MACHINE_IS_SKELETON)
+SYST(1988, korgz3, 0, 0, korgz3, korgz3, korgz3_state, empty_init, "Korg", "Z3 Guitar Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

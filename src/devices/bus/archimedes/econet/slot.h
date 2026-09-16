@@ -51,10 +51,7 @@ public:
 	archimedes_econet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
 		: archimedes_econet_slot_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	archimedes_econet_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
@@ -68,8 +65,8 @@ public:
 	void efiq_w(int state) { m_efiq_handler(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	device_archimedes_econet_interface *m_device;
 
@@ -89,11 +86,11 @@ public:
 protected:
 	device_archimedes_econet_interface(const machine_config &mconfig, device_t &device);
 
-	archimedes_econet_slot_device *m_slot;
+	archimedes_econet_slot_device *const m_slot;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ARCHIMEDES_ECONET_SLOT, archimedes_econet_slot_device)
 
 void archimedes_econet_devices(device_slot_interface &device);

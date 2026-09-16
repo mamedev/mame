@@ -1,0 +1,382 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<element name="matrixlamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="reellamp">
+		<rect state ="0">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+		<rect state ="1">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+		<rect state ="2">
+			<bounds x="0" y="0" width="7" height="7" />
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+	</element>
+
+	<element name="Steppers" defstate="0">
+		<simplecounter maxstate="999" digits="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</simplecounter>
+	</element>
+
+
+
+	<!-- a stateoffset of 682 will shift us by 1 step on a 96 step reel (0x10000/96) which seems a good default alignment for 96 step / 16 symbol reels -->
+	<element name="SteppersReel1">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="Fruit1">  <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image11.png -->
+		<text string="Fruit2">  <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image12.png -->
+		<text string="Fruit3">  <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image13.png -->
+		<text string="Fruit4">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image14.png -->
+		<text string="Fruit5">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image15.png -->
+		<text string="Fruit6">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image16.png -->
+		<text string="Fruit7">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image17.png -->
+		<text string="Fruit8">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image18.png -->
+		<text string="Fruit9">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image19.png -->
+		<text string="Fruit10"> <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image110.png -->
+		<text string="Fruit11"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image111.png -->
+		<text string="Fruit12"> <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image112.png -->
+		<text string="Fruit13"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image113.png -->
+		<text string="Fruit14"> <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image114.png -->
+		<text string="Fruit15"> <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image115.png -->
+		<text string="Fruit16"> <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text> <!-- image116.png -->
+	</element>
+
+	<element name="SteppersReel2">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="Fruit1">  <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit2">  <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit3">  <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit4">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit5">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit6">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit7">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit8">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit9">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit10"> <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit11"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit12"> <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit13"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit14"> <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit15"> <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit16"> <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+
+	<element name="SteppersReel3">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="Fruit1">  <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit2">  <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit3">  <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit4">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit5">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit6">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit7">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit8">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit9">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit10"> <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit11"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit12"> <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit13"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit14"> <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit15"> <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit16"> <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+
+	<element name="SteppersReel4">
+		<rect> <bounds x="0" y="0" width="50" height="272"/> <color alpha="0.0"/> </rect>
+		<text string="Fruit1">  <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit2">  <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit3">  <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit4">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit5">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit6">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit7">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit8">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit9">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit10"> <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit11"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit12"> <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit13"> <bounds x="2" y="208" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit14"> <bounds x="2" y="225" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit15"> <bounds x="2" y="242" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Fruit16"> <bounds x="2" y="259" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+
+	<element name="SteppersReel5">
+		<rect> <bounds x="0" y="0" width="50" height="204"/> <color alpha="0.0"/> </rect>
+		<text string="Example1">  <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example2">  <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example3">  <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example4">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example5">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example6">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example7">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example8">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example9">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example10"> <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example11"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example12"> <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+
+	<element name="SteppersReel6">
+		<rect> <bounds x="0" y="0" width="50" height="204"/> <color alpha="0.0"/> </rect>
+		<text string="Example1">  <bounds x="2" y="4"   width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example2">  <bounds x="2" y="21"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example3">  <bounds x="2" y="38"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example4">  <bounds x="2" y="55"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example5">  <bounds x="2" y="72"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example6">  <bounds x="2" y="89"  width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example7">  <bounds x="2" y="106" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example8">  <bounds x="2" y="123" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example9">  <bounds x="2" y="140" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example10"> <bounds x="2" y="157" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example11"> <bounds x="2" y="174" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+		<text string="Example12"> <bounds x="2" y="191" width="46" height="9"/> <color red="1.0" green="1.0" blue="1.0"/> </text>
+	</element>
+
+	<element name="vfd_dm_background">
+		<rect>
+			<color red="0" green="0.0" blue="0.0" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+		<rect>
+			<color state="7" red="1.0" green="1.0" blue="1.0" />
+			<color state="6" red="0.0" green="1.0" blue="1.0" />
+			<color state="5" red="1.0" green="0.0" blue="1.0" />
+			<color state="4" red="0.0" green="0.0" blue="1.0" />
+			<color state="3" red="1.0" green="1.0" blue="0.0" />
+			<color state="2" red="0.0" green="1.0" blue="0.0" />
+			<color state="1" red="1.0" green="0.0" blue="0.0" />
+			<color state="0" red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="vfd_dm_dot">
+		<rect>
+			<color state="0" red="0.0" green="0.075" blue="0.125" />
+			<color state="1" red="0.0" green="0.6" blue="1.0" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<group name="vfd0">
+		<element name="vfdbackground0" ref="vfd_dm_background" state="0">
+			<bounds x="-1.0" y="-1.0" width="98.0" height="10.0" />
+			<color red="0.4" green="0.4" blue="0.4" />
+		</element>
+		<repeat count="8">
+			<param name="s" start="0" increment="96" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="96">
+				<param name="x" start="0" increment="1" />
+				<element ref="vfd_dm_dot" >
+					<animate name="vfdduty0" />
+					<color state="8" red="0.0" green="1.0" blue="1.0" alpha="1.0" />
+					<color state="0" red="0.0" green="1.0" blue="1.0" alpha="0.0" />
+					<bounds x="~x~" y="~y~" width="0.8" height="0.8" />
+				</element>
+			</repeat>
+		</repeat>
+		<repeat count="8">
+			<param name="s" start="0" increment="96" />
+			<param name="y" start="0" increment="1" />
+			<repeat count="96">
+				<param name="n" start="~s~" increment="1" />
+				<param name="x" start="0" increment="1" />
+				<element name="vfddotmatrix~n~" ref="vfd_dm_dot" state="0">
+					<animate name="vfdduty0" />
+					<color state="0" red="0.0" green="1.0" blue="1.0" alpha="1.0" />
+					<color state="8" red="0.0" green="1.0" blue="1.0" alpha="0.0" />
+					<bounds x="~x~" y="~y~" width="0.8" height="0.8" />
+				</element>
+			</repeat>
+		</repeat>
+	</group>
+
+	<element name="digit" defstate="10">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="AWP Simulated Video (No Artwork)">
+		<group ref="vfd0">
+			<bounds x="210" y="200" width="147" height="20" />
+		</group>
+
+		<element name="reel1:pos" ref="Steppers" state="0">
+			<bounds x="250" y="350" width="10" height="5"/>
+		</element>
+		<element name="reel2:pos" ref="Steppers" state="0">
+			<bounds x="300" y="350" width="10" height="5"/>
+		</element>
+		<element name="reel3:pos" ref="Steppers" state="0">
+			<bounds x="350" y="350" width="10" height="5"/>
+		</element>
+
+		<element name="reel4:pos" ref="Steppers" state="0">
+			<bounds x="250" y="410" width="10" height="5"/>
+		</element>
+		<element name="reel5:pos" ref="Steppers" state="0">
+			<bounds x="300" y="410" width="10" height="5"/>
+		</element>
+		<element name="reel6:pos" ref="Steppers" state="0">
+			<bounds x="350" y="410" width="10" height="5"/>
+		</element>
+
+		<!-- these are typically the reel lamps, so duplicate them here -->
+		<element name="lamp32" ref="reellamp" state="0">
+			<bounds x="210" y="300" width="50" height="17"/>
+		</element>
+		<element name="lamp33" ref="reellamp" state="0">
+			<bounds x="210" y="317" width="50" height="17"/>
+		</element>
+		<element name="lamp34" ref="reellamp" state="0">
+			<bounds x="210" y="333" width="50" height="17"/>
+		</element>
+
+		<element name="lamp35" ref="reellamp" state="0">
+			<bounds x="260" y="300" width="50" height="17"/>
+		</element>
+		<element name="lamp36" ref="reellamp" state="0">
+			<bounds x="260" y="317" width="50" height="17"/>
+		</element>
+		<element name="lamp37" ref="reellamp" state="0">
+			<bounds x="260" y="333" width="50" height="17"/>
+		</element>
+
+		<element name="lamp48" ref="reellamp" state="0">
+			<bounds x="310" y="300" width="50" height="17"/>
+		</element>
+		<element name="lamp49" ref="reellamp" state="0">
+			<bounds x="310" y="317" width="50" height="17"/>
+		</element>
+		<element name="lamp50" ref="reellamp" state="0">
+			<bounds x="310" y="333" width="50" height="17"/>
+		</element>
+
+		<element name="lamp51" ref="reellamp" state="0">
+			<bounds x="210" y="360" width="50" height="17"/>
+		</element>
+		<element name="lamp52" ref="reellamp" state="0">
+			<bounds x="210" y="377" width="50" height="17"/>
+		</element>
+		<element name="lamp53" ref="reellamp" state="0">
+			<bounds x="210" y="393" width="50" height="17"/>
+		</element>
+
+		<element ref="SteppersReel1">
+			<bounds x="210" y="300" width="50" height="50"/>
+			<yscroll name="reel1:scroll" size="0.1875" wrap="yes" min="64854" max="130389"/>
+		</element>
+		<element ref="SteppersReel2">
+			<bounds x="260" y="300" width="50" height="50"/>
+			<yscroll name="reel2:scroll" size="0.1875" wrap="yes" min="64854" max="130389"/>
+		</element>
+		<element ref="SteppersReel3">
+			<bounds x="310" y="300" width="50" height="50"/>
+			<yscroll name="reel3:scroll" size="0.1875" wrap="yes" min="64854" max="130389"/>
+		</element>
+
+		<element ref="SteppersReel4">
+			<bounds x="210" y="360" width="50" height="50"/>
+			<yscroll name="reel4:scroll" size="0.1875" wrap="yes" min="64854" max="130389"/>
+		</element>
+		<element ref="SteppersReel5">
+			<bounds x="260" y="360" width="50" height="50"/>
+			<yscroll name="reel5:scroll" size="0.25" wrap="yes" min="0" max="65535"/>
+		</element>
+		<element ref="SteppersReel6">
+			<bounds x="310" y="360" width="50" height="50"/>
+			<yscroll name="reel6:scroll" size="0.25" wrap="yes" min="0" max="65535"/>
+		</element>
+
+
+		<repeat count="16">
+			<param name="s" start="0" increment="16"/>
+			<param name="y" start="0" increment="8"/>
+			<repeat count="16">
+				<param name="n" start="~s~" increment="1"/>
+				<param name="x" start="0" increment="8"/>
+				<element name="lamp~n~" ref="matrixlamp" state="0">
+					<bounds x="~x~" y="~y~" width="7" height="7"/>
+				</element>
+			</repeat>
+		</repeat>
+
+
+		<repeat count="4">
+			<param name="p" start="0" increment="40"/>
+			<param name="b" start="180" increment="22"/>
+			<repeat count="5">
+				<param name="s" start="~p~" increment="8"/>
+				<param name="x" start="~b~" increment="4"/>
+				<repeat count="8">
+					<param name="n" start="~s~" increment="1"/>
+					<param name="y" start="0" increment="4"/>
+					<element name="matrix~n~" ref="matrixlamp" state="0">
+						<bounds y="~y~" x="~x~" width="3" height="3"/>
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
+
+
+		<!-- the rest of the elements tend to be used for 7-segs
+		    so render them as both -->
+		<repeat count="12">
+			<param name="s" start="160" increment="8"/>
+			<param name="x" start="280" increment="4"/>
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1"/>
+				<param name="y" start="0" increment="4"/>
+				<element name="matrix~n~" ref="matrixlamp" state="0">
+					<bounds y="~y~" x="~x~" width="3" height="3"/>
+				</element>
+			</repeat>
+		</repeat>
+
+
+		<repeat count="4">
+			<param name="s" start="0" increment="8"/>
+			<param name="y" start="64" increment="20"/>
+			<repeat count="8">
+				<param name="n" start="~s~" increment="1"/>
+				<param name="x" start="180" increment="10"/>
+				<element name="digit~n~" ref="digit" state="0">
+					<bounds x="~x~" y="~y~" width="9" height="19"/>
+				</element>
+			</repeat>
+		</repeat>
+
+	</view>
+
+	<view name="VFD Display Output Only">
+		<group ref="vfd0">
+			<bounds x="210" y="200" width="144" height="17" />
+		</group>
+	</view>
+
+</mamelayout>
+

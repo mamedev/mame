@@ -125,9 +125,9 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -153,12 +153,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -207,7 +205,6 @@ const atari_motion_objects_config relief_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -254,60 +251,65 @@ uint32_t relief_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
-					 *      PF/M = PFXS
-					 *
-					 *      --- CS0 is set to 1 if the MO is transparent
-					 *      CS0=!MPX0*!MPX1*!MPX2*!MPX3
-					 *
-					 *      --- CS1 is 1 to select playfield pixels or 0 to select MO pixels
-					 *      !CS1=MPX5*MPX6*MPX7*!CS0
-					 *          +!MPX4*MPX5*MPX6*MPX7
-					 *          +PFXS*!CS0
-					 *          +!MPX4*PFXS
-					 *
-					 *      --- CRA10 is the 0x200 bit of the color RAM index; set for the top playfield only
-					 *      CRA10:=CS1*PFXS
-					 *
-					 *      --- CRA9 is the 0x100 bit of the color RAM index; set for MOs only
-					 *      !CA9:=CS1
-					 *
-					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
-					 */
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
+							 *      PF/M = PFXS
+							 *
+							 *      --- CS0 is set to 1 if the MO is transparent
+							 *      CS0=!MPX0*!MPX1*!MPX2*!MPX3
+							 *
+							 *      --- CS1 is 1 to select playfield pixels or 0 to select MO pixels
+							 *      !CS1=MPX5*MPX6*MPX7*!CS0
+							 *          +!MPX4*MPX5*MPX6*MPX7
+							 *          +PFXS*!CS0
+							 *          +!MPX4*PFXS
+							 *
+							 *      --- CRA10 is the 0x200 bit of the color RAM index; set for the top playfield only
+							 *      CRA10:=CS1*PFXS
+							 *
+							 *      --- CRA9 is the 0x100 bit of the color RAM index; set for MOs only
+							 *      !CA9:=CS1
+							 *
+							 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
+							 */
 
-					// compute the CS0 signal
-					int cs0 = 0;
-					cs0 = ((mo[x] & 0x0f) == 0);
+							// compute the CS0 signal
+							int cs0 = 0;
+							cs0 = ((mo[x] & 0x0f) == 0);
 
-					// compute the CS1 signal
-					int cs1 = 1;
-					if ((!cs0 && (mo[x] & 0xe0) == 0xe0) ||
-						((mo[x] & 0xf0) == 0xe0) ||
-						(!pri[x] && !cs0) ||
-						(!pri[x] && !(mo[x] & 0x10)))
-						cs1 = 0;
+							// compute the CS1 signal
+							int cs1 = 1;
+							if ((!cs0 && (mo[x] & 0xe0) == 0xe0) ||
+								((mo[x] & 0xf0) == 0xe0) ||
+								(!pri[x] && !cs0) ||
+								(!pri[x] && !(mo[x] & 0x10)))
+								cs1 = 0;
 
-					// MO is displayed if cs1 == 0
-					if (!cs1)
-						pf[x] = mo[x];
+							// MO is displayed if cs1 == 0
+							if (!cs1)
+								pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -344,7 +346,7 @@ void relief_state::machine_reset()
 uint16_t relief_state::special_port2_r()
 {
 	int result = m_260010->read();
-	if (!(result & 0x0080) || m_screen->hblank()) result ^= 0x0001;
+	if (BIT(~result, 7) || m_screen->hblank()) result ^= 0x0001;
 	return result;
 }
 
@@ -487,7 +489,7 @@ static INPUT_PORTS_START( relief )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("260012")
@@ -557,13 +559,13 @@ void relief_state::relief(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_relief);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(relief_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(relief_state::get_playfield2_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
+	ATARI_MOTION_OBJECTS(config, "vad:mob", m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses a VAD chip to generate video signals */

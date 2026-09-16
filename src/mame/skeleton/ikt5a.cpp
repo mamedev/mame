@@ -10,7 +10,7 @@
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/eepromser.h"
 #include "emupal.h"
 #include "screen.h"
@@ -37,7 +37,7 @@ public:
 	void ikt5a(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -52,8 +52,8 @@ private:
 	void p1_w(u8 data);
 	u8 p3_r();
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -163,7 +163,7 @@ void ikt5a_state::ikt5a(machine_config &config)
 {
 	I80C51(config, m_maincpu, 15_MHz_XTAL / 2); // PCB 80C51BH-2 (clock uncertain)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ikt5a_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &ikt5a_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &ikt5a_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(ikt5a_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(ikt5a_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(ikt5a_state::p3_r));
@@ -175,7 +175,7 @@ void ikt5a_state::ikt5a(machine_config &config)
 	m_keyboard->out_clock_cb().set(FUNC(ikt5a_state::keyboard_clk_w));
 	m_keyboard->out_data_cb().set(FUNC(ikt5a_state::keyboard_data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15_MHz_XTAL, 800, 0, 640, 375, 0, 350); // timings guessed
 	screen.set_screen_update(FUNC(ikt5a_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, MCS51_INT0_LINE);
@@ -200,4 +200,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1993, ikt5a, 0, 0, ikt5a, ikt5a, ikt5a_state, empty_init, "Creator / Fura Elektronik", "IKT-5A", MACHINE_IS_SKELETON)
+COMP(1993, ikt5a, 0, 0, ikt5a, ikt5a, ikt5a_state, empty_init, "Creator / Fura Elektronik", "IKT-5A", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -1,7 +1,7 @@
 // ProgressDialog2.h
 
-#ifndef __PROGRESS_DIALOG_2_H
-#define __PROGRESS_DIALOG_2_H
+#ifndef ZIP7_INC_PROGRESS_DIALOG_2_H
+#define ZIP7_INC_PROGRESS_DIALOG_2_H
 
 #include "../../../Common/MyCom.h"
 
@@ -33,9 +33,9 @@ class CProgressSync
 {
   bool _stopped;
   bool _paused;
-
 public:
-  bool _bytesProgressMode;
+  bool _filesProgressMode;
+  bool _isDir;
   UInt64 _totalBytes;
   UInt64 _completedBytes;
   UInt64 _totalFiles;
@@ -46,7 +46,6 @@ public:
   UString _titleFileName;
   UString _status;
   UString _filePath;
-  bool _isDir;
 
   UStringVector Messages;
   CProgressFinalMessage FinalMessage;
@@ -73,13 +72,14 @@ public:
     _paused = val;
   }
   
-  void Set_BytesProgressMode(bool bytesProgressMode)
+  void Set_FilesProgressMode(bool filesProgressMode)
   {
     NWindows::NSynchronization::CCriticalSectionLock lock(_cs);
-    _bytesProgressMode = bytesProgressMode;
+    _filesProgressMode = filesProgressMode;
   }
   
   HRESULT CheckStop();
+  void Clear_Stop_Status();
   HRESULT ScanProgress(UInt64 numFiles, UInt64 totalSize, const FString &fileName, bool isDir = false);
 
   HRESULT Set_NumFilesTotal(UInt64 val);
@@ -96,17 +96,38 @@ public:
 
   void AddError_Message(const wchar_t *message);
   void AddError_Message_Name(const wchar_t *message, const wchar_t *name);
-  void AddError_Code_Name(DWORD systemError, const wchar_t *name);
+  // void AddError_Code_Name(DWORD systemError, const wchar_t *name);
+  void AddError_Code_Name(HRESULT systemError, const wchar_t *name);
 
   bool ThereIsMessage() const { return !Messages.IsEmpty() || FinalMessage.ThereIsMessage(); }
 };
 
+
 class CProgressDialog: public NWindows::NControl::CModalDialog
 {
+  bool _isDir;
+  bool _wasCreated;
+  bool _needClose;
+  bool _errorsWereDisplayed;
+  bool _waitCloseByCancelButton;
+  bool _cancelWasPressed;
+  bool _inCancelMessageBox;
+  bool _externalCloseMessageWasReceived;
+  bool _background;
+public:
+  bool WaitMode;
+  bool MessagesDisplayed; // = true if user pressed OK on all messages or there are no messages.
+  bool CompressingMode;
+  bool ShowCompressionInfo;
+
+private:
+  unsigned _numPostedMessages;
+  unsigned _numAutoSizeMessages;
+  unsigned _numMessages;
+
   UString _titleFileName;
   UString _filePath;
   UString _status;
-  bool _isDir;
 
   UString _background_String;
   UString _backgrounded_String;
@@ -151,12 +172,11 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   NWindows::NControl::CProgressBar m_ProgressBar;
   NWindows::NControl::CListView _messageList;
   
-  int _numMessages;
   UStringVector _messageStrings;
 
-  #ifdef __ITaskbarList3_INTERFACE_DEFINED__
+  // #ifdef __ITaskbarList3_INTERFACE_DEFINED__
   CMyComPtr<ITaskbarList3> _taskbarList;
-  #endif
+  // #endif
   HWND _hwndForTaskbar;
 
   UInt32 _prevTime;
@@ -174,51 +194,33 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   UString _filesStr_Prev;
   UString _filesTotStr_Prev;
 
+  unsigned _numReduceSymbols;
   unsigned _prevSpeed_MoveBits;
   UInt64 _prevSpeed;
 
-  bool _foreground;
-
-  unsigned _numReduceSymbols;
-
-  bool _wasCreated;
-  bool _needClose;
-
-  unsigned _numPostedMessages;
-  UInt32 _numAutoSizeMessages;
-
-  bool _errorsWereDisplayed;
-
-  bool _waitCloseByCancelButton;
-  bool _cancelWasPressed;
-  
-  bool _inCancelMessageBox;
-  bool _externalCloseMessageWasReceived;
-
-
-  #ifdef __ITaskbarList3_INTERFACE_DEFINED__
+  // #ifdef __ITaskbarList3_INTERFACE_DEFINED__
   void SetTaskbarProgressState(TBPFLAG tbpFlags)
   {
     if (_taskbarList && _hwndForTaskbar)
       _taskbarList->SetProgressState(_hwndForTaskbar, tbpFlags);
   }
-  #endif
+  // #endif
   void SetTaskbarProgressState();
 
   void UpdateStatInfo(bool showAll);
-  bool OnTimer(WPARAM timerID, LPARAM callback);
   void SetProgressRange(UInt64 range);
   void SetProgressPos(UInt64 pos);
-  virtual bool OnInit();
-  virtual bool OnSize(WPARAM wParam, int xSize, int ySize);
-  virtual void OnCancel();
-  virtual void OnOK();
-  virtual bool OnNotify(UINT /* controlID */, LPNMHDR header);
+  virtual bool OnTimer(WPARAM timerID, LPARAM callback) Z7_override;
+  virtual bool OnInit() Z7_override;
+  virtual bool OnSize(WPARAM wParam, int xSize, int ySize) Z7_override;
+  virtual void OnCancel() Z7_override;
+  virtual void OnOK() Z7_override;
+  virtual bool OnNotify(UINT /* controlID */, LPNMHDR header) Z7_override;
   void CopyToClipboard();
 
   NWindows::NSynchronization::CManualResetEvent _createDialogEvent;
   NWindows::NSynchronization::CManualResetEvent _dialogCreatedEvent;
-  #ifndef _SFX
+  #ifndef Z7_SFX
   void AddToTitle(LPCWSTR string);
   #endif
 
@@ -226,11 +228,11 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   void SetPriorityText();
   void OnPauseButton();
   void OnPriorityButton();
-  bool OnButtonClicked(int buttonID, HWND buttonHWND);
-  bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
+  bool OnButtonClicked(unsigned buttonID, HWND buttonHWND) Z7_override;
+  bool OnMessage(UINT message, WPARAM wParam, LPARAM lParam) Z7_override;
 
   void SetTitleText();
-  void ShowSize(int id, UInt64 val, UInt64 &prev);
+  void ShowSize(unsigned id, UInt64 val, UInt64 &prev);
 
   void UpdateMessagesDialog();
 
@@ -243,19 +245,15 @@ class CProgressDialog: public NWindows::NControl::CModalDialog
   void ShowAfterMessages(HWND wndParent);
 
   void CheckNeedClose();
+
 public:
   CProgressSync Sync;
-  bool CompressingMode;
-  bool WaitMode;
-  bool ShowCompressionInfo;
-  bool MessagesDisplayed; // = true if user pressed OK on all messages or there are no messages.
   int IconID;
-
   HWND MainWindow;
-  #ifndef _SFX
+  #ifndef Z7_SFX
   UString MainTitle;
   UString MainAddTitle;
-  ~CProgressDialog();
+  ~CProgressDialog() Z7_DESTRUCTOR_override;
   #endif
 
   CProgressDialog();
@@ -265,7 +263,7 @@ public:
     _dialogCreatedEvent.Lock();
   }
 
-  INT_PTR Create(const UString &title, NWindows::CThread &thread, HWND wndParent = 0);
+  INT_PTR Create(const UString &title, NWindows::CThread &thread, HWND wndParent = NULL);
 
 
   /* how it works:
@@ -306,7 +304,7 @@ public:
   void Process();
   void AddErrorPath(const FString &path) { ErrorPaths.Add(path); }
 
-  HRESULT Create(const UString &title, HWND parentWindow = 0);
+  HRESULT Create(const UString &title, HWND parentWindow = NULL);
   CProgressThreadVirt(): Result(E_FAIL), ThreadFinishedOK(false) {}
 
   CProgressMessageBoxPair &GetMessagePair(bool isError) { return isError ? FinalMessage.ErrorMessage : FinalMessage.OkMessage; }

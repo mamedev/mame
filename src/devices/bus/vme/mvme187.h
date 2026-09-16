@@ -25,14 +25,14 @@ public:
 	vme_mvme187_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void cpu_mem(address_map &map);
+	void cpu_mem(address_map &map) ATTR_COLD;
 
 	required_device<mc88100_device> m_cpu;
 	required_device_array<mc88200_device, 2> m_mmu;
@@ -40,7 +40,7 @@ private:
 	required_device<ds1643_device> m_rtc;
 	//required_device_array<cd2401, 2> m_uart;
 	required_device_array<rs232_port_device, 6> m_serial;
-	//required_device<ncr53c7xx_device> m_scsi;
+	//required_device<ncr53c710_device> m_scsi;
 	required_device<i82596_device> m_lan;
 
 	memory_view m_boot;

@@ -29,9 +29,9 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "bin,rom"; }
 
 protected:
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	bee_card_interface *m_beecard;

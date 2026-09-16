@@ -120,7 +120,7 @@ vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, v
 		LEFT = UP = LEFT3 = UP3 = 0.0;		\
 		PX0  = vec2(0.0, PX);				\
 		LIN0 = vec4(0.0, 0.0, 0.0, 0.0);	\
-	}										\
+	}
 
 
 

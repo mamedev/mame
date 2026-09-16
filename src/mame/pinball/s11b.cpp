@@ -145,8 +145,8 @@ static INPUT_PORTS_START( s11b )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP64")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11b_state, main_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11b_state::audio_nmi), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11b_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
@@ -354,7 +354,7 @@ void s11b_state::s11b_base(machine_config &config)
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(12), RES_K(12), RES_K(56), CAP_P(4700), CAP_P(470));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(180), RES_K(180), RES_K(180), CAP_P(470), CAP_P(100));
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
+	HC55516(config, m_hc55516).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0/4.0); // to prevent massive clipping issues, we divide the signal by 4 here before going into the filters, then multiply it by 4 after it comes out the other end
 
 	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s11b_state::sound_r));
@@ -388,13 +388,13 @@ void s11b_state::s11b_jokerz(machine_config &config)
 	PINSND88(config, m_ps88);
 	// the dac and cvsd volumes should be equally mixed on the s11 board send to the audio board, whatever type it is
 	// the 4 gain values in the add_route statements are actually irrelevant, the ps88 device will override them
-	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.29, AUTO_ALLOC_INPUT, 0);
-	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.25, AUTO_ALLOC_INPUT, 1);
-	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.29*4.0), AUTO_ALLOC_INPUT, 0);
-	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), AUTO_ALLOC_INPUT, 1);
+	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.29, 0);
+	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.25, 1);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.29*4.0), 0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), 1);
 	m_pia34->ca2_handler().set(m_ps88, FUNC(pinsnd88_device::resetq_w));
 	m_ps88->syncq_cb().set(m_pia34, FUNC(pia6821_device::ca1_w)); // the sync connection comes from sound connector pin 16 to MCA1, not the usual pin 12 to MCB1
-	SPEAKER(config, "cabinet").front_floor(); // the cabinet speaker is aimed down underneath the pinball table itself
+	SPEAKER(config, "cabinet").set_position(0, 0.0, -0.5, 1.0); // the cabinet speaker is aimed down underneath the pinball table itself
 	SPEAKER(config, "backbox").front_center(); // the backbox speakers are roughly level with the user, but farther in front of them than the cabinet
 	m_ps88->add_route(0, "cabinet", 1.0);
 	m_ps88->add_route(1, "backbox", 1.0);
@@ -451,6 +451,28 @@ ROM_START(bcats_g4)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("cats_u26.l5",  0x4000, 0x4000, CRC(32246d12) SHA1(b8aa89d197a6b992501904f5072a10ab1a31db87))
 	ROM_LOAD("cats_u27.lg4", 0x8000, 0x8000, CRC(6af8cc3b) SHA1(ac9908dc3fbe1d3b1821c2976aaa5bbffbf24cda))
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cats_u21.l1", 0x8000, 0x8000, CRC(04110d08) SHA1(4b44b26983cb5d14a93c16a19dc2bdbaa665dc69))
+	ROM_LOAD("cats_u22.l1", 0x0000, 0x8000, CRC(7e152c78) SHA1(b4ab770fdd9420a5d35e55bf8fb84c99ac544b8b))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cats_u4.l1", 0x00000, 0x8000, CRC(18c62813) SHA1(a4fb69cfedd0b92c22b599913df3cdf8b3eef42c))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("cats_u19.l1", 0x20000, 0x8000, CRC(f2fea68b) SHA1(9a41823e71342b7a162420378f122bba34ce0636))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("cats_u20.l1", 0x40000, 0x8000, CRC(bf4dc35a) SHA1(9920ce90d93fb6ecf98792c35bb6eb8862a969f3))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
+ROM_START(bcats_f1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("cats_u26.lf1", 0x4000, 0x4000, CRC(e7f3552b) SHA1(fbef003e62b624c80b6f6705599ad6982c901834))
+	ROM_LOAD("cats_u27.lf1", 0x8000, 0x8000, CRC(73f50ce7) SHA1(b13eff5c9ca5a3565c47eb7de2a525a291c00303))
 	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("cats_u21.l1", 0x8000, 0x8000, CRC(04110d08) SHA1(4b44b26983cb5d14a93c16a19dc2bdbaa665dc69))
 	ROM_LOAD("cats_u22.l1", 0x0000, 0x8000, CRC(7e152c78) SHA1(b4ab770fdd9420a5d35e55bf8fb84c99ac544b8b))
@@ -656,10 +678,10 @@ ROM_START(bk2k_l4)
 	ROM_RELOAD(0x38000,0x8000)
 ROM_END
 
-ROM_START(bk2k_lg1) // the rom at u26 is reported as bad when the game is booted, but appears to run nonetheless; bad dump or original bug in the LG-1 set fixed in LG-2 and LG-3?
+ROM_START(bk2k_lg1)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("bk2kgu26.lg1", 0x4000, 0x4000, CRC(f916d163) SHA1(bd8cbac9345a8debd01c8c68110652f591ad9d51))
-	ROM_LOAD("bk2kgu27.lg1", 0x8000, 0x8000, CRC(4132ac5c) SHA1(5636d4e8fb9bf5a5f4ccafe4ef035ab0e8964e8b))
+	ROM_LOAD("u26-pu1.rom", 0x4000, 0x4000, CRC(2da07403) SHA1(4b48c5d7b0a03aa4593dc6053dc5e94df22d2a64))
+	ROM_LOAD("bk2kgu27.lg1", 0x8000, 0x8000, CRC(2d6359d4) SHA1(531841dedf2acf3ac10577813f003cf077d4607d))
 	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("bk2k_u21.l1", 0x8000, 0x8000, CRC(08be36ad) SHA1(0f4c448e003df54ed8ccf0e0c57f6123ce1e2027))
 	ROM_LOAD("bk2k_u22.l1", 0x0000, 0x8000, CRC(9c8becd8) SHA1(9090e8104dad63f14246caabafec428d94d5e18d))
@@ -1059,6 +1081,28 @@ ROM_START(eatpm_4g)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u26-lg4.rom", 0x4000, 0x4000, CRC(5e196382) SHA1(e948993ae100ab3d7e1b771f4ce22e3faaad84b4))
 	ROM_LOAD("elvi_u27.l4", 0x8000, 0x8000, CRC(3614f3e2) SHA1(3143fef8ab91ad357803d1e98b8ee953e6a194ef))
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("elvi_u21.l1", 0x8000, 0x8000, CRC(68d44545) SHA1(8c3ea8521a44b1539cd148f142cca14184174ba7))
+	ROM_LOAD("elvi_u22.l1", 0x0000, 0x8000, CRC(e525b4fe) SHA1(be728ec33a00b93c3346428a9248b588460af945))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("elvi_u4.l1", 0x00000, 0x8000, CRC(b5afa4db) SHA1(59b72dac5301a4befa01b93da5162478682e6021))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("elvi_u19.l1", 0x20000, 0x8000, CRC(806bc350) SHA1(d170aef11001096da9f2f7240726662009e26f5f))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("elvi_u20.l1", 0x40000, 0x8000, CRC(3d92d5fd) SHA1(834d40a59be57057103d1d8ab48fdaaf7dc5eda2))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
+ROM_START(eatpm_3g)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u26-lg4.rom", 0x4000, 0x4000, BAD_DUMP CRC(5e196382) SHA1(e948993ae100ab3d7e1b771f4ce22e3faaad84b4)) // the U27 came without matching U26
+	ROM_LOAD("elvira_u27_rom1_lg-3_novaapparate.bin", 0x8000, 0x8000, CRC(a3adae98) SHA1(3b94cd83ecbae1a58d780b35cac879d636c2d5b0))
 	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("elvi_u21.l1", 0x8000, 0x8000, CRC(68d44545) SHA1(8c3ea8521a44b1539cd148f142cca14184174ba7))
 	ROM_LOAD("elvi_u22.l1", 0x0000, 0x8000, CRC(e525b4fe) SHA1(be728ec33a00b93c3346428a9248b588460af945))
@@ -1541,6 +1585,28 @@ ROM_START(tsptr_l3)
 	ROM_RELOAD(0x58000,0x8000)
 ROM_END
 
+ROM_START(tsptr_l1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("transporter-la1-u26-checksumb412.l1", 0x4000, 0x4000, CRC(3504300f) SHA1(1a8b779b7375e4087e42b31c1aa17a8a32c6d6aa))
+	ROM_LOAD("transporter-la1-u27-checksum01cf.l1", 0x8000, 0x8000, CRC(49635399) SHA1(8cdc700c501f0d611152010d5ae28bcd84d06861))
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("transporter-u21-checksumca54.l1", 0x8000, 0x8000, CRC(2b194ca6) SHA1(20cb956143622409a7f4b918ab1699db1b6e6b07))
+	ROM_LOAD("transporter-u22-checksumd84c.l1", 0x0000, 0x8000, CRC(4c7ba6d7) SHA1(0134dce454c29c572c4ee0e0139a8ad5f0249b99))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("transporter-u4-checksum58b0.l1", 0x00000, 0x8000, CRC(63e92f8b) SHA1(57f2841419415fc3560d46a63119c76f98cade9b))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("transporter-u19-checksumc7af.l1", 0x20000, 0x8000, CRC(3cfde8b0) SHA1(7bdc71ba1ba4fd337f052354323c86fd97b2b881)) // only common ROM with L3
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("transporter-u20-checksum21ae.l1", 0x40000, 0x8000, CRC(fabddaaf) SHA1(7c014bb5b1ac8da61ffd265ba98bcb8256c5f666))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
 /*-----------------------
 / Whirlwind 4/90 (#574)
 /-----------------------*/
@@ -1610,9 +1676,54 @@ ROM_START(whirl_l2)
 	ROM_RELOAD(0x58000,0x8000)
 ROM_END
 
+ROM_START(whirl_lg2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("whir_u26.l3", 0x4000, 0x4000, CRC(066b8fec) SHA1(017ca12ef5ebd9bb70690b0e096064be5144a512))
+	ROM_LOAD("whirlwind_u27_lg2.bin", 0x8000, 0x8000, CRC(49f03cd9) SHA1(ee7837861678f86d3903842e1895de358383b6b2)) // the U27 came without U26, so unknown if these 2 really match, even though the game runs
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("whir_u21.l1", 0x8000, 0x8000, CRC(fa3da322) SHA1(732107eace9eecdb97eff4abb4420a2febef7425))
+	ROM_LOAD("whir_u22.l1", 0x0000, 0x8000, CRC(fcaf8c4e) SHA1(8e8cab1923a56bcef4671dce28aef1e39303c04a))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("whir_u4.l1", 0x00000, 0x8000, CRC(29952d84) SHA1(26479a341b0552c5f9d9bf9dd013855e51a7b857))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("whir_u19.l1", 0x20000, 0x8000, CRC(c63f6fe9) SHA1(947bbccb5eeae414770254d42d0a95425e2dca8c))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("whir_u20.l1", 0x40000, 0x8000, CRC(713007af) SHA1(3ac88bb905ccf8e227bbf3c102c74e3d2446cc88))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
+ROM_START(whirl_lg1)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("whir_u26.l3", 0x4000, 0x4000, CRC(066b8fec) SHA1(017ca12ef5ebd9bb70690b0e096064be5144a512))
+	ROM_LOAD("whirlwind_u27_lg1.bin", 0x8000, 0x8000, CRC(e85a5004) SHA1(dd88d8b26e44df1bc9304f844cf1f8cbc46f31f7)) // the U27 came without U26, so unknown if these 2 really match, even though the game runs
+	ROM_REGION(0x10000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("whir_u21.l1", 0x8000, 0x8000, CRC(fa3da322) SHA1(732107eace9eecdb97eff4abb4420a2febef7425))
+	ROM_LOAD("whir_u22.l1", 0x0000, 0x8000, CRC(fcaf8c4e) SHA1(8e8cab1923a56bcef4671dce28aef1e39303c04a))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("whir_u4.l1", 0x00000, 0x8000, CRC(29952d84) SHA1(26479a341b0552c5f9d9bf9dd013855e51a7b857))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("whir_u19.l1", 0x20000, 0x8000, CRC(c63f6fe9) SHA1(947bbccb5eeae414770254d42d0a95425e2dca8c))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("whir_u20.l1", 0x40000, 0x8000, CRC(713007af) SHA1(3ac88bb905ccf8e227bbf3c102c74e3d2446cc88))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
 GAME(1989,  bcats_l5,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (L-5)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bcats_l2,       bcats_l5,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (LA-2)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  bcats_g4,       bcats_l5,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (LG-4)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bcats_f1,       bcats_l5,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Bad Cats (LF-1)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  bnzai_l3,       0,          s11b,   s11b, s11b_state, init_s11bn7, ROT0, "Williams", "Banzai Run (L-3)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  bnzai_g3,       bnzai_l3,   s11b,   s11b, s11b_state, init_s11bn7, ROT0, "Williams", "Banzai Run (L-3) Germany",                     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  bnzai_l1,       bnzai_l3,   s11b,   s11b, s11b_state, init_s11bn7, ROT0, "Williams", "Banzai Run (L-1)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -1621,14 +1732,14 @@ GAME(1987,  bguns_l8,       0,          s11b,   s11b, s11b_state, init_s11bnn, R
 GAME(1987,  bguns_l7,       bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (L-7)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  bguns_la,       bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (L-A)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987,  bguns_p1,       bguns_l8,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Big Guns (P-1)",                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_l4,        0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (L-4)",                      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_lg1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LG-1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_lg3,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LG-3)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_pu1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PU-1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_pf1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PF-1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_la2,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LA-2)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_pa7,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PA-7)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1989,  bk2k_pa5,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PA-5)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_l4,        0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (L-4)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_lg1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LG-1)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_lg3,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LG-3)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_pu1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PU-1)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_pf1,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PF-1)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_la2,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (LA-2)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_pa7,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PA-7)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  bk2k_pa5,       bk2k_l4,    s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Black Knight 2000 (PA-5)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  cycln_l5,       0,          s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Cyclone (L-5)",                                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  cycln_l4,       cycln_l5,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Cyclone (L-4)",                                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  cycln_l1,       cycln_l5,   s11b,   s11b, s11b_state, init_s11bnn, ROT0, "Williams", "Cyclone (L-1)",                                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -1644,6 +1755,7 @@ GAME(1989,  eatpm_l4,       0,          s11b,   s11b, s11b_state, init_s11bin, R
 GAME(1989,  eatpm_l1,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (LA-1)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  eatpm_l2,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (LA-2)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  eatpm_4g,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (LG-4)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  eatpm_3g,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (LG-3)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  eatpm_4u,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (LU-4)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  eatpm_f1,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (LF-1) French",  MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  eatpm_p7,       eatpm_l4,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Elvira and the Party Monsters (PA-7)",         MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
@@ -1668,6 +1780,9 @@ GAME(1988,  taxi_lu1,       taxi_l4,    s11b,   s11b, s11b_state, init_s11bi7, R
 GAME(1988,  taxi_lg1,       taxi_l4,    s11b,   s11b, s11b_state, init_s11bi7, ROT0, "Williams", "Taxi (Marilyn) (L-1) Germany",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1988,  taxi_p5,        taxi_l4,    s11b,   s11b, s11b_state, init_s11bi7, ROT0, "Williams", "Taxi (P-5)",                                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1989,  tsptr_l3,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Transporter the Rescue (L-3)",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  whirl_l3,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (L-3)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1990,  whirl_l2,       whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (L-2)",                              MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1989,  tsptr_l1,       tsptr_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Bally",    "Transporter the Rescue (LA-1)",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  whirl_l3,       0,          s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LA-3)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  whirl_l2,       whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LU-2)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1990,  whirl_lg3,      whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LG-3)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  whirl_lg2,      whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LG-2)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1990,  whirl_lg1,      whirl_l3,   s11b,   s11b, s11b_state, init_s11bin, ROT0, "Williams", "Whirlwind (LG-1)",                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

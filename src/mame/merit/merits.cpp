@@ -18,7 +18,8 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "speaker.h"
@@ -38,8 +39,8 @@ public:
 	void scrpiondold(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -49,7 +50,7 @@ void merits_state::mem_map(address_map &map)
 	map(0x0000, 0xffff).rom().region("maincpu", 0);
 }
 
-void merits_state::io_map(address_map &map)
+void merits_state::data_map(address_map &map)
 {
 	map(0x8000, 0x87ff).ram().share("nvram");
 	//map(0x9000, 0x9000).r();
@@ -87,7 +88,7 @@ void merits_state::scrpiond(machine_config &config)
 {
 	DS80C320(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merits_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &merits_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &merits_state::data_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 }
@@ -96,7 +97,7 @@ void merits_state::scrpiondold(machine_config &config)
 {
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merits_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &merits_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &merits_state::data_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 }
@@ -147,7 +148,7 @@ ROM_END
 } // Anonymous namespace
 
 //   YEAR  NAME         PARENT    COMPAT       MACHINE   INPUT         CLASS       INIT  COMPANY  FULLNAME                                                        FLAGS
-GAME(1999, scrpiond,    0,        scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Jun 15, 1999)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, scrpionda,   scrpiond, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Oct 01, 1997)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, scrpiondb,   scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Dec 24, 1993)",                                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1992, pubtimed2ch, 0,        scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Pub Time Darts II Plus 2 with Solo Challenger (Mar 24, 1992)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1999, scrpiond,    0,        scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Jun 15, 1999)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, scrpionda,   scrpiond, scrpiond,    scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Oct 01, 1997)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1993, scrpiondb,   scrpiond, scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Scorpion (Dec 24, 1993)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1992, pubtimed2ch, 0,        scrpiondold, scrpiond, merits_state, empty_init, ROT0, "Merit", "Pub Time Darts II Plus 2 with Solo Challenger (Mar 24, 1992)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

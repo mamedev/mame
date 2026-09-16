@@ -291,6 +291,10 @@ at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_typ
 {
 }
 
+at_kbc_device_base::~at_kbc_device_base()
+{
+}
+
 void at_kbc_device_base::device_start()
 {
 	save_item(NAME(m_hot_res));
@@ -376,6 +380,10 @@ at_keyboard_controller_device::at_keyboard_controller_device(machine_config cons
 {
 }
 
+at_keyboard_controller_device::~at_keyboard_controller_device()
+{
+}
+
 tiny_rom_entry const *at_keyboard_controller_device::device_rom_region() const
 {
 	return ROM_NAME(at_kbc);
@@ -452,6 +460,10 @@ ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config co
 {
 }
 
+ps2_keyboard_controller_device::~ps2_keyboard_controller_device()
+{
+}
+
 tiny_rom_entry const *ps2_keyboard_controller_device::device_rom_region() const
 {
 	return ROM_NAME(ps2_kbc);
@@ -471,6 +483,8 @@ void ps2_keyboard_controller_device::device_add_mconfig(machine_config &config)
 void ps2_keyboard_controller_device::device_start()
 {
 	at_kbc_device_base::device_start();
+
+	m_aux_irq_timer = timer_alloc(FUNC(ps2_keyboard_controller_device::set_aux_irq_timer_callback), this);
 
 	save_item(NAME(m_aux_irq));
 	save_item(NAME(m_aux_clk_in));
@@ -540,6 +554,17 @@ void ps2_keyboard_controller_device::p2_w(uint8_t data)
 	if (BIT(data & ~m_p2_data, 4))
 		set_kbd_irq(1U);
 	if (BIT(data & ~m_p2_data, 5))
-		set_aux_irq(1U);
+	{
+		// HACK: delay raising the aux irq until compaq queues the data
+		if (m_mcu->pcbase() == 0x7ba)
+			m_aux_irq_timer->adjust(attotime::from_hz(clock() / 16));
+		else
+			set_aux_irq(1U);
+	}
 	m_p2_data = data;
+}
+
+TIMER_CALLBACK_MEMBER(ps2_keyboard_controller_device::set_aux_irq_timer_callback)
+{
+	set_aux_irq(1U);
 }

@@ -48,8 +48,7 @@ QTY     Type
 Notes
 
 This is the PCB for one of the first ever CD based Juke Box, made in 1988 by Midcoin, some info here:
-http://www.tilt.it/deb/i-midcoin.html
-
+https://www.tilt.it/deb/midcoin-en.html
 
 */
 
@@ -78,8 +77,7 @@ public:
 	void midcoin24cdjuke(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -96,10 +94,10 @@ private:
 
 	uint8_t unknown_r() { return machine().rand(); }
 
-	void midcoin24cdjuke_io(address_map &map);
-	void midcoin24cdjuke_map(address_map &map);
+	void midcoin24cdjuke_io(address_map &map) ATTR_COLD;
+	void midcoin24cdjuke_map(address_map &map) ATTR_COLD;
 
-	uint8_t m_kb_col;
+	uint8_t m_kb_col = 0;
 };
 
 
@@ -280,11 +278,7 @@ INPUT_PORTS_END
 
 void midcoin24cdjuke_state::machine_start()
 {
-	m_digits.resolve();
-}
-
-void midcoin24cdjuke_state::machine_reset()
-{
+	save_item(NAME(m_kb_col));
 }
 
 

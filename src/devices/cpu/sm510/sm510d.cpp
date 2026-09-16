@@ -46,6 +46,38 @@ offs_t sm510_common_disassembler::increment_pc(offs_t pc, u8 pclen)
 
 // common lookup tables
 
+enum sm510_common_disassembler::e_mnemonics : unsigned
+{
+	// SM510 common
+	mILL /* 0! */, mEXT,
+	mLB, mLBL, mSBM, mEXBLA, mINCB, mDECB,
+	mATPL, mRTN0, mRTN1, mTL, mTML, mTM, mT,
+	mEXC, mBDC, mEXCI, mEXCD, mLDA, mLAX, mPTW, mWR, mWS,
+	mKTA, mATBP, mATX, mATL, mATFC, mATR,
+	mADD, mADD11, mADX, mCOMA, mROT, mRC, mSC,
+	mTB, mTC, mTAM, mTMI, mTA0, mTABL, mTIS, mTAL, mTF1, mTF4,
+	mRM, mSM,
+	mPRE, mSME, mRME, mTMEL,
+	mSKIP, mCEND, mIDIV, mDR, mDTA, mCLKLO, mCLKHI,
+
+	// SM500 common
+	mCOMCB, mRTN, mRTNS, mSSR, mTR, mTRS, mRBM,
+	mADDC, mPDTW, mTW, mDTW,
+	mATS, mEXKSA, mEXKFA,
+	mRMF, mSMF, mCOMCN,
+	mTA, mTM2, mTG,
+
+	// SM530 common
+	mSABM, mSABL, mEXBL,
+	mTG2, mTBA,
+	mKETA, mATF, mSDS, mRDS,
+	mINIS,
+
+	// SM590 common
+	mTAX, mLBLX, mMTR, mSTR, mINBM, mDEBM, mRTA, mBLTA, mEXAX, mTBA2, mADS, mADC, mLBMX, mTLS,
+	mNOP, mCCTRL, mINBL, mDEBL, mXBLA, mADCS, mTR7 // aliases
+};
+
 const char *const sm510_common_disassembler::s_mnemonics[] =
 {
 	// SM510

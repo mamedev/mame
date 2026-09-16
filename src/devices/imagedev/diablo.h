@@ -4,8 +4,8 @@
  *   DIABLO drive image to hard disk interface
  **********************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_DIABLO_H
-#define MAME_DEVICES_IMAGEDEV_DIABLO_H
+#ifndef MAME_IMAGEDEV_DIABLO_H
+#define MAME_IMAGEDEV_DIABLO_H
 
 #pragma once
 
@@ -34,7 +34,7 @@ public:
 	typedef device_delegate<void (device_image_interface &)> unload_delegate;
 
 	// construction/destruction
-	diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~diablo_image_device();
 
 	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }
@@ -57,8 +57,8 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
@@ -78,4 +78,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(DIABLO, diablo_image_device)
 
-#endif // MAME_DEVICES_IMAGEDEV_DIABLO_H
+#endif // MAME_IMAGEDEV_DIABLO_H

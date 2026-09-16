@@ -72,30 +72,26 @@ bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	for (int track = 0; track < tracks; track++)
 		for (int head = 0; head < heads; head++)
 		{
-			size_t actual;
-			io.read_at(0x100 + bps * spt * (track * heads + head), sect_data, bps * spt, actual);
+			/*auto const [err, actual] =*/ read_at(io, 0x100 + bps * spt * (track * heads + head), sect_data, bps * spt); // FIXME: check for errors and premature EOF
 
 			for (int i = 0; i < spt; i++)
 			{
-				sects[i].track       = track;
-				sects[i].head        = head;
-				sects[i].sector      = i + 1;
-				sects[i].size        = ssize;
-				sects[i].actual_size = bps;
-				sects[i].deleted     = false;
-				sects[i].bad_crc     = false;
-				sects[i].data        = sect_data + i * bps;
+				sects[i].track        = track;
+				sects[i].head         = head;
+				sects[i].sector       = i + 1;
+				sects[i].size         = ssize;
+				sects[i].actual_size  = bps;
+				sects[i].deleted      = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
+				sects[i].weak         = false;
+				sects[i].data         = sect_data + i * bps;
 			}
 
 			build_pc_track_mfm(track, head, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));
 		}
 
 	return true;
-}
-
-bool dip_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const dip_format FLOPPY_DIP_FORMAT;

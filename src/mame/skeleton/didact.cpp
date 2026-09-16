@@ -95,7 +95,7 @@ namespace {
 /* Didact base class */
 class didact_state : public driver_device
 {
-	public:
+public:
 	didact_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
 		, m_cass(*this, "cassette")
@@ -107,9 +107,8 @@ class didact_state : public driver_device
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_shift);
-protected:
-	virtual void machine_start() override { m_led.resolve(); }
 
+protected:
 	optional_device<cassette_image_device> m_cass;
 	required_ioport_array<5> m_io_lines;
 	uint8_t m_lines[4]{};
@@ -170,7 +169,7 @@ public:
 		, m_segments(0)
 	{ }
 
-	void md6802(machine_config &config);
+	void md6802(machine_config &config) ATTR_COLD;
 
 protected:
 	uint8_t pia2_kbA_r();
@@ -179,10 +178,10 @@ protected:
 	void pia2_kbB_w(uint8_t data);
 	void pia2_ca2_w(int state);
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
-	void md6802_map(address_map &map);
+	void md6802_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m6802_cpu_device> m_maincpu;
@@ -267,7 +266,6 @@ void md6802_state::machine_start()
 	LOG("--->%s()\n", FUNCNAME);
 
 	didact_state::machine_start();
-	m_7segs.resolve();
 
 	save_item(NAME(m_reset));
 	save_item(NAME(m_shift));
@@ -327,14 +325,12 @@ void md6802_state::md6802_map(address_map &map)
  */
 /* Didact mp68a driver class */
 
-// Just a statement that the real mp68a hardware was designed with 6820 and not 6821
+// The real mp68a hardware was designed with 6820 and not 6821.
 // They are functional equivalents BUT has different electrical characteristics.
 // 2019-07-27 Cassette added: saves ok, load is unreliable, probably an original design problem.
-#define pia6820_device pia6821_device
-#define PIA6820 PIA6821
 class mp68a_state : public didact_state
 {
-	public:
+public:
 	mp68a_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -344,11 +340,10 @@ class mp68a_state : public didact_state
 		, m_pia2(*this, PIA2_TAG)
 	{ }
 
-	required_device<m6800_cpu_device> m_maincpu;
+	void mp68a(machine_config &config) ATTR_COLD;
 
-	// The display segment driver device (there is actually just one, needs rewrite to be correct)
-	required_device_array<dm9368_device, 6> m_digits;
-	output_finder<6> m_7segs;
+protected:
+	required_device<m6800_cpu_device> m_maincpu;
 
 	uint8_t pia2_kbA_r();
 	void pia2_kbA_w(uint8_t data);
@@ -357,13 +352,15 @@ class mp68a_state : public didact_state
 	int pia2_cb1_r();
 	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void mp68a(machine_config &config);
-	void mp68a_map(address_map &map);
-protected:
-	required_device<pia6820_device> m_pia1;
-	required_device<pia6820_device> m_pia2;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	void mp68a_map(address_map &map) ATTR_COLD;
+
+	required_device_array<dm9368_device, 6> m_digits;
+	output_finder<6> m_7segs; // The display segment driver device (there is actually just one, needs rewrite to be correct)
+
+	required_device<pia6821_device> m_pia1;
+	required_device<pia6821_device> m_pia2;
 };
 
 INPUT_CHANGED_MEMBER(didact_state::trigger_shift)
@@ -425,13 +422,13 @@ uint8_t mp68a_state::pia2_kbB_r()
 		while (a012 > 0 && !(line & (1 << --a012)));
 		a012 += 8;
 	}
-	if ( a012 == 0 && (line = ((m_lines[2]) | m_lines[3])) != 0)
+	if (a012 == 0 && (line = ((m_lines[2]) | m_lines[3])) != 0)
 	{
 		a012 = 8;
 		while (a012 > 0 && !(line & (1 << --a012)));
 	}
 
-	pb  = a012;       // A0-A2 -> PB0-PB3
+	pb = a012;       // A0-A2 -> PB0-PB3
 
 	if (m_shift)
 	{
@@ -475,7 +472,6 @@ void mp68a_state::machine_start()
 	LOG("--->%s()\n", FUNCNAME);
 
 	didact_state::machine_start();
-	m_7segs.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
@@ -486,8 +482,8 @@ void mp68a_state::machine_start()
 void mp68a_state::mp68a_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().mirror(0xf000);
-	map(0x0500, 0x0503).rw(m_pia1, FUNC(pia6820_device::read), FUNC(pia6820_device::write)).mirror(0xf0fc);
-	map(0x0600, 0x0603).rw(m_pia2, FUNC(pia6820_device::read), FUNC(pia6820_device::write)).mirror(0xf0fc);
+	map(0x0500, 0x0503).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0xf0fc);
+	map(0x0600, 0x0603).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).mirror(0xf0fc);
 	map(0x0700, 0x07ff).ram().mirror(0xf000);
 	map(0x0800, 0x0bff).rom().mirror(0xf400).region("maincpu", 0x0800);
 }
@@ -536,7 +532,7 @@ void mp68a_state::mp68a_map(address_map &map)
 /* Didact modulab driver class */
 class modulab_state : public didact_state
 {
-	public:
+public:
 	modulab_state(const machine_config &mconfig, device_type type, const char * tag)
 		: didact_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -546,19 +542,22 @@ class modulab_state : public didact_state
 		, m_da(0)
 	{ }
 
+	void modulab(machine_config &config) ATTR_COLD;
+
+protected:
 	required_device<m6802_cpu_device> m_maincpu;
 
 	output_finder<6> m_7segs;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void modulab(machine_config &config);
-protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
 	void da_w(int state);
+
 private:
-	void modulab_map(address_map &map);
+	void modulab_map(address_map &map) ATTR_COLD;
 	// Offsets for display and keyboard i/o
 	enum
 	{
@@ -571,7 +570,7 @@ private:
 	class shift8
 	{
 	public:
-		shift8(){ byte = 0; }
+		shift8() { byte = 0; }
 		void shiftIn(uint8_t in){ byte = ((byte << 1) & 0xfe) | (in & 1 ? 1 : 0); }
 		uint8_t byte;
 	};
@@ -642,7 +641,6 @@ void modulab_state::machine_start()
 	LOG("--->%s()\n", FUNCNAME);
 
 	didact_state::machine_start();
-	m_7segs.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_shift));
@@ -694,7 +692,7 @@ static INPUT_PORTS_START( modulab )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("C/B") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 
 	PORT_START("LINE4") /* Special KEY ROW for reset key */
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, modulab_state, trigger_reset, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(modulab_state::trigger_reset), 0)
 	PORT_BIT(0xfb, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -728,8 +726,8 @@ static INPUT_PORTS_START( md6802 )
 	PORT_BIT(0xf0, 0x00, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys */
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_shift, 0)
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, md6802_state, trigger_reset, 0)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md6802_state::trigger_shift), 0)
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md6802_state::trigger_reset), 0)
 	PORT_BIT(0xf3, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -763,9 +761,9 @@ static INPUT_PORTS_START( mp68a )
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("LINE4") /* Special KEY ROW for reset and Shift/'*' keys, they are hard wired */
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_shift, 0)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR('*') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mp68a_state::trigger_shift), 0)
 	//PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, mp68a_state, trigger_reset, 0)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mp68a_state::trigger_reset), 0)
 	PORT_BIT(0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -789,7 +787,7 @@ void modulab_state::modulab(machine_config &config)
 	config.set_default_layout(layout_modulab);
 
 	/* Devices */
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->set_cap_osc(CAP_U(0.10));
 	m_kb->set_cap_debounce(CAP_U(1));
 	m_kb->da_wr_callback().set(FUNC(modulab_state::da_w));
@@ -814,7 +812,7 @@ void md6802_state::md6802(machine_config &config)
 	config.set_default_layout(layout_md6802);
 
 	/* Devices */
-	TTL74145(config, m_tb16_74145, 0);
+	TTL74145(config, m_tb16_74145);
 	/* PIA #1 0xA000-0xA003 - used differently by laborations and loaded software */
 	PIA6821(config, m_pia1);
 
@@ -850,10 +848,10 @@ void mp68a_state::mp68a(machine_config &config)
 
 	/* Devices */
 	/* PIA #1 0x500-0x503 - used differently by laborations and loaded software */
-	PIA6820(config, m_pia1, 0);
+	PIA6821(config, m_pia1); // actually 6820
 
 	/* PIA #2 Keyboard & Display 0x600-0x603 */
-	PIA6820(config, m_pia2, 0);
+	PIA6821(config, m_pia2); // actually 6820
 	/* --PIA inits----------------------- */
 	/* 0x0BAF 0x601 (Control A) = 0x30 - CA2 is low and enable DDRA */
 	/* 0x0BB1 0x603 (Control B) = 0x30 - CB2 is low and enable DDRB */
@@ -886,12 +884,12 @@ void mp68a_state::mp68a(machine_config &config)
 	/* 0x086B 0x600 (Port A)    = 0x70 */
 	/* 0x086B 0x600 (Port A)    = 0x50 */
 	/* 0x086B 0x600 (Port A)    = 0x70 */
-	DM9368(config, m_digits[0], 0).update_cb().set(FUNC(mp68a_state::digit_w<0>));
-	DM9368(config, m_digits[1], 0).update_cb().set(FUNC(mp68a_state::digit_w<1>));
-	DM9368(config, m_digits[2], 0).update_cb().set(FUNC(mp68a_state::digit_w<2>));
-	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(mp68a_state::digit_w<3>));
-	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(mp68a_state::digit_w<4>));
-	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(mp68a_state::digit_w<5>));
+	DM9368(config, m_digits[0]).update_cb().set(FUNC(mp68a_state::digit_w<0>));
+	DM9368(config, m_digits[1]).update_cb().set(FUNC(mp68a_state::digit_w<1>));
+	DM9368(config, m_digits[2]).update_cb().set(FUNC(mp68a_state::digit_w<2>));
+	DM9368(config, m_digits[3]).update_cb().set(FUNC(mp68a_state::digit_w<3>));
+	DM9368(config, m_digits[4]).update_cb().set(FUNC(mp68a_state::digit_w<4>));
+	DM9368(config, m_digits[5]).update_cb().set(FUNC(mp68a_state::digit_w<5>));
 
 	/* Cassette */
 	SPEAKER(config, "mono").front_center();

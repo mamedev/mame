@@ -20,13 +20,12 @@ protected:
 	mips1core_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 40; }
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -60,9 +59,9 @@ protected:
 	// memory
 	enum translate_result : unsigned { ERROR, UNCACHED, CACHED };
 	virtual translate_result translate(int intention, offs_t &address, bool debug);
-	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(u32 address, U &&apply);
-	template <typename T, bool Aligned = true> void store(u32 address, T data, T mem_mask = ~T(0));
-	void fetch(u32 address, std::function<void(u32)> &&apply);
+	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, void> load(offs_t address, U &&apply);
+	template <typename T, bool Aligned = true> void store(offs_t address, T data, T mem_mask = ~T(0));
+	void fetch(offs_t address, std::function<void(u32)> &&apply);
 
 	// cache
 	template <typename T> unsigned shift_factor(u32 address) const;
@@ -98,10 +97,6 @@ protected:
 		std::unique_ptr<struct line[]> line;
 	};
 	std::tuple<struct cache::line &, bool> cache_lookup(u32 address, bool invalidate, bool icache = false);
-
-	// debug helpers
-	std::string debug_string(u32 string_pointer, unsigned const limit = 0);
-	std::string debug_string_array(u32 array_pointer);
 
 	// address spaces
 	address_space_config const m_program_config_be;
@@ -164,8 +159,8 @@ protected:
 	mips1_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 cpurev, size_t icache_size, size_t dcache_size, bool cache_pws);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual translate_result translate(int intention, offs_t &address, bool debug) override;
 
@@ -220,8 +215,8 @@ public:
 	r3041_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class r3051_device : public mips1core_device_base

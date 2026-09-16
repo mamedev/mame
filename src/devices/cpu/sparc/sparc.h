@@ -26,15 +26,14 @@ public:
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void device_resolve_objects() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -296,8 +295,8 @@ public:
 protected:
 	sparcv8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool execute_extra_group2(uint32_t op) override;
 	virtual bool execute_extra_group3(uint32_t op) override;
@@ -340,8 +339,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	virtual bool execute_extra_group2(uint32_t op) override;
@@ -398,14 +397,14 @@ protected:
 	u32 dcache_data_r(offs_t offset, u32 mem_mask);
 	void dcache_data_w(offs_t offset, u32 data, u32 mem_mask);
 
-	void control_map(address_map &map);
-	void icache_lock_map(address_map &map);
-	void dcache_lock_map(address_map &map);
-	template <uint8_t Asi> void mmu_map(address_map &map);
-	void icache_tag_map(address_map &map);
-	void icache_data_map(address_map &map);
-	void dcache_tag_map(address_map &map);
-	void dcache_data_map(address_map &map);
+	void control_map(address_map &map) ATTR_COLD;
+	void icache_lock_map(address_map &map) ATTR_COLD;
+	void dcache_lock_map(address_map &map) ATTR_COLD;
+	template <uint8_t Asi> void mmu_map(address_map &map) ATTR_COLD;
+	void icache_tag_map(address_map &map) ATTR_COLD;
+	void icache_data_map(address_map &map) ATTR_COLD;
+	void dcache_tag_map(address_map &map) ATTR_COLD;
+	void dcache_data_map(address_map &map) ATTR_COLD;
 
 	void update_addr_masks();
 	void update_wait_states();

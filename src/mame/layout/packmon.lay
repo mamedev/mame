@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -20,8 +21,8 @@ license:CC0-1.0
 		<screen index="0"><bounds x="0" y="0" width="48" height="17" /></screen>
 
 		<element ref="text_score"><bounds x="22.6" y="-2.8" width="10" height="2.2" /></element>
-		<element ref="text_warpl"><bounds x="-0.7" y="14.7" width="10" height="2.2" /></element>
-		<element ref="text_warpr"><bounds x="49" y="14.7" width="10" height="2.2" /></element>
+		<element ref="text_warpl"><bounds x="-0.7" y="14.7" width="6.8" height="2.2" /></element>
+		<element ref="text_warpr"><bounds x="49" y="14.7" width="6.8" height="2.2" /></element>
 
 		<!-- maze overlay -->
 

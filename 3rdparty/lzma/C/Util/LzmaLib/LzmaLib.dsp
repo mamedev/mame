@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LZMALIB_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /Gr /MT /W3 /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LZMALIB_EXPORTS" /FD /c
+# ADD CPP /nologo /Gr /MT /W4 /WX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LZMALIB_EXPORTS" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -71,7 +71,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LZMALIB_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LZMALIB_EXPORTS" /D "COMPRESS_MF_MT" /FD /GZ /c
+# ADD CPP /nologo /MTd /W4 /WX /Gm /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LZMALIB_EXPORTS" /D "COMPRESS_MF_MT" /FD /GZ /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
@@ -101,10 +101,18 @@ SOURCE=.\LzmaLib.def
 
 SOURCE=.\LzmaLibExports.c
 # End Source File
+# Begin Source File
+
+SOURCE=.\Precomp.h
+# End Source File
 # End Group
 # Begin Source File
 
 SOURCE=..\..\7zTypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\7zWindows.h
 # End Source File
 # Begin Source File
 
@@ -113,6 +121,18 @@ SOURCE=..\..\Alloc.c
 # Begin Source File
 
 SOURCE=..\..\Alloc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compiler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\CpuArch.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\CpuArch.h
 # End Source File
 # Begin Source File
 
@@ -165,6 +185,10 @@ SOURCE=..\..\LzmaLib.c
 # Begin Source File
 
 SOURCE=..\..\LzmaLib.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Precomp.h
 # End Source File
 # Begin Source File
 

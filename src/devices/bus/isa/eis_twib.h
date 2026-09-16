@@ -23,16 +23,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// devices
 	required_device<i8274_device> m_uart8274;
 	required_device<sdlc_logger_device> m_sdlclogger;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// Timers
 	TIMER_DEVICE_CALLBACK_MEMBER(tick_bitclock);

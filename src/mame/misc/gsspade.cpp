@@ -11,7 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
@@ -32,8 +32,8 @@ public:
 	void gsspade(machine_config &config);
 
 private:
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_soundcpu;
 };
@@ -70,7 +70,7 @@ void gsspade_state::gsspade(machine_config &config)
 {
 	I8051(config, m_soundcpu, 10.738635_MHz_XTAL); // Intel/Fujitsu P8051AH
 	m_soundcpu->set_addrmap(AS_PROGRAM, &gsspade_state::prog_map);
-	m_soundcpu->set_addrmap(AS_IO, &gsspade_state::ext_map);
+	m_soundcpu->set_addrmap(AS_DATA, &gsspade_state::ext_map);
 	m_soundcpu->port_in_cb<1>().set_ioport("P1");
 
 	I8279(config, "kdc", 1'789'772); // ?

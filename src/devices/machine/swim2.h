@@ -34,8 +34,8 @@ public:
 	virtual void sync() override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum {
@@ -52,9 +52,6 @@ private:
 	u32 m_half_cycles_before_change;
 
 	u64 m_last_sync;
-	u64 m_flux_write_start;
-	std::array<u64, 32> m_flux_write;
-	u32 m_flux_write_count;
 
 	fdc_pll_t m_pll;
 
@@ -64,11 +61,12 @@ private:
 	void fifo_clear();
 	bool fifo_push(u16 data);
 	u16 fifo_pop();
-	void flush_write(u64 when = 0);
 	void show_mode() const;
 
 	void crc_update(int bit);
 	void crc_clear();
+
+	void update_dat1byte();
 };
 
 DECLARE_DEVICE_TYPE(SWIM2, swim2_device)

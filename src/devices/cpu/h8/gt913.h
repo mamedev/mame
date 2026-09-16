@@ -13,17 +13,17 @@
 
 #pragma once
 
+#include "gt913_timer.h"
 #include "h8.h"
 #include "h8_intc.h"
 #include "h8_port.h"
 #include "h8_sci.h"
-#include "machine/gt913_io.h"
 #include "machine/gt913_kbd.h"
-#include "machine/gt913_snd.h"
+#include "sound/gt913.h"
 
 class gt913_device : public h8_device, public device_mixer_interface {
 public:
-	gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gt913_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
@@ -33,39 +33,47 @@ public:
 	auto write_port2() { return m_write_port[PORT_2].bind(); }
 	auto read_port3()  { return m_read_port [PORT_3].bind(); }
 	auto write_port3() { return m_write_port[PORT_3].bind(); }
-	auto read_port4()  { return m_read_port [PORT_4].bind(); }
-	auto write_port4() { return m_write_port[PORT_4].bind(); }
-
-	void uart_rate_w(uint8_t data);
-	void uart_control_w(offs_t offset, uint8_t data);
-	uint8_t uart_control_r(offs_t offset);
-
-	void data_w(offs_t offset, uint8_t data);
-	uint8_t data_r(offs_t offset);
-
-	void syscr_w(uint8_t data);
-	uint8_t syscr_r();
+	auto write_ple()   { return m_write_ple.bind(); }
 
 protected:
+	void uart_rate_w(u8 data);
+	void uart_control_w(offs_t offset, u8 data);
+	u8 uart_control_r(offs_t offset);
+
+	void adc_control_w(uint8_t data);
+	uint8_t adc_control_r();
+	uint8_t adc_data_r();
+
+	void data_w(offs_t offset, u8 data);
+	u8 data_r(offs_t offset);
+
+	void syscr_w(u8 data);
+	u8 syscr_r();
+
 	/* indirect reads/writes with banking support */
-	uint8_t read8ib(uint32_t adr);
-	void write8ib(uint32_t adr, uint8_t data);
-	uint16_t read16ib(uint32_t adr);
-	void write16ib(uint32_t adr, uint16_t data);
+	u8 read8ib(u32 adr);
+	void write8ib(u32 adr, u8 data);
+	u16 read16ib(u32 adr);
+	void write16ib(u32 adr, u16 data);
 
 	virtual void update_irq_filter() override;
 	virtual void interrupt_taken() override;
-	virtual void internal_update(uint64_t current_time) override;
+	virtual void internal_update(u64 current_time) override;
+	using h8_device::internal_update;
+	virtual void notify_standby(int state) override;
 	virtual void irq_setup() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	void map(address_map &map);
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
@@ -90,8 +98,13 @@ protected:
 
 	address_space_config m_data_config;
 	memory_access<32, 1, 0, ENDIANNESS_BIG>::specific m_data;
-	uint16_t m_banknum;
-	uint8_t m_syscr;
+	devcb_write16 m_write_ple;
+	u16 m_banknum;
+	u8 m_syscr;
+
+	/* 2x ADC */
+	bool m_adc_enable, m_adc_channel;
+	uint8_t m_adc_data[2];
 
 	required_device<gt913_intc_device> m_intc;
 
@@ -101,8 +114,9 @@ protected:
 	/* key controller */
 	required_device<gt913_kbd_hle_device> m_kbd;
 
-	/* misc. I/O (timers, ADCs) */
-	required_device<gt913_io_hle_device> m_io_hle;
+	/* timers */
+	required_device<gt913_timer16_device> m_timer0;
+	required_device<gt913_timer8_device> m_timer1;
 
 	/* 3x 8-bit I/O ports */
 	required_device_array<h8_port_device, 3> m_port;

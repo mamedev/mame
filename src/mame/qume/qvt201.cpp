@@ -43,7 +43,7 @@ private:
 	uint8_t keyboard_r();
 	void duart_out_w(uint8_t data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainnmi;
@@ -164,7 +164,7 @@ void qvt201_state::qvt201(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250);
 	//screen.set_raw(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250);
 	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
@@ -204,4 +204,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )
+COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

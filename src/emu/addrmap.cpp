@@ -1008,17 +1008,17 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					{
 						subentry->m_addrstart = ((subentry->m_addrstart * ratio) >> -addr_shift) + entry->m_addrstart;
 						subentry->m_addrend = (((subentry->m_addrend + 1) * ratio - 1) >> -addr_shift) + entry->m_addrstart;
-						subentry->m_addrmirror = ((subentry->m_addrmirror / ratio) << -addr_shift) | entry->m_addrmirror;
-						subentry->m_addrmask = ((subentry->m_addrmask / ratio) << -addr_shift) | entry->m_addrmask;
-						subentry->m_addrselect = ((subentry->m_addrselect / ratio) << -addr_shift) | entry->m_addrselect;
+						subentry->m_addrmirror = ((subentry->m_addrmirror * ratio) << -addr_shift) | entry->m_addrmirror;
+						subentry->m_addrmask = ((subentry->m_addrmask * ratio) << -addr_shift) | entry->m_addrmask;
+						subentry->m_addrselect = ((subentry->m_addrselect * ratio) << -addr_shift) | entry->m_addrselect;
 					}
 					else
 					{
 						subentry->m_addrstart = subentry->m_addrstart * ratio + entry->m_addrstart;
 						subentry->m_addrend = (subentry->m_addrend + 1) * ratio - 1 + entry->m_addrstart;
-						subentry->m_addrmirror = (subentry->m_addrmirror / ratio) | entry->m_addrmirror;
-						subentry->m_addrmask = (subentry->m_addrmask / ratio) | entry->m_addrmask;
-						subentry->m_addrselect = (subentry->m_addrselect / ratio) | entry->m_addrselect;
+						subentry->m_addrmirror = (subentry->m_addrmirror * ratio) | entry->m_addrmirror;
+						subentry->m_addrmask = (subentry->m_addrmask * ratio) | entry->m_addrmask;
+						subentry->m_addrselect = (subentry->m_addrselect * ratio) | entry->m_addrselect;
 					}
 
 					if (subentry->m_addrstart > entry->m_addrend)
@@ -1067,7 +1067,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 	if (m_spacenum != spacenum)
 		osd_printf_error("Space %d has address space %d handlers!\n", spacenum, m_spacenum);
 
-	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addr_width);
+	offs_t globalmask = util::make_bitmask<offs_t>(spaceconfig.m_addr_width);
 	if (m_globalmask != 0)
 		globalmask = m_globalmask;
 

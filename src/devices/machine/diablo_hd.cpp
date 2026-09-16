@@ -1432,7 +1432,7 @@ TIMER_CALLBACK_MEMBER(diablo_hd_device::sector_mark_tick)
 
 void diablo_hd_device::device_add_mconfig(machine_config &config)
 {
-	DIABLO(config, "drive", 0);
+	DIABLO(config, "drive");
 }
 
 

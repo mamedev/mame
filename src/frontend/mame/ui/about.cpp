@@ -34,8 +34,8 @@ namespace {
 //  ctor
 //-------------------------------------------------
 
-menu_about::menu_about(mame_ui_manager &mui, render_container &container)
-	: menu_textbox(mui, container)
+menu_about::menu_about(mame_ui_manager &mui, render_target &target)
+	: menu_textbox(mui, target)
 	, m_header{
 			util::string_format(
 #ifdef MAME_DEBUG
@@ -80,7 +80,7 @@ void menu_about::recompute_metrics(uint32_t width, uint32_t height, float aspect
 //  perform our special rendering
 //-------------------------------------------------
 
-void menu_about::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
+void menu_about::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// draw the title
 	draw_text_box(
@@ -118,19 +118,6 @@ void menu_about::populate_text(std::optional<text_layout> &layout, float &width,
 
 void menu_about::populate()
 {
-}
-
-
-//-------------------------------------------------
-//  handle - manages inputs in the about modal
-//-------------------------------------------------
-
-bool menu_about::handle(event const *ev)
-{
-	if (ev)
-		return handle_key(ev->iptkey);
-	else
-		return false;
 }
 
 } // namespace ui

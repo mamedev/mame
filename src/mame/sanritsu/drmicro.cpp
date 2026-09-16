@@ -41,9 +41,9 @@ public:
 	void drmicro(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -73,12 +73,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void pcm_w(int state);
-	void prg_map(address_map &map);
-	void io_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /****************************************************************************/
 
@@ -130,10 +128,9 @@ void drmicro_state::palette(palette_device &palette) const
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -207,8 +204,6 @@ uint32_t drmicro_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-// machine
-
 /*************************************
  *
  *  Memory handlers
@@ -255,6 +250,7 @@ void drmicro_state::pcm_set_w(uint8_t data)
 	pcm_w(1);
 }
 
+
 /*************************************
  *
  *  Address maps
@@ -280,6 +276,7 @@ void drmicro_state::io_map(address_map &map)
 	map(0x04, 0x04).portr("DSW2").w(FUNC(drmicro_state::nmi_enable_w));
 	map(0x05, 0x05).noprw(); // unused? / watchdog?
 }
+
 
 /*************************************
  *
@@ -346,6 +343,7 @@ static INPUT_PORTS_START( drmicro )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_HIGH, "SW2:!7" ) // Service Mode shows as "X"
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" ) // Service Mode shows as "X"
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -436,10 +434,8 @@ void drmicro_state::drmicro(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &drmicro_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(drmicro_state::interrupt));
 
-	config.set_maximum_quantum(attotime::from_hz(60));
-
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -453,15 +449,16 @@ void drmicro_state::drmicro(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "sn1", MCLK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76496(config, "sn2", MCLK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76496(config, "sn3", MCLK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn1", MCLK / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn2", MCLK / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76496(config, "sn3", MCLK / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_legacy_callback().set(FUNC(drmicro_state::pcm_w));   // IRQ handler
 	m_msm->set_prescaler_selector(msm5205_device::S64_4B);  // 6 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
+
 
 /*************************************
  *

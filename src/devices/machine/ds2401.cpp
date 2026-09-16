@@ -9,7 +9,7 @@
  */
 
 #include "emu.h"
-#include "machine/ds2401.h"
+#include "ds2401.h"
 
 #include <cstdarg>
 

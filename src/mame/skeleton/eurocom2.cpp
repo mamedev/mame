@@ -84,8 +84,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -100,7 +100,7 @@ protected:
 
 	void pia1_cb2_w(int state);
 
-	void eurocom2_map(address_map &map);
+	void eurocom2_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(toggle_sst);
 
@@ -144,7 +144,7 @@ private:
 	uint8_t waveterm_adc();
 	void waveterm_dac(uint8_t data); // declared but not defined, commented in memory map
 
-	void waveterm_map(address_map &map);
+	void waveterm_map(address_map &map) ATTR_COLD;
 
 	bool m_driveh = false;
 	uint8_t m_drive = 0;
@@ -416,14 +416,14 @@ void eurocom2_state::eurocom2(machine_config &config)
 	MC6809(config, m_maincpu, 10.7172_MHz_XTAL / 2); // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &eurocom2_state::eurocom2_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(10.7172_MHz_XTAL, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT);
 	m_screen->set_screen_update(FUNC(eurocom2_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(eurocom2_state::kbd_put));
 
 	PIA6821(config, m_pia1);
@@ -439,7 +439,7 @@ void eurocom2_state::eurocom2(machine_config &config)
 //  m_pia2->irqa_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 //  m_pia2->irqb_handler().set_inputline("maincpu", M6809_FIRQ_LINE);
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
@@ -470,7 +470,7 @@ void waveterm_state::waveterm(machine_config &config)
 	m_pia3->readcb1_handler().set_ioport("FP");
 //  m_pia3->cb2_handler().set(FUNC(waveterm_state::pia3_cb2_w));
 
-	PTM6840(config, m_ptm, 0);
+	PTM6840(config, m_ptm);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("waveterm");
 }
@@ -514,6 +514,6 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY      FULLNAME                     FLAGS
-COMP( 1981, eurocom2,  0,        0,      eurocom2,  eurocom2, eurocom2_state, empty_init, "Eltec",     "Eurocom II V7",             MACHINE_IS_SKELETON )
-COMP( 1982, waveterm,  eurocom2, 0,      waveterm,  waveterm, waveterm_state, empty_init, "PPG",       "Waveterm A",                MACHINE_IS_SKELETON )
-COMP( 1985, microtrol, eurocom2, 0,      microtrol, eurocom2, eurocom2_state, empty_init, "Microtrol", "unknown Microtrol portable computer", MACHINE_IS_SKELETON )
+COMP( 1981, eurocom2,  0,        0,      eurocom2,  eurocom2, eurocom2_state, empty_init, "Eltec",     "Eurocom II V7",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1982, waveterm,  eurocom2, 0,      waveterm,  waveterm, waveterm_state, empty_init, "PPG",       "Waveterm A",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1985, microtrol, eurocom2, 0,      microtrol, eurocom2, eurocom2_state, empty_init, "Microtrol", "unknown Microtrol portable computer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

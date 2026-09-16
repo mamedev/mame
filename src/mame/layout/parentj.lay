@@ -1,0 +1,304 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders: Roberto Fresca, Grull Osgo
+
+**********************************************
+
+  Parent Jack control panel
+
+  May or may not match arrangement/colour
+  of real control panel
+
+**********************************************
+-->
+
+<mamelayout version="2">
+
+<!-- define button-lamps -->
+
+	<element name="start" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.15" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="deal" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.15" />
+		</rect>
+		<text string="DEAL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="check" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.15" />
+		</rect>
+		<text string="CHECK">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BET 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BET 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BET 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="bet4" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BET 4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="dup" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="take" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.075" blue="0.0" />
+		</rect>
+		<text string="TAKE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="PAYOUT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+
+
+<!-- define basic elements -->
+
+	<element name="cpanel">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="bet_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="dup_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.35" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.05" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="start_b" defstate="0">
+		<rect state="1">
+			<color red="0.0" green="0.7" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="deal_b" defstate="0">
+		<rect state="1">
+			<color red="0.7" green="0.0" blue="0.7" />
+		</rect>
+		<rect state="0">
+			<color red="0.1" green="0.0" blue="0.1" />
+		</rect>
+	</element>
+
+
+<!-- define cpanel degradee elements -->
+
+	<element name="cpanel2">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
+	</element>
+
+	<element name="cpanel3">
+		<rect>
+			<color red="0.10" green="0.10" blue="0.10" />
+		</rect>
+	</element>
+
+	<element name="cpanel4">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+
+<!-- View Field... -->
+
+	<view name="Control Panel">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<element ref="cpanel">
+			<bounds left="0" right="4" top="3" bottom="3.40" />
+		</element>
+
+		<element ref="cpanel2">
+			<bounds left="0" right="4" top="3.02" bottom="3.38" />
+		</element>
+
+		<element ref="cpanel3">
+			<bounds left="0" right="4" top="3.03" bottom="3.37" />
+		</element>
+
+		<element ref="cpanel4">
+			<bounds left="0" right="4" top="3.04" bottom="3.36" />
+		</element>
+
+		<element ref="cpanel">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+		</element>
+
+
+		<element name="lamp8" ref="start_b" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.04" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp8" ref="start" inputtag="IN0" inputmask="0x40">
+			<bounds x="0.06" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+
+		<element name="lamp12" ref="deal_b" inputtag="IN0" inputmask="0x100">
+			<bounds x="0.48" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp12" ref="deal" inputtag="IN0" inputmask="0x100">
+			<bounds x="0.50" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element name="lamp9" ref="deal_b" inputtag="IN0" inputmask="0x80">
+			<bounds x="0.92" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp9" ref="check" inputtag="IN0" inputmask="0x80">
+			<bounds x="0.94" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+
+		<element name="lamp0" ref="bet_b" inputtag="IN0" inputmask="0x01">
+			<bounds x="1.36" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp0" ref="bet1" inputtag="IN0" inputmask="0x01">
+			<bounds x="1.38" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element name="lamp1" ref="bet_b" inputtag="IN0" inputmask="0x02">
+			<bounds x="1.80" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp1" ref="bet2" inputtag="IN0" inputmask="0x02">
+			<bounds x="1.82" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element name="lamp2" ref="bet_b" inputtag="IN0" inputmask="0x04">
+			<bounds x="2.24" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp2" ref="bet3" inputtag="IN0" inputmask="0x04">
+			<bounds x="2.26" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element name="lamp3" ref="bet_b" inputtag="IN0" inputmask="0x08">
+			<bounds x="2.68" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp3" ref="bet4" inputtag="IN0" inputmask="0x08">
+			<bounds x="2.70" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+
+		<element name="lamp10" ref="dup_b" inputtag="IN0" inputmask="0x200">
+			<bounds x="3.12" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp10" ref="dup" inputtag="IN0" inputmask="0x200">
+			<bounds x="3.14" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+		<element name="lamp13" ref="dup_b" inputtag="IN0" inputmask="0x20">
+			<bounds x="3.56" y="3.08" width="0.40" height="0.24" />
+		</element>
+		<element name="lamp13" ref="take" inputtag="IN0" inputmask="0x20">
+			<bounds x="3.58" y="3.10" width="0.36" height="0.20" />
+		</element>
+
+	</view>
+</mamelayout>

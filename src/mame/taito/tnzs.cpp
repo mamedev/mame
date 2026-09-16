@@ -26,7 +26,7 @@ PCBs:
 
 Seta#       Taito#s             CPUS    RxM2    ROM1    MCU?    Video RAM   PROMs   SETA X1 GFXROMs     QUADRATURE  ESD. PROT   Games                           Picture
 P0-022-A    K1100245A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     uPD4701AC   3x X2-003*4 arkanoid2                       http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
-P0-022-B    K1100234A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      27c512(A)   uPD4701AC   3x X2-003*4 plumppop                        N/A
+P0-022-B    K1100234A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      27c512(A)   uPD4701AC   3x X2-003*4 plumppop                        https://archive.org/download/plump-pop-pcb/IMG_3544.jpg
 P0-025-A    K1100241A J1100107A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     N/A         3x X2-003   drtoppel,extermatn,chukatai(B)  http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
 P0-028-A    K1100416A J1100332A 2xZ80B  512/256 512/256 8042    4x6116      No      05,06   23c1000     N/A         3x X2-004   chukatai(B)                     http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
 P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No      05,06   23c1000     N/A         3x X2-003   kageki                          http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
@@ -673,7 +673,6 @@ d23f=input port 1 value
 #include "machine/gen_latch.h"
 #include "machine/upd4701.h"
 #include "sound/dac.h"
-#include "sound/samples.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 
@@ -825,10 +824,10 @@ class kageki_state : public insectx_state
 public:
 	kageki_state(const machine_config &mconfig, device_type type, const char *tag)
 		: insectx_state(mconfig, type, tag)
-		, m_samples(*this, "samples")
 		, m_dswa(*this, "DSWA")
 		, m_dswb(*this, "DSWB")
 		, m_csport_sel(0)
+		, m_scpu(*this, "samples")
 	{ }
 
 	void kageki(machine_config &config) ATTR_COLD;
@@ -847,20 +846,15 @@ private:
 	uint8_t csport_r();
 	void csport_w(uint8_t data);
 
-	SAMPLES_START_CB_MEMBER(init_samples);
-
 	void kageki_sub_map(address_map &map) ATTR_COLD;
-
-	required_device<samples_device> m_samples;
+	void scpu_map(address_map& map) ATTR_COLD;
+	void scpu_io_map(address_map& map) ATTR_COLD;
 
 	required_ioport m_dswa;
 	required_ioport m_dswb;
 
-	// sound-related
-	std::unique_ptr<int16_t[]>    m_sampledata[MAX_SAMPLES];
-	int      m_samplesize[MAX_SAMPLES]{};
-
 	int      m_csport_sel;
+	required_device<cpu_device> m_scpu;
 };
 
 
@@ -909,6 +903,8 @@ protected:
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+private:
+	IRQ_CALLBACK_MEMBER(sound_vector_r);
 };
 
 
@@ -1405,7 +1401,8 @@ void jpopnics_state::subbankswitch_w(uint8_t data)
 void tnzsb_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	// IM1
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
@@ -1422,38 +1419,6 @@ void kabukiz_state::sound_bank_w(uint8_t data)
 }
 
 
-SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
-{
-	uint8_t *src = memregion("samples")->base() + 0x0090;
-	for (int i = 0; i < MAX_SAMPLES; i++)
-	{
-		int start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
-		uint8_t *scan = &src[start];
-		int size = 0;
-
-		// check sample length
-		while (*scan++ != 0x00)
-			size++;
-
-		/* 2009-11 FP: should these be saved? */
-		m_sampledata[i] = std::make_unique<int16_t[]>(size);
-		m_samplesize[i] = size;
-
-		if (start < 0x100)
-			start = size = 0;
-
-		// signed 8-bit sample to unsigned 8-bit sample convert
-		int16_t *dest = m_sampledata[i].get();
-		scan = &src[start];
-		for (int n = 0; n < size; n++)
-		{
-			*dest++ = (int8_t)((*scan++) ^ 0x80) * 256;
-		}
-	//  logerror("samples num:%02X ofs:%04X lng:%04X\n", i, start, size);
-	}
-}
-
-
 uint8_t kageki_state::csport_r()
 {
 	int dsw, dsw1, dsw2;
@@ -1461,7 +1426,7 @@ uint8_t kageki_state::csport_r()
 	dsw1 = m_dswa->read();
 	dsw2 = m_dswb->read();
 
-	switch (m_csport_sel)
+	switch (m_csport_sel & 3)
 	{
 		case    0x00:           // DSW2 5,1 / DSW1 5,1
 			dsw = (((dsw2 & 0x10) >> 1) | ((dsw2 & 0x01) << 2) | ((dsw1 & 0x10) >> 3) | ((dsw1 & 0x01) >> 0));
@@ -1485,26 +1450,10 @@ uint8_t kageki_state::csport_r()
 
 void kageki_state::csport_w(uint8_t data)
 {
-	if (data > 0x3f)
-	{
-		// read dipsw port
-		m_csport_sel = (data & 0x03);
-	}
-	else
-	{
-		if (data < MAX_SAMPLES)
-		{
-			// play samples
-			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
-			LOG("VOICE:%02X PLAY", data);
-		}
-		else
-		{
-			// stop samples
-			m_samples->stop(0);
-			LOG("VOICE:%02X STOP", data);
-		}
-	}
+	m_csport_sel = data;
+
+	if (!BIT(data, 6))
+		m_scpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void insectx_state::prompal_main_map(address_map &map)
@@ -1588,6 +1537,18 @@ void kageki_state::kageki_sub_map(address_map &map)
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
+}
+
+void kageki_state::scpu_map(address_map& map)
+{
+	map(0x0000, 0xffff).rom();
+}
+
+void kageki_state::scpu_io_map(address_map& map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x00, 0xff).lr8(NAME([this]() { return m_csport_sel; }));
 }
 
 void insectx_state::insectx_sub_map(address_map &map)
@@ -1833,15 +1794,15 @@ static INPUT_PORTS_START( arknoid2 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, right_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", FUNC(upd4701_device::right_w))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN1")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, left_w)
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", FUNC(upd4701_device::left_w))
 
 	PORT_START("COIN2")
-	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", upd4701_device, middle_w)
+	PORT_BIT( 1, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("upd4701", FUNC(upd4701_device::middle_w))
 
 	PORT_START("AN1")       /* spinner 1 - read at f000/1 */
 	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -2303,14 +2264,14 @@ void insectx_state::tnzs_base(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::base_sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(insectx_state::irq0_line_hold));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	/* video hardware */
 	X1_001(config, m_spritegen, 12'000'000, m_palette, gfx_tnzs);
 	m_spritegen->set_fg_yoffsets( -0x12, 0x0e );
 	m_spritegen->set_bg_yoffsets( 0x1, -0x1 );
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2415,6 +2376,10 @@ void kageki_state::kageki(machine_config &config)
 	/* basic machine hardware */
 	m_subcpu->set_addrmap(AS_PROGRAM, &kageki_state::kageki_sub_map);
 
+	Z80(config, m_scpu, XTAL(12'000'000) / 4);
+	m_scpu->set_addrmap(AS_PROGRAM, &kageki_state::scpu_map);
+	m_scpu->set_addrmap(AS_IO, &kageki_state::scpu_io_map);
+
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */
 	ymsnd.port_a_read_callback().set(FUNC(kageki_state::csport_r));
@@ -2424,10 +2389,7 @@ void kageki_state::kageki(machine_config &config)
 	ymsnd.add_route(2, "speaker", 0.15);
 	ymsnd.add_route(3, "speaker", 0.35);
 
-	SAMPLES(config, m_samples);
-	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(kageki_state::init_samples));
-	m_samples->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // HA17408P R2R DAC, TODO: check levels
 }
 
 void tnzsb_state::tnzsb(machine_config &config)
@@ -3682,45 +3644,45 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,       MONITOR,COMPANY,             FULLNAME,            FLAGS
-GAME( 1987, plumppop,  0,        plumppop, plumppop, plumppop_state, empty_init, ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, empty_init, ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        MONITOR COMPANY  FULLNAME                                        FLAGS
+GAME( 1987, plumppop,  0,        plumppop, plumppop, plumppop_state, empty_init, ROT0,   "Taito", "Plump Pop (Japan)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, jpopnics_state, empty_init, ROT0,   "Nics",  "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito",                           "Extermination (World)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito (World Games license)",     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito America (Romstar license)", "Extermination (US, Romstar)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, tnzs_mcu_state, empty_init, ROT270, "Taito",                           "Extermination (Japan)",           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2_state, empty_init, ROT270, "Taito Corporation Japan",                     "Arkanoid - Revenge of DOH (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito Corporation",                           "Arkanoid - Revenge of DOH (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "bootleg",                                     "Arkanoid - Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2_state, empty_init, ROT270, "Taito",                           "Arkanoid: Revenge of DOH (World)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito America (Romstar license)", "Arkanoid: Revenge of DOH (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "Taito",                           "Arkanoid: Revenge of DOH (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2_state, empty_init, ROT270, "bootleg",                         "Arkanoid: Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito",         "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) // Possible region hack
+GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito America", "Dr. Toppel's Adventure (US)",    MACHINE_SUPPORTS_SAVE ) // Possible region hack
+GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, tnzs_mcu_state, empty_init, ROT90,  "Kaneko / Taito",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   empty_init, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   empty_init, ROT90,  "hack",                                                 "Kageki (hack)",  MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
+GAME( 1988, kageki,    0,        kageki,   kageki,   kageki_state,   empty_init, ROT90,  "Kaneko / Taito",                           "Kageki (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kagekiu,   kageki,   kageki,   kagekiu,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito America (Romstar license)", "Kageki (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  kageki_state,   empty_init, ROT90,  "Kaneko / Taito",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, kagekih,   kageki,   kageki,   kageki,   kageki_state,   empty_init, ROT90,  "hack",                                     "Kageki (hack)",  MACHINE_SUPPORTS_SAVE ) // date is hacked at least, might also be a Japan set hacked to show english
 
-GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito America Corporation", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, chukataija,chukatai, extrmatn, chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) /* Higher ROM ID# but older PCB stock */
+GAME( 1988, chukatai,  0,        tnzs,     chukatai, tnzs_mcu_state, empty_init, ROT0,   "Taito",         "Chuka Taisen (World) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE ) // Possible region hack
+GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito America", "Chuka Taisen (US) (P0-028-A PCB)",    MACHINE_SUPPORTS_SAVE ) // Possible region hack
+GAME( 1988, chukataij, chukatai, tnzs,     chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito",         "Chuka Taisen (Japan) (P0-028-A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, chukataija,chukatai, extrmatn, chukatau, tnzs_mcu_state, empty_init, ROT0,   "Taito",         "Chuka Taisen (Japan) (P0-025-A PCB)", MACHINE_SUPPORTS_SAVE ) // Higher ROM ID# but older PCB stock
 
-GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (P0-043A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_mcu_state, empty_init, ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (P0-041A PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (P0-041-1 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     tnzsb_state,    empty_init, ROT0,   "Taito",         "The NewZealand Story (World, new version) (P0-043A PCB)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    tnzsb_state,    empty_init, ROT0,   "Taito",         "The NewZealand Story (Japan, new version) (P0-043A PCB)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito",         "The NewZealand Story (World, old version) (P0-041A PCB)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   tnzs_mcu_state, empty_init, ROT0,   "Taito",         "The NewZealand Story (Japan, old version) (P0-041A PCB)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   tnzs_mcu_state, empty_init, ROT0,   "Taito America", "The NewZealand Story (US, old version) (P0-041A PCB)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito",         "The NewZealand Story (World, unknown version) (P0-041A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   tnzs_mcu_state, empty_init, ROT0,   "Taito",         "The NewZealand Story (World, prototype) (P0-041-1 PCB)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, kabukiz_state,  empty_init, ROT0,   "Kaneko / Taito", "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito Corporation Japan",   "Insector X (World)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito Corporation",         "Insector X (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectx,   0,        insectx,  insectx,  insectx_state,  empty_init, ROT0,   "Taito",                     "Insector X (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, insectxj,  insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "Taito",                     "Insector X (Japan)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1990, insectxbl, insectx,  insectx,  insectxj, insectx_state,  empty_init, ROT0,   "bootleg (Nagoya Kaihatsu)", "Insector X (bootleg)", MACHINE_SUPPORTS_SAVE )

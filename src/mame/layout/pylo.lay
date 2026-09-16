@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -34,18 +35,9 @@ license:CC0-1.0
 		</text>
 	</element>
 
-	<element name="text_p1">
-		<rect><color red="0.86" green="0.86" blue="0.88" /></rect>
-		<text string="PLAYER 1"><color red="0.6" green="0.6" blue="0.61" /></text>
-	</element>
-	<element name="text_p2">
-		<rect><color red="0.86" green="0.86" blue="0.88" /></rect>
-		<text string="PLAYER 2"><color red="0.6" green="0.6" blue="0.61" /></text>
-	</element>
-	<element name="text_v">
-		<rect><color red="0.86" green="0.86" blue="0.88" /></rect>
-		<text string="v"><color red="0.6" green="0.6" blue="0.61" /></text>
-	</element>
+	<element name="text_p1"><text string="PLAYER 1"><color red="0.6" green="0.6" blue="0.61" /></text></element>
+	<element name="text_p2"><text string="PLAYER 2"><color red="0.6" green="0.6" blue="0.61" /></text></element>
+	<element name="text_v"><text string="v"><color red="0.6" green="0.6" blue="0.61" /></text></element>
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.3" green="0.03" blue="0.045" /></disk>

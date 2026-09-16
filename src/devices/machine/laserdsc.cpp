@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    laserdsc.c
-
     Core laserdisc player implementation.
 
 *************************************************************************/
@@ -60,49 +58,54 @@ const uint32_t VIRTUAL_LEAD_OUT_TRACKS = LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINA
 ALLOW_SAVE_TYPE(laserdisc_device::player_state);
 ALLOW_SAVE_TYPE(laserdisc_device::slider_position);
 
+parallel_laserdisc_device::parallel_laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: laserdisc_device(mconfig, type, tag, owner, clock)
+{
+}
+
 //-------------------------------------------------
 //  laserdisc_device - constructor
 //-------------------------------------------------
 
 laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_getdisc_callback(*this),
-		m_audio_callback(*this),
-		m_overwidth(0),
-		m_overheight(0),
-		m_overclip(0, -1, 0, -1),
-		m_overupdate_rgb32(*this),
-		m_disc(nullptr),
-		m_is_cav_disc(false),
-		m_width(0),
-		m_height(0),
-		m_fps_times_1million(0),
-		m_samplerate(0),
-		m_readresult(),
-		m_chdtracks(0),
-		m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
-		m_audiosquelch(0),
-		m_videosquelch(0),
-		m_fieldnum(0),
-		m_curtrack(0),
-		m_maxtrack(0),
-		m_attospertrack(0),
-		m_sliderupdate(attotime::zero),
-		m_videoindex(0),
-		m_stream(nullptr),
-		m_audiobufsize(0),
-		m_audiobufin(0),
-		m_audiobufout(0),
-		m_audiocursamples(0),
-		m_audiomaxsamples(0),
-		m_videoenable(false),
-		m_videotex(nullptr),
-		m_videopalette(nullptr),
-		m_overenable(false),
-		m_overindex(0),
-		m_overtex(nullptr)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_getdisc_callback(*this)
+	, m_audio_callback(*this)
+	, m_overwidth(0)
+	, m_overheight(0)
+	, m_overclip(0, -1, 0, -1)
+	, m_overupdate_rgb32(*this)
+	, m_disc(nullptr)
+	, m_is_cav_disc(false)
+	, m_width(0)
+	, m_height(0)
+	, m_fps_times_1million(0)
+	, m_samplerate(0)
+	, m_readresult()
+	, m_chdtracks(0)
+	, m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO))
+	, m_audiosquelch(0)
+	, m_videosquelch(0)
+	, m_fieldnum(0)
+	, m_curtrack(0)
+	, m_maxtrack(0)
+	, m_attospertrack(0)
+	, m_sliderupdate(attotime::zero)
+	, m_videoindex(0)
+	, m_stream(nullptr)
+	, m_audiobufsize(0)
+	, m_audiobufin(0)
+	, m_audiobufout(0)
+	, m_audiocursamples(0)
+	, m_audiomaxsamples(0)
+	, m_videoenable(false)
+	, m_videotex(nullptr)
+	, m_videopalette(nullptr)
+	, m_overenable(false)
+	, m_overindex(0)
+	, m_overtex(nullptr)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;
@@ -316,15 +319,15 @@ void laserdisc_device::device_start()
 void laserdisc_device::device_stop()
 {
 	// make sure all async operations have completed
-	if (m_disc != nullptr)
+	if (m_disc)
 		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
 
 	// free any textures and palettes
-	if (m_videotex != nullptr)
+	if (m_videotex)
 		machine().render().texture_free(m_videotex);
-	if (m_videopalette != nullptr)
+	if (m_videopalette)
 		m_videopalette->deref();
-	if (m_overtex != nullptr)
+	if (m_overtex)
 		machine().render().texture_free(m_overtex);
 }
 
@@ -338,7 +341,7 @@ void laserdisc_device::device_reset()
 	// attempt to wire up the audio
 	m_stream->set_sample_rate(m_samplerate);
 
-	// set up the general ld
+	// set up the general LD
 	m_audiosquelch = 3;
 	m_videosquelch = 1;
 	m_fieldnum = 0;
@@ -389,7 +392,7 @@ TIMER_CALLBACK_MEMBER(laserdisc_device::fetch_vbi_data)
 //  laserdiscs
 //-------------------------------------------------
 
-void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void laserdisc_device::sound_stream_update(sound_stream &stream)
 {
 	// compute AND values based on the squelch
 	int16_t leftand = (m_audiosquelch & 1) ? 0x0000 : 0xffff;
@@ -400,17 +403,7 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<rea
 	if (samples_avail < 0)
 		samples_avail += m_audiobufsize;
 
-	// if no attached ld, just clear the buffers
-	auto &dst0 = outputs[0];
-	auto &dst1 = outputs[1];
-	if (samples_avail < outputs[0].samples())
-	{
-		dst0.fill(0);
-		dst1.fill(0);
-	}
-
-	// otherwise, stream from our buffer
-	else
+	if (samples_avail >= stream.samples())
 	{
 		int16_t *buffer0 = &m_audiobuffer[0][0];
 		int16_t *buffer1 = &m_audiobuffer[1][0];
@@ -418,10 +411,10 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<rea
 
 		// copy samples, clearing behind us as we go
 		int sampindex;
-		for (sampindex = 0; sampout != m_audiobufin && sampindex < outputs[0].samples(); sampindex++)
+		for (sampindex = 0; sampout != m_audiobufin && sampindex < stream.samples(); sampindex++)
 		{
-			dst0.put_int(sampindex, buffer0[sampout] & leftand, 32768);
-			dst1.put_int(sampindex, buffer1[sampout] & rightand, 32768);
+			stream.put_int(0, sampindex, buffer0[sampout] & leftand, 32768);
+			stream.put_int(1, sampindex, buffer1[sampout] & rightand, 32768);
 			buffer0[sampout] = 0;
 			buffer1[sampout] = 0;
 			sampout++;
@@ -431,16 +424,16 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<rea
 		m_audiobufout = sampout;
 
 		// clear out the rest of the buffer
-		if (sampindex < outputs[0].samples())
+		if (sampindex < stream.samples())
 		{
 			sampout = (m_audiobufout == 0) ? m_audiobufsize - 1 : m_audiobufout - 1;
 			s32 fill0 = buffer0[sampout] & leftand;
 			s32 fill1 = buffer1[sampout] & rightand;
 
-			for ( ; sampindex < outputs[0].samples(); sampindex++)
+			for ( ; sampindex < stream.samples(); sampindex++)
 			{
-				dst0.put_int(sampindex, fill0, 32768);
-				dst1.put_int(sampindex, fill1, 32768);
+				stream.put_int(0, sampindex, fill0, 32768);
+				stream.put_int(1, sampindex, fill1, 32768);
 			}
 		}
 	}
@@ -453,30 +446,30 @@ void laserdisc_device::sound_stream_update(sound_stream &stream, std::vector<rea
 
 //-------------------------------------------------
 //  set_slider_speed - dynamically change the
-//  slider speed
+//  slider speed, supports fractional values
 //-------------------------------------------------
 
-void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
+void laserdisc_device::set_slider_speed(const double tracks_per_vsync)
 {
 	// update to the current time
 	update_slider_pos();
 
 	// if 0, set the time to 0
-	attotime vsyncperiod = screen().frame_period();
+	double vsyncperiod = screen().frame_period().as_double();
 	if (tracks_per_vsync == 0)
 		m_attospertrack = 0;
 
 	// positive values store positive times
 	else if (tracks_per_vsync > 0)
-		m_attospertrack = (vsyncperiod / tracks_per_vsync).as_attoseconds();
+		m_attospertrack = DOUBLE_TO_ATTOSECONDS(vsyncperiod / tracks_per_vsync);
 
 	// negative values store negative times
 	else
 	{
-		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
+		m_attospertrack = DOUBLE_TO_ATTOSECONDS(-vsyncperiod / -tracks_per_vsync);
 	}
 
-	LOGMASKED(LOG_SLIDER, "Slider speed = %d\n", tracks_per_vsync);
+	LOGMASKED(LOG_SLIDER, "Slider speed = %f\n", tracks_per_vsync);
 }
 
 
@@ -724,10 +717,10 @@ void laserdisc_device::init_disc()
 	m_fps_times_1million = 59940000;
 	m_samplerate = 48000;
 
-	// get the disc metadata and extract the ld
+	// get the disc metadata and extract the LD
 	m_chdtracks = 0;
 	m_maxtrack = VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
-	if (m_disc != nullptr)
+	if (m_disc)
 	{
 		// require the A/V codec and nothing else
 		if (m_disc->compression(0) != CHD_CODEC_AVHUFF || m_disc->compression(1) != CHD_CODEC_NONE)
@@ -994,7 +987,7 @@ void laserdisc_device::read_track_data()
 		vbidata.line16 = 0;
 		vbidata.line17 = vbidata.line18 = vbidata.line1718 = VBI_CODE_LEADIN;
 	}
-//printf("track %5d.%d: %06X %06X %06X\n", m_curtrack, m_fieldnum, vbidata.line16, vbidata.line17, vbidata.line18);
+	LOGMASKED(LOG_SLIDER, "track %5d.%d: %06X %06X %06X\n", m_curtrack, m_fieldnum, vbidata.line16, vbidata.line17, vbidata.line18);
 
 	// if we're about to read the first field in a frame, advance
 	frame_data *frame = &m_frame[m_videoindex];
@@ -1073,7 +1066,7 @@ void laserdisc_device::read_track_data()
 void *laserdisc_device::read_async_static(void *param, int threadid)
 {
 	laserdisc_device &ld = *reinterpret_cast<laserdisc_device *>(param);
-	ld.m_readresult = ld.m_disc->read_hunk(ld.m_queued_hunknum, nullptr);
+	ld.m_readresult = ld.m_disc->codec_process_hunk(ld.m_queued_hunknum);
 	return nullptr;
 }
 
@@ -1220,7 +1213,7 @@ void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *p
 void laserdisc_device::add_ntsc_screen(machine_config &config, const char *_tag)
 {
 	set_screen(_tag);
-	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, _tag));
 	screen.set_video_attributes(VIDEO_SELF_RENDER);
 	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));
@@ -1229,7 +1222,7 @@ void laserdisc_device::add_ntsc_screen(machine_config &config, const char *_tag)
 void laserdisc_device::add_pal_screen(machine_config &config, const char *_tag)
 {
 	set_screen(_tag);
-	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, _tag));
 	screen.set_video_attributes(VIDEO_SELF_RENDER);
 	screen.set_raw(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624);
 	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));

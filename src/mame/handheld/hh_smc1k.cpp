@@ -43,8 +43,8 @@ public:
 	virtual DECLARE_INPUT_CHANGED_MEMBER(acl_button);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// devices
 	required_device<smc1102_cpu_device> m_maincpu;
@@ -63,9 +63,6 @@ protected:
 
 void hh_smc1k_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 }
@@ -185,7 +182,7 @@ static INPUT_PORTS_START( tkkongq )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Game A")
 
 	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tkkongq_state, acl_button, 0) PORT_NAME("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tkkongq_state::acl_button), 0) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 // config
@@ -282,7 +279,7 @@ static INPUT_PORTS_START( tlluke2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("ACL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tlluke2_state, acl_button, 0) PORT_NAME("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tlluke2_state::acl_button), 0) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 // config

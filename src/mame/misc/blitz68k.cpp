@@ -64,6 +64,8 @@ To Do:
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 // configurable logging
 #define LOG_MCU     (1U << 1)
 #define LOG_BLITTER (1U << 2)
@@ -101,38 +103,38 @@ public:
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void init_bankrob();
-	void init_bankroba();
-	void init_bankrobb();
-	void init_cjffruit();
-	void init_cjplus();
-	void init_deucesw2();
-	void init_megadble();
-	void init_maxidbl();
-	void init_cj3play();
-	void init_surpr5();
-	void init_super97();
-	void init_texasrls();
-	void init_cjbj();
-	void init_megadblj();
-	void init_hermit();
-	void init_dualgame();
-	void init_megastrp();
+	void init_bankrob() ATTR_COLD;
+	void init_bankroba() ATTR_COLD;
+	void init_bankrobb() ATTR_COLD;
+	void init_cj3play() ATTR_COLD;
+	void init_cjbj() ATTR_COLD;
+	void init_cjbj122() ATTR_COLD;
+	void init_cjffruit() ATTR_COLD;
+	void init_cjplus() ATTR_COLD;
+	void init_deucesw2() ATTR_COLD;
+	void init_dualgame() ATTR_COLD;
+	void init_hermit() ATTR_COLD;
+	void init_maxidbl() ATTR_COLD;
+	void init_megadble() ATTR_COLD;
+	void init_megadblj() ATTR_COLD;
+	void init_megastrp() ATTR_COLD;
+	void init_mpokerdx() ATTR_COLD;
+	void init_mpokerdx109() ATTR_COLD;
+	void init_super97() ATTR_COLD;
+	void init_surpr5() ATTR_COLD;
+	void init_texasrls() ATTR_COLD;
 
-	void hermit(machine_config &config);
-	void bankrob(machine_config &config);
-	void cjffruit(machine_config &config);
-	void steaser(machine_config &config);
-	void deucesw2(machine_config &config);
-	void ilpag(machine_config &config);
-	void maxidbl(machine_config &config);
-	void dualgame(machine_config &config);
-	void bankroba(machine_config &config);
-	void ramdac_config(machine_config &config);
-	void texasrls(machine_config &config);
-
-protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	void bankrob(machine_config &config) ATTR_COLD;
+	void bankroba(machine_config &config) ATTR_COLD;
+	void cjffruit(machine_config &config) ATTR_COLD;
+	void deucesw2(machine_config &config) ATTR_COLD;
+	void dualgame(machine_config &config) ATTR_COLD;
+	void hermit(machine_config &config) ATTR_COLD;
+	void ilpag(machine_config &config) ATTR_COLD;
+	void maxidbl(machine_config &config) ATTR_COLD;
+	void ramdac_config(machine_config &config) ATTR_COLD;
+	void steaser(machine_config &config) ATTR_COLD;
+	void texasrls(machine_config &config) ATTR_COLD;
 
 private:
 	void blit_copy_w(uint16_t data);
@@ -219,16 +221,16 @@ private:
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
-	void bankrob_map(address_map &map);
-	void bankroba_map(address_map &map);
-	void cjffruit_map(address_map &map);
-	void deucesw2_map(address_map &map);
-	void dualgame_map(address_map &map);
-	void hermit_map(address_map &map);
-	void ilpag_map(address_map &map);
-	void maxidbl_map(address_map &map);
-	void ramdac_map(address_map &map);
-	void steaser_map(address_map &map);
+	void bankrob_map(address_map &map) ATTR_COLD;
+	void bankroba_map(address_map &map) ATTR_COLD;
+	void cjffruit_map(address_map &map) ATTR_COLD;
+	void deucesw2_map(address_map &map) ATTR_COLD;
+	void dualgame_map(address_map &map) ATTR_COLD;
+	void hermit_map(address_map &map) ATTR_COLD;
+	void ilpag_map(address_map &map) ATTR_COLD;
+	void maxidbl_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+	void steaser_map(address_map &map) ATTR_COLD;
 
 	optional_shared_ptr<uint16_t> m_nvram;
 	std::unique_ptr<uint8_t[]> m_blit_buffer;
@@ -1425,11 +1427,11 @@ static INPUT_PORTS_START( cjffruit )
 	PORT_START("IN2")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_POKER_HOLD4 ) // hold 4
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_POKER_HOLD5 ) // hold 5
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // hopper coin
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // blitter busy
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // 5] 0 = mcu response ready
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // 6] 0 = mcu busy
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // hopper coin
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_DOOR        ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // blitter busy
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // 5] 0 = mcu response ready
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // 6] 0 = mcu busy
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_NAME("Call Attendant")
 
 	PORT_START("DSW")
@@ -1445,11 +1447,11 @@ static INPUT_PORTS_START( cjffruit )
 	PORT_DIPSETTING(      0x0400, "PMMG" )
 	PORT_DIPSETTING(      0x0200, "Invalid #1" )
 	PORT_DIPSETTING(      0x0000, "Invalid #2" )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
 	PORT_DIPNAME( 0x2000, 0x2000, "Factory Default" )       PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1512,19 +1514,19 @@ static INPUT_PORTS_START( deucesw2 )
 	PORT_START("IN2")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_POKER_HOLD4 ) // hold 4
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_POKER_HOLD5 ) // hold 5
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // hopper coin
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // blitter busy
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM     ) // 5] 0 = mcu response ready
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM     ) // 6] 0 = mcu busy
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // hopper coin
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_DOOR        ) PORT_NAME("Cash Door") PORT_CODE(KEYCODE_D) PORT_TOGGLE
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // blitter busy
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM      ) // 5] 0 = mcu response ready
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_CUSTOM      ) // 6] 0 = mcu busy
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SERVICE3    ) PORT_NAME("Call Attendant")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0100, 0x0100, "Screen Refresh" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "50 Hz" )
 	PORT_DIPSETTING(      0x0100, "60 Hz" )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Main Door")  PORT_CODE(KEYCODE_O) PORT_TOGGLE
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Logic Door") PORT_CODE(KEYCODE_L) PORT_TOGGLE
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Main Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 	PORT_DIPNAME( 0x3800, 0x2000, "Pinout" )                PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x3800, "8L6 (Cherry Master)" )
 	PORT_DIPSETTING(      0x3000, "8L7"   )
@@ -1793,7 +1795,7 @@ void blitz68k_state::ramdac_map(address_map &map)
 void blitz68k_state::ramdac_config(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &blitz68k_state::ramdac_map);
 }
 
@@ -1803,7 +1805,7 @@ void blitz68k_state::ilpag(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &blitz68k_state::ilpag_map);
 	m_maincpu->set_vblank_int("screen", FUNC(blitz68k_state::irq4_line_hold)); //3 & 6 used, mcu comms?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1873,7 +1875,7 @@ void blitz68k_state::cjffruit(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1913,7 +1915,7 @@ void blitz68k_state::bankrob(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1944,7 +1946,7 @@ void blitz68k_state::bankroba(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -1974,7 +1976,7 @@ void blitz68k_state::deucesw2(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2006,7 +2008,7 @@ void blitz68k_state::dualgame(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2036,7 +2038,7 @@ void blitz68k_state::hermit(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2070,7 +2072,7 @@ void blitz68k_state::maxidbl(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2534,6 +2536,28 @@ ROM_START( cjbj ) // CJ-8L REV-C LEV-1 PCB
 	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( cjbj122 ) // CJ-8L REV-B LEV-1 PCB
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD( "u65", 0x00000, 0x40000, CRC(2512e4b7) SHA1(6313e109b658c766c80a8be8a2e38f2327a3b693) ) // AM27C020, no sticker
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "cj-blackjack 2.0 for cj-8l revab.u30", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x40000, "blitter", 0 )
+	ROM_LOAD16_BYTE( "cjcadiljack 1.01-d for cj-8l.u68", 0x000000, 0x20000, CRC(98c74092) SHA1(a4a6d7c8280d656e9627799630f0941c9c40ecc4) ) // M27C1001
+	ROM_LOAD16_BYTE( "cjcadiljack 1.01-c for cj-8l.u75", 0x000001, 0x20000, CRC(dd896d30) SHA1(cad5e7e8ce7e8ba5266a6eab0e39bc1f48c58fc0) ) // M27C1001
+
+	ROM_REGION( 0x40000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "cjcadiljack 1.01-g for cj-8l.u50", 0x00000, 0x40000, CRC(bfec4381) SHA1(9e551db1cb51b79725248b3bfcced9d249969308) ) // M27C2001
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d_vdp.u15", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_vdo.u53", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck2.u64", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_ck1.u69", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d_dec.u70", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 
 /*************************************************************************************************************
 
@@ -2727,6 +2751,55 @@ ROM_START( hermit )
 	ROM_LOAD( "palce16v8h.u46", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8h.u56", 0x000, 0x117, NO_DUMP )
 ROM_END
+
+// MMLC-8L REV-A LEV-1
+// basically identical to the hermit's one. One difference is Bt476KPJ35 RAMDAC instead of Bt471KPJ80
+ROM_START( mpokerdx )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "major_poker_112-a_073098.u69", 0x00000, 0x40000, CRC(9868da4c) SHA1(734ab1e1dc42a4c66ceb49443d2beafe039fa6d1) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "lc-micro_1.4_u51_for_lc-8l.u51", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD16_BYTE( "major_poker_103-d_051997.u2", 0x000000, 0x80000, CRC(e50bfa9e) SHA1(2e46d572911c09b9d5a7ac1ade0e6220243b2230) )
+	ROM_LOAD16_BYTE( "major_poker_103-c_101996.u3", 0x000001, 0x80000, CRC(0b999b94) SHA1(6b7a63d674fa3df35e3ab46378c49af4a0353c5c) )
+	ROM_LOAD16_BYTE( "major_poker_103-f_101996.u1", 0x100000, 0x80000, CRC(deae1bf9) SHA1(0cd67177b18e237c13043bc4590fc88d4c8c6998) )
+	ROM_LOAD16_BYTE( "major_poker_103-e_051997.u4", 0x100001, 0x80000, CRC(04969d5f) SHA1(823d09523831bedfb7f0a8029e06378b95c9c123) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "major_poker_103-g_100996.u48", 0x00000, 0x80000, CRC(3bd6ea24) SHA1(c98136d926a2c768632694a06eca0501d553c479) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u34", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u45", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u46", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u56", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( mpokerdx109 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "major_poker_112-a_051997.u69", 0x00000, 0x40000, CRC(d28cf836) SHA1(6c1af3707ee6bd5b9a856be0fe2332e3f71c6e02) )
+
+	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
+	ROM_LOAD( "lc-micro_1.4_u51_for_lc-8l.u51", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD16_BYTE( "major_poker_103-d_051997.u2", 0x000000, 0x80000, CRC(e50bfa9e) SHA1(2e46d572911c09b9d5a7ac1ade0e6220243b2230) )
+	ROM_LOAD16_BYTE( "major_poker_103-c_051997.u3", 0x000001, 0x80000, CRC(0b999b94) SHA1(6b7a63d674fa3df35e3ab46378c49af4a0353c5c) ) // same as the parent set, even if date on label is different
+	ROM_LOAD16_BYTE( "major_poker_103-f_051997.u1", 0x100000, 0x80000, CRC(deae1bf9) SHA1(0cd67177b18e237c13043bc4590fc88d4c8c6998) ) // same as the parent set, even if date on label is different
+	ROM_LOAD16_BYTE( "major_poker_103-e_051997.u4", 0x100001, 0x80000, CRC(04969d5f) SHA1(823d09523831bedfb7f0a8029e06378b95c9c123) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "major_poker_103-g_051997.u48", 0x00000, 0x80000, CRC(f4a79130) SHA1(7fc367b08a42ac7c9a2c1939aa4557d0852d83d9) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u34", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u45", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u46", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u56", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 
 /*************************************************************************************************************
 
@@ -3170,6 +3243,18 @@ void blitz68k_state::init_cjbj()
 	rom[0x380/2] = 0xfffb;
 }
 
+void blitz68k_state::init_cjbj122()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	rom[0xaf0e/2] = 0x6028;
+
+	// ERROR CHECKSUM ROM PROGRAM
+	rom[0x380/2] = 0xfffb;
+}
+
+
 void blitz68k_state::init_deucesw2()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -3252,26 +3337,63 @@ void blitz68k_state::init_megastrp()
 	rom[0x10c80/2] = 0x4e71;
 }
 
-} // Anonymous namespace
+void blitz68k_state::init_mpokerdx()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	rom[0xda46/2] = 0x6024;
+
+	// checksum error
+	rom[0x17bfa/2] = 0x6054;
+
+	// loop
+	//rom[0x15508/2] = 0x4e71;
+
+	// crtc
+	//rom[0x3238/2] = 0x4e75;
+}
+
+void blitz68k_state::init_mpokerdx109()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	// WRONG C8 #1
+	rom[0xe012/2] = 0x6024;
+
+	// checksum error
+	rom[0x177c2/2] = 0x6054;
+
+	// loop
+	//rom[0x15508/2] = 0x4e71;
+
+	// crtc
+	//rom[0x3238/2] = 0x4e75;
+}
+
+} // anonymous namespace
 
 
-GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,  ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
-GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadblj, ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
-GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadble, ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1992,  megastrp, 0,       bankroba, bankrob,  blitz68k_state, init_megastrp, ROT0, "Blitz Systems Inc.",             "Mega Double Strip (Ver. 1.10b)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
-GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
-GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
-GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993,  bankrobb, bankrob, bankroba, bankrob,  blitz68k_state, init_bankrobb, ROT0, "Blitz Systems Inc.",             "Bank Robbery (Ver. 1.23)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // MARCH 10TH, 1994
-GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
-GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
-GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
-GAME( 1997,  surpr5,   0,       cjffruit, surpr5,   blitz68k_state, init_surpr5,   ROT0, "Cadillac Jack",                  "Surprise 5 (Ver. 1.19)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 25TH, 1997
-GAME( 1997,  super97,  0,       cjffruit, surpr5,   blitz68k_state, init_super97,  ROT0, "Cadillac Jack",                  "Super 97 (Ver. 1.00)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 22ND, 1997
-GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, init_cj3play,  ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
-GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, init_cjffruit, ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
-GAME( 1998,  texasrls, 0,       texasrls, cjffruit, blitz68k_state, init_texasrls, ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002
-GAME( 1999,  cjplus,   0,       cjffruit, cjffruit, blitz68k_state, init_cjplus,   ROT0, "Cadillac Jack",                  "New! Cherry Plus (Ver. 3.10)",                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999, named CJ PLUS (SPECIAL) in strings
-GAME( 1999,  cjbj,     0,       cjffruit, cjffruit, blitz68k_state, init_cjbj,     ROT0, "Cadillac Jack",                  "Blackjack (Ver. 1.31)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // DECEMBER 1999
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 1992,  maxidbl,     0,        maxidbl,  maxidbl,  blitz68k_state, init_maxidbl,     ROT0, "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1990,  megadblj,    0,        maxidbl,  maxidbl,  blitz68k_state, init_megadblj,    ROT0, "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
+GAME( 1990,  megadble,    0,        maxidbl,  maxidbl,  blitz68k_state, init_megadble,    ROT0, "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1992,  megastrp,    0,        bankroba, bankrob,  blitz68k_state, init_megastrp,    ROT0, "Blitz Systems Inc.",             "Mega Double Strip (Ver. 1.10b)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
+GAME( 1993,  steaser,     0,        steaser,  steaser,  blitz68k_state, empty_init,       ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  bankrob,     0,        bankrob,  bankrob,  blitz68k_state, init_bankrob,     ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
+GAME( 1993,  bankroba,    bankrob,  bankroba, bankrob,  blitz68k_state, init_bankroba,    ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
+GAME( 1993,  bankrobb,    bankrob,  bankroba, bankrob,  blitz68k_state, init_bankrobb,    ROT0, "Blitz Systems Inc.",             "Bank Robbery (Ver. 1.23)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
+GAME( 1993?, poker52,     0,        maxidbl,  maxidbl,  blitz68k_state, empty_init,       ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // MARCH 10TH, 1994
+GAME( 1995,  dualgame,    0,        dualgame, dualgame, blitz68k_state, init_dualgame,    ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
+GAME( 1995,  hermit,      0,        hermit,   hermit,   blitz68k_state, init_hermit,      ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
+GAME( 1997,  mpokerdx,    0,        hermit,   hermit,   blitz68k_state, init_mpokerdx,    ROT0, "Micro Manufacturing",            "Major Poker Deluxe (Ver. 1.12)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // DECEMBER 11TH, 1997
+GAME( 1997,  mpokerdx109, mpokerdx, hermit,   hermit,   blitz68k_state, init_mpokerdx109, ROT0, "Micro Manufacturing",            "Major Poker Deluxe (Ver. 1.09)",                 MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // MAY 15TH, 1997
+GAME( 1997,  deucesw2,    0,        deucesw2, deucesw2, blitz68k_state, init_deucesw2,    ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
+GAME( 1997,  surpr5,      0,        cjffruit, surpr5,   blitz68k_state, init_surpr5,      ROT0, "Cadillac Jack",                  "Surprise 5 (Ver. 1.19)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 25TH, 1997
+GAME( 1997,  super97,     0,        cjffruit, surpr5,   blitz68k_state, init_super97,     ROT0, "Cadillac Jack",                  "Super 97 (Ver. 1.00)",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 22ND, 1997
+GAME( 1998,  cj3play,     0,        cjffruit, cjffruit, blitz68k_state, init_cj3play,     ROT0, "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
+GAME( 1998,  cjffruit,    0,        cjffruit, cjffruit, blitz68k_state, init_cjffruit,    ROT0, "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
+GAME( 1998,  texasrls,    0,        texasrls, cjffruit, blitz68k_state, init_texasrls,    ROT0, "Cadillac Jack",                  "Texas Reels (Ver. 2.00)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // OCTOBER 15TH, 2002
+GAME( 1999,  cjplus,      0,        cjffruit, cjffruit, blitz68k_state, init_cjplus,      ROT0, "Cadillac Jack",                  "New! Cherry Plus (Ver. 3.10)",                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999, named CJ PLUS (SPECIAL) in strings
+GAME( 1999,  cjbj,        0,        cjffruit, cjffruit, blitz68k_state, init_cjbj,        ROT0, "Cadillac Jack",                  "Blackjack (Cadillac Jack, Ver. 1.31)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // DECEMBER 1999
+GAME( 1996,  cjbj122,     cjbj,     cjffruit, cjffruit, blitz68k_state, init_cjbj122,     ROT0, "Cadillac Jack",                  "Blackjack (Cadillac Jack, Ver. 1.22)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // DECEMBER 1996
+GAME( 199?,  ilpag,       0,        ilpag,    ilpag,    blitz68k_state, empty_init,       ROT0, "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

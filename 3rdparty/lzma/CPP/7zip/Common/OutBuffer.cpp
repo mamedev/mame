@@ -11,18 +11,18 @@ bool COutBuffer::Create(UInt32 bufSize) throw()
   const UInt32 kMinBlockSize = 1;
   if (bufSize < kMinBlockSize)
     bufSize = kMinBlockSize;
-  if (_buf != 0 && _bufSize == bufSize)
+  if (_buf && _bufSize == bufSize)
     return true;
   Free();
   _bufSize = bufSize;
   _buf = (Byte *)::MidAlloc(bufSize);
-  return (_buf != 0);
+  return (_buf != NULL);
 }
 
 void COutBuffer::Free() throw()
 {
   ::MidFree(_buf);
-  _buf = 0;
+  _buf = NULL;
 }
 
 void COutBuffer::Init() throw()
@@ -32,7 +32,7 @@ void COutBuffer::Init() throw()
   _pos = 0;
   _processedSize = 0;
   _overDict = false;
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   ErrorCode = S_OK;
   #endif
 }
@@ -51,17 +51,17 @@ HRESULT COutBuffer::FlushPart() throw()
   // _streamPos < _bufSize
   UInt32 size = (_streamPos >= _pos) ? (_bufSize - _streamPos) : (_pos - _streamPos);
   HRESULT result = S_OK;
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   result = ErrorCode;
   #endif
-  if (_buf2 != 0)
+  if (_buf2)
   {
     memcpy(_buf2, _buf + _streamPos, size);
     _buf2 += size;
   }
 
-  if (_stream != 0
-      #ifdef _NO_EXCEPTIONS
+  if (_stream
+      #ifdef Z7_NO_EXCEPTIONS
       && (ErrorCode == S_OK)
       #endif
      )
@@ -85,14 +85,14 @@ HRESULT COutBuffer::FlushPart() throw()
 
 HRESULT COutBuffer::Flush() throw()
 {
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   if (ErrorCode != S_OK)
     return ErrorCode;
   #endif
 
   while (_streamPos != _pos)
   {
-    HRESULT result = FlushPart();
+    const HRESULT result = FlushPart();
     if (result != S_OK)
       return result;
   }
@@ -101,8 +101,8 @@ HRESULT COutBuffer::Flush() throw()
 
 void COutBuffer::FlushWithCheck()
 {
-  HRESULT result = Flush();
-  #ifdef _NO_EXCEPTIONS
+  const HRESULT result = Flush();
+  #ifdef Z7_NO_EXCEPTIONS
   ErrorCode = result;
   #else
   if (result != S_OK)

@@ -87,6 +87,38 @@ void news_hid_hle_device::map_apbus(address_map &map)
 	// 40-43 kb tx speed
 }
 
+void news_hid_hle_device::map_nws12xx_keyboard(address_map &map)
+{
+	map(0x0, 0x0).r(FUNC(news_hid_hle_device::data_r<KEYBOARD>));
+	map(0x1, 0x1).r(FUNC(news_hid_hle_device::status_68k_r));
+	map(0x2, 0x2).w(FUNC(news_hid_hle_device::ien_w<KEYBOARD>));
+	map(0x3, 0x3).lw8(NAME([this] (u8 data) {
+		// The NWS-1250 appears to only write one register and expects that to reset everything.
+		// Without this, any pending mouse interrupts will cause the monitor ROM to complain about
+		// level 5 autovector interrupts (keyboard/mouse) that stop it from turning off or reloading the OS.
+		reset_w<KEYBOARD>(data);
+		reset_w<MOUSE>(data);
+	}));
+
+	// TODO: below are unemulated features
+	// 4 = keyboard speed
+	// 5 = keyboard clock
+	// 6 = buzzer, ROM version 2.0A writes to this and also reads it back
+	// 7 = buzzer frequency
+	map(0x4, 0x7).ram();
+}
+
+void news_hid_hle_device::map_nws12xx_mouse(address_map &map)
+{
+	map(0x0, 0x0).r(FUNC(news_hid_hle_device::data_r<MOUSE>));
+	map(0x1, 0x1).r(FUNC(news_hid_hle_device::status_r<MOUSE>));
+	map(0x2, 0x2).w(FUNC(news_hid_hle_device::ien_w<MOUSE>));
+	map(0x3, 0x3).w(FUNC(news_hid_hle_device::reset_w<MOUSE>));
+
+	// TODO: below are unemulated features
+	// 4 = mouse speed, 5 = mouse clock
+}
+
 void news_hid_hle_device::device_start()
 {
 	//save_item(NAME(m_fifo));

@@ -9,6 +9,7 @@
 #include "logwindow.h"
 #include "memorywindow.h"
 
+#include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
@@ -140,7 +141,7 @@ WindowQt::~WindowQt()
 void WindowQt::debugActOpenMemory()
 {
 	MemoryWindow *foo = new MemoryWindow(m_debugger, this);
-	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new toolbar icon
+	// A valiant effort, but it just doesn't wanna' hide behind the main window & not make a new taskbar icon
 	// foo->setWindowFlags(Qt::Dialog);
 	// foo->setWindowFlags(foo->windowFlags() & ~Qt::WindowStaysOnTopHint);
 	foo->show();
@@ -251,7 +252,8 @@ void WindowQt::debugActQuit()
 
 void WindowQt::debuggerExit()
 {
-	close();
+	// this isn't called from a Qt event loop, so close() will leak the window object
+	delete this;
 }
 
 

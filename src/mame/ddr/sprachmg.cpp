@@ -84,15 +84,15 @@ public:
 		m_speech_select(0xff),
 		m_speech_module_pcb1(nullptr),
 		m_speech_module_pcb2(nullptr)
-		{ }
+	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_res);
 
 	void sprachmg(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -109,8 +109,8 @@ private:
 	output_finder<> m_led_morse;
 	output_finder<> m_led_standard;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void display_data_w(uint8_t data);
 	void display_column_w(uint8_t data);
@@ -200,16 +200,16 @@ static INPUT_PORTS_START( sprachmg )
 
 	PORT_START("special")
 	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("STA/STP") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", z80pio_device, pb5_w)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("STA/STP") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", FUNC(z80pio_device::pb5_w))
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("remote")
 	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("STA/STP (Remote)") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", z80pio_device, pb6_w)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("STA/STP (Remote)") PORT_WRITE_LINE_DEVICE_MEMBER("pio0", FUNC(z80pio_device::pb6_w))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("reset")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, sprachmg_state, keypad_res, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RES") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sprachmg_state::keypad_res), 0)
 INPUT_PORTS_END
 
 
@@ -322,12 +322,6 @@ void sprachmg_state::sys_w(uint8_t data)
 
 void sprachmg_state::machine_start()
 {
-	// resolve outputs
-	m_dmd.resolve();
-	m_led_speech.resolve();
-	m_led_morse.resolve();
-	m_led_standard.resolve();
-
 	// register for save states
 	save_item(NAME(m_display_data));
 	save_item(NAME(m_key_scan));
@@ -373,12 +367,12 @@ void sprachmg_state::sprachmg(machine_config &config)
 	m_pio[1]->out_pa_callback().set(FUNC(sprachmg_state::display_data_w));
 	m_pio[1]->out_pb_callback().set(FUNC(sprachmg_state::display_column_w));
 
-	Z80PIO(config, m_pio[2], 0);
+	Z80PIO(config, m_pio[2]);
 	m_pio[2]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio[2]->out_pa_callback().set([this](uint8_t data) { m_dac->write(data); });
 	m_pio[2]->out_pb_callback().set(FUNC(sprachmg_state::sys_w));
 
-	Z80PIO(config, m_pio[3], 0);
+	Z80PIO(config, m_pio[3]);
 	m_pio[3]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// port a: tape
 	// port b: tape, dac gain
@@ -427,5 +421,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1985, sprachmg, 0,      0,      sprachmg, sprachmg, sprachmg_state, empty_init, "Institut für Kosmosforschung", "Gerät 32620 (Sprach/Morsegenerator)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                           FULLNAME                                 FLAGS
+COMP( 1985, sprachmg, 0,      0,      sprachmg, sprachmg, sprachmg_state, empty_init, u8"Institut für Kosmosforschung", u8"Gerät 32620 (Sprach/Morsegenerator)", MACHINE_SUPPORTS_SAVE )

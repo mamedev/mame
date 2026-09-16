@@ -17,7 +17,7 @@ public:
 	auto tx_callback() { return m_out_tx_func.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 

@@ -241,11 +241,6 @@ archimedes_keyboard_device::archimedes_keyboard_device(const machine_config &mco
 }
 
 
-void archimedes_keyboard_device::device_resolve_objects()
-{
-	m_leds.resolve();
-}
-
 void archimedes_keyboard_device::device_start()
 {
 	m_mouse_timer = timer_alloc(FUNC(archimedes_keyboard_device::update_mouse), this);

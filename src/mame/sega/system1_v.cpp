@@ -196,15 +196,15 @@ void system1_state::video_start_common(int pagecount)
 {
 	int pagenum;
 
-	/* allocate memory for the collision arrays */
+	// allocate memory for the collision arrays
 	m_mix_collide = make_unique_clear<u8[]>(64);
 	m_sprite_collide = make_unique_clear<u8[]>(1024);
 
-	/* allocate memory for videoram */
+	// allocate memory for videoram
 	m_tilemap_pages = pagecount;
 	m_videoram = make_unique_clear<u8[]>(0x800 * pagecount);
 
-	/* create the tilemap pages */
+	// create the tilemap pages
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
 		m_tilemap_page[pagenum] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(system1_state::tile_get_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
@@ -212,10 +212,10 @@ void system1_state::video_start_common(int pagecount)
 		m_tilemap_page[pagenum]->set_user_data(m_videoram.get() + 0x800 * pagenum);
 	}
 
-	/* allocate a temporary bitmap for sprite rendering */
+	// allocate a temporary bitmap for sprite rendering
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	/* register for save stats */
+	// register for save states
 	save_item(NAME(m_video_mode));
 	save_item(NAME(m_mix_collide_summary));
 	save_item(NAME(m_sprite_collide_summary));
@@ -246,12 +246,10 @@ VIDEO_START_MEMBER(system1_state,system2)
 
 void system1_state::common_videomode_w(u8 data)
 {
-	if (data & 0x6e) logerror("videomode = %02x\n",data);
-
-	/* bit 4 is screen blank */
+	// bit 4 is screen blank
 	m_video_mode = data;
 
-	/* bit 7 is flip screen */
+	// bit 7 is flip screen
 	flip_screen_set(data & 0x80);
 }
 
@@ -324,18 +322,20 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 	   and is only restarted by the FIXST signal, which occurs once every
 	   'n' pixel clocks. 'n' is determined by the horizontal control PAL. */
 
-	/* this assumes 4 5MHz pixel clocks per FIXST, or 8*4 20MHz CPU clocks,
+	/* this assumes 4 5MHz pixel clocks per FIXST, or 3.2 4MHz CPU clocks,
 	   and is based on a dump of 315-5137 */
-	const u32 cpu_cycles_per_fixst = 4 * 4;
-	const u32 fixst_offset = 2 * 4;
-	u32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((cpu->total_cycles() - fixst_offset) % cpu_cycles_per_fixst);
+	const u32 cpu_cycles_per_fixst = 32; // 3.2 * 10
+	const u32 fixst_offset = cpu_cycles_per_fixst / 2;
+	const u64 total_cycles = cpu->total_cycles() * 10ULL;
+	u32 cycles_until_next_fixst = cpu_cycles_per_fixst - ((total_cycles - fixst_offset) % cpu_cycles_per_fixst);
 
-	cpu->adjust_icount(-cycles_until_next_fixst);
+	cpu->adjust_icount(-((cycles_until_next_fixst + 5) / 10));
 }
 
 u8 system1_state::videoram_r(offs_t offset)
 {
-	videoram_wait_states(m_maincpu);
+	if (!machine().side_effects_disabled())
+		videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
 	return m_videoram[offset];
 }
@@ -344,16 +344,16 @@ void system1_state::videoram_w(offs_t offset, u8 data)
 {
 	videoram_wait_states(m_maincpu);
 	offset |= 0x1000 * ((m_videoram_bank >> 1) % (m_tilemap_pages / 2));
-	m_videoram[offset] = data;
 
-	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
-
-	/* force a partial update if the page is changing */
+	// force a partial update if the page is changing
 	if (m_tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
 	{
 		//m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
+
+	m_videoram[offset] = data;
+	m_tilemap_page[offset / 0x800]->mark_tile_dirty((offset % 0x800) / 2);
 }
 
 void system1_state::videoram_bank_w(u8 data)
@@ -386,7 +386,7 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	const u32 gfxbanks = m_spriterom.bytes() / 0x8000;
 	const int flipscreen = flip_screen();
 
-	/* up to 32 sprites total */
+	// up to 32 sprites total
 	for (int spritenum = 0; spritenum < 32; spritenum++)
 	{
 		const u8 *spritedata = &m_spriteram[spritenum * 0x10];
@@ -404,11 +404,11 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (spritedata[0] == 0xff)
 			return;
 
-		/* clamp the bank to the size of the sprite ROMs */
+		// clamp the bank to the size of the sprite ROMs
 		bank %= gfxbanks;
 		const u8 *gfxbankbase = &m_spriterom[bank * 0x8000];
 
-		/* flip sprites vertically */
+		// flip sprites vertically
 		if (flipscreen)
 		{
 			int temp = top;
@@ -416,19 +416,19 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			bottom = 256 - temp;
 		}
 
-		/* iterate over all rows of the sprite */
+		// iterate over all rows of the sprite
 		for (int y = top; y < bottom; y++)
 		{
 			u16 *const destbase = &bitmap.pix(y);
 
-			/* advance by the row counter */
+			// advance by the row counter
 			srcaddr += stride;
 
-			/* skip if outside of our clipping area */
+			// skip if outside of our clipping area
 			if (y < cliprect.min_y || y > cliprect.max_y)
 				continue;
 
-			/* iterate over X */
+			// iterate over X
 			int addrdelta = (srcaddr & 0x8000) ? -1 : 1;
 			for (int x = xstart, curaddr = srcaddr; ; x += 4, curaddr += addrdelta)
 			{
@@ -436,7 +436,7 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 				const u8 data = gfxbankbase[curaddr & 0x7fff];
 
-				/* non-flipped case */
+				// non-flipped case
 				if (!(curaddr & 0x8000))
 				{
 					color1 = data >> 4;
@@ -448,11 +448,11 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					color2 = data >> 4;
 				}
 
-				/* stop when we see color 0x0f */
+				// stop when we see color 0x0f
 				if (color1 == 0x0f)
 					break;
 
-				/* draw if non-transparent */
+				// draw if non-transparent
 				if (color1 != 0)
 				{
 					for (int i = 0; i < 2; i++)
@@ -469,11 +469,11 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 					}
 				}
 
-				/* stop when we see color 0x0f */
+				// stop when we see color 0x0f
 				if (color2 == 0x0f)
 					break;
 
-				/* draw if non-transparent */
+				// draw if non-transparent
 				if (color2 != 0)
 				{
 					for (int i = 0; i < 2; i++)
@@ -508,11 +508,11 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 		bitmap.fill(0, cliprect);
 		return;
 	}
-	/* first clear the sprite bitmap and draw sprites within this area */
+	// first clear the sprite bitmap and draw sprites within this area
 	m_sprite_bitmap.fill(0, cliprect);
 	draw_sprites(m_sprite_bitmap, cliprect, spritexoffs);
 
-	/* iterate over rows */
+	// iterate over rows
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const u16 *const fgbase = &fgpixmap.pix(y & 0xff);
@@ -521,10 +521,10 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 		const int bgy = (y + bgyscroll) & 0x1ff;
 		const int bgxscroll = bgrowscroll[y >> 3 & 0x1f];
 
-		/* get the base of the left and right pixmaps for the effective background Y */
+		// get the base of the left and right pixmaps for the effective background Y
 		const u16 *const bgbase[2] = { &bgpixmaps[(bgy >> 8) * 2 + 0]->pix(bgy & 0xff), &bgpixmaps[(bgy >> 8) * 2 + 1]->pix(bgy & 0xff) };
 
-		/* iterate over pixels */
+		// iterate over pixels
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			const int bgx = ((x - bgxscroll) / 2) & 0x1ff;
@@ -532,19 +532,19 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 			const u16 bgpix = bgbase[bgx >> 8][bgx & 0xff];
 			const u16 sprpix = sprbase[x];
 
-			/* using the sprite, background, and foreground pixels, look up the color behavior */
-			const u8 lookup_index =  (((sprpix & 0xf) == 0) << 0) |
-							(((fgpix & 7) == 0) << 1) |
-							(((fgpix >> 9) & 3) << 2) |
-							(((bgpix & 7) == 0) << 4) |
-							(((bgpix >> 9) & 3) << 5);
+			// using the sprite, background, and foreground pixels, look up the color behavior
+			const u8 lookup_index = (((sprpix & 0xf) == 0) << 0) |
+					(((fgpix & 7) == 0) << 1) |
+					(((fgpix >> 9) & 3) << 2) |
+					(((bgpix & 7) == 0) << 4) |
+					(((bgpix >> 9) & 3) << 5);
 			u8 lookup_value = m_lookup_prom[lookup_index];
 
-			/* compute collisions based on two of the PROM bits */
+			// compute collisions based on two of the PROM bits
 			if (!(lookup_value & 4))
 				m_mix_collide[((lookup_value & 8) << 2) | ((sprpix >> 4) & 0x1f)] = m_mix_collide_summary = 1;
 
-			/* the lower 2 PROM bits select the palette and which pixels */
+			// the lower 2 PROM bits select the palette and which pixels
 			lookup_value &= 3;
 			if (lookup_value == 0)
 				dstbase[x] = 0x000 | (sprpix & 0x1ff);
@@ -568,28 +568,28 @@ u32 system1_state::screen_update_system1(screen_device &screen, bitmap_ind16 &bi
 	bitmap_ind16 *bgpixmaps[4];
 	int bgrowscroll[32];
 
-	/* all 4 background pages are the same, fixed to page 0 */
+	// all 4 background pages are the same, fixed to page 0
 	bgpixmaps[0] = bgpixmaps[1] = bgpixmaps[2] = bgpixmaps[3] = &m_tilemap_page[0]->pixmap();
 
-	/* foreground is fixed to page 1 */
+	// foreground is fixed to page 1
 	bitmap_ind16 &fgpixmap = m_tilemap_page[1]->pixmap();
 
-	/* get fixed scroll offsets */
+	// get fixed scroll offsets
 	int xscroll = (s16)((m_videoram[0xffc] | (m_videoram[0xffd] << 8)) + 28);
 	int yscroll = m_videoram[0xfbd];
 
-	/* adjust for flipping */
+	// adjust for flipping
 	if (flip_screen())
 	{
 		xscroll = 640 - (xscroll & 0x1ff);
 		yscroll = 764 - (yscroll & 0x1ff);
 	}
 
-	/* fill in the row scroll table */
+	// fill in the row scroll table
 	for (int y = 0; y < 32; y++)
 		bgrowscroll[y] = xscroll;
 
-	/* common update */
+	// common update
 	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, bgrowscroll, yscroll, 0);
 	return 0;
 }
@@ -602,16 +602,16 @@ u32 system1_state::screen_update_system2(screen_device &screen, bitmap_ind16 &bi
 	int xscroll, yscroll;
 	int sprxoffset;
 
-	/* 4 independent background pages */
+	// 4 independent background pages
 	bgpixmaps[0] = &m_tilemap_page[m_videoram[0x740] & 7]->pixmap();
 	bgpixmaps[1] = &m_tilemap_page[m_videoram[0x742] & 7]->pixmap();
 	bgpixmaps[2] = &m_tilemap_page[m_videoram[0x744] & 7]->pixmap();
 	bgpixmaps[3] = &m_tilemap_page[m_videoram[0x746] & 7]->pixmap();
 
-	/* foreground is fixed to page 0 */
+	// foreground is fixed to page 0
 	bitmap_ind16 &fgpixmap = m_tilemap_page[0]->pixmap();
 
-	/* get scroll offsets */
+	// get scroll offsets
 	if (!flip_screen())
 	{
 		xscroll = ((m_videoram[0x7c0] | (m_videoram[0x7c1] << 8)) & 0x1ff) - 512 + 10;
@@ -625,11 +625,11 @@ u32 system1_state::screen_update_system2(screen_device &screen, bitmap_ind16 &bi
 		sprxoffset = -14;
 	}
 
-	/* fill in the row scroll table */
+	// fill in the row scroll table
 	for (int y = 0; y < 32; y++)
 		rowscroll[y] = xscroll;
 
-	/* common update */
+	// common update
 	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, sprxoffset);
 	return 0;
 }
@@ -642,16 +642,16 @@ u32 system1_state::screen_update_system2_rowscroll(screen_device &screen, bitmap
 	int yscroll;
 	int sprxoffset;
 
-	/* 4 independent background pages */
+	// 4 independent background pages
 	bgpixmaps[0] = &m_tilemap_page[m_videoram[0x740] & 7]->pixmap();
 	bgpixmaps[1] = &m_tilemap_page[m_videoram[0x742] & 7]->pixmap();
 	bgpixmaps[2] = &m_tilemap_page[m_videoram[0x744] & 7]->pixmap();
 	bgpixmaps[3] = &m_tilemap_page[m_videoram[0x746] & 7]->pixmap();
 
-	/* foreground is fixed to page 0 */
+	// foreground is fixed to page 0
 	bitmap_ind16 &fgpixmap = m_tilemap_page[0]->pixmap();
 
-	/* get scroll offsets */
+	// get scroll offsets
 	if (!flip_screen())
 	{
 		for (int y = 0; y < 32; y++)
@@ -669,7 +669,7 @@ u32 system1_state::screen_update_system2_rowscroll(screen_device &screen, bitmap
 		sprxoffset = -14;
 	}
 
-	/* common update */
+	// common update
 	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, sprxoffset);
 	return 0;
 }

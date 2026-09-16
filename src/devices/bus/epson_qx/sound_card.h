@@ -6,8 +6,8 @@
  *
  *******************************************************************/
 
-#ifndef MAME_BUS_EPSON_QX_YM2149_H
-#define MAME_BUS_EPSON_QX_YM2149_H
+#ifndef MAME_BUS_EPSON_QX_SOUND_CARD_H
+#define MAME_BUS_EPSON_QX_SOUND_CARD_H
 
 #pragma once
 
@@ -32,14 +32,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_irqline;
@@ -58,4 +58,4 @@ private:
 DECLARE_DEVICE_TYPE_NS(EPSON_QX_OPTION_YM2149, bus::epson_qx, ym2149_sound_card_device)
 
 
-#endif // MAME_BUS_EPSON_QX_YM2149_H
+#endif // MAME_BUS_EPSON_QX_SOUND_CARD_H

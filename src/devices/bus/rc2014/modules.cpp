@@ -20,7 +20,7 @@
 #include "bus/rc2014/romram.h"
 #include "bus/rc2014/rtc.h"
 #include "bus/rc2014/serial.h"
-#include "bus/rc2014/sound.h"
+#include "bus/rc2014/sound_ym_ay.h"
 #include "bus/rc2014/z180cpu.h"
 #include "bus/rc2014/z80cpu.h"
 

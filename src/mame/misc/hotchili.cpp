@@ -197,7 +197,7 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -210,7 +210,7 @@ private:
 	uint8_t m_addr_high, m_addr_low;
 	uint16_t m_addr_mask, m_addr_latch;
 
-	void hc_map(address_map &map);
+	void hc_map(address_map &map) ATTR_COLD;
 	void bankswitch_w(uint8_t data);
 
 	//inports
@@ -304,7 +304,7 @@ void hotchili_state::hc_map(address_map &map)
 static INPUT_PORTS_START( hotchili )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("All Clear / Configuration")  // pressed on startup
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("All Clear / Configuration")  // pressed on startup
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unknown
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )  // active: enables RNG and read inputs on secondary buffer (inputs with special timing)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meter Reading Key") PORT_TOGGLE
@@ -320,7 +320,7 @@ static INPUT_PORTS_START( hotchili )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("CoinTest")      // coin test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_CODE(KEYCODE_T) PORT_NAME("Test Select")   // test select
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_CODE(KEYCODE_Y) PORT_NAME("Test End")
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_TOGGLE
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Play 1 Credits / Change (Setup)") // 1st. Start
@@ -538,7 +538,6 @@ uint8_t hotchili_state::extram_r(offs_t offset)
 
 void hotchili_state::machine_start()
 {
-	m_lamp.resolve();
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 }
 
@@ -556,7 +555,7 @@ void hotchili_state::hotchili(machine_config &config)
 	RAM(config, m_ram).set_default_size("2K").set_default_value(0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw( MAIN_CLOCK / 2, 260, 0, 256, 256, 16, 239);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(hotchili_state::screen_update));

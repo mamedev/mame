@@ -79,9 +79,9 @@ INPUT_PORTS_START( sac_ioports )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, sound_to_main_ready) // output buffer full
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", atari_sound_comm_device, main_to_sound_ready) // input buffer full
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, atari_sac_device, main_test_read_line) // self test
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::sound_to_main_ready)) // output buffer full
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundcomm", FUNC(atari_sound_comm_device::main_to_sound_ready)) // input buffer full
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(atari_sac_device::main_test_read_line)) // self test
 INPUT_PORTS_END
 
 
@@ -95,7 +95,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 atari_sac_device::atari_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: atari_jsa_base_device(mconfig, ATARI_SAC, tag, owner, clock, 2)
+	: atari_jsa_base_device(mconfig, ATARI_SAC, tag, owner, clock)
 	, m_daccpu(*this, "dac")
 	, m_datin(*this, "datin")
 	, m_datout(*this, "datout")
@@ -265,12 +265,12 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	YM2151(config, m_ym2151, 14.318181_MHz_XTAL/4);
 	m_ym2151->irq_handler().set(FUNC(atari_sac_device::ym2151_irq_gen));
 	m_ym2151->port_write_handler().set(FUNC(atari_sac_device::ym2151_port_w));
-	m_ym2151->add_route(0, *this, 0.60, AUTO_ALLOC_INPUT, 0);
-	m_ym2151->add_route(1, *this, 0.60, AUTO_ALLOC_INPUT, 1);
+	m_ym2151->add_route(0, *this, 0.60, 0);
+	m_ym2151->add_route(1, *this, 0.60, 1);
 
 	// FIXME: there is actually only one DAC (plus some analog switches)
-	AM6012(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 1); // AM6012.6j
-	AM6012(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0); // AM6012.6j
+	AM6012(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.5, 1); // AM6012.6j
+	AM6012(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.5, 0); // AM6012.6j
 }
 
 

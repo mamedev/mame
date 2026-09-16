@@ -35,27 +35,26 @@
 
 TILE_GET_INFO_MEMBER(atarig42_state::get_alpha_tile_info)
 {
-	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
-	int code = data & 0xfff;
-	int color = (data >> 12) & 0x0f;
-	int opaque = data & 0x8000;
+	uint16_t const data = m_alpha_tilemap->basemem_read(tile_index);
+	int const code = data & 0xfff;
+	int const color = (data >> 12) & 0x0f;
+	bool const opaque = BIT(data, 15);
 	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
 TILE_GET_INFO_MEMBER(atarig42_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
-	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
-	int color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
-	tileinfo.set(0, code, color, (data >> 15) & 1);
-	tileinfo.category = (m_playfield_color_bank >> 2) & 7;
+	uint16_t const data = m_playfield_tilemap->basemem_read(tile_index);
+	int const code = (m_playfield_tile_bank << 12) | (data & 0xfff);
+	int const color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
+	tileinfo.set(0, code, color, BIT(data, 15));
 }
 
 
 TILEMAP_MAPPER_MEMBER(atarig42_state::atarig42_playfield_scan)
 {
-	int bank = 1 - (col / (num_cols / 2));
+	int const bank = 1 - (col / (num_cols / 2));
 	return bank * (num_rows * num_cols / 2) + row * (num_cols / 2) + (col % (num_cols / 2));
 }
 
@@ -90,7 +89,7 @@ void atarig42_state::video_start()
 
 TIMER_DEVICE_CALLBACK_MEMBER(atarig42_state::scanline_update)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	/* keep in range */
 	int offset = (scanline / 8) * 64 + 48;
@@ -100,13 +99,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarig42_state::scanline_update)
 	/* update the playfield scrolls */
 	for (int i = 0; i < 8; i++)
 	{
-		uint16_t word;
-
-		word = m_alpha_tilemap->basemem_read(offset++);
-		if (word & 0x8000)
+		uint16_t word = m_alpha_tilemap->basemem_read(offset++);
+		if (BIT(word, 15))
 		{
-			int newscroll = (word >> 5) & 0x3ff;
-			int newbank = word & 0x1f;
+			int const newscroll = (word >> 5) & 0x3ff;
+			int const newbank = word & 0x1f;
 			if (newscroll != m_playfield_xscroll)
 			{
 				if (scanline + i > 0)
@@ -124,10 +121,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarig42_state::scanline_update)
 		}
 
 		word = m_alpha_tilemap->basemem_read(offset++);
-		if (word & 0x8000)
+		if (BIT(word, 15))
 		{
-			int newscroll = ((word >> 6) - (scanline + i)) & 0x1ff;
-			int newbank = word & 7;
+			int const newscroll = ((word >> 6) - (scanline + i)) & 0x1ff;
+			int const newbank = word & 7;
 			if (newscroll != m_playfield_yscroll)
 			{
 				if (scanline + i > 0)
@@ -154,20 +151,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarig42_state::scanline_update)
  *
  *************************************/
 
-uint32_t atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarig42_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind8 &priority_bitmap = screen.priority();
 
 	/* draw the playfield */
 	priority_bitmap.fill(0, cliprect);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 1, 1);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 2, 2);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 3, 3);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 4, 4);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 5, 5);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 6, 6);
-	m_playfield_tilemap->draw(screen, bitmap, cliprect, 7, 7);
+	m_playfield_tilemap->draw(screen, bitmap, cliprect, 0, (m_playfield_color_bank >> 2) & 7);
 
 	/* copy the motion objects on top */
 	{
@@ -187,9 +177,9 @@ uint32_t atarig42_state::screen_update_atarig42(screen_device &screen, bitmap_in
 				if (mo[x])
 				{
 					int const pfpri = pri[x];
-					int const mopri = mo[x] >> ATARIRLE_PRIORITY_SHIFT;
+					int const mopri = mo[x] >> atari_rle_objects_device::PRIORITY_SHIFT;
 					if (mopri >= pfpri)
-						pf[x] = mo[x] & ATARIRLE_DATA_MASK;
+						pf[x] = mo[x] & atari_rle_objects_device::DATA_MASK;
 				}
 		}
 	}

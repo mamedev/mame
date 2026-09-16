@@ -45,7 +45,7 @@ public:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void qvt190_mem_map(address_map &map);
+	void qvt190_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -123,11 +123,11 @@ void qvt190_state::qvt190(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // V61C16P55L + battery
 
-	ACIA6850(config, "acia1", 0);
+	ACIA6850(config, "acia1");
 
-	ACIA6850(config, "acia2", 0);
+	ACIA6850(config, "acia2");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.6698_MHz_XTAL, 882, 18, 738, 315, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -152,4 +152,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1987, qvt190, 0, 0, qvt190, qvt190, qvt190_state, empty_init, "Qume", "QVT-190", MACHINE_IS_SKELETON )
+COMP( 1987, qvt190, 0, 0, qvt190, qvt190, qvt190_state, empty_init, "Qume", "QVT-190", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

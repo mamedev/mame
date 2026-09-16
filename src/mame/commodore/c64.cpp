@@ -6,10 +6,6 @@
 
     - floating bus writes to peripheral registers in m6502.c
     - sort out kernals between PAL/NTSC
-    - tsuit215 test failures
-        - IRQ (WRONG $DC0D)
-        - NMI (WRONG $DD0D)
-        - some CIA tests
     - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
 
 */
@@ -70,6 +66,7 @@ public:
 		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
+		m_portswap(*this, "JOYSWAP"),
 		m_loram(1),
 		m_hiram(1),
 		m_charen(1),
@@ -101,9 +98,10 @@ public:
 	memory_share_creator<uint8_t> m_color_ram;
 	optional_ioport_array<8> m_row;
 	optional_ioport m_lock;
+	optional_ioport m_portswap;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	[[maybe_unused]] void check_interrupts();
 	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);
@@ -170,12 +168,19 @@ public:
 	int m_user_pa2;
 	int m_user_pb;
 
+	bool m_iec_atn;
+	bool m_iec_clk;
+	bool m_iec_data;
+	emu_timer *m_iec_sync_timer;
+	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void pet64(machine_config &config);
-	void c64_mem(address_map &map);
-	void vic_colorram_map(address_map &map);
-	void vic_videoram_map(address_map &map);
+	void cia_config(machine_config &config, int tod_clock);
+	void c64_mem(address_map &map) ATTR_COLD;
+	void vic_colorram_map(address_map &map) ATTR_COLD;
+	void vic_videoram_map(address_map &map) ATTR_COLD;
 
 	offs_t dasm_zeropage(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
 	offs_t dasm_vector(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const char *opname);
@@ -759,12 +764,12 @@ void c64_state::write_restore(int state)
 
 static INPUT_PORTS_START( c64 )
 	PORT_START( "ROW0" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_RALT)        PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)                                    PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)                                    PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1)                                    PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4)                                    PORT_CHAR(UCHAR_MAMEKEY(F7))
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CRSR \xE2\x86\x91 \xE2\x86\x93") PORT_CODE(KEYCODE_DOWN)        PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CRSR \xE2\x86\x90 \xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)             PORT_CHAR(13)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INST DEL") PORT_CODE(KEYCODE_BACKSPACE)       PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 
@@ -820,30 +825,35 @@ static INPUT_PORTS_START( c64 )
 
 	PORT_START( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91 \xCF\x80") PORT_CODE(KEYCODE_END) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLR HOME") PORT_CODE(KEYCODE_INSERT)      PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLR HOME") PORT_CODE(KEYCODE_HOME)        PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(0xA3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN)                              PORT_CHAR(0xA3)
 
 	PORT_START( "ROW7" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN STOP") PORT_CODE(KEYCODE_HOME)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN STOP") PORT_CODE(KEYCODE_ESC)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)                                 PORT_CHAR('Q')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CBM") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                             PORT_CHAR(' ')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)                                 PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)                               PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("CTRL") PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_TILDE)   PORT_CHAR(0x2190)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
 
 	PORT_START( "RESTORE" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, c64_state, write_restore)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_TAB) PORT_WRITE_LINE_MEMBER(FUNC(c64_state::write_restore))
 
 	PORT_START( "LOCK" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 
@@ -874,6 +884,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( c64gs )
 	// no keyboard
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Switch joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in switched port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 
@@ -899,23 +914,25 @@ INPUT_PORTS_END
 uint8_t c64_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	switch (m_cia1->pa_r() >> 6)
 	{
-	case 1: data = m_joy1->read_pot_x(); break;
-	case 2: data = m_joy2->read_pot_x(); break;
+	case 1: data = cur1->read_pot_x(); break;
+	case 2: data = cur2->read_pot_x(); break;
 	case 3:
-		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
+		if (cur1->has_pot_x() && cur2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
+			data = 1 / (1 / cur1->read_pot_x() + 1 / cur2->read_pot_x());
 		}
-		else if (m_joy1->has_pot_x())
+		else if (cur1->has_pot_x())
 		{
-			data = m_joy1->read_pot_x();
+			data = cur1->read_pot_x();
 		}
-		else if (m_joy2->has_pot_x())
+		else if (cur2->has_pot_x())
 		{
-			data = m_joy2->read_pot_x();
+			data = cur2->read_pot_x();
 		}
 		break;
 	}
@@ -926,23 +943,25 @@ uint8_t c64_state::sid_potx_r()
 uint8_t c64_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	switch (m_cia1->pa_r() >> 6)
 	{
-	case 1: data = m_joy1->read_pot_y(); break;
-	case 2: data = m_joy2->read_pot_y(); break;
+	case 1: data = cur1->read_pot_y(); break;
+	case 2: data = cur2->read_pot_y(); break;
 	case 3:
-		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
+		if (cur1->has_pot_y() && cur2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
+			data = 1 / (1 / cur1->read_pot_y() + 1 / cur2->read_pot_y());
 		}
-		else if (m_joy1->has_pot_y())
+		else if (cur1->has_pot_y())
 		{
-			data = m_joy1->read_pot_y();
+			data = cur1->read_pot_y();
 		}
-		else if (m_joy2->has_pot_y())
+		else if (cur2->has_pot_y())
 		{
-			data = m_joy2->read_pot_y();
+			data = cur2->read_pot_y();
 		}
 		break;
 	}
@@ -973,9 +992,10 @@ uint8_t c64_state::cia1_pa_r()
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	// joystick
-	uint8_t joy_b = m_joy2->read_joy();
+	uint8_t joy_b = cur2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
@@ -1041,9 +1061,10 @@ uint8_t c64_state::cia1_pb_r()
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
 
 	// joystick
-	uint8_t joy_a = m_joy1->read_joy();
+	uint8_t joy_a = cur1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
@@ -1079,10 +1100,9 @@ void c64_state::cia1_pb_w(uint8_t data)
 	    PB7     ROW7
 
 	*/
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
 
-	m_joy1->joy_w(data & 0x1f);
-
-	m_vic->lp_w(BIT(data, 4));
+	cur1->joy_w(data & 0x1f);
 }
 
 uint8_t c64gs_state::cia1_pa_r()
@@ -1103,9 +1123,10 @@ uint8_t c64gs_state::cia1_pa_r()
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
 
 	// joystick
-	uint8_t joy_b = m_joy2->read_joy();
+	uint8_t joy_b = cur2->read_joy();
 
 	data &= (0xf0 | (joy_b & 0x0f));
 	data &= ~(!BIT(joy_b, 5) << 4);
@@ -1131,9 +1152,10 @@ uint8_t c64gs_state::cia1_pb_r()
 	*/
 
 	uint8_t data = 0xff;
+	vcs_control_port_device *cur1 = m_portswap->read() ? m_joy2 : m_joy1;
 
 	// joystick
-	uint8_t joy_a = m_joy1->read_joy();
+	uint8_t joy_a = cur1->read_joy();
 
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
@@ -1175,6 +1197,13 @@ uint8_t c64_state::cia2_pa_r()
 	return data;
 }
 
+TIMER_CALLBACK_MEMBER(c64_state::iec_sync_tick)
+{
+	m_iec->host_atn_w(m_iec_atn);
+	m_iec->host_clk_w(m_iec_clk);
+	m_iec->host_data_w(m_iec_data);
+}
+
 void c64_state::cia2_pa_w(uint8_t data)
 {
 	/*
@@ -1200,9 +1229,10 @@ void c64_state::cia2_pa_w(uint8_t data)
 	m_user->write_m(BIT(data, 2));
 
 	// IEC bus
-	m_iec->host_atn_w(!BIT(data, 3));
-	m_iec->host_clk_w(!BIT(data, 4));
-	m_iec->host_data_w(!BIT(data, 5));
+	m_iec_atn = !BIT(data, 3);
+	m_iec_clk = !BIT(data, 4);
+	m_iec_data = !BIT(data, 5);
+	m_iec_sync_timer->adjust(attotime::zero);
 }
 
 uint8_t c64_state::cia2_pb_r()
@@ -1408,6 +1438,8 @@ void sx1541_iec_devices(device_slot_interface &device)
 
 void c64_state::machine_start()
 {
+	m_iec_sync_timer = timer_alloc(FUNC(c64_state::iec_sync_tick), this);
+
 	// get pointers to ROMs
 	if (memregion("basic") != nullptr)
 	{
@@ -1446,15 +1478,8 @@ void c64_state::machine_start()
 
 void c64_state::machine_reset()
 {
-	m_maincpu->reset();
-
-	m_vic->reset();
-	m_sid->reset();
-	m_cia1->reset();
-	m_cia2->reset();
-
-	m_iec->reset();
-	m_exp->reset();
+	m_iec->host_reset_w(0);
+	m_iec->host_reset_w(1);
 
 	m_user->write_3(0);
 	m_user->write_3(1);
@@ -1465,6 +1490,35 @@ void c64_state::machine_reset()
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
+
+//-------------------------------------------------
+//  cia_config - wire up the two CIAs
+//-------------------------------------------------
+
+//  Split out from the machine configs so the 64C, which fits a later CIA, can
+//  swap the devices and keep one copy of the wiring.
+
+void c64_state::cia_config(machine_config &config, int tod_clock)
+{
+	m_cia1->set_tod_clock(tod_clock);
+	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
+	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
+	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
+	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
+	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
+
+	m_cia2->set_tod_clock(tod_clock);
+	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
+	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
+	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
+	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
+	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
+	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
+	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
+	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+}
+
 
 //-------------------------------------------------
 //  machine_config( ntsc )
@@ -1491,11 +1545,12 @@ void c64_state::ntsc(machine_config &config)
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
 	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos6567.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6567_VRETRACERATE);
 	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
 	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
@@ -1512,24 +1567,8 @@ void c64_state::ntsc(machine_config &config)
 	PLS100(config, m_pla);
 
 	MOS6526(config, m_cia1, XTAL(14'318'181)/14);
-	m_cia1->set_tod_clock(60);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
-	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
-	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
-	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
-	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
-	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
-
 	MOS6526(config, m_cia2, XTAL(14'318'181)/14);
-	m_cia2->set_tod_clock(60);
-	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
-	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
-	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
-	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
-	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
-	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
-	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
-	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+	cia_config(config, 60);
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
 	m_cassette->read_handler().set(FUNC(c64_state::cass_rd_w));
@@ -1540,6 +1579,8 @@ void c64_state::ntsc(machine_config &config)
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
+	m_joy1->set_screen_tag(SCREEN_TAG);
+	m_joy1->set_lightpen_time_callback(m_vic, FUNC(mos6566_device::time_until_lightpen_pos));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/14, c64_expansion_cards, nullptr);
@@ -1568,7 +1609,9 @@ void c64_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c64_state::quickload_c64));
+	quickload.set_interface("cbm_quik");
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
@@ -1577,6 +1620,9 @@ void c64_state::ntsc(machine_config &config)
 	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
 	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("NTSC");
+	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter("NTSC");
+	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter("NTSC");
+	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1632,6 +1678,9 @@ void sx64_state::ntsc_dx(machine_config &config)
 void c64c_state::ntsc_c(machine_config &config)
 {
 	ntsc(config);
+	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
+	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
+	cia_config(config, 60);
 	MOS8580(config.replace(), m_sid, XTAL(14'318'181)/14);
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
@@ -1664,11 +1713,12 @@ void c64_state::pal(machine_config &config)
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos6569.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6569_VRETRACERATE);
 	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
 	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
@@ -1685,24 +1735,8 @@ void c64_state::pal(machine_config &config)
 	PLS100(config, m_pla);
 
 	MOS6526(config, m_cia1, XTAL(17'734'472)/18);
-	m_cia1->set_tod_clock(50);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
-	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
-	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
-	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
-	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
-	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
-
 	MOS6526(config, m_cia2, XTAL(17'734'472)/18);
-	m_cia2->set_tod_clock(50);
-	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
-	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
-	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
-	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
-	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
-	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
-	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
-	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+	cia_config(config, 50);
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
 	m_cassette->read_handler().set(FUNC(c64_state::cass_rd_w));
@@ -1713,6 +1747,8 @@ void c64_state::pal(machine_config &config)
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
+	m_joy1->set_screen_tag(SCREEN_TAG);
+	m_joy1->set_lightpen_time_callback(m_vic, FUNC(mos6566_device::time_until_lightpen_pos));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, c64_expansion_cards, nullptr);
@@ -1741,7 +1777,9 @@ void c64_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c64_state::quickload_c64));
+	quickload.set_interface("cbm_quik");
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
@@ -1750,6 +1788,9 @@ void c64_state::pal(machine_config &config)
 	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("PAL");
 	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("PAL");
+	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter("PAL");
+	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter("PAL");
+	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1781,6 +1822,9 @@ void sx64_state::pal_sx(machine_config &config)
 void c64c_state::pal_c(machine_config &config)
 {
 	pal(config);
+	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
+	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
+	cia_config(config, 50);
 	MOS8580(config.replace(), m_sid, XTAL(17'734'472)/18);
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
@@ -1813,11 +1857,12 @@ void c64gs_state::pal_gs(machine_config &config)
 	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos8565.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6569_VRETRACERATE);
 	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
 	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
@@ -1833,7 +1878,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	// devices
 	PLS100(config, m_pla);
 
-	MOS6526(config, m_cia1, XTAL(17'734'472)/18);
+	MOS8521(config, m_cia1, XTAL(17'734'472)/18);
 	m_cia1->set_tod_clock(50);
 	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
@@ -1843,7 +1888,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_cia1->pb_rd_callback().set(FUNC(c64gs_state::cia1_pb_r));
 	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
 
-	MOS6526(config, m_cia2, XTAL(17'734'472)/18);
+	MOS8521(config, m_cia2, XTAL(17'734'472)/18);
 	m_cia2->set_tod_clock(50);
 	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
 	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
@@ -1860,6 +1905,8 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
+	m_joy1->set_screen_tag(SCREEN_TAG);
+	m_joy1->set_lightpen_time_callback(m_vic, FUNC(mos6566_device::time_until_lightpen_pos));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, c64_expansion_cards, nullptr);
@@ -1888,7 +1935,9 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c64_state::quickload_c64));
+	quickload.set_interface("cbm_quik");
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
@@ -1989,6 +2038,8 @@ ROM_START( c64 )
 	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(28) )
 	ROM_SYSTEM_BIOS(29, "mercury31s", "Mercury-ROM v3.1s" )
 	ROMX_LOAD( "mercury31s.u4", 0x0000, 0x2000, CRC(97aa5d2f) SHA1(9fc653e61c34225245036f266db14e05feeadb21), ROM_BIOS(29) )
+	ROM_SYSTEM_BIOS(30, "rapidos", "RapiDOS Professional 2.0" )
+	ROMX_LOAD( "rapidos_pro_20_kernal.u4", 0x0000, 0x2000, CRC(bb2bdf0e) SHA1(f47456ef5f9336ac6529131d546a5ce873cb780f), ROM_BIOS(30) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

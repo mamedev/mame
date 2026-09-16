@@ -30,14 +30,13 @@
 #include "emu.h"
 #include "spec_snqk.h"
 
+#include "bus/spectrum/ay/slot.h"
+#include "cpu/z80/z80.h"
+#include "hrust.h"
 #include "specpls3.h"
 #include "spec128.h"
 #include "spectrum.h"
 #include "timex.h"
-
-#include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-
 #include "ui/uimain.h"
 
 #include "corestr.h"
@@ -121,7 +120,17 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 
 	image.fread(&snapshot_data[0], snapshot_size);
 
-	if (image.is_filetype("sna"))
+	if (image.is_filetype("snx"))
+	{
+		if (snapshot_data[0] == 'X' && snapshot_data[1] == 'S' && snapshot_data[2] == 'N' && snapshot_data[3] == 'A')
+			setup_snx(&snapshot_data[0], snapshot_size);
+		// snx as alias for sna
+		else if ((snapshot_size == SNA48_SIZE) || (snapshot_size == SNA128_SIZE_1) || (snapshot_size == SNA128_SIZE_2))
+			setup_sna(&snapshot_data[0], snapshot_size);
+		else
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
+	}
+	else if (image.is_filetype("sna"))
 	{
 		if ((snapshot_size != SNA48_SIZE) && (snapshot_size != SNA128_SIZE_1) && (snapshot_size != SNA128_SIZE_2))
 			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SNA file size");
@@ -130,7 +139,8 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("sp"))
 	{
-		if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
+		if ((snapshot_data[0] != 'S' || snapshot_data[1] != 'P')
+			|| (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
 		{
 			if (snapshot_size != SP_OLD_SIZE)
 				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SP file size");
@@ -160,9 +170,9 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 	}
 	else if (image.is_filetype("sem"))
 	{
-		if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' && \
-			snapshot_data[2] != 'P' && snapshot_data[3] != 'E' && \
-			snapshot_data[4] != 'C' && snapshot_data[5] != '1')
+		if (snapshot_data[0] != 0x05 || snapshot_data[1] != 'S'
+			|| snapshot_data[2] != 'P' || snapshot_data[3] != 'E'
+			|| snapshot_data[4] != 'C' || snapshot_data[5] != '1')
 		{
 			if (snapshot_size != SEM_SIZE)
 				return std::make_pair(image_error::INVALIDLENGTH, "Invalid .SEM file size");
@@ -190,20 +200,21 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 
 		setup_snp(&snapshot_data[0], snapshot_size);
 	}
-	else if (image.is_filetype("snx"))
-	{
-		if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
-			snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
-			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SNX file header");
-
-		setup_snx(&snapshot_data[0], snapshot_size);
-	}
 	else if (image.is_filetype("frz"))
 	{
 		if (snapshot_size != FRZ_SIZE)
 			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .FRZ file size");
 
 		setup_frz(&snapshot_data[0], snapshot_size);
+	}
+	else if (image.is_filetype("spg"))
+	{
+		if (snapshot_data[32] != 'S' || snapshot_data[33] != 'p' || snapshot_data[34] != 'e' || snapshot_data[35] != 'c'
+			|| snapshot_data[36] != 't' || snapshot_data[37] != 'r' || snapshot_data[38] != 'u' || snapshot_data[39] != 'm'
+			|| snapshot_data[40] != 'P' || snapshot_data[41] != 'r' ||snapshot_data[42] != 'o' || snapshot_data[43] != 'g')
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SPG file header.");
+
+		setup_spg(&snapshot_data[0], snapshot_size);
 	}
 	else
 	{
@@ -285,7 +296,7 @@ void spectrum_state::border_update(int data)
 #endif
 }
 
-void spectrum_state::setup_sp(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sp(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, SP_OFFSET;
 	uint8_t intr;
@@ -484,7 +495,7 @@ void spectrum_state::setup_sp(uint8_t *snapdata, uint32_t snapsize)
  *      in which case it is included twice.
  *
  *******************************************************************/
-void spectrum_state::setup_sna(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sna(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j, usedbanks[8];
 	long bank_offset;
@@ -702,7 +713,7 @@ void spectrum_state::setup_sna(uint8_t *snapdata, uint32_t snapsize)
  *      16640   49152   RAM dump
  *
  *******************************************************************/
-void spectrum_state::setup_ach(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_ach(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -833,7 +844,7 @@ void spectrum_state::setup_ach(uint8_t *snapdata, uint32_t snapsize)
  *      suffer from the same "top of the stack" bug as well as .SNA images.
  *
  *******************************************************************/
-void spectrum_state::setup_prg(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_prg(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1001,7 +1012,7 @@ void spectrum_state::setup_prg(uint8_t *snapdata, uint32_t snapsize)
  *      suffer from the same "top of the stack" bug as well as .SNA images.
  *
  *******************************************************************/
-void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_plusd(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j;
 	uint8_t intr;
@@ -1072,7 +1083,7 @@ void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
 						m_port_7ffd_data += i;
 						update_paging();
 						break;
-			};
+			}
 			logerror("Loading bank %d from offset:%05X\n", i, PLUSD128_HDR + i*SPECTRUM_BANK);
 			for (j = 0; j < SPECTRUM_BANK; j++)
 				space.write_byte(j + addr, snapdata[j + PLUSD128_HDR + i*SPECTRUM_BANK]);
@@ -1167,7 +1178,7 @@ void spectrum_state::setup_plusd(uint8_t *snapdata, uint32_t snapsize)
  *      Following these data, there are optional POKE blocks
  *
  *******************************************************************/
-void spectrum_state::setup_sem(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sem(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1284,7 +1295,7 @@ void spectrum_state::setup_sem(uint8_t *snapdata, uint32_t snapsize)
  *      16412   49152   RAM dump
  *
  *******************************************************************/
-void spectrum_state::setup_sit(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_sit(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1412,7 +1423,7 @@ void spectrum_state::setup_sit(uint8_t *snapdata, uint32_t snapsize)
  *      49476   10      0x00 (reserved for future use)
  *
  *******************************************************************/
-void spectrum_state::setup_zx(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_zx(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1542,7 +1553,7 @@ void spectrum_state::setup_zx(uint8_t *snapdata, uint32_t snapsize)
  *      49181   2       HL'
  *
  *******************************************************************/
-void spectrum_state::setup_snp(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_snp(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t intr;
@@ -1720,7 +1731,7 @@ void spectrum_state::setup_snp(uint8_t *snapdata, uint32_t snapsize)
  *                      length of the block.
  *
  *******************************************************************/
-void spectrum_state::snx_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size)
+void spectrum_state::snx_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size)
 {
 	uint8_t counthi, countlo, compress, fill;
 	uint16_t block = 0, count, i, j, numbytes;
@@ -1766,7 +1777,7 @@ void spectrum_state::snx_decompress_block(address_space &space, uint8_t *source,
 	}
 }
 
-void spectrum_state::setup_snx(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_snx(const uint8_t *snapdata, uint32_t snapsize)
 {
 	uint8_t intr;
 	uint16_t data, addr;
@@ -1917,7 +1928,7 @@ void spectrum_state::setup_snx(uint8_t *snapdata, uint32_t snapsize)
  *      The 8 16K banks are stored in the order 5, 2, 0, 1, 3, 4, 6, 7
  *
  *******************************************************************/
-void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_frz(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i, j;
 	uint8_t intr;
@@ -2010,7 +2021,7 @@ void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
 					m_port_7ffd_data += banks[i];
 					update_paging();
 					break;
-		};
+		}
 		logerror("Loading bank %d from offset:%05X\n", banks[i], FRZ_HDR + i*SPECTRUM_BANK);
 		for (j = 0; j < SPECTRUM_BANK; j++)
 			space.write_byte(j + addr, snapdata[j + FRZ_HDR + i*SPECTRUM_BANK]);
@@ -2029,7 +2040,7 @@ void spectrum_state::setup_frz(uint8_t *snapdata, uint32_t snapsize)
 	//logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", m_port_7ffd_data & 0x07, m_maincpu->state_string(Z80_PC).c_str());
 }
 
-void spectrum_state::z80_decompress_block(address_space &space, uint8_t *source, uint16_t dest, uint16_t size)
+void spectrum_state::z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size)
 {
 	uint8_t ch;
 	int i;
@@ -2089,7 +2100,7 @@ void spectrum_state::z80_decompress_block(address_space &space, uint8_t *source,
 	while (size > 0);
 }
 
-static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (uint8_t *snapdata, uint32_t snapsize)
+static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (const uint8_t *snapdata, uint32_t snapsize)
 {
 	uint8_t lo, hi, data;
 
@@ -2137,7 +2148,7 @@ static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (uint8_t *snapdata, uint
 }
 
 // supports 48k & 128k .Z80 files
-void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
+void spectrum_state::setup_z80(const uint8_t *snapdata, uint32_t snapsize)
 {
 	int i;
 	uint8_t lo, hi, data;
@@ -2289,7 +2300,6 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 	}
 	else
 	{
-		uint8_t *pSource;
 		int header_size;
 
 		header_size = 30 + 2 + ((snapdata[30] & 0x0ff) | ((snapdata[31] & 0x0ff) << 8));
@@ -2300,40 +2310,39 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 
 		if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine().system().name,"ts2068")))
 		{
-			ay8910_device *ay8912 = subdevice<ay8910_device>("ay8912");
+			ay_slot_device *ay = subdevice<ay_slot_device>("ay_slot");
 
 			// Only set up sound registers for 128K machine or TS2068!
 			for (i = 0; i < 16; i++)
 			{
-				ay8912->address_w(i);
-				ay8912->data_w(snapdata[39 + i]);
+				ay->address_w(i);
+				ay->data_w(snapdata[39 + i]);
 			}
-			ay8912->address_w(snapdata[38]);
+			ay->address_w(snapdata[38]);
 		}
-
-		pSource = snapdata + header_size;
 
 		if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K)
 			// Ensure 48K Basic ROM is used
 			page_basicrom();
 
+		const uint8_t *p_source = snapdata + header_size;
 		do
 		{
 			unsigned short length;
 			uint8_t page;
-			int Dest = 0;
+			int dest = 0;
 
-			length = (pSource[0] & 0x0ff) | ((pSource[1] & 0x0ff) << 8);
-			page = pSource[2];
+			length = (p_source[0] & 0x0ff) | ((p_source[1] & 0x0ff) << 8);
+			page = p_source[2];
 
 			if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K || z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068)
 			{
 				switch (page)
 				{
-					case 4: Dest = 0x08000; break;
-					case 5: Dest = 0x0c000; break;
-					case 8: Dest = 0x04000; break;
-					default: Dest = 0; break;
+					case 4: dest = 0x08000; break;
+					case 5: dest = 0x0c000; break;
+					case 8: dest = 0x04000; break;
+					default: dest = 0; break;
 				}
 			}
 			else
@@ -2344,14 +2353,14 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 					// Page the appropriate bank into 0xc000 - 0xfff
 					m_port_7ffd_data = page - 3;
 					update_paging();
-					Dest = 0x0c000;
+					dest = 0x0c000;
 				}
 				else
 					// Other values correspond to ROM pages
-					Dest = 0x0;
+					dest = 0x0;
 			}
 
-			if (Dest != 0)
+			if (dest != 0)
 			{
 				if (length == 0x0ffff)
 				{
@@ -2360,21 +2369,21 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 
 					// not compressed
 					for (i = 0; i < 16384; i++)
-						space.write_byte(i + Dest, pSource[i]);
+						space.write_byte(i + dest, p_source[i]);
 				}
 				else
 				{
 					logerror("Compressed\n");
 
 					// block is compressed
-					z80_decompress_block(space, &pSource[3], Dest, 16384);
+					z80_decompress_block(space, &p_source[3], dest, 16384);
 				}
 			}
 
 			// go to next block
-			pSource += (3 + length);
+			p_source += (3 + length);
 		}
-		while ((pSource - snapdata) < snapsize);
+		while ((p_source - snapdata) < snapsize);
 
 		if ((m_port_7ffd_data != -1) && (z80_type != SPECTRUM_Z80_SNAPSHOT_48K))
 		{
@@ -2395,6 +2404,90 @@ void spectrum_state::setup_z80(uint8_t *snapdata, uint32_t snapsize)
 			ts2068_update_memory();
 		}
 	}
+}
+
+/*
+    Load a .SPG (Spectrum Prog) file.
+
+    v1.1: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_1.txt
+    v1.0: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_0.txt
+    v0.2  https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv0_2.txt
+*/
+void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
+{
+	u16 data;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	hrust_decoder hrust;
+
+	data = snapdata[SPG_OFFSET + 0x2c];
+	if (BIT(data, 4, 4) != 1 || BIT(data, 0, 4) != 0) // just v1.0 for now
+	{
+		logerror("Can't load .SPG file v%d.%d\n", BIT(data, 4, 4), BIT(data, 0, 4));
+		return;
+	}
+
+	m_maincpu->set_state_int(Z80_IY, 0x5c3a);
+	m_maincpu->set_state_int(Z80_HL2, 0x2758);
+	m_maincpu->set_state_int(Z80_I, 0x3f);
+	m_maincpu->set_state_int(Z80_IM, 1);
+	m_port_7ffd_data = 16;
+
+	data = (snapdata[SPG_OFFSET + 0x31] << 8) | snapdata[SPG_OFFSET + 0x30];
+	if (data < 0x4000)
+	{
+		logerror("PC(%04x) < 0x4000 is not allowed\n", data);
+	}
+	m_maincpu->set_state_int(Z80_PC, data);
+
+	data = (snapdata[SPG_OFFSET + 0x33] << 8) | snapdata[SPG_OFFSET + 0x32];
+	m_maincpu->set_state_int(Z80_SP, data);
+
+	const u8 page3 = snapdata[SPG_OFFSET + 0x34];
+
+	data = snapdata[SPG_OFFSET + 0x35];
+	m_maincpu->set_state_int(Z80_IFF1, BIT(data, 2));
+
+	offs_t data_offset = SPG_DATA;
+	for (auto b = 0; b < 0x100; b++)
+	{
+		data = snapdata[SPG_BLOCK_INFO(b) + 0];
+		const u16 offs = BIT(data, 0, 5) * 512;
+		const bool is_last = BIT(data, 7);
+
+		data = snapdata[SPG_BLOCK_INFO(b) + 1];
+		const u16 size = (BIT(data, 0, 5) + 1) * 512;
+		const u8 compression = BIT(data, 6, 2);
+
+		data = snapdata[SPG_BLOCK_INFO(b) + 2];
+		bank3_set_page(data);
+
+		switch (compression)
+		{
+			case 0x00:
+				for (auto i = 0; i < size; i++)
+					space.write_byte(0xc000 + offs + i, snapdata[data_offset + i]);
+				break;
+
+			case 0x01:
+				logerror("Unsupported MegaLZ compressed");
+				return;
+				break;
+
+			case 0x02:
+				hrust.decode(space, &snapdata[data_offset], 0xc000 + offs, size);
+				break;
+
+			default:
+				logerror("Unsupported compression: %d\n", compression);
+				return;
+		}
+
+		data_offset += size;
+		if (is_last)
+			break;
+	}
+
+	bank3_set_page(page3);
 }
 
 QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
@@ -2451,7 +2544,7 @@ QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)
  *      SAVE "filename" CODE 16384,6144
  *
  *******************************************************************/
-void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
+void spectrum_state::setup_scr(const uint8_t *quickdata, uint32_t quicksize)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -2487,7 +2580,7 @@ void spectrum_state::setup_scr(uint8_t *quickdata, uint32_t quicksize)
  *      However, no image of such type has ever surfaced.
  *
  *******************************************************************/
-void spectrum_state::setup_raw(uint8_t *quickdata, uint32_t quicksize)
+void spectrum_state::setup_raw(const uint8_t *quickdata, uint32_t quicksize)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

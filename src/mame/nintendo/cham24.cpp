@@ -83,8 +83,8 @@ public:
 	void cham24(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<rp2a03_device> m_maincpu;
@@ -105,8 +105,8 @@ private:
 	void cham24_in0_w(u8 data);
 	void cham24_mapper_w(offs_t offset, u8 data);
 	void cham24_set_mirroring(int mirroring);
-	void cham24_map(address_map &map);
-	void cham24_ppu_map(address_map &map);
+	void cham24_map(address_map &map) ATTR_COLD;
+	void cham24_ppu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -244,7 +244,7 @@ void cham24_state::cham24(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cham24_state::cham24_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(32*8, 262);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);

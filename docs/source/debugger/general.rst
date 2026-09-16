@@ -190,15 +190,22 @@ available:
 
 %c
     Prints the corresponding argument as an 8-bit character.
-%[0][<n>]d
+%[-][0][<n>]d
     Prints the corresponding argument as a decimal number with optional
-    minimum field width and zero fill.
-%[0][<n>]o
+    left justification, zero fill and minimum field width.
+%[-][0][<n>]o
     Prints the corresponding argument as an octal number with optional
-    minimum field width and zero fill using lowercase letters.
-%[0][<n>]x
-    Prints the corresponding argument as a hexadecimal number with
-    optional minimum field width and zero fill using uppercase letters.
+    left justification, zero fill and minimum field width.
+%[-][0][<n>]x
+    Prints the corresponding argument as a lowercase hexadecimal number
+    with optional left justification, zero fill and minimum field width.
+%[-][0][<n>]X
+    Prints the corresponding argument as an uppercase hexadecimal number
+    with optional left justification, zero fill and minimum field width.
+%[-][<n>][.[<n>]]s
+    Prints a null-terminated string of 8-bit characters from the address
+    and address space given by the corresponding argument, with optional
+    left justification, minimum and maximum field widths.
 \%%
     Prints a literal percent symbol.
 \\n

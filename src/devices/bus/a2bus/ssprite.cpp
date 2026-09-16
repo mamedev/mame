@@ -44,13 +44,14 @@ public:
 protected:
 	a2bus_ssprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 private:
 	void tms_irq_w(int state);
@@ -69,7 +70,7 @@ void a2bus_ssprite_device::device_add_mconfig(machine_config &config)
 	TMS9918A(config, m_tms, XTAL(10'738'635)).set_screen(SCREEN_TAG);
 	m_tms->set_vram_size(0x4000); // 16k of VRAM
 	m_tms->int_callback().set(FUNC(a2bus_ssprite_device::tms_irq_w));
-	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
+	SCREEN(config, SCREEN_TAG);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, 1022727).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -104,6 +105,12 @@ void a2bus_ssprite_device::device_start()
 
 void a2bus_ssprite_device::device_reset()
 {
+}
+
+void a2bus_ssprite_device::reset_from_bus()
+{
+	m_tms->reset();
+	m_ay->reset();
 }
 
 /*

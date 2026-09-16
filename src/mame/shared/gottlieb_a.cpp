@@ -67,7 +67,7 @@ gottlieb_sound_p2_device::gottlieb_sound_p2_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_p2_device::write_sync(int param)
+void gottlieb_sound_p2_device::write_sync(s32 param)
 {
 	// write the command data to bits 0-3 (also bit 6 used in system1 pinballs)
 	u8 pb0_3 = ~param & 0x4f; // U7
@@ -110,7 +110,7 @@ INPUT_PORTS_START( gottlieb_sound_p2 )
 
 	// The sound test will only work if the 2 above dips are in opposing directions (one off and one on)
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_p2_device, audio_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gottlieb_sound_p2_device::audio_nmi), 0)
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_p2_device::device_input_ports() const
@@ -150,8 +150,6 @@ void gottlieb_sound_p2_device::device_add_mconfig(machine_config &config)
 
 void gottlieb_sound_p2_device::device_start()
 {
-	// register for save states
-	save_item(NAME(m_dummy));
 }
 
 
@@ -176,7 +174,7 @@ gottlieb_sound_p3_device::gottlieb_sound_p3_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_p3_device::write_sync(int param)
+void gottlieb_sound_p3_device::write_sync(s32 param)
 {
 	// low 4 bits NORed together, triggers IRQ on falling edge
 	bool irqclock = (~param & 0xf) == 0;
@@ -286,7 +284,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_r1_device::write_sync(int param)
+void gottlieb_sound_r1_device::write_sync(s32 param)
 {
 	// write the command data to the low 6 bits, the low 4 bits are also NANDed together and go to PA7
 	u8 pa0_5 = ~param & 0x3f;
@@ -369,8 +367,6 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 
 void gottlieb_sound_r1_device::device_start()
 {
-	// register for save states
-	save_item(NAME(m_dummy));
 }
 
 
@@ -451,7 +447,7 @@ INPUT_PORTS_START( gottlieb_sound_speech_r1 )
 	PORT_INCLUDE( gottlieb_sound_r1 )
 
 	PORT_MODIFY("SB1")
-	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", votrax_sc01_device, request)
+	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", FUNC(votrax_sc01_device::request))
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_speech_r1_device::device_input_ports() const
@@ -648,7 +644,7 @@ INPUT_PORTS_START( gottlieb_sound_r2 )
 	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("spsnd", sp0250_device, drq_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("spsnd", FUNC(sp0250_device::drq_r))
 INPUT_PORTS_END
 
 ioport_constructor gottlieb_sound_r2_device::device_input_ports() const
@@ -692,14 +688,18 @@ void gottlieb_sound_r2_device::device_start()
 {
 	gottlieb_sound_p4_device::device_start();
 
-	// disable the non-speech CPU for cobram3
-	if (m_cobram3_mod)
-		m_dcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
 	// register for save states
 	save_item(NAME(m_sp0250_latch));
 }
 
+void gottlieb_sound_r2_device::device_reset()
+{
+	gottlieb_sound_p4_device::device_reset();
+
+	// disable the non-speech CPU for cobram3
+	if (m_cobram3_mod)
+		m_dcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
 
 
 //**************************************************************************
@@ -742,7 +742,7 @@ gottlieb_sound_p4_device::gottlieb_sound_p4_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_p4_device::write_sync(int param)
+void gottlieb_sound_p4_device::write_sync(s32 param)
 {
 	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
 	if (param != 0xff)

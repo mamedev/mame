@@ -78,7 +78,11 @@
 
 #include "emu.h"
 #include "ioport.h"
+#include "splitter.h"
 #include "bus/ti99/peb/peribox.h"
+#include "bus/ti99/sidecar/arcturus.h"
+#include "bus/ti99/sidecar/speechsyn.h"
+#include "bus/ti99/sidecar/thermal.h"
 
 DEFINE_DEVICE_TYPE(TI99_IOPORT, bus::ti99::internal::ioport_device, "ti99_ioport", "TI-99 I/O Port")
 
@@ -86,7 +90,7 @@ namespace bus::ti99::internal {
 
 ioport_device::ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_IOPORT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
+		device_single_card_slot_interface<ioport_attached_device>(mconfig, *this),
 		m_console_extint(*this),
 		m_console_ready(*this),
 		m_connected(nullptr)
@@ -147,6 +151,12 @@ void ioport_device::reset_in(int state)
 		m_connected->reset_in(state);
 }
 
+void ioport_device::sbe(int state)
+{
+	if (m_connected != nullptr)
+		m_connected->sbe(state);
+}
+
 void ioport_device::device_start()
 {
 	if (m_connected != nullptr)
@@ -155,7 +165,7 @@ void ioport_device::device_start()
 
 void ioport_device::device_config_complete()
 {
-	m_connected = static_cast<ioport_attached_device*>(subdevices().first());
+	m_connected = get_card_device();
 }
 
 
@@ -174,9 +184,25 @@ void ioport_attached_device::set_ready(int state)
 void ti99_ioport_options_plain(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX);
+	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
+	device.option_add("speechsyn", TI99_SPEECHSYN);
+	device.option_add("thermal", TI99_THERMAL);
 }
 
 void ti99_ioport_options_evpc(device_slot_interface &device)
 {
 	device.option_add("peb", TI99_PERIBOX_EV);
+	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
+	device.option_add("speechsyn", TI99_SPEECHSYN);
+	device.option_add("thermal", TI99_THERMAL);
+}
+
+// Used for the splitter (to avoid getting multiple EVPCs in the system)
+void ti99_ioport_options_evpc1(device_slot_interface &device)
+{
+	device.option_add("peb", TI99_PERIBOX_EV1);
+	device.option_add("splitter", TI99_IOSPLIT);
+	device.option_add("arcturus", TI99_ARCTURUS);
 }

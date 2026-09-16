@@ -68,8 +68,8 @@ protected:
 
 	static constexpr XTAL MASTER_CLOCK = 4.194304_MHz_XTAL;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void gb_io_w(offs_t offset, uint8_t data);
 	uint8_t gb_ie_r();
@@ -123,8 +123,8 @@ public:
 	void gbpocket(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void disable_boot();
 
@@ -139,7 +139,7 @@ private:
 	void gb_palette(palette_device &palette) const;
 	void gbp_palette(palette_device &palette) const;
 
-	void gameboy_map(address_map &map);
+	void gameboy_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_bios_hack;
 };
@@ -156,15 +156,15 @@ public:
 	void supergb2(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void sgb_palette(palette_device &palette) const;
 
 	void sgb_io_w(offs_t offset, uint8_t data);
 
-	void sgb_map(address_map &map);
+	void sgb_map(address_map &map) ATTR_COLD;
 
 	int8_t m_sgb_packets = 0;
 	uint8_t m_sgb_bitcount = 0;
@@ -189,8 +189,8 @@ public:
 	void gbcolor(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr XTAL GBC_CLOCK = 8.388_MHz_XTAL;
@@ -199,7 +199,7 @@ private:
 	void gbc_io2_w(offs_t offset, uint8_t data);
 	uint8_t gbc_io2_r(offs_t offset);
 
-	void gbc_map(address_map &map);
+	void gbc_map(address_map &map) ATTR_COLD;
 
 	required_memory_bank m_rambank;
 	memory_share_creator<uint8_t> m_bankedram;
@@ -225,7 +225,7 @@ private:
 	void megaduck_sound_w2(offs_t offset, uint8_t data);
 	uint8_t megaduck_sound_r2(offs_t offset);
 	void megaduck_palette(palette_device &palette) const;
-	void megaduck_map(address_map &map);
+	void megaduck_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1048,7 +1048,7 @@ void gb_state::gameboy(machine_config &config)
 	m_maincpu->set_halt_bug(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(MASTER_CLOCK, 456, 0, 20 * 8, 154, 0, 18 * 8);
 	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
@@ -1059,12 +1059,11 @@ void gb_state::gameboy(machine_config &config)
 	DMG_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMG_APU(config, m_apu, MASTER_CLOCK);
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
@@ -1083,7 +1082,7 @@ void sgb_state::supergb(machine_config &config)
 	m_maincpu->set_halt_bug(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
 	screen.set_refresh_hz(SGB_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
@@ -1098,12 +1097,11 @@ void sgb_state::supergb(machine_config &config)
 	SGB_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMG_APU(config, m_apu, 4'295'454);
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
@@ -1150,7 +1148,7 @@ void gbc_state::gbcolor(machine_config &config)
 	m_maincpu->timer_cb().set(FUNC(gbc_state::gb_timer_callback));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(GBC_CLOCK / 2, 456, 0, 20 * 8, 154, 0, 18 * 8);
 	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
@@ -1161,12 +1159,11 @@ void gbc_state::gbcolor(machine_config &config)
 	CGB_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	CGB04_APU(config, m_apu, GBC_CLOCK / 2);
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	GB_CART_SLOT(config, m_cartslot, gameboy_cartridges, nullptr);
@@ -1185,7 +1182,7 @@ void megaduck_state::megaduck(machine_config &config)
 	m_maincpu->set_halt_bug(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(m_ppu, FUNC(dmg_ppu_device::screen_update));
@@ -1199,11 +1196,10 @@ void megaduck_state::megaduck(machine_config &config)
 	DMG_PPU(config, m_ppu, m_maincpu);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	DMG_APU(config, m_apu, XTAL(4'194'304));
-	m_apu->add_route(0, "lspeaker", 0.50);
-	m_apu->add_route(1, "rspeaker", 0.50);
+	m_apu->add_route(0, "speaker", 0.50, 0);
+	m_apu->add_route(1, "speaker", 0.50, 1);
 
 	// cartslot
 	MEGADUCK_CART_SLOT(config, m_cartslot, megaduck_cartridges, nullptr);

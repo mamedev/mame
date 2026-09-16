@@ -53,8 +53,8 @@ protected:
 	z180asci_channel_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const int id, const bool ext);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	void transmit_edge();
@@ -144,7 +144,7 @@ protected:
 	z180asci_channel_0(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
 
 	// device_t implementation
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 //**************************************************************************
@@ -164,7 +164,7 @@ protected:
 	z180asci_channel_1(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool ext);
 
 	// device_t implementation
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 //**************************************************************************

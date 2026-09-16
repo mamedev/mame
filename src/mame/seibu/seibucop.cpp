@@ -192,9 +192,6 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	memset(cop_itoa_digits, 0, sizeof(uint8_t)*10);
 
 	memset(cop_regs, 0, sizeof(uint32_t)*8);
-
-
-	memset(cop_collision_info, 0, sizeof(colinfo)*2);
 }
 
 
@@ -1088,6 +1085,7 @@ void raiden2cop_device::cop_cmd_w(offs_t offset, uint16_t data)
 
 	case 0x130e:   // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
 	case 0x138e:
+	case 0x330e:
 		execute_130e(offset, data, false); // angle from dx/dy
 		break;
 
@@ -1172,7 +1170,7 @@ void raiden2cop_device::cop_cmd_w(offs_t offset, uint16_t data)
 		break;
 
 	case 0xb100: {
-		execute_b100(offset, data);// collisions
+		execute_b100(offset, data); // collisions
 		break;
 	}
 
@@ -1181,7 +1179,23 @@ void raiden2cop_device::cop_cmd_w(offs_t offset, uint16_t data)
 		break;
 	}
 
+	case 0xede5: {
+		execute_ede5(offset, data); // zeroteam bird boss, probable divide
+		break;
+	}
+
+	case 0xf790: {
+		execute_f790(offset, data); // zeroteam bird boss, probable sqrt
+		break;
+	}
+
+	case 0xfc84: {
+		execute_fc84(offset, data); // zeroteam bird boss, probable sub
+		break;
+	}
+
 	default:
+		machine().debug_break();
 		logerror("pcall %04x [%x %x %x %x]\n", data, /*rps(), rpc(),*/ cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
 	}
 }

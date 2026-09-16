@@ -35,14 +35,14 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void midi_in(int state);
 
-	void bm_012_memory_map(address_map &map);
+	void bm_012_memory_map(address_map &map) ATTR_COLD;
 
 	required_device<tmpz84c015_device> m_tmpz84c015af;
 	required_device<z80pio_device> m_bm012_pio;

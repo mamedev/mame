@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -197,43 +198,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />
@@ -397,30 +378,30 @@ license:CC0-1.0
 		<element ref="rmask" blend="multiply"><bounds x="7.6"  y="4" width="1.8" height="1.8" /></element>
 		<element ref="rmask" blend="multiply"><bounds x="13.6" y="4" width="1.8" height="1.8" /></element>
 
-		<element ref="text_l1"><bounds x="0" y="8.4" width="5" height="0.9" /></element>
-		<element ref="text_l2a"><bounds x="6" y="8" width="5" height="0.9" /></element>
-		<element ref="text_l2b"><bounds x="6" y="8.8" width="5" height="0.9" /></element>
-		<element ref="text_l3a"><bounds x="12" y="8" width="5" height="0.9" /></element>
-		<element ref="text_l3b"><bounds x="12" y="8.8" width="5" height="0.9" /></element>
+		<element ref="text_l1"><bounds x="0.25" y="8.4" width="4.5" height="0.9" /></element>
+		<element ref="text_l2a"><bounds x="6.25" y="8" width="4.5" height="0.9" /></element>
+		<element ref="text_l2b"><bounds x="6.25" y="8.8" width="4.5" height="0.9" /></element>
+		<element ref="text_l3a"><bounds x="12.25" y="8" width="4.5" height="0.9" /></element>
+		<element ref="text_l3b"><bounds x="12.25" y="8.8" width="4.5" height="0.9" /></element>
 
-		<element ref="text_l4"><bounds x="0" y="12.4" width="5" height="0.9" /></element>
-		<element ref="text_l5"><bounds x="6" y="12.4" width="5" height="0.9" /></element>
-		<element ref="text_l6"><bounds x="12" y="12.4" width="5" height="0.9" /></element>
+		<element ref="text_l4"><bounds x="0.25" y="12.4" width="4.5" height="0.9" /></element>
+		<element ref="text_l5"><bounds x="6.25" y="12.4" width="4.5" height="0.9" /></element>
+		<element ref="text_l6"><bounds x="12.25" y="12.4" width="4.5" height="0.9" /></element>
 
-		<element ref="text_l7a"><bounds x="0" y="16" width="5" height="0.9" /></element>
-		<element ref="text_l7b"><bounds x="0" y="16.8" width="5" height="0.9" /></element>
-		<element ref="text_l8"><bounds x="6" y="16.4" width="5" height="0.9" /></element>
-		<element ref="text_l9"><bounds x="12" y="16.4" width="5" height="0.9" /></element>
+		<element ref="text_l7a"><bounds x="0.25" y="16" width="4.5" height="0.9" /></element>
+		<element ref="text_l7b"><bounds x="0.25" y="16.8" width="4.5" height="0.9" /></element>
+		<element ref="text_l8"><bounds x="6.25" y="16.4" width="4.5" height="0.9" /></element>
+		<element ref="text_l9"><bounds x="12.25" y="16.4" width="4.5" height="0.9" /></element>
 
-		<element ref="text_l10a"><bounds x="0" y="20" width="5" height="0.9" /></element>
-		<element ref="text_l10b"><bounds x="0" y="20.8" width="5" height="0.9" /></element>
-		<element ref="text_l11a"><bounds x="6" y="20" width="5" height="0.9" /></element>
-		<element ref="text_l11b"><bounds x="6" y="20.8" width="5" height="0.9" /></element>
-		<element ref="text_l12a"><bounds x="12" y="20" width="5" height="0.9" /></element>
-		<element ref="text_l12b"><bounds x="12" y="20.8" width="5" height="0.9" /></element>
+		<element ref="text_l10a"><bounds x="0.25" y="20" width="4.5" height="0.9" /></element>
+		<element ref="text_l10b"><bounds x="0.25" y="20.8" width="4.5" height="0.9" /></element>
+		<element ref="text_l11a"><bounds x="6.25" y="20" width="4.5" height="0.9" /></element>
+		<element ref="text_l11b"><bounds x="6.25" y="20.8" width="4.5" height="0.9" /></element>
+		<element ref="text_l12a"><bounds x="12.25" y="20" width="4.5" height="0.9" /></element>
+		<element ref="text_l12b"><bounds x="12.25" y="20.8" width="4.5" height="0.9" /></element>
 
-		<element ref="text_l13"><bounds x="-1" y="26.15" width="7" height="0.9" /></element>
-		<element ref="text_l14"><bounds x="12" y="26.15" width="5" height="0.9" /></element>
+		<element ref="text_l13"><bounds x="0.25" y="26.15" width="4.5" height="0.9" /></element>
+		<element ref="text_l14"><bounds x="12.25" y="26.15" width="4.5" height="0.9" /></element>
 
 		<element ref="black" blend="add"><bounds x="0"  y="0" width="5" height="3" /></element>
 		<element ref="black" blend="add"><bounds x="6"  y="0" width="5" height="3" /></element>
@@ -442,7 +423,6 @@ license:CC0-1.0
 		<element ref="black" blend="add"><bounds x="12" y="20" width="5" height="3" /></element>
 		<element ref="black" blend="add"><bounds x="0"  y="25.75" width="5" height="3" /></element>
 		<element ref="black" blend="add"><bounds x="12" y="25.75" width="5" height="3" /></element>
-
 
 		<element name="8.5" ref="led"><bounds x="2.07" y="1.85" width="0.86" height="0.86" /></element>
 		<element name="8.4" ref="led"><bounds x="8.07" y="1.85" width="0.86" height="0.86" /></element>

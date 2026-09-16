@@ -32,17 +32,17 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 private:
-	// ata_hle_device_base implementation
+	// device_ata_hle_interface implementation
 	virtual void set_irq_out(int state) override { }
 	virtual void set_dmarq_out(int state) override { }
 	virtual void set_dasp_out(int state) override { }

@@ -11,7 +11,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class wd33c9x_base_device : public nscsi_device, public nscsi_slot_card_interface
+class wd33c9x_base_device : public device_t, public nscsi_device_interface
 {
 public:
 	auto irq_cb() { return m_irq_cb.bind(); }
@@ -31,6 +31,8 @@ public:
 	uint8_t indir_reg_r();
 	void indir_reg_w(uint8_t data);
 
+	uint8_t status_r();
+
 	// Master Reset (MR) Interface
 	void reset_w(int state);
 
@@ -41,8 +43,8 @@ public:
 protected:
 	wd33c9x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_step);
 

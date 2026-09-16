@@ -23,7 +23,7 @@ PCB has a single OSC at 24MHz
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/acorn_ioc.h"
 #include "machine/acorn_memc.h"
 #include "machine/acorn_vidc.h"
@@ -41,8 +41,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ioc(*this, "ioc")
 		, m_memc(*this, "memc")
-		, m_vidc10(*this, "vidc")
-		{ }
+		, m_vidc(*this, "vidc")
+	{ }
 
 	void ertictac(machine_config &config);
 
@@ -50,16 +50,16 @@ public:
 
 private:
 	uint32_t ertictac_podule_r(offs_t offset);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
-	void ertictac_arm_map(address_map &map);
-	void ertictac_map(address_map &map);
+	void ertictac_arm_map(address_map &map) ATTR_COLD;
+	void ertictac_map(address_map &map) ATTR_COLD;
 
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
 	required_device<acorn_memc_device> m_memc;
-	required_device<acorn_vidc10_device> m_vidc10;
+	required_device<acorn_vidc10_device> m_vidc;
 };
 
 
@@ -92,7 +92,7 @@ void ertictac_state::ertictac_map(address_map &map)
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	map(0x03000000, 0x033fffff).m(m_ioc, FUNC(acorn_ioc_device::map));
-	map(0x03400000, 0x035fffff).w(m_vidc10, FUNC(acorn_vidc10_device::write));
+	map(0x03400000, 0x035fffff).w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).w(m_memc, FUNC(acorn_memc_device::registers_w));
 	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
 }
@@ -124,7 +124,7 @@ static INPUT_PORTS_START( ertictac )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x02, 0x02, "Demo Sound" )    PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )    PORT_DIPLOCATION("DSW1:3") // "Demo Sound"
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )     PORT_DIPLOCATION("DSW1:1")
@@ -182,38 +182,38 @@ static INPUT_PORTS_START( poizone )
 	// TODO: default settings
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW1:3" )
-	PORT_DIPNAME( 0x30, 0x40, "Coinage 1" ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPNAME( 0x30, 0x00, "Coinage 1" ) PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xC0, 0x00, "Coinage 2" ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Coinage 2" ) PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xC0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Setting 1" ) PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x01, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x1A, 0x1A, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
+	PORT_DIPNAME( 0x1a, 0x1a, "Setting 2" )  PORT_DIPLOCATION("DSW2:3,4,5")
 	PORT_DIPSETTING(    0x00, "Extremely Easy - 2:00")  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x02, "Very Easy - 1:30")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x08, "Easy - 2:00")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x0A, "Normal 1 - 1:30")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x0a, "Normal 1 - 1:30")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x10, "Normal 2 - 1:45")    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x12, "Difficult - 2:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x18, "Very Difficult - 2:00")  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x1A, "Extremely Difficult - 1:30") PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x1a, "Extremely Difficult - 1:30") PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "Clear 20% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x02, "Clear 30% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x08, "Clear 40% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x0A, "Clear 50% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x0a, "Clear 50% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x10, "Clear 60% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x12, "Clear 70% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPSETTING(    0x18, "Clear 80% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
-	PORT_DIPSETTING(    0x1A, "Clear 90% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x1a, "Clear 90% - 1:00")   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW2:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW2:6" )
 INPUT_PORTS_END
@@ -237,31 +237,35 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 void ertictac_state::ertictac(machine_config &config)
 {
-	ARM(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	ARM2(config, m_maincpu, 24_MHz_XTAL/3); /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_arm_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
 	PCF8583(config, "i2cmem", 32.768_kHz_XTAL); // TODO: Are we sure that this HW have I2C device?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 	screen.screen_vblank().append(m_memc, FUNC(acorn_memc_device::vidrq_w));
 
-	ACORN_MEMC(config, m_memc, 24_MHz_XTAL/3, m_vidc10);
+	ACORN_MEMC(config, m_memc, 24_MHz_XTAL/3, m_vidc);
 	m_memc->set_addrmap(0, &ertictac_state::ertictac_map);
 	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
 	ACORN_IOC(config, m_ioc, 24_MHz_XTAL/3);
-	m_ioc->fiq_w().set_inputline(m_maincpu, ARM_FIRQ_LINE);
-	m_ioc->irq_w().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ioc->fiq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_ioc->irq_w().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_ioc->peripheral_r<4>().set(FUNC(ertictac_state::ertictac_podule_r));
 	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
 	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
 
-	ACORN_VIDC1A(config, m_vidc10, 24_MHz_XTAL);
-	m_vidc10->set_screen("screen");
-	m_vidc10->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	SPEAKER(config, "speaker", 2).front();
+
+	ACORN_VIDC1A(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 }
 
 ROM_START( ertictac )
@@ -350,7 +354,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, ertictac,         0, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
+GAME( 1990, ertictac,  0,        ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic",          MACHINE_IMPERFECT_SOUND)
 GAME( 1990, ertictaca, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (ver 01)", MACHINE_IMPERFECT_SOUND)
 GAME( 1990, ertictacb, ertictac, ertictac, ertictac, ertictac_state, init_ertictac, ROT0, "Sisteme", "Erotictac/Tactic (set 2)",  MACHINE_IMPERFECT_SOUND)
-GAME( 1991, poizone,          0, ertictac, poizone,  ertictac_state, init_ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1991, poizone,   0,        ertictac, poizone,  ertictac_state, init_ertictac, ROT0, "Eterna",  "Poizone",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)

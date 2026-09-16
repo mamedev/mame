@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -26,6 +27,8 @@ license:CC0-1.0
 		<text string="YOUR SCORE"><color red="0.9" green="0.9" blue="0.9" /></text>
 	</element>
 
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
 	<element name="digit" defstate="0">
 		<led7seg>
 			<color red="1.0" green="0.1" blue="0.15" />
@@ -38,7 +41,7 @@ license:CC0-1.0
 	<group name="best">
 		<element ref="yellow"><bounds x="0" y="0" width="96" height="23" /></element>
 		<element ref="black"><bounds x="1" y="1" width="94" height="21" /></element>
-		<element ref="text_b1"><bounds x="3" y="4" width="50" height="15" /></element>
+		<element ref="text_b1"><bounds x="3" y="4" width="28" height="15" /></element>
 		<element name="digit9" ref="digit"><bounds x="32" y="4" width="10" height="15" /></element>
 		<element name="digit8" ref="digit"><bounds x="44" y="4" width="10" height="15" /></element>
 		<element name="digit7" ref="digit"><bounds x="56" y="4" width="10" height="15" /></element>
@@ -47,7 +50,7 @@ license:CC0-1.0
 
 		<element ref="yellow"><bounds x="0" y="27" width="96" height="23" /></element>
 		<element ref="black"><bounds x="1" y="28" width="94" height="21" /></element>
-		<element ref="text_b2"><bounds x="3" y="31" width="50" height="15" /></element>
+		<element ref="text_b2"><bounds x="3" y="31" width="28" height="15" /></element>
 		<element name="digit14" ref="digit"><bounds x="32" y="31" width="10" height="15" /></element>
 		<element name="digit13" ref="digit"><bounds x="44" y="31" width="10" height="15" /></element>
 		<element name="digit12" ref="digit"><bounds x="56" y="31" width="10" height="15" /></element>
@@ -56,7 +59,7 @@ license:CC0-1.0
 
 		<element ref="yellow"><bounds x="0" y="54" width="96" height="23" /></element>
 		<element ref="black"><bounds x="1" y="55" width="94" height="21" /></element>
-		<element ref="text_b3"><bounds x="3" y="58" width="50" height="15" /></element>
+		<element ref="text_b3"><bounds x="3" y="58" width="28" height="15" /></element>
 		<element name="digit19" ref="digit"><bounds x="32" y="58" width="10" height="15" /></element>
 		<element name="digit18" ref="digit"><bounds x="44" y="58" width="10" height="15" /></element>
 		<element name="digit17" ref="digit"><bounds x="56" y="58" width="10" height="15" /></element>
@@ -65,7 +68,7 @@ license:CC0-1.0
 
 		<element ref="yellow"><bounds x="0" y="81" width="96" height="23" /></element>
 		<element ref="black"><bounds x="1" y="82" width="94" height="21" /></element>
-		<element ref="text_b4"><bounds x="3" y="85" width="50" height="15" /></element>
+		<element ref="text_b4"><bounds x="3" y="85" width="28" height="15" /></element>
 		<element name="digit24" ref="digit"><bounds x="32" y="85" width="10" height="15" /></element>
 		<element name="digit23" ref="digit"><bounds x="44" y="85" width="10" height="15" /></element>
 		<element name="digit22" ref="digit"><bounds x="56" y="85" width="10" height="15" /></element>
@@ -74,7 +77,7 @@ license:CC0-1.0
 
 		<element ref="yellow"><bounds x="0" y="108" width="96" height="23" /></element>
 		<element ref="black"><bounds x="1" y="109" width="94" height="21" /></element>
-		<element ref="text_b5"><bounds x="3" y="112" width="50" height="15" /></element>
+		<element ref="text_b5"><bounds x="3" y="112" width="28" height="15" /></element>
 		<element name="digit29" ref="digit"><bounds x="32" y="112" width="10" height="15" /></element>
 		<element name="digit28" ref="digit"><bounds x="44" y="112" width="10" height="15" /></element>
 		<element name="digit27" ref="digit"><bounds x="56" y="112" width="10" height="15" /></element>
@@ -86,7 +89,7 @@ license:CC0-1.0
 		<element ref="blue"><bounds x="0" y="0" width="152" height="238" /></element>
 		<element ref="black"><bounds x="8" y="8" width="136" height="222" /></element>
 		<element ref="red"><bounds x="10" y="10" width="132" height="31.5" /></element>
-		<element ref="text_best"><bounds x="10" y="14.25" width="132" height="23" /></element>
+		<element ref="text_best"><bounds x="15" y="14.25" width="122" height="23" /></element>
 		<group ref="best"><bounds x="10" y="48" width="132" height="180" /></group>
 	</group>
 
@@ -108,7 +111,7 @@ license:CC0-1.0
 		<element ref="blue"><bounds x="0" y="0" width="152" height="96.5" /></element>
 		<element ref="black"><bounds x="8" y="8" width="136" height="80.5" /></element>
 		<element ref="red"><bounds x="10" y="10" width="132" height="31.5" /></element>
-		<element ref="text_score"><bounds x="10" y="14.25" width="132" height="23" /></element>
+		<element ref="text_score"><bounds x="15" y="14.25" width="122" height="23" /></element>
 		<group ref="score"><bounds x="10" y="48" width="132" height="38.5" /></group>
 	</group>
 
@@ -116,10 +119,13 @@ license:CC0-1.0
 <!-- build screen -->
 
 	<view name="Score Panel">
-		<bounds left="-168" top="0" right="640" bottom="480" />
-
+		<element ref="nothing"><bounds x="-168" y="0" width="8" height="480" /></element>
 		<group ref="panel1"><bounds x="-160" y="45" width="152" height="238" /></group>
 		<group ref="panel2"><bounds x="-160" y="330" width="152" height="96.5" /></group>
+
+		<collection name="Centre Display" visible="no">
+			<element ref="nothing"><bounds x="640" y="0" width="168" height="480" /></element>
+		</collection>
 
 		<screen index="0">
 			<bounds left="0" top="0" right="640" bottom="480" />

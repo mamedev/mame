@@ -21,7 +21,7 @@ public:
 	void bfm_sc5(machine_config &config);
 
 protected:
-	void sc5_map(address_map &map);
+	void sc5_map(address_map &map) ATTR_COLD;
 
 	required_device<m68000_base_device> m_maincpu;
 

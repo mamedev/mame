@@ -37,9 +37,9 @@ private:
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
 
-	void cpu_map(address_map &map);
-	void vic_colorram_map(address_map &map);
-	void vic_videoram_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void vic_colorram_map(address_map &map) ATTR_COLD;
+	void vic_videoram_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -132,7 +132,7 @@ void attckufo_state::attckufo(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(MOS6560_VRETRACERATE);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);

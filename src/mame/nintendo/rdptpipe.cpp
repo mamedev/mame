@@ -21,15 +21,11 @@
 
 #define RELATIVE(x, y)  ((((x) >> 3) - (y)) << 3) | (x & 7);
 
-void n64_texture_pipe_t::set_machine(running_machine &machine)
+void n64_texture_pipe_t::init_internal_state()
 {
-	n64_state* state = machine.driver_data<n64_state>();
-
-	m_rdp = state->rdp();
-
 	for(int32_t i = 0; i < 0x10000; i++)
 	{
-		m_expand_16to32_table[i] = color_t((i & 1) ? 0xff : 0x00, m_rdp->m_replicated_rgba[(i >> 11) & 0x1f], m_rdp->m_replicated_rgba[(i >>  6) & 0x1f], m_rdp->m_replicated_rgba[(i >>  1) & 0x1f]);
+		m_expand_16to32_table[i] = color_t((i & 1) ? 0xff : 0x00, m_rdp.m_replicated_rgba[(i >> 11) & 0x1f], m_rdp.m_replicated_rgba[(i >>  6) & 0x1f], m_rdp.m_replicated_rgba[(i >>  1) & 0x1f]);
 	}
 
 	for(uint32_t i = 0; i < 0x80000; i++)
@@ -199,10 +195,10 @@ void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, int32_t SSS,
 
 	t0.sign_extend(0x00000100, 0xffffff00);
 
-	rgbaint_t k13r(m_rdp->get_k13());
+	rgbaint_t k13r(m_rdp.get_k13());
 	k13r.mul_imm(t0.get_r32());
 
-	TEX->set(m_rdp->get_k02());
+	TEX->set(m_rdp.get_k02());
 	TEX->mul_imm(t0.get_g32());
 	TEX->add(k13r);
 	TEX->add_imm(0x80);
@@ -249,10 +245,10 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, int32_t SSS, 
 
 	t0.sign_extend(0x00000100, 0xffffff00);
 
-	rgbaint_t k13r(m_rdp->get_k13());
+	rgbaint_t k13r(m_rdp.get_k13());
 	k13r.mul_imm(t0.get_r32());
 
-	TEX->set(m_rdp->get_k02());
+	TEX->set(m_rdp.get_k02());
 	TEX->mul_imm(t0.get_g32());
 	TEX->add(k13r);
 	TEX->add_imm(0x80);
@@ -377,11 +373,11 @@ void n64_texture_pipe_t::lod_1cycle(int32_t* sss, int32_t* sst, const int32_t s,
 
 	if (object.m_other_modes.persp_tex_en)
 	{
-		m_rdp->tc_div(nexts, nextt, nextsw, &nexts, &nextt);
+		m_rdp.tc_div(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 	else
 	{
-		m_rdp->tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
+		m_rdp.tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 
 	userdata->m_start_span = false;
@@ -415,7 +411,7 @@ void n64_texture_pipe_t::lod_1cycle(int32_t* sss, int32_t* sst, const int32_t s,
 		lod = object.m_misc_state.m_min_level;
 	}
 
-	int32_t l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
+	int32_t l_tile = m_rdp.get_log2((lod >> 5) & 0xff);
 	const bool magnify = (lod < 32);
 	const bool distant = ((lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level));
 
@@ -450,11 +446,11 @@ void n64_texture_pipe_t::lod_2cycle(int32_t* sss, int32_t* sst, const int32_t s,
 
 	if (object.m_other_modes.persp_tex_en)
 	{
-		m_rdp->tc_div(nexts, nextt, nextsw, &nexts, &nextt);
+		m_rdp.tc_div(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 	else
 	{
-		m_rdp->tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
+		m_rdp.tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 
 	userdata->m_start_span = false;
@@ -488,7 +484,7 @@ void n64_texture_pipe_t::lod_2cycle(int32_t* sss, int32_t* sst, const int32_t s,
 		lod = object.m_misc_state.m_min_level;
 	}
 
-	int32_t l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
+	int32_t l_tile = m_rdp.get_log2((lod >> 5) & 0xff);
 	const bool magnify = (lod < 32);
 	const bool distant = ((lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level));
 
@@ -563,11 +559,11 @@ void n64_texture_pipe_t::lod_2cycle_limited(int32_t* sss, int32_t* sst, const in
 
 	if (object.m_other_modes.persp_tex_en)
 	{
-		m_rdp->tc_div(nexts, nextt, nextsw, &nexts, &nextt);
+		m_rdp.tc_div(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 	else
 	{
-		m_rdp->tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
+		m_rdp.tc_div_no_perspective(nexts, nextt, nextsw, &nexts, &nextt);
 	}
 
 	const int32_t lodclamp = (((*sst & 0x60000) > 0) | ((nextt & 0x60000) > 0)) || (((*sss & 0x60000) > 0) | ((nexts & 0x60000) > 0));
@@ -597,7 +593,7 @@ void n64_texture_pipe_t::lod_2cycle_limited(int32_t* sss, int32_t* sst, const in
 		lod = object.m_misc_state.m_min_level;
 	}
 
-	int32_t l_tile = m_rdp->get_log2((lod >> 5) & 0xff);
+	int32_t l_tile = m_rdp.get_log2((lod >> 5) & 0xff);
 	const bool magnify = (lod < 32);
 	const bool distant = (lod & 0x6000) || (l_tile >= object.m_misc_state.m_max_level);
 

@@ -28,7 +28,7 @@ static void jasmin_floppies(device_slot_interface &device)
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, oric_jasmin_device, boot_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(oric_jasmin_device::boot_pressed), 0)
 INPUT_PORTS_END
 
 void oric_jasmin_device::map_io(address_space_installer &space)

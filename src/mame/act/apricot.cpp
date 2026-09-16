@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     ACT Apricot PC/Xi
@@ -8,6 +8,8 @@
     - External RS232 data transfers to the Apricot are usually garbage (but
       sending to an external target works fine)
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
+    - The Apricot User Group custom bios displays the error code 32 (CTC
+      accuracy check failed) - likely requires a V30 CPU.
 
 ***************************************************************************/
 
@@ -18,6 +20,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i8089/i8089.h"
+#include "formats/apricotpc_dsk.h"
 #include "formats/apridisk.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
@@ -72,7 +75,6 @@ public:
 	{ }
 
 	void apricot(machine_config &config);
-	void apricotxi(machine_config &config);
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -97,10 +99,10 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void apricot_io(address_map &map);
-	void apricot_mem(address_map &map);
+	void apricot_io(address_map &map) ATTR_COLD;
+	void apricot_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<i8089_device> m_iop;
@@ -256,6 +258,7 @@ void apricot_state::fdc_intrq_w(int state)
 void apricot_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
+	fr.add(FLOPPY_APRICOTPC_FORMAT);
 	fr.add(FLOPPY_APRIDISK_FORMAT);
 }
 
@@ -338,7 +341,7 @@ void apricot_state::apricot_mem(address_map &map)
 {
 	map(0x00000, 0x3ffff).bankrw("ram");
 	map(0xf0000, 0xf0fff).mirror(0x7000).ram().share("screen_buffer");
-	map(0xf8000, 0xfbfff).mirror(0x4000).rom().region("bootstrap", 0);
+	map(0xf8000, 0xfffff).rom().region("bootstrap", 0);
 }
 
 void apricot_state::apricot_io(address_map &map)
@@ -385,7 +388,7 @@ void apricot_state::apricot(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(15_MHz_XTAL, 950, 0, 800, 426, 0, 400); // should be interlace
 	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));
@@ -411,10 +414,10 @@ void apricot_state::apricot(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(apricot_state::i8255_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(apricot_state::i8255_portc_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_cpu, 0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(4_MHz_XTAL / 16);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir6_w));
 	m_pit->set_clk<1>(4_MHz_XTAL / 2);
@@ -476,7 +479,7 @@ void apricot_state::apricot(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("apricot_flop");
 
 	// expansion bus
-	APRICOT_EXPANSION_BUS(config, m_exp, 0);
+	APRICOT_EXPANSION_BUS(config, m_exp);
 	m_exp->set_program_space(m_cpu, AS_PROGRAM);
 	m_exp->set_io_space(m_cpu, AS_IO);
 	m_exp->set_program_iop_space(m_iop, AS_PROGRAM);
@@ -487,26 +490,25 @@ void apricot_state::apricot(machine_config &config)
 	APRICOT_EXPANSION_SLOT(config, "exp:2", apricot_expansion_cards, nullptr);
 }
 
-void apricot_state::apricotxi(machine_config &config)
-{
-	apricot(config);
-}
-
 
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
 
 ROM_START( apricot )
-	ROM_REGION16_LE(0x4000, "bootstrap", 0)
-	ROM_LOAD16_BYTE("pc_bios_lo_001.bin", 0x0000, 0x2000, CRC(0c217cc2) SHA1(0d7a2b61e17966462b555115f962a175fadcf72a))
-	ROM_LOAD16_BYTE("pc_bios_hi_001.bin", 0x0001, 0x2000, CRC(7c27f36c) SHA1(c801bbf904815f76ec6463e948f57e0118a26292))
-ROM_END
-
-ROM_START( apricotxi )
-	ROM_REGION16_LE(0x4000, "bootstrap", 0)
-	ROM_LOAD16_BYTE("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee)) // LO Ve007 03.04.84
-	ROM_LOAD16_BYTE("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572)) // HI Ve007 03.04.84
+	ROM_REGION16_LE(0x8000, "bootstrap", 0)
+	ROM_DEFAULT_BIOS("ve009")
+	ROM_SYSTEM_BIOS(0, "ve007", "Ve007 03.04.84")
+	ROMX_LOAD("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee), ROM_SKIP(1) | ROM_BIOS(0)) // LO Ve007 03.04.84
+	ROMX_LOAD("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572), ROM_SKIP(1) | ROM_BIOS(0)) // HI Ve007 03.04.84
+	ROM_COPY("bootstrap", 0x0000, 0x4000, 0x4000)
+	ROM_SYSTEM_BIOS(1, "ve009", "Ve009 18.10.84")
+	ROMX_LOAD("lo_ve009.u11", 0x0000, 0x2000, CRC(0c217cc2) SHA1(0d7a2b61e17966462b555115f962a175fadcf72a), ROM_SKIP(1) | ROM_BIOS(1)) // LO Ve009 18.10.84
+	ROMX_LOAD("hi_ve009.u9",  0x0001, 0x2000, CRC(7c27f36c) SHA1(c801bbf904815f76ec6463e948f57e0118a26292), ROM_SKIP(1) | ROM_BIOS(1)) // HI Ve009 18.10.84
+	ROM_COPY("bootstrap", 0x0000, 0x4000, 0x4000)
+	ROM_SYSTEM_BIOS(2, "aug", "Apricot User Group V30") // "apricot user group deutschland  Berlin, 06.12.85 Klaus Neumeister"
+	ROMX_LOAD("lo_aug.u11",   0x0000, 0x4000, CRC(65ad8f9d) SHA1(6e94feb115db4e57290462da952649cd1e7a2c49), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("hi_aug.u9",    0x0001, 0x4000, CRC(0b1513c3) SHA1(1708a0ca40e7c602863d5d3a8e97608883771f80), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
 
@@ -517,6 +519,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT        COMPANY  FULLNAME      FLAGS
-COMP( 1983, apricot,   0,       0,      apricot,   0,     apricot_state, empty_init, "ACT",   "Apricot PC", 0 )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     apricot_state, empty_init, "ACT",   "Apricot Xi", 0 )
+//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT        COMPANY  FULLNAME         FLAGS
+COMP( 1983, apricot,   0,       0,      apricot,   0,     apricot_state, empty_init, "ACT",   "Apricot PC/Xi", 0 )

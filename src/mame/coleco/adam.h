@@ -51,6 +51,9 @@ public:
 
 	void adam(machine_config &config);
 
+	void computer_reset_w(int state);
+	void game_reset_w(int state);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m6801_cpu_device> m_netcpu;
@@ -65,8 +68,8 @@ private:
 	required_memory_region m_boot_rom;
 	required_memory_region m_os7_rom;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t mreq_r(offs_t offset);
 	void mreq_w(offs_t offset, uint8_t data);
@@ -85,12 +88,12 @@ private:
 	void m6801_p3_w(uint8_t data);
 	void m6801_p4_w(uint8_t data);
 
-	void vdc_int_w(int state);
-
 	void os3_w(int state);
 
 	void joy1_irq_w(int state);
 	void joy2_irq_w(int state);
+
+	void mioc_reset(bool game);
 
 	// memory state
 	uint8_t m_mioc;
@@ -110,10 +113,8 @@ private:
 	int m_spindis;
 
 	// video state
-	int m_vdp_nmi = 0;
-	void adam_io(address_map &map);
-	void adam_mem(address_map &map);
-	void m6801_mem(address_map &map);
+	void adam_io(address_map &map) ATTR_COLD;
+	void adam_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_COLECO_ADAM_H

@@ -351,7 +351,7 @@ uint8_t adam_state::mreq_r(offs_t offset)
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
-	uint8_t data = 0;
+	uint8_t data = 0xff;
 
 	if (offset < 0x8000)
 	{
@@ -457,7 +457,7 @@ uint8_t adam_state::mreq_r(offs_t offset)
 		}
 	}
 
-	data = m_cart->bd_r(offset & 0x7fff, data, cs1, cs2, cs3, cs4);
+	data &= m_cart->read(offset & 0x7fff, cs1, cs2, cs3, cs4);
 	data = m_slot[0]->bd_r(offset & 0xff, data, 1, biorq, 1, 1, 1);
 	data = m_slot[1]->bd_r(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	data = m_slot[2]->bd_r(offset, data, 1, 1, 1, cas1, cas2);
@@ -516,6 +516,7 @@ void adam_state::mreq_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset] = data;
 	}
 
+	// TODO: cartridge slot write
 	m_slot[0]->bd_w(offset & 0xff, data, 1, biorq, 1, 1, 1);
 	m_slot[1]->bd_w(offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
 	m_slot[2]->bd_w(offset, data, 1, 1, 1, cas1, cas2);
@@ -878,18 +879,6 @@ void adam_state::adam_io(address_map &map)
 }
 
 
-//-------------------------------------------------
-//  ADDRESS_MAP( m6801_mem )
-//-------------------------------------------------
-
-void adam_state::m6801_mem(address_map &map)
-{
-	map(0x0000, 0x001f).m(m_netcpu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf800, 0xffff).rom().region(M6801_TAG, 0);
-}
-
-
 
 //**************************************************************************
 //  INPUT PORTS
@@ -900,28 +889,36 @@ void adam_state::m6801_mem(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( adam )
-	// defined in bus/adamnet/kb.c
+	PORT_START("RESET") // switches on either side of cartridge slot
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Computer Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_MEMBER(FUNC(adam_state::computer_reset_w))
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cartridge Reset") PORT_CODE(KEYCODE_F12) PORT_WRITE_LINE_MEMBER(FUNC(adam_state::game_reset_w))
 INPUT_PORTS_END
+
+
+void adam_state::computer_reset_w(int state)
+{
+	if (!state)
+		mioc_reset(false);
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_netcpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+void adam_state::game_reset_w(int state)
+{
+	if (!state)
+		mioc_reset(true);
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_netcpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+}
 
 
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
-
-//-------------------------------------------------
-//  TMS9928A_INTERFACE( vdc_intf )
-//-------------------------------------------------
-
-void adam_state::vdc_int_w(int state)
-{
-	if (state && !m_vdp_nmi)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
-
-	m_vdp_nmi = state;
-}
 
 //-------------------------------------------------
 //  M6801_INTERFACE( m6801_intf )
@@ -943,8 +940,8 @@ void adam_state::os3_w(int state)
 
 			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
 
-			m_netcpu->set_input_line(M6801_SC1_LINE, ASSERT_LINE);
-			m_netcpu->set_input_line(M6801_SC1_LINE, CLEAR_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, ASSERT_LINE);
+			m_netcpu->set_input_line(M6801_IS3_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -982,31 +979,33 @@ void adam_state::machine_start()
 	save_item(NAME(m_data_in));
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_spindis));
-	save_item(NAME(m_vdp_nmi));
 }
 
 
 void adam_state::machine_reset()
 {
-	if (m_cart->exists())
+	// reset to computer mode at power up
+	mioc_reset(false);
+}
+
+
+void adam_state::mioc_reset(bool game)
+{
+	if (game)
 	{
-		// game reset
+		// game mode
 		m_game = 1;
-		m_mioc = (HI_CARTRIDGE_ROM << 2) | LO_OS7_ROM_INTERNAL_RAM;
+		mioc_w((HI_CARTRIDGE_ROM << 2) | LO_OS7_ROM_INTERNAL_RAM);
 	}
 	else
 	{
-		// computer reset
+		// computer mode
 		m_game = 0;
-		m_mioc = 0;
+		mioc_w(0);
 	}
 
 	m_an = 0;
-
-	m_maincpu->reset();
-	m_netcpu->reset();
 }
-
 
 
 //**************************************************************************
@@ -1034,7 +1033,6 @@ void adam_state::adam(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &adam_state::adam_io);
 
 	M6801(config, m_netcpu, XTAL(4'000'000));
-	m_netcpu->set_addrmap(AS_PROGRAM, &adam_state::m6801_mem);
 	m_netcpu->out_p1_cb().set(FUNC(adam_state::m6801_p1_w));
 	m_netcpu->in_p2_cb().set(FUNC(adam_state::m6801_p2_r));
 	m_netcpu->out_p2_cb().set(FUNC(adam_state::m6801_p2_w));
@@ -1047,8 +1045,8 @@ void adam_state::adam(machine_config &config)
 	// video hardware
 	TMS9928A(config, m_vdc, XTAL(10'738'635)).set_screen("screen");
 	m_vdc->set_vram_size(0x4000);
-	m_vdc->int_callback().set(FUNC(adam_state::vdc_int_w));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	m_vdc->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1058,12 +1056,17 @@ void adam_state::adam(machine_config &config)
 	//m_psg->ready_cb().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT).invert();
 
 	// devices
-	ADAMNET(config, m_adamnet, 0);
+	ADAMNET(config, m_adamnet);
 	ADAMNET_SLOT(config, "net1", m_adamnet, adamnet_devices, "kb");
 	ADAMNET_SLOT(config, "net2", m_adamnet, adamnet_devices, "prn");
 	ADAMNET_SLOT(config, "net3", m_adamnet, adamnet_devices, "ddp");
 	ADAMNET_SLOT(config, "net4", m_adamnet, adamnet_devices, "fdc");
-	ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc").set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	adamnet_slot_device &net5(ADAMNET_SLOT(config, "net5", m_adamnet, adamnet_devices, "fdc"));
+	net5.set_option_device_input_defaults("fdc", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_320kb", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_a720dipi", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_fp720at", device_iptdef_drive2);
+	net5.set_option_device_input_defaults("fdc_mihddd", device_iptdef_drive2);
 	ADAMNET_SLOT(config, "net6", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net7", m_adamnet, adamnet_devices, nullptr);
 	ADAMNET_SLOT(config, "net8", m_adamnet, adamnet_devices, nullptr);
@@ -1092,6 +1095,7 @@ void adam_state::adam(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "colec_cart_list").set_original("coleco");
+	SOFTWARE_LIST(config, "colec_hb_list").set_original("coleco_homebrew");
 	SOFTWARE_LIST(config, "adam_cart_list").set_original("adam_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("adam_cass");
 	SOFTWARE_LIST(config, "flop_list").set_original("adam_flop");

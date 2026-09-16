@@ -85,7 +85,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_cbus_card_interface *m_slot[CBUS_COUNT];
@@ -101,17 +101,14 @@ public:
 		: cbus_slot_device(mconfig, tag, owner, clock)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 	cbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<cbus_bus_device> m_bus;
@@ -197,7 +194,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_srx_card_interface *m_slot[SRX_COUNT];
@@ -213,17 +210,14 @@ public:
 		: srx_slot_device(mconfig, tag, owner, clock)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(fixed);
+		set_options(std::forward<U>(slot_options), default_option, fixed);
 	}
 	srx_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device_t implementation
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<srx_bus_device> m_bus;

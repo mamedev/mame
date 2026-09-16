@@ -28,12 +28,12 @@ public:
 		m_intc.set_tag(std::forward<T>(intc));
 	}
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	enum {
@@ -78,15 +78,15 @@ public:
 		m_tgr_count = chan_id == 0 ? 4 : 2;
 	}
 
-	void map_chan0(address_map &map);
-	void map_chan1_2(address_map &map);
+	void map_chan0(address_map &map) ATTR_COLD;
+	void map_chan1_2(address_map &map) ATTR_COLD;
 
 	void set_enable(bool enabled);
 	bool is_enabled() { return m_channel_active; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum {

@@ -59,9 +59,8 @@ void t6721a_device::device_start()
 //  our sound stream
 //-------------------------------------------------
 
-void t6721a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void t6721a_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
 }
 
 

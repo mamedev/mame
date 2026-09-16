@@ -41,6 +41,7 @@ DEFINE_DEVICE_TYPE(A26_ROM_4IN1,  a26_rom_4in1_device,  "vcs_4in1",  "Atari VCS 
 DEFINE_DEVICE_TYPE(A26_ROM_8IN1,  a26_rom_8in1_device,  "vcs_8in1",  "Atari VCS 2600 ROM Cart 8 in 1")
 DEFINE_DEVICE_TYPE(A26_ROM_32IN1, a26_rom_32in1_device, "vcs_32in1", "Atari VCS 2600 ROM Cart 32 in 1")
 DEFINE_DEVICE_TYPE(A26_ROM_X07,   a26_rom_x07_device,   "vcs_x07",   "Atari VCS 2600 ROM Carts w/X07 bankswitch")
+DEFINE_DEVICE_TYPE(A26_ROM_F0,    a26_rom_f0_device,    "vcs_f0",    "Atari VCS 2600 ROM Carts w/F0 bankswitch")
 
 
 
@@ -882,4 +883,32 @@ void a26_rom_x07_device::change_bank1(offs_t address)
 void a26_rom_x07_device::change_bank2(offs_t address)
 {
 	m_bank->set_entry((address >> 4) & 0x0f);
+}
+
+
+/*-------------------------------------------------
+ "F0 Bankswitch" Carts:
+ read/write access to 0x1ff0-0x1ff1 & 0x1ff8-0x1ff9
+ determines the 4K ROM bank to be read
+
+ GAMES: Atari Tarzan (prototype)
+
+ -------------------------------------------------*/
+
+a26_rom_f0_device::a26_rom_f0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a26_rom_f6_device(mconfig, A26_ROM_F0, tag, owner, clock)
+{
+}
+
+void a26_rom_f0_device::install_memory_handlers(address_space *space)
+{
+	m_bank->configure_entries(0, 4, get_rom_base(), 0x1000);
+	space->install_read_bank(0x1000, 0x1fff, m_bank);
+	space->install_write_handler(0x1ff0, 0x1ff1, write8sm_delegate(*this, FUNC(a26_rom_f0_device::switch_bank)));
+	space->install_write_handler(0x1ff8, 0x1ff9, write8sm_delegate(*this, [this] (offs_t offset, u8) { switch_bank(offset + 2, 0); }, "bank"));
+	install_super_chip_handlers(space);
+	space->install_read_tap(0x1ff0, 0x1ff1, "bank",
+			[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) switch_bank(address - 0x1ff0, 0); });
+	space->install_read_tap(0x1ff8, 0x1ff9, "bank",
+			[this] (offs_t address, u8 &, u8) { if (!machine().side_effects_disabled()) switch_bank(address - 0x1ff8 + 2, 0); });
 }

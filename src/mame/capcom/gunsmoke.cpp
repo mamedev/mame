@@ -68,20 +68,22 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * Levels 3 and 6 are swapped.
 
 
-***************************************************************************/
+Notes by Jose Tejada (jotego):
 
-// Notes by Jose Tejada (jotego)
-// CPU speed is 3MHz as per PCB measurement
-// Vertical speed is 59.63 Hz
-// There is no watchdog
-// There is a DMA circuit, same as GnG, Commando and other CAPCOM games of the era
-// The DMA copies sprites to a video and halts the CPU for ~131us
+CPU speed is 3MHz as per PCB measurement
+Vertical speed is 59.63 Hz
+There is no watchdog
+There is a DMA circuit, same as GnG, Commando and other CAPCOM games of the era
+The DMA copies sprites to a video and halts the CPU for ~131us
+
+***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -96,37 +98,39 @@ class gunsmoke_state : public driver_device
 public:
 	gunsmoke_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_scrollx(*this, "scrollx"),
 		m_scrolly(*this, "scrolly"),
-		m_spriteram(*this, "spriteram"),
-		m_mainbank(*this, "mainbank"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	void gunsmoke(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<buffered_spriteram8_device> m_spriteram;
+
 	// memory pointers
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_scrollx;
 	required_shared_ptr<uint8_t> m_scrolly;
-	required_shared_ptr<uint8_t> m_spriteram;
 	required_memory_bank m_mainbank;
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -139,20 +143,18 @@ private:
 	uint8_t protection_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void c804_w(uint8_t data);
-	void d806_w(uint8_t data);
+	void control_w(uint8_t data);
+	void layer_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -220,7 +222,7 @@ void gunsmoke_state::colorram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-void gunsmoke_state::c804_w(uint8_t data)
+void gunsmoke_state::control_w(uint8_t data)
 {
 	// bits 0 and 1 are for coin counters
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
@@ -238,7 +240,7 @@ void gunsmoke_state::c804_w(uint8_t data)
 	m_chon = data & 0x80;
 }
 
-void gunsmoke_state::d806_w(uint8_t data)
+void gunsmoke_state::layer_w(uint8_t data)
 {
 	// bits 0-2 select the sprite 3 bank
 	m_sprite3bank = data & 0x07;
@@ -279,26 +281,23 @@ void gunsmoke_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gunsmoke_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 32, 32, 2048, 8);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gunsmoke_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(  6,   6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(  6,   6);
-
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0x4f);
 }
 
 void gunsmoke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
+	const u8 *spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 32; offs >= 0; offs -= 32)
 	{
-		int attr = m_spriteram[offs + 1];
+		int attr = spriteram[offs + 1];
 		int bank = (attr & 0xc0) >> 6;
-		int code = m_spriteram[offs];
+		int code = spriteram[offs];
 		int color = attr & 0x0f;
 		int flipx = 0;
 		int flipy = attr & 0x10;
-		int sx = m_spriteram[offs + 3] - ((attr & 0x20) << 3);
-		int sy = m_spriteram[offs + 2];
+		int sx = spriteram[offs + 3] - ((attr & 0x20) << 3);
+		int sy = spriteram[offs + 2];
 
 		if (bank == 3)
 			bank += m_sprite3bank;
@@ -313,7 +312,7 @@ void gunsmoke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx + 128, sy + 6, 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -336,8 +335,6 @@ uint32_t gunsmoke_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 // Read/Write Handlers
 
@@ -375,15 +372,15 @@ void gunsmoke_state::main_map(address_map &map)
 	map(0xc004, 0xc004).portr("DSW2");
 	map(0xc4c9, 0xc4cb).r(FUNC(gunsmoke_state::protection_r));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(gunsmoke_state::c804_w));  // ROM bank switch, screen flip
-	// 0xc806 DMA trigger (not emulated)
+	map(0xc804, 0xc804).w(FUNC(gunsmoke_state::control_w)); // ROM bank switch, screen flip
+	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
 	map(0xd000, 0xd3ff).ram().w(FUNC(gunsmoke_state::videoram_w)).share(m_videoram);
 	map(0xd400, 0xd7ff).ram().w(FUNC(gunsmoke_state::colorram_w)).share(m_colorram);
 	map(0xd800, 0xd801).ram().share(m_scrollx);
 	map(0xd802, 0xd802).ram().share(m_scrolly);
-	map(0xd806, 0xd806).w(FUNC(gunsmoke_state::d806_w));  // sprites and bg enable
+	map(0xd806, 0xd806).w(FUNC(gunsmoke_state::layer_w)); // sprites and bg enable
 	map(0xe000, 0xefff).ram();
-	map(0xf000, 0xffff).ram().share(m_spriteram);
+	map(0xf000, 0xffff).ram().share("spriteram");
 }
 
 void gunsmoke_state::sound_map(address_map &map)
@@ -405,8 +402,8 @@ static INPUT_PORTS_START( gunsmoke )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    // VBLANK
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -451,7 +448,7 @@ static INPUT_PORTS_START( gunsmoke )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) // Also "debug mode"
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -460,7 +457,7 @@ static INPUT_PORTS_START( gunsmoke )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -563,17 +560,21 @@ void gunsmoke_state::machine_reset()
 void gunsmoke_state::gunsmoke(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL / 4);   // 3 MHz Verified on PCB by jotego
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 3 MHz Verified on PCB by jotego
 	m_maincpu->set_addrmap(AS_PROGRAM, &gunsmoke_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gunsmoke_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 4));  // 3 MHz, actually inside a 85H001 CAPCOM custom
-	audiocpu.set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_ticks(384*262/4, 12_MHz_XTAL / 2));
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4); // 3 MHz, actually inside a 85H001 CAPCOM custom
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
+
+	const attotime audio_irq_period = attotime::from_ticks(384 * 262 / 4, 12_MHz_XTAL / 2);
+	m_audiocpu->set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), audio_irq_period);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12_MHz_XTAL / 2, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	BUFFERED_SPRITERAM8(config, m_spriteram);
+
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(gunsmoke_state::screen_update));
 	screen.set_palette(m_palette);
 

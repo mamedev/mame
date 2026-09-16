@@ -14,7 +14,7 @@ DECLARE_DEVICE_TYPE(TI99X_FD800, fd800_legacy_device)
 class fd800_legacy_device : public device_t
 {
 public:
-	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t cru_r(offs_t offset);
 	void cru_w(offs_t offset, uint8_t data);
@@ -28,8 +28,8 @@ private:
 
 	static constexpr unsigned MAX_FLOPPIES = 4;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void set_interrupt_line();
 
 	int     read_id(int unit, int head, int *cylinder_id, int *sector_id);

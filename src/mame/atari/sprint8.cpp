@@ -44,9 +44,9 @@ public:
 	void sprint8(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -91,11 +91,9 @@ private:
 
 	void set_pens();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void sprint8_state::palette(palette_device &palette) const
 {
@@ -275,8 +273,6 @@ void sprint8_state::screen_vblank(int state)
 }
 
 
-// machine
-
 TIMER_DEVICE_CALLBACK_MEMBER(sprint8_state::input_callback)
 {
 	for (int i = 0; i < 8; i++)
@@ -362,9 +358,9 @@ void sprint8_state::program_map(address_map &map)
 	map(0x1c10, 0x1c1f).writeonly().share(m_pos_v_ram);
 	map(0x1c20, 0x1c2f).writeonly().share(m_pos_d_ram);
 	map(0x1c30, 0x1c37).w(FUNC(sprint8_state::lockout_w));
-	map(0x1d00, 0x1d07).w("latch", FUNC(f9334_device::write_d0));
-	map(0x1e00, 0x1e07).w("motor", FUNC(f9334_device::write_d0));
-	map(0x1f00, 0x1f00).nopw(); // probably a watchdog, disabled in service mode
+	map(0x1d00, 0x1d07).nopr().w("latch", FUNC(f9334_device::write_d0));
+	map(0x1e00, 0x1e07).nopr().w("motor", FUNC(f9334_device::write_d0));
+	map(0x1f00, 0x1f00).noprw(); // probably a watchdog, disabled in service mode
 	map(0x2000, 0x3fff).rom();
 	map(0xf800, 0xffff).rom();
 }
@@ -417,7 +413,7 @@ static INPUT_PORTS_START( sprint8 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Track Select") PORT_CODE(KEYCODE_SPACE)
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	// this is actually a variable resistor
 	PORT_START("R132")
@@ -510,7 +506,7 @@ void sprint8_state::sprint8(machine_config &config)
 	TIMER(config, "input_timer").configure_periodic(FUNC(sprint8_state::input_callback), attotime::from_hz(60));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 261);
 	m_screen->set_visarea(0, 495, 0, 231);

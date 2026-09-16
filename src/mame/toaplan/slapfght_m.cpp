@@ -14,7 +14,7 @@
 
 /**************************************************************************/
 
-uint8_t slapfght_state::tigerh_mcu_status_r()
+uint8_t tigerh_state::tigerh_mcu_status_r()
 {
 	return
 			(m_screen->vblank() ? 0x01 : 0x00) |
@@ -39,21 +39,25 @@ void slapfght_state::scroll_from_mcu_w(offs_t offset, uint8_t data)
 
 uint8_t slapfght_state::getstar_mcusim_status_r()
 {
-	static const int states[3]={ 0xc7, 0x55, 0x00 };
+	static const uint8_t states[3]={ 0xc7, 0x55, 0x00 };
 
-	m_getstar_status = states[m_getstar_status_state];
+	const uint8_t ret = states[m_getstar_status_state];
+	if (!machine().side_effects_disabled())
+	{
+		m_getstar_status = ret;
 
-	m_getstar_status_state++;
-	if (m_getstar_status_state > 2) m_getstar_status_state = 0;
+		m_getstar_status_state++;
+		if (m_getstar_status_state > 2) m_getstar_status_state = 0;
+	}
 
-	return m_getstar_status;
+	return ret;
 }
 
 uint8_t slapfght_state::getstar_mcusim_r()
 {
 	uint8_t getstar_val = 0;
-	uint8_t lives_lookup_table[] = {0x03, 0x05, 0x01, 0x02};                                     /* table at 0x0e62 in 'getstarb1' */
-	uint8_t lgsb2_lookup_table[] = {0x00, 0x03, 0x04, 0x05};                                     /* fake tanle for "test mode" in 'getstarb2' */
+	static const uint8_t lives_lookup_table[] = {0x03, 0x05, 0x01, 0x02};                                     /* table at 0x0e62 in 'getstarb1' */
+	static const uint8_t lgsb2_lookup_table[] = {0x00, 0x03, 0x04, 0x05};                                     /* fake tanle for "test mode" in 'getstarb2' */
 
 	switch (m_getstar_id)
 	{
@@ -79,7 +83,8 @@ uint8_t slapfght_state::getstar_mcusim_r()
 			if (m_maincpu->pc() == 0x6b04) return (lgsb2_lookup_table[m_gs_a]);
 			break;
 		default:
-			logerror("%04x: getstar_mcusim_r - cmd = %02x - unknown set !\n",m_maincpu->pc(),m_getstar_cmd);
+			if (!machine().side_effects_disabled())
+				logerror("%s: getstar_mcusim_r - cmd = %02x - unknown set !\n",machine(). describe_context(), m_getstar_cmd);
 			break;
 	}
 	return getstar_val;
@@ -175,7 +180,7 @@ void slapfght_state::getstar_mcusim_w(uint8_t data)
 			}
 			break;
 		default:
-			logerror("%04x: getstar_mcusim_w - data = %02x - unknown set !\n",m_maincpu->pc(),data);
+			logerror("%s: getstar_mcusim_w - data = %02x - unknown set !\n", machine().describe_context(), data);
 			break;
 	}
 }
@@ -188,7 +193,7 @@ void slapfght_state::getstar_mcusim_w(uint8_t data)
 
 ***************************************************************************/
 
-uint8_t slapfght_state::tigerhb1_prot_r()
+uint8_t tigerh_state::tigerhb1_prot_r()
 {
 	uint8_t tigerhb_val = 0;
 	switch (m_tigerhb_cmd)
@@ -197,13 +202,14 @@ uint8_t slapfght_state::tigerhb1_prot_r()
 			tigerhb_val = 0x83;
 			break;
 		default:
-			logerror("%04x: tigerhb1_prot_r - cmd = %02x\n", m_maincpu->pc(), m_getstar_cmd);
+			if (!machine().side_effects_disabled())
+				logerror("%s: tigerhb1_prot_r - cmd = %02x\n", machine().describe_context(), m_tigerhb_cmd);
 			break;
 	}
 	return tigerhb_val;
 }
 
-void slapfght_state::tigerhb1_prot_w(uint8_t data)
+void tigerh_state::tigerhb1_prot_w(uint8_t data)
 {
 	switch (data)
 	{
@@ -212,7 +218,7 @@ void slapfght_state::tigerhb1_prot_w(uint8_t data)
 			m_tigerhb_cmd = 0x73;
 			break;
 		default:
-			logerror("%04x: tigerhb1_prot_w - data = %02x\n",m_maincpu->pc(),data);
+			logerror("%s: tigerhb1_prot_w - data = %02x\n", machine().describe_context(), data);
 			m_tigerhb_cmd = 0x00;
 			break;
 	}
@@ -270,7 +276,8 @@ uint8_t slapfght_state::getstarb1_prot_r()
 	if (m_maincpu->pc() == 0x6ae4) return 2; /* bit 1 must be ON */
 	if (m_maincpu->pc() == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",m_maincpu->pc());
+	if (!machine().side_effects_disabled())
+		logerror("Port Read PC=%04x\n", m_maincpu->pc());
 
 	return 0;
 }

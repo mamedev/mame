@@ -20,11 +20,11 @@
 #define COP402N_TAG "cop402n"
 #define AY8910_TAG  "ay8910"
 
-#define DESTRYER_CHR1   3579000.0 // unverified
-#define DESTRYER_CHR2   XTAL(5'714'300)
-#define ALTAIR_CHR1     3579000.0 // unverified
-#define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL // unverified
-#define DRACO_CHR1      XTAL(4'433'610)
+#define DESTRYER_CHR1   3.579_MHz_XTAL
+#define DESTRYER_CHR2   5.7143_MHz_XTAL
+#define ALTAIR_CHR1     3.579_MHz_XTAL
+#define ALTAIR_CHR2     cdp1869_device::DOT_CLK_PAL
+#define DRACO_CHR1      4.43361_MHz_XTAL
 #define DRACO_CHR2      cdp1869_device::DOT_CLK_PAL // unverified
 #define DRACO_SND_CHR1  XTAL(2'012'160)
 
@@ -66,17 +66,17 @@ public:
 	void destryer(machine_config &config);
 	void destryer_video(machine_config &config);
 	void altair_video(machine_config &config);
-	void altair_io_map(address_map &map);
-	void altair_map(address_map &map);
-	void cidelsa_page_ram(address_map &map);
-	void destryer_io_map(address_map &map);
-	void destryer_map(address_map &map);
-	void destryera_map(address_map &map);
+	void altair_io_map(address_map &map) ATTR_COLD;
+	void altair_map(address_map &map) ATTR_COLD;
+	void cidelsa_page_ram(address_map &map) ATTR_COLD;
+	void destryer_io_map(address_map &map) ATTR_COLD;
+	void destryer_map(address_map &map) ATTR_COLD;
+	void destryera_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(reset_done);
 
@@ -119,13 +119,13 @@ public:
 
 	void draco(machine_config &config);
 	void draco_video(machine_config &config);
-	void draco_io_map(address_map &map);
-	void draco_map(address_map &map);
-	void draco_page_ram(address_map &map);
-	void draco_sound_map(address_map &map);
+	void draco_io_map(address_map &map) ATTR_COLD;
+	void draco_map(address_map &map) ATTR_COLD;
+	void draco_page_ram(address_map &map) ATTR_COLD;
+	void draco_sound_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<ay8910_device> m_psg;
 	// sound state

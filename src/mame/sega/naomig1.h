@@ -21,7 +21,7 @@ public:
 	auto reset_out_callback() { return reset_out_cb.bind(); }
 	void set_dma_cb(dma_cb cb) { _dma_cb = cb; }
 
-	void amap(address_map &map);               // for range 0x005f7400-0x005f74ff
+	void amap(address_map &map) ATTR_COLD;     // for range 0x005f7400-0x005f74ff
 	virtual void submap(address_map &map) = 0; // for range 0x005f7000-0x005f70ff
 
 	uint32_t sb_gdstar_r();   // 5f7404
@@ -53,8 +53,8 @@ public:
 protected:
 	naomi_g1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_maincpu) = 0;
 	virtual void dma_advance(uint32_t size) = 0;

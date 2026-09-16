@@ -11,12 +11,15 @@
     MagicEyes VRENDER 3D Soc (200 MHz ARM920T CPU / GFX / Sound)
     Also Has 2x QDSP QS1000 for sound
 
+    TODO:
+    - hang at very beginning, cfr. driver inits
+    - identify where the palette is for the texture RAM (8bpp)
+
 */
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/serflash.h"
+#include "machine/nandflash.h"
 #include "emupal.h"
 #include "screen.h"
 #include "debugger.h"
@@ -34,7 +37,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_fbram(*this, "fbram"),
-		m_serflash(*this, "flash"),
+		m_nand(*this, "nand"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
@@ -48,7 +51,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_shared_ptr<uint32_t> m_fbram;
-	required_device<serflash_device> m_serflash;
+	required_device<samsung_k9f2g08u0m_device> m_nand;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
@@ -57,12 +60,12 @@ private:
 //  void nexus3d_unk2_w(uint32_t data);
 //  void nexus3d_unk3_w(uint32_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void nexus3d_map(address_map &map);
+	void nexus3d_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_intpend = 0, m_intmask = 0, m_intlevel = 0;
 	uint32_t int_pending_r();
@@ -101,6 +104,7 @@ uint32_t nexus3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	uint16_t const *const fbram = reinterpret_cast<uint16_t *>(m_fbram.target());
 	int const width = 640;
 
+	// TODO: framebuffer upload should draw on request and probably be with a defined base somewhere
 	uint16_t const *const visible = fbram + (m_screen->frame_number() & 1) * (0x96000/2);
 
 	uint32_t const dx = cliprect.left();
@@ -125,9 +129,9 @@ void nexus3d_state::IntReq(int level)
 	uint32_t inten = m_intmask ^ 0xffffffff;
 
 	if (m_intpend & inten)
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -230,9 +234,9 @@ uint32_t nexus3d_state::crtc_vblank_r()
 void nexus3d_state::nexus3d_map(address_map &map)
 {
 	map(0x00000000, 0x01ffffff).ram().share("mainram");
-	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd
+	map(0x02000000, 0x023fffff).ram().share("fbram"); // boundary tbd, also 8bpp texture RAM storage at around $020axxxx onward
 
-	map(0x03720000, 0x0373ffff).ram(); // 3d fifo, boundary tbd
+	map(0x03720000, 0x0373ffff).ram(); // 3d FIFO, boundary tbd
 	map(0x046c0000, 0x046fffff).ram(); // """
 
 	map(0x60000000, 0x67ffffff).ram(); // color tables?
@@ -243,9 +247,9 @@ void nexus3d_state::nexus3d_map(address_map &map)
 	map(0x8d000000, 0x8d000003).portr("IN2");
 
 	// flash
-	map(0x9C000000, 0x9C000003).r(m_serflash, FUNC(serflash_device::n3d_flash_r));
-	map(0x9C000010, 0x9C000013).w(m_serflash, FUNC(serflash_device::n3d_flash_cmd_w));
-	map(0x9C000018, 0x9C00001b).w(m_serflash, FUNC(serflash_device::n3d_flash_addr_w));
+	map(0x9C000000, 0x9C000003).r(m_nand, FUNC(nand_device::data_r));
+	map(0x9C000010, 0x9C000013).w(m_nand, FUNC(nand_device::command_w));
+	map(0x9C000018, 0x9C00001b).w(m_nand, FUNC(nand_device::address_w));
 
 	// read on irq 9 service, unknown purpose
 	map(0xc0000200, 0xc00002bf).nopr();
@@ -298,7 +302,7 @@ void nexus3d_state::machine_start()
 void nexus3d_state::machine_reset()
 {
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy(m_mainram, memregion("flash")->base(), 4 * 1024);
+	memcpy(m_mainram, memregion("nand")->base(), 4 * 1024);
 }
 
 void nexus3d_state::screen_vblank(int state)
@@ -318,7 +322,7 @@ void nexus3d_state::nexus3d(machine_config &config)
 	ARM920T(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nexus3d_state::nexus3d_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw((XTAL(14'318'181)*2), 454*2, 0, 640, 262*2, 0, 480); // not accurate, needs CRTC understanding
 	m_screen->set_screen_update(FUNC(nexus3d_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(nexus3d_state::screen_vblank));
@@ -326,13 +330,13 @@ void nexus3d_state::nexus3d(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
-	SERFLASH(config, m_serflash, 0);
+	SAMSUNG_K9F2G08U0M(config, m_nand);
 }
 
 
 
 ROM_START( acheart )
-	ROM_REGION( 0x10800898, "flash", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x10800898, "nand", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "arcanaheart.u1",     0x000000, 0x10800898, CRC(109bf439) SHA1(33fd39355923ef384d5eaeec8ae3f296509bde93) )
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
@@ -348,7 +352,7 @@ ROM_END
 
 
 ROM_START( acheartf )
-	ROM_REGION( 0x10800898, "flash", 0 ) /* ARM 32 bit code */
+	ROM_REGION( 0x10800898, "nand", 0 ) /* ARM 32 bit code */
 	ROM_LOAD( "arcanaheartfull.u1",     0x000000, 0x10800898, CRC(54b57a9d) SHA1(dee5a43b3aea854d2b98869dca74c57b66fb06eb))
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
@@ -380,5 +384,5 @@ void nexus3d_state::init_acheartf()
 } // anonymous namespace
 
 
-GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
-GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )
+GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // has a "for use in Japan" texture uploaded at startup right after framebuffer space

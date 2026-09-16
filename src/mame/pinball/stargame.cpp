@@ -51,9 +51,13 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void stargame(machine_config &config);
-	void init_0() { m_game = 0; }
-	void init_1() { m_game = 1; }
+	void stargame(machine_config &config) ATTR_COLD;
+	void init_0() ATTR_COLD { m_game = 0; }
+	void init_1() ATTR_COLD { m_game = 1; }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void reset2_w(int state) { m_audiocpu->reset(); }
@@ -64,16 +68,14 @@ private:
 	u8 csw1_r();
 	u8 csw2_r();
 
-	void audiocpu_io(address_map &map);
-	void audiocpu_map(address_map &map);
-	void maincpu_io(address_map &map);
-	void maincpu_map(address_map &map);
+	void audiocpu_io(address_map &map) ATTR_COLD;
+	void audiocpu_map(address_map &map) ATTR_COLD;
+	void maincpu_io(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
 	u8 m_segment[5]{};
 	u8 m_game = 0U;
 	u8 m_row = 0U;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
@@ -374,9 +376,6 @@ void stargame_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_segment));
 	save_item(NAME(m_game));
 }
@@ -384,6 +383,7 @@ void stargame_state::machine_start()
 void stargame_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -444,7 +444,7 @@ void stargame_state::stargame(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(stargame_state::reset2_w)); // SRESET
 	mainlatch.q_out_cb<7>().set_nop(); // MAKRES
 
-	TTL7474(config, m_7a, 0);
+	TTL7474(config, m_7a);
 	m_7a->comp_output_cb().set_inputline(m_audiocpu, INPUT_LINE_IRQ0).invert();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -469,5 +469,5 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME( 1986, spcship,  0, stargame, spcship,  stargame_state, init_0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, whtforce, 0, stargame, whtforce, stargame_state, init_1, ROT0, "Stargame", "White Force",           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spcship,  0, stargame, spcship,  stargame_state, init_0, ROT0, "Stargame", "Space Ship (Pinball)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, whtforce, 0, stargame, whtforce, stargame_state, init_1, ROT0, "Stargame", "White Force",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

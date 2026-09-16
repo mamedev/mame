@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -16,39 +17,15 @@ license:CC0-1.0
 	<element name="text_l2"><text string="ROWS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l3"><text string="FUSE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
-	<element name="text_r1">
-		<rect><color red="0.9" green="0.15" blue="0.17" /></rect>
-		<text string="1"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_r2">
-		<rect><color red="0.9" green="0.15" blue="0.17" /></rect>
-		<text string="2"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_r3">
-		<rect><color red="0.9" green="0.15" blue="0.17" /></rect>
-		<text string="3"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_r4">
-		<rect><color red="0.9" green="0.15" blue="0.17" /></rect>
-		<text string="4"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
+	<element name="text_r1"><text string="1"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_r2"><text string="2"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_r3"><text string="3"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_r4"><text string="4"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 
-	<element name="text_g1">
-		<rect><color red="0.3" green="0.9" blue="0.25" /></rect>
-		<text string="SHORTEST"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_g2">
-		<rect><color red="0.3" green="0.9" blue="0.25" /></rect>
-		<text string="SHORT"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_g3">
-		<rect><color red="0.3" green="0.9" blue="0.25" /></rect>
-		<text string="LONG"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
-	<element name="text_g4">
-		<rect><color red="0.3" green="0.9" blue="0.25" /></rect>
-		<text string="LONGEST"><color red="0.03" green="0.03" blue="0.03" /></text>
-	</element>
+	<element name="text_g1"><text string="SHORTEST"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_g2"><text string="SHORT"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_g3"><text string="LONG"><color red="0.03" green="0.03" blue="0.03" /></text></element>
+	<element name="text_g4"><text string="LONGEST"><color red="0.03" green="0.03" blue="0.03" /></text></element>
 
 	<element name="hl" defstate="0">
 		<text string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
@@ -72,8 +49,7 @@ license:CC0-1.0
 
 		<element name="0.0" ref="led"><bounds x="31" y="7.75" width="2" height="2" /></element>
 
-	<!-- button panel -->
-
+		<!-- button panel -->
 		<element ref="disk_red"><bounds x="0" y="0.0"  width="4" height="4" /></element>
 		<element ref="disk_red"><bounds x="0" y="4.5"  width="4" height="4" /></element>
 		<element ref="disk_red"><bounds x="0" y="9.0"  width="4" height="4" /></element>

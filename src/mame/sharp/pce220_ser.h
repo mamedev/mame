@@ -25,7 +25,7 @@ class pce220_serial_device :    public device_t,
 {
 public:
 	// construction/destruction
-	pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~pce220_serial_device();
 
 	// device_image_interface implementation
@@ -57,8 +57,8 @@ protected:
 	int get_next_state();
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(send_tick);
 	TIMER_CALLBACK_MEMBER(receive_tick);

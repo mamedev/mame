@@ -38,7 +38,7 @@ const tiny_rom_entry *sbus_bwtwo_device::device_rom_region() const
 
 void sbus_bwtwo_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(sbus_bwtwo_device::screen_update));
 	screen.set_size(1152, 900);
 	screen.set_visarea(0, 1152-1, 0, 900-1);

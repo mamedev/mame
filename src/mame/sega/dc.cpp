@@ -14,7 +14,6 @@
 #include "mie.h"
 
 #include "cpu/sh/sh4.h"
-#include "cpu/arm7/arm7core.h"
 
 //#include "debugger.h"
 
@@ -624,7 +623,7 @@ void dc_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void dc_state::aica_irq(int state)
 {
-	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dc_state::sh4_aica_irq(int state)

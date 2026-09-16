@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/uda1344.h"
+#include "uda1344.h"
 
 #define LOG_ADDR            (1U << 1)
 #define LOG_STATUS_REG      (1U << 2)
@@ -47,6 +47,9 @@ void uda1344_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, BASE_FREQUENCY);
 
+	m_buffer[0].resize(BUFFER_SIZE);
+	m_buffer[1].resize(BUFFER_SIZE);
+
 	save_item(NAME(m_buffer[0]));
 	save_item(NAME(m_buffer[1]));
 	save_item(NAME(m_bufin));
@@ -63,9 +66,6 @@ void uda1344_device::device_start()
 	save_item(NAME(m_power_reg));
 	save_item(NAME(m_dac_enable));
 	save_item(NAME(m_adc_enable));
-
-	m_buffer[0].resize(BUFFER_SIZE);
-	m_buffer[1].resize(BUFFER_SIZE);
 }
 
 void uda1344_device::device_reset()
@@ -88,24 +88,20 @@ void uda1344_device::device_reset()
 	memset(m_bufout, 0, sizeof(uint32_t) * 2);
 }
 
-void uda1344_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void uda1344_device::sound_stream_update(sound_stream &stream)
 {
-	for (int channel = 0; channel < 2 && channel < outputs.size(); channel++)
+	for (int channel = 0; channel < 2 && channel < stream.output_count(); channel++)
 	{
-		auto &output = outputs[channel];
 		uint32_t curout = m_bufout[channel];
 		uint32_t curin = m_bufin[channel];
 
 		// feed as much as we can
 		int sampindex;
-		for (sampindex = 0; curout != curin && sampindex < output.samples(); sampindex++)
+		for (sampindex = 0; curout != curin && sampindex < stream.samples(); sampindex++)
 		{
-			output.put(sampindex, stream_buffer::sample_t(m_buffer[channel][curout]) * m_volume);
+			stream.put(channel, sampindex, sound_stream::sample_t(m_buffer[channel][curout]) * m_volume);
 			curout = (curout + 1) % BUFFER_SIZE;
 		}
-
-		// fill the rest with silence
-		output.fill(0, sampindex);
 
 		// save the new output pointer
 		m_bufout[channel] = curout;
@@ -116,8 +112,8 @@ void uda1344_device::ingest_samples(int16_t left, int16_t right)
 {
 	const int16_t samples[2] = { left, right };
 
-	const stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-	const stream_buffer::sample_t enable_scale = m_dac_enable ? 1.0 : 0.0;
+	const sound_stream::sample_t sample_scale = 1.0 / 32768.0;
+	const sound_stream::sample_t enable_scale = m_dac_enable ? 1.0 : 0.0;
 
 	m_stream->update();
 
@@ -126,7 +122,7 @@ void uda1344_device::ingest_samples(int16_t left, int16_t right)
 		int maxin = (m_bufout[channel] + BUFFER_SIZE - 1) % BUFFER_SIZE;
 		if (m_bufin[channel] != maxin)
 		{
-			m_buffer[channel][m_bufin[channel]] = stream_buffer::sample_t(samples[channel]) * sample_scale * enable_scale;
+			m_buffer[channel][m_bufin[channel]] = sound_stream::sample_t(samples[channel]) * sample_scale * enable_scale;
 			m_bufin[channel] = (m_bufin[channel] + 1) % BUFFER_SIZE;
 		}
 		else

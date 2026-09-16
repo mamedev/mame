@@ -3,21 +3,19 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Mephisto Glasgow 3 S chess computer
+Mephisto III-S Glasgow chess computer
 Dirk V.
 sp_rinter@gmx.de
 
-TODO:
-- add waitstates, CPU is 12MHz but with DTACK waitstates for slow EPROMs,
-  effective speed is around 7.2MHz
-
-================================================================================
+Mephisto Glasgow is the last chess engine written by Thomas Nitsche & Elmar Henne.
+Amsterdam/Dallas/Roma are by Richard Lang.
 
 Hardware notes:
-- 68000 CPU
-- 64 KB ROM
-- 16 KB RAM
-- 4 Digit LCD
+- R68000C10 or MC68000P12 @ 12MHz, IRQ from 50Hz Seiko SG-10 chip "50H", to IPL0+2
+- 64KB ROM (4*27128), 16KB RAM (2*6264)
+- LCD module same as MMx series, piezo
+
+Other TTL:
 
 3*74LS138 Decoder/Multiplexer
 1*74LS74  Dual positive edge triggered D Flip Flop
@@ -29,14 +27,22 @@ Hardware notes:
 1*74121   Monostable Multivibrator with Schmitt Trigger Inputs
 1*74LS20  Dual 4 Input NAND GAte
 1*74LS367 3 State Hex Buffers
-1*SG-10   Seiko 4-pin plastic XTAL chip "50H", to IPL0+2
+
+By default, it makes heavy use of DTACK wait states. Overall it runs much slower
+than 12MHz. The LDS/UDS wait states can be modified with solder pads on the
+backside of the PCB (under the 74LS164).
+
+To verify CPU speed: Set level to 9 and move pawn to F3. At exactly 6 minutes,
+a real Glasgow with 1 LDS/UDS wait state will have calculated 3432 positions
+(may fluctuate a little due to 74121). To see number of calculated positions,
+press INFO, C, then Right 3 times.
 
 *******************************************************************************/
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay1.h"
+#include "mboard.h"
+#include "mdisplay1.h"
 
 #include "cpu/m68000/m68000.h"
 #include "sound/dac.h"
@@ -58,33 +64,109 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_keys(*this, "KEY.%u", 0)
+		m_keys(*this, "KEY.%u", 0),
+		m_wait(*this, "WAIT")
 	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(wait_changed) { install_wait(); }
 
 	void glasgow(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { install_wait(); }
+	virtual void device_post_load() override { install_wait(); }
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display1_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_keys;
+	required_ioport m_wait;
 
-	void glasgow_mem(address_map &map);
+	memory_passthrough_handler m_read_tap;
+	memory_passthrough_handler m_write_tap;
+
+	u8 m_kp_mux = 0;
+	int m_wait_ticks = 0;
+	int m_ext_ticks = 0;
+
+	void glasgow_mem(address_map &map) ATTR_COLD;
+
+	void install_wait();
 
 	void control_w(u8 data);
 	u8 keys_r();
 	void keys_w(u8 data);
-
-	u8 m_kp_mux = 0;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void glasgow_state::machine_start()
 {
 	save_item(NAME(m_kp_mux));
+
+	// on external access (0x10000-0x17fff), additional wait states via a 74121
+	// (R=internal 2K, C=10nf, which is 20us according to datasheet)
+	attotime ext_delay = attotime::from_usec(20);
+	m_ext_ticks = ext_delay.as_ticks(m_maincpu->clock());
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	space.install_read_tap(
+			0x10000, 0x17fff,
+			"maincpu_ext_r",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+					m_maincpu->adjust_icount(-m_ext_ticks);
+			});
+	space.install_write_tap(
+			0x10000, 0x17fff,
+			"maincpu_ext_w",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+					m_maincpu->adjust_icount(-m_ext_ticks);
+			});
+}
+
+void glasgow_state::install_wait()
+{
+	m_read_tap.remove();
+	m_write_tap.remove();
+
+	// optional 0-3 wait states via 74LS164 for each LDS/UDS
+	m_wait_ticks = m_wait->read() & 3;
+
+	if (m_wait_ticks)
+	{
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+
+		m_read_tap = program.install_read_tap(
+				0x00000, 0x1ffff,
+				"maincpu_wait_r",
+				[this] (offs_t offset, u16 &data, u16 mem_mask)
+				{
+					if (!machine().side_effects_disabled())
+						m_maincpu->adjust_icount(-m_wait_ticks);
+				},
+				&m_read_tap);
+		m_write_tap = program.install_write_tap(
+				0x00000, 0x1ffff,
+				"maincpu_wait_w",
+				[this] (offs_t offset, u16 &data, u16 mem_mask)
+				{
+					if (!machine().side_effects_disabled())
+						m_maincpu->adjust_icount(-m_wait_ticks);
+				},
+				&m_write_tap);
+	}
 }
 
 
@@ -98,8 +180,8 @@ void glasgow_state::control_w(u8 data)
 	// d0: speaker out
 	m_dac->write(BIT(data, 0));
 
-	// d7: lcd strobe
-	m_display->strobe_w(BIT(data, 7));
+	// d7: lcd common
+	m_display->common_w(BIT(data, 7));
 }
 
 u8 glasgow_state::keys_r()
@@ -133,11 +215,11 @@ void glasgow_state::glasgow_mem(address_map &map)
 {
 	map.global_mask(0x1ffff);
 	map(0x000000, 0x00ffff).rom();
-	map(0x010000, 0x010000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x010002, 0x010002).rw(FUNC(glasgow_state::keys_r), FUNC(glasgow_state::keys_w));
-	map(0x010004, 0x010004).w(FUNC(glasgow_state::control_w));
-	map(0x010006, 0x010006).rw(m_board, FUNC(mephisto_board_device::input_r), FUNC(mephisto_board_device::led_w));
-	map(0x010008, 0x010008).w(m_board, FUNC(mephisto_board_device::mux_w));
+	map(0x010000, 0x010001).mirror(0x007ff0).w(m_display, FUNC(mephisto_display1_device::data_w)).umask16(0xff00);
+	map(0x010002, 0x010003).mirror(0x007ff0).rw(FUNC(glasgow_state::keys_r), FUNC(glasgow_state::keys_w)).umask16(0xff00);
+	map(0x010004, 0x010005).mirror(0x007ff0).w(FUNC(glasgow_state::control_w)).umask16(0xff00);
+	map(0x010006, 0x010007).mirror(0x007ff0).rw(m_board, FUNC(mephisto_board_device::input_r), FUNC(mephisto_board_device::led_w)).umask16(0xff00);
+	map(0x010008, 0x010009).mirror(0x007ff0).w(m_board, FUNC(mephisto_board_device::mux_w)).umask16(0xff00);
 	map(0x01c000, 0x01ffff).ram();
 }
 
@@ -152,7 +234,7 @@ static INPUT_PORTS_START( glasgow )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E / 5 / Rook") PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("INFO") PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right / White / 0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_P)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H / 8") PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G / 7 / King") PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
@@ -167,6 +249,13 @@ static INPUT_PORTS_START( glasgow )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A / 1") PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F / 6 / Queen") PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B / 2 / Pawn") PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+
+	PORT_START("WAIT") // hardwired, default to 1
+	PORT_CONFNAME( 0x03, 0x01, "LDS/UDS Wait States" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(glasgow_state::wait_changed), 0)
+	PORT_CONFSETTING(    0x00, "None (12MHz)" )
+	PORT_CONFSETTING(    0x01, "1 (~9.5MHz)" )
+	PORT_CONFSETTING(    0x02, "2 (~8MHz)" )
+	PORT_CONFSETTING(    0x03, "3 (~7Mhz)" )
 INPUT_PORTS_END
 
 
@@ -209,7 +298,7 @@ ROM_START( glasgow )
 ROM_END
 
 
-ROM_START( amsterda )
+ROM_START( amsterdg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("vr_1_1", 0x00000, 0x04000, CRC(a186cc81) SHA1(903f93243536de3c2778ba3d38dcf46ae568862d) )
 	ROM_LOAD16_BYTE("vl_2_1", 0x00001, 0x04000, CRC(9b326226) SHA1(1b29319643d63a43ac84c1af08e02a4fc4fc6ffa) )
@@ -217,7 +306,7 @@ ROM_START( amsterda )
 	ROM_LOAD16_BYTE("bl_4_1", 0x08001, 0x04000, CRC(533e584a) SHA1(0e4510977dc627125c278920492bc137793a9554) )
 ROM_END
 
-ROM_START( dallas16a )
+ROM_START( dallas16g )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("dal_g_pr", 0x00000, 0x04000, CRC(66deade9) SHA1(07ec6b923f2f053172737f1fc94aec84f3ea8da1) )
 	ROM_LOAD16_BYTE("dal_g_pl", 0x00001, 0x04000, CRC(c5b6171c) SHA1(663167a3839ed7508ecb44fd5a1b2d3d8e466763) )
@@ -225,7 +314,7 @@ ROM_START( dallas16a )
 	ROM_LOAD16_BYTE("dal_g_bl", 0x08001, 0x04000, CRC(144a15e2) SHA1(c4fcc23d55fa5262f5e01dbd000644a7feb78f32) )
 ROM_END
 
-ROM_START( roma16a )
+ROM_START( roma16g )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("roma_r_low",  0x00000, 0x04000, CRC(f2312170) SHA1(82a50ba59f74365aa77478adaadbbace6693dcc1) )
 	ROM_LOAD16_BYTE("roma_l_low",  0x00001, 0x04000, CRC(5fbb72cc) SHA1(458473a62f9f7394c9d02a6ad0939d8e19bae78b) )
@@ -242,9 +331,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE )
 
 // newer chesscomputers on 4-ROM hardware (see amsterdam.cpp for parent sets)
-SYST( 1985, amsterda,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, dallas16a, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, roma16a,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, amsterdg,  amsterd,  0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam (Glasgow hardware)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas16g, dallas32, 0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, roma16g,   roma32,   0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000 (Glasgow hardware)", MACHINE_SUPPORTS_SAVE )

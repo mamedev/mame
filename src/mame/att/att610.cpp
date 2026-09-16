@@ -47,16 +47,16 @@ public:
 	void att610(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cart_select_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80sio_device> m_sio;
@@ -147,7 +147,7 @@ void att610_state::att610(machine_config &config)
 	duart.outport_cb().set("sio", FUNC(z80sio_device::rxcb_w)).bit(3);
 	duart.outport_cb().append("sio", FUNC(z80sio_device::txcb_w)).bit(3);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_raw(21.6675_MHz_XTAL, 963, 0, 720, 375, 0, 351);
 	//m_screen->set_raw(27.72_MHz_XTAL, 1232, 0, 924, 375, 0, 351);
 	m_screen->set_screen_update(FUNC(att610_state::screen_update));
@@ -187,5 +187,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_IS_SKELETON)
-COMP(1987, att615, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "615 MT", MACHINE_IS_SKELETON)
+COMP(1986, att610, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "610 Business Communication Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1987, att615, 0, 0, att610, att610, att610_state, empty_init, "AT&T", "615 MT", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -16,6 +16,8 @@
 #include "harddisk.h"
 #include "opresolv.h"
 
+#include <cstring>
+
 
 static imgtoolerr_t map_chd_error(std::error_condition chderr)
 {

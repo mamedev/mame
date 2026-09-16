@@ -58,8 +58,8 @@ public:
 	void init_drill();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* input-related */
@@ -80,7 +80,7 @@ private:
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	void irqhandler(int state);
 
-	void drill_map(address_map &map);
+	void drill_map(address_map &map) ATTR_COLD;
 
 	#ifdef UNUSED_FUNCTION
 protected:
@@ -303,8 +303,8 @@ static const gfx_layout layout_6bpp_tile_hi =
 };
 
 static GFXDECODE_START( gfx_2mindril )
-	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_RAM(   nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) // dynamically modified
+	GFXDECODE_RAM(   nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) // dynamically modified
 	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
 	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
 	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
@@ -357,14 +357,14 @@ void _2mindril_state::drill(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(_2mindril_state::vblank_irq));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2mindril);
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("DSW");
 	tc0510nio.read_1_callback().set(FUNC(_2mindril_state::arm_pwr_r));
 	tc0510nio.read_2_callback().set(FUNC(_2mindril_state::sensors_r));
 	tc0510nio.write_4_callback().set(FUNC(_2mindril_state::coins_w));
 	tc0510nio.read_7_callback().set_ioport("COINS");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* inaccurate, same as Taito F3? (needs screen raw params anyway) */
 	m_screen->set_size(40*8+48*2, 32*8);
@@ -374,15 +374,14 @@ void _2mindril_state::drill(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x2000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set(FUNC(_2mindril_state::irqhandler));
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 
@@ -390,6 +389,25 @@ ROM_START( 2mindril )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) ) // Ver 2.93A 1994/02/16 09:45:00
 	ROM_LOAD16_BYTE( "d58-37.ic9",  0x00001, 0x40000, CRC(19e5cc3c) SHA1(04ac0eef893c579fe90d91d7fd55c5741a2b7460) )
+
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
+
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "sprites_hi", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD32_WORD( "d58-08.ic27", 0x000000, 0x200000, CRC(9f5a3f52) SHA1(7b696bd823819965b974c853cebc1660750db61e) )
+	ROM_LOAD32_WORD( "d58-09.ic28", 0x000002, 0x200000, CRC(d8f6a86a) SHA1(d6b2ec309e21064574ee63e025ae4716b1982a98) )
+
+	ROM_REGION( 0x200000, "tilemap_hi", 0 )
+	ROM_LOAD       ( "d58-10.ic29", 0x000000, 0x200000, CRC(74c87e08) SHA1(f39b3a64f8338ccf5ca6eb76cee92a10fe0aad8f) )
+ROM_END
+
+ROM_START( 2mindrila )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "d58-17.ic11", 0x00000, 0x40000, CRC(3abc3e2c) SHA1(ee70c9fc20bf31a427384230672110895eeb0b90) ) // Ver 2.2A 1993/10/18 03:20:00
+	ROM_LOAD16_BYTE( "d58-16.ic9",  0x00001, 0x40000, CRC(a82101dd) SHA1(4eacac76fc47294f28af65e2a02d7c279bd52f2d) ) // Program ROMs have asterisks on the labels, "16*" and "17*"
 
 	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
@@ -414,5 +432,6 @@ void _2mindril_state::init_drill()
 } // anonymous namespace
 
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT  CLASS            INIT        ROT   COMPANY                      FULLNAME                                   FLAGS
-GAME( 1993, 2mindril, 0,      drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America Corporation", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+//    YEAR  NAME       PARENT    MACHINE  INPUT  CLASS            INIT        ROT   COMPANY          FULLNAME                                   FLAGS
+GAME( 1993, 2mindril,  0,        drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America", "Two Minute Drill (Ver 2.93A 1994/02/16)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)
+GAME( 1993, 2mindrila, 2mindril, drill,   drill, _2mindril_state, init_drill, ROT0, "Taito America", "Two Minute Drill (Ver 2.2A 1993/10/18)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL)

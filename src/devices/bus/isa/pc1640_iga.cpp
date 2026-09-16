@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(ISA8_PC1640_IGA, isa8_pc1640_iga_device, "pc1640_iga", "Amstr
 //-------------------------------------------------
 
 ROM_START( pc1640_iga )
-	ROM_REGION16_LE( 0x8000, "iga", 0)
+	ROM_REGION( 0x8000, "iga", 0 )
 	ROM_LOAD( "40100.ic913", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) ) // 8736 E
 ROM_END
 

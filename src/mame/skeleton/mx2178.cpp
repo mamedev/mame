@@ -50,10 +50,10 @@ public:
 private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;
@@ -138,7 +138,7 @@ void mx2178_state::mx2178(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mx2178_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
@@ -161,7 +161,7 @@ void mx2178_state::mx2178(machine_config &config)
 	acia_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia2", FUNC(acia6850_device::write_rxc));
 
-	acia6850_device &acia1(ACIA6850(config, "acia1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia1"));
 	acia1.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	acia1.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
 	acia1.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -170,7 +170,7 @@ void mx2178_state::mx2178(machine_config &config)
 	rs232a.rxd_handler().set("acia1", FUNC(acia6850_device::write_rxd));
 	rs232a.cts_handler().set("acia1", FUNC(acia6850_device::write_cts));
 
-	acia6850_device &acia2(ACIA6850(config, "acia2", 0));
+	acia6850_device &acia2(ACIA6850(config, "acia2"));
 	acia2.txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	acia2.rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
 	acia2.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -198,4 +198,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY    FULLNAME        FLAGS
-COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mx2178, 0,      0,      mx2178,  mx2178, mx2178_state, empty_init, "Memorex", "Memorex 2178", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

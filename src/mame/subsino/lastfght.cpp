@@ -63,7 +63,8 @@ Notes:
                 V100.U7  - ST M27C801 8MBit DIP32 EPROM; Audio Samples?
 
     TODO:
-     - Game speed seems to be completely wrong, timers and player movement too fast?
+     - blitter timing is guessed, definitely expect non-instant transfers otherwise game is too fast
+     - no sound (custom SS9804 as per subsino_kr_h8.cpp and subsino2.cpp later games)
 
     The EEPROM protection method is the same as in the subsino2.cpp games.
 
@@ -92,16 +93,14 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	void lastfght(machine_config &config);
 
-	void init_lastfght();
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	/* memory */
@@ -122,8 +121,8 @@ private:
 	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void lastfght_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void lastfght_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
 	bitmap_ind16 m_bitmap[2];
@@ -151,6 +150,10 @@ private:
 	required_device<ds2430a_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	bool m_blitter_busy = false;
+	emu_timer *m_blitter_end_timer = nullptr;
+	TIMER_CALLBACK_MEMBER(blitter_end_cb);
 };
 
 
@@ -160,12 +163,13 @@ private:
 
 void lastfght_state::video_start()
 {
-	int i;
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 		m_screen->register_screen_bitmap(m_bitmap[i]);
 
 	save_item(NAME(m_bitmap[0]));
 	save_item(NAME(m_bitmap[1]));
+
+	m_blitter_end_timer = timer_alloc(FUNC(lastfght_state::blitter_end_cb), this);
 }
 
 
@@ -348,9 +352,19 @@ void lastfght_state::blit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					dest.pix(m_y + y, m_x + x) = data;
 			}
 		}
+		m_blitter_busy = true;
+		// num pixels x2 seems to match a reasonable timer countdown during gameplay.
+		// notice that the other two bits (bit 6 and bit 5 in $c00007) are all
+		// busy checks, implying multiple stall checks (drawing? vblank?).
+		m_blitter_end_timer->adjust(m_maincpu->cycles_to_attotime(m_w * m_h * 2));
 	}
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x: 600007.b = %02x\n", m_maincpu->pc(), data);
+}
+
+TIMER_CALLBACK_MEMBER(lastfght_state::blitter_end_cb)
+{
+	m_blitter_busy = false;
 }
 
 // toggle framebuffer
@@ -364,7 +378,7 @@ uint8_t lastfght_state::c00000_r()
 {
 	// bit 7 = blitter busy
 	// bit 6 = blitter?
-	return 0x40;
+	return 0x40 | m_blitter_busy << 7;
 }
 
 uint8_t lastfght_state::c00002_r()
@@ -401,16 +415,16 @@ void lastfght_state::lastfght_map(address_map &map)
 {
 	map.global_mask(0xffffff);
 
-	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0fffff).rom();
 
 	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
 	map(0x600000, 0x600001).w(FUNC(lastfght_state::hi_w));
 	map(0x600002, 0x600003).rw(FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
 	map(0x600006, 0x600007).w(FUNC(lastfght_state::blit_w));
-	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x60000a, 0x60000a).w("ramdac", FUNC(ramdac_device::mask_w));
 
 	map(0x800000, 0x800001).w(FUNC(lastfght_state::sx_w));
@@ -479,7 +493,7 @@ static INPUT_PORTS_START( lastfght )
 	PORT_START("PROT")
 	PORT_BIT( 0x005f, IP_ACTIVE_HIGH, IPT_UNUSED        ) // outputs
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN        ) // blitter?
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", ds2430a_device, data_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(ds2430a_device::data_r))
 INPUT_PORTS_END
 
 
@@ -541,18 +555,19 @@ void lastfght_state::lastfght(machine_config &config)
 	io.in_port_callback<7>().set_ioport("PROT");
 	io.out_port_callback<7>().set(FUNC(lastfght_state::c00007_w));
 
-	DS2430A(config, m_eeprom).set_timing_scale(0.16);
+	DS2430A(config, m_eeprom).set_timing_scale(0.32);
 
 	/* video hardware */
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &lastfght_state::ramdac_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(lastfght_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0);
@@ -564,31 +579,24 @@ void lastfght_state::lastfght(machine_config &config)
 ***************************************************************************/
 
 ROM_START( lastfght )
-	ROM_REGION( 0x100000, "maincpu", 0 )        // H8/3044 program
-	ROM_LOAD( "v106.u16", 0x000000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044 program
+	ROM_LOAD( "ss9689_6433044a22f.u12", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "v106.u16",               0x080000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )       // Blitter data
+	ROM_REGION( 0x800000, "gfx1", 0 ) // Blitter data
 	ROM_LOAD( "1.b1", 0x000000, 0x200000, CRC(6c438136) SHA1(138934e948bbd6bd80f354f037badedef6cd8cb1) )
 	ROM_LOAD( "2.b2", 0x200000, 0x200000, CRC(9710bcff) SHA1(0291385489a065ed895c99ae7197fdeac0a0e2a0) )
 	ROM_LOAD( "3.b3", 0x400000, 0x200000, CRC(4236c79a) SHA1(94f093d12c096d38d1e7278796f6d58e4ba14e2e) )
 	ROM_LOAD( "4.b4", 0x600000, 0x200000, CRC(68153b0f) SHA1(46ddf37d5885f411e0e6de9c7e8969ba3a00f17f) )
 
-	ROM_REGION( 0x100000, "samples", 0 )    // Samples
+	ROM_REGION( 0x100000, "samples", 0 ) // Samples
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(622a8862) SHA1(fae60a326e6905aefc36275d505147e1860a71d0) BAD_DUMP ) // handcrafted to pass protection check
+	ROM_LOAD( "ds2430a.q3", 0x00, 0x28, CRC(af461d83) SHA1(bb8d25e9bb60e00e460e4b7e1855c735becaaa6d) )
 ROM_END
 
-void lastfght_state::init_lastfght()
-{
-	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
-
-	// rts -> rte
-	rom[0x01b86 / 2] = 0x5670;
-}
-
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, empty_init, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

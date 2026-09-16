@@ -108,8 +108,8 @@ public:
 	void psr70(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -136,15 +136,18 @@ private:
 	output_finder<RYP4_MAX_TARGETS> m_ryp4_out;
 	required_ioport m_mastervol;
 
-	void psr60_map(address_map &map);
-	void psr60_io_map(address_map &map);
+	void psr60_map(address_map &map) ATTR_COLD;
+	void psr60_io_map(address_map &map) ATTR_COLD;
 
 	u8 ppi_pa_r();
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 	void recalc_irqs();
 
-	attoseconds_t cv_handler(attotime const &curtime);
+	TIMER_CALLBACK_MEMBER(bbd_tick);
+	void bbd_setup_next_tick();
+
+	emu_timer *m_bbd_timer;
 
 	int m_acia_irq, m_ym_irq, m_drvif_irq, m_ym2154_irq;
 	u16 m_keyboard_select;
@@ -171,7 +174,7 @@ public:
 	// optional sustain pedal input; if this doesn't change, sustain will not work
 	// if no pedal present, it seems sustain should still work, so toggle the value
 	// here a bit to make the keyboard notice
-	CUSTOM_INPUT_MEMBER(sustain_fuzz) { return (m_sustain_fuzz = !m_sustain_fuzz) ? 8 : 12; }
+	ioport_value sustain_fuzz() { return (m_sustain_fuzz = !m_sustain_fuzz) ? 8 : 12; }
 };
 
 void psr60_state::psr60_map(address_map &map)
@@ -227,9 +230,15 @@ void psr60_state::ryp4_out_w(u8 data)
 	// modulation, which we simulate in a periodic timer
 }
 
-attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
+TIMER_CALLBACK_MEMBER(psr60_state::bbd_tick)
 {
-	attotime curtime = cvtime;
+	m_bbd->tick();
+	bbd_setup_next_tick();
+}
+
+void psr60_state::bbd_setup_next_tick()
+{
+	attotime curtime = machine().time();
 
 	// only two states have been observed to be measured: CT1=1/CT2=0 and CT1=0/CT2=1
 	double bbd_freq;
@@ -252,7 +261,7 @@ attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
 	}
 
 	// BBD driver provides two out-of-phase clocks to basically run the BBD at 2x
-	return HZ_TO_ATTOSECONDS(bbd_freq * 2);
+	m_bbd_timer->adjust(attotime::from_ticks(1, bbd_freq * 2));
 }
 
 //
@@ -313,7 +322,8 @@ void psr60_state::recalc_irqs()
 
 void psr60_state::machine_start()
 {
-	m_drvif_out.resolve();
+	m_bbd_timer = timer_alloc(FUNC(psr60_state::bbd_tick), this);
+
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
 	m_acia_irq = 0;
@@ -324,14 +334,15 @@ void psr60_state::machine_start()
 
 void psr60_state::machine_reset()
 {
+	bbd_setup_next_tick();
 }
 
 #define DRVIF_PORT(num, sw1, sw2, sw3, sw4) \
 	PORT_START("DRVIF_" #num) \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num) \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num) \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num) \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::drvif_changed), num)
 
 #define RYP4_PORT(num, defval, name) \
 	PORT_START("RYP4_" #num) \
@@ -456,13 +467,13 @@ static INPUT_PORTS_START(psr60)
 	RYP4_PORT( 4, 50, "Rhythm Tempo")
 	RYP4_PORT( 5, 75, "Chord Volume")
 	RYP4_PORT( 6, 75, "Bass Volume")
-	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(psr60_state, sustain_fuzz)
+	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(FUNC(psr60_state::sustain_fuzz))
 	RYP4_PORT( 8,  0, "Unused8")
 	RYP4_PORT( 9,  0, "Unused9")
 	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::mastervol_changed), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(psr70)
@@ -596,13 +607,13 @@ static INPUT_PORTS_START(psr70)
 	RYP4_PORT( 4, 50, "Rhythm Tempo")
 	RYP4_PORT( 5, 75, "Chord Volume")
 	RYP4_PORT( 6, 75, "Bass Volume")
-	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(psr60_state, sustain_fuzz)
+	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(FUNC(psr60_state::sustain_fuzz))
 	RYP4_PORT( 8,  0, "Unused8")
 	RYP4_PORT( 9,  0, "Unused9")
 	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psr60_state::mastervol_changed), 0)
 INPUT_PORTS_END
 
 void psr60_state::psr_common(machine_config &config)
@@ -628,14 +639,13 @@ void psr60_state::psr_common(machine_config &config)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 500_kHz_XTAL));    // 31250 * 16 = 500,000
 	acia_clock.signal_handler().set(FUNC(psr60_state::write_acia_clock));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MIXER(config, m_lmixer);
-	m_lmixer->add_route(0, "lspeaker", 1.0);
+	m_lmixer->add_route(0, "speaker", 1.0, 0);
 
 	MIXER(config, m_rmixer);
-	m_rmixer->add_route(0, "rspeaker", 1.0);
+	m_rmixer->add_route(0, "speaker", 1.0, 1);
 
 	// begin BBD filter chain....
 	// thanks to Lord Nightmare for figuring this out
@@ -660,10 +670,8 @@ void psr60_state::psr_common(machine_config &config)
 	MIXER(config, m_bbd_mixer);
 	m_bbd_mixer->add_route(0, m_postbbd_rc, 1.0);
 
-	MN3204P(config, m_bbd, 50000);
-	m_bbd->set_cv_handler(FUNC(psr60_state::cv_handler));
-	m_bbd->add_route(0, m_bbd_mixer, 0.5);
-	m_bbd->add_route(1, m_bbd_mixer, 0.5);
+	MN3204P(config, m_bbd);
+	m_bbd->add_route(0, m_bbd_mixer, 1.0);
 
 	FILTER_BIQUAD(config, m_ic204b);
 	m_ic204b->opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.9), RES_R(0.001), CAP_U(0.0068), CAP_P(82));
@@ -738,5 +746,5 @@ ROM_END
 
 } // namespace
 
-CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
-CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND)
+CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND)

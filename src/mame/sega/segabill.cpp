@@ -6,7 +6,7 @@
     Sega Billboard
 
     TODO: Timing, vs298 needs a higher interrupt frequency, but then
-    the animations seem to fast?
+    the animations seem too fast?
     Document and add support for Blast City Billboard with EPR-19158.IC3
     ( https://www.arcade-projects.com/forums/index.php?attachment/1477-blast-city-billboard-pcb-jpg/ )
 
@@ -188,10 +188,6 @@ sega_billboard_device::sega_billboard_device(const machine_config &mconfig, cons
 
 void sega_billboard_device::device_start()
 {
-	// resolve output finders
-	m_digits.resolve();
-	m_leds.resolve();
-
 	// register for save states
 	save_item(NAME(m_cmd));
 }

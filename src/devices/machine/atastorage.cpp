@@ -3,15 +3,22 @@
 #include "emu.h"
 #include "atastorage.h"
 
-/***************************************************************************
-    DEBUGGING
-***************************************************************************/
+#include "multibyte.h"
 
-#define VERBOSE                     0
-#define PRINTF_IDE_COMMANDS         0
-#define PRINTF_IDE_PASSWORD         0
+#define LOG_READ (1U << 2)
+#define LOG_WRITE (1U << 3)
+#define LOG_BUFFER (1U << 4)
+#define LOG_SECURITY (1U << 5)
 
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) osd_printf_debug x; } while (0)
+//#define VERBOSE (LOG_GENERAL | LOG_SECURITY)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGREAD(...) LOGMASKED(LOG_READ, __VA_ARGS__)
+#define LOGWRITE(...) LOGMASKED(LOG_WRITE, __VA_ARGS__)
+#define LOGBUFFER(...) LOGMASKED(LOG_SECURITY, __VA_ARGS__)
+#define LOGSECURITY(...) LOGMASKED(LOG_SECURITY, __VA_ARGS__)
+
 
 #define TIME_PER_SECTOR_WRITE               (attotime::from_usec(100))
 #define TIME_PER_ROTATION                   (attotime::from_hz(5400/60))
@@ -20,98 +27,74 @@
 #define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
 #define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
-ata_mass_storage_device_base::ata_mass_storage_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	ata_hle_device_base(mconfig, type, tag, owner, clock),
+device_ata_mass_storage_device_interface::device_ata_mass_storage_device_interface(const machine_config &mconfig, device_t &device) :
+	device_ata_hle_interface(mconfig, device),
 	m_can_identify_device(0),
 	m_num_cylinders(0),
 	m_num_sectors(0),
-	m_num_heads(0), m_cur_lba(0), m_block_count(0), m_sectors_until_int(0), m_master_password_enable(0), m_user_password_enable(0),
+	m_num_heads(0), m_cur_lba(0), m_block_count(0), m_sectors_until_int(0), m_sectors_remaining(0), m_master_password_enable(0), m_user_password_enable(0),
 	m_master_password(nullptr),
 	m_user_password(nullptr),
 	m_dma_transfer_time(attotime::zero)
 {
 }
 
-/*************************************
- *
- *  Compute the LBA address
- *
- *************************************/
-
-uint32_t ata_mass_storage_device_base::lba_address()
+uint64_t device_ata_mass_storage_device_interface::lba_address()
 {
 	/* LBA direct? */
 	if (m_device_head & IDE_DEVICE_HEAD_L)
-		return ((m_device_head & IDE_DEVICE_HEAD_HS) << 24) | (m_cylinder_high << 16) | (m_cylinder_low << 8) | m_sector_number;
+	{
+		return ((is_lba48() ?
+			((uint64_t)m_cylinder_high_hob << 16) | ((uint64_t)m_cylinder_low_hob << 8) | m_sector_number_hob : m_device_head & IDE_DEVICE_HEAD_HS) << 24) |
+			((uint64_t)m_cylinder_high << 16) | ((uint64_t)m_cylinder_low << 8) | m_sector_number;
+	}
 
 	/* standard CHS */
 	else
 		return (((((m_cylinder_high << 8) | m_cylinder_low) * m_num_heads) + (m_device_head & IDE_DEVICE_HEAD_HS)) * m_num_sectors) + m_sector_number - 1;
 }
 
-
-/*************************************
- *
- *  Build a features page
- *
- *************************************/
-
-static void swap_strncpy(uint16_t *dst, const char *src, int field_size_in_words)
+uint32_t device_ata_mass_storage_device_interface::sectors_remaining()
 {
-	for (int i = 0; i < field_size_in_words; i++)
-	{
-		uint16_t d;
+	if (is_lba48())
+		return (m_sector_count_hob || m_sector_count) ? (m_sector_count_hob << 8) | m_sector_count : 0x10000;
 
-		if (*src)
-		{
-			d = *(src++) << 8;
-		}
-		else
-		{
-			d = ' ' << 8;
-		}
-
-		if (*src)
-		{
-			d |= *(src++);
-		}
-		else
-		{
-			d |= ' ';
-		}
-
-		dst[i] = d;
-	}
-
-	assert(*(src) == 0);
+	return m_sector_count ? m_sector_count : 0x100;
 }
 
+bool device_ata_mass_storage_device_interface::is_lba48()
+{
+	return m_command == IDE_COMMAND_READ_SECTORS_EXT ||
+		m_command == IDE_COMMAND_READ_DMA_EXT ||
+		m_command == IDE_COMMAND_READ_MULTIPLE_EXT ||
+		m_command == IDE_COMMAND_WRITE_SECTORS_EXT ||
+		m_command == IDE_COMMAND_WRITE_DMA_EXT ||
+		m_command == IDE_COMMAND_WRITE_MULTIPLE_EXT ||
+		m_command == IDE_COMMAND_VERIFY_SECTORS_EXT;
+}
 
-void ata_mass_storage_device_base::ide_build_identify_device()
+void device_ata_mass_storage_device_interface::ide_build_identify_device()
 {
 	memset(m_identify_buffer, 0, sizeof(m_identify_buffer));
-	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
+	uint64_t total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
 
 	/* basic geometry */
-	m_identify_buffer[0] = 0x045a;                    /*  0: configuration bits */
-	m_identify_buffer[1] = m_num_cylinders;           /*  1: logical cylinders */
-	m_identify_buffer[2] = 0;                         /*  2: reserved */
-	m_identify_buffer[3] = m_num_heads;               /*  3: logical heads */
-	m_identify_buffer[4] = 0;                         /*  4: vendor specific (obsolete) */
-	m_identify_buffer[5] = 0;                         /*  5: vendor specific (obsolete) */
-	m_identify_buffer[6] = m_num_sectors;             /*  6: logical sectors per logical track */
-	m_identify_buffer[7] = 0;                         /*  7: vendor-specific */
-	m_identify_buffer[8] = 0;                         /*  8: vendor-specific */
-	m_identify_buffer[9] = 0;                         /*  9: vendor-specific */
-	swap_strncpy(&m_identify_buffer[10],               /* 10-19: serial number */
-			"00000000000000000000", 10);
+	m_identify_buffer[0] = 0x045a;                     /*  0: configuration bits */
+	m_identify_buffer[1] = m_num_cylinders;            /*  1: logical cylinders */
+	m_identify_buffer[2] = 0;                          /*  2: reserved */
+	m_identify_buffer[3] = m_num_heads;                /*  3: logical heads */
+	m_identify_buffer[4] = 0;                          /*  4: vendor specific (obsolete) */
+	m_identify_buffer[5] = 0;                          /*  5: vendor specific (obsolete) */
+	m_identify_buffer[6] = m_num_sectors;              /*  6: logical sectors per logical track */
+	m_identify_buffer[7] = 0;                          /*  7: vendor-specific */
+	m_identify_buffer[8] = 0;                          /*  8: vendor-specific */
+	m_identify_buffer[9] = 0;                          /*  9: vendor-specific */
+	identify(10, 10, "00000000000000000000");          /* 10-19: serial number */
 	m_identify_buffer[20] = 0;                         /* 20: vendor-specific */
 	m_identify_buffer[21] = 0;                         /* 21: vendor-specific */
 	m_identify_buffer[22] = 4;                         /* 22: # of vendor-specific bytes on read/write long commands */
-	swap_strncpy(&m_identify_buffer[23],               /* 23-26: firmware revision */
-			"1.0", 4);
-	swap_strncpy(&m_identify_buffer[27],               /* 27-46: model number */
-			"MAME Compressed Hard Disk", 20);
+	identify(23, 4, "1.0");                            /* 23-26: firmware revision */
+	identify(27, 20, "MAME    Virtual Hard Disk");     /* 27-46: model number */
 	m_identify_buffer[47] = 0x8010;                    /* 47: read/write multiple support, value from Seagate Quantum Fireball */
 	m_identify_buffer[48] = 0;                         /* 48: reserved */
 	m_identify_buffer[49] = 0x0f03;                    /* 49: capabilities */
@@ -119,14 +102,41 @@ void ata_mass_storage_device_base::ide_build_identify_device()
 	m_identify_buffer[51] = 2;                         /* 51: PIO data transfer cycle timing mode */
 	m_identify_buffer[52] = 2;                         /* 52: single word DMA transfer cycle timing mode */
 	m_identify_buffer[53] = 3;                         /* 53: field validity */
-	m_identify_buffer[54] = m_num_cylinders;           /* 54: number of current logical cylinders */
-	m_identify_buffer[55] = m_num_heads;               /* 55: number of current logical heads */
-	m_identify_buffer[56] = m_num_sectors;             /* 56: number of current logical sectors per track */
-	m_identify_buffer[57] = total_sectors & 0xffff;    /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
-	m_identify_buffer[58] = total_sectors >> 16;
+
+	if (total_sectors >= 16514064)
+	{
+		/// CHS limit
+		m_identify_buffer[1] = 16383;                  /*  1: logical cylinders */
+		m_identify_buffer[3] = 16;                     /*  3: logical heads */
+		m_identify_buffer[6] = 63;                     /*  6: logical sectors per logical track */
+		m_identify_buffer[54] = 16383;                 /* 54: number of current logical cylinders */
+		m_identify_buffer[55] = 16;                    /* 55: number of current logical heads */
+		m_identify_buffer[56] = 63;                    /* 56: number of current logical sectors per track */
+		m_identify_buffer[57] = 16514064 & 0xffff;     /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
+		m_identify_buffer[58] = 16514064 >> 16;
+	}
+	else
+	{
+		m_identify_buffer[54] = m_num_cylinders;       /* 54: number of current logical cylinders */
+		m_identify_buffer[55] = m_num_heads;           /* 55: number of current logical heads */
+		m_identify_buffer[56] = m_num_sectors;         /* 56: number of current logical sectors per track */
+		m_identify_buffer[57] = total_sectors & 0xffff; /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
+		m_identify_buffer[58] = total_sectors >> 16;
+	}
+
 	m_identify_buffer[59] = 0;                         /* 59: multiple sector timing */
-	m_identify_buffer[60] = total_sectors & 0xffff;    /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
-	m_identify_buffer[61] = total_sectors >> 16;
+
+	if (total_sectors > 0xfffffffULL)
+	{
+		m_identify_buffer[60] = 0xfffffffULL & 0xffff;
+		m_identify_buffer[61] = 0xfffffffULL >> 16;
+	}
+	else
+	{
+		m_identify_buffer[60] = total_sectors & 0xffff; /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
+		m_identify_buffer[61] = total_sectors >> 16;
+	}
+
 	m_identify_buffer[62] = 0x0007;                    /* 62: single word dma transfer */
 	m_identify_buffer[63] = 0x0407;                    /* 63: multiword DMA transfer */
 	m_identify_buffer[64] = 0x0003;                    /* 64: flow control PIO transfer modes supported */
@@ -145,6 +155,10 @@ void ata_mass_storage_device_base::ide_build_identify_device()
 	m_identify_buffer[81] = 0x00;                      /* 81: minor version number */
 	m_identify_buffer[82] = 0x00;                      /* 82: command set supported */
 	m_identify_buffer[83] = 0x00;                      /* 83: command sets supported */
+
+	if (total_sectors > 0xfffffffULL)
+		m_identify_buffer[83] |= COMMAND_SET_SUPPORTED_LBA48;
+
 	m_identify_buffer[84] = 0x00;                      /* 84: command set/feature supported extension */
 	m_identify_buffer[85] = 0x00;                      /* 85: command set/feature enabled */
 	m_identify_buffer[86] = 0x00;                      /* 86: command set/feature enabled */
@@ -157,10 +171,15 @@ void ata_mass_storage_device_base::ide_build_identify_device()
 	m_identify_buffer[93] = 0x00;                      /* 93: hardware reset result */
 	m_identify_buffer[94] = 0x00;                      /* 94: acoustic management values */
 	m_identify_buffer[95] = 0x00;                      /* 95-99: reserved */
-	m_identify_buffer[100] = total_sectors & 0xffff;   /* 100-103: maximum 48-bit LBA */
-	m_identify_buffer[101] = total_sectors >> 16;
-	m_identify_buffer[102] = 0x00;
-	m_identify_buffer[103] = 0x00;
+
+	if (m_identify_buffer[83] & COMMAND_SET_SUPPORTED_LBA48)
+	{
+		m_identify_buffer[100] = total_sectors & 0xffff; /* 100-103: maximum 48-bit LBA */
+		m_identify_buffer[101] = total_sectors >> 16;
+		m_identify_buffer[102] = total_sectors >> 32;
+		m_identify_buffer[103] = total_sectors >> 48;
+	}
+
 	m_identify_buffer[104] = 0x00;                     /* 104-126: reserved */
 	m_identify_buffer[127] = 0x00;                     /* 127: removable media status notification */
 	m_identify_buffer[128] = 0x00;                     /* 128: security status */
@@ -170,51 +189,32 @@ void ata_mass_storage_device_base::ide_build_identify_device()
 	m_identify_buffer[176] = 0x00;                     /* 176-205: current media serial number */
 	m_identify_buffer[206] = 0x00;                     /* 206-254: reserved */
 	m_identify_buffer[255] = 0x00;                     /* 255: integrity word */
-
-	if (total_sectors >= 16514064)
-	{
-		/// CHS limit
-		m_identify_buffer[1] = 16383;           /*  1: logical cylinders */
-		m_identify_buffer[3] = 16;               /*  3: logical heads */
-		m_identify_buffer[6] = 63;             /*  6: logical sectors per logical track */
-		m_identify_buffer[54] = 16383;           /* 54: number of current logical cylinders */
-		m_identify_buffer[55] = 16;               /* 55: number of current logical heads */
-		m_identify_buffer[56] = 63;             /* 56: number of current logical sectors per track */
-		m_identify_buffer[57] = 16514064 & 0xffff;    /* 57-58: current capacity in sectors (ATA-1 through ATA-5; obsoleted in ATA-6) */
-		m_identify_buffer[58] = 16514064 >> 16;
-	}
-
-	if (total_sectors > 268435455)
-	{
-		/// LBA limit
-		m_identify_buffer[60] = 268435455 & 0xffff;    /* 60-61: total user addressable sectors for LBA mode (ATA-1 through ATA-7) */
-		m_identify_buffer[61] = 268435455 >> 16;
-	}
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void ata_mass_storage_device_base::device_start()
+void device_ata_mass_storage_device_interface::interface_post_start()
 {
-	ata_hle_device_base::device_start();
+	device_ata_hle_interface::interface_post_start();
 
-	save_item(NAME(m_can_identify_device));
-	save_item(NAME(m_num_cylinders));
-	save_item(NAME(m_num_sectors));
-	save_item(NAME(m_num_heads));
+	device().save_item(NAME(m_can_identify_device));
+	device().save_item(NAME(m_num_cylinders));
+	device().save_item(NAME(m_num_sectors));
+	device().save_item(NAME(m_num_heads));
 
-	save_item(NAME(m_cur_lba));
-	save_item(NAME(m_sectors_until_int));
-	save_item(NAME(m_master_password_enable));
-	save_item(NAME(m_user_password_enable));
-	save_item(NAME(m_block_count));
+	device().save_item(NAME(m_cur_lba));
+	device().save_item(NAME(m_block_count));
+	device().save_item(NAME(m_sectors_until_int));
+	device().save_item(NAME(m_sectors_remaining));
+	device().save_item(NAME(m_master_password_enable));
+	device().save_item(NAME(m_user_password_enable));
 }
 
-void ata_mass_storage_device_base::soft_reset()
+void device_ata_mass_storage_device_interface::soft_reset()
 {
-	ata_hle_device_base::soft_reset();
+	device_ata_hle_interface::soft_reset();
 
 	m_cur_lba = 0;
 	m_status |= IDE_STATUS_DSC;
@@ -223,13 +223,13 @@ void ata_mass_storage_device_base::soft_reset()
 	m_user_password_enable = (m_user_password != nullptr);
 }
 
-void ata_mass_storage_device_base::perform_diagnostic()
+void device_ata_mass_storage_device_interface::perform_diagnostic()
 {
 	if (m_can_identify_device)
 		m_error = IDE_ERROR_DIAGNOSTIC_PASSED;
 }
 
-void ata_mass_storage_device_base::signature()
+void device_ata_mass_storage_device_interface::signature()
 {
 	m_sector_count = 1;
 	m_sector_number = 1;
@@ -238,7 +238,7 @@ void ata_mass_storage_device_base::signature()
 	m_device_head = 0;
 }
 
-void ata_mass_storage_device_base::finished_command()
+void device_ata_mass_storage_device_interface::finished_command()
 {
 	int total_sectors = m_num_cylinders * m_num_heads * m_num_sectors;
 
@@ -248,10 +248,7 @@ void ata_mass_storage_device_base::finished_command()
 		if (m_can_identify_device)
 		{
 			for( int w = 0; w < 256; w++ )
-			{
-				m_buffer[w * 2] = m_identify_buffer[ w ] & 0xff;
-				m_buffer[(w * 2) + 1] = m_identify_buffer[ w ] >> 8;
-			}
+				put_u16le(&m_buffer[w * 2], m_identify_buffer[ w ]);
 
 			m_status |= IDE_STATUS_DRQ;
 		}
@@ -265,24 +262,31 @@ void ata_mass_storage_device_base::finished_command()
 		break;
 
 	case IDE_COMMAND_SET_CONFIG:
-		set_geometry(m_sector_count,(m_device_head & IDE_DEVICE_HEAD_HS) + 1);
+		set_geometry(m_sector_count ? m_sector_count : 0x100, (m_device_head & IDE_DEVICE_HEAD_HS) + 1);
 		set_irq(ASSERT_LINE);
 		break;
 
 	case IDE_COMMAND_READ_SECTORS:
+	case IDE_COMMAND_READ_SECTORS_EXT:
 	case IDE_COMMAND_READ_SECTORS_NORETRY:
 	case IDE_COMMAND_READ_MULTIPLE:
+	case IDE_COMMAND_READ_MULTIPLE_EXT:
 	case IDE_COMMAND_VERIFY_SECTORS:
+	case IDE_COMMAND_VERIFY_SECTORS_EXT:
 	case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
 	case IDE_COMMAND_READ_DMA:
+	case IDE_COMMAND_READ_DMA_EXT:
 	case IDE_COMMAND_READ_BUFFER:
 		finished_read();
 		break;
 
 	case IDE_COMMAND_WRITE_SECTORS:
+	case IDE_COMMAND_WRITE_SECTORS_EXT:
 	case IDE_COMMAND_WRITE_SECTORS_NORETRY:
 	case IDE_COMMAND_WRITE_MULTIPLE:
+	case IDE_COMMAND_WRITE_MULTIPLE_EXT:
 	case IDE_COMMAND_WRITE_DMA:
+	case IDE_COMMAND_WRITE_DMA_EXT:
 	case IDE_COMMAND_WRITE_BUFFER:
 		finished_write();
 		break;
@@ -292,26 +296,17 @@ void ata_mass_storage_device_base::finished_command()
 		break;
 
 	case IDE_COMMAND_READ_NATIVE_MAX_ADDRESS:
-		m_buffer[0] = (total_sectors & 0xff000000) >> 24;
-		m_buffer[1] = (total_sectors & 0x00ff0000) >> 16;
-		m_buffer[2] = (total_sectors & 0x0000ff00) >> 8;
-		m_buffer[3] = (total_sectors & 0x000000ff);
+		put_u32be(&m_buffer[0], total_sectors);
 		set_irq(ASSERT_LINE);
 		break;
 
 	default:
-		ata_hle_device_base::finished_command();
+		device_ata_hle_interface::finished_command();
 		break;
 	}
 }
 
-/*************************************
- *
- *  Advance to the next sector
- *
- *************************************/
-
-void ata_mass_storage_device_base::next_sector()
+void device_ata_mass_storage_device_interface::next_sector()
 {
 	uint8_t cur_head = m_device_head & IDE_DEVICE_HEAD_HS;
 
@@ -357,40 +352,25 @@ void ata_mass_storage_device_base::next_sector()
 }
 
 
-
-/*************************************
- *
- *  security error handling
- *
- *************************************/
-
-void ata_mass_storage_device_base::security_error()
+void device_ata_mass_storage_device_interface::security_error()
 {
+	LOGSECURITY("Security error\n");
 	/* set error state */
 	m_status |= IDE_STATUS_ERR;
-	m_error = IDE_ERROR_NONE;
-	m_status &= ~IDE_STATUS_DRDY;
+	m_error = IDE_ERROR_ABRT;
 }
 
-
-
-/*************************************
- *
- *  Sector reading
- *
- *************************************/
-
-attotime ata_mass_storage_device_base::seek_time()
+attotime device_ata_mass_storage_device_interface::seek_time()
 {
 	int sectors_per_cylinder =  m_num_heads * m_num_sectors;
 
 	if (sectors_per_cylinder == 0 || m_num_cylinders == 0)
 		return attotime::zero;
 
-	int new_lba = lba_address();
-	int old_cylinder = m_cur_lba / sectors_per_cylinder;
-	int new_cylinder = new_lba / sectors_per_cylinder;
-	int diff = abs(old_cylinder - new_cylinder);
+	uint64_t new_lba = lba_address();
+	int64_t old_cylinder = m_cur_lba / sectors_per_cylinder;
+	int64_t new_cylinder = new_lba / sectors_per_cylinder;
+	int64_t diff = abs(old_cylinder - new_cylinder);
 
 	m_cur_lba = new_lba;
 
@@ -404,7 +384,7 @@ attotime ata_mass_storage_device_base::seek_time()
 	return seek_time + TIME_AVERAGE_ROTATIONAL_LATENCY;
 }
 
-void ata_mass_storage_device_base::fill_buffer()
+void device_ata_mass_storage_device_interface::fill_buffer()
 {
 	switch (m_command)
 	{
@@ -412,11 +392,16 @@ void ata_mass_storage_device_base::fill_buffer()
 		break;
 
 	case IDE_COMMAND_READ_MULTIPLE:
+	case IDE_COMMAND_READ_MULTIPLE_EXT:
 		/* if there is more data to read, keep going */
-		if (m_sector_count > 0)
-			m_sector_count--;
+		if (m_sectors_remaining > 0)
+		{
+			m_sectors_remaining--;
+			m_sector_count = m_sectors_remaining;
+			m_sector_count_hob = m_sectors_remaining >> 8;
+		}
 
-		if (m_sector_count > 0)
+		if (m_sectors_remaining > 0)
 		{
 			// Read the next sector with no delay
 			finished_read();
@@ -429,13 +414,18 @@ void ata_mass_storage_device_base::fill_buffer()
 
 	default:
 		/* if there is more data to read, keep going */
-		if (m_sector_count > 0)
-			m_sector_count--;
-
-		if (m_sector_count > 0)
+		if (m_sectors_remaining > 0)
 		{
+			m_sectors_remaining--;
+			m_sector_count = m_sectors_remaining;
+			m_sector_count_hob = m_sectors_remaining >> 8;
+		}
+
+		if (m_sectors_remaining > 0)
+		{
+			set_irq(CLEAR_LINE);
 			set_dasp(ASSERT_LINE);
-			if (m_command == IDE_COMMAND_READ_DMA)
+			if (m_command == IDE_COMMAND_READ_DMA || m_command == IDE_COMMAND_READ_DMA_EXT)
 				start_busy(TIME_BETWEEN_SECTORS + m_dma_transfer_time, PARAM_COMMAND);
 			else
 				start_busy(TIME_BETWEEN_SECTORS, PARAM_COMMAND);
@@ -445,9 +435,10 @@ void ata_mass_storage_device_base::fill_buffer()
 }
 
 
-void ata_mass_storage_device_base::finished_read()
+void device_ata_mass_storage_device_interface::finished_read()
 {
-	int lba = lba_address(), read_status;
+	uint64_t lba = lba_address();
+	int read_status;
 
 	set_dasp(CLEAR_LINE);
 
@@ -466,18 +457,19 @@ void ata_mass_storage_device_base::finished_read()
 	{
 		/* advance the pointers, unless this is the last sector */
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
-		if (m_sector_count != 1)
+		if (m_sectors_remaining != 1)
 			next_sector();
 
-		/* signal an interrupt, IDE_COMMAND_READ_MULTIPLE sets the interrupt at the start the block */
-		if (--m_sectors_until_int == 0 || (m_sector_count == 1 && m_command != IDE_COMMAND_READ_MULTIPLE))
+		/* signal an interrupt, IDE_COMMAND_READ_MULTIPLE & IDE_COMMAND_READ_MULTIPLE_EXT sets the interrupt at the start the block */
+		if (--m_sectors_until_int == 0 || (m_sectors_remaining == 1 && m_command != IDE_COMMAND_READ_MULTIPLE && m_command != IDE_COMMAND_READ_MULTIPLE_EXT))
 		{
-			m_sectors_until_int = ((m_command == IDE_COMMAND_READ_MULTIPLE) ? m_block_count : 1);
+			m_sectors_until_int = ((m_command == IDE_COMMAND_READ_MULTIPLE || m_command == IDE_COMMAND_READ_MULTIPLE_EXT) ? m_block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
 		/* if we're just verifying we can read the next sector */
 		if (m_command == IDE_COMMAND_VERIFY_SECTORS ||
+			m_command == IDE_COMMAND_VERIFY_SECTORS_EXT ||
 			m_command == IDE_COMMAND_VERIFY_SECTORS_NORETRY )
 		{
 			read_buffer_empty();
@@ -486,12 +478,10 @@ void ata_mass_storage_device_base::finished_read()
 		{
 			m_status |= IDE_STATUS_DRQ;
 
-			if (m_command == IDE_COMMAND_READ_DMA)
+			if (m_command == IDE_COMMAND_READ_DMA || m_command == IDE_COMMAND_READ_DMA_EXT)
 				set_dmarq(ASSERT_LINE);
 		}
 	}
-
-	/* if we got an error, we need to report it */
 	else
 	{
 		/* set the error flag and the error */
@@ -504,7 +494,7 @@ void ata_mass_storage_device_base::finished_read()
 }
 
 
-void ata_mass_storage_device_base::read_first_sector()
+void device_ata_mass_storage_device_interface::read_first_sector()
 {
 	if (m_master_password_enable || m_user_password_enable)
 	{
@@ -526,47 +516,46 @@ void ata_mass_storage_device_base::read_first_sector()
 	}
 }
 
-/*************************************
- *
- *  Sector writing
- *
- *************************************/
-
-void ata_mass_storage_device_base::process_buffer()
+void device_ata_mass_storage_device_interface::process_buffer()
 {
 	if (m_command == IDE_COMMAND_SECURITY_UNLOCK)
 	{
-		if (m_user_password_enable && memcmp(&m_buffer[0], m_user_password, 2 + 32) == 0)
-		{
-			LOGPRINT(("IDE Unlocked user password\n"));
-			m_user_password_enable = 0;
-		}
-		if (m_master_password_enable && memcmp(&m_buffer[0], m_master_password, 2 + 32) == 0)
-		{
-			LOGPRINT(("IDE Unlocked master password\n"));
-			m_master_password_enable = 0;
-		}
-		if (PRINTF_IDE_PASSWORD)
-		{
-			int i;
+		const uint8_t *password = (m_buffer[0] & IDE_SECURITY_UNLOCK_MASTER) ? m_master_password : m_user_password;
 
-			for (i = 0; i < 34; i += 2)
-			{
-				if (i % 8 == 2)
-					osd_printf_debug("\n");
+		if (VERBOSE & LOG_SECURITY)
+		{
+			std::string unlock;
+			for (int i = 0; i < 32; i ++)
+				unlock += util::string_format(" 0x%02x,", m_buffer[i + 2]);
 
-				osd_printf_debug("0x%02x, 0x%02x, ", m_buffer[i], m_buffer[i + 1]);
-				//osd_printf_debug("0x%02x%02x, ", m_buffer[i], m_buffer[i + 1]);
-			}
-			osd_printf_debug("\n");
+			std::string stored;
+			if (password)
+				for (int i = 0; i < 32; i++)
+					stored += util::string_format(" 0x%02x,", password[i]);
+
+			std::string_view type = (m_buffer[0] & IDE_SECURITY_UNLOCK_MASTER) ? "master" : "user";
+			std::string_view status = memcmp(password, &m_buffer[2], 32) == 0 ? "ok" : "error";
+
+			LOGSECURITY("Unlock %s password %s\n", type, unlock);
+			LOGSECURITY("Stored %s password %s (%s)\n", type, stored, status);
 		}
+
+		if (memcmp(password, &m_buffer[2], 32) == 0)
+		{
+			if (m_buffer[0] & IDE_SECURITY_UNLOCK_MASTER)
+				m_master_password_enable = 0;
+			else
+				m_user_password_enable = 0;
+		}
+		else
+			LOG("Security unlock failed\n");
 
 		if (m_master_password_enable || m_user_password_enable)
 			security_error();
 	}
 	else if (m_command == IDE_COMMAND_SECURITY_DISABLE_PASSWORD)
 	{
-		LOGPRINT(("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n"));
+		LOG("IDE Done unimplemented SECURITY_DISABLE_PASSWORD command\n");
 	}
 	else if (m_command == IDE_COMMAND_WRITE_BUFFER)
 	{
@@ -576,7 +565,7 @@ void ata_mass_storage_device_base::process_buffer()
 	{
 		set_dasp(ASSERT_LINE);
 
-		if (m_command == IDE_COMMAND_WRITE_MULTIPLE)
+		if (m_command == IDE_COMMAND_WRITE_MULTIPLE || m_command == IDE_COMMAND_WRITE_MULTIPLE_EXT)
 		{
 			if (m_sectors_until_int != 1)
 			{
@@ -598,9 +587,10 @@ void ata_mass_storage_device_base::process_buffer()
 }
 
 
-void ata_mass_storage_device_base::finished_write()
+void device_ata_mass_storage_device_interface::finished_write()
 {
-	int lba = lba_address(), count;
+	uint64_t lba = lba_address();
+	int count;
 
 	set_dasp(CLEAR_LINE);
 
@@ -619,25 +609,29 @@ void ata_mass_storage_device_base::finished_write()
 	{
 		/* advance the pointers, unless this is the last sector */
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
-		if (m_sector_count != 1)
+		if (m_sectors_remaining != 1)
 			next_sector();
 
 		/* signal an interrupt */
-		if (--m_sectors_until_int == 0 || m_sector_count == 1)
+		if (--m_sectors_until_int == 0 || m_sectors_remaining == 1)
 		{
-			m_sectors_until_int = ((m_command == IDE_COMMAND_WRITE_MULTIPLE) ? m_block_count : 1);
+			m_sectors_until_int = ((m_command == IDE_COMMAND_WRITE_MULTIPLE || m_command == IDE_COMMAND_WRITE_MULTIPLE_EXT) ? m_block_count : 1);
 			set_irq(ASSERT_LINE);
 		}
 
 		/* signal an interrupt if there's more data needed */
-		if (m_sector_count > 0)
-			m_sector_count--;
+		if (m_sectors_remaining > 0)
+		{
+			m_sectors_remaining--;
+			m_sector_count = m_sectors_remaining;
+			m_sector_count_hob = m_sectors_remaining >> 8;
+		}
 
-		if (m_sector_count > 0)
+		if (m_sectors_remaining > 0)
 		{
 			m_status |= IDE_STATUS_DRQ;
 
-			if (m_command == IDE_COMMAND_WRITE_DMA)
+			if (m_command == IDE_COMMAND_WRITE_DMA || m_command == IDE_COMMAND_WRITE_DMA_EXT)
 				set_dmarq(ASSERT_LINE);
 		}
 	}
@@ -655,23 +649,24 @@ void ata_mass_storage_device_base::finished_write()
 }
 
 
-/*************************************
- *
- *  Handle IDE commands
- *
- *************************************/
-
-void ata_mass_storage_device_base::process_command()
+void device_ata_mass_storage_device_interface::process_command()
 {
+	if (is_lba48() && !(m_identify_buffer[83] & COMMAND_SET_SUPPORTED_LBA48))
+	{
+		device_ata_hle_interface::process_command();
+		return;
+	}
+
 	m_sectors_until_int = 0;
 	m_buffer_size = IDE_DISK_SECTOR_SIZE;
 
 	switch (m_command)
 	{
 	case IDE_COMMAND_READ_SECTORS:
+	case IDE_COMMAND_READ_SECTORS_EXT:
 	case IDE_COMMAND_READ_SECTORS_NORETRY:
-		LOGPRINT(("IDE Read multiple: C=%u H=%d S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		m_sectors_remaining = sectors_remaining();
+		LOGREAD("Read sectors: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		m_sectors_until_int = 1;
 
@@ -680,7 +675,8 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_READ_BUFFER:
-		LOGPRINT(("IDE Read Buffer\n"));
+		m_sectors_remaining = sectors_remaining();
+		LOGBUFFER("Read buffer\n");
 
 		m_sectors_until_int = 1;
 		m_buffer_offset = 0;
@@ -690,8 +686,9 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_READ_MULTIPLE:
-		LOGPRINT(("IDE Read multiple block: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+	case IDE_COMMAND_READ_MULTIPLE_EXT:
+		m_sectors_remaining = sectors_remaining();
+		LOGREAD("Read multiple: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		m_sectors_until_int = 1;
 
@@ -701,31 +698,34 @@ void ata_mass_storage_device_base::process_command()
 
 	case IDE_COMMAND_VERIFY_SECTORS:
 	case IDE_COMMAND_VERIFY_SECTORS_NORETRY:
-		LOGPRINT(("IDE Read verify multiple with/without retries: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+	case IDE_COMMAND_VERIFY_SECTORS_EXT:
+		m_sectors_remaining = sectors_remaining();
+		LOGREAD("Verify sectors: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		/* reset the buffer */
-		m_sectors_until_int = m_sector_count;
+		m_sectors_until_int = m_sectors_remaining;
 
 		/* start the read going */
 		read_first_sector();
 		break;
 
 	case IDE_COMMAND_READ_DMA:
-		LOGPRINT(("IDE Read multiple DMA: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+	case IDE_COMMAND_READ_DMA_EXT:
+		m_sectors_remaining = sectors_remaining();
+		LOGREAD("Read DMA: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		/* reset the buffer */
-		m_sectors_until_int = m_sector_count;
+		m_sectors_until_int = m_sectors_remaining;
 
 		/* start the read going */
 		read_first_sector();
 		break;
 
 	case IDE_COMMAND_WRITE_SECTORS:
+	case IDE_COMMAND_WRITE_SECTORS_EXT:
 	case IDE_COMMAND_WRITE_SECTORS_NORETRY:
-		LOGPRINT(("IDE Write multiple: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+		m_sectors_remaining = sectors_remaining();
+		LOGWRITE("Write sectors: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		/* reset the buffer */
 		m_sectors_until_int = 1;
@@ -735,7 +735,8 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_WRITE_BUFFER:
-		LOGPRINT(("IDE Write Buffer\n"));
+		m_sectors_remaining = sectors_remaining();
+		LOGBUFFER("Write buffer\n");
 
 		/* reset the buffer */
 		m_sectors_until_int = 1;
@@ -746,8 +747,9 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_WRITE_MULTIPLE:
-		LOGPRINT(("IDE Write multiple block: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+	case IDE_COMMAND_WRITE_MULTIPLE_EXT:
+		m_sectors_remaining = sectors_remaining();
+		LOGWRITE("Write multiple: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		/* reset the buffer */
 		m_sectors_until_int = m_block_count;
@@ -757,11 +759,12 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_WRITE_DMA:
-		LOGPRINT(("IDE Write multiple DMA: C=%u H=%u S=%u LBA=%u count=%u\n",
-			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
+	case IDE_COMMAND_WRITE_DMA_EXT:
+		m_sectors_remaining = sectors_remaining();
+		LOGWRITE("Write multiple DMA: LBA=0x%06x count=%u\n", lba_address(), m_sectors_remaining);
 
 		/* reset the buffer */
-		m_sectors_until_int = m_sector_count;
+		m_sectors_until_int = m_sectors_remaining;
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -771,7 +774,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_SECURITY_UNLOCK:
-		LOGPRINT(("IDE Security Unlock\n"));
+		LOGSECURITY("Security unlock\n");
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -780,7 +783,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_SECURITY_DISABLE_PASSWORD:
-		LOGPRINT(("IDE Unimplemented SECURITY DISABLE PASSWORD command\n"));
+		LOG("IDE Unimplemented SECURITY DISABLE PASSWORD command\n");
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -789,7 +792,7 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_IDENTIFY_DEVICE:
-		LOGPRINT(("IDE Identify device\n"));
+		LOG("IDE Identify device\n");
 
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
@@ -804,22 +807,28 @@ void ata_mass_storage_device_base::process_command()
 		break;
 
 	case IDE_COMMAND_SET_CONFIG:
-		LOGPRINT(("IDE Set configuration (%u heads, %u sectors)\n", (m_device_head & IDE_DEVICE_HEAD_HS) + 1, m_sector_count));
+		LOG("IDE Set configuration (%u heads, %u sectors)\n",
+				(m_device_head & IDE_DEVICE_HEAD_HS) + 1,
+				m_sector_count);
 
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
 
 	case IDE_COMMAND_SET_MAX:
-		LOGPRINT(("IDE Set max (%02X %02X %02X %02X %02X)\n", m_feature, m_sector_count & 0xff, m_sector_number, m_cylinder_low, m_cylinder_high));
+		LOG("IDE Set max (%02X %02X %02X %02X %02X)\n",
+				m_feature,
+				m_sector_count,
+				m_sector_number,
+				m_cylinder_low, m_cylinder_high);
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
 		break;
 
 	case IDE_COMMAND_SET_BLOCK_COUNT:
-		LOGPRINT(("IDE Set block count (%u)\n", m_sector_count));
+		m_block_count = m_sector_count ? m_sector_count : 0x100;
 
-		m_block_count = m_sector_count;
+		LOG("IDE Set block count (%u)\n", m_block_count);
 
 		/* signal an interrupt */
 		set_irq(ASSERT_LINE);
@@ -834,30 +843,25 @@ void ata_mass_storage_device_base::process_command()
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
 
+	case IDE_COMMAND_IDLE_IMMEDIATE:
+		set_irq(ASSERT_LINE);
+		break;
+
 	default:
-		ata_hle_device_base::process_command();
+		device_ata_hle_interface::process_command();
 		break;
 	}
 }
 
-//**************************************************************************
-//  IDE HARD DISK DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ide_hdd_device_base - constructor
-//-------------------------------------------------
-
 ide_hdd_device_base::ide_hdd_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	ata_mass_storage_device_base(mconfig, type, tag, owner, clock),
+	device_t(mconfig, type, tag, owner, clock),
+	device_ata_mass_storage_device_interface(mconfig, *this),
 	m_image(*this, "image")
 {
 }
 
 void ide_hdd_device_base::device_start()
 {
-	ata_mass_storage_device_base::device_start();
-
 	/* create a timer for timing status */
 	m_last_status_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
@@ -876,8 +880,11 @@ void ide_hdd_device_base::device_reset()
 			m_num_cylinders = hdinfo.cylinders;
 			m_num_sectors = hdinfo.sectors;
 			m_num_heads = hdinfo.heads;
-			if (PRINTF_IDE_COMMANDS) osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
-			osd_printf_debug("CHS: %u %u %u\n", m_num_cylinders, m_num_heads, m_num_sectors);
+			osd_printf_verbose("%s: Mounted disk image CHS: %u %u %u\n",
+					tag(),
+					m_num_cylinders,
+					m_num_heads,
+					m_num_sectors);
 		}
 
 		// build the features page
@@ -886,9 +893,7 @@ void ide_hdd_device_base::device_reset()
 		if (ident.size() == 512)
 		{
 			for( int w = 0; w < 256; w++ )
-			{
-				m_identify_buffer[w] = (ident[(w * 2) + 1] << 8) | ident[w * 2];
-			}
+				m_identify_buffer[w] = get_u16le(&ident[w * 2]);
 		}
 		else
 		{
@@ -897,13 +902,11 @@ void ide_hdd_device_base::device_reset()
 
 		m_can_identify_device = 1;
 	}
-
-	ata_mass_storage_device_base::device_reset();
 }
 
 uint8_t ide_hdd_device_base::calculate_status()
 {
-	uint8_t result = ata_hle_device_base::calculate_status();
+	uint8_t result = device_ata_hle_interface::calculate_status();
 
 	if (m_last_status_timer->elapsed() > TIME_PER_ROTATION)
 	{
@@ -914,22 +917,10 @@ uint8_t ide_hdd_device_base::calculate_status()
 	return result;
 }
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
 void ide_hdd_device_base::device_add_mconfig(machine_config &config)
 {
 	HARDDISK(config, "image", "ide_hdd,hdd");
 }
-
-//**************************************************************************
-//  ATA COMPACTFLASH CARD DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cf_device_base - constructor
-//-------------------------------------------------
 
 cf_device_base::cf_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	ide_hdd_device_base(mconfig, type, tag, owner, clock)
@@ -965,15 +956,12 @@ void cf_device_base::ide_build_identify_device()
 	m_identify_buffer[7] = total_sectors >> 16;        /*  7: number of sectors per card MSW */
 	m_identify_buffer[8] = total_sectors & 0xffff;     /*  8: number of sectors per card LSW  */
 	m_identify_buffer[9] = 0;                          /*  9: vendor-specific */
-	swap_strncpy(&m_identify_buffer[10],               /* 10-19: serial number */
-			"00000000000000000000", 10);
+	identify(10, 10, "00000000000000000000");          /* 10-19: serial number */
 	m_identify_buffer[20] = 0;                         /* 20: buffer type */
 	m_identify_buffer[21] = 0;                         /* 21: buffer size in 512 byte increments */
 	m_identify_buffer[22] = 4;                         /* 22: # of vendor-specific bytes on read/write long commands */
-	swap_strncpy(&m_identify_buffer[23],               /* 23-26: firmware revision */
-			"1.0", 4);
-	swap_strncpy(&m_identify_buffer[27],               /* 27-46: model number */
-			"MAME Compressed CompactFlash", 20);
+	identify(23, 4, "1.0");                            /* 23-26: firmware revision */
+	identify(27, 20, "MAME    Virtual CompactFlash");  /* 27-46: model number */
 	m_identify_buffer[47] = 0x0001;                    /* 47: read/write multiple support */
 	m_identify_buffer[48] = 0;                         /* 48: double word not supported */
 	m_identify_buffer[49] = 0x0200;                    /* 49: capabilities */

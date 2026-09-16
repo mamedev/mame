@@ -21,7 +21,6 @@ Pluto 8: ColdFire 5475
 
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "speaker.h"
 
 
@@ -38,7 +37,7 @@ public:
 	void jpmsys7(machine_config &config);
 
 private:
-	void jpmsys7_map(address_map &map);
+	void jpmsys7_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -52,7 +51,7 @@ void jpmsys7_state::jpmsys7_map(address_map &map)
 	map(0x20000018, 0x2000001b).nopw(); // large data upload like astra/pluto?
 	map(0x50000000, 0x50001fff).ram();
 
-	map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//  map(0xf0000000, 0xf00003ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 static INPUT_PORTS_START(  jpmsys7 )
@@ -62,10 +61,8 @@ void jpmsys7_state::jpmsys7(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000);  // seems to be a Coldfire of some kind
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmsys7_state::jpmsys7_map);
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound (probably DMA driven DAC) */
 }
 
@@ -235,15 +232,15 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, j7bmagic,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Black Magic (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7cexprs,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Cash Xpress (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7crztrl,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Crazy Trails (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7fantaz,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Fantaztec (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7kerchn,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Ker - Chinq (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7razzma,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Razzamataz (JPM) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7razzmaa, j7razzma,  jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Razzamataz (JPM) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7r2roll,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Ready To Roll (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7tubgld,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Turbo Gold (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7wldwkd,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Wild 'N' Wicked (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7bullio,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "Ace","Bullionaire (Ace)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, j7clbmag,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "Qps","Club Magic (JPM)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, j7bmagic,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Black Magic (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7cexprs,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Cash Xpress (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7crztrl,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Crazy Trails (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7fantaz,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Fantaztec (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7kerchn,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Ker - Chinq (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7razzma,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Razzamataz (JPM) (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7razzmaa, j7razzma,  jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Razzamataz (JPM) (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7r2roll,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Ready To Roll (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7tubgld,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Turbo Gold (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7wldwkd,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Wild 'N' Wicked (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7bullio,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "Ace","Bullionaire (Ace)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, j7clbmag,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "Qps","Club Magic (JPM)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

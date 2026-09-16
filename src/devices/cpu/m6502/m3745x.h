@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:R. Belmont, Olivier Galibert
 #ifndef MAME_CPU_M6502_M3745X_H
 #define MAME_CPU_M6502_M3745X_H
 
@@ -38,9 +38,9 @@ public:
 
 	const address_space_config m_program_config;
 
-	template<std::size_t Bit> auto read_p() { return m_read_p[Bit-3].bind(); }
-	template<std::size_t Bit> auto write_p() { return m_write_p[Bit-3].bind(); }
-	template<std::size_t Bit> auto read_ad() { return m_read_ad[Bit].bind(); }
+	template<std::size_t Port> auto read_p() { return m_read_p[Port-3].bind(); }
+	template<std::size_t Port> auto write_p() { return m_write_p[Port-3].bind(); }
+	template<std::size_t Port> auto read_ad() { return m_read_ad[Port].bind(); }
 
 	uint8_t ports_r(offs_t offset);
 	void ports_w(offs_t offset, uint8_t data);
@@ -56,8 +56,8 @@ protected:
 	m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_execute_interface overrides
@@ -76,7 +76,7 @@ protected:
 	devcb_write8::array<4> m_write_p;
 	devcb_read8::array<8>  m_read_ad;
 
-	uint8_t m_ports[6], m_ddrs[6];
+	uint8_t m_ports[4], m_ddrs[4];
 	uint8_t m_intreq1, m_intreq2, m_intctrl1, m_intctrl2;
 	uint8_t m_adctrl;
 	uint16_t m_last_all_ints;
@@ -90,7 +90,7 @@ class m37450_device : public m3745x_device
 public:
 	m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void m37450_map(address_map &map);
+	void m37450_map(address_map &map) ATTR_COLD;
 protected:
 	m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };

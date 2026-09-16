@@ -17,7 +17,7 @@ class dec_ioga_device : public device_t
 public:
 	dec_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// irq inputs
 	void rtc_irq_w(int state);
@@ -34,8 +34,8 @@ public:
 	void lance_dma_w(offs_t offset, u16 data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u32 csr_r();
 	void csr_w(offs_t offset, u32 data, u32 mem_mask = ~0);

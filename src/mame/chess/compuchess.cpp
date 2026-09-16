@@ -124,6 +124,7 @@ public:
 	cmpchess_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_smi(*this, "smi"),
 		m_display(*this, "display"),
 		m_beeper_off(*this, "beeper_off"),
 		m_beeper(*this, "beeper"),
@@ -131,7 +132,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { update_cpu_freq(newval); }
+	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq);
 
 	// machine configs
 	void cmpchess(machine_config &config);
@@ -140,28 +141,33 @@ public:
 	void cncchess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
 	required_device<pwm_display_device> m_display;
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_digit_select = 0;
+	u8 m_digit_data = 0;
+	bool m_blink = false;
+
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-	void cncchess_map(address_map &map);
-	void cncchess_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void cncchess_map(address_map &map) ATTR_COLD;
+	void cncchess_io(address_map &map) ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 	TIMER_DEVICE_CALLBACK_MEMBER(blink) { m_blink = !m_blink; update_display(); }
 	void update_display();
 	void update_reset(ioport_value state);
-	void update_cpu_freq(ioport_value state);
 
 	// I/O handlers
 	void input_w(u8 data);
@@ -173,11 +179,6 @@ private:
 
 	void input_digit_select_w(u8 data) { input_w(data); digit_select_w(data); }
 	void input_digit_data_w(u8 data) { input_w(data); digit_data_w(data); }
-
-	u8 m_inp_mux = 0;
-	u8 m_digit_select = 0;
-	u8 m_digit_data = 0;
-	bool m_blink = false;
 };
 
 
@@ -197,9 +198,6 @@ void cmpchess_state::machine_start()
 
 void cmpchess_state::machine_reset()
 {
-	if (ioport("FAKE") != nullptr)
-		update_cpu_freq(ioport("FAKE")->read());
-
 	update_reset(ioport("RESET")->read());
 }
 
@@ -213,12 +211,12 @@ void cmpchess_state::update_reset(ioport_value state)
 		m_display->clear();
 }
 
-void cmpchess_state::update_cpu_freq(ioport_value state)
+INPUT_CHANGED_MEMBER(cmpchess_state::change_cpu_freq)
 {
 	// 2 MK I versions, 2nd one was a lot faster
-	const u32 freq = state ? 3500000 : 2250000;
+	const u32 freq = (newval & 1) ? 3'500'000 : 2'250'000;
 	m_maincpu->set_unscaled_clock(freq);
-	subdevice<f3853_device>("smi")->set_unscaled_clock(freq);
+	m_smi->set_unscaled_clock(freq);
 }
 
 
@@ -310,7 +308,7 @@ void cmpchess_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(cmpchess_state::input_r), FUNC(cmpchess_state::input_digit_data_w));
 	map(0x01, 0x01).w(FUNC(cmpchess_state::digit_select_w));
-	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 void cmpchess_state::cncchess_map(address_map &map)
@@ -324,7 +322,7 @@ void cmpchess_state::cncchess_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(cmpchess_state::digit_data_r), FUNC(cmpchess_state::digit_data_w));
 	map(0x01, 0x01).rw(FUNC(cmpchess_state::input_r), FUNC(cmpchess_state::input_digit_select_w));
-	map(0x0c, 0x0f).rw("smi", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -359,17 +357,17 @@ static INPUT_PORTS_START( cmpchess )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Black Knight")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, 0) PORT_NAME("Reset Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cmpchess_state::reset_switch), 0) PORT_NAME("Reset Switch")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mk1 )
 	PORT_INCLUDE( cmpchess )
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, 0) PORT_NAME("L.S. Switch")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cmpchess_state::reset_switch), 0) PORT_NAME("L.S. Switch")
 
-	PORT_START("FAKE")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, change_cpu_freq, 0) // factory set
+	PORT_START("CPU")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cmpchess_state::change_cpu_freq), 0) // factory set
 	PORT_CONFSETTING(    0x00, "2.25MHz (Spassky packaging)" )
 	PORT_CONFSETTING(    0x01, "3.5MHz (Karpov packaging)" )
 INPUT_PORTS_END
@@ -400,7 +398,7 @@ static INPUT_PORTS_START( cncchess )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("E / White Queen")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, cmpchess_state, reset_switch, 0) PORT_NAME("Reset")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cmpchess_state::reset_switch), 0) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 
@@ -415,10 +413,10 @@ void cmpchess_state::cmpchess(machine_config &config)
 	F8(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("smi", FUNC(f3853_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_smi, FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &smi(F3853(config, "smi", 2_MHz_XTAL));
-	smi.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	F3853(config, m_smi, 2_MHz_XTAL);
+	m_smi->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 8+1);
@@ -435,7 +433,7 @@ void cmpchess_state::cmpchess2(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_clock(3.579545_MHz_XTAL);
-	subdevice<f3853_device>("smi")->set_clock(3.579545_MHz_XTAL);
+	m_smi->set_clock(3.579545_MHz_XTAL);
 }
 
 void cmpchess_state::mk1(machine_config &config)
@@ -443,8 +441,8 @@ void cmpchess_state::mk1(machine_config &config)
 	cmpchess(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(2250000); // see notes
-	subdevice<f3853_device>("smi")->set_clock(2250000);
+	m_maincpu->set_clock(2'250'000); // see notes
+	m_smi->set_clock(2'250'000);
 
 	config.set_default_layout(layout_novag_mk1);
 }
@@ -454,11 +452,11 @@ void cmpchess_state::cncchess(machine_config &config)
 	cmpchess2(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(2000000); // LC circuit, measured 2MHz
+	m_maincpu->set_clock(2'000'000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmpchess_state::cncchess_map);
 	m_maincpu->set_addrmap(AS_IO, &cmpchess_state::cncchess_io);
 
-	subdevice<f3853_device>("smi")->set_clock(2000000);
+	m_smi->set_clock(2'000'000);
 
 	config.set_default_layout(layout_conic_cchess);
 
@@ -506,9 +504,9 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1977, cmpchess,  0,        0,      cmpchess,  cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka CompuChess I
-SYST( 1978, cmpchess2, 0,        0,      cmpchess2, cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess: The Second Edition", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1977, cmpchess,  0,        0,      cmpchess,  cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE ) // aka CompuChess I
+SYST( 1978, cmpchess2, 0,        0,      cmpchess2, cmpchess, cmpchess_state, empty_init, "DataCash Systems / Staid", "CompuChess: The Second Edition", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 
-SYST( 1978, ccmk1,     cmpchess, 0,      mk1,       mk1,      cmpchess_state, empty_init, "bootleg (Novag)", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1978, ccmk1,     cmpchess, 0,      mk1,       mk1,      cmpchess_state, empty_init, "bootleg (Novag Industries)", "Chess Champion: MK I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 
-SYST( 1979, cncchess,  0,        0,      cncchess,  cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, cncchess,  0,        0,      cncchess,  cncchess, cmpchess_state, empty_init, "Conic", "Computer Chess (Conic, model 7011)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

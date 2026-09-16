@@ -28,11 +28,11 @@ public:
 	void lee1214(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	[[maybe_unused]] u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -89,4 +89,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1985, lee1214d, 0, 0, lee1214, lee1214, lee1214_state, empty_init, "Lee Data", "1214D Display Terminal", MACHINE_IS_SKELETON)
+COMP(1985, lee1214d, 0, 0, lee1214, lee1214, lee1214_state, empty_init, "Lee Data", "1214D Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -86,16 +86,16 @@ private:
 	uint8_t starwars_main_ready_flag_r();
 	void starwars_soundrst_w(uint8_t data);
 	void quad_pokeyn_w(offs_t offset, uint8_t data);
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(math_run_clear);
 
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();
 
-	void esb_main_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void esb_main_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_ATARI_STARWARS_H

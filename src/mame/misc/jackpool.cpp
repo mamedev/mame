@@ -47,14 +47,14 @@ public:
 	void init_jackpool();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint8_t jackpool_io_r(offs_t offset);
 	void map_vreg_w(int state);
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
-	void jackpool_mem(address_map &map);
+	void jackpool_mem(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg = 0;
@@ -243,7 +243,7 @@ void jackpool_state::jackpool(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackpool);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 64*8);

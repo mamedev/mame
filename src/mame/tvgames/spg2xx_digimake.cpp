@@ -19,7 +19,7 @@ public:
 	{ }
 
 	void digimake(machine_config &config);
-	void mem_map_digi(address_map& map);
+	void mem_map_digi(address_map &map) ATTR_COLD;
 
 private:
 	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
@@ -222,4 +222,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2005, rad_digi,  0,        0, digimake, rad_digi,   spg2xx_game_digimake_state, init_crc, "Radica", "Digi Makeover (Girl Tech)",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, rad_digi, 0, 0, digimake, rad_digi, spg2xx_game_digimake_state, init_crc, "Radica", "Digi Makeover (Girl Tech)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

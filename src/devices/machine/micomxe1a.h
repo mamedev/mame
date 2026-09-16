@@ -15,6 +15,7 @@ class micom_xe_1a_device : public device_t
 {
 public:
 	micom_xe_1a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+	virtual ~micom_xe_1a_device();
 
 	auto buttons_handler() { return m_buttons_callback.bind(); }
 	auto analog_handler() { return m_analog_callback.bind(); }

@@ -101,8 +101,8 @@ public:
 	void basf7100(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -126,11 +126,11 @@ private:
 		INT_CENTRONICS = 0x40
 	};
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
-	void fdc_mem_map(address_map &map);
-	void fdc_io_map(address_map &map);
+	void fdc_mem_map(address_map &map) ATTR_COLD;
+	void fdc_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t mmio_r(offs_t offset);
 	void mmio_w(offs_t offset, uint8_t data);
@@ -609,10 +609,12 @@ void basf7100_state::basf7100(machine_config &config)
 	m_fdccpu->set_addrmap(AS_IO, &basf7100_state::fdc_io_map);
 	m_fdccpu->set_irq_acknowledge_callback(FUNC(basf7100_state::fdccpu_irq_callback));
 
-	PIC8259(config, m_pic, 0);
+	config.set_maximum_quantum(attotime::from_usec(600));
+
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8251(config, m_usart[0], 0); // unknown clock
+	I8251(config, m_usart[0]); // unknown clock
 	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -626,7 +628,7 @@ void basf7100_state::basf7100(machine_config &config)
 	rs232.cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
 	rs232.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 
-	I8251(config, m_usart[1], 0); // unknown clock
+	I8251(config, m_usart[1]); // unknown clock
 	m_usart[1]->txd_handler().set("auxrs232", FUNC(rs232_port_device::write_txd));
 	m_usart[1]->rts_handler().set("auxrs232", FUNC(rs232_port_device::write_rts));
 	m_usart[1]->dtr_handler().set("auxrs232", FUNC(rs232_port_device::write_dtr));
@@ -666,7 +668,7 @@ void basf7100_state::basf7100(machine_config &config)
 	m_ppi[4]->out_pc_callback().set(FUNC(basf7100_state::sod_low_w));
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_size(640, 288); // wrong because of wrong charrom
 	m_screen->set_visarea_full();

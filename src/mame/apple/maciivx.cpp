@@ -19,12 +19,14 @@
 
 #include "emu.h"
 
+#include "dfac.h"
 #include "egret.h"
-#include "macadb.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 #include "vasp.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -42,6 +44,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
+#include "speaker.h"
 
 namespace {
 
@@ -55,16 +58,18 @@ public:
 	maciivx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_vasp(*this, "vasp"),
+		m_dfac(*this, "dfac"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scsibus1(*this, "scsi"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_scc(*this, "scc"),
 		m_egret(*this, "egret"),
+		m_config(*this, "config"),
 		m_cur_floppy(nullptr),
 		m_hdsel(0)
 	{
@@ -73,15 +78,16 @@ public:
 	void maciiv_base(machine_config &config);
 	void maciivx(machine_config &config);
 	void maciivi(machine_config &config);
-	void base_map(address_map &map);
-	void maciivx_map(address_map &map);
-	void maciivi_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
+	void maciivx_map(address_map &map) ATTR_COLD;
+	void maciivi_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<m68030_device> m_maincpu;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<vasp_device> m_vasp;
+	required_device<dfac_device> m_dfac;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<nscsi_bus_device> m_scsibus1;
@@ -89,8 +95,10 @@ private:
 	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<z80scc_device> m_scc;
 	required_device<egret_device> m_egret;
+	optional_ioport m_config;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u16 scc_r(offs_t offset)
 	{
@@ -130,9 +138,17 @@ private:
 
 void maciivx_state::machine_start()
 {
-	m_vasp->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+	m_vasp->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
+}
+
+void maciivx_state::machine_reset()
+{
+	if (m_config)
+	{
+		m_maincpu->set_fpu_enable(BIT(m_config->read(), 0));
+	}
 }
 
 /***************************************************************************
@@ -240,6 +256,9 @@ void maciivx_state::swim_w(offs_t offset, u16 data, u16 mem_mask)
 		m_fdc->write((offset >> 8) & 0xf, data & 0xff);
 	else
 		m_fdc->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 void maciivx_state::phases_w(uint8_t phases)
@@ -281,6 +300,13 @@ void maciivx_state::hdsel_w(int state)
 static INPUT_PORTS_START( maciivx )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( maciivi )
+	PORT_START("config")
+	PORT_CONFNAME(0x01, 0x00, "FPU")
+	PORT_CONFSETTING(0x00, "No FPU")
+	PORT_CONFSETTING(0x01, "FPU Present")
+INPUT_PORTS_END
+
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
@@ -291,24 +317,23 @@ void maciivx_state::maciiv_base(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,36M,48M,64M,68M");
 
-	NSCSI_BUS(config, "scsi");
+	NSCSI_BUS(config, m_scsibus1);
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^vasp:lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^vasp:rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
-	{
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
+
+	NCR53C80(config, m_ncr5380);
+	m_scsibus1->set_external_device(7, m_ncr5380);
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
@@ -325,27 +350,37 @@ void maciivx_state::maciiv_base(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_vasp, FUNC(vasp_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
+
+	SPEAKER(config, "speaker", 2).front();
+
+	APPLE_DFAC(config, m_dfac, 22257);
+	m_dfac->add_route(0, "speaker", 1.0, 0);
+	m_dfac->add_route(1, "speaker", 1.0, 1);
 
 	VASP(config, m_vasp, C15M);
 	m_vasp->set_maincpu_tag("maincpu");
 	m_vasp->set_rom_tag("bootrom");
 	m_vasp->hdsel_callback().set(FUNC(maciivx_state::hdsel_w));
+	m_vasp->add_route(0, m_dfac, 1.0, 0);
+	m_vasp->add_route(1, m_dfac, 1.0, 1);
 
-	MACADB(config, m_macadb, C15M);
+	ADB_BUS(config, m_adbbus);
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
-	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus_device &nubus(NUBUS(config, "nubus"));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.out_irqc_callback().set(m_vasp, FUNC(vasp_device::slot0_irq_w));
 	nubus.out_irqd_callback().set(m_vasp, FUNC(vasp_device::slot1_irq_w));
@@ -374,10 +409,13 @@ void maciivx_state::maciivx(machine_config &config)
 	EGRET(config, m_egret, XTAL(32'768));
 	m_egret->set_default_bios_tag("341s0851");
 	m_egret->reset_callback().set(FUNC(maciivx_state::egret_reset_w));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->dfac_scl_callback().set(m_dfac, FUNC(dfac_device::clock_write));
+	m_egret->dfac_sda_callback().set(m_dfac, FUNC(dfac_device::data_write));
+	m_egret->dfac_latch_callback().set(m_dfac, FUNC(dfac_device::latch_write));
+	m_egret->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_egret->via_clock_callback().set(m_vasp, FUNC(vasp_device::cb1_w));
 	m_egret->via_data_callback().set(m_vasp, FUNC(vasp_device::cb2_w));
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	m_adbbus->out_adb_callback().set(m_egret, FUNC(egret_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_vasp->pb3_callback().set(m_egret, FUNC(egret_device::get_xcvr_session));
@@ -408,4 +446,4 @@ ROM_END
 }   // anonymous namespace
 
 COMP(1993, maciivx, 0,       0, maciivx, maciivx, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE)
-COMP(1993, maciivi, maciivx, 0, maciivi, maciivx, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE)
+COMP(1993, maciivi, maciivx, 0, maciivi, maciivi, maciivx_state, empty_init, "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE)

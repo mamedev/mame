@@ -58,7 +58,7 @@ protected:
 	md4330b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 qmax);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void update_output();
 

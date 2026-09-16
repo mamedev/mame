@@ -50,6 +50,7 @@ enum
 	A26_CM,
 	A26_X07,
 	A26_HARMONY,
+	A26_F0,
 };
 
 //-------------------------------------------------
@@ -175,6 +176,7 @@ static const vcs_slot slot_list[] =
 	{ A26_32IN1, "a26_32in1" },
 	{ A26_X07, "a26_x07" },
 	{ A26_HARMONY, "a26_harmony" },
+	{ A26_F0, "a26_f0" },
 };
 
 static int vcs_get_pcb_id(const char *slot)
@@ -774,8 +776,7 @@ std::string vcs_cart_slot_device::get_default_card_software(get_default_card_sof
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		int const type = identify_cart_type(&rom[0], len);
 		char const *const slot_string = vcs_get_slot(type);

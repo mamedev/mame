@@ -38,7 +38,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/ra17xx.h"
+#include "ra17xx.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"

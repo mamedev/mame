@@ -6,6 +6,12 @@
 #include "emu.h"
 #include "ks0164.h"
 
+#define LOG_KEYON  (1U << 1)
+#define LOG_SERIAL (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_KEYON | LOG_SERIAL)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(KS0164, ks0164_device, "ks0164", "Samsung KS0164 Wavetable Synthesizer")
 
@@ -153,7 +159,7 @@ TIMER_CALLBACK_MEMBER(ks0164_device::irq_timer_tick)
 
 void ks0164_device::tra_complete()
 {
-	logerror("transmit done\n");
+	LOGMASKED(LOG_SERIAL, "transmit done\n");
 }
 
 void ks0164_device::rcv_complete()
@@ -163,7 +169,7 @@ void ks0164_device::rcv_complete()
 	m_midi_in_active = true;
 	m_cpu->set_input_line(6, ASSERT_LINE);
 
-	logerror("recieved %02x\n", m_midi_in);
+	LOGMASKED(LOG_SERIAL, "recieved %02x\n", m_midi_in);
 }
 
 void ks0164_device::tra_callback()
@@ -180,7 +186,7 @@ u8 ks0164_device::midi_r()
 
 void ks0164_device::midi_w(u8 data)
 {
-	logerror("want to transmit %02x\n", data);
+	LOG("want to transmit %02x\n", data);
 }
 
 u8 ks0164_device::midi_status_r()
@@ -191,7 +197,7 @@ u8 ks0164_device::midi_status_r()
 
 void ks0164_device::midi_status_w(u8 data)
 {
-	logerror("midi status_w %02x\n", data);
+	LOG("midi status_w %02x\n", data);
 }
 
 
@@ -221,7 +227,11 @@ void ks0164_device::mpu401_ctrl_w(u8 data)
 
 u8 ks0164_device::mpu401_data_r()
 {
-	//  logerror("mpu pop %02x\n", m_mpu_out);
+	if (!machine().side_effects_disabled())
+	{
+		m_mpu_status &= ~MPUS_TX_FULL;
+		//  logerror("mpu pop %02x\n", m_mpu_out);
+	}
 	return m_mpu_out;
 }
 
@@ -251,9 +261,12 @@ void ks0164_device::mpu401_istatus_w(u8 data)
 
 u8 ks0164_device::mpu401_r()
 {
-	m_mpu_status &= ~MPUS_RX_FULL;
-	m_cpu->set_input_line(11, CLEAR_LINE);
-	//  logerror("mpu_r %02x (%04x)\n", m_mpu_in, m_cpu->pc());
+	if (!machine().side_effects_disabled())
+	{
+		m_mpu_status &= ~MPUS_RX_FULL;
+		m_cpu->set_input_line(11, CLEAR_LINE);
+		//  logerror("mpu_r %02x (%04x)\n", m_mpu_in, m_cpu->pc());
+	}
 	return m_mpu_in;
 }
 
@@ -328,19 +341,18 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 	m_stream->update();
 	u16 old = m_sregs[m_voice_select & 0x1f][offset];
 	COMBINE_DATA(&m_sregs[m_voice_select & 0x1f][offset]);
-	if(0)
-		if(m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
-			logerror("voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
+	if(0 && m_sregs[m_voice_select & 0x1f][offset] != old && offset == 0)
+		LOGMASKED(LOG_KEYON, "voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
 	if(offset == 0 && (data & 1) && !(old & 1))
-		logerror("keyon %02x mode=%04x (%s %c %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%02x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
+		LOGMASKED(LOG_KEYON, "keyon %02x mode=%04x (%s %c %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
 				 m_voice_select,
 
 				 m_sregs[m_voice_select & 0x1f][0x00],
 
 				 m_sregs[m_voice_select & 0x1f][0x00] & 0x8000 ? " 8" : "16", // 8-bit/16-bit samples
 				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0400 ? 'c' : 'l', // compressed/linear samples
-				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0010 ? 'r' : '-', // loop
-				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0008 ? '3' : '-',
+				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0010 ? '4' : '-',
+				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0008 ? 'l' : '-', // loop
 				 m_sregs[m_voice_select & 0x1f][0x00] & 0x0004 ? '2' : '-',
 
 				 m_sregs[m_voice_select & 0x1f][0x01], // cur
@@ -355,8 +367,8 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 				 m_sregs[m_voice_select & 0x1f][0x0e],
 				 m_sregs[m_voice_select & 0x1f][0x0f],
 
-				 m_sregs[m_voice_select & 0x1f][0x08] & 0x1f, // pitch
-				 m_sregs[m_voice_select & 0x1f][0x08] >> 5,
+				 m_sregs[m_voice_select & 0x1f][0x08] & 0xf, // pitch
+				 m_sregs[m_voice_select & 0x1f][0x08] >> 4,
 
 				 m_sregs[m_voice_select & 0x1f][0x10] >> 9,
 				 m_sregs[m_voice_select & 0x1f][0x12] >> 9,
@@ -413,7 +425,7 @@ u8 ks0164_device::irqen_77_r()
 void ks0164_device::irqen_77_w(u8 data)
 {
 	m_irqen_77 = data;
-	logerror("irqen_77 = %02x (%04x)\n", m_irqen_77, m_cpu->pc());
+	LOG("irqen_77 = %02x (%04x)\n", m_irqen_77, m_cpu->pc());
 }
 
 u8 ks0164_device::unk60_r()
@@ -424,7 +436,7 @@ u8 ks0164_device::unk60_r()
 void ks0164_device::unk60_w(u8 data)
 {
 	m_unk60 = data;
-	logerror("unk60 = %02x (%04x)\n", m_unk60, m_cpu->pc());
+	LOG("unk60 = %02x (%04x)\n", m_unk60, m_cpu->pc());
 }
 
 u8 ks0164_device::voice_select_r()
@@ -462,19 +474,14 @@ void ks0164_device::cpu_map(address_map &map)
 	map(0xe000, 0xffff).ram();
 }
 
-void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ks0164_device::sound_stream_update(sound_stream &stream)
 {
-	for(int sample = 0; sample != outputs[0].samples(); sample++) {
+	for(int sample = 0; sample != stream.samples(); sample++) {
 		s32 suml = 0, sumr = 0;
 		for(int voice = 0; voice < 0x20; voice++) {
 			u16 *regs = m_sregs[voice];
 			if(regs[0] & 0x0001) {
-
 				u64 current = (u64(regs[1]) << 32) | (u64(regs[2]) << 16) | regs[3];
-
-				if(current & 0xc000000000)
-					continue;
-
 				u32 adr = current >> 16;
 				s16 samp0, samp1;
 				switch(regs[0] & 0x8400) {
@@ -489,38 +496,48 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					break;
 
 				default:
-					logerror("Sample mode %04x\n", regs[0] & 0x8400);
+					LOG("Sample mode %04x\n", regs[0] & 0x8400);
 					samp0 = samp1 = 0;
 					break;
 				}
 
 				s16 samp = samp0 + (((samp1 - samp0) * (current & 0xffff)) >> 16);
-				u32 step = 0x10000 | (regs[8] & ~0x1f);
-				u32 shift = regs[8] & 0x1f;
-				if(shift > 0x10)
-					step >>= 0x20 - shift;
+				u32 step = 0x10000 | (regs[8] & ~0xf);
+				u32 shift = regs[8] & 0xf;
+				if(shift >= 0x8)
+					step >>= 0x10 - shift;
 				else if(shift)
 					step <<= shift;
 				current += step;
 				u64 end = (u64(regs[0xd]) << 32) | (u64(regs[0xe]) << 16) | regs[0xf];
 				if(current >= end) {
-					// guessed, 1d26 in btplay2k flash.u22 seems to check this flag for something similar to looping but no games use it
-					if (regs[0] & 0x10) {
-						u64 loop = (u64(regs[9]) << 32) | (regs[0xa] << 16) | regs[0xb];
-						current = current - end + loop;
+					if (regs[0] & 8) {
+						u64 loop = (u64(regs[9]) << 32) | (u64(regs[0xa]) << 16) | regs[0xb];
+						while(current >= end)
+							current = current - end + loop;
 					} else {
 						regs[0] = ~1;
+						regs[0xc] = 0;
+						regs[0x10] = regs[0x12] = regs[0x14] = regs[0x16] = 0;
 					}
 				}
 				regs[1] = current >> 32;
 				regs[2] = current >> 16;
 				regs[3] = current;
 
-				suml += samp;
-				sumr += samp;
+				suml += (s64(samp) * regs[0x12] * regs[0x16]) >> 32;
+				sumr += (s64(samp) * regs[0x10] * regs[0x14]) >> 32;
+
+				if(regs[0xc]) {
+					regs[0x10] += regs[0x11];
+					regs[0x12] += regs[0x13];
+					regs[0x14] += regs[0x15];
+					regs[0x16] += regs[0x17];
+					regs[0xc] --;
+				}
 			}
 		}
-		outputs[0].put_int(sample, suml, 32768 * 32);
-		outputs[1].put_int(sample, sumr, 32768 * 32);
+		stream.put_int(0, sample, suml, 32768 * 32);
+		stream.put_int(1, sample, sumr, 32768 * 32);
 	}
 }

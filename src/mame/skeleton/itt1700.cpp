@@ -42,8 +42,8 @@ public:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_videoram;
@@ -102,7 +102,7 @@ void itt1700_state::itt1700(machine_config &config)
 
 	ITT1700_KEYBOARD(config, "keyboard");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.6698_MHz_XTAL, 882, 0, 720, 315, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -127,4 +127,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_IS_SKELETON)
+COMP(1983, itt1700, 0, 0, itt1700, itt1700, itt1700_state, empty_init, "ITT Courier", "ITT 1700", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

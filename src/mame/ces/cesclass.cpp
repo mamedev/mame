@@ -1,34 +1,43 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/*
+/**************************************************************************************************
 
-    CES Classic wall games
+CES Classic wall games
 
-    driver by Angelo Salese
+Notes:
+- to play hrclass you have to select a pitcher shot and hold the remote button.
+  When you release the strobe, batter does the swing.
+- "forfait point" in tsclass means the *other* team gets a point, which means the linear
+  LED orientation is actually correct.
 
-    Notes:
-    - to play Home Run Classic you have to select a pitcher shot and keep pressed the
-      wall strobe. When you release the strobe, batter does the swing.
+TODO:
+- complete artworks;
+\- confirm LED colors;
+\- remaining lamps;
+\- actual strobe outputs;
+\- image bezel for each game;
+\- measure bezel dims properly (currently very arbitrary 594x300);
+- irq sources & timings are unknown
+\- cfr. ccclass, being really slow on continue screen;
+- sound doesn't play most samples;
+- hookup m68681 + 2x max232;
+- tsclass: throws bad U43 and U44 at POST, should also be two roms not one.
 
-    TODO:
-    - custom layout for dual LCDs
-    - artwork and lamps position needed to make progresses
-    - U43 and U44 bad in Trap Shoot Classic
-    - games are incredibly sluggish by now
-    - irq sources are unknown
-    - sound doesn't play most samples
-    - Trap Shoot Classic runs on a single LCD, needs mods
-
-*/
-
+**************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "ces_ccclass.lh"
+#include "ces_hrclass.lh"
+#include "ces_tsclass.lh"
 
 
 namespace {
@@ -40,102 +49,199 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
-		, m_vram(*this, "vram")
+		, m_workram(*this, "work_ram")
 		, m_palette(*this, "palette")
+		, m_screen(*this, { "l_lcd", "r_lcd" })
+		, m_led_matrix(*this, "ledmatrix%u", 0U)
 	{ }
 
-	void irq2_ack_w(uint16_t data);
-	void irq3_ack_w(uint16_t data);
-	void lamps_w(uint16_t data);
-	void outputs_w(uint16_t data);
+	void ccclass(machine_config &config);
+	void tsclass(machine_config &config);
 
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cesclassic_palette(palette_device &palette) const;
-	void cesclassic(machine_config &config);
-	void cesclassic_map(address_map &map);
 protected:
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
-	// devices
+	void cesclassic(machine_config &config);
+
+	virtual void lamps_w(u16 data);
+	void led_update(u32 src_offset, u16 dst_offset);
+
+	void palette_init(palette_device &palette) const;
+	void main_map(address_map &map) ATTR_COLD;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 
-	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<u16> m_workram;
 	required_device<palette_device> m_palette;
-	// driver_device overrides
-	virtual void video_start() override;
+	required_device_array<screen_device, 2> m_screen;
+	output_finder<25 * 8 * 2> m_led_matrix;
 
+	bitmap_rgb32 m_lcd_bitmap[2]{};
+	bool m_lcd_display = false;
+
+	void irq2_ack_w(u16 data);
+	void irq3_ack_w(u16 data);
+	void outputs_w(u16 data);
+
+	void dma_trigger_w(offs_t offset, u16 data, u16 mem_mask=~0);
+
+	template <unsigned N> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
+
+class hrclass_state : public cesclassic_state
+{
+public:
+	hrclass_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cesclassic_state(mconfig, type, tag)
+	{ }
+
+	void hrclass(machine_config &config);
+
+private:
+	virtual void lamps_w(u16 data) override;
 };
 
 
 void cesclassic_state::video_start()
 {
+	save_item(NAME(m_lcd_display));
+
+	m_screen[0]->register_screen_bitmap(m_lcd_bitmap[0]);
+	m_screen[1]->register_screen_bitmap(m_lcd_bitmap[1]);
 }
 
-uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void cesclassic_state::video_reset()
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	m_lcd_display = false;
+}
 
-	for(int y=0;y<64;y++)
+// selects the start offset from work RAM and triggers
+// TODO: not instant
+void cesclassic_state::dma_trigger_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// all games just pings here with 0x000d
+	// TODO: which may really be just enable flags rather than work RAM base
+	if (data != 0xd)
+		popmessage("dma_trigger_w %04x & %04x", data, mem_mask);
+
+	const u16 *vram = &m_workram[(data & 0xf) << 11];
+
+	for (unsigned N = 0; N < 2; N++)
 	{
-		for(int x=0;x<16;x++)
+		const u32 base_screen = N * 0x80;
+
+		rectangle cliprect = m_screen[N]->visible_area();
+
+		for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			for(int xi=0;xi<16;xi++)
+			for(int x = cliprect.min_x; x <= cliprect.max_x; x+= 16)
 			{
-				uint8_t color;
+				const u32 base_offset = ((x + base_screen) >> 4) + y * 16;
+				const u16 cell_high = vram[base_offset];
+				const u16 cell_low = vram[(base_offset + 0x400) >> 0];
+				for(int xi = 0; xi < 16; xi++)
+				{
+					const u8 color = BIT(cell_low, 15 - xi) | (BIT(cell_high, 15 - xi) << 1);
 
-				color = (((m_vram[x+y*16+0x400])>>(15-xi)) & 1);
-				color |= (((m_vram[x+y*16])>>(15-xi)) & 1)<<1;
-
-				if((x*16+xi)<256 && ((y)+0)<256)
-					bitmap.pix(y, x*16+xi) = m_palette->pen(color);
+					m_lcd_bitmap[N].pix(y, x + xi) = m_palette->pen(color);
+				}
 			}
 		}
 	}
+}
 
+template <unsigned N> uint32_t cesclassic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	if (m_lcd_display)
+		copybitmap(bitmap, m_lcd_bitmap[N], 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-void cesclassic_state::irq2_ack_w(uint16_t data)
+void cesclassic_state::irq2_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-void cesclassic_state::irq3_ack_w(uint16_t data)
+void cesclassic_state::irq3_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
-void cesclassic_state::lamps_w(uint16_t data)
+/*
+ * LED (or DMD?) matrix used for holding score
+ *
+ * - $40ce88-$40ceb8 player 1 side
+ * - $40ceba player 1 lamps
+ * - $40cebe-$40cec2 control words?
+ * - $40cec4 player 2 side, same as above
+ */
+void cesclassic_state::led_update(u32 src_offset, u16 dst_offset)
 {
-	//popmessage("%04x",data);
+	const u16 *digit_ram = &m_workram[src_offset];
+
+	for (int x = 0; x < 25; x++)
+	{
+		const u16 cell = digit_ram[x];
+
+		for(int yi = 0; yi < 8; yi++)
+		{
+			// tri-color
+			const u8 color = BIT(cell, 15 - yi) | (BIT(cell, 7 - yi) << 1);
+
+			m_led_matrix[dst_offset + yi + x * 8] = color;
+		}
+	}
+
+	// TODO: 26th word is actually wired to informative lamps (cfr. after LED tests)
 }
 
-void cesclassic_state::outputs_w(uint16_t data)
+void cesclassic_state::lamps_w(u16 data)
 {
-	/*
-	-x-- ---- OKI bankswitch
-	--x- ---- probably screen enable
-	---- --x- coin counter
-	*/
-	m_oki->set_rom_bank((data & 0x40) >> 6);
-	machine().bookkeeping().coin_counter_w(0, data & 2);
+	// TODO: pinpoint how this really triggers
+	// data sent here or in $640000 should select data transfer
+	led_update(0xce88 / 2, 0);
+	led_update(0xcec4 / 2, 25 * 8);
+}
+
+// TODO: how hrclass manages to configure a different format?
+void hrclass_state::lamps_w(u16 data)
+{
+	led_update(0xce9a / 2, 0);
+	led_update(0xcec4 / 2, 25 * 8);
+}
+
+/*
+ * -x-- ---- OKI bankswitch
+ * --x- ---- enable screen transfers?
+ * ---- --x- coin counter
+ */
+void cesclassic_state::outputs_w(u16 data)
+{
+	m_oki->set_rom_bank(BIT(data, 6));
+	m_lcd_display = bool(BIT(data, 5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 	if(data & ~0x62)
-	logerror("Output: %02x\n",data);
+		logerror("Output: %02x\n",data);
 }
 
-void cesclassic_state::cesclassic_map(address_map &map)
+void cesclassic_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40cfff).ram();
-	map(0x40d000, 0x40ffff).ram().share("vram");
-	map(0x410000, 0x410001).portr("VBLANK"); //probably m68681 lies there instead
-	map(0x410004, 0x410005).w(FUNC(cesclassic_state::irq3_ack_w));
-	map(0x410006, 0x410007).w(FUNC(cesclassic_state::irq2_ack_w));
+	// MK48Z08
+	map(0x400000, 0x40ffff).ram().share("work_ram");
+	// xC5202 FPGA
+	map(0x410000, 0x410001).portr("VBLANK");
+	map(0x410002, 0x410003).w(FUNC(cesclassic_state::dma_trigger_w));
+	map(0x410004, 0x410005).nopr().w(FUNC(cesclassic_state::irq3_ack_w));
+	map(0x410006, 0x410007).nopr().w(FUNC(cesclassic_state::irq2_ack_w));
 	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
 	map(0x600000, 0x600001).portr("SYSTEM");
 	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
-//  map(0x640000, 0x640001).nopw();
+//  map(0x640000, 0x640001).nopw(); // more lamp strobe? cfr. tsclass test mode
 	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
 	map(0x670000, 0x670001).portr("DSW");
 	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
@@ -184,11 +290,11 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_SERVICE )
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) // select button in ccclass
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) // hit strobe
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, "DSW" )
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
 	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -212,7 +318,8 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYSTEM" )
+	// TODO: schematics shows 1x DIPSW bank only, are (some of) these debug jumpers?
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW2" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
@@ -230,46 +337,75 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) // LCD test
+	PORT_DIPNAME( 0x8000, 0x8000, "LCD test" )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("l_lcd")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("l_lcd", FUNC(screen_device::vblank)) // TODO: most likely tied to "DONE" from FPGA
 INPUT_PORTS_END
 
-void cesclassic_state::cesclassic_palette(palette_device &palette) const
+void cesclassic_state::palette_init(palette_device &palette) const
 {
-	for (int i = 0; i < 4; i++)
-		palette.set_pen_color(i, pal2bit(i), 0, 0);
+	// amber approximation, borrowed from pinball/de_3.cpp
+	// red *seems* more charged in motion with the 240p video refs, just camera artifact?
+	for (int idx = 0; idx < 4; idx++)
+		palette.set_pen_color(idx, 0x3f * idx, 0x2a * idx, 0);
 }
 
 void cesclassic_state::cesclassic(machine_config &config)
 {
 	M68000(config, m_maincpu, 24000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cesclassic_state::cesclassic_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cesclassic_state::main_map);
 	m_maincpu->set_vblank_int("l_lcd", FUNC(cesclassic_state::irq2_line_assert));  // TODO: unknown sources
 	m_maincpu->set_periodic_int(FUNC(cesclassic_state::irq3_line_assert), attotime::from_hz(60*8));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	// tsclass wants 1-fill for init correctly, other games don't seem to care
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "l_lcd", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(cesclassic_state::screen_update));
-	screen.set_size(8*16*2, 8*8+3*8);
-	screen.set_visarea(0*8, 8*16*2-1, 0*8, 8*8-1);
+	// DS1232 MicroMonitor
 
-	PALETTE(config, m_palette, FUNC(cesclassic_state::cesclassic_palette), 4);
+	// LCD screen section (2bpp)
+	screen_device &l_screen(SCREEN(config, "l_lcd").set_lcd());
+	l_screen.set_refresh_hz(60);
+	l_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	l_screen.set_screen_update(FUNC(cesclassic_state::screen_update<0>));
+	l_screen.set_size(256+128, 64+24);
+	l_screen.set_visarea(0, 128 - 1, 0, 64 - 1);
+
+	screen_device &r_screen(SCREEN(config, "r_lcd").set_lcd());
+	r_screen.set_refresh_hz(60);
+	r_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	r_screen.set_screen_update(FUNC(cesclassic_state::screen_update<1>));
+	r_screen.set_size(256+128, 64+24);
+	r_screen.set_visarea(0, 128 - 1, 0, 64 - 1);
+
+	PALETTE(config, m_palette, FUNC(cesclassic_state::palette_init), 4);
 
 	SPEAKER(config, "mono").front_center();
 	OKIM6295(config, m_oki, 24000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
+void cesclassic_state::ccclass(machine_config &config)
+{
+	cesclassic(config);
+	config.set_default_layout(layout_ces_ccclass);
+}
+
+void hrclass_state::hrclass(machine_config &config)
+{
+	cesclassic(config);
+	config.set_default_layout(layout_ces_hrclass);
+}
+
+void cesclassic_state::tsclass(machine_config &config)
+{
+	cesclassic(config);
+	config.set_default_layout(layout_ces_tsclass);
+}
 
 ROM_START(hrclass)
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -300,6 +436,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1997, hrclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME(1997, ccclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME(1997, tsclass, 0, cesclassic, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics And Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, hrclass, 0, hrclass, cesclassic, hrclass_state,    empty_init, ROT0, "Creative Electronics and Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, ccclass, 0, ccclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME(1997, tsclass, 0, tsclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )

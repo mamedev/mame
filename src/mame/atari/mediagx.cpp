@@ -71,6 +71,7 @@
 
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
+#include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "machine/timer.h"
@@ -101,6 +102,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_lpt0(*this, "lpt0"),
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
@@ -108,9 +110,9 @@ public:
 	void mediagx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	struct speedup_entry
@@ -143,9 +145,9 @@ private:
 	void report_speedups();
 	void install_speedups(const speedup_entry *entries, int count);
 	void init_mediagx();
-	void mediagx_io(address_map &map);
-	void mediagx_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void mediagx_io(address_map &map) ATTR_COLD;
+	void mediagx_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask)
 	{
@@ -174,6 +176,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<pc_lpt_device> m_lpt0;
 	uint8_t m_pal[768];
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
@@ -316,7 +319,7 @@ void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clip
 		m_frame_height = height;
 
 		visarea.set(0, width - 1, 0, height - 1);
-		m_screen->configure(width, height * 262 / 240, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(width, height * 262 / 240, visarea, m_screen->frame_period());
 	}
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
@@ -762,6 +765,7 @@ void mediagx_state::mediagx_io(address_map &map)
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
 	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x03bc, 0x03bf).rw(m_lpt0, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
@@ -879,6 +883,10 @@ void mediagx_state::mediagx(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mediagx_state::mediagx_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
+	// TODO: checked at POST, wants a debug device?
+	PC_LPT(config, m_lpt0);
+//  m_lpt0->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
+
 	pcat_common(config);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
@@ -889,11 +897,11 @@ void mediagx_state::mediagx(machine_config &config)
 
 	TIMER(config, "sound_timer").configure_generic(FUNC(mediagx_state::sound_timer_callback));
 
-	RAMDAC(config, m_ramdac, 0, m_palette);
+	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 639, 0, 239);
@@ -904,12 +912,11 @@ void mediagx_state::mediagx(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

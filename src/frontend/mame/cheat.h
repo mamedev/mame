@@ -15,7 +15,15 @@
 
 #include "debug/express.h"
 #include "ui/text.h"
+
+#include "utilfwd.h"
 #include "xmlfile.h"
+
+#include <iosfwd>
+#include <memory>
+#include <string>
+#include <vector>
+
 
 
 //**************************************************************************
@@ -102,7 +110,7 @@ public:
 	bool set_next_state();
 
 	// actions
-	void save(util::core_file &cheatfile) const;
+	void save(std::ostream &cheatfile) const;
 
 private:
 	// a single item in a parameter item list
@@ -160,7 +168,7 @@ public:
 
 	// actions
 	void execute(cheat_manager &manager, uint64_t &argindex);
-	void save(util::core_file &cheatfile) const;
+	void save(std::ostream &cheatfile) const;
 
 private:
 	// an entry within the script
@@ -177,7 +185,7 @@ private:
 
 		// actions
 		void execute(cheat_manager &manager, uint64_t &argindex);
-		void save(util::core_file &cheatfile) const;
+		void save(std::ostream &cheatfile) const;
 
 	private:
 		// an argument for output
@@ -196,7 +204,7 @@ private:
 			int values(uint64_t &argindex, uint64_t *result);
 
 			// actions
-			void save(util::core_file &cheatfile) const;
+			void save(std::ostream &cheatfile) const;
 
 		private:
 			// internal state
@@ -267,7 +275,7 @@ public:
 	bool select_default_state();
 	bool select_previous_state();
 	bool select_next_state();
-	void save(util::core_file &cheatfile) const;
+	void save(std::ostream &cheatfile) const;
 
 	// UI helpers
 	void menu_text(std::string &description, std::string &state, uint32_t &flags);
@@ -314,12 +322,12 @@ public:
 	std::vector<std::unique_ptr<cheat_entry>> const &entries() const { return m_cheatlist; }
 
 	// setters
-	void set_enable(bool enable);
+	void set_enable(bool enable, bool show);
 
 	// actions
 	void reload();
 	bool save_all(std::string const &filename);
-	void render_text(mame_ui_manager &mui, render_container &container);
+	void render_text(mame_ui_manager &mui, render_target &target);
 
 	// output helpers
 	std::string &get_output_string(int row, ui::text_layout::text_justify justify);

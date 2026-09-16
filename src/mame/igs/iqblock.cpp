@@ -83,7 +83,7 @@ public:
 	void init_iqblock();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -112,12 +112,10 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void program_map(address_map &map);
-	void port_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -204,8 +202,6 @@ uint32_t iqblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void iqblock_state::iqblock_prot_w(uint8_t data)
 {
@@ -500,7 +496,7 @@ void iqblock_state::iqblock(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(iqblock_state::port_c_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

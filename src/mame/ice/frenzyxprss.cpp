@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-    Skeleton driver for ICE Frenzy Express.
-    PC-based configuration running Windows 98 SE SP3:
-    - 694T Pro Ver 5 motherboard (Via VT82C686B + Via VT82C694T).
-    - Intel Celeron CPU 1000A/256/100/1.475 Q208A083-0620 SL5ZF.
-    - 256MB PC133 RAM (one single M366S3253CTS-C7A module).
-    - InsideTNC IV011A AGP graphics card.
-    - Crystal CS4281-CM EP based PCI sound card.
-    - "FE 107 I/O" ISA card.
+Skeleton driver for ICE Frenzy Express.
+
+PC-based configuration running Windows 98 SE SP3:
+- 694T Pro Ver 5 motherboard (Via VT82C686B + Via VT82C694T).
+- Intel Celeron CPU 1000A/256/100/1.475 Q208A083-0620 SL5ZF.
+- 256MB PC133 RAM (one single M366S3253CTS-C7A module).
+- InsideTNC IV011A AGP graphics card. a.k.a. GeForce2 MX/GTS (NV15/NV11)
+- Crystal CS4281-CM EP based PCI sound card.
+- "FE 107 I/O" ISA card.
 
    FE 107 I/O
        ________    ________    ________    ________
@@ -49,7 +50,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void frenzyxprss_map(address_map &map);
+	void frenzyxprss_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -68,7 +69,7 @@ void frenzyxprss_state::frenzyxprss(machine_config &config)
 	PENTIUM3(config, m_maincpu, 100'000'000); // Intel Celeron SL5ZF 1GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &frenzyxprss_state::frenzyxprss_map);
 
-	PCI_ROOT(config, "pci", 0);
+	PCI_ROOT(config, "pci");
 	// ...
 }
 
@@ -103,4 +104,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME(2001, frenzyxprss, 0, frenzyxprss, frenzyxprss, frenzyxprss_state, empty_init, ROT0, "ICE / Uniana", "Frenzy Express", MACHINE_IS_SKELETON)
+GAME(2001, frenzyxprss, 0, frenzyxprss, frenzyxprss, frenzyxprss_state, empty_init, ROT0, "ICE / Uniana", "Frenzy Express", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

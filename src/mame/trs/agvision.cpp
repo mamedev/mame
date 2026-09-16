@@ -41,10 +41,10 @@
 
 #include "emu.h"
 
-#include "6883sam.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "machine/6883sam.h"
 #include "machine/ram.h"
 #include "video/mc6847.h"
 #include "screen.h"
@@ -75,7 +75,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(hang_up);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	static constexpr int CD_DELAY = 250;
@@ -91,12 +91,12 @@ private:
 
 	emu_timer *m_timer; // Carrier Detect Timer
 	uint8_t sam_read(offs_t offset);
-	void mem_map(address_map &map);
-	void rom_map(address_map &map);
-	void static_ram_map(address_map &map);
-	void io0_map(address_map &map);
-	void io1_map(address_map &map);
-	void boot_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void rom_map(address_map &map) ATTR_COLD;
+	void static_ram_map(address_map &map) ATTR_COLD;
+	void io0_map(address_map &map) ATTR_COLD;
+	void io1_map(address_map &map) ATTR_COLD;
+	void boot_map(address_map &map) ATTR_COLD;
 	void ff20_write(offs_t offset, uint8_t data);
 	void configure_sam();
 	uint8_t pia0_pa_r();
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( agvision )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("hup")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HUP") PORT_CODE(KEYCODE_TAB) PORT_CHANGED_MEMBER(DEVICE_SELF, agvision_state, agvision_state::hang_up, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HUP") PORT_CODE(KEYCODE_TAB) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(agvision_state::agvision_state::hang_up), 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -210,9 +210,11 @@ void agvision_state::agvision(machine_config &config)
 	m_pia_0->cb2_handler().set(FUNC(agvision_state::pia0_cb2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER).set_raw(3.579545_MHz_XTAL * 2, 456, 0, 320, 262, 0, 240);
+	SCREEN(config, m_screen);
+	m_screen->set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_screen_update("vdg", FUNC(mc6847_base_device::screen_update));
 
-	MC6847_NTSC(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
+	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
 	m_vdg->input_callback().set(FUNC(agvision_state::sam_read));

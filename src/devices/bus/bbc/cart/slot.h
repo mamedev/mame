@@ -101,8 +101,8 @@ CSYNC/MADET  10  10  LPSTB
    22      0V - Zero volts.
 
 **********************************************************************/
-#ifndef MAME_BUS_BBC_CARTSLOT_H
-#define MAME_BUS_BBC_CARTSLOT_H
+#ifndef MAME_BUS_BBC_CART_SLOT_H
+#define MAME_BUS_BBC_CART_SLOT_H
 
 #pragma once
 
@@ -126,10 +126,7 @@ public:
 	bbc_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
 		: electron_cartslot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	bbc_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -158,4 +155,4 @@ DECLARE_DEVICE_TYPE(BBCM_CARTSLOT, bbc_cartslot_device)
 void bbcm_cart(device_slot_interface &device);
 
 
-#endif // MAME_BUS_BBC_CARTSLOT_H
+#endif // MAME_BUS_BBC_CART_SLOT_H

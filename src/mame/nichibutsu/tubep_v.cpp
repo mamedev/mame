@@ -2,8 +2,6 @@
 // copyright-holders:Jarek Burczynski
 /***************************************************************************
 
-  video.c
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/

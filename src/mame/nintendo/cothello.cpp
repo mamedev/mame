@@ -67,7 +67,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(insert_coin);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -77,7 +77,12 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<3> m_digits;
 
-	void main_map(address_map &map);
+	u16 m_counter = 0;
+	u8 m_sound_data = 0;
+	emu_timer *m_counter_timer;
+	emu_timer *m_beeper_off;
+
+	void main_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -87,17 +92,10 @@ private:
 
 	TIMER_CALLBACK_MEMBER(counter_tick);
 	TIMER_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
-
-	u16 m_counter = 0;
-	u8 m_sound_data = 0;
-	emu_timer *m_counter_timer;
-	emu_timer *m_beeper_off;
 };
 
 void cothello_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_counter_timer = timer_alloc(FUNC(cothello_state::counter_tick), this);
 	m_beeper_off = timer_alloc(FUNC(cothello_state::beeper_off), this);
 
@@ -259,7 +257,7 @@ static INPUT_PORTS_START( cothello )
 	PORT_DIPSETTING(     0x09, "900 seconds" )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cothello_state, insert_coin, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cothello_state::insert_coin), 0)
 INPUT_PORTS_END
 
 
@@ -276,7 +274,7 @@ void cothello_state::cothello(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cothello_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64, 192);
 	m_screen->set_visarea(0, 64-1, 0, 192-1);
@@ -285,7 +283,7 @@ void cothello_state::cothello(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 

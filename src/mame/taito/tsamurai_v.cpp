@@ -7,6 +7,8 @@
 #include "emu.h"
 #include "tsamurai.h"
 
+#include "input.h" // for vsgongf debug keys
+
 
 /***************************************************************************
 
@@ -282,7 +284,7 @@ void vsgongf_state::video_start()
 
 uint32_t vsgongf_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	#ifdef MAME_DEBUG
+#ifdef MAME_DEBUG
 	if( machine().input().code_pressed( KEYCODE_Q ) ){
 		while( machine().input().code_pressed( KEYCODE_Q ) ){
 			m_key_count++;
@@ -290,7 +292,7 @@ uint32_t vsgongf_state::screen_update_vsgongf(screen_device &screen, bitmap_ind1
 			m_foreground ->mark_all_dirty();
 		}
 	}
-	#endif
+#endif
 
 	m_foreground->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);

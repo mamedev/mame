@@ -31,7 +31,7 @@ public:
 private:
 	required_device<msx_slot_bruc100_device> m_bruc100_firm;
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 	void port90_w(u8 data);
 };
 

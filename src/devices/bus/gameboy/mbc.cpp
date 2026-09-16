@@ -783,13 +783,6 @@ public:
 	}
 
 protected:
-	virtual void device_start() override ATTR_COLD
-	{
-		mbc5_device_base::device_start();
-
-		m_rumble.resolve();
-	}
-
 	virtual void device_reset() override ATTR_COLD
 	{
 		mbc5_device_base::device_reset();

@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SPECTRUM_USOURCE, spectrum_usource_device, "spectrum_usource", "Spectrum Currah \xC2\xB5Source")
+DEFINE_DEVICE_TYPE(SPECTRUM_USOURCE, spectrum_usource_device, "spectrum_usource", u8"Spectrum Currah µSource")
 
 
 //-------------------------------------------------
@@ -78,7 +78,7 @@ void spectrum_usource_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-int spectrum_usource_device::romcs()
+bool spectrum_usource_device::romcs()
 {
 	return m_romcs;
 }

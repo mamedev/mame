@@ -10,7 +10,7 @@
 class dw_keyboard_device :  public device_t
 {
 public:
-	dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto out_data_handler() { return m_out_data.bind(); }
 	auto out_clock_handler() { return m_out_clock.bind(); }
@@ -22,12 +22,12 @@ public:
 	void ack_w(int state);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t m_dip, m_bus, m_p2;

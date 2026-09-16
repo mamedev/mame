@@ -29,7 +29,7 @@ class victor_9000_fdc_device :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	victor_9000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_wr_callback() { return m_irq_cb.bind(); }
 	auto syn_wr_callback() { return m_syn_cb.bind(); }
@@ -44,12 +44,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(gen_tick);
 	TIMER_CALLBACK_MEMBER(tach0_tick);
@@ -115,8 +115,8 @@ private:
 	output_finder<2> m_leds;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
-	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da);
-	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da);
+	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, float tach_hz);
+	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t dacval, float &tach_hz);
 	void update_rdy();
 
 	void load0_cb(floppy_image_device *device);
@@ -128,13 +128,12 @@ private:
 	uint8_t m_p2;
 
 	/* floppy state */
-	uint8_t m_data;
 	uint8_t m_da[2];
 	int m_start[2];
 	int m_stop[2];
 	int m_sel[2];
 	int m_tach[2];
-	int m_rdy[2];
+	float m_tach_hz[2];
 	int m_scp_rdy0;
 	int m_scp_rdy1;
 	int m_via_rdy0;
@@ -165,7 +164,7 @@ private:
 	floppy_image_device* get_floppy();
 	void live_start();
 	void pll_reset(const attotime &when);
-	void pll_start_writing(const attotime &tm);
+	void pll_start_writing(const attotime &tm, floppy_image_device *floppy);
 	void pll_commit(floppy_image_device *floppy, const attotime &tm);
 	void pll_stop_writing(floppy_image_device *floppy, const attotime &tm);
 	int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, const attotime &limit);

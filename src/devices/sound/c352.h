@@ -7,6 +7,8 @@
 
 #include "dirom.h"
 
+#include <map>
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,12 +36,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
@@ -81,7 +83,7 @@ private:
 		u16 freq;
 		u16 flags;
 
-		u16  wave_bank;
+		u16 wave_bank;
 		u16 wave_start;
 		u16 wave_end;
 		u16 wave_loop;
@@ -90,6 +92,7 @@ private:
 
 	void fetch_sample(c352_voice_t &v);
 	void ramp_volume(c352_voice_t &v, int ch, u8 val);
+	void log_pcm(int voice);
 
 	sound_stream *m_stream;
 
@@ -101,7 +104,9 @@ private:
 	s16 m_mulawtab[256];
 
 	u16 m_random;
-	u16 m_control; // control flags, purpose unknown.
+	u16 m_control; // control flags, purpose unknown
+
+	std::map<u32, bool> m_found_pcm; // only for log_pcm
 };
 
 

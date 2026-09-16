@@ -59,8 +59,8 @@ public:
 private:
 	void usart_clock_tick(int state);
 
-	void sdk80_io(address_map &map);
-	void sdk80_mem(address_map &map);
+	void sdk80_io(address_map &map) ATTR_COLD;
+	void sdk80_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -130,7 +130,7 @@ void sdk80_state::sdk80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sdk80_state::sdk80_mem);
 	m_maincpu->set_addrmap(AS_IO, &sdk80_state::sdk80_io);
 
-	I8251(config, m_usart, 0);
+	I8251(config, m_usart);
 	m_usart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));

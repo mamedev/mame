@@ -2,31 +2,19 @@
 // copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
- *   i8051dasm.c
- *   Portable MCS-51 Family Emulator
+ * Portable MCS-51 Family Disassembler
+ * Copyright Steve Ellenoff
  *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
- *
- *****************************************************************************
  * Symbol Memory Name Tables borrowed from:
  * D52 8052 Disassembler - Copyright Jeffery L. Post
+ *
  *****************************************************************************/
 
 #include "emu.h"
 #include "mcs51dasm.h"
 
 // Note: addresses >= 0x100 are bit addresses
+// Note: place default_names last in constructors to allow other names to override it
 
 const mcs51_disassembler::mem_info mcs51_disassembler::default_names[] = {
 	{  0x00, "rb0r0" },
@@ -111,8 +99,7 @@ const mcs51_disassembler::mem_info mcs51_disassembler::default_names[] = {
 	{ 0x1ae, "ie.6"  },
 	{ 0x1af, "ea"    },
 
-	/* FIXME: port 3 - depends on external circuits and not really
-	 * implemented in the core. TBD */
+	// FIXME: port 3 - depends on external circuits and not really implemented in the core. TBD
 	{ 0x1b0, "rxd"   },
 	{ 0x1b1, "txd"   },
 	{ 0x1b2, "int0"  },
@@ -319,16 +306,16 @@ const mcs51_disassembler::mem_info mcs51_disassembler::i8xc751_names[] = {
 	{  0x98, "i2con"   },
 	{  0x99, "i2dat"   },
 	{  0xd8, "i2cfg"   },
-	{  0xf8, "i2sta"   },  /* read only */
+	{  0xf8, "i2sta"   }, // read only
 
-	{ 0x198, "xstp"    }, /* read: no function */
-	{ 0x199, "xstr"    }, /* read: MASTER */
-	{ 0x19a, "cstp"    }, /* read: STP */
-	{ 0x19b, "cstr"    }, /* read: STR */
-	{ 0x19c, "carl"    }, /* read: ARL */
-	{ 0x19d, "cdr"     }, /* read: DRDY */
-	{ 0x19e, "idle"    }, /* read: ATN */
-	{ 0x19f, "cxa"     }, /* read: RDAT */
+	{ 0x198, "xstp"    }, // read: no function
+	{ 0x199, "xstr"    }, // read: MASTER
+	{ 0x19a, "cstp"    }, // read: STP
+	{ 0x19b, "cstr"    }, // read: STR
+	{ 0x19c, "carl"    }, // read: ARL
+	{ 0x19d, "cdr"     }, // read: DRDY
+	{ 0x19e, "idle"    }, // read: ATN
+	{ 0x19f, "cxa"     }, // read: RDAT
 
 	{ 0x1ac, "ei2"     },
 
@@ -649,13 +636,127 @@ const mcs51_disassembler::mem_info mcs51_disassembler::rupi44_names[] = {
 	{ -1 }
 };
 
+const mcs51_disassembler::mem_info mcs51_disassembler::p8xc562_names[] = {
+	{  0xa8, "ien0"   },
+	{  0xa9, "cml0"   },
+	{  0xaa, "cml1"   },
+	{  0xab, "cml2"   },
+	{  0xac, "ctl0"   },
+	{  0xad, "ctl1"   },
+	{  0xae, "ctl2"   },
+	{  0xaf, "ctl3"   },
+	{  0xb8, "ip0"    },
+	{  0xc0, "p4"     },
+	{  0xc4, "p5"     },
+	{  0xc5, "adcon"  },
+	{  0xc6, "adch"   },
+	{  0xc8, "tm2ir"  },
+	{  0xc9, "cmh0"   },
+	{  0xca, "cmh1"   },
+	{  0xcb, "cmh2"   },
+	{  0xcc, "cth0"   },
+	{  0xcd, "cth1"   },
+	{  0xce, "cth2"   },
+	{  0xcf, "cth3"   },
+	{  0xe8, "ien1"   },
+	{  0xea, "tm2con" },
+	{  0xeb, "ctcon"  },
+	{  0xec, "tml2"   },
+	{  0xed, "tmh2"   },
+	{  0xee, "ste"    },
+	{  0xef, "rte"    },
+	{  0xf8, "ip1"    },
+	{  0xfc, "pwm0"   },
+	{  0xfd, "pwm1"   },
+	{  0xfe, "pwmp"   },
+	{  0xff, "t3"     },
+
+	{ 0x190, "ct0i"   },
+	{ 0x191, "ct1i"   },
+	{ 0x192, "ct2i"   },
+	{ 0x193, "ct3i"   },
+	{ 0x194, "t2"     },
+	{ 0x195, "rt2"    },
+
+	{ 0x1ae, "ead"    },
+
+	{ 0x1be, "pad"    },
+
+	{ 0x1c0, "cmsr0"  },
+	{ 0x1c1, "cmsr1"  },
+	{ 0x1c2, "cmsr2"  },
+	{ 0x1c3, "cmsr3"  },
+	{ 0x1c4, "cmsr4"  },
+	{ 0x1c5, "cmsr5"  },
+	{ 0x1c6, "cmt0"   },
+	{ 0x1c7, "cmt1"   },
+
+	{ 0x1c8, "cti0"   },
+	{ 0x1c9, "cti1"   },
+	{ 0x1ca, "cti2"   },
+	{ 0x1cb, "cti3"   },
+	{ 0x1cc, "cmi0"   },
+	{ 0x1cd, "cmi1"   },
+	{ 0x1ce, "cmi2"   },
+	{ 0x1cf, "t2ov"   },
+
+	{ 0x1e8, "ect0"   },
+	{ 0x1e9, "ect1"   },
+	{ 0x1ea, "ect2"   },
+	{ 0x1eb, "ect3"   },
+	{ 0x1ec, "ecm0"   },
+	{ 0x1ed, "ecm1"   },
+	{ 0x1ee, "ecm2"   },
+	{ 0x1ef, "et2"    },
+
+	{ 0x1f8, "pct0"   },
+	{ 0x1f9, "pct1"   },
+	{ 0x1fa, "pct2"   },
+	{ 0x1fb, "pct3"   },
+	{ 0x1fc, "pcm0"   },
+	{ 0x1fd, "pcm1"   },
+	{ 0x1fe, "pcm2"   },
+	{ 0x1ff, "pt2"    },
+
+	{ -1 }
+};
+
+const mcs51_disassembler::mem_info mcs51_disassembler::p8xc552_names[] = {
+	{  0x98, "s0con"  },
+	{  0x99, "s0buf"  },
+	{  0xd8, "s1con"  },
+	{  0xd9, "s1sta"  },
+	{  0xda, "s1dat"  },
+	{  0xdb, "s1adr"  },
+
+	{ 0x196, "scl"    },
+	{ 0x197, "sda"    },
+
+	{ 0x1ac, "es0"    },
+	{ 0x1ad, "es1"    },
+
+	{ 0x1bc, "ps0"    },
+	{ 0x1bd, "ps1"    },
+
+	{ 0x1d8, "cr0"    },
+	{ 0x1d9, "cr1"    },
+	{ 0x1da, "aa"     },
+	{ 0x1db, "si"     },
+	{ 0x1dc, "sto"    },
+	{ 0x1dd, "sta"    },
+	{ 0x1de, "ens1"   },
+	{ 0x1df, "cr2"    },
+
+	{ -1 }
+};
+
 mcs51_disassembler::mcs51_disassembler()
 {
 }
 
 void mcs51_disassembler::add_names(const mem_info *info)
 {
-	for(unsigned int i=0; info[i].addr >= 0; i++)
+	for (unsigned int i = 0; info[i].addr >= 0; i++)
 		m_names[info[i].addr] = info[i].name;
 }
 
@@ -665,7 +766,7 @@ u32 mcs51_disassembler::opcode_alignment() const
 }
 
 
-std::string mcs51_disassembler::get_data_address( uint8_t arg ) const
+std::string mcs51_disassembler::get_data_address(uint8_t arg) const
 {
 	auto i = m_names.find(arg);
 	if (i == m_names.end())
@@ -674,11 +775,11 @@ std::string mcs51_disassembler::get_data_address( uint8_t arg ) const
 		return i->second;
 }
 
-std::string mcs51_disassembler::get_bit_address( uint8_t arg ) const
+std::string mcs51_disassembler::get_bit_address(uint8_t arg) const
 {
-	if(arg < 0x80)
+	if (arg < 0x80)
 	{
-		//Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
+		// Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
 		return util::string_format("$%02X.%d", (arg >> 3) | 0x20, arg & 0x07);
 	}
 	else
@@ -1543,7 +1644,7 @@ i8051_disassembler::i8051_disassembler() : mcs51_disassembler(default_names)
 {
 }
 
-i8052_disassembler::i8052_disassembler() : mcs51_disassembler(default_names, i8052_names)
+i8052_disassembler::i8052_disassembler() : mcs51_disassembler(i8052_names, default_names)
 {
 }
 
@@ -1551,34 +1652,42 @@ i80c51_disassembler::i80c51_disassembler() : mcs51_disassembler(default_names)
 {
 }
 
-i80c52_disassembler::i80c52_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names)
+i80c52_disassembler::i80c52_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, default_names)
 {
 }
 
-i8xc51fx_disassembler::i8xc51fx_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, i8xc51fx_names)
+i8xc51fx_disassembler::i8xc51fx_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, i8xc51fx_names, default_names)
 {
 }
 
-i8xc51gb_disassembler::i8xc51gb_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, i8xc51fx_names, i8xc51gb_names)
+i8xc51gb_disassembler::i8xc51gb_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, i8xc51fx_names, i8xc51gb_names, default_names)
 {
 }
 
-ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(default_names, i8052_names, i80c52_names, ds5002fp_names, i8xc751_names)
+ds5002fp_disassembler::ds5002fp_disassembler() : mcs51_disassembler(i8052_names, i80c52_names, ds5002fp_names, i8xc751_names, default_names)
 {
 }
 
-ds80c320_disassembler::ds80c320_disassembler() : mcs51_disassembler(default_names, i8052_names, ds80c320_names)
+ds80c320_disassembler::ds80c320_disassembler() : mcs51_disassembler(i8052_names, ds80c320_names, default_names)
 {
 }
 
-sab80515_disassembler::sab80515_disassembler() : mcs51_disassembler(default_names, sab80515_names)
+sab80515_disassembler::sab80515_disassembler() : mcs51_disassembler(sab80515_names, default_names)
 {
 }
 
-sab80c515_disassembler::sab80c515_disassembler() : mcs51_disassembler(default_names, sab80515_names, sab80c515_names)
+sab80c515_disassembler::sab80c515_disassembler() : mcs51_disassembler(sab80515_names, sab80c515_names, default_names)
 {
 }
 
 rupi44_disassembler::rupi44_disassembler() : mcs51_disassembler(rupi44_names)
+{
+}
+
+p8xc552_disassembler::p8xc552_disassembler() : mcs51_disassembler(p8xc562_names, p8xc552_names, default_names)
+{
+}
+
+p8xc562_disassembler::p8xc562_disassembler() : mcs51_disassembler(p8xc562_names, default_names)
 {
 }

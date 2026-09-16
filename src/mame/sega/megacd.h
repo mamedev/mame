@@ -7,9 +7,9 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
-#include "machine/lc89510.h"
-#include "megacdcd.h"
 #include "sound/rf5c68.h"
+
+#include "megacdcd.h"
 #include "screen.h"
 #include "tilemap.h"
 
@@ -101,13 +101,13 @@ public:
 	void font_color_w(uint8_t data);
 	uint16_t font_converted_r(offs_t offset);
 
-	void segacd_map(address_map &map);
-	void segacd_pcm_map(address_map &map);
+	void segacd_map(address_map &map) ATTR_COLD;
+	void segacd_pcm_map(address_map &map) ATTR_COLD;
 protected:
 	sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<cpu_device> m_scdcpu;
 	required_device<cpu_device> m_hostcpu;
@@ -119,7 +119,7 @@ protected:
 	required_device<timer_device> m_dma_timer;
 	//required_device<timer_device> m_hock_timer;
 
-	required_shared_ptr<uint16_t> m_prgram;
+	std::unique_ptr<uint16_t[]> m_prgram;
 	required_shared_ptr<uint16_t> m_dataram;
 	required_shared_ptr<uint16_t> m_font_bits;
 
@@ -138,6 +138,7 @@ protected:
 
 
 	uint8_t segacd_ram_writeprotect_bits = 0;
+	u32 m_write_boundary = 0;
 	int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 	int segacd_memory_priority_mode = 0;
 	int segacd_stampsize = 0;
@@ -190,8 +191,8 @@ protected:
 
 	uint8_t read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
@@ -206,19 +207,19 @@ protected:
 class sega_segacd_us_device : public sega_segacd_device
 {
 public:
-	sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class sega_segacd_japan_device : public sega_segacd_device
 {
 public:
-	sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class sega_segacd_europe_device : public sega_segacd_device
 {
 public:
-	sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 

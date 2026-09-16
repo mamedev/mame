@@ -155,7 +155,7 @@ INPUT_PORTS_START(zac1b11142_ioports)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1") PORT_CHANGED_MEMBER(DEVICE_SELF, zac1b11142_audio_device, p1_changed, 0) // test button?  generates NMI on master CPU
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("P1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(zac1b11142_audio_device::p1_changed), 0) // test button?  generates NMI on master CPU
 
 	PORT_START("VP1")
 	PORT_ADJUSTER( 50, "VP1 - Music volume" )   NETLIST_ANALOG_PORT_CHANGED("sound_nl", "pot1")
@@ -179,7 +179,7 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, devtype, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 1)
+	, device_mixer_interface(mconfig, *this)
 	, m_melodycpu(*this, "melodycpu")
 	, m_melodypia(*this, "melodypia")
 	, m_melodypsg1(*this, "melodypsg1")
@@ -232,7 +232,8 @@ void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
 	M6802(config, m_melodycpu, XTAL(3'579'545)); // verified on pcb
 	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b111xx_melody_base::zac1b111xx_melody_base_map);
 
-	clock_device &timebase(CLOCK(config, "timebase", XTAL(3'579'545)/4096/2)); // CPU clock divided using 4040 and half of 74LS74
+	clock_device &timebase(CLOCK(config, "timebase"));
+	timebase.set_period(attotime::from_ticks(0x2000, XTAL(3'579'545))); // CPU clock divided using 4040 and half of 74LS74
 	timebase.signal_handler().set(m_melodypia, FUNC(pia6821_device::cb1_w));
 
 	PIA6821(config, m_melodypia);
@@ -242,10 +243,10 @@ void zac1b111xx_melody_base::device_add_mconfig(machine_config &config)
 	m_melodypia->irqa_handler().set_inputline("melodycpu", INPUT_LINE_NMI);
 	m_melodypia->irqb_handler().set_inputline("melodycpu", M6802_IRQ_LINE);
 
-	AY8910(config, m_melodypsg1, XTAL(3'579'545)/2); // CPU clock divided using 4040
+	AY8910(config, m_melodypsg1, XTAL(3'579'545) / 2); // CPU clock divided using 4040
 	m_melodypsg1->port_b_read_callback().set(FUNC(zac1b111xx_melody_base::melodypsg1_portb_r));
 
-	AY8910(config, m_melodypsg2, XTAL(3'579'545)/2); // CPU clock divided using 4040
+	AY8910(config, m_melodypsg2, XTAL(3'579'545) / 2); // CPU clock divided using 4040
 }
 
 void zac1b111xx_melody_base::device_start()
@@ -299,7 +300,7 @@ void zac1b11107_audio_device::melodypsg1_porta_w(u8 data)
 			RES_R(390),
 			RES_K(1.5),
 			RES_R(47) };
-	m_melodypsg2->set_volume(1, 150 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
+	m_melodypsg2->set_output_gain(1, 1.5 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
 }
 
 void zac1b11107_audio_device::melodypsg2_porta_w(u8 data)
@@ -314,10 +315,10 @@ void zac1b11107_audio_device::device_add_mconfig(machine_config &config)
 	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b11107_audio_device::zac1b11107_melody_map);
 
 	m_melodypsg1->port_a_write_callback().set(FUNC(zac1b11107_audio_device::melodypsg1_porta_w));
-	m_melodypsg1->add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_melodypsg1->add_route(ALL_OUTPUTS, *this, 0.5, 0);
 
 	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11107_audio_device::melodypsg2_porta_w));
-	m_melodypsg2->add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_melodypsg2->add_route(ALL_OUTPUTS, *this, 0.5, 0);
 }
 
 
@@ -435,7 +436,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, 0); // mc1408.1f
 	MC1408(config, "dac").add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
@@ -447,7 +448,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(netlist_zac1b11142)
-		.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+		.add_route(ALL_OUTPUTS, *this, 1.0, 0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa0",   "I_IOA0.IN",   0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa1",   "I_IOA1.IN",   0);

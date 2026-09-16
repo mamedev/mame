@@ -4,18 +4,26 @@
 
 Mephisto Amsterdam (2-ROM hardware version)
 
-The base hardware components are the same as Glasgow, but the 32-bit versions
-have more RAM and a faster CPU.
+Hardware notes:
+
+Amsterdam:
+- same as Glasgow, but 2*27C256 EPROMs
+
+Dallas 68020:
+- MC68020RC12B @ 14MHz
+- 64KB ROM(27C512), 64KB RAM(8*M5M5165P-10L)
+- rest is similar to 16-bit version
 
 TODO:
-- waitstates, same as glasgow.cpp
+- does it have DTACK wait states? surely the PCB supports LDS/UDS wait states
+  just like Glasgow, but it's probably disabled due to faster EPROMs
 
 *******************************************************************************/
 
 #include "emu.h"
 
-#include "mmboard.h"
-#include "mmdisplay1.h"
+#include "mboard.h"
+#include "mdisplay1.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
@@ -51,27 +59,17 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display1_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<2> m_keys;
 	required_ioport m_reset;
 
-	void amsterd_mem(address_map &map);
-	void dallas32_mem(address_map &map);
+	void amsterd_mem(address_map &map) ATTR_COLD;
+	void dallas32_mem(address_map &map) ATTR_COLD;
 
 	void led_w(offs_t offset, u8 data);
 	void dac_w(u8 data);
 	u8 keys_r();
 };
-
-INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
-{
-	// RES buttons in serial tied to CPU RESET
-	if (m_reset->read() == 3)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_display->reset();
-	}
-}
 
 
 
@@ -79,13 +77,20 @@ INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
     I/O
 *******************************************************************************/
 
+INPUT_CHANGED_MEMBER(amsterdam_state::reset_button)
+{
+	// RES buttons in serial tied to CPU RESET
+	if (m_reset->read() == 3)
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
 void amsterdam_state::led_w(offs_t offset, u8 data)
 {
 	// d0-d7: board leds
 	m_board->led_w(data);
 
-	// a8: lcd strobe
-	m_display->strobe_w(BIT(offset, 7));
+	// a8: lcd common
+	m_display->common_w(BIT(offset, 7));
 }
 
 void amsterdam_state::dac_w(u8 data)
@@ -96,8 +101,8 @@ void amsterdam_state::dac_w(u8 data)
 
 u8 amsterdam_state::keys_r()
 {
-	// lcd strobe is shared with keypad select
-	return m_keys[m_display->strobe_r()]->read();
+	// lcd common is shared with keypad select
+	return m_keys[m_display->common_r()]->read();
 }
 
 
@@ -140,7 +145,7 @@ void amsterdam_state::dallas32_mem(address_map &map)
 static INPUT_PORTS_START( amsterdam )
 	PORT_START("KEY.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("INFO") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("POS") PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEV") PORT_CODE(KEYCODE_L)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MEM") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
@@ -159,11 +164,8 @@ static INPUT_PORTS_START( amsterdam )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right / White / 0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_RIGHT)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, amsterdam_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, amsterdam_state, reset_button, 0)
-
-	PORT_START("CLICKABLE") // helper for clickable artwork
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 1") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amsterdam_state::reset_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RES 2") PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amsterdam_state::reset_button), 0)
 INPUT_PORTS_END
 
 
@@ -197,7 +199,7 @@ void amsterdam_state::dallas32(machine_config &config)
 
 	// basic machine hardware
 	M68020(config.replace(), m_maincpu, 14_MHz_XTAL);
-	m_maincpu->set_periodic_int(FUNC(amsterdam_state::irq5_line_hold), attotime::from_hz(50));
+	m_maincpu->set_periodic_int(FUNC(amsterdam_state::irq4_line_hold), attotime::from_hz(50));
 	m_maincpu->set_addrmap(AS_PROGRAM, &amsterdam_state::dallas32_mem);
 }
 
@@ -214,9 +216,14 @@ ROM_START( amsterd )
 ROM_END
 
 
-ROM_START( dallas32 )
+ROM_START( dallas32 ) // serial 06053xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("dallas32.bin", 0x00000, 0x10000, CRC(83b9ff3f) SHA1(97bf4cb3c61f8ec328735b3c98281bba44b30a28) )
+	ROM_LOAD("dallas_68020", 0x00000, 0x10000, CRC(00ab8e11) SHA1(5e0a2f5e6b5a65d4997d6a999f23f9c30460f2e3) ) // MBM27C512-25
+ROM_END
+
+ROM_START( dallas32a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("dallas32a.bin", 0x00000, 0x10000, CRC(83b9ff3f) SHA1(97bf4cb3c61f8ec328735b3c98281bba44b30a28) )
 ROM_END
 
 ROM_START( dallas16 )
@@ -246,10 +253,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas32a, dallas32, 0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020 (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, dallas16,  dallas32, 0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68000", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1987, roma32,    0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68020", MACHINE_SUPPORTS_SAVE )
+SYST( 1987, roma16,    roma32,   0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Roma 68000", MACHINE_SUPPORTS_SAVE )

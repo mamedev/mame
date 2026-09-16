@@ -23,7 +23,7 @@ class sega_315_5248_multiplier_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// public interface
 	u16 read(offs_t offset);
@@ -31,8 +31,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state
@@ -46,7 +46,7 @@ class sega_315_5249_divider_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// public interface
 	u16 read(offs_t offset);
@@ -54,8 +54,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal helpers
@@ -72,7 +72,7 @@ class sega_315_5250_compare_timer_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	sega_315_5250_compare_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	auto m68kint_callback() { return m_68kint_callback.bind(); }
@@ -86,8 +86,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal helpers

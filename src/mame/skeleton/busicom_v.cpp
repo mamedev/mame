@@ -1826,7 +1826,7 @@ uint32_t busicom_state::screen_update_busicom(screen_device &screen, bitmap_ind1
 			for (u8 j = 0; j < 44; j++)
 			{
 				for (u8 b = 0; b < 34; b++)
-					bitmap.pix((y*44)+j, x*40+b) =  printer_font[44*34 * chr + j*34 + b] + col ;
+					bitmap.pix((y*44)+j, x*40+b) =  printer_font[44*34 * chr + j*34 + b] + col;
 
 				for (u8 b = 34; b < 40; b++)
 					bitmap.pix((y*44)+j, x*40+b) =  0;

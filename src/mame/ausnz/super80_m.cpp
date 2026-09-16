@@ -193,8 +193,6 @@ void super80_state::portf0_w(u8 data)
 
 void super80_state::machine_start_common()
 {
-	m_cass_led.resolve();
-
 	// register for savestates
 	save_item(NAME(m_portf0));
 	save_item(NAME(m_s_options));

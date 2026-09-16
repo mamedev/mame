@@ -109,10 +109,10 @@ private:
 	//emu_timer *m_outfifo_timer = nullptr;
 
 	// overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void m68k_mem(address_map &map);
+	void m68k_mem(address_map &map) ATTR_COLD;
 
 	//TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 };
@@ -385,4 +385,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT            COMPANY      FULLNAME  FLAGS
-COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_IS_SKELETON )
+COMP( 1984, s3670, 0,      0,      symbolics, symbolics, symbolics_state, init_symbolics, "Symbolics", "3670",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

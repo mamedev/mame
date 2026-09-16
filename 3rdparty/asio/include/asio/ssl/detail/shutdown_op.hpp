@@ -2,7 +2,7 @@
 // ssl/detail/shutdown_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,13 +22,14 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 namespace detail {
 
 class shutdown_op
 {
 public:
-  static ASIO_CONSTEXPR const char* tracking_name()
+  static constexpr const char* tracking_name()
   {
     return "ssl::stream<>::async_shutdown";
   }
@@ -41,6 +42,17 @@ public:
     return eng.shutdown(ec);
   }
 
+  void complete_sync(asio::error_code& ec) const
+  {
+    if (ec == asio::error::eof)
+    {
+      // The engine only generates an eof when the shutdown notification has
+      // been received from the peer. This indicates that the shutdown has
+      // completed successfully, and thus need not be returned to the caller.
+      ec = asio::error_code();
+    }
+  }
+
   template <typename Handler>
   void call_handler(Handler& handler,
       const asio::error_code& ec,
@@ -51,17 +63,18 @@ public:
       // The engine only generates an eof when the shutdown notification has
       // been received from the peer. This indicates that the shutdown has
       // completed successfully, and thus need not be passed on to the handler.
-      ASIO_MOVE_OR_LVALUE(Handler)(handler)(asio::error_code());
+      static_cast<Handler&&>(handler)(asio::error_code());
     }
     else
     {
-      ASIO_MOVE_OR_LVALUE(Handler)(handler)(ec);
+      static_cast<Handler&&>(handler)(ec);
     }
   }
 };
 
 } // namespace detail
 } // namespace ssl
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

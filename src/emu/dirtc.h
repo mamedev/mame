@@ -51,7 +51,7 @@ public:
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
 
 	void set_time(bool update, int year, int month, int day, int day_of_week, int hour, int minute, int second);
-	virtual void set_current_time(const system_time &systime);
+	void set_current_time(const system_time &systime);
 
 	bool has_battery() const { return rtc_battery_backed(); }
 

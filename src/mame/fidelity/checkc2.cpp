@@ -44,13 +44,22 @@ public:
 	void cr(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<ucom4_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
+
+	u8 m_ram[0x100] = { };
+	u8 m_ram_address = 0;
+	u8 m_ram_data = 0;
+	u8 m_ram_control = 0;
+
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
 
 	// I/O handlers
 	void update_display();
@@ -63,15 +72,6 @@ private:
 	void rama0_w(u8 data);
 	void rama1_w(u8 data);
 	u8 input_r();
-
-	u8 m_ram[0x100] = { };
-	u8 m_ram_address = 0;
-	u8 m_ram_data = 0;
-	u8 m_ram_control = 0;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
 };
 
 void cr_state::machine_start()
@@ -208,7 +208,7 @@ INPUT_PORTS_END
 void cr_state::cr(machine_config &config)
 {
 	// basic machine hardware
-	NEC_D546(config, m_maincpu, 400000); // approximation
+	NEC_D546(config, m_maincpu, 400'000); // approximation
 	m_maincpu->read_a().set(FUNC(cr_state::input_r));
 	m_maincpu->read_b().set(FUNC(cr_state::ram_r));
 	m_maincpu->write_c().set(FUNC(cr_state::ram_w));
@@ -245,4 +245,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT CLASS     INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1978, checkc2, 0,      0,      cr,      cr,   cr_state, empty_init, "Fidelity Electronics", "Checker Challenger (model CR, 2 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
+SYST( 1978, checkc2, 0,      0,      cr,      cr,   cr_state, empty_init, "Fidelity Electronics", "Checker Challenger (model CR, 2 levels)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

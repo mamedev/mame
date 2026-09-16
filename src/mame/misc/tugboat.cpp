@@ -85,12 +85,12 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void tugboat(machine_config &config);
-	void noahsark(machine_config &config);
+	void tugboat(machine_config &config) ATTR_COLD;
+	void noahsark(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -120,7 +120,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -131,8 +131,6 @@ private:
 
 void tugboat_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_hd46505_regs));
 	save_item(NAME(m_hd46505_reglatch));
 	save_item(NAME(m_start_address));
@@ -439,7 +437,7 @@ void tugboat_state::tugboat(machine_config &config)
 	m_pia[1]->irqb_handler().append_inputline(m_maincpu, 0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10_MHz_XTAL/2, 320, 8, 248, 264, 8, 240);
 	m_screen->set_screen_update(FUNC(tugboat_state::screen_update));
 	m_screen->set_palette(m_palette);

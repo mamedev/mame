@@ -25,10 +25,10 @@ public:
 	uint8_t pcm_r(offs_t offset);
 	void pcm_w(offs_t offset, uint8_t data);
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void dack16_w(int line, uint16_t data) override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(pcm_update);
 
@@ -134,19 +134,18 @@ TIMER_CALLBACK_MEMBER(vis_audio_device::pcm_update)
 
 void vis_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
-	ymf262.add_route(0, "lspeaker", 1.00);
-	ymf262.add_route(1, "rspeaker", 1.00);
-	ymf262.add_route(2, "lspeaker", 1.00);
-	ymf262.add_route(3, "rspeaker", 1.00);
+	ymf262.add_route(0, "speaker", 1.00, 0);
+	ymf262.add_route(1, "speaker", 1.00, 1);
+	ymf262.add_route(2, "speaker", 1.00, 0);
+	ymf262.add_route(3, "speaker", 1.00, 1);
 
 	DAC_16BIT_R2R(config, m_ldac, 0);
 	DAC_16BIT_R2R(config, m_rdac, 0);
-	m_ldac->add_route(ALL_OUTPUTS, "lspeaker", 1.0); // sanyo lc7883k
-	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
+	m_ldac->add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // sanyo lc7883k
+	m_rdac->add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // sanyo lc7883k
 }
 
 uint8_t vis_audio_device::pcm_r(offs_t offset)
@@ -241,18 +240,18 @@ public:
 	uint8_t visvgamem_r(offs_t offset);
 	void visvgamem_w(offs_t offset, uint8_t data);
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void recompute_params() override;
 
-	virtual void io_3cx_map(address_map &map) override;
+	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
-	virtual void crtc_map(address_map &map) override;
-	virtual void gc_map(address_map &map) override;
-	virtual void sequencer_map(address_map &map) override;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void gc_map(address_map &map) override ATTR_COLD;
+	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 
-	void io_isa_map(address_map &map);
+	void io_isa_map(address_map &map) ATTR_COLD;
 private:
 	u8 ramdac_hidden_mask_r(offs_t offset);
 	void ramdac_hidden_mask_w(offs_t offset, u8 data);
@@ -286,7 +285,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 
 void vis_vga_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(FUNC(vis_vga_device::screen_update));
 }
@@ -566,8 +565,6 @@ void vis_vga_device::flush_8bpp_mode()
 
 void vis_vga_device::recompute_params()
 {
-	int vblank_period,hblank_period;
-	attoseconds_t refresh;
 	uint8_t hclock_m = (!vga.gc.alpha_dis) ? (vga.sequencer.data[1]&1)?8:9 : 8;
 	int pixel_clock;
 	const XTAL base_xtal = XTAL(14'318'181);
@@ -580,13 +577,13 @@ void vis_vga_device::recompute_params()
 
 	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
 
-	vblank_period = (vga.crtc.vert_total + 2);
-	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
+	int vblank_period = (vga.crtc.vert_total + 2);
+	int hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
 	/* TODO: 10b and 11b settings aren't known */
 	pixel_clock = xtal.value() / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
 	m_vblank_timer->adjust( screen().time_until_pos((vga.crtc.vert_blank_start + vga.crtc.vert_blank_end)) );
@@ -862,10 +859,10 @@ private:
 	void pad_w(offs_t offset, uint16_t data);
 	uint8_t unk1_r(offs_t offset);
 	void unk1_w(offs_t offset, uint8_t data);
-	void io_map(address_map &map);
-	void main_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 
 	uint8_t m_sysctl;
 	uint8_t m_unkidx;
@@ -1071,16 +1068,16 @@ static void vis_cards(device_slot_interface &device)
 // TODO: other buttons
 static INPUT_PORTS_START(vis)
 	PORT_START("PAD")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, vis_state, update, 0)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vis_state::update), 0)
 INPUT_PORTS_END
 
 void vis_state::vis(machine_config &config)
@@ -1109,7 +1106,7 @@ void vis_state::vis(machine_config &config)
 
 	SOFTWARE_LIST(config, "cd_list").set_original("vis");
 
-	DS6417(config, m_card, 0);
+	DS6417(config, m_card);
 }
 
 ROM_START(vis)

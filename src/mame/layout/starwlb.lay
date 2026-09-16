@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -64,15 +65,8 @@ license:CC0-1.0
 		</text>
 	</element>
 
-	<element name="text_1">
-		<rect><color red="0.13" green="0.13" blue="0.13" /></rect>
-		<text string="1"><color red="0" green="0" blue="0" /></text>
-	</element>
-
-	<element name="text_2">
-		<rect><color red="0.13" green="0.13" blue="0.13" /></rect>
-		<text string="2"><color red="0" green="0" blue="0" /></text>
-	</element>
+	<element name="text_1"><text string="1"><color red="0" green="0" blue="0" /></text></element>
+	<element name="text_2"><text string="2"><color red="0" green="0" blue="0" /></text></element>
 
 
 <!-- build screen -->

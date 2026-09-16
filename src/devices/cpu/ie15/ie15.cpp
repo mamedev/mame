@@ -186,7 +186,7 @@ uint32_t ie15_cpu_device::execute_max_cycles() const noexcept
 void ie15_cpu_device::execute_run()
 {
 	// Removing the hook entirely is considerably faster than calling it for every instruction if the debugger is disabled entirely
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 	{
 		do
 		{
@@ -205,7 +205,7 @@ void ie15_cpu_device::execute_run()
 
 inline void ie15_cpu_device::illegal(uint8_t opcode)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		logerror("IE15 illegal instruction %04X $%02X\n", m_PC.w.l, opcode);
 	}

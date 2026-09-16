@@ -98,30 +98,7 @@ function disconnect_old_event() {
 	eventNode = null;
 };
 
-function set_mastervolume (
-	// even though it's 'attenuation' the value is negative, so...
-	attenuation_in_decibels
-) {
-	lazy_init();
-	if (!context) return;
-
-	// http://stackoverflow.com/questions/22604500/web-audio-api-working-with-decibels
-	// seemingly incorrect/broken. figures. welcome to Web Audio
-	// var gain_web_audio = 1.0 - Math.pow(10, 10 / attenuation_in_decibels);
-
-	// HACK: Max attenuation in JSMESS appears to be 32.
-	// Hit ' then left/right arrow to test.
-	// FIXME: This is linear instead of log10 scale.
-	var gain_web_audio = 1.0 + (+attenuation_in_decibels / +32);
-	if (gain_web_audio < +0)
-		gain_web_audio = +0;
-	else if (gain_web_audio > +1)
-		gain_web_audio = +1;
-
-	gain_node.gain.value = gain_web_audio;
-};
-
-function update_audio_stream (
+function stream_sink_update (
 	pBuffer,           // pointer into emscripten heap. int16 samples
 	samples_this_frame // int. number of samples at pBuffer address.
 ) {
@@ -160,6 +137,7 @@ function update_audio_stream (
 		}
 	}
 };
+
 function tick (event) {
 	//Find all output channels:
 	for (var bufferCount = 0, buffers = []; bufferCount < 2; ++bufferCount) {
@@ -207,14 +185,12 @@ function sample_count() {
 }
 
 return {
-	set_mastervolume: set_mastervolume,
-	update_audio_stream: update_audio_stream,
+	stream_sink_update: stream_sink_update,
 	get_context: get_context,
 	sample_count: sample_count
 };
 
 })();
 
-window.jsmame_set_mastervolume = jsmame_web_audio.set_mastervolume;
-window.jsmame_update_audio_stream = jsmame_web_audio.update_audio_stream;
+window.jsmame_stream_sink_update = jsmame_web_audio.stream_sink_update;
 window.jsmame_sample_count = jsmame_web_audio.sample_count;

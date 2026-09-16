@@ -36,7 +36,6 @@
 
 #include "emu.h"
 
-#include "awpvid.h"
 #include "fruitsamples.h"
 
 #include "cpu/m6800/m6800.h"
@@ -97,10 +96,10 @@ protected:
 		m_samples(*this, "samples")
 	{ }
 
-	void mpu12_base(machine_config &config);
+	void mpu12_base(machine_config &config) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_CALLBACK_MEMBER(change_pia2a_bit7);
@@ -115,7 +114,7 @@ protected:
 	void meter_tick_w(int meter, bool state);
 	void coin_lockout_w(bool state);
 
-	void mpu1_map(address_map &map);
+	void mpu1_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_lamp_relay;
 	lamp_flags m_lamp_flags_pia2b[8];
@@ -150,8 +149,8 @@ public:
 		m_reels(*this, "emreel%u", 1U)
 	{ }
 
-	void mpu1(machine_config &config);
-	void mpu1_lg(machine_config &config);
+	void mpu1(machine_config &config) ATTR_COLD;
+	void mpu1_lg(machine_config &config) ATTR_COLD;
 
 protected:
 	enum { STEPS_PER_SYMBOL = 20 };
@@ -183,14 +182,15 @@ public:
 		m_nvram(*this, "nvram", 0x100, ENDIANNESS_BIG)
 	{ }
 
-	void mpu2_em(machine_config &config);
-	void mpu2_em_sstar(machine_config &config);
-	void mpu2_em_starl(machine_config &config);
-	void mpu2_em_lg(machine_config &config);
+	void mpu2_em(machine_config &config) ATTR_COLD;
+	void mpu2_em_sstar(machine_config &config) ATTR_COLD;
+	void mpu2_em_starl(machine_config &config) ATTR_COLD;
+	void mpu2_em_lg(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-
 	template <unsigned Digit> TIMER_DEVICE_CALLBACK_MEMBER(clear_digit) { m_digits[Digit] = 0; };
 
 	void pia1_portb_w(uint8_t data);
@@ -203,7 +203,7 @@ private:
 	void nvram_w(offs_t offset, uint8_t data) { m_nvram[offset] = data & 0xf; }
 	virtual void update_pia_lamps() override;
 
-	void mpu2_em_map(address_map &map);
+	void mpu2_em_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_disp_digit;
 
@@ -222,19 +222,19 @@ public:
 		mpu12_base_state(mconfig, type, tag),
 		m_pia3(*this, "pia3"),
 		m_pia4(*this, "pia4"),
-		m_reels(*this, "reel%u", 0U)
+		m_reels(*this, "reel%u", 1U)
 	{ }
 
-	void mpu2_stepper(machine_config &config);
-	void mpu2_stepper_rockon(machine_config &config);
-	void mpu2_stepper_hilite(machine_config &config);
-	void mpu2_stepper_splite(machine_config &config);
-	void mpu2_stepper_frpoly(machine_config &config);
-	void mpu2_stepper_triple(machine_config &config);
+	void mpu2_stepper(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_rockon(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_hilite(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_splite(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_frpoly(machine_config &config) ATTR_COLD;
+	void mpu2_stepper_triple(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-	virtual void device_post_load() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	template <unsigned N> void opto_cb(int state) { m_optos[N] = state; }
 
@@ -251,7 +251,7 @@ private:
 	void reel_w(int reel, uint8_t data);
 	virtual void update_pia_lamps() override;
 
-	void mpu2_stepper_map(address_map &map);
+	void mpu2_stepper_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_optos[3];
 	uint8_t m_reel1;
@@ -691,8 +691,7 @@ uint8_t mpu1_state::reel_pos_r(uint8_t reel)
 void mpu2_stepper_state::reel_w(int reel, uint8_t data)
 {
 	m_reels[reel]->update(data);
-	constexpr char reelnames[3][6] = { "reel1", "reel2", "reel3" };
-	awp_draw_reel(machine(), reelnames[reel], *m_reels[reel]);
+	m_reels[reel]->draw();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( mpu12_base_state::nmi )
@@ -763,24 +762,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_5p_10p_10pt_50p )
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 0) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 1) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 2) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 3) PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 0) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 1) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 2) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 3) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_10p_10pt_50p )
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 1) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 2) PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 3) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 1) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 2) PORT_IMPULSE(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 3) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_dutch )
 	PORT_MODIFY("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Fl 0,25") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 0) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Fl 1") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 1) PORT_IMPULSE(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Fl 2,50") PORT_CHANGED_MEMBER(DEVICE_SELF, mpu1_state, coin_input, 2) PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Fl 0,25") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 0) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Fl 1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 1) PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Fl 2,50") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpu1_state::coin_input), 2) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( m_gndgit )
@@ -860,7 +859,7 @@ static INPUT_PORTS_START( m2rockon )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 
 	PORT_MODIFY("IN_PIA4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 	/* Clears credits when activated if door is open. Don't know what this looks like on
 	   actual machines if even there, it's not shown on any wiring diagrams. */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Clear Credits")
@@ -880,7 +879,7 @@ static INPUT_PORTS_START( m2hilite )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 
 	PORT_MODIFY("IN_PIA4")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Nudge Up 3")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up 2")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up 1")
@@ -912,7 +911,7 @@ static INPUT_PORTS_START( m2splite )
 
 	PORT_MODIFY("IN_PIA4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Auto Nudge")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Nudge Up 3")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Nudge Up 2")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Nudge Up 1")
@@ -1035,8 +1034,6 @@ INPUT_PORTS_END
 
 void mpu12_base_state::machine_start()
 {
-	m_lamps.resolve();
-
 	m_change_pia2a_bit7_timer = timer_alloc(FUNC(mpu1_state::change_pia2a_bit7), this);
 
 	save_item(NAME(m_lamp_relay));
@@ -1047,8 +1044,6 @@ void mpu12_base_state::machine_start()
 void mpu2_em_state::machine_start()
 {
 	mpu12_base_state::machine_start();
-
-	m_digits.resolve();
 }
 
 void mpu2_stepper_state::machine_start()
@@ -1070,8 +1065,7 @@ void mpu12_base_state::machine_reset()
 
 void mpu2_stepper_state::device_post_load()
 {
-	constexpr char reelnames[3][6] = { "reel1", "reel2", "reel3" };
-	for(int i = 0; i < 3; i++) awp_draw_reel(machine(), reelnames[i], *m_reels[i]);
+	for(int i = 0; i < 3; i++) m_reels[i]->draw();
 }
 
 void mpu12_base_state::mpu12_base(machine_config &config)
@@ -1127,14 +1121,11 @@ void mpu12_base_state::mpu12_base(machine_config &config)
 
 void mpu1_state::add_em_reels(machine_config &config, int symbols, attotime period)
 {
-	for(int i = 0; i < 4; i++)
-	{
-		std::set<uint16_t> detents;
-		for(int i = 0; i < symbols; i++)
-			detents.insert(i * STEPS_PER_SYMBOL);
-
-		EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, detents, period);
-	}
+	std::set<uint16_t> detents;
+	for(int i = 0; i < symbols; i++)
+		detents.insert(i * STEPS_PER_SYMBOL);
+	for(auto &reel : m_reels)
+		EM_REEL(config, reel, reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
 
 	m_reels[0]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<0>));
 	m_reels[1]->state_changed_callback().set(FUNC(mpu1_state::reel_sample_cb<1>));

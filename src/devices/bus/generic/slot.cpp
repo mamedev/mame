@@ -148,6 +148,14 @@ generic_slot_device::~generic_slot_device()
 {
 }
 
+generic_socket_device::~generic_socket_device()
+{
+}
+
+generic_cartslot_device::~generic_cartslot_device()
+{
+}
+
 void generic_slot_device::device_start()
 {
 	m_cart = get_card_device();

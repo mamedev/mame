@@ -19,10 +19,10 @@
 //**************************************************************************
 
 #define PORT_ATARI_COMM_SOUND_TO_MAIN_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, sound_to_main_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_sound_comm_device::sound_to_main_ready))
 
 #define PORT_ATARI_COMM_MAIN_TO_SOUND_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_sound_comm_device, main_to_sound_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_sound_comm_device::main_to_sound_ready))
 
 
 // ======================> atari_sound_comm_device
@@ -67,8 +67,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(delayed_6502_write);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// configuration state

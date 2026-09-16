@@ -21,8 +21,8 @@ public:
 protected:
 	segag80_audio_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 lomask, u8 himask, bool haspsg, netlist_ptr netlist, double output_scale);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	optional_device_array<netlist_mame_logic_input_device, 8> m_lo_input;
 	optional_device_array<netlist_mame_logic_input_device, 8> m_hi_input;
@@ -40,28 +40,28 @@ private:
 class elim_audio_device : public segag80_audio_device_base
 {
 public:
-	elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	elim_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class zektor_audio_device : public segag80_audio_device_base
 {
 public:
-	zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	zektor_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class spacfury_audio_device : public segag80_audio_device_base
 {
 public:
-	spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	spacfury_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 
 class astrob_audio_device : public segag80_audio_device_base
 {
 public:
-	astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	astrob_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 

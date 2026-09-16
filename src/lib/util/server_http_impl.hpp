@@ -63,10 +63,10 @@ namespace webpp {
 				}
 			}
 		public:
-			virtual Response& status(int number) { m_ostream << statusToString(number); return *this; }
-			virtual void type(std::string str) { m_header << "Content-Type: "<< str << "\r\n"; }
-			virtual void send(std::string str) { m_ostream << m_header.str() << "Content-Length: " << str.length() << "\r\n\r\n" << str; }
-			virtual size_t size() const { return m_streambuf.size(); }
+			virtual Response& status(int number) override { m_ostream << statusToString(number); return *this; }
+			virtual void type(std::string str) override { m_header << "Content-Type: "<< str << "\r\n"; }
+			virtual void send(std::string str) override { m_ostream << m_header.str() << "Content-Length: " << str.length() << "\r\n\r\n" << str; }
+			virtual size_t size() const override { return m_streambuf.size(); }
 			std::shared_ptr<socket_type> socket() { return m_socket; }
 
 			/// If true, force server to close the connection after the response have been sent.
@@ -96,10 +96,6 @@ namespace webpp {
 		class Request : public webpp::Request {
 			friend class ServerBase<socket_type>;
 			friend class Server<socket_type>;
-		public:
-			Content content;
-
-			virtual ~Request() {}
 		private:
 			Request(const socket_type &socket): content(streambuf) {
 				try {
@@ -109,6 +105,10 @@ namespace webpp {
 				catch(...) {}
 			}
 			asio::streambuf streambuf;
+		public:
+			Content content;
+
+			virtual ~Request() {}
 		};
 
 		class Config {

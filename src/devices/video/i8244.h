@@ -39,9 +39,7 @@ DECLARE_DEVICE_TYPE(I8244, i8244_device)
 DECLARE_DEVICE_TYPE(I8245, i8245_device)
 
 
-class i8244_device :  public device_t
-					, public device_sound_interface
-					, public device_video_interface
+class i8244_device : public device_t, public device_sound_interface, public device_video_interface
 {
 public:
 	// construction/destruction
@@ -110,11 +108,11 @@ protected:
 
 	// device-level overrides
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(hblank_start);
 	TIMER_CALLBACK_MEMBER(vblank_start);
@@ -129,7 +127,7 @@ protected:
 	void draw_grid(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void major_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// callbacks
 	devcb_write_line m_irq_func;
@@ -156,7 +154,7 @@ protected:
 	int m_bgate_start;
 
 	vdc_t m_vdc;
-	u8 m_collision_map[0x200];
+	u16 m_collision_map[0x200];
 	u8 m_priority_map[0x200];
 
 	u8 m_x_beam_pos;

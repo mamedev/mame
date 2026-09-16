@@ -790,6 +790,7 @@ void superfx_device::execute_run()
 	{
 		if(!(m_sfr & SUPERFX_SFR_G))
 		{
+			debugger_wait_hook();
 			superfx_add_clocks_internal(6);
 			m_icount = std::min(m_icount, 0);
 			break;

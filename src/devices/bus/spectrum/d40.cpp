@@ -32,7 +32,7 @@ DEFINE_DEVICE_TYPE(SPECTRUM_D80V2, spectrum_d80v2_device, "spectrum_d80v2", "Did
 
 INPUT_PORTS_START(d40)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_d40base_device, snapshot_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Snapshot Button") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(spectrum_d40base_device::snapshot_button), 0)
 
 	PORT_START("JOY")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
@@ -117,7 +117,7 @@ void spectrum_d80_device::device_add_mconfig(machine_config &config)
 
 void spectrum_d80v2_device::device_add_mconfig(machine_config &config)
 {
-	WD37C65C(config, m_fdc, 16_MHz_XTAL); // actually GM82C765B
+	WD37C65B(config, m_fdc, 16_MHz_XTAL); // actually GM82C765B
 	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
@@ -211,7 +211,7 @@ void spectrum_d40base_device::device_reset()
 //  IMPLEMENTATION  spectrum_d40base_device
 //**************************************************************************
 
-int spectrum_d40base_device::romcs()
+bool spectrum_d40base_device::romcs()
 {
 	return m_romcs;
 }

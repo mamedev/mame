@@ -1,31 +1,35 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_LUXOR_ABC800_H
-#define MAME_LUXOR_ABC800_H
+#ifndef MAME_LUXOR_ABC80X_H
+#define MAME_LUXOR_ABC80X_H
 
 #pragma once
 
-#include "bus/abcbus/abcbus.h"
-#include "bus/rs232/rs232.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
-#include "cpu/mcs48/mcs48.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "bus/abckb/abckb.h"
-#include "bus/abckb/abc800kb.h"
-#include "machine/74259.h"
-#include "machine/e0516.h"
-#include "machine/z80ctc.h"
-#include "machine/z80sio.h"
-#include "machine/ram.h"
-#include "machine/timer.h"
-#include "sound/discrete.h"
-#include "video/mc6845.h"
-#include "video/saa5050.h"
 #include "emupal.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "bus/abcbus/abcbus.h"
+#include "bus/abckb/abc800kb.h"
+#include "bus/abckb/abckb.h"
+#include "bus/rs232/printer.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/teletex800.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/74259.h"
+#include "machine/e0516.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80sio.h"
+#include "sound/discrete.h"
+#include "video/mc6845.h"
+#include "video/saa5050.h"
+
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -59,9 +63,9 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
-#define CASSETTE_TAG        "cassette"
-#define RS232_A_TAG         "rs232a"
-#define RS232_B_TAG         "rs232b"
+#define CASSETTE_TAG        "cas"
+#define RS232_A_TAG         "pr"
+#define RS232_B_TAG         "v24"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
 #define TIMER_CTC_TAG       "timer_ctc"
 #define TIMER_CASSETTE_TAG  "timer_cass"
@@ -113,9 +117,9 @@ public:
 	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_io_sb;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	void cassette_output_tick(int state);
 
@@ -158,11 +162,11 @@ public:
 	// timers
 	emu_timer *m_cassette_timer;
 	void common(machine_config &config);
-	void abc800_m1(address_map &map);
-	void abc800_mem(address_map &map);
-	void abc800_io(address_map &map);
-	void abc800m_io(address_map &map);
-	void abc800c_io(address_map &map);
+	void abc800_m1(address_map &map) ATTR_COLD;
+	void abc800_mem(address_map &map) ATTR_COLD;
+	void abc800_io(address_map &map) ATTR_COLD;
+	void abc800m_io(address_map &map) ATTR_COLD;
+	void abc800c_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -239,9 +243,9 @@ public:
 	required_memory_region m_char_rom;
 	required_ioport m_config;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -260,9 +264,9 @@ public:
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
-	void abc802_m1(address_map &map);
-	void abc802_mem(address_map &map);
-	void abc802_io(address_map &map);
+	void abc802_m1(address_map &map) ATTR_COLD;
+	void abc802_mem(address_map &map) ATTR_COLD;
+	void abc802_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -292,14 +296,18 @@ public:
 	required_memory_region m_char_rom;
 	memory_share_creator<uint8_t> m_attr_ram;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void read_pal_p4(offs_t offset, bool m1l, bool xml, offs_t &m, bool &romd, bool &ramd, bool &hre, bool &vr);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t videoram_read(offs_t offset) const { return m_ram->pointer()[(0x8000 + offset) & videoram_mask()]; }
+	void videoram_write(offs_t offset, uint8_t data) { m_ram->pointer()[(0x8000 + offset) & videoram_mask()] = data; }
+	offs_t videoram_mask() const { return m_ram->size() - 0x8001; }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -330,6 +338,7 @@ public:
 	// memory state
 	int m_eme = 0;                  // extended memory enable
 	uint8_t m_map[16]{};            // memory page register
+	bool m_30k = false;             // 30K block trigger (M1 fetch from 7800-7fff)
 
 	// video state
 	int m_txoff = 0;                // text display enable
@@ -347,8 +356,8 @@ public:
 
 	void abc806(machine_config &config);
 	void abc806_video(machine_config &config);
-	void abc806_io(address_map &map);
-	void abc806_mem(address_map &map);
+	void abc806_io(address_map &map) ATTR_COLD;
+	void abc806_mem(address_map &map) ATTR_COLD;
 };
 
-#endif // MAME_LUXOR_ABC800_H
+#endif // MAME_LUXOR_ABC80X_H

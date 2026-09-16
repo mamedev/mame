@@ -13,14 +13,14 @@ class hyperscan_card_device : public device_t,
 				public device_memcard_image_interface
 {
 public:
-	hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hyperscan_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	int read();
 	void write(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;

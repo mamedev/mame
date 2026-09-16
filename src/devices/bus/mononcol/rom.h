@@ -19,7 +19,6 @@ public:
 	mononcol_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read() override { return m_spi->read(); }
-	void dir_w(int state) override { m_spi->dir_w(state); }
 	void write(uint8_t data) override { m_spi->write(data); }
 	void set_ready() override { m_spi->set_ready(); }
 
@@ -29,8 +28,8 @@ protected:
 	mononcol_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<generic_spi_flash_device> m_spi;

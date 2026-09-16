@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/ram.h"
 #include "emupal.h"
 #include "screen.h"
@@ -30,13 +30,13 @@ public:
 	void vt320(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void vt320_io(address_map &map);
-	void vt320_mem(address_map &map);
+	void vt320_data(address_map &map) ATTR_COLD;
+	void vt320_mem(address_map &map) ATTR_COLD;
 };
 
 /*
@@ -71,7 +71,7 @@ void vt320_state::vt320_mem(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void vt320_state::vt320_io(address_map &map)
+void vt320_state::vt320_data(address_map &map)
 {
 }
 
@@ -99,10 +99,10 @@ void vt320_state::vt320(machine_config &config)
 	/* basic machine hardware */
 	I8051(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt320_state::vt320_mem);
-	m_maincpu->set_addrmap(AS_IO, &vt320_state::vt320_io);
+	m_maincpu->set_addrmap(AS_DATA, &vt320_state::vt320_data);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -141,7 +141,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                          FULLNAME   FLAGS */
-COMP( 1987,  vt320,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT320",   MACHINE_IS_SKELETON )
-COMP( 1987,  vt330,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT330",   MACHINE_IS_SKELETON )
-//COMP( 1989?, vt340,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340",   MACHINE_IS_SKELETON )
-//COMP( 1990?, vt340p, 0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340+",  MACHINE_IS_SKELETON )
+COMP( 1987,  vt320,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT320",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1987,  vt330,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT330",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1989?, vt340,  0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//COMP( 1990?, vt340p, 0,      0,      vt320,   vt320, vt320_state,  empty_init, "Digital Equipment Corporation", "VT340+",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

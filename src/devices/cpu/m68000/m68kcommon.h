@@ -35,7 +35,9 @@ enum
 	M68K_FP0, M68K_FP1, M68K_FP2, M68K_FP3, M68K_FP4, M68K_FP5, M68K_FP6, M68K_FP7,
 	M68K_FPSR, M68K_FPCR, M68K_CRP_LIMIT, M68K_CRP_APTR, M68K_SRP_LIMIT, M68K_SRP_APTR,
 	M68K_MMU_TC, M68K_TT0, M68K_TT1, M68K_MMU_SR, M68K_ITT0, M68K_ITT1,
-	M68K_DTT0, M68K_DTT1, M68K_URP_APTR
+	M68K_DTT0, M68K_DTT1, M68K_URP_APTR, M68K_MMU_SR_040,
+	COLDFIRE_ROMBAR0, COLDFIRE_ROMBAR1, COLDFIRE_RAMBAR0, COLDFIRE_RAMBAR1,
+	COLDFIRE_MPCR, COLDFIRE_EDRAMBAR, COLDFIRE_SECMBAR, COLDFIRE_MBAR
 };
 
 class m68000_base_device : public cpu_device
@@ -48,13 +50,12 @@ public:
 	};
 
 	static constexpr u8 autovector(int level) { return 0x18 + level; }
-	void autovectors_map(address_map &map);
+	void autovectors_map(address_map &map) ATTR_COLD;
 
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 	void set_interrupt_mixer(bool enable) { m_interrupt_mixer = enable; }
 	auto reset_cb() { return m_reset_cb.bind(); }
 
-	virtual u32 execute_input_lines() const noexcept override { return m_interrupt_mixer ? 8 : 3; } // number of input lines
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false; }
 
 	virtual bool supervisor_mode() const noexcept = 0;

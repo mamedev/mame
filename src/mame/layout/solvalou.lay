@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+	<view name="Deluxe (Full, Over-Under)">
+		<bounds x="0" y="0" width="640" height="480" />
+
+		<screen index="0"><bounds x="0" y="0" width="640" height="480" /></screen>
+
+		<!-- upper part of display is projected to an overhead panel and mirrored vertically -->
+		<screen index="0"><bounds x="0" y="-387" width="640" height="480" /><orientation flipy="yes" /></screen>
+		<element ref="blackb"><bounds x="-10" y="-400" width="660" height="400" /></element>
+	</view>
+
+	<view name="Deluxe (Main Display)">
+		<bounds x="0" y="93" width="640" height="387" />
+
+		<screen index="0"><bounds x="0" y="0" width="640" height="480" /></screen>
+		<element ref="blackb"><bounds x="-10" y="-10" width="660" height="103" /></element>
+	</view>
+
+	<view name="Deluxe (Overhead Panel)">
+		<bounds x="0" y="387" width="640" height="93" />
+
+		<screen index="0"><bounds x="0" y="0" width="640" height="480" /><orientation flipy="yes" /></screen>
+		<element ref="blackb"><bounds x="-10" y="-10" width="660" height="397" /></element>
+	</view>
+
+</mamelayout>

@@ -29,7 +29,7 @@ class adc1038_device : public device_t
 public:
 	typedef device_delegate<int (int input)> input_delegate;
 
-	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename... T> void set_input_callback(T &&... args) { m_input_cb.set(std::forward<T>(args)...); }
 
@@ -42,8 +42,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal state

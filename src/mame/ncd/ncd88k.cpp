@@ -64,6 +64,8 @@
 #include "video/bt47x.h"
 #include "screen.h"
 
+#include "endianness.h"
+
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -86,8 +88,8 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void code_map(address_map &map);
-	void data_map(address_map &map);
+	void code_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -148,9 +150,9 @@ void ncd88k_state::ncd19c(machine_config &config)
 
 	SCN2681(config, "duart", 3'686'400);
 
-	BT458(config, m_ramdac, 0);
+	BT458(config, m_ramdac);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
 	m_screen->set_screen_update(FUNC(ncd88k_state::screen_update));
 }
@@ -182,12 +184,12 @@ public:
 	void ncdmcx(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
-	void code_map(address_map &map);
-	void data_map(address_map &map);
+	void code_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	template <unsigned N> void irq_w(int state);
 
@@ -267,7 +269,7 @@ void ncdmcx_state::ncdmcx(machine_config &config)
 
 	BT477(config, m_ramdac, 125'000'000); // ATT20C497-11
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(125'000'000, 1680, 0, 1280, 1063, 0, 1024); // 74.4 kHz horizontal, 70 Hz vertical
 	m_screen->set_screen_update(FUNC(ncdmcx_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(ncdmcx_state::irq_w<4>));
@@ -390,5 +392,5 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1991, ncd19c, 0, 0, ncd19c, ncd19c, ncd88k_state, empty_init, "Network Computing Devices", "19c", MACHINE_IS_SKELETON)
-COMP(1993, ncdmcx, 0, 0, ncdmcx, 0,      ncdmcx_state, empty_init, "Network Computing Devices", "MCX", MACHINE_IS_SKELETON)
+COMP(1991, ncd19c, 0, 0, ncd19c, ncd19c, ncd88k_state, empty_init, "Network Computing Devices", "19c", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1993, ncdmcx, 0, 0, ncdmcx, 0,      ncdmcx_state, empty_init, "Network Computing Devices", "MCX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -22,7 +22,7 @@
 class ra17xx_device : public device_t
 {
 public:
-	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t io_r(offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
@@ -33,8 +33,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t           m_line[16];   //!< input/output flip-flops for 16 I/O lines

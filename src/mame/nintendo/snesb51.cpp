@@ -62,7 +62,7 @@
 
 #include "emu.h"
 #include "snes.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "emupal.h"
 #include "speaker.h"
 
@@ -85,15 +85,15 @@ public:
 	void init_fatfurspb();
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
 	required_device<mcs51_cpu_device> m_mcu;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 
 	void mcu_p1_w(uint8_t data);
 	uint8_t mcu_p3_r();
@@ -261,7 +261,7 @@ void snesb51_state::base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	m_screen->set_screen_update(FUNC(snes_state::screen_update));
@@ -271,13 +271,12 @@ void snesb51_state::base(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &snesb51_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 }
 
 void snesb51_state::mk3snes(machine_config &config)
@@ -285,7 +284,7 @@ void snesb51_state::mk3snes(machine_config &config)
 	base(config);
 
 	I8751(config, m_mcu, 12_MHz_XTAL);
-	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->set_addrmap(AS_DATA, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
@@ -298,7 +297,7 @@ void snesb51_state::snes4sl(machine_config &config)
 	// exact type unknown
 	I8031(config, m_mcu, 12_MHz_XTAL);
 	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
-	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->set_addrmap(AS_DATA, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
@@ -314,7 +313,7 @@ void snesb51_state::snes4sln(machine_config &config)
 
 	I8051(config, m_mcu, 12_MHz_XTAL); // SAB 8051A-P
 	m_mcu->set_addrmap(AS_PROGRAM, &snesb51_state::mem_map);
-	m_mcu->set_addrmap(AS_IO, &snesb51_state::io_map);
+	m_mcu->set_addrmap(AS_DATA, &snesb51_state::io_map);
 	m_mcu->port_out_cb<1>().set(FUNC(snesb51_state::mcu_p1_w));
 	m_mcu->port_in_cb<3>().set(FUNC(snesb51_state::mcu_p3_r));
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
@@ -411,8 +410,8 @@ void snesb51_state::init_fatfurspb()
 
 
 //    YEAR  NAME       PARENT  MACHINE   INPUT    CLASS          INIT             ROT   COMPANY    FULLNAME                                     FLAGS
-GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
-GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)",    MACHINE_IS_SKELETON )
-GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",                  MACHINE_IS_SKELETON )
-GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",        MACHINE_IS_SKELETON )
-GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg with timer)", MACHINE_IS_SKELETON )
+GAME( 199?, mk3snes,   0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Mortal Kombat 3 (SNES bootleg with timer)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, kinstsnes, 0,      mk3snes,  mk3snes, snesb51_state, init_snes_hirom, ROT0, "bootleg", "Killer Instinct (SNES bootleg with timer)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1993, snes4sl,   0,      snes4sl,  snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, snes4sln,  0,      snes4sln, snes4sl, snesb51_state, init_snes,       ROT0, "bootleg", "SNES 4 Slot arcade switcher (NBA Jam)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, fatfurspb, 0,      mk3snes,  mk3snes, snesb51_state, init_fatfurspb,  ROT0, "bootleg", "Fatal Fury Special (SNES bootleg with timer)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

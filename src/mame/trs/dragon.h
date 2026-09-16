@@ -47,10 +47,10 @@ public:
 
 	void dragon_base(machine_config &config);
 	void dragon32(machine_config &config);
-	void dragon_mem(address_map &map);
+	void dragon_mem(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void pia1_pa_changed(uint8_t data) override;
+	virtual void pia1_pa_w(uint8_t data) override;
 
 	static void dragon_cart(device_slot_interface &device);
 
@@ -76,14 +76,14 @@ public:
 	void dragon64h(machine_config &config);
 
 protected:
-	void d64_rom0(address_map &map);
-	void d64_rom1(address_map &map);
-	void d64_io0(address_map &map);
+	void d64_rom0(address_map &map) ATTR_COLD;
+	void d64_rom1(address_map &map) ATTR_COLD;
+	void d64_io0(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void pia1_pb_changed(uint8_t data) override;
+	virtual void pia1_pb_w(uint8_t data) override;
 	void page_rom(bool romswitch);
 
 private:
@@ -135,8 +135,8 @@ public:
 
 	void d64plus(machine_config &config);
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<hd6845s_device> m_crtc;

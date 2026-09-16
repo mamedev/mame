@@ -1,7 +1,7 @@
 // GUI/ExtractGUI.h
 
-#ifndef __EXTRACT_GUI_H
-#define __EXTRACT_GUI_H
+#ifndef ZIP7_INC_EXTRACT_GUI_H
+#define ZIP7_INC_EXTRACT_GUI_H
 
 #include "../Common/Extract.h"
 
@@ -28,7 +28,7 @@ HRESULT ExtractGUI(
     UStringVector &archivePathsFull,
     const NWildcard::CCensorNode &wildcardCensor,
     CExtractOptions &options,
-    #ifndef _SFX
+    #ifndef Z7_SFX
     CHashBundle *hb,
     #endif
     bool showDialog,

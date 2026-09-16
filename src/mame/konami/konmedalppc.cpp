@@ -33,8 +33,8 @@ public:
 	void konmedalppc(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -42,19 +42,12 @@ private:
 	required_device<ata_interface_device> m_ata;
 	required_shared_ptr<uint32_t> m_work_ram;
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void main_map(address_map &map);
-	void ymz280b_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void ymz280b_map(address_map &map) ATTR_COLD;
 
 	u16 ata_r(offs_t offset, u16 mem_mask);
 	void ata_w(offs_t offset, u16 data, u16 mem_mask);
 };
-
-uint32_t konmedalppc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_gcu->draw(screen, bitmap, cliprect);
-}
 
 /*
    Offset 0 is the full 16 bits of ATA register 0 (1F0h on PC)
@@ -66,30 +59,33 @@ u16 konmedalppc_state::ata_r(offs_t offset, u16 mem_mask)
 {
 	if (offset == 0)
 	{
-		return m_ata->cs0_swap_r(offset, mem_mask);
+		return m_ata->cs0_swap_r(offset);
 	}
 
-	u16 result = m_ata->cs0_r((offset<<1) + 1, 0x00ff)<<8;
-	result |= m_ata->cs0_r(offset<<1, 0xff);
-	return result;
+	u16 data = 0;
+	if (ACCESSING_BITS_0_7)
+		data |= m_ata->cs0_r(offset<<1) & 0xff;
+	if (ACCESSING_BITS_8_15)
+		data |= m_ata->cs0_r((offset<<1) + 1)<<8;
+	return data;
 }
 
 void konmedalppc_state::ata_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (offset == 0)
 	{
-		m_ata->cs0_swap_w(offset, data, mem_mask);
+		m_ata->cs0_swap_w(offset, data);
 		return;
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		m_ata->cs0_w(offset << 1, data & 0xff, 0xff);
+		m_ata->cs0_w(offset << 1, data & 0xff);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_ata->cs0_w((offset<<1) + 1, data>>8, 0xff);
+		m_ata->cs0_w((offset<<1) + 1, data>>8);
 	}
 }
 
@@ -139,22 +135,21 @@ void konmedalppc_state::konmedalppc(machine_config &config)
 	// video hardware
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1280, 800);
 	screen.set_visarea(0, 1024-1, 0, 768-1);
-	screen.set_screen_update(FUNC(konmedalppc_state::screen_update));
+	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
 
-	K057714(config, m_gcu, 0).set_screen("screen");
+	K057714(config, m_gcu).set_screen("screen");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
 	ymz.set_addrmap(0, &konmedalppc_state::ymz280b_map);
-	ymz.add_route(1, "lspeaker", 1.0);
-	ymz.add_route(0, "rspeaker", 1.0);
+	ymz.add_route(1, "speaker", 1.0, 0);
+	ymz.add_route(0, "speaker", 1.0, 1);
 }
 
 ROM_START( turfwld3 )

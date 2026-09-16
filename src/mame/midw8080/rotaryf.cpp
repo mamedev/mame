@@ -57,13 +57,13 @@ private:
 	bool m_flipscreen = 0;
 	uint8_t m_last = 0U;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
-	void rotaryf_io_map(address_map &map);
-	void rotaryf_map(address_map &map);
+	void rotaryf_io_map(address_map &map) ATTR_COLD;
+	void rotaryf_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -273,7 +273,7 @@ void rotaryf_state::rotaryf(machine_config &config)
 	ppi.tri_pc_callback().set_constant(0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(32*8, 262);     /* vert size is a guess, taken from mw8080bw */
 	screen.set_visarea(1*8, 30*8-1, 0*8, 32*8-1);
 	screen.set_refresh_hz(60);

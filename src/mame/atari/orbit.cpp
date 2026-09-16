@@ -59,9 +59,9 @@ public:
 	void orbit(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -95,14 +95,12 @@ private:
 	void noise_amp_w(uint8_t data);
 	void noise_rst_w(uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_misc_flags(address_space &space, uint8_t val);
 };
 
-
-// video
 
 void orbit_state::playfield_w(offs_t offset, uint8_t data)
 {
@@ -180,8 +178,6 @@ uint32_t orbit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -346,7 +342,7 @@ static INPUT_PORTS_START( orbit )
 	PORT_DIPNAME( 0x40, 0x40, "DIAG TEST" ) // should be off
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x00, DEF_STR( On ))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("BUTTONS")   // 2800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Game 7 / Strong Gravity") PORT_CODE(KEYCODE_7_PAD)
@@ -465,7 +461,7 @@ void orbit_state::orbit(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2);
 	m_screen->set_screen_update(FUNC(orbit_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -475,12 +471,11 @@ void orbit_state::orbit(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, orbit_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 

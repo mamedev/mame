@@ -379,7 +379,7 @@ public:
 	// setters
 	void set_device_class(input_device_class devclass) noexcept
 	{
-		assert(devclass >= 0 && devclass <= 0xf);
+		assert(0 == (std::underlying_type_t<input_device_class>(devclass) & ~0xf));
 		m_internal = (m_internal & ~(0xf << 28)) | ((devclass & 0xf) << 28);
 	}
 	void set_device_index(int devindex) noexcept
@@ -389,17 +389,17 @@ public:
 	}
 	void set_item_class(input_item_class itemclass) noexcept
 	{
-		assert(itemclass >= 0 && itemclass <= 0xf);
+		assert(0 == (std::underlying_type_t<input_item_class>(itemclass) & ~0xf));
 		m_internal = (m_internal & ~(0xf << 16)) | ((itemclass & 0xf) << 16);
 	}
 	void set_item_modifier(input_item_modifier modifier) noexcept
 	{
-		assert(modifier >= 0 && modifier <= 0xf);
+		assert(0 == (std::underlying_type_t<input_item_modifier>(modifier) & ~0xf));
 		m_internal = (m_internal & ~(0xf << 12)) | ((modifier & 0xf) << 12);
 	}
 	void set_item_id(input_item_id itemid) noexcept
 	{
-		assert(itemid >= 0 && itemid <= 0xfff);
+		assert(0 == (std::underlying_type_t<input_item_id>(itemid) & ~0xfff));
 		m_internal = (m_internal & ~0xfff) | (itemid & 0xfff);
 	}
 
@@ -888,19 +888,19 @@ constexpr input_code JOYCODE_HAT4RIGHT_INDEXED(int n) { return input_code(DEVICE
 
 #define JOYCODE_HAT1UP    JOYCODE_HAT1UP_INDEXED(0)
 #define JOYCODE_HAT1DOWN  JOYCODE_HAT1DOWN_INDEXED(0)
-#define JOYCODE_HAT1LEFT  JOYCODE_HAT1EFT_INDEXED(0)
+#define JOYCODE_HAT1LEFT  JOYCODE_HAT1LEFT_INDEXED(0)
 #define JOYCODE_HAT1RIGHT JOYCODE_HAT1RIGHT_INDEXED(0)
 #define JOYCODE_HAT2UP    JOYCODE_HAT2UP_INDEXED(0)
 #define JOYCODE_HAT2DOWN  JOYCODE_HAT2DOWN_INDEXED(0)
-#define JOYCODE_HAT2LEFT  JOYCODE_HAT2EFT_INDEXED(0)
+#define JOYCODE_HAT2LEFT  JOYCODE_HAT2LEFT_INDEXED(0)
 #define JOYCODE_HAT2RIGHT JOYCODE_HAT2RIGHT_INDEXED(0)
 #define JOYCODE_HAT3UP    JOYCODE_HAT3UP_INDEXED(0)
 #define JOYCODE_HAT3DOWN  JOYCODE_HAT3DOWN_INDEXED(0)
-#define JOYCODE_HAT3LEFT  JOYCODE_HAT3EFT_INDEXED(0)
+#define JOYCODE_HAT3LEFT  JOYCODE_HAT3LEFT_INDEXED(0)
 #define JOYCODE_HAT3RIGHT JOYCODE_HAT3RIGHT_INDEXED(0)
 #define JOYCODE_HAT4UP    JOYCODE_HAT4UP_INDEXED(0)
 #define JOYCODE_HAT4DOWN  JOYCODE_HAT4DOWN_INDEXED(0)
-#define JOYCODE_HAT4LEFT  JOYCODE_HAT4EFT_INDEXED(0)
+#define JOYCODE_HAT4LEFT  JOYCODE_HAT4LEFT_INDEXED(0)
 #define JOYCODE_HAT4RIGHT JOYCODE_HAT4RIGHT_INDEXED(0)
 
 

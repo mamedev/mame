@@ -253,7 +253,7 @@ void msx_cart_disk_device::softlist_525(machine_config &config)
 template <bool Is35, bool IsDS>
 void msx_cart_disk_device::add_floppy_mconfig(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, Is35 ? (IsDS ? "35dd" : "35ssdd") : (IsDS ? "525dd" : "525ssdd"), msx_cart_disk_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", msx_floppies, Is35 ? (IsDS ? "35dd" : "35ssdd") : (IsDS ? "525dd" : "525ssdd"), msx_cart_disk_device::floppy_formats).enable_sound(true);
 	if (Is35)
 		softlist_35(config);
 	else
@@ -321,7 +321,7 @@ protected:
 	{ }
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	u8 side_control_r();
@@ -337,8 +337,6 @@ protected:
 
 void disk_type1_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_side_control));
 	save_item(NAME(m_control));
 }
@@ -598,7 +596,7 @@ protected:
 	{ }
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	void set_control(u8 data);
@@ -610,8 +608,6 @@ protected:
 
 void disk_type2_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_control));
 }
 
@@ -732,7 +728,7 @@ protected:
 	{ }
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	void control_w(u8 control);
@@ -893,8 +889,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	u8 status_r();
@@ -913,8 +909,6 @@ void fd03_device::device_add_mconfig(machine_config &config)
 
 void fd03_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_control));
 }
 
@@ -1044,8 +1038,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	void set_side_motor();
@@ -1197,8 +1191,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	void set_side_motor();
@@ -1300,8 +1294,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 	void control_w(u8 control);

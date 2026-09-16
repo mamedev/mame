@@ -209,12 +209,15 @@ std::error_condition zippath_resolve(std::string_view path, osd::directory::entr
 	bool went_up = false;
 	do
 	{
-		// trim the path of trailing path separators
-		auto const i = apath.find_last_not_of(PATH_SEPARATOR);
-		if (i != std::string::npos)
-			apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
-		else if (!is_root(apath))
-			break;
+		if (apath != ".")
+		{
+			// trim the path of trailing path separators
+			auto const i = apath.find_last_not_of(PATH_SEPARATOR);
+			if (i != std::string::npos)
+				apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
+			else if (!is_root(apath))
+				break;
+		}
 
 		apath_trimmed = apath;
 
@@ -608,9 +611,20 @@ std::string &zippath_combine(std::string &dst, const std::string &path1, const s
 	}
 	else if (path2 == "..")
 	{
-		dst = zippath_parent(path1);
+		if (path1 == ".")
+		{
+			// go back to an absolute path (hoping we can get one)
+			if (osd_get_full_path(dst, path2))
+				dst.clear();
+		}
+		else
+		{
+			dst = zippath_parent(path1);
+			if (dst.empty())
+				dst = ".";
+		}
 	}
-	else if (osd_is_absolute_path(path2))
+	else if (path1 == "." || osd_is_absolute_path(path2))
 	{
 		dst.assign(path2);
 	}
@@ -699,41 +713,43 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 						filerr = std::errc::permission_denied;
 					else
 						filerr = std::errc::no_such_file_or_directory;
-					goto done;
 				}
 				else if (osd::directory::entry::entry_type::DIR == entry_type)
 				{
 					filerr = std::errc::is_a_directory;
-					goto done;
 				}
 				else if (openflags & OPEN_FLAG_WRITE)
 				{
 					filerr = std::errc::permission_denied;
-					goto done;
+				}
+				else
+				{
+					// attempt to read the file
+					filerr = create_core_file_from_zip(*zip, file);
+					if (!filerr)
+					{
+						// update subpath, if appropriate
+						if (subpath.empty())
+							subpath.assign(zip->current_name());
+					}
 				}
 
-				// attempt to read the file
-				filerr = create_core_file_from_zip(*zip, file);
-				if (filerr)
-					goto done;
-
-				// update subpath, if appropriate
-				if (subpath.empty())
-					subpath.assign(zip->current_name());
-
 				// we're done
-				goto done;
+				break;
 			}
 		}
 
 		if (subpath.empty())
 			filerr = util::core_file::open(filename, openflags, file);
-		else
+		else if (!filerr)
 			filerr = std::errc::no_such_file_or_directory;
 
 		// if we errored, then go up a directory
 		if (filerr)
 		{
+			if ((std::errc::no_such_file_or_directory != filerr) && (std::errc::not_a_directory != filerr))
+				break;
+
 			// go up a directory
 			auto temp = zippath_parent(mainpath);
 
@@ -755,11 +771,10 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 			while (len > 0 && is_zip_file_separator(temp[len - 1]))
 				len--;
 			temp = temp.substr(0, len);
-			mainpath.assign(temp);
+			mainpath = std::move(temp);
 		}
 	}
 
-done:
 	// store the revised path
 	revised_path.clear();
 	if (!filerr)

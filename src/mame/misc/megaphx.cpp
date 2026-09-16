@@ -194,8 +194,8 @@ public:
 	void hamboy(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -215,7 +215,7 @@ private:
 	void ppi_portc_w(uint8_t data);
 	void dsw_w(int state) { m_dsw_data = state; }
 
-	void megaphx_68k_map(address_map &map);
+	void megaphx_68k_map(address_map &map) ATTR_COLD;
 
 	void install_bootrom(bool enable);
 	TIMER_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
@@ -521,9 +521,9 @@ void megaphx_state::megaphx(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
 	m_ppi->tri_pc_callback().set_constant(0);
 
-	INDER_VIDEO(config, m_indervid, 0);
+	INDER_VIDEO(config, m_indervid);
 
-	INDER_AUDIO(config, "inder_sb", 0);
+	INDER_AUDIO(config, "inder_sb");
 }
 
 void megaphx_state::hamboy(machine_config &config)

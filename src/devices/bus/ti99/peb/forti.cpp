@@ -102,24 +102,23 @@ void forti_device::device_add_mconfig(machine_config& config)
 	// 1 and 3 are mixed to left channel
 	// 2 and 4 are moxed to right channel
 
-	SPEAKER(config, "forti_left").front_left();
-	SPEAKER(config, "forti_right").front_right();
+	SPEAKER(config, "forti", 2).front();
 
 	SN94624(config, m_generator1, XTAL(3'579'545)/8);
 	m_generator1->ready_cb().set(FUNC(forti_device::ready_sound));
-	m_generator1->add_route(ALL_OUTPUTS, "forti_left", 0.75);
+	m_generator1->add_route(ALL_OUTPUTS, "forti", 0.75, 0);
 
 	SN94624(config, m_generator2, XTAL(3'579'545)/8);
 	m_generator2->ready_cb().set(FUNC(forti_device::ready_sound));
-	m_generator2->add_route(ALL_OUTPUTS, "forti_right", 0.75);
+	m_generator2->add_route(ALL_OUTPUTS, "forti", 0.75, 1);
 
 	SN94624(config, m_generator3, XTAL(3'579'545)/8);
 	m_generator3->ready_cb().set(FUNC(forti_device::ready_sound));
-	m_generator3->add_route(ALL_OUTPUTS, "forti_left", 0.75);
+	m_generator3->add_route(ALL_OUTPUTS, "forti", 0.75, 0);
 
 	SN94624(config, m_generator4, XTAL(3'579'545)/8);
 	m_generator4->ready_cb().set(FUNC(forti_device::ready_sound));
-	m_generator4->add_route(ALL_OUTPUTS, "forti_right", 0.75);
+	m_generator4->add_route(ALL_OUTPUTS, "forti", 0.75, 1);
 }
 
 void forti_device::device_start()

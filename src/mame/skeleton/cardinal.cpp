@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "bus/rs232/rs232.h"
 #include "machine/eepromser.h"
 #include "sound/spkrdev.h"
@@ -42,7 +42,7 @@ public:
 	void cardinal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 p1_r();
@@ -51,9 +51,9 @@ private:
 	u8 vtlc_r();
 	void vtlc_w(u8 data);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
-	void ram_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+	void ram_map(address_map &map) ATTR_COLD;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<crt9028_device> m_vtlc;
@@ -129,7 +129,7 @@ void cardinal_state::cardinal(machine_config &config)
 {
 	i8031_device &maincpu(I8031(config, "maincpu", 7.3728_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &cardinal_state::prog_map);
-	maincpu.set_addrmap(AS_IO, &cardinal_state::ext_map);
+	maincpu.set_addrmap(AS_DATA, &cardinal_state::ext_map);
 	maincpu.port_in_cb<1>().set(FUNC(cardinal_state::p1_r));
 	maincpu.port_out_cb<1>().set(FUNC(cardinal_state::p1_w));
 	maincpu.port_in_cb<3>().set_ioport("P3");
@@ -141,7 +141,7 @@ void cardinal_state::cardinal(machine_config &config)
 	m_vtlc->set_addrmap(0, &cardinal_state::ram_map);
 	m_vtlc->vsync_callback().set_inputline("maincpu", MCS51_INT0_LINE).invert();
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.05);
@@ -175,4 +175,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1984, cardinal, 0, 0, cardinal, cardinal, cardinal_state, empty_init, "Standard Microsystems", "Cardinal Video Terminal", MACHINE_IS_SKELETON)
+COMP(1984, cardinal, 0, 0, cardinal, cardinal, cardinal_state, empty_init, "Standard Microsystems", "Cardinal Video Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

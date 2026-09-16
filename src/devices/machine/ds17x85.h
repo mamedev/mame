@@ -86,7 +86,7 @@ protected:
 	ds17x85_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 model, u32 extram_size);
 
 	// device-specific overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

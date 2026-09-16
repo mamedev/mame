@@ -13,6 +13,7 @@
 #include "nl_280zzzap.h"
 
 #include "mw8080bw.h"
+#include "sound.h"
 #include "speaker.h"
 
 
@@ -775,14 +776,13 @@ void gunfight_audio_device::write(u8 data)
 
 void gunfight_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	netlist_mame_sound_device &nl_sound =
 		NETLIST_SOUND(config, "sound_nl", 48000)
 			.set_source(NETLIST_NAME(gunfight));
-	nl_sound.add_route(0, "lspeaker", 0.5);
-	nl_sound.add_route(1, "rspeaker", 0.5);
+	nl_sound.add_route(0, "speaker", 0.5, 0);
+	nl_sound.add_route(1, "speaker", 0.5, 1);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:left_shot",  "I_LEFT_SHOT.IN",  0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:right_shot", "I_RIGHT_SHOT.IN",  0);
@@ -1060,12 +1060,11 @@ void boothill_audio_device::write(u8 data)
 
 void boothill_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, boothill_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 ioport_constructor boothill_audio_device::device_input_ports() const
@@ -1319,8 +1318,6 @@ ioport_constructor desertgu_audio_device::device_input_ports() const
 
 void desertgu_audio_device::device_start()
 {
-	m_recoil.resolve();
-
 	m_p2 = 0U;
 
 	save_item(NAME(m_p2));
@@ -1659,25 +1656,21 @@ void gmissile_audio_device::device_add_mconfig(machine_config &config)
 			"2",        // explosion
 			nullptr };
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SAMPLES(config, m_samples[0]);
 	m_samples[0]->set_channels(1);
 	m_samples[0]->set_samples_names(sample_names);
-	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_samples[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	SAMPLES(config, m_samples[1]);
 	m_samples[1]->set_channels(1);
 	m_samples[1]->set_samples_names(sample_names);
-	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_samples[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void gmissile_audio_device::device_start()
 {
-	m_l_exp.resolve();
-	m_r_exp.resolve();
-
 	m_p1 = 0U;
 
 	save_item(NAME(m_p1));
@@ -1745,18 +1738,17 @@ void m4_audio_device::device_add_mconfig(machine_config &config)
 			"2",        // explosion
 			nullptr };
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SAMPLES(config, m_samples[0]);
 	m_samples[0]->set_channels(2);
 	m_samples[0]->set_samples_names(sample_names);
-	m_samples[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_samples[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	SAMPLES(config, m_samples[1]);
 	m_samples[1]->set_channels(2);
 	m_samples[1]->set_samples_names(sample_names);
-	m_samples[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_samples[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void m4_audio_device::device_start()
@@ -2557,12 +2549,11 @@ void dogpatch_audio_device::write(u8 data)
 
 void dogpatch_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, dogpatch_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 void dogpatch_audio_device::device_start()
@@ -3101,9 +3092,6 @@ void spcenctr_audio_device::device_add_mconfig(machine_config &config)
 
 void spcenctr_audio_device::device_start()
 {
-	m_lamp.resolve();
-	m_strobe.resolve();
-
 	m_strobe_timer = timer_alloc(FUNC(spcenctr_audio_device::strobe_callback), this);
 
 	m_strobe_enable = 0U;
@@ -3193,8 +3181,6 @@ void phantom2_audio_device::device_add_mconfig(machine_config &config)
 
 void phantom2_audio_device::device_start()
 {
-	m_exp.resolve();
-
 	m_p1 = 0U;
 	m_p2 = 0U;
 
@@ -3501,12 +3487,11 @@ void invad2ct_audio_device::p4_w(u8 data)
 
 void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "spk1").front_left();
-	SPEAKER(config, "spk2").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	DISCRETE(config, m_discrete, invad2ct_discrete);
-	m_discrete->add_route(0, "spk1", 0.5);
-	m_discrete->add_route(1, "spk2", 0.5);
+	m_discrete->add_route(0, "speakers", 0.5, 0);
+	m_discrete->add_route(1, "speakers", 0.5, 1);
 
 	SN76477(config, m_sn[0]);
 	m_sn[0]->set_noise_params(0, 0, 0);
@@ -3522,7 +3507,7 @@ void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 	m_sn[0]->set_mixer_params(0, 0, 0);
 	m_sn[0]->set_envelope_params(1, 0);
 	m_sn[0]->set_enable(1);
-	m_sn[0]->add_route(ALL_OUTPUTS, "spk1", 0.3);
+	m_sn[0]->add_route(ALL_OUTPUTS, "speakers", 0.3, 0);
 
 	SN76477(config, m_sn[1]);
 	m_sn[1]->set_noise_params(0, 0, 0);
@@ -3538,7 +3523,7 @@ void invad2ct_audio_device::device_add_mconfig(machine_config &config)
 	m_sn[1]->set_mixer_params(0, 0, 0);
 	m_sn[1]->set_envelope_params(1, 0);
 	m_sn[1]->set_enable(1);
-	m_sn[1]->add_route(ALL_OUTPUTS, "spk2", 0.3);
+	m_sn[1]->add_route(ALL_OUTPUTS, "speakers", 0.3, 1);
 }
 
 void invad2ct_audio_device::device_start()

@@ -161,9 +161,9 @@ public:
 	void ccastles(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -223,11 +223,9 @@ private:
 	inline void write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba);
 	inline void bitmode_autoinc();
 	inline void schedule_next_irq(int curscanline);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -555,8 +553,6 @@ uint32_t ccastles_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 /************************************* *
  *  VBLANK and IRQ generation
  *
@@ -626,7 +622,7 @@ void ccastles_state::machine_start()
 
 	// reconfigure the visible area to match
 	visarea.set(0, 255, m_vblank_end, m_vblank_start - 1);
-	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	m_screen->configure(320, 256, visarea, attotime::from_ticks(VTOTAL * HTOTAL, PIXEL_CLOCK));
 
 	// configure the ROM banking
 	membank("rombank")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);
@@ -756,7 +752,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(ccastles_state, vblank_r)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ccastles_state::vblank_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Jump/1P Start Upright")    PORT_CONDITION("IN1", 0x20, EQUALS, 0x00)  // left Jump, non-cocktail start1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P Jump")           PORT_CONDITION("IN1", 0x20, EQUALS, 0x20)  // 1p Jump, cocktail
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Jump/2P Start Upright")   PORT_CONDITION("IN1", 0x20, EQUALS, 0x00)  // right Jump, non-cocktail start2
@@ -873,7 +869,7 @@ void ccastles_state::ccastles(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ccastles);
 	PALETTE(config, m_palette).set_entries(32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 24, 256); // potentially adjusted later
 	m_screen->set_screen_update(FUNC(ccastles_state::screen_update));
 	m_screen->set_palette(m_palette);

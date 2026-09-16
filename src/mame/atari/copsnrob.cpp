@@ -96,8 +96,8 @@ public:
 	void copsnrob(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_trucky;
@@ -117,7 +117,7 @@ private:
 
 	uint8_t m_misc = 0U;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t misc_r();
 	void misc2_w(uint8_t data);
@@ -125,8 +125,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-
-// video
 
 uint32_t copsnrob_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -245,8 +243,6 @@ uint32_t copsnrob_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 
 void copsnrob_state::one_start_w(int state)
@@ -416,7 +412,6 @@ GFXDECODE_END
 void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_misc));
-	m_leds.resolve();
 }
 
 void copsnrob_state::machine_reset()
@@ -432,7 +427,7 @@ void copsnrob_state::copsnrob(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &copsnrob_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL / 2, 457, 0, 256, 261, 0, 200);
 	// H RESET (synchronous) = 256H & 8H & 64H & 128H
 	// V RESET (synchronous) = 256V & 4V
@@ -444,12 +439,11 @@ void copsnrob_state::copsnrob(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	discrete_sound_device &discrete(DISCRETE(config, "discrete", copsnrob_discrete));
-	discrete.add_route(0, "lspeaker", 1.0);
-	discrete.add_route(1, "rspeaker", 1.0);
+	discrete.add_route(0, "speaker", 1.0, 0);
+	discrete.add_route(1, "speaker", 1.0, 1);
 
 	f9334_device &latch(F9334(config, "latch")); // H3 on audio board
 	latch.q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<COPSNROB_MOTOR3_INV>));

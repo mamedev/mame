@@ -27,16 +27,16 @@ public:
 	void mt5510(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void bank_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
@@ -100,7 +100,7 @@ void mt5510_state::mt5510(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom2").do_callback().set("duart", FUNC(scn2681_device::ip5_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(45.8304_MHz_XTAL / 2, 1120, 0, 960, 341, 0, 300); // wild guess at resolution
 	screen.set_screen_update(FUNC(mt5510_state::screen_update));
 }
@@ -121,4 +121,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1988, mt5510, 0, 0, mt5510, mt5510, mt5510_state, empty_init, "Microterm", "Microterm 5510", MACHINE_IS_SKELETON)
+COMP(1988, mt5510, 0, 0, mt5510, mt5510, mt5510_state, empty_init, "Microterm", "Microterm 5510", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

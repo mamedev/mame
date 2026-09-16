@@ -39,11 +39,11 @@ class emu_timer
 public:
 	// getters
 	bool enabled() const noexcept { return m_enabled; }
-	int param() const noexcept { return m_param; }
+	s32 param() const noexcept { return m_param; }
 
 	// setters
 	bool enable(bool enable = true) noexcept;
-	void set_param(int param) noexcept { m_param = param; }
+	void set_param(s32 param) noexcept { m_param = param; }
 
 	// control
 	void reset(const attotime &duration = attotime::never) noexcept { adjust(duration, m_param, m_period); }
@@ -66,7 +66,7 @@ private:
 			running_machine &machine,
 			timer_expired_delegate &&callback,
 			attotime start_delay,
-			int param,
+			s32 param,
 			bool temporary);
 
 	// internal helpers
@@ -85,6 +85,7 @@ private:
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
+	u32                 m_index;        // needed to restore timers scheduled at the same time in correct order
 
 	friend class device_scheduler;
 	friend class fixed_allocator<emu_timer>;
@@ -121,9 +122,9 @@ public:
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback);
-	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use TIMER_CALLBACK_MEMBER and an allocated emu_timer instead.")]]
-	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
-	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), int param = 0);
+	[[deprecated("timer_set is deprecated; please avoid anonymous timers. Use an allocated emu_timer instead.")]]
+	void timer_set(const attotime &duration, timer_expired_delegate callback, s32 param = 0);
+	void synchronize(timer_expired_delegate callback = timer_expired_delegate(), s32 param = 0);
 
 	// debugging
 	void dump_timers() const;
@@ -143,7 +144,7 @@ private:
 	void apply_suspend_changes();
 
 	// timer helpers
-	emu_timer &timer_list_insert(emu_timer &timer);
+	template <bool CheckIndex = false> emu_timer &timer_list_insert(emu_timer &timer);
 	emu_timer &timer_list_remove(emu_timer &timer);
 	void execute_timers();
 

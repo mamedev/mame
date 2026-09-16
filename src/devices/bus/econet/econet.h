@@ -27,7 +27,7 @@ class econet_device : public device_t
 {
 public:
 	// construction/destruction
-	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	econet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto clk_wr_callback() { return m_write_clk.bind(); }
 	auto data_wr_callback() { return m_write_data.bind(); }
@@ -66,8 +66,8 @@ protected:
 	};
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	std::vector<daisy_entry> m_device_list;
 
@@ -88,7 +88,7 @@ class econet_slot_device : public device_t, public device_single_card_slot_inter
 {
 public:
 	// construction/destruction
-	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T, typename U>
 	econet_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&econet_tag, U &&devs)
@@ -99,7 +99,7 @@ public:
 	}
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// inline configuration
 	template <typename T> void set_econet_tag(T &&tag) { m_econet.set_tag(std::forward<T>(tag)); }

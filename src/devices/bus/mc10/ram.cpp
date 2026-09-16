@@ -35,7 +35,7 @@ namespace
 
 	protected:
 		// device_t implementation
-		virtual void device_start() override;
+		virtual void device_start() override ATTR_COLD;
 	private:
 		memory_share_creator<u8> m_share;
 	};

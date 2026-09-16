@@ -58,13 +58,12 @@ public:
 	void init_emeraldj();
 	void init_swcourtb();
 
-	void namcona1_mcu_map(address_map &map);
+	void namcona1_mcu_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_post_load() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(set_scanline_interrupt);
 	void scanline_interrupt(int scanline);
@@ -95,8 +94,8 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void namcona1_main_map(address_map &map);
-	void namcona1_c219_map(address_map &map);
+	void namcona1_main_map(address_map &map) ATTR_COLD;
+	void namcona1_c219_map(address_map &map) ATTR_COLD;
 
 	enum
 	{
@@ -194,7 +193,7 @@ private:
 	u16 m_zelos_ctrl = 0;
 
 	void zelos_ctrl_w(u16 data);
-	void zelos_main_map(address_map &map);
+	void zelos_main_map(address_map &map) ATTR_COLD;
 };
 
 class xday2_namcona2_state : public namcona2_state
@@ -217,7 +216,7 @@ private:
 	u8 printer_r();
 	void printer_w(u8 data);
 
-	void xday2_main_map(address_map &map);
+	void xday2_main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_NAMCONA1_H

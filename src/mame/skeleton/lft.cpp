@@ -47,10 +47,10 @@ public:
 	void lft(machine_config &config);
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;
 	required_device<scc8530_device> m_scc;
@@ -94,7 +94,7 @@ void lft_state::lft(machine_config &config)
 	// Devices
 	MM58167(config, m_rtc, 32.768_kHz_XTAL);
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 	m_scc->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -136,5 +136,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY             FULLNAME                      FLAGS
-COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, lft1510, 0,       0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1510 186 User Processor",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, lft1230, lft1510, 0,      lft,     lft,   lft_state, empty_init, "L/F Technologies", "A1230 186 Master Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

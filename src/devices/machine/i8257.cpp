@@ -158,6 +158,7 @@ inline void i8257_device::dma_read()
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY:
+		break;
 	case MODE_TRANSFER_WRITE:
 		LOGTFR(" - MODE TRANSFER VERIFY/WRITE");
 		m_temp = m_in_ior_cb[m_current_channel](offset);
@@ -185,9 +186,7 @@ inline void i8257_device::dma_write()
 	{
 	case MODE_TRANSFER_VERIFY: {
 		LOGTFR(" - MODE TRANSFER VERIFY");
-		uint8_t v1 = m_in_memr_cb(offset);
-		if(0 && m_temp != v1)
-			logerror("verify error %02x vs. %02x\n", m_temp, v1);
+		m_verify_cb[m_current_channel](offset);
 		break;
 	}
 
@@ -273,6 +272,7 @@ i8257_device::i8257_device(const machine_config &mconfig, const char *tag, devic
 	, m_out_memw_cb(*this)
 	, m_in_ior_cb(*this, 0)
 	, m_out_iow_cb(*this)
+	, m_verify_cb(*this, 0)
 	, m_out_dack_cb(*this)
 {
 }

@@ -25,7 +25,7 @@ The following files are supported:
 history.xml
     From Gaming-History (formerly Arcade-History)
 mameinfo.dat
-    From `MASH’s MAMEINFO <https://mameinfo.mameworld.info/>`_
+    From `MASH’s MAMEINFO <https://mashinfo.github.io/mameinfo/>`_
 messinfo.dat
     From `progetto-SNAPS MESSINFO.dat
     <https://www.progettosnaps.net/messinfo/>`_

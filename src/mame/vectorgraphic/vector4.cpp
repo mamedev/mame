@@ -87,9 +87,9 @@ public:
 	void vector4(machine_config &config);
 
 private:
-	void vector4_io(address_map &map);
-	void vector4_z80mem(address_map &map);
-	void vector4_8088mem(address_map &map);
+	void vector4_io(address_map &map) ATTR_COLD;
+	void vector4_z80mem(address_map &map) ATTR_COLD;
+	void vector4_8088mem(address_map &map) ATTR_COLD;
 	void spr_w(uint8_t data);
 	uint8_t msc_r();
 	void msc_w(uint8_t data) { machine_reset(); }
@@ -99,8 +99,8 @@ private:
 	int ppi_pc_r() { return m_ppi_pc; }
 	uint8_t s100_r(offs_t offset) { return m_s100->sinp_r(offset+0x20); }
 	void s100_w(offs_t offset, uint8_t data) { m_s100->sout_w(offset+0x20, data); }
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_8088cpu;
@@ -191,7 +191,7 @@ void vector4_state::vector4(machine_config &config)
 	S100_SLOT(config, "s100:2", vector4_s100_devices, nullptr);
 	S100_SLOT(config, "s100:3", vector4_s100_devices, nullptr);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	// 7200-0001 page 210 D7, 208 (VI A-5) A1
 	pit.set_clk<0>(_2mclk);
 	pit.set_clk<1>(_2mclk);
@@ -201,16 +201,16 @@ void vector4_state::vector4(machine_config &config)
 	pit.out_handler<0>().append_inputline(m_8088cpu, INPUT_LINE_IRQ0);
 
 	// 7200-0001 page 210 D13, D1
-	vector4_keyboard_device &v4kbd(VECTOR4_KEYBOARD(config, "rs232keyboard", 0));
+	vector4_keyboard_device &v4kbd(VECTOR4_KEYBOARD(config, "rs232keyboard"));
 	v4kbd.txd_handler().set(m_uart0, FUNC(i8251_device::write_rxd));
 	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", _2mclk/26/16));
 	keyboard_clock.signal_handler().set(m_uart0, FUNC(i8251_device::write_txc));
 	keyboard_clock.signal_handler().append(m_uart0, FUNC(i8251_device::write_rxc));
-	I8251(config, m_uart0, 0);
+	I8251(config, m_uart0);
 	m_uart0->txd_handler().set(v4kbd, FUNC(vector4_keyboard_device::write_rxd));
 
 	// D3
-	i8251_device &uart1(I8251(config, "uart1", 0));
+	i8251_device &uart1(I8251(config, "uart1"));
 	rs232_port_device &rs232com(RS232_PORT(config, "rs232com", default_rs232_devices, nullptr));
 	pit.out_handler<1>().set(uart1, FUNC(i8251_device::write_txc));
 	pit.out_handler<1>().append(uart1, FUNC(i8251_device::write_rxc));
@@ -222,7 +222,7 @@ void vector4_state::vector4(machine_config &config)
 	rs232com.cts_handler().set(uart1, FUNC(i8251_device::write_cts));
 
 	// D2
-	i8251_device &uart2(I8251(config, "uart2", 0));
+	i8251_device &uart2(I8251(config, "uart2"));
 	rs232_port_device &rs232prtr(RS232_PORT(config, "rs232prtr", default_rs232_devices, nullptr));
 	pit.out_handler<2>().set(uart2, FUNC(i8251_device::write_txc));
 	pit.out_handler<2>().append(uart2, FUNC(i8251_device::write_rxc));

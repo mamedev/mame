@@ -10,16 +10,16 @@
 class hyperscan_ctrl_device : public device_t
 {
 public:
-	hyperscan_ctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hyperscan_ctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t read(offs_t offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	required_ioport_array<4> m_inputs;

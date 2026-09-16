@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 enum
 {
 	V60_R0 = 1,
@@ -88,17 +87,18 @@ public:
 
 	void stall();
 
+	auto irq_cycle_callback() { return m_irq_cycle.bind(); }
+
 protected:
 	v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -148,6 +148,8 @@ private:
 	static const am_func s_Op58Table[32];
 	static const am_func s_Op5ATable[32];
 	static const am_func s_OpCodeTable[256];
+
+	devcb_read8 m_irq_cycle;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -777,7 +779,6 @@ private:
 	[[noreturn]] uint32_t opUNHANDLED();
 	void v60_do_irq(int vector);
 	void v60_try_irq();
-
 };
 
 
@@ -792,4 +793,4 @@ public:
 DECLARE_DEVICE_TYPE(V60, v60_device)
 DECLARE_DEVICE_TYPE(V70, v70_device)
 
-#endif // MAME_CPU_V60_V60_H
+#endif

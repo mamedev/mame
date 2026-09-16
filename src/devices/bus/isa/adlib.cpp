@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-  ISA 8 bit Adlib Sound Card
+  ISA 8 bit AdLib Music Synthesizer Card
 
 ***************************************************************************/
 
@@ -13,32 +13,11 @@
 #include "speaker.h"
 
 
-#define ym3812_StdClock 3579545
-
-uint8_t isa8_adlib_device::ym3812_16_r(offs_t offset)
-{
-	uint8_t retVal = 0xff;
-	switch(offset)
-	{
-		case 0 : retVal = m_ym3812->status_r(); break;
-	}
-	return retVal;
-}
-
-void isa8_adlib_device::ym3812_16_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0 : m_ym3812->address_w(data); break;
-		case 1 : m_ym3812->data_w(data); break;
-	}
-}
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device, "isa_adlib", "Ad Lib Sound Card")
+DEFINE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device, "isa_adlib", "AdLib Music Synthesizer Card")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -47,7 +26,8 @@ DEFINE_DEVICE_TYPE(ISA8_ADLIB, isa8_adlib_device, "isa_adlib", "Ad Lib Sound Car
 void isa8_adlib_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	YM3812(config, m_ym3812, ym3812_StdClock).add_route(ALL_OUTPUTS, "mono", 3.00);
+	YM3812(config, m_ym3812, 14.318181_MHz_XTAL / 4); // from ISA OSC pin
+	m_ym3812->add_route(ALL_OUTPUTS, "mono", 3.00);
 }
 
 //**************************************************************************
@@ -72,7 +52,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 void isa8_adlib_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_r)), write8sm_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_w)));
+	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*m_ym3812, FUNC(ym3812_device::read)), write8sm_delegate(*m_ym3812, FUNC(ym3812_device::write)));
 }
 
 //-------------------------------------------------

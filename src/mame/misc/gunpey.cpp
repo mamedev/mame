@@ -256,8 +256,8 @@ public:
 	void gunpey(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory handlers
@@ -315,6 +315,7 @@ private:
 	// interrupt functions
 	u8 m_irq_cause = 0, m_irq_mask = 0;
 	void irq_check(u8 irq_type);
+	IRQ_CALLBACK_MEMBER( vector_r );
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -328,8 +329,8 @@ private:
 	required_region_ptr<u8> m_blit_rom;
 
 	// address spaces
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -575,14 +576,19 @@ u32 gunpey_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	return 0;
 }
 
+IRQ_CALLBACK_MEMBER(gunpey_state::vector_r)
+{
+	return 0x200 / 4;
+}
+
 void gunpey_state::irq_check(u8 irq_type)
 {
 	m_irq_cause |= irq_type;
 
 	if (m_irq_cause & m_irq_mask)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE); // V30
 	else
-		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4); // V30
+		m_maincpu->set_input_line(0, CLEAR_LINE); // V30
 }
 
 void gunpey_state::status_w(offs_t offset, u8 data)
@@ -1164,26 +1170,26 @@ void gunpey_state::gunpey(machine_config &config)
 	V30(config, m_maincpu, 57242400 / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gunpey_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &gunpey_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(gunpey_state::vector_r));
 	TIMER(config, "scantimer").configure_scanline(FUNC(gunpey_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(57242400/8, 442, 0, 320, 264, 0, 240); /* just to get ~60 Hz */
 	screen.set_screen_update(FUNC(gunpey_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, XTAL(16'934'400) / 8, okim6295_device::PIN7_LOW);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.125);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.125);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.125, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.125, 1);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
-	ymz.add_route(0, "lspeaker", 0.25);
-	ymz.add_route(1, "rspeaker", 0.25);
+	ymz.add_route(0, "speaker", 0.25, 0);
+	ymz.add_route(1, "speaker", 0.25, 1);
 }
 
 /***************************************************************************************/

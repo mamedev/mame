@@ -40,8 +40,8 @@ public:
 	void pwrview(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tmr0);
 	TIMER_CALLBACK_MEMBER(update_kbd);
@@ -71,10 +71,10 @@ private:
 	u8 err_r();
 	MC6845_UPDATE_ROW(update_row);
 
-	void bios_bank(address_map &map);
-	void pwrview_fetch_map(address_map &map);
-	void pwrview_io(address_map &map);
-	void pwrview_map(address_map &map);
+	void bios_bank(address_map &map) ATTR_COLD;
+	void pwrview_fetch_map(address_map &map) ATTR_COLD;
+	void pwrview_io(address_map &map) ATTR_COLD;
+	void pwrview_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -504,12 +504,12 @@ void pwrview_state::pwrview(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &pwrview_state::pwrview_fetch_map);
 	m_maincpu->set_addrmap(AS_IO, &pwrview_state::pwrview_io);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_physical_aspect(3, 4); // Portrait CRT
 	screen.set_raw(XTAL(64'000'000)/8, 992, 0, 744, 1040, 0, 960);  // clock unknown
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(16'000'000)/16); // clocks unknown, fix above when found
 	m_pit->set_clk<1>(XTAL(16'000'000)/16);
 	m_pit->set_clk<2>(XTAL(16'000'000)/16);
@@ -525,7 +525,7 @@ void pwrview_state::pwrview(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->rxrdy_handler().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
 	m_uart->txd_handler().set([this](bool state){ if(BIT(m_c280, 4) && m_dtr) m_uart->write_rxd(state); }); // m_dtr here appears unlikely but the post seems to expect it
 	m_uart->dtr_handler().set([this](bool state){ m_dtr = state; });

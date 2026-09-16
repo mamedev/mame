@@ -28,12 +28,12 @@ public:
 	auto rtc_read_callback() { return m_rtc_read_callback.bind(); }
 	auto rtc_write_callback() { return m_rtc_write_callback.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(ust_tick);
 	TIMER_CALLBACK_MEMBER(msc_tick);

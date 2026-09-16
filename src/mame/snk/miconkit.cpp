@@ -73,7 +73,7 @@ public:
 	void smiconk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -84,10 +84,12 @@ private:
 	required_ioport_array<5> m_inputs;
 	output_finder<2> m_lamps;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-	void smiconk_main_map(address_map &map);
-	void smiconk_io_map(address_map &map);
+	u8 m_select = 0;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void smiconk_main_map(address_map &map) ATTR_COLD;
+	void smiconk_io_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -96,14 +98,10 @@ private:
 	u8 vblank_r();
 	void select_w(u8 data);
 	u8 input_r();
-
-	u8 m_select = 0;
 };
 
 void miconkit_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_select));
 }
 
@@ -280,7 +278,7 @@ void miconkit_state::micon2(machine_config &config)
 	m_ppi->tri_pc_callback().set_constant(0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 240-1, 24, 256-24-1);
@@ -290,7 +288,7 @@ void miconkit_state::micon2(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 0).add_route(ALL_OUTPUTS, "mono", 0.25);
+	BEEP(config, m_beeper).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void miconkit_state::smiconk(machine_config &config)

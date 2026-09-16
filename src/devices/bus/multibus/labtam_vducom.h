@@ -28,13 +28,12 @@ class labtam_vducom_device_base
 protected:
 	labtam_vducom_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	void cpu_mem(address_map &map);
-	virtual void cpu_pio(address_map &map);
+	void cpu_mem(address_map &map) ATTR_COLD;
+	virtual void cpu_pio(address_map &map) ATTR_COLD;
 
 	void bus_mem_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 bus_mem_r(offs_t offset, u16 mem_mask);
@@ -50,7 +49,6 @@ protected:
 	u16 start() const { return m_start; }
 	u8 u7() const { return m_u7; }
 
-private:
 	u8 nvram_recall();
 	void nvram_store(u8 data);
 
@@ -62,6 +60,7 @@ private:
 
 	required_device_array<rs232_port_device, 4> m_serial;
 
+private:
 	required_ioport m_e4;
 	memory_view m_mbus;
 
@@ -77,8 +76,8 @@ public:
 	labtam_8086cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class labtam_vducom_device : public labtam_vducom_device_base
@@ -87,11 +86,11 @@ public:
 	labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void cpu_pio(address_map &map) override;
+	virtual void cpu_pio(address_map &map) override ATTR_COLD;
 
 private:
 	void palette_init(palette_device &palette);

@@ -4,7 +4,7 @@
 //TODO: rotating priority, cascade
 
 #include "emu.h"
-#include "machine/am9519.h"
+#include "am9519.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"

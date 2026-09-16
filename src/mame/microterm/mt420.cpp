@@ -42,10 +42,10 @@ private:
 	void control_w(u8 data);
 	u8 attr_r(offs_t offset);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void chars_map(address_map &map);
-	void attrs_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void chars_map(address_map &map) ATTR_COLD;
+	void attrs_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<input_merger_device> m_mainnmi;
@@ -141,7 +141,7 @@ void mt420_state::mt420(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom").do_callback().set("duart", FUNC(scn2681_device::ip6_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9.87768_MHz_XTAL * 2, 612 * 2, 0, 480 * 2, 269, 0, 250);
 	//screen.set_raw(15.30072_MHz_XTAL * 2, 948 * 2, 0, 792 * 2, 269, 0, 250);
 	screen.set_screen_update("avdc", FUNC(scn2674_device::screen_update));
@@ -176,4 +176,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1986, mt420, 0, 0, mt420, mt420, mt420_state, empty_init, "Micro-Term", "Micro-Term 420", MACHINE_IS_SKELETON)
+COMP(1986, mt420, 0, 0, mt420, mt420, mt420_state, empty_init, "Micro-Term", "Micro-Term 420", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

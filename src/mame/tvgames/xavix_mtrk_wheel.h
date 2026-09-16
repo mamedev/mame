@@ -15,7 +15,7 @@ class xavix_mtrk_wheel_device :  public device_t
 {
 public:
 	// construction/destruction
-	xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_mtrk_wheel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto event_out_cb() { return m_event_out_cb.bind(); }
 
@@ -23,9 +23,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( changed );
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	devcb_write_line m_event_out_cb;

@@ -11,6 +11,8 @@
 #include "stic.h"
 #include "screen.h"
 
+#include <iostream>
+
 
 /****************************************************************************
  *                                                                          *
@@ -1310,6 +1312,13 @@ void stic_device::write(offs_t offset, uint16_t data)
 uint16_t stic_device::gram_read(offs_t offset)
 {
 	return m_gram[offset];
+}
+
+uint16_t stic_device::grom_read(offs_t offset)
+{
+	if (offset > 0x800)
+		util::stream_format(std::cerr, "help! %X\n", offset);
+	return (0xff00 | m_grom[offset]);
 }
 
 void stic_device::gram_write(offs_t offset, uint16_t data)

@@ -1,7 +1,7 @@
 // MyLinux.h
 
-#ifndef __MY_LIN_LINUX_H
-#define __MY_LIN_LINUX_H
+#ifndef ZIP7_INC_COMMON_MY_LINUX_H
+#define ZIP7_INC_COMMON_MY_LINUX_H
 
 // #include "../../C/7zTypes.h"
 

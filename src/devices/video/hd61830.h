@@ -24,9 +24,12 @@ class hd61830_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto rd_rd_callback() { return m_read_rd.bind(); }
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t status_r();
 	void control_w(uint8_t data);
@@ -38,9 +41,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -75,7 +78,7 @@ private:
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, int x, int y, uint8_t md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hd61830(address_map &map);
+	void hd61830(address_map &map) ATTR_COLD;
 
 	devcb_read8 m_read_rd;
 

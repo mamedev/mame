@@ -2,9 +2,10 @@
 // copyright-holders:David Haywood, K.Wilkins
 
 /*
+
 TODO:
-output support, Golly Ghost is currently hacking this based on DPRAM in the namcos2.cpp driver side!
-some of this can likely be moved into the actual MCU core too
+- output support, Golly Ghost is currently hacking this based on DPRAM in the namcos2.cpp driver side!
+  some of this can likely be moved into the actual MCU core too
 
 */
 
@@ -142,7 +143,7 @@ uint8_t namcoc65_device::dpram_byte_r(offs_t offset)
 
 void namcoc65_device::dpram_byte_w(offs_t offset, uint8_t data)
 {
-	m_dp_out(offset,data);
+	m_dp_out(offset, data);
 }
 
 void namcoc65_device::mcu_map(address_map &map)

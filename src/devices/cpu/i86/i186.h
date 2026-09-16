@@ -37,6 +37,9 @@ public:
 	void int2_w(int state) { external_int(2, state); }
 	void int3_w(int state) { external_int(3, state); }
 
+	// This a hack, only use if there are sync problems with another cpu
+	void dma_sync_req(int which) { drq_callback(which); }
+
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
@@ -66,16 +69,15 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks / 2); }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_run() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
 
 	virtual uint8_t read_port_byte(uint16_t port) override;
 	virtual uint16_t read_port_word(uint16_t port) override;
 	virtual void write_port_byte(uint16_t port, uint8_t data) override;
-	void write_port_byte_al(uint16_t port);
+	virtual void write_port_byte_al(uint16_t port) override;
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 	virtual uint8_t read_byte(uint32_t addr) override;
 	virtual uint16_t read_word(uint32_t addr) override;
@@ -83,6 +85,7 @@ protected:
 	virtual void write_word(uint32_t addr, uint16_t data) override;
 
 	static const uint8_t m_i80186_timing[200];
+	static const uint8_t m_i80186_ea_timing[200];
 
 private:
 	void update_interrupt_state();
@@ -102,45 +105,45 @@ private:
 
 	struct mem_state
 	{
-		uint16_t      lower;
-		uint16_t      upper;
-		uint16_t      middle;
-		uint16_t      middle_size;
-		uint16_t      peripheral;
+		uint16_t    lower;
+		uint16_t    upper;
+		uint16_t    middle;
+		uint16_t    middle_size;
+		uint16_t    peripheral;
 	};
 
 	struct timer_state
 	{
-		uint16_t      control;
-		uint16_t      maxA;
-		uint16_t      maxB;
-		uint16_t      count;
+		uint16_t    control;
+		uint16_t    maxA;
+		uint16_t    maxB;
+		uint16_t    count;
 		emu_timer   *int_timer;
 	};
 
 	struct dma_state
 	{
 		bool        drq_state;
-		uint32_t      source;
-		uint32_t      dest;
-		uint16_t      count;
-		uint16_t      control;
+		uint32_t    source;
+		uint32_t    dest;
+		uint16_t    count;
+		uint16_t    control;
 	};
 
 	struct intr_state
 	{
-		uint8_t       vector;
-		uint8_t       pending;
-		uint16_t      ack_mask;
-		uint16_t      priority_mask;
-		uint16_t      in_service;
-		uint16_t      request;
-		uint16_t      status;
-		uint16_t      poll_status;
-		uint16_t      timer[3];
-		uint16_t      dma[2];
-		uint16_t      ext[4];
-		uint8_t       ext_state;
+		uint8_t     vector;
+		uint8_t     pending;
+		uint16_t    ack_mask;
+		uint16_t    priority_mask;
+		uint16_t    in_service;
+		uint16_t    request;
+		uint16_t    status;
+		uint16_t    poll_status;
+		uint16_t    timer[3];
+		uint16_t    dma[2];
+		uint16_t    ext[4];
+		uint8_t     ext_state;
 	};
 
 	timer_state     m_timer[3];
@@ -149,6 +152,7 @@ private:
 	mem_state       m_mem;
 	bool            m_last_dma;
 
+	int m_dma_latency;
 	uint16_t m_reloc;
 
 	address_space_config m_program_config;

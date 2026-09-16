@@ -8,6 +8,11 @@
 #include "emu.h"
 #include "pci.h"
 
+#include "bus/pci/pci_slot.h"
+
+#include <bit>
+
+
 DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual root")
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
 
@@ -33,6 +38,8 @@ void pci_device::config_map(address_map &map)
 	map(0x34, 0x34).r(FUNC(pci_device::capptr_r));
 	map(0x3c, 0x3c).rw(FUNC(pci_device::interrupt_line_r), FUNC(pci_device::interrupt_line_w));
 	map(0x3d, 0x3d).rw(FUNC(pci_device::interrupt_pin_r), FUNC(pci_device::interrupt_pin_w));
+	map(0x3e, 0x3e).r(FUNC(pci_device::minimum_grant_r));
+	map(0x3f, 0x3f).r(FUNC(pci_device::maximum_latency_r));
 }
 
 void pci_bridge_device::config_map(address_map &map)
@@ -96,7 +103,7 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 // main_id & 0xffff = device ID ($02-$03)
 // revision = board versioning ($08)
 // pclass = programming interface/sub class code/base class code ($09-$0b)
-// subsystem_id << 16 = sub vendor ID ($2c-$2d)    - NB: not all cards have these
+// subsystem_id << 16 = sub vendor ID ($2c-$2d)    - NOTE: not all cards have these
 // subsystem_id & 0xffff = sub device ID ($2e-$2f) /
 void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
 {
@@ -108,9 +115,11 @@ void pci_device::set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass,
 
 void pci_device::device_start()
 {
-	command = 0x0080;
+	command = 0x0000;
 	command_mask = 0x01bf;
 	status = 0x0000;
+	minimum_grant = 0;
+	maximum_latency = 0;
 
 	bank_count = 0;
 	bank_reg_count = 0;
@@ -121,6 +130,14 @@ void pci_device::device_start()
 	save_item(NAME(status));
 	save_item(NAME(intr_line));
 	save_item(NAME(intr_pin));
+
+	device_t *root = owner();
+	while(root && root->type() != PCI_ROOT)
+		root = root->owner();
+	if(!root)
+		fatalerror("PCI device %s is without a PCI root\n", tag());
+
+	m_pci_root = downcast<pci_root_device *>(root);
 }
 
 void pci_device::device_reset()
@@ -200,7 +217,7 @@ void pci_device::command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
-	logerror("command = %04x\n", command);
+	logerror("command = %04x (%04x & %04x)\n", command, data, command_mask);
 	if ((old ^ command) & 3)
 		remap_cb();
 }
@@ -215,11 +232,13 @@ uint32_t pci_device::class_rev_r()
 	return (pclass << 8) | revision;
 }
 
+// vendor defined, writeable with optional "fallback to zero" if unsupported
 uint8_t pci_device::cache_line_size_r()
 {
 	return 0x00;
 }
 
+// latency timer in PCI bus clocks, optionally writeable if supported
 uint8_t pci_device::latency_timer_r()
 {
 	return 0x00;
@@ -306,6 +325,20 @@ void pci_device::interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&intr_pin);
 	logerror("interrupt_pin_w = %02x\n", data);
+}
+
+// value x 0.25 usec to complete a burst
+uint8_t pci_device::minimum_grant_r()
+{
+	logerror("minimum_grant_r = %02x\n", minimum_grant);
+	return minimum_grant;
+}
+
+// value x 0.25 usec between request cycles
+uint8_t pci_device::maximum_latency_r()
+{
+	logerror("maximum_latency_r = %02x\n", maximum_latency);
+	return maximum_latency;
 }
 
 void pci_device::set_remap_cb(mapper_cb _remap_cb)
@@ -509,13 +542,25 @@ void pci_bridge_device::device_start()
 
 	for (device_t &d : bus_root()->subdevices())
 	{
-		const char *t = d.tag();
-		int l = strlen(t);
-		if(l <= 4 || t[l-5] != ':' || t[l-2] != '.')
-			continue;
-		int id = strtol(t+l-4, nullptr, 16);
-		int fct = t[l-1] - '0';
-		sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
+		if(d.type() == PCI_SLOT) {
+			pci_slot_device &slot = downcast<pci_slot_device &>(d);
+			pci_device *card = slot.get_card();
+			if(card) {
+				int id = slot.get_slot();
+				sub_devices[id << 3] = card;
+			}
+
+		} else {
+			const char *t = d.tag();
+			int l = strlen(t);
+			if(l <= 4 || t[l-5] != ':' || t[l-2] != '.') {
+				logerror("Device %s unhandled\n", t);
+				continue;
+			}
+			int id = strtol(t+l-4, nullptr, 16);
+			int fct = t[l-1] - '0';
+			sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
+		}
 	}
 
 	mapper_cb cf_cb(&pci_bridge_device::regenerate_config_mapping, this);
@@ -867,6 +912,12 @@ void pci_host_device::io_configuration_access_map(address_map &map)
 	map(0xcfc, 0xcff).rw(FUNC(pci_host_device::config_data_r), FUNC(pci_host_device::config_data_w));
 }
 
+void pci_host_device::set_spaces(address_space *memory, address_space *io, address_space *busmaster)
+{
+	memory_space = memory;
+	io_space = io ? io : memory;
+	m_pci_root->set_pci_busmaster_space(busmaster ? busmaster : memory);
+}
 
 pci_host_device::pci_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_bridge_device(mconfig, type, tag, owner, clock)
@@ -917,7 +968,7 @@ void pci_host_device::regenerate_mapping()
 				io_window_start, io_window_end, io_offset, io_space);
 }
 
-uint32_t pci_host_device::config_address_r()
+uint32_t pci_host_device::config_address_r(offs_t offset, uint32_t mem_mask)
 {
 	return config_address;
 }
@@ -943,7 +994,7 @@ uint32_t pci_host_device::config_data_ex_r(offs_t offset, uint32_t mem_mask)
 	// is this a Type 0 or Type 1 configuration address? (page 31, PCI 2.2 Specification)
 	if ((config_address & 3) == 0)
 	{
-		const int devnum = 31 - count_leading_zeros_32(config_address & 0xfffff800);
+		const int devnum = std::bit_width(config_address & 0xfffff800) - 1;
 		return root_config_read(0, devnum << 3, config_address & 0xfc, mem_mask);
 	}
 	else if ((config_address & 3) == 1)
@@ -958,7 +1009,7 @@ void pci_host_device::config_data_ex_w(offs_t offset, uint32_t data, uint32_t me
 	// is this a Type 0 or Type 1 configuration address? (page 31, PCI 2.2 Specification)
 	if ((config_address & 3) == 0)
 	{
-		const int devnum = 31 - count_leading_zeros_32(config_address & 0xfffff800);
+		const int devnum = std::bit_width(config_address & 0xfffff800) - 1;
 		root_config_write(0, devnum << 3, config_address & 0xfc, data, mem_mask);
 	}
 	else if ((config_address & 3) == 1)
@@ -989,7 +1040,10 @@ void pci_host_device::root_config_write(uint8_t bus, uint8_t device, uint16_t re
 
 
 pci_root_device::pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCI_ROOT, tag, owner, clock)
+	: device_t(mconfig, PCI_ROOT, tag, owner, clock),
+	  m_pin_mapper(*this),
+	  m_irq_handler(*this),
+	  m_pci_busmaster_space(nullptr)
 {
 }
 
@@ -999,4 +1053,14 @@ void pci_root_device::device_start()
 
 void pci_root_device::device_reset()
 {
+}
+
+void pci_root_device::irq_pin_w(int pin, int state)
+{
+	m_irq_handler(m_pin_mapper(pin), state);
+}
+
+void pci_root_device::irq_w(int line, int state)
+{
+	m_irq_handler(line, state);
 }

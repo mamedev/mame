@@ -59,7 +59,11 @@ private:
 
 	emu_timer       *m_scan_timer;
 	emu_timer       *m_typematic_timer;
+	// NOTE: protected for pc88va_kbd due of reading in direct form
+	// (an exception not the norm)
+protected:
 	required_ioport m_key_rows[ROW_COUNT];
+private:
 	ioport_value    m_key_states[ROW_COUNT];
 	u8              m_next_row;
 	u8              m_processing;
@@ -77,7 +81,8 @@ public:
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			u32 clock);
+			u32 clock = 0);
+	virtual ~generic_keyboard_device();
 
 	template <typename... T>
 	void set_keyboard_callback(T &&... args)
@@ -85,7 +90,7 @@ public:
 		m_keyboard_cb.set(std::forward<T>(args)...);
 	}
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	generic_keyboard_device(
@@ -94,8 +99,8 @@ protected:
 			char const *tag,
 			device_t *owner,
 			u32 clock);
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_repeat(u8 row, u8 column) override;
 	virtual void send_key(u8 code);

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Igor
+// copyright-holders:hap
+// thanks-to:Igor
 
 // SM500 shared opcode handlers
 

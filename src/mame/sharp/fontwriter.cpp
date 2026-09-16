@@ -42,8 +42,8 @@ public:
 	void fw600(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -57,14 +57,14 @@ private:
 		m_vbl2 ^= 0x88;
 		return m_vbl;
 	}
-	void main_map(address_map &map);
-	void fw600_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void fw600_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<m37720s1_device> m_maincpu;
 
 	// driver_device overrides
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint8_t m_vbl = 0, m_vbl2 = 0;
 };
 
@@ -115,9 +115,9 @@ void fontwriter_state::fontwriter(machine_config &config)
 	m_maincpu->p6_in_cb().set(FUNC(fontwriter_state::vbl_r));
 	m_maincpu->p7_in_cb().set(FUNC(fontwriter_state::vbl2_r));
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(fontwriter_state::screen_update));
@@ -132,9 +132,9 @@ void fontwriter_state::fw600(machine_config &config)
 	m_maincpu->p6_in_cb().set(FUNC(fontwriter_state::vbl_r));
 	m_maincpu->p7_in_cb().set(FUNC(fontwriter_state::vbl2_r));
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(fontwriter_state::screen_update));

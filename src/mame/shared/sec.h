@@ -56,8 +56,8 @@ public:
 	int data_r();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static const size_t MAX_COUNTERS = 32;

@@ -456,7 +456,7 @@ public:
 	void avt(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void avt_6845_address_w(uint8_t data);
@@ -470,8 +470,8 @@ private:
 	void avt_palette(palette_device &palette) const;
 	uint32_t screen_update_avt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void avt_map(address_map &map);
-	void avt_portmap(address_map &map);
+	void avt_map(address_map &map) ATTR_COLD;
+	void avt_portmap(address_map &map) ATTR_COLD;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
@@ -974,7 +974,7 @@ void avt_state::avt(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &avt_state::avt_portmap);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

@@ -67,8 +67,8 @@ public:
 	void ts28(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -79,14 +79,14 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_ioport_array<16> m_keys;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	void key_scan_w(uint8_t data);
 
 	void crt_brightness_w(uint8_t data);
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
 	uint8_t m_key_scan = 0;
@@ -371,7 +371,7 @@ void ts28_state::ts28(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber()); // unknown color
 	m_screen->set_raw(16.537_MHz_XTAL, 864, 0, 720, 319, 0, 300);
 	m_screen->set_screen_update(m_pvtc, FUNC(scn2672_device::screen_update));

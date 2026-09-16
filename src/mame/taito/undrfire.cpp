@@ -60,7 +60,7 @@
     enabled - kludge.
 
 
-    Todo
+    TODO
     ----
 
     What does the 0xb00000 area do... alpha blending ??
@@ -71,8 +71,6 @@
     Pivot port which may be used for rotation: but not
     seen changing except in game inits. Perhaps only used
     in later levels?
-
-    Chase Bombers title screen has wrong Taito logo;
 
     Chase Bombers proto sports lots of gfx bugs;
 
@@ -206,14 +204,6 @@ Board contains only 29 ROMs and not much else.
 #include "cbombers.lh"
 
 
-void undrfire_state::machine_start()
-{
-	m_lamp_start.resolve();
-	m_gun_recoil.resolve();
-	m_lamp.resolve();
-	m_wheel_vibration.resolve();
-}
-
 /**********************************************************
             GAME INPUTS
 **********************************************************/
@@ -244,8 +234,6 @@ void undrfire_state::shared_ram_w(offs_t offset, u16 data, u16 mem_mask)
 
 u32 undrfire_state::undrfire_lightgun_r(offs_t offset)
 {
-	int x,y;
-
 	switch (offset)
 	{
 		/* NB we are raising the raw inputs by an arbitrary amount,
@@ -256,8 +244,8 @@ u32 undrfire_state::undrfire_lightgun_r(offs_t offset)
 		case 0x00:  /* P1 */
 		case 0x01:  /* P2 */
 		{
-			x = m_in_gunx[offset & 1]->read() << 6;
-			y = m_in_guny[offset & 1]->read() << 6;
+			int x = m_in_gunx[offset & 1]->read() << 6;
+			int y = m_in_guny[offset & 1]->read() << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 					| ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -421,7 +409,6 @@ static INPUT_PORTS_START( undrfire )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	/* Gun inputs (real range is 0-0xffff: we use standard 0-255 and shift later) */
-
 	PORT_START("GUNX1")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
 
@@ -433,11 +420,6 @@ static INPUT_PORTS_START( undrfire )
 
 	PORT_START("GUNY2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
-
-	PORT_START("FAKE")
-	PORT_DIPNAME( 0x01, 0x00, "Show gun target" ) PORT_CODE(KEYCODE_F1) PORT_TOGGLE
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -507,6 +489,7 @@ static GFXDECODE_START( gfx_undrfire )
 	GFXDECODE_ENTRY( "sprites", 0x0, tile16x16_layout, 0, 512 )
 GFXDECODE_END
 
+
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -526,7 +509,7 @@ void undrfire_state::undrfire(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("INPUTS0");
 	tc0510nio.read_1_callback().set_ioport("INPUTS1");
 	tc0510nio.read_2_callback().set_ioport("INPUTS2");
@@ -539,7 +522,7 @@ void undrfire_state::undrfire(machine_config &config)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -550,22 +533,21 @@ void undrfire_state::undrfire(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
-	taito_en.add_route(0, "lspeaker", 1.0);
-	taito_en.add_route(1, "rspeaker", 1.0);
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
+	taito_en.add_route(0, "speaker", 1.0, 0);
+	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -588,7 +570,7 @@ void undrfire_state::cbombers(machine_config &config)
 	adc.eoc_ff_callback().set_inputline("maincpu", 5);
 	adc.in_callback<0>().set_ioport("STEER");
 
-	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
+	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio"));
 	tc0510nio.read_0_callback().set_ioport("INPUTS0");
 	tc0510nio.read_1_callback().set_ioport("INPUTS1");
 	tc0510nio.read_2_callback().set_ioport("INPUTS2");
@@ -601,7 +583,7 @@ void undrfire_state::cbombers(machine_config &config)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -612,25 +594,24 @@ void undrfire_state::cbombers(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_undrfire);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 16384);
 
-	TC0620SCC(config, m_tc0620scc, 0);
+	TC0620SCC(config, m_tc0620scc);
 	m_tc0620scc->set_offsets(50, 8);
 	m_tc0620scc->set_palette(m_palette);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(0x24, 0);
 	m_tc0480scp->set_offsets_tx(-1, 0);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
-	taito_en.add_route(0, "lspeaker", 1.0);
-	taito_en.add_route(1, "rspeaker", 1.0);
+	taito_en_device &taito_en(TAITO_EN(config, "taito_en"));
+	taito_en.add_route(0, "speaker", 1.0, 0);
+	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -665,7 +646,7 @@ ROM_START( undrfire )
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
+	ROM_LOAD( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
@@ -706,7 +687,7 @@ ROM_START( undrfireu )
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
+	ROM_LOAD( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
@@ -746,7 +727,7 @@ ROM_START( undrfirej )
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
+	ROM_LOAD( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
@@ -795,7 +776,7 @@ ROM_START( cbombers )
 	ROM_LOAD16_BYTE( "d83_17.ic5",  0x000000, 0x100000, CRC(0ffe737c) SHA1(5923a4edf9d0c8339f793840c2bdc691e2c651e6) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
+	ROM_LOAD( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_BYTE( "d83_31.ic10", 0x000001, 0x40000, CRC(85c37961) SHA1(15ea5c4904d910575e984e146c8941dff913d45f) )
@@ -850,7 +831,7 @@ ROM_START( cbombersj )
 	ROM_LOAD16_BYTE( "d83_17.ic5",  0x000000, 0x100000, CRC(0ffe737c) SHA1(5923a4edf9d0c8339f793840c2bdc691e2c651e6) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
+	ROM_LOAD( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_BYTE( "d83_31.ic10", 0x000001, 0x40000, CRC(85c37961) SHA1(15ea5c4904d910575e984e146c8941dff913d45f) )
@@ -938,8 +919,8 @@ ROM_START( cbombersp )
 	ROM_LOAD16_BYTE( "ic57_1a62.bin",  0x100001, 0x080000, CRC(afd45e35) SHA1(6d7c0729c7d2b204473679b97923130e289f429d) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "ic45_5cc2.bin",  0x000000, 0x080000, CRC(7ae48d63) SHA1(2a8b291f0a683ed5b0c39d221737956b6fc72fa5) )
-	ROM_LOAD       ( "ic59_7cce.bin",  0x080000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
+	ROM_LOAD( "ic45_5cc2.bin",  0x000000, 0x080000, CRC(7ae48d63) SHA1(2a8b291f0a683ed5b0c39d221737956b6fc72fa5) )
+	ROM_LOAD( "ic59_7cce.bin",  0x080000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_BYTE( "st8_ic2.bin", 0x000001, 0x40000, CRC(d74254d8) SHA1(f4a4f9d95f70edf74d937be067d6a9f68a955ea7) )
@@ -954,23 +935,16 @@ ROM_START( cbombersp )
 	ROM_LOAD16_BYTE("ic86_9e88_wave2.bin", 0x200000, 0x080000, CRC(d6dcb45d) SHA1(ec69fb0a9fc6f7e72850775656e9fcd185889825) )
 	ROM_LOAD16_BYTE("ic87_42e7_wave3.bin", 0x300000, 0x080000, CRC(fe52856b) SHA1(fc68301d8b514a142cb38c3aa7a081674bdba6ca) )
 	ROM_LOAD16_BYTE("ic88_2704_wave4.bin", 0x400000, 0x080000, CRC(cba55d36) SHA1(944188bb3d9466ba246cabc57db6b965f2a902a0) )
-	// wave 5 not populated
-	// wave 6 not populated
-	// wave 7 not populated
-	// wave 8 not populated
-	// wave 9 not populated
-	// wave 10 not populated
-	// wave 11 not populated
-	// wave 12 not populated
-	// wave 13 not populated
-	ROM_LOAD16_BYTE("ic107_3a9c_wave14.bin", 0xe00000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )    // -std-
-	ROM_LOAD16_BYTE("ic108_a148_wave15.bin", 0xf00000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // -std-
+	// wave 5-13 not populated
+	ROM_LOAD16_BYTE("ic107_3a9c_wave14.bin", 0xe00000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) ) // -std-
+	ROM_LOAD16_BYTE("ic108_a148_wave15.bin", 0xf00000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) ) // -std-
 ROM_END
 
 
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito",         "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito America", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito",         "Under Fire (Japan)",              0 )
+
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito",         "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )

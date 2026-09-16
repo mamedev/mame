@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "machine/bankdev.h"
-
 DECLARE_DEVICE_TYPE(TAITO_CCHIP, taito_cchip_device)
 
 

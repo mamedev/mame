@@ -95,8 +95,8 @@ namespace {
 class apple1_state : public driver_device
 {
 public:
-	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apple1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, A1_CPU_TAG),
 		m_pia(*this, A1_PIA_TAG),
 		m_ram(*this, RAM_TAG),
@@ -109,11 +109,11 @@ public:
 		m_kbspecial(*this, "KBSPECIAL")
 	{ }
 
-	void apple1(machine_config &config);
+	void apple1(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -149,7 +149,7 @@ private:
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
-	void apple1_map(address_map &map);
+	void apple1_map(address_map &map) ATTR_COLD;
 
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen);
 	void poll_keyboard();
@@ -583,7 +583,7 @@ void apple1_state::apple1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple1_state::apple1_map);
 
 	// video timings are identical to the Apple II, unsurprisingly
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192);
 	m_screen->set_screen_update(FUNC(apple1_state::screen_update));
 	m_screen->set_palette("palette");
@@ -595,6 +595,7 @@ void apple1_state::apple1(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(apple1_state::pia_display_w));
 	m_pia->cb2_handler().set(FUNC(apple1_state::pia_display_gate_w));
 
+	// FIXME: set bus clock frequency
 	A1BUS(config, A1_BUS_TAG, 0).set_space(m_maincpu, AS_PROGRAM);
 	A1BUS_SLOT(config, "exp", 0, A1_BUS_TAG, apple1_cards, "cassette");
 

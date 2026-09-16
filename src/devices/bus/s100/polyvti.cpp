@@ -40,10 +40,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_s100_card_interface overrides
 	virtual u8 s100_smemr_r(offs_t offset) override;
@@ -313,7 +313,7 @@ GFXDECODE_END
 
 void poly_vti_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*10, 16*15);
@@ -324,7 +324,7 @@ void poly_vti_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_vti);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(poly_vti_device::kbd_put));
 
 	I8212(config, m_kbdlatch);

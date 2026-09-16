@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/h8500/h8520.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/hd6305.h"
 
 namespace {
 
@@ -26,7 +26,7 @@ public:
 	void sy35(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<h8520_device> m_maincpu;
 	required_device<cpu_device> m_scancpu;
@@ -73,4 +73,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1992, sy35, 0, 0, sy35, sy35, yamaha_sy35_state, empty_init, "Yamaha", "SY35 Music Synthesizer", MACHINE_IS_SKELETON)
+SYST(1992, sy35, 0, 0, sy35, sy35, yamaha_sy35_state, empty_init, "Yamaha", "SY35 Music Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

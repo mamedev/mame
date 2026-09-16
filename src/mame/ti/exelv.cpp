@@ -99,7 +99,7 @@ TODO:
 
 #include "cpu/tms7000/tms7000.h"
 #include "imagedev/cassette.h"
-#include "machine/spchrom.h"
+#include "machine/tms6100.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
 #include "sound/spkrdev.h"
@@ -166,7 +166,7 @@ private:
 	DECLARE_MACHINE_START(exl100);
 	DECLARE_MACHINE_START(exeltel);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 	void machine_common();
 
 	/* tms7020 i/o ports */
@@ -185,8 +185,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
-	void tms7020_mem(address_map &map);
-	void tms7040_mem(address_map &map);
+	void tms7020_mem(address_map &map) ATTR_COLD;
+	void tms7040_mem(address_map &map) ATTR_COLD;
 
 	// variables for the keyboard
 	u8 k_channels[3] = { 0xff, 0xff, 0x3e }; // [0] = key down, [1] = key being sent; [2] = ch62
@@ -707,16 +707,16 @@ static INPUT_PORTS_START(exelv)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1  &") PORT_CHAR('1')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6  $") PORT_CHAR('6')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8  !") PORT_CHAR('8')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0  \xc3\xa0") PORT_CHAR('0')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME(u8"0  à") PORT_CHAR('0')
 
 	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("\xe2\x8c\xab") PORT_CHAR(127)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_NAME(".  ;") PORT_CHAR('.')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2  " e_ACUTE) PORT_CHAR('2')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME(u8"2  é") PORT_CHAR('2')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3  \"") PORT_CHAR('3')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9  \xc3\xa7") PORT_CHAR('9')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME(u8"9  ç") PORT_CHAR('9')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("#  )") PORT_CHAR('#')
 
 	PORT_START("X4")
@@ -745,7 +745,7 @@ static INPUT_PORTS_START(exelv)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("~  ^") PORT_CHAR('~')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4  '") PORT_CHAR('4')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7  \xc3\xa8") PORT_CHAR('7')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME(u8"7  è") PORT_CHAR('7')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("*  \\") PORT_CHAR('*')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
@@ -842,7 +842,7 @@ void exelv_state::exl100(machine_config &config)
 	TMS3556(config, m_tms3556, 18_MHz_XTAL);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH
@@ -860,7 +860,7 @@ void exelv_state::exl100(machine_config &config)
 
 	TIMER(config, m_timer_k).configure_generic(FUNC(exelv_state::timer_k));
 
-	//SPEECHROM(config, "vsm", 0);
+	//SPEECHROM(config, "vsm");
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
@@ -874,7 +874,7 @@ void exelv_state::exl100(machine_config &config)
 	/* cartridge */
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "exelvision_cart", "bin,rom");
 
-	CASSETTE(config, m_cass, 0);
+	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
@@ -907,7 +907,7 @@ void exelv_state::exeltel(machine_config &config)
 	TMS3556(config, m_tms3556, 18_MHz_XTAL);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH
@@ -923,13 +923,17 @@ void exelv_state::exeltel(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	SPEECHROM(config, "vsm", 0);
-
 	/* sound */
 	SPEAKER(config, "mono").front_center();
 	TMS5220C(config, m_tms5220c, 9.8304_MHz_XTAL / 15); // unknown divider for "VSPCLK" (generated by TAHC06 gate array)
-	m_tms5220c->set_speechrom_tag("vsm");
 	m_tms5220c->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	TMS6100(config, "vsm", 640_kHz_XTAL/4);
+	m_tms5220c->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
+	m_tms5220c->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
+	m_tms5220c->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
+	m_tms5220c->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
+	m_tms5220c->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
 }
 
 

@@ -1,18 +1,20 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Barry Rodewald
-/******************************************************************************
+/***************************************************************************************************
  *
  * Sharp X1 Video functions
  *
  * TODO:
  * - Rewrite drawing functions by taking scanline renderer into account
  *   * cfr. x1fdemo raster effect on first screen.
- * - Use mc6845 internal functions instead of breaking encapsulation
- *   * annoying due of the double height/width stuff.
- * - Improve border drawing, pinpoint what are the visible limits for a mc6845;
+ * - Use mc6845 internal functions or instead of breaking encapsulation
+ * \- annoying due of the double height/width stuff.
+ * \- may consider doing an own version of 6845 instead, aiding other heavyweight clients in
+ *     the process cfr. https://github.com/mamedev/mame/pull/12010#discussion_r1479780670
+ * \- improve border drawing, pinpoint what are the visible limits for a mc6845;
  * - Move X1Turbo features into specific overrides;
  *
- *****************************************************************************/
+ **************************************************************************************************/
 
 #include "emu.h"
 #include "x1.h"
@@ -34,7 +36,7 @@ void x1_state::video_start()
 
 // helper for a single tile pixel taking height and width into account
 // TODO: height is never used
-void x1_state::x1_draw_pixel(bitmap_rgb32 &bitmap, int y, int x, uint16_t pen, uint8_t width, uint8_t height)
+void x1_state::draw_pixel(bitmap_rgb32 &bitmap, int y, int x, uint16_t pen, uint8_t width, uint8_t height)
 {
 	if(!m_screen->visible_area().contains(x, y))
 		return;
@@ -105,25 +107,24 @@ uint8_t x1_state::check_line_valid_height(int y, int x_size, int height)
 }
 
 // tilemap drawing
+/*
+    attribute table:
+    x--- ---- double width
+    -x-- ---- double height
+    --x- ---- PCG select
+    ---x ---- color blinking (if 1 reverses color patterns rather than true blinking)
+    ---- x--- reverse color
+    ---- -xxx color pen
+
+    X1 Turbo can also access an additional Kanji VRAM area
+    x--- ---- select Kanji ROM
+    -x-- ---- Kanji side (0=left, 1=right)
+    --x- ---- Underline
+    ---x ---- Kanji ROM select (0=level 1, 1=level 2)
+    ---- xxxx Kanji upper 4 bits
+*/
 void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/*
-	    attribute table:
-	    x--- ---- double width
-	    -x-- ---- double height
-	    --x- ---- PCG select
-	    ---x ---- color blinking (if 1 reverses color patterns rather than true blinking)
-	    ---- x--- reverse color
-	    ---- -xxx color pen
-
-	    X1 Turbo can also access an additional Kanji VRAM area
-	    x--- ---- select Kanji ROM
-	    -x-- ---- Kanji side (0=left, 1=right)
-	    --x- ---- Underline
-	    ---x ---- Kanji ROM select (0=level 1, 1=level 2)
-	    ---- xxxx Kanji upper 4 bits
-	*/
-
 	int y, x, res_x, res_y;
 	uint32_t tile_offset;
 	uint8_t x_size, y_size;
@@ -270,7 +271,7 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 						if(res_y < cliprect.min_y || res_y > cliprect.max_y)
 							continue;
 
-						x1_draw_pixel(bitmap, res_y, res_x, pcg_pen, width, 0);
+						draw_pixel(bitmap, res_y, res_x, pcg_pen, width, 0);
 					}
 				}
 			}
@@ -363,7 +364,7 @@ void x1_state::draw_gfxbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 						continue;
 
 					// TODO: call a fn subset instead of looping for a width/height that is never hit
-					x1_draw_pixel(bitmap, y*(mc6845_tile_height)+yi, x*8+xi, color, 0, 0);
+					draw_pixel(bitmap, y*(mc6845_tile_height)+yi, x*8+xi, color, 0, 0);
 				}
 			}
 		}

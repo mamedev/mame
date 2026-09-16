@@ -175,9 +175,9 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl")                  PORT_CODE(KEYCODE_RALT)       PORT_CHAR(UCHAR_SHIFT_2)
 
 	PORT_START("kbrow.3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xE2\x86\x91 \xC2\xA3") PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR(0xa3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u2191 £")            PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR(U'£') // U+2191 = ↑
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@ \xC2\xA6")            PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR('|')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@') PORT_CHAR(U'¦','|')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(':') PORT_CHAR('*')
@@ -321,7 +321,7 @@ As far as I know, the KC compact used HD6845S only.
 //  PORT_CONFSETTING(M6845_PERSONALITY_PREASIC, "Type 4 - Pre-ASIC")
 
 	PORT_START("green_display")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, amstrad_state,  cpc_monitor_changed, 0 )
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(amstrad_state::cpc_monitor_changed), 0)
 	PORT_CONFSETTING(0x00, "CTM640 Colour Monitor" )
 	PORT_CONFSETTING(0x01, "GT64 Green Monitor" )
 
@@ -458,21 +458,21 @@ static INPUT_PORTS_START( cpc6128f )
 	PORT_MODIFY("kbrow.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(')') PORT_CHAR('[')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^   \xC2\xA6")          PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('^') PORT_CHAR('|')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\xB9   %")          PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0xF9) PORT_CHAR('%')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('^') PORT_CHAR(U'¦','|')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'ù') PORT_CHAR('%')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR(':') PORT_CHAR('/')
 
 	PORT_MODIFY("kbrow.4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\xA0   0")          PORT_CODE(KEYCODE_0)          PORT_CHAR(0xE0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\xA7   9")          PORT_CODE(KEYCODE_9)          PORT_CHAR(0xE7) PORT_CHAR('9')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR(U'à') PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_9)          PORT_CHAR(U'ç') PORT_CHAR('9')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_M)          PORT_CHAR(',') PORT_CHAR('?')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(';') PORT_CHAR('.')
 
 	PORT_MODIFY("kbrow.5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_8)          PORT_CHAR('!') PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\xA9   7")          PORT_CODE(KEYCODE_7)          PORT_CHAR(0xE8) PORT_CHAR('7')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_7)          PORT_CHAR(U'è') PORT_CHAR('7')
 
 	PORT_MODIFY("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_6)          PORT_CHAR(']') PORT_CHAR('6')
@@ -485,7 +485,7 @@ static INPUT_PORTS_START( cpc6128f )
 
 	PORT_MODIFY("kbrow.8")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_1)          PORT_CHAR('&') PORT_CHAR('1')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\xA9   2   ~")      PORT_CODE(KEYCODE_2)          PORT_CHAR(0xE9) PORT_CHAR('2') PORT_CHAR('~')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_2)          PORT_CHAR(U'é') PORT_CHAR('2') PORT_CHAR('~')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('w') PORT_CHAR('W')
@@ -499,16 +499,16 @@ static INPUT_PORTS_START( cpc6128s )
 	PORT_INCLUDE(cpc6128)
 
 	PORT_MODIFY("kbrow.2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x9C")              PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(0x00DC)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x89")              PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(0x00E9)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'Ü')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(U'É')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR('/') PORT_CHAR('?')
 
 	PORT_MODIFY("kbrow.3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('+') PORT_CHAR('*')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x85")              PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00C5)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x84")              PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00C4)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\xC3\x96")              PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00D6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(U'Å')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(U'Ä')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(U'Ö')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('<') PORT_CHAR('>')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
 
@@ -524,9 +524,9 @@ static INPUT_PORTS_START( cpc6128sp )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]")                     PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('+')
 
 	PORT_MODIFY("kbrow.3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR(0x20A7)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^') PORT_CHAR(U'\u20a7') // U+20A7 = ₧ (Peseta)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00F1) PORT_CHAR(0x00D1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(U'ñ') PORT_CHAR(U'Ñ')
 INPUT_PORTS_END
 
 /*
@@ -740,17 +740,17 @@ static INPUT_PORTS_START( aleste )
 
 	PORT_MODIFY( "kbrow.9" )
 	/* Documentation marks this input as "R/L", it's purpose is unknown - I can't even find it on the keyboard */
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R  L")       PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R  L")      PORT_CODE(KEYCODE_PGUP)
 
 	PORT_START( "kbrow.10" )
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F1  F6")    PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F2  F7")    PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F3  F8")    PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F4  F9")    PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F5  F10")   PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("HELP")      PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("\xD0\xAA  _") PORT_CODE(KEYCODE_HOME)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1  F6")    PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2  F7")    PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  F8")    PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4  F9")    PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5  F10")   PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("HELP")      PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"Ъ  _")    PORT_CODE(KEYCODE_HOME)
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
@@ -916,7 +916,7 @@ void amstrad_state::amstrad_base(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15);
 	m_screen->set_screen_update(FUNC(amstrad_state::screen_update_amstrad));
 	m_screen->screen_vblank().set(FUNC(amstrad_state::screen_vblank_amstrad));
@@ -1040,7 +1040,7 @@ void amstrad_state::cpcplus(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15);
 	m_screen->set_screen_update(FUNC(amstrad_state::screen_update_amstrad));
 	m_screen->screen_vblank().set(FUNC(amstrad_state::screen_vblank_amstrad));
@@ -1117,7 +1117,7 @@ void amstrad_state::gx4000(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(amstrad_state::amstrad_ppi_portc_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw((40_MHz_XTAL * 2) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15);
 	m_screen->set_screen_update(FUNC(amstrad_state::screen_update_amstrad));
 	m_screen->screen_vblank().set(FUNC(amstrad_state::screen_vblank_amstrad));
@@ -1310,6 +1310,6 @@ COMP( 1985, cpc6128sp, cpc464, 0,     cpc6128, cpc6128sp, amstrad_state, empty_i
 COMP( 1990, cpc464p,   0,      0,     cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC464+",                           0 )
 COMP( 1990, cpc6128p,  0,      0,     cpcplus, plus,      amstrad_state, empty_init, "Amstrad plc", "Amstrad CPC6128+",                          0 )
 CONS( 1990, gx4000,    0,      0,     gx4000,  gx4000,    amstrad_state, empty_init, "Amstrad plc", "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,    cpc464, 0,     kccomp,  kccomp,    amstrad_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" M?hlhausen",
+COMP( 1989, kccomp,    cpc464, 0,     kccomp,  kccomp,    amstrad_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen",
 																									"KC Compact",                                0 )
 COMP( 1993, al520ex,   cpc464, 0,     aleste,  aleste,    amstrad_state, empty_init, "Patisonic",   "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

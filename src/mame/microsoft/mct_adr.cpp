@@ -154,6 +154,8 @@ void mct_adr_device::device_start()
 
 	m_out_int_timer_asserted = false;
 	m_out_int_device_asserted = false;
+
+	std::fill(std::begin(m_drq_active), std::end(m_drq_active), false);
 }
 
 void mct_adr_device::device_reset()
@@ -262,11 +264,11 @@ TIMER_CALLBACK_MEMBER(mct_adr_device::dma_check)
 
 		// check channel enabled
 		if (!(m_dma_reg[(channel << 2) + REG_ENABLE] & DMA_ENABLE))
-			return;
+			continue;
 
 		// check transfer count
 		if (!m_dma_reg[(channel << 2) + REG_COUNT])
-			return;
+			continue;
 
 		u32 const address = translate_address(m_dma_reg[(channel << 2) + REG_ADDRESS]);
 

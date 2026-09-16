@@ -66,7 +66,7 @@ protected:
 	void port_a_w(uint8_t data);
 	void cass_w(int state);
 	int cass_r();
-	void mk14_map(address_map &map);
+	void mk14_map(address_map &map) ATTR_COLD;
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -92,7 +92,7 @@ public:
 	void mk14vdu(machine_config &config);
 
 private:
-	void mk14vdu_map(address_map &map);
+	void mk14vdu_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_page_character(int page, uint16_t addr, int invert, bitmap_rgb32 &bitmap);
@@ -433,7 +433,7 @@ void mk14vdu_state::mk14vdu(machine_config &config)
 	m_maincpu->set_clock(4_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mk14vdu_state::mk14vdu_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(4_MHz_XTAL, 256, 0, 128, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(mk14vdu_state::screen_update));
 	config.set_default_layout(layout_mk14vdu);

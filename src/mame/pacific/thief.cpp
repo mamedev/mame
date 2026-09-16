@@ -59,12 +59,12 @@ public:
 	void slam_w(int state);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	uint8_t videoram_r(offs_t offset);
 	void videoram_w(offs_t offset, uint8_t data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
@@ -95,7 +95,7 @@ private:
 	void tape_set_audio(int track, int bon);
 	void tape_set_motor(int bon);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 class thief_state : public sharkatt_state
@@ -111,7 +111,7 @@ public:
 	void thief(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_region_ptr<uint8_t> m_blitrom;
@@ -142,11 +142,9 @@ private:
 
 	uint16_t fetch_image_addr();
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 enum {
 	IMAGE_ADDR_LO,      //0xe000
@@ -448,8 +446,6 @@ void thief_state::coprocessor_w(offs_t offset, uint8_t data)
 }
 
 
-// machine
-
 void sharkatt_state::slam_w(int state)
 {
 	// SLAM switch causes an NMI if it's pressed
@@ -633,7 +629,7 @@ static INPUT_PORTS_START( sharkatt )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, sharkatt_state, slam_w)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(sharkatt_state::slam_w))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -702,7 +698,7 @@ static INPUT_PORTS_START( thief )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, thief_state, slam_w)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(thief_state::slam_w))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -769,7 +765,7 @@ static INPUT_PORTS_START( natodef )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, thief_state, slam_w)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_TILT ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(thief_state::slam_w))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -820,7 +816,7 @@ void sharkatt_state::sharkatt(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(sharkatt_state::tape_control_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(20'000'000) / 4, 320, 0, 256, 272, 0, 192);
 	m_screen->set_screen_update(FUNC(sharkatt_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -975,7 +971,7 @@ ROM_START( natodefa )
 	ROM_LOAD( "nato_cop_c8.c8", 0x200, 0x0200, CRC(7ed5c923) SHA1(35757d50bfa9ea3cf916576a148064a0f9be8732) ) // Nato  COP # C8 - PCB silkscreened  PROM 1
 	// C8 is mapped (banked) in the coprocessor's address space; it contains Z80 code
 
-	ROM_REGION( 0x6000, "blitter", 0 ) // image ROMs for coprocessor - same ROMs as natodef, but in a different oder to give different mazes
+	ROM_REGION( 0x6000, "blitter", 0 ) // image ROMs for coprocessor - same ROMs as natodef, but in a different order to give different mazes
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_062182_7058h_cop_d4.d4", 0x0001, 0x1000, CRC(39a868f8) SHA1(870795f18cd8f831b714b809a380e30b5d323a5f) ) // C 1982   P.N.M.  Inc.  NATO  062182  7058H  COP#D4 - PCB silkscreened  O4
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_062182_f67ah_cop_h4.h4", 0x0000, 0x1000, CRC(b6d1623d) SHA1(0aa15db0e1459a6cc7d2a5bc8e588fd514b71d85) ) // C 1982   P.N.M.  Inc.  NATO  062182  F67AH  COP#H4 - PCB silkscreened  E1
 	ROM_LOAD16_BYTE( "p.n.m._inc._nato_060982_71fch_cop_b4.b4", 0x2001, 0x1000, CRC(b217909a) SHA1(a26eb5bf2c92d79a75376deb6278710426b34cc5) ) // C 1982   P.N.M.  Inc.  NATO  060982  71FCH  COP#B4 - PCB silkscreened  O2

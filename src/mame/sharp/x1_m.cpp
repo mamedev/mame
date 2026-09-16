@@ -26,6 +26,8 @@ DEFINE_DEVICE_TYPE(X1_KEYBOARD, x1_keyboard_device, "x1_keyboard", "Sharp X1 Key
 x1_keyboard_device::x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X1_KEYBOARD, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
+	, m_flag_cb(*this, 0)
+	, m_ack_cb(*this, 0x00)
 {
 }
 
@@ -48,8 +50,7 @@ void x1_keyboard_device::device_start()
 
 int x1_keyboard_device::z80daisy_irq_state()
 {
-	x1_state *state = machine().driver_data<x1_state>();
-	if(state->m_key_irq_flag != 0)
+	if(m_flag_cb() != 0)
 		return Z80_DAISY_INT;
 	return 0;
 }
@@ -62,10 +63,7 @@ int x1_keyboard_device::z80daisy_irq_state()
 
 int x1_keyboard_device::z80daisy_irq_ack()
 {
-	x1_state *state = machine().driver_data<x1_state>();
-	state->m_key_irq_flag = 0;
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
-	return state->m_key_irq_vector;
+	return m_ack_cb();
 }
 
 //-------------------------------------------------
@@ -75,4 +73,14 @@ int x1_keyboard_device::z80daisy_irq_ack()
 
 void x1_keyboard_device::z80daisy_irq_reti()
 {
+}
+
+uint8_t x1_state::key_irq_ack_r()
+{
+	if(!machine().side_effects_disabled())
+	{
+		m_key_irq_flag = 0;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+	return m_key_irq_vector;
 }

@@ -25,8 +25,8 @@ public:
 private:
 	uint8_t m_i2cunk = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void tvg_i2c_w(offs_t offset, uint8_t data);
 	uint8_t tvg_i2c_r(offs_t offset);
@@ -267,4 +267,4 @@ ROM_END
 
 
 // Toyquest games
-CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'
+CONS( 2005, tvgogo, 0, 0, tvgogo, tvgogo, tvgogo_state, empty_init, "Toyquest", "GoGo TV Video Vision", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // or TV Go Go - the game addons call it the 'Video Vision console'

@@ -118,11 +118,6 @@ uint32_t ti990_10_device::execute_max_cycles() const noexcept
 	return 10;
 }
 
-uint32_t ti990_10_device::execute_input_lines() const noexcept
-{
-	return 2;
-}
-
 // TODO: check 9900dasm
 std::unique_ptr<util::disasm_interface> ti990_10_device::create_disassembler()
 {

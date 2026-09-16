@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_gray"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
+	<element name="static_green"><rect><color red="0.2" green="0.8" blue="0.4" /></rect></element>
+
+	<element name="text_x">
+		<text string="X:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_y">
+		<text string="Y:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+	<element name="text_a">
+		<text string="A:" align="1">
+			<color red="0.85" green="0.85" blue="0.85" />
+		</text>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.2" />
+		</led7seg>
+	</element>
+
+	<element name="counter" defstate="0">
+		<simplecounter maxstate="999" digits="3" align="1">
+			<color red="0.95" green="0.95" blue="0.95" />
+		</simplecounter>
+	</element>
+
+	<element name="lamp_b1" defstate="0">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1.0" height="0.6" />
+		</text>
+	</element>
+	<element name="lamp_b2" defstate="0">
+		<disk><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
+		</disk>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.2" width="1.0" height="0.6" />
+		</text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="200" top="0" bottom="90" />
+		<element ref="static_black">
+			<bounds left="0" right="200" top="0" bottom="90" />
+		</element>
+
+		<element ref="static_gray">
+			<bounds x="99" y="0" width="2" height="80" />
+		</element>
+
+		<!-- control panel -->
+		<element ref="static_green">
+			<bounds x="0" y="60" width="200" height="30" />
+		</element>
+
+		<element name="lamp0" ref="lamp_b1" inputtag="IN1" inputmask="0x01" >
+			<bounds x="30" y="70" width="10" height="10"/>
+		</element>
+		<element name="lamp1" ref="lamp_b2" inputtag="IN1" inputmask="0x02" >
+			<bounds x="43" y="70" width="10" height="10"/>
+		</element>
+
+		<element name="lamp3" ref="lamp_b2" inputtag="IN2" inputmask="0x02" >
+			<bounds x="147" y="70" width="10" height="10"/>
+		</element>
+		<element name="lamp2" ref="lamp_b1" inputtag="IN2" inputmask="0x01" >
+			<bounds x="160" y="70" width="10" height="10"/>
+		</element>
+
+		<element ref="static_black">
+			<bounds x="60" y="70" width="12" height="17" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds x="61" y="71" width="10" height="15" />
+		</element>
+
+		<element ref="static_black">
+			<bounds x="128" y="70" width="12" height="17" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds x="129" y="71" width="10" height="15" />
+		</element>
+
+		<!-- left ufo info (no lamps) -->
+		<element ref="text_x">
+			<bounds x="5" y="5" width="10" height="4" />
+		</element>
+		<element ref="text_y">
+			<bounds x="5" y="10" width="10" height="4" />
+		</element>
+		<element ref="text_a">
+			<bounds x="5" y="15" width="10" height="4" />
+		</element>
+
+		<element name="counter0" ref="counter">
+			<bounds x="12" y="5" width="20" height="4" />
+		</element>
+		<element name="counter1" ref="counter">
+			<bounds x="12" y="10" width="20" height="4" />
+		</element>
+		<element name="counter2" ref="counter">
+			<bounds x="12" y="15" width="20" height="4" />
+		</element>
+
+		<!-- right ufo info (no lamps) -->
+		<element ref="text_x">
+			<bounds x="105" y="5" width="10" height="4" />
+		</element>
+		<element ref="text_y">
+			<bounds x="105" y="10" width="10" height="4" />
+		</element>
+		<element ref="text_a">
+			<bounds x="105" y="15" width="10" height="4" />
+		</element>
+
+		<element name="counter4" ref="counter">
+			<bounds x="112" y="5" width="20" height="4" />
+		</element>
+		<element name="counter5" ref="counter">
+			<bounds x="112" y="10" width="20" height="4" />
+		</element>
+		<element name="counter6" ref="counter">
+			<bounds x="112" y="15" width="20" height="4" />
+		</element>
+
+	</view>
+</mamelayout>

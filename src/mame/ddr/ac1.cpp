@@ -57,14 +57,14 @@ private:
 	u8 ac1_port_b_r();
 	u8 ac1_port_a_r();
 	bool has_lowercase = 0;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	void ac1_port_a_w(u8 data);
 	void ac1_port_b_w(u8 data);
 
-	void ac1_32_mem(address_map &map);
-	void ac1_io(address_map &map);
-	void ac1scch_io(address_map &map);
-	void ac1_mem(address_map &map);
+	void ac1_32_mem(address_map &map) ATTR_COLD;
+	void ac1_io(address_map &map) ATTR_COLD;
+	void ac1scch_io(address_map &map) ATTR_COLD;
+	void ac1_mem(address_map &map) ATTR_COLD;
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;
@@ -337,7 +337,7 @@ void ac1_state::ac1(machine_config &config)
 	Z80CTC(config, "ctc", 8'000'000 / 4); // all connections go external
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*6, 16*8);

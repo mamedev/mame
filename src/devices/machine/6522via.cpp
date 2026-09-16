@@ -171,6 +171,9 @@ void via6522_device::map(address_map &map)
 
 via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	m_in_cb1(0),
+	m_in_cb2(0),
+	m_acr(0),
 	m_in_a_handler(*this, 0xff),
 	m_in_b_handler(*this, 0xff),
 	m_out_a_handler(*this),
@@ -183,10 +186,7 @@ via6522_device::via6522_device(const machine_config &mconfig, device_type type, 
 	m_in_ca1(0),
 	m_in_ca2(0),
 	m_in_b(0xff),
-	m_in_cb1(0),
-	m_in_cb2(0),
-	m_pcr(0),
-	m_acr(0)
+	m_pcr(0)
 {
 }
 
@@ -263,10 +263,11 @@ void via6522_device::device_start()
 	m_ddr_b = 0;
 	m_latch_b = 0;
 
-	m_t1cl = 0;
-	m_t1ch = 0;
-	m_t2cl = 0;
-	m_t2ch = 0;
+	// TODO: initial counter state unknown, but definitely not zero.
+	m_t1cl = 0xff;
+	m_t1ch = 0xff;
+	m_t2cl = 0xff;
+	m_t2ch = 0xff;
 
 	m_sr = 0;
 	m_pcr = 0;
@@ -338,11 +339,6 @@ void via6522_device::device_reset()
 	m_ddr_b = 0;
 	m_latch_b = 0;
 
-	m_t1cl = 0;
-	m_t1ch = 0;
-	m_t2cl = 0;
-	m_t2ch = 0;
-
 	m_pcr = 0;
 	m_acr = 0;
 	m_ier = 0;
@@ -350,7 +346,6 @@ void via6522_device::device_reset()
 	m_t1_active = 0;
 	m_t1_pb7 = 1;
 	m_t2_active = 0;
-	m_shift_counter = 0;
 
 	output_pa();
 	output_pb();
@@ -482,8 +477,16 @@ void via6522_device::shift_in()
 		if (m_shift_counter == 0 && !SR_DISABLED(m_acr))
 		{
 			LOGINT("SHIFT in INT request ");
-//            set_int(INT_SR);// TODO: this interrupt is 1-2 clock cycles too early
-			m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 edges for all shift INs (mode 1-3)
+			if (SI_EXT_CONTROL(m_acr))
+			{
+				// Set IRQ immediately for external shifter clock.  PCI PowerMacs rely on this timing,
+				// including the Pippin.
+				set_int(INT_SR);
+			}
+			else
+			{
+				m_shift_irq_timer->adjust(clocks_to_attotime(2)/2); // Delay IRQ 2 edges for internal shift INs (mode 1-2)
+			}
 		}
 	}
 	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
@@ -532,16 +535,17 @@ TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
 
 TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 {
-	if (T1_CONTINUOUS (m_acr))
+	if (T1_CONTINUOUS(m_acr))
 	{
-		m_t1_pb7 = !m_t1_pb7;
+		if (TIMER1_VALUE > 0)
+			m_t1_pb7 = !m_t1_pb7;
 		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 	}
 	else
 	{
 		m_t1_pb7 = 1;
 		m_t1_active = 0;
-		m_time1 = machine().time();
+		m_time1 = machine().time() - clocks_to_attotime(IFR_DELAY - 1);
 	}
 
 	if (T1_SET_PB7(m_acr))
@@ -556,7 +560,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 TIMER_CALLBACK_MEMBER(via6522_device::t2_tick)
 {
 	m_t2_active = 0;
-	m_time2 = machine().time();
+	m_time2 = machine().time() - clocks_to_attotime(IFR_DELAY - 1);
 
 	LOGINT("T2 INT request ");
 	set_int(INT_T2);
@@ -732,7 +736,10 @@ u8 via6522_device::read(offs_t offset)
 		}
 		if (m_t2_active && m_t2->enabled())
 		{
-			val = attotime_to_clocks(m_t2->remaining()) & 0xff;
+			// Do not wrap before t2_tick sets IFR.  Mac OS reads T2CH, then IFR,
+			// and skips T2CL if the high byte is zero.  An early wrap makes it
+			// read T2CL and clear a newly arrived interrupt without servicing it.
+			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) & 0xff;
 		}
 		else
 		{
@@ -750,7 +757,8 @@ u8 via6522_device::read(offs_t offset)
 	case VIA_T2CH:
 		if (m_t2_active && m_t2->enabled())
 		{
-			val = attotime_to_clocks(m_t2->remaining()) >> 8;
+			// Hold at zero through the delayed IFR window, as for T2CL.
+			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) >> 8;
 		}
 		else
 		{
@@ -829,7 +837,7 @@ u8 via6522_device::read(offs_t offset)
 
 void via6522_device::write(offs_t offset, u8 data)
 {
-	offset &=0x0f;
+	offset &= 0x0f;
 
 	LOGSETUP(" * %s Reg %02x <- %02x - %s\n", tag(), offset, data, std::array<char const *, 16>
 		 {{"ORB", "ORA", "DDRB", "DDRA", "T1CL","T1CH","T1LL","T1LH","T2CL","T2CH","SR","ACR","PCR","IFR","IER","ORA (nh)"}}[offset]);

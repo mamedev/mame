@@ -59,7 +59,7 @@
         NRST (pin 14) - Not RESET. This is an active low output from the system reset line. It may
                         be used to initialise peripherals whenever a power up or a BREAK causes a
                         reset.
-   Analog In (pin 16) - This is an input to the audio amplifier on the main computer. The amplified
+    Audio In (pin 16) - This is an input to the audio amplifier on the main computer. The amplified
                         signal is produced over the speaker on the keyboard. Its input impedance is
                         9K Ohms and a 3 volt RMS signal will produce maximum volume on the speaker.
                         Note however that signals as large as this will cause distortion if the sound
@@ -87,7 +87,7 @@
 
 class device_bbc_1mhzbus_interface;
 
-class bbc_1mhzbus_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_1mhzbus_interface>
+class bbc_1mhzbus_slot_device : public device_t, public device_single_card_slot_interface<device_bbc_1mhzbus_interface>, public device_mixer_interface
 {
 public:
 	// construction/destruction
@@ -95,10 +95,7 @@ public:
 	bbc_1mhzbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
 		: bbc_1mhzbus_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	bbc_1mhzbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
@@ -116,8 +113,8 @@ public:
 	void nmi_w(int state) { m_nmi_handler(state); }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
 
 	device_bbc_1mhzbus_interface *m_card;
 
@@ -140,11 +137,11 @@ public:
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);
 
-	bbc_1mhzbus_slot_device *m_slot;
+	bbc_1mhzbus_slot_device *const m_slot;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device)
 
 void bbc_1mhzbus_devices(device_slot_interface &device);

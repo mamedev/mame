@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -22,71 +23,23 @@ license:CC0-1.0
 		<disk state="1"><color red="0" green="1" blue="0" /></disk>
 	</element>
 
-	<element name="text_1">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="1"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_2">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="2"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_3">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="3"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_4">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="4"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_5">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="5"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_6">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="6"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_7">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="7"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_8">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="8"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
+	<element name="text_1"><text string="1"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.87" green="0.87" blue="0.84" /></text></element>
 
-	<element name="text_a">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="A"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_b">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="B"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_c">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="C"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_d">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="D"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_e">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="E"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_f">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="F"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_g">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="G"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
-	<element name="text_h">
-		<rect><color red="0.56" green="0.33" blue="0.12" /></rect>
-		<text string="H"><color red="0.87" green="0.87" blue="0.84" /></text>
-	</element>
+	<element name="text_a"><text string="A"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_b"><text string="B"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_c"><text string="C"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_d"><text string="D"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_e"><text string="E"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_f"><text string="F"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_g"><text string="G"><color red="0.87" green="0.87" blue="0.84" /></text></element>
+	<element name="text_h"><text string="H"><color red="0.87" green="0.87" blue="0.84" /></text></element>
 
 
 <!-- sb board -->
@@ -244,43 +197,23 @@ license:CC0-1.0
 	<element name="text_uit1"><text string="S.BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uit2"><text string="INTERFACE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uib1"><text string="BOARD:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uib2">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uib3">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uib2"><text string="RESET"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uib3"><text string="CLEAR"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uis1"><text string="SPAWN:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uih1"><text string="HAND:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uih2">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uih2"><text string="REMOVE"><color red="0.01" green="0.01" blue="0.01" /></text></element>
 	<element name="text_uiu1"><text string="UNDO:"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_uiu2a">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2b">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2c">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
-	<element name="text_uiu2d">
-		<rect><color red="0.84" green="0.75" blue="0.50" /></rect>
-		<text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text>
-	</element>
+	<element name="text_uiu2a"><text string=" &lt;&lt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2b"><text string=" &lt;  "><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2c"><text string="   &gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu2d"><text string=" &gt;&gt;"><color red="0.01" green="0.01" blue="0.01" /></text></element>
+	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+
 	<element name="text_uiu3a" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="2">
 			<color red="0.81" green="0.8" blue="0.79" />
 		</simplecounter>
 	</element>
-	<element name="text_uiu3b"><text string="/"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_uiu3c" defstate="0">
 		<simplecounter maxstate="999" digits="1" align="1">
 			<color red="0.81" green="0.8" blue="0.79" />
@@ -467,10 +400,6 @@ license:CC0-1.0
 		<rect state="0"><color red="0.21" green="0.2" blue="0.2" /></rect>
 		<rect state="1"><color red="0.34" green="0.33" blue="0.33" /></rect>
 	</element>
-	<element name="butd" defstate="0">
-		<disk state="0"><color red="0.21" green="0.2" blue="0.2" /></disk>
-		<disk state="1"><color red="0.34" green="0.33" blue="0.33" /></disk>
-	</element>
 
 	<element name="text_ln1"><text string="1" align="2"/></element>
 	<element name="text_ln2"><text string="2" align="2"/></element>
@@ -507,7 +436,6 @@ license:CC0-1.0
 	<element name="text_l011"><text string="Mode"/></element>
 	<element name="text_l012"><text string="Comm."/></element>
 	<element name="text_l013"><text string="Module"/></element>
-	<element name="text_l014"><text string="ACL"/></element>
 
 	<element name="text_l11"><text string="Color"/></element>
 	<element name="text_l11a"><text string="Tab/"/></element>
@@ -609,7 +537,6 @@ license:CC0-1.0
 		<element ref="text_l011"><bounds x="50.25" y="4.1" width="5.5" height="1.3" /></element>
 		<element ref="text_l012"><bounds x="55.75" y="4.1" width="5.5" height="1.3" /></element>
 		<element ref="text_l013"><bounds x="61.25" y="4.1" width="5.5" height="1.3" /></element>
-		<element ref="text_l014"><bounds x="66.75" y="4.1" width="5.5" height="1.3" /></element>
 
 		<element ref="text_l11"><bounds x="22.5" y="8.6" width="6" height="1.3" /></element>
 		<element ref="text_l11a"><bounds x="22.5" y="7.4" width="6" height="1.3" /></element>
@@ -680,8 +607,6 @@ license:CC0-1.0
 		<element name="8.7" ref="ledr" blend="add"><bounds x="52.25" y="5.5" width="1.5" height="1.5" /></element>
 		<element name="9.7" ref="ledg" blend="add"><bounds x="52.25" y="5.5" width="1.5" height="1.5" /></element>
 
-		<element ref="butd" inputtag="RESET" inputmask="0x02"><bounds x="69" y="5.75" width="1" height="1" /></element>
-
 		<element ref="but" inputtag="IN.0" inputmask="0x01"><bounds x="1.5"  y="10" width="4" height="1" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x02"><bounds x="7.0"  y="10" width="4" height="1" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x04"><bounds x="12.5" y="10" width="4" height="1" /></element>
@@ -746,7 +671,7 @@ license:CC0-1.0
 		<group ref="sb_ui"><bounds x="-12" y="3" width="10" height="80" /></group>
 	</view>
 
-	<view name="Internal Layout (Board)"><!-- chesscomputer has a wooden lid for covering bottom side -->
+	<view name="Internal Layout (Board)"> <!-- chesscomputer has a wooden lid for covering bottom side -->
 		<bounds left="-13" right="88" top="-1.5" bottom="87.5" />
 
 		<group ref="board"><bounds x="-1" y="-1.5" width="89" height="89" /></group>

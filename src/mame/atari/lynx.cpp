@@ -19,7 +19,7 @@
 #include "emu.h"
 #include "lynx.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -78,12 +78,12 @@ void lynx_state::sound_cb()
 void lynx_state::lynx(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, XTAL(16'000'000) / 4);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
+	G65SC02(config, m_maincpu, XTAL(16'000'000) / 4); /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::cpu_map);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(XTAL(16'000'000) / 16 / (158 + 1) / (104 + 1)); // default config from machine_reset(), actually variable
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(lynx_state::screen_update));
@@ -118,12 +118,11 @@ void lynx_state::lynx2(machine_config &config)
 
 	/* sound hardware */
 	config.device_remove("mono");
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	LYNX2_SND(config.replace(), m_sound, XTAL(16'000'000));
 	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
-	m_sound->add_route(0, "lspeaker", 0.50);
-	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->add_route(0, "speaker", 0.50, 0);
+	m_sound->add_route(1, "speaker", 0.50, 1);
 }
 #endif
 

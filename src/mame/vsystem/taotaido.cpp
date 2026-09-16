@@ -120,8 +120,8 @@ public:
 	void taotaido(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -160,13 +160,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	uint32_t tile_callback(uint32_t code);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_port_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_port_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers
 void taotaido_state::spritebank_w(offs_t offset, uint8_t data)
@@ -218,7 +216,7 @@ TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 
 	code |= m_bgbank[bank] << 9;
 
-	tileinfo.set(1, code, col, 0);
+	tileinfo.set(0, code, col, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
@@ -288,8 +286,6 @@ void taotaido_state::screen_vblank(int state)
 	}
 }
 
-
-// machine
 
 void taotaido_state::machine_start()
 {
@@ -530,10 +526,10 @@ static INPUT_PORTS_START( taotaido6 )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("P4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW3")
 	PORT_DIPNAME( 0x08, 0x08, "Debug Info 1" )
@@ -552,8 +548,11 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_taotaido )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0x000, 256 )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_16x16x4_packed_lsb, 0x300, 256 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_taotaido_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0x000, 256 )
 GFXDECODE_END
 
 
@@ -568,7 +567,7 @@ void taotaido_state::taotaido(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taotaido_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &taotaido_state::sound_port_map); // IRQs are triggered by the YM2610
 
-	vs9209_device &io1(VS9209(config, "io1", 0));
+	vs9209_device &io1(VS9209(config, "io1"));
 	io1.porta_input_cb().set_ioport("P1");
 	io1.portb_input_cb().set_ioport("P2");
 	io1.portc_input_cb().set_ioport("SYSTEM");
@@ -578,15 +577,15 @@ void taotaido_state::taotaido(machine_config &config)
 	io1.portg_output_cb().set(FUNC(taotaido_state::unknown_output_w));
 	io1.porth_input_cb().set_ioport("JP");
 
-	vs9209_device &io2(VS9209(config, "io2", 0));
+	vs9209_device &io2(VS9209(config, "io2"));
 	io2.porta_input_cb().set_ioport("P3"); // used only by taotaida
 	io2.portb_input_cb().set_ioport("P4"); // used only by taotaida
 
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_taotaido);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -597,14 +596,11 @@ void taotaido_state::taotaido(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
-	VSYSTEM_SPR(config, m_spr, 0);
+	VSYSTEM_SPR(config, m_spr, "palette", gfx_taotaido_spr);
 	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback));
-	m_spr->set_gfx_region(0);
-	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(taotaido_state::soundlatch_pending_w));
@@ -612,10 +608,10 @@ void taotaido_state::taotaido(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8'000'000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 

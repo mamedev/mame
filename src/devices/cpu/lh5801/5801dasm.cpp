@@ -623,10 +623,10 @@ offs_t lh5801_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			util::stream_format(stream, "%s %04x", entry->ins_name(),absolut);break;
 		case RelP:
 			temp=opcodes.r8(pos++);
-			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos+temp);break;
+			util::stream_format(stream, "%s %04x", entry->ins_name(),pos+temp);break;
 		case RelM:
 			temp=opcodes.r8(pos++);
-			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos-temp);break;
+			util::stream_format(stream, "%s %04x", entry->ins_name(),pos-temp);break;
 		case Abs:
 			absolut=opcodes.r8(pos++)<<8;
 			absolut|=opcodes.r8(pos++);

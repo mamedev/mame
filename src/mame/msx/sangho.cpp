@@ -67,9 +67,9 @@ public:
 	{ }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void sangho_map(address_map &map);
+	void sangho_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<uint8_t[]> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -93,11 +93,11 @@ protected:
 	uint8_t sec_slot_r();
 	void sec_slot_w(uint8_t data);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void pzlestar_map_banks();
 
-	void pzlestar_io_map(address_map &map);
+	void pzlestar_io_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_pzlestar_mem_bank = 0;
@@ -115,11 +115,11 @@ public:
 protected:
 	void sexyboom_bank_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void sexyboom_map_bank(int bank);
 
-	void sexyboom_io_map(address_map &map);
+	void sexyboom_io_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t m_sexyboom_bank[8];
@@ -489,7 +489,7 @@ void pzlestar_state::pzlestar(machine_config &config)
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -506,7 +506,7 @@ void sexyboom_state::sexyboom(machine_config &config)
 	v9958.set_screen_ntsc("screen");
 	v9958.set_vram_size(0x20000);
 	v9958.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	PALETTE(config, "palette").set_entries(19780);
 

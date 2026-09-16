@@ -16,18 +16,6 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 
-/* Border sizes for TS2068. These are guesses based on the number of cycles
-   available per frame. */
-#define TS2068_TOP_BORDER    32
-#define TS2068_BOTTOM_BORDER 32
-#define TS2068_SCREEN_HEIGHT (TS2068_TOP_BORDER + SPEC_DISPLAY_YSIZE + TS2068_BOTTOM_BORDER)
-
-/* Double the border sizes to maintain ratio of screen to border */
-#define TS2068_LEFT_BORDER   96   /* Number of left hand border pixels */
-#define TS2068_DISPLAY_XSIZE 512  /* Horizontal screen resolution */
-#define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
-#define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
-
 class tc2048_state : public spectrum_128_state
 {
 public:
@@ -39,7 +27,18 @@ public:
 	void tc2048(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	// Border sizes for TS2068. These are guesses based on the number of cycles available per frame.
+	static inline constexpr int TS2068_TOP_BORDER    = 32;
+	static inline constexpr int TS2068_BOTTOM_BORDER = 32;
+	static inline constexpr int TS2068_SCREEN_HEIGHT = (TS2068_TOP_BORDER + SPEC_DISPLAY_YSIZE + TS2068_BOTTOM_BORDER);
+
+	// Double the border sizes to maintain ratio of screen to border
+	static inline constexpr int TS2068_LEFT_BORDER   = 96;   // Number of left hand border pixels
+	static inline constexpr int TS2068_DISPLAY_XSIZE = 512;  // Horizontal screen resolution
+	static inline constexpr int TS2068_RIGHT_BORDER  = 96;   // Number of right hand border pixels
+	static inline constexpr int TS2068_SCREEN_WIDTH  = (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER);
+
+	virtual void machine_reset() override ATTR_COLD;
 
 	u8 port_ff_r();
 
@@ -52,8 +51,8 @@ protected:
 private:
 	void port_ff_w(offs_t offset, u8 data);
 
-	void tc2048_io(address_map &map);
-	void tc2048_mem(address_map &map);
+	void tc2048_io(address_map &map) ATTR_COLD;
+	void tc2048_mem(address_map &map) ATTR_COLD;
 
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 };
@@ -71,8 +70,8 @@ public:
 	void uk2086(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void ts2068_update_memory() override;
 
@@ -93,8 +92,8 @@ private:
 	int m_dock_cart_type = 0, m_ram_chunks = 0;
 	memory_region *m_dock_crt = nullptr;
 
-	void ts2068_io(address_map &map);
-	void ts2068_mem(address_map &map);
+	void ts2068_io(address_map &map) ATTR_COLD;
+	void ts2068_mem(address_map &map) ATTR_COLD;
 
 	required_device<generic_slot_device> m_dock;
 };

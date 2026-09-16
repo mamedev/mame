@@ -56,25 +56,27 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void pmi80(machine_config &config);
+	void pmi80(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(int_button);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t keyboard_r();
 	void keyboard_w(uint8_t data);
 	void leds_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_keyrow = 0U;
 	bool m_ledready = false;
 	bool m_cassbit = false, m_cassold = false;
 	u16 m_cass_cnt = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi1;
 	required_device<cassette_image_device> m_cass;
@@ -146,8 +148,8 @@ void pmi80_state::io_map(address_map &map)
 /* Input ports */
 static INPUT_PORTS_START( pmi80 )
 	PORT_START("SP")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RE") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, reset_button, 0) PORT_CHAR('W')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, pmi80_state, int_button, 0) PORT_CHAR('I')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RE") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pmi80_state::reset_button), 0) PORT_CHAR('W')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(pmi80_state::int_button), 0) PORT_CHAR('I')
 	PORT_START("X0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
@@ -203,8 +205,6 @@ void pmi80_state::machine_reset()
 
 void pmi80_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_keyrow));
 	save_item(NAME(m_ledready));
 	save_item(NAME(m_cassbit));

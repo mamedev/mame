@@ -78,9 +78,9 @@ public:
 	void changes(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -128,18 +128,16 @@ private:
 	void nmi_mask_w(int state);
 	uint8_t system_watchdog_r();
 	void marineb_vblank_irq(int state);
-	void marineb_map(address_map &map);
-	void marineb_io_map(address_map &map);
+	void marineb_map(address_map &map) ATTR_COLD;
+	void marineb_io_map(address_map &map) ATTR_COLD;
 
 	// wanted, bcruzm12
 	void irq_mask_w(int state);
 	void wanted_vblank_irq(int state);
-	void wanted_map(address_map &map);
-	void wanted_io_map(address_map &map);
+	void wanted_map(address_map &map) ATTR_COLD;
+	void wanted_io_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void marineb_state::palette(palette_device &palette) const
 {
@@ -580,8 +578,6 @@ uint32_t marineb_state::screen_update_hopprobo(screen_device &screen, bitmap_ind
 	return 0;
 }
 
-
-// machine
 
 void marineb_state::machine_reset()
 {
@@ -1104,7 +1100,7 @@ void marineb_state::marineb(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 16);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // frames per second, vblank duration
 	screen.set_size(32*8, 32*8);

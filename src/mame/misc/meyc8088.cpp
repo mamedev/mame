@@ -50,10 +50,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void meyc8088(machine_config &config);
+	void meyc8088(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -82,7 +82,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
-	void meyc8088_map(address_map &map);
+	void meyc8088_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -294,8 +294,6 @@ void meyc8088_state::common_w(uint8_t data)
 
 void meyc8088_state::machine_start()
 {
-	m_lamps.resolve();
-
 	save_item(NAME(m_status));
 	save_item(NAME(m_common));
 }
@@ -309,7 +307,7 @@ void meyc8088_state::machine_start()
 
 static INPUT_PORTS_START( gldarrow )
 	PORT_START("SW")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) // coin4
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -390,7 +388,7 @@ void meyc8088_state::meyc8088(machine_config &config)
 	TIMER(config, m_heartbeat).configure_generic(FUNC(meyc8088_state::heartbeat_callback));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224);
 	screen.set_screen_update(FUNC(meyc8088_state::screen_update));
 	screen.screen_vblank().set(FUNC(meyc8088_state::screen_vblank));

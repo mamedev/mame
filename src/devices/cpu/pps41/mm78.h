@@ -51,8 +51,8 @@ protected:
 	mm78_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override { ; }
 
 	// device_disasm_interface overrides
@@ -61,11 +61,11 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_one() override;
 
-	void data_96x4(address_map &map);
-	void data_128x4(address_map &map);
-	void program_1_3k(address_map &map);
-	void program_1_5k(address_map &map);
-	void program_2k(address_map &map);
+	void data_96x4(address_map &map) ATTR_COLD;
+	void data_128x4(address_map &map) ATTR_COLD;
+	void program_1_3k(address_map &map) ATTR_COLD;
+	void program_1_5k(address_map &map) ATTR_COLD;
+	void program_2k(address_map &map) ATTR_COLD;
 
 	// opcode helpers
 	virtual bool op_is_eob(u8 op) override { return (op & 0xf8) == 0x08; }

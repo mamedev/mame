@@ -85,8 +85,8 @@ public:
 	void v6809(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void speaker_en_w(int state);
@@ -100,7 +100,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	void v6809_mem(address_map &map);
+	void v6809_mem(address_map &map) ATTR_COLD;
 
 	u16 m_video_address = 0U;
 	bool m_speaker_en = false;
@@ -299,7 +299,7 @@ void v6809_state::v6809(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &v6809_state::v6809_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -320,7 +320,7 @@ void v6809_state::v6809(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row));
 	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));
 
 	// port A = drive select and 2 control lines ; port B = keyboard
@@ -341,9 +341,9 @@ void v6809_state::v6809(machine_config &config)
 	ptm.o2_callback().set(FUNC(v6809_state::speaker_w));
 	ptm.irq_callback().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	ACIA6850(config, "acia0", 0);
+	ACIA6850(config, "acia0");
 
-	ACIA6850(config, "acia1", 0);
+	ACIA6850(config, "acia1");
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
 	acia_clock.signal_handler().set("acia0", FUNC(acia6850_device::write_txc));
@@ -351,7 +351,7 @@ void v6809_state::v6809(machine_config &config)
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia1", FUNC(acia6850_device::write_rxc));
 
-	MM58174(config, "rtc", 0);
+	MM58174(config, "rtc");
 	//rtc.irq_handler().set(m_pia0, FUNC(pia6821_device::cb2_w));   // unsupported by RTC emulation
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);

@@ -21,6 +21,7 @@
 #include "fileio.h"
 
 #include <cinttypes>
+#include <string_view>
 
 
 namespace osd {
@@ -47,71 +48,85 @@ static const char *const gdb_register_type_str[] = {
 struct gdb_register_map
 {
 	const char *arch;
-	const char *feature;
-	struct gdb_register_description
+	struct gdb_feature
 	{
-		const char *state_name;
-		const char *gdb_name;
-		bool stop_packet;
-		gdb_register_type gdb_type;
-		int override_bitsize;
+		const char *feature_name;
+		struct gdb_register_description
+		{
+			const char *state_name;
+			const char *gdb_name;
+			bool stop_packet;
+			gdb_register_type gdb_type;
+			int override_bitsize;
 
-		gdb_register_description(const char *_state_name=nullptr, const char *_gdb_name=nullptr, bool _stop_packet=false, gdb_register_type _gdb_type=TYPE_INT, int _override_bitsize=-1)
-		: state_name(_state_name)
-		, gdb_name(_gdb_name)
-		, stop_packet(_stop_packet)
-		, gdb_type(_gdb_type)
-		, override_bitsize(_override_bitsize)
+			gdb_register_description(const char *_state_name = nullptr, const char *_gdb_name = nullptr, bool _stop_packet = false, gdb_register_type _gdb_type = TYPE_INT, int _override_bitsize = -1)
+				: state_name(_state_name)
+				, gdb_name(_gdb_name)
+				, stop_packet(_stop_packet)
+				, gdb_type(_gdb_type)
+				, override_bitsize(_override_bitsize)
+			{
+			}
+		};
+		std::vector<gdb_register_description> registers;
+
+		gdb_feature(const char *_feature_name, std::initializer_list<gdb_register_description> _registers)
+			: feature_name(_feature_name)
+			, registers(_registers)
 		{
 		}
 	};
-	std::vector<gdb_register_description> registers;
+	std::vector<gdb_feature> features;
 };
 
 //-------------------------------------------------------------------------
 static const gdb_register_map gdb_register_map_i486 =
 {
 	"i386",
-	"org.gnu.gdb.i386.core",
 	{
-		{ "EAX",     "eax",    false, TYPE_INT },
-		{ "ECX",     "ecx",    false, TYPE_INT },
-		{ "EDX",     "edx",    false, TYPE_INT },
-		{ "EBX",     "ebx",    false, TYPE_INT },
-		{ "ESP",     "esp",    true,  TYPE_DATA_POINTER },
-		{ "EBP",     "ebp",    true,  TYPE_DATA_POINTER },
-		{ "ESI",     "esi",    false, TYPE_INT },
-		{ "EDI",     "edi",    false, TYPE_INT },
-		{ "EIP",     "eip",    true,  TYPE_CODE_POINTER },
-		{ "EFLAGS",  "eflags", false, TYPE_INT }, // TODO describe bitfield
-		{ "CS",      "cs",     false, TYPE_INT },
-		{ "SS",      "ss",     false, TYPE_INT },
-		{ "DS",      "ds",     false, TYPE_INT },
-		{ "ES",      "es",     false, TYPE_INT },
-		{ "FS",      "fs",     false, TYPE_INT },
-		{ "GS",      "gs",     false, TYPE_INT },
-		// TODO fix x87 registers!
-		// The x87 registers are just plain wrong for a few reasons:
-		//  - The st* registers use a dummy variable in i386_device, so we
-		//    don't retrieve the real value (also the bitsize is wrong);
-		//  - The seg/off/op registers don't seem to be exported in the
-		//    state.
-		{ "ST0",     "st0",    false, TYPE_I387_EXT },
-		{ "ST1",     "st1",    false, TYPE_I387_EXT },
-		{ "ST2",     "st2",    false, TYPE_I387_EXT },
-		{ "ST3",     "st3",    false, TYPE_I387_EXT },
-		{ "ST4",     "st4",    false, TYPE_I387_EXT },
-		{ "ST5",     "st5",    false, TYPE_I387_EXT },
-		{ "ST6",     "st6",    false, TYPE_I387_EXT },
-		{ "ST7",     "st7",    false, TYPE_I387_EXT },
-		{ "x87_CW",  "fctrl",  false, TYPE_INT },
-		{ "x87_SW",  "fstat",  false, TYPE_INT },
-		{ "x87_TAG", "ftag",   false, TYPE_INT },
-		{ "EAX",     "fiseg",  false, TYPE_INT },
-		{ "EAX",     "fioff",  false, TYPE_INT },
-		{ "EAX",     "foseg",  false, TYPE_INT },
-		{ "EAX",     "fooff",  false, TYPE_INT },
-		{ "EAX",     "fop",    false, TYPE_INT },
+		{
+			"org.gnu.gdb.i386.core",
+			{
+				{ "EAX",     "eax",    false, TYPE_INT },
+				{ "ECX",     "ecx",    false, TYPE_INT },
+				{ "EDX",     "edx",    false, TYPE_INT },
+				{ "EBX",     "ebx",    false, TYPE_INT },
+				{ "ESP",     "esp",    true,  TYPE_DATA_POINTER },
+				{ "EBP",     "ebp",    true,  TYPE_DATA_POINTER },
+				{ "ESI",     "esi",    false, TYPE_INT },
+				{ "EDI",     "edi",    false, TYPE_INT },
+				{ "EIP",     "eip",    true,  TYPE_CODE_POINTER },
+				{ "EFLAGS",  "eflags", false, TYPE_INT }, // TODO describe bitfield
+				{ "CS",      "cs",     false, TYPE_INT },
+				{ "SS",      "ss",     false, TYPE_INT },
+				{ "DS",      "ds",     false, TYPE_INT },
+				{ "ES",      "es",     false, TYPE_INT },
+				{ "FS",      "fs",     false, TYPE_INT },
+				{ "GS",      "gs",     false, TYPE_INT },
+				// TODO fix x87 registers!
+				// The x87 registers are just plain wrong for a few reasons:
+				//  - The st* registers use a dummy variable in i386_device, so we
+				//    don't retrieve the real value (also the bitsize is wrong);
+				//  - The seg/off/op registers don't seem to be exported in the
+				//    state.
+				{ "ST0",     "st0",    false, TYPE_I387_EXT },
+				{ "ST1",     "st1",    false, TYPE_I387_EXT },
+				{ "ST2",     "st2",    false, TYPE_I387_EXT },
+				{ "ST3",     "st3",    false, TYPE_I387_EXT },
+				{ "ST4",     "st4",    false, TYPE_I387_EXT },
+				{ "ST5",     "st5",    false, TYPE_I387_EXT },
+				{ "ST6",     "st6",    false, TYPE_I387_EXT },
+				{ "ST7",     "st7",    false, TYPE_I387_EXT },
+				{ "x87_CW",  "fctrl",  false, TYPE_INT },
+				{ "x87_SW",  "fstat",  false, TYPE_INT },
+				{ "x87_TAG", "ftag",   false, TYPE_INT },
+				{ "EAX",     "fiseg",  false, TYPE_INT },
+				{ "EAX",     "fioff",  false, TYPE_INT },
+				{ "EAX",     "foseg",  false, TYPE_INT },
+				{ "EAX",     "fooff",  false, TYPE_INT },
+				{ "EAX",     "fop",    false, TYPE_INT },
+			}
+		}
 	}
 };
 
@@ -119,25 +134,29 @@ static const gdb_register_map gdb_register_map_i486 =
 static const gdb_register_map gdb_register_map_arm7 =
 {
 	"arm",
-	"org.gnu.gdb.arm.core",
 	{
-		{ "R0",   "r0",   false, TYPE_INT },
-		{ "R1",   "r1",   false, TYPE_INT },
-		{ "R2",   "r2",   false, TYPE_INT },
-		{ "R3",   "r3",   false, TYPE_INT },
-		{ "R4",   "r4",   false, TYPE_INT },
-		{ "R5",   "r5",   false, TYPE_INT },
-		{ "R6",   "r6",   false, TYPE_INT },
-		{ "R7",   "r7",   false, TYPE_INT },
-		{ "R8",   "r8",   false, TYPE_INT },
-		{ "R9",   "r9",   false, TYPE_INT },
-		{ "R10",  "r10",  false, TYPE_INT },
-		{ "R11",  "r11",  false, TYPE_INT },
-		{ "R12",  "r12",  false, TYPE_INT },
-		{ "R13",  "sp",   true,  TYPE_DATA_POINTER },
-		{ "R14",  "lr",   true,  TYPE_INT },
-		{ "R15",  "pc",   true,  TYPE_CODE_POINTER },
-		{ "CPSR", "cpsr", false, TYPE_INT }, // TODO describe bitfield
+		{
+			"org.gnu.gdb.arm.core",
+			{
+				{ "R0",   "r0",   false, TYPE_INT },
+				{ "R1",   "r1",   false, TYPE_INT },
+				{ "R2",   "r2",   false, TYPE_INT },
+				{ "R3",   "r3",   false, TYPE_INT },
+				{ "R4",   "r4",   false, TYPE_INT },
+				{ "R5",   "r5",   false, TYPE_INT },
+				{ "R6",   "r6",   false, TYPE_INT },
+				{ "R7",   "r7",   false, TYPE_INT },
+				{ "R8",   "r8",   false, TYPE_INT },
+				{ "R9",   "r9",   false, TYPE_INT },
+				{ "R10",  "r10",  false, TYPE_INT },
+				{ "R11",  "r11",  false, TYPE_INT },
+				{ "R12",  "r12",  false, TYPE_INT },
+				{ "R13",  "sp",   true,  TYPE_DATA_POINTER },
+				{ "R14",  "lr",   true,  TYPE_INT },
+				{ "R15",  "pc",   true,  TYPE_CODE_POINTER },
+				{ "CPSR", "cpsr", false, TYPE_INT }, // TODO describe bitfield
+			}
+		}
 	}
 };
 
@@ -145,46 +164,50 @@ static const gdb_register_map gdb_register_map_arm7 =
 static const gdb_register_map gdb_register_map_ppc601 =
 {
 	"powerpc:common",
-	"org.gnu.gdb.power.core",
 	{
-		{ "R0",   "r0",   false, TYPE_INT },
-		{ "R1",   "r1",   false, TYPE_INT },
-		{ "R2",   "r2",   false, TYPE_INT },
-		{ "R3",   "r3",   false, TYPE_INT },
-		{ "R4",   "r4",   false, TYPE_INT },
-		{ "R5",   "r5",   false, TYPE_INT },
-		{ "R6",   "r6",   false, TYPE_INT },
-		{ "R7",   "r7",   false, TYPE_INT },
-		{ "R8",   "r8",   false, TYPE_INT },
-		{ "R9",   "r9",   false, TYPE_INT },
-		{ "R10",  "r10",  false, TYPE_INT },
-		{ "R11",  "r11",  false, TYPE_INT },
-		{ "R12",  "r12",  false, TYPE_INT },
-		{ "R13",  "r13",  false, TYPE_INT },
-		{ "R14",  "r14",  false, TYPE_INT },
-		{ "R15",  "r15",  false, TYPE_INT },
-		{ "R16",  "r16",  false, TYPE_INT },
-		{ "R17",  "r17",  false, TYPE_INT },
-		{ "R18",  "r18",  false, TYPE_INT },
-		{ "R19",  "r19",  false, TYPE_INT },
-		{ "R20",  "r20",  false, TYPE_INT },
-		{ "R21",  "r21",  false, TYPE_INT },
-		{ "R22",  "r22",  false, TYPE_INT },
-		{ "R23",  "r23",  false, TYPE_INT },
-		{ "R24",  "r24",  false, TYPE_INT },
-		{ "R25",  "r25",  false, TYPE_INT },
-		{ "R26",  "r26",  false, TYPE_INT },
-		{ "R27",  "r27",  false, TYPE_INT },
-		{ "R28",  "r28",  false, TYPE_INT },
-		{ "R29",  "r29",  false, TYPE_INT },
-		{ "R30",  "r30",  false, TYPE_INT },
-		{ "R31",  "r31",  false, TYPE_INT },
-		{ "PC",   "pc",   true,  TYPE_CODE_POINTER },
-		{ "MSR",  "msr",  false, TYPE_INT },
-		{ "CR",   "cr",   false, TYPE_INT },
-		{ "LR",   "lr",   true,  TYPE_CODE_POINTER },
-		{ "CTR",  "ctr",  false, TYPE_INT },
-		{ "XER",  "xer",  false, TYPE_INT },
+		{
+			"org.gnu.gdb.power.core",
+			{
+				{ "R0",   "r0",   false, TYPE_INT },
+				{ "R1",   "r1",   false, TYPE_INT },
+				{ "R2",   "r2",   false, TYPE_INT },
+				{ "R3",   "r3",   false, TYPE_INT },
+				{ "R4",   "r4",   false, TYPE_INT },
+				{ "R5",   "r5",   false, TYPE_INT },
+				{ "R6",   "r6",   false, TYPE_INT },
+				{ "R7",   "r7",   false, TYPE_INT },
+				{ "R8",   "r8",   false, TYPE_INT },
+				{ "R9",   "r9",   false, TYPE_INT },
+				{ "R10",  "r10",  false, TYPE_INT },
+				{ "R11",  "r11",  false, TYPE_INT },
+				{ "R12",  "r12",  false, TYPE_INT },
+				{ "R13",  "r13",  false, TYPE_INT },
+				{ "R14",  "r14",  false, TYPE_INT },
+				{ "R15",  "r15",  false, TYPE_INT },
+				{ "R16",  "r16",  false, TYPE_INT },
+				{ "R17",  "r17",  false, TYPE_INT },
+				{ "R18",  "r18",  false, TYPE_INT },
+				{ "R19",  "r19",  false, TYPE_INT },
+				{ "R20",  "r20",  false, TYPE_INT },
+				{ "R21",  "r21",  false, TYPE_INT },
+				{ "R22",  "r22",  false, TYPE_INT },
+				{ "R23",  "r23",  false, TYPE_INT },
+				{ "R24",  "r24",  false, TYPE_INT },
+				{ "R25",  "r25",  false, TYPE_INT },
+				{ "R26",  "r26",  false, TYPE_INT },
+				{ "R27",  "r27",  false, TYPE_INT },
+				{ "R28",  "r28",  false, TYPE_INT },
+				{ "R29",  "r29",  false, TYPE_INT },
+				{ "R30",  "r30",  false, TYPE_INT },
+				{ "R31",  "r31",  false, TYPE_INT },
+				{ "PC",   "pc",   true,  TYPE_CODE_POINTER },
+				{ "MSR",  "msr",  false, TYPE_INT },
+				{ "CR",   "cr",   false, TYPE_INT },
+				{ "LR",   "lr",   true,  TYPE_CODE_POINTER },
+				{ "CTR",  "ctr",  false, TYPE_INT },
+				{ "XER",  "xer",  false, TYPE_INT },
+			}
+		}
 	}
 };
 
@@ -192,43 +215,78 @@ static const gdb_register_map gdb_register_map_ppc601 =
 static const gdb_register_map gdb_register_map_r4600 =
 {
 	"mips",
-	"org.gnu.gdb.mips.cpu",
 	{
-		{ "zero", "r0",   false, TYPE_INT, 32 },
-		{ "at",   "r1",   false, TYPE_INT, 32 },
-		{ "v0",   "r2",   false, TYPE_INT, 32 },
-		{ "v1",   "r3",   false, TYPE_INT, 32 },
-		{ "a0",   "r4",   false, TYPE_INT, 32 },
-		{ "a1",   "r5",   false, TYPE_INT, 32 },
-		{ "a2",   "r6",   false, TYPE_INT, 32 },
-		{ "a3",   "r7",   false, TYPE_INT, 32 },
-		{ "t0",   "r8",   false, TYPE_INT, 32 },
-		{ "t1",   "r9",   false, TYPE_INT, 32 },
-		{ "t2",   "r10",  false, TYPE_INT, 32 },
-		{ "t3",   "r11",  false, TYPE_INT, 32 },
-		{ "t4",   "r12",  false, TYPE_INT, 32 },
-		{ "t5",   "r13",  false, TYPE_INT, 32 },
-		{ "t6",   "r14",  false, TYPE_INT, 32 },
-		{ "t7",   "r15",  false, TYPE_INT, 32 },
-		{ "s0",   "r16",  false, TYPE_INT, 32 },
-		{ "s1",   "r17",  false, TYPE_INT, 32 },
-		{ "s2",   "r18",  false, TYPE_INT, 32 },
-		{ "s3",   "r19",  false, TYPE_INT, 32 },
-		{ "s4",   "r20",  false, TYPE_INT, 32 },
-		{ "s5",   "r21",  false, TYPE_INT, 32 },
-		{ "s6",   "r22",  false, TYPE_INT, 32 },
-		{ "s7",   "r23",  false, TYPE_INT, 32 },
-		{ "t8",   "r24",  false, TYPE_INT, 32 },
-		{ "t9",   "r25",  false, TYPE_INT, 32 },
-		{ "k0",   "r26",  false, TYPE_INT, 32 },
-		{ "k1",   "r27",  false, TYPE_INT, 32 },
-		{ "gp",   "r28",  false, TYPE_INT, 32 },
-		{ "sp",   "r29",  false, TYPE_INT, 32 },
-		{ "fp",   "r30",  false, TYPE_INT, 32 },
-		{ "ra",   "r31",  false, TYPE_INT, 32 },
-		{ "LO",   "lo",   false, TYPE_INT, 32 },
-		{ "HI",   "hi",   false, TYPE_INT, 32 },
-		{ "PC",   "pc",   true,  TYPE_CODE_POINTER, 32 },
+		{
+			"org.gnu.gdb.mips.cpu",
+			{
+				{ "zero", "r0",   false, TYPE_INT, 32 },
+				{ "at",   "r1",   false, TYPE_INT, 32 },
+				{ "v0",   "r2",   false, TYPE_INT, 32 },
+				{ "v1",   "r3",   false, TYPE_INT, 32 },
+				{ "a0",   "r4",   false, TYPE_INT, 32 },
+				{ "a1",   "r5",   false, TYPE_INT, 32 },
+				{ "a2",   "r6",   false, TYPE_INT, 32 },
+				{ "a3",   "r7",   false, TYPE_INT, 32 },
+				{ "t0",   "r8",   false, TYPE_INT, 32 },
+				{ "t1",   "r9",   false, TYPE_INT, 32 },
+				{ "t2",   "r10",  false, TYPE_INT, 32 },
+				{ "t3",   "r11",  false, TYPE_INT, 32 },
+				{ "t4",   "r12",  false, TYPE_INT, 32 },
+				{ "t5",   "r13",  false, TYPE_INT, 32 },
+				{ "t6",   "r14",  false, TYPE_INT, 32 },
+				{ "t7",   "r15",  false, TYPE_INT, 32 },
+				{ "s0",   "r16",  false, TYPE_INT, 32 },
+				{ "s1",   "r17",  false, TYPE_INT, 32 },
+				{ "s2",   "r18",  false, TYPE_INT, 32 },
+				{ "s3",   "r19",  false, TYPE_INT, 32 },
+				{ "s4",   "r20",  false, TYPE_INT, 32 },
+				{ "s5",   "r21",  false, TYPE_INT, 32 },
+				{ "s6",   "r22",  false, TYPE_INT, 32 },
+				{ "s7",   "r23",  false, TYPE_INT, 32 },
+				{ "t8",   "r24",  false, TYPE_INT, 32 },
+				{ "t9",   "r25",  false, TYPE_INT, 32 },
+				{ "k0",   "r26",  false, TYPE_INT, 32 },
+				{ "k1",   "r27",  false, TYPE_INT, 32 },
+				{ "gp",   "r28",  false, TYPE_INT, 32 },
+				{ "sp",   "r29",  false, TYPE_INT, 32 },
+				{ "fp",   "r30",  false, TYPE_INT, 32 },
+				{ "ra",   "r31",  false, TYPE_INT, 32 },
+				{ "LO",   "lo",   false, TYPE_INT, 32 },
+				{ "HI",   "hi",   false, TYPE_INT, 32 },
+				{ "PC",   "pc",   true,  TYPE_CODE_POINTER, 32 },
+			}
+		}
+	}
+};
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m68030 =
+{
+	"m68k",
+	{
+		{
+			"org.gnu.gdb.m68k.core",
+			{
+				{ "D0", "d0", false, TYPE_INT },
+				{ "D1", "d1", false, TYPE_INT },
+				{ "D2", "d2", false, TYPE_INT },
+				{ "D3", "d3", false, TYPE_INT },
+				{ "D4", "d4", false, TYPE_INT },
+				{ "D5", "d5", false, TYPE_INT },
+				{ "D6", "d6", false, TYPE_INT },
+				{ "D7", "d7", false, TYPE_INT },
+				{ "A0", "a0", false, TYPE_INT },
+				{ "A1", "a1", false, TYPE_INT },
+				{ "A2", "a2", false, TYPE_INT },
+				{ "A3", "a3", false, TYPE_INT },
+				{ "A4", "a4", false, TYPE_INT },
+				{ "A5", "a5", false, TYPE_INT },
+				{ "A6", "fp", true,  TYPE_INT },
+				{ "SP", "sp", true,  TYPE_INT },
+				{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+				{ "CURPC","pc", true,  TYPE_CODE_POINTER },
+			}
+		}
 	}
 };
 
@@ -236,26 +294,30 @@ static const gdb_register_map gdb_register_map_r4600 =
 static const gdb_register_map gdb_register_map_m68020pmmu =
 {
 	"m68k",
-	"org.gnu.gdb.m68k.core",
 	{
-		{ "D0", "d0", false, TYPE_INT },
-		{ "D1", "d1", false, TYPE_INT },
-		{ "D2", "d2", false, TYPE_INT },
-		{ "D3", "d3", false, TYPE_INT },
-		{ "D4", "d4", false, TYPE_INT },
-		{ "D5", "d5", false, TYPE_INT },
-		{ "D6", "d6", false, TYPE_INT },
-		{ "D7", "d7", false, TYPE_INT },
-		{ "A0", "a0", false, TYPE_INT },
-		{ "A1", "a1", false, TYPE_INT },
-		{ "A2", "a2", false, TYPE_INT },
-		{ "A3", "a3", false, TYPE_INT },
-		{ "A4", "a4", false, TYPE_INT },
-		{ "A5", "a5", false, TYPE_INT },
-		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
-		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		{
+			"org.gnu.gdb.m68k.core",
+			{
+				{ "D0", "d0", false, TYPE_INT },
+				{ "D1", "d1", false, TYPE_INT },
+				{ "D2", "d2", false, TYPE_INT },
+				{ "D3", "d3", false, TYPE_INT },
+				{ "D4", "d4", false, TYPE_INT },
+				{ "D5", "d5", false, TYPE_INT },
+				{ "D6", "d6", false, TYPE_INT },
+				{ "D7", "d7", false, TYPE_INT },
+				{ "A0", "a0", false, TYPE_INT },
+				{ "A1", "a1", false, TYPE_INT },
+				{ "A2", "a2", false, TYPE_INT },
+				{ "A3", "a3", false, TYPE_INT },
+				{ "A4", "a4", false, TYPE_INT },
+				{ "A5", "a5", false, TYPE_INT },
+				{ "A6", "fp", true,  TYPE_INT },
+				{ "SP", "sp", true,  TYPE_INT },
+				{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+				{ "CURPC","pc", true,  TYPE_CODE_POINTER },
+			}
+		}
 	}
 };
 
@@ -263,27 +325,31 @@ static const gdb_register_map gdb_register_map_m68020pmmu =
 static const gdb_register_map gdb_register_map_m68000 =
 {
 	"m68k",
-	"org.gnu.gdb.m68k.core",
 	{
-		{ "D0", "d0", false, TYPE_INT },
-		{ "D1", "d1", false, TYPE_INT },
-		{ "D2", "d2", false, TYPE_INT },
-		{ "D3", "d3", false, TYPE_INT },
-		{ "D4", "d4", false, TYPE_INT },
-		{ "D5", "d5", false, TYPE_INT },
-		{ "D6", "d6", false, TYPE_INT },
-		{ "D7", "d7", false, TYPE_INT },
-		{ "A0", "a0", false, TYPE_INT },
-		{ "A1", "a1", false, TYPE_INT },
-		{ "A2", "a2", false, TYPE_INT },
-		{ "A3", "a3", false, TYPE_INT },
-		{ "A4", "a4", false, TYPE_INT },
-		{ "A5", "a5", false, TYPE_INT },
-		{ "A6", "fp", true,  TYPE_INT },
-		{ "A7", "sp", true,  TYPE_INT },
-		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
-		{ "PC", "pc", true,  TYPE_CODE_POINTER },
-		//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
+		{
+			"org.gnu.gdb.m68k.core",
+			{
+				{ "D0", "d0", false, TYPE_INT },
+				{ "D1", "d1", false, TYPE_INT },
+				{ "D2", "d2", false, TYPE_INT },
+				{ "D3", "d3", false, TYPE_INT },
+				{ "D4", "d4", false, TYPE_INT },
+				{ "D5", "d5", false, TYPE_INT },
+				{ "D6", "d6", false, TYPE_INT },
+				{ "D7", "d7", false, TYPE_INT },
+				{ "A0", "a0", false, TYPE_INT },
+				{ "A1", "a1", false, TYPE_INT },
+				{ "A2", "a2", false, TYPE_INT },
+				{ "A3", "a3", false, TYPE_INT },
+				{ "A4", "a4", false, TYPE_INT },
+				{ "A5", "a5", false, TYPE_INT },
+				{ "A6", "fp", true,  TYPE_INT },
+				{ "SP", "sp", true,  TYPE_INT },
+				{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+				{ "CURPC","pc", true,  TYPE_CODE_POINTER },
+				//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
+			}
+		}
 	}
 };
 
@@ -291,20 +357,25 @@ static const gdb_register_map gdb_register_map_m68000 =
 static const gdb_register_map gdb_register_map_z80 =
 {
 	"z80",
-	"mame.z80",
 	{
-		{ "AF",  "af",  false, TYPE_INT },
-		{ "BC",  "bc",  false, TYPE_INT },
-		{ "DE",  "de",  false, TYPE_INT },
-		{ "HL",  "hl",  false, TYPE_INT },
-		{ "AF2", "af'", false, TYPE_INT },
-		{ "BC2", "bc'", false, TYPE_INT },
-		{ "DE2", "de'", false, TYPE_INT },
-		{ "HL2", "hl'", false, TYPE_INT },
-		{ "IX",  "ix",  false, TYPE_INT },
-		{ "IY",  "iy",  false, TYPE_INT },
-		{ "SP",  "sp",  true,  TYPE_DATA_POINTER },
-		{ "PC",  "pc",  true,  TYPE_CODE_POINTER },
+		{
+			"org.gnu.gdb.z80.cpu",
+			{
+				{ "AF",  "af",  false, TYPE_INT },
+				{ "BC",  "bc",  false, TYPE_INT },
+				{ "DE",  "de",  false, TYPE_INT },
+				{ "HL",  "hl",  false, TYPE_INT },
+				{ "AF2", "af'", false, TYPE_INT },
+				{ "BC2", "bc'", false, TYPE_INT },
+				{ "DE2", "de'", false, TYPE_INT },
+				{ "HL2", "hl'", false, TYPE_INT },
+				{ "IX",  "ix",  false, TYPE_INT },
+				{ "IY",  "iy",  false, TYPE_INT },
+				{ "SP",  "sp",  true,  TYPE_DATA_POINTER },
+				{ "PC",  "pc",  true,  TYPE_CODE_POINTER },
+				{ "IR",  "ir",  false, TYPE_INT },
+			}
+		}
 	}
 };
 
@@ -312,14 +383,18 @@ static const gdb_register_map gdb_register_map_z80 =
 static const gdb_register_map gdb_register_map_m6502 =
 {
 	"m6502",
-	"mame.m6502",
 	{
-		{ "A",  "a",   false, TYPE_INT },
-		{ "X",  "x",   false, TYPE_INT },
-		{ "Y",  "y",   false, TYPE_INT },
-		{ "P",  "p",   false, TYPE_INT },
-		{ "SP", "sp",  true,  TYPE_DATA_POINTER },
-		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+		{
+			"mame.m6502",
+			{
+				{ "A",  "a",   false, TYPE_INT },
+				{ "X",  "x",   false, TYPE_INT },
+				{ "Y",  "y",   false, TYPE_INT },
+				{ "P",  "p",   false, TYPE_INT },
+				{ "SP", "sp",  true,  TYPE_DATA_POINTER },
+				{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+			}
+		}
 	}
 };
 
@@ -328,18 +403,22 @@ static const gdb_register_map gdb_register_map_m6502 =
 static const gdb_register_map gdb_register_map_m6809 =
 {
 	"m6809",
-	"mame.m6809",
 	{
-		{ "A",  "a",   false, TYPE_INT },
-		{ "B",  "b",   false, TYPE_INT },
-		{ "D",  "d",   false, TYPE_INT },
-		{ "X",  "x",   false, TYPE_INT },
-		{ "Y",  "y",   false, TYPE_INT },
-		{ "U",  "u",   true,  TYPE_DATA_POINTER },
-		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
-		{ "S",  "s",   true,  TYPE_DATA_POINTER },
-		{ "CC", "cc",  false, TYPE_INT }, // TODO describe bitfield
-		{ "DP", "dp",  false, TYPE_INT },
+		{
+			"mame.m6809",
+			{
+				{ "A",  "a",   false, TYPE_INT },
+				{ "B",  "b",   false, TYPE_INT },
+				{ "D",  "d",   false, TYPE_INT },
+				{ "X",  "x",   false, TYPE_INT },
+				{ "Y",  "y",   false, TYPE_INT },
+				{ "U",  "u",   true,  TYPE_DATA_POINTER },
+				{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+				{ "S",  "s",   true,  TYPE_DATA_POINTER },
+				{ "CC", "cc",  false, TYPE_INT }, // TODO describe bitfield
+				{ "DP", "dp",  false, TYPE_INT },
+			}
+		}
 	}
 };
 
@@ -348,64 +427,68 @@ static const gdb_register_map gdb_register_map_m6809 =
 static const gdb_register_map gdb_register_map_score7 =
 {
 	"score7",
-	"mame.score7",
 	{
-		{ "r0",      "r0",      true,  TYPE_DATA_POINTER },
-		{ "r1",      "r1",      false, TYPE_INT },
-		{ "r2",      "r2",      false, TYPE_INT },
-		{ "r3",      "r3",      false, TYPE_INT },
-		{ "r4",      "r4",      false, TYPE_INT },
-		{ "r5",      "r5",      false, TYPE_INT },
-		{ "r6",      "r6",      false, TYPE_INT },
-		{ "r7",      "r7",      false, TYPE_INT },
-		{ "r8",      "r8",      false, TYPE_INT },
-		{ "r9",      "r9",      false, TYPE_INT },
-		{ "r10",     "r10",     false, TYPE_INT },
-		{ "r11",     "r11",     false, TYPE_INT },
-		{ "r12",     "r12",     false, TYPE_INT },
-		{ "r13",     "r13",     false, TYPE_INT },
-		{ "r14",     "r14",     false, TYPE_INT },
-		{ "r15",     "r15",     false, TYPE_INT },
-		{ "r16",     "r16",     false, TYPE_INT },
-		{ "r17",     "r17",     false, TYPE_INT },
-		{ "r18",     "r18",     false, TYPE_INT },
-		{ "r19",     "r19",     false, TYPE_INT },
-		{ "r20",     "r20",     false, TYPE_INT },
-		{ "r21",     "r21",     false, TYPE_INT },
-		{ "r22",     "r22",     false, TYPE_INT },
-		{ "r23",     "r23",     false, TYPE_INT },
-		{ "r24",     "r24",     false, TYPE_INT },
-		{ "r25",     "r25",     false, TYPE_INT },
-		{ "r26",     "r26",     false, TYPE_INT },
-		{ "r27",     "r27",     false, TYPE_INT },
-		{ "r28",     "r28",     false, TYPE_INT },
-		{ "r29",     "r29",     false, TYPE_INT },
-		{ "r30",     "r30",     false, TYPE_INT },
-		{ "r31",     "r31",     false, TYPE_INT },
-		{ "cr0",     "PSR",     false, TYPE_INT },
-		{ "cr1",     "COND",    false, TYPE_INT },
-		{ "cr2",     "ECR",     false, TYPE_INT },
-		{ "cr3",     "EXCPVEC", false, TYPE_INT },
-		{ "cr4",     "CCR",     false, TYPE_INT },
-		{ "cr5",     "EPC",     false, TYPE_INT },
-		{ "cr6",     "EMA",     false, TYPE_INT },
-		{ "cr7",     "TLBLOCK", false, TYPE_INT },
-		{ "cr8",     "TLBPT",   false, TYPE_INT },
-		{ "cr9",     "PEADDR",  false, TYPE_INT },
-		{ "cr10",    "TLBRPT",  false, TYPE_INT },
-		{ "cr11",    "PEVN",    false, TYPE_INT },
-		{ "cr12",    "PECTX",   false, TYPE_INT },
-		{ "cr15",    "LIMPFN",  false, TYPE_INT },
-		{ "cr16",    "LDMPFN",  false, TYPE_INT },
-		{ "cr18",    "PREV",    false, TYPE_INT },
-		{ "cr29",    "DREG",    false, TYPE_INT },
-		{ "PC",      "PC",      true,  TYPE_CODE_POINTER }, // actually Debug exception program counter (DEPC)
-		{ "cr31",    "DSAVE",   false, TYPE_INT },
-		{ "sr0",     "COUNTER", false, TYPE_INT },
-		{ "sr1",     "LDCR",    false, TYPE_INT },
-		{ "sr2",     "STCR",    false, TYPE_INT },
-		{ "ceh",     "CEH",     false, TYPE_INT },
-		{ "cel",     "CEL",     false, TYPE_INT },
+		{
+			"mame.score7",
+			{
+				{ "r0",      "r0",      true,  TYPE_DATA_POINTER },
+				{ "r1",      "r1",      false, TYPE_INT },
+				{ "r2",      "r2",      false, TYPE_INT },
+				{ "r3",      "r3",      false, TYPE_INT },
+				{ "r4",      "r4",      false, TYPE_INT },
+				{ "r5",      "r5",      false, TYPE_INT },
+				{ "r6",      "r6",      false, TYPE_INT },
+				{ "r7",      "r7",      false, TYPE_INT },
+				{ "r8",      "r8",      false, TYPE_INT },
+				{ "r9",      "r9",      false, TYPE_INT },
+				{ "r10",     "r10",     false, TYPE_INT },
+				{ "r11",     "r11",     false, TYPE_INT },
+				{ "r12",     "r12",     false, TYPE_INT },
+				{ "r13",     "r13",     false, TYPE_INT },
+				{ "r14",     "r14",     false, TYPE_INT },
+				{ "r15",     "r15",     false, TYPE_INT },
+				{ "r16",     "r16",     false, TYPE_INT },
+				{ "r17",     "r17",     false, TYPE_INT },
+				{ "r18",     "r18",     false, TYPE_INT },
+				{ "r19",     "r19",     false, TYPE_INT },
+				{ "r20",     "r20",     false, TYPE_INT },
+				{ "r21",     "r21",     false, TYPE_INT },
+				{ "r22",     "r22",     false, TYPE_INT },
+				{ "r23",     "r23",     false, TYPE_INT },
+				{ "r24",     "r24",     false, TYPE_INT },
+				{ "r25",     "r25",     false, TYPE_INT },
+				{ "r26",     "r26",     false, TYPE_INT },
+				{ "r27",     "r27",     false, TYPE_INT },
+				{ "r28",     "r28",     false, TYPE_INT },
+				{ "r29",     "r29",     false, TYPE_INT },
+				{ "r30",     "r30",     false, TYPE_INT },
+				{ "r31",     "r31",     false, TYPE_INT },
+				{ "cr0",     "PSR",     false, TYPE_INT },
+				{ "cr1",     "COND",    false, TYPE_INT },
+				{ "cr2",     "ECR",     false, TYPE_INT },
+				{ "cr3",     "EXCPVEC", false, TYPE_INT },
+				{ "cr4",     "CCR",     false, TYPE_INT },
+				{ "cr5",     "EPC",     false, TYPE_INT },
+				{ "cr6",     "EMA",     false, TYPE_INT },
+				{ "cr7",     "TLBLOCK", false, TYPE_INT },
+				{ "cr8",     "TLBPT",   false, TYPE_INT },
+				{ "cr9",     "PEADDR",  false, TYPE_INT },
+				{ "cr10",    "TLBRPT",  false, TYPE_INT },
+				{ "cr11",    "PEVN",    false, TYPE_INT },
+				{ "cr12",    "PECTX",   false, TYPE_INT },
+				{ "cr15",    "LIMPFN",  false, TYPE_INT },
+				{ "cr16",    "LDMPFN",  false, TYPE_INT },
+				{ "cr18",    "PREV",    false, TYPE_INT },
+				{ "cr29",    "DREG",    false, TYPE_INT },
+				{ "PC",      "PC",      true,  TYPE_CODE_POINTER }, // actually Debug exception program counter (DEPC)
+				{ "cr31",    "DSAVE",   false, TYPE_INT },
+				{ "sr0",     "COUNTER", false, TYPE_INT },
+				{ "sr1",     "LDCR",    false, TYPE_INT },
+				{ "sr2",     "STCR",    false, TYPE_INT },
+				{ "ceh",     "CEH",     false, TYPE_INT },
+				{ "cel",     "CEL",     false, TYPE_INT },
+			}
+		}
 	}
 };
 
@@ -414,57 +497,156 @@ static const gdb_register_map gdb_register_map_score7 =
 static const gdb_register_map gdb_register_map_nios2 =
 {
 	"nios2",
-	"org.gnu.gdb.nios2.cpu",
 	{
-		{ "zero",     "zero",     false, TYPE_INT },
-		{ "at",       "at",       false, TYPE_INT },
-		{ "r2",       "r2",       false, TYPE_INT },
-		{ "r3",       "r3",       false, TYPE_INT },
-		{ "r4",       "r4",       false, TYPE_INT },
-		{ "r5",       "r5",       false, TYPE_INT },
-		{ "r6",       "r6",       false, TYPE_INT },
-		{ "r7",       "r7",       false, TYPE_INT },
-		{ "r8",       "r8",       false, TYPE_INT },
-		{ "r9",       "r9",       false, TYPE_INT },
-		{ "r10",      "r10",      false, TYPE_INT },
-		{ "r11",      "r11",      false, TYPE_INT },
-		{ "r12",      "r12",      false, TYPE_INT },
-		{ "r13",      "r13",      false, TYPE_INT },
-		{ "r14",      "r14",      false, TYPE_INT },
-		{ "r15",      "r15",      false, TYPE_INT },
-		{ "r16",      "r16",      false, TYPE_INT },
-		{ "r17",      "r17",      false, TYPE_INT },
-		{ "r18",      "r18",      false, TYPE_INT },
-		{ "r19",      "r19",      false, TYPE_INT },
-		{ "r20",      "r20",      false, TYPE_INT },
-		{ "r21",      "r21",      false, TYPE_INT },
-		{ "r22",      "r22",      false, TYPE_INT },
-		{ "r23",      "r23",      false, TYPE_INT },
-		{ "et",       "et",       false, TYPE_INT },
-		{ "bt",       "bt",       false, TYPE_INT },
-		{ "gp",       "gp",       false, TYPE_DATA_POINTER },
-		{ "sp",       "sp",       true,  TYPE_DATA_POINTER },
-		{ "fp",       "fp",       false, TYPE_DATA_POINTER },
-		{ "ea",       "ea",       false, TYPE_CODE_POINTER },
-		{ "ba",       "sstatus",  false, TYPE_INT }, // this is Altera's fault
-		{ "ra",       "ra",       false, TYPE_CODE_POINTER },
-		{ "status",   "status",   false, TYPE_INT },
-		{ "estatus",  "estatus",  false, TYPE_INT },
-		{ "bstatus",  "bstatus",  false, TYPE_INT },
-		{ "ienable",  "ienable",  false, TYPE_INT },
-		{ "ipending", "ipending", false, TYPE_INT },
-		{ "cpuid",    "cpuid",    false, TYPE_INT },
-		{ "ctl6",     "ctl6",     false, TYPE_INT },
-		{ "exception","exception",false, TYPE_INT },
-		{ "pteaddr",  "pteaddr",  false, TYPE_INT },
-		{ "tlbacc",   "tlbacc",   false, TYPE_INT },
-		{ "tlbmisc",  "tlbmisc",  false, TYPE_INT },
-		{ "eccinj",   "eccinj",   false, TYPE_INT },
-		{ "badaddr",  "badaddr",  false, TYPE_INT },
-		{ "config",   "config",   false, TYPE_INT },
-		{ "mpubase",  "mpubase",  false, TYPE_INT },
-		{ "mpuacc",   "mpuacc",   false, TYPE_INT },
-		{ "PC",       "pc",       true,  TYPE_CODE_POINTER },
+		{
+			"org.gnu.gdb.nios2.cpu",
+			{
+				{ "zero",     "zero",     false, TYPE_INT },
+				{ "at",       "at",       false, TYPE_INT },
+				{ "r2",       "r2",       false, TYPE_INT },
+				{ "r3",       "r3",       false, TYPE_INT },
+				{ "r4",       "r4",       false, TYPE_INT },
+				{ "r5",       "r5",       false, TYPE_INT },
+				{ "r6",       "r6",       false, TYPE_INT },
+				{ "r7",       "r7",       false, TYPE_INT },
+				{ "r8",       "r8",       false, TYPE_INT },
+				{ "r9",       "r9",       false, TYPE_INT },
+				{ "r10",      "r10",      false, TYPE_INT },
+				{ "r11",      "r11",      false, TYPE_INT },
+				{ "r12",      "r12",      false, TYPE_INT },
+				{ "r13",      "r13",      false, TYPE_INT },
+				{ "r14",      "r14",      false, TYPE_INT },
+				{ "r15",      "r15",      false, TYPE_INT },
+				{ "r16",      "r16",      false, TYPE_INT },
+				{ "r17",      "r17",      false, TYPE_INT },
+				{ "r18",      "r18",      false, TYPE_INT },
+				{ "r19",      "r19",      false, TYPE_INT },
+				{ "r20",      "r20",      false, TYPE_INT },
+				{ "r21",      "r21",      false, TYPE_INT },
+				{ "r22",      "r22",      false, TYPE_INT },
+				{ "r23",      "r23",      false, TYPE_INT },
+				{ "et",       "et",       false, TYPE_INT },
+				{ "bt",       "bt",       false, TYPE_INT },
+				{ "gp",       "gp",       false, TYPE_DATA_POINTER },
+				{ "sp",       "sp",       true,  TYPE_DATA_POINTER },
+				{ "fp",       "fp",       false, TYPE_DATA_POINTER },
+				{ "ea",       "ea",       false, TYPE_CODE_POINTER },
+				{ "ba",       "sstatus",  false, TYPE_INT }, // this is Altera's fault
+				{ "ra",       "ra",       false, TYPE_CODE_POINTER },
+				{ "status",   "status",   false, TYPE_INT },
+				{ "estatus",  "estatus",  false, TYPE_INT },
+				{ "bstatus",  "bstatus",  false, TYPE_INT },
+				{ "ienable",  "ienable",  false, TYPE_INT },
+				{ "ipending", "ipending", false, TYPE_INT },
+				{ "cpuid",    "cpuid",    false, TYPE_INT },
+				{ "ctl6",     "ctl6",     false, TYPE_INT },
+				{ "exception","exception",false, TYPE_INT },
+				{ "pteaddr",  "pteaddr",  false, TYPE_INT },
+				{ "tlbacc",   "tlbacc",   false, TYPE_INT },
+				{ "tlbmisc",  "tlbmisc",  false, TYPE_INT },
+				{ "eccinj",   "eccinj",   false, TYPE_INT },
+				{ "badaddr",  "badaddr",  false, TYPE_INT },
+				{ "config",   "config",   false, TYPE_INT },
+				{ "mpubase",  "mpubase",  false, TYPE_INT },
+				{ "mpuacc",   "mpuacc",   false, TYPE_INT },
+				{ "PC",       "pc",       true,  TYPE_CODE_POINTER },
+			}
+		}
+	}
+};
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_psxcpu =
+{
+	"mips",
+	{
+		{
+			"org.gnu.gdb.mips.cpu",
+			{
+				{ "zero",  "r0",       false, TYPE_INT },
+				{ "at",    "r1",       false, TYPE_INT },
+				{ "v0",    "r2",       false, TYPE_INT },
+				{ "v1",    "r3",       false, TYPE_INT },
+				{ "a0",    "r4",       false, TYPE_INT },
+				{ "a1",    "r5",       false, TYPE_INT },
+				{ "a2",    "r6",       false, TYPE_INT },
+				{ "a3",    "r7",       false, TYPE_INT },
+				{ "t0",    "r8",       false, TYPE_INT },
+				{ "t1",    "r9",       false, TYPE_INT },
+				{ "t2",    "r10",      false, TYPE_INT },
+				{ "t3",    "r11",      false, TYPE_INT },
+				{ "t4",    "r12",      false, TYPE_INT },
+				{ "t5",    "r13",      false, TYPE_INT },
+				{ "t6",    "r14",      false, TYPE_INT },
+				{ "t7",    "r15",      false, TYPE_INT },
+				{ "s0",    "r16",      false, TYPE_INT },
+				{ "s1",    "r17",      false, TYPE_INT },
+				{ "s2",    "r18",      false, TYPE_INT },
+				{ "s3",    "r19",      false, TYPE_INT },
+				{ "s4",    "r20",      false, TYPE_INT },
+				{ "s5",    "r21",      false, TYPE_INT },
+				{ "s6",    "r22",      false, TYPE_INT },
+				{ "s7",    "r23",      false, TYPE_INT },
+				{ "t8",    "r24",      false, TYPE_INT },
+				{ "t9",    "r25",      false, TYPE_INT },
+				{ "k0",    "r26",      false, TYPE_INT },
+				{ "k1",    "r27",      false, TYPE_INT },
+				{ "gp",    "r28",      false, TYPE_INT },
+				{ "sp",    "r29",      false, TYPE_INT },
+				{ "fp",    "r30",      false, TYPE_INT },
+				{ "ra",    "r31",      false, TYPE_CODE_POINTER },
+				{ "lo",    "lo",       false, TYPE_INT },
+				{ "hi",    "hi",       false, TYPE_INT },
+				{ "pc",    "pc",       true,  TYPE_CODE_POINTER },
+			}
+		},
+		{
+			"org.gnu.gdb.mips.cp0",
+			{
+				{ "SR",    "status",   false, TYPE_INT },
+				{ "BadA",  "badvaddr", false, TYPE_INT },
+				{ "Cause", "cause",    false, TYPE_INT },
+			}
+		},
+		{
+			"org.gnu.gdb.mips.fpu",
+			{
+				{ "zero",  "f0",       false, TYPE_INT },
+				{ "zero",  "f1",       false, TYPE_INT },
+				{ "zero",  "f2",       false, TYPE_INT },
+				{ "zero",  "f3",       false, TYPE_INT },
+				{ "zero",  "f4",       false, TYPE_INT },
+				{ "zero",  "f5",       false, TYPE_INT },
+				{ "zero",  "f6",       false, TYPE_INT },
+				{ "zero",  "f7",       false, TYPE_INT },
+				{ "zero",  "f8",       false, TYPE_INT },
+				{ "zero",  "f9",       false, TYPE_INT },
+				{ "zero",  "f10",      false, TYPE_INT },
+				{ "zero",  "f11",      false, TYPE_INT },
+				{ "zero",  "f12",      false, TYPE_INT },
+				{ "zero",  "f13",      false, TYPE_INT },
+				{ "zero",  "f14",      false, TYPE_INT },
+				{ "zero",  "f15",      false, TYPE_INT },
+				{ "zero",  "f16",      false, TYPE_INT },
+				{ "zero",  "f17",      false, TYPE_INT },
+				{ "zero",  "f18",      false, TYPE_INT },
+				{ "zero",  "f19",      false, TYPE_INT },
+				{ "zero",  "f20",      false, TYPE_INT },
+				{ "zero",  "f21",      false, TYPE_INT },
+				{ "zero",  "f22",      false, TYPE_INT },
+				{ "zero",  "f23",      false, TYPE_INT },
+				{ "zero",  "f24",      false, TYPE_INT },
+				{ "zero",  "f25",      false, TYPE_INT },
+				{ "zero",  "f26",      false, TYPE_INT },
+				{ "zero",  "f27",      false, TYPE_INT },
+				{ "zero",  "f28",      false, TYPE_INT },
+				{ "zero",  "f29",      false, TYPE_INT },
+				{ "zero",  "f30",      false, TYPE_INT },
+				{ "zero",  "f31",      false, TYPE_INT },
+				{ "zero",  "fcsr",     false, TYPE_INT },
+				{ "zero",  "fir" ,     false, TYPE_INT },
+			}
+		}
 	}
 };
 
@@ -474,23 +656,40 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "arm7_le",    gdb_register_map_arm7 },
 	{ "r4600",      gdb_register_map_r4600 },
 	{ "ppc601",     gdb_register_map_ppc601 },
+	{ "m68030",     gdb_register_map_m68030 },
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
 	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
+	{ "z80n",       gdb_register_map_z80 },
 	{ "z84c015",    gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
+	{ "m6507",      gdb_register_map_m6502 },
+	{ "m6510",      gdb_register_map_m6502 },
+	{ "m65ce02",    gdb_register_map_m6502 },
 	{ "rp2a03",     gdb_register_map_m6502 },
+	{ "rp2a03g",    gdb_register_map_m6502 },
+	{ "w65c02",     gdb_register_map_m6502 },
+	{ "w65c02s",    gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
 	{ "score7",     gdb_register_map_score7 },
 	{ "nios2",      gdb_register_map_nios2 },
+	{ "cxd8530q",   gdb_register_map_psxcpu },
+	{ "cxd8530aq",  gdb_register_map_psxcpu },
+	{ "cxd8530bq",  gdb_register_map_psxcpu },
+	{ "cxd8530cq",  gdb_register_map_psxcpu },
+	{ "cxd8606q",   gdb_register_map_psxcpu },
+	{ "cxd8606aq",  gdb_register_map_psxcpu },
+	{ "cxd8606bq",  gdb_register_map_psxcpu },
+	{ "cxd8606cq",  gdb_register_map_psxcpu },
+	{ "cxd8661r",   gdb_register_map_psxcpu },
 };
 
 //-------------------------------------------------------------------------
 class debug_gdbstub : public osd_module, public debug_module
 {
 public:
-	debug_gdbstub()
-	: osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
+	debug_gdbstub() :
+		osd_module(OSD_DEBUG_PROVIDER, "gdbstub"), debug_module(),
 		m_readbuf_state(PACKET_START),
 		m_machine(nullptr),
 		m_maincpu(nullptr),
@@ -499,6 +698,7 @@ public:
 		m_address_space(nullptr),
 		m_debugger_cpu(nullptr),
 		m_debugger_console(nullptr),
+		m_debugger_host(),
 		m_debugger_port(0),
 		m_socket(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE),
 		m_is_be(false),
@@ -582,7 +782,7 @@ public:
 
 	int readchar();
 
-	void send_reply(const char *str);
+	void send_reply(std::string_view str);
 	void send_stop_packet();
 
 private:
@@ -593,6 +793,7 @@ private:
 	address_space *m_address_space;
 	debugger_cpu *m_debugger_cpu;
 	debugger_console *m_debugger_console;
+	std::string m_debugger_host;
 	int m_debugger_port;
 	emu_file m_socket;
 	bool m_is_be;
@@ -604,16 +805,16 @@ private:
 
 	struct gdb_register
 	{
+		std::string gdb_feature_name;
 		std::string gdb_name;
 		int gdb_regnum;
 		gdb_register_type gdb_type;
 		int gdb_bitsize;
-		int state_index;
+		const device_state_entry *state_entry;
 	};
 	std::vector<gdb_register> m_gdb_registers;
 	std::set<int> m_stop_reply_registers;
 	std::string m_gdb_arch;
-	std::string m_gdb_feature;
 
 	std::map<offs_t, uint64_t> m_address_map;
 
@@ -635,6 +836,7 @@ private:
 //-------------------------------------------------------------------------
 int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
+	m_debugger_host = options.debugger_host();
 	m_debugger_port = options.debugger_port();
 	return 0;
 }
@@ -648,6 +850,21 @@ void debug_gdbstub::exit()
 void debug_gdbstub::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
+
+	// the fatal error is deferred to a reset notifier: throwing from
+	// here or from an instruction hook crashes on exit
+	std::string socket_name = string_format("socket.%s:%d", m_debugger_host, m_debugger_port);
+	std::error_condition const filerr = m_socket.open(socket_name);
+	if ( filerr )
+	{
+		osd_printf_error("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+		machine.add_notifier(MACHINE_NOTIFY_RESET,
+			machine_notify_delegate([this]() {
+				fatalerror("gdbstub: failed to start listening on address %s port %d\n", m_debugger_host, m_debugger_port);
+			}));
+		return;
+	}
+	osd_printf_info("gdbstub: listening on address %s port %d\n", m_debugger_host, m_debugger_port);
 }
 
 //-------------------------------------------------------------------------
@@ -671,11 +888,11 @@ int debug_gdbstub::readchar()
 }
 
 //-------------------------------------------------------------------------
-static std::string escape_packet(const std::string src)
+static std::string escape_packet(std::string_view src)
 {
 	std::string result;
 	result.reserve(src.length());
-	for ( char ch: src )
+	for ( char ch : src )
 	{
 		if ( ch == '#' || ch == '$' || ch == '}' )
 		{
@@ -696,11 +913,27 @@ void debug_gdbstub::generate_target_xml()
 	target_xml += "<?xml version=\"1.0\"?>\n";
 	target_xml += "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">\n";
 	target_xml += "<target version=\"1.0\">\n";
-	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch.c_str());
-	target_xml += string_format("  <feature name=\"%s\">\n", m_gdb_feature.c_str());
+	target_xml += string_format("<architecture>%s</architecture>\n", m_gdb_arch);
+	std::string feature_name;
 	for ( const auto &reg: m_gdb_registers )
-		target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name.c_str(), reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
-	target_xml += "  </feature>\n";
+	{
+		if (feature_name != reg.gdb_feature_name)
+		{
+			if (!feature_name.empty())
+				target_xml += "  </feature>\n";
+
+			feature_name = reg.gdb_feature_name;
+			target_xml += string_format("  <feature name=\"%s\">\n", feature_name);
+		}
+
+		// the group is the device's absolute path (the feature name without its "mame." prefix)
+		if ( reg.gdb_feature_name.compare(0, 5, "mame.") == 0 )
+			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\" group=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type], reg.gdb_feature_name.c_str() + 5);
+		else
+			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+	}
+	if (!feature_name.empty())
+		target_xml += "  </feature>\n";
 	target_xml += "</target>\n";
 	m_target_xml = escape_packet(target_xml);
 }
@@ -746,47 +979,92 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 		const gdb_register_map &register_map = it->second;
 		m_gdb_arch = register_map.arch;
-		m_gdb_feature = register_map.feature;
 		int cur_gdb_regnum = 0;
-		for ( const auto &reg: register_map.registers )
-		{
-			bool added = false;
-			for ( const auto &entry: m_state->state_entries() )
+		for ( const auto &feature: register_map.features )
+			for ( const auto &reg: feature.registers )
 			{
-				const char *symbol = entry->symbol();
-				if ( strcmp(symbol, reg.state_name) == 0 )
+				const device_state_entry *entry_found = nullptr;
+				for ( const auto &entry: m_state->state_entries() )
+					if ( strcmp(entry->symbol(), reg.state_name) == 0 )
+					{
+						entry_found = entry.get();
+						break;
+					}
+				if ( entry_found != nullptr )
 				{
 					gdb_register new_reg;
+					new_reg.gdb_feature_name = feature.feature_name;
 					new_reg.gdb_name = reg.gdb_name;
 					new_reg.gdb_regnum = cur_gdb_regnum;
 					new_reg.gdb_type = reg.gdb_type;
 					if ( reg.override_bitsize != -1 )
 						new_reg.gdb_bitsize = reg.override_bitsize;
 					else
-						new_reg.gdb_bitsize = entry->datasize() * 8;
-					new_reg.state_index = entry->index();
+						new_reg.gdb_bitsize = entry_found->datasize() * 8;
+					new_reg.state_entry = entry_found;
 					m_gdb_registers.push_back(std::move(new_reg));
 					if ( reg.stop_packet )
 						m_stop_reply_registers.insert(cur_gdb_regnum);
-					added = true;
 					cur_gdb_regnum++;
-					break;
+				}
+				else
+					osd_printf_info("gdbstub: could not find register [%s]\n", reg.gdb_name);
+			}
+
+		// append the visible state entries of every other device
+		{
+			std::set<std::string> used_names;
+			auto sanitize = [](std::string &s, bool keep_slash)
+			{
+				for (char &c : s)
+					if ( !isalnum(c) && c != '_' && (!keep_slash || c != '/') )
+						c = '_';
+			};
+			for ( const auto &reg: m_gdb_registers )
+				used_names.insert(reg.gdb_name);
+			for (device_state_interface &state : device_interface_enumerator<device_state_interface>(m_machine->root_device()))
+			{
+				if ( &state.device() == m_maincpu )
+					continue;
+				// ':' -> '/' keeps the path hierarchy unambiguous: device
+				// tags may contain '_' themselves
+				std::string tag = state.device().tag();
+				std::replace(tag.begin(), tag.end(), ':', '/');
+				sanitize(tag, true);
+				tag.erase(0, tag.find_first_not_of("_/"));
+				tag.erase(tag.find_last_not_of("_/") + 1);
+				tag.insert(tag.begin(), '/');
+				std::string feature_name = "mame." + tag;
+				for ( const auto &entry: state.state_entries() )
+				{
+					if ( !entry->visible() || entry->divider() )
+						continue;
+					std::string name = entry->symbol();
+					sanitize(name, false);
+					if ( name.empty() )
+						continue;
+					if ( !isalpha(name[0]) && name[0] != '_' )
+						name.insert(0, 1, '_');
+					if ( used_names.count(name) != 0 )
+					{
+						name = tag + "_" + name;
+						sanitize(name, false);
+						if ( used_names.count(name) != 0 )
+							continue;
+					}
+					used_names.insert(name);
+					gdb_register new_reg;
+					new_reg.gdb_feature_name = feature_name;
+					new_reg.gdb_name = name;
+					new_reg.gdb_regnum = cur_gdb_regnum++;
+					new_reg.gdb_type = TYPE_INT;
+					new_reg.gdb_bitsize = std::min(entry->datasize() * 8, 64);
+					new_reg.state_entry = entry.get();
+					m_gdb_registers.push_back(std::move(new_reg));
 				}
 			}
-			if ( !added )
-				osd_printf_info("gdbstub: could not find register [%s]\n", reg.gdb_name);
 		}
 
-#if 0
-		for ( const auto &reg: m_gdb_registers )
-			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
-#endif
-
-		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);
-		std::error_condition const filerr = m_socket.open(socket_name);
-		if ( filerr )
-			fatalerror("gdbstub: failed to start listening on port %d\n", m_debugger_port);
-		osd_printf_info("gdbstub: listening on port %d\n", m_debugger_port);
 
 		m_initialized = true;
 	}
@@ -827,31 +1105,32 @@ void debug_gdbstub::debugger_update()
 			break;
 		handle_character((char) ch);
 	}
+
+	if ( m_dettached && m_socket.is_open() )
+		m_socket.close();
 }
 
 //-------------------------------------------------------------------------
 void debug_gdbstub::send_nack()
 {
-	m_socket.puts("-");
+	m_socket.write("-", 1);
 }
 
 //-------------------------------------------------------------------------
 void debug_gdbstub::send_ack()
 {
-	m_socket.puts("+");
+	m_socket.write("+", 1);
 }
 
 //-------------------------------------------------------------------------
-void debug_gdbstub::send_reply(const char *str)
+void debug_gdbstub::send_reply(std::string_view str)
 {
-	size_t length = strlen(str);
-
 	uint8_t checksum = 0;
-	for ( size_t i = 0; i < length; i++ )
-		checksum += str[i];
+	for ( char ch : str )
+		checksum += ch;
 
 	std::string reply = string_format("$%s#%02x", str, checksum);
-	m_socket.puts(reply);
+	m_socket.write(reply.c_str(), reply.length());
 }
 
 
@@ -909,7 +1188,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_g(const char *buf)
 	std::string reply;
 	for ( const auto &reg: m_gdb_registers )
 		reply += get_register_string(reg.gdb_regnum);
-	send_reply(reply.c_str());
+	send_reply(reply);
 	return REPLY_NONE;
 }
 
@@ -978,7 +1257,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_m(const char *buf)
 		uint8_t value = tspace->read_byte(offset + i);
 		reply += string_format("%02x", value);
 	}
-	send_reply(reply.c_str());
+	send_reply(reply);
 
 	return REPLY_NONE;
 }
@@ -1034,12 +1313,12 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_p(const char *buf)
 	if ( sscanf(buf, "%x", &gdb_regnum) != 1 || gdb_regnum >= m_gdb_registers.size() )
 		return REPLY_ENN;
 	std::string reply = get_register_string(gdb_regnum);
-	send_reply(reply.c_str());
+	send_reply(reply);
 	return REPLY_NONE;
 }
 
 //-------------------------------------------------------------------------
-// Write register n… with value r….
+// Write register n... with value r... .
 debug_gdbstub::cmd_reply debug_gdbstub::handle_P(const char *buf)
 {
 	if ( !m_target_xml_sent )
@@ -1101,7 +1380,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 				reply += string_format("%02x", *line++);
 			reply += "0A";
 		}
-		send_reply(reply.c_str());
+		send_reply(reply);
 		return REPLY_NONE;
 	}
 
@@ -1117,14 +1396,19 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	if ( name == "Supported" )
 	{
 		std::string reply = string_format("PacketSize=%x", MAX_PACKET_SIZE);
-		reply += ";qXfer:features:read+";
-		send_reply(reply.c_str());
+		reply += ";qXfer:features:read+;qOffsets+";
+		send_reply(reply);
+		return REPLY_NONE;
+	}
+	else if ( name == "Offsets" )
+	{
+		send_reply("Text=0;Data=0;Bss=0");
 		return REPLY_NONE;
 	}
 	else if ( name == "Xfer" )
 	{
 		// "features:read:target.xml:0,3fff"
-		if ( strncmp(params.c_str(), "features:read:", 14) == 0 )
+		if ( params.compare(0, 14, "features:read:") == 0 )
 		{
 			int offset = 0;
 			int length = 0;
@@ -1132,14 +1416,20 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 			{
 				if ( m_target_xml.empty() )
 					generate_target_xml();
+				if ( offset < 0 )
+					offset = 0;
 				length = std::min(length, (int) m_target_xml.length()-offset);
+				if ( offset > (int) m_target_xml.length() )
+					offset = m_target_xml.length();
+				if ( length < 0 )
+					length = 0;
 				std::string reply;
 				if ( offset + length < m_target_xml.length() )
 					reply += 'm';
 				else
 					reply += 'l';
 				reply += m_target_xml.substr(offset, length);
-				send_reply(reply.c_str());
+				send_reply(reply);
 				m_target_xml_sent = true;
 				return REPLY_NONE;
 			}
@@ -1326,7 +1616,7 @@ void debug_gdbstub::send_stop_packet()
 	if ( m_target_xml_sent )
 		for ( const auto &gdb_regnum: m_stop_reply_registers )
 			reply += string_format("%02x:%s;", gdb_regnum, get_register_string(gdb_regnum));
-	send_reply(reply.c_str());
+	send_reply(reply);
 }
 
 //-------------------------------------------------------------------------
@@ -1375,7 +1665,7 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 					: (reg.gdb_bitsize == 32) ? "%08"  PRIx64
 					: (reg.gdb_bitsize == 16) ? "%04"  PRIx64
 					:                           "%02"  PRIx64;
-	uint64_t value = m_state->state_int(reg.state_index);
+	uint64_t value = reg.state_entry->value();
 	if ( reg.gdb_bitsize < 64 )
 		value &= (1ULL << reg.gdb_bitsize) - 1;
 	if ( !m_is_be )
@@ -1414,7 +1704,7 @@ bool debug_gdbstub::parse_register_string(uint64_t *pvalue, const char *buf, int
 void debug_gdbstub::set_register_value(int gdb_regnum, uint64_t value)
 {
 	const gdb_register &reg = m_gdb_registers[gdb_regnum];
-	m_state->set_state_int(reg.state_index, value);
+	reg.state_entry->set_value(value);
 }
 
 //-------------------------------------------------------------------------

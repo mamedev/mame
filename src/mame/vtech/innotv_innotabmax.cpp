@@ -60,7 +60,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -87,10 +86,10 @@ public:
 	void vtech_innotv_innotabmax(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -144,7 +143,7 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 	ARM9(config, m_maincpu, 240000000); // unknown core type / frequency, but confirmed as ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech_innotv_innotabmax_state::main_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
 	m_screen->set_size(1280, 720);
@@ -166,4 +165,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_IS_SKELETON )
+CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

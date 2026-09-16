@@ -62,7 +62,7 @@ Current status:
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/tms5220.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/rs232.h"
@@ -86,12 +86,12 @@ public:
 private:
 
 	u8 m_port3 = 0U;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void port3_w(u8 data);
 	u8 port3_r();
 	void rx_w(int state);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 	required_device<i80c31_device> m_maincpu;
 	required_device<rs232_port_device> m_serial;
 	required_device<tms5220_device> m_speech;
@@ -181,7 +181,7 @@ void pes_state::pes(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(10'245'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pes_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &pes_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &pes_state::io_map);
 	m_maincpu->port_in_cb<1>().set(m_speech, FUNC(tms5220_device::status_r));
 	m_maincpu->port_out_cb<1>().set(m_speech, FUNC(tms5220_device::data_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(pes_state::port3_r));

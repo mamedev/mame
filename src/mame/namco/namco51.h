@@ -26,9 +26,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// internal state
@@ -40,16 +40,13 @@ private:
 	devcb_write_line m_lockout;
 
 	uint8_t K_r();
-	uint8_t R0_r();
-	uint8_t R1_r();
-	uint8_t R2_r();
-	uint8_t R3_r();
+	template<int N> uint8_t R_r();
 	void O_w(uint8_t data);
 	void P_w(uint8_t data);
 
-	TIMER_CALLBACK_MEMBER( rw_sync );
-	TIMER_CALLBACK_MEMBER( write_sync );
-	TIMER_CALLBACK_MEMBER( O_w_sync );
+	TIMER_CALLBACK_MEMBER(rw_sync);
+	TIMER_CALLBACK_MEMBER(write_sync);
+	TIMER_CALLBACK_MEMBER(O_w_sync);
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device)

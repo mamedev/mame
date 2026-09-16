@@ -123,8 +123,8 @@ public:
 	void hp95lx(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev_c000;
@@ -156,9 +156,9 @@ private:
 	void video_register_w(uint8_t data);
 	[[maybe_unused]] void debug_w(offs_t offset, uint8_t data);
 
-	void hp95lx_io(address_map &map);
-	void hp95lx_map(address_map &map);
-	void hp95lx_romdos(address_map &map);
+	void hp95lx_io(address_map &map) ATTR_COLD;
+	void hp95lx_map(address_map &map) ATTR_COLD;
+	void hp95lx_romdos(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -729,20 +729,21 @@ void hp95lx_state::hp95lx(machine_config &config)
 	ADDRESS_MAP_BANK(config, "bankdev_e800").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "bankdev_ec00").set_map(&hp95lx_state::hp95lx_romdos).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	PIT8254(config, m_pit8254, 0);
+	PIT8254(config, m_pit8254);
 	m_pit8254->set_clk<0>(XTAL(14'318'181) / 12); /* heartbeat IRQ */
 	m_pit8254->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8254->set_clk<1>(XTAL(14'318'181) / 12); /* misc IRQ */
 	m_pit8254->out_handler<1>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	ISA8(config, m_isabus, 0);
+	ISA8(config, m_isabus);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
 
-	ISA8_SLOT(config, "board0", 0, "isa", pc_isa8_cards, "com", true);
+	// FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "board0", 0, m_isabus, pc_isa8_cards, "com", true);
 
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
 	pc_kbdc.out_clock_cb().set(FUNC(hp95lx_state::keyboard_clock_w));
@@ -754,7 +755,7 @@ void hp95lx_state::hp95lx(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	SCREEN(config, m_screen).set_lcd().set_color(rgb_t::white());
 	m_screen->set_screen_update(FUNC(hp95lx_state::screen_update));
 	m_screen->set_raw(XTAL(5'370'000) / 2, 300, 0, 240, 180, 0, 128);
 	m_screen->set_palette("palette");

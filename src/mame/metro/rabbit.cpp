@@ -114,8 +114,8 @@ public:
 	void rabbit(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(blit_done);
 
@@ -132,7 +132,7 @@ private:
 	void blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void eeprom_write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	void rabbit_map(address_map &map);
+	void rabbit_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -740,7 +740,7 @@ void rabbit_state::rabbit_map(address_map &map)
 
 static INPUT_PORTS_START( rabbit )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) // as per code at 4d932
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // as per code at 4d932
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unlabeled in input test
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
@@ -887,7 +887,7 @@ void rabbit_state::rabbit(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rabbit);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*16, 64*16);
@@ -900,12 +900,11 @@ void rabbit_state::rabbit(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xGRB_888, 0x4000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	i5000snd_device &i5000snd(I5000_SND(config, "i5000snd", XTAL(40'000'000)));
-	i5000snd.add_route(0, "rspeaker", 1.0);
-	i5000snd.add_route(1, "lspeaker", 1.0);
+	i5000snd.add_route(0, "speaker", 1.0, 1);
+	i5000snd.add_route(1, "speaker", 1.0, 0);
 }
 
 

@@ -17,7 +17,7 @@ public:
 	djmemc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// interface routines
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
@@ -29,9 +29,9 @@ protected:
 	djmemc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 	void vbl_w(int state);
@@ -39,6 +39,15 @@ protected:
 	required_device<dafb_base> m_video;
 
 private:
+	// 0x00 interleave config, 0x04-0x28 bank 0-9 config, 0x2c memory top,
+	// 0x30 config, 0x34 refresh
+	static constexpr int DJMEMC_NUM_REGS = 0x38 / 4;
+
+	u32 regs_r(offs_t offset);
+	void regs_w(offs_t offset, u32 data);
+
+	u32 m_regs[DJMEMC_NUM_REGS];
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u32> m_rom;
 	devcb_write_line m_irq;
@@ -55,11 +64,11 @@ public:
 	// construction/destruction
 	memcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	u32 dafb_holding_r(offs_t offset);

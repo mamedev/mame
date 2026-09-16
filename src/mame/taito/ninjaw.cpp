@@ -330,6 +330,7 @@ rumbling on a subwoofer in the cabinet.)
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "ninjaw.lh"
@@ -359,8 +360,8 @@ public:
 
 protected:
 	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/* devices */
@@ -395,11 +396,13 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip);
 	void parse_control();
 	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
-	void darius2_master_map(address_map &map);
-	void darius2_slave_map(address_map &map);
-	void ninjaw_master_map(address_map &map);
-	void ninjaw_slave_map(address_map &map);
-	void sound_map(address_map &map);
+	rgb_t color_xbgr555(u16 data);
+
+	void darius2_master_map(address_map &map) ATTR_COLD;
+	void darius2_slave_map(address_map &map) ATTR_COLD;
+	void ninjaw_master_map(address_map &map) ATTR_COLD;
+	void ninjaw_slave_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -419,7 +422,7 @@ protected:
 	virtual void device_start();
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 };
 
 extern const device_type SUBWOOFER;
@@ -454,9 +457,8 @@ void subwoofer_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void subwoofer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void subwoofer_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
 }
 
 #endif
@@ -546,6 +548,11 @@ void ninjaw_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 /*******************************************************************************
         SCREEN REFRESH
 *******************************************************************************/
+
+rgb_t ninjaw_state::color_xbgr555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
 
 u32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip)
 {
@@ -642,7 +649,7 @@ void ninjaw_state::pancontrol_w(offs_t offset, u8 data)
 
 	m_pandata[offset] = (float)data * (100.f / 255.0f);
 	//popmessage(" pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3] );
-	flt->flt_volume_set_volume(m_pandata[offset] / 100.0);
+	flt->set_gain(m_pandata[offset] / 100.0);
 }
 
 
@@ -674,9 +681,9 @@ void ninjaw_state::ninjaw_master_map(address_map &map)
 	map(0x2e0000, 0x2e000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300000, 0x313fff).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));      /* tilemaps (3rd screen) */
 	map(0x320000, 0x32000f).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
-	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
-	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
-	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (3rd screen) */
 }
 
 // NB there could be conflicts between which cpu writes what to the
@@ -690,9 +697,9 @@ void ninjaw_state::ninjaw_slave_map(address_map &map)
 	map(0x240000, 0x24ffff).ram().share("share1");
 	map(0x260000, 0x263fff).ram().share("spriteram");
 	map(0x280000, 0x293fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::ram_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
-	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
-	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
-	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (3rd screen) */
 }
 
 void ninjaw_state::darius2_master_map(address_map &map)
@@ -711,9 +718,9 @@ void ninjaw_state::darius2_master_map(address_map &map)
 	map(0x2e0000, 0x2e000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300000, 0x313fff).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));      /* tilemaps (3rd screen) */
 	map(0x320000, 0x32000f).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
-	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
-	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
-	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (3rd screen) */
 }
 
 void ninjaw_state::darius2_slave_map(address_map &map)
@@ -910,7 +917,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -925,7 +932,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 
 	config.set_default_layout(layout_ninjaw);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(36*8, 32*8);
@@ -933,7 +940,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
 	lscreen.set_palette(m_tc0110pcr[0]);
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	screen_device &mscreen(SCREEN(config, "mscreen"));
 	mscreen.set_refresh_hz(60);
 	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	mscreen.set_size(36*8, 32*8);
@@ -941,7 +948,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
 	mscreen.set_palette(m_tc0110pcr[1]);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(36*8, 32*8);
@@ -949,53 +956,58 @@ void ninjaw_state::ninjaw(machine_config &config)
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
 	rscreen.set_palette(m_tc0110pcr[2]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
+	m_tc0110pcr[0]->set_shift(0);
+	m_tc0110pcr[0]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
+	m_tc0110pcr[1]->set_shift(0);
+	m_tc0110pcr[1]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[2], 0);
+	TC0100SCN(config, m_tc0100scn[2]);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2]);
+	m_tc0110pcr[2]->set_shift(0);
+	m_tc0110pcr[2]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").seat();
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "subwoofer", 0.25);
+	ymsnd.add_route(0, "subwoofer", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
 	ymsnd.add_route(1, "2610.1.r", 1.0);
 	ymsnd.add_route(2, "2610.2.l", 1.0);
 	ymsnd.add_route(2, "2610.2.r", 1.0);
 
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-//  SUBWOOFER(config, "subwoofer", 0);
+//  SUBWOOFER(config, "subwoofer");
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	TC0140SYT(config, m_tc0140syt);
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 
@@ -1016,7 +1028,7 @@ void ninjaw_state::darius2(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
+	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc"));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
 	tc0040ioc.read_1_callback().set_ioport("DSWB");
 	tc0040ioc.read_2_callback().set_ioport("IN0");
@@ -1031,7 +1043,7 @@ void ninjaw_state::darius2(machine_config &config)
 
 	config.set_default_layout(layout_ninjaw);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(36*8, 32*8);
@@ -1039,7 +1051,7 @@ void ninjaw_state::darius2(machine_config &config)
 	lscreen.set_screen_update(FUNC(ninjaw_state::screen_update_left));
 	lscreen.set_palette(m_tc0110pcr[0]);
 
-	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	screen_device &mscreen(SCREEN(config, "mscreen"));
 	mscreen.set_refresh_hz(60);
 	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	mscreen.set_size(36*8, 32*8);
@@ -1047,7 +1059,7 @@ void ninjaw_state::darius2(machine_config &config)
 	mscreen.set_screen_update(FUNC(ninjaw_state::screen_update_middle));
 	mscreen.set_palette(m_tc0110pcr[1]);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(36*8, 32*8);
@@ -1055,53 +1067,58 @@ void ninjaw_state::darius2(machine_config &config)
 	rscreen.set_screen_update(FUNC(ninjaw_state::screen_update_right));
 	rscreen.set_palette(m_tc0110pcr[2]);
 
-	TC0100SCN(config, m_tc0100scn[0], 0);
+	TC0100SCN(config, m_tc0100scn[0]);
 	m_tc0100scn[0]->set_offsets(22, 0);
 	m_tc0100scn[0]->set_multiscr_xoffs(0);
 	m_tc0100scn[0]->set_multiscr_hack(0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
-	TC0110PCR(config, m_tc0110pcr[0], 0);
+	TC0110PCR(config, m_tc0110pcr[0]);
+	m_tc0110pcr[0]->set_shift(0);
+	m_tc0110pcr[0]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[1], 0);
+	TC0100SCN(config, m_tc0100scn[1]);
 	m_tc0100scn[1]->set_offsets(22, 0);
 	m_tc0100scn[1]->set_multiscr_xoffs(2);
 	m_tc0100scn[1]->set_multiscr_hack(1);
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
-	TC0110PCR(config, m_tc0110pcr[1], 0);
+	TC0110PCR(config, m_tc0110pcr[1]);
+	m_tc0110pcr[1]->set_shift(0);
+	m_tc0110pcr[1]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
-	TC0100SCN(config, m_tc0100scn[2], 0);
+	TC0100SCN(config, m_tc0100scn[2]);
 	m_tc0100scn[2]->set_offsets(22, 0);
 	m_tc0100scn[2]->set_multiscr_xoffs(4);
 	m_tc0100scn[2]->set_multiscr_hack(1);
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
-	TC0110PCR(config, m_tc0110pcr[2], 0);
+	TC0110PCR(config, m_tc0110pcr[2]);
+	m_tc0110pcr[2]->set_shift(0);
+	m_tc0110pcr[2]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").seat();
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "subwoofer", 0.25);
+	ymsnd.add_route(0, "subwoofer", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
 	ymsnd.add_route(1, "2610.1.r", 1.0);
 	ymsnd.add_route(2, "2610.2.l", 1.0);
 	ymsnd.add_route(2, "2610.2.r", 1.0);
 
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-//  SUBWOOFER(config, "subwoofer", 0);
+//  SUBWOOFER(config, "subwoofer");
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	TC0140SYT(config, m_tc0140syt);
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 
@@ -1378,9 +1395,9 @@ ROM_END
         DRIVERS
 *******************************************************************************/
 
-//    YEAR, NAME,     PARENT, MACHINE, INPUT,   CLASS,        INIT,       MONITOR, COMPANY,                     FULLNAME, FLAGS
-GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, later version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito Corporation Japan",   "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "The Ninja Warriors (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito Corporation America (licensed to Romstar)", "The Ninja Warriors (US, Romstar license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Uses same coinage as World, see notes */
-GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito Corporation",         "Darius II (triple screen) (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR, NAME,     PARENT, MACHINE, INPUT,   CLASS,        INIT,       MONITOR, COMPANY,                           FULLNAME,                                      FLAGS
+GAME( 1987, ninjaw,   0,      ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito",                           "The Ninja Warriors (World, later version)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjaw1,  ninjaw, ninjaw,  ninjaw,  ninjaw_state, empty_init, ROT0,    "Taito",                           "The Ninja Warriors (World, earlier version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawj,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito",                           "The Ninja Warriors (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, ninjawu,  ninjaw, ninjaw,  ninjawj, ninjaw_state, empty_init, ROT0,    "Taito America (Romstar license)", "The Ninja Warriors (US)",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Uses same coinage as World, see notes
+GAME( 1989, darius2,  0,      darius2, darius2, ninjaw_state, empty_init, ROT0,    "Taito",                           "Darius II (triple screen) (Japan, rev 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

@@ -48,16 +48,16 @@ public:
 	void tk635(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_ram;
 	required_shared_ptr<u8> m_charram;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
@@ -194,7 +194,7 @@ void tk635_state::tk635(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tk635_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &tk635_state::io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(70);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(tk635_state::screen_update));

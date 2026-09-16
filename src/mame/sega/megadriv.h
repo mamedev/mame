@@ -5,10 +5,9 @@
 
 #pragma once
 
-#include "mdioport.h"
-
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/sega_md_ioport.h"
 #include "sound/sn76496.h"
 #include "sound/ymopn.h"
 #include "video/315_5313.h"
@@ -36,7 +35,7 @@ protected:
 	{
 	}
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void md_core_ntsc(machine_config &config);
 	void md_core_pal(machine_config &config);
@@ -54,10 +53,11 @@ protected:
 	optional_ioport m_io_reset;
 
 private:
-	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+//  IRQ_CALLBACK_MEMBER(genesis_int_callback);
+	void cpu_space_map(address_map &map);
 
-	void vdp_lv6irqline_callback_genesis_68k(int state);
-	void vdp_lv4irqline_callback_genesis_68k(int state);
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
 
 	void megadriv_timers(machine_config &config);
 };
@@ -108,8 +108,6 @@ protected:
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 
-	void vdp_sndirqline_callback_genesis_z80(int state);
-
 	void megadriv_stop_scanline_timer();
 
 	void md_ntsc(machine_config &config);
@@ -118,20 +116,21 @@ protected:
 	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void megadriv_68k_base_map(address_map &map);
-	void megadriv_68k_map(address_map &map);
-	void megadriv_z80_io_map(address_map &map);
-	void megadriv_z80_map(address_map &map);
+	void megadriv_68k_base_map(address_map &map) ATTR_COLD;
+	void megadriv_68k_map(address_map &map) ATTR_COLD;
+	void megadriv_z80_io_map(address_map &map) ATTR_COLD;
+	void megadriv_z80_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_z80snd;
 	required_device<ym_generic_device> m_ymsnd;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
 
 	genesis_z80_vars m_genz80;
-	int m_version_hi_nibble;
+	uint8_t m_version_hi_nibble;
+	uint8_t m_version_lo_nibble; // 0 = non-TMSS, 1 = TMSS
 
 	required_device_array<megadrive_io_port_device, 3> m_ioports;
 
@@ -166,7 +165,7 @@ protected:
 	void ctrl1_6button(machine_config &config);
 	void ctrl2_6button(machine_config &config);
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	template <unsigned N> uint8_t ioport_in_3button();

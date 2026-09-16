@@ -38,16 +38,18 @@
 #include "emu.h"
 #include "ds2430a.h"
 
-#include <algorithm>
+#include <numeric> // std::accumulate
+#include <tuple> // std::tie
 
 #define LOG_PULSE   (1U << 1)
 #define LOG_BITS    (1U << 2)
 #define LOG_STATE   (1U << 3)
 #define LOG_DATA    (1U << 4)
 #define LOG_COMMAND (1U << 5)
-#define VERBOSE     (0)
 
+#define VERBOSE     (0)
 #include "logmacro.h"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -65,8 +67,8 @@ DEFINE_DEVICE_TYPE(DS1971, ds1971_device, "ds1971", "Dallas DS1971 EEPROM iButto
 // timing constants
 static constexpr attoseconds_t tRSTL = 480 * ATTOSECONDS_PER_MICROSECOND; // 480 μs ≤ t < ∞
 static constexpr attoseconds_t tRSTH = 480 * ATTOSECONDS_PER_MICROSECOND; // 480 μs ≤ t < ∞
-static constexpr attoseconds_t tPDL = 15 * ATTOSECONDS_PER_MICROSECOND; // 15 μs ≤ t < 60 μs
-static constexpr attoseconds_t tPDH = 120 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 240 μs
+static constexpr attoseconds_t tPDL = 120 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 240 μs
+static constexpr attoseconds_t tPDH = 16 * ATTOSECONDS_PER_MICROSECOND; // 15 μs ≤ t < 60 μs (but must exceed 15 μs for Konami Viper games)
 static constexpr attoseconds_t tSLOT = 60 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 120 μs
 static constexpr attoseconds_t tREC = 1 * ATTOSECONDS_PER_MICROSECOND; // 1 μs ≤ t < ∞
 static constexpr attoseconds_t tLOW0 = 60 * ATTOSECONDS_PER_MICROSECOND; // 60 μs ≤ t < 120 μs
@@ -381,6 +383,7 @@ TIMER_CALLBACK_MEMBER(ds1wire_device::update_state)
 	case state::ROM_READ:
 	case state::ROM_SEARCH:
 	case state::ROM_SEARCH_COMPLEMENT:
+	case state::DONE: // pull up data line after reading last bit
 		m_data_out = true;
 		break;
 
@@ -394,7 +397,6 @@ TIMER_CALLBACK_MEMBER(ds1wire_device::update_state)
 	case state::MEMORY_COMMAND:
 	case state::MEMORY_WRITE:
 	case state::ROM_SEARCH_WRITE:
-	case state::DONE:
 		// Only compilers care about cases that do nothing
 		break;
 	}
@@ -457,15 +459,18 @@ void ds2430a_device::device_start()
 
 bool ds2430a_device::nvram_read(util::read_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.read(&m_eeprom[0], 0x20, actual) || actual != 0x20)
+	std::tie(err, actual) = read(file, &m_eeprom[0], 0x20);
+	if (err || (0x20 != actual))
 		return false;
-	if (file.read(&m_rom[0], 8, actual) || actual != 8)
+	std::tie(err, actual) = read(file, &m_rom[0], 8);
+	if (err || (8 != actual))
 		return false;
 
 	if (m_rom[0] != 0x14)
 		osd_printf_error("Incorrect ROM family code (expected 14h, found %02Xh in saved data)\n", m_rom[0]);
-	u8 crc = std::accumulate(std::begin(m_rom), std::end(m_rom) - 1, u8(0), &ds1wire_crc);
+	u8 const crc = std::accumulate(std::begin(m_rom), std::end(m_rom) - 1, u8(0), &ds1wire_crc);
 	if (m_rom[7] != crc)
 		osd_printf_error("Incorrect ROM CRC (expected %02Xh, found %02Xh in saved data)\n", crc, m_rom[7]);
 
@@ -480,10 +485,13 @@ bool ds2430a_device::nvram_read(util::read_stream &file)
 
 bool ds2430a_device::nvram_write(util::write_stream &file)
 {
+	std::error_condition err;
 	size_t actual;
-	if (file.write(&m_eeprom[0], 0x20, actual) || actual != 0x20)
+	std::tie(err, actual) = write(file, &m_eeprom[0], 0x20);
+	if (err)
 		return false;
-	if (file.write(&m_rom[0], 8, actual) || actual != 8)
+	std::tie(err, actual) = write(file, &m_rom[0], 8);
+	if (err)
 		return false;
 
 	return true;

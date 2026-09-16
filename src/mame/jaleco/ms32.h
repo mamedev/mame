@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "jaleco_ms32_sysctrl.h"
@@ -27,7 +28,7 @@ public:
 	{ }
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<v70_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank_array<2> m_z80bank;
@@ -40,7 +41,7 @@ protected:
 	void sound_reset_line_w(int state);
 
 	void ms32_snd_bank_w(u8 data);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 irq_callback();
 	void configure_banks();
 	u8 latch_r();
 	void to_main_w(u8 data);
@@ -48,10 +49,10 @@ protected:
 	void sound_command_w(u32 data);
 	void irq_raise(int level, bool state);
 	void irq_init();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void base_sound_map(address_map &map);
+	void base_sound_map(address_map &map) ATTR_COLD;
 
 private:
 	u32 m_to_main = 0;
@@ -80,20 +81,18 @@ public:
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
 		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
+		, m_io_mj(*this, "KEY%u", 0U)
 	{ }
 
-	void ms32(machine_config &config);
-	void ms32_invert_lines(machine_config &config);
+	void ms32(machine_config &config) ATTR_COLD;
+	void ms32_invert_lines(machine_config &config) ATTR_COLD;
 
-	void init_ss92047_01();
-	void init_ss91022_10();
-	void init_kirarast();
-	void init_suchie2();
-	void init_ss92048_01();
-	void init_bnstars();
-	void init_ss92046_01();
+	void init_ss92047_01() ATTR_COLD;
+	void init_ss91022_10() ATTR_COLD;
+	void init_ss92048_01() ATTR_COLD;
+	void init_ss92046_01() ATTR_COLD;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value mahjong_ctrl_r();
 
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
@@ -104,10 +103,10 @@ protected:
 	required_device<ymf271_device> m_ymf;
 
 	void flipscreen_w(int state);
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
-	void ms32_map(address_map &map);
-	void ms32_sound_map(address_map &map);
+	void ms32_map(address_map &map) ATTR_COLD;
+	void ms32_sound_map(address_map &map) ATTR_COLD;
 
 private:
 	required_shared_ptr<u32> m_roz_ctrl;
@@ -121,6 +120,7 @@ private:
 	memory_share_creator<u16> m_sprram;
 	memory_share_creator<u16> m_txram;
 	memory_share_creator<u16> m_bgram;
+	optional_ioport_array<5> m_io_mj;
 
 	std::unique_ptr<u8[]> m_nvram_8;
 
@@ -178,30 +178,33 @@ public:
 	ms32_f1superbattle_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ms32_state(mconfig, type, tag)
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
+		, m_io_analog(*this, "AN%u", 0U)
 		// TODO: COPROs
 	{}
 
-	void f1superb(machine_config &config);
-	void init_f1superb();
+	void f1superb(machine_config &config) ATTR_COLD;
+	void init_f1superb() ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 private:
+	memory_share_creator<u16> m_road_vram;
+
+	required_ioport_array<3> m_io_analog;
+
+	tilemap_t* m_extra_tilemap;
+
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
 
 	void ms32_irq2_guess_w(u32 data);
 	void ms32_irq5_guess_w(u32 data);
 
-	memory_share_creator<u16> m_road_vram;
-
-	void f1superb_map(address_map &map);
+	void f1superb_map(address_map &map) ATTR_COLD;
 
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);
 
 	u32 analog_r();
-
-	tilemap_t* m_extra_tilemap;
 };
 
 #endif // MAME_JALECO_MS32_H

@@ -5,6 +5,11 @@
     Mac video support, "Sonora" edition
     Supports 5 different modelines at up to 16bpp
 
+    The original Sonora ASIC and its follow-on Ardbeg require an
+    external pixel clock source, while the version used in the PDM
+    machines has an internal clock source that automatically is set
+    appropriately for the video mode.
+
 *********************************************************************/
 
 #include "emu.h"
@@ -13,11 +18,11 @@
 DEFINE_DEVICE_TYPE(MAC_VIDEO_SONORA, mac_video_sonora_device, "mv_sonora", "Mac Sonora video support")
 
 const mac_video_sonora_device::modeline mac_video_sonora_device::modelines[5] = {
-	{ 0x02, "512x384 12\" RGB",      15667200,  640, 16, 32,  80,  407,  1, 3, 19, true  },
-	{ 0x06, "640x480 13\" RGB",      31334400,  896, 80, 64, 112,  525,  3, 3, 39, true  },
-	{ 0x01, "640x870 15\" Portrait", 57283200,  832, 32, 80,  80,  918,  3, 3, 42, false },
-	{ 0x09, "832x624 16\" RGB",      57283200, 1152, 32, 64, 224,  667,  1, 3, 39, false },
-	{ 0x0b, "640x480 VGA",           25175000,  800, 16, 96,  48,  525, 10, 2, 33, false },
+	{ 0x02, "512x384 12\" RGB",      15667200,  640, 16, 32,  80,  407,  1, 3, 19,  true, false },
+	{ 0x06, "640x480 13\" RGB",      31334400,  896, 80, 64, 112,  525,  3, 3, 39,  true, false },
+	{ 0x01, "640x870 15\" Portrait", 57283200,  832, 32, 80,  80,  918,  3, 3, 42, false,  true },
+	{ 0x09, "832x624 16\" RGB",      57283200, 1152, 32, 64, 224,  667,  1, 3, 39, false, false },
+	{ 0x0b, "640x480 VGA",           25175000,  800, 16, 96,  48,  525, 10, 2, 33, false, false },
 };
 
 mac_video_sonora_device::mac_video_sonora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -26,6 +31,7 @@ mac_video_sonora_device::mac_video_sonora_device(const machine_config &mconfig, 
 	m_palette(*this, "palette"),
 	m_monitor_config(*this, "monitor"),
 	m_screen_vblank(*this),
+	m_isPDM(false),
 	m_is32bit(false)
 {
 }
@@ -54,7 +60,7 @@ void mac_video_sonora_device::device_reset()
 
 void mac_video_sonora_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(mac_video_sonora_device::screen_update));
@@ -197,6 +203,32 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 			}
 			break;
 
+		case 1: // 2bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 32)
+				{
+					uint64_t pixels = *vram++;
+					for (int32_t bit = 62; bit >= 0; bit -= 2)
+						*scanline ++ = pens[(((pixels >> bit) & 0x3) << 6) | 0x3f];
+				}
+			}
+			break;
+
+		case 2: // 4bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 16)
+				{
+					uint64_t pixels = *vram++;
+					for (int32_t bit = 60; bit >= 0; bit -= 4)
+						*scanline ++ = pens[(((pixels >> bit) & 0x0f) << 4) | 0x0f];
+				}
+			}
+			break;
+
 		case 3: // 8bpp
 			for(uint32_t y = 0; y != vres; y++) {
 				uint32_t *scanline = &bitmap.pix(y);
@@ -204,6 +236,21 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 					uint64_t pixels = *vram ++;
 					for(int32_t bit = 56; bit >= 0; bit -= 8)
 						*scanline ++ = pens[((pixels >> bit) & 0xff)];
+				}
+			}
+			break;
+
+		case 4: // 16bpp
+			for (uint32_t y = 0; y != vres; y++)
+			{
+				uint32_t *scanline = &bitmap.pix(y);
+				for (uint32_t x = 0; x != hres; x += 4)
+				{
+					const uint64_t pixels = *vram++;
+					*scanline++ = rgb_t(((pixels >> 58) & 0x1f) << 3, ((pixels >> 53) & 0x1f) << 3, ((pixels >> 48) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 42) & 0x1f) << 3, ((pixels >> 37) & 0x1f) << 3, ((pixels >> 32) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 26) & 0x1f) << 3, ((pixels >> 21) & 0x1f) << 3, ((pixels >> 16) & 0x1f) << 3);
+					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
 				}
 			}
 			break;
@@ -272,7 +319,11 @@ void mac_video_sonora_device::vctrl_w(offs_t offset, uint8_t data)
 		if(m_modeline_id != -1 && m_modeline_id != prev_modeline) {
 			const modeline &m = modelines[m_modeline_id];
 			rectangle visarea(0, m.htot - m.hfp - m.hs - m.hbp - 1, 0, m.vtot - m.vfp - m.vs - m.vbp - 1);
-			m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot*m.vtot, m.dotclock).as_attoseconds());
+			if (m_isPDM) {
+				m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot*m.vtot, m.dotclock));
+			} else {
+				m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot * m.vtot, m_extPixelClock));
+			}
 		}
 		break;
 	}
@@ -305,7 +356,7 @@ uint8_t mac_video_sonora_device::dac_r(offs_t offset)
 		return m_pal_control;
 
 	default:
-		logerror("dac_r %x\n", offset);
+//      logerror("dac_r %x\n", offset);
 		return 0;
 	}
 }
@@ -322,7 +373,18 @@ void mac_video_sonora_device::dac_w(offs_t offset, uint8_t data)
 		switch(m_pal_idx) {
 		case 0: m_palette->set_pen_red_level(m_pal_address, data); break;
 		case 1: m_palette->set_pen_green_level(m_pal_address, data); break;
-		case 2: m_palette->set_pen_blue_level(m_pal_address, data); break;
+		case 2:
+			// monochrome monitors use the blue line as the video, so duplicate blue to all 3 primaries
+			if (modelines[m_modeline_id].monochrome) {
+				m_palette->set_pen_red_level(m_pal_address, data);
+				m_palette->set_pen_green_level(m_pal_address, data);
+				m_palette->set_pen_blue_level(m_pal_address, data);
+			}
+			else
+			{
+				m_palette->set_pen_blue_level(m_pal_address, data);
+			}
+			break;
 		}
 		m_pal_idx ++;
 		if(m_pal_idx == 3) {

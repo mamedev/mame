@@ -107,10 +107,10 @@ public:
 		m_start_lamp(*this, "start_lamp")
 	{ }
 
-	void speedbsk(machine_config &config);
+	void speedbsk(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -123,10 +123,10 @@ private:
 	output_finder<24> m_lamps;
 	output_finder<> m_start_lamp;
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void pcm_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void pcm_map(address_map &map) ATTR_COLD;
 
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -203,9 +203,9 @@ static INPUT_PORTS_START( speedbsk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("service_panel")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, right_w)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, left_w)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", upd4701_device, right_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", FUNC(upd4701_device::right_w))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", FUNC(upd4701_device::left_w))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", FUNC(upd4701_device::right_w))
 
 	PORT_START("unk")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_PGDN) PORT_CODE_INC(KEYCODE_PGUP)
@@ -364,10 +364,6 @@ void speedbsk_state::soundbank_w(uint8_t data)
 
 void speedbsk_state::machine_start()
 {
-	// resolve outputs
-	m_lamps.resolve();
-	m_start_lamp.resolve();
-
 	m_soundbank->configure_entries(0, 0x100, memregion("audiocpu")->base(), 0x2000);
 	m_soundbank->set_entry(0);
 }
@@ -396,11 +392,11 @@ void speedbsk_state::speedbsk(machine_config &config)
 	uart_clock.signal_handler().append("tmp82c51", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("tmp82c51", FUNC(i8251_device::write_rxc));
 
-	i8251_device &uart_main(I8251(config, "d71051", 0));
+	i8251_device &uart_main(I8251(config, "d71051"));
 	uart_main.txd_handler().set("tmp82c51", FUNC(i8251_device::write_rxd));
 	uart_main.rts_handler().set("tmp82c51", FUNC(i8251_device::write_cts));
 
-	PIT8254(config, "d71054", 0);
+	PIT8254(config, "d71054");
 
 	I8255(config, m_ppi[0]);
 	m_ppi[0]->out_pa_callback().set(FUNC(speedbsk_state::solenoid1_w));
@@ -442,7 +438,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
 
 	// service lcd
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*20+1, 19);
@@ -452,7 +448,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(speedbsk_state::lcd_palette), 3);
 
-	HD44780(config, m_lcd, 0);
+	HD44780(config, m_lcd, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(speedbsk_state::lcd_pixel_update));
 
@@ -465,12 +461,12 @@ void speedbsk_state::speedbsk(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &speedbsk_state::audio_io_map);
 
-	i8251_device &tmp82c51(I8251(config, "tmp82c51", 0));
+	i8251_device &tmp82c51(I8251(config, "tmp82c51"));
 	tmp82c51.rxrdy_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 	tmp82c51.txd_handler().set("d71051", FUNC(i8251_device::write_rxd));
 	tmp82c51.rts_handler().set("d71051", FUNC(i8251_device::write_cts));
 
-	msm6253_device &adc(MSM6253(config, "adc", 0));
+	msm6253_device &adc(MSM6253(config, "adc"));
 	adc.set_input_tag<0>("unk");
 
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
@@ -533,4 +529,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY  FULLNAME              FLAGS
 GAME( 1992, speedbsk, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Speed Basketball",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1993, boatrace, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Exciting Boat Race", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1993, boatrace, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Exciting Boat Race", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -83,8 +83,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t bicom_r(offs_t offset);
@@ -104,11 +104,11 @@ private:
 	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 
-	void alphatro_io(address_map &map);
-	void alphatro_map(address_map &map);
-	void cartbank_map(address_map &map);
-	void monbank_map(address_map &map);
-	void rombank_map(address_map &map);
+	void alphatro_io(address_map &map) ATTR_COLD;
+	void alphatro_map(address_map &map) ATTR_COLD;
+	void cartbank_map(address_map &map) ATTR_COLD;
+	void monbank_map(address_map &map) ATTR_COLD;
+	void rombank_map(address_map &map) ATTR_COLD;
 	void update_banking();
 
 	const bool m_is_ntsc;
@@ -619,7 +619,7 @@ static INPUT_PORTS_START( alphatro )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 
 	PORT_START("other")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF,alphatro_state,alphatro_break,0)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(alphatro_state::alphatro_break), 0)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x01, 0x00, "FDD Unit installed")
@@ -793,7 +793,6 @@ static void alphatro_floppies(device_slot_interface &device)
 }
 
 static DEVICE_INPUT_DEFAULTS_START(printer)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_4800)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_4800)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_EVEN)
@@ -809,7 +808,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	if (m_is_ntsc)
 		screen.set_raw(16_MHz_XTAL, 1016, 0, 640, 271, 0, 216);
 	else if (m_is_bicom)
@@ -841,7 +840,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_dmac->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->in_sp_callback().set_constant(1);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
@@ -860,11 +859,13 @@ void alphatro_state::alphatro(machine_config &config)
 	m_usart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 	m_usart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	clock_device &cass_clock(CLOCK(config, "cass_clock", 16_MHz_XTAL / 4 / 13 / 16)); // 19.2 kHz
+	clock_device &cass_clock(CLOCK(config, "cass_clock"));
+	cass_clock.set_period(attotime::from_hz(16_MHz_XTAL / 4 / 13 / 16)); // 19.2 kHz
 	cass_clock.signal_handler().set(FUNC(alphatro_state::kansas_w));
 	cass_clock.signal_handler().append(FUNC(alphatro_state::kansas_r));
 
-	clock_device &serial_clock(CLOCK(config, "serial_clock", 16_MHz_XTAL / 4 / 13 / 4)); // 76.8 kHz 4800 baud (can be set with jumpers)
+	clock_device &serial_clock(CLOCK(config, "serial_clock"));
+	serial_clock.set_period(attotime::from_hz(16_MHz_XTAL / 4 / 13 / 4)); // 76.8 kHz 4800 baud (can be set with jumpers)
 	serial_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_txc));
 	serial_clock.signal_handler().append(m_usart, FUNC(i8251_device::write_rxc));
 

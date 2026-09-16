@@ -50,7 +50,9 @@ public:
 
 	// The access has already happened, nothing to abort
 	void access_after_delay(u32 cycles) noexcept;
+
 	void defer_access() noexcept;
+	void retry_access() noexcept;
 
 protected:
 	// construction/destruction
@@ -58,7 +60,7 @@ protected:
 
 private:
 	// configured state
-	bool                    m_force_no_drc;             // whether or not to force DRC off
+	bool m_force_no_drc;                   // whether or not to force DRC off
 
 	bool m_access_to_be_redone;            // whether an access needs to be redone
 	const void *m_access_before_delay_tag; // if the tag matches on access_before_delay, consider the delay to have already happened

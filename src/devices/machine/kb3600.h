@@ -60,7 +60,7 @@ class ay3600_device : public device_t
 {
 public:
 	// construction/destruction
-	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// public interface
 	uint16_t b_r();
@@ -81,8 +81,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(perform_scan);
 

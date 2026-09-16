@@ -56,8 +56,8 @@ public:
 	void init_skykid();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -106,12 +106,10 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void mcu_map(address_map &map);
-	void main_map(address_map &map);
+	void mcu_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 
 /***************************************************************************
@@ -167,16 +165,12 @@ void skykid_state::palette(palette_device &palette) const
 // convert from 32x32 to 36x28
 TILEMAP_MAPPER_MEMBER(skykid_state::tx_tilemap_scan)
 {
-	int offs;
-
 	row += 2;
 	col -= 2;
 	if (col & 0x20)
-		offs = row + ((col & 0x1f) << 5);
+		return row + ((col & 0x1f) << 5);
 	else
-		offs = col + (row << 5);
-
-	return offs;
+		return col + (row << 5);
 }
 
 TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
@@ -361,8 +355,6 @@ uint32_t skykid_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-// machine
-
 void skykid_state::inputport_select_w(uint8_t data)
 {
 	if ((data & 0xe0) == 0x60)
@@ -379,19 +371,19 @@ uint8_t skykid_state::inputport_r()
 {
 	switch (m_inputport_selected)
 	{
-		case 0x00:  // DSW B (bits 0-4)
+		case 0x00: // DSW B (bits 0-4)
 			return (m_dsw[1]->read() & 0xf8) >> 3;
-		case 0x01:  // DSW B (bits 5-7), DSW A (bits 0-1)
+		case 0x01: // DSW B (bits 5-7), DSW A (bits 0-1)
 			return ((m_dsw[1]->read() & 0x07) << 2) | ((m_dsw[0]->read() & 0xc0) >> 6);
-		case 0x02:  // DSW A (bits 2-6)
+		case 0x02: // DSW A (bits 2-6)
 			return (m_dsw[0]->read() & 0x3e) >> 1;
-		case 0x03:  // DSW A (bit 7), DSW C (bits 0-3)
+		case 0x03: // DSW A (bit 7), DSW C (bits 0-3)
 			return ((m_dsw[0]->read() & 0x01) << 4) | (m_button2->read() & 0x0f);
-		case 0x04:  // coins, start
+		case 0x04: // coins, start
 			return m_system->read();
-		case 0x05:  // 2P controls
+		case 0x05: // 2P controls
 			return m_pl[1]->read();
-		case 0x06:  // 1P controls
+		case 0x06: // 1P controls
 			return m_pl[0]->read();
 		default:
 			return 0xff;
@@ -433,8 +425,6 @@ void skykid_state::irq_2_ctrl_w(offs_t offset, uint8_t data)
 
 void skykid_state::machine_start()
 {
-	m_leds.resolve();
-
 	// configure the banks
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
@@ -451,7 +441,7 @@ void skykid_state::main_map(address_map &map)
 	map(0x4800, 0x5fff).ram().share(m_spriteram);
 	map(0x6000, 0x60ff).w(FUNC(skykid_state::scroll_y_w));
 	map(0x6200, 0x63ff).w(FUNC(skykid_state::scroll_x_w));
-	map(0x6800, 0x6bff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM
+	map(0x6800, 0x6bff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
 	map(0x7000, 0x7fff).w(FUNC(skykid_state::irq_1_ctrl_w));
 	map(0x7800, 0x7fff).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0x8000, 0xffff).rom();
@@ -462,60 +452,57 @@ void skykid_state::main_map(address_map &map)
 
 void skykid_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)); // PSG device, shared RAM/
-	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));     // ?
+	map(0x1000, 0x13ff).m(m_cus30, FUNC(namco_cus30_device::amap)); // PSG device, shared RAM
+	map(0x2000, 0x3fff).w("watchdog", FUNC(watchdog_timer_device::reset_w)); // ?
 	map(0x4000, 0x7fff).w(FUNC(skykid_state::irq_2_ctrl_w));
-	map(0x8000, 0xbfff).rom();
+	map(0x8000, 0x9fff).rom().region("mcusub", 0);
 	map(0xc000, 0xc7ff).ram();
-	map(0xf000, 0xffff).rom();
 }
 
 
 
 static INPUT_PORTS_START( skykid )
-	PORT_START("DSWA")  // DSW A
-	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWA:1" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Round Skip" ) PORT_DIPLOCATION("SWA:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Freeze" ) PORT_DIPLOCATION("SWA:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:8,7")
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("SWA:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" )               PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Round Skip" )           PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SWA:3,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWA:1" )
 
-	PORT_START("DSWB")  // DSW B
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:2,1")
-	PORT_DIPSETTING(    0x80, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:4,3")
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Allow Buy In" )         PORT_DIPLOCATION("SWB:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SWB:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SWB:5" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SWB:4,3")
 	PORT_DIPSETTING(    0x00, "20k every 80k" )
 	PORT_DIPSETTING(    0x10, "20k and 80k" )
 	PORT_DIPSETTING(    0x20, "30k every 90k" )
 	PORT_DIPSETTING(    0x30, "30k and 90k" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SWB:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SWB:6" )
-	PORT_DIPNAME( 0x02, 0x02, "Allow Buy In" ) PORT_DIPLOCATION("SWB:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )       PORT_DIPLOCATION("SWB:2,1")
+	PORT_DIPSETTING(    0x80, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
 
 	PORT_START("BUTTON2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -524,7 +511,7 @@ static INPUT_PORTS_START( skykid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM")    // IN 0
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -532,7 +519,7 @@ static INPUT_PORTS_START( skykid )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")    // IN 1
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -540,7 +527,7 @@ static INPUT_PORTS_START( skykid )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")    // IN 2
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -552,13 +539,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( skykids )
 	PORT_INCLUDE( skykid )
 
-	PORT_MODIFY("DSWA")  // DSW A
-	PORT_DIPNAME( 0x08, 0x08, "Round Select" ) PORT_DIPLOCATION("SWA:5")
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x08, 0x08, "Round Select" )         PORT_DIPLOCATION("SWA:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 
-	PORT_MODIFY("DSWB")  // DSW B
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SWB:4,3")
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SWB:4,3")
 	PORT_DIPSETTING(    0x00, "30k every 80k" )
 	PORT_DIPSETTING(    0x10, "30k and 80k" )
 	PORT_DIPSETTING(    0x20, "40k every 90k" )
@@ -566,51 +553,51 @@ static INPUT_PORTS_START( skykids )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( drgnbstr )
-	PORT_START("DSWA")  // DSW A
-	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWA:1" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Round Skip" ) PORT_DIPLOCATION("SWA:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Freeze" ) PORT_DIPLOCATION("SWA:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:8,7")
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )      PORT_DIPLOCATION("SWA:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Freeze" )               PORT_DIPLOCATION("SWA:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Round Skip" )           PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_A ) )      PORT_DIPLOCATION("SWA:3,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWA:1" )
 
-	PORT_START("DSWB")  // DSW B
-	PORT_DIPNAME( 0x80, 0x80, "Spurt Time" ) PORT_DIPLOCATION("SWB:1")
-	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x40, 0x40, "Level of Monster" ) PORT_DIPLOCATION("SWB:2")
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:8") // When vitality is under 32
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Bonus Level" )          PORT_DIPLOCATION("SWB:7") // Clear Round
+	PORT_DIPSETTING(    0x00, "Partial" )
+	PORT_DIPSETTING(    0x02, "Full" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Vitality" )       PORT_DIPLOCATION("SWB:6,5") // Clear Mountain, Tower, etc...
+	PORT_DIPSETTING(    0x04, "32/64" )
+	PORT_DIPSETTING(    0x08, "48/64" )
+	PORT_DIPSETTING(    0x00, "64" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+	PORT_DIPNAME( 0x30, 0x30, "Starting Vitality" )    PORT_DIPLOCATION("SWB:4,3")
+	PORT_DIPSETTING(    0x20, "64" )
+	PORT_DIPSETTING(    0x10, "96" )
+	PORT_DIPSETTING(    0x30, "128" )
+	PORT_DIPSETTING(    0x00, "160" )
+	PORT_DIPNAME( 0x40, 0x40, "Level of Monster" )     PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x30, 0x30, "Starting Vitality" ) PORT_DIPLOCATION("SWB:4,3")
-	PORT_DIPSETTING(    0x00, "160" )
-	PORT_DIPSETTING(    0x30, "128" )
-	PORT_DIPSETTING(    0x10, "96" )
-	PORT_DIPSETTING(    0x20, "64" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Vitality" ) PORT_DIPLOCATION("SWB:6,5") /* Clear Mountain, Tower, ect... */
-	PORT_DIPSETTING(    0x00, "64" )
-	PORT_DIPSETTING(    0x08, "48/64" )
-	PORT_DIPSETTING(    0x04, "32/64" )
-	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x02, 0x02, "Bonus Level" ) PORT_DIPLOCATION("SWB:7")    /* Clear Round */
-	PORT_DIPSETTING(    0x02, "Full" )
-	PORT_DIPSETTING(    0x00, "Partial" )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:8")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Spurt Time" )           PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 
 	PORT_START("BUTTON2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -621,7 +608,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM")    // IN 0
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -629,7 +616,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")    // IN 1
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -637,7 +624,7 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")    // IN 2
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
@@ -710,15 +697,15 @@ void skykid_state::skykid(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &skykid_state::mcu_map);
 	m_mcu->in_p1_cb().set(FUNC(skykid_state::inputport_r));
 	m_mcu->out_p1_cb().set(FUNC(skykid_state::inputport_select_w));
-	m_mcu->in_p2_cb().set_constant(0xff);                           // leds won't work otherwise
+	m_mcu->in_p2_cb().set_constant(0xff); // leds won't work otherwise
 	m_mcu->out_p2_cb().set(FUNC(skykid_state::led_w));
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // we need heavy synch
+	config.set_maximum_quantum(attotime::from_hz(6000)); // we need heavy sync
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.606060);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(36*8, 28*8);
@@ -734,7 +721,6 @@ void skykid_state::skykid(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	NAMCO_CUS30(config, m_cus30, 49152000 / 2048);
-	m_cus30->set_voices(8);
 	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -745,9 +731,11 @@ ROM_START( skykid ) // a PCB was found with ROM 4 and 6 labeled sk1, but hashes 
 	ROM_LOAD( "sk1-1c.6b",    0x0c000, 0x4000, CRC(7abe6c6c) SHA1(7d2631cc6149fa3e02b1355cb899de5474ff5d0a) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk2_4.3c",       0x8000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
-	ROM_LOAD( "cus63-63a1.mcu", 0xf000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus63-63a1.mcu", 0x0000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk2_4.3c",     0x0000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -775,9 +763,11 @@ ROM_START( skykido )
 	ROM_LOAD( "sk1_1.6b",     0x0c000, 0x4000, CRC(070a49d4) SHA1(4b994bde3e34b574bd927843804d2fb1a08d1bdf) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk2_4.3c",       0x8000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
-	ROM_LOAD( "cus63-63a1.mcu", 0xf000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus63-63a1.mcu", 0x0000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk2_4.3c",     0x0000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -805,9 +795,11 @@ ROM_START( skykidd )
 	ROM_LOAD( "sk1_1.6b",     0x0c000, 0x4000, CRC(070a49d4) SHA1(4b994bde3e34b574bd927843804d2fb1a08d1bdf) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk1_4.3c",       0x8000, 0x2000, CRC(887137cc) SHA1(dd0f66afb78833c4da73539b692854346f448c0d) )  // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk1_4.3c",     0x0000, 0x2000, CRC(887137cc) SHA1(dd0f66afb78833c4da73539b692854346f448c0d) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -835,9 +827,11 @@ ROM_START( skykids )
 	ROM_LOAD( "sk1a.6b",     0x0c000, 0x4000, CRC(e16abe25) SHA1(78e0d30b15fb62c4399d847784ddc61f6819feba) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )   // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "sk2_4.3c",       0x8000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
-	ROM_LOAD( "cus63-63a1.mcu", 0xf000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus63-63a1.mcu", 0x0000, 0x1000, CRC(6ef08fb3) SHA1(4842590d60035a0059b0899eb2d5f58ae72c2529) )  // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "sk2_4.3c",     0x0000, 0x2000, CRC(a460d0e0) SHA1(7124ffeb3b84b282940dcbf9421ae4934bcce1c8) )  // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "sk1_6.6l",     0x0000, 0x2000, CRC(58b731b9) SHA1(40f7be85914833ce02a734c20d68c0db8b77911d) )
@@ -865,9 +859,11 @@ ROM_START( drgnbstr )
 	ROM_LOAD( "db1_1.6b",     0x0c000, 0x04000, CRC(1c7c1821) SHA1(8b6111afc42e2996bdc2fc276be0c40556cd431e) )
 	ROM_LOAD( "db1_3.6d",     0x10000, 0x04000, CRC(6da169ae) SHA1(235211c26562fef0660e3fde1e87f2e52626d119) )  // banked ROM
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "db1_4.3c",       0x8000, 0x02000, CRC(8a0b1fc1) SHA1(c2861d0da63e2d17f2d1ad46dccf753ecd902ce3) ) // subprogram for the MCU
-	ROM_LOAD( "cus60-60a1.mcu", 0xf000, 0x01000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // MCU internal code
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) // MCU internal code
+
+	ROM_REGION( 0x2000, "mcusub", 0 )
+	ROM_LOAD( "db1_4.3c",     0x0000, 0x2000, CRC(8a0b1fc1) SHA1(c2861d0da63e2d17f2d1ad46dccf753ecd902ce3) ) // subprogram for the MCU
 
 	ROM_REGION( 0x02000, "chars", 0 )
 	ROM_LOAD( "db1_6.6l",     0x0000, 0x2000, CRC(c080b66c) SHA1(05dcd45274d0bd12ef8ae7fd10c8719e679b3e7b) )

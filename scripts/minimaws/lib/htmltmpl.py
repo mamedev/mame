@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -131,13 +131,6 @@ MACHINE_BIOS_PROLOGUE = string.Template(
 
 MACHINE_BIOS_OPTION = string.Template(
         '        <option value="${name}" data-isdefault="${isdefault}">${name} - ${description}</option>\n')
-
-MACHINE_RAM_PROLOGUE = string.Template(
-        '    <h3>RAM Size</h3>\n' \
-        '    <select id="select-ram-option" onchange="update_cmd_preview()">\n')
-
-MACHINE_RAM_OPTION = string.Template(
-        '        <option value="${name}" data-isdefault="${isdefault}">${name} (${size})</option>\n')
 
 MACHINE_SLOTS_PLACEHOLDER_PROLOGUE = string.Template(
         '    <h3>Slots</h3>\n' \

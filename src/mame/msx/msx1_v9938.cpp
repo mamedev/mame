@@ -68,7 +68,7 @@ protected:
 	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, const internal_layout &layout);
 	void svi738_base(machine_config &config, const internal_layout &layout);
 
-	void io_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<v9938_device> m_v9938;
 };

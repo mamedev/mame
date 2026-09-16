@@ -10,10 +10,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <list>
-#include <map>
-#include "emuopts.h"
-#include "debug/debugcpu.h"
 
 #include "emumem_mud.h"
 #include "emumem_hea.h"
@@ -26,6 +22,14 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 #include "emumem_hws.h"
+
+#include "emuopts.h"
+#include "debug/debugcpu.h"
+
+#include "mfpresolve.h"
+
+#include <list>
+#include <map>
 
 
 //**************************************************************************
@@ -310,23 +314,24 @@ public:
 		m_root_write->detach(handlers);
 	}
 
-	// generate accessor table
-	virtual void accessors(data_accessors &accessors) const override
+	// generate specific accessor info
+	virtual specific_access_info specific_accessors() const override
 	{
-		accessors.read_byte = reinterpret_cast<u8 (*)(address_space &, offs_t)>(&read_byte_static);
-		accessors.read_word = reinterpret_cast<u16 (*)(address_space &, offs_t)>(&read_word_static);
-		accessors.read_word_masked = reinterpret_cast<u16 (*)(address_space &, offs_t, u16)>(&read_word_masked_static);
-		accessors.read_dword = reinterpret_cast<u32 (*)(address_space &, offs_t)>(&read_dword_static);
-		accessors.read_dword_masked = reinterpret_cast<u32 (*)(address_space &, offs_t, u32)>(&read_dword_masked_static);
-		accessors.read_qword = reinterpret_cast<u64 (*)(address_space &, offs_t)>(&read_qword_static);
-		accessors.read_qword_masked = reinterpret_cast<u64 (*)(address_space &, offs_t, u64)>(&read_qword_masked_static);
-		accessors.write_byte = reinterpret_cast<void (*)(address_space &, offs_t, u8)>(&write_byte_static);
-		accessors.write_word = reinterpret_cast<void (*)(address_space &, offs_t, u16)>(&write_word_static);
-		accessors.write_word_masked = reinterpret_cast<void (*)(address_space &, offs_t, u16, u16)>(&write_word_masked_static);
-		accessors.write_dword = reinterpret_cast<void (*)(address_space &, offs_t, u32)>(&write_dword_static);
-		accessors.write_dword_masked = reinterpret_cast<void (*)(address_space &, offs_t, u32, u32)>(&write_dword_masked_static);
-		accessors.write_qword = reinterpret_cast<void (*)(address_space &, offs_t, u64)>(&write_qword_static);
-		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space &, offs_t, u64, u64)>(&write_qword_masked_static);
+		specific_access_info accessors;
+
+		accessors.native_bytes = 1 << Width;
+		accessors.native_mask_bits = ((Width + AddrShift) >= 0) ? (Width + AddrShift) : 0;
+		accessors.address_width = addr_width();
+		accessors.low_bits = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+		accessors.read.dispatch = reinterpret_cast<void const *const *>(m_dispatch_read);
+		accessors.write.dispatch = reinterpret_cast<void const *const *>(m_dispatch_write);
+
+		auto readfunc = &handler_entry_read<Width, AddrShift>::read;
+		auto writefunc = &handler_entry_write<Width, AddrShift>::write;
+		std::tie(accessors.read.function, accessors.read.displacement, accessors.read.is_virtual) = util::resolve_member_function(readfunc);
+		std::tie(accessors.write.function, accessors.write.displacement, accessors.write.is_virtual) = util::resolve_member_function(writefunc);
+
+		return accessors;
 	}
 
 	// return a pointer to the read bank, or nullptr if none
@@ -370,6 +375,7 @@ public:
 
 	// virtual access to these functions
 	u8 read_byte(offs_t address) override { if constexpr(Width == 0) return read_native(address & ~NATIVE_MASK); else return memory_read_generic<Width, AddrShift, Endian, 0, true>(rop(), address, 0xff); }
+	u8 read_byte(offs_t address, u8 mask) override { return memory_read_generic<Width, AddrShift, Endian, 0, true>(rop(), address, mask); }
 	u16 read_word(offs_t address) override { if constexpr(Width == 1) return read_native(address & ~NATIVE_MASK); else return memory_read_generic<Width, AddrShift, Endian, 1, true>(rop(), address, 0xffff); }
 	u16 read_word(offs_t address, u16 mask) override { return memory_read_generic<Width, AddrShift, Endian, 1, true>(rop(), address, mask); }
 	u16 read_word_unaligned(offs_t address) override { return memory_read_generic<Width, AddrShift, Endian, 1, false>(rop(), address, 0xffff); }
@@ -384,6 +390,7 @@ public:
 	u64 read_qword_unaligned(offs_t address, u64 mask) override { return memory_read_generic<Width, AddrShift, Endian, 3, false>(rop(), address, mask); }
 
 	void write_byte(offs_t address, u8 data) override { if constexpr(Width == 0) write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 0, true>(wop(), address, data, 0xff); }
+	void write_byte(offs_t address, u8 data, u8 mask) override { memory_write_generic<Width, AddrShift, Endian, 0, true>(wop(), address, data, mask); }
 	void write_word(offs_t address, u16 data) override { if constexpr(Width == 1) write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 1, true>(wop(), address, data, 0xffff); }
 	void write_word(offs_t address, u16 data, u16 mask) override { memory_write_generic<Width, AddrShift, Endian, 1, true>(wop(), address, data, mask); }
 	void write_word_unaligned(offs_t address, u16 data) override { memory_write_generic<Width, AddrShift, Endian, 1, false>(wop(), address, data, 0xffff); }
@@ -396,23 +403,6 @@ public:
 	void write_qword(offs_t address, u64 data, u64 mask) override { memory_write_generic<Width, AddrShift, Endian, 3, true>(wop(), address, data, mask); }
 	void write_qword_unaligned(offs_t address, u64 data) override { memory_write_generic<Width, AddrShift, Endian, 3, false>(wop(), address, data, 0xffffffffffffffffU); }
 	void write_qword_unaligned(offs_t address, u64 data, u64 mask) override { memory_write_generic<Width, AddrShift, Endian, 3, false>(wop(), address, data, mask); }
-
-
-	// static access to these functions
-	static u8 read_byte_static(this_type &space, offs_t address) { return Width == 0 ? space.read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 0, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, 0xff); }
-	static u16 read_word_static(this_type &space, offs_t address) { return Width == 1 ? space.read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 1, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, 0xffff); }
-	static u16 read_word_masked_static(this_type &space, offs_t address, u16 mask) { return memory_read_generic<Width, AddrShift, Endian, 1, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, mask); }
-	static u32 read_dword_static(this_type &space, offs_t address) { return Width == 2 ? space.read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 2, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, 0xffffffff); }
-	static u32 read_dword_masked_static(this_type &space, offs_t address, u32 mask) { return memory_read_generic<Width, AddrShift, Endian, 2, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, mask); }
-	static u64 read_qword_static(this_type &space, offs_t address) { return Width == 3 ? space.read_native(address & ~NATIVE_MASK) : memory_read_generic<Width, AddrShift, Endian, 3, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, 0xffffffffffffffffU); }
-	static u64 read_qword_masked_static(this_type &space, offs_t address, u64 mask) { return memory_read_generic<Width, AddrShift, Endian, 3, true>([&space](offs_t offset, NativeType mask) -> NativeType { return space.read_native(offset, mask); }, address, mask); }
-	static void write_byte_static(this_type &space, offs_t address, u8 data) { if (Width == 0) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 0, true>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xff); }
-	static void write_word_static(this_type &space, offs_t address, u16 data) { if (Width == 1) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 1, true>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xffff); }
-	static void write_word_masked_static(this_type &space, offs_t address, u16 data, u16 mask) { memory_write_generic<Width, AddrShift, Endian, 1, true>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, mask); }
-	static void write_dword_static(this_type &space, offs_t address, u32 data) { if (Width == 2) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 2, true>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xffffffff); }
-	static void write_dword_masked_static(this_type &space, offs_t address, u32 data, u32 mask) { memory_write_generic<Width, AddrShift, Endian, 2, true>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, mask); }
-	static void write_qword_static(this_type &space, offs_t address, u64 data) { if (Width == 3) space.write_native(address & ~NATIVE_MASK, data); else memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, 0xffffffffffffffffU); }
-	static void write_qword_masked_static(this_type &space, offs_t address, u64 data, u64 mask) { memory_write_generic<Width, AddrShift, Endian, 3, false>([&space](offs_t offset, NativeType data, NativeType mask) { space.write_native(offset, data, mask); }, address, data, mask); }
 
 	handler_entry_read <Width, AddrShift> *m_root_read;
 	handler_entry_write<Width, AddrShift> *m_root_write;
@@ -1034,9 +1024,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_read_before_time(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1053,9 +1043,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_read_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1072,9 +1062,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_read_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1093,9 +1083,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_write_before_time(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1112,9 +1102,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_write_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1131,9 +1121,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_write_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1151,9 +1141,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_readwrite_before_time(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1172,9 +1162,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_readwrite_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1193,9 +1183,9 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_device.tag());
 
 	VPRINTF("address_space::install_readwrite_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,

@@ -37,7 +37,7 @@ bool flat_ram_device_base<Base>::check_ram(std::string &message)
 	memory_region *const nvramregion(this->cart_nvram_region());
 	auto const rambytes(ramregion ? ramregion->bytes() : 0);
 	auto const nvrambytes(nvramregion ? nvramregion->bytes() : 0);
-	if (rambytes && nvrambytes && ((rambytes > nvrambytes) || ((nvrambytes - 1) & nvrambytes)))
+	if (rambytes && nvrambytes && ((rambytes > nvrambytes) || !std::has_single_bit(nvrambytes)))
 	{
 		message = "Unsupported cartridge RAM size (if not all RAM is battery-backed, battery backed RAM size must be a power of two, and at least half the total RAM must be battery-backed)";
 		return false;
@@ -123,7 +123,7 @@ void flat_ram_device_base<Base>::install_ram()
 						this->cart_space()->install_ram(begin, end, mirror, &rambase[src]);
 					});
 		}
-		else if ((0x2000 > nvrambytes) && !((nvrambytes - 1) & nvrambytes) && (nvrambytes >= rambytes))
+		else if ((0x2000 > nvrambytes) && std::has_single_bit(nvrambytes) && (nvrambytes >= rambytes))
 		{
 			device_generic_cart_interface::install_non_power_of_two<0>(
 					rambytes,
@@ -193,7 +193,7 @@ bool mbc_ram_device_base<Base>::check_ram(std::string &message)
 	memory_region *const nvramregion(this->cart_nvram_region());
 	auto const rambytes(ramregion ? ramregion->bytes() : 0);
 	auto const nvrambytes(nvramregion ? nvramregion->bytes() : 0);
-	if (rambytes && nvrambytes && ((rambytes & (PAGE_RAM_SIZE - 1)) || (nvrambytes & (PAGE_RAM_SIZE - 1)) || ((nvrambytes - 1) & nvrambytes)))
+	if (rambytes && nvrambytes && ((rambytes & (PAGE_RAM_SIZE - 1)) || (nvrambytes & (PAGE_RAM_SIZE - 1)) || !std::has_single_bit(nvrambytes)))
 	{
 		message = "Unsupported cartridge RAM size (if not all RAM is battery-backed, battery backed RAM size must be a power of two no smaller than 8 KiB, and total RAM size must be a multiple of 8 KiB)";
 		return false;
@@ -243,7 +243,7 @@ bool mbc_ram_device_base<Base>::configure_bank_ram(std::string &message)
 				1U << m_bank_bits_ram);
 		return false;
 	}
-	else if (rambytes && nvrambytes && ((nvrambytes - 1) & nvrambytes))
+	else if (rambytes && nvrambytes && !std::has_single_bit(nvrambytes))
 	{
 		message = "Unsupported cartridge RAM size (if not all RAM is battery-backed, battery backed RAM size must be a power of two no smaller than 8 KiB, and total RAM size must be a multiple of 8 KiB)";
 		return false;

@@ -46,8 +46,8 @@ public:
 	void pooyan(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -79,11 +79,9 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void vblank_irq(int state);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -232,8 +230,7 @@ void pooyan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int const flipx = ~m_spriteram[1][offs] & 0x40;
 		int const flipy = m_spriteram[1][offs] & 0x80;
 
-
-			m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
+		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
 			code,
 			color,
 			flipx, flipy,
@@ -257,8 +254,6 @@ uint32_t pooyan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -425,10 +420,8 @@ void pooyan_state::machine_start()
 
 void pooyan_state::pooyan(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(18'432'000);
-
 	// basic machine hardware
-	Z80(config, m_maincpu, MASTER_CLOCK / 3 / 2);
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 3 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pooyan_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
@@ -443,10 +436,8 @@ void pooyan_state::pooyan(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // measured ~60.6Hz
 	screen.set_screen_update(FUNC(pooyan_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(pooyan_state::vblank_irq));

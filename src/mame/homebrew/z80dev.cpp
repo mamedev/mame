@@ -42,10 +42,8 @@ private:
 	void display_w(offs_t offset, uint8_t data);
 	uint8_t test_r();
 
-	virtual void machine_start() override;
-
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	output_finder<6> m_digits;
@@ -63,11 +61,6 @@ void z80dev_state::display_w(offs_t offset, uint8_t data)
 uint8_t z80dev_state::test_r()
 {
 	return machine().rand();
-}
-
-void z80dev_state::machine_start()
-{
-	m_digits.resolve();
 }
 
 void z80dev_state::mem_map(address_map &map)

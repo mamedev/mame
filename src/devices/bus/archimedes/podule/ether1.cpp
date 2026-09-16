@@ -12,35 +12,35 @@
 #include "ether1.h"
 #include "machine/i82586.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
-class arc_ether1_aka25_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_ether1_aka25_device : public device_t, public device_archimedes_podule_interface
 {
 public:
 	// construction/destruction
 	arc_ether1_aka25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_archimedes_podule_interface overrides
-	virtual void ioc_map(address_map &map) override;
+	virtual void ioc_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_memory_region m_podule_rom;
 	required_shared_ptr<u16> m_ram;
 	required_device<i82586_device> m_lance;
 
-	void lan_map(address_map &map);
+	void lan_map(address_map &map) ATTR_COLD;
 
 	void checksum();
 	void control_w(u8 data);
@@ -52,10 +52,10 @@ private:
 
 void arc_ether1_aka25_device::ioc_map(address_map &map)
 {
-	map(0x0000, 0x003f).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 4) & 0x1f)]; })).umask32(0x000000ff);
+	map(0x0000, 0x003f).mirror(0x1fc0).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 4) & 0x1f)]; })).umask32(0x000000ff);
 	map(0x0000, 0x0000).lw8(NAME([this](u8 data) { m_ram_page = data & 0x0f; }));
 	map(0x0004, 0x0004).w(FUNC(arc_ether1_aka25_device::control_w));
-	map(0x2000, 0x3fff).lrw8(NAME([this](offs_t offset) { return m_ram[offset | (m_ram_page << 11)]; }), NAME([this](offs_t offset, u16 data) { m_ram[offset | (m_ram_page << 11)] = data; })).umask32(0x0000ffff);
+	map(0x2000, 0x3fff).lrw16(NAME([this](offs_t offset) { return m_ram[offset | (m_ram_page << 11)]; }), NAME([this](offs_t offset, u16 data) { m_ram[offset | (m_ram_page << 11)] = data; })).umask32(0x0000ffff);
 }
 
 
@@ -160,7 +160,7 @@ void arc_ether1_aka25_device::checksum()
 	}
 
 	// get CRC from PROM
-	u32 checksum = (m_podule_rom->base()[31] << 24) | (m_podule_rom->base()[30] << 16) | (m_podule_rom->base()[29] << 8) | (m_podule_rom->base()[28] << 0);
+	u32 checksum = get_u32le(&m_podule_rom->base()[28]);
 
 	// test to see if the same
 	logerror("checksum: %08x %s\n", chk, checksum == chk ? "Pass" : "Fail");

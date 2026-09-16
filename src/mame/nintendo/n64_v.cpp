@@ -103,14 +103,9 @@ void n64_state::video_start()
 {
 	m_rdp = std::make_unique<n64_rdp>(*this, m_rdram, m_rsp_dmem);
 
-	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
 	m_rdp->set_n64_periphs(m_rcp_periphs);
-
-	m_rdp->m_blender.set_machine(machine());
-	m_rdp->m_blender.set_processor(m_rdp.get());
-
-	m_rdp->m_tex_pipe.set_machine(machine());
+	m_rcp_periphs->set_rdp(*m_rdp);
 
 	m_rdp->m_aux_buf = make_unique_clear<uint8_t[]>(EXTENT_AUX_COUNT);
 
@@ -174,11 +169,11 @@ uint32_t n64_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	if (m_rcp_periphs->is_interlace_mode())
 	{
 		m_rcp_periphs->video_update(m_interlace_bitmap[m_rcp_periphs->get_current_field()]);
-		for (int y=cliprect.min_y; y <= cliprect.max_y; y ++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			const u8 line_field = y & 1;
 			const u16 y_field_line = y >> 1;
-			for (int x = cliprect.min_x; x<=cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				bitmap.pix(y, x) = m_interlace_bitmap[line_field].pix(y_field_line, x);
 			}
@@ -2988,7 +2983,11 @@ void n64_rdp::process_command_list()
 
 /*****************************************************************************/
 
-n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8>(state.machine())
+n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem)
+	: poly_manager<uint32_t, rdp_poly_state, 8>(state.machine())
+	, m_blender(state.machine(), *this)
+	, m_tex_pipe(*this)
+	, m_machine(state.machine())
 {
 	ignore = false;
 	dolog = false;
@@ -3012,7 +3011,6 @@ n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manag
 
 	m_tmem = nullptr;
 
-	m_machine = nullptr;
 	m_n64_periphs = nullptr;
 
 	//memset(m_hidden_bits, 3, 8388608);
@@ -3490,11 +3488,7 @@ void n64_rdp::span_draw_1cycle(int32_t scanline, const extent_t &extent, const r
 	const uint32_t zb = object.m_misc_state.m_zb_address >> 1;
 	const uint32_t zhb = object.m_misc_state.m_zb_address;
 
-#ifdef PTR64
-	assert(extent.userdata != (const void *)0xcccccccccccccccc);
-#else
-	assert(extent.userdata != (const void *)0xcccccccc);
-#endif
+	assert(uintptr_t(extent.userdata) != uintptr_t(uint64_t(0xcccccccc'cccccccc)));
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
 	m_tex_pipe.calculate_clamp_diffs(tilenum, userdata, object);
@@ -3813,11 +3807,7 @@ void n64_rdp::span_draw_2cycle(int32_t scanline, const extent_t &extent, const r
 	int32_t news = 0;
 	int32_t newt = 0;
 
-#ifdef PTR64
-	assert(extent.userdata != (const void *)0xcccccccccccccccc);
-#else
-	assert(extent.userdata != (const void *)0xcccccccc);
-#endif
+	assert(uintptr_t(extent.userdata) != uintptr_t(uint64_t(0xcccccccc'cccccccc)));
 	rdp_span_aux* userdata = (rdp_span_aux*)extent.userdata;
 
 	m_tex_pipe.calculate_clamp_diffs(tile1, userdata, object);

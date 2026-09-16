@@ -137,8 +137,8 @@ public:
 	void sbubsm(machine_config &config);
 
 private:
-	void topshoot_68k_map(address_map &map);
-	void sbubsm_68k_map(address_map &map);
+	void topshoot_68k_map(address_map &map) ATTR_COLD;
+	void sbubsm_68k_map(address_map &map) ATTR_COLD;
 
 	uint16_t topshoot_200051_r();
 	uint16_t sbubsm_400000_r();

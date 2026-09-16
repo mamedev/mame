@@ -41,8 +41,7 @@ private:
 	{
 		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
 
-		size_t nbytes;
-		src.infile->read(src.buffer, INPUT_BUF_SIZE, nbytes); // TODO: check error return
+		auto [err, nbytes] = read(*src.infile, src.buffer, INPUT_BUF_SIZE); // TODO: check error return
 
 		if (0 >= nbytes)
 		{

@@ -71,21 +71,27 @@
 // http://www.hpmuseum.net/exhibit.php?class=1&cat=9 - Last but not least: HP museum pages for HP80
 
 #include "emu.h"
-#include "emupal.h"
-#include "screen.h"
+
+#include "hp80_optrom.h"
+
+#include "bus/hp80_io/82937.h"
+#include "bus/hp80_io/hp80_io.h"
 #include "cpu/capricorn/capricorn.h"
-#include "speaker.h"
+#include "imagedev/bitbngr.h"
+#include "machine/1ma6.h"
+#include "machine/bankdev.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
-#include "machine/1ma6.h"
-#include "hp80_optrom.h"
-#include "machine/ram.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "softlist_dev.h"
-#include "machine/bankdev.h"
-#include "bus/hp80_io/hp80_io.h"
-#include "bus/hp80_io/82937.h"
-#include "imagedev/bitbngr.h"
+#include "speaker.h"
+
+#include <bit>
+
 #include "hp86b.lh"
 
 // Debugging
@@ -153,12 +159,12 @@ public:
 protected:
 	void hp80_base(machine_config &config);
 
-	virtual void cpu_mem_map(address_map &map);
-	virtual void rombank_mem_map(address_map &map);
+	virtual void cpu_mem_map(address_map &map) ATTR_COLD;
+	virtual void rombank_mem_map(address_map &map) ATTR_COLD;
 	virtual void unmap_optroms(address_space &space);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t intack_r();
 
@@ -275,8 +281,8 @@ void hp80_base_state::hp80_base(machine_config &config)
 
 	// Beeper
 	SPEAKER(config, "mono").front_center();
-	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
-	BEEP(config, m_beep, CPU_CLOCK / 512).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, 0);
+	BEEP(config, m_beep, CPU_CLOCK / 512).add_route(ALL_OUTPUTS, "mono", 0.5, 0);
 
 	// Optional ROMs
 	for (auto& finder : m_rom_drawers) {
@@ -705,7 +711,7 @@ static const uint8_t keyboard_table[ 80 ][ 2 ] = {
 bool hp80_base_state::kb_scan_ioport(ioport_value pressed , unsigned idx_base , uint8_t& row , uint8_t& col)
 {
 	if (pressed) {
-		unsigned bit_no = 31 - count_leading_zeros_32(pressed);
+		unsigned bit_no = std::bit_width(pressed) - 1;
 		row = (idx_base + bit_no) / 8;
 		col = (idx_base + bit_no) % 8;
 		return true;
@@ -990,8 +996,8 @@ public:
 	void hp85(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
@@ -1008,7 +1014,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(vm_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(prt_busy_timer);
 
-	virtual void cpu_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
 	virtual void unmap_optroms(address_space &space) override;
 
 	required_device<screen_device> m_screen;
@@ -1574,7 +1580,7 @@ void hp85_state::hp85(machine_config &config)
 
 	m_cpu->set_addrmap(AS_PROGRAM, &hp85_state::cpu_mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192);
 	m_screen->set_screen_update(FUNC(hp85_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(hp85_state::vblank_w));
@@ -1584,11 +1590,11 @@ void hp85_state::hp85(machine_config &config)
 	TIMER(config, m_prt_busy_timer).configure_generic(FUNC(hp85_state::prt_busy_timer));
 
 	// Tape drive
-	HP_1MA6(config, "tape", 0);
+	HP_1MA6(config, "tape");
 
 	// Printer output
-	BITBANGER(config, m_prt_graph_out, 0);
-	BITBANGER(config, m_prt_alpha_out, 0);
+	BITBANGER(config, m_prt_graph_out);
+	BITBANGER(config, m_prt_alpha_out);
 
 	SOFTWARE_LIST(config, "optrom_list").set_original("hp85_rom");
 }
@@ -1633,11 +1639,11 @@ public:
 	void hp86(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void cpu_mem_map(address_map &map) override;
-	virtual void rombank_mem_map(address_map &map) override;
+	virtual void cpu_mem_map(address_map &map) override ATTR_COLD;
+	virtual void rombank_mem_map(address_map &map) override ATTR_COLD;
 	virtual void unmap_optroms(address_space &space) override;
 
 private:
@@ -1751,7 +1757,7 @@ void hp86_state::hp86(machine_config &config)
 
 	RAM(config , m_ram).set_default_size("128K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK , 784 , 0 , 640 , 261 , 0 , 240);
 	m_screen->set_screen_update(FUNC(hp86_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(hp86_state::vblank_w));
@@ -1770,8 +1776,6 @@ void hp86_state::hp86(machine_config &config)
 void hp86_state::machine_start()
 {
 	hp80_base_state::machine_start();
-
-	m_run_light.resolve();
 
 	m_screen->register_screen_bitmap(m_bitmap);
 	m_video_mem = std::make_unique<uint8_t[]>(VIDEO_MEM_SIZE);
@@ -2250,7 +2254,7 @@ public:
 	hp86_int_state(const machine_config &mconfig, device_type type, const char *tag);
 
 protected:
-	virtual void rombank_mem_map(address_map &map) override;
+	virtual void rombank_mem_map(address_map &map) override ATTR_COLD;
 	virtual void unmap_optroms(address_space &space) override;
 };
 

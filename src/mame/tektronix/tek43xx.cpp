@@ -27,7 +27,7 @@ public:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 };
@@ -54,7 +54,7 @@ void tek43xx_state::tek4319(machine_config &config)
 	M68020(config, m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tek43xx_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(60 * 1600 * 1066, 1600, 0, 1280, 1066, 0, 1024); // not confirmed except for displayed resolution
 	screen.set_screen_update(FUNC(tek43xx_state::screen_update));
 }
@@ -67,4 +67,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP(1988, tek4319, 0, 0, tek4319, tek4319, tek43xx_state, empty_init, "Tektronix", "4319 Graphics Workstation", MACHINE_IS_SKELETON)
+COMP(1988, tek4319, 0, 0, tek4319, tek4319, tek43xx_state, empty_init, "Tektronix", "4319 Graphics Workstation", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

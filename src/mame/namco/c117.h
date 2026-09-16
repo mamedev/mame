@@ -19,7 +19,7 @@ class namco_c117_device :
 {
 public:
 	//construction/destruction
-	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	template <typename T, typename U> void set_cpu_tags(T &&maintag, U &&subtag)
@@ -41,9 +41,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

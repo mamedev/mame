@@ -22,5 +22,5 @@ midiout_port_device::midiout_port_device(const machine_config &mconfig, const ch
 
 void midiout_port_device::device_add_mconfig(machine_config &config)
 {
-	MIDIOUT(config, m_midiout, 0);
+	MIDIOUT(config, m_midiout);
 }

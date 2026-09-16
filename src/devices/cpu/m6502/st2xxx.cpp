@@ -35,10 +35,12 @@
 #include "emu.h"
 #include "st2xxx.h"
 
+#include <bit>
+
 #define LOG_IRQ  (1U << 1)
 #define LOG_BT   (1U << 2)
 #define LOG_LCDC (1U << 3)
-#define VERBOSE LOG_IRQ
+
 //#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
@@ -47,6 +49,7 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_bits, 0)
 	, m_in_port_cb(*this, 0xff)
 	, m_out_port_cb(*this)
+	, m_spi_exchange_cb(*this)
 	, m_prr_mask(data_bits <= 14 ? 0 : ((u16(1) << (data_bits - 14)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_drr_mask(data_bits <= 15 ? 0 : ((u16(1) << (data_bits - 15)) - 1) | (has_banked_ram ? 0x8000 : 0))
 	, m_pdata{0}
@@ -82,18 +85,24 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_sckr(0)
 	, m_ssr(0)
 	, m_smod(0)
+	, m_sdata_tx(0)
+	, m_sdata_rx(0)
+	, m_spi_pending_rx(0)
+	, m_spi_busy(false)
+	, m_spi_tx_pending(false)
+	, m_spi_timer(nullptr)
 	, m_uctr(0)
 	, m_usr(0)
 	, m_irctr(0)
 	, m_bctr(0)
 {
-	program_config.m_internal_map = std::move(internal_map);
+	m_program_config.m_internal_map = std::move(internal_map);
 }
 
 device_memory_interface::space_config_vector st2xxx_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &program_config),
+		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA, &m_data_config)
 	};
 }
@@ -150,7 +159,7 @@ void st2xxx_device::init_lcd_timer(u16 ireq)
 
 void st2xxx_device::save_common_registers()
 {
-	mi_st2xxx *intf = downcast<mi_st2xxx *>(mintf.get());
+	mi_st2xxx *intf = downcast<mi_st2xxx *>(m_mintf.get());
 
 	save_item(NAME(m_pdata));
 	save_item(NAME(m_pctrl));
@@ -161,14 +170,14 @@ void st2xxx_device::save_common_registers()
 	{
 		if (BIT(st2xxx_sys_mask(), 1))
 		{
-			save_item(NAME(intf->irq_service));
-			save_item(NAME(intf->irr_enable));
-			save_item(NAME(intf->irr));
+			save_item(NAME(intf->m_irq_service));
+			save_item(NAME(intf->m_irr_enable));
+			save_item(NAME(intf->m_irr));
 		}
-		save_item(NAME(intf->prr));
+		save_item(NAME(intf->m_prr));
 	}
 	if (m_drr_mask != 0)
-		save_item(NAME(intf->drr));
+		save_item(NAME(intf->m_drr));
 	if (m_bt_mask != 0)
 	{
 		save_item(NAME(m_bten));
@@ -199,9 +208,16 @@ void st2xxx_device::save_common_registers()
 	}
 	if (st2xxx_has_spi())
 	{
+		m_spi_exchange_cb.resolve();
+		m_spi_timer = timer_alloc(FUNC(st2xxx_device::spi_complete), this);
 		save_item(NAME(m_sctr));
 		save_item(NAME(m_sckr));
 		save_item(NAME(m_ssr));
+		save_item(NAME(m_sdata_tx));
+		save_item(NAME(m_sdata_rx));
+		save_item(NAME(m_spi_pending_rx));
+		save_item(NAME(m_spi_busy));
+		save_item(NAME(m_spi_tx_pending));
 		if (st2xxx_spi_iis())
 			save_item(NAME(m_smod));
 	}
@@ -230,11 +246,11 @@ void st2xxx_device::device_reset()
 	m_pmcr = 0x80;
 
 	// reset bank registers
-	mi_st2xxx &m = downcast<mi_st2xxx &>(*mintf);
-	m.irr_enable = false;
-	m.irr = 0;
-	m.prr = 0;
-	m.drr = 0;
+	mi_st2xxx &m = downcast<mi_st2xxx &>(*m_mintf);
+	m.m_irr_enable = false;
+	m.m_irr = 0;
+	m.m_prr = 0;
+	m.m_drr = 0;
 
 	// reset interrupt registers
 	m_ireq = 0;
@@ -270,6 +286,13 @@ void st2xxx_device::device_reset()
 	m_sckr = 0;
 	m_ssr = 0;
 	m_smod = 0;
+	m_sdata_tx = 0;
+	m_sdata_rx = 0;
+	m_spi_pending_rx = 0;
+	m_spi_busy = false;
+	m_spi_tx_pending = false;
+	if (m_spi_timer != nullptr)
+		m_spi_timer->adjust(attotime::never);
 
 	// reset UART and BRG
 	m_uctr = 0;
@@ -283,7 +306,7 @@ u8 st2xxx_device::active_irq_level() const
 	// IREQH interrupts have priority over IREQL interrupts
 	u16 ireq_active = swapendian_int16(m_ireq & m_iena);
 	if (ireq_active != 0)
-		return 31 - (8 ^ count_leading_zeros_32(ireq_active & -ireq_active));
+		return 31 - (8 ^ std::countl_zero(u32(ireq_active & -ireq_active)));
 	else
 		return 0xff;
 }
@@ -297,7 +320,7 @@ u8 st2xxx_device::read_vector(u16 adr)
 			set_irq_service(true);
 
 			// Make sure this doesn't change in between vector pull cycles
-			m_irq_level = irq_taken ? active_irq_level() : 0xff;
+			m_irq_level = m_irq_taken ? active_irq_level() : 0xff;
 		}
 
 		if (m_irq_level != 0xff)
@@ -306,7 +329,7 @@ u8 st2xxx_device::read_vector(u16 adr)
 
 			LOGMASKED(LOG_IRQ, "Acknowledging %s interrupt (PC = $%04X, IREQ = $%04X, IENA = $%04X, vector pull from $%04X)\n",
 				st2xxx_irq_name(m_irq_level),
-				PPC,
+				m_PPC,
 				m_ireq,
 				m_iena,
 				adr & 0x7fff);
@@ -318,7 +341,7 @@ u8 st2xxx_device::read_vector(u16 adr)
 			}
 		}
 	}
-	return downcast<mi_st2xxx &>(*mintf).read_vector(adr);
+	return downcast<mi_st2xxx &>(*m_mintf).read_vector(adr);
 }
 
 u8 st2xxx_device::pdata_r(offs_t offset)
@@ -441,12 +464,12 @@ void st2xxx_device::bten_w(u8 data)
 			assert(div != 0);
 			assert(m_base_timer[n] != nullptr);
 			m_base_timer[n]->adjust(attotime::from_ticks(div, 32768), n);
-			LOGMASKED(LOG_BT, "Base timer %d enabled at %.1f Hz (PC = $%04X)\n", n, 32768.0 / div, PPC);
+			LOGMASKED(LOG_BT, "Base timer %d enabled at %.1f Hz (PC = $%04X)\n", n, 32768.0 / div, m_PPC);
 		}
 		else if (!BIT(data, n) && BIT(m_bten, n))
 		{
 			m_base_timer[n]->adjust(attotime::never);
-			LOGMASKED(LOG_BT, "Base timer %d disabled (PC = $%04X)\n", n, PPC);
+			LOGMASKED(LOG_BT, "Base timer %d disabled (PC = $%04X)\n", n, m_PPC);
 		}
 	}
 
@@ -523,7 +546,7 @@ void st2xxx_device::sys_w(u8 data)
 	u8 mask = st2xxx_sys_mask();
 	m_sys = data & mask;
 	if (BIT(mask, 1))
-		downcast<mi_st2xxx &>(*mintf).irr_enable = BIT(data, 1);
+		downcast<mi_st2xxx &>(*m_mintf).m_irr_enable = BIT(data, 1);
 }
 
 u8 st2xxx_device::misc_r()
@@ -538,67 +561,67 @@ void st2xxx_device::misc_w(u8 data)
 
 u8 st2xxx_device::irrl_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).irr & 0xff;
+	return downcast<mi_st2xxx &>(*m_mintf).m_irr & 0xff;
 }
 
 void st2xxx_device::irrl_w(u8 data)
 {
-	u16 &irr = downcast<mi_st2xxx &>(*mintf).irr;
+	u16 &irr = downcast<mi_st2xxx &>(*m_mintf).m_irr;
 	irr = (data & m_prr_mask) | (irr & 0xff00);
 }
 
 u8 st2xxx_device::irrh_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).irr >> 8;
+	return downcast<mi_st2xxx &>(*m_mintf).m_irr >> 8;
 }
 
 void st2xxx_device::irrh_w(u8 data)
 {
-	u16 &irr = downcast<mi_st2xxx &>(*mintf).irr;
+	u16 &irr = downcast<mi_st2xxx &>(*m_mintf).m_irr;
 	irr = ((u16(data) << 8) & m_prr_mask) | (irr & 0x00ff);
 }
 
 u8 st2xxx_device::prrl_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).prr & 0xff;
+	return downcast<mi_st2xxx &>(*m_mintf).m_prr & 0xff;
 }
 
 void st2xxx_device::prrl_w(u8 data)
 {
-	u16 &prr = downcast<mi_st2xxx &>(*mintf).prr;
+	u16 &prr = downcast<mi_st2xxx &>(*m_mintf).m_prr;
 	prr = (data & m_prr_mask) | (prr & 0xff00);
 }
 
 u8 st2xxx_device::prrh_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).prr >> 8;
+	return downcast<mi_st2xxx &>(*m_mintf).m_prr >> 8;
 }
 
 void st2xxx_device::prrh_w(u8 data)
 {
-	u16 &prr = downcast<mi_st2xxx &>(*mintf).prr;
+	u16 &prr = downcast<mi_st2xxx &>(*m_mintf).m_prr;
 	prr = ((u16(data) << 8) & m_prr_mask) | (prr & 0x00ff);
 }
 
 u8 st2xxx_device::drrl_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).drr & 0xff;
+	return downcast<mi_st2xxx &>(*m_mintf).m_drr & 0xff;
 }
 
 void st2xxx_device::drrl_w(u8 data)
 {
-	u16 &drr = downcast<mi_st2xxx &>(*mintf).drr;
+	u16 &drr = downcast<mi_st2xxx &>(*m_mintf).m_drr;
 	drr = (data & m_drr_mask) | (drr & 0xff00);
 }
 
 u8 st2xxx_device::drrh_r()
 {
-	return downcast<mi_st2xxx &>(*mintf).drr >> 8;
+	return downcast<mi_st2xxx &>(*m_mintf).m_drr >> 8;
 }
 
 void st2xxx_device::drrh_w(u8 data)
 {
-	u16 &drr = downcast<mi_st2xxx &>(*mintf).drr;
+	u16 &drr = downcast<mi_st2xxx &>(*m_mintf).m_drr;
 	drr = ((u16(data) << 8) & m_drr_mask) | (drr & 0x00ff);
 }
 
@@ -614,7 +637,7 @@ void st2xxx_device::ireql_w(u8 data)
 		for (int i = 0; i < 8; i++)
 		{
 			if (!BIT(data, i) && BIT(m_ireq, i))
-				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i), PPC);
+				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i), m_PPC);
 		}
 		m_ireq &= data | 0xff00;
 		update_irq_state();
@@ -633,7 +656,7 @@ void st2xxx_device::ireqh_w(u8 data)
 		for (int i = 0; i < 8; i++)
 		{
 			if (!BIT(data, i) && BIT(m_ireq, i + 8))
-				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i + 8), PPC);
+				LOGMASKED(LOG_IRQ, "%s interrupt cleared (PC = $%04X)\n", st2xxx_irq_name(i + 8), m_PPC);
 		}
 		m_ireq &= u16(data) << 8 | 0x00ff;
 		update_irq_state();
@@ -656,7 +679,7 @@ void st2xxx_device::ienal_w(u8 data)
 				LOGMASKED(LOG_IRQ, "%s interrupt %sabled (PC = $%04X)\n",
 					st2xxx_irq_name(i),
 					BIT(data, i) ? "en" : "dis",
-					PPC);
+					m_PPC);
 		}
 		m_iena = (m_iena & 0xff00) | data;
 		update_irq_state();
@@ -679,7 +702,7 @@ void st2xxx_device::ienah_w(u8 data)
 				LOGMASKED(LOG_IRQ, "%s interrupt %sabled (PC = $%04X)\n",
 					st2xxx_irq_name(i + 8),
 					BIT(data, i) ? "en" : "dis",
-					PPC);
+					m_PPC);
 		}
 		m_iena = (m_iena & 0x00ff) | (u16(data) << 8);
 		update_irq_state();
@@ -766,7 +789,7 @@ void st2xxx_device::lfr_recalculate_period()
 		unsigned clocks = st2xxx_lfr_clocks();
 		assert(clocks != 0);
 		attotime period = cycles_to_attotime(clocks);
-		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), PPC);
+		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), m_PPC);
 		m_lcd_timer->adjust(period, 0, period);
 	}
 	else
@@ -800,11 +823,105 @@ u8 st2xxx_device::sctr_r()
 
 void st2xxx_device::sctr_w(u8 data)
 {
-	// TXEMP on wakeup?
+	// TODO: Slave operation, external SS/data-ready signals, collision/mode-fault
+	// status and IIS mode are not implemented.
+
+	// Enabling SPI resets its internal state and leaves the transmit buffer empty.
 	if (!BIT(m_sctr, 7) && BIT(data, 7))
-		m_ssr |= 0x20;
+	{
+		m_spi_timer->adjust(attotime::never);
+		m_sdata_tx = 0;
+		m_sdata_rx = 0;
+		m_spi_pending_rx = 0;
+		m_spi_busy = false;
+		m_spi_tx_pending = false;
+		m_ssr = 0x20;
+	}
+	else if (BIT(m_sctr, 7) && !BIT(data, 7))
+	{
+		m_spi_timer->adjust(attotime::never);
+		m_spi_pending_rx = 0;
+		m_spi_busy = false;
+		m_spi_tx_pending = false;
+		m_ssr &= ~0x10;
+	}
 
 	m_sctr = data;
+
+	// A word loaded in slave mode begins shifting if the interface is changed to master mode.
+	if (BIT(m_sctr, 7) && BIT(m_sctr, 0) && !m_spi_busy && m_spi_tx_pending)
+		spi_start();
+}
+
+u8 st2xxx_device::sdatal_r()
+{
+	if (!machine().side_effects_disabled())
+		m_ssr &= ~0x42;
+	return u8(m_sdata_rx);
+}
+
+void st2xxx_device::sdatal_w(u8 data)
+{
+	m_sdata_tx = (m_sdata_tx & 0xff00) | data;
+	m_spi_tx_pending = true;
+	m_ssr &= ~0x20;
+
+	if (BIT(m_sctr, 7) && BIT(m_sctr, 0) && !m_spi_busy)
+		spi_start();
+}
+
+u8 st2xxx_device::sdatah_r()
+{
+	return m_sdata_rx >> 8;
+}
+
+void st2xxx_device::sdatah_w(u8 data)
+{
+	m_sdata_tx = (m_sdata_tx & 0x00ff) | u16(data) << 8;
+}
+
+void st2xxx_device::spi_start()
+{
+	assert(BIT(m_sctr, 7));
+	assert(BIT(m_sctr, 0));
+	assert(!m_spi_busy);
+	assert(m_spi_tx_pending);
+
+	u8 const bits = (m_sckr & 0x0f) + 1;
+	u16 const mask = bits == 16 ? 0xffff : (u16(1) << bits) - 1;
+	m_spi_pending_rx = m_spi_exchange_cb.isnull() ? mask : m_spi_exchange_cb(m_sdata_tx & mask, bits) & mask;
+	m_spi_tx_pending = false;
+	m_spi_busy = true;
+	m_ssr |= 0x30;
+
+	// The transmit request occurs when the shift register takes the buffered word.
+	m_ireq |= 0x0100;
+	update_irq_state();
+
+	unsigned const clocks = bits * (2U << ((m_sckr >> 4) & 0x07));
+	m_spi_timer->adjust(cycles_to_attotime(clocks));
+}
+
+TIMER_CALLBACK_MEMBER(st2xxx_device::spi_complete)
+{
+	m_spi_busy = false;
+	m_ssr &= ~0x10;
+
+	bool const overrun = BIT(m_ssr, 6);
+	if (overrun)
+		m_ssr |= 0x02;
+	m_sdata_rx = m_spi_pending_rx;
+	m_ssr |= 0x40;
+
+	if (BIT(m_sctr, 6) || (overrun && BIT(m_sctr, 5)))
+	{
+		m_ireq |= 0x0200;
+		update_irq_state();
+	}
+
+	// A waiting transmit buffer is reloaded without a gap between words.
+	if (BIT(m_sctr, 7) && BIT(m_sctr, 0) && m_spi_tx_pending)
+		spi_start();
 }
 
 u8 st2xxx_device::sckr_r()
@@ -825,7 +942,7 @@ u8 st2xxx_device::ssr_r()
 void st2xxx_device::ssr_w(u8 data)
 {
 	// Write any value to clear
-	m_ssr = 0;
+	m_ssr = m_spi_busy ? 0x10 : 0;
 }
 
 u8 st2xxx_device::smod_r()
@@ -880,7 +997,7 @@ u8 st2xxx_device::udata_r()
 
 void st2xxx_device::udata_w(u8 data)
 {
-	logerror("Writing %02X to UART transmitter (PC = %04X)\n", data, PPC);
+	logerror("Writing %02X to UART transmitter (PC = %04X)\n", data, m_PPC);
 }
 
 u8 st2xxx_device::bctr_r()

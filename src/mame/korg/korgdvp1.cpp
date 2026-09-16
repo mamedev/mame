@@ -9,7 +9,7 @@
 #include "emu.h"
 //#include "bus/midi/midi.h"
 #include "cpu/upd7810/upd7810.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "machine/nvram.h"
 
 
@@ -34,10 +34,10 @@ private:
 	void leds_w(offs_t offset, u8 data);
 	void dsp_w(offs_t offset, u8 data);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<upd7810_device> m_maincpu;
-	required_device_array<tms32010_device, 2> m_dsp;
+	required_device_array<tms320c10_device, 2> m_dsp;
 };
 
 
@@ -98,8 +98,8 @@ void korgdvp1_state::dvp1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // HM6116LP-4 + 3V lithium battery
 
-	TMS32010(config, m_dsp[0], 20_MHz_XTAL).set_disable();
-	TMS32010(config, m_dsp[1], 20_MHz_XTAL).set_disable();
+	TMS320C10(config, m_dsp[0], 20_MHz_XTAL).set_disable();
+	TMS320C10(config, m_dsp[1], 20_MHz_XTAL).set_disable();
 }
 
 ROM_START(dvp1)
@@ -116,4 +116,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, dvp1, 0, 0, dvp1, dvp1, korgdvp1_state, empty_init, "Korg", "DVP-1 Digital Voice Processor", MACHINE_IS_SKELETON)
+SYST(1985, dvp1, 0, 0, dvp1, dvp1, korgdvp1_state, empty_init, "Korg", "DVP-1 Digital Voice Processor", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

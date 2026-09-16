@@ -166,8 +166,8 @@ void device_macpds_card_interface::install_bank(offs_t start, offs_t end, uint8_
 
 void device_macpds_card_interface::install_rom(device_t *dev, const char *romregion, uint32_t addr)
 {
-	uint8_t *rom = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->base();
-	uint32_t romlen = device().machine().root_device().memregion(dev->subtag(romregion).c_str())->bytes();
+	uint8_t *rom = dev->memregion(romregion)->base();
+	uint32_t romlen = dev->memregion(romregion)->bytes();
 
 	m_macpds->install_bank(addr, addr+romlen-1, rom);
 }

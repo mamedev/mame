@@ -135,7 +135,7 @@ Notes:
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -180,11 +180,11 @@ public:
 	void nomcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void nomcu_main_io_map(address_map &map);
+	void nomcu_main_io_map(address_map &map) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -234,8 +234,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_prg_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class blktiger_mcu_state : public blktiger_state
@@ -249,8 +249,8 @@ public:
 	void mcu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// MCU-related
@@ -265,11 +265,9 @@ private:
 	uint8_t from_main_r();
 	void to_main_w(uint8_t data);
 
-	void mcu_main_io_map(address_map &map);
+	void mcu_main_io_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -345,13 +343,6 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(1, 0xfff0, 0x800f);
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
-
-	m_tx_tilemap->set_scrolldx(128, 128);
-	m_tx_tilemap->set_scrolldy(  6,   6);
-	m_bg_tilemap8x4->set_scrolldx(128, 128);
-	m_bg_tilemap8x4->set_scrolldy(  6,   6);
-	m_bg_tilemap4x8->set_scrolldx(128, 128);
-	m_bg_tilemap4x8->set_scrolldy(  6,   6);
 }
 
 
@@ -471,7 +462,7 @@ void blktiger_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				code,
 				color,
 				flipx, flip_screen(),
-				sx + 128, sy + 6, 15);
+				sx, sy, 15);
 	}
 }
 
@@ -494,8 +485,6 @@ uint32_t blktiger_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /**************************************************
 
@@ -772,8 +761,8 @@ void blktiger_state::nomcu(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(blktiger_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -1076,8 +1065,8 @@ void blktiger_state::init_blktigerb3()
 } // anonymous namespace
 
 
-GAME( 1987, blktiger,   0,        mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigera,  blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Tiger (US, older)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blktigerb1, blktiger, nomcu, blktiger, blktiger_state,     empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blktigerb2, blktiger, nomcu, blktiger, blktiger_state,     empty_init,      ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blkdrgon,   blktiger, mcu,   blktiger, blktiger_mcu_state, empty_init,      ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )

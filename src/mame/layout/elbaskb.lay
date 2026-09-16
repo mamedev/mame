@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="whited"><disk><color red="0.8" green="0.8" blue="0.8" /></disk></element>
+
+	<element name="text_l1" align="1"><text string="АУТ"><color red="0.1" green="0.3" blue="0.7" /></text></element>
+	<element name="text_l2" align="2"><text string="ПРОБЕЖКА"><color red="0.1" green="0.3" blue="0.7" /></text></element>
+
+	<element name="ledr" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="1.0" green="0.1" blue="0.15" alpha="0.12" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="1"><color red="0.15" green="1.0" blue="0.1" /></disk>
+		<disk state="0"><color red="0.15" green="1.0" blue="0.1" alpha="0.09" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="line7">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="100">
+				<rect width="200" height="2.75" x="0" y="0" transform="rotate(7.0)" fill="#cccccc" />
+			</svg>
+		]]></data></image>
+	</element>
+
+
+<!-- half court background -->
+
+	<group name="bg">
+		<bounds x="0" y="0" width="50" height="50" />
+
+		<element ref="white"><bounds xc="20" y="10" width="26" height="35" /></element>
+		<element ref="black"><bounds xc="20" y="10" width="25.2" height="35" /></element>
+
+		<element ref="whited"><bounds xc="20" yc="20" width="23" height="23" /></element>
+		<element ref="blackd"><bounds xc="20" yc="20" width="22.2" height="22.2" /></element>
+		<element ref="white"><bounds xc="20" y="9" width="23" height="11.5" /></element>
+		<element ref="black"><bounds xc="20" y="9" width="22.2" height="11.5" /></element>
+
+		<element ref="line7"><bounds x="15" y="12.75" width="15" height="15" /><orientation rotate="90" flipx="yes" /></element>
+		<element ref="line7"><bounds x="10" y="12.75" width="15" height="15" /><orientation rotate="90" flipx="no" /></element>
+
+		<element ref="whited"><bounds xc="20" yc="27" width="6.5" height="6.5" /></element>
+		<element ref="blackd"><bounds xc="20" yc="27" width="5.7" height="5.7" /></element>
+		<element ref="white"><bounds xc="20" yc="27" width="6.0" height="0.4" /></element>
+
+		<element ref="whited"><bounds xc="20" yc="18.25" width="4.5" height="3" /></element>
+		<element ref="blackd"><bounds xc="20" yc="18.25" width="3.9" height="2.4" /></element>
+
+		<element ref="white"><bounds xc="20" y="8" width="26" height="8.25" /></element>
+		<element ref="black"><bounds xc="20" y="7.6" width="26" height="8.25" /></element>
+	</group>
+
+
+<!-- 7seg panel -->
+
+	<group name="digits">
+		<element name="digit0" ref="digit"><bounds x="0" y="0" width="0.85" height="1" /></element>
+		<element name="digit1" ref="digit"><bounds x="1" y="0" width="0.85" height="1" /></element>
+		<element name="digit2" ref="digit"><bounds x="3" y="0" width="0.85" height="1" /></element>
+		<element name="digit3" ref="digit"><bounds x="4" y="0" width="0.85" height="1" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="1.15" right="35" top="15.05" bottom="64.95" />
+
+		<!-- background -->
+		<group ref="bg"><bounds x="0" y="0" width="50" height="50" /></group>
+		<group ref="bg"><bounds x="0" y="30" width="50" height="50" /><orientation flipy="yes" /></group>
+
+		<element ref="whited"><bounds xc="20" yc="40" width="9" height="9" /></element>
+		<element ref="blackd"><bounds xc="20" yc="40" width="8.2" height="8.2" /></element>
+		<element ref="white"><bounds xc="20" yc="40" width="26" height="0.4" /></element>
+
+		<!-- leds top half -->
+		<element name="4.1.1" ref="ledr"><bounds xc="20" yc="18.25" width="1.4" height="1.4" /></element>
+
+		<element name="8.0.0" ref="ledg"><bounds xc="14.5" yc="22.5" width="1.4" height="1.4" /></element>
+		<element name="7.1.0" ref="ledg"><bounds xc="20" yc="25.5" width="1.4" height="1.4" /></element>
+		<element name="8.2.0" ref="ledg"><bounds xc="25.5" yc="22.5" width="1.4" height="1.4" /></element>
+
+		<element name="4.2.1" ref="ledr"><bounds xc="13" yc="25.5" width="1.4" height="1.4" /></element>
+		<element name="5.1.1" ref="ledr"><bounds xc="20" yc="28.5" width="1.4" height="1.4" /></element>
+		<element name="4.0.1" ref="ledr"><bounds xc="27" yc="25.5" width="1.4" height="1.4" /></element>
+
+		<element name="7.0.0" ref="ledg"><bounds xc="13.5" yc="33.25" width="1.4" height="1.4" /></element>
+		<element name="6.1.0" ref="ledg"><bounds xc="20" yc="37.875" width="1.4" height="1.4" /></element>
+		<element name="7.2.0" ref="ledg"><bounds xc="26.5" yc="33.25" width="1.4" height="1.4" /></element>
+
+		<element name="5.2.1" ref="ledr"><bounds xc="10.5" yc="36.25" width="1.4" height="1.4" /></element>
+		<element name="5.0.1" ref="ledr"><bounds xc="29.5" yc="36.25" width="1.4" height="1.4" /></element>
+
+		<!-- leds bottom half -->
+		<element name="4.1.0" ref="ledg"><bounds xc="20" yc="61.75" width="1.4" height="1.4" /></element>
+
+		<element name="8.2.1" ref="ledr"><bounds xc="14.5" yc="57.5" width="1.4" height="1.4" /></element>
+		<element name="7.1.1" ref="ledr"><bounds xc="20" yc="54.55" width="1.4" height="1.4" /></element>
+		<element name="8.0.1" ref="ledr"><bounds xc="25.5" yc="57.5" width="1.4" height="1.4" /></element>
+
+		<element name="4.0.0" ref="ledg"><bounds xc="13" yc="54.5" width="1.4" height="1.4" /></element>
+		<element name="5.1.0" ref="ledg"><bounds xc="20" yc="51.5" width="1.4" height="1.4" /></element>
+		<element name="4.2.0" ref="ledg"><bounds xc="27" yc="54.5" width="1.4" height="1.4" /></element>
+
+		<element name="7.2.1" ref="ledr"><bounds xc="13.5" yc="46.75" width="1.4" height="1.4" /></element>
+		<element name="6.1.1" ref="ledr"><bounds xc="20" yc="42.125" width="1.4" height="1.4" /></element>
+		<element name="7.0.1" ref="ledr"><bounds xc="26.5" yc="46.75" width="1.4" height="1.4" /></element>
+
+		<element name="5.0.0" ref="ledg"><bounds xc="10.5" yc="43.75" width="1.4" height="1.4" /></element>
+		<element name="5.2.0" ref="ledg"><bounds xc="29.5" yc="43.75" width="1.4" height="1.4" /></element>
+
+		<!-- left side -->
+		<group ref="digits"><bounds x="1.95" yc="40" width="4.25" height="17" /><orientation rotate="270" /></group>
+
+		<!-- right side -->
+		<element ref="text_l1"><bounds xc="34" y="8.75" width="1.4" height="30" /><orientation rotate="270" /></element>
+		<element name="2.3.1" ref="ledr"><bounds xc="34" yc="26" width="1.4" height="1.4" /></element>
+
+		<element ref="text_l2"><bounds xc="34" y="43.25" width="1.4" height="30" /><orientation rotate="270" /></element>
+		<element name="2.3.0" ref="ledr"><bounds xc="34" yc="54" width="1.4" height="1.4" /></element>
+	</view>
+
+</mamelayout>

@@ -1,7 +1,7 @@
 // 7zCompressionMode.h
 
-#ifndef __7Z_COMPRESSION_MODE_H
-#define __7Z_COMPRESSION_MODE_H
+#ifndef ZIP7_INC_7Z_COMPRESSION_MODE_H
+#define ZIP7_INC_7Z_COMPRESSION_MODE_H
 
 #include "../../Common/MethodId.h"
 #include "../../Common/MethodProps.h"
@@ -52,33 +52,38 @@ struct CCompressionMethodMode
 
   bool DefaultMethod_was_Inserted;
   bool Filter_was_Inserted;
+  bool PasswordIsDefined;
+  bool MemoryUsageLimit_WasSet;
 
-  #ifndef _7ZIP_ST
-  UInt32 NumThreads;
+  #ifndef Z7_ST
   bool NumThreads_WasForced;
   bool MultiThreadMixer;
+  UInt32 NumThreads;
+  UInt32 NumThreadGroups;
   #endif
 
-  UInt64 MemoryUsageLimit;
-  bool MemoryUsageLimit_WasSet;
-  
-  bool PasswordIsDefined;
   UString Password; // _Wipe
-
+  UInt64 MemoryUsageLimit;
+ 
   bool IsEmpty() const { return (Methods.IsEmpty() && !PasswordIsDefined); }
   CCompressionMethodMode():
         DefaultMethod_was_Inserted(false)
       , Filter_was_Inserted(false)
-      #ifndef _7ZIP_ST
-      , NumThreads(1)
+      , PasswordIsDefined(false)
+      , MemoryUsageLimit_WasSet(false)
+      #ifndef Z7_ST
       , NumThreads_WasForced(false)
       , MultiThreadMixer(true)
+      , NumThreads(1)
+      , NumThreadGroups(0)
       #endif
       , MemoryUsageLimit((UInt64)1 << 30)
-      , MemoryUsageLimit_WasSet(false)
-      , PasswordIsDefined(false)
   {}
 
+#ifdef Z7_CPP_IS_SUPPORTED_default
+  CCompressionMethodMode(const CCompressionMethodMode &) = default;
+  CCompressionMethodMode& operator =(const CCompressionMethodMode &) = default;
+#endif
   ~CCompressionMethodMode() { Password.Wipe_and_Empty(); }
 };
 

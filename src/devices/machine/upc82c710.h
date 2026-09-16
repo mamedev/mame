@@ -52,9 +52,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ata_interface_device> m_ide;
@@ -62,6 +62,7 @@ private:
 	required_device<pc_lpt_device> m_lpt;
 	required_device<ns16450_device> m_serial;
 
+	u8 dir_r();
 	void dor_w(u8 data);
 	void fdc_irq_w(int state);
 	void fdc_drq_w(int state);

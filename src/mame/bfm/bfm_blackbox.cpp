@@ -44,6 +44,8 @@
 
 #include "speaker.h"
 
+#include <numbers>
+
 namespace {
 
 #include "bfm_blackbox.lh"
@@ -87,9 +89,9 @@ protected:
 		m_nvram(*this, "nvram", 0x40, ENDIANNESS_BIG)
 	{ }
 
-	void blackbox_base(machine_config &config);
+	void blackbox_base(machine_config &config) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi) { m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq) { m_maincpu->pulse_input_line(M6800_IRQ_LINE, attotime::from_usec(2500)); }
@@ -112,7 +114,7 @@ protected:
 	template <unsigned Digit> uint8_t out_disp_r(address_space &space);
 	void payout_w(uint8_t payout, uint8_t enable, bool state);
 
-	void blackbox_base_map(address_map &map);
+	void blackbox_base_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_out_data;
 	uint8_t m_input_en[6];
@@ -149,7 +151,7 @@ protected:
 
 	enum { STEPS_PER_SYMBOL = 20 };
 
-	void add_em_reels(machine_config &config, int symbols, attotime period);
+	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
 	template <unsigned Reel> void reel_sample_cb(int state);
 
 	void out_triacs2_w(address_space &space, uint8_t data);
@@ -166,8 +168,8 @@ public:
 		m_in_extra(*this, "EXTRA")
 	{ }
 
-	void blackbox_em(machine_config &config);
-	void blackbox_em_bellt(machine_config &config);
+	void blackbox_em(machine_config &config) ATTR_COLD;
+	void blackbox_em_bellt(machine_config &config) ATTR_COLD;
 
 	int in_extra_r();
 
@@ -179,8 +181,8 @@ protected:
 	uint8_t out_lamps2_buzzer_r(address_space &space);
 	uint8_t out_bellt_in_select_r(address_space &space);
 
-	void blackbox_em_map(address_map &map);
-	void blackbox_em_bellt_map(address_map &map);
+	void blackbox_em_map(address_map &map) ATTR_COLD;
+	void blackbox_em_bellt_map(address_map &map) ATTR_COLD;
 
 	bool m_buzzer_on;
 	bool m_in_extra_select[8];
@@ -196,15 +198,15 @@ public:
 		m_beep_sample(*this, "beep_sample")
 	{ }
 
-	void blackbox_em_21up(machine_config &config);
+	void blackbox_em_21up(machine_config &config) ATTR_COLD;
 
-	void init_21up();
+	void init_21up() ATTR_COLD;
 
 private:
 	void out_lamps1_beeper_w(address_space &space, uint8_t data);
 	uint8_t out_lamps1_beeper_r(address_space &space);
 
-	void blackbox_em_21up_map(address_map &map);
+	void blackbox_em_21up_map(address_map &map) ATTR_COLD;
 
 	bool m_beeper_on;
 	int16_t m_beep_sample_data[477];
@@ -219,7 +221,7 @@ public:
 		blackbox_em_state(mconfig, type, tag)
 	{ }
 
-	void blackbox_em_admc(machine_config &config);
+	void blackbox_em_admc(machine_config &config) ATTR_COLD;
 
 private:
 	void out_triacs2_w(address_space &space, uint8_t data);
@@ -235,7 +237,7 @@ private:
 	uint8_t prot_r();
 	void prot_reset_w(uint8_t data) { m_prot_index = 0; }
 
-	void blackbox_em_admc_map(address_map &map);
+	void blackbox_em_admc_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_prot_index;
 	uint8_t m_sound_value;
@@ -255,7 +257,7 @@ protected:
 	void out_meters_w(address_space &space, uint8_t data);
 	uint8_t out_meters_r(address_space &space);
 
-	void blackbox_em_opto_map(address_map &map);
+	void blackbox_em_opto_map(address_map &map) ATTR_COLD;
 };
 
 class blackbox_em_opto_sndgen_state : public blackbox_em_opto_state
@@ -266,7 +268,7 @@ public:
 		m_beep(*this, "beep")
 	{ }
 
-	void blackbox_em_opto_sndgen(machine_config &config);
+	void blackbox_em_opto_sndgen(machine_config &config) ATTR_COLD;
 
 private:
 	void out_tone_w(address_space &space, uint8_t data);
@@ -274,7 +276,7 @@ private:
 	uint8_t out_tone_r(address_space &space);
 	uint8_t out_mute_r(address_space &space);
 
-	void blackbox_em_opto_sndgen_map(address_map &map);
+	void blackbox_em_opto_sndgen_map(address_map &map) ATTR_COLD;
 
 	required_device<beep_device> m_beep;
 };
@@ -287,14 +289,15 @@ public:
 		m_beep(*this, "beep")
 	{ }
 
-	void blackbox_em_opto_aux_base(machine_config &config);
-	void blackbox_em_opto_aux(machine_config &config);
+	void blackbox_em_opto_aux(machine_config &config) ATTR_COLD;
 
 protected:
+	void blackbox_em_opto_aux_base(machine_config &config) ATTR_COLD;
+
 	void out_tone_w(address_space &space, uint8_t data);
 	uint8_t out_tone_r(address_space &space);
 
-	void blackbox_em_opto_aux_map(address_map &map);
+	void blackbox_em_opto_aux_map(address_map &map) ATTR_COLD;
 
 	required_device<beep_device> m_beep;
 };
@@ -309,7 +312,7 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
-	void blackbox_em_opto_music(machine_config &config);
+	void blackbox_em_opto_music(machine_config &config) ATTR_COLD;
 
 private:
 	void out_music_480_w(address_space &space, uint8_t data);
@@ -320,7 +323,7 @@ private:
 	void tms1000_r_w(uint32_t data);
 	void tms1000_o_w(uint16_t data);
 
-	void blackbox_em_opto_music_map(address_map &map);
+	void blackbox_em_opto_music_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_k_cols;
 	uint8_t m_r_bits;
@@ -340,11 +343,12 @@ public:
 		blackbox_em_opto_aux_state(mconfig, type, tag)
 	{ }
 
-	void blackbox_em_opto_club(machine_config &config);
+	void blackbox_em_opto_club(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_start() override;
-
 	void out_triacs1_w(address_space &space, uint8_t data);
 	void out_triacs2_w(address_space &space, uint8_t data);
 	void out_meters_w(address_space &space, uint8_t data);
@@ -353,7 +357,7 @@ private:
 	uint8_t out_meters_r(address_space &space);
 	void update_payout(uint8_t payout);
 
-	void blackbox_em_opto_club_map(address_map &map);
+	void blackbox_em_opto_club_map(address_map &map) ATTR_COLD;
 
 	bool m_payout_en[2];
 };
@@ -1232,7 +1236,7 @@ static INPUT_PORTS_START( blackbox_inputs )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_base_state, in_perc_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_base_state::in_perc_r))
 
 	PORT_START("PERCENTAGE")
 	PORT_DIPNAME( 0x03, 0x02, "Percentage adjustment" )
@@ -1245,38 +1249,38 @@ static INPUT_PORTS_START( blackbox_inputs_em_opto )
 	PORT_INCLUDE( blackbox_inputs )
 
 	PORT_MODIFY("IN1800_3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<0>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<1>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<1>)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<2>)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<2>)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<3>)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<0>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<1>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<1>))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<2>))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<2>))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<3>))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<3>))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blackbox_inputs_em_opto_alt )
 	PORT_INCLUDE( blackbox_inputs )
 
 	PORT_MODIFY("IN1800") // Some games expect to see the opto inputs without setting any enable bits
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<0>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<1>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<1>)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<2>)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<2>)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, reel_opto_r<3>)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_opto_state, symbol_opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<0>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<1>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<1>))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<2>))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<2>))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::reel_opto_r<3>))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_opto_state::symbol_opto_r<3>))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coin_5p_10p_10pt_50p )
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(1)
-												PORT_CHANGED_MEMBER(DEVICE_SELF, blackbox_base_state, chute_inserted, 0)
+												PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blackbox_base_state::chute_inserted), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_base_state, chute_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_base_state::chute_r))
 	PORT_CONFNAME( 0x20, 0x20, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x20, "Full" )
@@ -1286,11 +1290,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( coin_10p_10pt_50p )
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(1)
-												PORT_CHANGED_MEMBER(DEVICE_SELF, blackbox_base_state, chute_inserted, 0)
+												PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blackbox_base_state::chute_inserted), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p Token") PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_base_state, chute_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_base_state::chute_r))
 	PORT_CONFNAME( 0x20, 0x20, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x20, "Full" )
@@ -1300,11 +1304,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( coin_5p_10p_50p )
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(1)
-												PORT_CHANGED_MEMBER(DEVICE_SELF, blackbox_base_state, chute_inserted, 0)
+												PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blackbox_base_state::chute_inserted), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("5p") PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_base_state, chute_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_base_state::chute_r))
 	PORT_CONFNAME( 0x20, 0x20, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x20, "Full" )
@@ -1313,11 +1317,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( coin_10p_2p_50p )
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(1)
-												PORT_CHANGED_MEMBER(DEVICE_SELF, blackbox_base_state, chute_inserted, 0)
+												PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blackbox_base_state::chute_inserted), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("2p") PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_base_state, chute_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_base_state::chute_r))
 	PORT_CONFNAME( 0x20, 0x20, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x20, "Full" )
@@ -1326,11 +1330,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( coin_20p_10p_10pt_50p )
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(1)
-												PORT_CHANGED_MEMBER(DEVICE_SELF, blackbox_base_state, chute_inserted, 0)
+												PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blackbox_base_state::chute_inserted), 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("10p") PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("10p Token") PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("20p") PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_base_state, chute_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_base_state::chute_r))
 	PORT_CONFNAME( 0x20, 0x20, "Coin tube" )
 	PORT_CONFSETTING(    0x00, "Empty" )
 	PORT_CONFSETTING(    0x20, "Full" )
@@ -1341,7 +1345,7 @@ static INPUT_PORTS_START( coin_10p_50p_20p_club )
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("10p") PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("50p") PORT_IMPULSE(1)
-												PORT_CHANGED_MEMBER(DEVICE_SELF, blackbox_base_state, chute_inserted, 0)
+												PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(blackbox_base_state::chute_inserted), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("20p") PORT_IMPULSE(1)
 INPUT_PORTS_END
@@ -1416,7 +1420,7 @@ static INPUT_PORTS_START( bb_bellt )
 
 	PORT_MODIFY("IN1800_6")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_state, in_extra_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_state::in_extra_r))
 
 	PORT_MODIFY("PERCENTAGE")
 	PORT_DIPNAME( 0x03, 0x01, "Hold chance" )
@@ -1441,7 +1445,7 @@ static INPUT_PORTS_START( bb_nudgm )
 	PORT_MODIFY("IN1800")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Start Up/Gamble")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start Down/Collect")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(blackbox_em_state, in_extra_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(blackbox_em_state::in_extra_r))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POKER_HOLD3 )
@@ -1612,7 +1616,7 @@ static INPUT_PORTS_START( bb_gspin )
 
 	PORT_MODIFY("IN2000")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POKER_CANCEL )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_INTERLOCK ) PORT_NAME("Back Door") PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_NAME("Back Door") PORT_TOGGLE
 
 	PORT_MODIFY("IN1800_4")
 	PORT_DIPNAME( 0x01, 0x00, "Test Switch 2" ) // Alternate test switches
@@ -1633,10 +1637,6 @@ INPUT_PORTS_END
 
 void blackbox_base_state::machine_start()
 {
-	m_lamps.resolve();
-	m_digits.resolve();
-	m_test_led.resolve();
-
 	save_item(NAME(m_input_en));
 
 	std::fill(std::begin(m_input_en), std::end(m_input_en), false);
@@ -1649,7 +1649,7 @@ void blackbox_base_state::machine_start()
 
 void blackbox_em_opto_club_state::machine_start()
 {
-	blackbox_base_state::machine_start();
+	blackbox_em_opto_aux_state::machine_start();
 
 	m_payout_en[0] = false;
 	m_payout_en[1] = false;
@@ -1672,21 +1672,18 @@ void blackbox_base_state::blackbox_base(machine_config &config)
 	m_pia->writepb_handler().set(FUNC(blackbox_base_state::pia_portb_w));
 	m_pia->cb2_handler().set_nop(); // Not connected
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 
 	FRUIT_SAMPLES(config, m_samples);
 }
 
 void blackbox_em_base_state::add_em_reels(machine_config &config, int symbols, attotime period)
 {
-	for(int i = 0; i < 4; i++)
-	{
-		std::set<uint16_t> detents;
-		for(int i = 0; i < symbols; i++)
-			detents.insert(i * STEPS_PER_SYMBOL);
-
-		EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, detents, period);
-	}
+	std::set<uint16_t> detents;
+	for(int i = 0; i < symbols; i++)
+		detents.insert(i * STEPS_PER_SYMBOL);
+	for(auto &reel : m_reels)
+		EM_REEL(config, reel, reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
 
 	m_reels[0]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<0>));
 	m_reels[1]->state_changed_callback().set(FUNC(blackbox_em_base_state::reel_sample_cb<1>));
@@ -1887,8 +1884,9 @@ void blackbox_em_21up_state::init_21up()
 {
 	for(int s = 0; s < 477; s++)
 	{
-		double wave = sin((2 * M_PI * 3500.0 * (double)s) / 48000.0);
-		double mod = sin((2 * M_PI * 50.0 * (double)s) / 48000.0);
+		constexpr double PI = std::numbers::pi;
+		double wave = sin((2 * PI * 3500.0 * (double)s) / 48000.0);
+		double mod = sin((2 * PI * 50.0 * (double)s) / 48000.0);
 		m_beep_sample_data[s] = 32767 * wave * mod;
 	}
 }

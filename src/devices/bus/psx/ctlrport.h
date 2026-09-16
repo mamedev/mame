@@ -67,7 +67,7 @@ class psx_standard_controller_device :  public device_t,
 public:
 	psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	virtual void device_start() override { }
@@ -82,7 +82,7 @@ private:
 class psxcontrollerports_device : public device_t
 {
 public:
-	psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void ack();
 
@@ -94,7 +94,7 @@ public:
 	void write_txd(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<psx_controller_port_device> m_port0;
@@ -114,10 +114,7 @@ public:
 	psx_controller_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: psx_controller_port_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -141,7 +138,7 @@ protected:
 	virtual void device_reset() override { m_tx = true; }
 	virtual void device_config_complete() override;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void_cb m_ack_cb;

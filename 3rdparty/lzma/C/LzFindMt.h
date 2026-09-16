@@ -1,19 +1,21 @@
 /* LzFindMt.h -- multithreaded Match finder for LZ algorithms
-2021-07-12 : Igor Pavlov : Public domain */
+: Igor Pavlov : Public domain */
 
-#ifndef __LZ_FIND_MT_H
-#define __LZ_FIND_MT_H
+#ifndef ZIP7_INC_LZ_FIND_MT_H
+#define ZIP7_INC_LZ_FIND_MT_H
 
 #include "LzFind.h"
 #include "Threads.h"
 
 EXTERN_C_BEGIN
 
-typedef struct _CMtSync
+typedef struct
 {
   UInt32 numProcessedBlocks;
-  CThread thread;
+  Int32 affinityGroup;
+  UInt64 affinityInGroup;
   UInt64 affinity;
+  CThread thread;
 
   BoolInt wasCreated;
   BoolInt needStart;
@@ -31,7 +33,10 @@ typedef struct _CMtSync
   // UInt32 numBlocks_Sent;
 } CMtSync;
 
-typedef UInt32 * (*Mf_Mix_Matches)(void *p, UInt32 matchMinPos, UInt32 *distances);
+
+struct CMatchFinderMt_;
+
+typedef UInt32 * (*Mf_Mix_Matches)(struct CMatchFinderMt_ *p, UInt32 matchMinPos, UInt32 *distances);
 
 /* kMtCacheLineDummy must be >= size_of_CPU_cache_line */
 #define kMtCacheLineDummy 128
@@ -39,7 +44,7 @@ typedef UInt32 * (*Mf_Mix_Matches)(void *p, UInt32 matchMinPos, UInt32 *distance
 typedef void (*Mf_GetHeads)(const Byte *buffer, UInt32 pos,
   UInt32 *hash, UInt32 hashMask, UInt32 *heads, UInt32 numHeads, const UInt32 *crc);
 
-typedef struct _CMatchFinderMt
+typedef struct CMatchFinderMt_
 {
   /* LZ */
   const Byte *pointerToCurPos;

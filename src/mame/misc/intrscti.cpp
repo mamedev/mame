@@ -44,12 +44,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void intrscti_io_map(address_map &map);
-	void intrscti_map(address_map &map);
-	void intrscti_sub_io_map(address_map &map);
-	void intrscti_sub_map(address_map &map);
+	void intrscti_io_map(address_map &map) ATTR_COLD;
+	void intrscti_map(address_map &map) ATTR_COLD;
+	void intrscti_sub_io_map(address_map &map) ATTR_COLD;
+	void intrscti_sub_map(address_map &map) ATTR_COLD;
 };
 
 void intrscti_state::video_start()
@@ -204,7 +204,7 @@ void intrscti_state::intrscti(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &intrscti_state::intrscti_sub_io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);

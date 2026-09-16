@@ -45,9 +45,7 @@
 	[expressionField sizeToFit];
 
 	// create the subview popup
-	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSOffsetRect(expressionFrame,
-																	  expressionFrame.size.width,
-																	  0)];
+	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinXMargin | NSViewMinYMargin)];
 	[subviewButton setBezelStyle:NSBezelStyleShadowlessSquare];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
@@ -144,7 +142,11 @@
 
 - (IBAction)debugNewMemoryWindow:(id)sender {
 	debug_view_disasm_source const *source = [dasmView source];
-	[console debugNewMemoryWindowForSpace:&source->space()
+	auto const [mintf, spacenum] = source->space();
+	assert(mintf);
+	assert(0 <= spacenum);
+	assert(mintf->has_space(spacenum));
+	[console debugNewMemoryWindowForSpace:&mintf->space(spacenum)
 								   device:source->device()
 							   expression:nil];
 }
@@ -152,7 +154,11 @@
 
 - (IBAction)debugNewDisassemblyWindow:(id)sender {
 	debug_view_disasm_source const *source = [dasmView source];
-	[console debugNewDisassemblyWindowForSpace:&source->space()
+	auto const [mintf, spacenum] = source->space();
+	assert(mintf);
+	assert(0 <= spacenum);
+	assert(mintf->has_space(spacenum));
+	[console debugNewDisassemblyWindowForSpace:&mintf->space(spacenum)
 										device:source->device()
 									expression:[dasmView expression]];
 }

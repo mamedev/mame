@@ -13,11 +13,11 @@
 // the size of a pointer. Finally cast int to pointer. All this
 // is supposed to avoid C compiler warnings and (worse) losing
 // address bits.
-#define PMSTREAM(obj, fid) ((PmStream *) (long) (*env)->GetLongField(env, obj, fid))
+#define PMSTREAM(obj, fid) ((PmStream *) (intptr_t) (*env)->GetLongField(env, obj, fid))
 // Cast stream to long to convert integer to pointer, then expand
 // integer to 64-bit jlong. This avoids compiler warnings.
 #define SET_PMSTREAM(obj, fid, stream) \
-    (*env)->SetLongField(env, obj, fid, (jlong) (long) stream)
+    (*env)->SetLongField(env, obj, fid, (jlong) (intptr_t) stream)
 
 
 /*

@@ -32,12 +32,12 @@ protected:
 	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0xa7; }
@@ -59,8 +59,8 @@ private:
 
 	void fdc_irq(int state);
 
-	void kc_d004_io(address_map &map);
-	void kc_d004_mem(address_map &map);
+	void kc_d004_io(address_map &map) ATTR_COLD;
+	void kc_d004_mem(address_map &map) ATTR_COLD;
 
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -93,11 +93,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	required_device<ata_interface_device> m_ata;
@@ -108,7 +108,7 @@ private:
 	uint8_t gide_r(offs_t offset);
 	void gide_w(offs_t offset, uint8_t data);
 
-	void kc_d004_gide_io(address_map &map);
+	void kc_d004_gide_io(address_map &map) ATTR_COLD;
 };
 
 // device type definition

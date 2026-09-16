@@ -41,7 +41,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t novadesitec_fr002_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -94,7 +94,7 @@ void novadesitec_fr002_state::fr002(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_fr002_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: all wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
@@ -139,5 +139,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, clrmatch, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Color Match",  MACHINE_IS_SKELETON )
-GAME( 200?, sportmem, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Sport Memory", MACHINE_IS_SKELETON )
+GAME( 200?, clrmatch, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Color Match",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, sportmem, 0, fr002, fr002, novadesitec_fr002_state, empty_init, ROT0, "Nova Desitec", "Sport Memory", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

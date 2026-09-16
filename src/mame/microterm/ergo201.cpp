@@ -52,7 +52,7 @@ public:
 	void ergo201(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -60,8 +60,8 @@ private:
 	void earom_latch_w(u8 data);
 	u8 status_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<er1400_device> m_earom;
@@ -162,7 +162,7 @@ void ergo201_state::ergo201(machine_config &config)
 
 	ER1400(config, m_earom); // GI ER-1400
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.313_MHz_XTAL, 855, 0, 720, 318, 0, 300);
 	screen.set_screen_update(FUNC(ergo201_state::screen_update));
 	screen.set_color(rgb_t::green()); // P31
@@ -186,4 +186,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1985, ergo201, 0, 0, ergo201, ergo201, ergo201_state, empty_init, "Micro-Term / Kurzweil Computer Products", "ERGO 201 (Special #9233)", MACHINE_IS_SKELETON)
+COMP(1985, ergo201, 0, 0, ergo201, ergo201, ergo201_state, empty_init, "Micro-Term / Kurzweil Computer Products", "ERGO 201 (Special #9233)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

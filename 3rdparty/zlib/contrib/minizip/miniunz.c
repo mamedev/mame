@@ -1,15 +1,14 @@
 /*
    miniunz.c
-   Version 1.1, February 14h, 2010
-   sample part of the MiniZip project - ( http://www.winimage.com/zLibDll/minizip.html )
+   sample part of the MiniZip project - ( https://www.winimage.com/zLibDll/minizip.html )
 
-         Copyright (C) 1998-2010 Gilles Vollant (minizip) ( http://www.winimage.com/zLibDll/minizip.html )
+         Copyright (C) 1998-2026 Gilles Vollant (minizip) ( https://www.winimage.com/zLibDll/minizip.html )
 
          Modifications of Unzip for Zip64
          Copyright (C) 2007-2008 Even Rouault
 
          Modifications for Zip64 support on both zip and unzip
-         Copyright (C) 2009-2010 Mathias Svensson ( http://result42.com )
+         Copyright (C) 2009-2010 Mathias Svensson ( https://result42.com )
 */
 
 #if (!defined(_WIN32)) && (!defined(WIN32)) && (!defined(__APPLE__))
@@ -27,7 +26,7 @@
         #endif
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__HAIKU__) || defined(MINIZIP_FOPEN_NO_64)
 // In darwin and perhaps other BSD variants off_t is a 64 bit value, hence no need for specific 64 bit functions
 #define FOPEN_FUNC(filename, mode) fopen(filename, mode)
 #define FTELLO_FUNC(stream) ftello(stream)
@@ -39,6 +38,9 @@
 #endif
 
 
+#ifndef _CRT_SECURE_NO_WARNINGS
+#  define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -79,14 +81,11 @@
 
 /* change_file_date : change the date/time of a file
     filename : the filename of the file where date/time must be modified
-    dosdate : the new date at the MSDos format (4 bytes)
+    dosdate : the new date at the MSDOS format (4 bytes)
     tmu_date : the SAME new date at the tm_unz format */
-static void change_file_date(filename,dosdate,tmu_date)
-    const char *filename;
-    uLong dosdate;
-    tm_unz tmu_date;
-{
+static void change_file_date(const char *filename, uLong dosdate, tm_unz tmu_date) {
 #ifdef _WIN32
+  (void)tmu_date;
   HANDLE hFile;
   FILETIME ftm,ftLocal,ftCreate,ftLastAcc,ftLastWrite;
 
@@ -97,8 +96,7 @@ static void change_file_date(filename,dosdate,tmu_date)
   LocalFileTimeToFileTime(&ftLocal,&ftm);
   SetFileTime(hFile,&ftm,&ftLastAcc,&ftm);
   CloseHandle(hFile);
-#else
-#if defined(unix) || defined(__APPLE__)
+#elif defined(__unix__) || defined(__unix) || defined(__APPLE__)
   (void)dosdate;
   struct utimbuf ut;
   struct tm newdate;
@@ -115,7 +113,10 @@ static void change_file_date(filename,dosdate,tmu_date)
 
   ut.actime=ut.modtime=mktime(&newdate);
   utime(filename,&ut);
-#endif
+#else
+  (void)filename;
+  (void)dosdate;
+  (void)tmu_date;
 #endif
 }
 
@@ -123,23 +124,19 @@ static void change_file_date(filename,dosdate,tmu_date)
 /* mymkdir and change_file_date are not 100 % portable
    As I don't know well Unix, I wait feedback for the unix portion */
 
-static int mymkdir(dirname)
-    const char* dirname;
-{
+static int mymkdir(const char* dirname) {
     int ret=0;
 #ifdef _WIN32
     ret = _mkdir(dirname);
-#elif unix
+#elif defined(__unix__) || defined(__unix) || defined(__APPLE__)
     ret = mkdir (dirname,0775);
-#elif __APPLE__
-    ret = mkdir (dirname,0775);
+#else
+    (void)dirname;
 #endif
     return ret;
 }
 
-static int makedir (newdir)
-    const char *newdir;
-{
+static int makedir(const char *newdir) {
   char *buffer ;
   char *p;
   size_t len = strlen(newdir);
@@ -153,7 +150,7 @@ static int makedir (newdir)
                 printf("Error allocating memory\n");
                 return UNZ_INTERNALERROR;
         }
-  strcpy(buffer,newdir);
+  memcpy(buffer,newdir,len+1);
 
   if (buffer[len-1] == '/') {
     buffer[len-1] = '\0';
@@ -187,14 +184,12 @@ static int makedir (newdir)
   return 1;
 }
 
-static void do_banner()
-{
-    printf("MiniUnz 1.01b, demo of zLib + Unz package written by Gilles Vollant\n");
-    printf("more info at http://www.winimage.com/zLibDll/unzip.html\n\n");
+static void do_banner(void) {
+    printf("MiniUnz 1.1, demo of zLib + Unz package written by Gilles Vollant\n");
+    printf("more info at https://www.winimage.com/zLibDll/unzip.html\n\n");
 }
 
-static void do_help()
-{
+static void do_help(void) {
     printf("Usage : miniunz [-e] [-x] [-v] [-l] [-o] [-p password] file.zip [file_to_extr.] [-d extractdir]\n\n" \
            "  -e  Extract without pathname (junk paths)\n" \
            "  -x  Extract with pathname\n" \
@@ -202,11 +197,10 @@ static void do_help()
            "  -l  list files\n" \
            "  -d  directory to extract into\n" \
            "  -o  overwrite files without prompting\n" \
-           "  -p  extract crypted file using password\n\n");
+           "  -p  extract encrypted file using password\n\n");
 }
 
-static void Display64BitsSize(ZPOS64_T n, int size_char)
-{
+static void Display64BitsSize(ZPOS64_T n, int size_char) {
   /* to avoid compatibility problem , we do here the conversion */
   char number[21];
   int offset=19;
@@ -233,24 +227,22 @@ static void Display64BitsSize(ZPOS64_T n, int size_char)
   printf("%s",&number[pos_string]);
 }
 
-static int do_list(uf)
-    unzFile uf;
-{
+static int do_list(unzFile uf) {
     uLong i;
     unz_global_info64 gi;
     int err;
 
     err = unzGetGlobalInfo64(uf,&gi);
     if (err!=UNZ_OK)
-        printf("error %d with zipfile in unzGetGlobalInfo \n",err);
+        printf("error %d with zipfile in unzGetGlobalInfo\n",err);
     printf("  Length  Method     Size Ratio   Date    Time   CRC-32     Name\n");
     printf("  ------  ------     ---- -----   ----    ----   ------     ----\n");
     for (i=0;i<gi.number_entry;i++)
     {
-        char filename_inzip[256];
+        char filename_inzip[65536+1];
         unz_file_info64 file_info;
         uLong ratio=0;
-        const char *string_method;
+        const char *string_method = "";
         char charCrypt=' ';
         err = unzGetCurrentFileInfo64(uf,&file_info,filename_inzip,sizeof(filename_inzip),NULL,0,NULL,0);
         if (err!=UNZ_OK)
@@ -261,7 +253,7 @@ static int do_list(uf)
         if (file_info.uncompressed_size>0)
             ratio = (uLong)((file_info.compressed_size*100)/file_info.uncompressed_size);
 
-        /* display a '*' if the file is crypted */
+        /* display a '*' if the file is encrypted */
         if ((file_info.flag & 1) != 0)
             charCrypt='*';
 
@@ -311,13 +303,8 @@ static int do_list(uf)
 }
 
 
-static int do_extract_currentfile(uf,popt_extract_without_path,popt_overwrite,password)
-    unzFile uf;
-    const int* popt_extract_without_path;
-    int* popt_overwrite;
-    const char* password;
-{
-    char filename_inzip[256];
+static int do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password) {
+    char filename_inzip[65536+1];
     char* filename_withoutpath;
     char* p;
     int err=UNZ_OK;
@@ -367,6 +354,20 @@ static int do_extract_currentfile(uf,popt_extract_without_path,popt_overwrite,pa
             write_filename = filename_inzip;
         else
             write_filename = filename_withoutpath;
+
+        if (write_filename[0]!='\0')
+        {
+            const char* relative_check = write_filename;
+            while (relative_check[1]!='\0')
+            {
+                if (relative_check[0]=='.' && relative_check[1]=='.')
+                    write_filename = relative_check;
+                relative_check++;
+            }
+        }
+
+        while (write_filename[0]=='/' || write_filename[0]=='.')
+            write_filename++;
 
         err = unzOpenCurrentFilePassword(uf,password);
         if (err!=UNZ_OK)
@@ -473,25 +474,24 @@ static int do_extract_currentfile(uf,popt_extract_without_path,popt_overwrite,pa
 }
 
 
-static int do_extract(uf,opt_extract_without_path,opt_overwrite,password)
-    unzFile uf;
-    int opt_extract_without_path;
-    int opt_overwrite;
-    const char* password;
-{
+static int do_extract(unzFile uf, int opt_extract_without_path, int opt_overwrite, const char* password) {
     uLong i;
     unz_global_info64 gi;
     int err;
 
     err = unzGetGlobalInfo64(uf,&gi);
     if (err!=UNZ_OK)
-        printf("error %d with zipfile in unzGetGlobalInfo \n",err);
+    {
+        printf("error %d with zipfile in unzGetGlobalInfo\n",err);
+        return err;
+    }
 
     for (i=0;i<gi.number_entry;i++)
     {
-        if (do_extract_currentfile(uf,&opt_extract_without_path,
+        err = do_extract_currentfile(uf,&opt_extract_without_path,
                                       &opt_overwrite,
-                                      password) != UNZ_OK)
+                                      password);
+        if (err != UNZ_OK)
             break;
 
         if ((i+1)<gi.number_entry)
@@ -505,35 +505,23 @@ static int do_extract(uf,opt_extract_without_path,opt_overwrite,password)
         }
     }
 
-    return 0;
+    return err;
 }
 
-static int do_extract_onefile(uf,filename,opt_extract_without_path,opt_overwrite,password)
-    unzFile uf;
-    const char* filename;
-    int opt_extract_without_path;
-    int opt_overwrite;
-    const char* password;
-{
+static int do_extract_onefile(unzFile uf, const char* filename, int opt_extract_without_path, int opt_overwrite, const char* password) {
     if (unzLocateFile(uf,filename,CASESENSITIVITY)!=UNZ_OK)
     {
         printf("file %s not found in the zipfile\n",filename);
         return 2;
     }
 
-    if (do_extract_currentfile(uf,&opt_extract_without_path,
+    return do_extract_currentfile(uf,&opt_extract_without_path,
                                       &opt_overwrite,
-                                      password) == UNZ_OK)
-        return 0;
-    else
-        return 1;
+                                      password);
 }
 
 
-int main(argc,argv)
-    int argc;
-    char *argv[];
-{
+int main(int argc, char *argv[]) {
     const char *zipfilename=NULL;
     const char *filename_to_extract=NULL;
     const char *password=NULL;
@@ -564,7 +552,7 @@ int main(argc,argv)
 
                 while ((*p)!='\0')
                 {
-                    char c=*(p++);;
+                    char c=*(p++);
                     if ((c=='l') || (c=='L'))
                         opt_do_list = 1;
                     if ((c=='v') || (c=='V'))
@@ -606,7 +594,7 @@ int main(argc,argv)
 #        endif
 
         strncpy(filename_try, zipfilename,MAXFILENAME-1);
-        /* strncpy doesnt append the trailing NULL, of the string is too long. */
+        /* strncpy doesn't append the trailing NULL, of the string is too long. */
         filename_try[ MAXFILENAME ] = '\0';
 
 #        ifdef USEWIN32IOAPI

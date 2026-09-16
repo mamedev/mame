@@ -107,7 +107,7 @@ public:
 	void init_lvcardsa();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -123,9 +123,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void lvcards_map(address_map &map);
-	void lvcardsa_decrypted_opcodes_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void lvcards_map(address_map &map) ATTR_COLD;
+	void lvcardsa_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -141,16 +141,16 @@ public:
 	void ponttehk(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void control_port_2_w(uint8_t data);
 	void control_port_2a_w(uint8_t data);
 	uint8_t payout_r();
 
-	void lvpoker_map(address_map &map);
-	void ponttehk_map(address_map &map);
+	void lvpoker_map(address_map &map) ATTR_COLD;
+	void ponttehk_map(address_map &map) ATTR_COLD;
 
 	required_ioport m_in2;
 
@@ -159,8 +159,6 @@ private:
 	uint8_t m_result = 0U;
 };
 
-
-// video
 
 void lvcards_state::palette(palette_device &palette) const //Ever so slightly different, but different enough.
 {
@@ -231,8 +229,6 @@ uint32_t lvcards_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 void lvpoker_state::machine_start()
 {
@@ -509,7 +505,7 @@ static INPUT_PORTS_START( lvpoker )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x40, 0x40, "Coin C (Service Switch)" )
 	PORT_DIPSETTING(    0x40, "1 Push/1 Credit" )
 	PORT_DIPSETTING(    0x00, "1 Push/10 Credits" )
@@ -587,7 +583,7 @@ static INPUT_PORTS_START( ponttehk )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x40, 0x40, "Coin C (Service Switch)" )
 	PORT_DIPSETTING(    0x40, "1 Push/1 Credit" )
 	PORT_DIPSETTING(    0x00, "1 Push/10 Credits" )
@@ -613,7 +609,7 @@ void lvcards_state::lvcards(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(lvcards_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -840,5 +836,5 @@ void lvcards_state::init_lvcardsa()
 
 GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init,    ROT0, "Tehkan", "Lovely Cards",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, lvcardsa, lvcards, lvcardsa, lvcards,  lvcards_state, init_lvcardsa, ROT0, "Tehkan", "Lovely Cards (encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init,    ROT0, "Tehkan", "Lovely Poker [BET]",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init,    ROT0, "Tehkan", "Lovely Poker",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvpoker_state, empty_init,    ROT0, "Tehkan", "Pontoon (Tehkan)",         MACHINE_SUPPORTS_SAVE )

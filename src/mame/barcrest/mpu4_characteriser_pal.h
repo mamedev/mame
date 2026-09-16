@@ -16,7 +16,7 @@ class mpu4_characteriser_pal : public device_t
 {
 public:
 	// construction/destruction
-	mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag)
 	{
@@ -1403,8 +1403,8 @@ public:
 protected:
 	mpu4_characteriser_pal(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t* m_current_chr_table;
 	int m_prot_col;

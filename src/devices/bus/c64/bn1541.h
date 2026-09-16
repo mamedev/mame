@@ -51,7 +51,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_c64_floppy_parallel_interface overrides
 	virtual void parallel_data_w(uint8_t data) override;

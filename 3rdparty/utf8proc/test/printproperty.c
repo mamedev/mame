@@ -8,12 +8,14 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; ++i) {
         utf8proc_uint8_t cstr[16], *map;
-        unsigned int c;
+        utf8proc_uint32_t x;
+        utf8proc_int32_t c;
         if (!strcmp(argv[i], "-V")) {
             printf("utf8proc version %s\n", utf8proc_version());
             continue;
         }
-        check(sscanf(argv[i],"%x",&c) == 1, "invalid hex input %s", argv[i]);
+        check(sscanf(argv[i],"%x", &x) == 1, "invalid hex input %s", argv[i]);
+        c = (utf8proc_int32_t)x;
         const utf8proc_property_t *p = utf8proc_get_property(c);
 
         if (utf8proc_codepoint_valid(c))
@@ -32,11 +34,14 @@ int main(int argc, char **argv)
             "  titlecase_mapping = %04x (seqindex %04x)\n"
             "  casefold = %s\n"
             "  comb_index = %d\n"
+            "  comb_length = %d\n"
+            "  comb_issecond = %d\n"
             "  bidi_mirrored = %d\n"
             "  comp_exclusion = %d\n"
             "  ignorable = %d\n"
             "  control_boundary = %d\n"
             "  boundclass = %d\n"
+            "  indic_conjunct_break = %d\n"
             "  charwidth = %d\n",
         argv[i], (char*) cstr,
         utf8proc_category_string(c),
@@ -48,11 +53,14 @@ int main(int argc, char **argv)
         utf8proc_totitle(c), p->titlecase_seqindex,
         (char *) map,
         p->comb_index,
+        p->comb_length,
+        p->comb_issecond,
         p->bidi_mirrored,
         p->comp_exclusion,
         p->ignorable,
         p->control_boundary,
         p->boundclass,
+        p->indic_conjunct_break,
         utf8proc_charwidth(c));
         free(map);
     }

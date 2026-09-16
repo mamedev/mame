@@ -18,7 +18,7 @@
 class pci9050_device : public pci_device
 {
 public:
-	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock);
+	pci9050_device(const machine_config &mconfig, const char *tag, device_t *device, uint32_t clock = 0);
 
 	auto user_input_callback() { return m_user_input_handler.bind(); }
 	auto user_output_callback() { return m_user_output_handler.bind(); }
@@ -26,12 +26,12 @@ public:
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_post_load() override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	// PCI9050 I/O register space handlers
 	uint32_t lasrr_r(offs_t offset);

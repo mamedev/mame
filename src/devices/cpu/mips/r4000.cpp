@@ -27,13 +27,18 @@
  */
 
 #include "emu.h"
+#include "r4000.h"
+
+#include "mips3dsm.h"
+
 #include "divtlb.h"
 #include "debug/debugcpu.h"
-#include "r4000.h"
-#include "mips3dsm.h"
+
 #include "unicode.h"
 
 #include "softfloat3/source/include/softfloat.h"
+
+#include <bit>
 
 #define LOG_TLB       (1U << 1)
 #define LOG_CACHE     (1U << 2)
@@ -1107,13 +1112,13 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 
 	if (exception == EXCEPTION_INT)
 	{
-		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 		{
 			// notify the debugger of the first pending hardware interrupt
 			u32 const iphw = CAUSE & SR & CAUSE_IPHW;
 
 			if (iphw)
-				debug()->interrupt_hook(22 - count_leading_zeros_32((iphw - 1) & ~iphw), m_pc);
+				debug()->interrupt_hook(std::bit_width((iphw - 1) & ~iphw) - 10, m_pc);
 		}
 	}
 	else
@@ -1592,7 +1597,7 @@ void r4000_base_device::cp0_tlbwi(u8 const index)
 		entry.pfn[0] = m_cp0[CP0_EntryLo0] & EL_WM;
 		entry.pfn[1] = m_cp0[CP0_EntryLo1] & EL_WM;
 
-		entry.low_bit = 32 - count_leading_zeros_32((entry.mask >> 1) | 0xfff);
+		entry.low_bit = std::bit_width((entry.mask >> 1) | 0xfff);
 
 		LOGMASKED(LOG_TLB, "tlb write index %02d mask 0x%016x vpn2 0x%016x %c asid 0x%02x pfn0 0x%016x %c%c pfn1 0x%016x %c%c (%s)\n",
 			index, entry.mask,

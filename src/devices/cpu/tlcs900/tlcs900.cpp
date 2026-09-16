@@ -70,13 +70,12 @@ std::unique_ptr<util::disasm_interface> tlcs900_device::create_disassembler()
 }
 
 
-/* Flag defines */
-#define FLAG_CF     0x01
-#define FLAG_NF     0x02
-#define FLAG_VF     0x04
-#define FLAG_HF     0x10
-#define FLAG_ZF     0x40
-#define FLAG_SF     0x80
+static constexpr u8 FLAG_CF = 0x01;
+static constexpr u8 FLAG_NF = 0x02;
+static constexpr u8 FLAG_VF = 0x04;
+static constexpr u8 FLAG_HF = 0x10;
+static constexpr u8 FLAG_ZF = 0x40;
+static constexpr u8 FLAG_SF = 0x80;
 
 
 inline uint8_t tlcs900_device::RDOP()
@@ -139,19 +138,20 @@ void tlcs900_device::device_start()
 	save_item( NAME(m_dmac) );
 	save_item( NAME(m_dmam) );
 	save_item( NAME(m_timer_pre) );
-	save_item( NAME(m_timer) );
+	save_item( NAME(m_timer_8) );
 	save_item( NAME(m_timer_change) );
 	save_item( NAME(m_level) );
 	save_item( NAME(m_check_irqs) );
 	save_item( NAME(m_ad_cycles_left) );
 	save_item( NAME(m_nmi_state) );
 	save_item( NAME(m_prefetch_clear) );
+	save_item( NAME(m_irq_inhibit) );
 	save_item( NAME(m_prefetch_index) );
 	save_item( NAME(m_prefetch) );
 	save_item( NAME(m_halted) );
 	save_item( NAME(m_regbank) );
 
-	state_add( TLCS900_PC,    "PC",    m_pc.d ).formatstr("%08X");
+	state_add( TLCS900_PC,    "PC",    m_pc.d ).callimport().formatstr("%08X");
 	state_add( TLCS900_XWA0,  "XWA0",  m_xwa[0].d ).formatstr("%08X");
 	state_add( TLCS900_XBC0,  "XBC0",  m_xbc[0].d ).formatstr("%08X");
 	state_add( TLCS900_XDE0,  "XDE0",  m_xde[0].d ).formatstr("%08X");
@@ -190,8 +190,8 @@ void tlcs900_device::device_start()
 	state_add( TLCS900_DMAC3, "DMAC3", m_dmac[3].w.l ).formatstr("%04X");
 	state_add( TLCS900_DMAM3, "DMAM3", m_dmam[3].b.l ).formatstr("%02X");
 
-	state_add( STATE_GENPC, "GENPC", m_pc.d ).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_pc.d ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_pc.d ).callimport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc.d ).callimport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr.w.l ).formatstr("%12s").noshow();
 
 	set_icountptr(m_icount);
@@ -201,29 +201,43 @@ void tlcs900_device::device_reset()
 {
 	m_pc.d = 0x00008000;
 	/* system mode, iff set to 111, min mode, register bank 0 */
-	m_sr.d = 0xF000;
+	m_sr.d = 0xf000;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
 	m_halted = 0;
 	m_check_irqs = 0;
 	m_prefetch_clear = true;
+	m_irq_inhibit = false;
 }
 
 void tlcs900h_device::device_reset()
 {
-	m_pc.b.l = RDMEM( 0xFFFF00 );
-	m_pc.b.h = RDMEM( 0xFFFF01 );
-	m_pc.b.h2 = RDMEM( 0xFFFF02 );
+	m_pc.b.l = RDMEM( 0xffff00 );
+	m_pc.b.h = RDMEM( 0xffff01 );
+	m_pc.b.h2 = RDMEM( 0xffff02 );
 	m_pc.b.h3 = 0;
 	/* system mode, iff set to 111, max mode, register bank 0 */
-	m_sr.d = 0xF800;
+	m_sr.d = 0xf800;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
 	m_halted = 0;
 	m_check_irqs = 0;
 	m_prefetch_clear = true;
+	m_irq_inhibit = false;
 }
 
+
+void tlcs900_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case STATE_GENPC:
+		case STATE_GENPCBASE:
+		case TLCS900_PC:
+			m_prefetch_clear = true;
+			break;
+	}
+}
 
 void tlcs900_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -262,18 +276,35 @@ void tlcs900_device::execute_run()
 
 		if ( m_check_irqs )
 		{
-			tlcs900_check_irqs();
-			m_check_irqs = 0;
+			if ( m_irq_inhibit )
+			{
+				/* Interrupt shadow after EI/RETI: on real TLCS-900 hardware,
+				   interrupt acceptance is deferred until after the next instruction
+				   following EI or RETI. This prevents immediate re-dispatch of
+				   level-triggered interrupts before the return address instruction
+				   gets a chance to execute (e.g. the EI 0; NOP; EI 6 pattern). */
+				m_irq_inhibit = false;
+			}
+			else
+			{
+				tlcs900_check_irqs();
+				m_check_irqs = 0;
+			}
 		}
-
-		debugger_instruction_hook( m_pc.d );
+		else
+		{
+			m_irq_inhibit = false;
+		}
 
 		if ( m_halted )
 		{
+			debugger_wait_hook();
 			m_cycles += 8;
 		}
 		else
 		{
+			debugger_instruction_hook( m_pc.d );
+
 			m_op = RDOP();
 			inst = &m_mnemonic[m_op];
 			prepare_operands( inst );

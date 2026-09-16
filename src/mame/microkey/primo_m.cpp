@@ -2,8 +2,6 @@
 // copyright-holders:Krzysztof Strzecha
 /*******************************************************************************
 
-    primo.c
-
     Functions to emulate general aspects of Microkey Primo computers
     (RAM, ROM, interrupts, I/O ports)
 
@@ -20,7 +18,6 @@
 #include "screen.h"
 
 
-
 /*******************************************************************************
 
     Interrupt callback
@@ -33,6 +30,7 @@ void primo_state::vblank_irq(int state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
+
 /*******************************************************************************
 
     Memory banking
@@ -42,7 +40,7 @@ void primo_state::vblank_irq(int state)
 void primo_state::update_memory()
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-	switch (m_port_FD & 0x03)
+	switch (m_port_fd & 0x03)
 	{
 		case 0x00:  /* Original ROM */
 			space.unmap_write(0x0000, 0x3fff);
@@ -61,8 +59,9 @@ void primo_state::update_memory()
 			membank("bank1")->set_base(m_cart1_rom->base());
 			break;
 	}
-	logerror ("Memory update: %02x\n", m_port_FD);
+	logerror("Memory update: %02x\n", m_port_fd);
 }
+
 
 /*******************************************************************************
 
@@ -121,7 +120,7 @@ uint8_t primo_state::be_2_r()
 
 	// bit 0 - joystic 1 (not implemeted yet)
 
-	logerror ("IOR BE-2 data:%02x\n", data);
+	logerror("IOR BE-2 data:%02x\n", data);
 	return data;
 }
 
@@ -181,29 +180,18 @@ void primo_state::ki_2_w(uint8_t data)
 
 	// bit 0 - not used
 
-//  logerror ("IOW KI-2 data:%02x\n", data);
+	//logerror("IOW KI-2 data:%02x\n", data);
 }
 
-void primo_state::FD_w(uint8_t data)
+void primo_state::fd_w(uint8_t data)
 {
 	if (!m_mem_exp_port->read())
 	{
-		m_port_FD = data;
+		m_port_fd = data;
 		update_memory();
 	}
 }
 
-/*******************************************************************************
-
-    Driver initialization
-
-*******************************************************************************/
-
-void primo_state::init_primo()
-{
-	m_port_FD = 0x00;
-	m_video_memory_base = 0x2800;
-}
 
 /*******************************************************************************
 
@@ -214,7 +202,7 @@ void primo_state::init_primo()
 void primo_state::common_machine_init()
 {
 	if (m_mem_exp_port->read())
-		m_port_FD = 0x00;
+		m_port_fd = 0x00;
 	update_memory();
 	m_maincpu->set_clock_scale(m_clock_port->read() ? 1.5 : 1.0);
 }
@@ -222,7 +210,7 @@ void primo_state::common_machine_init()
 void primo_state::machine_start()
 {
 	save_item(NAME(m_video_memory_base));
-	save_item(NAME(m_port_FD));
+	save_item(NAME(m_port_fd));
 	save_item(NAME(m_nmi));
 
 	std::string region_tag;
@@ -235,13 +223,6 @@ void primo_state::machine_reset()
 	common_machine_init();
 }
 
-MACHINE_RESET_MEMBER(primo_state,primob)
-{
-	common_machine_init();
-
-//removed   cbm_drive_0_config(SERIAL, 8);
-//removed   cbm_drive_1_config(SERIAL, 9);
-}
 
 /*******************************************************************************
 
@@ -249,7 +230,7 @@ MACHINE_RESET_MEMBER(primo_state,primob)
 
 *******************************************************************************/
 
-void primo_state::setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size)
+void primo_state::setup_pss(uint8_t* snapshot_data, uint32_t snapshot_size)
 {
 	/* Z80 registers */
 	m_maincpu->set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
@@ -266,7 +247,6 @@ void primo_state::setup_pss (uint8_t* snapshot_data, uint32_t snapshot_size)
 	m_maincpu->set_state_int(Z80_R, snapshot_data[25]);
 	m_maincpu->set_state_int(Z80_IX, snapshot_data[26] + snapshot_data[27]*256);
 	m_maincpu->set_state_int(Z80_IY, snapshot_data[28] + snapshot_data[29]*256);
-
 
 	/* IO ports */
 
@@ -296,12 +276,12 @@ SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 	return std::make_pair(std::error_condition(), std::string());
 }
 
+
 /*******************************************************************************
 
     Quicload files (.pp)
 
 *******************************************************************************/
-
 
 void primo_state::setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
 {
@@ -313,7 +293,7 @@ void primo_state::setup_pp(uint8_t* quickload_data, uint32_t quickload_size)
 
 	m_maincpu->set_state_int(Z80_PC, start_addr);
 
-	logerror ("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
+	logerror("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
 }
 
 QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
@@ -346,4 +326,3 @@ u32 primo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 	return 0;
 }
-

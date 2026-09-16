@@ -67,7 +67,7 @@ public:
 	void facit4440(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void earom_latch_w(u8 data);
@@ -80,8 +80,8 @@ private:
 
 	MC6845_UPDATE_ROW(update_row);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device_array<er1400_device, 2> m_earom;
@@ -269,7 +269,7 @@ void facit4440_state::facit4440(machine_config &config)
 
 	M6801(config, "kbdmcu", 2.4576_MHz_XTAL).set_disable(); // exact type unknown
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(DOT_CLOCK, 103 * 8, 0, 80 * 8, 621, 0, 500);
 	//screen.set_raw(DOT_CLOCK, 103 * 8, 0, 80 * 8, 621, 0, 560);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

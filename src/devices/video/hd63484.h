@@ -13,8 +13,6 @@
 #pragma once
 
 
-#define HD63484_DISPLAY_PIXELS_MEMBER(_name) void _name(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)
-
 // ======================> hd63484_device
 
 class hd63484_device :  public device_t,
@@ -22,10 +20,10 @@ class hd63484_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)> display_delegate;
+	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n)> display_delegate;
 
 	// construction/destruction
-	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
@@ -40,13 +38,13 @@ public:
 	uint8_t read8(offs_t offset);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);

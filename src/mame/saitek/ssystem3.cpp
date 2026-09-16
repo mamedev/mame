@@ -3,21 +3,25 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-SciSys / Novag Chess Champion: Super System III (aka MK III), distributed by
-both SciSys and Novag. Which company was responsible for which part of the
-manufacturing chain is unknown. The software is by SciSys (no mention of Novag
-in the ROM, it has "COPYRIGHT SCISYS LTD 1979").
+SciSys / Novag Chess Champion: Super System III (aka MK III)
+
+It was distributed by both SciSys and Novag. Which company was responsible for
+which part of the production chain is unknown. The copyright was assigned to SciSys
+(no mention of Novag in the ROM, it has "COPYRIGHT SCISYS LTD 1979").
 
 This is their 1st original product. MK II was licensed from Peter Jennings, and
-MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson,
-with support from David Levy.
+MK I was, to put it bluntly, a bootleg. The chess engine is by Mike Johnson, with
+support from David Levy, Philidor Software.
 
-Hardware notes (Master Unit):
+Hardware notes:
+
+Master Unit:
+- PCB label: 201041 (Rev.A to Rev.E)
 - Synertek 6502A @ 2MHz (4MHz XTAL)
 - Synertek 6522 VIA
 - 8KB ROM (2*Synertek 2332)
 - 1KB RAM (2*HM472114P-3)
-- MD4332BE + a bunch of TTL for the LCD
+- MD4332BE or HLCD0438 + a bunch of TTL for the LCD
 - 13 buttons, 4 switches, no leds or sensorboard
 - connectors for: PSU, Power Pack, Chess Unit, Printer Unit
 
@@ -49,7 +53,8 @@ TODO:
 - LCD TC pin? connects to the display, source is a 50hz timer(from power supply),
   probably to keep refreshing the LCD when inactive, there is no need to emulate it
 - dump/add printer unit
-- dump/add ssystem3 1980 program revision, were the BTANB fixed?
+- dump/add other ssystem3 program revisions, were the BTANB fixed in the 1980 version?
+  known undumped: C19081 + C19082 (instead of C19081E), C45000 + C45012
 - ssystem4 softwarelist if a prototype cartridge is ever dumped
 
 BTANB (ssystem3):
@@ -75,7 +80,7 @@ BTANB (ssystem3):
 #include "video/md4330b.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -106,13 +111,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(cu_plug);
 
 	// machine configs
-	void ssystem3(machine_config &config);
-	void ssystem4(machine_config &config);
+	void ssystem3(machine_config &config) ATTR_COLD;
+	void ssystem4(machine_config &config) ATTR_COLD;
 
-	void init_ssystem3() { m_xor_kludge = true; }
+	void init_ssystem3() ATTR_COLD { m_xor_kludge = true; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -123,15 +128,24 @@ private:
 	required_device<md4332b_device> m_lcd1;
 	optional_device_array<hlcd0438_device, 2> m_lcd2;
 	optional_device_array<pwm_display_device, 2> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	optional_shared_ptr<u8> m_nvram;
 	optional_ioport_array<4+3> m_inputs;
 	output_finder<8, 48> m_out_lcd2;
 
+	u8 m_inp_mux = 0;
+	u8 m_control = 0;
+	u8 m_shift = 0;
+	u32 m_lcd1_data = 0;
+	u64 m_lcd2_data = 0;
+	u8 m_lcd2_select = 0;
+
+	bool m_xor_kludge = false;
+
 	// address maps
-	void ssystem3_map(address_map &map);
-	void ssystem4_map(address_map &map);
-	void chessunit_map(address_map &map);
+	void ssystem3_map(address_map &map) ATTR_COLD;
+	void ssystem4_map(address_map &map) ATTR_COLD;
+	void chessunit_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void lcd1_output_w(u32 data) { m_lcd1_data = data; }
@@ -150,20 +164,10 @@ private:
 	u8 cu_pia_a_r();
 	void cu_pia_b_w(u8 data);
 	u8 cu_pia_b_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_control = 0;
-	u8 m_shift = 0;
-	u32 m_lcd1_data = 0;
-	u64 m_lcd2_data = 0;
-	u8 m_lcd2_select = 0;
-	bool m_xor_kludge = false;
 };
 
 void ssystem3_state::machine_start()
 {
-	m_out_lcd2.resolve();
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_control));
@@ -435,7 +439,7 @@ static INPUT_PORTS_START( ssystem3 )
 	PORT_CONFNAME( 0x01, 0x01, "Memory Unit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x02, "Chess Unit" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssystem3_state, cu_plug, 0)
+	PORT_CONFNAME( 0x02, 0x02, "Chess Unit" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ssystem3_state::cu_plug), 0)
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM)
@@ -466,10 +470,9 @@ void ssystem3_state::ssystem4(machine_config &config)
 	MD4332B(config, m_lcd1);
 	m_lcd1->write_q().set(FUNC(ssystem3_state::lcd1_output_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2, 729/2);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display[0]).set_size(5, 9);
 	m_display[0]->set_bri_levels(0.25);
@@ -488,7 +491,7 @@ void ssystem3_state::ssystem3(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssystem3_state::ssystem3_map);
 
-	M6808(config, m_subcpu, 6800000); // LC circuit, measured
+	M6808(config, m_subcpu, 6'800'000); // LC circuit, measured
 	m_subcpu->set_addrmap(AS_PROGRAM, &ssystem3_state::chessunit_map);
 
 	config.set_perfect_quantum(m_maincpu);
@@ -505,17 +508,16 @@ void ssystem3_state::ssystem3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	HLCD0438(config, m_lcd2[0], 0);
+	HLCD0438(config, m_lcd2[0]);
 	m_lcd2[0]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<0>));
 	m_lcd2[0]->write_data().set(m_lcd2[1], FUNC(hlcd0438_device::data_w));
 
-	HLCD0438(config, m_lcd2[1], 0);
+	HLCD0438(config, m_lcd2[1]);
 	m_lcd2[1]->write_segs().set(FUNC(ssystem3_state::lcd2_output_w<1>));
 
-	screen_device &screen(SCREEN(config, "chessunit", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "chessunit"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1060/1.5, 1080/1.5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display[1]).set_size(8, 48);
 	m_display[1]->output_x().set(FUNC(ssystem3_state::lcd2_pwm_w));
@@ -567,5 +569,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY, FULLNAME, FLAGS
-SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, ssystem3, 0,      0,      ssystem3, ssystem3, ssystem3_state, init_ssystem3, "SciSys / Novag Industries / Philidor Software", "Chess Champion: Super System III", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1980, ssystem4, 0,      0,      ssystem4, ssystem4, ssystem3_state, empty_init,    "SciSys / Philidor Software", "Chess Champion: Super System IV", MACHINE_SUPPORTS_SAVE )

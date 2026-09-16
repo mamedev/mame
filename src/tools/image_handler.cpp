@@ -15,6 +15,9 @@
 #include "multibyte.h"
 #include "strformat.h"
 
+#include <algorithm>
+#include <cstring>
+
 
 // Format enumeration
 
@@ -43,7 +46,7 @@ namespace {
 
 	struct fs_enum : public fs::manager_t::floppy_enumerator {
 		filesystem_format *m_format;
-		fs_enum(filesystem_format *format, const std::vector<u32> &variants) : fs::manager_t::floppy_enumerator(floppy_image::FF_UNKNOWN, variants), m_format(format) {}
+		fs_enum(filesystem_format *format, u32 form_factor, const std::vector<u32> &variants) : fs::manager_t::floppy_enumerator(form_factor, variants), m_format(format) {}
 
 		virtual void add_format(const floppy_image_format_t &type, u32 image_size, const char *name, const char *description) override {
 			m_format->m_floppy = true;
@@ -65,7 +68,7 @@ void formats_table::init()
 	mame_formats_full_list(en);
 
 	for(auto &f : filesystem_formats) {
-		fs_enum fen(f.get(), variants);
+		fs_enum fen(f.get(), floppy_image::FF_UNKNOWN, variants);
 		f->m_manager->enumerate_f(fen);
 	}
 
@@ -244,6 +247,9 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 			res.emplace_back(std::make_pair(score, e.second));
 	}
 
+	// Sort results by decreasing score
+	std::stable_sort(res.begin(), res.end(), [](const auto &a, const auto &b) { return a.first > b.first; });
+
 	return res;
 }
 
@@ -277,26 +283,34 @@ bool image_handler::floppy_save(const floppy_format_info &format) const
 	return !format.m_format->save(*io, variants, m_floppy_image);
 }
 
-void image_handler::floppy_create(const floppy_create_info &format, fs::meta_data meta)
+bool image_handler::floppy_create(const floppy_create_info &format, fs::meta_data meta)
 {
 	if(format.m_type) {
 		std::vector<uint32_t> variants;
 		std::vector<u8> img(format.m_image_size);
 		fs::fsblk_vec_t blockdev(img);
 		auto fs = format.m_manager->mount(blockdev);
-		fs->format(meta);
+		if(!fs || fs->format(meta))
+			return true;
 
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		format.m_type->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
+		return !format.m_type->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
 	} else {
 		fs::unformatted_image::format(format.m_key, &m_floppy_image);
+		return false;
 	}
 }
 
 bool image_handler::floppy_mount_fs(const filesystem_format &format)
 {
+	// Create a restricted copy of the format list based on the known form factor and variant
+	filesystem_format fmtcopy(format.m_manager, format.m_category);
+	std::vector<u32> const var(1, m_floppy_image.get_variant());
+	fs_enum fen(&fmtcopy, m_floppy_image.get_form_factor(), var);
+	format.m_manager->enumerate_f(fen);
+
 	m_floppy_fs_converter = nullptr;
-	for(const auto &ci : format.m_floppy_create) {
+	for(const auto &ci : fmtcopy.m_floppy_create) {
 		if(ci->m_type != m_floppy_fs_converter) {
 			std::vector<uint32_t> variants;
 			m_floppy_fs_converter = ci->m_type;
@@ -316,6 +330,11 @@ bool image_handler::floppy_mount_fs(const filesystem_format &format)
 	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
 	m_fsm = format.m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
+	if(!m_fs) {
+		m_fsblk.reset();
+		m_sector_image.clear();
+		return true;
+	}
 	return false;
 }
 
@@ -327,6 +346,11 @@ bool image_handler::hd_mount_fs(const filesystem_format &format)
 	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
 	m_fsm = format.m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
+	if(!m_fs) {
+		m_fsblk.reset();
+		m_sector_image.clear();
+		return true;
+	}
 	return false;
 }
 

@@ -15,7 +15,7 @@ public:
 
 	auto output_callback() { return output_cb.bind(); }
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 	void set_ddrsbm_fpga(bool flag) { is_ddrsbm_fpga = flag; }
 
 	uint16_t a00_r();
@@ -71,10 +71,10 @@ public:
 	void network_id_w(uint16_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	memory_share_creator<uint16_t> ram;

@@ -59,15 +59,15 @@ public:
 		, m_config(*this, "CONFIG")
 	{ }
 
-	void triton1(machine_config &config);
-	void triton2(machine_config &config);
+	void triton1(machine_config &config) ATTR_COLD;
+	void triton2(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(pushbutton_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(charset_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -89,8 +89,8 @@ private:
 	required_ioport m_modifiers;
 	required_ioport m_config;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
@@ -247,11 +247,11 @@ static INPUT_PORTS_START(triton)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
 
 	PORT_START("PUSHBUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset")        PORT_CHANGED_MEMBER(DEVICE_SELF, triton_state, pushbutton_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_F2) PORT_NAME("Clear Screen") PORT_CHANGED_MEMBER(DEVICE_SELF, triton_state, pushbutton_changed, 0xcf) // INT1
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_F3) PORT_NAME("Initialise")   PORT_CHANGED_MEMBER(DEVICE_SELF, triton_state, pushbutton_changed, 0xd7) // INT2
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_F4) PORT_NAME("Menu")         PORT_CHANGED_MEMBER(DEVICE_SELF, triton_state, pushbutton_changed, 0xdf) // INT3
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_F5) PORT_NAME("Pause")        PORT_CHANGED_MEMBER(DEVICE_SELF, triton_state, pushbutton_changed, 1) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_F1) PORT_NAME("Reset")        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(triton_state::pushbutton_changed), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_F2) PORT_NAME("Clear Screen") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(triton_state::pushbutton_changed), 0xcf) // INT1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_F3) PORT_NAME("Initialise")   PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(triton_state::pushbutton_changed), 0xd7) // INT2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_CODE(KEYCODE_F4) PORT_NAME("Menu")         PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(triton_state::pushbutton_changed), 0xdf) // INT3
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_F5) PORT_NAME("Pause")        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(triton_state::pushbutton_changed), 1) PORT_TOGGLE
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x07, 0x00, "8K RAM Card")
@@ -261,7 +261,7 @@ static INPUT_PORTS_START(triton)
 	PORT_CONFSETTING(0x03, "3x8K 2000-7FFF")
 	PORT_CONFSETTING(0x04, "4x8K 2000-9FFF")
 	PORT_CONFSETTING(0x05, "5x8K 2000-BFFF")
-	PORT_CONFNAME(0x10, 0x00, "Graphics PROM") PORT_CHANGED_MEMBER(DEVICE_SELF, triton_state, charset_changed, 0)
+	PORT_CONFNAME(0x10, 0x00, "Graphics PROM") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(triton_state::charset_changed), 0)
 	PORT_CONFSETTING(0x00, "Graphics")
 	PORT_CONFSETTING(0x10, "Lower Case")
 	//PORT_CONFNAME(0x20, 0x00, "Auto repeat")
@@ -390,8 +390,6 @@ void triton_state::machine_start()
 
 	m_exp_ram = make_unique_clear<uint8_t[]>(0xe000);
 
-	m_led.resolve();
-
 	save_pointer(NAME(m_exp_ram), 0xe000);
 }
 
@@ -435,7 +433,6 @@ GFXDECODE_END
 
 static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_110)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_110)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_MARK)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
@@ -449,7 +446,7 @@ void triton_state::triton1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &triton_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(triton_state::inta_cb));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("ef9364", FUNC(ef9364_device::screen_update));
 	screen.set_size(64 * 8, 16 * 12);

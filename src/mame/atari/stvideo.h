@@ -15,7 +15,7 @@ public:
 	template <typename T> void set_ram(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	auto de_cb()    { return m_de_cb.bind();    }
 	auto hsync_cb() { return m_hsync_cb.bind(); }
@@ -24,8 +24,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void device_config_complete() override;
 	ioport_constructor device_input_ports() const override;
 	u32 palette_entries() const noexcept override { return 16; }

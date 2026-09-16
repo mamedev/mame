@@ -45,9 +45,9 @@ public:
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual u32 palette_entries() const noexcept override { return 16; }
 

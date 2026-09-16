@@ -58,10 +58,7 @@ public:
 	pc1512_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: pc1512_mouse_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -80,7 +77,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	devcb_write8 m_write_x;
 	devcb_write8 m_write_y;
@@ -100,7 +97,7 @@ public:
 	pc1512_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed ) { m_port->x_w(newval); }
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed ) { m_port->y_w(newval); }
@@ -109,7 +106,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 

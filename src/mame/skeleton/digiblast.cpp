@@ -10,7 +10,6 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 #include "machine/s3c2410.h"
 
 #include "emupal.h"
@@ -36,8 +35,8 @@ public:
 	void digiblast(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -48,7 +47,7 @@ private:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void digiblast_map(address_map &map);
+	void digiblast_map(address_map &map) ATTR_COLD;
 };
 
 void digiblast_state::digiblast_map(address_map &map)
@@ -84,7 +83,7 @@ void digiblast_state::digiblast(machine_config &config)
 	ARM9(config, m_maincpu, 200000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &digiblast_state::digiblast_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(455, 262);
@@ -124,4 +123,4 @@ ROM_END
 
 } // Anonymous namespace
 
-CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_IS_SKELETON )
+CONS( 2005, digiblst,  0, 0, digiblast,  digiblast,  digiblast_state, empty_init, "Nikko Entertainment B.V. / Grey Innovation", "digiBLAST", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

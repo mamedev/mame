@@ -58,8 +58,8 @@ protected:
 
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -71,12 +71,12 @@ protected:
 	std::unique_ptr<uint8_t []> m_data;
 
 	// configuration state
-	uint32_t                  m_cells;
-	uint8_t                   m_address_bits;
-	uint8_t                   m_data_bits;
+	uint32_t                m_cells;
+	uint8_t                 m_address_bits;
+	uint8_t                 m_data_bits;
 	const void *            m_default_data;
-	uint32_t                  m_default_data_size;
-	uint32_t                  m_default_value;
+	uint32_t                m_default_data_size;
+	uint32_t                m_default_value;
 	bool                    m_default_value_set;
 	attotime                m_operation_time[TIMING_COUNT];
 

@@ -35,7 +35,7 @@ It means we probably would have to emulate a modem device for it to treat commun
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -62,16 +62,16 @@ public:
 	void init_ti630();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void i80c31_p1_w(uint8_t data);
 	void i80c31_p3_w(uint8_t data);
 	uint8_t i80c31_p1_r();
 	void ti630_palette(palette_device &palette) const;
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
+	void i80c31_data(address_map &map) ATTR_COLD;
+	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -86,11 +86,11 @@ void ti630_state::init_ti630()
 {
 }
 
-void ti630_state::i80c31_io(address_map &map)
+void ti630_state::i80c31_data(address_map &map)
 {
-	map(0x0000, 0x0000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::control_w));
-	map(0x1000, 0x1000) /*.mirror(?)*/ .w("hd44780", FUNC(hd44780_device::data_w));
-	map(0x2000, 0x2000) /*.mirror(?)*/ .r("hd44780", FUNC(hd44780_device::control_r));
+	map(0x0000, 0x0000) /*.mirror(?)*/ .w(m_lcdc, FUNC(hd44780_device::control_w));
+	map(0x1000, 0x1000) /*.mirror(?)*/ .w(m_lcdc, FUNC(hd44780_device::data_w));
+	map(0x2000, 0x2000) /*.mirror(?)*/ .r(m_lcdc, FUNC(hd44780_device::control_r));
 	map(0x8000, 0xffff).ram(); /*TODO: verify the ammont of RAM and the correct address range to which it is mapped. This is just a first reasonable guess that apparently yields good results in the emulation */
 }
 
@@ -145,16 +145,16 @@ void ti630_state::ti630(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti630_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_IO, &ti630_state::i80c31_io);
+	m_maincpu->set_addrmap(AS_DATA, &ti630_state::i80c31_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(ti630_state::i80c31_p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(ti630_state::i80c31_p1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(ti630_state::i80c31_p3_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 9*2);
 	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
 	screen.set_palette("palette");
@@ -162,7 +162,7 @@ void ti630_state::ti630(machine_config &config)
 	PALETTE(config, "palette", FUNC(ti630_state::ti630_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_ti630);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 }
 

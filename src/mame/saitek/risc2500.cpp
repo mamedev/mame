@@ -20,7 +20,8 @@ Hardware notes:
 
 *: Sold with 128KB RAM by default. This can be easily increased up to 2MB
 by the user(chesscomputer owner, but also the MAME user in this case).
-The manual also says that RAM is expandable.
+The manual also says that RAM is expandable. Although the hardware only
+supports 128KB, 512KB, or 2MB, the software also supports 256KB or 1MB.
 
 According to Saitek's repair manual, there is a GAL and a clock frequency
 divider chip, ROM access goes through it. This allows reading from slow EPROM
@@ -32,7 +33,6 @@ Undocumented buttons:
 - hold UP+DOWN on boot to start the TestMode
 
 TODO:
-- bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
 - More accurate dynamic cpu clock divider, without the cost of emulation speed.
   The current implementation catches almost everything, luckily ARM opcodes have a
   fixed length. It only fails to detect ALU opcodes that directly modify pc(R15).
@@ -43,16 +43,17 @@ TODO:
 
 #include "emu.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
+#include "video/pwm.h"
 #include "video/sed1520.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -65,78 +66,82 @@ namespace {
 class risc2500_state : public driver_device
 {
 public:
-	risc2500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_rom(*this, "maincpu")
-		, m_ram(*this, "ram")
-		, m_nvram(*this, "nvram")
-		, m_disable_bootrom(*this, "disable_bootrom")
-		, m_speaker(*this, "speaker")
-		, m_lcdc(*this, "lcdc")
-		, m_board(*this, "board")
-		, m_inputs(*this, "IN.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
-		, m_syms(*this, "sym%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+	risc2500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_boot_view(*this, "boot_view"),
+		m_rom(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_nvram(*this, "nvram"),
+		m_board(*this, "board"),
+		m_led_pwm(*this, "led_pwm"),
+		m_lcdc(*this, "lcdc"),
+		m_screen(*this, "screen"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0),
+		m_lcd_dmz(*this, "dmz%u.%u.%u", 0U, 0U, 0U),
+		m_lcd_digit(*this, "digit%u", 0U),
+		m_lcd_seg(*this, "seg%u.%u", 0U, 0U),
+		m_lcd_sym(*this, "sym%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(acl_button) { if (newval) power_off(); }
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 
-	void risc2500(machine_config &config);
-	void montreux(machine_config &config);
+	void risc2500(machine_config &config) ATTR_COLD;
+	void montreux(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm2_cpu_device> m_maincpu;
+	memory_view m_boot_view;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
-	required_device<timer_device> m_disable_bootrom;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<sed1520_device> m_lcdc;
 	required_device<sensorboard_device> m_board;
+	required_device<pwm_display_device> m_led_pwm;
+	required_device<sed1520_device> m_lcdc;
+	required_device<screen_svg_device> m_screen;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<8> m_inputs;
-	output_finder<12> m_digits;
-	output_finder<14> m_syms;
-	output_finder<16> m_leds;
-
-	void risc2500_mem(address_map &map);
-
-	void lcd_palette(palette_device &palette) const;
-	SED1520_UPDATE_CB(screen_update_cb);
-	u32 input_r();
-	void control_w(u32 data);
-	u32 rom_r(offs_t offset);
-	void power_off();
-
-	u32 disable_boot_rom_r();
-	void install_bootrom(bool enable);
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
-	bool m_bootrom_enabled = false;
+	output_finder<12, 7, 6> m_lcd_dmz;
+	output_finder<12> m_lcd_digit;
+	output_finder<12, 8> m_lcd_seg;
+	output_finder<14> m_lcd_sym;
 
 	bool m_power = false;
 	u32 m_control = 0;
 	u32 m_prev_pc = 0;
 	u64 m_prev_cycle = 0;
+
+	void risc2500_mem(address_map &map) ATTR_COLD;
+
+	void screen_svg_update(screen_svg_device &screen);
+	SED1520_UPDATE_CB(sed1520_update);
+
+	u32 input_r();
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 rom_r(offs_t offset);
+	void power_off();
+
+	u32 disable_bootrom_r();
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void risc2500_state::machine_start()
 {
-	m_digits.resolve();
-	m_syms.resolve();
-	m_leds.resolve();
-
+	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
 	// register for savestates
 	save_item(NAME(m_power));
-	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_control));
 	save_item(NAME(m_prev_pc));
 	save_item(NAME(m_prev_cycle));
@@ -144,7 +149,7 @@ void risc2500_state::machine_start()
 
 void risc2500_state::machine_reset()
 {
-	install_bootrom(true);
+	m_boot_view.select(0);
 
 	m_power = true;
 	m_control = 0;
@@ -158,51 +163,43 @@ void risc2500_state::machine_reset()
     Video
 *******************************************************************************/
 
-void risc2500_state::lcd_palette(palette_device &palette) const
+void risc2500_state::screen_svg_update(screen_svg_device &screen)
 {
-	palette.set_pen_color(0, rgb_t(131, 136, 139)); // lcd pixel off
-	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
-}
-
-SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
-{
-	bitmap.fill(2, cliprect);
+	auto [static_drive, lcd_on, dram, start_line, adc, duty] = m_lcdc->render();
+	if (static_drive)
+		return;
 
 	for (int c = 0; c < 12; c++)
 	{
+		u8 data = 0;
+
 		// 12 characters 5 x 7
 		for (int x = 0; x < 5; x++)
 		{
-			u8 gfx = 0;
 			if (lcd_on)
-				gfx = bitswap<8>(dram[c * 5 + x], 6,5,0,1,2,3,4,7);
+				data = bitswap<8>(dram[c * 5 + x], 6,5,0,1,2,3,4,7);
 
 			for (int y = 1; y < 8; y++)
-				bitmap.pix(y, 71 - (c * 6 + x)) = BIT(gfx, y);
+				m_lcd_dmz[11 - c][y - 1][4 - x] = BIT(data, y);
 		}
 
 		// LCD digits and symbols
+		int data_addr = 80 + c * 5;
 		if (lcd_on)
 		{
-			int data_addr = 80 + c * 5;
-			u16 data = ((dram[data_addr + 1] & 0x3) << 5) | ((dram[data_addr + 2] & 0x7) << 2) | (dram[data_addr + 4] & 0x3);
+			data = ((dram[data_addr + 1] & 0x3) << 5) | ((dram[data_addr + 2] & 0x7) << 2) | (dram[data_addr + 4] & 0x3);
 			data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((dram[data_addr - 1] & 0x04) ? 0x80 : 0);
+		}
 
-			m_digits[c] = data;
-			m_syms[c] = BIT(dram[data_addr + 1], 2);
-		}
-		else
-		{
-			m_digits[c] = 0;
-			m_syms[c] = 0;
-		}
+		for (int s = 0; s < 8; s++)
+			m_lcd_seg[11 - c][s] = BIT(data, s);
+
+		m_lcd_digit[11 - c] = data;
+		m_lcd_sym[c] = lcd_on ? BIT(dram[data_addr + 1], 2) : 0;
 	}
 
-	m_syms[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
-	m_syms[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
-
-	return 0;
+	m_lcd_sym[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
+	m_lcd_sym[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
 }
 
 
@@ -210,31 +207,6 @@ SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
 /*******************************************************************************
     I/O
 *******************************************************************************/
-
-// bootrom bankswitch
-
-void risc2500_state::install_bootrom(bool enable)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), size_t(m_ram->size())) - 1);
-
-	if (enable)
-		program.install_read_handler(0, m_rom.bytes() - 1, read32sm_delegate(*this, FUNC(risc2500_state::rom_r)));
-	else
-		program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
-
-	m_bootrom_enabled = enable;
-}
-
-u32 risc2500_state::disable_boot_rom_r()
-{
-	// disconnect bootrom from the bus after next opcode
-	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
-		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
-
-	return 0;
-}
-
 
 // soft power on/off
 
@@ -254,9 +226,7 @@ void risc2500_state::power_off()
 
 	// clear display
 	m_lcdc->reset();
-
-	for (int i = 0; i < 16; i++)
-		m_leds[i] = 0;
+	m_led_pwm->clear();
 }
 
 
@@ -264,11 +234,11 @@ void risc2500_state::power_off()
 
 u32 risc2500_state::input_r()
 {
-	u32 data = (u32)m_lcdc->status_read() << 16;
+	u32 data = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (m_control & (1 << i))
+		if (BIT(m_control, i))
 		{
 			data |= m_inputs[i]->read() << 24;
 			data |= m_board->read_rank(i, true);
@@ -276,15 +246,18 @@ u32 risc2500_state::input_r()
 	}
 
 	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, CLEAR_LINE);
 
 	return data;
 }
 
-void risc2500_state::control_w(u32 data)
+void risc2500_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	if (mem_mask != 0xffffffff)
+		logerror("control_w unexpected mem_mask %08X\n", mem_mask);
+
 	// lcd
-	if (!BIT(data, 27))
+	if (BIT(m_control & ~data, 27))
 	{
 		if (BIT(data, 26))
 			m_lcdc->data_write(data);
@@ -292,28 +265,26 @@ void risc2500_state::control_w(u32 data)
 			m_lcdc->control_write(data);
 	}
 
-	// vertical leds
-	if (BIT(data, 31))
-	{
-		for (int i = 0; i < 8; i++)
-			m_leds[i] = BIT(~data, i);
-	}
-
-	// horizontal leds
-	if (BIT(data, 30))
-	{
-		for (int i = 0; i < 8; i++)
-			m_leds[8 + i] = BIT(~data, i);
-	}
+	// leds
+	m_led_pwm->matrix(data >> 30, ~data & 0xff);
 
 	// speaker
-	m_speaker->level_w(data >> 28 & 3);
+	m_dac->write(data >> 28 & 3);
 
 	// power-off
 	if (BIT(m_control & ~data, 24))
 		power_off();
 
 	m_control = data;
+}
+
+u32 risc2500_state::disable_bootrom_r()
+{
+	// disconnect bootrom from the bus after next opcode
+	if (!machine().side_effects_disabled())
+		m_boot_view.select(1);
+
+	return 0;
 }
 
 u32 risc2500_state::rom_r(offs_t offset)
@@ -352,8 +323,11 @@ u32 risc2500_state::rom_r(offs_t offset)
 
 void risc2500_state::risc2500_mem(address_map &map)
 {
-	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_boot_rom_r));
+	map(0x00000000, 0x001fffff).view(m_boot_view);
+	m_boot_view[0](0x00000000, 0x0003ffff).r(FUNC(risc2500_state::rom_r));
+
 	map(0x01000000, 0x01000003).rw(FUNC(risc2500_state::input_r), FUNC(risc2500_state::control_w));
+	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_bootrom_r));
 	map(0x02000000, 0x0203ffff).r(FUNC(risc2500_state::rom_r));
 }
 
@@ -366,49 +340,48 @@ void risc2500_state::risc2500_mem(address_map &map)
 static INPUT_PORTS_START( risc2500 )
 	PORT_START("IN.0")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn")     PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("BACK")     PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Back")     PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("IN.1")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Knight")   PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENTER")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("IN.2")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop")   PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DOWN")     PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Down")     PORT_CODE(KEYCODE_DOWN)
 
 	PORT_START("IN.3")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Rook")     PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("UP")       PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Up")       PORT_CODE(KEYCODE_UP)
 
 	PORT_START("IN.4")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen")    PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("MENU")     PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Menu")     PORT_CODE(KEYCODE_M)
 
 	PORT_START("IN.5")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King")     PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PLAY")     PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Play")     PORT_CODE(KEYCODE_P)
 
 	PORT_START("IN.6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RIGHT")    PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("NEW GAME") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right")    PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game") PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN.7")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEFT")     PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("OFF")      PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Left")     PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Off")      PORT_CODE(KEYCODE_F)
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ON")       PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, on_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ACL")      PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, acl_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("On")       PORT_CODE(KEYCODE_O) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(risc2500_state::on_button), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( montreux ) // on/off buttons have different labels
 	PORT_INCLUDE( risc2500 )
 
 	PORT_MODIFY("IN.7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("STOP")     PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Stop")     PORT_CODE(KEYCODE_S)
 
 	PORT_MODIFY("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("GO")       PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, risc2500_state, on_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Go")       PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(risc2500_state::on_button), 0)
 INPUT_PORTS_END
 
 
@@ -420,14 +393,11 @@ INPUT_PORTS_END
 void risc2500_state::risc2500(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28.322_MHz_XTAL / 2);
+	ARM2(config, m_maincpu, 28.322_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc2500_state::risc2500_mem);
-	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_assert), irq_period);
-
-	TIMER(config, "disable_bootrom").configure_generic(FUNC(risc2500_state::disable_bootrom));
 
 	RAM(config, m_ram).set_extra_options("128K, 256K, 512K, 1M, 2M");
 	m_ram->set_default_size("128K");
@@ -442,25 +412,19 @@ void risc2500_state::risc2500(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(12*6+1, 7+2);
-	screen.set_visarea_full();
-	screen.set_screen_update(m_lcdc, FUNC(sed1520_device::screen_update));
-	screen.set_palette("palette");
+	SED1520(config, m_lcdc);
 
+	SCREEN_SVG(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(1920/5, 768/5);
+	m_screen->set_screen_svg_update(FUNC(risc2500_state::screen_svg_update));
+
+	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_saitek_risc2500);
 
-	PALETTE(config, "palette", FUNC(risc2500_state::lcd_palette), 3);
-
-	SED1520(config, m_lcdc);
-	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::screen_update_cb));
-
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-	m_speaker->set_levels(4, speaker_levels);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.125);
 }
 
 void risc2500_state::montreux(machine_config &config)
@@ -475,19 +439,28 @@ void risc2500_state::montreux(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( risc2500 )
+ROM_START( risc2500 ) // v1.04 21-Oct-92
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD("risc2500_v.1.04.u7", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c) ) // M27C1001
+	ROM_LOAD("st17_a22_u_7.u7", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c) ) // 27C010A-12
+
+	ROM_REGION( 221222, "screen", 0 )
+	ROM_LOAD("risc2500.svg", 0, 221222, CRC(73076886) SHA1(d278f071f8a92201a5aba59ad1c99234a389118f) )
 ROM_END
 
-ROM_START( risc2500a )
+ROM_START( risc2500a ) // v1.03 14-Oct-92
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD("risc2500_v.1.03.u7", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc) )
+	ROM_LOAD("st17_a15.u7", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc) ) // 27C010A-15
+
+	ROM_REGION( 221222, "screen", 0 )
+	ROM_LOAD("risc2500.svg", 0, 221222, CRC(73076886) SHA1(d278f071f8a92201a5aba59ad1c99234a389118f) )
 ROM_END
 
-ROM_START( montreux ) // v1.00
+ROM_START( montreux ) // v1.00 10-Dec-94
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD("rt17b_103_u_7.u7", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac) ) // 27C020-15
+
+	ROM_REGION( 221222, "screen", 0 )
+	ROM_LOAD("risc2500.svg", 0, 221222, CRC(73076886) SHA1(d278f071f8a92201a5aba59ad1c99234a389118f) )
 ROM_END
 
 } // anonymous namespace
@@ -499,7 +472,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
+SYST( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
-SYST( 1995, montreux,  0,        0,      montreux, montreux, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // after Saitek bought Hegener + Glaser
+SYST( 1995, montreux,  0,        0,      montreux, montreux, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING ) // when H+G was a subsidiary of Saitek

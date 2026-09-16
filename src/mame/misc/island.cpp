@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 
@@ -31,8 +31,8 @@ public:
 	void vortex(machine_config &config);
 
 private:
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -58,7 +58,7 @@ void island_state::vortex(machine_config &config)
 {
 	DS80C320(config, m_maincpu, 20_MHz_XTAL); // FIXME: has more registers, faster machine cycles
 	m_maincpu->set_addrmap(AS_PROGRAM, &island_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &island_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &island_state::ext_map);
 
 	SPEAKER(config, "mono").front_center();
 

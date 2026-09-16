@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_AM2910_AM2910_H
-#define MAME_MACHINE_AM2910_AM2910_H
+#ifndef MAME_MACHINE_AM2910_H
+#define MAME_MACHINE_AM2910_H
 
 #pragma once
 
@@ -22,7 +22,7 @@ class am2910_device : public device_t
 {
 public:
 	// construction/destruction
-	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	am2910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void cc_w(int state);    // !CC
 	void ccen_w(int state);  // !CCEN
@@ -40,8 +40,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(clock_tick);
 
@@ -79,4 +79,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(AM2910, am2910_device)
 
-#endif // MAME_MACHINE_AM2910_AM2910_H
+#endif // MAME_MACHINE_AM2910_H

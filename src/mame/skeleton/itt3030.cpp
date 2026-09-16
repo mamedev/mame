@@ -244,8 +244,8 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -269,9 +269,9 @@ private:
 	void fdchld_w(int state);
 	void itt3030_palette(palette_device &palette) const;
 
-	void itt3030_io(address_map &map);
-	void itt3030_map(address_map &map);
-	void lower48_map(address_map &map);
+	void itt3030_io(address_map &map) ATTR_COLD;
+	void itt3030_map(address_map &map) ATTR_COLD;
+	void lower48_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -726,7 +726,7 @@ void itt3030_state::itt3030(machine_config &config)
 	m_kbdmcu->p2_out_cb().set(FUNC(itt3030_state::kbd_port2_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250));
 	m_screen->set_screen_update(FUNC(itt3030_state::screen_update));

@@ -76,140 +76,118 @@ inline void i8086_common_cpu_device::CLKM(uint8_t op_reg, uint8_t op_mem)
 inline uint32_t i8086_common_cpu_device::get_ea(int size, int op)
 {
 	uint16_t e16;
+	uint8_t modrm = m_modrm & 0xc7;
 
-	switch( m_modrm & 0xc7 )
+	switch( modrm )
 	{
 	case 0x00:
-		m_icount -= 7;
 		m_eo = m_regs.w[BX] + m_regs.w[SI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x01:
-		m_icount -= 8;
 		m_eo = m_regs.w[BX] + m_regs.w[DI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x02:
-		m_icount -= 8;
 		m_eo = m_regs.w[BP] + m_regs.w[SI];
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x03:
-		m_icount -= 7;
 		m_eo = m_regs.w[BP] + m_regs.w[DI];
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x04:
-		m_icount -= 5;
 		m_eo = m_regs.w[SI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x05:
-		m_icount -= 5;
 		m_eo = m_regs.w[DI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x06:
-		m_icount -= 6;
 		m_eo = fetch_word();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x07:
-		m_icount -= 5;
 		m_eo = m_regs.w[BX];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 
 	case 0x40:
-		m_icount -= 11;
 		m_eo = m_regs.w[BX] + m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x41:
-		m_icount -= 12;
 		m_eo = m_regs.w[BX] + m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x42:
-		m_icount -= 12;
 		m_eo = m_regs.w[BP] + m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x43:
-		m_icount -= 11;
 		m_eo = m_regs.w[BP] + m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x44:
-		m_icount -= 9;
 		m_eo = m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x45:
-		m_icount -= 9;
 		m_eo = m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x46:
-		m_icount -= 9;
 		m_eo = m_regs.w[BP] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x47:
-		m_icount -= 9;
 		m_eo = m_regs.w[BX] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 
 	case 0x80:
-		m_icount -= 11;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BX] + m_regs.w[SI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x81:
-		m_icount -= 12;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BX] + m_regs.w[DI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x82:
-		m_icount -= 11;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BP] + m_regs.w[SI] + (int16_t)e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x83:
-		m_icount -= 11;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BP] + m_regs.w[DI] + (int16_t)e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x84:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[SI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x85:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[DI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x86:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BP] + (int16_t)e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x87:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BX] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	}
+	m_icount -= m_ea_timing[modrm];
 	return m_ea;
 }
 
@@ -518,7 +496,16 @@ inline void i8086_common_cpu_device::ExpandFlags(uint16_t f)
 inline void i8086_common_cpu_device::i_insb()
 {
 	uint32_t ea = calc_addr(ES, m_regs.w[DI], 1, I8086_WRITE);
-	write_byte(ea, read_port_byte(m_regs.w[DX]));
+	uint8_t const data = read_port_byte(m_regs.w[DX]);
+	if (access_to_be_redone())
+	{
+		// the device wait-stated the cycle; restart the instruction
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
+	write_byte(ea, data);
 	m_regs.w[DI] += -2 * m_DF + 1;
 	CLK(IN_IMM8);
 }
@@ -526,7 +513,15 @@ inline void i8086_common_cpu_device::i_insb()
 inline void i8086_common_cpu_device::i_insw()
 {
 	uint32_t ea = calc_addr(ES, m_regs.w[DI], 2, I8086_WRITE);
-	write_word(ea, read_port_word(m_regs.w[DX]));
+	uint16_t const data = read_port_word(m_regs.w[DX]);
+	if (access_to_be_redone())
+	{
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
+	write_word(ea, data);
 	m_regs.w[DI] += -4 * m_DF + 2;
 	CLK(IN_IMM16);
 }
@@ -534,6 +529,14 @@ inline void i8086_common_cpu_device::i_insw()
 inline void i8086_common_cpu_device::i_outsb()
 {
 	write_port_byte(m_regs.w[DX], GetMemB(DS, m_regs.w[SI]));
+	if (access_to_be_redone())
+	{
+		// the device wait-stated the cycle; restart the instruction
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
 	m_regs.w[SI] += -2 * m_DF + 1;
 	CLK(OUT_IMM8);
 }
@@ -541,6 +544,13 @@ inline void i8086_common_cpu_device::i_outsb()
 inline void i8086_common_cpu_device::i_outsw()
 {
 	write_port_word(m_regs.w[DX], GetMemW(DS, m_regs.w[SI]));
+	if (access_to_be_redone())
+	{
+		m_io_stall = true;
+		m_ip = m_prev_ip;
+		m_icount -= 4;
+		return;
+	}
 	m_regs.w[SI] += -4 * m_DF + 2;
 	CLK(OUT_IMM16);
 }
@@ -643,9 +653,9 @@ inline void i8086_common_cpu_device::i_popf()
 }
 
 
-inline uint32_t i8086_common_cpu_device::ADDB()
+inline uint32_t i8086_common_cpu_device::ADDB(uint8_t c)
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = m_dst + m_src + c;
 
 	set_OFB_Add(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -655,9 +665,9 @@ inline uint32_t i8086_common_cpu_device::ADDB()
 }
 
 
-inline uint32_t i8086_common_cpu_device::ADDX()
+inline uint32_t i8086_common_cpu_device::ADDX(uint8_t c)
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = m_dst + m_src + c;
 
 	set_OFW_Add(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -667,9 +677,9 @@ inline uint32_t i8086_common_cpu_device::ADDX()
 }
 
 
-inline uint32_t i8086_common_cpu_device::SUBB()
+inline uint32_t i8086_common_cpu_device::SUBB(uint8_t b)
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = m_dst - m_src - b;
 
 	set_OFB_Sub(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -679,9 +689,9 @@ inline uint32_t i8086_common_cpu_device::SUBB()
 }
 
 
-inline uint32_t i8086_common_cpu_device::SUBX()
+inline uint32_t i8086_common_cpu_device::SUBX(uint8_t b)
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = m_dst - m_src - b;
 
 	set_OFW_Sub(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);

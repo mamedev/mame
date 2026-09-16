@@ -394,220 +394,72 @@ _recip_approx(float value)
 
 
 /*-------------------------------------------------
-    mul_64x64 - perform a signed 64 bit x 64 bit
-    multiply and return the full 128 bit result
+    muldivu_64 - perform an unsigned 64 bits a*b/c,
+    rounding toward zero.  Unpredictable (including
+    crashes) when the result does not fit in 64
+    bits.
 -------------------------------------------------*/
 
 #ifdef __x86_64__
-#define mul_64x64 _mul_64x64
-inline int64_t ATTR_FORCE_INLINE
-_mul_64x64(int64_t a, int64_t b, int64_t &hi)
-{
-	__int128 const r(__int128(a) * b);
-	hi = int64_t(uint64_t((unsigned __int128)r >> 64));
-	return int64_t(uint64_t((unsigned __int128)r));
-}
-#endif
-
-
-/*-------------------------------------------------
-    mulu_64x64 - perform an unsigned 64 bit x 64
-    bit multiply and return the full 128 bit result
--------------------------------------------------*/
-
-#ifdef __x86_64__
-#define mulu_64x64 _mulu_64x64
+#define muldivu_64 _muldivu_64
 inline uint64_t ATTR_FORCE_INLINE
-_mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
+_muldivu_64(uint64_t m1, uint64_t m2, uint64_t d)
 {
-	unsigned __int128 const r((unsigned __int128)a * b);
-	hi = uint64_t(r >> 64);
-	return uint64_t(r);
-}
-#endif
-
-
-
-/***************************************************************************
-    INLINE BIT MANIPULATION FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    count_leading_zeros_32 - return the number of
-    leading zero bits in a 32-bit value
--------------------------------------------------*/
-
-#define count_leading_zeros_32 _count_leading_zeros_32
-inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros_32(uint32_t value)
-{
-	uint32_t result;
+	uint64_t lower, upper;
 	__asm__ (
-		" bsrl    %[value], %[result] ;"
-		" cmovzl  %[bias], %[result]  ;"
-		: [result] "=&r" (result)       // result can be in any register
-		: [value]  "rm"  (value)        // 'value' can be register or memory
-		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
-		: "cc"                          // clobbers condition codes
+		" mulq %[m2]"
+		: [result]    "=a"  (lower)
+		, [upper]     "=d"  (upper)
+		: [m1]        "%0"  (m1)
+		, [m2]        "rm"  (m2)
+		: "cc"
 	);
-	return uint8_t(31U - result);
-}
-
-
-/*-------------------------------------------------
-    count_leading_ones_32 - return the number of
-    leading one bits in a 32-bit value
--------------------------------------------------*/
-
-#define count_leading_ones_32 _count_leading_ones_32
-inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones_32(uint32_t value)
-{
-	uint32_t result;
+	uint64_t quotient, remainder;
 	__asm__ (
-		" bsrl    %[value], %[result] ;"
-		" cmovzl  %[bias], %[result]  ;"
-		: [result] "=&r" (result)       // result can be in any register
-		: [value]  "rm"  (~value)       // 'value' can be register or memory
-		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
-		: "cc"                          // clobbers condition codes
+		" divq %[d]"
+		: [result]    "=a"  (quotient)
+		, [remainder] "=d"  (remainder)
+		: [lower]     "0"   (lower)
+		, [upper]     "1"   (upper)
+		, [d]         "rm"  (d)
+		: "cc"
 	);
-	return uint8_t(31U - result);
-}
-
-
-/*-------------------------------------------------
-    count_leading_zeros_64 - return the number of
-    leading zero bits in a 64-bit value
--------------------------------------------------*/
-
-#ifdef __x86_64__
-#define count_leading_zeros_64 _count_leading_zeros_64
-inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros_64(uint64_t value)
-{
-	uint64_t result;
-	__asm__ (
-		" bsrq    %[value], %[result] ;"
-		" cmovzq  %[bias], %[result]  ;"
-		: [result] "=&r" (result)       // result can be in any register
-		: [value]  "rm"  (value)        // 'value' can be register or memory
-		, [bias]   "rm"  (~uint64_t(0)) // 'bias' can be register or memory
-		: "cc"                          // clobbers condition codes
-	);
-	return uint8_t(63U - result);
+	return quotient;
 }
 #endif
 
 
 /*-------------------------------------------------
-    count_leading_ones_64 - return the number of
-    leading one bits in a 64-bit value
+    muldivupu_64 - perform an unsigned 64 bits
+    a*b/c, rounding away from zero.  Unpredictable
+    (including crashes) when the result does not
+    fit in 64 bits.
 -------------------------------------------------*/
 
 #ifdef __x86_64__
-#define count_leading_ones_64 _count_leading_ones_64
-inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones_64(uint64_t value)
+#define muldivupu_64 _muldivupu_64
+inline uint64_t _muldivupu_64(uint64_t m1, uint64_t m2, uint64_t d)
 {
-	uint64_t result;
+	uint64_t lower, upper;
 	__asm__ (
-		" bsrq    %[value], %[result] ;"
-		" cmovzq  %[bias], %[result]  ;"
-		: [result] "=&r" (result)       // result can be in any register
-		: [value]  "rm"  (~value)       // 'value' can be register or memory
-		, [bias]   "rm"  (~uint64_t(0)) // 'bias' can be register or memory
-		: "cc"                          // clobbers condition codes
+		" mulq %[m2]"
+		: [result]    "=a"  (lower)
+		, [upper]     "=d"  (upper)
+		: [m1]        "%0"  (m1)
+		, [m2]        "rm"  (m2)
+		: "cc"
 	);
-	return uint8_t(63U - result);
-}
-#endif
-
-
-/*-------------------------------------------------
-    rotl_32 - circularly shift a 32-bit value left
-    by the specified number of bits (modulo 32)
--------------------------------------------------*/
-
-#define rotl_32 _rotl_32
-inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
-_rotl_32(uint32_t val, int shift)
-{
-	uint32_t result;
+	uint64_t quotient, remainder;
 	__asm__ (
-		" roll %[shift], %[value] ;"
-		: [result] "=rm" (result)                   // result can be in register or memory
-		: [value]  "%0" (val)                       // 'value' is updated with result
-		, [shift]  "Ic" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-31 range or in cl
-		: "cc"                                      // clobbers condition codes
+		" divq %[d]"
+		: [result]    "=a"  (quotient)
+		, [remainder] "=d"  (remainder)
+		: [lower]     "0"   (lower)
+		, [upper]     "1"   (upper)
+		, [d]         "rm"  (d)
+		: "cc"
 	);
-	return result;
-}
-
-
-/*-------------------------------------------------
-    rotr_32 - circularly shift a 32-bit value right
-    by the specified number of bits (modulo 32)
--------------------------------------------------*/
-
-#define rotr_32 _rotr_32
-inline uint32_t ATTR_CONST ATTR_FORCE_INLINE
-rotr_32(uint32_t val, int shift)
-{
-	uint32_t result;
-	__asm__ (
-		" rorl %[shift], %[value] ;"
-		: [result] "=rm" (result)                   // result can be in register or memory
-		: [value]  "%0" (val)                       // 'value' is updated with result
-		, [shift]  "Ic" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-31 range or in cl
-		: "cc"                                      // clobbers condition codes
-	);
-	return result;
-}
-
-
-/*-------------------------------------------------
-    rotl_64 - circularly shift a 64-bit value left
-    by the specified number of bits (modulo 64)
--------------------------------------------------*/
-
-#ifdef __x86_64__
-#define rotl_64 _rotl_64
-inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
-_rotl_64(uint64_t val, int shift)
-{
-	uint64_t result;
-	__asm__ (
-		" rolq %[shift], %[value] ;"
-		: [result] "=rm" (result)                   // result can be in register or memory
-		: [value]  "%0" (val)                       // 'value' is updated with result
-		, [shift]  "Jc" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-63 range or in cl
-		: "cc"                                      // clobbers condition codes
-	);
-	return result;
-}
-#endif
-
-
-/*-------------------------------------------------
-    rotr_64 - circularly shift a 64-bit value right
-    by the specified number of bits (modulo 64)
--------------------------------------------------*/
-
-#ifdef __x86_64__
-#define rotr_64 _rotr_64
-inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
-rotr_64(uint64_t val, int shift)
-{
-	uint64_t result;
-	__asm__ (
-		" rorq %[shift], %[value] ;"
-		: [result] "=rm" (result)                   // result can be in register or memory
-		: [value]  "%0" (val)                       // 'value' is updated with result
-		, [shift]  "Jc" (uint8_t(unsigned(shift)))  // 'shift' must be constant in 0-63 range or in cl
-		: "cc"                                      // clobbers condition codes
-	);
-	return result;
+	return quotient + (remainder ? 1 : 0);
 }
 #endif
 

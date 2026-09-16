@@ -486,7 +486,7 @@ static void isbc202_floppy_formats(format_registration &fr)
 
 void isbc202_device::device_add_mconfig(machine_config &config)
 {
-	I3001(config , m_mcu , 0);
+	I3001(config , m_mcu);
 
 	// Allocation of the bit-slices:
 	// m_cpes[ 0 ]  Bits 0..1
@@ -494,7 +494,7 @@ void isbc202_device::device_add_mconfig(machine_config &config)
 	// m_cpes[ 2 ]  Bits 4..5
 	// m_cpes[ 3 ]  Bits 6..7
 	for (auto& finder : m_cpes) {
-		I3002(config , finder , 0);
+		I3002(config , finder);
 	}
 
 	// Connect CO/CI signals
@@ -1074,7 +1074,7 @@ void isbc202_device::set_rd_wr(bool new_rd , bool new_wr)
 		// Start writing
 		LOG_WR("Start WR\n");
 		m_pll.set_clock(attotime::from_usec(HALF_BIT_CELL_US));
-		m_pll.start_writing(machine().time());
+		m_pll.start_writing(machine().time(), m_current_drive);
 		m_pll.ctime = machine().time();
 		m_last_data_bit = false;
 		m_byte_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 14));

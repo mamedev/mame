@@ -442,7 +442,7 @@ static INPUT_PORTS_START( mjsikaku )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -498,7 +498,7 @@ static INPUT_PORTS_START( mmsikaku )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -546,7 +546,7 @@ static INPUT_PORTS_START( otonano )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -589,7 +589,7 @@ static INPUT_PORTS_START( mjcamera )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -635,7 +635,7 @@ static INPUT_PORTS_START( kaguya )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	// NOTE:Coins counted by pressing service switch
 	PORT_DIPNAME( 0x04, 0x04, "NOTE" )                      PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, "Coin x5" )
@@ -656,7 +656,7 @@ static INPUT_PORTS_START( kaguya )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -721,7 +721,7 @@ static INPUT_PORTS_START( kanatuen )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -785,7 +785,7 @@ static INPUT_PORTS_START( kyuhito )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -812,7 +812,7 @@ static INPUT_PORTS_START( idhimitu )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x20, 0x20, "Bet Max" )                   PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x20, "20" )
@@ -850,7 +850,7 @@ static INPUT_PORTS_START( idhimitu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -915,7 +915,7 @@ static INPUT_PORTS_START( secolove )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -980,7 +980,7 @@ static INPUT_PORTS_START( barline )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1090,7 +1090,7 @@ static INPUT_PORTS_START( citylove )
 	PORT_DIPSETTING(    0x00, "HAIPAI" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -1152,7 +1152,7 @@ static INPUT_PORTS_START( mcitylov )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1202,7 +1202,7 @@ static INPUT_PORTS_START( seiha )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1266,7 +1266,7 @@ static INPUT_PORTS_START( seiham )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1316,7 +1316,7 @@ static INPUT_PORTS_START( iemoto )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1380,7 +1380,7 @@ static INPUT_PORTS_START( iemotom )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1445,7 +1445,7 @@ static INPUT_PORTS_START( ryuuha )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1510,7 +1510,7 @@ static INPUT_PORTS_START( bijokkoy )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1586,7 +1586,7 @@ static INPUT_PORTS_START( bijokkog )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1662,7 +1662,7 @@ static INPUT_PORTS_START( housemnq )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1737,7 +1737,7 @@ static INPUT_PORTS_START( housemn2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1799,7 +1799,7 @@ static INPUT_PORTS_START( orangec )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1864,7 +1864,7 @@ static INPUT_PORTS_START( orangeci )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1929,7 +1929,7 @@ static INPUT_PORTS_START( vipclub )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -1992,7 +1992,7 @@ static INPUT_PORTS_START( livegal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2041,7 +2041,7 @@ static INPUT_PORTS_START( ojousan )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
@@ -2105,7 +2105,7 @@ static INPUT_PORTS_START( ojousanm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2155,7 +2155,7 @@ static INPUT_PORTS_START( korinai )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2219,7 +2219,7 @@ static INPUT_PORTS_START( korinaim )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2232,8 +2232,9 @@ static INPUT_PORTS_START( korinaim )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crystalg )
+	// defaults based on crystalg2 manual
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0f, 0x0d, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x05, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
 	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
 	PORT_DIPSETTING(    0x0a, "2" )
 	PORT_DIPSETTING(    0x09, "3" )
@@ -2257,64 +2258,17 @@ static INPUT_PORTS_START( crystalg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSWB:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSWB:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSWB:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSWB:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSWB:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSWB:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSWB:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                         // TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                  // COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )               // SERVICE
-
-	PORT_INCLUDE( nbmjcontrols )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( crystal2 )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x0f, 0x0d, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
-	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
-	PORT_DIPSETTING(    0x0a, "2" )
-	PORT_DIPSETTING(    0x09, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x07, "5" )
-	PORT_DIPSETTING(    0x06, "6" )
-	PORT_DIPSETTING(    0x05, "7" )
-	PORT_DIPSETTING(    0x04, "8" )
-	PORT_DIPSETTING(    0x00, "9 (Hard)" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x00, "Number of last chance" )     PORT_DIPLOCATION("DSWB:1,2")
+	PORT_DIPNAME( 0x03, 0x02, "Last Chance Count" )         PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(    0x03, "0" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x0c, 0x00, "SANGEN Rush" )               PORT_DIPLOCATION("DSWB:3,4")
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2324,19 +2278,81 @@ static INPUT_PORTS_START( crystal2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                         // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE                              // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                       // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                                // COIN1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )         // OPTION (?)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )                                             // SERVICE
+
+	PORT_INCLUDE( nbmjcontrols )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( crystal2 )
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x0f, 0x05, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")  // ゲーム難易度(９＝最強)
+	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
+	PORT_DIPSETTING(    0x0a, "2" )
+	PORT_DIPSETTING(    0x09, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x07, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x05, "7" )
+	PORT_DIPSETTING(    0x04, "8" )
+	PORT_DIPSETTING(    0x00, "9 (Hard)" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:5")        // 常時 OFF
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:6")        // 常時 OFF
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:7")        // 常時 OFF
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:8")        // 常時 OFF
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x02, "Last Chance Count" )         PORT_DIPLOCATION("DSWB:1,2")      // ラストチャンス
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x0c, 0x00, "Sangen Rush" )               PORT_DIPLOCATION("DSWB:3,4")      // 三元ラッシュ
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                                   // 無限
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:5")        // 常時 OFF
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:6")        // 常時 OFF
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:7")        // 常時 OFF
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWB:8")        // DEMO音声    (suggested default is Off in manual)
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                         // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE                              // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                       // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                                // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                               // OPTION (?)
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
@@ -2391,7 +2407,7 @@ static INPUT_PORTS_START( apparel )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2445,7 +2461,7 @@ static INPUT_PORTS_START( nightlov )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSWB:8" )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )           // MEMORY RESET
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_TOGGLE   // ANALYZER
@@ -2488,7 +2504,7 @@ static INPUT_PORTS_START( bikkuri )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", nb1413m3_device, busyflag_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Medal In")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Mode SW")
@@ -2552,13 +2568,13 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz */
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8688_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2711,7 +2727,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8688_state::secolove_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8688_state::p16bit_LCD_io_map);
 
-	NB1413M3(config, m_nb1413m3, 0);
+	NB1413M3(config, m_nb1413m3);
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -2720,7 +2736,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_16bit), 65536);
 	config.set_default_layout(layout_nbmj8688);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2730,7 +2746,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 
 	PALETTE(config, "palette_lcd", FUNC(nbmj8688_state::mbmj8688_lcd), 2);
 
-	screen_device &lcd0(SCREEN(config, "lcd0", SCREEN_TYPE_LCD));
+	screen_device &lcd0(SCREEN(config, "lcd0").set_lcd());
 	lcd0.set_physical_aspect(15, 3);
 	lcd0.set_orientation(ROT180);
 	lcd0.set_refresh_hz(60);
@@ -2742,7 +2758,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	HD61830B(config, m_lcdc0,  5000000/2); // ???
 	m_lcdc0->set_screen("lcd0");
 
-	screen_device &lcd1(SCREEN(config, "lcd1", SCREEN_TYPE_LCD));
+	screen_device &lcd1(SCREEN(config, "lcd1").set_lcd());
 	lcd1.set_physical_aspect(15, 3);
 	lcd1.set_orientation(ROT180);
 	lcd1.set_refresh_hz(60);
@@ -3618,6 +3634,25 @@ ROM_START( kaguya )
 	ROM_LOAD( "kaguya11.bin", 0x0e0000, 0x20000, CRC(fcbede4f) SHA1(543912e9fbb1c2b208701e5eb1347f734f5ce3cb) )
 ROM_END
 
+ROM_START( kaguyaa ) // 16040 PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mk1.3f", 0x00000, 0x10000, CRC(79242558) SHA1(f683e49df798f339f9d995ec1654e204f916ecf7) )
+
+	ROM_REGION( 0x20000, "voice", 0 )
+	ROM_LOAD( "mk2.3k", 0x00000, 0x10000, CRC(561dc656) SHA1(0c3ca794ec71202aabcb337bb7d972a6d69dbbc7) )
+	ROM_LOAD( "mk3.3l", 0x10000, 0x10000, CRC(a09e9387) SHA1(c5f5e0f5d841671bc38cd240193f60ccf7ab0455) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mk4.6a",  0x000000, 0x20000, CRC(ccd08d8d) SHA1(6495946efdc99a945e30e7a46d4e0e2045ce62d5) )
+	ROM_LOAD( "mk5.6b",  0x020000, 0x20000, CRC(a3abc686) SHA1(822c9e2a25343501f4168b45bb93942952640feb) )
+	ROM_LOAD( "mk6.6d",  0x040000, 0x20000, CRC(6accd6d3) SHA1(ebcb911580329453ea91f2fbcba9f46bd5f6110f) )
+	ROM_LOAD( "mk7.6e",  0x060000, 0x20000, CRC(4309e77e) SHA1(6cee4c03fedba2ff79babd9562cc0014a9293a1e) )
+	ROM_LOAD( "mk8.6f",  0x080000, 0x20000, CRC(f0ad7c6c) SHA1(fb7587852b29b68bbeea3c123b13d50c23ba7584) )
+	ROM_LOAD( "mk9.6h",  0x0a0000, 0x20000, CRC(a0b5bedd) SHA1(0b21e335b8cc15ca91d0e4dc05fc8fac94895f88) )
+	ROM_LOAD( "mk10.6k", 0x0c0000, 0x20000, CRC(741d13f6) SHA1(5d8143ec158b2e6c58b44f61dd063fb1615ff59e) )
+	ROM_LOAD( "mk11.6l", 0x0e0000, 0x20000, CRC(fcbede4f) SHA1(543912e9fbb1c2b208701e5eb1347f734f5ce3cb) )
+ROM_END
+
 ROM_START( kaguya2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3f",    0x00000, 0x10000, CRC(1a6ad8fd) SHA1(ebb1e3f08643e0602a0ec2e7401c3ee2fccff9f5) )
@@ -3835,7 +3870,7 @@ ROM_START( otonano )
 	ROM_LOAD( "otona_13.bin", 0x0e0000, 0x20000, CRC(208dee43) SHA1(f154ac4dab929c6f610038dbbebcf5283258e553) )
 ROM_END
 
-ROM_START( mjcamera )
+ROM_START( mjcamerao )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "mcam_01.bin", 0x00000, 0x10000, CRC(73d4b9ff) SHA1(219bc9617c14490d70bb3e28ab497dfd2ef01cf8) )
 
@@ -3937,54 +3972,55 @@ ROM_END
 
 
 /* 8-bit palette */
-GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, crystalg, 0,        crystalg,        crystalg, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal (Japan 860512)", MACHINE_SUPPORTS_SAVE ) // クリスタルギャル
 GAME( 1986, crystal2, 0,        crystal2,        crystal2, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Crystal Gal 2 (Japan 860620)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, apparel,  0,        apparel,         apparel,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Apparel Night (Japan 860929)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nightlov, 0,        nightlov,        nightlov, nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Night Love (Japan 860705)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ナイトラブ
+GAME( 1986, apparel,  0,        apparel,         apparel,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Apparel Night (Japan 860929)", MACHINE_SUPPORTS_SAVE ) // アパレルナイト
 GAME( 1988, bikkuri,  0,        bikkuri,         bikkuri,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bikkuri Pro Wrestling (Japan 881221, Ver 1.05)", MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 12-bit palette */
-GAME( 1986, citylove, 0,        citylove,        citylove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860908)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mcitylov, citylove, mcitylov,        mcitylov, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love [BET] (Japan 860904)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, secolove, 0,        secolove,        secolove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Second Love (Japan 861201)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, citylove, 0,        citylove,        citylove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860908)", MACHINE_SUPPORTS_SAVE ) // シティラブ
+GAME( 1986, mcitylov, citylove, mcitylov,        mcitylov, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "City Love (Japan 860904, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, secolove, 0,        secolove,        secolove, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Second Love (Japan 861201)", MACHINE_SUPPORTS_SAVE ) // セカンドラブ
 GAME( 1988, barline,  0,        barline,         barline,  nbmj8688_state, empty_init,    ROT180, "Nichibutsu",   "Barline (Japan?)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* hybrid 16-bit palette */
 GAME( 1987, seiha,    0,        seiha,           seiha,    nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha (Japan 870725)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, seiham,   seiha,    seiham,          seiham,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha [BET] (Japan 870723)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Mahjong Gaiden [BET] (Japan 870803)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, iemoto,   0,        iemoto,          iemoto,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871020)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, iemotom,  iemoto,   iemotom,         iemotom,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto [BET] (Japan 871118)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ryuuha,   iemoto,   ryuuha,          ryuuha,   nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Ryuuha [BET] (Japan 871027)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, seiham,   seiha,    seiham,          seiham,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Seiha (Japan 870723, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mjgaiden, 0,        mjgaiden,        ojousan,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Mahjong Gaiden (Japan 870803)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, iemoto,   0,        iemoto,          iemoto,   nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871020)", MACHINE_SUPPORTS_SAVE ) // 家元
+GAME( 1987, iemotom,  iemoto,   iemotom,         iemotom,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Iemoto (Japan 871118, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ryuuha,   iemoto,   ryuuha,          ryuuha,   nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Ryuuha (Japan 871027)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ojousan,  0,        ojousan,         ojousan,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan (Japan 871204)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan [BET] (Japan 870108)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal [BET] (Japan 871221)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ojousanm, ojousan,  ojousanm,        ojousanm, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Ojousan (Japan 870108, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, swinggal, 0,        swinggal,        ryuuha,   nbmj8688_state, empty_init,    ROT0, "Digital Denshi", "Swing Gal (Japan 871221)", MACHINE_SUPPORTS_SAVE ) // スウィングギャル
 GAME( 1988, korinai,  0,        korinai,         korinai,  nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880425)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, korinaim, korinai,  korinaim,        korinaim, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen [BET] (Japan 880920)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, korinaim, korinai,  korinaim,        korinaim, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong-zukino Korinai Menmen (Japan 880920, medal)", MACHINE_SUPPORTS_SAVE )
 
 /* pure 16-bit palette (+ LCD in some) */
 GAME( 1987, housemnq, 0,        housemnq,        housemnq, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "House Mannequin (Japan 870217)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, housemn2, 0,        housemn2,        housemn2, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "House Mannequin Roppongi Live hen (Japan 870418)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, livegal,  0,        livegal,         livegal,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Live Gal [BET] (Japan 870530)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, livegal,  0,        livegal,         livegal,  nbmj8688_state, empty_init,    ROT0, "Central Denshi", "Live Gal (Japan 870530)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bijokkoy, 0,        bijokkoy,        bijokkoy, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bijokko Yume Monogatari (Japan 870925)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bijokkog, 0,        bijokkog,        bijokkog, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Bijokko Gakuen (Japan 880116)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, orangec,  0,        orangec,         orangec,  nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, orangeci, orangec,  orangeci,        orangeci, nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880221)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, orangeci, orangec,  orangeci,        orangeci, nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou (Japan 880221)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  nbmj8688_state, empty_init,    ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou (Japan 880310)", MACHINE_SUPPORTS_SAVE )
 
 /* pure 12-bit palette */
-GAME( 1988, kaguya,   0,        kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime [BET] (Japan 880521)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kaguya2,  0,        kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 [BET] (Japan 890829)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, kaguya2f, kaguya2,  kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 Fukkokuban [BET] (Japan 010808)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kanatuen, 0,        kanatuen,        kanatuen, nbmj8688_state, init_kanatuen, ROT0, "Panac",          "Kanatsuen no Onna [BET] (Japan 880905)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kyuhito,  kanatuen, kyuhito,         kyuhito,  nbmj8688_state, init_kyuhito,  ROT0, "Roller Tron",    "Kyukyoku no Hito [BET] (Japan 880824)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, idhimitu, 0,        idhimitu,        idhimitu, nbmj8688_state, init_idhimitu, ROT0, "Digital Soft",   "Idol no Himitsu [BET] (Japan 890304)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kaguya,   0,        kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime (Japan 880521)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kaguyaa,  kaguya,   kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime (Japan 880425)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, kaguya2,  0,        kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 (Japan 890829)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, kaguya2f, kaguya2,  kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 Fukkokuban (Japan 010808)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kanatuen, 0,        kanatuen,        kanatuen, nbmj8688_state, init_kanatuen, ROT0, "Panac",          "Kanatsuen no Onna (Japan 880905)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kyuhito,  kanatuen, kyuhito,         kyuhito,  nbmj8688_state, init_kyuhito,  ROT0, "Roller Tron",    "Kyukyoku no Hito (Japan 880824)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, idhimitu, 0,        idhimitu,        idhimitu, nbmj8688_state, init_idhimitu, ROT0, "Digital Soft",   "Idol no Himitsu (Japan 890304)", MACHINE_SUPPORTS_SAVE )
 
 /* pure 12-bit palette + YM3812 instead of AY-3-8910 */
 GAME( 1988, mjsikaku, 0,        mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880908)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakb, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880722)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakc, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880806)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880802)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku [BET] (Japan 880929)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mjcamera, 0,        mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (set 1) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880929, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE ) // おとなの麻雀
+GAME( 1988, mjcamerao,mjcamera, mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (Japan 881109, older hardware)", MACHINE_SUPPORTS_SAVE )

@@ -57,8 +57,8 @@ protected:
 	video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	int     m_beol;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(hold_cpu);
 	TIMER_CALLBACK_MEMBER(free_cpu);
@@ -114,8 +114,8 @@ protected:
 	io992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	bool m_have_banked_rom;
 
-	virtual void device_start() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void hexbus_value_changed(uint8_t data) override;
 
@@ -140,14 +140,14 @@ private:
 class io992_24_device : public io992_device
 {
 public:
-	io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 /* Variant for TI-99/2 32K */
 class io992_32_device : public io992_device
 {
 public:
-	io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	io992_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 /********************************************************************
@@ -174,22 +174,17 @@ public:
 	virtual void write(offs_t offset, uint8_t data) { }
 };
 
-class ti992_expport_device : public device_t, public device_slot_interface
+class ti992_expport_device : public device_t, public device_single_card_slot_interface<ti992_expport_attached_device>
 {
-	friend class expport_attached_device;
-
 public:
 	template <typename U>
-	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: ti992_expport_device(mconfig, tag, owner, clock)
+	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, U &&opts, const char *dflt)
+		: ti992_expport_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 
-	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti992_expport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Methods called from the console
 	// More methods should be added, once we can find further 99/2 cartridges
@@ -215,7 +210,7 @@ public:
 
 protected:
 	virtual void device_start() override {}
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<ram_device> m_ram;

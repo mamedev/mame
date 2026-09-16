@@ -22,12 +22,12 @@ namespace ui {
 class menu_slot_devices : public menu
 {
 public:
-	menu_slot_devices(mame_ui_manager &mui, render_container &container);
+	menu_slot_devices(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_slot_devices() override;
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
 	enum class step_t

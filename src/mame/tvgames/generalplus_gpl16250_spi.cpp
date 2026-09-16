@@ -1,74 +1,26 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
-    GPL16250 / GPAC800 / GMC384 / GCM420 related support
+     GPL16250* games using SPI Flash + RAM configuration
 
-    GPL16250 is the GeneralPlus / SunPlus part number
-    GPAC800 is the JAKKS Pacific codename
-    GMC384 / GCM420 is what is printed on the die
-
-    ----
-
-    GPL16250 games using SPI Flash + RAM configuration
+     *part number could be different for these, they've only
+      been seen as globtops
 */
 
 #include "emu.h"
-#include "generalplus_gpl16250.h"
+#include "generalplus_gpl16250_spi.h"
 #include "softlist_dev.h"
-
-
-namespace {
-
-class generalplus_gpspispi_game_state : public gcm394_game_state
-{
-public:
-	generalplus_gpspispi_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void generalplus_gpspispi(machine_config &config);
-
-	void init_spi();
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
-};
-
-
-
-class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
-{
-public:
-	generalplus_gpspispi_bkrankp_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		generalplus_gpspispi_game_state(mconfig, type, tag),
-		m_cart(*this, "cartslot")
-	{
-	}
-
-	void generalplus_gpspispi_bkrankp(machine_config &config);
-
-protected:
-	required_device<generic_slot_device> m_cart;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-private:
-};
 
 
 void generalplus_gpspispi_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
 }
 
 void generalplus_gpspispi_game_state::machine_reset()
 {
+	gcm394_game_state::machine_reset();
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
-
-	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 static INPUT_PORTS_START( gcm394 )
@@ -77,38 +29,60 @@ static INPUT_PORTS_START( gcm394 )
 	PORT_START("IN2")
 INPUT_PORTS_END
 
+// CS0 should be RAM on these? (will need to bootstrap the CS config too as it's done by the internal ROM)
+u16 generalplus_gpspispi_game_state::cs0_r(offs_t offset)
+{
+	logerror("%s: read from cs0 region %08x\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+void generalplus_gpspispi_game_state::cs0_w(offs_t offset, u16 data)
+{
+	logerror("%s: write to cs0 region %08x %04x\n", machine().describe_context(), offset, data);
+}
+
+u16 generalplus_gpspispi_game_state::cs1_r(offs_t offset)
+{
+	logerror("%s: read from cs1 region %08x\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+void generalplus_gpspispi_game_state::cs1_w(offs_t offset, u16 data)
+{
+	logerror("%s: write to cs1 region %08x %04x\n", machine().describe_context(), offset, data);
+}
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
-	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen);
+	set_addrmap(0, &gcm394_game_state::cs_map_base);
+
+	GPL16250VA(config, m_maincpu, 96000000, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
 	m_maincpu->portc_in().set(FUNC(generalplus_gpspispi_game_state::portc_r));
 	m_maincpu->porta_out().set(FUNC(generalplus_gpspispi_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpspispi_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpspispi_game_state::write_external_space));
-	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(generalplus_gpl162xx_base_device::irq_vector_cb));
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (SPI bootstrap)
-	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->set_cs_config_callback(FUNC(generalplus_gpspispi_game_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspispi_game_state::cs_map_base);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
-	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
-	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
+	m_screen->set_screen_update("maincpu", FUNC(generalplus_gpl16250va_device::screen_update));
+	m_screen->screen_vblank().set(m_maincpu, FUNC(generalplus_gpl16250va_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpspispi_bkrankp_game_state::cart_load)
 {
-	uint32_t const size = m_cart->common_get_size("rom");
+	u32 const size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
@@ -130,20 +104,78 @@ void generalplus_gpspispi_bkrankp_game_state::generalplus_gpspispi_bkrankp(machi
 
 
 ROM_START( bkrankp )
-	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
-
 	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "unit_mx25l3206e_c22016.bin", 0x0000, 0x400000, CRC(7efad116) SHA1(427d707e97586ae6ab5fe08f29ca450ddc7ad36e) )
+ROM_END
+
+ROM_START( prailpls )
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25635f.u9", 0x0000, 0x2000000, CRC(17faefb0) SHA1(1d31c5aa1a37882f74c08414f69c4285149352b7) )
+ROM_END
+
+ROM_START( vmastspi )
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l25635f.sfrom1", 0x0000, 0x2000000, CRC(f30af4a2) SHA1(99526156c6e72eda9ea1ef93b9e825da069e050f) )
+ROM_END
+
+ROM_START( anpanbd )
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u2", 0x0000, 0x1000000, CRC(c4be09d7) SHA1(c9098d0c1c9db649a010f67469f500b69407372f) )
+ROM_END
+
+ROM_START( anpanm15 )
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.ic3", 0x0000, 0x1000000, CRC(47c36cbd) SHA1(f1cae506e21c1795401004d79f6bb1b1d982d657) )
+ROM_END
+
+ROM_START( anpaneng )
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "w25q128fv.u11", 0x0000, 0x1000000, CRC(d204d646) SHA1(0b2f9f2d91a078b5fba687d73079b2b5665b33d4) )
+ROM_END
+
+ROM_START( jspodred )
+	ROM_REGION(0x400000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "gpr5l322.sfrom1", 0x0000, 0x400000, CRC(5bd08294) SHA1(3a4a76b7b30c0dcf8184cb94d75819c382c1c668) )
+ROM_END
+
+ROM_START( wildking )
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.sfrom1", 0x0000, 0x1000000, CRC(bc4cace6) SHA1(1fc2e28b194a59ddb1ed9a63978064d2d0a6ab8c) )
+
+	// there was an SD card slot, but the "Power Up Cartridge" included was just a piece of plastic, not a real card
+	// other software may be available for the unit however.
+ROM_END
+
+
+
+ROM_START( pokegach )
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u4", 0x0000, 0x1000000, CRC(85bc9716) SHA1(3de7f0fd92e8f6084eb0b82ec293be3166c800ac) )
+ROM_END
+
+ROM_START( pokegac2 )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "red_mx25l6445e.u4", 0x0000, 0x800000, CRC(f20bb213) SHA1(787ae27e36352525e6ffebe25da4329cb156b219) )
+
+	ROM_REGION(0x800, "i2cmem", ROMREGION_ERASE00) // probably just progress / settings
+	ROM_LOAD16_WORD_SWAP( "red_ft24c16a.u9", 0x000, 0x800, CRC(2abcf4d4) SHA1(5227e868f93205a069bc49c30792a9b95c8f0efc) )
+ROM_END
+
+ROM_START( pokegac2y )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "yellow_mx25l6445e.u4", 0x0000, 0x800000, CRC(587310fa) SHA1(4334b91b7f9f599bc21b354b267b132fd470f53c) )
+
+	ROM_REGION(0x800, "i2cmem", ROMREGION_ERASE00) // probably just progress / settings
+	ROM_LOAD16_WORD_SWAP( "yellow_ft24c16a.u9", 0x000, 0x800, CRC(b7662106) SHA1(a75366cbf3f3954a4136c89cc1db0ffb6f7d8c13) )
 ROM_END
 
 
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
-	uint8_t* spirom = memregion("maincpu")->base();
+	u8 *spirom = memregion("maincpu")->base();
 
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	/*  Offset(h) 00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 
@@ -164,13 +196,13 @@ void generalplus_gpspispi_game_state::init_spi()
 	// copy a block of code from the NAND to RAM
 	for (int i = 0; i < 0x2000; i++)
 	{
-		uint16_t word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
+		u16 word = spirom[(i * 2) + 0] | (spirom[(i * 2) + 1] << 8);
 
 		mem.write_word(dest + i, word);
 	}
 
 	// these vectors must either directly point to RAM, or at least redirect there after some code
-	uint16_t* internal = (uint16_t*)memregion("maincpu:internal")->base();
+	u16 *internal = (u16*)memregion("maincpu:internal")->base();
 	internal[0x7ff5] = vectorbase + 0x0a;
 	internal[0x7ff6] = vectorbase + 0x0c;
 	internal[0x7ff7] = dest + 0x20; // point boot vector at code in RAM (probably in reality points to internal code that copies the first block)
@@ -184,7 +216,42 @@ void generalplus_gpspispi_game_state::init_spi()
 	internal[0x7fff] = vectorbase + 0x1e;
 }
 
-} // anonymous namespace
+
+// ----------------------------------------------------
+// these all use RAM up to 6fff
+//
+// high resolution mode is used, most likely GPL16250VA (but could be GPL16240VA if 3d mode isn't used)
+// ----------------------------------------------------
 
 
-CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ぼくはプラレール運転士 新幹線で行こう！プラス  (I am a Plarail Driver: Let's Go by Shinkansen! Plus)
+CONS( 2015, prailpls, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Takara Tomy", "Boku wa Plarail Untenshi: Shinkansen de Ikou! Plus (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // has built-in screen, but can be connected to a TV
+
+// uses glob, fishing controller
+// バーチャルマスターズ スピリッツ ブルー
+// a red version also exists, but software might be the same
+CONS( 201?, vmastspi, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Takara Tomy", "Virtual Masters Spirits (blue, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
+CONS( 2014, anpanbd, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive - Kimi mo Noreru Yo! Anpanman-gou (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// それいけ！アンパンマン」みんなで！育脳マット
+CONS( 2015, anpanm15, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "English" says "えいご")
+CONS( 2013, anpaneng, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// 甲虫王者ムシキング むしとりバトルずかん  (JS Pod on PCB)
+CONS( 201?, jspodred, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 201?, wildking, 0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, init_spi, "Sega Toys", "Wild King (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2015, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ポケでるガチャ
+CONS( 2015, pokegach, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha (20150902, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// ポケでるガチャ 2.0
+// the second release comes in two colours and they can communicate
+CONS( 2015, pokegac2,  0,        0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Red (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2015, pokegac2y, pokegach, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Takara Tomy", "PokeDeru Gacha 2.0 Yellow (20151230, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

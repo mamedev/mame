@@ -128,7 +128,7 @@ In **scsi_command()**, the device can either handle the command or pass it up wi
 
 To handle the command, a number of methods are available:
 
-- **get_lun(lua-set-in-command)** will give you the LUN to work on (the in-command one can be overriden by a message-level one).
+- **get_lun(lua-set-in-command)** will give you the LUN to work on (the in-command one can be overridden by a message-level one).
 
 - **bad_lun()** replies to the host that the specific LUN is unsupported.
 

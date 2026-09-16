@@ -16,15 +16,22 @@ public:
 		eeprom.set_tag(std::forward<T>(eeprom_tag));
 		m_key_data.set_tag(std::forward<U>(keyregion_tag));
 	}
+	template <typename T, typename U>
+	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, T &&eeprom_tag, U &&keyregion_tag)
+		: naomi_m4_board(mconfig, tag, owner, 0, std::forward<T>(eeprom_tag), std::forward<U>(keyregion_tag))
+	{
+		eeprom.set_tag(std::forward<T>(eeprom_tag));
+		m_key_data.set_tag(std::forward<U>(keyregion_tag));
+	}
 
-	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void submap(address_map &map) override;
+	virtual void submap(address_map &map) override ATTR_COLD;
 
 	uint16_t m4_id_r();
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void board_setup_address(uint32_t address, bool is_dma) override;
 	virtual void board_get_buffer(uint8_t *&base, uint32_t &limit) override;

@@ -14,7 +14,6 @@
 #include "machine/ay31015.h"
 #include "machine/ripple_counter.h"
 #include "sound/beep.h"
-#include "speaker.h"
 
 
 //**************************************************************************
@@ -27,7 +26,7 @@ class vt100_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
-	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	vt100_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	auto signal_out_callback() { return m_signal_out_cb.bind(); }
@@ -35,11 +34,11 @@ public:
 	void signal_line_w(int state);
 
 protected:
-	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	vt100_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual bool scan_enabled() const { return m_uart->tbmt_r(); }
 	virtual void scan_start() { }
@@ -73,12 +72,12 @@ class ms7002_device : public vt100_keyboard_device
 {
 public:
 	// construction/destruction
-	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual bool scan_enabled() const override { return m_scan_enable; }
 	virtual void scan_start() override { m_scan_enable = true; }

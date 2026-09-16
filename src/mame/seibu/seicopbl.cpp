@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "seicopbl.h"
 
+#include <numbers>
+
 
 DEFINE_DEVICE_TYPE(SEIBU_COP_BOOTLEG, seibu_cop_bootleg_device, "seibu_cop_boot", "Seibu COP (bootleg)")
 
@@ -171,7 +173,7 @@ void seibu_cop_bootleg_device::cmd_trigger_w(offs_t offset, uint16_t data)
 			{
 				m_status = 0;
 
-				m_angle =  atan(double(dy)/double(dx)) * 128.0 / M_PI;
+				m_angle =  atan(double(dy)/double(dx)) * 128.0 / std::numbers::pi;
 
 				//printf("%f\n",atan(double(dy)/double(dx)));
 
@@ -273,7 +275,7 @@ void seibu_cop_bootleg_device::cmd_trigger_w(offs_t offset, uint16_t data)
 			sin_offs = m_host_space->read_byte(m_reg[0]+(0x35));
 			sin_offs |= m_host_space->read_byte(m_reg[0]+(0x37)) << 8;
 			int raw_angle = (m_host_space->read_word(m_reg[0]+(0x34^2)) & 0xff);
-			double angle = raw_angle * M_PI / 128;
+			double angle = raw_angle * std::numbers::pi / 128;
 			double amp = (65536 >> 5)*(m_host_space->read_word(m_reg[0]+(0x36^2)) & 0xff);
 			int res;
 
@@ -292,7 +294,7 @@ void seibu_cop_bootleg_device::cmd_trigger_w(offs_t offset, uint16_t data)
 		case 0x8900:
 		{
 			int raw_angle = (m_host_space->read_word(m_reg[0]+(0x34^2)) & 0xff);
-			double angle = raw_angle * M_PI / 128;
+			double angle = raw_angle * std::numbers::pi / 128;
 			double amp = (65536 >> 5)*(m_host_space->read_word(m_reg[0]+(0x36^2)) & 0xff);
 			int res;
 

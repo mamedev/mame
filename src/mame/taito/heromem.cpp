@@ -57,11 +57,11 @@ private:
 	required_device<tc0091lvc_device> m_tc0091lvc_l;
 	required_device<tc0091lvc_device> m_tc0091lvc_r;
 
-	void maincpu_prg_map(address_map &map);
-	void audiocpu_l_prg_map(address_map &map);
-	void audiocpu_r_prg_map(address_map &map);
-	void tc0091lvc_l_prg_map(address_map &map);
-	void tc0091lvc_r_prg_map(address_map &map);
+	void maincpu_prg_map(address_map &map) ATTR_COLD;
+	void audiocpu_l_prg_map(address_map &map) ATTR_COLD;
+	void audiocpu_r_prg_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_l_prg_map(address_map &map) ATTR_COLD;
+	void tc0091lvc_r_prg_map(address_map &map) ATTR_COLD;
 
 	void screen_vblank_l(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
 	void screen_vblank_r(int state) { if (state) { m_tc0091lvc_l->screen_eof(); } }
@@ -223,7 +223,7 @@ void heromem_state::heromem(machine_config &config)
 	TE7751(config, "io");
 
 	// video hardware
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &lscreen(SCREEN(config, "lscreen")); // all wrong
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	lscreen.set_size(64*8, 32*8);
@@ -232,7 +232,7 @@ void heromem_state::heromem(machine_config &config)
 	lscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_l));
 	lscreen.set_palette("tc0091lvc_l:palette");
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &rscreen(SCREEN(config, "rscreen")); // all wrong
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	rscreen.set_size(64*8, 32*8);
@@ -241,13 +241,13 @@ void heromem_state::heromem(machine_config &config)
 	rscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_r));
 	rscreen.set_palette("tc0091lvc_r:palette");
 
-	pc060ha_device &ciu_l(PC060HA(config, "ciu_l", 0));
-	ciu_l.set_master_tag("maincpu");
-	ciu_l.set_slave_tag(m_tc0091lvc_l);
+	pc060ha_device &ciu_l(PC060HA(config, "ciu_l"));
+	ciu_l.nmi_callback().set_inputline(m_tc0091lvc_l, INPUT_LINE_NMI);
+	ciu_l.reset_callback().set_inputline(m_tc0091lvc_l, INPUT_LINE_RESET);
 
-	pc060ha_device &ciu_r(PC060HA(config, "ciu_r", 0));
-	ciu_r.set_master_tag("maincpu");
-	ciu_r.set_slave_tag(m_tc0091lvc_r);
+	pc060ha_device &ciu_r(PC060HA(config, "ciu_r"));
+	ciu_r.nmi_callback().set_inputline(m_tc0091lvc_r, INPUT_LINE_NMI);
+	ciu_r.reset_callback().set_inputline(m_tc0091lvc_r, INPUT_LINE_RESET);
 
 	tc0091lvc_device &vdp_l(TC0091LVC(config, m_tc0091lvc_l, 16000000 / 4));
 	vdp_l.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_l_prg_map);
@@ -256,31 +256,29 @@ void heromem_state::heromem(machine_config &config)
 	vdp_r.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_r_prg_map);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "speaker", 2).front();
 
-	SPEAKER(config, "rspeaker").front_right();
+	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l"));
+	syt_l.nmi_callback().set_inputline("audiocpu_l", INPUT_LINE_NMI);
+	syt_l.reset_callback().set_inputline("audiocpu_l", INPUT_LINE_RESET);
 
-	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l", 0));
-	syt_l.set_master_tag("maincpu");
-	syt_l.set_slave_tag("audiocpu_l");
-
-	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r", 0));
-	syt_r.set_master_tag("maincpu");
-	syt_r.set_slave_tag("audiocpu_r");
+	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r"));
+	syt_r.nmi_callback().set_inputline("audiocpu_r", INPUT_LINE_NMI);
+	syt_r.reset_callback().set_inputline("audiocpu_r", INPUT_LINE_RESET);
 
 	ym2610b_device &ym_l(YM2610B(config, "ym_l", 16000000 / 2));
 	ym_l.irq_handler().set_inputline("audiocpu_l", 0);
-	ym_l.add_route(0, "lspeaker", 0.25);
-	ym_l.add_route(0, "lspeaker", 0.25);
-	ym_l.add_route(1, "lspeaker", 1.0);
-	ym_l.add_route(2, "lspeaker", 1.0);
+	ym_l.add_route(0, "speaker", 0.75, 0);
+	ym_l.add_route(0, "speaker", 0.75, 0);
+	ym_l.add_route(1, "speaker", 1.0, 0);
+	ym_l.add_route(2, "speaker", 1.0, 0);
 
 	ym2610b_device &ym_r(YM2610B(config, "ym_r", 16000000 / 2));
 	ym_r.irq_handler().set_inputline("audiocpu_r", 0);
-	ym_r.add_route(0, "rspeaker", 0.25);
-	ym_r.add_route(0, "rspeaker", 0.25);
-	ym_r.add_route(1, "rspeaker", 1.0);
-	ym_r.add_route(2, "rspeaker", 1.0);
+	ym_r.add_route(0, "speaker", 0.75, 1);
+	ym_r.add_route(0, "speaker", 0.75, 1);
+	ym_r.add_route(1, "speaker", 1.0, 1);
+	ym_r.add_route(2, "speaker", 1.0, 1);
 }
 
 
@@ -333,4 +331,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1997, heromem, 0, heromem, heromem, heromem_state, empty_init, ROT0, "Taito", "Heroine's Memory", MACHINE_IS_SKELETON_MECHANICAL ) // video is emulatable, coin pushing mechanics less so
+GAME( 1997, heromem, 0, heromem, heromem, heromem_state, empty_init, ROT0, "Taito", "Heroine's Memory", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // video is emulatable, coin pushing mechanics less so

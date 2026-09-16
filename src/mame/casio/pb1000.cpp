@@ -73,7 +73,7 @@ private:
 	memory_region *m_card1_reg = nullptr;
 	memory_region *m_card2_reg = nullptr;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	void gatearray_w(offs_t offset, uint16_t data);
 	uint16_t pb1000_kb_r();
 	uint16_t pb2000c_kb_r();
@@ -84,8 +84,8 @@ private:
 	uint16_t read_touchscreen(uint8_t line);
 	void pb1000_palette(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
-	void pb1000_mem(address_map &map);
-	void pb2000c_mem(address_map &map);
+	void pb1000_mem(address_map &map) ATTR_COLD;
+	void pb2000c_mem(address_map &map) ATTR_COLD;
 };
 
 void pb1000_state::pb1000_mem(address_map &map)
@@ -477,7 +477,7 @@ void pb1000_state::pb1000(machine_config &config)
 	m_maincpu->port_write().set(FUNC(pb1000_state::port_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("hd44352", FUNC(hd44352_device::screen_update));

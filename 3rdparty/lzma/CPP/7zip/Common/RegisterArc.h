@@ -1,7 +1,7 @@
 // RegisterArc.h
 
-#ifndef __REGISTER_ARC_H
-#define __REGISTER_ARC_H
+#ifndef ZIP7_INC_REGISTER_ARC_H
+#define ZIP7_INC_REGISTER_ARC_H
 
 #include "../Archive/IArchive.h"
 
@@ -34,7 +34,7 @@ void RegisterArc(const CArcInfo *arcInfo) throw();
 
 #define IMP_CreateArcIn IMP_CreateArcIn_2(CHandler())
 
-#ifdef EXTRACT_ONLY
+#ifdef Z7_EXTRACT_ONLY
   #define IMP_CreateArcOut
   #define CreateArcOut NULL
 #else
@@ -52,7 +52,7 @@ void RegisterArc(const CArcInfo *arcInfo) throw();
 
 #define REGISTER_ARC_I_CLS(cls, n, e, ae, id, sig, offs, flags, isArc) \
   IMP_CreateArcIn_2(cls) \
-  REGISTER_ARC_R(n, e, ae, id, ARRAY_SIZE(sig), sig, offs, flags, 0, CreateArc, NULL, isArc)
+  REGISTER_ARC_R(n, e, ae, id, Z7_ARRAY_SIZE(sig), sig, offs, flags, 0, CreateArc, NULL, isArc)
 
 #define REGISTER_ARC_I_CLS_NO_SIG(cls, n, e, ae, id, offs, flags, isArc) \
   IMP_CreateArcIn_2(cls) \
@@ -68,12 +68,12 @@ void RegisterArc(const CArcInfo *arcInfo) throw();
 #define REGISTER_ARC_IO(n, e, ae, id, sig, offs, flags, tf, isArc) \
   IMP_CreateArcIn \
   IMP_CreateArcOut \
-  REGISTER_ARC_R(n, e, ae, id, ARRAY_SIZE(sig), sig, offs, flags, tf, CreateArc, CreateArcOut, isArc)
+  REGISTER_ARC_R(n, e, ae, id, Z7_ARRAY_SIZE(sig), sig, offs, flags, tf, CreateArc, CreateArcOut, isArc)
 
 #define REGISTER_ARC_IO_DECREMENT_SIG(n, e, ae, id, sig, offs, flags, tf, isArc) \
   IMP_CreateArcIn \
   IMP_CreateArcOut \
-  REGISTER_ARC_V(n, e, ae, id, ARRAY_SIZE(sig), sig, offs, flags, tf, CreateArc, CreateArcOut, isArc) \
+  REGISTER_ARC_V(n, e, ae, id, Z7_ARRAY_SIZE(sig), sig, offs, flags, tf, CreateArc, CreateArcOut, isArc) \
   struct CRegisterArcDecSig { CRegisterArcDecSig() { sig[0]--; RegisterArc(&g_ArcInfo); }}; \
   static CRegisterArcDecSig g_RegisterArc;
 

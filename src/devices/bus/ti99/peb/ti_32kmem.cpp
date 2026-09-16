@@ -102,7 +102,7 @@ void ti_32k_expcard_device::device_start()
 
 void ti_32k_expcard_device::device_add_mconfig(machine_config &config)
 {
-	RAM(config, m_ram, 0);
+	RAM(config, m_ram);
 	m_ram->set_default_size("32k");
 	m_ram->set_default_value(0);
 }

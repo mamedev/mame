@@ -24,8 +24,8 @@ public:
 	virtual int get_fixed_bank_type() override { return 0; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void patch(uint8_t* cpurom, uint32_t cpurom_size);
 };

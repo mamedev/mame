@@ -51,10 +51,7 @@ public:
 	cbm2_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts, char const *dflt)
 		: cbm2_expansion_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -67,7 +64,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -107,7 +104,7 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device)
 
 

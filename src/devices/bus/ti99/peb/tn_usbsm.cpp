@@ -357,8 +357,8 @@ INPUT_PORTS_END
 
 void nouspikel_usb_smartmedia_device::device_add_mconfig(machine_config &config)
 {
-	SMARTMEDIA(config, "smartmedia", 0);
-	STRATAFLASH(config, STRATA_TAG, 0);
+	SMARTMEDIA(config, "smartmedia");
+	STRATAFLASH(config, STRATA_TAG);
 	RAM(config, RAM1_TAG).set_default_size("512K").set_default_value(0);
 	RAM(config, RAM2_TAG).set_default_size("512K").set_default_value(0);
 }

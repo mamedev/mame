@@ -39,15 +39,14 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007342(*this, "k007342"),
 		m_k007420(*this, "k007420"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_rombank(*this, "rombank")
 	{ }
 
 	void battlnts(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// video-related
@@ -58,7 +57,6 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007342_device> m_k007342;
 	required_device<k007420_device> m_k007420;
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_memory_bank m_rombank;
 
@@ -67,15 +65,13 @@ private:
 	void spritebank_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
-	K007342_CALLBACK_MEMBER(tile_callback);
-	K007420_CALLBACK_MEMBER(sprite_callback);
+	void tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags);
+	void sprite_callback(uint32_t &code, uint32_t &color);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -83,10 +79,10 @@ private:
 
 ***************************************************************************/
 
-K007342_CALLBACK_MEMBER(battlnts_state::tile_callback)
+void battlnts_state::tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags)
 {
-	*code |= ((*color & 0x0f) << 9) | ((*color & 0x40) << 2);
-	*color = 0;
+	code |= ((color & 0x0f) << 9) | ((color & 0x40) << 2);
+	color = 0;
 }
 
 /***************************************************************************
@@ -95,11 +91,11 @@ K007342_CALLBACK_MEMBER(battlnts_state::tile_callback)
 
 ***************************************************************************/
 
-K007420_CALLBACK_MEMBER(battlnts_state::sprite_callback)
+void battlnts_state::sprite_callback(uint32_t &code, uint32_t &color)
 {
-	*code |= ((*color & 0xc0) << 2) | m_spritebank;
-	*code = (*code << 2) | ((*color & 0x30) >> 4);
-	*color = 0;
+	code |= ((color & 0xc0) << 2) | m_spritebank;
+	code = (code << 2) | ((color & 0x30) >> 4);
+	color = 0;
 }
 
 void battlnts_state::spritebank_w(uint8_t data)
@@ -118,13 +114,11 @@ uint32_t battlnts_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_k007342->tilemap_update();
 
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
-	m_k007420->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(1));
+	m_k007420->sprites_draw(bitmap, cliprect);
 	m_k007342->tilemap_draw(screen, bitmap, cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
 	return 0;
 }
 
-
-// machine
 
 /*************************************
  *
@@ -140,7 +134,7 @@ void battlnts_state::vblank_irq(int state)
 
 void battlnts_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void battlnts_state::bankswitch_w(uint8_t data)
@@ -283,21 +277,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout charlayout =
-{
-	8,8,            // 8 x 8 characters
-	0x40000/32,     // 8192 characters
-	4,              // 4bpp
-	{ 0, 1, 2, 3 }, // the four bitplanes are packed in one nibble
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8            // every character takes 32 consecutive bytes
-};
+static GFXDECODE_START( gfx_battlnts_tiles )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_packed_msb,      0, 1 ) // colors  0-15
+GFXDECODE_END
 
-
-static GFXDECODE_START( gfx_battlnts )
-	GFXDECODE_ENTRY( "tiles", 0, charlayout,                 0, 1 ) // colors  0-15
-	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb , 4*16, 1 ) // colors 64-79
+static GFXDECODE_START( gfx_battlnts_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 4*16, 1 ) // colors 64-79
 GFXDECODE_END
 
 
@@ -324,45 +309,40 @@ void battlnts_state::machine_reset()
 void battlnts_state::battlnts(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &battlnts_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(24'000'000) / 6); // 3579545? (no such XTAL on board)
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 6); // 3579545? (no such XTAL on board)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &battlnts_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(battlnts_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(battlnts_state::vblank_irq));
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_battlnts);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 128);
 
-	K007342(config, m_k007342, 0);
-	m_k007342->set_gfxnum(0);
+	K007342(config, m_k007342, 24_MHz_XTAL, "palette", gfx_battlnts_tiles);
 	m_k007342->set_tile_callback(FUNC(battlnts_state::tile_callback));
-	m_k007342->set_gfxdecode_tag(m_gfxdecode);
+	m_k007342->flipscreen_cb().set(m_k007420, FUNC(k007420_device::set_flipscreen));
+	m_k007342->sprite_wrap_y_cb().set(m_k007420, FUNC(k007420_device::set_wrap_y));
 
-	K007420(config, m_k007420, 0);
+	K007420(config, m_k007420, 24_MHz_XTAL, "palette", gfx_battlnts_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(battlnts_state::sprite_callback));
-	m_k007420->set_palette_tag("palette");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM3812(config, "ym1", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ym1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	YM3812(config, "ym2", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM3812(config, "ym2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -381,7 +361,7 @@ ROM_START( battlnts )
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) )
+	ROM_LOAD16_WORD_SWAP( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "777c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) )
@@ -396,7 +376,7 @@ ROM_START( battlntsa )
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) )
+	ROM_LOAD16_WORD_SWAP( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "777c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) )
@@ -411,7 +391,7 @@ ROM_START( battlntsj )
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) )
+	ROM_LOAD16_WORD_SWAP( "777c04.13a",  0x00000, 0x40000, CRC(45d92347) SHA1(8537b4ccd0a80ea3260ef82fde177f1d65a49c03) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "777c05.13e",  0x00000, 0x40000, CRC(aeee778c) SHA1(fc58ada9c97361d13439b7b0918c947d48402445) )
@@ -426,7 +406,7 @@ ROM_START( rackemup )
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "765_l04.13a", 0x00000, 0x40000, CRC(d8fb9c64) SHA1(37dac643aa492ef1ecc29c5030bc7fe5226027a2) )
+	ROM_LOAD16_WORD_SWAP( "765_l04.13a", 0x00000, 0x40000, CRC(d8fb9c64) SHA1(37dac643aa492ef1ecc29c5030bc7fe5226027a2) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "765_l05.13e", 0x00000, 0x40000, CRC(1bb6855f) SHA1(251081564dfede8fa9a422081d58465fe5ca4ed1) )
@@ -441,7 +421,7 @@ ROM_START( thehustl )
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "765_e04.13a", 0x00000, 0x40000, CRC(08c2b72e) SHA1(02d9c690da839d6fee75fffdf66a4d3da35a0263) )
+	ROM_LOAD16_WORD_SWAP( "765_e04.13a", 0x00000, 0x40000, CRC(08c2b72e) SHA1(02d9c690da839d6fee75fffdf66a4d3da35a0263) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "765_e05.13e", 0x00000, 0x40000, CRC(ef044655) SHA1(c8272283eab8fc2899979da398819cb72c92a299) )
@@ -456,7 +436,7 @@ ROM_START( thehustlj )
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "765_e04.13a", 0x00000, 0x40000, CRC(08c2b72e) SHA1(02d9c690da839d6fee75fffdf66a4d3da35a0263) )
+	ROM_LOAD16_WORD_SWAP( "765_e04.13a", 0x00000, 0x40000, CRC(08c2b72e) SHA1(02d9c690da839d6fee75fffdf66a4d3da35a0263) )
 
 	ROM_REGION( 0x40000, "sprites", 0 )
 	ROM_LOAD( "765_e05.13e", 0x00000, 0x40000, CRC(ef044655) SHA1(c8272283eab8fc2899979da398819cb72c92a299) )
@@ -471,9 +451,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code G)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (program code F)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (Japan, program code E)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, empty_init, ROT90, "Konami", "Rack 'em Up (program code L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, program code J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlnts,  0,        battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (version G)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsa, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (version F)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, battlntsj, battlnts, battlnts, battlnts, battlnts_state, empty_init, ROT90, "Konami", "Battlantis (Japan, version E)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, rackemup,  0,        battlnts, rackemup, battlnts_state, empty_init, ROT90, "Konami", "Rack 'em Up (version L)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustl,  rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, version M)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, thehustlj, rackemup, battlnts, thehustl, battlnts_state, empty_init, ROT90, "Konami", "The Hustler (Japan, version J)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

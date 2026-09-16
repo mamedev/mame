@@ -17,7 +17,7 @@
                   _CTS   9 |             | 20  DB2
                    TxD  10 |             | 19  DB1
                   _DTR  11 |             | 18  DB0
-                   RxD  12 |             | 17  _DBR
+                   RxD  12 |             | 17  _DSR
                    RS0  13 |             | 16  _DCD
                    RS1  14 |_____________| 15  Vcc
 
@@ -41,6 +41,8 @@ public:
 	auto rts_handler() { return m_rts_handler.bind(); }
 	auto dtr_handler() { return m_dtr_handler.bind(); }
 
+	void map(address_map &map) ATTR_COLD;
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -55,9 +57,9 @@ public:
 	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	enum
@@ -170,6 +172,7 @@ private:
 	int m_rx_clock;
 	int m_rx_bits;
 	int m_rx_shift;
+	int m_rx_shifted_bits;
 	int m_rx_parity;
 	int m_rx_counter;
 	int m_rx_irq_enable;
@@ -182,7 +185,6 @@ private:
 	int m_tx_shift;
 	int m_tx_parity;
 	int m_tx_counter;
-	int m_tx_enable;
 	int m_tx_irq_enable;
 	int m_tx_internal_clock;
 };

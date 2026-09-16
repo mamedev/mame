@@ -75,8 +75,8 @@ public:
 	void eacc(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void scan_w(int state);
@@ -85,7 +85,7 @@ private:
 	uint8_t keyboard_r();
 	void digit_w(uint8_t data);
 	void segment_w(uint8_t data);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 	void do_nmi(bool, bool);
 	uint8_t m_digit = 0U;
 	bool m_cb2 = false;
@@ -157,9 +157,6 @@ void eacc_state::machine_reset()
 
 void eacc_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
-
 	save_item(NAME(m_cb2));
 	save_item(NAME(m_scan));
 	save_item(NAME(m_digit));
@@ -271,7 +268,7 @@ void eacc_state::eacc(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	TTL7474(config, m_7474, 0);
+	TTL7474(config, m_7474);
 	m_7474->output_cb().set(m_pia, FUNC(pia6821_device::cb1_w));
 
 	clock_device &eacc_scan(CLOCK(config, "eacc_scan", 600)); // 74C14 with 100k & 10nF = 1200Hz, but article says 600.

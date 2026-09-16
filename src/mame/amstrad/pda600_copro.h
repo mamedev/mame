@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_PDA600_COPRO_H
-#define MAME_MACHINE_PDA600_COPRO_H
+#ifndef MAME_AMSTRAD_PDA600_COPRO_H
+#define MAME_AMSTRAD_PDA600_COPRO_H
 
 #pragma once
 
@@ -34,9 +34,9 @@ public:
 
 private:
 	// device-level overrides
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface overrides
 	void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
@@ -64,4 +64,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PDA600_COPRO_HLE, pda600_copro_device)
 
-#endif // MAME_MACHINE_PDA600_COPRO_H
+#endif // MAME_AMSTRAD_PDA600_COPRO_H

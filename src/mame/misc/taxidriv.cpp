@@ -40,7 +40,7 @@ public:
 	void taxidriv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -77,10 +77,10 @@ private:
 	void taxidriv_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cpu2_map(address_map &map);
-	void cpu3_map(address_map &map);
-	void cpu3_port_map(address_map &map);
-	void main_map(address_map &map);
+	void cpu2_map(address_map &map) ATTR_COLD;
+	void cpu3_map(address_map &map) ATTR_COLD;
+	void cpu3_port_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -552,7 +552,7 @@ void taxidriv_state::taxidriv(machine_config &config)
 	ppi4.out_pc_callback().set(FUNC(taxidriv_state::spritectrl_w<8>));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

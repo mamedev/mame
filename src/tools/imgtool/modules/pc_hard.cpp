@@ -55,6 +55,8 @@
 #include "multibyte.h"
 #include "opresolv.h"
 
+#include <cstring>
+
 #define FAT_SECLEN  512
 
 OPTION_GUIDE_START( pc_chd_create_optionguide )
@@ -292,6 +294,7 @@ static imgtoolerr_t pc_chd_image_open(imgtool::image &image, imgtool::stream::pt
 	if (err)
 		return err;
 
+	stream.release();
 	return IMGTOOLERR_SUCCESS;
 }
 

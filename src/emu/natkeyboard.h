@@ -45,7 +45,6 @@ public:
 	// getters and queries
 	running_machine &machine() const { return m_machine; }
 	bool empty() const { return (m_bufbegin == m_bufend); }
-	bool full() const { return ((m_bufend + 1) % m_buffer.size()) == m_bufbegin; }
 	bool can_post() const { return m_have_charkeys || !m_queue_chars.isnull(); }
 	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
 	bool in_use() const { return m_in_use; }
@@ -62,10 +61,8 @@ public:
 
 	// posting
 	void post_char(char32_t ch, bool normalize_crlf = false);
-	void post(const char32_t *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post(std::u32string_view text, const attotime &rate = attotime::zero);
 	void post_utf8(std::string_view text, const attotime &rate = attotime::zero);
-	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_coded(std::string_view text, const attotime &rate = attotime::zero);
 	void paste();
 

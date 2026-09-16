@@ -14,7 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/msm6242.h"
+#include "msm6242.h"
 
 #define LOG_UNMAPPED    (1U << 1)
 #define LOG_IRQ         (1U << 2)

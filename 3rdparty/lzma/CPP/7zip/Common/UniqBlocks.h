@@ -1,7 +1,7 @@
 // UniqBlocks.h
 
-#ifndef __UNIQ_BLOCKS_H
-#define __UNIQ_BLOCKS_H
+#ifndef ZIP7_INC_UNIQ_BLOCKS_H
+#define ZIP7_INC_UNIQ_BLOCKS_H
 
 #include "../../Common/MyBuffer.h"
 #include "../../Common/MyString.h"

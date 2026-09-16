@@ -62,6 +62,10 @@ private:
 	void init_common();
 	static FLAC__StreamEncoderWriteStatus write_callback_static(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data);
 	FLAC__StreamEncoderWriteStatus write_callback(const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame);
+	static FLAC__StreamEncoderSeekStatus seek_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data);
+	FLAC__StreamEncoderSeekStatus seek_callback(FLAC__uint64 absolute_byte_offset);
+	static FLAC__StreamEncoderTellStatus tell_callback_static(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
+	FLAC__StreamEncoderTellStatus tell_callback(FLAC__uint64 *absolute_byte_offset);
 
 	// internal state
 	FLAC__StreamEncoder *   m_encoder;              // actual encoder
@@ -115,13 +119,17 @@ public:
 	uint32_t finish();
 
 private:
+	enum DECODE_MODE {
+		SCALE_UP, SCALE_DOWN, SCALE_SAME
+	};
 	// internal helpers
 	static FLAC__StreamDecoderReadStatus read_callback_static(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data);
 	FLAC__StreamDecoderReadStatus read_callback(FLAC__byte buffer[], size_t *bytes);
 	static void metadata_callback_static(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data);
 	static FLAC__StreamDecoderTellStatus tell_callback_static(const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
-	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data);
-	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
+	static FLAC__StreamDecoderWriteStatus write_callback_static(const FLAC__StreamDecoder *decoder, const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[], void *client_data);
+	FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[]);
+	template <DECODE_MODE Mode, bool SwapEndian> FLAC__StreamDecoderWriteStatus write_callback(const ::FLAC__Frame *frame, const FLAC__int32 *const buffer[]);
 	static void error_callback_static(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data);
 
 	// output state

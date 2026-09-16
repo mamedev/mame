@@ -1,7 +1,7 @@
 // SortUtils.h
 
-#ifndef __SORT_UTLS_H
-#define __SORT_UTLS_H
+#ifndef ZIP7_INC_SORT_UTLS_H
+#define ZIP7_INC_SORT_UTLS_H
 
 #include "../../../Common/MyString.h"
 

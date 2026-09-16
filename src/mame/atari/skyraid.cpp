@@ -45,8 +45,8 @@ public:
 	void skyraid(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_pos_ram;
@@ -86,11 +86,9 @@ private:
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void skyraid_state::video_start()
 {
@@ -210,12 +208,8 @@ uint32_t skyraid_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-// machine
-
 void skyraid_state::machine_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_analog_range));
 	save_item(NAME(m_analog_offset));
 	save_item(NAME(m_scroll));
@@ -452,7 +446,7 @@ void skyraid_state::skyraid(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 4);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(22 * 1'000'000 / 15'750));
 	m_screen->set_size(512, 240);

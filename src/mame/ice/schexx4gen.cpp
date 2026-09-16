@@ -25,7 +25,7 @@ public:
 	void schexx(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<mc68hc11_cpu_device> m_maincpu;
 };
@@ -51,4 +51,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1996, schexx, 0, schexx, schexx, schexx_state, empty_init, ROT0, "ICE", "Super Chexx (EM Bubble Hockey)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, schexx, 0, schexx, schexx, schexx_state, empty_init, ROT0, "ICE", "Super Chexx (EM Bubble Hockey)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

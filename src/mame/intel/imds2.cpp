@@ -96,9 +96,6 @@ namespace {
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     8_MHz_XTAL
 
-// Y1 oscillator of IPC board: 19.6608 MHz
-#define IPC_XTAL_Y1     19.6608_MHz_XTAL
-
 class imds2_state : public driver_device
 {
 public:
@@ -121,8 +118,8 @@ private:
 	virtual void driver_start() override;
 	virtual void driver_reset() override;
 
-	void ipc_io_map(address_map &map);
-	void ipc_mem_map(address_map &map);
+	void ipc_io_map(address_map &map) ATTR_COLD;
+	void ipc_mem_map(address_map &map) ATTR_COLD;
 
 	u8 bus_pio_r(offs_t offset) { return m_bus->space(AS_IO).read_byte(offset); }
 	void bus_pio_w(offs_t offset, u8 data) { m_bus->space(AS_IO).write_byte(offset, data); }
@@ -188,8 +185,8 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipcctrl(*this, "ipcctrl"),
 	m_serial(*this, "serial%u", 0U),
 	m_ioc(*this, "ioc"),
-	m_bus(*this, "slot"),
-	m_slot(*this, "slot:1"),
+	m_bus(*this, "bus"),
+	m_slot(*this, "slot1"),
 	m_ram(*this, "ram"),
 	m_boot(*this, "boot")
 {
@@ -256,21 +253,24 @@ static void imds2_cards(device_slot_interface &device)
 
 void imds2_state::imds2(machine_config &config)
 {
+	// Y1 oscillator of IPC board: 19.6608 MHz
+	constexpr auto IPC_XTAL_Y1 = 19.6608_MHz_XTAL;
+
 	I8085A(config, m_ipccpu, IPC_XTAL_Y2);  // CLK OUT = 4 MHz
 	m_ipccpu->set_addrmap(AS_PROGRAM, &imds2_state::ipc_mem_map);
 	m_ipccpu->set_addrmap(AS_IO, &imds2_state::ipc_io_map);
 	m_ipccpu->in_inta_func().set("ipcsyspic", FUNC(pic8259_device::acknowledge));
 	//config.set_maximum_quantum(attotime::from_hz(100));
 
-	PIC8259(config, m_ipcsyspic, 0);
+	PIC8259(config, m_ipcsyspic);
 	m_ipcsyspic->out_int_callback().set(FUNC(imds2_state::ipc_intr_w));
 	m_ipcsyspic->in_sp_callback().set_constant(1);
 
-	PIC8259(config, m_ipclocpic, 0);
+	PIC8259(config, m_ipclocpic);
 	m_ipclocpic->out_int_callback().set(m_ipcsyspic, FUNC(pic8259_device::ir7_w));
 	m_ipclocpic->in_sp_callback().set_constant(0);
 
-	PIT8253(config, m_ipctimer, 0);
+	PIT8253(config, m_ipctimer);
 	m_ipctimer->set_clk<0>(IPC_XTAL_Y1 / 16);
 	m_ipctimer->set_clk<1>(IPC_XTAL_Y1 / 16);
 	m_ipctimer->set_clk<2>(IPC_XTAL_Y1 / 16);
@@ -308,9 +308,9 @@ void imds2_state::imds2(machine_config &config)
 	m_ioc->master_intr_cb().set(m_ipclocpic, FUNC(pic8259_device::ir6_w));
 	m_ioc->parallel_int_cb().set(m_ipclocpic, FUNC(pic8259_device::ir5_w));
 
-	MULTIBUS(config, m_bus, 9'830'400);
+	MULTIBUS(config, m_bus, IPC_XTAL_Y1 / 2);
 	m_bus->xack_cb().set(FUNC(imds2_state::xack));
-	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
+	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false, (IPC_XTAL_Y1 / 2).value()); // FIXME: isbc202
 }
 
 void imds2_state::xack(int state)

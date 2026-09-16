@@ -38,8 +38,8 @@ public:
 	void jonos(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 keyboard_r(offs_t offset);
@@ -47,7 +47,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_framecnt = 0U;
 	u8 m_term_data = 0U;
@@ -196,7 +196,7 @@ void jonos_state::jonos(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jonos_state::mem_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(jonos_state::screen_update));
@@ -207,7 +207,7 @@ void jonos_state::jonos(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jonos);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(jonos_state::kbd_put));
 }
 

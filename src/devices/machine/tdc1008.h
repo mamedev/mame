@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_TDC1008_TDC1008_H
-#define MAME_MACHINE_TDC1008_TDC1008_H
+#ifndef MAME_MACHINE_TDC1008_H
+#define MAME_MACHINE_TDC1008_H
 
 #pragma once
 
@@ -56,8 +56,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void latch_flags();
 
@@ -108,4 +108,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(TDC1008, tdc1008_device)
 
-#endif // MAME_MACHINE_TDC1008_TDC1008_H
+#endif // MAME_MACHINE_TDC1008_H

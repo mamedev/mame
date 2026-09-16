@@ -48,8 +48,8 @@ protected:
 	devcb_write8 m_int_write_func;
 	TIMER_CALLBACK_MEMBER(blink_callback);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void execute_rule(const bool src, const int rule, bool &dst) const;
 	void update_int();

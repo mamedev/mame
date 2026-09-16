@@ -46,7 +46,7 @@ class mm74c922_device :  public device_t
 {
 public:
 	// construction/destruction
-	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm74c922_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_cap_osc(double value) { m_cap_osc = value; }
 	void set_cap_debounce(double value) { m_cap_debounce = value; }
@@ -66,7 +66,7 @@ protected:
 	mm74c922_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int max_y);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
@@ -104,7 +104,7 @@ class mm74c923_device :  public mm74c922_device
 {
 public:
 	// construction/destruction
-	mm74c923_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm74c923_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 

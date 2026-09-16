@@ -9,8 +9,8 @@ is supported by the game F-16 Fighting Falcon for its 2 players mode.
 
 **********************************************************************/
 
-#ifndef MAME_BUS_SG1000_EXP_SK1100_KBLINK_H
-#define MAME_BUS_SG1000_EXP_SK1100_KBLINK_H
+#ifndef MAME_BUS_SG1000_EXP_KBLINK_H
+#define MAME_BUS_SG1000_EXP_KBLINK_H
 
 #pragma once
 
@@ -35,9 +35,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_sk1100_link_cable_interface overrides
 	virtual void input_data(int state) override { m_data = state; set_data_transfer(); }
@@ -81,4 +81,4 @@ private:
 DECLARE_DEVICE_TYPE(SK1100_LINK_CABLE, sk1100_link_cable_device)
 
 
-#endif // MAME_BUS_SG1000_EXP_SK1100_KBLINK_H
+#endif // MAME_BUS_SG1000_EXP_KBLINK_H

@@ -78,10 +78,10 @@ public:
 private:
 	uint8_t ff_r();
 
-	void horizon_io(address_map &map);
-	void horizon_mem(address_map &map);
+	void horizon_io(address_map &map) ATTR_COLD;
+	void horizon_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart_l;
 	required_device<i8251_device> m_usart_r;
@@ -192,7 +192,7 @@ void horizon_state::horizon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &horizon_state::horizon_io);
 
 	// devices
-	I8251(config, m_usart_l, 0);
+	I8251(config, m_usart_l);
 	m_usart_l->txd_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart_l->dtr_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart_l->rts_handler().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
@@ -202,7 +202,7 @@ void horizon_state::horizon(machine_config &config)
 	rs232a.dsr_handler().set(m_usart_l, FUNC(i8251_device::write_dsr));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	I8251(config, m_usart_r, 0);
+	I8251(config, m_usart_r);
 	m_usart_r->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_usart_r->dtr_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_usart_r->rts_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
@@ -213,7 +213,7 @@ void horizon_state::horizon(machine_config &config)
 
 	// S-100
 	S100_BUS(config, m_s100, XTAL(8'000'000) / 4);
-	m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	//m_s100->rdy().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 	//S100_SLOT(config, S100_TAG":1", horizon_s100_cards, nullptr, nullptr); // CPU
 	S100_SLOT(config, "s100:2", horizon_s100_cards, nullptr); // RAM
 	S100_SLOT(config, "s100:3", horizon_s100_cards, "mdsad"); // MDS

@@ -842,12 +842,14 @@ void apexc_cpu_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(m_pc);
-
 		if (m_running)
+		{
+			debugger_instruction_hook(m_pc);
 			execute();
+		}
 		else
 		{
+			debugger_wait_hook();
 			DELAY(m_icount);    /* burn cycles once for all */
 		}
 	} while (m_icount > 0);

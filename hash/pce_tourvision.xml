@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -973,7 +973,7 @@ Parasol Stars
 	</software>
 
 	<software name="pcgenja">
-		<description>PC Genjin - Pithecanthropus Computerurus (Alt) (TourVisión PCE bootleg)</description>
+		<description>PC Genjin - Pithecanthropus Computerurus (alt, TourVisión PCE bootleg)</description>
 		<year>1989</year>
 		<publisher>bootleg (TourVisión) / Hudson</publisher>
 		<info name="alt_title" value="PC原人"/>

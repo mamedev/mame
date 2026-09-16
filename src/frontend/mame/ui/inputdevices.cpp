@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "inputdevices.h"
 
+#include "input.h"
 #include "inputdev.h"
 
 // FIXME: allow OSD module headers to be included in a less ugly way
@@ -24,15 +25,15 @@ namespace {
 class menu_input_device : public menu
 {
 public:
-	menu_input_device(mame_ui_manager &mui, render_container &container, input_device &device)
-		: menu(mui, container)
+	menu_input_device(mame_ui_manager &mui, render_target &target, input_device &device)
+		: menu(mui, target)
 		, m_device(device)
 		, m_have_analog(false)
 	{
 		set_heading(
 				util::string_format(_("menu-inputdev", "%1$s (%2$s %3$d)"),
 					device.name(),
-					machine().input().device_class(device.devclass()).name(),
+					machine().input().device_class(device.device_class()).name(),
 					device.devindex() + 1));
 	}
 
@@ -44,33 +45,33 @@ protected:
 		set_custom_space(0.0F, (line_height() * (m_have_analog ? 2.0F : 1.0F)) + (tb_border() * 3.0F));
 	}
 
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override
 	{
 		if (selectedref)
 		{
 			// get the complete token for the highlighted input
 			input_device_item &input = *reinterpret_cast<input_device_item *>(selectedref);
 			input_code code = input.code();
-			if (!machine().input().device_class(m_device.devclass()).multi())
+			if (!machine().input().device_class(m_device.device_class()).multi())
 				code.set_device_index(0);
 			std::string const token = machine().input().code_to_token(code);
 
 			// measure the name of the token string
 			float const tokenwidth = (std::min)(get_string_width(token) + (gutter_width() * 2.0F), 1.0F);
-			float const boxwidth = (std::max)(tokenwidth, x2 - x);
+			float const boxwidth = (std::max)(tokenwidth, origx2 - origx1);
 			rgb_t const fgcolor(ui().colors().text_color());
 
 			// draw the outer box
 			ui().draw_outlined_box(
 					container(),
-					(1.0F - boxwidth) * 0.5F, y2 + tb_border(),
-					(1.0F + boxwidth) * 0.5F, y2 + bottom,
+					(1.0F - boxwidth) * 0.5F, origy2 + tb_border(),
+					(1.0F + boxwidth) * 0.5F, origy2 + bottom,
 					ui().colors().background_color());
 
 			// show the token
 			draw_text_normal(
 					token,
-					(1.0F - boxwidth) * 0.5F, y2 + (tb_border() * 2.0F), boxwidth,
+					(1.0F - boxwidth) * 0.5F, origy2 + (tb_border() * 2.0F), boxwidth,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
 					fgcolor);
 
@@ -81,11 +82,11 @@ protected:
 			case ITEM_CLASS_RELATIVE:
 				{
 					// draw the indicator
-					float const indleft = x + gutter_width();
-					float const indright = x2 - gutter_width();
-					float const indtop = y2 + (tb_border() * 2.0F) + (line_height() * 1.2F);
-					float const indbottom = y2 + (tb_border() * 2.0F) + (line_height() * 1.8F);
-					float const indcentre = (x + x2) * 0.5F;
+					float const indleft = origx1 + gutter_width();
+					float const indright = origx2 - gutter_width();
+					float const indtop = origy2 + (tb_border() * 2.0F) + (line_height() * 1.2F);
+					float const indbottom = origy2 + (tb_border() * 2.0F) + (line_height() * 1.8F);
+					float const indcentre = (origx1 + origx2) * 0.5F;
 					s32 const value = (input.itemclass() == ITEM_CLASS_ABSOLUTE) ? input.read_as_absolute(ITEM_MODIFIER_NONE) : input.read_as_relative(ITEM_MODIFIER_NONE);
 					if (0 < value)
 					{
@@ -191,8 +192,8 @@ private:
 
 
 
-menu_input_devices::menu_input_devices(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_input_devices::menu_input_devices(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 {
 	set_heading(_("menu-inputdev", "Input Devices"));
 }
@@ -250,12 +251,12 @@ bool menu_input_devices::handle(event const *ev)
 	switch (ev->iptkey)
 	{
 	case IPT_UI_SELECT:
-		stack_push<menu_input_device>(ui(), container(), dev);
+		stack_push<menu_input_device>(ui(), target(), dev);
 		break;
 
 	case IPT_UI_PREV_GROUP:
 		{
-			auto group = dev.devclass();
+			auto group = dev.device_class();
 			bool found_break = false;
 			int target = 0;
 			for (auto i = selected_index(); 0 < i--; )
@@ -263,13 +264,13 @@ bool menu_input_devices::handle(event const *ev)
 				input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
 				if (candidate)
 				{
-					if (candidate->devclass() == group)
+					if (candidate->device_class() == group)
 					{
 						target = i;
 					}
 					else if (!found_break)
 					{
-						group = candidate->devclass();
+						group = candidate->device_class();
 						found_break = true;
 						target = i;
 					}
@@ -290,11 +291,11 @@ bool menu_input_devices::handle(event const *ev)
 
 	case IPT_UI_NEXT_GROUP:
 		{
-			auto const group = dev.devclass();
+			auto const group = dev.device_class();
 			for (auto i = selected_index(); item_count() > ++i; )
 			{
 				input_device *const candidate = reinterpret_cast<input_device *>(item(i).ref());
-				if (candidate && (candidate->devclass() != group))
+				if (candidate && (candidate->device_class() != group))
 				{
 					set_selected_index(i);
 					return true;

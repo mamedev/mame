@@ -53,7 +53,7 @@ public:
 	void bigstrkb(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -75,11 +75,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // Sprites
 
@@ -193,8 +191,6 @@ uint32_t bigstrkb_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*
 
@@ -390,7 +386,7 @@ void bigstrkb_state::bigstrkb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bigstrkb);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -400,17 +396,16 @@ void bigstrkb_state::bigstrkb(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 //  YM2151(config, "ymsnd", 4'000'000);
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 4'000'000, okim6295_device::PIN7_HIGH));
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", 4'000'000, okim6295_device::PIN7_HIGH));
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 }
 
 // Rom Loading

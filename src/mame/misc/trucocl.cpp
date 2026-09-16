@@ -66,9 +66,9 @@ public:
 	void init_trucocl();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -86,8 +86,8 @@ private:
 	uint8_t m_irq_mask = 0;
 	emu_timer *m_dac_irq_timer = nullptr;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void irq_enable_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
@@ -101,8 +101,6 @@ private:
 	TIMER_CALLBACK_MEMBER(dac_irq);
 };
 
-
-// video
 
 void trucocl_state::palette(palette_device &palette) const
 {
@@ -149,8 +147,6 @@ uint32_t trucocl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
 
 // TODO: doesn't seem suited to neither irq nor nmi
 void trucocl_state::irq_enable_w(uint8_t data)
@@ -302,7 +298,7 @@ void trucocl_state::trucocl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

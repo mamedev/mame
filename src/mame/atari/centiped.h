@@ -58,7 +58,7 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	// drivers/centiped.cpp
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void irq_ack_w(uint8_t data);
 	uint8_t centiped_IN0_r();
@@ -135,18 +135,18 @@ private:
 	void init_common();
 	void milliped_set_color(offs_t offset, uint8_t data);
 	inline int read_trackball(int idx, int switch_port);
-	void bullsdrt_data_map(address_map &map);
-	void bullsdrt_map(address_map &map);
-	void bullsdrt_port_map(address_map &map);
-	void caterplr_map(address_map &map);
-	void centipdb_map(address_map &map);
-	void centiped_base_map(address_map &map);
-	void centiped_map(address_map &map);
-	void centipedj_map(address_map &map);
-	void magworm_map(address_map &map);
-	void mazeinv_map(address_map &map);
-	void milliped_map(address_map &map);
-	void warlords_map(address_map &map);
+	void bullsdrt_data_map(address_map &map) ATTR_COLD;
+	void bullsdrt_map(address_map &map) ATTR_COLD;
+	void bullsdrt_port_map(address_map &map) ATTR_COLD;
+	void caterplr_map(address_map &map) ATTR_COLD;
+	void centipdb_map(address_map &map) ATTR_COLD;
+	void centiped_base_map(address_map &map) ATTR_COLD;
+	void centiped_map(address_map &map) ATTR_COLD;
+	void centipedj_map(address_map &map) ATTR_COLD;
+	void magworm_map(address_map &map) ATTR_COLD;
+	void mazeinv_map(address_map &map) ATTR_COLD;
+	void milliped_map(address_map &map) ATTR_COLD;
+	void warlords_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -164,7 +164,7 @@ public:
 	void init_multiped();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -182,7 +182,7 @@ private:
 
 	void multiped_gfxbank_w(uint8_t data);
 
-	void multiped_map(address_map &map);
+	void multiped_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_ATARI_CENTIPED_H

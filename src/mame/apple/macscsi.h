@@ -31,8 +31,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum class mode : u8 { NON_DMA, READ_WAIT_DRQ, READ_DMA, WRITE_DMA, BAD_DMA };
@@ -42,6 +42,7 @@ private:
 	void write_fifo_process();
 	TIMER_CALLBACK_MEMBER(timer_callback);
 	void dma_stop();
+	void read_fifo_flush();
 
 	// callback objects
 	devcb_read8 m_scsi_read_callback;

@@ -36,6 +36,8 @@ this reason.
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -63,7 +65,7 @@ public:
 	int start2_r();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 
@@ -88,8 +90,8 @@ private:
 
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void megaplay_bios_io_map(address_map &map);
-	void megaplay_bios_map(address_map &map);
+	void megaplay_bios_io_map(address_map &map) ATTR_COLD;
+	void megaplay_bios_map(address_map &map) ATTR_COLD;
 
 	uint32_t m_bios_mode = 0;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
 
@@ -138,10 +140,10 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("PAD1") // P1 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mplay_state::start1_r))
 
 	PORT_MODIFY("PAD2") // P2 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(mplay_state::start2_r))
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -707,8 +709,8 @@ void mplay_state::megaplay(machine_config &config)
 	m_vdp1->set_hcounter_divide(5);
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
-	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -969,7 +971,8 @@ void mplay_state::init_megaplay()
 	m_ic36_ram = std::make_unique<uint16_t[]>(0x10000 / 2);
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
-	init_megadrij();
+	// use Export NTSC init, as MegaPlay was apparently only intended for export markets.
+	init_megadriv();
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);

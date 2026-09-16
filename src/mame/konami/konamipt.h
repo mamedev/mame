@@ -62,6 +62,7 @@
 #define KONAMI8_RL_40( player, button1, button2, button3 )              \
 	KONAMI8_MULTI_8WAY( player, RIGHT, LEFT, button1, button2, button3 )
 
+
 /*********************** Actual Inputs 8bit ***********************/
 
 /* Cocktail Cabinet 4Way Inputs */
@@ -212,6 +213,7 @@ because they just need a few lines of code */
 
 /**************************** 16bit Players Inputs ****************************/
 
+/* Upright Multiplayer Cabinet Inputs */
 #define KONAMI16_LSB_40( player, button3 )  \
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(player) \
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) \
@@ -264,6 +266,33 @@ because they just need a few lines of code */
 	KONAMI16_MSB_40_UDLR( player, button3 )         \
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, start )
 
+/* Cocktail Cabinet 4Way Inputs */
+#define KONAMI16_LSB_40_MONO_4WAY( button3 )  \
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY \
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY \
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY \
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_4WAY \
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) \
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) \
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, button3            )
+
+#define KONAMI16_LSB_40_COCKTAIL_4WAY( button3 )  \
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY PORT_COCKTAIL \
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL \
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY PORT_COCKTAIL \
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_4WAY PORT_COCKTAIL \
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_COCKTAIL \
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_COCKTAIL \
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, button3            ) PORT_COCKTAIL
+
+#define KONAMI16_LSB_MONO_4WAY( button3, start ) \
+	KONAMI16_LSB_40_MONO_4WAY( button3 )         \
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, start )
+
+#define KONAMI16_LSB_COCKTAIL_4WAY( button3, start ) \
+	KONAMI16_LSB_40_COCKTAIL_4WAY( button3 )         \
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, start )
+
 
 /******************** System Inputs (Coin, Start & Service) *******************/
 
@@ -279,6 +308,8 @@ because they just need a few lines of code */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
 /**************************** Coinage Dip Switches ****************************/
 
 /* Konami games from 80s-90s basically use only two kind of coinage dips. The only

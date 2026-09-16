@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "lynx.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 
 #include "corestr.h"
 #include "render.h"
@@ -1227,7 +1227,7 @@ void lynx_state::interrupt_set(u8 line)
 
 void lynx_state::interrupt_update()
 {
-	m_maincpu->set_input_line(M65SC02_IRQ_LINE, (m_mikey.interrupt == 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(G65SC02_IRQ_LINE, (m_mikey.interrupt == 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1320,7 +1320,7 @@ TIM_BORROWOUT   EQU %00000001
 
 void lynx_state::timer_init(int which)
 {
-	memset(&m_timer[which], 0, sizeof(LYNX_TIMER));
+	m_timer[which] = LYNX_TIMER();
 	m_timer[which].timer = timer_alloc(FUNC(lynx_state::timer_shot), this);
 
 	save_item(NAME(m_timer[which].bakup), which);
@@ -1541,8 +1541,8 @@ void lynx_state::update_screen_timing()
 			m_pixclock = time_factor(m_timer[0].timer_clock());
 			m_hcount = m_timer[0].bakup; // TODO: multiplied internally?
 			m_vcount = m_timer[2].bakup;
-			attotime framerate = attotime::from_hz(m_pixclock) * (m_hcount + 1) * (m_vcount + 1);
-			m_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), framerate.attoseconds());
+			attotime framerate = attotime::from_ticks((m_hcount + 1) * (m_vcount + 1), m_pixclock);
+			m_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), framerate);
 		}
 	}
 }
@@ -1557,7 +1557,7 @@ void lynx_state::update_screen_timing()
 
 void lynx_state::uart_reset()
 {
-	memset(&m_uart, 0, sizeof(m_uart));
+	m_uart = UART();
 }
 
 TIMER_CALLBACK_MEMBER(lynx_state::uart_loopback_timer)
@@ -1877,10 +1877,10 @@ void lynx_state::machine_reset()
 
 	m_mikey.interrupt = 0;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(G65SC02_IRQ_LINE, CLEAR_LINE);
 
-	memset(&m_suzy, 0, sizeof(m_suzy));
-	memset(&m_mikey, 0, sizeof(m_mikey));
+	m_suzy = SUZY();
+	m_mikey = MIKEY();
 
 	m_suzy.data[0x88]  = 0x01;
 	m_suzy.data[0x90]  = 0x00;

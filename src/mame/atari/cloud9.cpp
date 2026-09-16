@@ -132,9 +132,9 @@ public:
 	void cloud9(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -181,11 +181,9 @@ private:
 	inline void write_vram(uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba);
 	inline void bitmode_autoinc();
 	inline void schedule_next_irq(int curscanline);
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /*************************************
  *
@@ -465,8 +463,6 @@ uint32_t cloud9_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-// machine
-
 static constexpr double MASTER_CLOCK = 10'000'000;
 static constexpr double PIXEL_CLOCK = MASTER_CLOCK / 2;
 static constexpr uint16_t HTOTAL = 320;
@@ -540,7 +536,7 @@ void cloud9_state::machine_start()
 
 	// reconfigure the visible area to match
 	visarea.set(0, 255, m_vblank_end + 1, m_vblank_start);
-	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	m_screen->configure(320, 256, visarea, attotime::from_ticks(VTOTAL * HTOTAL, PIXEL_CLOCK));
 
 	// create a timer for IRQs and set up the first callback
 	m_irq_timer = timer_alloc(FUNC(cloud9_state::clock_irq), this);
@@ -649,7 +645,7 @@ static INPUT_PORTS_START( cloud9 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cloud9_state, vblank_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cloud9_state::vblank_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -690,7 +686,7 @@ static INPUT_PORTS_START( firebeas )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(cloud9_state, vblank_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(cloud9_state::vblank_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -772,7 +768,7 @@ void cloud9_state::cloud9(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
 	PALETTE(config, m_palette).set_entries(64);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz((double)PIXEL_CLOCK / (double)VTOTAL / (double)HTOTAL);
 	m_screen->set_size(HTOTAL, VTOTAL);
 	m_screen->set_vblank_time(0);          // VBLANK is handled manually

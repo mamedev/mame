@@ -31,23 +31,22 @@ namespace {
 class nes_vt09_common_base_state : public driver_device
 {
 public:
-	nes_vt09_common_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_common_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
-		m_exin(*this, "EXTRAIN%u", 0U),
-		m_prgrom(*this, "mainrom")
+		m_exin(*this, "EXTRAIN%u", 0U)
 	{ }
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint8_t in0_r();
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt09_map(address_map& map);
+	void nes_vt09_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -58,12 +57,7 @@ protected:
 
 	optional_ioport_array<4> m_exin;
 
-	required_region_ptr<uint8_t> m_prgrom;
-
-	uint8_t vt_rom_r(offs_t offset);
-	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
-
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(nes_vt02_vt03_soc_device *soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -77,18 +71,18 @@ private:
 class nes_vt09_common_state : public nes_vt09_common_base_state
 {
 public:
-	nes_vt09_common_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_common_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt09_common_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
 
-	void vt_external_space_map_32mbyte(address_map& map);
-	void vt_external_space_map_16mbyte(address_map& map);
-	void vt_external_space_map_8mbyte(address_map& map);
-	void vt_external_space_map_4mbyte(address_map& map);
-	void vt_external_space_map_2mbyte(address_map& map);
-	void vt_external_space_map_1mbyte(address_map& map);
-	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map& map);
+	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 
 protected:
@@ -98,17 +92,17 @@ protected:
 class nes_vt09_state : public nes_vt09_common_state
 {
 public:
-	nes_vt09_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt09_common_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt09(machine_config& config);
-	void nes_vt09_1mb(machine_config& config);
-	void nes_vt09_2mb(machine_config& config);
-	void nes_vt09_4mb(machine_config& config);
-	void nes_vt09_4mb_rasterhack(machine_config& config);
-	void nes_vt09_8mb(machine_config& config);
-	void nes_vt09_16mb(machine_config& config);
+	void nes_vt09(machine_config &config);
+	void nes_vt09_1mb(machine_config &config);
+	void nes_vt09_2mb(machine_config &config);
+	void nes_vt09_4mb(machine_config &config);
+	void nes_vt09_4mb_rasterhack(machine_config &config);
+	void nes_vt09_8mb(machine_config &config);
+	void nes_vt09_16mb(machine_config &config);
 
 private:
 };
@@ -116,20 +110,20 @@ private:
 class nes_vt09_cart_state : public nes_vt09_state
 {
 public:
-	nes_vt09_cart_state(const machine_config& mconfig, device_type type, const char* tag) :
+	nes_vt09_cart_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_vt09_state(mconfig, type, tag),
 		m_bank(*this, "cartbank"),
 		m_cart(*this, "cartslot"),
 		m_cart_region(nullptr)
 	{ }
 
-	void nes_vt09_cart(machine_config& config);
+	void nes_vt09_cart(machine_config &config);
 
 protected:
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 
 private:
-	void vt_external_space_map_cart(address_map& map);
+	void vt_external_space_map_cart(address_map &map) ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -165,50 +159,40 @@ DEVICE_IMAGE_LOAD_MEMBER(nes_vt09_cart_state::cart_load)
 }
 
 
-uint8_t nes_vt09_common_base_state::vt_rom_r(offs_t offset)
-{
-	return m_prgrom[offset];
-}
-
-void nes_vt09_common_base_state::vtspace_w(offs_t offset, uint8_t data)
-{
-	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
-}
-
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
 void nes_vt09_common_state::vt_external_space_map_32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
 }
 
 void nes_vt09_common_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).rom().region("mainrom", 0);
 }
 
 void nes_vt09_common_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).rom().region("mainrom", 0);
 }
 
 void nes_vt09_common_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).rom().region("mainrom", 0);
 }
 
 void nes_vt09_common_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).rom().region("mainrom", 0);
 }
 
 void nes_vt09_common_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).rom().region("mainrom", 0);
 }
 
 void nes_vt09_common_state::vt_external_space_map_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x007ffff).mirror(0x1f80000).rom().region("mainrom", 0);
 }
 
 void nes_vt09_cart_state::vt_external_space_map_cart(address_map &map)
@@ -280,7 +264,7 @@ void nes_vt09_common_base_state::machine_reset()
 {
 }
 
-void nes_vt09_common_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void nes_vt09_common_base_state::configure_soc(nes_vt02_vt03_soc_device *soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &nes_vt09_common_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(nes_vt09_common_base_state::in0_r));
@@ -326,43 +310,43 @@ void nes_vt09_state::nes_vt09(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void nes_vt09_state::nes_vt09_16mb(machine_config& config)
+void nes_vt09_state::nes_vt09_16mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt09_state::nes_vt09_8mb(machine_config& config)
+void nes_vt09_state::nes_vt09_8mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt09_state::nes_vt09_1mb(machine_config& config)
+void nes_vt09_state::nes_vt09_1mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt09_state::nes_vt09_2mb(machine_config& config)
+void nes_vt09_state::nes_vt09_2mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt09_state::nes_vt09_4mb(machine_config& config)
+void nes_vt09_state::nes_vt09_4mb(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
+void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config &config)
 {
 	nes_vt09_4mb(config);
 	m_soc->force_raster_timing_hack();
 }
 
-void nes_vt09_cart_state::nes_vt09_cart(machine_config& config)
+void nes_vt09_cart_state::nes_vt09_cart(machine_config &config)
 {
 	nes_vt09(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_cart_state::vt_external_space_map_cart);
@@ -474,11 +458,6 @@ ROM_START( cybar120 )
 	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
 
-ROM_START( jl2050 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "jl2050.u5", 0x00000, 0x1000000, CRC(f96c5c02) SHA1(c7d0b57c2622b5213d3c7e6532495d9da74d4b01) )
-ROM_END
-
 ROM_START( vsmaxtx2 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "tx2.bin", 0x00000, 0x400000, CRC(eddf0ca8) SHA1(b87c5c3e945d1efdcb953325425d4ddb0fded00a) )
@@ -504,6 +483,21 @@ ROM_START( ventur25 )
 	ROM_LOAD( "25games_m5m29gt320vp_001c0020.bin", 0x00000, 0x400000, CRC(3f78a45a) SHA1(3e97333c13e09c580e66518dd2e1e031371d399c) )
 ROM_END
 
+ROM_START( lxplasma )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "ig810.u2", 0x00000, 0x800000, CRC(e2cf5fe7) SHA1(1f75c723b1ab456e322c81c1d3080b9dd1f80fec) )
+ROM_END
+
+ROM_START( gampow50 )
+    ROM_REGION( 0x400000, "mainrom", 0 )
+    ROM_LOAD( "mx29lv320bt.u2", 0x00000, 0x400000, CRC(65ede8ed) SHA1(a7dc43a6d47a3f486e5af24cdd730dcd479fa8bb) )
+ROM_END
+
+ROM_START( pckarc50 )
+    ROM_REGION( 0x400000, "mainrom", 0 )
+    ROM_LOAD( "mx29lv320bt.u1", 0x00000, 0x400000, CRC(a38f0c89) SHA1(28e8c428394e71bcd2b19d26e271df8eb2634b2a) )
+ROM_END
+
 ROM_START( vgtablet )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "vgtablet.bin", 0x00000, 0x400000, CRC(99ef3978) SHA1(0074445708d66a04ab02b4993069ce1ae0514c2f) )
@@ -526,15 +520,40 @@ ROM_START( joypad65 )
 	ROM_LOAD( "joypad65.bin", 0x00000, 0x800000, CRC(b7f81c5f) SHA1(8579d9bc866415e0049979b7c3427d8dd0a60813) )
 ROM_END
 
-ROM_START( rbbrite )
-	ROM_REGION( 0x100000, "mainrom", 0 )
-	ROM_LOAD( "coleco_rainbowbrite_29dl800ba_000422cb.bin", 0x00000, 0x100000, CRC(d2ad0d7d) SHA1(4423a5aa2eda20b3621ab46e951ac08dc2d24789) )
-ROM_END
-
 ROM_START( timetp25 )
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "s29al016d70tfi02.u2", 0x00000, 0x200000, CRC(6109816a) SHA1(e48699d48b72219d80b8d27b1337e8d09793f4da) )
 	ROM_FILL(0x1fce36, 0x01, 0x04 | 0x40) // the code doesn't set the 'alt 4bpp' mode bit, but needs it? why? it isn't hardcoded as the system takes cartridges which don't want it
+ROM_END
+
+ROM_START( wfmotor )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "motorcycle.bin", 0x00000, 0x400000, CRC(978f12f0) SHA1(a0230cfe4398d3971d487ff5d4b7107341799424) )
+ROM_END
+
+ROM_START( gujtv108 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "29lv320.u1", 0x00000, 0x400000, CRC(56df0a09) SHA1(03aa6ad71ab283c99608a6dfa55c96148841bd10) )
+ROM_END
+
+ROM_START( mc_dcat8 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "100-in-1, d-cat8 8bit console, v5.01.11-frd, bl 20041217.prg", 0x00000, 0x800000, CRC(97d20611) SHA1(d49796e66d7b1dff0ee2781cb0e48b777969d83f) )
+ROM_END
+
+ROM_START( mc_dcat8a )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064.u6", 0x00000, 0x800000, CRC(e28b1ef8) SHA1(4a6f107d2189cbe1bb0b86b3738d0af58e24e0f7) )
+ROM_END
+
+ROM_START( pumpactv )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "pumpactive.bin", 0x00000, 0x100000, CRC(e3c07561) SHA1(2bfff426d72d481ba0647e9110f942d142a4625f) )
+ROM_END
+
+ROM_START( techni4 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "technigame.bin", 0x00000, 0x200000, CRC(3c96b1b1) SHA1(1acc81b26e740327bd6d9faa5a96ab027a48dd77) )
 ROM_END
 
 } // anonymous namespace
@@ -572,16 +591,26 @@ CONS( 200?, rcapnp,    0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_ini
 CONS( 200?, dturbogt,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, ventur25,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, joypad65,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Joypad 65", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, wfmotor,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Motorcycle 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, vgpocket,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
 CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
+CONS( 2005, lxplasma,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "Lexibook / JungleTac",  "Plasma Console (IG810, 60-in-1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, gampow50,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Logic 3 / JungleTac",   "GamesPower 50 Games", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, pckarc50,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "<unknown> / JungleTac", "Pocket Arcade 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp25,   0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// might be VT369 based, if so, move
-CONS( 2018, rbbrite,    0,  0,  nes_vt09_1mb, nes_vt09, nes_vt09_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
+CONS( 200?, gujtv108,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "YSN", "GameU Joint TV Bank 108-in-1 (model AH9069)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, timetp25, 0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, mc_dcat8,   0,        0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
+
+// probably VT09 or similar, 'pump' control is mapped on extra IO address that I don't think is present on 02/03
+CONS( 200?, pumpactv,  0,  0,  nes_vt09_1mb, nes_vt09, nes_vt09_state, empty_init, "Giggle", "TV Pump Active", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// die is marked as VH2009, like various sets in nes_vt02_vt03.cpp, but no scrambled opcodes here and also some VT09 register usage
+CONS( 201?, techni4,   0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )

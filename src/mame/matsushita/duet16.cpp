@@ -47,7 +47,7 @@ public:
 
 	void duet16(machine_config &config);
 protected:
-	void machine_reset() override;
+	void machine_reset() override ATTR_COLD;
 private:
 	u8 pic_r(offs_t offset);
 	void pic_w(offs_t offset, u8 data);
@@ -71,8 +71,8 @@ private:
 	void rtc_busy_w(int state);
 	void rtc_irq_reset();
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void duet16_io(address_map &map);
-	void duet16_mem(address_map &map);
+	void duet16_io(address_map &map) ATTR_COLD;
+	void duet16_mem(address_map &map) ATTR_COLD;
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<upd765a_device> m_fdc;
@@ -372,7 +372,7 @@ void duet16_state::duet16(machine_config &config)
 
 	I8741A(config, "i8741", 20_MHz_XTAL / 4);
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	AM9517A(config, m_dmac, 20_MHz_XTAL / 4);
@@ -383,7 +383,7 @@ void duet16_state::duet16(machine_config &config)
 	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
+	pit8253_device &bgpit(PIT8253(config, "bgpit"));
 	bgpit.set_clk<0>(8_MHz_XTAL / 13);
 	bgpit.set_clk<1>(8_MHz_XTAL / 13);
 	bgpit.set_clk<2>(8_MHz_XTAL / 13);
@@ -432,7 +432,7 @@ void duet16_state::duet16(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea_full();

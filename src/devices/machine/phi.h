@@ -16,7 +16,7 @@ class phi_device : public device_t
 {
 public:
 	// construction/destruction
-	phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	phi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// See ieee488.h
 	enum phi_488_signal_t
@@ -93,8 +93,8 @@ protected:
 	phi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(delayed_update);
 

@@ -18,7 +18,7 @@ class alpha_8921_device : public device_t
 {
 public:
 	// construction/destruction
-	alpha_8921_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	alpha_8921_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inputs
 	void clk_w(int state);
@@ -35,8 +35,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// inputs

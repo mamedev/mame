@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUC_C64_GEORAM_H
-#define MAME_BUC_C64_GEORAM_H
+#ifndef MAME_BUS_C64_GEORAM_H
+#define MAME_BUS_C64_GEORAM_H
 
 #pragma once
 
@@ -31,8 +31,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
@@ -49,4 +49,4 @@ private:
 DECLARE_DEVICE_TYPE(C64_GEORAM, c64_georam_cartridge_device)
 
 
-#endif // MAME_BUC_C64_GEORAM_H
+#endif // MAME_BUS_C64_GEORAM_H

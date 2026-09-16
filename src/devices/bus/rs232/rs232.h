@@ -32,10 +32,12 @@
 #define RS232_BAUD_3600 (0x14)
 #define RS232_BAUD_7200 (0x15)
 #define RS232_BAUD_111900 (0x16)
+#define RS232_BAUD_76800 (0x17)
+#define RS232_BAUD_78125 (0x18)
 
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_BAUD_50, "50") \
 	PORT_CONFSETTING( RS232_BAUD_75, "75") \
 	PORT_CONFSETTING( RS232_BAUD_110, "110") \
@@ -57,6 +59,8 @@
 	PORT_CONFSETTING( RS232_BAUD_28800, "28800") \
 	PORT_CONFSETTING( RS232_BAUD_38400, "38400") \
 	PORT_CONFSETTING( RS232_BAUD_57600, "57600") \
+	PORT_CONFSETTING( RS232_BAUD_76800, "76800") \
+	PORT_CONFSETTING( RS232_BAUD_78125, "78125") \
 	PORT_CONFSETTING( RS232_BAUD_111900, "111900") \
 	PORT_CONFSETTING( RS232_BAUD_115200, "115200")
 
@@ -67,7 +71,7 @@
 
 #define PORT_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_DATABITS_5, "5") \
 	PORT_CONFSETTING( RS232_DATABITS_6, "6") \
 	PORT_CONFSETTING( RS232_DATABITS_7, "7") \
@@ -81,7 +85,7 @@
 
 #define PORT_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_PARITY_NONE, "None") \
 	PORT_CONFSETTING( RS232_PARITY_ODD, "Odd") \
 	PORT_CONFSETTING( RS232_PARITY_EVEN, "Even") \
@@ -95,7 +99,7 @@
 
 #define PORT_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
-	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
+	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(_class::_write_line)) \
 	PORT_CONFSETTING( RS232_STOPBITS_0, "0") \
 	PORT_CONFSETTING( RS232_STOPBITS_1, "1") \
 	PORT_CONFSETTING( RS232_STOPBITS_1_5, "1.5") \
@@ -112,12 +116,9 @@ public:
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: rs232_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
-	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
@@ -148,9 +149,9 @@ public:
 protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_resolve_objects() override;
-	virtual void device_reset() override;
-	virtual void device_start() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	int m_rxd;
@@ -229,7 +230,9 @@ protected:
 			2000,
 			3600,
 			7200,
-			111900
+			111900,
+			76800,
+			78125
 		};
 
 		return values[baud];

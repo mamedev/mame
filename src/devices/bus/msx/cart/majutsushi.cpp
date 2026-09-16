@@ -26,7 +26,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override { }
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	template <int Bank> void bank_w(u8 data);

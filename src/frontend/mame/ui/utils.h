@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <iosfwd>
 #include <limits>
 #include <memory>
 #include <string>
@@ -30,7 +31,7 @@
 
 
 class mame_ui_manager;
-class render_container;
+class render_target;
 
 
 // TODO: namespace these things
@@ -141,7 +142,7 @@ public:
 
 	virtual bool apply(Entry const &info) const = 0;
 
-	virtual void show_ui(mame_ui_manager &mui, render_container &container, std::function<void (Impl &)> &&handler) = 0;
+	virtual void show_ui(mame_ui_manager &mui, render_target &target, std::function<void (Impl &)> &&handler) = 0;
 
 	virtual bool wants_adjuster() const = 0;
 	virtual char const *adjust_text() const = 0;
@@ -149,7 +150,7 @@ public:
 	virtual bool adjust_left() = 0;
 	virtual bool adjust_right() = 0;
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const = 0;
+	virtual void save_ini(std::ostream &file, unsigned indent) const = 0;
 
 	template <typename InputIt, class OutputIt>
 	void apply(InputIt first, InputIt last, OutputIt dest) const
@@ -362,40 +363,10 @@ private:
 
 enum
 {
-	RP_FIRST = 0,
-	RP_IMAGES = RP_FIRST,
-	RP_INFOS,
-	RP_LAST = RP_INFOS
-};
-
-enum
-{
 	SHOW_PANELS = 0,
 	HIDE_LEFT_PANEL,
 	HIDE_RIGHT_PANEL,
 	HIDE_BOTH
-};
-
-enum
-{
-	HOVER_DAT_UP = -1000,
-	HOVER_DAT_DOWN,
-	HOVER_UI_LEFT,
-	HOVER_UI_RIGHT,
-	HOVER_ARROW_UP,
-	HOVER_ARROW_DOWN,
-	HOVER_B_FAV,
-	HOVER_B_EXPORT,
-	HOVER_B_AUDIT,
-	HOVER_B_DATS,
-	HOVER_BACKTRACK,
-	HOVER_RPANEL_ARROW,
-	HOVER_LPANEL_ARROW,
-	HOVER_FILTER_FIRST,
-	HOVER_FILTER_LAST = HOVER_FILTER_FIRST + std::max<int>(ui::machine_filter::COUNT, ui::software_filter::COUNT),
-	HOVER_RP_FIRST,
-	HOVER_RP_LAST = HOVER_RP_FIRST + 1 + RP_LAST,
-	HOVER_INFO_TEXT
 };
 
 // FIXME: this stuff shouldn't all be globals

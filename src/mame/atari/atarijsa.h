@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_ATARI_ATARI_JSA_H
-#define MAME_ATARI_ATARI_JSA_H
+#ifndef MAME_ATARI_ATARIJSA_H
+#define MAME_ATARI_ATARIJSA_H
 
 #pragma once
 
@@ -36,10 +36,10 @@ DECLARE_DEVICE_TYPE(ATARI_JSA_IIIS, atari_jsa_iiis_device)
 //**************************************************************************
 
 #define PORT_ATARI_JSA_SOUND_TO_MAIN_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, sound_to_main_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_jsa_base_device::sound_to_main_ready))
 
 #define PORT_ATARI_JSA_MAIN_TO_SOUND_READY(_tag) \
-	PORT_READ_LINE_DEVICE_MEMBER(_tag, atari_jsa_base_device, main_to_sound_ready)
+	PORT_READ_LINE_DEVICE_MEMBER(_tag, FUNC(atari_jsa_base_device::main_to_sound_ready))
 
 
 
@@ -54,7 +54,7 @@ class atari_jsa_base_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
+	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock = 0);
 
 public:
 	// configuration
@@ -87,8 +87,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() = 0;
@@ -125,7 +125,7 @@ class atari_jsa_oki_base_device : public atari_jsa_base_device
 {
 protected:
 	// derived construction/destruction
-	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
+	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock = 0);
 
 public:
 	// read/write handlers
@@ -137,8 +137,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() override;
@@ -169,7 +169,7 @@ class atari_jsa_i_device : public atari_jsa_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write handlers
 	uint8_t rdio_r();
@@ -179,13 +179,13 @@ public:
 	uint8_t pokey_r(offs_t offset);
 	void pokey_w(offs_t offset, uint8_t data);
 
-	void atarijsa1_map(address_map &map);
+	void atarijsa1_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// internal helpers
 	virtual void update_all_volumes() override;
@@ -207,16 +207,16 @@ class atari_jsa_ii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write handlers
 	uint8_t rdio_r();
 
-	void atarijsa2_map(address_map &map);
+	void atarijsa2_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	required_ioport m_jsaii;
 };
@@ -228,13 +228,13 @@ class atari_jsa_iii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void atarijsa3_map(address_map &map);
-	void jsa3_oki1_map(address_map &map);
+	void atarijsa3_map(address_map &map) ATTR_COLD;
+	void jsa3_oki1_map(address_map &map) ATTR_COLD;
 protected:
 	// derived construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels);
+	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock);
 
 public:
 	// read/write handlers
@@ -242,8 +242,8 @@ public:
 
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	required_ioport m_jsaiii;
 };
@@ -255,13 +255,13 @@ class atari_jsa_iiis_device : public atari_jsa_iii_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void jsa3_oki2_map(address_map &map);
+	void jsa3_oki2_map(address_map &map) ATTR_COLD;
 protected:
 	// device level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 
-#endif // MAME_ATARI_ATARI_JSA_H
+#endif // MAME_ATARI_ATARIJSA_H

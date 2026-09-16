@@ -82,7 +82,7 @@ void seeq8003_device::device_reset()
 
 	// TODO: deassert RxDC and TxRET
 
-	if (m_dev)
+	if (has_net_device())
 		m_out_txrdy(1);
 
 	interrupt();
@@ -97,7 +97,8 @@ int seeq8003_device::recv_start_cb(u8 *buf, int length)
 	if (address_filter(buf))
 	{
 		LOG("receiving frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return receive(buf, length);
 	}
@@ -253,7 +254,7 @@ void seeq8003_device::tx_command_w(u8 data)
 	m_tx_command = data;
 }
 
-void seeq8003_device::transmit(int param)
+void seeq8003_device::transmit(s32 param)
 {
 	if (m_tx_fifo.queue_length())
 	{
@@ -280,7 +281,8 @@ void seeq8003_device::transmit(int param)
 		}
 
 		LOG("transmitting frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		// transmit the frame
 		send(buf, length, 4);
@@ -328,7 +330,7 @@ int seeq8003_device::receive(u8 *buf, int length)
 	return length;
 }
 
-void seeq8003_device::interrupt(int param)
+void seeq8003_device::interrupt(s32 param)
 {
 	int const state =
 		(!(m_tx_status & TXS_O) && (m_tx_status & m_tx_command & TXS_M)) ||
@@ -427,7 +429,7 @@ void seeq80c03_device::send_complete_cb(int result)
 	else
 	{
 		// assume transmit failure and no device means loss of carrier
-		if ((m_control & CTL_TNC) && !m_dev)
+		if ((m_control & CTL_TNC) && !has_net_device())
 			m_flags |= FLAGS_TNC;
 	}
 }
@@ -618,20 +620,4 @@ bool seeq80c03_device::address_filter(u8 *address)
 	}
 
 	return false;
-}
-
-void seeq8003_device::dump_bytes(u8 *buf, int length)
-{
-	if (VERBOSE & LOG_FRAMES)
-	{
-		// pad frame with zeros to 8-byte boundary
-		for (int i = 0; i < 8 - (length % 8); i++)
-			buf[length + i] = 0;
-
-		// dump length / 8 (rounded up) groups of 8 bytes
-		for (int i = 0; i < (length + 7) / 8; i++)
-			LOGMASKED(LOG_FRAMES, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
-	}
 }

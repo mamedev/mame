@@ -243,9 +243,9 @@ offs_t cosmac_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	case 0xc6: CDP1802_OPCODE("LSNZ %04X", long_skip(pc)); flags = STEP_COND; break;
 	case 0xc7: CDP1802_OPCODE("LSNF %04X", long_skip(pc)); flags = STEP_COND; break;
 	case 0xc8: CDP1802_OPCODE("LSKP %04X", long_skip(pc)); break;
-	case 0xc9: CDP1802_OPCODE("LBNQ %04X", long_skip(pc)); flags = STEP_COND; break;
-	case 0xca: CDP1802_OPCODE("LBNZ %04X", long_skip(pc)); flags = STEP_COND; break;
-	case 0xcb: CDP1802_OPCODE("LBNF %04X", long_skip(pc)); flags = STEP_COND; break;
+	case 0xc9: CDP1802_OPCODE("LBNQ %04X", long_branch(pc, params)); flags = STEP_COND; break;
+	case 0xca: CDP1802_OPCODE("LBNZ %04X", long_branch(pc, params)); flags = STEP_COND; break;
+	case 0xcb: CDP1802_OPCODE("LBNF %04X", long_branch(pc, params)); flags = STEP_COND; break;
 	case 0xcc: CDP1802_OPCODE("LSIE %04X", long_skip(pc)); flags = STEP_COND; break;
 	case 0xcd: CDP1802_OPCODE("LSQ %04X", long_skip(pc)); flags = STEP_COND; break;
 	case 0xce: CDP1802_OPCODE("LSZ %04X", long_skip(pc)); flags = STEP_COND; break;

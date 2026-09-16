@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -510,6 +510,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dongjr" cloneof="dkongjr">
+		<description>Dong Junior (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="dong jr.col" size="24576" crc="acb70368" sha1="0df347ad72222442252413cf2b74f49f4a434665" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="docastle">
 		<!-- Mr. Do's Castle (1983)(Parker Brothers).bin -->
 		<description>Mr. Do!'s Castle</description>
@@ -721,6 +733,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="zorf" cloneof="gorf">
+		<description>Zorf (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Zorf (Splice).col" size="16384" crc="40ef6b2c" sha1="650a54dfc9f7f619c58070eb39f9e128514a47e8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gustbust">
 		<!-- Gust Buster (1983)(Sunrise Software).bin -->
 		<description>Gust Buster</description>
@@ -860,6 +884,18 @@ license:CC0-1.0
 			<dataarea name="rom" size="16384">
 				<rom name="ladybug.1" size="8192" crc="6e63f2ed" sha1="3dd931e093cbe757d93df60055cbdad9e8055e26" offset="0x0000" />
 				<rom name="ladybug.2" size="8192" crc="147b94fe" sha1="d472892c4b63d52750f9485f9b0d525f02bfad1e" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="papatudo" cloneof="ladybug">
+		<description>Papa Tudo (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Papa Tudo (Splice).col" size="16384" crc="4532e7bb" sha1="d435d08476bd4177ae8db852bc7e0df771024c62" />
 			</dataarea>
 		</part>
 	</software>
@@ -1083,6 +1119,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mtrapbr" cloneof="mtrap">
+		<description>Ratoeira (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ratoeira.col" size="16384" crc="4c42ea5c" sha1="ce99d6e0a46347f06f0c0cac8b49bd52c41d0ed1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="novablst">
 		<!-- Nova Blast (1983)(Coleco).bin -->
 		<description>Nova Blast</description>
@@ -1185,6 +1233,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="panicbr" cloneof="panic">
+		<description>Pânico Cósmico (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Panico Cosmico (Splice).col" size="16384" crc="03459417" sha1="71b43f1900d0c88fae631e70f0bde76d2c149dae" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pepper2">
 		<!-- Pepper II (1983)(Coleco).bin -->
 		<description>Pepper II</description>
@@ -1196,6 +1256,18 @@ license:CC0-1.0
 			<dataarea name="rom" size="16384">
 				<rom name="pepper2.1" size="8192" crc="2ea3deb5" sha1="bf1e30be5aa3e4438c4444ae551d4e8a93fea0cc" offset="0x0000" />
 				<rom name="pepper2.2" size="8192" crc="cd31ba03" sha1="bf1e308ffb9f46360d6d0dd108a2f2ccdd2e9071" offset="0x2000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zipper" cloneof="pepper2">
+		<description>Zipper (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Zipper (Splice).col" size="16384" crc="dba855f9" sha1="42c209bb564b4dc3b5a8a64628e0c58bfc11db7c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1241,10 +1313,10 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
+	<!-- This was found in multiple carts with Coleco-style shell, both from USA, Euro and Canada -->
 	<software name="pitstop">
 		<!-- Pitstop (1983)(Epyx)[a].bin -->
-		<description>Pitstop (Euro, USA, Canada)</description>
+		<description>Pitstop (Europe, USA, Canada)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
 		<info name="serial" value="600" />
@@ -1257,7 +1329,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This was found in multiple carts with Imagic-style shell, USA only -->
+	<!-- This was found in multiple carts with Imagic-style shell, USA only -->
 	<software name="pitstopa" cloneof="pitstop">
 		<!-- Pitstop (1983)(Epyx).bin -->
 		<!-- 0x26a7 : 0x20 ('pitstop') - 0x10 ('pitstopa') -->
@@ -1303,7 +1375,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This has been verified with a real cart -->
+	<!-- This has been verified with a real cart -->
 	<software name="qbertqub">
 		<description>Q*bert Qubes</description>
 		<year>1984</year>
@@ -1582,6 +1654,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spacfurybr" cloneof="spacfury">
+		<description>Fúria Espaçial (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Furia Espacial (Splice).col" size="16384" crc="4a3e23c9" sha1="046363b2d7c33b117d9c1d551f64db1a4879b582" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spectron">
 		<!-- Spectron (1983)(Spectravideo).bin -->
 		<description>Spectron</description>
@@ -1798,6 +1882,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="venturebr" cloneof="venture">
+		<description>Aventura (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Aventura (Splice).col" size="16384" crc="639912f1" sha1="10e63559c2d341cd2c408072a7d0340921cf1a11" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wingwar">
 		<!-- Wing War (1983)(Imagic).bin -->
 		<description>Wing War</description>
@@ -2000,6 +2096,18 @@ license:CC0-1.0
 				<rom name="dkonga.1" size="8192" crc="dcaf20d8" sha1="0e8c227b69453ed21850baffff882ed272966500" offset="0x0000" />
 				<rom name="dkonga.2" size="8192" crc="6045f75d" sha1="6e84f270549b0c239fbab325983b1dcb8d1f4752" offset="0x2000" />
 				<rom name="dkonga.3" size="8192" crc="00739499" sha1="283f7e56a283ce5d5c54fc6f5f7f9ff0ff543195" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdong" cloneof="dkong">
+		<description>Monkey Dong (Brazil)</description>
+		<year>1983</year>
+		<publisher>Splice</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="Monkey Dong (Splice).col" size="24576" crc="de5e6f45" sha1="e9747a70a594e4312180ace1d2c01943ae9eeab2" />
 			</dataarea>
 		</part>
 	</software>
@@ -2344,7 +2452,7 @@ license:CC0-1.0
 	<software name="victory">
 		<!-- Victory (1983)(Coleco).bin -->
 		<!-- 0x5000-0x5fff : Filled with 0xff -->
-		<description>Victory (Euro)</description>
+		<description>Victory (Europe)</description>
 		<year>1983</year>
 		<publisher>CBS</publisher>
 		<info name="developer" value="Exidy" />
@@ -2567,7 +2675,7 @@ license:CC0-1.0
 <!-- The dump with title "Super Action Soccer" is likely hacked -->
 	<software name="safootb">
 		<!-- Super Action Football (1984)(Coleco)[a].bin -->
-		<description>Super Action Football (Euro)</description>
+		<description>Super Action Football (Europe)</description>
 		<year>1984</year>
 		<publisher>Coleco / CBS</publisher>
 		<info name="serial" value="2422" />
@@ -2627,6 +2735,17 @@ license:CC0-1.0
 				<rom name="act2010-rv44-chip2.bin" size="8192" crc="84288fcb" sha1="f4a7f79186e5030f35cad042ab2baa72d18d4aef" offset="0x2000" />
 				<rom name="act2010-rv44-chip3.bin" size="8192" crc="57807547" sha1="25877380bf5ac920f28087efb071cb586692b2c8" offset="0x4000" />
 				<rom name="act2010-rv44-chip4.bin" size="8192" crc="44e900fc" sha1="84a82f8044fe1df44c4f57a53988fd3cf0734200" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adamusic">
+		<description>Adam's Musicbox Demo</description>
+		<year>1987</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="adams-musicbox-demo.rom" size="24576" crc="164c8c26" sha1="9ef2974a04f5982bd034f39d1741666b6d117d24" />
 			</dataarea>
 		</part>
 	</software>
@@ -2732,6 +2851,19 @@ license:CC0-1.0
 				<rom name="dragon80-chip1-4-16-ec4a.bin" size="8192" crc="950950d0" sha1="ef0c45269cfe7b78125be2a2edf3f3781305f740" offset="0x0000" />
 				<rom name="dragon80-chip2-4-16-ec4a.bin" size="8192" crc="8a778f5a" sha1="274944cfe6f4ebfa13a68377ef5716879426b577" offset="0x2000" />
 				<rom name="dragon80-chip3-4-16-ec4a.bin" size="8192" crc="8eec1020" sha1="21b08651f76925baa0ec99b0b5e7dba3a5880c5a" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Apparently for use in children's play areas of Canadian nuclear power plants -->
+	<software name="energyq">
+		<description>Energy Quiz (limited release)</description>
+		<year>1983</year>
+		<publisher>Sydney Development Corporation</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<!-- second half empty, overdump? -->
+				<rom name="energy-quiz.rom" size="32768" crc="afb90dcd" sha1="9bd47f0b288612e85224c9bda093b12f0b5bff36" />
 			</dataarea>
 		</part>
 	</software>
@@ -2877,6 +3009,18 @@ license:CC0-1.0
 				<rom name="power.2" size="8192" crc="4c872266" sha1="b7ac12e02d31734fa1eac91bd01f9366b5143a81" offset="0x2000" />
 				<rom name="power.3" size="8192" crc="5f20b4e1" sha1="7979b12c89c089bbb2635b5ea4aff1a03b3e6264" offset="0x4000" />
 				<rom name="power.4" size="8192" crc="560207f3" sha1="32e9b8a1e0d56ea3b2d3375c109fb63b2ec9b8ae" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powheman">
+		<!-- Title screen has been hacked to show "NOT FOR RESALE" -->
+		<description>Masters of the Universe: The Power of He-Man (prototype, hacked)</description>
+		<year>1984</year>
+		<publisher>Mattel Electronics</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="motu-notforresale.rom" size="32768" crc="2277f82b" sha1="be034ef23af778b986b59bf6609dff0c90b6f8de" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3377,33 +3521,6 @@ license:CC0-1.0
 				<rom name="ttennis.2" size="8192" crc="b72f9ff8" sha1="d960b0f6207a64d6330a5dee458f1a18f6ec6a87" offset="0x2000" />
 				<rom name="ttennis.3" size="8192" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x4000" /> <!-- All FF bytes -->
 				<rom name="ttennis.4" size="8192" crc="b4293435" sha1="5e2b96c19c4f5c63a5afa2de504d29fe64a4c908" offset="0x6000" /> <!-- All FF bytes -->
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Unofficial multicarts -->
-
-	<software name="31in1">
-		<description>31-in-1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="coleco_cart">
-			<feature name="slot" value="xin1" />
-			<dataarea name="rom" size="1048576">
-				<rom name="31in1-eprom-15012013-rev2.rom" size="1048576" crc="3f4ebe58" sha1="bf7fc70b25b9654c86f644474ef9e6906df82a46" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="63in1">
-		<description>63-in-1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="coleco_cart">
-			<feature name="slot" value="xin1" />
-			<dataarea name="rom" size="2097152">
-				<rom name="eprom-flash-63in1-part1.rom" size="1048576" crc="3b21137f" sha1="a22b1a4ea96507c87269db50c0d21052e987e83f" offset="0x000000" />
-				<rom name="eprom-flash-63in1-part2.rom" size="1048576" crc="f4d18722" sha1="e5a6d0071a0b1d813f03713133b48ba3a073c2cd" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>

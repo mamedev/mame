@@ -269,17 +269,6 @@ uint32_t necdsp_device::execute_max_cycles() const noexcept
 
 
 //-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t necdsp_device::execute_input_lines() const noexcept
-{
-	return 3; // TODO: there should be 11: INT, SCK, /SIEN, /SOEN, SI, and /DACK, plus SO, /SORQ and DRQ; for now, just INT, P0, and P1 are enough.
-}
-
-
-//-------------------------------------------------
 //  execute_set_input -
 //-------------------------------------------------
 
@@ -316,7 +305,7 @@ void necdsp_device::execute_run()
 	do
 	{
 		// call debugger hook if necessary
-		if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 		{
 			debugger_instruction_hook(regs.pc);
 		}
@@ -384,7 +373,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	case 12: regs.idb = bitswap<16>(regs.si, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15); break;  //LSB = first bit in from serial, 'reversed' SI register order
 	case 13: regs.idb = regs.k; break;
 	case 14: regs.idb = regs.l; break;
-	case 15: regs.idb = dataRAM[regs.dp]; break;
+	case 15: regs.idb = dataRAM[regs.dp & 0x07ff]; break;
 	}
 
 	if(alu) {
@@ -398,7 +387,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	flag.ov1 = 0;
 
 	switch(pselect) {
-		case 0: p = dataRAM[regs.dp]; break;
+		case 0: p = dataRAM[regs.dp & 0x07ff]; break;
 		case 1: p = regs.idb; break;
 		case 2: p = regs.m; break;
 		case 3: p = regs.n; break;
@@ -573,45 +562,51 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	case  9: regs.so = id; break;  //MSB first output, output tapped at bit 15 shifting left
 	case 10: regs.k = id; break;
 	case 11: regs.k = id; regs.l = m_data.read_word(regs.rp); break;
-	case 12: regs.l = id; regs.k = dataRAM[regs.dp | 0x40]; break;
+	case 12: regs.l = id; regs.k = dataRAM[(regs.dp & 0x7ff) | 0x40]; break;
 	case 13: regs.l = id; break;
 	case 14: regs.trb = id; break;
-	case 15: dataRAM[regs.dp] = id; break;
+	case 15: dataRAM[regs.dp & 0x7ff] = id; break;
 	}
 }
 
-uint8_t necdsp_device::snesdsp_read(bool mode) {
-	if (!mode)
-	{
-		return regs.sr >> 8;
-	}
+uint8_t necdsp_device::status_r()
+{
+	return regs.sr >> 8;
+}
 
+
+uint8_t necdsp_device::data_r()
+{
 	if (regs.sr.drc == 0)
 	{
 		//16-bit
 		if(regs.sr.drs == 0)
 		{
-			regs.sr.drs = 1;
+			if (!machine().side_effects_disabled())
+				regs.sr.drs = 1;
 			return regs.dr >> 0;
 		}
 		else
 		{
-			regs.sr.rqm = 0;
-			regs.sr.drs = 0;
+			if (!machine().side_effects_disabled())
+			{
+				regs.sr.rqm = 0;
+				regs.sr.drs = 0;
+			}
 			return regs.dr >> 8;
 		}
 	}
 	else
 	{
 		//8-bit
-		regs.sr.rqm = 0;
+		if (!machine().side_effects_disabled())
+			regs.sr.rqm = 0;
 		return regs.dr >> 0;
 	}
 }
 
-void necdsp_device::snesdsp_write(bool mode, uint8_t data) {
-	if (!mode) return;
-
+void necdsp_device::data_w(uint8_t data)
+{
 	if (regs.sr.drc == 0)
 	{
 		//16-bit

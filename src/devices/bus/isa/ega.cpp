@@ -537,7 +537,7 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 
 void isa8_ega_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(EGA_CRTC_NAME, FUNC(crtc_ega_device::screen_update));
 	m_screen->set_palette(m_palette);
@@ -587,7 +587,7 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_irq(0), m_video_mode(0),
-	m_palette(*this, "palette"), m_screen(*this, EGA_SCREEN_NAME)
+	m_last_pixel_value(0), m_palette(*this, "palette"), m_screen(*this, EGA_SCREEN_NAME)
 {
 }
 
@@ -642,6 +642,7 @@ void isa8_ega_device::device_start()
 	save_item(STRUCT_MEMBER(m_attribute, index));
 	save_item(STRUCT_MEMBER(m_attribute, data));
 	save_item(STRUCT_MEMBER(m_attribute, index_write));
+	save_item(NAME(m_last_pixel_value));
 	save_pointer(NAME(m_vram), 256 * 1024);
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "user2");
@@ -814,6 +815,8 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 		*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
 		*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
 		*p = m_attribute.data[   data        & 0x03 ]; p++;
+
+		m_last_pixel_value = *(p - 1);
 	}
 	else
 	{
@@ -847,6 +850,8 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 			data2 >>= 1;
 			data3 >>= 1;
 		}
+
+		m_last_pixel_value = p[0];
 	}
 }
 
@@ -909,7 +914,12 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_text )
 	*p = ( data & 0x02 ) ? fg : bg; p++;
 	*p = ( data & 0x01 ) ? fg : bg; p++;
 	if ( !( m_sequencer.data[0x01] & 0x01 ) )
+	{
 		*p = ( m_attribute.data[0x10] & 0x04 ) ? *(p - 1) : bg;
+		m_last_pixel_value = *p;
+	}
+	else
+		m_last_pixel_value = *(p - 1);
 }
 
 
@@ -969,7 +979,7 @@ uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
-	if ( !machine().side_effects_disabled() && !( m_graphics_controller.data[5] & 0x10 ) )
+	if ( !machine().side_effects_disabled() )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];
@@ -981,8 +991,23 @@ uint8_t isa8_ega_device::read(offs_t offset)
 	if ( m_graphics_controller.data[5] & 0x08 )
 	{
 		// Read mode #1
-		popmessage("ega: Read mode 1 not supported yet!");
-		printf("EGA: Read mode 1 not supported yet!\n");
+		data = 0;
+		for ( int i = 0; i < 8; i++ )
+		{
+			int bit = 1;
+			for ( int p = 0; p < 4; p++ )
+			{
+				if ( BIT(m_graphics_controller.data[7], p) )
+				{
+					if ( BIT(m_graphics_controller.data[2], p) != BIT(m_plane[p][offset & 0xffff], i) )
+					{
+						bit = 0;
+						break;
+					}
+				}
+			}
+			data |= bit << i;
+		}
 	}
 	else
 	{
@@ -1036,7 +1061,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t d[4];
 	uint8_t alu[4];
-	uint8_t target_mask = m_graphics_controller.data[8];
 
 	alu[0] =alu[1] = alu[2] = alu[3] = 0;
 
@@ -1079,7 +1103,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		alu[1] = m_read_latch[1];
 		alu[2] = m_read_latch[2];
 		alu[3] = m_read_latch[3];
-		target_mask = 0xff;
 		break;
 
 	case 2:     // Write mode 2
@@ -1112,25 +1135,25 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		{
 			// Plane 0
 			// Bit selection
-			m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+			m_plane[0][offset] = alu[0];
 		}
 		if ( m_sequencer.data[2] & 0x02 )
 		{
 			// Plane 1
 			// Bit selection
-			m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+			m_plane[1][offset] = alu[1];
 		}
 		if ( m_sequencer.data[2] & 0x04 )
 		{
 			// Plane 2
 			// Bit selection
-			m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+			m_plane[2][offset] = alu[2];
 		}
 		if ( m_sequencer.data[2] & 0x08 )
 		{
 			// Plane 3
 			// Bit selection
-			m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+			m_plane[3][offset] = alu[3];
 		}
 	}
 	else
@@ -1145,13 +1168,13 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 			{
 				// Plane 1
 				// Bit selection
-				m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+				m_plane[1][offset] = alu[1];
 			}
 			if ( ( m_sequencer.data[2] & 0x08 ) && ! ( m_sequencer.data[4] & 0x01 ) )
 			{
 				// Plane 3
 				// Bit selection
-				m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+				m_plane[3][offset] = alu[3];
 			}
 		}
 		else
@@ -1162,13 +1185,13 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 			{
 				// Plane 0
 				// Bit selection
-				m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+				m_plane[0][offset] = alu[0];
 			}
 			if ( ( m_sequencer.data[2] & 0x04 ) && ! ( m_sequencer.data[4] & 0x01 ) )
 			{
 				// Plane 2
 				// Bit selection
-				m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+				m_plane[2][offset] = alu[2];
 			}
 		}
 	}
@@ -1197,11 +1220,17 @@ uint8_t isa8_ega_device::pc_ega8_3X0_r(offs_t offset)
 
 		if ( m_display_enable )
 		{
-			/* For the moment i'm putting in some bogus data */
-			static int pixel_data;
-
-			pixel_data = ( pixel_data + 1 ) & 0x03;
-			data |= ( pixel_data << 4 );
+			/* Diagnostic bits 4-5 feed back 2 of the attribute controller's 6
+			   P0-P5 color outputs, selected by the Video Status Mux Field in
+			   AR12 bits 5-4, from whichever pixel was drawn last. */
+			uint8_t pins = m_last_pixel_value;
+			switch ( ( m_attribute.data[0x12] >> 4 ) & 0x03 )
+			{
+			case 0: data |= ( BIT(pins, 0) << 4 ) | ( BIT(pins, 2) << 5 ); break;
+			case 1: data |= ( BIT(pins, 4) << 4 ) | ( BIT(pins, 5) << 5 ); break;
+			case 2: data |= ( BIT(pins, 1) << 4 ) | ( BIT(pins, 3) << 5 ); break;
+			case 3: data |= ( BIT(pins, 5) << 4 ) | ( BIT(pins, 3) << 5 ); break;
+			}
 		}
 
 		/* Reset the attirubte writing flip flop to let the next write go to the index reigster */

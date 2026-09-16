@@ -183,7 +183,7 @@ public:
 	void spbactn(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -208,7 +208,7 @@ protected:
 
 	int draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites);
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -220,7 +220,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class spbactnp_state : public spbactn_state
@@ -239,7 +239,7 @@ public:
 	void spbactnp(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_extracpu;
@@ -266,12 +266,10 @@ private:
 
 	uint8_t extra_latch_r(offs_t offset);
 
-	void extra_map(address_map &map);
-	void main_map(address_map &map);
+	void extra_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 void spbactn_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -373,7 +371,6 @@ TILE_GET_INFO_MEMBER(spbactnp_state::get_extra_tile_info)
 
 
 
-
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
 	m_tile_bitmap_bg.fill(0, cliprect);
@@ -381,7 +378,7 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_sprite_bitmap, cliprect, &m_spvideoram[0], 0, 0, flip_screen());
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 
@@ -406,8 +403,6 @@ uint32_t spbactnp_state::extrascreen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-// machine
-
 void spbactn_state::main_irq_ack_w(uint16_t data)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
@@ -416,7 +411,7 @@ void spbactn_state::main_irq_ack_w(uint16_t data)
 void spbactn_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x43fff).ram();   // main RAM
+	map(0x40000, 0x43fff).ram(); // main RAM
 	map(0x50000, 0x50fff).ram().share(m_spvideoram);
 	map(0x60000, 0x67fff).ram().w(FUNC(spbactn_state::fg_videoram_w)).share(m_fgvideoram);
 	map(0x70000, 0x77fff).ram().w(FUNC(spbactn_state::bg_videoram_w)).share(m_bgvideoram);
@@ -424,8 +419,8 @@ void spbactn_state::main_map(address_map &map)
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90010, 0x90011).portr("IN1");
 	map(0x90020, 0x90021).portr("SYSTEM");
-	map(0x90030, 0x90031).portr("DSW1");
-	map(0x90040, 0x90041).portr("DSW2");
+	map(0x90030, 0x90031).portr("DSW2");
+	map(0x90040, 0x90041).portr("DSW1");
 
 	// these are an awful lot of unknowns
 	map(0x90000, 0x90001).nopw();
@@ -466,11 +461,11 @@ void spbactn_state::main_map(address_map &map)
 void spbactnp_state::main_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x43fff).ram();   // main RAM
+	map(0x40000, 0x43fff).ram(); // main RAM
 	map(0x50000, 0x50fff).ram().share(m_spvideoram);
 	map(0x60000, 0x67fff).ram().w(FUNC(spbactnp_state::fg_videoram_w)).share(m_fgvideoram);
 	map(0x70000, 0x77fff).ram().w(FUNC(spbactnp_state::bg_videoram_w)).share(m_bgvideoram);
-	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // yes R and G are swapped vs. the released version
+	map(0x80000, 0x827ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x90000, 0x90001).portr("IN0");
 	map(0x90002, 0x90003).portr("IN1").w(FUNC(spbactnp_state::main_irq_ack_w));
@@ -540,7 +535,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  // needed to avoid confusion with # of players. Press multiple times for multiple players
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" ) // needed to avoid confusion with # of players. Press multiple times for multiple players
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -566,7 +561,7 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPSETTING(    0x28, "1 Coin/1 Credit 2/3" )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )         PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )                 PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
@@ -578,21 +573,21 @@ static INPUT_PORTS_START( spbactn )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )        PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )            PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x04, "100k and 500k" )
 	PORT_DIPSETTING(    0x0c, "200k and 800k" )
 	PORT_DIPSETTING(    0x08, "200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")   // From .xls file - WHAT does that mean ?
+	PORT_DIPNAME( 0x10, 0x10, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5") // From .xls file - WHAT does that mean ?
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Difficult ) )
 	PORT_DIPNAME( 0x20, 0x20, "Display Instructions" )  PORT_DIPLOCATION("SW2:6") // Listed in manual as "Change Software", but seems to have no effect?
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7") // As listed in manual, but seems to have no effect? Works on the prototype, though
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Match" )         PORT_DIPLOCATION("SW2:8")   // Check code at 0x00bf8c
+	PORT_DIPNAME( 0x80, 0x80, "Match" )                 PORT_DIPLOCATION("SW2:8") // Check code at 0x00bf8c
 	PORT_DIPSETTING(    0x80, "1/20" )
 	PORT_DIPSETTING(    0x00, "1/40" )
 INPUT_PORTS_END
@@ -601,7 +596,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flippers" )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flippers" )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME( "Start" )  // needed to avoid confusion with # of players. Press multiple times for multiple players
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" ) // needed to avoid confusion with # of players. Press multiple times for multiple players
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -635,7 +630,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") // TODO: double check 0x0100, 0x0800, 0xc000
-	PORT_DIPNAME( 0x0003, 0x0003, "Balls" )         PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPNAME( 0x0003, 0x0003, "Balls" )                 PORT_DIPLOCATION("SW1:8,7")
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0001, "4" )
@@ -658,7 +653,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_DIPSETTING(      0x00a0, "1 Coin/1 Credit 2/3" )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, "1 Coin/1 Credit 5/6" )
-	PORT_DIPNAME( 0x0100, 0x0100, "Match" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x0100, 0x0100, "Match" )                 PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0100, "1/20" )
 	PORT_DIPSETTING(      0x0000, "1/40" )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
@@ -670,7 +665,7 @@ static INPUT_PORTS_START( spbactnp )
 	PORT_DIPNAME( 0x0800, 0x0800, "Hit Difficulty" )        PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x3000, 0x3000, "Extra Ball" )        PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPNAME( 0x3000, 0x3000, "Extra Ball" )            PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(      0x2000, "100k and 500k" )
 	PORT_DIPSETTING(      0x3000, "200k and 800k" )
 	PORT_DIPSETTING(      0x1000, "200k" )
@@ -686,13 +681,12 @@ INPUT_PORTS_END
 static const gfx_layout fgtilelayout =
 {
 	16,8,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+1*4, 2*4, 3*4, RGN_FRAC(1,2)+2*4, RGN_FRAC(1,2)+3*4,
-			16*8+0*4, 16*8+1*4, 16*8+RGN_FRAC(1,2)+0*4, 16*8+RGN_FRAC(1,2)+1*4, 16*8+2*4, 16*8+3*4, 16*8+RGN_FRAC(1,2)+2*4, 16*8+RGN_FRAC(1,2)+3*4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	32*8
+	{ STEP4(0, 1) },
+	{ STEP8(0, 4), STEP8(4*8*8, 4) },
+	{ STEP8(0, 4*8) },
+	16*8*4
 };
 
 static const gfx_layout bgtilelayout =
@@ -711,40 +705,22 @@ static const gfx_layout bgtilelayout =
 	32*8
 };
 
-static const gfx_layout spritelayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 8+0, 8+4, 8+RGN_FRAC(1,2)+0, 8+RGN_FRAC(1,2)+4 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
 static GFXDECODE_START( gfx_spbactn )
 	GFXDECODE_ENTRY( "fgtiles", 0, fgtilelayout, 0x0200, 16 + 240 )
 	GFXDECODE_ENTRY( "bgtiles", 0, bgtilelayout, 0x0300, 16 + 128 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x0000,    0x100 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_spbactn_spr )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0x0000, 0x100 )
 GFXDECODE_END
 
 
-static const gfx_layout proto_fgtilelayout =
-{
-	16,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,  64*4, 65*4, 66*4, 67*4, 68*4, 69*4, 70*4, 71*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	64*8
-};
-
-
-
 static GFXDECODE_START( gfx_spbactnp )
-	GFXDECODE_ENTRY( "fgtiles", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
-	GFXDECODE_ENTRY( "bgtiles", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
+	GFXDECODE_ENTRY( "fgtiles", 0, fgtilelayout,   0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "bgtiles", 0, fgtilelayout,   0x0300, 16 + 128 ) // wrong
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_spbactnp_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_packed_msb, 0x0000, 16 + 384 )
 GFXDECODE_END
 
@@ -764,7 +740,7 @@ void spbactn_state::spbactn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spbactn_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: verify actual blanking frequencies (should be close to NTSC)
 	m_screen->set_raw(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240);
 	m_screen->set_screen_update(FUNC(spbactn_state::screen_update));
@@ -772,9 +748,9 @@ void spbactn_state::spbactn(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactn);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x2800 / 2);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_spbactn_spr);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(8,10,4);
 	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
 	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
@@ -814,7 +790,7 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_extralatch->data_pending_callback().set_inputline(m_extracpu, INPUT_LINE_NMI);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -823,9 +799,9 @@ void spbactnp_state::spbactnp(machine_config &config)
 	m_screen->set_orientation(ROT90);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spbactnp);
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800 / 2);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2800 / 2); // yes R and G are swapped vs. the released version
 
-	SCREEN(config, m_extrascreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_extrascreen);
 	m_extrascreen->set_refresh_hz(60);
 	m_extrascreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_extrascreen->set_size(32*8, 32*8);
@@ -838,9 +814,9 @@ void spbactnp_state::spbactnp(machine_config &config)
 
 	config.set_default_layout(layout_spbactnp);
 
-	TECMO_SPRITE(config, m_sprgen, 0);
+	TECMO_SPRITE(config, m_sprgen, m_palette, gfx_spbactnp_spr);
 
-	TECMO_MIXER(config, m_mixer, 0);
+	TECMO_MIXER(config, m_mixer);
 	m_mixer->set_mixer_shifts(12,14,8);
 	m_mixer->set_blendcols(   0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 );
 	m_mixer->set_regularcols( 0x0800 + 0x300, 0x0800 + 0x200, 0x0800 + 0x100, 0x0800 + 0x000 );
@@ -877,16 +853,16 @@ ROM_START( spbactn )
 
 	// Board 9002-B (GFX Board)
 	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
-	ROM_LOAD( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
-	ROM_LOAD( "b-u99",   0x40000, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
+	ROM_LOAD16_BYTE( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
+	ROM_LOAD16_BYTE( "b-u99",   0x00001, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
 
 	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u104",  0x00000, 0x40000, CRC(b648a40a) SHA1(1fb756dcd027a5702596e33bbe8a0beeb3ceb22b) )
 	ROM_LOAD( "b-u105",  0x40000, 0x40000, CRC(0172d79a) SHA1(7ee1faa65c85860bd81988329df516bc34940ef5) )
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // 8x8
-	ROM_LOAD( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
-	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
+	ROM_LOAD16_BYTE( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
+	ROM_LOAD16_BYTE( "b-u111",  0x00001, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
 ROM_START( spbactnj )
@@ -903,16 +879,16 @@ ROM_START( spbactnj )
 
 	// Board 9002-B (GFX Board)
 	ROM_REGION( 0x080000, "fgtiles", 0 ) // 16x8
-	ROM_LOAD( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
-	ROM_LOAD( "b-u99",   0x40000, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
+	ROM_LOAD16_BYTE( "b-u98",   0x00000, 0x40000, CRC(315eab4d) SHA1(6f812c85981dc649caca8b4635e3b8fd3a3c054d) )
+	ROM_LOAD16_BYTE( "b-u99",   0x00001, 0x40000, CRC(7b76efd9) SHA1(9f23460aebe12cb5c4193776bf876d6044892979) )
 
 	ROM_REGION( 0x080000, "bgtiles", 0 ) // 16x8
 	ROM_LOAD( "b-u104",  0x00000, 0x40000, CRC(b648a40a) SHA1(1fb756dcd027a5702596e33bbe8a0beeb3ceb22b) )
 	ROM_LOAD( "b-u105",  0x40000, 0x40000, CRC(0172d79a) SHA1(7ee1faa65c85860bd81988329df516bc34940ef5) )
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // 8x8
-	ROM_LOAD( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
-	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
+	ROM_LOAD16_BYTE( "b-u110",  0x00000, 0x40000, CRC(862ebacd) SHA1(05732e8524c50256c1db29317625d0edc19b87d2) )
+	ROM_LOAD16_BYTE( "b-u111",  0x00001, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
 

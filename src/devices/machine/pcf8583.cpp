@@ -181,8 +181,8 @@ void pcf8583_device::nvram_default()
 
 bool pcf8583_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+	auto const [err, actual] = read(file, m_data, sizeof(m_data));
+	return !err && (actual == sizeof(m_data));
 }
 
 //-------------------------------------------------
@@ -192,8 +192,8 @@ bool pcf8583_device::nvram_read(util::read_stream &file)
 
 bool pcf8583_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_data, sizeof(m_data), actual) && actual == sizeof(m_data);
+	auto const [err, actual] = write(file, m_data, sizeof(m_data));
+	return !err;
 }
 
 

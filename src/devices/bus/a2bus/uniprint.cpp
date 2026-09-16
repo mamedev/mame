@@ -22,14 +22,16 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual u8 read_c800(u16 offset) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 protected:
 	// device_t implementation
-	virtual tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(update_strobe);
@@ -199,6 +201,12 @@ void a2bus_uniprint_device::device_start()
 
 
 void a2bus_uniprint_device::device_reset()
+{
+	reset_from_bus();
+}
+
+
+void a2bus_uniprint_device::reset_from_bus()
 {
 	m_ack_latch = 0x01U;
 }

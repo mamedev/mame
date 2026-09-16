@@ -2,25 +2,9 @@
 // copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
- *   i8051dasm.c
- *   Portable MCS-51 Family Emulator
+ * Portable MCS-51 Family Disassembler
+ * Copyright Steve Ellenoff
  *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
- *
- *****************************************************************************
- * Symbol Memory Name Tables borrowed from:
- * D52 8052 Disassembler - Copyright Jeffery L. Post
  *****************************************************************************/
 
 #ifndef MAME_CPU_MCS51_MCS51DASM_H
@@ -50,6 +34,8 @@ public:
 	static const mem_info sab80515_names[];
 	static const mem_info sab80c515_names[];
 	static const mem_info rupi44_names[];
+	static const mem_info p8xc552_names[];
+	static const mem_info p8xc562_names[];
 
 	template<typename ...Names> mcs51_disassembler(Names &&... names) : mcs51_disassembler() {
 		add_names(names...);
@@ -74,11 +60,11 @@ protected:
 	virtual void disassemble_op_lcall(std::ostream& stream, unsigned& PC, const data_buffer& params);
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op);
 
-	std::string get_data_address( uint8_t arg ) const;
-	std::string get_bit_address( uint8_t arg ) const;
+	std::string get_data_address(uint8_t arg) const;
+	std::string get_bit_address(uint8_t arg) const;
+
 private:
 	std::unordered_map<offs_t, const char *> m_names;
-
 };
 
 class i8051_disassembler : public mcs51_disassembler
@@ -156,6 +142,20 @@ class rupi44_disassembler : public mcs51_disassembler
 public:
 	rupi44_disassembler();
 	virtual ~rupi44_disassembler() = default;
+};
+
+class p8xc552_disassembler : public mcs51_disassembler
+{
+public:
+	p8xc552_disassembler();
+	virtual ~p8xc552_disassembler() = default;
+};
+
+class p8xc562_disassembler : public mcs51_disassembler
+{
+public:
+	p8xc562_disassembler();
+	virtual ~p8xc562_disassembler() = default;
 };
 
 

@@ -76,7 +76,7 @@ inline emu_timer &emu_timer::init(
 		running_machine &machine,
 		timer_expired_delegate &&callback,
 		attotime start_delay,
-		int param,
+		s32 param,
 		bool temporary)
 {
 	// ensure the entire timer state is clean
@@ -230,6 +230,7 @@ void emu_timer::register_save(save_manager &manager)
 	manager.save_item(nullptr, "timer", name.c_str(), index, NAME(m_period));
 	manager.save_item(nullptr, "timer", name.c_str(), index, NAME(m_start));
 	manager.save_item(nullptr, "timer", name.c_str(), index, NAME(m_expire));
+	manager.save_item(nullptr, "timer", name.c_str(), index, NAME(m_index));
 }
 
 
@@ -473,7 +474,7 @@ void device_scheduler::timeslice()
 
 					// update the local time for this CPU
 					attotime deltatime;
-					if (ran < exec->m_cycles_per_second)
+					if (EXPECTED(ran < exec->m_cycles_per_second))
 						deltatime = attotime(0, exec->m_attoseconds_per_cycle * ran);
 					else
 					{
@@ -613,7 +614,7 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback)
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param)
+void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, s32 param)
 {
 	[[maybe_unused]] emu_timer &timer = m_timer_allocator.alloc()->init(
 			machine(),
@@ -630,7 +631,7 @@ void device_scheduler::timer_set(const attotime &duration, timer_expired_delegat
 //  timer and set it to go off as soon as possible
 //-------------------------------------------------
 
-void device_scheduler::synchronize(timer_expired_delegate callback, int param)
+void device_scheduler::synchronize(timer_expired_delegate callback, s32 param)
 {
 	m_timer_allocator.alloc()->init(
 			machine(),
@@ -672,6 +673,9 @@ void device_scheduler::presave()
 {
 	// report the timer state after a log
 	LOG("Prior to saving state:\n");
+	u32 index = 0;
+	for (emu_timer *timer = m_timer_list; timer; timer = timer->m_next)
+		timer->m_index = index++;
 #if VERBOSE
 	dump_timers();
 #endif
@@ -724,7 +728,7 @@ void device_scheduler::postload()
 	{
 		emu_timer &timer = *private_list;
 		private_list = timer.m_next;
-		timer_list_insert(timer);
+		timer_list_insert<true>(timer);
 	}
 
 	m_suspend_changes_pending = true;
@@ -839,6 +843,7 @@ void device_scheduler::rebuild_execute_list()
 //  the list at the appropriate location
 //-------------------------------------------------
 
+template <bool CheckIndex>
 inline emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 {
 	// disabled timers never expire
@@ -849,7 +854,10 @@ inline emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 		for (emu_timer *curtimer = m_timer_list; curtimer; prevtimer = curtimer, curtimer = curtimer->m_next)
 		{
 			// if the current list entry expires after us, we should be inserted before it
-			if (curtimer->m_expire > timer.m_expire)
+			bool const here =
+					(curtimer->m_expire > timer.m_expire) ||
+					(CheckIndex && !(curtimer->m_expire < timer.m_expire) && (curtimer->m_index > timer.m_index));
+			if (here)
 			{
 				// link the new guy in before the current list entry
 				timer.m_prev = prevtimer;

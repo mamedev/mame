@@ -39,8 +39,8 @@ mov sreg, doesnot disable until next operation is executed
 -----------
 integrated pic, timer and dmac entirely incompatible with 8259, 825[3,4] and 82[3,5]7
 additional instructions
-#BR/bound/int 5, #UD/illegal instruction/int 6, #NM/coprocessor unavailable/int 7 support 
-"mov cs, " ignored (likely causes int 6) 
+#BR/bound/int 5, #UD/illegal instruction/int 6, #NM/coprocessor unavailable/int 7 support
+"mov cs, " ignored (likely causes int 6)
 shift count anded with 0x1f
 
 80188
@@ -76,7 +76,7 @@ pinout, integrated peripherals 8259,54,37 clones at nonpc compatible addresses
 
 NEC V50
 -------
-pinout, integrated peripherals as v40 
+pinout, integrated peripherals as v40
 
 NEC V33?
 --------
@@ -98,6 +98,7 @@ v30? emulation mode (without 8080 emulation mode)
 80186 with additional instructions but no peripherals
 24 bit address bus,
 protected mode selector/descriptor
+idiv lower bound is 1 less (eg. -128 instead of -127)
 
 80386 and later
 ---------------

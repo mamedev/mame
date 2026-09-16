@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_I8080_I8089_CHANNEL_H
-#define MAME_CPU_I8080_I8089_CHANNEL_H
+#ifndef MAME_CPU_I8089_I8089_CHANNEL_H
+#define MAME_CPU_I8089_I8089_CHANNEL_H
 
 #pragma once
 
@@ -25,7 +25,7 @@ class i8089_channel_device : public device_t
 {
 public:
 	// construction/destruction
-	i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto sintr() { return m_write_sintr.bind(); }
 
@@ -76,8 +76,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 
@@ -206,4 +206,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(I8089_CHANNEL, i8089_channel_device)
 
-#endif // MAME_CPU_I8080_I8089_CHANNEL_H
+#endif // MAME_CPU_I8089_I8089_CHANNEL_H

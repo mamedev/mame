@@ -12,6 +12,8 @@
 #include "modules/lib/osdobj_common.h"
 #include "fileio.h"
 #include "screen.h"
+#include "sound.h"
+#include "video.h"
 
 
 avi_write::avi_write(running_machine& machine, uint32_t width, uint32_t height)
@@ -57,11 +59,11 @@ void avi_write::begin_avi_recording(std::string_view name)
 	m_frame = 0;
 	m_next_frame_time = m_machine.time();
 
-	const screen_device *primary_screen = screen_device_enumerator(m_machine.root_device()).first();
+	const device_video_output_interface *primary_screen = video_output_interface_enumerator(m_machine.root_device()).first();
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * (primary_screen ? ATTOSECONDS_TO_HZ(primary_screen->frame_period().m_attoseconds) : screen_device::DEFAULT_FRAME_RATE);
+	info.video_timescale = 1000 * (primary_screen ? ATTOSECONDS_TO_HZ(primary_screen->frame_period().m_attoseconds) : device_video_output_interface::DEFAULT_FRAME_RATE);
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_width;
@@ -72,7 +74,7 @@ void avi_write::begin_avi_recording(std::string_view name)
 	info.audio_timescale = m_machine.sample_rate();
 	info.audio_sampletime = 1;
 	info.audio_numsamples = 0;
-	info.audio_channels = 2;
+	info.audio_channels = m_machine.sound().outputs_count();
 	info.audio_samplebits = 16;
 	info.audio_samplerate = m_machine.sample_rate();
 
@@ -142,9 +144,10 @@ void avi_write::audio_frame(const int16_t *buffer, int samples_this_frame)
 	if (m_output_file != nullptr)
 	{
 		// write the next frame
-		avi_file::error avierr = m_output_file->append_sound_samples(0, buffer + 0, samples_this_frame, 1);
-		if (avierr == avi_file::error::NONE)
-			avierr = m_output_file->append_sound_samples(1, buffer + 1, samples_this_frame, 1);
+		int channels = m_machine.sound().outputs_count();
+		avi_file::error avierr = avi_file::error::NONE;
+		for (int channel = 0; channel != channels && avierr == avi_file::error::NONE; channel ++)
+			avierr = m_output_file->append_sound_samples(channel, buffer + channel, samples_this_frame, channels-1);
 		if (avierr != avi_file::error::NONE)
 		{
 			osd_printf_error("Error while logging AVI audio frame: %s\n", avi_file::error_string(avierr));

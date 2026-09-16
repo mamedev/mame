@@ -33,8 +33,8 @@ public:
 
 protected:
 	// address maps for program memory and io memory
-	void gsz80_mem(address_map &map);
-	void gsz80_io(address_map &map);
+	void gsz80_mem(address_map &map) ATTR_COLD;
+	void gsz80_io(address_map &map) ATTR_COLD;
 
 	// two member devices required here
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ void gsz80_state::gsz80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &gsz80_state::gsz80_io);
 
 	// Configure UART (via m_acia)
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->irq_handler().set_inputline("maincpu", INPUT_LINE_IRQ0); // Connect interrupt pin to our Z80 INT line

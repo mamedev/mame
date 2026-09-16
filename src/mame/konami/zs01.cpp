@@ -15,21 +15,16 @@
 #include "zs01.h"
 
 #include <cstdarg>
+#include <tuple>
 
-#define VERBOSE_LEVEL ( 0 )
+#define LOG_SIGNALS (1 << 1)
+#define LOG_ALL (LOG_GENERAL | LOG_SIGNALS)
 
-inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: zs01(%s) %s", machine().describe_context(), tag(), buf );
-	}
-}
+//#define VERBOSE LOG_ALL
+#include "logmacro.h"
+
+#define LOGSIGNALS(...) LOGMASKED(LOG_SIGNALS, __VA_ARGS__)
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(ZS01, zs01_device, "zs01", "Konami ZS01 PIC")
@@ -103,12 +98,12 @@ void zs01_device::write_rst(int state)
 {
 	if( m_rst != state )
 	{
-		verboselog( 2, "rst=%d\n", state );
+		LOGSIGNALS( "%s: rst=%d\n", machine().describe_context(), state );
 	}
 
 	if( m_rst == 0 && state != 0 && m_cs == 0 )
 	{
-		verboselog( 1, "goto response to reset\n" );
+		LOG( "%s: goto response to reset\n", machine().describe_context() );
 		m_state = STATE_RESPONSE_TO_RESET;
 		m_bit = 0;
 		m_byte = 0;
@@ -121,7 +116,7 @@ void zs01_device::write_cs(int state)
 {
 	if( m_cs != state )
 	{
-		verboselog( 2, "cs=%d\n", state );
+		LOGSIGNALS( "%s: cs=%d\n", machine().describe_context(), state );
 	}
 
 //  if( m_cs != 0 && state == 0 )
@@ -341,7 +336,7 @@ void zs01_device::write_scl(int state)
 {
 	if( m_scl != state )
 	{
-		verboselog( 2, "scl=%d\n", state );
+		LOGSIGNALS( "%s: scl=%d\n", machine().describe_context(), state );
 	}
 
 	if( m_cs == 0 )
@@ -357,7 +352,7 @@ void zs01_device::write_scl(int state)
 				if( m_bit == 0 )
 				{
 					m_shift = m_response_to_reset[ m_byte ];
-					verboselog( 1, "<- response_to_reset[ %d ]: %02x\n", m_byte, m_shift );
+					LOG( "%s: <- response_to_reset[ %d ]: %02x\n", machine().describe_context(), m_byte, m_shift );
 				}
 
 				m_sdar = ( m_shift >> 7 ) & 1;
@@ -372,7 +367,7 @@ void zs01_device::write_scl(int state)
 					if( m_byte == sizeof( m_response_to_reset ) )
 					{
 						m_sdar = 1;
-						verboselog( 1, "goto stop\n" );
+						LOG( "%s: goto stop\n", machine().describe_context() );
 						m_state = STATE_STOP;
 					}
 				}
@@ -386,7 +381,7 @@ void zs01_device::write_scl(int state)
 			{
 				if( m_bit < 8 )
 				{
-					verboselog( 2, "clock\n" );
+					LOGSIGNALS( "%s: clock\n", machine().describe_context() );
 					m_shift <<= 1;
 
 					if( m_sdaw != 0 )
@@ -404,7 +399,7 @@ void zs01_device::write_scl(int state)
 					{
 					case STATE_LOAD_COMMAND:
 						m_write_buffer[ m_byte ] = m_shift;
-						verboselog( 2, "-> write_buffer[ %d ]: %02x\n", m_byte, m_write_buffer[ m_byte ] );
+						LOGSIGNALS( "%s: -> write_buffer[ %d ]: %02x\n", machine().describe_context(), m_byte, m_write_buffer[ m_byte ] );
 
 						m_byte++;
 						if( m_byte == sizeof( m_write_buffer ) )
@@ -422,12 +417,17 @@ void zs01_device::write_scl(int state)
 							uint16_t crc = calc_crc( m_write_buffer, 10 );
 							uint16_t msg_crc = ( ( m_write_buffer[ 10 ] << 8 ) | m_write_buffer[ 11 ] );
 
-							verboselog( 1, "-> command: %02x (%s)\n", m_write_buffer[ 0 ], ( m_write_buffer[ 0 ] & 1 ) ? "READ" : "WRITE" );
-							verboselog( 1, "-> address: %04x (%02x)\n", data_offset(), m_write_buffer[ 1 ] );
-							verboselog( 1, "-> data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
-								m_write_buffer[ 2 ], m_write_buffer[ 3 ], m_write_buffer[ 4 ], m_write_buffer[ 5 ],
-								m_write_buffer[ 6 ], m_write_buffer[ 7 ], m_write_buffer[ 8 ], m_write_buffer[ 9 ] );
-							verboselog( 1, "-> crc: %04x vs %04x %s\n", crc, msg_crc, crc == msg_crc ? "" : "(BAD)");
+							LOG(
+									"%s: -> command: %02x (%s)\n"
+									"-> address: %04x (%02x)\n"
+									"-> data: %02x%02x%02x%02x%02x%02x%02x%02x\n"
+									"-> crc: %04x vs %04x %s\n",
+									machine().describe_context(),
+									m_write_buffer[ 0 ], ( m_write_buffer[ 0 ] & 1 ) ? "READ" : "WRITE",
+									data_offset(), m_write_buffer[ 1 ],
+									m_write_buffer[ 2 ], m_write_buffer[ 3 ], m_write_buffer[ 4 ], m_write_buffer[ 5 ],
+									m_write_buffer[ 6 ], m_write_buffer[ 7 ], m_write_buffer[ 8 ], m_write_buffer[ 9 ],
+									crc, msg_crc, crc == msg_crc ? "" : "(BAD)" );
 
 							if( crc == msg_crc )
 							{
@@ -461,7 +461,7 @@ void zs01_device::write_scl(int state)
 									}
 									else
 									{
-										verboselog( 1, "-> unknown write offset: %04x (%02x)\n", data_offset(), m_write_buffer[ 1 ] );
+										LOG( "%s: -> unknown write offset: %04x (%02x)\n", machine().describe_context(), data_offset(), m_write_buffer[ 1 ] );
 									}
 
 									break;
@@ -498,7 +498,7 @@ void zs01_device::write_scl(int state)
 									}
 									else
 									{
-										verboselog( 1, "-> unknown read offset: %04x (%02x)\n", data_offset(), m_write_buffer[ 1 ] );
+										LOG( "%s: -> unknown read offset: %04x (%02x)\n", machine().describe_context(), data_offset(), m_write_buffer[ 1 ] );
 									}
 
 									memcpy( m_response_key, &m_write_buffer[ 2 ], sizeof( m_response_key ) );
@@ -507,7 +507,7 @@ void zs01_device::write_scl(int state)
 							}
 							else
 							{
-								verboselog( 0, "bad crc\n" );
+								logerror( "%s: bad crc\n", machine().describe_context() );
 								m_read_buffer[ 0 ] = STATUS_ERROR;
 
 								m_configuration_registers[ CONFIG_RC ]++;
@@ -519,11 +519,13 @@ void zs01_device::write_scl(int state)
 								}
 							}
 
-							verboselog( 1, "<- status: %02x\n", m_read_buffer[ 0 ] );
-
-							verboselog( 1, "<- data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
-								m_read_buffer[ 2 ], m_read_buffer[ 3 ], m_read_buffer[ 4 ], m_read_buffer[ 5 ],
-								m_read_buffer[ 6 ], m_read_buffer[ 7 ], m_read_buffer[ 8 ], m_read_buffer[ 9 ] );
+							LOG(
+									"%s: <- status: %02x\n"
+									"<- data: %02x%02x%02x%02x%02x%02x%02x%02x\n",
+									machine().describe_context(),
+									m_read_buffer[ 0 ],
+									m_read_buffer[ 2 ], m_read_buffer[ 3 ], m_read_buffer[ 4 ], m_read_buffer[ 5 ],
+									m_read_buffer[ 6 ], m_read_buffer[ 7 ], m_read_buffer[ 8 ], m_read_buffer[ 9 ] );
 
 							m_previous_byte = m_read_buffer[ 1 ];
 
@@ -558,7 +560,7 @@ void zs01_device::write_scl(int state)
 						{
 						case STATE_READ_DATA:
 							m_shift = m_read_buffer[ m_byte ];
-							verboselog( 2, "<- read_buffer[ %d ]: %02x\n", m_byte, m_shift );
+							LOGSIGNALS( "%s: <- read_buffer[ %d ]: %02x\n", machine().describe_context(), m_byte, m_shift );
 							break;
 						}
 					}
@@ -574,7 +576,7 @@ void zs01_device::write_scl(int state)
 
 					if( m_sdaw == 0 )
 					{
-						verboselog( 2, "ack <-\n" );
+						LOGSIGNALS( "%s: ack <-\n", machine().describe_context() );
 						m_byte++;
 
 						if( m_byte == sizeof( m_read_buffer ) )
@@ -586,7 +588,7 @@ void zs01_device::write_scl(int state)
 					}
 					else
 					{
-						verboselog( 2, "nak <-\n" );
+						LOGSIGNALS( "%s: nak <-\n", machine().describe_context() );
 					}
 				}
 			}
@@ -601,14 +603,14 @@ void zs01_device::write_sda(int state)
 {
 	if( m_sdaw != state )
 	{
-		verboselog( 2, "sdaw=%d\n", state );
+		LOGSIGNALS( "%s: sdaw=%d\n", machine().describe_context(), state );
 	}
 
 	if( m_cs == 0 && m_scl != 0 )
 	{
 //      if( m_sdaw == 0 && state != 0 )
 //      {
-//          verboselog( 1, "goto stop\n" );
+//          LOG( "%s: goto stop\n", machine().describe_context() );
 //          m_state = STATE_STOP;
 //          m_sdar = 0;
 //      }
@@ -618,12 +620,12 @@ void zs01_device::write_sda(int state)
 			switch( m_state )
 			{
 			case STATE_STOP:
-				verboselog( 1, "goto start\n" );
+				LOG( "%s: goto start\n", machine().describe_context() );
 				m_state = STATE_LOAD_COMMAND;
 				break;
 
 //          default:
-//              verboselog( 1, "skipped start (default)\n" );
+//              LOG( "%s: skipped start (default)\n", machine().describe_context() );
 //              break;
 			}
 
@@ -641,11 +643,11 @@ int zs01_device::read_sda()
 {
 	if( m_cs != 0 )
 	{
-		verboselog( 2, "not selected\n" );
+		LOGSIGNALS( "%s: not selected\n", machine().describe_context() );
 		return 1;
 	}
 
-	verboselog( 2, "sdar=%d\n", m_sdar );
+	LOGSIGNALS( "%s: sdar=%d\n", machine().describe_context(), m_sdar );
 
 	return m_sdar;
 }
@@ -694,22 +696,32 @@ void zs01_device::nvram_default()
 
 bool zs01_device::nvram_read( util::read_stream &file )
 {
+	std::error_condition err;
 	std::size_t actual;
-	bool result = !file.read( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.read( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
-	result = result && !file.read( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
-	result = result && !file.read( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
-	result = result && !file.read( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
-	return result;
+	std::tie( err, actual ) = read( file, m_response_to_reset, sizeof( m_response_to_reset ) );
+	if( err || ( sizeof( m_response_to_reset ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_command_key, sizeof( m_command_key ) );
+	if( err || ( sizeof( m_command_key ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data_key, sizeof( m_data_key ) );
+	if( err || ( sizeof( m_data_key ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_configuration_registers, sizeof( m_configuration_registers ) );
+	if( err || ( sizeof( m_configuration_registers ) != actual ) )
+		return false;
+	std::tie( err, actual ) = read( file, m_data, sizeof( m_data ) );
+	if( err || ( sizeof( m_data ) != actual ) )
+		return false;
+	return true;
 }
 
 bool zs01_device::nvram_write( util::write_stream &file )
 {
-	std::size_t actual;
-	bool result = !file.write( m_response_to_reset, sizeof( m_response_to_reset ), actual ) && actual == sizeof( m_response_to_reset );
-	result = result && !file.write( m_command_key, sizeof( m_command_key ), actual ) && actual == sizeof( m_command_key );
-	result = result && !file.write( m_data_key, sizeof( m_data_key ), actual ) && actual == sizeof( m_data_key );
-	result = result && !file.write( m_configuration_registers, sizeof( m_configuration_registers ), actual ) && actual == sizeof( m_configuration_registers );
-	result = result && !file.write( m_data, sizeof( m_data ), actual ) && actual == sizeof( m_data );
+	bool result = !write( file, m_response_to_reset, sizeof( m_response_to_reset ) ).first;
+	result = result && !write( file, m_command_key, sizeof( m_command_key ) ).first;
+	result = result && !write( file, m_data_key, sizeof( m_data_key ) ).first;
+	result = result && !write( file, m_configuration_registers, sizeof( m_configuration_registers ) ).first;
+	result = result && !write( file, m_data, sizeof( m_data ) ).first;
 	return result;
 }

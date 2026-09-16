@@ -1,6 +1,6 @@
 PROG = 7zr
 
-CONSOLE_VARIANT_FLAGS=-DPROG_VARIANT_R
+CONSOLE_VARIANT_FLAGS=-DZ7_PROG_VARIANT_R
 
 # IS_X64 = 1
 # USE_ASM = 1
@@ -24,7 +24,7 @@ MT_OBJS =
 
 ifdef ST_MODE
 
-LOCAL_FLAGS_ST = -D_7ZIP_ST
+LOCAL_FLAGS_ST = -DZ7_ST
 
 ifdef IS_MINGW
 MT_OBJS = \
@@ -37,10 +37,11 @@ else
 MT_OBJS = \
   $O/LzFindMt.o \
   $O/LzFindOpt.o \
-  $O/StreamBinder.o \
-  $O/Synchronization.o \
-  $O/VirtThread.o \
   $O/Threads.o \
+  $O/StreamBinder.o \
+  $O/VirtThread.o \
+
+
 
 
 
@@ -53,9 +54,7 @@ LOCAL_FLAGS_SYS =
 ifdef IS_MINGW
 
 LOCAL_FLAGS_SYS = \
-  -D_7ZIP_LARGE_PAGES \
-  -DWIN_LONG_PATH \
-  -DSUPPORT_DEVICE_FILE \
+  -DZ7_DEVICE_FILE \
 
 SYS_OBJS = \
   $O/FileSystem.o \
@@ -76,13 +75,10 @@ LOCAL_FLAGS = \
   $(LOCAL_FLAGS_ST) \
   $(LOCAL_FLAGS_SYS) \
 
-# -D_LZMA_PROB32
-
 
 CONSOLE_OBJS = \
   $O/BenchCon.o \
   $O/ConsoleClose.o \
-  $O/DynLimBuf.o \
   $O/ExtractCallbackConsole.o \
   $O/HashCon.o \
   $O/List.o \
@@ -119,6 +115,7 @@ COMMON_OBJS = \
   $O/CommandLineParser.o \
   $O/CRC.o \
   $O/CrcReg.o \
+  $O/DynLimBuf.o \
   $O/IntToString.o \
   $O/ListFileUtils.o \
   $O/LzFindPrepare.o \
@@ -127,10 +124,10 @@ COMMON_OBJS = \
   $O/NewHandler.o \
   $O/Sha256Prepare.o \
   $O/Sha256Reg.o \
-  $O/StringConvert.o \
-  $O/StringToInt.o \
   $O/StdInStream.o \
   $O/StdOutStream.o \
+  $O/StringConvert.o \
+  $O/StringToInt.o \
   $O/UTFConvert.o \
   $O/Wildcard.o \
   $O/XzCrc64Init.o \
@@ -160,6 +157,7 @@ WIN_OBJS = \
   $O/LimitedStreams.o \
   $O/MethodId.o \
   $O/MethodProps.o \
+  $O/MultiOutStream.o \
   $O/OffsetStream.o \
   $O/OutBuffer.o \
   $O/ProgressUtils.o \
@@ -227,7 +225,11 @@ CRYPTO_OBJS = \
   $O/RandGen.o \
 
 C_OBJS = \
+  $O/7zCrc.o \
+  $O/7zCrcOpt.o \
   $O/7zStream.o \
+  $O/Aes.o \
+  $O/AesOpt.o \
   $O/Alloc.o \
   $O/Bcj2.o \
   $O/Bcj2Enc.o \
@@ -246,21 +248,17 @@ C_OBJS = \
   $O/MtDec.o \
   $O/Sha256.o \
   $O/Sha256Opt.o \
-  $O/Sort.o \
+  $O/SwapBytes.o \
   $O/Xz.o \
   $O/XzDec.o \
   $O/XzEnc.o \
   $O/XzIn.o \
   $O/XzCrc64.o \
   $O/XzCrc64Opt.o \
-  $O/7zCrc.o \
-  $O/7zCrcOpt.o \
-  $O/Aes.o \
-  $O/AesOpt.o \
 
 
 OBJS = \
-	$(LZMA_DEC_OPT_OBJS) \
+  $(LZMA_DEC_OPT_OBJS) \
   $(C_OBJS) \
   $(MT_OBJS) \
   $(SYS_OBJS) \

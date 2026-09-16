@@ -100,8 +100,8 @@ public:
 	void speedspn(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -129,13 +129,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_io_map(address_map &map);
-	void oki_map(address_map &map);
-	void main_program_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
-
-// video
 
 TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
 {
@@ -226,8 +224,6 @@ uint32_t speedspn_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 uint8_t speedspn_state::irq_ack_r()
 {
@@ -340,13 +336,13 @@ static INPUT_PORTS_START( speedspn )
 	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(    0x05, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_5C ) )
@@ -357,13 +353,13 @@ static INPUT_PORTS_START( speedspn )
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(    0x50, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(    0x50, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_5C ) )
@@ -460,7 +456,7 @@ void speedspn_state::speedspn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &speedspn_state::sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

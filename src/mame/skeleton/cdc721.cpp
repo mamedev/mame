@@ -45,8 +45,8 @@ public:
 	void cdc721(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -62,8 +62,8 @@ private:
 
 	template<int Bit> void foreign_char_bank_w(int state);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_flashcnt = 0;
 	u8 m_foreign_char_bank = 0;
@@ -305,7 +305,7 @@ void cdc721_state::cdc721(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.936_MHz_XTAL, 800, 0, 640, 539, 0, 450);
 	screen.set_screen_update(FUNC(cdc721_state::screen_update));
 	screen.set_palette("palette");

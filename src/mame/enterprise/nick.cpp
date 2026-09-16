@@ -73,7 +73,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
+DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "Intelligent Designs NICK")
 
 
 void nick_device::vram_map(address_map &map)
@@ -105,20 +105,20 @@ void nick_device::nick_map(address_map &map)
 //  nick_device - constructor
 //-------------------------------------------------
 
-nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NICK, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nick_device::nick_map), this)),
-		m_write_virq(*this),
-		m_scanline_count(0),
-		m_FIXBIAS(0),
-		m_BORDER(0),
-		m_LPL(0),
-		m_LPH(0),
-		m_LD1(0),
-		m_LD2(0),
-		m_virq(CLEAR_LINE)
+nick_device::nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NICK, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	device_video_interface(mconfig, *this),
+	m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nick_device::nick_map), this)),
+	m_write_virq(*this),
+	m_scanline_count(0),
+	m_FIXBIAS(0),
+	m_BORDER(0),
+	m_LPL(0),
+	m_LPH(0),
+	m_LD1(0),
+	m_LD2(0),
+	m_virq(CLEAR_LINE)
 {
 	memset(&m_LPT, 0x00, sizeof(m_LPT));
 }
@@ -508,7 +508,6 @@ void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
 			}
 #endif
 
-
 			write_pixels2color(pen_offs, (pen_offs | 0x01), data);
 		}
 		break;
@@ -598,8 +597,6 @@ void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
 			write_pixel(pal_idx);
 			write_pixel(pal_idx);
 			write_pixel(pal_idx);
-
-
 		}
 		break;
 	}
@@ -660,7 +657,6 @@ void nick_device::write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx)
 				}
 			}
 #endif
-
 
 			write_pixels2color_lpixel(pen_offs, (pen_offs | 0x01), data);
 		}
@@ -765,8 +761,6 @@ void nick_device::write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx)
 			write_pixel(pal_idx);
 			write_pixel(pal_idx);
 			write_pixel(pal_idx);
-
-
 		}
 		break;
 	}

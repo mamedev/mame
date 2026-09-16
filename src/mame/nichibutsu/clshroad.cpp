@@ -85,9 +85,9 @@ public:
 	void clshroad(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -130,8 +130,8 @@ protected:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class firebatl_state : public clshroad_state
@@ -146,15 +146,13 @@ public:
 	void init_firebatl();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	void palette(palette_device &palette) const;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -480,8 +478,6 @@ u32 clshroad_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-// machine
-
 void clshroad_state::machine_start()
 {
 	save_item(NAME(m_main_irq_mask));
@@ -760,7 +756,7 @@ void firebatl_state::firebatl(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(firebatl_state::flip_screen_set));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	m_screen->set_screen_update(FUNC(firebatl_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -797,7 +793,7 @@ void clshroad_state::clshroad(machine_config &config)
 	mainlatch.q_out_cb<4>().set(FUNC(clshroad_state::flip_screen_set));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 288, 264, 16, 240); // unknown, single XTAL on PCB & 288x224 suggests 60.606060 Hz like Galaxian HW
 	m_screen->set_screen_update(FUNC(clshroad_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1030,7 +1026,7 @@ void firebatl_state::init_firebatl()
 } // anonymous namespace
 
 
-GAME( 1984, firebatl,  0,        firebatl, firebatl, firebatl_state, init_firebatl, ROT90, "Woodplace Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION ) // developed by Graphic Research
-GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Woodplace Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1984, firebatl,  0,        firebatl, firebatl, firebatl_state, init_firebatl, ROT90, "Wood Place (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION ) // developed by Graphic Research
+GAME( 1986, clshroad,  0,        clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1986, clshroads, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1986, clshroadd, clshroad, clshroad, clshroad, clshroad_state, empty_init,    ROT0,  "Wood Place (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )

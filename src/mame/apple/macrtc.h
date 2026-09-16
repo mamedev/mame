@@ -13,7 +13,7 @@
 #pragma once
 
 #include "dirtc.h"
-
+#include "machine/macseconds.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -23,7 +23,8 @@
 
 class rtc3430042_device :  public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface
+						public device_nvram_interface,
+						public macseconds_interface
 {
 	friend class rtc3430040_device;
 
@@ -42,8 +43,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;

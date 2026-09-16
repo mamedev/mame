@@ -522,7 +522,7 @@ void segaic16_road_device::segaic16_road_init(int which, int type, int colorbase
 	road_info *info = &segaic16_road[which];
 
 	/* reset the tilemap info */
-	memset(info, 0, sizeof(*info));
+	*info = road_info();
 	info->index = which;
 	info->type = type;
 	info->colorbase1 = colorbase1;

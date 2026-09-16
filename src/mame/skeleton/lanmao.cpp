@@ -1,0 +1,729 @@
+// license:BSD-3-Clause
+// copyright-holders:
+
+/*
+蓝猫 - Lán Māo - Blue Cat
+
+Mechanical redemption game
+Seems to be very similar to misc/marywu.cpp, only with more sound chips
+and a different CPU of the MCS51 family
+Same "Music by: SunKiss Chen" strings
+Same or at least extremely similar lamps / LEDs layout
+
+'Custom Made By LZY-P' PCB
+
+W78E065 CPU (I8052 compatible)
+10.7386 MHz XTAL
+KC8279P KDC (I8279 compatible)
+24C02 EEPROM
+2x KC89C72 (AY8910 compatible)
+YM2413
+3.579 MHz XTAL
+Oki M6295 (or clone, not readable)
+1 MHz resonator
+3x switch
+
+TODO (all):
+- SVG / less simplistic layout?
+
+TODO (panda2 and msaiche):
+- inputs aren't verified
+
+For Lan Mao, schematics and manual with list of error codes are available.
+
+Initialization for Lan Mao (not necessary in MAME due to pre-initialized NVRAM, unless coinage DIPs are changed):
+On first power-up the machine must be zeroed:
+- Hold K0 + K3 while switching on
+- Press the Start button once
+- Power-cycle the machine
+After this sequence it will run normally.
+
+panda2 takes roughly 33 emulated seconds to boot.
+*/
+
+
+#include "emu.h"
+
+#include "cpu/mcs51/i80c52.h"
+#include "machine/at28c16.h"
+#include "machine/i2cmem.h"
+#include "machine/i8279.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "sound/ay8910.h"
+#include "sound/okim6295.h"
+#include "sound/ymopl.h"
+
+#include "speaker.h"
+
+#include "marywu.lh"
+
+
+// configurable logging
+#define LOG_PORTS8052     (1U << 1)
+#define LOG_PORTS8279     (1U << 2)
+
+// #define VERBOSE (LOG_GENERAL | LOG_PORTS8052 | LOG_PORTS8279)
+
+#include "logmacro.h"
+
+#define LOGPORTS8052(...)     LOGMASKED(LOG_PORTS8052,     __VA_ARGS__)
+#define LOGPORTS8279(...)     LOGMASKED(LOG_PORTS8279,     __VA_ARGS__)
+
+
+namespace {
+
+class panda2_state : public driver_device
+{
+public:
+	panda2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
+		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
+		m_p1(*this, "P1"),
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 0U)
+	{ }
+
+	void panda2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	required_device<i8052_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
+
+	required_ioport_array<4> m_inputs;
+	required_ioport m_p1;
+	output_finder<32> m_digits;
+	output_finder<31> m_leds;
+
+	uint8_t m_kbd_line = 0;
+	uint8_t m_p1_out = 0xff;
+
+	template <uint8_t Which> void leds_w(uint8_t data);
+	void display_w(uint8_t data);
+	uint8_t keyboard_r();
+	uint8_t i8052_p1_r();
+	void i8052_p1_w(uint8_t data);
+
+	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+};
+
+class lanmao_state : public panda2_state
+{
+public:
+	lanmao_state(const machine_config &mconfig, device_type type, const char *tag) :
+		panda2_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem"),
+		m_oki(*this, "oki")
+	{ }
+
+	void lanmao(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<i2cmem_device> m_i2cmem;
+	required_device<okim6295_device> m_oki;
+
+	void i8052_p1_w(uint8_t data);
+	void port3_w(uint8_t data);
+
+	void data_map(address_map &map) ATTR_COLD;
+};
+
+
+void panda2_state::machine_start()
+{
+	save_item(NAME(m_kbd_line));
+	save_item(NAME(m_p1_out));
+}
+
+template <uint8_t Which>
+void panda2_state::leds_w(uint8_t data)
+{
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		if ((i + (Which * 8)) < 31) // only 31 LEDs
+			m_leds[i + (Which * 8)] = BIT(data, i);
+	}
+}
+
+void panda2_state::display_w(uint8_t data)
+{
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };
+
+	m_digits[2 * m_kbd_line + 0] = patterns[data & 0x0f];
+	m_digits[2 * m_kbd_line + 1] = patterns[data >> 4];
+}
+
+uint8_t panda2_state::keyboard_r()
+{
+	switch (m_kbd_line & 0x07)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			return m_inputs[m_kbd_line & 0x07]->read();
+		default:
+			return 0x00;
+	}
+}
+
+uint8_t panda2_state::i8052_p1_r()
+{
+	// meter feedback is read here. Fails with error 02 if it doesn't get the expected value.
+	uint8_t const ioport_val = m_p1->read();
+	uint8_t meter_fb = 0x00;
+
+	if (!BIT(m_p1_out, 0))
+		meter_fb = (BIT(m_p1_out, 1) << 4) | (BIT(m_p1_out, 2) << 5);
+
+	return (ioport_val & 0xcf) | meter_fb;
+}
+
+void panda2_state::i8052_p1_w(uint8_t data)
+{
+	m_hopper->motor_w(BIT(data, 3));
+
+	m_p1_out = data;
+}
+
+void lanmao_state::i8052_p1_w(uint8_t data)
+{
+	m_i2cmem->write_sda(BIT(data, 1));
+	m_i2cmem->write_scl(BIT(data, 2));
+	m_hopper->motor_w(BIT(data, 3));
+
+	if ((data & 0xf1) != 0xf1)
+		logerror("unknown port1 write: %02x\n", data);
+}
+
+void lanmao_state::port3_w(uint8_t data)
+{
+	if ((data & 0xdf) != 0xdf)
+		logerror("unknown port3 write: %02x\n", data);
+
+	m_oki->set_rom_bank(BIT(data, 5));
+}
+
+void panda2_state::program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
+
+void panda2_state::data_map(address_map &map)
+{
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x9002, 0x9003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa000, 0xa7ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write));
+	map(0xb000, 0xb001).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); // according to schematics and present on PCB, but doesn't seem used?
+}
+
+void lanmao_state::data_map(address_map &map)
+{
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x9002, 0x9003).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xb000, 0xb001).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); // according to schematics and present on PCB, but doesn't seem used?
+	map(0xd000, 0xd000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+
+static INPUT_PORTS_START( panda2 ) // TODO: check everything once possible
+	PORT_START("KEYS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 1" ) PORT_CODE( KEYCODE_1_PAD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 2" ) PORT_CODE( KEYCODE_2_PAD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 3" ) PORT_CODE( KEYCODE_3_PAD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 4" ) PORT_CODE( KEYCODE_4_PAD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 5" ) PORT_CODE( KEYCODE_5_PAD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 6" ) PORT_CODE( KEYCODE_6_PAD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 7" ) PORT_CODE( KEYCODE_7_PAD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 8" ) PORT_CODE( KEYCODE_8_PAD )
+
+	PORT_START("KEYS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Single" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Shift Right" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Shift Left" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Running Lights Difficulty" )  PORT_DIPLOCATION("DSW:1,2")
+	PORT_DIPSETTING(    0x03, "3" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x02, "2" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x01, "1" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x00, "0" ) // Manual doesn't list the settings
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Difficulty" )  PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "1" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x00, "0" ) // Manual doesn't list the settings
+	PORT_DIPNAME( 0x10, 0x10, "Bet Ratio" )  PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "1/1" )
+	PORT_DIPSETTING(    0x00, "1/5" )
+	// the following will give error 21 (coin ratio changed) and machine will need to be reinitialized
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0x80, 0x80, "Maximum Bet" )  PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, "60" )
+	PORT_DIPSETTING(    0x00, "95" )
+
+	PORT_START("PUSHBUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // K0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // K1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // K2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // K3
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// what's marked as DIP hereunder is actually something else, but left as DIP for easier testing
+	PORT_START("P1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper sensor, gives error 31 if high
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+
+	PORT_START("P3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( msaiche )
+	PORT_INCLUDE( panda2 )
+
+	PORT_MODIFY("KEYS2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Double" )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( lanmao )
+	PORT_START("KEYS1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 1" ) PORT_CODE( KEYCODE_1_PAD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 2" ) PORT_CODE( KEYCODE_2_PAD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 3" ) PORT_CODE( KEYCODE_3_PAD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 4" ) PORT_CODE( KEYCODE_4_PAD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 5" ) PORT_CODE( KEYCODE_5_PAD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 6" ) PORT_CODE( KEYCODE_6_PAD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 7" ) PORT_CODE( KEYCODE_7_PAD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 8" ) PORT_CODE( KEYCODE_8_PAD )
+
+	PORT_START("KEYS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Single" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Shift Right" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Shift Left" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Double" )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x03, "Running Lights Difficulty" )  PORT_DIPLOCATION("DSW:1,2")
+	PORT_DIPSETTING(    0x03, "3" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x02, "2" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x01, "1" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x00, "0" ) // Manual doesn't list the settings
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Difficulty" )  PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "1" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x00, "0" ) // Manual doesn't list the settings
+	PORT_DIPNAME( 0x10, 0x10, "Bet Ratio" )  PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "1/1" )
+	PORT_DIPSETTING(    0x00, "1/5" )
+	// the following will give error 21 (coin ratio changed) and machine will need to be reinitialized
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0x80, 0x80, "Maximum Bet" )  PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, "60" )
+	PORT_DIPSETTING(    0x00, "95" )
+
+	PORT_START("PUSHBUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // K0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // K1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // K2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // K3
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// what's marked as DIP hereunder is actually something else, but left as DIP for easier testing
+	PORT_START("P1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P1:1" )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) // scl
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper sensor, gives error 31 if high
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+
+	PORT_START("P3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "P3:4" ) // needs to be low to avoid error 30 (coin acceptor)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
+INPUT_PORTS_END
+
+
+void panda2_state::panda2(machine_config &config)
+{
+	I8052(config, m_maincpu, 10.738635_MHz_XTAL); // actually W78E065
+	m_maincpu->set_addrmap(AS_PROGRAM, &panda2_state::program_map);
+	m_maincpu->set_addrmap(AS_DATA, &panda2_state::data_map);
+	m_maincpu->port_in_cb<0>().set([this] () { LOGPORTS8052("%s CPU port 0 read\n", machine().describe_context()); return 0xff; });
+	m_maincpu->port_in_cb<1>().set(FUNC(panda2_state::i8052_p1_r));
+	m_maincpu->port_in_cb<2>().set([this] () { LOGPORTS8052("%s CPU port 2 read\n", machine().describe_context()); return 0xff; });
+	m_maincpu->port_in_cb<3>().set_ioport("P3");
+	m_maincpu->port_out_cb<0>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 0 write: %02x\n", machine().describe_context(), data); });
+	m_maincpu->port_out_cb<1>().set(FUNC(panda2_state::i8052_p1_w));
+	m_maincpu->port_out_cb<2>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 2 write: %02x\n", machine().describe_context(), data); });
+	m_maincpu->port_out_cb<3>().set([this] (uint8_t data) { LOGPORTS8052("%s CPU port 3 write: %02x\n", machine().describe_context(), data); });
+
+	i8279_device &kdc(I8279(config, "kdc", 10.738635_MHz_XTAL / 6 )); // TODO: divider
+	kdc.out_irq_callback().set([this] (int state) { LOGPORTS8279("%s I8279 irq write: %02x\n", machine().describe_context(), state); }); // not connected according to schematics
+	kdc.out_sl_callback().set([this] (uint8_t data) { m_kbd_line = data; }); // 4 bit port
+	kdc.out_disp_callback().set(FUNC(panda2_state::display_w)); // to 7-seg LEDs through to 2 CD4511 according to schematics
+	kdc.out_bd_callback().set([this] (int state) { LOGPORTS8279("%s I8279 bd write: %01x\n", machine().describe_context(), state); }); // not connected according to schematics
+	kdc.in_rl_callback().set(FUNC(panda2_state::keyboard_r));
+	kdc.in_shift_callback().set([this] () { LOGPORTS8279("%s I8279 shift read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+	kdc.in_ctrl_callback().set([this] () { LOGPORTS8279("%s I8279 ctrl read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	AT28C16(config, "at28c16");
+
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed
+
+	config.set_default_layout(layout_marywu);
+
+	SPEAKER(config, "mono").front_center();
+
+	YM2413(config, "ym", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	ay8910_device &ay1(AY8910(config, "ay1", 10.738635_MHz_XTAL / 6)); // TODO: divider
+	ay1.port_a_write_callback().set(FUNC(panda2_state::leds_w<0>));
+	ay1.port_b_write_callback().set(FUNC(panda2_state::leds_w<1>));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	ay8910_device &ay2(AY8910(config, "ay2", 10.738635_MHz_XTAL / 6)); // TODO: divider
+	ay2.port_a_write_callback().set(FUNC(panda2_state::leds_w<2>));
+	ay2.port_b_write_callback().set(FUNC(panda2_state::leds_w<3>));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
+
+void lanmao_state::lanmao(machine_config &config)
+{
+	I8052(config, m_maincpu, 10.738635_MHz_XTAL); // actually W78E065
+	m_maincpu->set_addrmap(AS_PROGRAM, &lanmao_state::program_map);
+	m_maincpu->set_addrmap(AS_DATA, &lanmao_state::data_map);
+	m_maincpu->port_in_cb<1>().set_ioport("P1");
+	m_maincpu->port_in_cb<3>().set_ioport("P3");
+	m_maincpu->port_out_cb<1>().set(FUNC(lanmao_state::i8052_p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(lanmao_state::port3_w));
+
+	i8279_device &kdc(I8279(config, "kdc", 10.738635_MHz_XTAL / 6 )); // TODO: divider
+	kdc.out_irq_callback().set([this] (int state) { LOGPORTS8279("%s I8279 irq write: %02x\n", machine().describe_context(), state); }); // not connected according to schematics
+	kdc.out_sl_callback().set([this] (uint8_t data) { m_kbd_line = data; }); // 4 bit port
+	kdc.out_disp_callback().set(FUNC(lanmao_state::display_w)); // to 7-seg LEDs through to 2 CD4511 according to schematics
+	kdc.out_bd_callback().set([this] (int state) { LOGPORTS8279("%s I8279 bd write: %01x\n", machine().describe_context(), state); }); // not connected according to schematics
+	kdc.in_rl_callback().set(FUNC(lanmao_state::keyboard_r));
+	kdc.in_shift_callback().set([this] () { LOGPORTS8279("%s I8279 shift read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+	kdc.in_ctrl_callback().set([this] () { LOGPORTS8279("%s I8279 ctrl read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	I2C_24C02(config, "i2cmem");
+
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed
+
+	config.set_default_layout(layout_marywu);
+
+	SPEAKER(config, "mono").front_center();
+
+	YM2413(config, "ym", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	ay8910_device &ay1(AY8910(config, "ay1", 10.738635_MHz_XTAL / 6)); // TODO: divider
+	ay1.port_a_write_callback().set(FUNC(lanmao_state::leds_w<0>));
+	ay1.port_b_write_callback().set(FUNC(lanmao_state::leds_w<1>));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	ay8910_device &ay2(AY8910(config, "ay2", 10.738635_MHz_XTAL / 6)); // TODO: divider
+	ay2.port_a_write_callback().set(FUNC(lanmao_state::leds_w<2>));
+	ay2.port_b_write_callback().set(FUNC(lanmao_state::leds_w<3>));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // verified
+}
+
+
+ROM_START( panda2 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x0000, 0x8000, CRC(e6a28090) SHA1(0b9b6f205c1ced586a9d15e28d470e055e037800) )
+
+	ROM_REGION( 0x800, "at28c16", 0 )
+	ROM_LOAD( "at28c16.u9", 0x000, 0x800, CRC(bd67af27) SHA1(19d19bf00fbe8573e13fb6026db31889023d4194) )
+ROM_END
+
+ROM_START( msaiche ) // 玛莉赛车 (Mǎlì Sàichē - Mario Racing)
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x0000, 0x8000, CRC(dd945526) SHA1(96f6ff1329a90fdfbb276a49bcd1926122da2012) )
+
+	ROM_REGION( 0x800, "at28c16", 0 )
+	ROM_LOAD( "at28c16.u9", 0x000, 0x800, CRC(bd67af27) SHA1(19d19bf00fbe8573e13fb6026db31889023d4194) ) // same as panda2?
+
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(eba9271c) SHA1(1c7308f83b7f016c11d83055de09029104702c19) ) // pre-initialized
+ROM_END
+
+ROM_START( lanmao )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(57a89c7f) SHA1(be54c40ae17df1155b2aaa67b4b0bf45d307eba1) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "w27e040-12", 0x00000, 0x80000, CRC(4481a891) SHA1(09448bdca052b27828a4797243eee96b98f3d924) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02", 0x000, 0x100, CRC(daf84e5e) SHA1(7aa6ba2a7e74e0f59efc8d9f67d06bf41f2e3d6d) )
+
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(5d051021) SHA1(06c1c78f7d2d53b98a2f010c4372d9c7135c1e62) ) // pre-initialized
+ROM_END
+
+// 挑战王 (Tiǎozhàn Wáng) (Challenge King)
+// on main PCB: W78E065A40DL + TMP82C255AP-10 + U6295 + YM2413 + bank of 4 DIP switches
+// on LED PCB: TMP82C255AN-2 + KC89C72 + logic
+ROM_START( tzwang )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(750602c1) SHA1(81f99968acb0a30b977303ed8d542e383c619df5) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(5202b5d5) SHA1(e9aaf976fea6be77855eff177ab4508bcc73d1cb) )
+ROM_END
+
+// 五虎将 (Wǔ Hǔjiàng) (Five Tiger Generals)
+// on main PCB: 8031 (exact model unknown) + 6116P-3 + 10 MHz XTAL + 3.579545 XTAL + YM2413 + bank of 8 DIP switches
+// on LED PCB: 2x D8255AC-2 + M5L8279P-5 + logic
+ROM_START( whujiang )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "cpu", 0x0000, 0x8000, CRC(2fac1d32) SHA1(543951defb4dccd888480a1ca62d771e62c2e23f) )
+ROM_END
+
+// 五虎将加强版 (Wǔ Hǔjiàng Jiāqiáng Bǎn) (Five Tiger Generals Enhanced Version)
+// on main PCB (080698): W78E065 + HM6116LP-3 + 12 MHz XTAL + 3.579545 XTAL + U3567 + JFC 95101 + U6295 + EPM7032LC44-12. No bank of switches
+// on LED PCB (YL-NO2): 2x D8255AC-2 + M5L8279P-5 + logic
+ROM_START( whujijqb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.u4", 0x00000, 0x10000, CRC(4ac988f0) SHA1(fe48fc92d28a7a737dcf382caec4325a83613116) )
+
+	ROM_REGION( 0x762, "epm7032", 0 )
+	ROM_LOAD( "epm7032.u15", 0x000, 0x762, CRC(c16a63e8) SHA1(0cc18b377dc1b882436ef37735509805995c811e) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "w27e040-12.u17", 0x00000, 0x80000, CRC(a520fe15) SHA1(dd1497626429f37de25071ab4be33500d582461b) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+
+// PK之王 (PK Zhīwáng) (King of PK)
+ROM_START( pkzw )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x0000, 0x8000, CRC(9bc248c8) SHA1(42574f765f38dbb50380dffd6227c064a75df5ca) )
+
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(d67da182) SHA1(12d51eae0eb0c15b04db58b7419dedf793cf44f7) )
+ROM_END
+
+// 小青蛙 (Xiǎo Qīngwā) (Little Frog)
+// 0DC0DC201ByLZY-P PCB: W78E065 + UM6116-2 + 12 MHz XTAL + 2x KC89C72 + TOP8279 + D71055C + OKIM6295. No bank of switches
+ROM_START( xqingwa )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.c56", 0x0000, 0x8000, CRC(fd3d5d51) SHA1(eb444d53ba97a40de95a17664e56000c7fe0bc23) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "w27e040.c59", 0x00000, 0x80000, CRC(129d5e14) SHA1(aea7cd7126b56def8166de99739dbfc552b72394) )
+ROM_END
+
+// 功夫熊猫 (Gōngfu Xióngmāo) (Kung Fu Panda)
+// 168H007A2 PCB: 89E516RD + 12 MHz XTAL + 2x KC89C72 + 2x TOP8279 + TMP82C255AP-2 + 24C02 + OKIM6295. No bank of switches
+ROM_START( gongfuxm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "89e516rd.bin", 0x00000, 0x10000, CRC(e3fa4dfd) SHA1(8f396887bec4f6443964c09f2700331bc26f1baa) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f161.bin", 0x000000, 0x200000, CRC(59cd681b) SHA1(6d5e541cc620f7c4548757cdea19638c7bb82098) ) // 1ST AND 2ND HALF IDENTICAL, has scrambled address lines
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(2365af83) SHA1(ea6a40939b0e08404b729edd000b01f0108e57df) )
+ROM_END
+
+// 亮剑 (Liàng Jiàn) (Draw the Sword)
+// W78E065 + HM6116P-2 + 12 MHz XTAL + 2x JFC95101 + 2x TOP8279 + U6295 + 24C02. No bank of switches
+ROM_START( ljian )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(2e50c3df) SHA1(65aef33ad0173c826d10e55c8f62c13c10e0aad2) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(ff2930c2) SHA1(6a260fba6cc73986477b8dc404a3a12ecb1306a3) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(cfffbd57) SHA1(22049c36c56272411d7d431e38a8bd1fc6257d42) )
+ROM_END
+
+// 两只蝴蝶 (Liǎng Zhī Húdié) (Two Butterflies)
+// SUPERR QQ5 PCB: 89E564R + HM6116P-2 + 12 MHz XTAL + JFC95101 + TMP82C255AN-2 + U6295 + 24C02. No bank of switches
+ROM_START( lzhudie )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(f9389dc5) SHA1(4014dbbc2aa7b1661db53b74bfbc57126400b528) ) // 1xxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x000000, 0x200000, CRC(5e827bea) SHA1(94ace5fb8161a3004526a77767baa789fd1b8d5d) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(bd8dde38) SHA1(4850a4eb9b63fbc4ae82806d347573e3a46d55f7) )
+ROM_END
+
+// 刀郎 (Dāoláng) (Knife Man, but also the name of a Chinese singer)
+// on main PCB (DL-ZY-20): W78E065A40PL (on riser socket) + HM6116P-3 + 12 MHz XTAL + TOP8279 + Oki M6295 + 24C02 +  bank of 8 switches
+// on LED PCB (6944177): D8255AC-2 + TOP8279 + JFC95101 + JFC95101G
+ROM_START( daolang )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "w78e065.bin", 0x0000, 0x8000, CRC(7fb77e5f) SHA1(aa417fef065b3c71c8d150101780ed3aa05d6792) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1615.bin", 0x000000, 0x200000, CRC(6ba48b6b) SHA1(a6e2193c7bbbc1552aeb7158102d94936767f357) ) // has scrambled address lines
+ROM_END
+
+// 钱多多 (Qián Duōduō) (Money Galore)
+// same PCB as lanmao
+ROM_START( qiandd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "w78e065", 0x00000, 0x10000, CRC(d58b137f) SHA1(eb0cfc4b98a88a73ebdde673d98a90970755ffda) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "29f1615", 0x00000, 0x80000, CRC(c47e29c5) SHA1(d55264f389339875d090c08bead6e3ec1558461f) )
+
+	ROM_REGION( 0x100, "i2cmem", 0 )
+	ROM_LOAD( "24c02.bin", 0x000, 0x100, CRC(98dbf990) SHA1(f22ceb7e66c3515d244b98b89ecc4e099eaab2a0) )
+ROM_END
+
+// 小蜜蜂 (Xiǎo Mìfēng) (Little Bee)
+// B13363 PCB: MPC89E515AE + 12 MHz XTAL + HT8279 + KC89C72 + U6295
+ROM_START( xmifeng )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mpc89e515", 0x00000, 0x10000, CRC(de21886e) SHA1(5c0c69c59ae0a32baa15445da698c590cca34cf9) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "27e040", 0x00000, 0x80000, CRC(baa1c867) SHA1(b27f21ca6609595e8a7bceb577e45e4990ef4d1b) )
+ROM_END
+
+// 夕阳天使 (Xīyáng Tiānshǐ) (Sunset Angel)
+// SST89C58 + 6116ASP-12 + 12 MHz XTAL + TOP8279 + 2x KC89C72 + U6295 + 24C02
+ROM_START( xtianshi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sst89c58.u34", 0x00000, 0x10000, CRC(3a16353c) SHA1(9b7823e9423077ae7057f3e569f450f632eef091) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29l1611.u15", 0x000000, 0x200000, CRC(9c4ba947) SHA1(ace7b41e0818a1ff82ac003a5c9023a59f9a4582) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
+// 还珠格格 (Huánzhū Gégé) (My Fair Princess)
+// Z84C0006PEC + LM5116D-10 + 12 MHz XTAL + TMP82C79P-2 + M5M82C255ASP + U6295 + YM2413 + 3.3579 MHz XTAL + 2x EPM7032 + 2x bank of 8 switches
+ROM_START( hgege )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "512-0-699a.bin", 0x00000, 0x10000, CRC(f597ff7a) SHA1(db78b1689633d0748ac2bc0496aa93a851a9e023) ) // encrypted, on the back of the PCB
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "d27c4001.u27", 0x00000, 0x80000, CRC(9dcaeaea) SHA1(7539366c2821637f1b0ec7ab5935bae4530afb21) )
+
+	ROM_REGION( 0x7a2, "epm7032a", 0 )
+	ROM_LOAD( "epm7032.u38", 0x000, 0x7a2, CRC(804bc9c4) SHA1(547431aa9dfd8cbb3a77cb286064f0fc1d1a2e3c) ) // pof
+
+	ROM_REGION( 0x7a2, "epm7032b", 0 )
+	ROM_LOAD( "epm7032.u39", 0x000, 0x7a2, CRC(1aa7e9e3) SHA1(6b82111323780a17fe40d7fde054164bcc6e6cfd) ) // pof
+ROM_END
+
+ROM_START( hgegea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "512-1-ac1b.bin", 0x00000, 0x10000, CRC(78991a15) SHA1(56e96b39dc708f2d968f09bfca99a19875483cb3) ) // encrypted, on the back of the PCB
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "d27c4001.u27", 0x00000, 0x80000, CRC(9dcaeaea) SHA1(7539366c2821637f1b0ec7ab5935bae4530afb21) )
+
+	ROM_REGION( 0x7a2, "epm7032a", 0 )
+	ROM_LOAD( "epm7032.u38", 0x000, 0x7a2, CRC(804bc9c4) SHA1(547431aa9dfd8cbb3a77cb286064f0fc1d1a2e3c) ) // pof
+
+	ROM_REGION( 0x7a2, "epm7032b", 0 )
+	ROM_LOAD( "epm7032.u39", 0x000, 0x7a2, CRC(1aa7e9e3) SHA1(6b82111323780a17fe40d7fde054164bcc6e6cfd) ) // pof
+ROM_END
+
+// 福星高照 (Fúxīng Gāozhào) (Lucky Star Shines Bright)
+// N78E366ADG + 6116ASP-12 + 12 MHz XTAL + JFC8279 + 2x JFC95101 + U6295 + 24C03
+ROM_START( fuxingg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "n78e366adg", 0x00000, 0x10000, CRC(fff990fc) SHA1(85faea4ddac7cd448133d03e2afc67a503be97c4) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "u34", 0x00000, 0x80000, CRC(3b26ffde) SHA1(56b9577ef283fdeb48519ecae094858e3e4865d8) )
+ROM_END
+
+} // anonymous namespace
+
+
+GAME( 1991, msaiche,  0,     panda2, msaiche, panda2_state, empty_init, ROT0, "Hengfa Electronics",          "Mali Saiche",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1996, panda2,   0,     panda2, panda2,  panda2_state, empty_init, ROT0, "Kelly",                       "Panda 2",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, lanmao,   0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+
+// for the following sets no effort has been made yet to emulate the different behaviour. Most have also different LED layout
+GAME( 1998, pkzw,     0,     panda2, panda2,  panda2_state, empty_init, ROT0, "Hengfa Electronics",          "PK Zhiwang",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2000, tzwang,   0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jindalai Electronics",        "Tiaozhan Wang",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991, whujiang, 0,     panda2, panda2,  panda2_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1998, whujijqb, 0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Hom Inn",                     "Wu Hujiang Jiaqiang Ban", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1997, xqingwa,  0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Xiao Qingwa",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2005, gongfuxm, 0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Yuanfa Technology",           "Gongfu Xiongmao",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, ljian,    0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Jian",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1999, lzhudie,  0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Liang Zhi Hudie",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, daolang,  0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Dao Lang",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1997, qiandd,   0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Jinlong Electronics",         "Qian Duoduo",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, xmifeng,  0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Huatian Company",             "Xiao Mifeng",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2002, xtianshi, 0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Longfeng Chengxiang",         "Xiyang Tianshi",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2005, fuxingg,  0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Zhenglong Company",           "Fuxing Gaozhao",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+
+// these ones use a Z80 instead of an MCS51 family chip. To be moved to other driver
+GAME( 1999, hgege,    0,     lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Geechang",                    "Huanzhu Gege (set 1)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1999, hgegea,   hgege, lanmao, lanmao,  lanmao_state, empty_init, ROT0, "Geechang",                    "Huanzhu Gege (set 2)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

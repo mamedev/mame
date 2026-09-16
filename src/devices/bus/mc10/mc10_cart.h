@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_BUS_MC10_MC10CART_H
-#define MAME_BUS_MC10_MC10CART_H
+#ifndef MAME_BUS_MC10_MC10_CART_H
+#define MAME_BUS_MC10_MC10_CART_H
 
 #pragma once
 
@@ -33,10 +33,7 @@ public:
 	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: mc10cart_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	mc10cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -64,7 +61,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_memspace;
 
@@ -73,7 +70,7 @@ private:
 	device_mc10cart_interface *m_cart;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(MC10CART_SLOT, mc10cart_slot_device)
 
 class device_mc10cart_interface : public device_interface
@@ -83,6 +80,7 @@ public:
 	virtual ~device_mc10cart_interface();
 
 	virtual int max_rom_length() const;
+
 	virtual std::pair<std::error_condition, std::string> load();
 
 protected:
@@ -106,4 +104,4 @@ void mc10_cart_add_basic_devices(device_slot_interface &device);
 void alice_cart_add_basic_devices(device_slot_interface &device);
 void alice32_cart_add_basic_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_MC10_MC10CART_H
+#endif // MAME_BUS_MC10_MC10_CART_H

@@ -39,8 +39,8 @@ public:
 	void pc1000(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t kb_r(offs_t offset);
 	void lcdc_data_w(uint8_t data);
@@ -55,8 +55,8 @@ protected:
 	void pc1000_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void pc1000_mem(address_map &map);
-	void pc1000_io(address_map &map);
+	void pc1000_mem(address_map &map) ATTR_COLD;
+	void pc1000_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sed1200_device> m_lcdc;
@@ -447,7 +447,7 @@ void pc1000_state::misterx(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(pc1000_state::irq0_line_hold), attotime::from_hz(10));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(pc1000_state::sed1200_screen_update));
@@ -455,7 +455,7 @@ void pc1000_state::misterx(machine_config &config)
 	m_screen->set_visarea(0, 120-1, 0, 9-1);
 	m_screen->set_palette("palette");
 
-	SED1200D0B(config, m_lcdc, 0); // packaging variant not verified
+	SED1200D0B(config, m_lcdc); // packaging variant not verified
 
 	PALETTE(config, "palette", FUNC(pc1000_state::pc1000_palette), 2);
 

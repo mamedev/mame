@@ -61,8 +61,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -72,16 +72,16 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport m_inputs;
 
+	bool m_power_on = false;
+	u16 m_inp_mux = 0;
+	u32 m_r = 0;
+
 	void power_off();
 	u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
-
-	bool m_power_on = false;
-	u16 m_inp_mux = 0;
-	u32 m_r = 0;
 };
 
 void bingobear_state::machine_start()
@@ -185,8 +185,8 @@ static INPUT_PORTS_START( bingobear )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Neck Sensor")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // test pad
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, bingobear_state, power_on, 0) PORT_NAME("Mouth Sensor")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, bingobear_state, power_on, 0) PORT_NAME("Body Sensor")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bingobear_state::power_on), 0) PORT_NAME("Mouth Sensor")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bingobear_state::power_on), 0) PORT_NAME("Body Sensor")
 INPUT_PORTS_END
 
 

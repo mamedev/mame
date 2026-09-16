@@ -8,10 +8,10 @@
  *
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_SH_SH4COMN_H
+#define MAME_CPU_SH_SH4COMN_H
 
-#ifndef __SH4COMN_H__
-#define __SH4COMN_H__
+#pragma once
 
 #include "sh.h"
 
@@ -63,8 +63,6 @@ enum
 #define SZ  0x00100000
 #define FR  0x00200000
 
-#define REGFLAG_R(n)                    (1 << (n))
-
 /* additional register flags 1 */
 #define REGFLAG_SGR                     (1 << 6)
 #define REGFLAG_FPUL                    (1 << 7)
@@ -73,4 +71,4 @@ enum
 #define REGFLAG_SSR                     (1 << 10)
 #define REGFLAG_SPC                     (1 << 11)
 
-#endif /* __SH4COMN_H__ */
+#endif // MAME_CPU_SH_SH4COMN_H

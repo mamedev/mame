@@ -31,7 +31,7 @@ protected:
 	virtual ~wininput_event_handler() = default;
 
 public:
-	virtual bool handle_input_event(input_event eventid, void *data)
+	virtual bool handle_input_event(input_event eventid, void const *data)
 	{
 		return false;
 	}

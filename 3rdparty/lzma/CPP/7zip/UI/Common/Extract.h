@@ -1,7 +1,7 @@
 // Extract.h
 
-#ifndef __EXTRACT_H
-#define __EXTRACT_H
+#ifndef ZIP7_INC_EXTRACT_H
+#define ZIP7_INC_EXTRACT_H
 
 #include "../../../Windows/FileFind.h"
 
@@ -13,6 +13,15 @@
 #include "Property.h"
 
 #include "../Common/LoadCodecs.h"
+
+namespace NExtractOutDirMode {
+enum EEnum
+{
+  k_Direct = 0,
+  k_AddArcName,
+  k_ReplaceAsterisk
+};
+}
 
 struct CExtractOptionsBase
 {
@@ -26,9 +35,11 @@ struct CExtractOptionsBase
   NExtract::NPathMode::EEnum PathMode;
   NExtract::NOverwriteMode::EEnum OverwriteMode;
   NExtract::NZoneIdMode::EEnum ZoneMode;
-  
-  FString OutputDir;
+  NExtractOutDirMode::EEnum OutDirMode;
+
   CExtractNtOptions NtOptions;
+  
+  FString OutputDir; // normalized : with path separator at the end
   UString HashDir;
 
   CExtractOptionsBase():
@@ -38,7 +49,8 @@ struct CExtractOptionsBase
       OverwriteMode_Force(false),
       PathMode(NExtract::NPathMode::kFullPaths),
       OverwriteMode(NExtract::NOverwriteMode::kAsk),
-      ZoneMode(NExtract::NZoneIdMode::kNone)
+      ZoneMode(NExtract::NZoneIdMode::kNone),
+      OutDirMode(NExtractOutDirMode::k_ReplaceAsterisk)
       {}
 };
 
@@ -52,12 +64,12 @@ struct CExtractOptions: public CExtractOptionsBase
   // bool ShowDialog;
   // bool PasswordEnabled;
   // UString Password;
-  #ifndef _SFX
+  #ifndef Z7_SFX
   CObjectVector<CProperty> Properties;
   #endif
 
   /*
-  #ifdef EXTERNAL_CODECS
+  #ifdef Z7_EXTERNAL_CODECS
   CCodecs *Codecs;
   #endif
   */
@@ -96,7 +108,8 @@ HRESULT Extract(
     const CExtractOptions &options,
     IOpenCallbackUI *openCallback,
     IExtractCallbackUI *extractCallback,
-    #ifndef _SFX
+    IFolderArchiveExtractCallback *faeCallback,
+    #ifndef Z7_SFX
     IHashCalc *hash,
     #endif
     UString &errorMessage,

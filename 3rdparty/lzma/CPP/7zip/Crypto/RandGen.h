@@ -1,7 +1,7 @@
 // RandGen.h
 
-#ifndef __CRYPTO_RAND_GEN_H
-#define __CRYPTO_RAND_GEN_H
+#ifndef ZIP7_INC_CRYPTO_RAND_GEN_H
+#define ZIP7_INC_CRYPTO_RAND_GEN_H
 
 #include "../../../C/Sha256.h"
 
@@ -27,10 +27,11 @@ class CRandomGenerator
 
   void Init();
 public:
-  CRandomGenerator(): _needInit(true) {};
+  CRandomGenerator(): _needInit(true) {}
   void Generate(Byte *data, unsigned size);
 };
 
+MY_ALIGN (16)
 extern CRandomGenerator g_RandomGenerator;
 
 #define MY_RAND_GEN(data, size) g_RandomGenerator.Generate(data, size)

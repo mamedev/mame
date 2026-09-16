@@ -5,16 +5,10 @@
 
 #pragma once
 
-// SoftFloat 2 lacks an include guard
-#ifndef softfloat2_h
-#define softfloat2_h 1
-#include "softfloat/milieu.h"
-#include "softfloat/softfloat.h"
-#endif
-
-#include "divtlb.h"
-
 #include "i386dasm.h"
+#include "divtlb.h"
+#include "softfloat3/source/include/softfloat.h"
+#include <algorithm>
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -45,14 +39,13 @@ protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 32; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -227,6 +220,46 @@ protected:
 		FF_SSE3 = 1 << 0,      // SSE3 Extensions
 	};
 
+	enum CR0_BITS : uint32_t {
+		CR0_PG = (u32)1 << 31, // Paging
+		CR0_CD = 1 << 30,      // Cache disable
+		CR0_NW = 1 << 29,      // Not writethrough
+		CR0_AM = 1 << 18,      // Alignment mask
+		CR0_WP = 1 << 16,      // Write protect
+		CR0_NE = 1 << 5,       // Numeric error
+		CR0_ET = 1 << 4,       // Extension type
+		CR0_TS = 1 << 3,       // Task switched
+		CR0_EM = 1 << 2,       // Emulation
+		CR0_MP = 1 << 1,       // Monitor coprocessor
+		CR0_PE = 1 << 0,       // Protection enabled
+	};
+
+	enum CR3_BITS : uint32_t {
+		CR3_PCD = 1 << 4,
+		CR3_PWT = 1 << 3,
+	};
+
+	enum CR4_BITS : uint32_t {
+		CR4_SMAP = 1 << 21,
+		CR4_SMEP = 1 << 20,
+		CR4_OSXSAVE = 1 << 18,
+		CR4_PCIDE = 1 << 17,
+		CR4_FSGSBASE = 1 << 16,
+		CR4_SMXE = 1 << 14,
+		CR4_VMXE = 1 << 13,
+		CR4_OSXMMEXCPT = 1 << 10,
+		CR4_OSFXSR = 1 << 9,
+		CR4_PCE = 1 << 8,
+		CR4_PGE = 1 << 7,
+		CR4_MCE = 1 << 6,
+		CR4_PAE = 1 << 5,
+		CR4_PSE = 1 << 4,
+		CR4_DE = 1 << 3,
+		CR4_TSD = 1 << 2,
+		CR4_PVI = 1 << 1,
+		CR4_VME = 1 << 0,
+	};
+
 	typedef void (i386_device::*i386_modrm_func)(uint8_t modrm);
 	typedef void (i386_device::*i386_op_func)();
 	struct X86_OPCODE {
@@ -307,19 +340,20 @@ protected:
 	uint8_t m_irq_state;
 	address_space *m_program;
 	address_space *m_io;
-	uint32_t m_a20_mask;
+	offs_t m_a20_mask;
 	memory_access<32, 1, 0, ENDIANNESS_LITTLE>::cache macache16;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache macache32;
 
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
 	uint32_t m_cpu_version;
+	uint32_t m_brand_id;
 	uint32_t m_feature_flags;
 	uint64_t m_tsc;
 	uint64_t m_perfctr[2];
 
 	// FPU
-	floatx80 m_x87_reg[8];
+	extFloat80_t m_x87_reg[8];
 
 	uint16_t m_x87_cw;
 	uint16_t m_x87_sw;
@@ -395,10 +429,10 @@ protected:
 	void register_state_i386();
 	void register_state_i386_x87();
 	void register_state_i386_x87_xmm();
-	uint32_t i386_translate(int segment, uint32_t ip, int rwn);
+	uint32_t i386_translate(int segment, uint32_t ip, int rwn, int size = 1);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, bool debug, offs_t *address, vtlb_entry *entry);
-	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
+	bool translate_address(int pl, int type, offs_t *address, uint32_t *error);
 	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
 	inline uint8_t FETCH();
@@ -472,9 +506,9 @@ protected:
 	uint32_t GetEA(uint8_t modrm, int rwn);
 	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
-	int i386_limit_check(int seg, uint32_t offset);
+	int i386_limit_check(int seg, uint32_t offset, int size = 1);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
-	void i386_trap(int irq, int irq_gate, int trap_level);
+	void i386_trap(int irq, int irq_gate);
 	void i386_trap_with_error(int irq, int irq_gate, int trap_level, uint32_t error);
 	void i286_task_switch(uint16_t selector, uint8_t nested);
 	void i386_task_switch(uint16_t selector, uint8_t nested);
@@ -996,7 +1030,7 @@ protected:
 	void i386_bound_r32_m32_m32();
 	void i386_retf32();
 	void i386_retf_i32();
-	void i386_load_far_pointer32(int s);
+	bool i386_load_far_pointer32(int s);
 	void i386_lds32();
 	void i386_lss32();
 	void i386_les32();
@@ -1022,7 +1056,8 @@ protected:
 	void i486_bswap_esi();
 	void i486_bswap_edi();
 	void i486_mov_cr_r32();
-	inline void MMXPROLOG();
+	inline bool MMXPROLOG();
+	inline bool SSEPROLOG();
 	inline void READMMX(uint32_t ea,MMX_REG &r);
 	inline void WRITEMMX(uint32_t ea,MMX_REG &r);
 	inline void READXMM(uint32_t ea,XMM_REG &r);
@@ -1350,11 +1385,11 @@ protected:
 	inline void sse_predicate_compare_double(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline void sse_predicate_compare_single_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
 	inline void sse_predicate_compare_double_scalar(uint8_t imm8, XMM_REG d, XMM_REG s);
-	inline floatx80 READ80(uint32_t ea);
-	inline void WRITE80(uint32_t ea, floatx80 t);
+	inline extFloat80_t READ80(uint32_t ea);
+	inline void WRITE80(uint32_t ea, extFloat80_t t);
 	inline void x87_set_stack_top(int top);
 	inline void x87_set_tag(int reg, int tag);
-	void x87_write_stack(int i, floatx80 value, bool update_tag);
+	void x87_write_stack(int i, extFloat80_t value, bool update_tag);
 	inline void x87_set_stack_underflow();
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
@@ -1364,10 +1399,10 @@ protected:
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);
 	void x87_reset();
-	floatx80 x87_add(floatx80 a, floatx80 b);
-	floatx80 x87_sub(floatx80 a, floatx80 b);
-	floatx80 x87_mul(floatx80 a, floatx80 b);
-	floatx80 x87_div(floatx80 a, floatx80 b);
+	extFloat80_t x87_add(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_sub(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_mul(extFloat80_t a, extFloat80_t b);
+	extFloat80_t x87_div(extFloat80_t a, extFloat80_t b);
 	void x87_fadd_m32real(uint8_t modrm);
 	void x87_fadd_m64real(uint8_t modrm);
 	void x87_fadd_st_sti(uint8_t modrm);
@@ -1557,8 +1592,8 @@ public:
 protected:
 	i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class i486dx4_device : public i486_device
@@ -1568,7 +1603,7 @@ public:
 	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1585,8 +1620,8 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1597,8 +1632,8 @@ public:
 	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1609,8 +1644,8 @@ public:
 	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1625,8 +1660,8 @@ protected:
 
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1637,8 +1672,8 @@ public:
 	pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 
@@ -1649,8 +1684,8 @@ public:
 	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void opcode_cpuid() override;
 };
@@ -1665,8 +1700,8 @@ public:
 protected:
 	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
 	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

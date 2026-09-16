@@ -39,8 +39,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_MACHINE_TTL7474_H
-#define MAME_MACHINE_TTL7474_H
+#ifndef MAME_MACHINE_7474_H
+#define MAME_MACHINE_7474_H
 
 #pragma once
 
@@ -55,7 +55,7 @@ class ttl7474_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl7474_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
 	auto output_cb() { return m_output_func.bind(); }
@@ -71,8 +71,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// callbacks
@@ -102,4 +102,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TTL7474, ttl7474_device)
 
-#endif // MAME_MACHINE_TTL7474_H
+#endif // MAME_MACHINE_7474_H

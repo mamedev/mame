@@ -31,8 +31,8 @@ protected:
 
 private:
 	// internal address maps
-	void internal_ram(address_map &map);
-	void internal_io(address_map &map);
+	void internal_ram(address_map &map) ATTR_COLD;
+	void internal_io(address_map &map) ATTR_COLD;
 };
 
 

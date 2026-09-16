@@ -20,14 +20,14 @@ class iq151_rom_device :
 {
 public:
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 protected:
 	// construction/destruction
 	iq151_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// iq151cart_interface overrides
 	virtual uint8_t* get_cart_base() override;

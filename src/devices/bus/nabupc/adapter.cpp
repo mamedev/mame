@@ -12,6 +12,8 @@
 #include "emuopts.h"
 #include "unzip.h"
 
+#include <tuple>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -29,17 +31,13 @@ namespace bus::nabupc {
 //**************************************************************************
 
 // Load segment file from disk
-std::error_condition network_adapter::segment_file::read_archive(util::core_file &stream, uint32_t segment_id)
+std::error_condition network_adapter::segment_file::read_archive(util::random_read &stream, uint32_t segment_id)
 {
 	segment_id &= 0xffffff;
 
-	util::core_file::ptr proxy;
-	std::error_condition err = util::core_file::open_proxy(stream, proxy);
-	if (err)
-		return err;
-
+	std::error_condition err;
 	util::archive_file::ptr zipfile;
-	err = util::archive_file::open_zip(std::move(proxy), zipfile);
+	err = util::archive_file::open_zip(stream, zipfile);
 	if (err)
 		return err;
 
@@ -93,7 +91,7 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 	current.tier[3]       = 0xff;
 	current.mbytes[0]     = 0x7f;
 	current.mbytes[1]     = 0x80;
-	err = fd->read_at(offset, current.data, 991, actual);
+	std::tie(err, actual) = read_at(*fd, offset, current.data, 991);
 	do {
 		crc = 0xffff;
 		if (err) {
@@ -119,7 +117,7 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 			pak_list.push_back(current);
 			offset = (++npak * 991);
 			memset(current.data, 0, 991);
-			err = fd->read_at(offset, current.data, 991, actual);
+			std::tie(err, actual) = read_at(*fd, offset, current.data, 991);
 		}
 	} while(actual > 0);
 

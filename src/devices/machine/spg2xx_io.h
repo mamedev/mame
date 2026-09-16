@@ -156,8 +156,8 @@ protected:
 	void check_tmb_lofreq_key_irq();
 	void check_all_irqs(const uint16_t changed);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(timer_ab_tick);
 	TIMER_CALLBACK_MEMBER(timer_c_tick);

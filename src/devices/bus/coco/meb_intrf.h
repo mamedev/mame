@@ -2,14 +2,14 @@
 // copyright-holders:tim lindner
 /*********************************************************************
 
-    intrf.h
+    meb_intrf.h
 
     CRC / Disto Mini Expansion Bus management
 
 *********************************************************************/
 
-#ifndef MAME_BUS_COCO_DISTOMEB_H
-#define MAME_BUS_COCO_DISTOMEB_H
+#ifndef MAME_BUS_COCO_MEB_INTRF_H
+#define MAME_BUS_COCO_MEB_INTRF_H
 
 #pragma once
 
@@ -30,10 +30,7 @@ public:
 	distomeb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&opts, const char *dflt)
 		: distomeb_slot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	distomeb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -48,8 +45,8 @@ public:
 	int get_cart_line() { return m_cart_line; }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	u8 m_cart_line;
@@ -57,7 +54,7 @@ private:
 	device_distomeb_interface *m_cart;
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(DISTOMEB_SLOT, distomeb_slot_device)
 
 
@@ -79,7 +76,6 @@ protected:
 
 	// setting cart values
 	void set_cart_value(int value);
-	void set_cart_value(bool value) { set_cart_value(value ? 1 : 0); }
 
 private:
 	distomeb_slot_device *const m_owning_slot;
@@ -87,4 +83,4 @@ private:
 
 void disto_meb_add_basic_devices(device_slot_interface &device);
 
-#endif // MAME_BUS_COCO_DISTOMEB_H
+#endif // MAME_BUS_COCO_MEB_INTRF_H

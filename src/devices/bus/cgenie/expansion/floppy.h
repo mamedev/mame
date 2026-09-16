@@ -31,10 +31,10 @@ public:
 	cgenie_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
@@ -47,7 +47,7 @@ private:
 	void select_w(uint8_t data);
 	void command_w(uint8_t data);
 
-	void mmio(address_map &map);
+	void mmio(address_map &map) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 

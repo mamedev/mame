@@ -26,12 +26,12 @@ class ramdac_device :   public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag)
-		: ramdac_device(mconfig, tag, owner, clock)
+	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&palette_tag)
+		: ramdac_device(mconfig, tag, owner)
 	{
 		m_palette.set_tag(std::forward<T>(palette_tag));
 	}
-	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_color_base(uint32_t color_base) { m_color_base = color_base; }
@@ -50,13 +50,13 @@ public:
 	void ramdac_rgb666_w(offs_t offset, uint8_t data);
 	void ramdac_rgb888_w(offs_t offset, uint8_t data);
 
-	void ramdac_palram(address_map &map);
+	void ramdac_palram(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

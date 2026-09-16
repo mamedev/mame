@@ -8,7 +8,8 @@
 #include "timeplt_a.h"
 
 #include "sound/namco.h"
-#include "sound/samples.h"
+
+#include "machine/netlist.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -23,7 +24,7 @@ public:
 		m_radarattr(*this, "radarattr"),
 		m_maincpu(*this, "maincpu"),
 		m_namco_sound(*this, "namco"),
-		m_samples(*this, "samples"),
+		m_bang(*this, "snd_nl:i_bang"),
 		m_timeplt_audio(*this, "timeplt_audio"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -37,7 +38,7 @@ public:
 	void tactcian(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -61,7 +62,6 @@ private:
 		uint8_t color = 0;
 	};
 
-	bool      m_last_bang = 0;
 	uint8_t   m_spriteram_base = 0;
 	bool      m_stars_enable = 0;
 	uint16_t  m_total_stars = 0;
@@ -72,8 +72,8 @@ private:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	optional_device<namco_device> m_namco_sound;
-	optional_device<samples_device> m_samples;
+	optional_device<namco_wsg_device> m_namco_sound;
+	optional_device<netlist_mame_logic_input_device> m_bang;
 	optional_device<timeplt_audio_device> m_timeplt_audio;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -85,7 +85,6 @@ private:
 	void irq_mask_w(int state);
 	void nmi_mask_w(int state);
 	void sound_on_w(int state);
-	void flip_screen_w(int state);
 	void coin_lockout_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);
@@ -124,9 +123,9 @@ private:
 	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 
-	void io_map(address_map &map);
-	void jungler_map(address_map &map);
-	void rallyx_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void jungler_map(address_map &map) ATTR_COLD;
+	void rallyx_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_NAMCO_RALLYX_H

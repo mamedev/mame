@@ -10,7 +10,7 @@
 #include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
-#include "machine/8530scc.h"
+#include "machine/z80scc.h"
 #include "nextkbd.h"
 #include "machine/upd765.h"
 #include "machine/ncr53c90.h"
@@ -29,7 +29,7 @@ public:
 			scc(*this, "scc"),
 			keyboard(*this, "keyboard"),
 			scsibus(*this, "scsibus"),
-			scsi(*this, "scsibus:7:ncr53c90"),
+			scsi(*this, "ncr53c90"),
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
@@ -65,7 +65,7 @@ public:
 private:
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
-	required_device<scc8530_legacy_device> scc;
+	required_device<scc8530_device> scc;
 	required_device<nextkbd_device> keyboard;
 	required_device<nscsi_bus_device> scsibus;
 	required_device<ncr53c90_device> scsi;
@@ -74,8 +74,8 @@ private:
 	optional_device<n82077aa_device> fdc; // 040 only
 	optional_device<floppy_connector> floppy0; // 040 only
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -146,18 +146,17 @@ private:
 
 	void vblank_w(int state);
 
-	void ncr53c90(device_t *device);
-	void next_0b_m_mem(address_map &map);
-	void next_0b_m_mo_mem(address_map &map);
-	void next_0b_m_nofdc_mem(address_map &map);
-	void next_0c_c_mem(address_map &map);
-	void next_0c_m_mem(address_map &map);
-	void next_0c_c_mo_mem(address_map &map);
-	void next_0c_m_mo_mem(address_map &map);
-	void next_2c_c_mem(address_map &map);
-	void next_fdc_mem(address_map &map);
-	void next_mo_mem(address_map &map);
-	void next_mem(address_map &map);
+	void next_0b_m_mem(address_map &map) ATTR_COLD;
+	void next_0b_m_mo_mem(address_map &map) ATTR_COLD;
+	void next_0b_m_nofdc_mem(address_map &map) ATTR_COLD;
+	void next_0c_c_mem(address_map &map) ATTR_COLD;
+	void next_0c_m_mem(address_map &map) ATTR_COLD;
+	void next_0c_c_mo_mem(address_map &map) ATTR_COLD;
+	void next_0c_m_mo_mem(address_map &map) ATTR_COLD;
+	void next_2c_c_mem(address_map &map) ATTR_COLD;
+	void next_fdc_mem(address_map &map) ATTR_COLD;
+	void next_mo_mem(address_map &map) ATTR_COLD;
+	void next_mem(address_map &map) ATTR_COLD;
 
 	struct dma_slot {
 		uint32_t start = 0;

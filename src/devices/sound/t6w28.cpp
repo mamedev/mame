@@ -104,26 +104,21 @@ void t6w28_device::write(offs_t offset, uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void t6w28_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void t6w28_device::sound_stream_update(sound_stream &stream)
 {
-	int i;
-	auto &buffer0 = outputs[0];
-	auto &buffer1 = outputs[1];
-
-
 	/* If the volume is 0, increase the counter */
-	for (i = 0;i < 8;i++)
+	for (int i = 0;i < 8;i++)
 	{
 		if (m_volume[i] == 0)
 		{
 			/* note that I do count += samples, NOT count = samples + 1. You might think */
 			/* it's the same since the volume is 0, but doing the latter could cause */
 			/* interferencies when the program is rapidly modulating the volume. */
-			if (m_count[i] <= buffer0.samples()*STEP) m_count[i] += buffer0.samples()*STEP;
+			if (m_count[i] <= stream.samples()*STEP) m_count[i] += stream.samples()*STEP;
 		}
 	}
 
-	for (int sampindex = 0; sampindex < buffer0.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int vol[8];
 		unsigned int out0, out1;
@@ -134,7 +129,7 @@ void t6w28_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		/* in the 1 position during the sample period. */
 		vol[0] = vol[1] = vol[2] = vol[3] = vol[4] = vol[5] = vol[6] = vol[7] = 0;
 
-		for (i = 2;i < 3;i++)
+		for (int i = 2;i < 3;i++)
 		{
 			if (m_output[i]) vol[i] += m_count[i];
 			m_count[i] -= STEP;
@@ -161,7 +156,7 @@ void t6w28_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			if (m_output[i]) vol[i] -= m_count[i];
 		}
 
-		for (i = 4;i < 7;i++)
+		for (int i = 4;i < 7;i++)
 		{
 			if (m_output[i]) vol[i] += m_count[i];
 			m_count[i] -= STEP;
@@ -252,8 +247,8 @@ void t6w28_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		if (out0 > MAX_OUTPUT * STEP) out0 = MAX_OUTPUT * STEP;
 		if (out1 > MAX_OUTPUT * STEP) out1 = MAX_OUTPUT * STEP;
 
-		buffer0.put_int(sampindex, out0 / STEP, 32768);
-		buffer1.put_int(sampindex, out1 / STEP, 32768);
+		stream.put_int(0, sampindex, out0 / STEP, 32768);
+		stream.put_int(1, sampindex, out1 / STEP, 32768);
 	}
 }
 

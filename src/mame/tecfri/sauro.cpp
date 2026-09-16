@@ -63,10 +63,12 @@ TODO
 
 - What do the rest of the ports in the range c0-ce do?
 
+
 Tricky Doc
 ----------
 
 Addition by Reip
+Applause by hap
 
 
 Stephh's notes (based on the games Z80 code and some tests) :
@@ -155,7 +157,7 @@ public:
 	void tecfri(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -167,15 +169,13 @@ protected:
 	required_shared_ptr<uint8_t> m_bg_colorram;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_palette_bank = 0U;
-
+	uint8_t m_palette_bank = 0;
 	bool m_irq_enable = 0;
 
 	// common
 	void vblank_irq(int state);
 	void irq_reset_w(int state);
 	template <uint8_t Which> void coin_w(int state);
-	void flip_screen_w(int state);
 	void bg_videoram_w(offs_t offset, uint8_t data);
 	void bg_colorram_w(offs_t offset, uint8_t data);
 	void scroll_bg_w(uint8_t data);
@@ -193,13 +193,13 @@ public:
 	void trckydoc(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void prg_map(address_map &map);
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class sauro_state : public base_state
@@ -216,7 +216,7 @@ public:
 	void saurobl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -239,14 +239,12 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_io_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sauro_sound_map(address_map &map);
-	void saurobl_sound_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sauro_sound_map(address_map &map) ATTR_COLD;
+	void saurobl_sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 // General
 
@@ -330,14 +328,10 @@ void sauro_state::scroll_fg_w(uint8_t data)
 
 void sauro_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_bg)), TILEMAP_SCAN_COLS,
-			8, 8, 32, 32);
-
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_fg)), TILEMAP_SCAN_COLS,
-			8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_bg)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_fg)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
-	m_palette_bank = 0;
 
 	save_item(NAME(m_palette_bank));
 }
@@ -346,10 +340,12 @@ void sauro_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int const flipy = flip_screen();
 
+	// Weird, sprites entries don't start on DWORD boundary
 	for (int offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
 		int sy = m_spriteram[offs];
-		if (sy == 0xf8) continue;
+		if (sy == 0xf8)
+			continue;
 
 		int const code = m_spriteram[offs + 1] + ((m_spriteram[offs + 3] & 0x03) << 8);
 		int sx = m_spriteram[offs + 2];
@@ -362,12 +358,13 @@ void sauro_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			if (sx > 0xc0)
 			{
 				// Sign extend
-				sx = (signed int)(signed char)sx;
+				sx = int8_t(sx);
 			}
 		}
 		else
 		{
-			if (sx < 0x40) continue;
+			if (sx < 0x40)
+				continue;
 		}
 
 		int flipx = m_spriteram[offs + 3] & 0x04;
@@ -375,7 +372,7 @@ void sauro_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (flipy)
 		{
 			flipx = !flipx;
-			sx = (235 - sx) & 0xff;  // The &0xff is not 100% percent correct
+			sx = (235 - sx) & 0xff; // The & 0xff is not 100% correct
 			sy = 240 - sy;
 		}
 
@@ -399,29 +396,16 @@ uint32_t sauro_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void trckydoc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trckydoc_state::get_tile_info_bg)), TILEMAP_SCAN_COLS,
-			8, 8, 32, 32);
-
-	m_palette_bank = 0;
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trckydoc_state::get_tile_info_bg)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 }
 
 void trckydoc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const flipy = flip_screen();
-
 	// Weird, sprites entries don't start on DWORD boundary
 	for (int offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
 		int sy = m_spriteram[offs];
-
-		if (m_spriteram[offs + 3] & 0x08)
-		{
-			// needed by the elevator cable (2nd stage), balls bouncing (3rd stage) and maybe other things
-			sy += 6;
-		}
-
 		int const code = m_spriteram[offs + 1] + ((m_spriteram[offs + 3] & 0x01) << 8);
-
 		int sx = m_spriteram[offs + 2] - 2;
 		int const color = (m_spriteram[offs + 3] >> 4) & 0x0f;
 
@@ -433,20 +417,23 @@ void trckydoc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (sx > 0xc0)
 			{
 				// Sign extend
-				sx = (signed int)(signed char)sx;
+				sx = int8_t(sx);
 			}
 		}
 		else
 		{
-			if (sx < 0x40) continue;
+			if (sx < 0x40)
+				continue;
 		}
 
 		int flipx = m_spriteram[offs + 3] & 0x04;
+		int flipy = m_spriteram[offs + 3] & 0x08;
 
-		if (flipy)
+		if (flip_screen())
 		{
 			flipx = !flipx;
-			sx = (235 - sx) & 0xff;  // The &0xff is not 100% percent correct
+			flipy = !flipy;
+			sx = (235 - sx) & 0xff; // The & 0xff is not 100% correct
 			sy = 240 - sy;
 		}
 
@@ -465,8 +452,6 @@ uint32_t trckydoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 void base_state::machine_start()
 {
@@ -505,11 +490,6 @@ void base_state::coin_w(int state)
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-void base_state::flip_screen_w(int state)
-{
-	flip_screen_set(state);
-}
-
 void sauro_state::main_prg_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
@@ -542,7 +522,7 @@ void sauro_state::sauro_sound_map(address_map &map)
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xa000, 0xa000).w("speech", FUNC(sp0256_device::ald_w));
 	map(0xe000, 0xe000).r(FUNC(sauro_state::sound_command_r));
-	map(0xe000, 0xe006).nopw();    // echo from write to e0000
+	map(0xe000, 0xe006).nopw(); // echo from write to e0000
 	map(0xe00e, 0xe00f).nopw();
 }
 
@@ -554,7 +534,7 @@ void sauro_state::saurobl_sound_map(address_map &map)
 	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xa000, 0xa000).nopw();
 	map(0xe000, 0xe000).r(FUNC(sauro_state::sound_command_r));
-	map(0xe000, 0xe006).nopw();    // echo from write to e0000
+	map(0xe000, 0xe006).nopw(); // echo from write to e0000
 	map(0xe00e, 0xe00f).nopw();
 }
 
@@ -589,7 +569,7 @@ static INPUT_PORTS_START( tecfri )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
 
-	PORT_START("P2")                                                  // See notes
+	PORT_START("P2") // See notes
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -667,7 +647,7 @@ static INPUT_PORTS_START( saurobl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN )  PORT_8WAY
 
-	PORT_START("P2")                                                  // See notes
+	PORT_START("P2") // See notes
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
@@ -775,7 +755,7 @@ GFXDECODE_END
 void base_state::tecfri(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, XTAL(20'000'000) / 4);       // Verified on PCB
+	Z80(config, m_maincpu, XTAL(20'000'000) / 4); // Verified on PCB
 
 	LS259(config, m_mainlatch);
 	m_mainlatch->q_out_cb<4>().set(FUNC(base_state::irq_reset_w));
@@ -785,7 +765,7 @@ void base_state::tecfri(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(55.72);   // Verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000));  // frames per second, vblank duration (otherwise sprites lag)
 	screen.set_size(32 * 8, 32 * 8);
@@ -798,7 +778,7 @@ void base_state::tecfri(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(20'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0);       // Verified on PCB
+	YM3812(config, "ymsnd", XTAL(20'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 1.0); // Verified on PCB
 }
 
 void trckydoc_state::trckydoc(machine_config &config)
@@ -807,7 +787,7 @@ void trckydoc_state::trckydoc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &trckydoc_state::prg_map);
 
-	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(trckydoc_state::flip_screen_set));
 	m_mainlatch->q_out_cb<2>().set(FUNC(trckydoc_state::coin_w<0>));
 	m_mainlatch->q_out_cb<3>().set(FUNC(trckydoc_state::coin_w<1>));
 
@@ -824,14 +804,14 @@ void sauro_state::saurobl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sauro_state::main_io_map);
 
 	// Z3
-	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(sauro_state::flip_screen_set));
 	m_mainlatch->q_out_cb<1>().set(FUNC(sauro_state::coin_w<0>));
 	m_mainlatch->q_out_cb<2>().set(FUNC(sauro_state::coin_w<1>));
 	m_mainlatch->q_out_cb<3>().set_nop(); // sound IRQ trigger?
 	m_mainlatch->q_out_cb<5>().set(FUNC(sauro_state::palette_bank0_w));
 	m_mainlatch->q_out_cb<6>().set(FUNC(sauro_state::palette_bank1_w));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(20'000'000) / 5));     // Verified on PCB
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(20'000'000) / 5)); // Verified on PCB
 	audiocpu.set_addrmap(AS_PROGRAM, &sauro_state::saurobl_sound_map);
 	audiocpu.set_periodic_int(FUNC(sauro_state::irq0_line_hold), attotime::from_hz(8 * 60)); // ?
 
@@ -841,7 +821,7 @@ void sauro_state::saurobl(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(20'000'000) / 5);     // Verified on PCB
+	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(20'000'000) / 5); // Verified on PCB
 }
 
 void sauro_state::sauro(machine_config &config)
@@ -851,7 +831,7 @@ void sauro_state::sauro(machine_config &config)
 	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &sauro_state::sauro_sound_map);
 
 	// Sound hardware
-	sp0256_device &sp0256(SP0256(config, "speech", XTAL(20'000'000) / 5));     // Verified on PCB
+	sp0256_device &sp0256(SP0256(config, "speech", XTAL(20'000'000) / 5)); // Verified on PCB
 	sp0256.data_request_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
 	sp0256.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

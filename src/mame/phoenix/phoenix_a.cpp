@@ -68,9 +68,9 @@ void phoenix_sound_device::device_start()
 	uint32_t shiftreg;
 
 	m_sound_latch_a = 0;
-	memset(&m_c24_state, 0, sizeof(m_c24_state));
-	memset(&m_c25_state, 0, sizeof(m_c25_state));
-	memset(&m_noise_state, 0, sizeof(m_noise_state));
+	m_c24_state = c_state();
+	m_c25_state = c_state();
+	m_noise_state = n_state();
 
 	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 
@@ -522,15 +522,14 @@ void phoenix_sound_device::control_b_w(uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void phoenix_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void phoenix_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-	int samplerate = buffer.sample_rate();
+	int samplerate = stream.sample_rate();
 
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int sum = 0;
 		sum = noise(samplerate) / 2;
-		buffer.put_int_clamp(sampindex, sum, 32768);
+		stream.put_int_clamp(0, sampindex, sum, 32768);
 	}
 }

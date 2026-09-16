@@ -94,7 +94,7 @@ private:
 	void kbd_put(u8 data);
 	uint8_t m_term_data = 0;
 	uint16_t m_term_status = 0;
-	void vax11_mem(address_map &map);
+	void vax11_mem(address_map &map) ATTR_COLD;
 };
 
 void vax11_state::term_w(uint16_t data)
@@ -150,10 +150,10 @@ void vax11_state::vax11(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vax11_state::vax11_mem);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 	m_terminal->set_keyboard_callback(FUNC(vax11_state::kbd_put));
 
-	RX01(config, "rx01", 0);
+	RX01(config, "rx01");
 }
 
 ROM_START( vax785 )

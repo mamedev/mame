@@ -33,8 +33,8 @@ private:
 	uint8_t status_r(offs_t offset);
 	void brightness_w(uint8_t data);
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -93,10 +93,10 @@ void dms5000_state::dms5000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dms5000_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dms5000_state::io_map);
 
-	LS259(config, "cntlatch", 0); // V34
+	LS259(config, "cntlatch"); // V34
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);

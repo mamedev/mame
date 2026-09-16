@@ -17,7 +17,7 @@ TODO: figure out keycodes (are they translated externally?)
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -41,8 +41,8 @@ public:
 	void sk101bl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -53,8 +53,8 @@ private:
 	u8 scan_shift_r();
 	void lcd_control_w(u8 data);
 
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
@@ -158,19 +158,19 @@ void sk101bl_state::sk101bl(machine_config &config)
 {
 	I80C31(config, m_maincpu, 11.0592_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sk101bl_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &sk101bl_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &sk101bl_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(sk101bl_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(sk101bl_state::p1_w));
 	m_maincpu->port_out_cb<3>().set("alarm", FUNC(speaker_sound_device::level_w)).bit(3);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 10);
 	screen.set_visarea(0, 16*6-1, 0, 10-1);
 	screen.set_palette("palette");
 
-	HD44780(config, m_lcdc).set_lcd_size(1, 16);
+	HD44780(config, m_lcdc, 270'000).set_lcd_size(1, 16); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_pixel_update_cb(FUNC(sk101bl_state::pixel_update));
 
 	PALETTE(config, "palette").set_entries(2);

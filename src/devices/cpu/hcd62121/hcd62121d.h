@@ -47,7 +47,7 @@ private:
 		ARG_DSZ,       /* dsize register? */
 		ARG_OPT,       /* OPTx (output) pins */
 		ARG_PORT,      /* PORTx (output) pins */
-		ARG_TIM,       /* timing related register? */
+		ARG_TIME,      /* timing related register */
 		ARG_KLO,       /* KO1 - KO8 output lines */
 		ARG_KHI,       /* KO9 - KO14(?) output lines */
 		ARG_KI,        /* K input lines */

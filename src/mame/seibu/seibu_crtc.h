@@ -24,7 +24,7 @@ class seibu_crtc_device : public device_t,
 {
 public:
 	// construction/destruction
-	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto decrypt_key_callback() { return m_decrypt_key_cb.bind(); }
 	auto layer_en_callback() { return m_layer_en_cb.bind(); }
@@ -44,12 +44,12 @@ public:
 	void layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void layer_scroll_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void seibu_crtc_vregs(address_map &map);
+	void seibu_crtc_vregs(address_map &map) ATTR_COLD;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 private:

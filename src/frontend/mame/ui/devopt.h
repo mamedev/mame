@@ -21,7 +21,7 @@ namespace ui {
 class menu_device_config : public menu_textbox
 {
 public:
-	menu_device_config(mame_ui_manager &mui, render_container &container, device_slot_interface *slot, device_slot_interface::slot_option const *option);
+	menu_device_config(mame_ui_manager &mui, render_target &target, device_slot_interface *slot, device_slot_interface::slot_option const *option);
 	virtual ~menu_device_config() override;
 
 protected:
@@ -29,7 +29,6 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual bool handle(event const *ev) override;
 
 	device_slot_interface::slot_option const *const m_option;
 	bool const m_mounted;

@@ -13,6 +13,7 @@
 
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
+#include "cpu/mb88xxx/mb88xxx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "sound/ay8910.h"
@@ -33,6 +34,7 @@ public:
 		m_vectors(*this, "vectors"),
 		m_maincpu(*this, "maincpu"),
 		m_sub(*this, "sub"),
+		m_kbmcu(*this, "kbmcu"),
 		m_cassette(*this, "cassette"),
 		m_beeper(*this, "beeper"),
 		m_psg(*this, "psg"),
@@ -138,8 +140,8 @@ protected:
 		uint8_t busy = 0U;
 	};
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void fm7_alu_function(uint32_t offset) { }
 	virtual void fm7_mmr_refresh(address_space &space) { }
@@ -199,12 +201,12 @@ protected:
 
 	uint32_t screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void fm16_io(address_map &map);
-	void fm16_mem(address_map &map);
-	void fm16_sub_mem(address_map &map);
-	void fm7_mem(address_map &map);
-	void fm7_sub_mem(address_map &map);
-	void fm8_mem(address_map &map);
+	void fm16_io(address_map &map) ATTR_COLD;
+	void fm16_mem(address_map &map) ATTR_COLD;
+	void fm16_sub_mem(address_map &map) ATTR_COLD;
+	void fm7_mem(address_map &map) ATTR_COLD;
+	void fm7_sub_mem(address_map &map) ATTR_COLD;
+	void fm8_mem(address_map &map) ATTR_COLD;
 
 	optional_shared_ptr<uint8_t> m_shared_ram;
 	optional_shared_ptr<uint8_t> m_a15_ram;
@@ -253,6 +255,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_sub;
+	optional_device<mb88401_cpu_device> m_kbmcu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
 	optional_device<ay8910_device> m_psg;
@@ -328,7 +331,7 @@ protected:
 		uint8_t mode = 0U;
 	};
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	DECLARE_MACHINE_START(fm77av);
 
@@ -376,9 +379,9 @@ protected:
 	uint32_t av_line_set_pixel(int x, int y);
 	void av_line_draw();
 
-	void fm77av_mem(address_map &map);
-	void fm77av_sub_mem(address_map &map);
-	void fm7_banked_mem(address_map &map);
+	void fm77av_mem(address_map &map) ATTR_COLD;
+	void fm77av_sub_mem(address_map &map) ATTR_COLD;
+	void fm7_banked_mem(address_map &map) ATTR_COLD;
 
 	required_device_array<address_map_bank_device, 16> m_avbank;
 	optional_device<ym2203_device> m_ym;
@@ -409,15 +412,15 @@ public:
 	void fm11(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_START(fm11);
 
-	void fm11_mem(address_map &map);
-	void fm11_sub_mem(address_map &map);
-	void fm11_x86_io(address_map &map);
-	void fm11_x86_mem(address_map &map);
+	void fm11_mem(address_map &map) ATTR_COLD;
+	void fm11_sub_mem(address_map &map) ATTR_COLD;
+	void fm11_x86_io(address_map &map) ATTR_COLD;
+	void fm11_x86_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_x86;
 };

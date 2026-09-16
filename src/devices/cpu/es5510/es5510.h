@@ -17,7 +17,6 @@ public:
 	// TODO : Not verified, Most of games are using 128KB DRAM.
 	static constexpr uint32_t DRAM_SIZE = (1<<20);
 	static constexpr uint32_t DRAM_MASK = (DRAM_SIZE-1);
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	es5510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -126,14 +125,13 @@ public:
 	void write_to_dol(int32_t value);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int linenum, int state) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -157,7 +155,7 @@ private:
 	int16_t ser3l;
 	int64_t machl;        // 48 bits, right justified and sign extended
 	bool mac_overflow;  // whether reading the MAC register should return a saturated replacement value
-	int32_t dil;
+	int16_t dil;
 	int32_t memsiz;
 	int32_t memmask;
 	int32_t memincrement;
@@ -170,7 +168,7 @@ private:
 	int mulshift;
 	int8_t ccr;           // really, 5 bits, left justified
 	int8_t cmr;           // really, 6 bits, left justified
-	int32_t dol[2];
+	int16_t dol[2];
 	int dol_count;
 
 	std::unique_ptr<uint64_t[]> instr;

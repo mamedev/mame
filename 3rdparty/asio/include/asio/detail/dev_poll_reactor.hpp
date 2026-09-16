@@ -2,7 +2,7 @@
 // detail/dev_poll_reactor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -28,6 +28,7 @@
 #include "asio/detail/op_queue.hpp"
 #include "asio/detail/reactor_op.hpp"
 #include "asio/detail/reactor_op_queue.hpp"
+#include "asio/detail/scheduler_task.hpp"
 #include "asio/detail/select_interrupter.hpp"
 #include "asio/detail/socket_types.hpp"
 #include "asio/detail/timer_queue_base.hpp"
@@ -38,10 +39,12 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class dev_poll_reactor
-  : public execution_context_service_base<dev_poll_reactor>
+  : public execution_context_service_base<dev_poll_reactor>,
+    public scheduler_task
 {
 public:
   enum op_types { read_op = 0, write_op = 1,
@@ -84,13 +87,30 @@ public:
       per_descriptor_data& source_descriptor_data);
 
   // Post a reactor operation for immediate completion.
-  void post_immediate_completion(reactor_op* op, bool is_continuation);
+  void post_immediate_completion(operation* op, bool is_continuation) const;
+
+  // Post a reactor operation for immediate completion.
+  ASIO_DECL static void call_post_immediate_completion(
+      operation* op, bool is_continuation, const void* self);
 
   // Start a new operation. The reactor operation will be performed when the
   // given descriptor is flagged as ready, or an error has occurred.
   ASIO_DECL void start_op(int op_type, socket_type descriptor,
       per_descriptor_data&, reactor_op* op,
-      bool is_continuation, bool allow_speculative);
+      bool is_continuation, bool allow_speculative,
+      void (*on_immediate)(operation*, bool, const void*),
+      const void* immediate_arg);
+
+  // Start a new operation. The reactor operation will be performed when the
+  // given descriptor is flagged as ready, or an error has occurred.
+  void start_op(int op_type, socket_type descriptor,
+      per_descriptor_data& descriptor_data, reactor_op* op,
+      bool is_continuation, bool allow_speculative)
+  {
+    start_op(op_type, descriptor, descriptor_data,
+        op, is_continuation, allow_speculative,
+        &dev_poll_reactor::call_post_immediate_completion, this);
+  }
 
   // Cancel all operations associated with the given descriptor. The
   // handlers associated with the descriptor will be invoked with the
@@ -121,32 +141,39 @@ public:
   ASIO_DECL void cleanup_descriptor_data(per_descriptor_data&);
 
   // Add a new timer queue to the reactor.
-  template <typename Time_Traits>
-  void add_timer_queue(timer_queue<Time_Traits>& queue);
+  template <typename TimeTraits, typename Allocator>
+  void add_timer_queue(timer_queue<TimeTraits, Allocator>& queue);
 
   // Remove a timer queue from the reactor.
-  template <typename Time_Traits>
-  void remove_timer_queue(timer_queue<Time_Traits>& queue);
+  template <typename TimeTraits, typename Allocator>
+  void remove_timer_queue(timer_queue<TimeTraits, Allocator>& queue);
 
   // Schedule a new operation in the given timer queue to expire at the
   // specified absolute time.
-  template <typename Time_Traits>
-  void schedule_timer(timer_queue<Time_Traits>& queue,
-      const typename Time_Traits::time_type& time,
-      typename timer_queue<Time_Traits>::per_timer_data& timer, wait_op* op);
+  template <typename TimeTraits, typename Allocator>
+  void schedule_timer(timer_queue<TimeTraits, Allocator>& queue,
+      const typename TimeTraits::time_type& time,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& timer,
+      wait_op* op);
 
   // Cancel the timer operations associated with the given token. Returns the
   // number of operations that have been posted or dispatched.
-  template <typename Time_Traits>
-  std::size_t cancel_timer(timer_queue<Time_Traits>& queue,
-      typename timer_queue<Time_Traits>::per_timer_data& timer,
+  template <typename TimeTraits, typename Allocator>
+  std::size_t cancel_timer(timer_queue<TimeTraits, Allocator>& queue,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& timer,
       std::size_t max_cancelled = (std::numeric_limits<std::size_t>::max)());
 
+  // Cancel the timer operations associated with the given key.
+  template <typename TimeTraits, typename Allocator>
+  void cancel_timer_by_key(timer_queue<TimeTraits, Allocator>& queue,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data* timer,
+      void* cancellation_key);
+
   // Move the timer operations associated with the given timer.
-  template <typename Time_Traits>
-  void move_timer(timer_queue<Time_Traits>& queue,
-      typename timer_queue<Time_Traits>::per_timer_data& target,
-      typename timer_queue<Time_Traits>::per_timer_data& source);
+  template <typename TimeTraits, typename Allocator>
+  void move_timer(timer_queue<TimeTraits, Allocator>& queue,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& target,
+      typename timer_queue<TimeTraits, Allocator>::per_timer_data& source);
 
   // Run /dev/poll once until interrupted or events are ready to be dispatched.
   ASIO_DECL void run(long usec, op_queue<operation>& ops);
@@ -208,6 +235,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

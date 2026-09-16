@@ -49,10 +49,10 @@ private:
 	void key_h_w(u8 data);
 	u8 key_r();
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay51013_device> m_uart;
@@ -335,7 +335,7 @@ void zms8085_state::zephyr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zms8085_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &zms8085_state::io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(15.582_MHz_XTAL, 980, 0, 800, 265, 0, 250);
 	screen.set_screen_update(FUNC(zms8085_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST55_LINE, ASSERT_LINE);
@@ -376,4 +376,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_IS_SKELETON )
+COMP( 1979, zephyr, 0, 0, zephyr, zephyr, zms8085_state, empty_init, "Zentec", "Zephyr (00-441-01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

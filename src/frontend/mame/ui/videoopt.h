@@ -22,7 +22,7 @@ namespace ui {
 class menu_video_targets : public menu
 {
 public:
-	menu_video_targets(mame_ui_manager &mui, render_container &container);
+	menu_video_targets(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_video_targets() override;
 
 private:
@@ -34,15 +34,15 @@ private:
 class menu_video_options : public menu
 {
 public:
-	menu_video_options(mame_ui_manager &mui, render_container &container, std::string_view title, render_target &target, bool snapshot);
+	menu_video_options(mame_ui_manager &mui, render_target &target, std::string_view title, render_target &config_target, bool is_snapshot);
 	virtual ~menu_video_options() override;
 
 private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	render_target &m_target;
-	bool const m_snapshot;
+	render_target &m_config_target;
+	bool const m_is_snapshot;
 };
 
 } // namespace ui

@@ -95,8 +95,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	}
 
 
-	const uint32_t page1_addr = 0x40 * m_video_regs[0x20];
-	const uint32_t page2_addr = 0x40 * m_video_regs[0x21];
+	const uint32_t page1_addr = m_video_regs[0x20];
+	const uint32_t page2_addr = m_video_regs[0x21];
 	const uint32_t sprite_addr = 0x40 * m_video_regs[0x22];
 
 	uint16_t *page1_scroll = m_video_regs + 0x10;
@@ -110,9 +110,9 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(false, false, false, 0, cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
-			m_renderer->draw_page(false, false, false, 0, cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
-			m_renderer->draw_sprites(false, 0, false, 0, false, cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
+			m_renderer->draw_page(cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
+			m_renderer->draw_page(cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
+			m_renderer->draw_sprites(cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -131,7 +131,11 @@ void spg2xx_video_device::do_sprite_dma(uint32_t len)
 
 	for (uint32_t j = 0; j < len; j++)
 	{
-		m_spriteram[(dst + j) & 0x3ff] = mem.read_word(src + j);
+		int dest = dst + j;
+		// jak_dpma does a full length transfer offset from the start, which causes corruption
+		// on the options screen if we wrap, assume DMA just writes to nowhere if it goes out of bounds
+		if (dest < 0x400)
+			m_spriteram[dest] = mem.read_word(src + j);
 	}
 
 	m_video_regs[0x72] = 0;
@@ -203,11 +207,11 @@ uint16_t spg2xx_video_device::video_r(offs_t offset)
 		return m_renderer->get_video_reg_42();
 
 	case 0x62: // Video IRQ Enable
-		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Enable: %04x\n", VIDEO_IRQ_ENABLE);
+		LOGMASKED(LOG_IRQS, "%s: video_r: Video IRQ Enable: %04x\n", machine().describe_context(), VIDEO_IRQ_ENABLE);
 		return VIDEO_IRQ_ENABLE;
 
 	case 0x63: // Video IRQ Status
-		LOGMASKED(LOG_IRQS, "video_r: Video IRQ Status: %04x\n", VIDEO_IRQ_STATUS);
+		LOGMASKED(LOG_IRQS, "%s: video_r: Video IRQ Status: %04x\n", machine().describe_context(), VIDEO_IRQ_STATUS);
 		return VIDEO_IRQ_STATUS;
 
 	default:
@@ -346,7 +350,10 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 	case 0x37: // IRQ pos H
 		m_video_regs[offset] = data & 0x01ff;
 		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Position: %04x,%04x (%04x)\n", m_video_regs[0x37], m_video_regs[0x36], 0x2800 | offset);
-		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] < 240)
+		// Some smartvad games, stvscri, and some smartcyc games set the scanline IRQ to 240 and need it to trigger to progress.
+		// should that be treated as valid, or is it intentionally disabling it for some other reason?
+		// documentation suggests that 0-239 is the valid range, but could be incorrect
+		if (m_video_regs[0x37] < 160 && m_video_regs[0x36] <= 240)
 			m_screenpos_timer->adjust(m_screen->time_until_pos(m_video_regs[0x36], m_video_regs[0x37] << 1));
 		else
 			m_screenpos_timer->adjust(attotime::never);
@@ -388,7 +395,7 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 
 	case 0x62: // Video IRQ Enable
 	{
-		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		LOGMASKED(LOG_IRQS, "%s: video_w: Video IRQ Enable = %04x (DMA:%d, Timing:%d, Blanking:%d)\n", machine().describe_context(), data, BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_ENABLE = data & 0x0007;
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
@@ -399,7 +406,7 @@ void spg2xx_video_device::video_w(offs_t offset, uint16_t data)
 
 	case 0x63: // Video IRQ Acknowledge
 	{
-		LOGMASKED(LOG_IRQS, "video_w: Video IRQ Acknowledge = %04x\n", data);
+		LOGMASKED(LOG_IRQS, "%s: video_w: Video IRQ Acknowledge = %04x\n", machine().describe_context(), data);
 		const uint16_t old = VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS;
 		VIDEO_IRQ_STATUS &= ~data;
 		const uint16_t changed = old ^ (VIDEO_IRQ_ENABLE & VIDEO_IRQ_STATUS);
@@ -473,5 +480,5 @@ TIMER_CALLBACK_MEMBER(spg2xx_video_device::screenpos_hit)
 
 void spg2xx_video_device::device_add_mconfig(machine_config &config)
 {
-	SPG_RENDERER(config, m_renderer, 0);
+	SPG_RENDERER(config, m_renderer);
 }

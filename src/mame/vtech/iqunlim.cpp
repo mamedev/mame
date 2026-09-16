@@ -89,10 +89,10 @@ public:
 	void iqunlim(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -119,12 +119,12 @@ void iqunlim_state::machine_start()
 void iqunlim_state::machine_reset()
 {
 	// Copy ROM vectors into RAM
-	memcpy(m_ram->pointer(), memregion("maincpu")->base(), 0x8);
+	memcpy(m_ram->pointer(), memregion("ipl")->base(), 0x100);
 }
 
 void iqunlim_state::mem_map(address_map &map)
 {
-	map(0x02000000, 0x023fffff).rom().region("maincpu", 0); // 68EZ328 /CSA0 pin selects System ROM after bootup
+	map(0x02000000, 0x023fffff).rom().region("ipl", 0); // 68EZ328 /CSA0 pin selects System ROM after bootup
 	map(0x03000000, 0x0307ffff).ram(); // Region used by the internal flash memory
 	map(0x04000000, 0x04ffffff).rw(FUNC(iqunlim_state::card4x_r), FUNC(iqunlim_state::card4x_w)); // Region used by Card B
 	map(0x05000000, 0x05ffffff).rw(FUNC(iqunlim_state::card5x_r), FUNC(iqunlim_state::card5x_w)); // Region used by Card A
@@ -193,13 +193,13 @@ void iqunlim_state::iqunlim(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("2M");
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(480, 260);
 	m_screen->set_visarea(0, 480 - 1, 0, 260 - 1);
 	m_screen->set_screen_update(FUNC(iqunlim_state::screen_update));
 
-	MC68328_LCD(config, m_lcdctrl, 0);
+	MC68328_LCD(config, m_lcdctrl);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "iqunlim_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -209,16 +209,16 @@ void iqunlim_state::iqunlim(machine_config &config)
 }
 
 ROM_START( iqunlim )
-	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_REGION16_BE(0x400000, "ipl", 0)
 	ROM_LOAD16_WORD_SWAP( "27-06122-006.bin", 0x000000, 0x400000, CRC(811b1b19) SHA1(bac99ce408ed0a3b6449db88b363293b46ce69b9) )
 ROM_END
 
 ROM_START( iqunlimgr )
-	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_REGION16_BE(0x400000, "ipl", 0)
 	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x400000, CRC(2e99cfef) SHA1(790869ffcf7fd666def8ff57fce0691062b3cec5) )
 ROM_END
 
 } // anonymous namespace
 
-COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
-COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_IS_SKELETON) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlim,         0, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.
+COMP( 1995, iqunlimgr, iqunlim, 0, iqunlim, iqunlim, iqunlim_state, empty_init, "VTech / Integrated Systems Inc.", "IQ Unlimited (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // COPYRIGHT 1995 INTERGRATED SYSTEMS, INC.

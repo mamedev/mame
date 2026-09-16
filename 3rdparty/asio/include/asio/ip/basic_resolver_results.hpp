@@ -2,7 +2,7 @@
 // ip/basic_resolver_results.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ip {
 
 /// A range of entries produced by a resolver.
@@ -48,11 +49,7 @@ namespace ip {
  */
 template <typename InternetProtocol>
 class basic_resolver_results
-#if !defined(ASIO_NO_DEPRECATED)
-  : public basic_resolver_iterator<InternetProtocol>
-#else // !defined(ASIO_NO_DEPRECATED)
   : private basic_resolver_iterator<InternetProtocol>
-#endif // !defined(ASIO_NO_DEPRECATED)
 {
 public:
   /// The protocol type associated with the results.
@@ -93,14 +90,12 @@ public:
   {
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move constructor.
   basic_resolver_results(basic_resolver_results&& other)
     : basic_resolver_iterator<InternetProtocol>(
-        ASIO_MOVE_CAST(basic_resolver_results)(other))
+        static_cast<basic_resolver_results&&>(other))
   {
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
   /// Assignment operator.
   basic_resolver_results& operator=(const basic_resolver_results& other)
@@ -109,15 +104,13 @@ public:
     return *this;
   }
 
-#if defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   /// Move-assignment operator.
   basic_resolver_results& operator=(basic_resolver_results&& other)
   {
     basic_resolver_iterator<InternetProtocol>::operator=(
-        ASIO_MOVE_CAST(basic_resolver_results)(other));
+        static_cast<basic_resolver_results&&>(other));
     return *this;
   }
-#endif // defined(ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
 #if !defined(GENERATING_DOCUMENTATION)
   // Create results from an addrinfo list returned by getaddrinfo.
@@ -140,14 +133,20 @@ public:
       if (address_info->ai_family == ASIO_OS_DEF(AF_INET)
           || address_info->ai_family == ASIO_OS_DEF(AF_INET6))
       {
-        using namespace std; // For memcpy.
-        typename InternetProtocol::endpoint endpoint;
-        endpoint.resize(static_cast<std::size_t>(address_info->ai_addrlen));
-        memcpy(endpoint.data(), address_info->ai_addr,
-            address_info->ai_addrlen);
-        results.values_->push_back(
-            basic_resolver_entry<InternetProtocol>(endpoint,
-              actual_host_name, service_name));
+        const std::size_t expected_size =
+          address_info->ai_family == ASIO_OS_DEF(AF_INET)
+            ? sizeof(asio::detail::sockaddr_in4_type)
+            : sizeof(asio::detail::sockaddr_in6_type);
+        if (static_cast<std::size_t>(address_info->ai_addrlen) >= expected_size)
+        {
+          using namespace std; // For memcpy.
+          typename InternetProtocol::endpoint endpoint;
+          endpoint.resize(expected_size);
+          memcpy(endpoint.data(), address_info->ai_addr, expected_size);
+          results.values_->push_back(
+              basic_resolver_entry<InternetProtocol>(endpoint,
+                actual_host_name, service_name));
+        }
       }
       address_info = address_info->ai_next;
     }
@@ -230,19 +229,19 @@ public:
 #endif // !defined(GENERATING_DOCUMENTATION)
 
   /// Get the number of entries in the results range.
-  size_type size() const ASIO_NOEXCEPT
+  size_type size() const noexcept
   {
     return this->values_ ? this->values_->size() : 0;
   }
 
   /// Get the maximum number of entries permitted in a results range.
-  size_type max_size() const ASIO_NOEXCEPT
+  size_type max_size() const noexcept
   {
     return this->values_ ? this->values_->max_size() : values_type().max_size();
   }
 
   /// Determine whether the results range is empty.
-  bool empty() const ASIO_NOEXCEPT
+  bool empty() const noexcept
   {
     return this->values_ ? this->values_->empty() : true;
   }
@@ -252,7 +251,7 @@ public:
   {
     basic_resolver_results tmp(*this);
     tmp.index_ = 0;
-    return ASIO_MOVE_CAST(basic_resolver_results)(tmp);
+    return static_cast<basic_resolver_results&&>(tmp);
   }
 
   /// Obtain an end iterator for the results range.
@@ -274,7 +273,7 @@ public:
   }
 
   /// Swap the results range with another.
-  void swap(basic_resolver_results& that) ASIO_NOEXCEPT
+  void swap(basic_resolver_results& that) noexcept
   {
     if (this != &that)
     {
@@ -300,10 +299,11 @@ public:
   }
 
 private:
-  typedef std::vector<basic_resolver_entry<InternetProtocol> > values_type;
+  typedef std::vector<basic_resolver_entry<InternetProtocol>> values_type;
 };
 
 } // namespace ip
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

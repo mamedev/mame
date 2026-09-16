@@ -49,7 +49,7 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_mbc_char_cb(*this, 0)
 	, m_mbc_attr_cb(*this, 0)
 	, m_IR_pointer(0)
-	, m_screen1_address(0), m_screen2_address(0)
+	, m_screen1_address(0), m_screen2_address(0), m_screen2_address_start(0)
 	, m_cursor_address(0)
 	, m_irq_register(0), m_status_register(0), m_irq_mask(0)
 	, m_gfx_enabled(false)
@@ -121,6 +121,7 @@ void scn2674_device::device_start()
 	save_item(NAME(m_linecounter));
 	save_item(NAME(m_screen1_address));
 	save_item(NAME(m_screen2_address));
+	save_item(NAME(m_screen2_address_start));
 	save_item(NAME(m_cursor_address));
 	save_item(NAME(m_IR_pointer));
 	save_item(NAME(m_irq_register));
@@ -174,6 +175,7 @@ void scn2674_device::device_reset()
 {
 	m_screen1_address = 0;
 	m_screen2_address = 0;
+	m_screen2_address_start = 0;
 	m_cursor_address = 0;
 	m_irq_register = 0;
 	m_status_register = 0;
@@ -975,6 +977,7 @@ void scn2674_device::write_screen2_address(bool msb, uint8_t data)
 	}
 	else
 		m_screen2_address = (m_screen2_address & 0x3f00) | data;
+	m_screen2_address_start = m_screen2_address;
 }
 
 void scn2672_device::write_screen2_address(bool msb, uint8_t data)
@@ -1004,7 +1007,7 @@ void scn2674_device::recompute_parameters()
 	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, refresh.as_hz());
 
 	rectangle visarea(0, max_visible_x, 0, max_visible_y);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	m_linecounter = screen().vpos();
 	m_scanline_timer->adjust(screen().time_until_pos((m_linecounter + 1) % vert_pix_total, 0), 0, screen().scan_period());
@@ -1197,6 +1200,7 @@ TIMER_CALLBACK_MEMBER(scn2674_device::vblank_timer)
 		m_irq_register |= 0x10;
 		m_intr_cb(ASSERT_LINE);
 	}
+	m_screen2_address = m_screen2_address_start;
 }
 
 uint32_t scn2674_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

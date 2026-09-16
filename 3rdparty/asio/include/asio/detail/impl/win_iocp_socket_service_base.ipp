@@ -2,7 +2,7 @@
 // detail/impl/win_iocp_socket_service_base.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 win_iocp_socket_service_base::win_iocp_socket_service_base(
@@ -72,7 +73,7 @@ void win_iocp_socket_service_base::construct(
 void win_iocp_socket_service_base::base_move_construct(
     win_iocp_socket_service_base::base_implementation_type& impl,
     win_iocp_socket_service_base::base_implementation_type& other_impl)
-  ASIO_NOEXCEPT
+  noexcept
 {
   impl.socket_ = other_impl.socket_;
   other_impl.socket_ = invalid_socket;
@@ -410,9 +411,8 @@ void win_iocp_socket_service_base::start_send_op(
 
 void win_iocp_socket_service_base::start_send_to_op(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    WSABUF* buffers, std::size_t buffer_count,
-    const socket_addr_type* addr, int addrlen,
-    socket_base::message_flags flags, operation* op)
+    WSABUF* buffers, std::size_t buffer_count, const void* addr,
+    int addrlen, socket_base::message_flags flags, operation* op)
 {
   update_cancellation_thread_id(impl);
   iocp_service_.work_started();
@@ -423,8 +423,8 @@ void win_iocp_socket_service_base::start_send_to_op(
   {
     DWORD bytes_transferred = 0;
     int result = ::WSASendTo(impl.socket_, buffers,
-        static_cast<DWORD>(buffer_count),
-        &bytes_transferred, flags, addr, addrlen, op, 0);
+        static_cast<DWORD>(buffer_count), &bytes_transferred, flags,
+        static_cast<const socket_addr_type*>(addr), addrlen, op, 0);
     DWORD last_error = ::WSAGetLastError();
     if (last_error == ERROR_PORT_UNREACHABLE)
       last_error = WSAECONNREFUSED;
@@ -489,7 +489,7 @@ int win_iocp_socket_service_base::start_null_buffers_receive_op(
 
 void win_iocp_socket_service_base::start_receive_from_op(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    WSABUF* buffers, std::size_t buffer_count, socket_addr_type* addr,
+    WSABUF* buffers, std::size_t buffer_count, void* addr,
     socket_base::message_flags flags, int* addrlen, operation* op)
 {
   update_cancellation_thread_id(impl);
@@ -502,8 +502,8 @@ void win_iocp_socket_service_base::start_receive_from_op(
     DWORD bytes_transferred = 0;
     DWORD recv_flags = flags;
     int result = ::WSARecvFrom(impl.socket_, buffers,
-        static_cast<DWORD>(buffer_count),
-        &bytes_transferred, &recv_flags, addr, addrlen, op, 0);
+        static_cast<DWORD>(buffer_count), &bytes_transferred, &recv_flags,
+        static_cast<socket_addr_type*>(addr), addrlen, op, 0);
     DWORD last_error = ::WSAGetLastError();
     if (last_error == ERROR_PORT_UNREACHABLE)
       last_error = WSAECONNREFUSED;
@@ -549,7 +549,7 @@ void win_iocp_socket_service_base::start_accept_op(
 void win_iocp_socket_service_base::restart_accept_op(
     socket_type s, socket_holder& new_socket, int family, int type,
     int protocol, void* output_buffer, DWORD address_length,
-    long* cancel_requested, operation* op)
+    LONG* cancel_requested, operation* op)
 {
   new_socket.reset();
   iocp_service_.work_started();
@@ -608,7 +608,7 @@ void win_iocp_socket_service_base::start_reactor_op(
 
 int win_iocp_socket_service_base::start_connect_op(
     win_iocp_socket_service_base::base_implementation_type& impl,
-    int family, int type, const socket_addr_type* addr, std::size_t addrlen,
+    int family, int type, const void* addr, std::size_t addrlen,
     win_iocp_socket_connect_op_base* op, operation* iocp_op)
 {
   // If ConnectEx is available, use that.
@@ -642,7 +642,8 @@ int win_iocp_socket_service_base::start_connect_op(
       iocp_service_.work_started();
 
       BOOL result = connect_ex(impl.socket_,
-          addr, static_cast<int>(addrlen), 0, 0, 0, iocp_op);
+          static_cast<const socket_addr_type*>(addr),
+          static_cast<int>(addrlen), 0, 0, 0, iocp_op);
       DWORD last_error = ::WSAGetLastError();
       if (!result && last_error != WSA_IO_PENDING)
         iocp_service_.on_completion(iocp_op, last_error);
@@ -812,6 +813,7 @@ void* win_iocp_socket_service_base::interlocked_exchange_pointer(
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

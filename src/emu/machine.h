@@ -132,7 +132,7 @@ public:
 	configuration_manager  &configuration() const { assert(m_configuration != nullptr); return *m_configuration; }
 	output_manager  &output() const { assert(m_output != nullptr); return *m_output; }
 	ui_manager &ui() const { assert(m_ui != nullptr); return *m_ui; }
-	ui_input_manager &ui_input() const { assert(m_ui_input != nullptr); return *m_ui_input; }
+	ui_input_manager &ui_input() const noexcept;
 	crosshair_manager &crosshair() const { assert(m_crosshair != nullptr); return *m_crosshair; }
 	image_manager &image() const { assert(m_image != nullptr); return *m_image; }
 	rom_load_manager &rom_load() const { assert(m_rom_load != nullptr); return *m_rom_load; }
@@ -140,7 +140,6 @@ public:
 	debug_view_manager &debug_view() const { assert(m_debug_view != nullptr); return *m_debug_view; }
 	debugger_manager &debugger() const { assert(m_debugger != nullptr); return *m_debugger; }
 	natural_keyboard &natkeyboard() noexcept { assert(m_natkeyboard != nullptr); return *m_natkeyboard; }
-	template <class DriverClass> DriverClass *driver_data() const { return &downcast<DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
@@ -218,18 +217,22 @@ public:
 	std::unique_ptr<emu_file> steal_debuglogfile();
 
 private:
-	class side_effects_disabler {
+	class side_effects_disabler
+	{
+	private:
 		running_machine *m_machine;
 		bool m_disable_se;
 
 	public:
-		side_effects_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
-			if(m_disable_se)
+		side_effects_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se)
+		{
+			if (m_disable_se)
 				m_machine->disable_side_effects_count();
 		}
 
-		~side_effects_disabler() {
-			if(m_disable_se)
+		~side_effects_disabler()
+		{
+			if (m_disable_se)
 				m_machine->enable_side_effects_count();
 		}
 
@@ -237,8 +240,11 @@ private:
 		side_effects_disabler(side_effects_disabler &&) = default;
 	};
 
+	class log_file_helper;
+	using log_file_helper_ptr = std::unique_ptr<log_file_helper>;
+
 	void disable_side_effects_count() { m_side_effects_disabled++; }
-	void enable_side_effects_count()  { m_side_effects_disabled--; }
+	void enable_side_effects_count() { m_side_effects_disabled--; }
 
 	// internal helpers
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
@@ -252,9 +258,6 @@ private:
 	void nvram_save();
 	void popup_clear() const;
 	void popup_message(util::format_argument_pack<char> const &args) const;
-
-	// internal callbacks
-	void logfile_callback(const char *buffer);
 
 	// internal device helpers
 	void start_all_devices();
@@ -273,7 +276,7 @@ private:
 	std::unique_ptr<sound_manager> m_sound;            // internal data from sound.cpp
 	std::unique_ptr<video_manager> m_video;            // internal data from video.cpp
 	ui_manager *m_ui;                                  // internal data from ui.cpp
-	std::unique_ptr<ui_input_manager> m_ui_input;      // internal data from uiinput.cpp
+	std::unique_ptr<ui_input_manager_impl> m_ui_input; // internal data from uiinput.cpp
 	std::unique_ptr<tilemap_manager> m_tilemap;        // internal data from tilemap.cpp
 	std::unique_ptr<debug_view_manager> m_debug_view;  // internal data from debugvw.cpp
 	std::unique_ptr<network_manager> m_network;        // internal data from network.cpp
@@ -298,7 +301,7 @@ private:
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
 	int                     m_sample_rate;          // the digital audio sample rate
-	std::unique_ptr<emu_file>  m_logfile;           // pointer to the active error.log file
+	log_file_helper_ptr     m_logfile;              // pointer to the active error.log file
 	std::unique_ptr<emu_file>  m_debuglogfile;      // pointer to the active debug.log file
 
 	// load/save management

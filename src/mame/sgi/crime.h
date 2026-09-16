@@ -25,12 +25,12 @@ public:
 
 	crime_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	uint64_t base_r(offs_t offset, uint64_t mem_mask);
 	void base_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);

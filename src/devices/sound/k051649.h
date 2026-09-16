@@ -29,17 +29,17 @@ public:
 	void k052539_waveform_w(offs_t offset, u8 data);
 	u8 k052539_waveform_r(offs_t offset);
 
-	void scc_map(address_map &map);
+	void scc_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_post_load() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// parameters for a channel

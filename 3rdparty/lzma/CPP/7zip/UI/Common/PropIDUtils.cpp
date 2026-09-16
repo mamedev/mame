@@ -14,15 +14,15 @@
 
 #include "PropIDUtils.h"
 
-#ifndef _SFX
+#ifndef Z7_SFX
 #define Get16(x) GetUi16(x)
 #define Get32(x) GetUi32(x)
 #endif
 
 using namespace NWindows;
 
-static const unsigned kNumWinAtrribFlags = 21;
-static const char g_WinAttribChars[kNumWinAtrribFlags + 1] = "RHS8DAdNTsLCOIEV.X.PU";
+static const unsigned kNumWinAtrribFlags = 30;
+static const char g_WinAttribChars[kNumWinAtrribFlags + 1] = "RHS8DAdNTsLCOIEVvX.PU.M......B";
 
 /*
 FILE_ATTRIBUTE_
@@ -48,13 +48,14 @@ FILE_ATTRIBUTE_
 18 RECALL_ON_OPEN or EA
 19 PINNED
 20 UNPINNED
-21 STRICTLY_SEQUENTIAL
+21 STRICTLY_SEQUENTIAL  (10.0.16267)
 22 RECALL_ON_DATA_ACCESS
+29 STRICTLY_SEQUENTIAL  (10.0.17134+) (SMR Blob)
 */
 
 
 static const char kPosixTypes[16] = { '0', 'p', 'c', '3', 'd', '5', 'b', '7', '-', '9', 'l', 'B', 's', 'D', 'E', 'F' };
-#define MY_ATTR_CHAR(a, n, c) ((a) & (1 << (n))) ? c : '-';
+#define MY_ATTR_CHAR(a, n, c) (((a) & (1 << (n))) ? c : '-')
 
 static void ConvertPosixAttribToString(char *s, UInt32 a) throw()
 {
@@ -83,26 +84,34 @@ void ConvertWinAttribToString(char *s, UInt32 wa) throw()
 {
   /*
   some programs store posix attributes in high 16 bits.
-  p7zip - stores additional 0x8000 flag marker.
-  macos - stores additional 0x4000 flag marker.
-  info-zip - no additional marker.
+    p7zip - stores additional 0x8000 flag marker.
+    macos - stores additional 0x4000 flag marker.
+    info-zip - no additional marker.
+  But this code works with Attrib from internal 7zip code.
+  So we expect that 0x8000 marker is set, if there are posix attributes.
+  (DT_UNKNOWN == 0) type in high bits is possible in some case for linux files.
+  0x8000 flag is possible also in ReFS (Windows)?
   */
-  
-  bool isPosix = ((wa & 0xF0000000) != 0);
-  
+
+  const bool isPosix = (
+      (wa & 0x8000) != 0 // FILE_ATTRIBUTE_UNIX_EXTENSION;
+      // && (wa & 0xFFFF0000u) != 0
+      );
+ 
   UInt32 posix = 0;
   if (isPosix)
   {
     posix = wa >> 16;
-    wa &= (UInt32)0x3FFF;
+    if ((wa & 0xF0000000u) != 0)
+      wa &= (UInt32)0x3FFF;
   }
 
   for (unsigned i = 0; i < kNumWinAtrribFlags; i++)
   {
-    UInt32 flag = (1 << i);
-    if ((wa & flag) != 0)
+    const UInt32 flag = (UInt32)1 << i;
+    if (wa & flag)
     {
-      char c = g_WinAttribChars[i];
+      const char c = g_WinAttribChars[i];
       if (c != '.')
       {
         wa &= ~flag;
@@ -183,7 +192,7 @@ void ConvertPropertyToShortString2(char *dest, const PROPVARIANT &prop, PROPID p
     {
       if (prop.vt != VT_UI4)
         break;
-      UInt32 a = prop.ulVal;
+      const UInt32 a = prop.ulVal;
 
       /*
       if ((a & 0x8000) && (a & 0x7FFF) == 0)
@@ -207,7 +216,7 @@ void ConvertPropertyToShortString2(char *dest, const PROPVARIANT &prop, PROPID p
       ConvertUInt32ToString((UInt32)(prop.uhVal.QuadPart >> 48), dest);
       dest += strlen(dest);
       *dest++ = '-';
-      UInt64 low = prop.uhVal.QuadPart & (((UInt64)1 << 48) - 1);
+      const UInt64 low = prop.uhVal.QuadPart & (((UInt64)1 << 48) - 1);
       ConvertUInt64ToString(low, dest);
       return;
     }
@@ -243,6 +252,7 @@ void ConvertPropertyToShortString2(char *dest, const PROPVARIANT &prop, PROPID p
       return;
     }
     */
+    default: break;
   }
   
   ConvertPropVariantToShortString(prop, dest);
@@ -260,17 +270,12 @@ void ConvertPropertyToString2(UString &dest, const PROPVARIANT &prop, PROPID pro
   dest = temp;
 }
 
-#ifndef _SFX
-
-static inline unsigned GetHex(unsigned v)
-{
-  return (v < 10) ? ('0' + v) : ('A' + (v - 10));
-}
+#ifndef Z7_SFX
 
 static inline void AddHexToString(AString &res, unsigned v)
 {
-  res += (char)GetHex(v >> 4);
-  res += (char)GetHex(v & 0xF);
+  res.Add_Char((char)GET_HEX_CHAR_UPPER(v >> 4));
+  res.Add_Char((char)GET_HEX_CHAR_UPPER(v & 15));
 }
 
 /*
@@ -379,41 +384,41 @@ static const CServicesToName services_to_name[] =
   { { 0x38FB89B5, 0xCBC28419, 0x6D236C5C, 0x6E770057, 0x876402C0 } , "TrustedInstaller" }
 };
 
-static void ParseSid(AString &s, const Byte *p, UInt32 lim, UInt32 &sidSize)
+static void ParseSid(AString &s, const Byte *p, size_t lim /* , unsigned &sidSize */)
 {
-  sidSize = 0;
+  // sidSize = 0;
   if (lim < 8)
   {
     s += "ERROR";
     return;
   }
-  UInt32 rev = p[0];
-  if (rev != 1)
+  if (p[0] != 1) // rev
   {
     s += "UNSUPPORTED";
     return;
   }
-  UInt32 num = p[1];
-  if (8 + num * 4 > lim)
+  const unsigned num = p[1];
+  const unsigned sidSize_Loc = 8 + num * 4;
+  if (sidSize_Loc > lim)
   {
     s += "ERROR";
     return;
   }
-  sidSize = 8 + num * 4;
-  UInt32 authority = GetBe32(p + 4);
+  // sidSize = sidSize_Loc;
+  const UInt32 authority = GetBe32(p + 4);
 
   if (p[2] == 0 && p[3] == 0 && authority == 5 && num >= 1)
   {
-    UInt32 v0 = Get32(p + 8);
-    if (v0 < ARRAY_SIZE(sidNames))
+    const UInt32 v0 = Get32(p + 8);
+    if (v0 < Z7_ARRAY_SIZE(sidNames))
     {
       s += sidNames[v0];
       return;
     }
     if (v0 == 32 && num == 2)
     {
-      UInt32 v1 = Get32(p + 12);
-      int index = FindPairIndex(sid_32_Names, ARRAY_SIZE(sid_32_Names), v1);
+      const UInt32 v1 = Get32(p + 12);
+      const int index = FindPairIndex(sid_32_Names, Z7_ARRAY_SIZE(sid_32_Names), v1);
       if (index >= 0)
       {
         s += sid_32_Names[(unsigned)index].sz;
@@ -423,7 +428,7 @@ static void ParseSid(AString &s, const Byte *p, UInt32 lim, UInt32 &sidSize)
     if (v0 == 21 && num == 5)
     {
       UInt32 v4 = Get32(p + 8 + 4 * 4);
-      int index = FindPairIndex(sid_21_Names, ARRAY_SIZE(sid_21_Names), v4);
+      const int index = FindPairIndex(sid_21_Names, Z7_ARRAY_SIZE(sid_21_Names), v4);
       if (index >= 0)
       {
         s += sid_21_Names[(unsigned)index].sz;
@@ -432,7 +437,7 @@ static void ParseSid(AString &s, const Byte *p, UInt32 lim, UInt32 &sidSize)
     }
     if (v0 == 80 && num == 6)
     {
-      for (unsigned i = 0; i < ARRAY_SIZE(services_to_name); i++)
+      for (unsigned i = 0; i < Z7_ARRAY_SIZE(services_to_name); i++)
       {
         const CServicesToName &sn = services_to_name[i];
         int j;
@@ -457,39 +462,39 @@ static void ParseSid(AString &s, const Byte *p, UInt32 lim, UInt32 &sidSize)
   }
   for (UInt32 i = 0; i < num; i++)
   {
-    s += '-';
+    s.Add_Minus();
     s.Add_UInt32(Get32(p + 8 + i * 4));
   }
 }
 
-static void ParseOwner(AString &s, const Byte *p, UInt32 size, UInt32 pos)
+static void ParseOwner(AString &s, const Byte *p, size_t size, UInt32 pos)
 {
   if (pos > size)
   {
     s += "ERROR";
     return;
   }
-  UInt32 sidSize = 0;
-  ParseSid(s, p + pos, size - pos, sidSize);
+  // unsigned sidSize = 0;
+  ParseSid(s, p + pos, size - pos /* , sidSize */);
 }
 
-static void ParseAcl(AString &s, const Byte *p, UInt32 size, const char *strName, UInt32 flags, UInt32 offset)
+static void ParseAcl(AString &s, const Byte *p, size_t size, const char *strName, UInt32 flags, UInt32 offset)
 {
-  UInt32 control = Get16(p + 2);
+  const unsigned control = Get16(p + 2);
   if ((flags & control) == 0)
     return;
-  UInt32 pos = Get32(p + offset);
+  const UInt32 pos = Get32(p + offset);
   s.Add_Space();
   s += strName;
   if (pos >= size)
     return;
   p += pos;
-  size -= pos;
+  size -= (size_t)pos;
   if (size < 8)
     return;
   if (Get16(p) != 2) // revision
     return;
-  UInt32 num = Get32(p + 4);
+  const UInt32 num = Get32(p + 4);
   s.Add_UInt32(num);
   
   /*
@@ -547,7 +552,7 @@ static void ParseAcl(AString &s, const Byte *p, UInt32 size, const char *strName
 #define MY_SE_SELF_RELATIVE         (0x8000)
 */
 
-void ConvertNtSecureToString(const Byte *data, UInt32 size, AString &s)
+void ConvertNtSecureToString(const Byte *data, size_t size, AString &s)
 {
   s.Empty();
   if (size < 20 || size > (1 << 18))
@@ -566,44 +571,43 @@ void ConvertNtSecureToString(const Byte *data, UInt32 size, AString &s)
   ParseAcl(s, data, size, "s:", MY_SE_SACL_PRESENT, 12);
   ParseAcl(s, data, size, "d:", MY_SE_DACL_PRESENT, 16);
   s.Add_Space();
-  s.Add_UInt32(size);
-  // s += '\n';
+  s.Add_UInt32((UInt32)size);
+  // s.Add_LF();
   // s += Data_To_Hex(data, size);
 }
 
 #ifdef _WIN32
 
-static bool CheckSid(const Byte *data, UInt32 size, UInt32 pos) throw()
+static bool CheckSid(const Byte *data, size_t size, UInt32 pos) throw()
 {
   if (pos >= size)
     return false;
   size -= pos;
   if (size < 8)
     return false;
-  UInt32 rev = data[pos];
-  if (rev != 1)
+  if (data[pos] != 1) // rev
     return false;
-  UInt32 num = data[pos + 1];
+  const unsigned num = data[pos + 1];
   return (8 + num * 4 <= size);
 }
 
-static bool CheckAcl(const Byte *p, UInt32 size, UInt32 flags, UInt32 offset) throw()
+static bool CheckAcl(const Byte *p, size_t size, UInt32 flags, size_t offset) throw()
 {
-  UInt32 control = Get16(p + 2);
+  const unsigned control = Get16(p + 2);
   if ((flags & control) == 0)
     return true;
-  UInt32 pos = Get32(p + offset);
+  const UInt32 pos = Get32(p + offset);
   if (pos >= size)
     return false;
   p += pos;
   size -= pos;
   if (size < 8)
     return false;
-  UInt32 aclSize = Get16(p + 2);
+  const unsigned aclSize = Get16(p + 2);
   return (aclSize <= size);
 }
 
-bool CheckNtSecure(const Byte *data, UInt32 size) throw()
+bool CheckNtSecure(const Byte *data, size_t size) throw()
 {
   if (size < 20)
     return false;
@@ -653,7 +657,7 @@ static const CSecID2Name k_ReparseTags[] =
   { 0x80000026, "LX_BLK" }
 };
 
-bool ConvertNtReparseToString(const Byte *data, UInt32 size, UString &s)
+bool ConvertNtReparseToString(const Byte *data, size_t size, UString &s)
 {
   s.Empty();
   NFile::CReparseAttr attr;
@@ -681,27 +685,27 @@ bool ConvertNtReparseToString(const Byte *data, UInt32 size, UString &s)
     if (attr.MinorError)
       s += " : MINOR_ERROR";
     return true;
-    // s += " "; // for debug
+    // s.Add_Space(); // for debug
   }
 
   if (size < 8)
     return false;
-  UInt32 tag = Get32(data);
-  UInt32 len = Get16(data + 4);
+  const UInt32 tag = Get32(data);
+  const UInt32 len = Get16(data + 4);
   if (len + 8 > size)
     return false;
   if (Get16(data + 6) != 0) // padding
     return false;
 
   /*
-  #define _my_IO_REPARSE_TAG_DEDUP        (0x80000013L)
-  if (tag == _my_IO_REPARSE_TAG_DEDUP)
+  #define my_IO_REPARSE_TAG_DEDUP        (0x80000013L)
+  if (tag == my_IO_REPARSE_TAG_DEDUP)
   {
   }
   */
 
   {
-    int index = FindPairIndex(k_ReparseTags, ARRAY_SIZE(k_ReparseTags), tag);
+    const int index = FindPairIndex(k_ReparseTags, Z7_ARRAY_SIZE(k_ReparseTags), tag);
     if (index >= 0)
       s += k_ReparseTags[(unsigned)index].sz;
     else
@@ -713,7 +717,7 @@ bool ConvertNtReparseToString(const Byte *data, UInt32 size, UString &s)
     }
   }
 
-  s += ":";
+  s.Add_Colon();
   s.Add_UInt32(len);
 
   if (len != 0)
@@ -729,9 +733,9 @@ bool ConvertNtReparseToString(const Byte *data, UInt32 size, UString &s)
         s += "...";
         break;
       }
-      unsigned b = data[i];
-      s += (char)GetHex((b >> 4) & 0xF);
-      s += (char)GetHex(b & 0xF);
+      const unsigned b = data[i];
+      s.Add_Char((char)GET_HEX_CHAR_UPPER(b >> 4));
+      s.Add_Char((char)GET_HEX_CHAR_UPPER(b & 15));
     }
   }
 

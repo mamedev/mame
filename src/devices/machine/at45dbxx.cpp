@@ -162,8 +162,8 @@ void at45db041_device::nvram_default()
 
 bool at45db041_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_data[0], m_size, actual) && actual == m_size;
+	auto const [err, actual] = read(file, &m_data[0], m_size);
+	return !err && (actual == m_size);
 }
 
 //-------------------------------------------------
@@ -173,8 +173,8 @@ bool at45db041_device::nvram_read(util::read_stream &file)
 
 bool at45db041_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
+	auto const [err, actual] = write(file, &m_data[0], m_size);
+	return !err;
 }
 
 uint8_t at45db041_device::read_byte()

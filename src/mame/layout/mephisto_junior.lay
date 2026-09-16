@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -8,18 +9,14 @@ license:CC0-1.0
 
 <!-- schach labels -->
 
-	<element name="text_schach">
-		<rect><color red="0.11" green="0.105" blue="0.10" /></rect>
-		<text string="SCHACH"><color red="0.3" green="0.3" blue="0.31" /></text>
-	</element>
-	<element name="text_matt">
-		<rect><color red="0.11" green="0.105" blue="0.10" /></rect>
-		<text string="MATT"><color red="0.3" green="0.3" blue="0.31" /></text>
-	</element>
-	<element name="text_patt">
-		<rect><color red="0.11" green="0.105" blue="0.10" /></rect>
-		<text string="PATT"><color red="0.3" green="0.3" blue="0.31" /></text>
-	</element>
+	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="gray1"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="gray2"><rect><color red="0.11" green="0.105" blue="0.10" /></rect></element>
+	<element name="gray3"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
+
+	<element name="text_schach"><text string="SCHACH"><color red="0.3" green="0.3" blue="0.31" /></text></element>
+	<element name="text_matt"><text string="MATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
+	<element name="text_patt"><text string="PATT"><color red="0.3" green="0.3" blue="0.31" /></text></element>
 
 	<group name="labels">
 		<bounds x="0" y="0" width="22.5" height="6" />
@@ -210,11 +207,6 @@ license:CC0-1.0
 
 
 <!-- build screen -->
-
-	<element name="blackb"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="gray1"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
-	<element name="gray2"><rect><color red="0.11" green="0.105" blue="0.10" /></rect></element>
-	<element name="gray3"><rect><color red="0.21" green="0.2" blue="0.2" /></rect></element>
 
 	<view name="Internal Layout">
 		<bounds x="21" y="9.7" width="23" height="39.7" />

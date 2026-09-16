@@ -19,6 +19,10 @@ PAL16L8B 7H
 PAL16L8B 6H
 PAL16R6A 11H
 
+European versions were seen with either the MAY-01 and MAY-02,
+or MAY-04 and MAY-05 sprite ROMs. The latter is more common on newer versions,
+these contain data for alternative title screen graphics enabled with a DIP switch.
+
 */
 
 #include "emu.h"
@@ -46,12 +50,12 @@ class dietgo_state : public driver_device
 public:
 	dietgo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_rowscroll(*this, "rowscroll_%u", 1)
 		, m_spriteram(*this, "spriteram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_deco_tilegen(*this, "tilegen")
+		, m_tilegen(*this, "tilegen")
 		, m_deco104(*this, "ioprot104")
 		, m_sprgen(*this, "spritegen")
 	{ }
@@ -62,58 +66,58 @@ public:
 
 private:
 	// memory pointers
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr_array<uint16_t, 2> m_rowscroll;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
-	required_device<deco16ic_device> m_deco_tilegen;
+	required_device<deco16ic_device> m_tilegen;
 	required_device<deco104_device> m_deco104;
 	required_device<decospr_device> m_sprgen;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
+	int bank_callback(int bank);
 
-	uint16_t protection_region_0_104_r(offs_t offset);
-	void protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	uint16_t ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
 uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t flip = m_deco_tilegen->pf_control_r(0);
+	uint16_t const flip = m_tilegen->control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+	m_tilegen->update(m_rowscroll[0], m_rowscroll[1]);
 
-	bitmap.fill(256, cliprect); /* not verified */
+	bitmap.fill(256, cliprect); // not verified
 
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
 
-uint16_t dietgo_state::protection_region_0_104_r(offs_t offset)
+uint16_t dietgo_state::ioprot_r(offs_t offset)
 {
-	int real_address = 0 + (offset * 2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data(deco146_addr, cs);
+	uint16_t const data = m_deco104->read_data(deco146_addr, cs);
 	return data;
 }
 
-void dietgo_state::protection_region_0_104_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void dietgo_state::ioprot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int real_address = 0 + (offset * 2);
-	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int const real_address = 0 + (offset * 2);
+	int const deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data(deco146_addr, data, mem_mask, cs);
 }
@@ -122,15 +126,15 @@ void dietgo_state::protection_region_0_104_w(offs_t offset, uint16_t data, uint1
 void dietgo_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x20000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
-	map(0x210000, 0x211fff).w(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_w));
-	map(0x212000, 0x213fff).w(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_w));
-	map(0x220000, 0x2207ff).writeonly().share(m_pf_rowscroll[0]);
-	map(0x222000, 0x2227ff).writeonly().share(m_pf_rowscroll[1]);
+	map(0x200000, 0x20000f).w(m_tilegen, FUNC(deco16ic_device::control_w));
+	map(0x210000, 0x211fff).w(m_tilegen, FUNC(deco16ic_device::vram_w<0>));
+	map(0x212000, 0x213fff).w(m_tilegen, FUNC(deco16ic_device::vram_w<1>));
+	map(0x220000, 0x2207ff).writeonly().share(m_rowscroll[0]);
+	map(0x222000, 0x2227ff).writeonly().share(m_rowscroll[1]);
 	map(0x280000, 0x2807ff).ram().share(m_spriteram);
 	map(0x300000, 0x300bff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::protection_region_0_104_r), FUNC(dietgo_state::protection_region_0_104_w)).share("prot16ram"); // Protection device
-	map(0x380000, 0x38ffff).ram(); // mainram
+	map(0x340000, 0x343fff).rw(FUNC(dietgo_state::ioprot_r), FUNC(dietgo_state::ioprot_w)).share("prot16ram"); // Protection device
+	map(0x380000, 0x38ffff).ram();
 }
 
 void dietgo_state::decrypted_opcodes_map(address_map &map)
@@ -158,7 +162,7 @@ static INPUT_PORTS_START( dietgo )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -220,11 +224,20 @@ static INPUT_PORTS_START( dietgo )
 	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) // Demo_Sounds ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) // Demo_Sounds
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) ) // Players don't move in attract mode if on!?
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dietgon ) // New European version with optional alternative graphics
+	PORT_INCLUDE( dietgo )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x2000, 0x2000, "Alternative graphics" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -253,10 +266,13 @@ static const gfx_layout tile_16x16_layout =
 static GFXDECODE_START( gfx_dietgo )
 	GFXDECODE_ENTRY( "tiles",   0, tile_8x8_layout,     0, 32 )    // Tiles (8x8)
 	GFXDECODE_ENTRY( "tiles",   0, tile_16x16_layout,   0, 32 )    // Tiles (16x16)
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_dietgo_spr )
 	GFXDECODE_ENTRY( "sprites", 0, tile_16x16_layout, 512, 16 )    // Sprites (16x16)
 GFXDECODE_END
 
-DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
+int dietgo_state::bank_callback(int bank)
 {
 	return (bank & 0x70) << 8;
 }
@@ -264,17 +280,17 @@ DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 void dietgo_state::dietgo(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(28'000'000) / 2); // DE102 (verified on PCB)
+	M68000(config, m_maincpu, 28_MHz_XTAL / 2); // DE102 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dietgo_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &dietgo_state::decrypted_opcodes_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dietgo_state::irq6_line_hold));
 
-	H6280(config, m_audiocpu, XTAL(32'220'000) / 4 / 3);  // Custom chip 45; XIN is 32.220MHZ/4, verified on PCB
+	H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3); // Custom chip 45; XIN is 32.220MHZ/4, verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dietgo_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(40*8, 32*8);
@@ -286,24 +302,22 @@ void dietgo_state::dietgo(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_dietgo);
 
-	DECO16IC(config, m_deco_tilegen, 0);
-	m_deco_tilegen->set_pf1_size(DECO_64x32);
-	m_deco_tilegen->set_pf2_size(DECO_64x32);
-	m_deco_tilegen->set_pf1_col_bank(0x00);
-	m_deco_tilegen->set_pf2_col_bank(0x10);
-	m_deco_tilegen->set_pf1_col_mask(0x0f);
-	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(dietgo_state::bank_callback));
-	m_deco_tilegen->set_bank2_callback(FUNC(dietgo_state::bank_callback));
-	m_deco_tilegen->set_pf12_8x8_bank(0);
-	m_deco_tilegen->set_pf12_16x16_bank(1);
-	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
+	DECO16IC(config, m_tilegen);
+	m_tilegen->set_size<0>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_size<1>(deco16ic_device::DECO_64x32);
+	m_tilegen->set_col_bank<0>(0x00);
+	m_tilegen->set_col_bank<1>(0x10);
+	m_tilegen->set_col_mask<0>(0x0f);
+	m_tilegen->set_col_mask<1>(0x0f);
+	m_tilegen->set_bank_callback<0>(FUNC(dietgo_state::bank_callback));
+	m_tilegen->set_bank_callback<1>(FUNC(dietgo_state::bank_callback));
+	m_tilegen->set_8x8_bank(0);
+	m_tilegen->set_16x16_bank(1);
+	m_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	DECO_SPRITE(config, m_sprgen, 0);
-	m_sprgen->set_gfx_region(2);
-	m_sprgen->set_gfxdecode_tag("gfxdecode");
+	DECO_SPRITE(config, m_sprgen, "palette", gfx_dietgo_spr);
 
-	DECO104PROT(config, m_deco104, 0);
+	DECO104PROT(config, m_deco104);
 	m_deco104->port_a_cb().set_ioport("INPUTS");
 	m_deco104->port_b_cb().set_ioport("SYSTEM");
 	m_deco104->port_c_cb().set_ioport("DSW");
@@ -314,15 +328,38 @@ void dietgo_state::dietgo(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000) / 9)); // verified on PCB
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32.22_MHz_XTAL / 9)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	OKIM6295(config, "oki", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // verified on PCB
+	OKIM6295(config, "oki", 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // verified on PCB
 }
 
+ROM_START( dietgo ) // same version 1.1 and same program ROMs as dietgoe but newer sprite ROMs
+	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
+	ROM_LOAD16_BYTE( "jy_00-3.4h", 0x000001, 0x040000, CRC(a863ad0c) SHA1(61bf2fe5dce92e3995791a7e9ef813d64bcc2b93) )
+	ROM_LOAD16_BYTE( "jy_01-3.5h", 0x000000, 0x040000, CRC(ef243eda) SHA1(b8efbb80c5bf40ef6c26a06fc7232d6e63596cb4) )
 
-ROM_START( dietgo ) // same version 1.1 and same date as dietgoe but newer version in rom labels
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jy_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
+
+	ROM_REGION( 0x100000, "tiles", 0 )
+	ROM_LOAD( "may-00.10a", 0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "may-04_w78_9235kd011.14a", 0x000000, 0x100000, CRC(dedd2dd3) SHA1(c1021edb0b377a030ab9593c838083f0f3b996b2) )
+	ROM_LOAD( "may-05_w79_9235kd019.16a", 0x100000, 0x100000, CRC(cb23835f) SHA1(c504ff99f9029355f69e7fd7e9528d647bd491bf) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "may-03.11l", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8b_vd-00.6h",  0x0000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8b_vd-01.7h",  0x0200, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
+ROM_END
+
+ROM_START( dietgoe ) // same version 1.1 and same date as dietgoea but newer version in ROM labels
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-3.4h", 0x000001, 0x040000, CRC(a863ad0c) SHA1(61bf2fe5dce92e3995791a7e9ef813d64bcc2b93) )
 	ROM_LOAD16_BYTE( "jy_01-3.5h", 0x000000, 0x040000, CRC(ef243eda) SHA1(b8efbb80c5bf40ef6c26a06fc7232d6e63596cb4) )
@@ -346,7 +383,7 @@ ROM_START( dietgo ) // same version 1.1 and same date as dietgoe but newer versi
 	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
-ROM_START( dietgoe ) // weird, still version 1.1 and same date
+ROM_START( dietgoea ) // weird, still version 1.1 and same date
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-2.4h", 0x000001, 0x040000, CRC(014dcf62) SHA1(1a28ce4a643ec8b6f062b1200342ed4dc6db38a1) )
 	ROM_LOAD16_BYTE( "jy_01-2.5h", 0x000000, 0x040000, CRC(793ebd83) SHA1(b9178f18ce6e9fca848cbbf9dce3f3856672bf94) )
@@ -370,7 +407,7 @@ ROM_START( dietgoe ) // weird, still version 1.1 and same date
 	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
-ROM_START( dietgoea ) // weird, still version 1.1 but different (earlier) date
+ROM_START( dietgoeb ) // weird, still version 1.1 but different (earlier) date
 	ROM_REGION( 0x80000, "maincpu", 0 ) // DE102 code (encrypted)
 	ROM_LOAD16_BYTE( "jy_00-1.4h", 0x000001, 0x040000, CRC(8bce137d) SHA1(55f5b1c89330803c6147f9656f2cabe8d1de8478) )
 	ROM_LOAD16_BYTE( "jy_01-1.5h", 0x000000, 0x040000, CRC(eca50450) SHA1(1a24117e3b1b66d7dbc5484c94cc2c627d34e6a3) )
@@ -452,8 +489,9 @@ void dietgo_state::init_dietgo()
 } // Anonymous namespace
 
 
-GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26 v3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoe,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26 v2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoea, dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgou,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dietgoj,  dietgo, dietgo, dietgo, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgo,   0,      dietgo, dietgon, dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoe,  dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoea, dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.09.26, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoeb, dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Europe v1.1 1992.08.04)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgou,  dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dietgoj,  dietgo, dietgo, dietgo,  dietgo_state, init_dietgo, ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)",         MACHINE_SUPPORTS_SAVE )

@@ -15,16 +15,7 @@
 #include "emu.h"
 #include "rx01.h"
 #include "cpu/rx01/rx01.h"
-#include "formats/basicdsk.h"
-
-static LEGACY_FLOPPY_OPTIONS_START( rx01 )
-	LEGACY_FLOPPY_OPTION(rx01, "img", "RX01 image", basicdsk_identify_default, basicdsk_construct_default, nullptr,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
+#include "formats/rx01_dsk.h"
 
 
 static const floppy_interface rx01_floppy_interface =
@@ -72,7 +63,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 	cpu.set_addrmap(AS_DATA, &rx01_device::secbuf_map);
 
 	for (auto &floppy : m_image)
-		LEGACY_FLOPPY(config, floppy, 0, &rx01_floppy_interface);
+		LEGACY_FLOPPY(config, floppy, &rx01_floppy_interface);
 }
 
 //-------------------------------------------------

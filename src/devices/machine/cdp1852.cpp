@@ -103,7 +103,7 @@ void cdp1852_device::device_reset()
 
 void cdp1852_device::clock_w(int state)
 {
-	if (m_clock_active != bool(state))
+	if (m_clock_active == bool(state))
 		return;
 
 	m_clock_active = bool(state);
@@ -116,7 +116,7 @@ void cdp1852_device::clock_w(int state)
 			m_data = m_read_data(0);
 
 			// signal processor
-			set_sr_line(0);
+			set_sr_line(false);
 		}
 		else
 		{
@@ -159,7 +159,18 @@ void cdp1852_device::set_sr_line(bool state)
 
 TIMER_CALLBACK_MEMBER(cdp1852_device::update_do)
 {
-	m_write_data(param);
+	if (!m_read_mode())
+	{
+		// input data into register
+		m_data = param;
+
+		// signal processor
+		set_sr_line(false);
+	}
+	else
+	{
+		m_write_data(param);
+	}
 }
 
 
@@ -192,7 +203,7 @@ uint8_t cdp1852_device::read()
 
 
 //-------------------------------------------------
-//  write - data write
+//  write - data write (synchronous)
 //-------------------------------------------------
 
 void cdp1852_device::write(uint8_t data)
@@ -203,5 +214,22 @@ void cdp1852_device::write(uint8_t data)
 		m_update_do_timer->adjust(attotime::zero, data);
 
 		m_new_data = true;
+	}
+}
+
+
+//-------------------------------------------------
+//  write_strobe - data write with asynchronous
+//  clock strobe
+//-------------------------------------------------
+
+void cdp1852_device::write_strobe(uint8_t data)
+{
+	if (!m_read_mode())
+	{
+		// output data
+		m_update_do_timer->adjust(attotime::zero, data);
+
+		m_clock_active = false;
 	}
 }

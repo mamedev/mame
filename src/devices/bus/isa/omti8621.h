@@ -35,6 +35,9 @@ public:
 	uint16_t read(offs_t offset, uint16_t mem_mask = 0xffff);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
+	// has issues booting with no HDD on PC version (at least)
+	static constexpr feature_type imperfect_features() { return feature::DISK; }
+
 protected:
 	static constexpr unsigned OMTI_MAX_LUN = 1;
 	static constexpr unsigned CDB_SIZE = 10;
@@ -47,11 +50,12 @@ protected:
 			uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
@@ -72,6 +76,7 @@ protected:
 	std::string cpu_context() const;
 
 private:
+	void sw_reset();
 	void fdc_irq_w(int state);
 	void fdc_drq_w(int state);
 	static void floppy_formats(format_registration &fr);
@@ -81,7 +86,7 @@ private:
 	void fd_extra_w(uint8_t data);
 	uint8_t fd_disk_chg_r();
 
-	void fdc_map(address_map &map);
+	void fdc_map(address_map &map) ATTR_COLD;
 
 	uint16_t m_jumper;
 
@@ -116,7 +121,9 @@ private:
 
 	uint8_t m_moten;
 
-	bool m_installed;
+	bool m_bios_enable;
+	uint32_t m_bios_base;
+	uint16_t m_esdi_base, m_fdc_base;
 
 	void clear_sense_data();
 	void set_sense_data(uint8_t code, const uint8_t * cdb);
@@ -131,8 +138,6 @@ private:
 	void copy_sectors(int32_t dst_addr, int32_t src_addr, uint8_t count, uint8_t lun);
 	void format_track(const uint8_t * cdb);
 	void set_esdi_defect_list(uint8_t lun, uint8_t head);
-
-	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 
 	void log_command(const uint8_t cdb[], const uint16_t cdb_length);
 	void log_data();
@@ -166,8 +171,8 @@ public:
 	uint32_t get_sector(int32_t diskaddr, uint8_t *buffer, uint32_t length, uint8_t lun);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(ISA16_OMTI8621_APOLLO, omti8621_apollo_device)

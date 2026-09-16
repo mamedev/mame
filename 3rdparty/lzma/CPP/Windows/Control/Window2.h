@@ -1,7 +1,7 @@
 // Windows/Control/Window2.h
 
-#ifndef __WINDOWS_CONTROL_WINDOW2_H
-#define __WINDOWS_CONTROL_WINDOW2_H
+#ifndef ZIP7_INC_WINDOWS_CONTROL_WINDOW2_H
+#define ZIP7_INC_WINDOWS_CONTROL_WINDOW2_H
 
 #include "../Window.h"
 
@@ -10,10 +10,12 @@ namespace NControl {
 
 class CWindow2: public CWindow
 {
+  // Z7_CLASS_NO_COPY(CWindow2)
+
   LRESULT DefProc(UINT message, WPARAM wParam, LPARAM lParam);
 public:
-  CWindow2(HWND newWindow = NULL): CWindow(newWindow){};
-  virtual ~CWindow2() {};
+  CWindow2(HWND newWindow = NULL): CWindow(newWindow) {}
+  virtual ~CWindow2() {}
 
   bool CreateEx(DWORD exStyle, LPCTSTR className, LPCTSTR windowName,
       DWORD style, int x, int y, int width, int height,
@@ -28,8 +30,8 @@ public:
   virtual LRESULT OnMessage(UINT message, WPARAM wParam, LPARAM lParam);
   virtual bool OnCreate(CREATESTRUCT * /* createStruct */) { return true; }
   // virtual LRESULT OnCommand(WPARAM wParam, LPARAM lParam);
-  virtual bool OnCommand(WPARAM wParam, LPARAM lParam, LRESULT &result);
-  virtual bool OnCommand(int code, int itemID, LPARAM lParam, LRESULT &result);
+  // bool OnCommand2(WPARAM wParam, LPARAM lParam, LRESULT &result);
+  virtual bool OnCommand(unsigned code, unsigned itemID, LPARAM lParam, LRESULT &result);
   virtual bool OnSize(WPARAM /* wParam */, int /* xSize */, int /* ySize */) { return false; }
   virtual bool OnNotify(UINT /* controlID */, LPNMHDR /* lParam */, LRESULT & /* result */) { return false; }
   virtual void OnDestroy() { PostQuitMessage(0); }
@@ -37,7 +39,7 @@ public:
   /*
   virtual LRESULT  OnHelp(LPHELPINFO helpInfo) { OnHelp(); }
   virtual LRESULT  OnHelp() {};
-  virtual bool OnButtonClicked(int buttonID, HWND buttonHWND);
+  virtual bool OnButtonClicked(unsigned buttonID, HWND buttonHWND);
   virtual void OnOK() {};
   virtual void OnCancel() {};
   */

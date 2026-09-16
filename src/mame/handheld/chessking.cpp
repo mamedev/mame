@@ -60,10 +60,10 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void chesskng(machine_config &config);
+	void chesskng(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -74,8 +74,12 @@ private:
 	required_device<beep_device> m_beeper;
 	required_device<generic_slot_device> m_cart;
 
-	void chesskng_map(address_map &map);
-	void chesskng_io(address_map &map);
+	uint8_t m_3f_data = 0;
+	uint8_t m_cart_bank = 0;
+	uint16_t m_beeper_freq = 0;
+
+	void chesskng_map(address_map &map) ATTR_COLD;
+	void chesskng_io(address_map &map) ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	uint8_t cartridge_r(offs_t offset);
@@ -96,10 +100,6 @@ private:
 	void unk_6f_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	uint8_t m_3f_data = 0;
-	uint8_t m_cart_bank = 0;
-	uint16_t m_beeper_freq = 0;
 };
 
 void chessking_state::machine_start()
@@ -189,12 +189,9 @@ DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
 
 uint8_t chessking_state::cartridge_r(offs_t offset)
 {
-	// bank 1 selects main rom
-	if (m_cart_bank == 1)
+	if (m_cart_bank == 1) // bank 1 selects main rom
 		return m_mainrom[offset & 0x3ffff];
-
-	// banks 4-7 go to cartridge
-	else if (m_cart_bank >= 4)
+	else if (m_cart_bank >= 4) // banks 4-7 go to cartridge
 		return m_cart->read_rom(offset | (m_cart_bank & 3) << 19);
 
 	// other banks: maybe cartridge too?
@@ -327,7 +324,7 @@ void chessking_state::chesskng(machine_config &config)
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 160);
 	m_screen->set_visarea_full();
@@ -336,7 +333,7 @@ void chessking_state::chesskng(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 0);
+	BEEP(config, m_beeper);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// Cartridge

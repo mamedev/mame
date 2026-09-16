@@ -33,8 +33,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<digitalker_device> m_digitalker;
 
-	void program_map(address_map &map);
-	void io_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -107,4 +107,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 198?, bnstlkr, 0, cleartone, cleartone, cleartone_state, empty_init, ROT0, "Cleartone Leisure Ltd.", "Bonus Talker", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 198?, bnstlkr, 0, cleartone, cleartone, cleartone_state, empty_init, ROT0, "Cleartone Leisure Ltd.", "Bonus Talker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

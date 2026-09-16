@@ -51,7 +51,7 @@ Space Invaders X.L. (dumped)          Planet of the Apes (2001 remake)
 Iron Soldier 3 (dumped)
 Ballistic (dumped)                    Samplers/Demos Released
 The Next Tetris (dumped)              -----------------------
-Crayon Shin-chan 3 (not dumped?)      Interactive Sampler (three different versions)
+Crayon Shin-chan 3 (dumped)           Interactive Sampler (three different versions)
                                       Nuon Games + Demos (collection from Nuon-Dome)
                                       Nuon-Dome PhillyClassic 5 Demo Disc (give-away collection)
                                       Motorola BlackBird Demonstration Pack
@@ -245,7 +245,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 uint32_t n5xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -279,7 +279,7 @@ void n5xx_state::n501(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &n5xx_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: all wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
@@ -324,4 +324,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 2001, n501, 0, 0, n501, n501, n5xx_state, empty_init, "Samsung", "Samsung NUON Enhanced DVD Player / DVD-N501", MACHINE_IS_SKELETON )
+SYST( 2001, n501, 0, 0, n501, n501, n5xx_state, empty_init, "Samsung", "Samsung NUON Enhanced DVD Player / DVD-N501", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

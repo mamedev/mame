@@ -89,8 +89,8 @@ class address_map_entry
 			return &dynamic_cast<T &>(obj);
 	}
 
-	template <typename T> static std::enable_if_t<emu::detail::is_device_implementation<T>::value, const char *> get_tag(T &obj) { return obj.tag(); }
-	template <typename T> static std::enable_if_t<emu::detail::is_device_interface<T>::value, const char *> get_tag(T &obj) { return obj.device().tag(); }
+	template <emu::detail::device_implementation_class T> static const char *get_tag(T const &obj) { return obj.tag(); }
+	template <emu::detail::device_interface_class T> static const char *get_tag(T const &obj) { return obj.device().tag(); }
 
 public:
 	// construction/destruction
@@ -156,6 +156,30 @@ public:
 	address_map_entry &portr(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
 	address_map_entry &portw(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
 	address_map_entry &portrw(const char *tag) { portr(tag); portw(tag); return *this; }
+
+	template<bool req> address_map_entry &portr(ioport_finder<req> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		m_read.m_type = AMH_PORT;
+		m_read.m_tag = target.second;
+		return *this;
+	}
+
+	template<bool req> address_map_entry &portw(ioport_finder<req> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		m_write.m_type = AMH_PORT;
+		m_write.m_tag = target.second;
+		return *this;
+	}
+
+	template<bool req> address_map_entry &portrw(ioport_finder<req> &finder) {
+		const std::pair<device_t &, const char *> target(finder.finder_target());
+		assert(&target.first == &m_devbase);
+		m_write.m_type = m_read.m_type = AMH_PORT;
+		m_write.m_tag  = m_read.m_tag = target.second;
+		return *this;
+	}
 
 	// memory bank configuration
 	address_map_entry &bankr(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }

@@ -48,7 +48,7 @@
  You can find the latest version of the doc at http://www.romhacking.net/docs/362/
 
  A lot of details have been based on the researches carried on at NesDev forums (by Blargg, Quietust and many more)
- and collected on the NesDev Wiki http://wiki.nesdev.com/
+ and collected on the NesDev Wiki https://www.nesdev.org/wiki
 
  Particular thanks go to
  - Martin Freij for his work on NEStopia
@@ -840,8 +840,7 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		const char *slot_string = "nrom";
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))

@@ -9,7 +9,7 @@
 /*
 
 Enterprise Sixty Four / Enterprise One Two Eight
-Enterprise Computers Ltd. 1985
+Developed by Intelligent Software, marketed by Enterprise Computers Ltd. 1985
 
 MAIN PCB Layout
 ---------------
@@ -159,7 +159,8 @@ Notes: (All IC's shown)
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "sound/dave.h"
+
+#include "dave.h"
 #include "nick.h"
 
 #include "softlist_dev.h"
@@ -214,8 +215,8 @@ private:
 	required_memory_region m_rom;
 	required_ioport_array<10> m_y;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t rd0_r();
 	void wr0_w(uint8_t data);
@@ -226,11 +227,11 @@ private:
 
 	void write_centronics_busy(int state);
 	int m_centronics_busy;
-	void dave_128k_mem(address_map &map);
-	void dave_64k_mem(address_map &map);
-	void dave_io(address_map &map);
-	void ep64_io(address_map &map);
-	void ep64_mem(address_map &map);
+	void dave_128k_mem(address_map &map) ATTR_COLD;
+	void dave_64k_mem(address_map &map) ATTR_COLD;
+	void dave_io(address_map &map) ATTR_COLD;
+	void ep64_io(address_map &map) ATTR_COLD;
+	void ep64_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -469,7 +470,7 @@ static INPUT_PORTS_START( ep64 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3 \xC2\xA3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(0x00a3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(U'£')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
@@ -582,7 +583,7 @@ void ep64_state::ep64(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ep64_state::ep64_io);
 
 	// video hardware
-	screen_device& screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device& screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT);
@@ -593,14 +594,14 @@ void ep64_state::ep64(machine_config &config)
 	m_nick->virq_wr_callback().set(m_dave, FUNC(dave_device::int1_w));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
+
 	DAVE(config, m_dave, XTAL(8'000'000));
 	m_dave->set_addrmap(AS_PROGRAM, &ep64_state::dave_64k_mem);
 	m_dave->set_addrmap(AS_IO, &ep64_state::dave_io);
 	m_dave->irq_wr().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
-	m_dave->add_route(0, "lspeaker", 0.25);
-	m_dave->add_route(1, "rspeaker", 0.25);
+	m_dave->add_route(0, "speaker", 0.25, 0);
+	m_dave->add_route(1, "speaker", 0.25, 1);
 
 	// devices
 	EP64_EXPANSION_BUS_SLOT(config, m_exp, nullptr);
@@ -608,7 +609,7 @@ void ep64_state::ep64(machine_config &config)
 	m_exp->set_io_space(m_dave, AS_IO);
 	m_exp->irq_wr().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_wr().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_exp->wait_wr().set_inputline(m_maincpu, Z80_INPUT_LINE_BOGUSWAIT);
+	m_exp->wait_wr().set_inputline(m_maincpu, Z80_INPUT_LINE_WAIT);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(ep64_state::write_centronics_busy));
@@ -621,12 +622,12 @@ void ep64_state::ep64(machine_config &config)
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette1->set_interface("ep64_cass");
-	m_cassette1->add_route(ALL_OUTPUTS, "lspeaker", 0.05);
+	m_cassette1->add_route(ALL_OUTPUTS, "speaker", 0.05, 0);
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->set_interface("ep64_cass");
-	m_cassette2->add_route(ALL_OUTPUTS, "rspeaker", 0.05);
+	m_cassette2->add_route(ALL_OUTPUTS, "speaker", 0.05, 1);
 
 	// internal RAM
 	RAM(config, m_ram).set_default_size("64K");
@@ -688,7 +689,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                 FULLNAME                     FLAGS
-COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, empty_init, "Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, empty_init, "Hegener + Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, empty_init, "Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                                        FULLNAME                     FLAGS
+COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, empty_init, "Intelligent Software / Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, empty_init, "Intelligent Software / Hegener + Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, empty_init, "Intelligent Software / Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

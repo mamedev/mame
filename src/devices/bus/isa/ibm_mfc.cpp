@@ -390,7 +390,7 @@ void isa8_ibm_mfc_device::device_add_mconfig(machine_config &config)
 	m_d71055c_1->in_pb_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_i_b));
 	m_d71055c_1->out_pc_callback().set(FUNC(isa8_ibm_mfc_device::ppi1_o_c));
 
-	I8251(config, m_d71051, 0);
+	I8251(config, m_d71051);
 
 	clock_device &usart_clock(CLOCK(config, "usart_clock", XTAL(4'000'000) / 8)); // 500KHz
 	usart_clock.signal_handler().set(FUNC(isa8_ibm_mfc_device::write_usart_clock));
@@ -403,12 +403,11 @@ void isa8_ibm_mfc_device::device_add_mconfig(machine_config &config)
 	m_d8253->set_clk<2>(XTAL(4'000'000) / 2);
 	m_d8253->out_handler<2>().set(m_d8253, FUNC(pit8253_device::write_clk1));
 
-	SPEAKER(config, "ymleft").front_left();
-	SPEAKER(config, "ymright").front_right();
+	SPEAKER(config, "ym", 2).front();
 	YM2164(config, m_ym2164, XTAL(4'000'000));
 	m_ym2164->irq_handler().set(FUNC(isa8_ibm_mfc_device::ibm_mfc_ym_irq));
-	m_ym2164->add_route(0, "ymleft", 1.00);
-	m_ym2164->add_route(1, "ymright", 1.00);
+	m_ym2164->add_route(0, "ym", 1.00, 0);
+	m_ym2164->add_route(1, "ym", 1.00, 1);
 }
 
 

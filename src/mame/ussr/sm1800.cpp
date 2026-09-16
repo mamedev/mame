@@ -51,13 +51,13 @@ private:
 	uint8_t porta_r();
 	uint8_t portc_r();
 	uint8_t m_irq_state = 0U;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	void sm1800_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 void sm1800_state::mem_map(address_map &map)
@@ -101,18 +101,21 @@ INTERRUPT_GEN_MEMBER(sm1800_state::vblank_interrupt)
 
 I8275_DRAW_CHARACTER_MEMBER( sm1800_state::crtc_display_pixels )
 {
+	using namespace i8275_attributes;
+
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint8_t const *const charmap = memregion("chargen")->base();
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp)
+	if (BIT(attrcode, VSP))
 		pixels = 0;
 
-	if (lten)
+	if (BIT(attrcode, LTEN))
 		pixels = 0xff;
 
-	if (rvv)
+	if (BIT(attrcode, RVV))
 		pixels ^= 0xff;
 
+	bool hlgt = BIT(attrcode, HLGT);
 	for(int i=0;i<8;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
@@ -172,7 +175,7 @@ void sm1800_state::sm1800(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(sm1800_state::irq_callback));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -193,7 +196,7 @@ void sm1800_state::sm1800(machine_config &config)
 	m_crtc->set_character_width(8);
 	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 }
 
 /* ROM definition */

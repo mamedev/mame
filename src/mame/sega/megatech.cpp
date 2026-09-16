@@ -48,8 +48,8 @@ Great Golf                                               610-0239-04
 Great Soccer                                             610-0239-05
 Out Run                    171-5783    837-6963-06       610-0239-06         MPR-11078      (Mask)        EPR-12368-06   (27256)   n/a
 Alien Syndrome             171-5783    837-6963-07       610-0239-07         MPR-11194      (232011)      EPR-12368-07   (27256)   n/a
-Shinobi                                                  610-0239-08
-Fantasy Zone                                             610-0239-09
+Shinobi                    171-5783    837-6963-08       610-0239-08         MPR-11706F     (832011)      EPR-12368-08   (27C256)  n/a
+Fantasy Zone               171-5783    837-6963-09       610-0239-09         MPR-10118      (831001)      EPR-12368-09   (27C256)  n/a
 After Burner               171-5784    837-6963-10       610-0239-10         315-5235       (custom)      MPR-11271-T    (834000)  EPR-12368-10 (27256)
 Great Football             171-5783    837-6963-19       610-0239-19         MPR-10576F     (831000)      EPR-12368-19   (27256)   n/a
 World Championship Soccer  171-5782    837-6963-21       610-0239-21         MPR-12607B     (uPD23C4000)  EPR-12368-21   (27256)   n/a
@@ -58,6 +58,7 @@ Ghouls'n Ghosts            171-5869A   -                 610-0239-23         MPR
 Super Hang On              171-5782    837-6963-24       610-0239-24         MPR-12640      (234000)      EPR-12368-24   (27256)   n/a
 Forgotten Worlds           171-5782    837-6963-26       610-0239-26         MPR-12672-H    (Mask)        EPR-12368-26   (27256)   n/a
 The Revenge Of Shinobi     171-5782    837-6963-28       610-0239-28         MPR-12675 S44  (uPD23C4000)  EPR-12368-28   (27C256)  n/a
+Parlour Games              171-5783    837-6963-29       610-0239-29         MPR-11404F     (831001)      EPR-12368-29   (27256)   n/a
 Arnold Palmer Tour Golf    171-5782    837-6963-31       610-0239-31         MPR-12645F     (834200A)     EPR-12368-31   (27256)   n/a
 Super Real Basketball      171-5782    837-6963-32       610-0239-32         MPR-12904F     (838200A)     EPR-12368-32   (27256)   n/a
 Tommy Lasorda Baseball     171-5782    837-6963-35       610-0239-35         MPR-12706F     (834200A)     EPR-12368-35   (27256)   n/a
@@ -121,8 +122,7 @@ public:
 	void init_mt_slot();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void megatech(machine_config &config);
@@ -160,8 +160,8 @@ private:
 	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_main(int state);
 
-	void megatech_bios_map(address_map &map);
-	void megatech_bios_portmap(address_map &map);
+	void megatech_bios_map(address_map &map) ATTR_COLD;
+	void megatech_bios_portmap(address_map &map) ATTR_COLD;
 
 	uint8_t m_mt_cart_select_reg = 0;
 	uint32_t m_bios_port_ctrl = 0;
@@ -215,12 +215,8 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Door 1") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_DOOR) PORT_NAME("Door 2") PORT_CODE(KEYCODE_E) PORT_TOGGLE
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -231,19 +227,20 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service coin") PORT_CODE(KEYCODE_9)
+	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Coin") PORT_CODE(KEYCODE_9)
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("BIOS_DSW0")
-	PORT_DIPNAME( 0x02, 0x02, "Coin slot 3" )
-	PORT_DIPSETTING(    0x00, "Inhibit" )
-	PORT_DIPSETTING(    0x02, "Accept" )
-	PORT_DIPNAME( 0x01, 0x01, "Coin slot 4" )
+	// Listed in the manual as a pair of switches
+	PORT_DIPNAME( 0x01, 0x01, "Coin Slot 4" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 	PORT_DIPSETTING(    0x01, "Accept" )
-	PORT_DIPNAME( 0x1c, 0x1c, "Coin slot 3/4 value" )
+	PORT_DIPNAME( 0x02, 0x02, "Coin Slot 3" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Inhibit" )
+	PORT_DIPSETTING(    0x02, "Accept" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Coin Slot 3/4 Value" ) PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
@@ -251,8 +248,8 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_8C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 credits" )
-	PORT_DIPNAME( 0xe0, 0x60, "Coin slot 2 value" )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0xe0, 0x60, "Coin Slot 2 Value" ) PORT_DIPLOCATION("SW1:6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
@@ -263,7 +260,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 
 	PORT_START("BIOS_DSW1")
-	PORT_DIPNAME( 0x0f, 0x01, "Coin Slot 1 value" )
+	PORT_DIPNAME( 0x0f, 0x01, "Coin Slot 1 Value" ) PORT_DIPLOCATION("SW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -274,13 +271,13 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_9C ) )
-	PORT_DIPSETTING(    0x0a, "1 coin/10 credits" )
-	PORT_DIPSETTING(    0x0b, "1 coin/11 credits" )
-	PORT_DIPSETTING(    0x0c, "1 coin/12 credits" )
-	PORT_DIPSETTING(    0x0d, "1 coin/13 credits" )
-	PORT_DIPSETTING(    0x0e, "1 coin/14 credits" )
-	PORT_DIPSETTING(    0x0f, "1 coin/15 credits" )
-	PORT_DIPNAME( 0xf0, 0xa0, "Time per credit" )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x0b, "1 Coin/11 Credits" )
+	PORT_DIPSETTING(    0x0c, "1 Coin/12 Credits" )
+	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits" )
+	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits" )
+	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits" )
+	PORT_DIPNAME( 0xf0, 0xa0, "Time Per Credit" ) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x10, "7:30" )
 	PORT_DIPSETTING(    0x20, "7:00" )
@@ -650,14 +647,6 @@ void mtech_state::screen_vblank_main(int state)
 		screen_vblank_megadriv(state);
 }
 
-void mtech_state::machine_start()
-{
-	md_ctrl_state::machine_start();
-
-	m_alarm_sound.resolve();
-	m_flash_screen.resolve();
-}
-
 void mtech_state::machine_reset()
 {
 	m_mt_bank_addr = 0;
@@ -733,7 +722,7 @@ void mtech_state::megatech(machine_config &config)
 
 	m_vdp->n_int().set_inputline(m_z80snd, 0);
 
-	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
+	screen_device &menu(SCREEN(config, "menu"));
 	// check frq
 	menu.set_raw(XTAL(10'738'635)/2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
@@ -744,8 +733,8 @@ void mtech_state::megatech(machine_config &config)
 	m_vdp1->set_screen("menu");
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
-	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

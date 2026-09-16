@@ -84,8 +84,6 @@ int sec_device::data_r(void)
 
 void sec_device::clk_w(int state)
 {
-	state = state ? 1 : 0;
-
 	if (m_clk ^ state)
 	{
 		if (!state)

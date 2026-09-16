@@ -15,23 +15,23 @@ class bus_mouse_device : public device_t
 {
 public:
 	// construction/destruction
-	bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto extint_callback() { return m_write_extint.bind(); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_x_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y_changed);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	uint8_t ppi_a_r();
 	uint8_t ppi_c_r();

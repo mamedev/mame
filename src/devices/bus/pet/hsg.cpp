@@ -93,7 +93,7 @@ void cbm8000_hsg_b_device::hsg_b_map(address_map &map)
 
 void cbm8000_hsg_a_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(EF9365_TAG, FUNC(ef9365_device::screen_update));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 512-1, 0, 512-1);
@@ -110,7 +110,7 @@ void cbm8000_hsg_a_device::device_add_mconfig(machine_config &config)
 
 void cbm8000_hsg_b_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(EF9366_TAG, FUNC(ef9365_device::screen_update));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);

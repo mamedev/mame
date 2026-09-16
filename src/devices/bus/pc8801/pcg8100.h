@@ -15,14 +15,14 @@ class pcg8100_device : public pc8801_exp_device
 public:
 	pcg8100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void io_map(address_map &map) override;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u8 m_pcg_data = 0;
 	u16 m_pcg_address = 0;

@@ -61,6 +61,7 @@ class a2bus_grappler_device_base : public device_t, public device_a2bus_card_int
 public:
 	// device_a2bus_card_interface implementation
 	virtual u8 read_c800(u16 offset) override;
+	virtual bool take_c800() const override { return true; }
 
 protected:
 	a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -76,8 +77,8 @@ protected:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// helpers
 	void set_rom_bank(u16 rom_bank);
@@ -237,13 +238,14 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(grappler); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// printer status inputs
@@ -289,7 +291,7 @@ u8 a2bus_grappler_device::read_c0nx(u8 offset)
 	if (BIT(offset, 0)) // A0 - printer status
 	{
 		return
-				0xf0U | // TODO: actually open bus
+				(get_open_bus() & 0xf0U) |
 				(busy_in() << 3) |
 				(pe_in() << 2) |
 				(slct_in() << 1) |
@@ -297,7 +299,7 @@ u8 a2bus_grappler_device::read_c0nx(u8 offset)
 	}
 	else
 	{
-		return 0xffU; // TODO: actually open bus
+		return get_open_bus();
 	}
 }
 
@@ -352,6 +354,12 @@ void a2bus_grappler_device::device_start()
 
 
 void a2bus_grappler_device::device_reset()
+{
+	reset_from_bus();
+}
+
+
+void a2bus_grappler_device::reset_from_bus()
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
 }
@@ -441,14 +449,15 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 protected:
 	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// ACK latch set input
 	void ack_w(int state);
@@ -497,7 +506,7 @@ INPUT_PORTS_START(grapplerplus)
 	PORT_DIPSETTING(   0x06, "Okidata 84 w/o Step II Graphics")
 	PORT_DIPSETTING(   0x05, "Apple Dot Matrix")
 	PORT_DIPSETTING(   0x07, "invalid")
-	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_grapplerplus_device_base, sw_msb, 0)
+	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a2bus_grapplerplus_device_base::sw_msb), 0)
 	PORT_DIPSETTING(   0x08, "Software Control")
 	PORT_DIPSETTING(   0x00, "Not Transmitted")
 INPUT_PORTS_END
@@ -519,6 +528,12 @@ void a2bus_grapplerplus_device_base::device_start()
 
 
 void a2bus_grapplerplus_device_base::device_reset()
+{
+	m_ack_latch = 1U;
+}
+
+
+void a2bus_grapplerplus_device_base::reset_from_bus()
 {
 	m_ack_latch = 1U;
 }
@@ -631,9 +646,9 @@ public:
 protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(grapplerplus); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// a2bus_grapplerplus_device_base implementation
@@ -855,10 +870,10 @@ protected:
 
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(bufgrapplerplus); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// helpers
 	template <typename T> void device_add_mconfig(machine_config &config, T &&mcu_clock);
@@ -871,7 +886,7 @@ private:
 	void buf_ack_w(int state);
 
 	// MCU I/O handlers
-	void mcu_io(address_map &map);
+	void mcu_io(address_map &map) ATTR_COLD;
 	void mcu_p2_w(u8 data);
 	u8 mcu_bus_r();
 	void mcu_bus_w(u8 data);

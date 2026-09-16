@@ -24,7 +24,7 @@ public:
 	void ksp10(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<tmp96c141_device> m_maincpu;
 };
@@ -57,4 +57,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(199?, ksp10, 0, 0, ksp10, ksp10, kawai_ksp10_state, empty_init, "Kawai Musical Instruments Manufacturing", "KSP10 Digital Piano", MACHINE_IS_SKELETON)
+SYST(199?, ksp10, 0, 0, ksp10, ksp10, kawai_ksp10_state, empty_init, "Kawai Musical Instruments Manufacturing", "KSP10 Digital Piano", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

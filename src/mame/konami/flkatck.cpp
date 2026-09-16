@@ -7,17 +7,22 @@
     Driver by:
         Manuel Abadia <emumanu+mame@gmail.com>
 
-NOTE: A USA version of Flak Attack is known to exist  - currently not dumped
+NOTE: A USA version of Flak Attack is known to exist - currently not dumped
 
 24MHz & 3.579545MHz OSCs
+
+TODO:
+- remove the bank 0 hack from get_tile_info_a. k007121 register 4 is supposed
+  to be 0xc0 on the press start screen, but if you insert a coin during demo
+  play, it won't update this register properly?
 
 ***************************************************************************/
 
 #include "emu.h"
 
-#include "konamipt.h"
 #include "k007452.h"
 #include "k007121.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
@@ -26,6 +31,7 @@ NOTE: A USA version of Flak Attack is known to exist  - currently not dumped
 #include "sound/k007232.h"
 #include "sound/ymopm.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -49,16 +55,15 @@ public:
 		m_k007121(*this, "k007121"),
 		m_k007232(*this, "k007232"),
 		m_watchdog(*this, "watchdog"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void flkatck(machine_config &config);
+	void flkatck(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -67,14 +72,12 @@ private:
 	required_memory_bank m_mainbank;
 
 	// video-related
-	tilemap_t *m_k007121_tilemap[2];
-	uint8_t m_flipscreen;
+	tilemap_t *m_tilemap[2];
 
 	// misc
 	required_ioport m_coin;
 	required_ioport_array<2> m_pl;
 	required_ioport_array<3> m_dsw;
-	uint8_t m_irq_enabled;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -82,25 +85,26 @@ private:
 	required_device<k007121_device> m_k007121;
 	required_device<k007232_device> m_k007232;
 	required_device<watchdog_timer_device> m_watchdog;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
+
+	TILE_GET_INFO_MEMBER(get_tile_info_a);
+	TILE_GET_INFO_MEMBER(get_tile_info_b);
+
+	void vram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(int state) { machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bankswitch_w(uint8_t data);
 	uint8_t ls138_r(offs_t offset);
 	void ls138_w(offs_t offset, uint8_t data);
-	void vram_w(offs_t offset, uint8_t data);
-	void k007121_regs_w(offs_t offset, uint8_t data);
-	TILE_GET_INFO_MEMBER(get_tile_info_a);
-	TILE_GET_INFO_MEMBER(get_tile_info_b);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+
 	void volume_callback(uint8_t data);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -110,26 +114,24 @@ private:
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_a)
 {
-	uint8_t ctrl_0 = m_k007121->ctrlram_r(0);
-	uint8_t ctrl_2 = m_k007121->ctrlram_r(2);
-	uint8_t ctrl_3 = m_k007121->ctrlram_r(3);
-	uint8_t ctrl_4 = m_k007121->ctrlram_r(4);
-	uint8_t ctrl_5 = m_k007121->ctrlram_r(5);
-	int attr = m_vram[tile_index];
-	int code = m_vram[tile_index + 0x400];
-	int bit0 = (ctrl_5 >> 0) & 0x03;
-	int bit1 = (ctrl_5 >> 2) & 0x03;
-	int bit2 = (ctrl_5 >> 4) & 0x03;
-	int bit3 = (ctrl_5 >> 6) & 0x03;
-	int bank = ((attr & 0x80) >> 7) |
-			((attr >> (bit0 + 2)) & 0x02) |
-			((attr >> (bit1 + 1)) & 0x04) |
-			((attr >> (bit2    )) & 0x08) |
-			((attr >> (bit3 - 1)) & 0x10) |
-			((ctrl_3 & 0x01) << 5);
-	int mask = (ctrl_4 & 0xf0) >> 4;
-
-	bank = (bank & ~(mask << 1)) | ((ctrl_4 & mask) << 1);
+	uint8_t const ctrl_0 = m_k007121->ctrl_r(0);
+	uint8_t const ctrl_2 = m_k007121->ctrl_r(2);
+	uint8_t const ctrl_3 = m_k007121->ctrl_r(3);
+	uint8_t const ctrl_4 = m_k007121->ctrl_r(4);
+	uint8_t const ctrl_5 = m_k007121->ctrl_r(5);
+	int const attr = m_vram[tile_index];
+	int const code = m_vram[tile_index + 0x400];
+	int const bit0 = (ctrl_5 >> 0) & 0x03;
+	int const bit1 = (ctrl_5 >> 2) & 0x03;
+	int const bit2 = (ctrl_5 >> 4) & 0x03;
+	int const bit3 = (ctrl_5 >> 6) & 0x03;
+	int bank = ((attr >> (bit0 + 3)) & 0x01) |
+			((attr >> (bit1 + 2)) & 0x02) |
+			((attr >> (bit2 + 1)) & 0x04) |
+			((attr >> (bit3 + 0)) & 0x08);
+	int const mask = (ctrl_4 & 0xf0) >> 4;
+	bank = (bank & ~mask) | (ctrl_4 & mask);
+	bank = ((attr & 0x80) >> 7) | (bank << 1) | ((ctrl_3 & 0x01) << 5);
 
 	if ((attr == 0x0d) && (!ctrl_0) && (!ctrl_2))
 		bank = 0;   /*  this allows the game to print text
@@ -143,13 +145,10 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_a)
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_b)
 {
-	int attr = m_vram[tile_index + 0x800];
-	int code = m_vram[tile_index + 0xc00];
+	int const attr = m_vram[tile_index + 0x800];
+	int const code = m_vram[tile_index + 0xc00];
 
-	tileinfo.set(0,
-			code,
-			(attr & 0x0f) + 16,
-			0);
+	tileinfo.set(0, code, (attr & 0x0f) + 16, 0);
 }
 
 
@@ -161,8 +160,14 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_b)
 
 void flkatck_state::video_start()
 {
-	m_k007121_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_a)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_k007121_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_a)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_tilemap[1]->set_transparent_pen(0);
+
+	m_k007121->register_tilemap(m_tilemap[0]);
+	m_k007121->register_tilemap(m_tilemap[1]);
+	m_k007121->set_spriteram(m_spriteram);
 }
 
 
@@ -176,28 +181,9 @@ void flkatck_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	if (offset & 0x800) // score
-		m_k007121_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
+		m_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 	else
-		m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
-}
-
-void flkatck_state::k007121_regs_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0x04:  // ROM bank select
-			if (data != m_k007121->ctrlram_r(4))
-				machine().tilemap().mark_all_dirty();
-			break;
-
-		case 0x07:  // flip screen + IRQ control
-			m_flipscreen = data & 0x08;
-			machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_irq_enabled = data & 0x02;
-			break;
-	}
-
-	m_k007121->ctrl_w(offset, data);
+		m_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -209,55 +195,44 @@ void flkatck_state::k007121_regs_w(offs_t offset, uint8_t data)
 
 uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0x100, cliprect);
+
+	// compute clipping
 	rectangle clip[2];
-	const rectangle &visarea = screen.visible_area();
-	// TODO: reversed polarity? Hard to say, FWIW Combat School uses this in reverse ...
-	uint16_t sprite_buffer = (m_k007121->ctrlram_r(3) & 8) * 0x100;
+	clip[0] = clip[1] = screen.visible_area();
 
-	if (m_flipscreen)
+	if (m_k007121->flipscreen())
 	{
-		clip[0] = visarea;
 		clip[0].max_x -= 40;
-
-		clip[1] = visarea;
-		clip[1].min_x = clip[1].max_x - 40;
-
-		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(0) - 56 );
-		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
-		m_k007121_tilemap[1]->set_scrollx(0, -16);
+		clip[1].min_x = clip[1].max_x - 39;
 	}
 	else
 	{
-		clip[0] = visarea;
 		clip[0].min_x += 40;
-
-		clip[1] = visarea;
 		clip[1].max_x = 39;
-		clip[1].min_x = 0;
-
-		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(0) - 40 );
-		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
-		m_k007121_tilemap[1]->set_scrollx(0, 0);
 	}
 
-	// compute clipping
 	clip[0] &= cliprect;
 	clip[1] &= cliprect;
 
+	// set scroll registers
+	int const scrollx = m_k007121->ctrl_r(0);
+	int const scrolly = m_k007121->ctrl_r(2);
+
+	if (!scrollx && !scrolly)
+		machine().tilemap().mark_all_dirty();
+
+	m_tilemap[0]->set_scrollx(0, scrollx - 40);
+	m_tilemap[0]->set_scrolly(0, scrolly);
+
 	// draw the graphics
-	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(0), m_gfxdecode->palette(), &m_spriteram[sprite_buffer], 0, 40, 0, screen.priority(), (uint32_t)-1, true);
-	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
+	m_k007121->sprites_draw(bitmap, clip[0], screen.priority(), (uint32_t)-1);
+	m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
+
 	return 0;
 }
 
-
-// machine
-INTERRUPT_GEN_MEMBER(flkatck_state::interrupt)
-{
-	if (m_irq_enabled)
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-}
 
 void flkatck_state::bankswitch_w(uint8_t data)
 {
@@ -272,7 +247,7 @@ void flkatck_state::bankswitch_w(uint8_t data)
 
 uint8_t flkatck_state::ls138_r(offs_t offset)
 {
-	int data = 0;
+	uint8_t data = 0;
 
 	switch ((offset & 0x1c) >> 2)
 	{
@@ -312,8 +287,8 @@ void flkatck_state::ls138_w(offs_t offset, uint8_t data)
 
 void flkatck_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).ram().w(FUNC(flkatck_state::k007121_regs_w));
-	map(0x0008, 0x03ff).ram();
+	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
+	map(0x0020, 0x005f).rw(m_k007121, FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 	map(0x0400, 0x041f).rw(FUNC(flkatck_state::ls138_r), FUNC(flkatck_state::ls138_w)); // inputs, DIPS, bankswitch, counters, sound command
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x1fff).ram().share(m_spriteram);
@@ -383,19 +358,8 @@ static INPUT_PORTS_START( flkatck )
 	KONAMI8_B12_UNK(2)
 INPUT_PORTS_END
 
-static const gfx_layout gfxlayout =
-{
-	8,8,
-	0x80000/32,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
 static GFXDECODE_START( gfx_flkatck )
-	GFXDECODE_ENTRY( "gfx", 0, gfxlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb, 0, 32 )
 GFXDECODE_END
 
 void flkatck_state::volume_callback(uint8_t data)
@@ -406,20 +370,13 @@ void flkatck_state::volume_callback(uint8_t data)
 
 void flkatck_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	m_mainbank->configure_entries(0, 3, &ROM[0x0000], 0x2000);
-
-	save_item(NAME(m_irq_enabled));
-	save_item(NAME(m_flipscreen));
+	uint8_t *rom = memregion("maincpu")->base();
+	m_mainbank->configure_entries(0, 3, &rom[0x0000], 0x2000);
 }
 
 void flkatck_state::machine_reset()
 {
 	m_k007232->set_bank(0, 1);
-
-	m_irq_enabled = 0;
-	m_flipscreen = 0;
 }
 
 void flkatck_state::flkatck(machine_config &config)
@@ -427,7 +384,6 @@ void flkatck_state::flkatck(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP, 3MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &flkatck_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(flkatck_state::interrupt));
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // NEC D780C-1
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flkatck_state::sound_map);
@@ -439,48 +395,60 @@ void flkatck_state::flkatck(machine_config &config)
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(37*8, 32*8);
-	screen.set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
 	screen.set_screen_update(FUNC(flkatck_state::screen_update));
 	screen.set_palette("palette");
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_flkatck);
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121, 0);
-	m_k007121->set_palette_tag("palette");
+	K007121(config, m_k007121, gfx_flkatck, "palette", "screen");
+	m_k007121->set_sprite_offsets(40, 16);
+	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
+	m_k007121->set_flipscreen_cb().set(FUNC(flkatck_state::flipscreen_w));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 
 	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(flkatck_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.50);
-	m_k007232->add_route(0, "rspeaker", 0.50);
-	m_k007232->add_route(1, "lspeaker", 0.50);
-	m_k007232->add_route(1, "rspeaker", 0.50);
+	m_k007232->add_route(0, "speaker", 0.30, 0);
+	m_k007232->add_route(0, "speaker", 0.30, 1);
+	m_k007232->add_route(1, "speaker", 0.30, 0);
+	m_k007232->add_route(1, "speaker", 0.30, 1);
 }
-
 
 
 ROM_START( mx5000 )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // 6309 code
-	ROM_LOAD( "669_r01.16c", 0x00000, 0x10000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) )
-
+	ROM_LOAD( "669_u01.16c", 0x00000, 0x10000, CRC(cef39f97) SHA1(6b754563b40815895ff3c07d53d71d470722c805) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites
-	ROM_LOAD( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
+	ROM_LOAD16_WORD_SWAP( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
+
+	ROM_REGION( 0x40000, "k007232", 0 )
+	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
+ROM_END
+
+
+ROM_START( mx5000r )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // 6309 code
+	ROM_LOAD( "669_r01.16c", 0x00000, 0x10000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites
+	ROM_LOAD16_WORD_SWAP( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
 
 	ROM_REGION( 0x40000, "k007232", 0 )
 	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
@@ -494,7 +462,7 @@ ROM_START( flkatck )
 	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites
-	ROM_LOAD( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
+	ROM_LOAD16_WORD_SWAP( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
 
 	ROM_REGION( 0x40000, "k007232", 0 )
 	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
@@ -509,14 +477,14 @@ ROM_START( flkatcka )
 	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites, same data as above set, on PWB 450593 sub-board instead.
-	ROM_LOAD16_BYTE( "669_f03a.4b", 0x00001, 0x10000, CRC(f0ed4c1e) SHA1(58efe3cd81054d22de54a7d195aa3b865bde4a01) )
-	ROM_LOAD16_BYTE( "669_f03e.4d", 0x00000, 0x10000, CRC(95a57a26) SHA1(c8aa30c2c734c0740630b1b04ae43c69931cc7c1) )
-	ROM_LOAD16_BYTE( "669_f03b.5b", 0x20001, 0x10000, CRC(e2593f3c) SHA1(aa0f6d04015650eaef17c4a39f228eaccf9a2948) )
-	ROM_LOAD16_BYTE( "669_f03f.5d", 0x20000, 0x10000, CRC(c6c9903e) SHA1(432ad6d03992499cc533273226944a666b40fa58) )
-	ROM_LOAD16_BYTE( "669_f03c.6b", 0x40001, 0x10000, CRC(47be92dd) SHA1(9ccc62d7d42fccbd5ad60e35e3a0478a04405cf1) )
-	ROM_LOAD16_BYTE( "669_f03g.6d", 0x40000, 0x10000, CRC(70d35fbd) SHA1(21384f738684c5da4a7a84a1c9aa173fffddf47a) )
-	ROM_LOAD16_BYTE( "669_f03d.7b", 0x60001, 0x10000, CRC(18d48f9e) SHA1(b95e38aa813e0f3a0dc6bd45fdb4bf71f7e2066c) )
-	ROM_LOAD16_BYTE( "669_f03h.7d", 0x60000, 0x10000, CRC(abfe76e7) SHA1(f8661f189308e83056ec442fa6c936efff67ba0a) )
+	ROM_LOAD16_BYTE( "669_f03a.4b", 0x00000, 0x10000, CRC(f0ed4c1e) SHA1(58efe3cd81054d22de54a7d195aa3b865bde4a01) )
+	ROM_LOAD16_BYTE( "669_f03e.4d", 0x00001, 0x10000, CRC(95a57a26) SHA1(c8aa30c2c734c0740630b1b04ae43c69931cc7c1) )
+	ROM_LOAD16_BYTE( "669_f03b.5b", 0x20000, 0x10000, CRC(e2593f3c) SHA1(aa0f6d04015650eaef17c4a39f228eaccf9a2948) )
+	ROM_LOAD16_BYTE( "669_f03f.5d", 0x20001, 0x10000, CRC(c6c9903e) SHA1(432ad6d03992499cc533273226944a666b40fa58) )
+	ROM_LOAD16_BYTE( "669_f03c.6b", 0x40000, 0x10000, CRC(47be92dd) SHA1(9ccc62d7d42fccbd5ad60e35e3a0478a04405cf1) )
+	ROM_LOAD16_BYTE( "669_f03g.6d", 0x40001, 0x10000, CRC(70d35fbd) SHA1(21384f738684c5da4a7a84a1c9aa173fffddf47a) )
+	ROM_LOAD16_BYTE( "669_f03d.7b", 0x60000, 0x10000, CRC(18d48f9e) SHA1(b95e38aa813e0f3a0dc6bd45fdb4bf71f7e2066c) )
+	ROM_LOAD16_BYTE( "669_f03h.7d", 0x60001, 0x10000, CRC(abfe76e7) SHA1(f8661f189308e83056ec442fa6c936efff67ba0a) )
 
 	ROM_REGION( 0x40000, "k007232", 0 )
 	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
@@ -525,6 +493,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, mx5000,   0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,   0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000 (version U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000r,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000 (version R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, version P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, version P, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

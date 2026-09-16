@@ -51,9 +51,9 @@ public:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 
-	required_device<sh3_device> m_maincpu;
+	required_device<sh7708s_device> m_maincpu;
 };
 
 uint32_t m119_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -99,12 +99,12 @@ INPUT_PORTS_END
 void m119_state::m119(machine_config &config)
 {
 	// basic machine hardware
-	SH3LE(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
+	SH7708S(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &m119_state::program_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(m119_state::irq2_line_hold));
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
@@ -114,12 +114,11 @@ void m119_state::m119(machine_config &config)
 	// TODO: UPD94244-210 VDP
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16'934'400)); // internal?
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -132,7 +131,7 @@ ROM_START( scumimon )
 	ROM_LOAD16_BYTE( "scu1.b-c1.ic2", 0x000001, 0x200000, CRC(adff81ba) SHA1(a176b9ab5b2f47abb89e817699d742dbf876a4c7) )
 
 	ROM_REGION(0x200000, "ymz", 0)
-	ROM_LOAD( "scu1.a-v0-.ic35", 0x000000, 0x100000, CRC(819e4bbd) SHA1(e0ca76a7b97b05bbffdb96866a8bdd460fc589b2) ) // FIXED BITS (xxxxxxxxxxxxx1xx)
+	ROM_LOAD( "scu1.a-v0-.ic35", 0x000000, 0x100000, CRC(ef52018d) SHA1(c64a8d1ce2f753ad100bb2fd04498a3f56c895c7) )
 
 	// TODO: 2x PLDs once identified
 ROM_END
@@ -140,4 +139,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, scumimon, 0, m119, m119, m119_state, empty_init, ROT0, "Irem", "Slotters Club: Umi Monogatari", MACHINE_IS_SKELETON ) // Ver PROGRAM 2000/09/14
+GAME( 2000, scumimon, 0, m119, m119, m119_state, empty_init, ROT0, "Irem", "Slotters Club: Umi Monogatari", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Ver PROGRAM 2000/09/14

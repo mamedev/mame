@@ -22,8 +22,8 @@ protected:
 	eeprom_parallel_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 class eeprom_parallel_28xx_device : public eeprom_parallel_base_device
@@ -47,8 +47,8 @@ protected:
 	eeprom_parallel_28xx_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// configuration state

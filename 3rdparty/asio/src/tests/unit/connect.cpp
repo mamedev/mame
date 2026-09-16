@@ -2,7 +2,7 @@
 // connect.cpp
 // ~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,23 +16,13 @@
 // Test that header file is self-contained.
 #include "asio/connect.hpp"
 
+#include <functional>
 #include <vector>
 #include "asio/detail/thread.hpp"
 #include "asio/ip/tcp.hpp"
-
-#if defined(ASIO_HAS_BOOST_BIND)
-# include <boost/bind/bind.hpp>
-#else // defined(ASIO_HAS_BOOST_BIND)
-# include <functional>
-#endif // defined(ASIO_HAS_BOOST_BIND)
-
 #include "unit_test.hpp"
 
-#if defined(ASIO_HAS_BOOST_BIND)
-namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
 namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
 using bindns::placeholders::_1;
 using bindns::placeholders::_2;
 
@@ -812,6 +802,13 @@ void test_async_connect_range()
   io_context.run();
   ASIO_CHECK(result == endpoints[1]);
   ASIO_CHECK(!ec);
+
+  asio::async_connect(socket, endpoints)(
+      bindns::bind(range_handler, _1, _2, &ec, &result));
+  io_context.restart();
+  io_context.run();
+  ASIO_CHECK(result == endpoints[1]);
+  ASIO_CHECK(!ec);
 }
 
 void test_async_connect_range_cond()
@@ -968,6 +965,13 @@ void test_async_connect_range_cond()
   io_context.run();
   ASIO_CHECK(result == asio::ip::tcp::endpoint());
   ASIO_CHECK(ec == asio::error::not_found);
+
+  asio::async_connect(socket, endpoints, false_cond)(
+      bindns::bind(range_handler, _1, _2, &ec, &result));
+  io_context.restart();
+  io_context.run();
+  ASIO_CHECK(result == asio::ip::tcp::endpoint());
+  ASIO_CHECK(ec == asio::error::not_found);
 }
 
 void test_async_connect_iter()
@@ -1008,6 +1012,13 @@ void test_async_connect_iter()
   endpoints.insert(endpoints.begin(), asio::ip::tcp::endpoint());
 
   asio::async_connect(socket, cendpoints.begin(), cendpoints.end(),
+      bindns::bind(iter_handler, _1, _2, &ec, &result));
+  io_context.restart();
+  io_context.run();
+  ASIO_CHECK(result == cendpoints.begin() + 1);
+  ASIO_CHECK(!ec);
+
+  asio::async_connect(socket, cendpoints.begin(), cendpoints.end())(
       bindns::bind(iter_handler, _1, _2, &ec, &result));
   io_context.restart();
   io_context.run();
@@ -1166,6 +1177,14 @@ void test_async_connect_iter_cond()
 
   asio::async_connect(socket, cendpoints.begin(), cendpoints.end(),
       false_cond, bindns::bind(iter_handler, _1, _2, &ec, &result));
+  io_context.restart();
+  io_context.run();
+  ASIO_CHECK(result == cendpoints.end());
+  ASIO_CHECK(ec == asio::error::not_found);
+
+  asio::async_connect(socket, cendpoints.begin(),
+      cendpoints.end(), false_cond)(
+        bindns::bind(iter_handler, _1, _2, &ec, &result));
   io_context.restart();
   io_context.run();
   ASIO_CHECK(result == cendpoints.end());

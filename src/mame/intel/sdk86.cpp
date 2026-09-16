@@ -59,11 +59,11 @@ private:
 	void digit_w(u8 data);
 	u8 kbd_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_digit = 0U;
-	void machine_start() override;
+	void machine_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<i8279_device> m_kdc;
@@ -120,8 +120,8 @@ static INPUT_PORTS_START( sdk86 )
 	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("X3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, sdk86_state, nmi_button, 0) PORT_CHAR('I')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Systm Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, sdk86_state, reset_button, 0) PORT_CHAR('N')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTR") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sdk86_state::nmi_button), 0) PORT_CHAR('I')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Systm Reset") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(sdk86_state::reset_button), 0) PORT_CHAR('N')
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(sdk86_state::nmi_button)
@@ -165,7 +165,6 @@ u8 sdk86_state::kbd_r()
 
 void sdk86_state::machine_start()
 {
-	m_digits.resolve();
 	save_item(NAME(m_digit));
 }
 
@@ -188,7 +187,7 @@ void sdk86_state::sdk86(machine_config &config)
 	config.set_default_layout(layout_sdk86);
 
 	/* Devices */
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_uart->rts_handler().set(m_uart, FUNC(i8251_device::write_cts));

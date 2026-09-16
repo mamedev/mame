@@ -26,8 +26,8 @@ public:
 	bit_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void input_tip(int state) override;
 	virtual void input_ring(int state) override;
@@ -58,7 +58,7 @@ bit_socket_device::bit_socket_device(
 
 void bit_socket_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config, m_stream, 0);
+	BITBANGER(config, m_stream);
 }
 
 

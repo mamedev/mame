@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic , Robbbert
+// copyright-holders:Miodrag Milanovic, Robbbert
 /*************************************************************************************
 
 Robotron Z9001 (KC85/1)
@@ -78,13 +78,13 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_framecnt = 0U;
 	bool m_cassbit = 0;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -252,7 +252,7 @@ void z9001_state::z9001(machine_config &config)
 	m_maincpu->set_daisy_config(z9001_daisy_chain);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(40*8, 24*8);
@@ -268,7 +268,7 @@ void z9001_state::z9001(machine_config &config)
 	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
 	TIMER(config, "z9001_timer").configure_periodic(FUNC(z9001_state::timer_callback), attotime::from_msec(10));
 

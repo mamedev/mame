@@ -27,6 +27,4 @@ mixer_device::mixer_device(const machine_config &mconfig, const char *tag, devic
 
 void mixer_device::device_start()
 {
-	// register for save states
-	save_item(NAME(m_dummy));
 }

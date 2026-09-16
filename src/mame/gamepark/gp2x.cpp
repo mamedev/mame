@@ -61,7 +61,7 @@ private:
 	uint32_t m_nand_ptr_temp = 0;
 	uint32_t m_timer = 0;
 	uint32_t screen_update_gp2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void gp2x_map(address_map &map);
+	void gp2x_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -370,15 +370,14 @@ void gp2x_state::gp2x(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 319, 0, 239);
 	screen.set_screen_update(FUNC(gp2x_state::screen_update_gp2x));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 } // anonymous namespace

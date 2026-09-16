@@ -117,12 +117,12 @@ private:
 #endif
 	void controls_w(uint8_t data);
 	uint8_t controls_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	void vblank_w(int state);
 	required_device<tms9995_device> m_maincpu;
-	void pachifev_cru(address_map &map);
-	void pachifev_map(address_map &map);
+	void pachifev_cru(address_map &map) ATTR_COLD;
+	void pachifev_map(address_map &map) ATTR_COLD;
 };
 
 void pachifev_state::controls_w(uint8_t data)
@@ -365,7 +365,7 @@ void pachifev_state::pachifev(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(FUNC(pachifev_state::vblank_w));
 
 	/* sound hardware */

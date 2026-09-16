@@ -29,8 +29,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// electron_cart_interface overrides
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;

@@ -78,9 +78,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -114,7 +114,7 @@ private:
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 class shootout_state : public shootoutj_state
@@ -136,11 +136,9 @@ private:
 	uint8_t sound_cpu_command_r();
 	void sound_cpu_command_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 };
-
-// video
 
 void shootoutj_state::palette(palette_device &palette) const
 {
@@ -148,21 +146,24 @@ void shootoutj_state::palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
+		int bit0, bit1, bit2;
+
 		// red component
-		int bit0 = BIT(color_prom[i], 0);
-		int bit1 = BIT(color_prom[i], 1);
-		int bit2 = BIT(color_prom[i], 2);
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// blue component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i], 6);
-		bit2 = BIT(color_prom[i], 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -309,8 +310,6 @@ uint32_t shootoutj_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-// machine
-
 /*******************************************************************************/
 
 void shootout_state::bankswitch_w(uint8_t data)
@@ -432,8 +431,8 @@ static INPUT_PORTS_START( shootout )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, shootoutj_state, coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, shootoutj_state, coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(shootoutj_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(shootoutj_state::coin_inserted), 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )       PORT_DIPLOCATION( "DSW1:1,2" )
@@ -474,7 +473,7 @@ static INPUT_PORTS_START( shootout )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // This needs to be low to allow both coins to be accepted...
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shootoutj )
@@ -551,7 +550,7 @@ void shootout_state::shootout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &shootout_state::audio_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
 	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
 	screen.set_screen_update(FUNC(shootout_state::screen_update));
@@ -578,7 +577,7 @@ void shootoutj_state::shootoutj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &shootoutj_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
 	screen.set_raw (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
 	screen.set_screen_update(FUNC(shootoutj_state::screen_update));

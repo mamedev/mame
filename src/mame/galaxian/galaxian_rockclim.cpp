@@ -21,10 +21,10 @@ public:
 	void init_rockclim();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	void rockclim_map(address_map &map);
+	void rockclim_map(address_map &map) ATTR_COLD;
 
 	void rockclim_palette(palette_device &palette) const;
 	void rockclim_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -238,7 +238,7 @@ void galaxian_rockclim_state::rockclim_palette(palette_device &palette) const
 		// blue component
 		bit0 = BIT(*color_prom, 6);
 		bit1 = BIT(*color_prom, 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, r, g, b);
 		color_prom++;

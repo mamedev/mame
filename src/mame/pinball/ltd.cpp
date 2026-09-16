@@ -75,7 +75,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 
 protected:
-
 	u8 m_digit = 0U;
 	void mr_common();
 	void ms_common();
@@ -96,21 +95,23 @@ public:
 		, m_monotone(*this, "monotone")
 	{ }
 
-	void ltd3(machine_config &config);
+	void ltd3(machine_config &config) ATTR_COLD;
 
-	void init_0() { m_game = 0; }
-	void init_1() { m_game = 1; }
-	void init_2() { m_game = 2; }
-	void init_3() { m_game = 3; }
+	void init_0() ATTR_COLD { m_game = 0; }
+	void init_1() ATTR_COLD { m_game = 1; }
+	void init_2() ATTR_COLD { m_game = 2; }
+	void init_3() ATTR_COLD { m_game = 3; }
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	u8 ram_r(offs_t);
 	void ram_w(offs_t, u8);
 	u8 sw_r(offs_t offset);
 	void irq_w(int state);
-	void ltd3_map(address_map &map);
+	void ltd3_map(address_map &map) ATTR_COLD;
 	u8 m_game = 0;
 	u8 m_ram[0x80]{};
 	u8 m_segment = 0;
@@ -128,12 +129,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void ltd4(machine_config &config);
+	void ltd4(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	void ltd4_map(address_map &map);
+	void ltd4_map(address_map &map) ATTR_COLD;
 	u8 port1_r();
 	void port1_w(u8 data);
 	u8 port2_r();
@@ -176,7 +179,7 @@ void ltd4_state::ltd4_map(address_map &map)
 // bits 6,7 not connected to data bus
 static INPUT_PORTS_START( ltd3 )
 	PORT_START("FICHA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ltd_state, ficha, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ltd_state::ficha), 0)
 
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
@@ -490,8 +493,6 @@ void ltd_state::ms_common()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
 	save_item(NAME(m_digit));
 }
 
@@ -561,7 +562,7 @@ void ltd3_state::ltd3(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0);
+	CLOCK(config, m_monotone);
 	m_monotone->signal_handler().set("snd", FUNC(input_merger_device::in_w<0>));
 	AY8910(config, "ay0", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
 	AY8910(config, "ay1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
@@ -809,31 +810,31 @@ ROM_END
 } // Anonymous namespace
 
 // system 3, 2-player, with beep sounds, playable
-GAME(1981, arizona,  0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, discodan, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, marqueen, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Martian Queen",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, arizona,  0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, discodan, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Disco Dancing",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Hustler",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, marqueen, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Martian Queen",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "King Kong",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Viking King",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // system 3, 2-player, unknown sound system, playable
-GAME(1981, force,    0,        ltd3, ltd3, ltd3_state, init_1,   ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Space Poker",                       MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, force,    0,        ltd3, ltd3, ltd3_state, init_1,   ROT0, "LTD", "Force",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Space Poker",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // system 3, 3-player, ay sounds, unplayable
-GAME(1981, cowboy,   0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 1)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, cowboya,  cowboy,   ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 2)",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, zephy,    0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 1)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 2)",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1981, cowboy,   0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, cowboya,  cowboy,   ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, zephy,    0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 1)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 2)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
 // system 4, mostly 4-player, ay sounds, unplayable
-GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, hhotel,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, pecmen,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, alcapone, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, columbia, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1982, tricksht, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, hhotel,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Haunted Hotel",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, pecmen,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, alcapone, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Al Capone",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982, columbia, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Columbia",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982, tricksht, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Trick Shooter",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

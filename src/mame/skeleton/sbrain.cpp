@@ -85,8 +85,8 @@ public:
 	void sagafox(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 mem_r(offs_t offset);
@@ -115,12 +115,11 @@ private:
 	void external_rxc_w(int state);
 	void internal_txc_rxc_w(int state);
 
-	void main_io_map(address_map &map);
-	void main_mem_map(address_map &map);
-	void sub_io_map(address_map &map);
-	void sub_mem_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
+	void sub_mem_map(address_map &map) ATTR_COLD;
 
-	bool m_busak = false;
 	u8 m_keydown = 0U;
 	u8 m_porta = 0U;
 	u8 m_portb = 0U;
@@ -130,7 +129,7 @@ private:
 	u8 m_framecnt = 0U;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<z80_device> m_subcpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<dp8350_device> m_crtc;
@@ -317,7 +316,7 @@ u8 sbrain_state::ppi_pb_r()
 	u8 capslock = BIT(m_modifiers->read(), 0) << 4; // bit 4, capslock
 	u8 p10d0 = BIT(m_port10, 0) << 5; // bit 5
 	u8 ri = m_mainport->ri_r() << 6;
-	u8 busak = m_busak ? 128 : 0; // bit 7
+	u8 busak = m_subcpu->busack_r() ? 0 : 128; // bit 7 (negative true)
 	return busak | ri | p10d0 | capslock | vertsync | m_keydown;
 }
 
@@ -352,8 +351,7 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_fdc->mr_w(!BIT(data, 3));
 	if (BIT(data, 3))
 		disk_select_w(0);
-	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
-	m_busak = BIT(data, 5);
+	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSREQ, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void sbrain_state::external_txc_w(int state)
@@ -590,7 +588,6 @@ void sbrain_state::machine_start()
 
 	m_usart[0]->write_cts(0);
 
-	save_item(NAME(m_busak));
 	save_item(NAME(m_keydown));
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
@@ -695,7 +692,7 @@ void sbrain_state::sbrain(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("32K");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_screen_update(FUNC(sbrain_state::screen_update));
 
@@ -717,6 +714,7 @@ void sbrain_state::sbrain(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(sbrain_state::ppi_pb_w));
 	m_ppi->in_pc_callback().set(FUNC(sbrain_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(sbrain_state::ppi_pc_w));
+	m_ppi->tri_pc_callback().set_constant(0x7f);
 
 	I8251(config, m_usart[0], 16_MHz_XTAL / 8);
 	m_usart[0]->txd_handler().set("auxport", FUNC(rs232_port_device::write_txd));
@@ -750,7 +748,7 @@ void sbrain_state::sbrain(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", sbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	TIMER(config, "timer_a", 0).configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
+	TIMER(config, "timer_a").configure_periodic(FUNC(sbrain_state::kbd_scan), attotime::from_hz(15));
 
 	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
 }
@@ -803,6 +801,17 @@ ROM_START( sagafoxf80 )
 	ROM_LOAD("oam120.bin", 0x0000, 0x0800, CRC(880a8e36) SHA1(c6bee88a294090f039161fe20ce36a4ada3b10d3))
 ROM_END
 
+ROM_START( sist600 )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD("s600bios.bin", 0x0000, 0x0800, CRC(d14bff15) SHA1(2d399547bca7efef003e86f446c5d24959c309e6))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD("crt8002-003.bin", 0x0000, 0x0800, BAD_DUMP CRC(5181d324) SHA1(7aa2d084947bcc0e3d31568f4de84c23b84abfff)) // unclear what CG is used here
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD("s600key.bin", 0x0000, 0x0800, CRC(2f4b386f) SHA1(a7d47736d09a457218dbe522178a352002038509))
+ROM_END
+
 } // anonymous namespace
 
 
@@ -810,3 +819,4 @@ ROM_END
 COMP( 1981, sbrain,     0,      0,     sbrain,   sbrain, sbrain_state, empty_init, "Intertec Data Systems",               "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sagafox,    sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sagafoxf80, sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox/F80",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, sist600,    sbrain, 0,     sbrain,   sbrain, sbrain_state, empty_init, u8"Prológica",                         "Sistema 600",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -63,7 +63,7 @@
 class p8k_16_daisy_device : public device_t, public z80_daisy_chain_interface
 {
 public:
-	p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	p8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	uint16_t viack_r() {
 		device_z80daisy_interface *intf = daisy_get_irq_device();
 		return intf ? intf->z80daisy_irq_ack() : 0;
@@ -112,11 +112,11 @@ private:
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
 
-	void p8k_16_datamap(address_map &map);
-	void p8k_16_iomap(address_map &map);
-	void p8k_16_memmap(address_map &map);
-	void p8k_iomap(address_map &map);
-	void p8k_memmap(address_map &map);
+	void p8k_16_datamap(address_map &map) ATTR_COLD;
+	void p8k_16_iomap(address_map &map) ATTR_COLD;
+	void p8k_16_memmap(address_map &map) ATTR_COLD;
+	void p8k_iomap(address_map &map) ATTR_COLD;
+	void p8k_memmap(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu; // Z80 or Z8001 depending on the machine
 	optional_device<p8k_16_daisy_device> m_daisy;
@@ -495,7 +495,7 @@ void p8k_state::p8k_16(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &p8k_state::p8k_16_iomap);
 	maincpu.viack().set("p8k_16_daisy", FUNC(p8k_16_daisy_device::viack_r));
 
-	P8K_16_DAISY(config, m_daisy, 0);
+	P8K_16_DAISY(config, m_daisy);
 	m_daisy->set_daisy_config(p8k_16_daisy_chain);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 307200));

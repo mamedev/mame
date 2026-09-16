@@ -36,11 +36,16 @@
         Selectable memory size.
         Video enable/reverse video switch.
 
+    FIXME: The CPU and PSG XTAL values are probably fake. More likely, all
+    clocks except the BRG clock are divisions of a ~41.42 MHz dot clock.
+    (What is its actual value?)
+
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
+#include "bus/keytronic/keytronic.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
@@ -50,7 +55,6 @@
 #include "machine/com8116.h"
 #include "machine/er2055.h"
 #include "machine/i8243.h"
-#include "machine/keytronic_l2207.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
@@ -108,14 +112,15 @@ public:
 		, m_earom(*this, EAROM_TAG)
 		, m_centronics(*this, "centronics")
 		, m_screen(*this, "screen")
+		, m_videoram(*this, "videoram")
 	{ }
 
 	void bitgrpha(machine_config &config);
 	void bitgrphb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t pia_r(offs_t offset);
 	void pia_w(offs_t offset, uint8_t data);
@@ -148,9 +153,9 @@ protected:
 	void bg_motherboard(machine_config &config);
 	[[maybe_unused]] void bg_ppu(machine_config &config);
 
-	void bitgrapha_mem(address_map &map);
-	void bitgraphb_mem(address_map &map);
-	void ppu_io(address_map &map);
+	void bitgrapha_mem(address_map &map) ATTR_COLD;
+	void bitgraphb_mem(address_map &map) ATTR_COLD;
+	void ppu_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -166,8 +171,8 @@ protected:
 	required_device<er2055_device> m_earom;
 	optional_device<centronics_device> m_centronics;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint16_t> m_videoram;
 
-	uint8_t *m_videoram = nullptr;
 	uint8_t m_misccr = 0;
 	uint8_t m_pia_a = 0;
 	uint8_t m_pia_b = 0;
@@ -189,7 +194,7 @@ void bitgraph_state::bitgrapha_mem(address_map &map)
 	map(0x010020, 0x010027).rw(FUNC(bitgraph_state::adlc_r), FUNC(bitgraph_state::adlc_w)).umask16(0xff00);
 	map(0x010028, 0x01002f).rw(FUNC(bitgraph_state::pia_r), FUNC(bitgraph_state::pia_w)).umask16(0xff00);    // EAROM, PSG
 	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
-	map(0x3e0000, 0x3fffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("videoram");
 }
 
 void bitgraph_state::bitgraphb_mem(address_map &map)
@@ -208,7 +213,8 @@ void bitgraph_state::bitgraphb_mem(address_map &map)
 	map(0x010030, 0x010031).w(FUNC(bitgraph_state::baud_write));
 //  map(0x010030, 0x010037).r(FUNC(bitgraph_state::ppu_read)).umask16(0x00ff);
 	map(0x010038, 0x01003f).w(FUNC(bitgraph_state::ppu_write)).umask16(0x00ff);
-	map(0x380000, 0x3fffff).ram();
+	map(0x380000, 0x3dffff).ram();
+	map(0x3e0000, 0x3fffff).ram().share("videoram");
 }
 
 static INPUT_PORTS_START(bitgraph)
@@ -382,16 +388,10 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		for (int x = 0; x < 1024 / 8; x += 2)
+		for (int x = 0; x < 1024 / 16; x++)
 		{
-			uint8_t gfx = m_videoram[(x + 1) | (y << 7)];
-			for (int i = 7; i >= 0; i--)
-			{
-				*p++ = BIT(gfx, i);
-			}
-
-			gfx = m_videoram[x | (y << 7)];
-			for (int i = 7; i >= 0; i--)
+			uint16_t gfx = m_videoram[x | (y << 6)];
+			for (int i = 15; i >= 0; i--)
 			{
 				*p++ = BIT(gfx, i);
 			}
@@ -458,7 +458,6 @@ template <unsigned Offset> void bitgraph_state::ppu_i8243_w(uint8_t data)
 
 void bitgraph_state::machine_start()
 {
-	m_videoram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x3e0000);
 }
 
 void bitgraph_state::machine_reset()
@@ -473,7 +472,7 @@ void bitgraph_state::machine_reset()
 
 void bitgraph_state::bg_motherboard(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(40);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(1024, 768);
@@ -483,7 +482,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	ACIA6850(config, m_acia0, 0);
+	ACIA6850(config, m_acia0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia0->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -493,13 +492,14 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	rs232h.dcd_handler().set(m_acia0, FUNC(acia6850_device::write_dcd));
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
-	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
+	ACIA6850(config, m_acia1);
+	m_acia1->txd_handler().set("keyboard", FUNC(keytronic_connector_device::ser_in_w));
 	m_acia1->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	keytronic_connector_device &keyboard(KEYTRONIC_CONNECTOR(config, "keyboard", ascii_terminal_keyboards, "l2207"));
+	keyboard.ser_out_callback().set(m_acia1, FUNC(acia6850_device::write_rxd));
 
-	ACIA6850(config, m_acia2, 0);
+	ACIA6850(config, m_acia2);
 	m_acia2->txd_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia2->rts_handler().set(RS232_D_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia2->irq_handler().set_inputline(m_maincpu, M68K_IRQ_1);
@@ -525,7 +525,7 @@ void bitgraph_state::bg_motherboard(machine_config &config)
 	m_pia->readpb_handler().set(FUNC(bitgraph_state::pia_pb_r));
 	m_pia->writepb_handler().set(FUNC(bitgraph_state::pia_pb_w));
 
-	ER2055(config, m_earom, 0);
+	ER2055(config, m_earom);
 
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_psg, XTAL(1'294'400));
@@ -571,7 +571,7 @@ void bitgraph_state::bitgrpha(machine_config &config)
 
 	CLOCK(config, "system_clock", 40).signal_handler().set(FUNC(bitgraph_state::system_clock_write));
 
-	ACIA6850(config, m_acia3, 0);
+	ACIA6850(config, m_acia3);
 	m_acia3->txd_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia3->rts_handler().set(RS232_M_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia3->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_1);

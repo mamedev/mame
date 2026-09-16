@@ -83,17 +83,14 @@ const char *fsd_format::extensions() const noexcept
 	return "fsd";
 }
 
-bool fsd_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int fsd_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t h[3];
-
-	size_t actual;
-	io.read_at(0, h, 3, actual);
+	auto const [err, actual] = read_at(io, 0, h, 3);
+	if (err || (3 != actual)) {
+		LOG_FORMATS("fsd: read error\n");
+		return 0;
+	}
 	if (memcmp(h, "FSD", 3) == 0) {
 		return FIFID_SIGN;
 	}
@@ -111,9 +108,9 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint64_t size;
 	if(io.length(size))
 		return false;
-	std::vector<uint8_t> img(size);
-	size_t actual;
-	io.read_at(0, &img[0], size, actual);
+	auto const [err, img, actual] = read_at(io, 0, size);
+	if(err || (actual != size))
+		return false;
 
 	uint64_t pos;
 	std::string title;
@@ -160,7 +157,9 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].actual_size = 128 << img[pos++];
 					error = img[pos++];
 					sects[i].deleted = (error & 0x20) == 0x20;
-					sects[i].bad_crc = (error & 0x0e) == 0x0e;
+					sects[i].bad_data_crc = (error & 0x0e) == 0x0e;
+					sects[i].bad_addr_crc = false;
+					sects[i].weak = false;
 					sects[i].data = &img[pos];
 					pos += sects[i].actual_size;
 					LOG_FORMATS("Read        %02X    %02X    %02X    %02X    %04X  %04X  %s\n", i, sects[i].track, sects[i].head, sects[i].sector, 128 << sects[i].size, sects[i].actual_size, result[error]);
@@ -170,7 +169,9 @@ bool fsd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					LOG_FORMATS("Unreadable sector on track %02d sector %02X head %02d\n", track, i, hnum);
 					sects[i].actual_size = 0;
 					sects[i].deleted = false;
-					sects[i].bad_crc = false;
+					sects[i].bad_data_crc = false;
+					sects[i].bad_addr_crc = false;
+					sects[i].weak = false;
 					sects[i].data = nullptr;
 					LOG_FORMATS("Unread      %02X    %02X    %02X    %02X    %04X  %04X  %s\n", i, sects[i].track, sects[i].head, sects[i].sector, sects[i].size, sects[i].actual_size, "Unreadable");
 					//return false;

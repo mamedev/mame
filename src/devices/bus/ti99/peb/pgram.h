@@ -38,8 +38,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( sw2_changed );
 
 private:
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override;
 
 	// Settings

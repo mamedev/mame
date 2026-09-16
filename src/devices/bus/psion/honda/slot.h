@@ -6,23 +6,23 @@
 
 **********************************************************************
 
-    Pin  Name    Comments
+    Pin  Name      Comments
 
     1    VEXT
-    2    RTS
-    3    DTR
-    4    TXD
-    5    DSR
-    6    DCD
-    7    CTS
-    8    RXD
-    9    SDOE
-    10   XSTAT
-    11   EXON
-    12   INT
-    13   SD
-    14   SCK
-    15   GND
+    2    RTS     - RS232
+    3    DTR     - RS232
+    4    TXD     - RS232
+    5    DSR     - RS232
+    6    DCD     - RS232
+    7    CTS     - RS232
+    8    RXD     - RS232
+    9    SDOE    - SIBO data direction control
+    10   EXTSTAT - active low SIBO peripheral detect line
+    11   EXON    - SIBO external turn-on
+    12   INT     - SIBO peripheral interrupt
+    13   SD      - SIBO serial data
+    14   SCK     - SIBO data clock
+    15   GND     - Signal and Power ground
 
 **********************************************************************/
 
@@ -48,10 +48,7 @@ public:
 	psion_honda_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
 		: psion_honda_slot_device(mconfig, tag, owner)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	psion_honda_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -78,7 +75,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write_line m_rxd_handler;

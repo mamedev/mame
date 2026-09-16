@@ -201,6 +201,7 @@ Core Artwork Options
 | :ref:`[no]artwork_crop <mame-commandline-noartworkcrop>`
 | :ref:`fallback_artwork <mame-commandline-fallbackartwork>`
 | :ref:`override_artwork <mame-commandline-overrideartwork>`
+| :ref:`artwork_font <mame-commandline-artworkfont>`
 
 
 Core Screen Options
@@ -246,7 +247,6 @@ Core Sound Options
 
 | :ref:`samplerate <mame-commandline-samplerate>`
 | :ref:`[no]samples <mame-commandline-nosamples>`
-| :ref:`[no]compressor <mame-commandline-nocompressor>`
 | :ref:`volume <mame-commandline-volume>`
 | :ref:`sound <mame-commandline-sound>`
 | :ref:`audio_latency <mame-commandline-audiolatency>`
@@ -264,7 +264,6 @@ Core Input Options
 | :ref:`[no]multimouse <mame-commandline-nomultimouse>`
 | :ref:`[no]steadykey <mame-commandline-nosteadykey>`
 | :ref:`[no]ui_active <mame-commandline-uiactive>`
-| :ref:`[no]offscreen_reload <mame-commandline-nooffscreenreload>`
 | :ref:`joystick_map <mame-commandline-joystickmap>`
 | :ref:`joystick_deadzone <mame-commandline-joystickdeadzone>`
 | :ref:`joystick_saturation <mame-commandline-joysticksaturation>`
@@ -298,6 +297,7 @@ Core Debugging Options
 | :ref:`debugscript <mame-commandline-debugscript>`
 | :ref:`[no]update_in_pause <mame-commandline-updateinpause>`
 | :ref:`watchdog <mame-commandline-watchdog>`
+| :ref:`debugger_host <mame-commandline-debuggerhost>`
 | :ref:`debugger_port <mame-commandline-debuggerport>`
 | :ref:`debugger_font <mame-commandline-debuggerfont>`
 | :ref:`debugger_font_size <mame-commandline-debuggerfontsize>`
@@ -317,6 +317,7 @@ Core Misc Options
 ~~~~~~~~~~~~~~~~~
 
 | :ref:`[no]drc <mame-commandline-drc>`
+| :ref:`[no]drc_rwx <mame-commandline-drcrwx>`
 | :ref:`[no]drc_use_c <mame-commandline-drcusec>`
 | :ref:`[no]drc_log_uml <mame-commandline-drcloguml>`
 | :ref:`[no]drc_log_native <mame-commandline-drclognative>`
@@ -325,11 +326,11 @@ Core Misc Options
 | :ref:`[no]skip_gameinfo <mame-commandline-skipgameinfo>`
 | :ref:`uifont <mame-commandline-uifont>`
 | :ref:`ui <mame-commandline-ui>`
-| :ref:`ramsize <mame-commandline-ramsize>`
 | :ref:`[no]confirm_quit <mame-commandline-confirmquit>`
 | :ref:`[no]ui_mouse <mame-commandline-uimouse>`
 | :ref:`language <mame-commandline-language>`
 | :ref:`[no]nvram_save <mame-commandline-nvramsave>`
+| :ref:`rtc <mame-commandline-rtc>`
 
 
 Scripting Options
@@ -350,14 +351,6 @@ HTTP Server Options
 | :ref:`http <mame-commandline-http>`
 | :ref:`http_port <mame-commandline-httpport>`
 | :ref:`http_root <mame-commandline-httproot>`
-
-
-PortAudio Options
-~~~~~~~~~~~~~~~~~
-
-| :ref:`pa_api <mame-commandline-paapi>`
-| :ref:`pa_device <mame-commandline-padevice>`
-| :ref:`pa_latency <mame-commandline-palatency>`
 
 
 Windows-Specific Command-line Options
@@ -423,10 +416,12 @@ SDL Keyboard Mapping
 | :ref:`keymap_file <mame-scommandline-keymapfile>`
 
 
-SDL Joystick Mapping
+SDL Input Options
 ~~~~~~~~~~~~~~~~~~~~
 
-| :ref:`sixaxis <mame-scommandline-sixaxis>`
+| :ref:`[no]enable_touch <mame-scommandline-enabletouch>`
+| :ref:`[no]sixaxis <mame-scommandline-sixaxis>`
+| :ref:`[no]dual_lightgun <mame-scommandline-duallightgun>`
 
 
 SDL Lightgun Mapping

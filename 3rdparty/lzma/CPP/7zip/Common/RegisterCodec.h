@@ -1,7 +1,7 @@
 // RegisterCodec.h
 
-#ifndef __REGISTER_CODEC_H
-#define __REGISTER_CODEC_H
+#ifndef ZIP7_INC_REGISTER_CODEC_H
+#define ZIP7_INC_REGISTER_CODEC_H
 
 #include "../Common/MethodId.h"
 
@@ -37,7 +37,7 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
 #define REGISTER_CODECS_VAR static const CCodecInfo g_CodecsInfo[] =
 
 #define REGISTER_CODECS(x) struct REGISTER_CODECS_NAME(x) { \
-    REGISTER_CODECS_NAME(x)() { for (unsigned i = 0; i < ARRAY_SIZE(g_CodecsInfo); i++) \
+    REGISTER_CODECS_NAME(x)() { for (unsigned i = 0; i < Z7_ARRAY_SIZE(g_CodecsInfo); i++) \
     RegisterCodec(&g_CodecsInfo[i]); }}; \
     static REGISTER_CODECS_NAME(x) g_RegisterCodecs;
 
@@ -48,7 +48,7 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
     REGISTER_CODEC(x)
 
 
-#ifdef EXTRACT_ONLY
+#ifdef Z7_EXTRACT_ONLY
   #define REGISTER_CODEC_E(x, clsDec, clsEnc, id, name) \
     REGISTER_CODEC_CREATE(CreateDec, clsDec) \
     REGISTER_CODEC_2(x, CreateDec, NULL, id, name)
@@ -71,7 +71,7 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw();
     REGISTER_FILTER_ITEM(crDec, crEnc, id, name); \
     REGISTER_CODEC(x)
 
-#ifdef EXTRACT_ONLY
+#ifdef Z7_EXTRACT_ONLY
   #define REGISTER_FILTER_E(x, clsDec, clsEnc, id, name) \
     REGISTER_FILTER_CREATE(x ## _CreateDec, clsDec) \
     REGISTER_FILTER(x, x ## _CreateDec, NULL, id, name)
@@ -97,7 +97,7 @@ void RegisterHasher(const CHasherInfo *hasher) throw();
 #define REGISTER_HASHER_NAME(x) CRegHasher_ ## x
 
 #define REGISTER_HASHER(cls, id, name, size) \
-    STDMETHODIMP_(UInt32) cls::GetDigestSize() throw() { return size; } \
+    Z7_COM7F_IMF2(UInt32, cls::GetDigestSize()) { return size; } \
     static IHasher *CreateHasherSpec() { return new cls(); } \
     static const CHasherInfo g_HasherInfo = { CreateHasherSpec, id, name, size }; \
     struct REGISTER_HASHER_NAME(cls) { REGISTER_HASHER_NAME(cls)() { RegisterHasher(&g_HasherInfo); }}; \

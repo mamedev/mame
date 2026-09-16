@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef DSP56156_OPCODE_H
-#define DSP56156_OPCODE_H
+#ifndef MAME_CPU_DSP56156_OPCODE_H
+#define MAME_CPU_DSP56156_OPCODE_H
 
 #include "inst.h"
 #include "pmove.h"
@@ -42,4 +42,4 @@ private:
 
 } // namespace DSP_56156
 
-#endif
+#endif // MAME_CPU_DSP56156_OPCODE_H

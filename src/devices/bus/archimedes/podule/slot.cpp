@@ -339,6 +339,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("prisma3", ARC_PRISMA3);            // Millipede PRISMA-3 Podule
 	//device.option_add("prisma3p", ARC_PRISMA3P);          // Millipede PRISMA-3 Plus Podule
 	device.option_add("rom_aka05", ARC_ROM_AKA05);        // Acorn AKA05 ROM Podule
+	device.option_add("rom_r225boot", ARC_ROM_R225);      // Acorn AKA05 ROM (with DiscLess Bootstrap support)
 	//device.option_add("rom_cc", ARC_ROM_CC);              // Computer Concepts ROM/RAM Podule
 	device.option_add("rs423", ARC_RS423);                // Intelligent Interfaces Dual RS423 Serial Interface
 	device.option_add("scan256", ARC_SCAN256);            // Watford Electronics 256 Grey-Scale Scanner
@@ -347,6 +348,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 	device.option_add("scanjunior3", ARC_SCANJUNIOR3);    // Computer Concepts ScanLight Junior Mk3
 	device.option_add("scanvideo", ARC_SCANVIDEO);        // Computer Concepts ScanLight Video 256
 	device.option_add("scsi_a500", ARC_SCSI_A500);        // Acorn A500 SCSI Interface
+	device.option_add("scsi_aka30", ARC_SCSI_AKA30);      // Acorn AKA30 SCSI Expansion Card
 	device.option_add("scsi_aka31", ARC_SCSI_AKA31);      // Acorn AKA31 SCSI Expansion Card
 	device.option_add("scsi_aka32", ARC_SCSI_AKA32);      // Acorn AKA32 CDFS & SCSI Expansion Card
 	device.option_add("scsi_cumana", ARC_SCSI_CUMANA);    // Cumana 16bit SCSI interface

@@ -151,7 +151,7 @@ public:
 		, m_banksel(1)
 	{ }
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 	uint8_t syspia_A_r();
@@ -161,7 +161,7 @@ public:
 	void usrpia_cb2_w(int state);
 	void write_acia_clock(int state);
 	void can09t(machine_config &config);
-	void can09t_map(address_map &map);
+	void can09t_map(address_map &map) ATTR_COLD;
 protected:
 	required_device<pia6821_device> m_syspia;
 	required_device<pia6821_device> m_usrpia;
@@ -518,15 +518,15 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t pia1_A_r();
 	void pia1_A_w(uint8_t data);
 	uint8_t pia1_B_r();
 	void pia1_B_w(uint8_t data);
 	void pia1_cb2_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void can09_map(address_map &map);
+	void can09_map(address_map &map) ATTR_COLD;
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
@@ -707,10 +707,10 @@ void can09t_state::can09t(machine_config &config)
 	PIA6821(config, m_pia3); // ROM board
 	PIA6821(config, m_pia4); // ROM board
 
-	PTM6840(config, "ptm", 0);
+	PTM6840(config, "ptm");
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
@@ -766,7 +766,7 @@ void can09_state::can09(machine_config &config)
 
 
 	/* screen - totally faked value for now */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_raw(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576);
 	screen.set_screen_update(FUNC(can09_state::screen_update));
@@ -797,8 +797,8 @@ void can09_state::can09(machine_config &config)
 
 #if 1
 	PIA6821(config, PIA2_TAG); // CPU board
-	ACIA6850(config, "acia1", 0); // CPU board
-	ACIA6850(config, "acia2", 0); // CPU board
+	ACIA6850(config, "acia1"); // CPU board
+	ACIA6850(config, "acia2"); // CPU board
 #endif
 }
 

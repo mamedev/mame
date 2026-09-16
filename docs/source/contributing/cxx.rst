@@ -361,30 +361,6 @@ to extract a bit field of a specified width from an integer value,
 starting at the specified bit position.  The result will also be
 right-justified and will be of the same type as the incoming value.
 
-There are, additionally, a number of helpers for functionality such as
-counting leading zeroes/ones, population count, and signed/unsigned
-integer multiplication and division for both 32-bit and 64-bit results.
-Not all of these helpers have wide use in the MAME codebase, but using
-them in new code is strongly preferred when that code is performance-
-critical, as they utilise inline assembly or compiler intrinsics per-
-platform when available.
-
-``count_leading_zeros_32/64(T value)``
-    Accepts an unsigned 32/64-bit value and returns an unsigned 8-bit
-    value containing the number of consecutive zeros starting from the
-    most significant bit.
-``count_leading_ones_32/64(T value)``
-    Same functionality as above, but examining consecutive one-bits.
-``population_count_32/64(T value)``
-    Accepts an unsigned 32/64-bit value and returns the number of
-    one-bits found, i.e. the Hamming weight of the value.
-``rotl_32/64(T value, int shift)``
-    Performs a circular/barrel left shift of an unsigned 32/64-bit value
-    with the specified shift value. The shift value will be masked to
-    the valid bit range for a 32-bit or 64-bit value.
-``rotr_32/64(T value, int shift)``
-    Same functionality as above, but with a right shift.
-
 For documentation on helpers related to multiplication and division,
 refer to ``src/osd/eminline.h``.
 

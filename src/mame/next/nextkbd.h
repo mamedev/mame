@@ -8,13 +8,13 @@
 
 class nextkbd_device : public device_t {
 public:
-	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto int_change_wr_callback() { return int_change_cb.bind(); }
 	auto int_power_wr_callback() { return int_power_cb.bind(); }
 	auto int_nmi_wr_callback() { return int_nmi_cb.bind(); }
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	uint8_t status_snd_r();
 	uint8_t status_kms_r();
@@ -33,9 +33,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(update);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 

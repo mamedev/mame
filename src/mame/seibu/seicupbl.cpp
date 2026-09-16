@@ -560,7 +560,7 @@ void seicupbl_state::cupsocbl(machine_config &config)
 	//m_audiocpu->set_periodic_int("screen", FUNC(seicupbl_state::nmi_line_pulse));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(42*8, 36*8);
@@ -568,7 +568,7 @@ void seicupbl_state::cupsocbl(machine_config &config)
 	screen.set_screen_update(FUNC(seicupbl_state::screen_update));
 	screen.set_palette(m_palette);
 
-	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	//seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
 	//crtc.layer_en_callback().set(FUNC(seicupbl_state::tilemap_enable_w));
 	//crtc.layer_scroll_callback().set(FUNC(seicupbl_state::tile_scroll_w));
 	//crtc.reg_1a_callback().set(FUNC(seicupbl_state::tile_vreg_1a_w));

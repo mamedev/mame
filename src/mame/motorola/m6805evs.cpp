@@ -77,10 +77,10 @@ public:
 	void m6805evs(machine_config &config);
 
 private:
-	[[maybe_unused]] void mem_map(address_map &map);
+	[[maybe_unused]] void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 

@@ -49,7 +49,7 @@ public:
 	void quizo(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -66,8 +66,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void memmap(address_map &map);
-	void portmap(address_map &map);
+	void memmap(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 void quizo_state::quizo_palette(palette_device &palette) const
@@ -213,7 +213,7 @@ void quizo_state::quizo(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(quizo_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 200);

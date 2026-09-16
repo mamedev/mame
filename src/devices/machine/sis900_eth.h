@@ -12,26 +12,26 @@
 class sis900_eth_device : public pci_device
 {
 public:
-	sis900_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis900_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static constexpr feature_type unemulated_features() { return feature::LAN; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 //  virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void memory_map(address_map &map);
-	void io_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

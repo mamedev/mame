@@ -211,8 +211,8 @@ public:
 	void namcofl(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i960_cpu_device> m_maincpu;
@@ -223,8 +223,8 @@ private:
 	required_device<namco_c355spr_device> m_c355spr;
 	required_device<m37710_cpu_device> m_mcu;
 
-	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint32_t> m_shareram;
+	required_shared_ptr<u32> m_workram;
+	required_shared_ptr<u32> m_shareram;
 	memory_view m_mainbank;
 
 	required_ioport m_in0;
@@ -238,51 +238,73 @@ private:
 	emu_timer *m_raster_interrupt_timer = nullptr;
 	emu_timer *m_vblank_interrupt_timer = nullptr;
 	emu_timer *m_network_interrupt_timer = nullptr;
-	uint8_t m_mcu_port6 = 0;
-	uint32_t m_sprbank = 0;
+	u8 m_mcu_port6 = 0;
+	u32 m_sprbank = 0;
 
-	uint32_t unk1_r();
-	uint8_t network_r(offs_t offset);
-	uint32_t sysreg_r();
-	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void c116_w(offs_t offset, uint8_t data);
-	uint16_t mcu_shared_r(offs_t offset);
-	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t port6_r();
-	void port6_w(uint8_t data);
-	uint8_t port7_r();
-	uint8_t dac6_r();
-	void spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	static constexpr int m_irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
+
+	u32 unk1_r();
+	u8 network_r(offs_t offset);
+	u32 sysreg_r();
+	void sysreg_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void c116_w(offs_t offset, u8 data);
+	u16 mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, u16 data, u16 mem_mask);
+	u8 port6_r();
+	void port6_w(u8 data);
+	u8 port7_r();
+	u8 dac6_r();
+	void spritebank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	int objcode2tile(int code);
-	void tilemap_cb(uint16_t code, int *tile, int *mask);
-	void roz_cb(uint16_t code, int *tile, int *mask, int which);
-	void namcoc75_am(address_map &map);
-	void main_map(address_map &map);
+	void tilemap_cb(u16 code, int &tile, int &mask);
+	void roz_cb(u16 code, int &tile, int &mask, int which);
+	void namcoc75_am(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-// video
-
-void namcofl_state::tilemap_cb(uint16_t code, int *tile, int *mask)
+void namcofl_state::tilemap_cb(u16 code, int &tile, int &mask)
 {
-	*tile = code;
-	*mask = code;
+	tile = code;
+	mask = code;
 }
 
-void namcofl_state::roz_cb(uint16_t code, int *tile, int *mask, int which)
+void namcofl_state::roz_cb(u16 code, int &tile, int &mask, int which)
 {
-	*tile = code;
-	*mask = code;
+	tile = code;
+	mask = code;
+}
+
+bool namcofl_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	if (srcpri >= destpri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			if (src == 0xffe)
+			{
+				dest |= 0x800;
+			}
+			else
+			{
+				dest = colbase + src;
+			}
+			destpri = srcpri;
+			return true;
+		}
+	}
+	return false;
 }
 
 
-uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// compute window for custom screen blanking
 	rectangle clip;
@@ -295,18 +317,18 @@ uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// intersect with master clip rectangle
 	clip &= cliprect;
 
-	bitmap.fill(m_c116->black_pen(), cliprect );
+	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (int pri = 0; pri < 16; pri++)
 	{
-		m_c169roz->draw(screen, bitmap, clip, pri);
+		m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
 		if ((pri & 1) == 0)
 		{
-			m_c123tmap->draw(screen, bitmap, clip, pri >> 1);
+			m_c123tmap->draw(screen, bitmap, clip, pri >> 1, pri, 0);
 		}
-
-		m_c355spr->draw(screen, bitmap, clip, pri);
 	}
+	m_c355spr->draw(screen, bitmap, clip);
 
 	return 0;
 }
@@ -315,7 +337,7 @@ uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //        groups of sprites.  I am unsure how to differentiate those groups
 //        at this time however.
 
-void namcofl_state::spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void namcofl_state::spritebank_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_sprbank);
 }
@@ -329,14 +351,12 @@ int namcofl_state::objcode2tile(int code)
 }
 
 
-// machine
-
-uint32_t namcofl_state::unk1_r()
+u32 namcofl_state::unk1_r()
 {
 	return 0xffffffff;
 }
 
-uint8_t namcofl_state::network_r(offs_t offset)
+u8 namcofl_state::network_r(offs_t offset)
 {
 	if (offset == 1)
 		return 0x7d;
@@ -344,12 +364,12 @@ uint8_t namcofl_state::network_r(offs_t offset)
 	return 0xff;
 }
 
-uint32_t namcofl_state::sysreg_r()
+u32 namcofl_state::sysreg_r()
 {
 	return 0;
 }
 
-void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void namcofl_state::sysreg_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
@@ -357,16 +377,21 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// 1: ROM at 00000000, RAM at 10000000
 		m_mainbank.select(data & 1);
 	}
+	else if (offset >= 0x10 && offset <= 0x13)  // clear i960 IRQ line
+	{
+		// data value doesn't seem to matter
+		m_maincpu->set_input_line(m_irq_type[offset & 3], CLEAR_LINE);
+	}
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
-void namcofl_state::c116_w(offs_t offset, uint8_t data)
+void namcofl_state::c116_w(offs_t offset, u8 data)
 {
 	m_c116->write(offset, data);
 
 	if ((offset & 0x180e) == 0x180a)
 	{
-		uint16_t triggerscanline=m_c116->get_reg(5)-(32+1);
+		const u16 triggerscanline = m_c116->get_reg(5) - (32+1);
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
 }
@@ -397,7 +422,7 @@ void namcofl_state::main_map(address_map &map)
 }
 
 
-void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namcofl_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -409,37 +434,37 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 #endif
 
-	if (offset & 1)
-		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~(uint32_t(mem_mask) << 16)) | ((data & mem_mask) << 16);
+	if (BIT(offset, 0))
+		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~(u32(mem_mask) << 16)) | ((data & mem_mask) << 16);
 	else
-		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~uint32_t(mem_mask)) | (data & mem_mask);
+		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~u32(mem_mask)) | (data & mem_mask);
 
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
-	if ((offset == 0x6000/2) && (data & 0x80))
+	if ((offset == 0x6000/2) && BIT(data, 7))
 	{
 		m_mcu->yield();
 	}
 }
 
-uint16_t namcofl_state::mcu_shared_r(offs_t offset)
+u16 namcofl_state::mcu_shared_r(offs_t offset)
 {
-	if (offset & 1)
+	if (BIT(offset, 0))
 		return m_shareram[offset >> 1] >> 16;
 	else
 		return m_shareram[offset >> 1];
 }
 
-uint8_t namcofl_state::port6_r()
+u8 namcofl_state::port6_r()
 {
 	return m_mcu_port6;
 }
 
-void namcofl_state::port6_w(uint8_t data)
+void namcofl_state::port6_w(u8 data)
 {
 	m_mcu_port6 = data;
 }
 
-uint8_t namcofl_state::port7_r()
+u8 namcofl_state::port7_r()
 {
 	switch (m_mcu_port6 & 0xf0)
 	{
@@ -462,7 +487,7 @@ uint8_t namcofl_state::port7_r()
 	return 0xff;
 }
 
-uint8_t namcofl_state::dac6_r()
+u8 namcofl_state::dac6_r()
 {
 	return m_brake.read_safe(0xff);
 }
@@ -654,12 +679,15 @@ void namcofl_state::machine_reset()
 
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
 	m_mainbank.select(1);
+
+	for (auto irq : m_irq_type)
+		m_maincpu->set_input_line(irq, CLEAR_LINE);
 }
 
 
 void namcofl_state::namcofl(machine_config &config)
 {
-	I960(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
+	I80960KA(config, m_maincpu, 80_MHz_XTAL / 4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::main_map);
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL / 3);
@@ -681,47 +709,46 @@ void namcofl_state::namcofl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(48.384_MHz_XTAL / 8, 384, 0, 288, 264, 0, 224); // same as namconb1.cpp?
 	m_screen->set_screen_update(FUNC(namcofl_state::screen_update));
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
-	NAMCO_C169ROZ(config, m_c169roz, 0);
+	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(true);
 	m_c169roz->set_ram_words(0x20000 / 2);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::roz_cb, this));
+	m_c169roz->set_tile_callback(FUNC(namcofl_state::roz_cb));
 	m_c169roz->set_color_base(0x1800);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0, 0);
-	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::objcode2tile, this));
-	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_tile_callback(FUNC(namcofl_state::objcode2tile));
+	m_c355spr->set_mix_callback(FUNC(namcofl_state::sprite_mix_callback));
 	m_c355spr->set_color_base(0);
 	m_c355spr->set_buffer(1);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcofl_state::tilemap_cb, this));
+	m_c123tmap->set_tile_callback(FUNC(namcofl_state::tilemap_cb));
 	m_c123tmap->set_color_base(0x1000);
 
-	NAMCO_C116(config, m_c116, 0);
+	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	c352_device &c352(C352(config, "c352", 48.384_MHz_XTAL / 2, 288));
-	c352.add_route(0, "lspeaker", 1.00);
-	c352.add_route(1, "rspeaker", 1.00);
-	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-	//c352.add_route(3, "rspeaker", 1.00);
+	c352.add_route(0, "speaker", 1.00, 0);
+	c352.add_route(1, "speaker", 1.00, 1);
+	//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "speaker", 1.00);
 }
 
 ROM_START( speedrcr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("se2_mp_ea4.19a",   0x000000, 0x080000, CRC(95ab3fd7) SHA1(273a536f8512f3c55260ac1b78533bc35b8390ed) )
 	ROM_LOAD32_WORD("se2_mp_oa4.18a",   0x000002, 0x080000, CRC(5b5ef1eb) SHA1(3e9e4abb1a32269baef772079de825dfe1ea230c) )
 
@@ -750,10 +777,10 @@ ROM_START( speedrcr )
 	ROM_LOAD32_WORD("se1obj1l.ic3", 0x400000, 0x200000, CRC(c4809fd5) SHA1(e0b80fccc17c83fb9d08f7f1cf2cd2f0f3a510b4) )
 	ROM_LOAD32_WORD("se1obj1u.ic4", 0x400002, 0x200000, CRC(0beefa56) SHA1(012fb7b330dbf851ab2217da0a0e7136ddc3d23f) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("se1_rsh.14k",    0x000000, 0x080000, CRC(f6408a1f) SHA1(3a299719090de3915331fc1ddbe0f41834da063a) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("se1_ssh.18u",    0x000000, 0x080000, CRC(cb534142) SHA1(935a377c72b3a815ed46dfdb6ea6734d312da373) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -772,7 +799,7 @@ ROM_END
 
 
 ROM_START( finalapr )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2_mp_eb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2_mp_ob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
 
@@ -797,10 +824,10 @@ ROM_START( finalapr )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -811,7 +838,7 @@ ROM_START( finalapr )
 ROM_END
 
 ROM_START( finalapr1 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2_mp_e.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2_mp_o.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
@@ -836,10 +863,10 @@ ROM_START( finalapr1 )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -850,7 +877,7 @@ ROM_START( finalapr1 )
 ROM_END
 
 ROM_START( finalaprj )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr1_mp_ec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
 	ROM_LOAD32_WORD("flr1_mp_oc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
@@ -875,10 +902,10 @@ ROM_START( finalaprj )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
@@ -889,7 +916,7 @@ ROM_START( finalaprj )
 ROM_END
 
 ROM_START( finalaprj1 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr1_mp_eb.19a", 0x000000, 0x080000, CRC(1a77bcc0) SHA1(4090917afcd0346ea78e6e307879a980cf196204) )
 	ROM_LOAD32_WORD("flr1_mp_ob.18a", 0x000002, 0x080000, CRC(5f64eb2b) SHA1(0011ceeedefcf16c333c7ab28f334dd228eac4cf) )
 
@@ -914,10 +941,10 @@ ROM_START( finalaprj1 )
 	ROM_LOAD32_WORD("flr1_obj1l.ic3", 0x400000, 0x200000, CRC(51fd8de7) SHA1(b1571c45e8c33d746716fd790c704a3361d02bdc) )
 	ROM_LOAD32_WORD("flr1_obj1u.ic4", 0x400002, 0x200000, CRC(1737aa3c) SHA1(8eaf0dc5d60a270d2c1626f54f5edbddbb0a59c8) )
 
-	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-1?)
+	ROM_REGION( 0x80000, "c169roz:mask", 0 ) // "RSHAPE" (roz mask like NB-2)
 	ROM_LOAD("flr1_rsh.14k", 0x000000, 0x080000, CRC(037c0983) SHA1(c48574a8ad125cedfaf2538c5ff824e121204629) )
 
-	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for other tiles?)
+	ROM_REGION( 0x80000, "c123tmap:mask", 0 ) // "SSHAPE" (mask for BG)
 	ROM_LOAD("flr1_ssh.18u", 0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples

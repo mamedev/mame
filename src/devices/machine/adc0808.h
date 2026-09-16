@@ -31,8 +31,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_DEVICES_MACHINE_ADC0808_H
-#define MAME_DEVICES_MACHINE_ADC0808_H
+#ifndef MAME_MACHINE_ADC0808_H
+#define MAME_MACHINE_ADC0808_H
 
 #pragma once
 
@@ -64,7 +64,7 @@ protected:
 	adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_state);
 
@@ -110,4 +110,4 @@ DECLARE_DEVICE_TYPE(ADC0808, adc0808_device)
 DECLARE_DEVICE_TYPE(ADC0809, adc0809_device)
 DECLARE_DEVICE_TYPE(M58990, m58990_device)
 
-#endif // MAME_DEVICES_MACHINE_ADC0808_H
+#endif // MAME_MACHINE_ADC0808_H

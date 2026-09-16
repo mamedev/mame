@@ -64,6 +64,7 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "warp1bl.lh"
@@ -97,7 +98,7 @@ public:
 	int warp1_protection_r() { return m_audio_data[0] & 1; }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -112,7 +113,7 @@ private:
 	required_shared_ptr<u8> m_videoram;
 	required_ioport_array<3> m_inputs;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// video
 	u8 m_flipscreen = 0;
@@ -451,7 +452,7 @@ static INPUT_PORTS_START( warp1 )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dai3wksi_state, warp1_protection_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(dai3wksi_state::warp1_protection_r))
 	PORT_DIPNAME( 0x20, 0x20, "High Score Table" )              PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -528,7 +529,7 @@ void dai3wksi_state::dai3wksi(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(dai3wksi_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 8, 247);
 	screen.set_refresh_hz(60);

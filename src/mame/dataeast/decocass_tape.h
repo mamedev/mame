@@ -8,7 +8,7 @@
 class decocass_tape_device : public device_t
 {
 public:
-	decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	decocass_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~decocass_tape_device() {}
 
 	uint8_t get_status_bits();
@@ -17,8 +17,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	/* regions within the virtual tape */
@@ -58,13 +58,13 @@ private:
 
 	// internal state
 	emu_timer *         m_tape_timer;              /* timer for running the tape */
-	int8_t                m_speed;              /* speed: <-1=fast rewind, -1=reverse, 0=stopped, 1=normal, >1=fast forward */
+	int8_t              m_speed;              /* speed: <-1=fast rewind, -1=reverse, 0=stopped, 1=normal, >1=fast forward */
 	tape_region         m_region;             /* current region */
 	tape_byte           m_bytenum;            /* byte number within a datablock */
-	uint8_t               m_bitnum;             /* bit number within a byte */
-	uint32_t              m_clockpos;           /* the current clock position of the tape */
-	uint32_t              m_numclocks;          /* total number of clocks on the entire tape */
-	uint16_t              m_crc16[256];         /* CRC16 for each block */
+	uint8_t             m_bitnum;             /* bit number within a byte */
+	uint32_t            m_clockpos;           /* the current clock position of the tape */
+	uint32_t            m_numclocks;          /* total number of clocks on the entire tape */
+	uint16_t            m_crc16[256];         /* CRC16 for each block */
 	optional_region_ptr<uint8_t> m_tape_data;
 
 	std::string describe_state();

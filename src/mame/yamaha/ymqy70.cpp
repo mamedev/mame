@@ -107,13 +107,13 @@ private:
 
 	u8 sw_sel;
 
-	void pa_w(u16 data) { if (data) sw_sel = data; }
+	void pa_w(u8 data) { if (data) sw_sel = data; }
 	u8 sw_in();
 	u16 adc_bkupbat_r() { return 0x2a0; }
-	void mem_map(address_map &map);
-	void lcd_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void lcd_map(address_map &map) ATTR_COLD;
 	void lcd_palette(palette_device &palette) const;
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 void qy70_state::machine_start()
@@ -166,12 +166,12 @@ void qy70_state::qy70(machine_config &config)
 	NVRAM(config, "userdata.nv", nvram_device::DEFAULT_NONE);
 	NVRAM(config, "workdata.nv", nvram_device::DEFAULT_NONE);
 
-	T6963C(config, m_lcdc, 0);
+	T6963C(config, m_lcdc);
 	m_lcdc->set_addrmap(0, &qy70_state::lcd_map);
 	m_lcdc->set_fs(2);
 	m_lcdc->set_md(8);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(128, 64);
 	screen.set_visarea_full();
@@ -180,8 +180,7 @@ void qy70_state::qy70(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(qy70_state::lcd_palette), 2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);

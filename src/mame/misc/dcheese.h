@@ -37,8 +37,8 @@ public:
 	void dcheese(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_region_ptr<u16> m_palrom;
@@ -90,9 +90,9 @@ private:
 	void do_clear();
 	void do_blit();
 
-	void main_cpu_map(address_map &map);
-	void main_fc7_map(address_map &map);
-	void sound_cpu_map(address_map &map);
+	void main_cpu_map(address_map &map) ATTR_COLD;
+	void main_fc7_map(address_map &map) ATTR_COLD;
+	void sound_cpu_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MISC_DCHEESE_H

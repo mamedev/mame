@@ -20,12 +20,12 @@ class hp9845_optrom_device : public device_t,
 {
 public:
 	// construction/destruction
-	hp9845_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hp9845_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~hp9845_optrom_device();
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_rom_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;

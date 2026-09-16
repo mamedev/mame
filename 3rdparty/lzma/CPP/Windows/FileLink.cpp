@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 #include "../../C/Alloc.h"
 #endif
 
@@ -20,6 +20,15 @@
 #include "FileIO.h"
 #include "FileName.h"
 
+#ifdef Z7_OLD_WIN_SDK
+#ifndef ERROR_INVALID_REPARSE_DATA
+#define ERROR_INVALID_REPARSE_DATA       4392L
+#endif
+#ifndef ERROR_REPARSE_TAG_INVALID
+#define ERROR_REPARSE_TAG_INVALID        4393L
+#endif
+#endif
+
 #ifndef _UNICODE
 extern bool g_IsNT;
 #endif
@@ -30,12 +39,24 @@ namespace NFile {
 using namespace NName;
 
 /*
+Win10 Junctions/SymLinks:
+  - (/) slash doesn't work as path separator
+  - Win10 preinstalled junctions don't use tail backslash, but tail backslashes also work.
+  - double backslash works only after drive prefix "c:\\dir1\dir2\",
+    and doesn't work in another places.
+  - absolute path without \??\ prefix doesn't work
+  - absolute path "c:" doesn't work
+*/
+
+/*
   Reparse Points (Junctions and Symbolic Links):
   struct
   {
     UInt32 Tag;
     UInt16 Size;     // not including starting 8 bytes
-    UInt16 Reserved; // = 0
+    UInt16 Reserved; // = 0, DOCs: // Length, in bytes, of the unparsed portion of
+       // the file name pointed to by the FileName member of the associated file object.
+       // This member is only valid for create operations when the I/O fails with STATUS_REPARSE.
     
     UInt16 SubstituteOffset; // offset in bytes from  start of namesChars
     UInt16 SubstituteLen;    // size in bytes, it doesn't include tailed NUL
@@ -59,6 +80,16 @@ using namespace NName;
     2) Default Order in table:
          Print Path
          Substitute Path
+
+DOCS:
+  The print name SHOULD be an informative pathname, suitable for display
+  to a user, that also identifies the target of the mount point.
+  Neither of these pathnames can contain dot directory names.
+
+reparse tags, with the exception of IO_REPARSE_TAG_SYMLINK,
+are processed on the server and are not processed by a client
+after transmission over the wire.
+Clients SHOULD treat associated reparse data as opaque data.
 */
 
 /*
@@ -72,19 +103,20 @@ static const UInt32 kReparseFlags_Alias       = (1 << 29);
 static const UInt32 kReparseFlags_HighLatency = (1 << 30);
 static const UInt32 kReparseFlags_Microsoft   = ((UInt32)1 << 31);
 
-#define _my_IO_REPARSE_TAG_HSM          (0xC0000004L)
-#define _my_IO_REPARSE_TAG_HSM2         (0x80000006L)
-#define _my_IO_REPARSE_TAG_SIS          (0x80000007L)
-#define _my_IO_REPARSE_TAG_WIM          (0x80000008L)
-#define _my_IO_REPARSE_TAG_CSV          (0x80000009L)
-#define _my_IO_REPARSE_TAG_DFS          (0x8000000AL)
-#define _my_IO_REPARSE_TAG_DFSR         (0x80000012L)
+#define Z7_WIN_IO_REPARSE_TAG_HSM          (0xC0000004L)
+#define Z7_WIN_IO_REPARSE_TAG_HSM2         (0x80000006L)
+#define Z7_WIN_IO_REPARSE_TAG_SIS          (0x80000007L)
+#define Z7_WIN_IO_REPARSE_TAG_WIM          (0x80000008L)
+#define Z7_WIN_IO_REPARSE_TAG_CSV          (0x80000009L)
+#define Z7_WIN_IO_REPARSE_TAG_DFS          (0x8000000AL)
+#define Z7_WIN_IO_REPARSE_TAG_DFSR         (0x80000012L)
 */
 
 #define Get16(p) GetUi16(p)
 #define Get32(p) GetUi32(p)
 
-static const wchar_t * const k_LinkPrefix = L"\\??\\";
+static const char * const k_LinkPrefix = "\\??\\";
+static const char * const k_LinkPrefix_UNC = "\\??\\UNC\\";
 static const unsigned k_LinkPrefix_Size = 4;
 
 static bool IsLinkPrefix(const wchar_t *s)
@@ -93,7 +125,7 @@ static bool IsLinkPrefix(const wchar_t *s)
 }
 
 /*
-static const wchar_t * const k_VolumePrefix = L"Volume{";
+static const char * const k_VolumePrefix = "Volume{";
 static const bool IsVolumeName(const wchar_t *s)
 {
   return IsString1PrefixedByString2(s, k_VolumePrefix);
@@ -109,79 +141,121 @@ static void WriteString(Byte *dest, const wchar_t *path)
 {
   for (;;)
   {
-    wchar_t c = *path++;
+    const wchar_t c = *path++;
     if (c == 0)
       return;
-    Set16(dest, (UInt16)c);
+    Set16(dest, (UInt16)c)
     dest += 2;
   }
 }
 
-bool FillLinkData(CByteBuffer &dest, const wchar_t *path, bool isSymLink, bool isWSL)
+#ifdef _WIN32
+void Convert_WinPath_to_WslLinuxPath(FString &s, bool convertDrivePath)
 {
-  bool isAbs = IsAbsolutePath(path);
-  if (!isAbs && !isSymLink)
-    return false;
-
-  if (isWSL)
+  if (convertDrivePath && IsDrivePath(s))
   {
-    // unsupported characters probably use Replacement Character UTF-16 0xFFFD
-    AString utf;
-    ConvertUnicodeToUTF8(path, utf);
-    const size_t size = 4 + utf.Len();
-    if (size != (UInt16)size)
-      return false;
-    dest.Alloc(8 + size);
-    Byte *p = dest;
-    Set32(p, _my_IO_REPARSE_TAG_LX_SYMLINK);
-    Set16(p + 4, (UInt16)(size));
-    Set16(p + 6, 0);
-    Set32(p + 8, _my_LX_SYMLINK_FLAG);
-    memcpy(p + 12, utf.Ptr(), utf.Len());
-    return true;
+    FChar c = s[0];
+    c = MyCharLower_Ascii(c);
+    s.DeleteFrontal(2);
+    s.InsertAtFront(c);
+    s.Insert(0, FTEXT("/mnt/"));
   }
+  s.Replace(FCHAR_PATH_SEPARATOR, FTEXT('/'));
+}
+#endif
 
-  // usual symbolic LINK (NOT WSL)
+
+static const unsigned k_Link_Size_Limit = 1u << 16; // 16-bit field is used for size.
+
+void FillLinkData_WslLink(CByteBuffer &dest, const wchar_t *path)
+{
+  // dest.Free(); // it's empty already
+  // WSL probably uses Replacement Character UTF-16 0xFFFD for unsupported characters?
+  AString utf;
+  ConvertUnicodeToUTF8(path, utf);
+  const unsigned size = 4 + utf.Len();
+  if (size >= k_Link_Size_Limit)
+    return;
+  dest.Alloc(8 + size);
+  Byte *p = dest;
+  Set32(p, Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK)
+  // Set32(p + 4, (UInt32)size)
+  Set16(p + 4, (UInt16)size)
+  Set16(p + 6, 0)
+  Set32(p + 8, Z7_WIN_LX_SYMLINK_VERSION_2)
+  memcpy(p + 12, utf.Ptr(), utf.Len());
+}
+
+
+void FillLinkData_WinLink(CByteBuffer &dest, const wchar_t *path, bool isSymLink)
+{
+  // dest.Free(); // it's empty already
+  bool isAbs = false;
+  if (IS_PATH_SEPAR(path[0]))
+  {
+    // root paths "\dir1\path" are marked as relative
+    if (IS_PATH_SEPAR(path[1]))
+      isAbs = true;
+  }
+  else
+    isAbs = IsAbsolutePath(path);
+  if (!isAbs && !isSymLink)
+  {
+    // Win10 allows us to create relative MOUNT_POINT.
+    // But relative MOUNT_POINT will not work when accessing it.
+    // So we prevent useless creation of a relative MOUNT_POINT.
+    return;
+  }
 
   bool needPrintName = true;
-
-  if (IsSuperPath(path))
+  UString subs (path);
+  if (isAbs)
   {
-    path += kSuperPathPrefixSize;
-    if (!IsDrivePath(path))
-      needPrintName = false;
+    const bool isSuperPath = IsSuperPath(path);
+    if (!isSuperPath && NName::IsNetworkPath(us2fs(path)))
+    {
+      subs = k_LinkPrefix_UNC;
+      subs += (path + 2);
+    }
+    else
+    {
+      if (isSuperPath)
+      {
+        // we remove super prefix:
+        path += kSuperPathPrefixSize;
+        // we want to get correct abolute path in PrintName still.
+        if (!IsDrivePath(path))
+          needPrintName = false; // we need "\\server\path" for print name.
+      }
+      subs = k_LinkPrefix;
+      subs += path;
+    }
   }
-
-  const unsigned add_Prefix_Len = isAbs ? k_LinkPrefix_Size : 0;
-    
+  const size_t len1 = subs.Len() * 2;
   size_t len2 = (size_t)MyStringLen(path) * 2;
-  const size_t len1 = len2 + add_Prefix_Len * 2;
   if (!needPrintName)
     len2 = 0;
-
-  size_t totalNamesSize = (len1 + len2);
-
+  size_t totalNamesSize = len1 + len2;
   /* some WIM imagex software uses old scheme for symbolic links.
-     so we can old scheme for byte to byte compatibility */
-
-  bool newOrderScheme = isSymLink;
+     so we can use old scheme for byte to byte compatibility */
+  const bool newOrderScheme = isSymLink;
   // newOrderScheme = false;
-
   if (!newOrderScheme)
-    totalNamesSize += 2 * 2;
+    totalNamesSize += 2 * 2; // we use NULL terminators in old scheme.
 
   const size_t size = 8 + 8 + (isSymLink ? 4 : 0) + totalNamesSize;
-  if (size != (UInt16)size)
-    return false;
+  if (size >= k_Link_Size_Limit)
+    return;
   dest.Alloc(size);
   memset(dest, 0, size);
   const UInt32 tag = isSymLink ?
-      _my_IO_REPARSE_TAG_SYMLINK :
-      _my_IO_REPARSE_TAG_MOUNT_POINT;
+      Z7_WIN_IO_REPARSE_TAG_SYMLINK :
+      Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT;
   Byte *p = dest;
-  Set32(p, tag);
-  Set16(p + 4, (UInt16)(size - 8));
-  Set16(p + 6, 0);
+  Set32(p, tag)
+  // Set32(p + 4, (UInt32)(size - 8))
+  Set16(p + 4, (UInt16)(size - 8))
+  Set16(p + 6, 0)
   p += 8;
 
   unsigned subOffs = 0;
@@ -191,25 +265,20 @@ bool FillLinkData(CByteBuffer &dest, const wchar_t *path, bool isSymLink, bool i
   else
     printOffs = (unsigned)len1 + 2;
 
-  Set16(p + 0, (UInt16)subOffs);
-  Set16(p + 2, (UInt16)len1);
-  Set16(p + 4, (UInt16)printOffs);
-  Set16(p + 6, (UInt16)len2);
-
+  Set16(p + 0, (UInt16)subOffs)
+  Set16(p + 2, (UInt16)len1)
+  Set16(p + 4, (UInt16)printOffs)
+  Set16(p + 6, (UInt16)len2)
   p += 8;
   if (isSymLink)
   {
-    UInt32 flags = isAbs ? 0 : _my_SYMLINK_FLAG_RELATIVE;
-    Set32(p, flags);
+    const UInt32 flags = isAbs ? 0 : Z7_WIN_SYMLINK_FLAG_RELATIVE;
+    Set32(p, flags)
     p += 4;
   }
-
-  if (add_Prefix_Len != 0)
-    WriteString(p + subOffs, k_LinkPrefix);
-  WriteString(p + subOffs + add_Prefix_Len * 2, path);
+  WriteString(p + subOffs, subs);
   if (needPrintName)
     WriteString(p + printOffs, path);
-  return true;
 }
 
 #endif // defined(_WIN32) && !defined(UNDER_CE)
@@ -221,7 +290,7 @@ static void GetString(const Byte *p, unsigned len, UString &res)
   unsigned i;
   for (i = 0; i < len; i++)
   {
-    wchar_t c = Get16(p + i * 2);
+    const wchar_t c = Get16(p + (size_t)i * 2);
     if (c == 0)
       break;
     s[i] = c;
@@ -229,6 +298,7 @@ static void GetString(const Byte *p, unsigned len, UString &res)
   s[i] = 0;
   res.ReleaseBuf_SetLen(i);
 }
+
 
 bool CReparseAttr::Parse(const Byte *p, size_t size)
 {
@@ -240,24 +310,29 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
   if (size < 8)
     return false;
   Tag = Get32(p);
-  UInt32 len = Get16(p + 4);
-  if (len + 8 != size)
-  // if (len + 8 > size)
+  if (Get16(p + 6) != 0) // padding
+  {
+    // DOCs: Reserved : the field SHOULD be set to 0
+    // and MUST be ignored (by parser).
+    // Win10 ignores it.
+    MinorError = true; // optional
+  }
+  unsigned len = Get16(p + 4);
+  p += 8;
+  size -= 8;
+  if (len != size)
+  // if (len > size)
     return false;
   /*
   if ((type & kReparseFlags_Alias) == 0 ||
       (type & kReparseFlags_Microsoft) == 0 ||
       (type & 0xFFFF) != 3)
   */
-
-  if (Get16(p + 6) != 0) // padding
-    return false;
-
   HeaderError = false;
 
-  if (   Tag != _my_IO_REPARSE_TAG_MOUNT_POINT
-      && Tag != _my_IO_REPARSE_TAG_SYMLINK
-      && Tag != _my_IO_REPARSE_TAG_LX_SYMLINK)
+  if (   Tag != Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT
+      && Tag != Z7_WIN_IO_REPARSE_TAG_SYMLINK
+      && Tag != Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK)
   {
     // for unsupported reparse points
     ErrorCode = (DWORD)ERROR_REPARSE_TAG_INVALID; // ERROR_REPARSE_TAG_MISMATCH
@@ -267,15 +342,11 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
 
   TagIsUnknown = false;
  
-  p += 8;
-  size -= 8;
-  
-  if (Tag == _my_IO_REPARSE_TAG_LX_SYMLINK)
+  if (Tag == Z7_WIN_IO_REPARSE_TAG_LX_SYMLINK)
   {
     if (len < 4)
       return false;
-    Flags = Get32(p); // maybe it's not Flags
-    if (Flags != _my_LX_SYMLINK_FLAG)
+    if (Get32(p) != Z7_WIN_LX_SYMLINK_VERSION_2)
       return false;
     len -= 4;
     p += 4;
@@ -283,12 +354,13 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
     unsigned i;
     for (i = 0; i < len; i++)
     {
-      char c = (char)p[i];
+      const char c = (char)p[i];
       s[i] = c;
       if (c == 0)
         break;
     }
-    WslName.ReleaseBuf_SetEnd(i);
+    s[i] = 0;
+    WslName.ReleaseBuf_SetLen(i);
     MinorError = (i != len);
     ErrorCode = 0;
     return true;
@@ -296,15 +368,15 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
   
   if (len < 8)
     return false;
-  unsigned subOffs = Get16(p);
-  unsigned subLen = Get16(p + 2);
-  unsigned printOffs = Get16(p + 4);
-  unsigned printLen = Get16(p + 6);
+  const unsigned subOffs = Get16(p);
+  const unsigned subLen = Get16(p + 2);
+  const unsigned printOffs = Get16(p + 4);
+  const unsigned printLen = Get16(p + 6);
   len -= 8;
   p += 8;
 
   Flags = 0;
-  if (Tag == _my_IO_REPARSE_TAG_SYMLINK)
+  if (Tag == Z7_WIN_IO_REPARSE_TAG_SYMLINK)
   {
     if (len < 4)
       return false;
@@ -327,34 +399,34 @@ bool CReparseAttr::Parse(const Byte *p, size_t size)
 
 bool CReparseShortInfo::Parse(const Byte *p, size_t size)
 {
-  const Byte *start = p;
-  Offset= 0;
+  const Byte * const start = p;
+  Offset = 0;
   Size = 0;
   if (size < 8)
     return false;
-  UInt32 Tag = Get32(p);
+  const UInt32 Tag = Get32(p);
   UInt32 len = Get16(p + 4);
+  /*
   if (len + 8 > size)
     return false;
+  */
   /*
   if ((type & kReparseFlags_Alias) == 0 ||
       (type & kReparseFlags_Microsoft) == 0 ||
       (type & 0xFFFF) != 3)
   */
-  if (Tag != _my_IO_REPARSE_TAG_MOUNT_POINT &&
-      Tag != _my_IO_REPARSE_TAG_SYMLINK)
+  if (Tag != Z7_WIN_IO_REPARSE_TAG_MOUNT_POINT &&
+      Tag != Z7_WIN_IO_REPARSE_TAG_SYMLINK)
     // return true;
     return false;
-
+  /*
   if (Get16(p + 6) != 0) // padding
     return false;
-  
+  */
   p += 8;
   size -= 8;
-  
   if (len != size) // do we need that check?
     return false;
-  
   if (len < 8)
     return false;
   unsigned subOffs = Get16(p);
@@ -365,7 +437,7 @@ bool CReparseShortInfo::Parse(const Byte *p, size_t size)
   p += 8;
 
   // UInt32 Flags = 0;
-  if (Tag == _my_IO_REPARSE_TAG_SYMLINK)
+  if (Tag == Z7_WIN_IO_REPARSE_TAG_SYMLINK)
   {
     if (len < 4)
       return false;
@@ -388,10 +460,14 @@ bool CReparseAttr::IsOkNamePair() const
 {
   if (IsLinkPrefix(SubsName))
   {
+    if (PrintName == GetPath())
+      return true;
+/*
     if (!IsDrivePath(SubsName.Ptr(k_LinkPrefix_Size)))
       return PrintName.IsEmpty();
     if (wcscmp(SubsName.Ptr(k_LinkPrefix_Size), PrintName) == 0)
       return true;
+*/
   }
   return wcscmp(SubsName, PrintName) == 0;
 }
@@ -407,32 +483,37 @@ bool CReparseAttr::IsVolume() const
 
 UString CReparseAttr::GetPath() const
 {
+  UString s (SubsName);
   if (IsSymLink_WSL())
   {
-    UString u;
     // if (CheckUTF8(attr.WslName)
-    if (!ConvertUTF8ToUnicode(WslName, u))
-      MultiByteToUnicodeString2(u, WslName);
-    return u;
+    if (!ConvertUTF8ToUnicode(WslName, s))
+      MultiByteToUnicodeString2(s, WslName);
   }
-
-  UString s (SubsName);
-  if (IsLinkPrefix(s))
+  else if (IsLinkPrefix(s))
   {
-    s.ReplaceOneCharAtPos(1, '\\'); // we normalize prefix from "\??\" to "\\?\"
-    if (IsDrivePath(s.Ptr(k_LinkPrefix_Size)))
-      s.DeleteFrontal(k_LinkPrefix_Size);
+    if (IsString1PrefixedByString2_NoCase_Ascii(s.Ptr(), k_LinkPrefix_UNC))
+    {
+      s.DeleteFrontal(6);
+      s.ReplaceOneCharAtPos(0, '\\');
+    }
+    else
+    {
+      s.ReplaceOneCharAtPos(1, '\\'); // we normalize prefix from "\??\" to "\\?\"
+      if (IsDrivePath(s.Ptr(k_LinkPrefix_Size)))
+        s.DeleteFrontal(k_LinkPrefix_Size);
+    }
   }
   return s;
 }
 
-#ifdef SUPPORT_DEVICE_FILE
+#ifdef Z7_DEVICE_FILE
 
 namespace NSystem
 {
 bool MyGetDiskFreeSpace(CFSTR rootPath, UInt64 &clusterSize, UInt64 &totalSize, UInt64 &freeSize);
 }
-#endif // SUPPORT_DEVICE_FILE
+#endif // Z7_DEVICE_FILE
 
 #if defined(_WIN32) && !defined(UNDER_CE)
 
@@ -460,7 +541,7 @@ bool GetReparseData(CFSTR path, CByteBuffer &reparseData, BY_HANDLE_FILE_INFORMA
 static bool CreatePrefixDirOfFile(CFSTR path)
 {
   FString path2 (path);
-  int pos = path2.ReverseFind_PathSepar();
+  const int pos = path2.ReverseFind_PathSepar();
   if (pos < 0)
     return true;
   #ifdef _WIN32
@@ -486,6 +567,8 @@ static bool OutIoReparseData(DWORD controlCode, CFSTR path, void *data, DWORD si
 }
 
 
+// MOUNT_POINT (Junction Point) and LX_SYMLINK (WSL) can be written without administrator rights.
+// SYMLINK requires administrator rights.
 // If there is Reparse data already, it still writes new Reparse data
 bool SetReparseData(CFSTR path, bool isDir, const void *data, DWORD size)
 {
@@ -509,7 +592,7 @@ bool SetReparseData(CFSTR path, bool isDir, const void *data, DWORD size)
     {
       CreatePrefixDirOfFile(path);
       COutFile file;
-      if (!file.Create(path, CREATE_NEW))
+      if (!file.Create_NEW(path))
         return false;
     }
   }
@@ -532,10 +615,11 @@ bool DeleteReparseData(CFSTR path)
     SetLastError(ERROR_INVALID_REPARSE_DATA);
     return false;
   }
-  BYTE buf[my_REPARSE_DATA_BUFFER_HEADER_SIZE];
-  memset(buf, 0, sizeof(buf));
-  memcpy(buf, reparseData, 4); // tag
-  return OutIoReparseData(my_FSCTL_DELETE_REPARSE_POINT, path, buf, sizeof(buf));
+  // BYTE buf[my_REPARSE_DATA_BUFFER_HEADER_SIZE];
+  // memset(buf, 0, sizeof(buf));
+  // memcpy(buf, reparseData, 4); // tag
+  memset(reparseData + 4, 0, my_REPARSE_DATA_BUFFER_HEADER_SIZE - 4);
+  return OutIoReparseData(my_FSCTL_DELETE_REPARSE_POINT, path, reparseData, my_REPARSE_DATA_BUFFER_HEADER_SIZE);
 }
 
 }

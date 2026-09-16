@@ -27,11 +27,12 @@ public:
 	sis630_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_ram_size(int ram_size) { m_ram_size = ram_size; }
 
+	void smi_act_w(int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual bool map_first() const override { return true; }
 
@@ -40,9 +41,9 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void memory_map(address_map &map);
+	void memory_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_host_cpu;
@@ -90,6 +91,8 @@ private:
 		bool enable = false;
 		u8 data_rate = 0;
 	} m_agp;
+
+	int m_smiact;
 };
 
 DECLARE_DEVICE_TYPE(SIS630_HOST, sis630_host_device)

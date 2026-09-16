@@ -66,9 +66,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	void att4425_io(address_map &map);
-	void att4425_mem(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void att4425_io(address_map &map) ATTR_COLD;
+	void att4425_mem(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
@@ -236,7 +236,7 @@ void att4425_state::att4425(machine_config &config)
 	m_maincpu->set_daisy_config(att4425_daisy_chain);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(att4425_state::screen_update));
@@ -275,7 +275,7 @@ void att4425_state::att4425(machine_config &config)
 	clock_device &line_clock(CLOCK(config, "line_clock", 9600 * 64));
 	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
-	I8251(config, m_i8251, 0);
+	I8251(config, m_i8251);
 	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
@@ -310,4 +310,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME              FLAGS
-COMP( 1983, att4425, 0,      0,      att4425, att4425, att4425_state, empty_init, "AT&T",  "AT&T Teletype 4425", MACHINE_IS_SKELETON )
+COMP( 1983, att4425, 0,      0,      att4425, att4425, att4425_state, empty_init, "AT&T",  "AT&T Teletype 4425", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -27,10 +27,10 @@ class mos8563_device : public mc6845_device,
 public:
 	mos8563_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void address_w(uint8_t data);
-	uint8_t status_r();
-	uint8_t register_r();
-	void register_w(uint8_t data);
+	virtual void address_w(uint8_t data) override;
+	virtual uint8_t status_r() override;
+	virtual uint8_t register_r() override;
+	virtual void register_w(uint8_t data) override;
 
 	inline uint8_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint8_t data);
@@ -41,8 +41,8 @@ protected:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -84,7 +84,7 @@ protected:
 
 	emu_timer *m_block_copy_timer;
 
-	void mos8563_videoram_map(address_map &map);
+	void mos8563_videoram_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -97,8 +97,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

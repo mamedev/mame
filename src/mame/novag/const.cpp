@@ -61,6 +61,7 @@ Super Constellation also has a power-off NMI, but it doesn't do anything other
 than writing 0x08 to control_w.
 
 TODO:
+- if/when MAME supports an exit callback, hook up power-off switch to that
 - is Dynamic S a program update of ssensor4 or identical?
 
 *******************************************************************************/
@@ -69,8 +70,8 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
@@ -96,13 +97,14 @@ public:
 	const_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_irq_clock(*this, "irq_clock"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_beeper(*this, "beeper"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(power) { if (newval && m_power) power_off(); }
+	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 
 	// machine configs
 	void nconst(machine_config &config);
@@ -115,49 +117,54 @@ public:
 	void init_const();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override { m_power = true; }
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_power = true; }
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	required_device<clock_device> m_irq_clock;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<8> m_inputs;
 
+	bool m_power = false;
+	u8 m_inp_mux = 0;
+
 	// address maps
-	void const_map(address_map &map);
-	void ssensor4_map(address_map &map);
-	void sconst_map(address_map &map);
+	void const_map(address_map &map) ATTR_COLD;
+	void ssensor4_map(address_map &map) ATTR_COLD;
+	void sconst_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
-	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input1_r();
 	u8 input2_r();
-
-	void power_off();
-	bool m_power = false;
-
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
 };
+
+
+
+/*******************************************************************************
+    Initialization
+*******************************************************************************/
 
 void const_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_power));
 	save_item(NAME(m_inp_mux));
-	save_item(NAME(m_led_select));
 }
 
-void const_state::power_off()
+INPUT_CHANGED_MEMBER(const_state::power_off)
 {
 	// NMI at power-off (ssensor4 prepares nvram for next power-on)
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	m_power = false;
+	if (newval && m_power)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_power = false;
+	}
 }
 
 void const_state::init_const()
@@ -173,28 +180,23 @@ void const_state::init_const()
     I/O
 *******************************************************************************/
 
-void const_state::update_display()
-{
-	m_display->matrix(m_led_select, m_inp_mux);
-}
-
 void const_state::mux_w(u8 data)
 {
 	// d0-d7: input mux, led data
 	m_inp_mux = data;
-	update_display();
+	m_display->write_mx(data);
 }
 
 void const_state::control_w(u8 data)
 {
 	// d0-d2: ?
 	// d3: ? (goes high at power-off NMI)
+
 	// d4-d6: select led row
-	m_led_select = data >> 4 & 7;
-	update_display();
+	m_display->write_my(data >> 4 & 7);
 
 	// d7: enable beeper
-	m_beeper->set_state(data >> 7 & 1);
+	m_beeper->set_state(BIT(data, 7));
 }
 
 u8 const_state::input1_r()
@@ -213,6 +215,7 @@ u8 const_state::input2_r()
 {
 	u8 data = 0;
 
+	// d0-d2: printer
 	// d3: timing related? seems unused (always high)
 	// other: ?
 
@@ -233,8 +236,8 @@ u8 const_state::input2_r()
 void const_state::ssensor4_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("nvram");
-	map(0x2000, 0x2000).nopw(); // accessory?
-	map(0x4000, 0x4000).nopw(); // "
+	map(0x2000, 0x2000).nopw(); // printer
+	map(0x4000, 0x4000).nopw(); // printer
 	map(0x6000, 0x6000).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x8000, 0x8000).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
 	map(0xc000, 0xdfff).r("exrom", FUNC(generic_slot_device::read_rom));
@@ -252,8 +255,8 @@ void const_state::const_map(address_map &map)
 void const_state::sconst_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1c00, 0x1c00).nopw(); // accessory?
-	map(0x1d00, 0x1d00).nopw(); // "
+	map(0x1c00, 0x1c00).nopw(); // printer
+	map(0x1d00, 0x1d00).nopw(); // printer
 	map(0x1e00, 0x1e00).rw(FUNC(const_state::input2_r), FUNC(const_state::mux_w));
 	map(0x1f00, 0x1f00).rw(FUNC(const_state::input1_r), FUNC(const_state::control_w));
 	map(0x2000, 0xffff).rom();
@@ -320,7 +323,7 @@ static INPUT_PORTS_START( ssensor4 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Hint")
 
 	PORT_START("POWER") // needs to be triggered for nvram to work
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(const_state::power_off), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nconstq )
@@ -345,7 +348,7 @@ static INPUT_PORTS_START( sconst )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Print List / Acc. Time / Pawn")
 
 	PORT_START("POWER")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, const_state, power, 0) PORT_NAME("Power Off")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(const_state::power_off), 0)
 INPUT_PORTS_END
 
 
@@ -360,9 +363,9 @@ void const_state::nconst(machine_config &config)
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	auto &irq_clock(CLOCK(config, "irq_clock", 2_MHz_XTAL / 0x2000)); // through 4020 IC, ~244Hz
-	irq_clock.set_pulse_width(attotime::from_nsec(17200)); // active for ~17.2us
-	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	CLOCK(config, m_irq_clock).set_period(attotime::from_ticks(0x2000, 2_MHz_XTAL)); // through 4020 IC, ~244Hz
+	m_irq_clock->set_pulse_width(attotime::from_nsec(17200)); // active for ~17.2us
+	m_irq_clock->signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -385,7 +388,7 @@ void const_state::ssensor4(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
-	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
+	m_irq_clock->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);
@@ -402,10 +405,10 @@ void const_state::nconst36(machine_config &config)
 	nconst(config);
 
 	// basic machine hardware
-	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
+	G65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
-	subdevice<clock_device>("irq_clock")->set_clock(7.2_MHz_XTAL/2 / 0x2000); // ~439Hz (pulse width same as nconst)
+	m_irq_clock->set_period(attotime::from_ticks(0x2000, 7.2_MHz_XTAL/2)); // ~439Hz (pulse width same as nconst)
 
 	m_board->set_delay(attotime::from_msec(200));
 
@@ -437,7 +440,7 @@ void const_state::nconstq(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_clock(8_MHz_XTAL/2);
 
-	subdevice<clock_device>("irq_clock")->set_clock(8_MHz_XTAL/4 / 0x1000); // ~488Hz (pulse width same as nconst)
+	m_irq_clock->set_period(attotime::from_ticks(0x1000, 8_MHz_XTAL/4)); // ~488Hz (pulse width same as nconst)
 
 	config.set_default_layout(layout_novag_constq);
 
@@ -454,7 +457,7 @@ void const_state::sconst(machine_config &config)
 	M6502(config.replace(), m_maincpu, 8_MHz_XTAL/2); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
 
-	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_nsec(10200)); // irq active for 10.2us
+	m_irq_clock->set_pulse_width(attotime::from_nsec(10200)); // irq active for 10.2us
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 	m_board->set_nvram_enable(true);
@@ -511,11 +514,11 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag", "Super Sensor IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, ssensor4, 0,       0,      ssensor4,  ssensor4, const_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Sensor IV", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag", "Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag", "Constellation Quattro", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1983, const,    0,       0,      nconst,    nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, const36,  const,   0,      nconst36,  nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation 3.6MHz (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, const36a, const,   0,      nconst36a, nconst,   const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation 3.6MHz (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, constq,   const,   0,      nconstq,   nconstq,  const_state, init_const, "Novag Industries / Intelligent Heuristic Programming", "Constellation Quattro", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, supercon, 0,       0,      sconst,    sconst,   const_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Super Constellation", MACHINE_SUPPORTS_SAVE )

@@ -9,14 +9,20 @@
 #include "emu.h"
 #include "dsp16fe.h"
 
+#include "cpu/drcfe.ipp"
+
 
 /***********************************************************************
     construction/destruction
 ***********************************************************************/
 
 dsp16_device_base::frontend::frontend(dsp16_device_base &host, u32 window_start, u32 window_end, u32 max_sequence)
-	: drc_frontend(host, window_start, window_end, max_sequence)
+	: drc_frontend_base(host.space_config(AS_PROGRAM)->page_shift(), window_start, window_end, max_sequence)
 	, m_host(host)
+{
+}
+
+dsp16_device_base::frontend::~frontend()
 {
 }
 
@@ -24,13 +30,20 @@ dsp16_device_base::frontend::frontend(dsp16_device_base &host, u32 window_start,
     drc_frontend implementation
 ***********************************************************************/
 
+dsp16_device_base::opcode_desc const *dsp16_device_base::frontend::describe_code(offs_t startpc)
+{
+	return do_describe_code(
+			[this] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev); },
+			startpc);
+}
+
 bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const *prev)
 {
 	// most instructions are one word long and run in one machine cycle
 	desc.length = 1U;
 	desc.cycles = 1U;
 
-	u16 const op(m_host.m_pcache.read_word(desc.physpc));
+	u16 const op(m_host.m_pcache.read_word(desc.pc));
 	switch (op >> 11)
 	{
 	case 0x00: // goto JA
@@ -38,8 +51,9 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	case 0x10: // call JA
 	case 0x11:
 		desc.cycles = 2U;
-		desc.targetpc = (desc.physpc & XAAU_I_EXT) | (op_ja(op) & XAAU_I_MASK);
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH;
+		desc.targetpc = (desc.pc & XAAU_I_EXT) | (op_ja(op) & XAAU_I_MASK);
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
 		if (BIT(op, 15))
 			flag_output_reg(desc, REG_BIT_XAAU_PR);
 		return true;
@@ -79,7 +93,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	case 0x08: // aT = R
 		desc.cycles = 2U;
 		if (op & 0x000fU) // reserved field?
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		flag_output_reg(desc, op_d(op) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
 		describe_r(desc, op, true, false);
 		return true;
@@ -88,7 +102,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	case 0x0b: // R = a1
 		desc.cycles = 2U;
 		if (op & 0x000fU) // reserved field?
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		flag_input_reg(desc, BIT(op, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
 		describe_r(desc, op, false, true);
 		return true;
@@ -97,14 +111,14 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 		desc.length = 2U;
 		desc.cycles = 2U;
 		if (op & 0x000fU) // reserved field?
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		describe_r(desc, op, false, true);
 		return true;
 
 	case 0x0c: // Y = R
 		desc.cycles = 2U;
 		if (op & 0x0400U) // reserved field?
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		describe_r(desc, op, true, false);
 		describe_y(desc, op, false, true);
 		return true;
@@ -124,7 +138,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	case 0x0f: // R = Y
 		desc.cycles = 2U;
 		if (op & 0x0400U) // reserved field?
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		describe_r(desc, op, false, true);
 		describe_y(desc, op, true, false);
 		return true;
@@ -175,7 +189,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 		desc.cycles = 2U;
 		if (op & 0x000fU)
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		flag_input_reg(desc, BIT(op, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
 		flag_output_reg(desc, REG_BIT_DAU_Y);
 		describe_f1(desc, op);
@@ -184,7 +198,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 
 	case 0x1a: // if CON # icall
 		if (op & 0x03e0U) // reserved field?
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 		if (BIT(op, 10))
 			return describe_icall(desc, op);
 		else
@@ -200,7 +214,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 		return true;
 
 	case 0x1e: // Reserved
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 		return true;
 
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
@@ -221,7 +235,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 
 u16 dsp16_device_base::frontend::read_op(opcode_desc const &desc, u16 offset)
 {
-	return m_host.m_pcache.read_word((desc.physpc & XAAU_I_EXT) | ((desc.physpc + offset) & XAAU_I_MASK));
+	return m_host.m_pcache.read_word((desc.pc & XAAU_I_EXT) | ((desc.pc + offset) & XAAU_I_MASK));
 }
 
 /***********************************************************************
@@ -232,16 +246,17 @@ bool dsp16_device_base::frontend::describe_goto_b(opcode_desc &desc, u16 op)
 {
 	desc.cycles = 2U;
 	if (op & 0x00ffU)
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 	desc.targetpc = BRANCH_TARGET_DYNAMIC;
-	desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH;
+	desc.set_is_unconditional_branch();
+	desc.set_end_sequence();
 	switch (op_b(op))
 	{
 	case 0x0: // return
 		flag_input_reg(desc, REG_BIT_XAAU_PR);
 		break;
 	case 0x1: // ireturn
-		desc.flags |= OPFLAG_CAN_CHANGE_MODES; // FIXME: is this flag useful for a switch in/out of interrupt service mode?
+		desc.set_can_change_modes(); // FIXME: is this flag useful for a switch in/out of interrupt service mode?
 		flag_input_reg(desc, REG_BIT_XAAU_PI);
 		break;
 	case 0x2: // goto pt
@@ -255,7 +270,7 @@ bool dsp16_device_base::frontend::describe_goto_b(opcode_desc &desc, u16 op)
 	case 0x5:
 	case 0x6:
 	case 0x7:
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 		break;
 	}
 	return true;
@@ -276,16 +291,17 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 		switch (op_con(op))
 		{
 		case 0xe: // true
-			desc.targetpc = (desc.physpc & XAAU_I_EXT) | (op_ja(next) & XAAU_I_MASK);
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH;
+			desc.targetpc = (desc.pc & XAAU_I_EXT) | (op_ja(next) & XAAU_I_MASK);
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
 			if (BIT(next, 15))
 				flag_output_reg(desc, REG_BIT_XAAU_PR);
 			break;
 		case 0xf: // false
 			break;
 		default:
-			desc.targetpc = (desc.physpc & XAAU_I_EXT) | (op_ja(next) & XAAU_I_MASK);
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.targetpc = (desc.pc & XAAU_I_EXT) | (op_ja(next) & XAAU_I_MASK);
+			desc.set_is_conditional_branch();
 			if (BIT(next, 15))
 				flag_output_reg(desc, REG_BIT_XAAU_PR);
 		}
@@ -306,13 +322,15 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 		case 0x5:
 		case 0x6:
 		case 0x7:
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 			break;
 		}
 		if (op_b(next) == 0x1) // can't predicate ireturn?
 		{
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_CAN_CHANGE_MODES; // FIXME: confirm appropriate flags
+			desc.set_is_unconditional_branch(); // FIXME: confirm appropriate flags
+			desc.set_end_sequence();
+			desc.set_can_change_modes();
 			flag_input_reg(desc, REG_BIT_XAAU_PI);
 		}
 		else
@@ -321,7 +339,8 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 			{
 			case 0xe: // true
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH;
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
 				switch (op_b(next))
 				{
 				case 0x0: // return
@@ -340,7 +359,7 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 				break;
 			default:
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+				desc.set_is_conditional_branch();
 				switch (op_b(next))
 				{
 				case 0x0: // return
@@ -359,7 +378,7 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 		break;
 
 	default:
-		desc.flags |= OPFLAG_INVALID_OPCODE; // can't predicate things that aren't branches?
+		desc.set_invalid_opcode(); // can't predicate things that aren't branches?
 	}
 	describe_con(desc, op, true);
 	return true;
@@ -369,18 +388,22 @@ bool dsp16_device_base::frontend::describe_icall(opcode_desc &desc, u16 op)
 {
 	desc.cycles = 3U;
 	if (0x000eU != op_con(op)) // CON must be true for icall?
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 	switch (op_con(op))
 	{
 	case 0xe: // true
 		desc.targetpc = 0x0002U;
-		desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_CAN_CHANGE_MODES; // FIXME: confirm appropriate flags
+		desc.set_is_unconditional_branch(); // FIXME: confirm appropriate flags
+		desc.set_end_sequence();
+		desc.set_can_change_modes();
 		break;
 	case 0xf: // false
 		break;
 	default:
 		desc.targetpc = 0x0002U;
-		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH | OPFLAG_CAN_CHANGE_MODES; // FIXME: confirm appropriate flags
+		desc.set_is_unconditional_branch(); // FIXME: confirm appropriate flags
+		desc.set_end_sequence();
+		desc.set_can_change_modes();
 	}
 	describe_con(desc, op, true);
 	return true;
@@ -390,7 +413,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 {
 	u16 const ni(op_ni(op)), k(op_k(op));
 	if (2U > k) // p3-25: "The iteration count can be between 2 and 127, inclusive"
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 	desc.length = ni + 1;
 	u32 cycles(0U), romcycles(0U), cachecycles(0U);
 	for (u16 i = 0; i < ni; ++i)
@@ -436,7 +459,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x08: // aT = R
 			romcycles = cachecycles = 2U;
 			if (op & 0x000fU) // reserved field?
-				desc.flags |= OPFLAG_INVALID_OPCODE;
+				desc.set_invalid_opcode();
 			flag_output_reg(desc, op_d(op) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
 			describe_r(desc, op, true, false);
 			break;
@@ -445,7 +468,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x0b: // R = a1
 			romcycles = cachecycles = 2U;
 			if (op & 0x000fU) // reserved field?
-				desc.flags |= OPFLAG_INVALID_OPCODE;
+				desc.set_invalid_opcode();
 			flag_input_reg(desc, BIT(op, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
 			describe_r(desc, op, false, true);
 			break;
@@ -453,7 +476,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x0c: // Y = R
 			romcycles = cachecycles = 2U;
 			if (op & 0x0400U) // reserved field?
-				desc.flags |= OPFLAG_INVALID_OPCODE;
+				desc.set_invalid_opcode();
 			describe_r(desc, op, true, false);
 			describe_y(desc, op, false, true);
 			break;
@@ -467,7 +490,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x0f: // R = Y
 			romcycles = cachecycles = 2U;
 			if (op & 0x0400U) // reserved field?
-				desc.flags |= OPFLAG_INVALID_OPCODE;
+				desc.set_invalid_opcode();
 			describe_r(desc, op, false, true);
 			describe_y(desc, op, true, false);
 			break;
@@ -520,7 +543,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 			romcycles = 2U;
 			cachecycles = 1U;
 			if (op & 0x000fU)
-				desc.flags |= OPFLAG_INVALID_OPCODE;
+				desc.set_invalid_opcode();
 			flag_input_reg(desc, BIT(op, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
 			flag_output_reg(desc, REG_BIT_DAU_Y);
 			describe_f1(desc, op);
@@ -554,7 +577,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x18: // goto B
 		case 0x1a: // if CON # icall
 		case 0x1e: // Reserved
-			desc.flags |= OPFLAG_INVALID_OPCODE;
+			desc.set_invalid_opcode();
 			m_cache_valid = false;
 			return false; // not going to get into what happens if you cache ineligible instructions
 		}
@@ -563,10 +586,11 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 	}
 	m_cache_cycles = cycles;
 	m_cache_last_cycles = cycles + (romcycles - cachecycles);
-	m_cache_flags = desc.flags & (OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY);
-	std::copy_n(desc.regin, std::size(desc.regin), m_cache_regin);
-	std::copy_n(desc.regout, std::size(desc.regout), m_cache_regout);
-	std::copy_n(desc.regreq, std::size(desc.regreq), m_cache_regreq);
+	m_cache_regin = desc.regin;
+	m_cache_regout = desc.regout;
+	m_cache_regreq = desc.regreq;
+	m_cache_reads_memory = desc.reads_memory();
+	m_cache_writes_memory = desc.writes_memory();
 	m_cache_valid = true;
 	desc.cycles += (2U - romcycles) + ((k - 1) * cycles) + (romcycles - cachecycles);
 	return true;
@@ -577,21 +601,24 @@ bool dsp16_device_base::frontend::describe_redo(opcode_desc &desc, u16 op)
 	desc.cycles = 2U;
 	u16 const k(op_k(op));
 	if (2U > k) // p3-25: "The iteration count can be between 2 and 127, inclusive"
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 
-	// assume that the block follwoing the last do K { ... } we examined is still cached - we can check properly when we actually run
+	// assume that the block following the last do K { ... } we examined is still cached - we can check properly when we actually run
 	if (!m_cache_valid)
 	{
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 		return false;
 	}
 	else
 	{
 		desc.cycles += ((k - 1) * m_cache_cycles) + m_cache_last_cycles;
-		desc.flags |= m_cache_flags;
-		std::copy_n(m_cache_regin, std::size(desc.regin), desc.regin);
-		std::copy_n(m_cache_regout, std::size(desc.regout), desc.regout);
-		std::copy_n(m_cache_regreq, std::size(desc.regreq), desc.regreq);
+		desc.regin = m_cache_regin;
+		desc.regout = m_cache_regout;
+		desc.regreq = m_cache_regreq;
+		if (m_cache_reads_memory)
+			desc.set_reads_memory();
+		if (m_cache_writes_memory)
+			desc.set_writes_memory();
 		return true;
 	}
 }
@@ -663,7 +690,7 @@ void dsp16_device_base::frontend::describe_r(opcode_desc &desc, u16 op, bool rea
 	case 0x1e: // pdx1
 		break;
 	default:
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 	}
 }
 
@@ -680,7 +707,7 @@ void dsp16_device_base::frontend::describe_con(opcode_desc &desc, u16 op, bool i
 		flag_input_reg(desc, REG_BIT_DAU_PSW);
 		break;
 	case 0x4: // heads/tails
-		throw emu_fatalerror("DSP16: unimplemented CON value %02X (PC = %04X)\n", con, desc.physpc);
+		throw emu_fatalerror("DSP16: unimplemented CON value %02X (PC = %04X)\n", con, desc.pc);
 	case 0x5: // c0ge/c0lt
 	case 0x6: // c1ge/c1lt
 		{
@@ -694,7 +721,7 @@ void dsp16_device_base::frontend::describe_con(opcode_desc &desc, u16 op, bool i
 	case 0x7: // true/false
 		break;
 	default:
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 	}
 }
 
@@ -796,7 +823,7 @@ void dsp16_device_base::frontend::describe_f2(opcode_desc &desc, u16 op)
 		flag_output_reg(desc, d, REG_BIT_DAU_PSW);
 		break;
 	case 0xa: // Reserved
-		desc.flags |= OPFLAG_INVALID_OPCODE;
+		desc.set_invalid_opcode();
 		break;
 	case 0xc: // aD = y
 		flag_input_reg(desc, REG_BIT_DAU_Y);
@@ -807,7 +834,7 @@ void dsp16_device_base::frontend::describe_f2(opcode_desc &desc, u16 op)
 
 void dsp16_device_base::frontend::describe_x(opcode_desc &desc, u16 op)
 {
-	desc.flags |= OPFLAG_READS_MEMORY; // TODO: is reading ROM the same as memory for dependency purposes?
+	desc.set_reads_memory(); // TODO: is reading ROM the same as memory for dependency purposes?
 	flag_input_reg(desc, REG_BIT_XAAU_PT);
 	flag_output_reg(desc, REG_BIT_XAAU_PT, REG_BIT_DAU_X);
 	if (op_x(op))
@@ -818,9 +845,9 @@ void dsp16_device_base::frontend::describe_y(opcode_desc &desc, u16 op, bool rea
 {
 	u32 const r(REG_BIT_YAAU_R0 + ((op >> 2) & 0x0003U));
 	if (read)
-		desc.flags |= OPFLAG_READS_MEMORY;
+		desc.set_reads_memory();
 	if (write)
-		desc.flags |= OPFLAG_WRITES_MEMORY;
+		desc.set_writes_memory();
 	switch (op & 0x0003U)
 	{
 	case 0x0: // *rN
@@ -845,7 +872,8 @@ void dsp16_device_base::frontend::describe_y(opcode_desc &desc, u16 op, bool rea
 void dsp16_device_base::frontend::describe_z(opcode_desc &desc, u16 op)
 {
 	u32 const r(REG_BIT_YAAU_R0 + ((op >> 2) & 0x0003U));
-	desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_WRITES_MEMORY;
+	desc.set_reads_memory();
+	desc.set_writes_memory();
 	flag_output_reg(desc, r);
 	switch (op & 0x0003U)
 	{

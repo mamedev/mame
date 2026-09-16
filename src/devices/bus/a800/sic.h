@@ -15,15 +15,15 @@ public:
 	a800_sic_128kb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	a800_sic_128kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void cart_map(address_map &map) override;
-	virtual void cctl_map(address_map &map) override;
+	virtual void cart_map(address_map &map) override ATTR_COLD;
+	virtual void cctl_map(address_map &map) override ATTR_COLD;
 	virtual std::tuple<int, int> get_initial_rd_state() override { return std::make_tuple(0, 1); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_device<intelfsh8_device> m_flash;
 
@@ -45,7 +45,7 @@ public:
 	a800_sic_256kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class a800_sic_512kb_device : public a800_sic_128kb_device
@@ -54,7 +54,7 @@ public:
 	a800_sic_512kb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(A800_SIC_128KB, a800_sic_128kb_device)

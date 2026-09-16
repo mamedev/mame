@@ -13,9 +13,6 @@
 
 #pragma once
 
-#include "debugcpu.h"
-#include "debugcon.h"
-
 #include <string_view>
 
 
@@ -73,7 +70,7 @@ private:
 	u64 global_get(global_entry *global);
 	void global_set(global_entry *global, u64 value);
 
-	bool mini_printf(std::ostream &stream, std::string_view format, int params, u64 *param);
+	bool mini_printf(std::ostream &stream, const std::vector<std::string_view> &params);
 	template <typename T>
 	void execute_index_command(std::vector<std::string_view> const &params, T &&apply, char const *unused_message);
 
@@ -130,18 +127,24 @@ private:
 	void execute_stateload(const std::vector<std::string_view> &params);
 	void execute_rewind(const std::vector<std::string_view> &params);
 	void execute_save(int spacenum, const std::vector<std::string_view> &params);
+	bool execute_save_try_memory(const std::vector<std::string_view> &params);
 	void execute_saveregion(const std::vector<std::string_view> &params);
 	void execute_load(int spacenum, const std::vector<std::string_view> &params);
+	bool execute_load_try_memory(const std::vector<std::string_view> &params);
 	void execute_loadregion(const std::vector<std::string_view> &params);
 	void execute_dump(int spacenum, const std::vector<std::string_view> &params);
+	bool execute_dump_try_memory(const std::vector<std::string_view> &params);
 	void execute_strdump(int spacenum, const std::vector<std::string_view> &params);
+	bool execute_strdump_try_memory(const std::vector<std::string_view> &params);
 	void execute_cheatrange(bool init, const std::vector<std::string_view> &params);
 	void execute_cheatnext(bool initial, const std::vector<std::string_view> &params);
 	void execute_cheatlist(const std::vector<std::string_view> &params);
 	void execute_cheatundo(const std::vector<std::string_view> &params);
 	void execute_dasm(const std::vector<std::string_view> &params);
 	void execute_find(int spacenum, const std::vector<std::string_view> &params);
+	bool execute_find_try_memory(const std::vector<std::string_view> &params);
 	void execute_fill(int spacenum, const std::vector<std::string_view> &params);
+	bool execute_fill_try_memory(const std::vector<std::string_view> &params);
 	void execute_trace(const std::vector<std::string_view> &params, bool trace_over);
 	void execute_traceflush(const std::vector<std::string_view> &params);
 	void execute_history(const std::vector<std::string_view> &params);

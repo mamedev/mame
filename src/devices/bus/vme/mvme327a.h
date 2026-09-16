@@ -23,21 +23,21 @@ public:
 	vme_mvme327a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void cpu_mem(address_map &map);
-	void cpu_int(address_map &map);
+	void cpu_mem(address_map &map) ATTR_COLD;
+	void cpu_int(address_map &map) ATTR_COLD;
 
 	required_device<m68010_device> m_cpu;
 	required_device<pit68230_device> m_pit;
 	required_device<bim68153_device> m_bim;
 
-	required_device<wd37c65c_device> m_fdc;
+	required_device<wd37c65_device> m_fdc;
 	required_device<wd33c93a_device> m_scsi;
 
 	memory_view m_boot;

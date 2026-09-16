@@ -13,15 +13,70 @@
 #include "emu.h"
 #include "bitstik.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_BITSTIK1, bbc_bitstik1_device, "bbc_bitstik1", "Acorn Bitstik")
-DEFINE_DEVICE_TYPE(BBC_BITSTIK2, bbc_bitstik2_device, "bbc_bitstik2", "Robo Bitstik 2")
+namespace {
+
+class bbc_bitstik_device : public device_t, public device_bbc_analogue_interface
+{
+protected:
+	bbc_bitstik_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_bbc_analogue_interface(mconfig, *this),
+		m_channel(*this, "CHANNEL%u", 0),
+		m_buttons(*this, "BUTTONS")
+	{
+	}
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual uint16_t ch_r(offs_t channel) override
+	{
+		return m_channel[channel]->read() << 4;
+	}
+
+	virtual uint8_t pb_r() override
+	{
+		return m_buttons->read() & 0x30;
+	}
+
+private:
+	required_ioport_array<4> m_channel;
+	required_ioport m_buttons;
+};
+
+
+class bbc_bitstik1_device : public bbc_bitstik_device
+{
+public:
+	bbc_bitstik1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		bbc_bitstik_device(mconfig, BBC_BITSTIK1, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+
+class bbc_bitstik2_device : public bbc_bitstik_device
+{
+public:
+	bbc_bitstik2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		bbc_bitstik_device(mconfig, BBC_BITSTIK2, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 
 //-------------------------------------------------
-//  ROM( bitstik )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START(bitstik1)
@@ -36,40 +91,6 @@ ROM_START(bitstik2)
 	ROM_RELOAD(0x2000, 0x2000)
 ROM_END
 
-//-------------------------------------------------
-//  INPUT_PORTS( bitstik )
-//-------------------------------------------------
-
-static INPUT_PORTS_START(bitstik)
-	PORT_START("CHANNEL0")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("AD Stick X")
-
-	PORT_START("CHANNEL1")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("AD Stick Y")
-
-	PORT_START("CHANNEL2")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Z) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("AD Stick Z")
-
-	PORT_START("CHANNEL3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Right Button - Release")
-
-	PORT_START("BUTTONS")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Top Button - Execute")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Left Button - Confirm")
-INPUT_PORTS_END
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor bbc_bitstik_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(bitstik);
-}
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
 
 const tiny_rom_entry *bbc_bitstik1_device::device_rom_region() const
 {
@@ -81,52 +102,37 @@ const tiny_rom_entry *bbc_bitstik2_device::device_rom_region() const
 	return ROM_NAME(bitstik2);
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
-//  bbc_bitstik_device - constructor
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
-bbc_bitstik_device::bbc_bitstik_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_bbc_analogue_interface(mconfig, *this),
-	m_channel(*this, "CHANNEL%u", 0),
-	m_buttons(*this, "BUTTONS")
+static INPUT_PORTS_START(bitstik)
+	PORT_START("CHANNEL0")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_NAME("AD Stick X")
+
+	PORT_START("CHANNEL1")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_NAME("AD Stick Y")
+
+	PORT_START("CHANNEL2")
+	PORT_BIT(0xfff, 0x800, IPT_AD_STICK_Z) PORT_MINMAX(0x00, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_NAME("AD Stick Z")
+
+	PORT_START("CHANNEL3")
+	PORT_BIT(0xfff, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Right Button - Release")
+
+	PORT_START("BUTTONS")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Top Button - Execute")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Left Button - Confirm")
+INPUT_PORTS_END
+
+
+ioport_constructor bbc_bitstik_device::device_input_ports() const
 {
+	return INPUT_PORTS_NAME(bitstik);
 }
 
-bbc_bitstik1_device::bbc_bitstik1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	bbc_bitstik_device(mconfig, BBC_BITSTIK1, tag, owner, clock)
-{
-}
-
-bbc_bitstik2_device::bbc_bitstik2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	bbc_bitstik_device(mconfig, BBC_BITSTIK2, tag, owner, clock)
-{
-}
+} // anonymous namespace
 
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void bbc_bitstik_device::device_start()
-{
-}
-
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-uint8_t bbc_bitstik_device::ch_r(int channel)
-{
-	return m_channel[channel]->read();
-}
-
-uint8_t bbc_bitstik_device::pb_r()
-{
-	return m_buttons->read() & 0x30;
-}
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_BITSTIK1, device_bbc_analogue_interface, bbc_bitstik1_device, "bbc_bitstik1", "Acorn Bitstik")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_BITSTIK2, device_bbc_analogue_interface, bbc_bitstik2_device, "bbc_bitstik2", "Robo Bitstik 2")

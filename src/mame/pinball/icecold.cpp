@@ -48,14 +48,14 @@ public:
 		m_start_output(*this, "start")
 	{ }
 
-	void icecold(machine_config &config);
+	void icecold(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
-	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+	ioport_value motors_limit_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void scanlines_w(uint8_t data);
@@ -98,7 +98,7 @@ private:
 	int     m_lmotor = 0;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
-	void icecold_map(address_map &map);
+	void icecold_map(address_map &map) ATTR_COLD;
 };
 
 void icecold_state::icecold_map(address_map &map)
@@ -161,20 +161,20 @@ static INPUT_PORTS_START( icecold )
 	PORT_DIPSETTING(    0xc0, "X-Fast" )
 
 	PORT_START("TEST")  // service switch is directly hard-wired with the NMI line
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_CHANGED_MEMBER(DEVICE_SELF, icecold_state, test_switch_press, 1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(icecold_state::test_switch_press), 1)
 
 	PORT_START("JOY")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP)
-	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(icecold_state, motors_limit_r)
+	PORT_BIT(0x55, IP_ACTIVE_LOW, IPT_CUSTOM)          PORT_CUSTOM_MEMBER(FUNC(icecold_state::motors_limit_r))
 
 	PORT_START("X0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Ball Gate")  PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_TILT1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_TILT)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME(DEF_STR( Free_Play )) PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hopper cycle sensor")    PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)    PORT_NAME("Hopper empty")   PORT_CODE(KEYCODE_7)
@@ -203,21 +203,13 @@ INPUT_PORTS_END
 
 void icecold_state::machine_start()
 {
-	m_digit_outputs.resolve();
-	m_lamp_outputs.resolve();
-	m_lmotor_output.resolve();
-	m_rmotor_output.resolve();
-	m_in_play.resolve();
-	m_good_game.resolve();
-	m_game_over.resolve();
-	m_tilt_output.resolve();
-	m_start_output.resolve();
+	// TODO: savestates
 }
 
 void icecold_state::machine_reset()
 {
 	// CH-C is used for generate a 30hz clock
-	m_ay8910[0]->set_volume(2, 0);
+	m_ay8910[0]->set_output_gain(2, 0.0);
 
 	m_rmotor = m_lmotor = 10;
 	m_sint = 0;
@@ -225,7 +217,7 @@ void icecold_state::machine_reset()
 	m_ball_gate_sw = 1;
 }
 
-CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
+ioport_value icecold_state::motors_limit_r()
 {
 	uint8_t data = 0;
 
@@ -404,10 +396,10 @@ void icecold_state::icecold(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	TIMER(config, "sint_timer", 0).configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
+	TIMER(config, "sint_timer").configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
 
 	// for update motors position
-	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
+	TIMER(config, "motors_timer").configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
 	config.set_default_layout(layout_icecold);

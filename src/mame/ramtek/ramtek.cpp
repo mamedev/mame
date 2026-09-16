@@ -79,10 +79,10 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -120,7 +120,7 @@ void ramtek_state::ramtek(machine_config &config)
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_ramtek);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
 	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
@@ -247,10 +247,10 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek) [TTL]",    MACHINE_IS_SKELETON )
-GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
-GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek) [TTL]",   MACHINE_IS_SKELETON )
-GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek) [TTL]",  MACHINE_IS_SKELETON )
-GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep [TTL]",       MACHINE_IS_SKELETON )
-GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B) [TTL]",    MACHINE_IS_SKELETON )
+GAME( 1973, vollyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Volly (Ramtek)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1973, hockyrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Hockey (Ramtek)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1973, soccrrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Soccer (Ramtek)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, wipeormt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Wipeout (Ramtek)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, cleanswp,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Clean Sweep",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, bballrmt,  0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Baseball (Ramtek)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1975, trivia,    0, ramtek, 0, ramtek_state, empty_init, ROT0, "Ramtek", "Trivia (Rev B)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

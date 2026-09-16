@@ -8,7 +8,7 @@
  *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
- * Copyright Karl Stenerud.  All rights reserved.
+ * Copyright Karl Stenerud.
  *
  */
 
@@ -193,8 +193,7 @@ std::string m68k_disassembler::get_ea_mode_str(u16 instruction, u32 size)
 		{
 		/* program counter with displacement */
 			u16 temp_value = read_imm_16();
-			return util::string_format("(%s,PC) ; ($%x)", make_signed_hex_str_16(temp_value),
-									   (make_int_16(temp_value) + m_cpu_pc-2) & 0xffffffff);
+			return util::string_format("($%x,PC)", (make_int_16(temp_value) + m_cpu_pc-2) & 0xffffffff);
 		}
 		case 0x3b:
 		{
@@ -893,7 +892,7 @@ std::string m68k_disassembler::d68020_cas_8()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_8(m_cpu_ir));
+	return util::string_format("cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_8(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas_16()
@@ -902,7 +901,7 @@ std::string m68k_disassembler::d68020_cas_16()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_16(m_cpu_ir));
+	return util::string_format("cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_16(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas_32()
@@ -911,7 +910,7 @@ std::string m68k_disassembler::d68020_cas_32()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_32(m_cpu_ir));
+	return util::string_format("cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_32(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas2_16()
@@ -1603,6 +1602,11 @@ std::string m68k_disassembler::d68040_fpu()
 		}
 	}
 	return util::string_format("FPU (?) ");
+}
+
+std::string m68k_disassembler::dcoldfire_halt()
+{
+	return std::string("halt");
 }
 
 std::string m68k_disassembler::d68000_jmp()
@@ -3030,47 +3034,50 @@ std::string m68k_disassembler::d68851_p000()
 		}
 	}
 
+	// The register selected by the P-REG field depends on which of the three
+	// PMOVE forms this is, so the two must be decoded together.
+	const int preg = (modes >> 10) & 7;
+	const char *regname = nullptr;
+	bool has_fd = true;
+
 	switch ((modes>>13) & 0x7)
 	{
-		case 0: // MC68030/040 form with FD bit
-		case 2: // MC68881 form, FD never set
-			if (modes & 0x0100)
+		case 0: // MC68030/040 transparent translation registers
+			if (preg == 2)
 			{
-				if (modes & 0x0200)
-				{
-					return util::string_format("pmovefd %s, %s", m_mmuregs[(modes>>10)&7], str);
-				}
-				else
-				{
-					return util::string_format("pmovefd %s, %s", str, m_mmuregs[(modes>>10)&7]);
-				}
+				regname = "tt0";
 			}
-			else
+			else if (preg == 3)
 			{
-				if (modes & 0x0200)
-				{
-					return util::string_format("pmove   %s, %s", m_mmuregs[(modes>>10)&7], str);
-				}
-				else
-				{
-					return util::string_format("pmove   %s, %s", str, m_mmuregs[(modes>>10)&7]);
-				}
+				regname = "tt1";
 			}
+			break;
+
+		case 2: // MC68851 registers (also TC/SRP/CRP on the MC68030/040)
+			regname = m_mmuregs[preg];
 			break;
 
 		case 3: // MC68030 to/from status reg
-			if (modes & 0x0200)
-			{
-				return util::string_format("pmove   mmusr, %s", str);
-			}
-			else
-			{
-				return util::string_format("pmove   %s, mmusr", str);
-			}
+			regname = "mmusr";
+			has_fd = false;
 			break;
-
 	}
-	return util::string_format("pmove [unknown form] %s", str);
+
+	if (!regname)
+	{
+		return util::string_format("pmove [unknown form] %s", str);
+	}
+
+	const char *const opname = (has_fd && (modes & 0x0100)) ? "pmovefd" : "pmove  ";
+
+	if (modes & 0x0200)
+	{
+		return util::string_format("%s %s, %s", opname, regname, str);
+	}
+	else
+	{
+		return util::string_format("%s %s, %s", opname, str, regname);
+	}
 }
 
 std::string m68k_disassembler::d68851_pbcc16()
@@ -3283,6 +3290,7 @@ const m68k_disassembler::opcode_struct m68k_disassembler::m_opcode_info[] =
 	{&m68k_disassembler::d68000_ext_16       , 0xfff8, 0x4880, 0x000},
 	{&m68k_disassembler::d68000_ext_32       , 0xfff8, 0x48c0, 0x000},
 	{&m68k_disassembler::d68040_fpu          , 0xffc0, 0xf200, 0x000},
+	{&m68k_disassembler::dcoldfire_halt      , 0xffff, 0x4ac8, 0x000},
 	{&m68k_disassembler::d68000_illegal      , 0xffff, 0x4afc, 0x000},
 	{&m68k_disassembler::d68000_jmp          , 0xffc0, 0x4ec0, 0x27b},
 	{&m68k_disassembler::d68000_jsr          , 0xffc0, 0x4e80, 0x27b},

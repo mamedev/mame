@@ -53,8 +53,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_on);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -71,9 +71,9 @@ private:
 
 	void palette_init(palette_device &palette);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void asic1_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void asic1_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_data_r();
 	void port_data_w(uint8_t data);
@@ -101,7 +101,7 @@ void psion3_state::io_map(address_map &map)
 	map(0x0000, 0x001f).rw(m_asic1, FUNC(psion_asic1_device::io_r), FUNC(psion_asic1_device::io_w));
 	map(0x0080, 0x008f).rw(m_asic2, FUNC(psion_asic2_device::io_r), FUNC(psion_asic2_device::io_w)).umask16(0x00ff);
 	//map(0x0100, 0x01ff).lr8(NAME([]() { return 0xff; })); // w: enable Vcc lines?
-	map(0x0200, 0x02ff).w(m_dtmf, FUNC(pcd3311_device::write));
+	map(0x0200, 0x02ff).w(m_dtmf, FUNC(pcd3311_device::write_direct));
 }
 
 void psion3_state::asic1_map(address_map &map)
@@ -205,7 +205,7 @@ static INPUT_PORTS_START( psion3 )
 	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("ESC")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_NAME("Esc On") PORT_CHANGED_MEMBER(DEVICE_SELF, psion3_state, key_on, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_NAME("Esc On") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(psion3_state::key_on), 0)
 INPUT_PORTS_END
 
 
@@ -284,7 +284,7 @@ void psion3_state::psion3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &psion3_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_asic1, FUNC(psion_asic1_device::inta_cb));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 80);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);
@@ -322,7 +322,7 @@ void psion3_state::psion3(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
-	PCD3311(config, m_dtmf, 3'580'000).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3311CT
+	PCD3311(config, m_dtmf, 3.58_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3311CT
 
 	PSION_SSD(config, m_ssd[0]);
 	m_ssd[0]->door_cb().set(m_asic2, FUNC(psion_asic2_device::dnmi_w));
@@ -345,9 +345,14 @@ void psion3_state::psion3s(machine_config &config)
 
 ROM_START(psion3)
 	ROM_REGION16_LE(0x80000, "flash", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "177f", "V1.77F/ENG 221091")
-	ROMX_LOAD("3504-3002-01_19-11-91v1.77f_eng.bin", 0x00000, 0x20000, CRC(73ba99fa) SHA1(1b3f7b2da9cc2f189e88a9aa01fdb6fad7598925), ROM_BIOS(0))
-	ROMX_LOAD("3504-3001-01_19-11-91v1.77f_eng.bin", 0x40000, 0x40000, CRC(e868c250) SHA1(48cce7dd219fb776bffe247c48ba070a89bff121), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "191f", "V1.91F/ENG/FRN/GER/ESP/ITA 270892")
+	ROMX_LOAD("s3_v1.91f_multi.bin", 0x00000, 0x80000, CRC(2d6846d8) SHA1(cf427216e37930e5edf33fe6c29b551d12e3971a), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "180f", "V1.80F/ENG/FRN/GER/ITA 241291")
+	ROMX_LOAD("s3_v1.80f_multi.bin", 0x00000, 0x80000, CRC(e30cc1ab) SHA1(b349465683ecaebc31b4188469b7c73c7eec00f8), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "177f", "V1.77F/ENG 221091")
+	ROMX_LOAD("3504-3002-01_19-11-91v1.77f_eng.bin", 0x00000, 0x20000, CRC(73ba99fa) SHA1(1b3f7b2da9cc2f189e88a9aa01fdb6fad7598925), ROM_BIOS(2))
+	ROM_RELOAD(0x20000, 0x20000)
+	ROMX_LOAD("3504-3001-01_19-11-91v1.77f_eng.bin", 0x40000, 0x40000, CRC(e868c250) SHA1(48cce7dd219fb776bffe247c48ba070a89bff121), ROM_BIOS(2))
 ROM_END
 
 ROM_START(psion3s)
@@ -369,6 +374,6 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY             FULLNAME           FLAGS
-COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_IMPERFECT_SOUND )
-COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_IMPERFECT_SOUND )
-COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_IMPERFECT_SOUND )
+COMP( 1991, psion3,    0,       0,      psion3,   psion3,    psion3_state,  empty_init,  "Psion",            "Series 3",        MACHINE_SUPPORTS_SAVE )
+COMP( 1992, pocketbk,  psion3,  0,      psion3s,  pocketbk,  psion3_state,  empty_init,  "Acorn Computers",  "Pocket Book",     MACHINE_SUPPORTS_SAVE )
+COMP( 1994, psion3s,   psion3,  0,      psion3s,  psion3s,   psion3_state,  empty_init,  "Psion",            "Series 3s",       MACHINE_SUPPORTS_SAVE )

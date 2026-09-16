@@ -18,7 +18,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "machine/mb8421.h"
+#include "mb8421.h"
 
 template class dual_port_mailbox_ram_base<u8, 10, 8>;
 template class dual_port_mailbox_ram_base<u8, 11, 8>;

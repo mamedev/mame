@@ -113,6 +113,8 @@
 #include "bus/interpro/keyboard/keyboard.h"
 #include "bus/interpro/mouse/mouse.h"
 
+#include "corefloat.h"
+
 #define LOG_LINE    (1U << 1)
 #define LOG_BLIT    (1U << 2)
 
@@ -262,7 +264,42 @@ ROM_END
 
 ROM_START(msmt070)
 	ROM_REGION(0x80, "idprom", 0)
-	ROM_LOAD32_BYTE("msmt070b.bin", 0x0, 0x20, CRC(ad11a4e6) SHA1(e620cd37a1e36d2c548b7783ece336428ec75b0e))
+	ROM_LOAD32_BYTE("mprgy920f_9305070_82s123.u71", 0x00, 0x20, CRC(4fec770c) SHA1(25bfb863336315975568f137e7e76bdc8101ab02))
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD("y230_0b30_4120_gal22v10.u107", 0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y231_0b30_5030_pal16v8.u109",  0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y232_0a30_5040_pal16v8.u124",  0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y233_0a30_4130_gal22v10.u126", 0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y234_0a30_5040_pal16v8.u95",   0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y235_0a30_4190_pal20v8.u130",  0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y236_0a30_5040_pal16v8.u131",  0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y237_0c30_4150_pal22v10.u157", 0x000, 0x2e5, NO_DUMP) // Same label as U158
+	ROM_LOAD("y237_0c30_4150_pal22v10.u158", 0x000, 0x2e5, NO_DUMP) // Same label as U157
+	ROM_LOAD("y237_0c30_4191_pal22v10.u140", 0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y237_0c30_4130_pal22v10.u137", 0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y241_0b30_4140_pal22v10.u165", 0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y242_0b30_4140_pal22v10.u63",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y243_0b30_4150_pal22v10.u66",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y244_0b30_4140_pal22v10.u67",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y245_0a30_5040_pal16v8.u90",   0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y246_0b30_4160_gal20v8.u106",  0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y247_0a30_5040_pal16v8.u91",   0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y248_0b30_4151_gal20v8.u7",    0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y249_0b30_4200_gal20v8.u11",   0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y250_0a30_4200_pal16v8.u98",   0x000, 0x117, NO_DUMP)
+	ROM_LOAD("y251_0a30_4200_gal20v8.u40",   0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y252_0a30_4160_gal20v8.u82",   0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y253_0a30_421_gal22v10.u117",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y254_0a30_421_gal22v10.u118",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y255_0a30_4161_gal20v8.u132",  0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y256_0a30_4160_gal22v10.u112", 0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y257_0a30_4160_gal22v10.u78",  0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y258_0a30_4161_gal20v8.u81",   0x000, 0x157, NO_DUMP)
+	ROM_LOAD("y259_0a30_4161_gal22v10.u74",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y260_0a30_4160_gal20v8.u75",   0x000, 0x157, NO_DUMP)
+	ROM_LOAD("x261_0a30_5272_gal22v10.u12",  0x000, 0x2e5, NO_DUMP)
+	ROM_LOAD("y262_0b30_4161_gal22v10.u13",  0x000, 0x2e5, NO_DUMP)
 ROM_END
 
 ROM_START(msmt071)
@@ -295,8 +332,8 @@ ROM_END
 
 void gt_device_base::device_add_mconfig(machine_config &config)
 {
-	DP8510(config, m_bpu[0], 0);
-	DP8510(config, m_bpu[1], 0);
+	DP8510(config, m_bpu[0]);
+	DP8510(config, m_bpu[1]);
 }
 
 void interpro_digitizer_devices(device_slot_interface &device)
@@ -309,7 +346,7 @@ void gtdb_device::device_add_mconfig(machine_config &config)
 {
 	gt_device_base::device_add_mconfig(config);
 
-	SCC8530N(config, m_scc, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc, 4.9152_MHz_XTAL);
 
 	interpro_keyboard_port_device &keyboard(INTERPRO_KEYBOARD_PORT(config, "kbd", interpro_keyboard_devices, "lle_en_us"));
 	keyboard.rxd_handler_cb().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -343,13 +380,13 @@ void mpcb963_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[0]->set_screen_update(FUNC(mpcb963_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("1M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("1M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 }
 
 void mpcba79_device::device_add_mconfig(machine_config &config)
@@ -358,20 +395,20 @@ void mpcba79_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[0]->set_screen_update(FUNC(mpcba79_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("1M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("1M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[1]->set_screen_update(FUNC(mpcba79_device::screen_update<1>));
 	BT459(config, m_ramdac[1], pixclock);
-	RAM(config, m_vram[1], 0).set_default_size("1M");
-	RAM(config, m_mram[1], 0).set_default_size("128K");
+	RAM(config, m_vram[1]).set_default_size("1M");
+	RAM(config, m_mram[1]).set_default_size("128K");
 }
 
 /*
@@ -391,13 +428,13 @@ void msmt070_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[0]->set_screen_update(FUNC(msmt070_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("2M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("2M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 }
 
 void msmt071_device::device_add_mconfig(machine_config &config)
@@ -406,20 +443,20 @@ void msmt071_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[0]->set_screen_update(FUNC(msmt071_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
-	RAM(config, m_vram[0], 0).set_default_size("2M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
+	RAM(config, m_vram[0]).set_default_size("2M");
+	RAM(config, m_mram[0]).set_default_size("128K");
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[1]->set_screen_update(FUNC(msmt071_device::screen_update<1>));
 	BT459(config, m_ramdac[1], pixclock);
-	RAM(config, m_vram[1], 0).set_default_size("2M");
-	RAM(config, m_mram[1], 0).set_default_size("128K");
+	RAM(config, m_vram[1]).set_default_size("2M");
+	RAM(config, m_mram[1]).set_default_size("128K");
 }
 
 /*
@@ -439,15 +476,15 @@ void msmt081_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 2076, 391 + GT_X_DELTA, 1664 + 391 + GT_X_DELTA, 1324, 74, 1248 + 74);
 	m_screen[0]->set_screen_update(FUNC(msmt081_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
 
 	// FIXME: following memory sizes are pure speculation
-	RAM(config, m_vram[0], 0).set_default_size("4M"); // guess
-	RAM(config, m_mram[0], 0).set_default_size("256K"); // guess
+	RAM(config, m_vram[0]).set_default_size("4M"); // guess
+	RAM(config, m_mram[0]).set_default_size("256K"); // guess
 }
 
 /*
@@ -459,16 +496,16 @@ void mpcbb68_device::device_add_mconfig(machine_config &config)
 
 	gtdb_device::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[0]->set_screen_update(FUNC(mpcbb68_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
 
 	// FIXME: pure speculation
-	RAM(config, m_vram[0], 0).set_default_size("2M");
-	RAM(config, m_mram[0], 0).set_default_size("128K");
-	RAM(config, m_hram[0], 0).set_default_size("512K");
+	RAM(config, m_vram[0]).set_default_size("2M");
+	RAM(config, m_mram[0]).set_default_size("128K");
+	RAM(config, m_hram[0]).set_default_size("512K");
 }
 
 /*
@@ -486,16 +523,16 @@ void mpcbb92_device::device_add_mconfig(machine_config &config)
 
 	gtdb_device::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 2076, 391 + GT_X_DELTA, 1664 + 391 + GT_X_DELTA, 1324, 74, 1248 + 74);
 	m_screen[0]->set_screen_update(FUNC(mpcbb92_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
 	BT459(config, m_ramdac[0], pixclock);
 
 	// FIXME: following memory sizes are pure speculation (40 parts @ 256Kx4?)
-	RAM(config, m_vram[0], 0).set_default_size("4M");
-	RAM(config, m_mram[0], 0).set_default_size("256K");
-	RAM(config, m_hram[0], 0).set_default_size("1M");
+	RAM(config, m_vram[0]).set_default_size("4M");
+	RAM(config, m_mram[0]).set_default_size("256K");
+	RAM(config, m_hram[0]).set_default_size("1M");
 }
 
 gt_device_base::gt_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const bool double_buffered, const bool masked_reads)

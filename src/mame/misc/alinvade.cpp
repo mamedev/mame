@@ -23,6 +23,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "alinvade.lh"
@@ -50,12 +51,12 @@ private:
 	void vblank_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alinvade_map(address_map &map);
+	void alinvade_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_irqmask = 0;
 	uint8_t m_irqff = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<discrete_device> m_discrete;
@@ -212,7 +213,7 @@ void alinvade_state::alinvade(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &alinvade_state::alinvade_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128, 128);

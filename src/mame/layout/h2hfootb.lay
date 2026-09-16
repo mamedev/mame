@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -10,30 +11,12 @@ license:CC0-1.0
 	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
 	<element name="static_green"><rect><color red="0.39" green="0.64" blue="0.39" /></rect></element>
 
-	<element name="text_down">
-		<rect><color red="0.39" green="0.64" blue="0.39" /></rect>
-		<text string="DOWN"><color red="0.84" green="0.84" blue="0.84" /></text>
-	</element>
-	<element name="text_home">
-		<rect><color red="0.39" green="0.64" blue="0.39" /></rect>
-		<text string="HOME"><color red="0.84" green="0.84" blue="0.84" /></text>
-	</element>
-	<element name="text_yards">
-		<rect><color red="0.39" green="0.64" blue="0.39" /></rect>
-		<text string="YARDS TO GO"><color red="0.84" green="0.84" blue="0.84" /></text>
-	</element>
-	<element name="text_time">
-		<rect><color red="0.39" green="0.64" blue="0.39" /></rect>
-		<text string="TIME REMAINING"><color red="0.84" green="0.84" blue="0.84" /></text>
-	</element>
-	<element name="text_field">
-		<rect><color red="0.39" green="0.64" blue="0.39" /></rect>
-		<text string="FIELD POS."><color red="0.84" green="0.84" blue="0.84" /></text>
-	</element>
-	<element name="text_visitor">
-		<rect><color red="0.39" green="0.64" blue="0.39" /></rect>
-		<text string="VISITOR"><color red="0.84" green="0.84" blue="0.84" /></text>
-	</element>
+	<element name="text_down"><text string="DOWN"><color red="0.84" green="0.84" blue="0.84" /></text></element>
+	<element name="text_home"><text string="HOME"><color red="0.84" green="0.84" blue="0.84" /></text></element>
+	<element name="text_yards"><text string="YARDS TO GO"><color red="0.84" green="0.84" blue="0.84" /></text></element>
+	<element name="text_time"><text string="TIME REMAINING"><color red="0.84" green="0.84" blue="0.84" /></text></element>
+	<element name="text_field"><text string="FIELD POS."><color red="0.84" green="0.84" blue="0.84" /></text></element>
+	<element name="text_visitor"><text string="VISITOR"><color red="0.84" green="0.84" blue="0.84" /></text></element>
 
 	<element name="text_p1">
 		<rect><color red="0.24" green="0.4" blue="0.24" /></rect>
@@ -56,7 +39,6 @@ license:CC0-1.0
 	</element>
 
 	<!-- 7segs are not italic here, so let's make custom ones -->
-
 	<element name="seg" defstate="0">
 		<rect state="0"><color red="0.1" green="0.01" blue="0.015" /></rect>
 		<rect state="1"><color red="0.5" green="0.05" blue="0.075" /></rect>
@@ -74,8 +56,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="-9" right="393" top="-130" bottom="156" />
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="static_green"><bounds left="-9" right="393" top="-130" bottom="-60" /></element>
 		<element ref="static_green"><bounds left="-9" right="393" top="111" bottom="156" /></element>
 
@@ -140,8 +121,7 @@ license:CC0-1.0
 		<element ref="static_white"><bounds x="344" y="29" width="4" height="1" /></element>
 		<element ref="static_white"><bounds x="344" y="56" width="4" height="1" /></element>
 
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="0.5" ref="seg"><bounds x="0" y="0" width="5" height="20" /></element>
 		<element name="0.4" ref="seg"><bounds x="0" y="21" width="5" height="20" /></element>
 		<element name="0.1" ref="seg"><bounds x="27" y="0" width="5" height="20" /></element>

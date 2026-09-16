@@ -28,7 +28,7 @@ class gtia_device :  public device_t
 {
 public:
 	// construction/destruction
-	gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gtia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void set_region(gtia_region region) { m_region = region; }
 	auto read_callback() { return m_read_cb.bind(); }
@@ -52,8 +52,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	void gtia_postload();
 

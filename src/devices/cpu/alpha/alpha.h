@@ -21,8 +21,8 @@ protected:
 	alpha_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
@@ -80,11 +80,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// device_execute_interface overrides
-	virtual u32 execute_input_lines() const noexcept override { return 6; }
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void cpu_execute(u32 const op) override;
 	virtual bool cpu_translate(u64 &address, int intention) override;
@@ -256,7 +253,7 @@ public:
 	dec_21064_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u32 icache_fetch(u64 const address) override;
 

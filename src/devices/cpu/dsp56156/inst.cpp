@@ -2,10 +2,9 @@
 // copyright-holders:Andrew Gardner
 #include "emu.h"
 #include "inst.h"
-#include "emu.h"
 
-namespace DSP_56156
-{
+namespace DSP_56156 {
+
 // Factory
 std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,
 											const uint16_t word0,
@@ -783,4 +782,4 @@ std::unique_ptr<Instruction> Instruction::decodeInstruction(const Opcode* opc,
 	return nullptr;
 }
 
-}
+} // namespace DSP_56156

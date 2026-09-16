@@ -183,7 +183,7 @@
 
   TODO:
 
-  - Set a common sampleset for all games and clones.
+  - Nothing... :)
 
 
 *******************************************************************************************************************************************************
@@ -504,31 +504,30 @@ public:
 
 	enum { STEPS_PER_SYMBOL = 168 };
 
-	void add_em_reels(machine_config &config, int symbols, attotime period);
-
-	void interflip(machine_config &config);
-	void cbr_81_cnf(machine_config &config);
-	void cbr_77_cnf(machine_config &config);
-	void sev_81_cnf(machine_config &config);
-	void sev_77_cnf(machine_config &config);
-	void tol_87_cnf(machine_config &config);
-	void tol_83_cnf(machine_config &config);
-	void jkp_cnf(machine_config &config);
+	void cbr_81_cnf(machine_config &config) ATTR_COLD;
+	void cbr_77_cnf(machine_config &config) ATTR_COLD;
+	void sev_81_cnf(machine_config &config) ATTR_COLD;
+	void sev_77_cnf(machine_config &config) ATTR_COLD;
+	void tol_87_cnf(machine_config &config) ATTR_COLD;
+	void tol_83_cnf(machine_config &config) ATTR_COLD;
+	void jkp_cnf(machine_config &config) ATTR_COLD;
 
 	template <unsigned Reel> int symbol_opto_r();
 	template <unsigned Reel> int reel_opto_r();
 
-
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+
+	void add_em_reels(machine_config &config, int symbols, attotime period) ATTR_COLD;
+	void interflip(machine_config &config) ATTR_COLD;
+
 	memory_share_creator<uint8_t> m_data_ram;
 
 private:
-	void audio_program_map(address_map &map);
-	void audio_io_map(address_map &map);
-	void main_program_map(address_map &map);
-	void main_io_map(address_map &map);
+	void audio_program_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
 
 	// Main MCU Interface
 	u8 main_io_r(offs_t offset);
@@ -591,12 +590,8 @@ private:
 
 void interflip8035_state::machine_start()
 {
-	m_outbit.resolve();
-	m_outbyte.resolve();
+	// TODO: savestates
 }
-
-void interflip8035_state::machine_reset()
-{}
 
 
 /*********************************************
@@ -897,7 +892,7 @@ void interflip8035_state::audio_p2_w(u8 data)
 	}
 	else
 	{
-		if(BIT(m_sample_flags,0) && change)
+		if(BIT(m_sample_flags, 0) && change)
 		{
 			m_sample_flags &= 0xfe;
 			m_samples->start(1, 3, false);
@@ -1072,14 +1067,14 @@ void interflip8035_state::irq_w(int state)
 
 void interflip8035_state::add_em_reels(machine_config &config, int symbols, attotime period)
 {
-	for(int i = 0; i < 4; i++)
-	{
-		std::set<uint16_t> detents;
-		for(int i = 0; i < symbols; i++)
-			detents.insert(i * STEPS_PER_SYMBOL);
+	std::set<uint16_t> detents;
+	for(int i = 0; i < symbols; i++)
+		detents.insert(i * STEPS_PER_SYMBOL);
 
-		EM_REEL(config, m_reels[i], symbols * STEPS_PER_SYMBOL, detents, period);
-		m_reels[i]->set_direction(em_reel_device::dir::FORWARD);
+	for(auto &reel : m_reels)
+	{
+		EM_REEL(config, reel, reel.finder_tag(), symbols * STEPS_PER_SYMBOL, detents, period);
+		reel->set_direction(em_reel_device::dir::FORWARD);
 	}
 }
 
@@ -1105,9 +1100,9 @@ int interflip8035_state::reel_opto_r()
 *                 Sound Samples                  *
 *************************************************/
 
-static const char *const interflip8035_sample_names[] =
+static const char *const ifslots_sample_names[] =
 {
-	"*samples",
+	"*ifslots",
 	"ringbellm",
 	"coin_in",
 	"rattle_forth",
@@ -1124,8 +1119,8 @@ static const char *const interflip8035_sample_names[] =
 static INPUT_PORTS_START( interflip )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )  PORT_NAME("Auxiliary Lever")                     // auxiliary lever
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )                                             // door
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)  // payout
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_DOOR )                                                    // door
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // payout
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Lever")                               // lever
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                   // unused
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Display Reset") PORT_CODE(KEYCODE_8)  // display reset
@@ -1139,16 +1134,16 @@ static INPUT_PORTS_START( interflip )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPTOS_A")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<2>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, reel_opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<1>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<2>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::reel_opto_r<3>))
 
 	PORT_START("OPTOS_B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<0>)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<1>)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<2>)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(interflip8035_state, symbol_opto_r<3>)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<0>))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<1>))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<2>))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(interflip8035_state::symbol_opto_r<3>))
 
 //  Test mode selection has lower priority. If DSW5, DSW6 and DSW7 are all Off, DSW5 is selected, and so on.
 //  To select Game Mode all DSW5, DSW6 and DSW7 must be On. All others are ignored.
@@ -1237,7 +1232,7 @@ void interflip8035_state::interflip(machine_config &config)
 	add_em_reels(config, 20, attotime::from_double(2));
 
 	// hopper device
-	HOPPER(config, m_hopper, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	// sound stuff
 	SPEAKER(config, "mono").front_center();
@@ -1246,7 +1241,7 @@ void interflip8035_state::interflip(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(2);
-	m_samples->set_samples_names(interflip8035_sample_names);
+	m_samples->set_samples_names(ifslots_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 2.0);
 
 }

@@ -85,16 +85,16 @@ private:
 	void key_w(u8 data);
 	u8 key_r();
 
-	void main_mem_map(address_map &map);
-	void video_data_map(address_map &map);
-	void video_mem_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void video_data_map(address_map &map) ATTR_COLD;
+	void video_mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_key_row = 0U;
 	u8 m_2 = 0U;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
-	required_device<avr8_device> m_videocpu;
+	required_device<atmega88_device> m_videocpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<9> m_keyboard;
 };
@@ -292,7 +292,7 @@ void sbc6510_state::sbc6510(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sbc6510);
 
 	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
+	GENERIC_TERMINAL(config, m_terminal);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

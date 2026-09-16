@@ -476,6 +476,14 @@ static DISCRETE_SOUND_START(mooncrst_discrete)
 DISCRETE_SOUND_END
 
 
+static DISCRETE_SOUND_START(bongo_discrete)
+	DISCRETE_IMPORT(mooncrst_discrete)
+
+	DISCRETE_REPLACE
+	DISCRETE_NOTE(NODE_132, 1, (SOUND_CLOCK/8).dvalue(), GAL_INP_PITCH, 255, 15,  DISC_CLK_IS_FREQ)
+DISCRETE_SOUND_END
+
+
 static DISCRETE_SOUND_START(sbhoei_discrete)
 
 	/************************************************/
@@ -604,6 +612,7 @@ DISCRETE_SOUND_END
 
 DEFINE_DEVICE_TYPE(GALAXIAN_SOUND, galaxian_sound_device, "galaxian_sound", "Galaxian Custom Sound")
 DEFINE_DEVICE_TYPE(MOONCRST_SOUND, mooncrst_sound_device, "mooncrst_sound", "Moon Cresta Custom Sound")
+DEFINE_DEVICE_TYPE(BONGO_SOUND, bongo_sound_device, "bongo_sound", "Bongo Custom Sound")
 DEFINE_DEVICE_TYPE(SBHOEI_SOUND, sbhoei_sound_device, "sbhoei_sound", "Space Battle Custom Sound")
 
 galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -619,6 +628,11 @@ galaxian_sound_device::galaxian_sound_device(const machine_config &mconfig, devi
 
 mooncrst_sound_device::mooncrst_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: galaxian_sound_device(mconfig, MOONCRST_SOUND, tag, owner, clock)
+{
+}
+
+bongo_sound_device::bongo_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: galaxian_sound_device(mconfig, BONGO_SOUND, tag, owner, clock)
 {
 }
 
@@ -658,6 +672,12 @@ void mooncrst_sound_device::device_add_mconfig(machine_config &config)
 {
 	galaxian_sound_device::device_add_mconfig(config);
 	m_discrete->set_intf(mooncrst_discrete);
+}
+
+void bongo_sound_device::device_add_mconfig(machine_config &config)
+{
+	galaxian_sound_device::device_add_mconfig(config);
+	m_discrete->set_intf(bongo_discrete);
 }
 
 void sbhoei_sound_device::device_add_mconfig(machine_config &config)

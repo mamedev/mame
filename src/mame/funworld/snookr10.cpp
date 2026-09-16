@@ -11,7 +11,7 @@
 
   * Snooker 10 (Ver 1.11),       Sandii', 1998.
   * Apple 10 (Ver 1.21),         Sandii', 1998.
-  * Ten Balls (Ver 1.05),        unknown, 1997.
+  * Ten Balls (Ver 1.05),        JCD srl, 1997.
   * Crystals Colours (Ver 1.02), JCD srl, 1998.
   * Crystals Colours (Ver 1.01), JCD srl, 1998.
 
@@ -68,7 +68,7 @@
   8 bits for color codes (256 x 16 colors). It means the hardware was designed for more
   elaborated graphics than these games...
 
-  Color PROMs from current games are 512 bytes lenght, but they only use the first 256 bytes.
+  Color PROMs from current games are 512 bytes length, but they only use the first 256 bytes.
 
   The sound is composed by 4-bit ADPCM samples. All the supported games have the same sound ROM.
   All the sounds/samples were ripped from the Gottlieb pinball 'Cue Ball Wizard'(1992).
@@ -585,7 +585,7 @@
   - Added the oki6295 emulation to all games.
   - Hooked output ports.
   - Documented and calculated all bits related to lamps.
-  - Adjusted palette lenght to 256 colors.
+  - Adjusted palette length to 256 colors.
   - Totally decrypted the apple10 color matrix. Now colors are perfect.
   - Created a new machine driver for apple10 due to encryption.
   - Reverse engineering the code to complete the DIP switches.
@@ -619,7 +619,7 @@
 #include "emu.h"
 #include "snookr10.h"
 
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/g65sc02.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "screen.h"
@@ -815,13 +815,13 @@ void snookr10_state::crystalc_map(address_map &map)
 
 static INPUT_PORTS_START( snookr10 )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Remote x100") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Remote x100")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Stop 1")  // Input Test in stats mode
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancella (Cancel) / Play / Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Estatistica (Stats)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Management")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Management")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Stop 4 / Alta (High)")
 
 	PORT_START("IN1")
@@ -884,7 +884,7 @@ static INPUT_PORTS_START( apple10 )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x10, 0x10, "Super Game Settings" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "Play to Payout" )
 	PORT_DIPSETTING(    0x00, "Direct Payout" )
@@ -939,13 +939,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crystalc )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )        PORT_NAME("Remote x100") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_NAME("Remote x100")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Stop 1")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancella (Cancel) / Play / Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Statistica (Stats)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Management")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Management")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    PORT_NAME("Stop 4 / Alta (High)")
 
 	PORT_START("IN1")
@@ -1037,14 +1037,14 @@ GFXDECODE_END
 void snookr10_state::snookr10(machine_config &config)
 {
 	// basic machine hardware
-	M65SC02(config, m_maincpu, XTAL(16'000'000) / 8);    // 2 MHz (1.999 MHz measured)
+	G65SC02(config, m_maincpu, XTAL(16'000'000) / 8); // 2 MHz (1.999 MHz measured)
 	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::snookr10_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(96*4, 30*8);
@@ -1132,22 +1132,26 @@ ROM_START( apple10 )
 	ROM_LOAD( "5.u27", 0x0000, 0x8000, CRC(3510d705) SHA1(2190c8199d29bf89e3007eb771cc6b0e2b58f6cd) )
 ROM_END
 
+// TENBALLS1 PCB with G65SC02P-2, 16 MHz XTAL, 2x XILINX XC9572, AD-65, 8-DIP bank
+// the same game, with just the copyright blanked in ROM, has also been found on a very similar, unmarked PCB with generic labels and bigger CPLDs
 ROM_START( tenballs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "4.u2", 0x8000, 0x8000, CRC(2f334862) SHA1(61d57995451b6bc7de23900c460c3e073993899c) )
+	ROM_LOAD( "ten_balls_1.u2", 0x8000, 0x8000, CRC(7fc8c292) SHA1(8e7f17d971379ea3b870cbda0b019d9a573bed07) ) // M27C256B, just labeled 4 on the other PCB
+	// the following is the hash of the version with copyright blanked
+	// ROM_LOAD( "4.u2", 0x8000, 0x8000, CRC(2f334862) SHA1(61d57995451b6bc7de23900c460c3e073993899c) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "3.u16", 0x0000, 0x8000, CRC(9eb88a08) SHA1(ab52924103e2b14c598a21c3d77b053da37a0212) )
-	ROM_LOAD( "2.u15", 0x8000, 0x8000, CRC(a5091583) SHA1(c0775d9b77cb634d3702b6c08cdf73c867b6169a) )
+	ROM_LOAD( "ten_balls_2.u16", 0x0000, 0x8000, CRC(9eb88a08) SHA1(ab52924103e2b14c598a21c3d77b053da37a0212) ) // M27C256B, just labeled 3 on the other PCB
+	ROM_LOAD( "ten_balls_3.u15", 0x8000, 0x8000, CRC(a5091583) SHA1(c0775d9b77cb634d3702b6c08cdf73c867b6169a) ) // M27C256B, just labeled 2 on the other PCB
 
 	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM samples
-	ROM_LOAD( "1.u28", 0x00000, 0x40000, CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) )
+	ROM_LOAD( "ten_balls_4.u28", 0x00000, 0x40000, CRC(17090d56) SHA1(3a4c247f96c80f8cf4c1389b273880c5ea6fc39d) ) // M27C2001, just labeled 1 on the other PCB
 
 	ROM_REGION( 0x0800, "nvram", 0 )  // default NVRAM
 	ROM_LOAD( "ten_balls_nvram.bin", 0x0000, 0x0800, CRC(42a5803f) SHA1(2c8c9ec0f26a947cf9cfa2e91e9127725becdef5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s147.u17", 0x0000, 0x0200, CRC(20234dcc) SHA1(197937bbec0201888467e250bdba49e39aa4204a) )
+	ROM_LOAD( "am27s29pc.u17", 0x0000, 0x0200, CRC(20234dcc) SHA1(197937bbec0201888467e250bdba49e39aa4204a) ) // 82s147 on the other PCB
 ROM_END
 
 /*
@@ -1213,6 +1217,6 @@ ROM_END
 //     YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT
 GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, empty_init, ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
 GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, empty_init, ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, empty_init, ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
-GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, empty_init, ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, empty_init, ROT0, "JCD",       "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, empty_init, ROT0, "JCD",       "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, empty_init, ROT0, "JCD",       "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )

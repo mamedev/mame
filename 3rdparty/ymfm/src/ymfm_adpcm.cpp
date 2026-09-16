@@ -390,13 +390,13 @@ void adpcm_b_registers::save_restore(ymfm_saved_state &state)
 adpcm_b_channel::adpcm_b_channel(adpcm_b_engine &owner, uint32_t addrshift) :
 	m_address_shift(addrshift),
 	m_status(STATUS_BRDY),
-	m_curnibble(0),
-	m_curbyte(0),
-	m_dummy_read(0),
+	m_buffer(0),
+	m_nibbles(0),
 	m_position(0),
 	m_curaddress(0),
 	m_accumulator(0),
-	m_prev_accum(0),
+	m_output(0),
+	m_prev_output(0),
 	m_adpcm_step(STEP_MIN),
 	m_regs(owner.regs()),
 	m_owner(owner)
@@ -411,13 +411,13 @@ adpcm_b_channel::adpcm_b_channel(adpcm_b_engine &owner, uint32_t addrshift) :
 void adpcm_b_channel::reset()
 {
 	m_status = STATUS_BRDY;
-	m_curnibble = 0;
-	m_curbyte = 0;
-	m_dummy_read = 0;
+	m_buffer = 0;
+	m_nibbles = 0;
 	m_position = 0;
 	m_curaddress = 0;
 	m_accumulator = 0;
-	m_prev_accum = 0;
+	m_output = 0;
+	m_prev_output = 0;
 	m_adpcm_step = STEP_MIN;
 }
 
@@ -429,13 +429,13 @@ void adpcm_b_channel::reset()
 void adpcm_b_channel::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_status);
-	state.save_restore(m_curnibble);
-	state.save_restore(m_curbyte);
-	state.save_restore(m_dummy_read);
+	state.save_restore(m_buffer);
+	state.save_restore(m_nibbles);
 	state.save_restore(m_position);
 	state.save_restore(m_curaddress);
 	state.save_restore(m_accumulator);
-	state.save_restore(m_prev_accum);
+	state.save_restore(m_output);
+	state.save_restore(m_prev_output);
 	state.save_restore(m_adpcm_step);
 }
 
@@ -447,9 +447,11 @@ void adpcm_b_channel::save_restore(ymfm_saved_state &state)
 void adpcm_b_channel::clock()
 {
 	// only process if active and not recording (which we don't support)
-	if (!m_regs.execute() || m_regs.record() || (m_status & STATUS_PLAYING) == 0)
+	if (!m_regs.execute() || m_regs.record() || (m_status & STATUS_INTERNAL_PLAYING) == 0)
 	{
-		m_status &= ~STATUS_PLAYING;
+		m_prev_output = m_output;
+		m_position = 0;
+		set_reset_status(0, STATUS_INTERNAL_PLAYING);
 		return;
 	}
 
@@ -459,76 +461,63 @@ void adpcm_b_channel::clock()
 	if (position < 0x10000)
 		return;
 
-	// if we're about to process nibble 0, fetch sample
-	if (m_curnibble == 0)
+	// if we have nibbles available, process them
+	if (m_nibbles != 0)
 	{
-		// playing from RAM/ROM
-		if (m_regs.external())
-			m_curbyte = m_owner.intf().ymfm_external_read(ACCESS_ADPCM_B, m_curaddress);
-	}
+		// fetch the next nibble
+		uint8_t data = consume_nibbles(1);
 
-	// extract the nibble from our current byte
-	uint8_t data = uint8_t(m_curbyte << (4 * m_curnibble)) >> 4;
-	m_curnibble ^= 1;
+		// forecast to next forecast: 1/8, 3/8, 5/8, 7/8, 9/8, 11/8, 13/8, 15/8
+		int32_t delta = (2 * bitfield(data, 0, 3) + 1) * m_adpcm_step / 8;
+		if (bitfield(data, 3))
+			delta = -delta;
 
-	// we just processed the last nibble
-	if (m_curnibble == 0)
-	{
-		// if playing from RAM/ROM, check the end/limit address or advance
-		if (m_regs.external())
+		// add and clamp to 16 bits
+		m_accumulator = clamp(m_accumulator + delta, -32768, 32767);
+
+		// scale the ADPCM step: 0.9, 0.9, 0.9, 0.9, 1.2, 1.6, 2.0, 2.4
+		static uint8_t const s_step_scale[8] = { 57, 57, 57, 57, 77, 102, 128, 153 };
+		m_adpcm_step = clamp((m_adpcm_step * s_step_scale[bitfield(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
+
+		// make the new output equal to the accumulator
+		m_prev_output = m_output;
+		m_output = m_accumulator;
+
+		// if we've drained all the nibbles, that means we're at a repeat point or end of sample
+		if (m_nibbles == 0)
 		{
-			// handle the sample end, either repeating or stopping
-			if (at_end())
-			{
-				// if repeating, go back to the start
-				if (m_regs.repeat())
-					load_start();
+			// reset the ADPCM state (but leave output alone)
+			m_accumulator = 0;
+			m_adpcm_step = STEP_MIN;
 
-				// otherwise, done; set the EOS bit
-				else
-				{
-					m_accumulator = 0;
-					m_prev_accum = 0;
-					m_status = (m_status & ~STATUS_PLAYING) | STATUS_EOS;
-					debug::log_keyon("%s\n", "ADPCM EOS");
-					return;
-				}
-			}
+			// always set EOS bit, even if repeating
+			set_reset_status(STATUS_EOS);
+			debug::log_keyon("%s\n", "ADPCM EOS");
 
-			// wrap at the limit address
-			else if (at_limit())
-				m_curaddress = 0;
-
-			// otherwise, advance the current address
-			else
-			{
-				m_curaddress++;
-				m_curaddress &= 0xffffff;
-			}
-		}
-
-		// if CPU-driven, copy the next byte and request more
-		else
-		{
-			m_curbyte = m_regs.cpudata();
-			m_status |= STATUS_BRDY;
+			// clear playing flag if we're not repeating
+			if (!m_regs.repeat())
+				set_reset_status(0, STATUS_INTERNAL_PLAYING);
 		}
 	}
 
-	// remember previous value for interpolation
-	m_prev_accum = m_accumulator;
+	// if we don't have at least 3 nibbles in the buffer, request more data
+	if ((m_status & STATUS_INTERNAL_PLAYING) != 0 && m_nibbles < 3)
+	{
+		// if we hit the end address after this fetch, handle looping/ending
+		if (request_data())
+		{
+			// the final 3 samples are not played; chop them from the stream
+			consume_nibbles(3);
 
-	// forecast to next forecast: 1/8, 3/8, 5/8, 7/8, 9/8, 11/8, 13/8, 15/8
-	int32_t delta = (2 * bitfield(data, 0, 3) + 1) * m_adpcm_step / 8;
-	if (bitfield(data, 3))
-		delta = -delta;
+			// this should always end up as 1; the logic above assumes we will hit
+			// 0 nibbles after processing the next one
+			assert(m_nibbles == 1);
 
-	// add and clamp to 16 bits
-	m_accumulator = clamp(m_accumulator + delta, -32768, 32767);
-
-	// scale the ADPCM step: 0.9, 0.9, 0.9, 0.9, 1.2, 1.6, 2.0, 2.4
-	static uint8_t const s_step_scale[8] = { 57, 57, 57, 57, 77, 102, 128, 153 };
-	m_adpcm_step = clamp((m_adpcm_step * s_step_scale[bitfield(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
+			// if repeating, set the current address back to start for next fetch
+			if (m_regs.repeat())
+				latch_addresses();
+		}
+	}
 }
 
 
@@ -545,7 +534,7 @@ void adpcm_b_channel::output(ymfm_output<NumOutputs> &output, uint32_t rshift) c
 		return;
 
 	// do a linear interpolation between samples
-	int32_t result = (m_prev_accum * int32_t((m_position ^ 0xffff) + 1) + m_accumulator * int32_t(m_position)) >> 16;
+	int32_t result = (m_prev_output * int32_t((m_position ^ 0xffff) + 1) + m_output * int32_t(m_position)) >> 16;
 
 	// apply volume (level) in a linear fashion and reduce
 	result = (result * int32_t(m_regs.level())) >> (8 + rshift);
@@ -568,37 +557,8 @@ uint8_t adpcm_b_channel::read(uint32_t regnum)
 
 	// register 8 reads over the bus under some conditions
 	if (regnum == 0x08 && !m_regs.execute() && !m_regs.record() && m_regs.external())
-	{
-		// two dummy reads are consumed first
-		if (m_dummy_read != 0)
-		{
-			load_start();
-			m_dummy_read--;
-		}
+		result = read_ram();
 
-		// read the data
-		else
-		{
-			// read from outside of the chip
-			result = m_owner.intf().ymfm_external_read(ACCESS_ADPCM_B, m_curaddress++);
-
-			// did we hit the end? if so, signal EOS
-			if (at_end())
-			{
-				m_status = STATUS_EOS | STATUS_BRDY;
-				debug::log_keyon("%s\n", "ADPCM EOS");
-			}
-			else
-			{
-				// signal ready
-				m_status = STATUS_BRDY;
-			}
-
-			// wrap at the limit address
-			if (at_limit())
-				m_curaddress = 0;
-		}
-	}
 	return result;
 }
 
@@ -613,68 +573,76 @@ void adpcm_b_channel::write(uint32_t regnum, uint8_t value)
 	// dummy read counter
 	if (regnum == 0x00)
 	{
-		if (m_regs.execute())
-		{
-			load_start();
-
-			// don't log masked channels
-			if ((debug::GLOBAL_ADPCM_B_CHANNEL_MASK & 1) != 0)
-				debug::log_keyon("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
-					m_regs.repeat(),
-					m_regs.speaker(),
-					m_regs.pan_left(),
-					m_regs.pan_right(),
-					m_regs.dac_enable(),
-					m_regs.dram_8bit(),
-					m_regs.rom_ram(),
-					m_regs.external(),
-					m_regs.record(),
-					m_regs.start(),
-					m_regs.end(),
-					m_regs.prescale(),
-					m_regs.delta_n(),
-					m_regs.level(),
-					m_regs.limit());
-		}
-		else
-			m_status &= ~STATUS_EOS;
+		// reset flag stops playback and holds output, but does not clear the
+		// externally-visible playing flag
 		if (m_regs.resetflag())
-			reset();
-		if (m_regs.external())
-			m_dummy_read = 2;
+			set_reset_status(STATUS_BRDY | (((m_status & STATUS_INTERNAL_PLAYING) != 0) ? STATUS_EOS : 0), STATUS_INTERNAL_PLAYING);
+
+		// all other modes set up for an operation
+		else
+		{
+			// initialize the core state; appears to leave EOS flag alone until next execute
+			set_reset_status(STATUS_BRDY, STATUS_PLAYING | STATUS_INTERNAL_DRAIN | STATUS_INTERNAL_PLAYING | STATUS_INTERNAL_SUPPRESS_WRITE);
+
+			// flag the address to be latched at the next access; this is necessary
+			// because it is allowed to program the start/stop addresses after this
+			// command byte is written
+			m_curaddress = LATCH_ADDRESS;
+
+			// if playing, set the playing status
+			if (m_regs.execute())
+			{
+				m_buffer = 0;
+				m_nibbles = 0;
+				m_position = 0;
+				m_accumulator = 0;
+				m_adpcm_step = STEP_MIN;
+				m_output = 0;
+
+				set_reset_status(STATUS_PLAYING | STATUS_INTERNAL_PLAYING, STATUS_EOS);
+
+				// don't log masked channels
+				if ((debug::GLOBAL_ADPCM_B_CHANNEL_MASK & 1) != 0)
+					debug::log_keyon("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
+						m_regs.repeat(),
+						m_regs.speaker(),
+						m_regs.pan_left(),
+						m_regs.pan_right(),
+						m_regs.dac_enable(),
+						m_regs.dram_8bit(),
+						m_regs.rom_ram(),
+						m_regs.external(),
+						m_regs.record(),
+						m_regs.start(),
+						m_regs.end(),
+						m_regs.prescale(),
+						m_regs.delta_n(),
+						m_regs.level(),
+						m_regs.limit());
+			}
+		}
 	}
 
 	// register 8 writes over the bus under some conditions
 	else if (regnum == 0x08)
 	{
-		// if writing from the CPU during execute, clear the ready flag
-		if (m_regs.execute() && !m_regs.record() && !m_regs.external())
-			m_status &= ~STATUS_BRDY;
-
-		// if writing during "record", pass through as data
-		else if (!m_regs.execute() && m_regs.record() && m_regs.external())
+		// writing during execute
+		if (m_regs.execute())
 		{
-			// clear out dummy reads and set start address
-			if (m_dummy_read != 0)
-			{
-				load_start();
-				m_dummy_read = 0;
-			}
-
-			// did we hit the end? if so, signal EOS
-			if (at_end())
-			{
-				debug::log_keyon("%s\n", "ADPCM EOS");
-				m_status = STATUS_EOS | STATUS_BRDY;
-			}
-
-			// otherwise, write the data and signal ready
-			else
-			{
-				m_owner.intf().ymfm_external_write(ACCESS_ADPCM_B, m_curaddress++, value);
-				m_status = STATUS_BRDY;
-			}
+			// if writing from the CPU during execute, clear the ready flag; data will be picked
+			// up on next fetch
+			if (!m_regs.record() && !m_regs.external())
+				set_reset_status(0, STATUS_BRDY);
 		}
+
+		// if writing to external data, process record mode, which writes data to RAM
+		else if (m_regs.external() && m_regs.record())
+			write_ram(value);
+
+		// writes in external non-record mode appear to behave like a read in that it will advance
+		// the address and consume a nibble, but the last written value will still be present
+		else
+			read_ram();
 	}
 }
 
@@ -702,20 +670,164 @@ uint32_t adpcm_b_channel::address_shift() const
 
 
 //-------------------------------------------------
-//  load_start - load the start address and
-//  initialize the state
+//  advance_address - advance the address, checking
+//  for end/limit values at programmed boundaries;
+//  returns true if the end is hit
 //-------------------------------------------------
 
-void adpcm_b_channel::load_start()
+bool adpcm_b_channel::advance_address()
 {
-	m_status = (m_status & ~STATUS_EOS) | STATUS_PLAYING;
-	m_curaddress = m_regs.external() ? (m_regs.start() << address_shift()) : 0;
-	m_curnibble = 0;
-	m_curbyte = 0;
-	m_position = 0;
-	m_accumulator = 0;
-	m_prev_accum = 0;
-	m_adpcm_step = STEP_MIN;
+	// if we're fetching the last byte of a unit, check ending conditions
+	auto shift = address_shift();
+	auto mask = (1 << shift) - 1;
+
+	// should never get here with an uninitialized current address
+	assert(m_curaddress != LATCH_ADDRESS);
+
+	// if at the end of a unit, check for end/limit
+	if ((m_curaddress & mask) == mask)
+	{
+		// shift off the low address bits and check against the end
+		uint32_t unitaddr = m_curaddress >> shift;
+		if (unitaddr == m_regs.end())
+			return true;
+
+		// wrap at the limit address; this does not report any status
+		else if (unitaddr == m_regs.limit())
+		{
+			m_curaddress = 0;
+			return false;
+		}
+	}
+
+	// advance the address
+	m_curaddress = (m_curaddress + 1) & 0xffffff;
+	return false;
+}
+
+
+//-------------------------------------------------
+//  request_data - request another byte of data
+//  for the buffer; used by both playback and
+//  data reading code
+//-------------------------------------------------
+
+bool adpcm_b_channel::request_data()
+{
+	// pick up the current address if this is the first read
+	if (m_curaddress == LATCH_ADDRESS)
+		latch_addresses();
+
+	// if CPU-driven, just set the flag and return true
+	if (!m_regs.external())
+	{
+		// if data was written, consume it
+		if ((m_status & STATUS_BRDY) == 0)
+			append_buffer_byte(m_regs.cpudata());
+		set_reset_status(STATUS_BRDY);
+		return false;
+	}
+
+	// append the new byte to our buffer; also write to the cpudata register to match
+	// behavior of dummy reads from real chip
+	uint8_t data = m_owner.intf().ymfm_external_read(ACCESS_ADPCM_B, m_curaddress);
+	append_buffer_byte(data);
+	m_regs.write(0x08, data);
+
+	// advance the address, returning true if we hit the end
+	return advance_address();
+}
+
+
+//-------------------------------------------------
+//  read_ram - perform a read cycle from RAM/ROM
+//-------------------------------------------------
+
+uint8_t adpcm_b_channel::read_ram()
+{
+	// if this is the first read, ensure there is at least 2 bytes of data available,
+	// padding with the cpudata register if needed
+	if (m_curaddress == LATCH_ADDRESS)
+	{
+		set_reset_status(0, STATUS_INTERNAL_DRAIN);
+		while (m_nibbles < 4)
+			append_buffer_byte(m_regs.cpudata());
+	}
+
+	// if we have the nibbles, return them
+	uint8_t result = consume_nibbles(2);
+	set_reset_status(STATUS_BRDY);
+
+	// if we previously hit the end and we're draining, see if we're out
+	if ((m_status & STATUS_INTERNAL_DRAIN) != 0)
+	{
+		// if we run out of nibbles, mark end of sample and reset the address
+		if (m_nibbles == 0)
+		{
+			set_reset_status(STATUS_EOS, STATUS_INTERNAL_DRAIN);
+
+			// if repeating, add one dummy sample and issue a fetch of the first byte
+			if (m_regs.repeat())
+			{
+				append_buffer_byte(m_regs.cpudata());
+				m_curaddress = m_regs.start() << address_shift();
+				request_data();
+			}
+
+			// otherwise, reset the address
+			else
+				m_curaddress = LATCH_ADDRESS;
+		}
+	}
+
+	// if not draining, then request more data and start draining if we hit the end
+	else if (request_data())
+		set_reset_status(STATUS_INTERNAL_DRAIN);
+
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_ram - perform a write cycle to RAM
+//-------------------------------------------------
+
+void adpcm_b_channel::write_ram(uint8_t value)
+{
+	// normal write case, unsuppressed
+	if ((m_status & STATUS_INTERNAL_SUPPRESS_WRITE) == 0)
+	{
+		// latch the current address if this is the first write
+		if (m_curaddress == LATCH_ADDRESS)
+			latch_addresses();
+
+		// write the data
+		m_owner.intf().ymfm_external_write(ACCESS_ADPCM_B, m_curaddress, value);
+		set_reset_status(STATUS_BRDY);
+
+		// advance; if we hit the end, signal EOS and put ourselves back in the latching state
+		if (advance_address())
+		{
+			set_reset_status(STATUS_EOS);
+			m_curaddress = LATCH_ADDRESS;
+
+			// in the repeat case, suppress further writes
+			if (m_regs.repeat())
+				set_reset_status(STATUS_INTERNAL_SUPPRESS_WRITE);
+		}
+	}
+
+	// suppressed writes after reaching stop address in repeat mode; note that this runs
+	// immediately after the EOS condition above, as well as on subsequent writes
+	if ((m_status & STATUS_INTERNAL_SUPPRESS_WRITE) != 0)
+	{
+		// reset the buffer to 4 nibbles with 0 and the value written, then trigger a read
+		// cycle which will consume the 0 and clock in the next byte, leaving the value
+		// written as the next byte to consume
+		m_buffer = value << 16;
+		m_nibbles = 4;
+		read_ram();
+	}
 }
 
 

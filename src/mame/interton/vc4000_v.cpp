@@ -27,22 +27,21 @@
 
 void vc4000_state::video_start()
 {
-	int i;
-
-	for (i=0;i<0x20; i++)
+	for (int i = 0; i < std::size(m_sprite_collision); i++)
 	{
-		m_sprite_collision[i]=0;
-		if ((i&3)==3) m_sprite_collision[i]|=0x20;
-		if ((i&5)==5) m_sprite_collision[i]|=0x10;
-		if ((i&9)==9) m_sprite_collision[i]|=8;
-		if ((i&6)==6) m_sprite_collision[i]|=4;
-		if ((i&0xa)==0xa) m_sprite_collision[i]|=2;
-		if ((i&0xc)==0xc) m_sprite_collision[i]|=1;
-		m_background_collision[i]=0;
-		if ((i&0x11)==0x11) m_background_collision[i]|=0x80;
-		if ((i&0x12)==0x12) m_background_collision[i]|=0x40;
-		if ((i&0x14)==0x14) m_background_collision[i]|=0x20;
-		if ((i&0x18)==0x18) m_background_collision[i]|=0x10;
+		m_sprite_collision[i] = 0;
+		if ((i & 0x3) == 0x3) m_sprite_collision[i] |= 0x20;
+		if ((i & 0x5) == 0x5) m_sprite_collision[i] |= 0x10;
+		if ((i & 0x9) == 0x9) m_sprite_collision[i] |= 0x08;
+		if ((i & 0x6) == 0x6) m_sprite_collision[i] |= 0x04;
+		if ((i & 0xa) == 0xa) m_sprite_collision[i] |= 0x02;
+		if ((i & 0xc) == 0xc) m_sprite_collision[i] |= 0x01;
+
+		m_background_collision[i] = 0;
+		if ((i & 0x11) == 0x11) m_background_collision[i] |= 0x80;
+		if ((i & 0x12) == 0x12) m_background_collision[i] |= 0x40;
+		if ((i & 0x14) == 0x14) m_background_collision[i] |= 0x20;
+		if ((i & 0x18) == 0x18) m_background_collision[i] |= 0x10;
 	}
 
 	m_joy1_x = STICKCENTRE;
@@ -50,8 +49,8 @@ void vc4000_state::video_start()
 	m_joy2_x = STICKCENTRE;
 	m_joy2_y = STICKCENTRE;
 
-	memset(&m_video, 0, sizeof(m_video));
-	for (i=0; i<3; i++)
+	m_video = vc4000_video_t();
+	for (int i = 0; i < std::size(m_video.reg.d.sprites); i++)
 	{
 		m_video.sprites[i].data = &m_video.reg.d.sprites[i];
 		m_video.sprites[i].mask = 1 << i;
@@ -59,7 +58,7 @@ void vc4000_state::video_start()
 	m_video.sprites[3].data = &m_video.reg.d.sprite4;
 	m_video.sprites[3].mask = 1 << 3;
 
-	m_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
+	m_bitmap.allocate(m_screen->width(), m_screen->height());
 }
 
 inline uint8_t vc4000_state::vc4000_joystick_return_to_centre(uint8_t joy)
@@ -523,7 +522,7 @@ inline void vc4000_state::vc4000_draw_grid(uint8_t *collision)
 
 	if (m_video.line>=height) return;
 
-	m_bitmap->plot_box(0, m_video.line, width, 1, (m_video.reg.d.background)&7);
+	m_bitmap.plot_box(0, m_video.line, width, 1, (m_video.reg.d.background)&7);
 
 	if (line<0 || line>=200) return;
 	if (~m_video.reg.d.background & 8) return;
@@ -564,7 +563,7 @@ inline void vc4000_state::vc4000_draw_grid(uint8_t *collision)
 		{
 			int l;
 			for (l=0; l<w; l++) collision[x+l]|=0x10;
-			m_bitmap->plot_box(x, m_video.line, w, 1, (m_video.reg.d.background>>4)&7);
+			m_bitmap.plot_box(x, m_video.line, w, 1, (m_video.reg.d.background>>4)&7);
 		}
 		if (j==7) m=0x100;
 	}
@@ -602,10 +601,10 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		for (int i=visarea.min_x; i<visarea.max_x; i++) m_objects[i]=8;
 
 		/* calculate object colours and OR overlapping object colours */
-		vc4000_sprite_update(*m_bitmap, collision, &m_video.sprites[0]);
-		vc4000_sprite_update(*m_bitmap, collision, &m_video.sprites[1]);
-		vc4000_sprite_update(*m_bitmap, collision, &m_video.sprites[2]);
-		vc4000_sprite_update(*m_bitmap, collision, &m_video.sprites[3]);
+		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[0]);
+		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[1]);
+		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[2]);
+		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[3]);
 
 		for (int i=visarea.min_x; i<visarea.max_x; i++)
 		{
@@ -613,7 +612,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 			m_video.background_collision|=m_background_collision[collision[i]];
 			/* display final object colours */
 			if (m_objects[i] < 8)
-					m_bitmap->pix(m_video.line, i) = m_objects[i];
+					m_bitmap.pix(m_video.line, i) = m_objects[i];
 		}
 
 		int y = m_video.reg.d.score_control&1?200:20;
@@ -621,11 +620,11 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		if ((m_video.line>=y)&&(m_video.line<y+20))
 		{
 			int x = 60;
-			vc4000_draw_digit(*m_bitmap, x, y, m_video.reg.d.bcd[0]>>4, m_video.line-y);
-			vc4000_draw_digit(*m_bitmap, x+16, y, m_video.reg.d.bcd[0]&0xf, m_video.line-y);
+			vc4000_draw_digit(m_bitmap, x, y, m_video.reg.d.bcd[0]>>4, m_video.line-y);
+			vc4000_draw_digit(m_bitmap, x+16, y, m_video.reg.d.bcd[0]&0xf, m_video.line-y);
 			if (m_video.reg.d.score_control&2)  x -= 16;
-			vc4000_draw_digit(*m_bitmap, x+48, y, m_video.reg.d.bcd[1]>>4, m_video.line-y);
-			vc4000_draw_digit(*m_bitmap, x+64, y, m_video.reg.d.bcd[1]&0xf, m_video.line-y);
+			vc4000_draw_digit(m_bitmap, x+48, y, m_video.reg.d.bcd[1]>>4, m_video.line-y);
+			vc4000_draw_digit(m_bitmap, x+64, y, m_video.reg.d.bcd[1]&0xf, m_video.line-y);
 		}
 	}
 	if (m_video.line==VC4000_END_LINE) m_video.reg.d.sprite_collision |=0x40;
@@ -643,6 +642,6 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 
 uint32_t vc4000_state::screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

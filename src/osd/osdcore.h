@@ -19,6 +19,7 @@
 #include <iosfwd>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -127,6 +128,8 @@ osd_ticks_t osd_ticks_per_second() noexcept;
         than specified rather than sleeping too long.
 -----------------------------------------------------------------------------*/
 void osd_sleep(osd_ticks_t duration) noexcept;
+
+
 
 /***************************************************************************
     WORK ITEM INTERFACES
@@ -348,6 +351,14 @@ void osd_work_item_release(osd_work_item *item);
 /// \param [in] message Message to output to the debugger as a
 ///   NUL-terminated string.
 void osd_break_into_debugger(const char *message);
+
+
+/// \brief Get cache line size in bytes
+///
+/// This function gets the host CPU's level 1 cache line size in bytes.
+/// \return A pair consisting of an error condition and the cache line
+///   size in bytes if successful.
+std::pair<std::error_condition, unsigned> osd_get_cache_line_size() noexcept;
 
 
 

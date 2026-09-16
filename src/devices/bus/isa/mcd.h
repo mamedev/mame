@@ -21,12 +21,14 @@ class mcd_isa_device : public cdrom_image_device,
 public:
 	// construction/destruction
 	mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual void call_unload() override;
 
 protected:
 	virtual uint16_t dack16_r(int line) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -35,7 +37,7 @@ private:
 	void cmd_w(uint8_t data);
 	void reset_w(uint8_t data);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	bool read_sector(bool first = false);
 

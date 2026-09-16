@@ -141,12 +141,12 @@ private:
 	void fdc_drq_w(int state);
 	void fdc_intrq_w(int state);
 
-	void pg675_mem(address_map &map);
-	void pg685_mem(address_map &map);
-	void pg685oua12_mem(address_map &map);
+	void pg675_mem(address_map &map) ATTR_COLD;
+	void pg685_mem(address_map &map) ATTR_COLD;
+	void pg685oua12_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -399,12 +399,12 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 
 void pg685_state::pg685_backplane(machine_config &config)
 {
-	PIT8253(config, m_bppit, 0);
+	PIT8253(config, m_bppit);
 	m_bppit->set_clk<0>(XTAL(12'288'000) / 10); // same input clock as for PC16-11?
 	m_bppit->set_clk<1>(XTAL(12'288'000) / 10);
 	m_bppit->set_clk<2>(XTAL(12'288'000) / 10);
 
-	pic8259_device &bppic(PIC8259(config, "bppic", 0));
+	pic8259_device &bppic(PIC8259(config, "bppic"));
 	bppic.out_int_callback().set_nop(); // configured in single 8086 mode?
 
 	SCN2661B(config, "bpuart", 4915200);
@@ -415,8 +415,8 @@ void pg685_state::pg685_module(machine_config &config)
 	FD1797(config, m_fdc, XTAL(4'000'000) / 2); // divider guessed
 	m_fdc->intrq_wr_callback().set("mainpic", FUNC(pic8259_device::ir4_w));
 
-	I8255(config, "modppi1", 0);
-	I8255(config, "modppi2", 0);
+	I8255(config, "modppi1");
+	I8255(config, "modppi2");
 
 	I8251(config, "moduart", XTAL(4'000'000) / 2); // divider guessed
 
@@ -430,7 +430,7 @@ void pg685_state::pg675(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg685_state::pg675_mem);
 	m_maincpu->set_irq_acknowledge_callback("mainpic", FUNC(pic8259_device::inta_cb));
 
-	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	pic8259_device &mainpic(PIC8259(config, "mainpic"));
 	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
 	mainpic.in_sp_callback().set_constant(1);
 
@@ -439,7 +439,7 @@ void pg685_state::pg675(machine_config &config)
 	// ram
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -478,7 +478,7 @@ void pg685_state::pg685(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg685_state::pg685_mem);
 	m_maincpu->set_irq_acknowledge_callback("mainpic", FUNC(pic8259_device::inta_cb));
 
-	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	pic8259_device &mainpic(PIC8259(config, "mainpic"));
 	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
 	mainpic.in_sp_callback().set_constant(1);
 
@@ -487,7 +487,7 @@ void pg685_state::pg685(machine_config &config)
 	// ram
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -530,7 +530,7 @@ void pg685_state::pg685oua12(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pg685_state::pg685oua12_mem);
 	m_maincpu->set_irq_acknowledge_callback("mainpic", FUNC(pic8259_device::inta_cb));
 
-	pic8259_device &mainpic(PIC8259(config, "mainpic", 0));
+	pic8259_device &mainpic(PIC8259(config, "mainpic"));
 	mainpic.out_int_callback().set_inputline(m_maincpu, 0);
 	mainpic.in_sp_callback().set_constant(1);
 
@@ -539,7 +539,7 @@ void pg685_state::pg685oua12(machine_config &config)
 	// ram
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

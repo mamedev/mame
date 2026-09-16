@@ -54,16 +54,13 @@ public:
 	imi7000_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: imi7000_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	imi7000_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_imi7000_interface *m_card;
 };
@@ -88,8 +85,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	required_device_array<imi7000_slot_device, 4> m_units;
 };

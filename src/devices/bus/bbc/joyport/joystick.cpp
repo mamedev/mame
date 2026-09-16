@@ -9,15 +9,38 @@
 #include "emu.h"
 #include "joystick.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBCMC_JOYSTICK, bbcmc_joystick_device, "bbcmc_joystick", "BBC Master Compact Joystick")
+namespace {
+
+class bbcmc_joystick_device : public device_t, public device_bbc_joyport_interface
+{
+public:
+	bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBCMC_JOYSTICK, tag, owner, clock)
+		, device_bbc_joyport_interface(mconfig, *this)
+		, m_joy(*this, "JOY")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual uint8_t pb_r() override
+	{
+		return m_joy->read();
+	}
+
+private:
+	required_ioport m_joy;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( joystick )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( joystick )
@@ -30,46 +53,12 @@ static INPUT_PORTS_START( joystick )
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor bbcmc_joystick_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( joystick );
 }
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbcmc_joystick_device - constructor
-//-------------------------------------------------
-
-bbcmc_joystick_device::bbcmc_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBCMC_JOYSTICK, tag, owner, clock)
-	, device_bbc_joyport_interface(mconfig, *this)
-	, m_joy(*this, "JOY")
-{
-}
+} // anonymous namespace
 
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void bbcmc_joystick_device::device_start()
-{
-}
-
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-uint8_t bbcmc_joystick_device::pb_r()
-{
-	return m_joy->read();
-}
+DEFINE_DEVICE_TYPE_PRIVATE(BBCMC_JOYSTICK, device_bbc_joyport_interface, bbcmc_joystick_device, "bbcmc_joystick", "BBC Master Compact Joystick")

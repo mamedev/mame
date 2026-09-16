@@ -17,11 +17,13 @@
 #ifndef MAME_EMU_DIIMAGE_H
 #define MAME_EMU_DIIMAGE_H
 
+#include "notifier.h"
 #include "utilfwd.h"
 
 #include <memory>
 #include <string>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 
@@ -70,7 +72,13 @@ private:
 class device_image_interface : public device_interface
 {
 public:
-	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
+	enum class media_change_event
+	{
+		LOADED,
+		UNLOADED
+	};
+
+	using formatlist_type = std::vector<std::unique_ptr<image_device_format> >;
 
 	// construction/destruction
 	device_image_interface(const machine_config &mconfig, device_t &device);
@@ -120,7 +128,12 @@ public:
 	bool is_open() const noexcept { return bool(m_file); }
 	util::core_file &image_core_file() const noexcept { assert(is_open()); return *m_file; }
 	bool is_readonly() const noexcept { return m_readonly; }
+
 	u32 sequence_counter() const { return m_sequence_counter; } // Increments on media load/unload/etc
+	util::notifier_subscription add_media_change_notifier(delegate<void (media_change_event)> &&n);
+	template <typename T>
+	util::notifier_subscription add_media_change_notifier(T &&n)
+	{ return add_media_change_notifier(delegate<void (media_change_event)>(std::forward<T>(n))); }
 
 	// image file I/O wrappers
 	// TODO: move away from using these and let implementations use the I/O interface directly
@@ -135,15 +148,13 @@ public:
 	u32 fread(void *buffer, u32 length)
 	{
 		check_for_file();
-		size_t actual;
-		m_file->read(buffer, length, actual);
+		auto const [err, actual] = read(*m_file, buffer, length);
 		return actual;
 	}
 	u32 fwrite(const void *buffer, u32 length)
 	{
 		check_for_file();
-		size_t actual;
-		m_file->write(buffer, length, actual);
+		auto const [err, actual] = write(*m_file, buffer, length);
 		return actual;
 	}
 	std::error_condition fseek(s64 offset, int whence)
@@ -158,15 +169,6 @@ public:
 		m_file->tell(result);
 		return result;
 	}
-	bool image_feof()
-	{
-		check_for_file();
-		return m_file->eof();
-	}
-
-	// allocate and read into buffers
-	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get(), length); }
-	u32 fread(std::unique_ptr<u8 []> &ptr, u32 length, offs_t offset) { ptr = std::make_unique<u8 []>(length); return fread(ptr.get() + offset, length - offset); }
 
 	// access to software list item information
 	const software_info *software_entry() const noexcept;
@@ -186,7 +188,7 @@ public:
 	std::error_condition load_software_region(std::string_view tag, std::unique_ptr<u8[]> &ptr);
 
 	u32 crc();
-	util::hash_collection& hash() { return m_hash; }
+	util::hash_collection &hash() { return m_hash; }
 	util::hash_collection calculate_hash_on_file(util::random_read &file) const;
 
 	void battery_load(void *buffer, int length, int fill);
@@ -220,18 +222,15 @@ public:
 	const std::string &full_software_name() const noexcept { return m_full_software_name; }
 
 protected:
-	// interface-level overrides
+	// device_interface implementation
 	virtual void interface_config_complete() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept { return false; }
 
-	std::pair<std::error_condition, std::string> load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
 	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);
-	void clear() noexcept;
 	bool is_loaded() const noexcept { return m_file != nullptr; }
 
-	void set_image_filename(std::string_view filename);
 	void set_image_tag();
 
 	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
@@ -247,6 +246,20 @@ protected:
 	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);
 
 private:
+	std::vector<u32> determine_open_plan(bool is_create);
+	void update_names();
+	void set_image_filename(std::string_view filename);
+	void clear() noexcept;
+	std::pair<std::error_condition, std::string> load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
+	std::error_condition load_software_part(std::string_view identifier);
+
+	bool init_phase() const;
+	static std::error_condition run_hash(util::random_read &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);
+
+	// loads an image or software items and resets - called internally when we
+	// load an is_reset_on_load() item
+	void reset_and_load(std::string_view path);
+
 	// variables that are only non-zero when an image is mounted
 	util::core_file::ptr m_file;
 	std::unique_ptr<emu_file> m_mame_file;
@@ -265,22 +278,14 @@ private:
 	const software_part *m_software_part_ptr;
 	std::string m_software_list_name;
 
-	std::vector<u32> determine_open_plan(bool is_create);
-	void update_names();
-	std::error_condition load_software_part(std::string_view identifier);
-
-	bool init_phase() const;
-	static std::error_condition run_hash(util::random_read &file, u32 skip_bytes, util::hash_collection &hashes, const char *types);
-
-	// loads an image or software items and resets - called internally when we
-	// load an is_reset_on_load() item
-	void reset_and_load(std::string_view path);
-
 	// creation info
 	formatlist_type m_formatlist;
 
 	// working directory; persists across mounts
 	std::string m_working_directory;
+
+	// to notify interested parties when media changes
+	util::notifier<media_change_event> m_media_change_notifier;
 
 	// flags
 	u32 m_sequence_counter;
@@ -311,4 +316,4 @@ private:
 // iterator
 typedef device_interface_enumerator<device_image_interface> image_interface_enumerator;
 
-#endif  /* MAME_EMU_DIIMAGE_H */
+#endif // MAME_EMU_DIIMAGE_H

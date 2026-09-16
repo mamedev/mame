@@ -807,7 +807,7 @@ void alto2_cpu_device::debug_write_mem(uint32_t addr, uint16_t data)
  */
 void alto2_cpu_device::init_memory()
 {
-	memset(&m_mem, 0, sizeof(m_mem));
+	m_mem = decltype(m_mem)();
 	save_item(NAME(m_mem.mar));
 	save_item(NAME(m_mem.rmdd));
 	save_item(NAME(m_mem.wmdd));
@@ -826,23 +826,19 @@ void alto2_cpu_device::exit_memory()
 
 void alto2_cpu_device::reset_memory()
 {
-	if (m_mem.ram) {
-		m_mem.ram = nullptr;
-	}
-	if (m_mem.hpb) {
-		m_mem.hpb = nullptr;
-	}
+	m_mem.ram.reset();
+	m_mem.hpb.reset();
 
 	// allocate 64K or 128K words of main memory
-	ioport_port* config = ioport(":CONFIG");
+	ioport_port *const config = ioport(":CONFIG");
 	m_mem.size = ALTO2_RAM_SIZE;
 	// config should be valid, unless the driver doesn't define it
 	if (config && 0 == config->read())
 		m_mem.size *= 2;
-	logerror("Main memory %u KiB\n", static_cast<uint32_t>(sizeof(uint16_t) * m_mem.size / 1024));
+	logerror("Main memory %u KiB\n", sizeof(uint16_t) * m_mem.size / 1024);
 
-	m_mem.ram = make_unique_clear<uint32_t[]>(sizeof(uint16_t) * m_mem.size);
-	m_mem.hpb = make_unique_clear<uint8_t[]> (sizeof(uint16_t) * m_mem.size);
+	m_mem.ram = make_unique_clear<uint32_t []>(sizeof(uint16_t) * m_mem.size);
+	m_mem.hpb = make_unique_clear<uint8_t []> (sizeof(uint16_t) * m_mem.size);
 
 	// Initialize the hamming codes and parity bits
 	for (uint32_t addr = 0; addr < m_mem.size; addr++)

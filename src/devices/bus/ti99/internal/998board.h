@@ -25,6 +25,7 @@
 #include "machine/ram.h"
 #include "machine/tmc0430.h"
 #include "machine/tms9901.h"
+#include "machine/tms6100.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
 #include "video/tms9928a.h"
@@ -98,9 +99,9 @@ class mainboard8_device;
 class vaquerro_device : public device_t
 {
 public:
-	vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void device_start() override;
-	void device_reset() override;
+	vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	line_state ready();
 	void treset();
@@ -246,10 +247,10 @@ private:
 class mofetta_device : public device_t
 {
 public:
-	mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	void cruwrite(offs_t offset, uint8_t data);
 	void set_address(offs_t offset, int state);
@@ -333,9 +334,9 @@ private:
 class amigo_device : public device_t
 {
 public:
-	amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void device_start() override;
-	void device_reset() override;
+	amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	uint8_t read();
 	void write(uint8_t data);
@@ -454,10 +455,10 @@ typedef enum
 class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
-	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void hexbus_value_changed(uint8_t data) override;
 
 	void clock_in(int state);
@@ -540,7 +541,7 @@ private:
 class mainboard8_device : public device_t
 {
 public:
-	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// Memory space
 	uint8_t read(offs_t offset);
@@ -583,9 +584,9 @@ public:
 	void pbox_ready(int state);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	// Holds the state of the A14 line

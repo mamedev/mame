@@ -26,6 +26,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
+		m_ram(*this, "ram"),
 		m_paddle(*this, "PADDLE")
 	{ }
 
@@ -33,9 +34,9 @@ public:
 	void circus(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
@@ -44,16 +45,17 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_ioport m_paddle;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	int16_t m_clown_x = 0;
-	int16_t m_clown_y = 0;
+	uint8_t m_clown_x = 0;
+	uint8_t m_clown_y = 0;
 	uint8_t m_clown_z = 0;
 
 	void videoram_w(offs_t offset, uint8_t data);
-	void clown_x_w(uint8_t data) { m_clown_x = 240 - data; }
-	void clown_y_w(uint8_t data) { m_clown_y = 240 - data; }
+	void clown_x_w(uint8_t data) { m_clown_x = data; }
+	void clown_y_w(uint8_t data) { m_clown_y = data; }
 	void clown_z_w(uint8_t data);
 	uint8_t paddle_r();
 	virtual void sound_w(uint8_t data);
@@ -61,12 +63,26 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int x1, int y1, int x2, int y2, int dotted);
-	void draw_sprite_collision(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bool draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 private:
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+
+// trapeze
+
+class trapeze_state : public circus_state
+{
+public:
+	trapeze_state(const machine_config &mconfig, device_type type, const char *tag) :
+		circus_state(mconfig, type, tag)
+	{ }
+
+private:
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
 
 
@@ -88,7 +104,6 @@ private:
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y);
 	void draw_scoreboard(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bowling_alley(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -106,8 +121,6 @@ public:
 private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void sound_w(uint8_t data) override;
-
-	void draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -125,6 +138,8 @@ public:
 private:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void sound_w(uint8_t data) override;
+
+	void draw_border(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

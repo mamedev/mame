@@ -99,8 +99,8 @@ public:
 	void init_hotbody();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -139,9 +139,9 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	void main_program_map(address_map &map);
-	void main_port_map(address_map &map);
-	void sound_program_map(address_map &map);
+	void main_program_map(address_map &map) ATTR_COLD;
+	void main_port_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 
 	void decode_cpu();
 	void decode_sprites();
@@ -394,7 +394,7 @@ void gameace_state::gameace(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

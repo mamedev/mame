@@ -3,6 +3,7 @@
 /***************************************************************************
 TI-85 and TI-86 drivers by Krzysztof Strzecha
 TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
+TI-84 Plus C Silver Edition support by grubbyplaya
 
 Notes:
 1. After start TI-85 waits for ON key interrupt, so press ON key to start
@@ -263,14 +264,17 @@ void ti85_state::ti81v2_io(address_map &map)
 void ti85_state::ti83_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti83_port_0000_w));  //TODO
+	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti83_port_0000_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83_port_0002_r), FUNC(ti85_state::ti83_port_0002_w));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_port_0003_w));
-	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti85_port_0004_r), FUNC(ti85_state::ti85_port_0004_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
+	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83_port_0000_r), FUNC(ti85_state::ti85_port_0004_w));
 	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
 	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0012, 0x0012).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0013, 0x0013).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
 	map(0x0014, 0x0014).portr("BATTERY");
+	map(0x0015, 0x0015).r(FUNC(ti85_state::ti8x_keypad_r));
 }
 
 void ti85_state::ti83p_io(address_map &map)
@@ -279,13 +283,14 @@ void ti85_state::ti83p_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).r(FUNC(ti85_state::ti83p_port_0002_r));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83p_port_0004_w));
+    map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83p_port_0005_r), FUNC(ti85_state::ti83p_port_0005_w));
 	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83p_port_0006_w));
 	map(0x0007, 0x0007).rw(FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83p_port_0007_w));
 	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
 	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
-//  map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
+    map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
 }
 
 void ti85_state::ti83pse_io(address_map &map)
@@ -294,7 +299,7 @@ void ti85_state::ti83pse_io(address_map &map)
 	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
 	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
 	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
-	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83p_int_mask_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
 	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
 	map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
 	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
@@ -308,6 +313,8 @@ void ti85_state::ti83pse_io(address_map &map)
 	map(0x0015, 0x0015).r(FUNC(ti85_state::ti83pse_port_0015_r));
 	map(0x0020, 0x0020).rw(FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
 	map(0x0021, 0x0021).rw(FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
+    map(0x0027, 0x0027).rw(FUNC(ti85_state::ti83pse_port_0027_r), FUNC(ti85_state::ti83pse_port_0027_w));
+    map(0x0028, 0x0028).rw(FUNC(ti85_state::ti83pse_port_0028_r), FUNC(ti85_state::ti83pse_port_0028_w));
 
 	map(0x0030, 0x0030).rw(FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
 	map(0x0031, 0x0031).rw(FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
@@ -319,8 +326,92 @@ void ti85_state::ti83pse_io(address_map &map)
 	map(0x0037, 0x0037).rw(FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
 	map(0x0038, 0x0038).rw(FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
 
-	map(0x0055, 0x0055).r(FUNC(ti85_state::ti84pse_port_0055_r));
-	map(0x0056, 0x0056).r(FUNC(ti85_state::ti84pse_port_0056_r));
+	map(0x0055, 0x0055).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0056_r));
+}
+
+void ti85_state::ti84p_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
+	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
+	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
+	map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
+	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
+	map(0x0007, 0x0007).rw(FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83pse_port_0007_w));
+	map(0x0009, 0x0009).r(FUNC(ti85_state::ti83pse_port_0009_r));
+	map(0x0010, 0x0010).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0011, 0x0011).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0012, 0x0012).rw("t6a04", FUNC(t6a04_device::control_read), FUNC(t6a04_device::control_write));
+	map(0x0013, 0x0013).rw("t6a04", FUNC(t6a04_device::data_read), FUNC(t6a04_device::data_write));
+	map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
+	map(0x0015, 0x0015).r(FUNC(ti85_state::ti83pse_port_0015_r));
+	map(0x0020, 0x0020).rw(FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
+	map(0x0021, 0x0021).rw(FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
+    map(0x0027, 0x0027).rw(FUNC(ti85_state::ti83pse_port_0027_r), FUNC(ti85_state::ti83pse_port_0027_w));
+    map(0x0028, 0x0028).rw(FUNC(ti85_state::ti83pse_port_0028_r), FUNC(ti85_state::ti83pse_port_0028_w));
+
+	map(0x0030, 0x0030).rw(FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
+	map(0x0031, 0x0031).rw(FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
+	map(0x0032, 0x0032).rw(FUNC(ti85_state::ti83pse_ctimer1_count_r), FUNC(ti85_state::ti83pse_ctimer1_count_w));
+	map(0x0033, 0x0033).rw(FUNC(ti85_state::ti83pse_ctimer2_setup_r), FUNC(ti85_state::ti83pse_ctimer2_setup_w));
+	map(0x0034, 0x0034).rw(FUNC(ti85_state::ti83pse_ctimer2_loop_r), FUNC(ti85_state::ti83pse_ctimer2_loop_w));
+	map(0x0035, 0x0035).rw(FUNC(ti85_state::ti83pse_ctimer2_count_r), FUNC(ti85_state::ti83pse_ctimer2_count_w));
+	map(0x0036, 0x0036).rw(FUNC(ti85_state::ti83pse_ctimer3_setup_r), FUNC(ti85_state::ti83pse_ctimer3_setup_w));
+	map(0x0037, 0x0037).rw(FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
+	map(0x0038, 0x0038).rw(FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
+
+    map(0x0040, 0x0040).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_control_r), FUNC(ti85_state::ti84p_rtc_control_w));
+    map(0x0041, 0x0044).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_basetime_r), FUNC(ti85_state::ti84p_rtc_basetime_w));
+    map(0x0045, 0x0048).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_currtime_r), FUNC(ti85_state::ti84p_rtc_currtime_w));
+    
+	map(0x0055, 0x0055).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0056_r));
+}
+
+void ti85_state::ti84pcse_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0000).rw(FUNC(ti85_state::ti8x_plus_serial_r), FUNC(ti85_state::ti8x_plus_serial_w));
+	map(0x0001, 0x0001).rw(FUNC(ti85_state::ti8x_keypad_r), FUNC(ti85_state::ti8x_keypad_w));
+	map(0x0002, 0x0002).rw(FUNC(ti85_state::ti83pse_port_0002_r), FUNC(ti85_state::ti83pse_int_ack_w));
+	map(0x0003, 0x0003).rw(FUNC(ti85_state::ti83_port_0003_r), FUNC(ti85_state::ti83_int_mask_w));
+	map(0x0004, 0x0004).rw(FUNC(ti85_state::ti83p_port_0004_r), FUNC(ti85_state::ti83pse_port_0004_w));
+	map(0x0005, 0x0005).rw(FUNC(ti85_state::ti83pse_port_0005_r), FUNC(ti85_state::ti83pse_port_0005_w));
+	map(0x0006, 0x0006).rw(FUNC(ti85_state::ti86_port_0005_r), FUNC(ti85_state::ti83pse_port_0006_w));
+	map(0x0007, 0x0007).rw(FUNC(ti85_state::ti86_port_0006_r), FUNC(ti85_state::ti83pse_port_0007_w));
+	map(0x0009, 0x0009).r(FUNC(ti85_state::ti83pse_port_0009_r));
+	map(0x000E, 0x000E).rw(FUNC(ti85_state::ti84pcse_port_000E_r), FUNC(ti85_state::ti84pcse_port_000E_w));
+	map(0x000F, 0x000F).rw(FUNC(ti85_state::ti84pcse_port_000F_r), FUNC(ti85_state::ti84pcse_port_000F_w));
+	map(0x0010, 0x0010).rw("ili9335", FUNC(ili9335_device::control_read), FUNC(ili9335_device::control_write));
+	map(0x0011, 0x0011).rw("ili9335", FUNC(ili9335_device::data_read), FUNC(ili9335_device::data_write));
+	map(0x0012, 0x0012).rw("ili9335", FUNC(ili9335_device::control_read), FUNC(ili9335_device::control_write));
+	map(0x0013, 0x0013).rw("ili9335", FUNC(ili9335_device::data_read), FUNC(ili9335_device::data_write));
+	map(0x0014, 0x0014).w(FUNC(ti85_state::ti83p_port_0014_w));
+	map(0x0015, 0x0015).r(FUNC(ti85_state::ti83pse_port_0015_r));
+	map(0x0020, 0x0020).rw(FUNC(ti85_state::ti83pse_port_0020_r), FUNC(ti85_state::ti83pse_port_0020_w));
+	map(0x0021, 0x0021).rw(FUNC(ti85_state::ti83pse_port_0021_r), FUNC(ti85_state::ti83pse_port_0021_w));
+    map(0x0027, 0x0027).rw(FUNC(ti85_state::ti83pse_port_0027_r), FUNC(ti85_state::ti83pse_port_0027_w));
+    map(0x0028, 0x0028).rw(FUNC(ti85_state::ti83pse_port_0028_r), FUNC(ti85_state::ti83pse_port_0028_w));
+
+	map(0x0030, 0x0030).rw(FUNC(ti85_state::ti83pse_ctimer1_setup_r), FUNC(ti85_state::ti83pse_ctimer1_setup_w));
+	map(0x0031, 0x0031).rw(FUNC(ti85_state::ti83pse_ctimer1_loop_r), FUNC(ti85_state::ti83pse_ctimer1_loop_w));
+	map(0x0032, 0x0032).rw(FUNC(ti85_state::ti83pse_ctimer1_count_r), FUNC(ti85_state::ti83pse_ctimer1_count_w));
+	map(0x0033, 0x0033).rw(FUNC(ti85_state::ti83pse_ctimer2_setup_r), FUNC(ti85_state::ti83pse_ctimer2_setup_w));
+	map(0x0034, 0x0034).rw(FUNC(ti85_state::ti83pse_ctimer2_loop_r), FUNC(ti85_state::ti83pse_ctimer2_loop_w));
+	map(0x0035, 0x0035).rw(FUNC(ti85_state::ti83pse_ctimer2_count_r), FUNC(ti85_state::ti83pse_ctimer2_count_w));
+	map(0x0036, 0x0036).rw(FUNC(ti85_state::ti83pse_ctimer3_setup_r), FUNC(ti85_state::ti83pse_ctimer3_setup_w));
+	map(0x0037, 0x0037).rw(FUNC(ti85_state::ti83pse_ctimer3_loop_r), FUNC(ti85_state::ti83pse_ctimer3_loop_w));
+	map(0x0038, 0x0038).rw(FUNC(ti85_state::ti83pse_ctimer3_count_r), FUNC(ti85_state::ti83pse_ctimer3_count_w));
+
+    map(0x0040, 0x0040).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_control_r), FUNC(ti85_state::ti84p_rtc_control_w));
+    map(0x0041, 0x0044).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_basetime_r), FUNC(ti85_state::ti84p_rtc_basetime_w));
+    map(0x0045, 0x0048).mirror(0x20).rw(FUNC(ti85_state::ti84p_rtc_currtime_r), FUNC(ti85_state::ti84p_rtc_currtime_w));
+    
+	map(0x0055, 0x0055).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0055_r));
+	map(0x0056, 0x0056).mirror(0x20).r(FUNC(ti85_state::ti84pse_port_0056_r));
 }
 
 void ti85_state::ti86_io(address_map &map)
@@ -355,29 +446,34 @@ void ti85_state::ti86_mem(address_map &map)
 
 void ti85_state::ti83pse_banked_mem(address_map &map)
 {
-	map(0x0000, 0x1fffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0000, 0x1fffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x200000, 0x21BFFF).ram().share("nvram");
 }
 
-
 void ti85_state::ti84p_banked_mem(address_map &map)
 {
-	map(0x0000, 0xfffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x0000, 0xfffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x200000, 0x21BFFF).ram().share("nvram");
 }
 
 void ti85_state::ti83p_banked_mem(address_map &map)
 {
-	map(0x00000, 0x7ffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0x00000, 0x7ffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
 	map(0x100000, 0x107fff).ram().share("nvram");
+}
+
+void ti85_state::ti84pcse_banked_mem(address_map &map)
+{
+	map(0x0000, 0x3fffff).r(m_flash, FUNC(intelfsh8_device::read)).w(FUNC(ti85_state::ti8x_flash_write));
+	map(0x400000, 0x41FFFF).ram().share("nvram");
 }
 
 void ti85_state::ti83p_asic_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(m_membank[0], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x7fff).w(m_membank[1], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank2_r));
-	map(0x8000, 0xbfff).w(m_membank[2], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank3_r));
-	map(0xc000, 0xffff).rw(m_membank[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).w(m_membank[1], FUNC(address_map_bank_device::write8)).r(FUNC(ti85_state::ti83p_membank1_r));
+	map(0x8000, 0xbfff).rw(FUNC(ti85_state::ti83p_membank2_r), FUNC(ti85_state::ti83p_membank2_w));
+	map(0xc000, 0xffff).rw(FUNC(ti85_state::ti83p_membank3_r), FUNC(ti85_state::ti83p_membank3_w));
 }
 
 /* keyboard input */
@@ -586,7 +682,7 @@ void ti85_state::ti81(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti81_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(0);
 	screen.set_size(96, 64);
@@ -635,7 +731,7 @@ void ti85_state::ti82(machine_config &config)
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	T6A04(config, "t6a04", 0).set_size(96, 64);
+	T6A04(config, "t6a04").set_size(96, 64);
 
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 }
@@ -652,15 +748,19 @@ void ti85_state::ti83(machine_config &config)
 {
 	ti81(config);
 	m_maincpu->set_clock(6000000);        /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti86_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83 )
 
 	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
 	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
 
-	T6A04(config, "t6a04", 0).set_size(96, 64);
+	T6A04(config, "t6a04").set_size(96, 64);
+
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 }
 
 void ti85_state::ti86(machine_config &config)
@@ -694,7 +794,7 @@ void ti85_state::ti83p(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_membank[2]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, m_membank[3]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	T6A04(config, "t6a04", 0).set_size(96, 64);
+	T6A04(config, "t6a04").set_size(96, 64);
 
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 
@@ -722,6 +822,9 @@ void ti85_state::ti83pse(machine_config &config)
 void ti85_state::ti84p(machine_config &config)
 {
 	ti83pse(config);
+
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti84p_io);
+
 	m_membank[0]->set_map(&ti85_state::ti84p_banked_mem);
 
 	m_membank[1]->set_map(&ti85_state::ti84p_banked_mem);
@@ -737,14 +840,44 @@ void ti85_state::ti84p(machine_config &config)
 void ti85_state::ti84pse(machine_config &config)
 {
 	ti83pse(config);
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti84p_io);
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
+}
+
+void ti85_state::ti84pcse(machine_config &config)
+{
+	Z80(config, m_maincpu, 15000000);        // 15 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);	
+	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti84pcse_io);
+	
+	ADDRESS_MAP_BANK(config, m_membank[0]).set_map(&ti85_state::ti84pcse_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[1]).set_map(&ti85_state::ti84pcse_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[2]).set_map(&ti85_state::ti84pcse_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_membank[3]).set_map(&ti85_state::ti84pcse_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(0);
+	screen.set_size(240, 320);
+	screen.set_visarea(0, 240-1, 0, 320-1);
+	screen.set_orientation(ROT90);
+	screen.set_screen_update("ili9335", FUNC(ili9335_device::screen_update));
+
+	ILI9335(config, "ili9335", 0).set_screen(screen);;
+
+	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pcse )
+	MACRONIX_29LV320ETTI(config, m_flash, 0);
 }
 
 void ti85_state::ti84pce(machine_config &config)
 {
 	ti84pse(config);
 
-	EZ80(config.replace(), m_maincpu, 15000000);
+	EZ80(config.replace(), m_maincpu, 48000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti85_state::ti83p_asic_mem);
 	m_maincpu->set_addrmap(AS_IO, &ti85_state::ti83pse_io);
 }
@@ -752,15 +885,54 @@ void ti85_state::ti84pce(machine_config &config)
 void ti85_state::ti73(machine_config &config)
 {
 	ti83p(config);
-	config.device_remove("linkport");
-	//TI73SERIAL(config, "tiserial");
+    
+	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti73 )
 }
 
 ROM_START (ti73)
 	ROM_REGION (0x80000, "flash",0)
-	ROM_DEFAULT_BIOS("v160")
-	ROM_SYSTEM_BIOS( 0, "v160", "V 1.60" )
-	ROMX_LOAD( "ti73v160.bin", 0x00000, 0x80000, CRC(bb0e3a16) SHA1(d62c2c7532698962818a747a7f32e35e41dfe338), ROM_BIOS(0) )
+	ROM_DEFAULT_BIOS("v191")
+	ROM_SYSTEM_BIOS( 0, "v13004", "V 1.3004" )
+	ROMX_LOAD( "ti73v5v13004.bin", 0x00000, 0x80000, CRC(23660ebc) SHA1(4aa24d2044ce7a477b4a0ac94c5aa56a248302e1), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v13007", "V 1.3007" )
+	ROMX_LOAD( "ti73v5v13007.bin", 0x00000, 0x80000, CRC(6035b64f) SHA1(1493ea8eb6aacf0cd67cfc457b6fa8143aa220c8), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v140", "V 1.40" )
+	ROMX_LOAD( "ti73v5v140.bin", 0x00000, 0x80000, CRC(632f8aca) SHA1(6e9165fb3e372b093b95a4e4c6ef39d92fa808eb), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v150", "V 1.50" )
+	ROMX_LOAD( "ti73v5v150.bin", 0x00000, 0x80000, CRC(a6bcf437) SHA1(4c47120e6bce19fefc0dd296d5191be0889fa5ee), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v160", "V 1.60" )
+	ROMX_LOAD( "ti73v5v160.bin", 0x00000, 0x80000, CRC(4e8172f9) SHA1(2c0e8bf66b5cbba212416f475edc95f887972a78), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v180", "V 1.80" )
+	ROMX_LOAD( "ti73v5v180.bin", 0x00000, 0x80000, CRC(1b6a9182) SHA1(ba4348c291968c6e3b7aaa74ee5bb50e13c81e48), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 6, "v185", "V 1.85" )
+	ROMX_LOAD( "ti73v5v185.bin", 0x00000, 0x80000, CRC(282c6783) SHA1(f6753406bdda626177c5a0701e7d7aec83177e41), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v190", "V 1.90" )
+	ROMX_LOAD( "ti73v5v190.bin", 0x00000, 0x80000, CRC(e177a7bf) SHA1(9d818ca54bbd1af9cef05e77534049f3d6b3721a), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 8, "v191", "V 1.91" )
+	ROMX_LOAD( "ti73v5v191.bin", 0x00000, 0x80000, CRC(95295233) SHA1(963cd8cabf2141ee49c48f509acfa46ca0a22009), ROM_BIOS(8) )
+ROM_END
+
+ROM_START (ti73v7)
+	ROM_REGION (0x80000, "flash",0)
+	ROM_DEFAULT_BIOS("v191")
+	ROM_SYSTEM_BIOS( 0, "v13004", "V 1.3004" )
+	ROMX_LOAD( "ti73v7v13004.bin", 0x00000, 0x80000, CRC(df2eb99e) SHA1(cdb2596333ffa302839a3a04f8d349f5f28492cb), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v13007", "V 1.3007" )
+	ROMX_LOAD( "ti73v7v13007.bin", 0x00000, 0x80000, CRC(9c7d016d) SHA1(1e537c1c273d12c4697779438f2373941b3d2db3), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v140", "V 1.40" )
+	ROMX_LOAD( "ti73v7v140.bin", 0x00000, 0x80000, CRC(9f673de8) SHA1(6269b7820352ed9efe44f0d33456c9cb6867fc77), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v150", "V 1.50" )
+	ROMX_LOAD( "ti73v7v150.bin", 0x00000, 0x80000, CRC(5af44315) SHA1(32a26984cdc6e3672900c5d00ad59a84222092ff), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v160", "V 1.60" )
+	ROMX_LOAD( "ti73v7v160.bin", 0x00000, 0x80000, CRC(b2c9c5db) SHA1(65a50a241e9cece32f739078011562357cf447f3), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v180", "V 1.80" )
+	ROMX_LOAD( "ti73v7v180.bin", 0x00000, 0x80000, CRC(e72226a0) SHA1(a39a49a4e3806ef2d50859137b4dfbcfc361727e), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 6, "v185", "V 1.85" )
+	ROMX_LOAD( "ti73v7v185.bin", 0x00000, 0x80000, CRC(d464d0a1) SHA1(fbda4792550ed4158a40e4795f9d89794820a685), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v190", "V 1.90" )
+	ROMX_LOAD( "ti73v7v190.bin", 0x00000, 0x80000, CRC(1d3f109d) SHA1(b89e87be9b7c2b6385b664a5749620af1fd804e6), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 8, "v191", "V 1.91" )
+	ROMX_LOAD( "ti73v7v191.bin", 0x00000, 0x80000, CRC(35da627b) SHA1(a490632b7f898b62951675d3709ea525f89364fa), ROM_BIOS(8) )
 ROM_END
 
 ROM_START (ti73b)
@@ -817,6 +989,13 @@ ROM_START (ti82)
 	//Rom versions according to ticalc.org 3*, 4*, 7*, 8.0, 10.0, 12.0, 15.0, 16.0, 17.0, 18.0, 19.0, 19.006
 ROM_END
 
+ROM_START (ti82stfr)
+	ROM_REGION (0x40000, "bios",0)
+	ROM_DEFAULT_BIOS("v111fr7")
+	ROM_SYSTEM_BIOS( 0, "v111fr7", "V 1.11fr7" )
+	ROMX_LOAD( "ti82stfr.bin", 0x00000, 0x40000, CRC(50bdbf4f) SHA1(1e53f3b983c742d77299f72b2ff0dd2f723c5f1f), ROM_BIOS(0) )
+ROM_END
+
 ROM_START (ti83)
 	ROM_REGION (0x40000, "bios",0)
 	ROM_DEFAULT_BIOS("v110")
@@ -839,7 +1018,7 @@ ROM_END
 
 ROM_START (ti83p)
 	ROM_REGION (0x80000, "flash",0)
-	ROM_DEFAULT_BIOS("v116")
+	ROM_DEFAULT_BIOS("v119")
 	ROM_SYSTEM_BIOS( 0, "v103", "V 1.03" )
 	ROMX_LOAD( "ti83pv103.bin", 0x00000, 0x80000, CRC(da466be0) SHA1(37eaeeb9fb5c18fb494e322b75070e80cc4d858e), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v110", "V 1.10" )
@@ -854,7 +1033,12 @@ ROM_START (ti83p)
 	ROMX_LOAD( "ti83pv115.bin", 0x00000, 0x80000, CRC(9288029b) SHA1(8bd05fd47cab4028f275d1cc5383fd4f0e193474), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "v116", "V 1.16" )
 	ROMX_LOAD( "ti83pv116.bin", 0x00000, 0x80000, CRC(0b7cd006) SHA1(290bc81159ea061d8ccb56a6f63e042f150afb32), ROM_BIOS(6) )
-	//Missing 1.17, 1.18, and 1.19
+	ROM_SYSTEM_BIOS( 7, "v117", "V 1.17" )
+	ROMX_LOAD( "ti83pv117.bin", 0x00000, 0x80000, CRC(ec433722) SHA1(9ea2bd50003bd7025f8eb9fc896b0e266fd2230b), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 8, "v118", "V 1.18" )
+	ROMX_LOAD( "ti83pv118.bin", 0x00000, 0x80000, CRC(85cde226) SHA1(8eef2acb9917ba406ffb7b6a8ebbf771ba06ea9a), ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS( 9, "v119", "V 1.19" )
+	ROMX_LOAD( "ti83pv119.bin", 0x00000, 0x80000, CRC(e7ffedd7) SHA1(63b996189409c855e9315179a0660bcaa1f68d97), ROM_BIOS(9) )
 ROM_END
 
 ROM_START (ti83pb)
@@ -874,11 +1058,12 @@ ROM_START (ti83pb)
 	ROMX_LOAD( "ti83pbv115.bin", 0x00000, 0x80000, CRC(a16a4bff) SHA1(a0374a5d5f25e3f9dc1c241447233cf3a23e7946), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "v116", "V 1.16" )
 	ROMX_LOAD( "ti83pbv116.bin", 0x00000, 0x80000, CRC(b5e00ef6) SHA1(23b131263b696c03f778eb5d37411be9a86cf752), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 7, "v118", "V 1.18" )
-	ROMX_LOAD( "ti83pbv118.bin", 0x00000, 0x80000, CRC(0915b0a0) SHA1(48c270c383c2d05058693a5bf58d462936bbb335), ROM_BIOS(7) )
-	ROM_SYSTEM_BIOS( 8, "v119", "V 1.19" )
-	ROMX_LOAD( "ti83pbv119.bin", 0x00000, 0x80000, CRC(58f14c79) SHA1(1fddd44d54f3ff12bfb548fcb03ce36b5a4f295a), ROM_BIOS(8) )
-	//Missing 1.17
+	ROM_SYSTEM_BIOS( 7, "v117", "V 1.17" )
+	ROMX_LOAD( "ti83pbv117.bin", 0x00000, 0x80000, CRC(22258883) SHA1(791b5738a51960ae3a5bc90759aeec676291040a), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 8, "v118", "V 1.18" )
+	ROMX_LOAD( "ti83pbv118.bin", 0x00000, 0x80000, CRC(0915b0a0) SHA1(48c270c383c2d05058693a5bf58d462936bbb335), ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS( 9, "v119", "V 1.19" )
+	ROMX_LOAD( "ti83pbv119.bin", 0x00000, 0x80000, CRC(58f14c79) SHA1(1fddd44d54f3ff12bfb548fcb03ce36b5a4f295a), ROM_BIOS(9) )
 ROM_END
 
 ROM_START (ti85)
@@ -919,16 +1104,28 @@ ROM_END
 
 ROM_START (ti83pse)
 	ROM_REGION (0x200000, "flash", 0)
-	ROM_SYSTEM_BIOS( 0, "v116", "V 1.16" )
-	ROM_DEFAULT_BIOS("v116")
-	ROMX_LOAD( "ti83psev116.bin", 0x00000, 0x200000, CRC(d2570863) SHA1(d4214b3c0ebb26e10fe95294ac72a90d2ba99537), ROM_BIOS(0) )
+	ROM_DEFAULT_BIOS("v119")
+	ROM_SYSTEM_BIOS( 0, "v113", "V 1.13" )
+	ROMX_LOAD( "ti83psev113.bin", 0x00000, 0x200000, CRC(e27f2233) SHA1(f0c2da41d45252410bd6f29385d0d3afcf8df11f), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v114", "V 1.14" )
+	ROMX_LOAD( "ti83psev114.bin", 0x00000, 0x200000, CRC(65ad0acc) SHA1(7347bf06ce4710d687cfe763d9fcf737d7fe54a7), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v115", "V 1.15" )
+	ROMX_LOAD( "ti83psev115.bin", 0x00000, 0x200000, CRC(54487710) SHA1(0333947795e0f31c5a72c57e01a930a4b0821ff7), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v116", "V 1.16" )
+	ROMX_LOAD( "ti83psev116.bin", 0x00000, 0x200000, CRC(d2570863) SHA1(d4214b3c0ebb26e10fe95294ac72a90d2ba99537), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v117", "V 1.17" )
+	ROMX_LOAD( "ti83psev117.bin", 0x00000, 0x200000, CRC(12816fed) SHA1(1b93096999a41f8341afdadb580f7bcd2ae1661f), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v118", "V 1.18" )
+	ROMX_LOAD( "ti83psev118.bin", 0x00000, 0x200000, CRC(273f6cea) SHA1(d809448878247a527174799e474e3891b870e9f5), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 6, "v119", "V 1.19" )
+	ROMX_LOAD( "ti83psev119.bin", 0x00000, 0x200000, CRC(0de21c7b) SHA1(61b4fd3919b7485682a041a1189e9e88b5eb78a6), ROM_BIOS(6) )
 ROM_END
 
 ROM_START (ti83pseb)
 	ROM_REGION (0x200000, "flash", 0)
 	ROM_DEFAULT_BIOS("v112")
 	ROM_SYSTEM_BIOS( 0, "v112", "V 1.12" )
-	ROMX_LOAD( "ti83psebv112.bin", 0x00000, 0x200000, CRC(e8cfcdb7) SHA1(322929d289c17c247da7da3674d6115f1740fa49), ROM_BIOS(0) )
+	ROMX_LOAD( "ti83psebv112.bin", 0x00000, 0x200000, BAD_DUMP CRC(e8cfcdb7) SHA1(322929d289c17c247da7da3674d6115f1740fa49), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v113", "V 1.13" )
 	ROMX_LOAD( "ti83psebv113.bin", 0x00000, 0x200000, CRC(cf90e998) SHA1(29b92a32e3ceae7d918fc404fec50a53f35b574c), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "v114", "V 1.14" )
@@ -937,10 +1134,12 @@ ROM_START (ti83pseb)
 	ROMX_LOAD( "ti83psebv115.bin", 0x00000, 0x200000, CRC(79a7bcbb) SHA1(1c47f2299eedde8db21b9ec469ba01a1b14533db), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "v116", "V 1.16" )
 	ROMX_LOAD( "ti83psebv116.bin", 0x00000, 0x200000, CRC(f75b896f) SHA1(75c8356ee89f35cb197684f3581cbfa3904c2f0a), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "v118", "V 1.18" )
-	ROMX_LOAD( "ti83psebv118.bin", 0x00000, 0x200000, CRC(0ad0a741) SHA1(cb83a6f1517fc5d34a29cdf4b1d30ea2762b2a95), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 6, "v119", "V 1.19" )
-	ROMX_LOAD( "ti83psebv119.bin", 0x00000, 0x200000, CRC(200dd7d0) SHA1(8177bc6d5489d575cbfa9a004d097fc08c6f8c86), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 5, "v117", "V 1.17" )
+	ROMX_LOAD( "ti83psebv117.bin", 0x00000, 0x200000, CRC(999e1288) SHA1(69cc772cff0f3dfb6858ffd84021703ecc6cfa56), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 6, "v118", "V 1.18" )
+	ROMX_LOAD( "ti83psebv118.bin", 0x00000, 0x200000, CRC(0ad0a741) SHA1(cb83a6f1517fc5d34a29cdf4b1d30ea2762b2a95), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v119", "V 1.19" )
+	ROMX_LOAD( "ti83psebv119.bin", 0x00000, 0x200000, CRC(200dd7d0) SHA1(8177bc6d5489d575cbfa9a004d097fc08c6f8c86), ROM_BIOS(7) )
 ROM_END
 
 ROM_START (ti84pse)
@@ -967,8 +1166,22 @@ ROM_END
 ROM_START (ti84psev3)
 	ROM_REGION (0x200000, "flash",0)
 	ROM_DEFAULT_BIOS("v255mp")
-	ROM_SYSTEM_BIOS( 0, "v255mp", "V 2.55MP" )
-	ROMX_LOAD( "ti84psev3v255mp.bin", 0x00000, 0x200000, CRC(daa7cb89) SHA1(eabdc9b46a1cb7fef60b0fabf36ab7d484cdb3bf), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 0, "v221", "V 2.21" )
+	ROMX_LOAD( "ti84psev3v221.bin", 0x00000, 0x200000, CRC(102ee1ae) SHA1(0b315edab35c96727eb06b8c94a77bc33fe225db), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v222", "V 2.22" )
+	ROMX_LOAD( "ti84psev3v222.bin", 0x00000, 0x200000, CRC(168cecfb) SHA1(7599f61da0b33ee1fa4f9587e1b419ee51870070), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v230", "V 2.30" )
+	ROMX_LOAD( "ti84psev3v230.bin", 0x00000, 0x200000, CRC(2836d996) SHA1(5d6930c5aa4877e1a8a37bcec533476a45ba5de7), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v240", "V 2.40" )
+	ROMX_LOAD( "ti84psev3v240.bin", 0x00000, 0x200000, CRC(8adb5f68) SHA1(250f5336e00860bb7fdd2664c821d38e3d643ef0), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v241", "V 2.41" )
+	ROMX_LOAD( "ti84psev3v241.bin", 0x00000, 0x200000, CRC(9dfd0616) SHA1(86c519b0bd6d8bfd020ac6643dd913c8aacb8cc2), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v243", "V 2.43" )
+	ROMX_LOAD( "ti84psev3v243.bin", 0x00000, 0x200000, CRC(bea11954) SHA1(bd0510fced6f296a18b531ba3009414931a0a70d), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 6, "v253mp", "V 2.53MP" )
+	ROMX_LOAD( "ti84psev3v253mp.bin", 0x00000, 0x200000, CRC(9e647696) SHA1(7dcf7130ddfb452a8ea51468de2e8360324e7b09), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v255mp", "V 2.55MP" )
+	ROMX_LOAD( "ti84psev3v255mp.bin", 0x00000, 0x200000, CRC(daa7cb89) SHA1(eabdc9b46a1cb7fef60b0fabf36ab7d484cdb3bf), ROM_BIOS(7) )
 ROM_END
 
 ROM_START (ti84pseb)
@@ -1027,7 +1240,7 @@ ROM_START (ti84pv2)
 	ROM_SYSTEM_BIOS( 4, "v241", "V 2.41" )
 	ROMX_LOAD( "ti84pv2v241.bin", 0x00000, 0x100000, CRC(2d0f8f6d) SHA1(5048cebac3814ed56e82c9d6f094be8ffaa15e10), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "v243", "V 2.43" )
-	ROMX_LOAD( "ti84v2pv243.bin", 0x00000, 0x100000, CRC(7742ac1d) SHA1(dc02d658412e7f00205906bdf8ba6b252a193506), ROM_BIOS(5) )
+	ROMX_LOAD( "ti84pv2pv243.bin", 0x00000, 0x100000, CRC(7742ac1d) SHA1(dc02d658412e7f00205906bdf8ba6b252a193506), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "v253mp", "V 2.53MP" )
 	ROMX_LOAD( "ti84pv2v253mp.bin", 0x00000, 0x100000, CRC(f1dd49b8) SHA1(c9b592f3451778df1a4ada76cdd2f859c6c5df26), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "v255mp", "V 2.55MP" )
@@ -1044,8 +1257,22 @@ ROM_END
 ROM_START (ti84pv3)
 	ROM_REGION (0x100000, "flash",0)
 	ROM_DEFAULT_BIOS("v255mp")
-	ROM_SYSTEM_BIOS( 0, "v255mp", "V 2.55MP" )
-	ROMX_LOAD( "ti84pv3v255mp.bin", 0x00000, 0x100000, CRC(a9b5d5a6) SHA1(d500540feca974f6e8fa269981cfb25dc951c338), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 0, "v221", "V 2.21" )
+	ROMX_LOAD( "ti84pv3v221.bin", 0x00000, 0x100000, CRC(c6c149d6) SHA1(19e65256a4e88980e0db44cdf97219dcf7d35df0), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v222", "V 2.22" )
+	ROMX_LOAD( "ti84pv3v222.bin", 0x00000, 0x100000, CRC(542c8209) SHA1(73a2815e0b450a10d0a58a6b3959eacbcb6fcd75), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "v230", "V 2.30" )
+	ROMX_LOAD( "ti84pv3v230.bin", 0x00000, 0x100000, CRC(27a6a4f9) SHA1(a9062bd327da298dcde1164a48504ffb9b4a5f9b), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "v240", "V 2.40" )
+	ROMX_LOAD( "ti84pv3v240.bin", 0x00000, 0x100000, CRC(a49f9307) SHA1(1230d5d4b373c658bf0938393d19cb2ed9d04eb3), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "v241", "V 2.41" )
+	ROMX_LOAD( "ti84pv3v241.bin", 0x00000, 0x100000, CRC(b1ed6495) SHA1(76851eec507439a7c96e629ab843b08ba786ed73), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "v243", "V 2.43" )
+	ROMX_LOAD( "ti84pv3pv243.bin", 0x00000, 0x100000, CRC(eba047e5) SHA1(dd13575c1426602ca12b4364e48ab66f14d002aa), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 6, "v253mp", "V 2.53MP" )
+	ROMX_LOAD( "ti84pv3v253mp.bin", 0x00000, 0x100000, CRC(6d3fa240) SHA1(fe59232ac03050a2a50b4ce13e79de2c75a91fe1), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 7, "v255mp", "V 2.55MP" )
+	ROMX_LOAD( "ti84pv3v255mp.bin", 0x00000, 0x100000, CRC(a9b5d5a6) SHA1(d500540feca974f6e8fa269981cfb25dc951c338), ROM_BIOS(7) )
 ROM_END
 
 ROM_START (ti84pob)
@@ -1161,32 +1388,50 @@ ROM_START (ti84pcev30)
 	ROMX_LOAD( "ti84pcev30v530.bin", 0x00000, 0x400000, CRC(cc7a7047) SHA1(0d348e60dc57276b1f8d5ff87935e47cdd27455c), ROM_BIOS(0) )
 ROM_END
 
+ROM_START (ti84pcev50)
+	ROM_REGION (0x400000, "flash",0)
+	ROM_DEFAULT_BIOS("v560")
+	ROM_SYSTEM_BIOS( 0, "v560", "V 5.6.0.0020" )
+	ROMX_LOAD( "ti84pcev50v560.bin", 0x00000, 0x400000, CRC(28b05c7c) SHA1(92ae118d4ceb7d1d4414525f054eb78aa215b5ae), ROM_BIOS(0) )
+ROM_END
+
+ROM_START (ti84pcev61)
+	ROM_REGION (0x400000, "flash",0)
+	ROM_DEFAULT_BIOS("v570")
+	ROM_SYSTEM_BIOS( 0, "v570", "V 5.7.0.0021" )
+	ROMX_LOAD( "ti84pcev61v570.bin", 0x00000, 0x400000, CRC(56d049ed) SHA1(ae958ffd947c5ad338d8bfecd1b72780f4381329), ROM_BIOS(0) )
+ROM_END
+
 //    YEAR  NAME        PARENT   COMPAT  MACHINE  INPUT  STATE       INIT        COMPANY              FULLNAME                                           FLAGS
 COMP( 201?, ti84pob,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (bootleg)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 201?, ti84pov2,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (Boot Code 1.02)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 COMP( 201?, ti84pov3,   ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "Orion TI-84 Plus (Boot Code 1.03)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 1998, ti73,       0,       0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer",                                  MACHINE_NO_SOUND_HW )
-COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 200?, ti73,       0,       0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (Boot Code 1.3005)",               MACHINE_NO_SOUND_HW )
+COMP( 200?, ti73v7,     ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (Boot Code 1.3007)",               MACHINE_NO_SOUND_HW )
+COMP( 20??, ti73b,      ti73,    0,      ti73,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-73 Explorer (bootleg)",                        MACHINE_NO_SOUND_HW )
 COMP( 1990, ti81,       0,       0,      ti81,    ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81",                                           MACHINE_NO_SOUND_HW )
 COMP( 1994, ti81v2,     ti81,    0,      ti81v2,  ti81,  ti85_state, empty_init, "Texas Instruments", "TI-81 v2.0",                                      MACHINE_NO_SOUND_HW )
 COMP( 1993, ti82,       0,       0,      ti82,    ti82,  ti85_state, empty_init, "Texas Instruments", "TI-82",                                           MACHINE_NO_SOUND_HW )
-COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti83pseb,   ti83pse, 0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2006, ti82stfr,   ti83,    0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-82 Stats.fr",                                  MACHINE_NO_SOUND_HW )
+COMP( 1996, ti83,       0,       0,      ti83,    ti83,  ti85_state, empty_init, "Texas Instruments", "TI-83",                                           MACHINE_NO_SOUND_HW )
+COMP( 1999, ti83p,      0,       0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW )
+COMP( 20??, ti83pb,     ti83p,   0,      ti83p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus (bootleg)",                            MACHINE_NO_SOUND_HW )
+COMP( 2001, ti83pse,    0,       0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW )
+COMP( 20??, ti83pseb,   ti83pse, 0,      ti83pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW )
 COMP( 2015, ti83pcev15, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",         MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2013, ti84pcse,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.0)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 201?, ti84pcsev2, ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.2)",     MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2004, ti84p,      0,       0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.00)",                     MACHINE_NO_SOUND_HW )
+COMP( 200?, ti84pv2,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.02)",                     MACHINE_NO_SOUND_HW )
+COMP( 2011, ti84pv3,    ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (Boot Code 1.03)",                     MACHINE_NO_SOUND_HW )
+COMP( 20??, ti84pb,     ti84p,   0,      ti84p,   ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus (bootleg)",                            MACHINE_NO_SOUND_HW )
+COMP( 2013, ti84pcse,   0,       0,      ti84pcse,ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.0)",     MACHINE_NO_SOUND_HW )
+COMP( 201?, ti84pcsev2, ti84pcse,0,      ti84pcse,ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus C Silver Edition (Boot Code 4.2)",     MACHINE_NO_SOUND_HW )
 COMP( 2015, ti84pce,    ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2016, ti84pcev15, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 COMP( 2017, ti84pcev30, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2020, ti84pcev50, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.5.0.0006)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2021, ti84pcev61, ti84pse, 0,      ti84pce, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.6.1.0006)",            MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2004, ti84pse,    0,       0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.00)",      MACHINE_NO_SOUND_HW )
+COMP( 2011, ti84psev3,  ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (Boot Code 1.03)",      MACHINE_NO_SOUND_HW )
+COMP( 20??, ti84pseb,   ti84pse, 0,      ti84pse, ti82,  ti85_state, empty_init, "Texas Instruments", "TI-84 Plus Silver Edition (bootleg)",             MACHINE_NO_SOUND_HW )
 COMP( 1992, ti85,       0,       0,      ti85d,   ti85,  ti85_state, empty_init, "Texas Instruments", "TI-85",                                           MACHINE_NO_SOUND_HW )
 COMP( 1997, ti86,       0,       0,      ti86,    ti85,  ti85_state, empty_init, "Texas Instruments", "TI-86",                                           MACHINE_NO_SOUND_HW )

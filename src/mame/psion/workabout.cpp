@@ -5,23 +5,25 @@
     Psion Workabout
 
     TODO:
-    - expansion LIF ports
+    - determine EEPROM factory settings.
 
 ******************************************************************************/
 
 #include "emu.h"
+
+//#include "bus/psion/exp/slot.h"
+#include "bus/psion/sibo/slot.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/psion_asic9.h"
 #include "machine/psion_ssd.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-//#include "bus/psion/exp/slot.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "utf8.h"
 
 
 namespace {
@@ -36,9 +38,11 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_palette(*this, "palette")
 		, m_keyboard(*this, "COL%u", 0U)
-		, m_speaker(*this, "speaker")
+		, m_buzzer(*this, "buzzer")
 		, m_ssd(*this, "ssd%u", 1U)
-		//, m_exp(*this, "exp%u", 1U)
+		, m_sibo(*this, "sibo")
+		//, m_exp(*this, "exp")
+		, m_eeprom(*this, "eeprom")
 	{ }
 
 	void workabout(machine_config &config);
@@ -48,22 +52,25 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void palette_init(palette_device &palette) const ATTR_COLD;
+
+	uint16_t kbd_r();
+	uint16_t portab_r();
+	void portab_w(uint16_t data);
+
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<palette_device> m_palette;
 	required_ioport_array<8> m_keyboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_buzzer;
 	required_device_array<psion_ssd_device, 2> m_ssd;
-	//required_device_array<psion_exp_slot_device, 3> m_exp;
-
-	void palette_init(palette_device &palette);
-
-	uint16_t kbd_r();
+	required_device<psion_sibo_slot_device> m_sibo;
+	//required_device<psion_exp_slot_device> m_exp;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	uint8_t m_key_col = 0;
 };
@@ -72,14 +79,12 @@ private:
 void workabout_state::machine_start()
 {
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	save_item(NAME(m_key_col));
 }
 
-void workabout_state::machine_reset()
-{
-}
 
-
-static INPUT_PORTS_START( workabout )
+static INPUT_PORTS_START( psionwa )
 	PORT_START("COL0")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)          PORT_CHAR('s')  PORT_CHAR('S')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)          PORT_CHAR('u')  PORT_CHAR('U')
@@ -87,9 +92,9 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('a')  PORT_CHAR('A')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/')  PORT_CHAR('?')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)          PORT_CHAR('6')  PORT_CHAR('^')  PORT_CHAR('}')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(UTF8_DOWN)
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))                  PORT_NAME(u8"\u2193") // U+2193 = ↓
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))                   PORT_NAME("On/Esc")          PORT_CHANGED_MEMBER(DEVICE_SELF, workabout_state, wakeup, 0)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))                   PORT_NAME("On/Esc")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(workabout_state::wakeup), 0)
 
 	PORT_START("COL1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)          PORT_CHAR('t')  PORT_CHAR('T')
@@ -98,7 +103,7 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)          PORT_CHAR('b')  PORT_CHAR('B')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)                                   PORT_NAME("Enter")
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-')  PORT_CHAR('_')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(UTF8_RIGHT)
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))                 PORT_NAME(u8"\u2192") // U+2192 = →
 	PORT_BIT(0x180, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL2")
@@ -128,7 +133,7 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)          PORT_CHAR('e')  PORT_CHAR('E')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)          PORT_CHAR('3')  PORT_CHAR(0xa3) PORT_CHAR('\\')
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)          PORT_CHAR('9')  PORT_CHAR(')')  PORT_CHAR(']')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))                    PORT_NAME(UTF8_UP)
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))                    PORT_NAME(u8"\u2191") // U+2191 = ↑
 	PORT_BIT(0x180, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL5")
@@ -155,11 +160,20 @@ static INPUT_PORTS_START( workabout )
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)          PORT_CHAR('p')  PORT_CHAR('P')
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)          PORT_CHAR('l')  PORT_CHAR('L')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(',')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')  PORT_CHAR(',')  PORT_CHAR('>')
 	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)          PORT_CHAR('5')  PORT_CHAR('%')  PORT_CHAR('{')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(UTF8_LEFT)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))                  PORT_NAME(u8"\u2190") // U+2190 = ←
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                                                               PORT_NAME("Backlight")
 	PORT_BIT(0x180, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( psionwamx )
+	PORT_INCLUDE(psionwa)
+
+	PORT_MODIFY("COL0")
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))                   PORT_NAME("On/Esc")          PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(workabout_state::wakeup), 0)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -183,11 +197,35 @@ uint16_t workabout_state::kbd_r()
 }
 
 
-void workabout_state::palette_init(palette_device &palette)
+uint16_t workabout_state::portab_r()
+{
+	uint16_t data = 0x00;
+
+	data |= kbd_r() & 0xff;
+	data |= m_eeprom->do_read() << 10;
+
+	return data;
+}
+
+void workabout_state::portab_w(uint16_t data)
+{
+	m_eeprom->cs_write(BIT(data, 11));
+	m_eeprom->di_write(BIT(data, 9));
+	m_eeprom->clk_write(BIT(data, 8));
+}
+
+
+void workabout_state::palette_init(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
-	palette.set_pen_color(1, rgb_t(130, 130, 110));
-	palette.set_pen_color(2, rgb_t(190, 210, 180));
+
+	for (int i = 1; i < 3; i++)
+	{
+		const int r = (0x99 * i) / 2;
+		const int g = (0xaa * i) / 2;
+		const int b = (0x88 * i) / 2;
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -197,20 +235,20 @@ void workabout_state::workabout(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
-	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
-	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
-	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
-	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
-	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
 	//m_asic9->data_r<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_r)); // Expansion port A
 	//m_asic9->data_w<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_w));
 	//m_asic9->data_r<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_r)); // Expansion port B
 	//m_asic9->data_w<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_w));
-	//m_asic9->data_r<4>().set(m_exp[2], FUNC(psion_exp_slot_device::data_r)); // Expansion port C
-	//m_asic9->data_w<4>().set(m_exp[2], FUNC(psion_exp_slot_device::data_w));
+	m_asic9->data_r<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_r));  // Expansion port C
+	m_asic9->data_w<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 100);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);
@@ -219,7 +257,7 @@ void workabout_state::workabout(machine_config &config)
 	PALETTE(config, "palette", FUNC(workabout_state::palette_init), 3);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
+	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.00); // Piezo buzzer
 
 	RAM(config, m_ram);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -229,11 +267,14 @@ void workabout_state::workabout(machine_config &config)
 	PSION_SSD(config, m_ssd[1]);
 	m_ssd[1]->door_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
 
-	//PSION_EXP_SLOT(config, m_exp[0], psion_exp_devices, nullptr);
-	//PSION_EXP_SLOT(config, m_exp[1], psion_exp_devices, nullptr);
-	//PSION_EXP_SLOT(config, m_exp[2], psion_exp_devices, nullptr);
+	// LIF-PFS socket (with LIF converter)
+	PSION_SIBO_SLOT(config, m_sibo, psion_sibo_devices, nullptr);
+	m_sibo->int_cb().set(m_asic9, FUNC(psion_asic9_device::sds_int_w));
+
+	//PSION_EXP_SLOT(config, m_exp, psion_exp_devices, nullptr);
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("WA");
+	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("WA");
 }
 
 
@@ -248,9 +289,27 @@ void workabout_state::psionwamx(machine_config &config)
 {
 	workabout(config);
 
-	m_asic9->set_clock(3.6864_MHz_XTAL * 15 / 2); // V30MX
+	PSION_ASIC9MX(config.replace(), m_asic9, 3.6864_MHz_XTAL * 15 / 2); // V30MX
+	m_asic9->set_screen("screen");
+	m_asic9->set_ram_rom("ram", "rom");
+	m_asic9->port_ab_r().set(FUNC(workabout_state::portab_r));
+	m_asic9->port_ab_w().set(FUNC(workabout_state::portab_w));
+	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
+	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
+	m_asic9->data_r<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<0>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<1>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
+	//m_asic9->data_r<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_r)); // Expansion port A
+	//m_asic9->data_w<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_w));
+	//m_asic9->data_r<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_r)); // Expansion port B
+	//m_asic9->data_w<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_w));
+	m_asic9->data_r<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_r));  // Expansion port C
+	m_asic9->data_w<4>().set(m_sibo, FUNC(psion_sibo_slot_device::data_w));
 
 	m_ram->set_default_size("2M");
+
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93S46
 }
 
 
@@ -269,11 +328,13 @@ ROM_START(psionwamx)
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "720f", "V7.20F 230798")
 	ROMX_LOAD("w2mx_v7.20f.bin", 0x00000, 0x200000, CRC(63734683) SHA1(9d8aa1e45f52e7fcb52d6e81ac47f60d1104c35d), ROM_BIOS(0))
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASE00)
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY   FULLNAME        FLAGS
-COMP( 1995, psionwa,   0,      0,      psionwa,   workabout, workabout_state, empty_init, "Psion",  "Workabout",    0 )
-COMP( 1998, psionwamx, 0,      0,      psionwamx, workabout, workabout_state, empty_init, "Psion",  "Workabout mx", 0 )
+COMP( 1995, psionwa,   0,      0,      psionwa,   psionwa,   workabout_state, empty_init, "Psion",  "Workabout",    MACHINE_SUPPORTS_SAVE )
+COMP( 1998, psionwamx, 0,      0,      psionwamx, psionwamx, workabout_state, empty_init, "Psion",  "Workabout mx", MACHINE_SUPPORTS_SAVE )

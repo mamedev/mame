@@ -20,6 +20,8 @@
   10  IFolderArchiveUpdateCallback2
   11  IFolderScanProgress
   12  IFolderSetZoneIdMode
+  13  IFolderSetZoneIdFile
+  14  IFolderArchiveUpdateCallback_MoveArc
   
   20  IFileExtractCallback.h::IGetProp
   30  IFileExtractCallback.h::IFolderExtractToStreamCallback (old)
@@ -31,11 +33,14 @@
   02  ISequentialOutStream
   03  IInStream
   04  IOutStream
+
   06  IStreamGetSize
   07  IOutStreamFinish
   08  IStreamGetProps
   09  IStreamGetProps2
   0A  IStreamGetProp
+
+  10  IStreamSetRestriction
 
 
 04 ICoder.h
@@ -91,10 +96,13 @@
   04  IArchiveKeepModeForNextOpen
   05  IArchiveAllowTail
 
+  09  IArchiveRequestMemoryUseCallback
+
   10  IArchiveOpenCallback
   
   20  IArchiveExtractCallback
-  21  IArchiveExtractCallbackMessage
+  21  IArchiveExtractCallbackMessage  (deprecated in v23)
+  22  IArchiveExtractCallbackMessage2 (new in v23)
   
   30  IArchiveOpenVolumeCallback
   40  IInArchiveGetStream
@@ -172,7 +180,9 @@ Handler GUIDs:
   0B lzma86
   0C xz
   0D ppmd
+  0E zstd
 
+  BF LVM
   C0 AVB
   C1 LP
   C2 Sparse

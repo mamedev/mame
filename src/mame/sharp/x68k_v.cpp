@@ -36,6 +36,8 @@
 #include "emu.h"
 #include "x68k.h"
 
+#include "input.h" // for sprite debug keys
+
 //#define VERBOSE 0
 #include "logmacro.h"
 
@@ -138,7 +140,7 @@ void x68k_state::spritereg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_video.bg_hstart = (data - 4) * 8 + 1;
 		break;
 	case 0x407:  // BG V-DISP (like CRTC reg 6)
-		m_video.bg_vstart = data - 1;
+		m_video.bg_vstart = data;
 		break;
 	case 0x408:  // BG H/V-Res
 		m_video.bg_hvres = data & 0x1f;
@@ -215,7 +217,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 	uint16_t xscr,yscr;
 	uint16_t colour = 0;
 	int shift;
-	bool blend, ret = false;
+	bool blend, ret = (m_video.reg[2] & 0x1a00) == 0x1a00;
 	uint16_t *pal = (uint16_t *)m_gfxpalette->basemem().base();
 	int divisor = 1;
 	if(m_crtc->gfx_double_scan())
@@ -262,6 +264,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 					loc++;
 					loc &= 0x3ff;
 				}
+				ret = false;
 			}
 		}
 		else  // else 512x512 "real" screen size
@@ -278,8 +281,6 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 					lineoffset = (((scanline - m_crtc->vbegin() / divisor) + yscr) & 0x1ff) * 512;
 					loc = xscr & 0x1ff;
 					shift = 4;
-					if((m_video.reg[2] & 0x1a00) == 0x1a00)
-						ret = true;
 					for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 					{
 						colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x000f);
@@ -332,8 +333,6 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						lineoffset1 = (((scanline - m_crtc->vbegin() / divisor) + yscr1) & 0x1ff) * 512;
 						loc1 = xscr1 & 0x1ff;
 						shift = 4;
-						if((m_video.reg[2] & 0x1a00) == 0x1a00)
-							ret = true;
 						for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 						{
 							colour = ((m_gvram[lineoffset0 + loc0] >> page*shift) & 0x000f);
@@ -387,6 +386,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 						loc++;
 						loc &= 0x1ff;
 					}
+					ret = false;
 					break;
 				}
 			}
@@ -443,7 +443,7 @@ template <bool Blend> rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, b
 		if(colour || (m_video.gfx_pri == 2))
 		{
 			if(blend)
-				return ((blendpix >> 1) & 0xff7f7f7f) + ((pal555(colour, 6, 11, 1) >> 1) & 0x7f7f7f);
+				return ((blendpix >> 1) & 0xff7f7f7f) + ((pal555(colour, 6, 11, 1) >> 2) & 0x3f3f3f);
 			else
 				return pal555(colour, 6, 11, 1);
 		}
@@ -461,7 +461,7 @@ template <bool Blend> rgb_t x68k_state::get_gfx_pixel(int scanline, int pixel, b
 		if((m_gfxpalette->pen(colour) & 0xffffff) || (m_video.gfx_pri == 2))
 		{
 			if(blend)
-				return ((blendpix >> 1) & 0xff7f7f7f) + ((m_gfxpalette->pen(colour) >> 1) & 0x7f7f7f);
+				return ((blendpix >> 1) & 0xff7f7f7f) + ((m_gfxpalette->pen(colour) >> 2) & 0x3f3f3f);
 			else
 				return m_gfxpalette->pen(colour);
 		}
@@ -765,7 +765,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			pcgprio = currprio;
 			currprio++;
 		}
-		if((m_video.gfx_pri == priority) && !m_crtc->gfx_layer_buffer())
+		if((m_video.gfx_pri == priority) && !m_crtc->gfx_layer_buffer() && (m_video.reg[2] & 0x1f))
 		{
 			gfxprio = currprio;
 			currprio++;

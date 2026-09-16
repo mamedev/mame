@@ -20,8 +20,8 @@ public:
 	uint16_t protection_r(address_space &space, offs_t offset);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint16_t     m_counter;

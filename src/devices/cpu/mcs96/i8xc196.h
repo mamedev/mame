@@ -22,7 +22,7 @@ protected:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
-	void internal_regs(address_map &map);
+	void internal_regs(address_map &map) ATTR_COLD;
 
 #define O(o) void o ## _196_full(); void o ## _196_partial()
 

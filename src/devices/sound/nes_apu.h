@@ -52,10 +52,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_stop() override;
 
-	virtual void sound_stream_update(
-		sound_stream &stream,
-		std::vector<read_stream_view> const &inputs,
-		std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 
@@ -237,19 +234,19 @@ private:
 
 	static constexpr u32 OUT_FIFO_SIZE = 2048;
 
-	stream_buffer::sample_t m_hp90_prev_in;
-	stream_buffer::sample_t m_hp90_prev_out;
+	sound_stream::sample_t m_hp90_prev_in;
+	sound_stream::sample_t m_hp90_prev_out;
 
-	stream_buffer::sample_t m_hp440_prev_in;
-	stream_buffer::sample_t m_hp440_prev_out;
+	sound_stream::sample_t m_hp440_prev_in;
+	sound_stream::sample_t m_hp440_prev_out;
 
-	stream_buffer::sample_t m_lp14k_prev_out;
+	sound_stream::sample_t m_lp14k_prev_out;
 
-	stream_buffer::sample_t m_output_accum;
-	stream_buffer::sample_t m_out_fifo[OUT_FIFO_SIZE];
+	sound_stream::sample_t m_output_accum;
+	sound_stream::sample_t m_out_fifo[OUT_FIFO_SIZE];
 	u32 m_out_fifo_r;
 	u32 m_out_fifo_w;
-	stream_buffer::sample_t m_last_out_sample;
+	sound_stream::sample_t m_last_out_sample;
 
 	u64 m_resample_phase;
 	u64 m_resample_step;
@@ -257,10 +254,10 @@ private:
 	//bool m_output_dirty;
 	uint64_t m_audio_fifo_overflows = 0;
 	uint64_t m_audio_fifo_underflows = 0;
-	stream_buffer::sample_t m_cached_output;
+	sound_stream::sample_t m_cached_output;
 
-	stream_buffer::sample_t m_square_lut[31];
-	stream_buffer::sample_t m_tnd_lut[16][16][128];
+	sound_stream::sample_t m_square_lut[31];
+	sound_stream::sample_t m_tnd_lut[16][16][128];
 
 	//============================================================
 	//  Core APU state
@@ -443,12 +440,12 @@ private:
 	//  Helpers - mixer / output
 	//============================================================
 
-	stream_buffer::sample_t calc_current_output();
-	stream_buffer::sample_t apply_analog_filter(stream_buffer::sample_t in);
+	sound_stream::sample_t calc_current_output();
+	sound_stream::sample_t apply_analog_filter(sound_stream::sample_t in);
 
-	void push_out_sample(stream_buffer::sample_t sample);
-	bool pop_out_sample(stream_buffer::sample_t &sample);
-	void accumulate_output_sample(stream_buffer::sample_t level);
+	void push_out_sample(sound_stream::sample_t sample);
+	bool pop_out_sample(sound_stream::sample_t &sample);
+	void accumulate_output_sample(sound_stream::sample_t level);
 
 	//============================================================
 	//  Helpers - APU units

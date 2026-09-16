@@ -88,30 +88,34 @@ public:
 		m_videoram(*this, "videoram"),
 		m_shared_ram(*this, "shared_ram"),
 		m_coins(*this, "COINS"),
-		m_dsw(*this, "DSW")
-	{ }
+		m_dsw(*this, "DSW"),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2")
+	{
+	}
 
-	void meijinsn(machine_config &config);
+	void meijinsn(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint16_t alpha_mcu_r(offs_t offset);
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_shared_ram;
 	required_ioport m_coins;
 	required_ioport m_dsw;
+	required_ioport m_p1, m_p2;
 
 	// misc
 	uint8_t m_deposits1 = 0;
@@ -127,7 +131,7 @@ uint16_t meijinsn_state::alpha_mcu_r(offs_t offset)
 	static const uint8_t coinage1[2][2] = {{1,1}, {1,2}};
 	static const uint8_t coinage2[2][2] = {{1,5}, {2,1}};
 
-	int source = m_shared_ram[offset];
+	int const source = m_shared_ram[offset];
 
 	switch (offset)
 	{
@@ -198,8 +202,8 @@ void meijinsn_state::main_map(address_map &map)
 	map(0x180000, 0x180dff).ram();
 	map(0x180e00, 0x180fff).ram().share(m_shared_ram);
 	map(0x181000, 0x181fff).ram();
-	map(0x1c0000, 0x1c0001).portr("P2");
-	map(0x1a0000, 0x1a0001).portr("P1");
+	map(0x1c0000, 0x1c0001).portr(m_p2);
+	map(0x1a0000, 0x1a0001).portr(m_p1);
 	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -307,16 +311,16 @@ uint32_t meijinsn_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	for (int offs = 0; offs < 0x4000; offs++)
 	{
-		int sx = offs >> 8;
-		int sy = offs & 0xff;
+		int const sx = offs >> 8;
+		int const sy = offs & 0xff;
 
-		int data1 = m_videoram[offs] >> 8;
-		int data2 = m_videoram[offs] & 0xff;
+		int const data1 = m_videoram[offs] >> 8;
+		int const data2 = m_videoram[offs] & 0xff;
 
 		for (int x = 0; x < 4; x++)
 		{
-			int color= BIT(data1, x) | (BIT(data1, x + 4) << 1);
-			int data = BIT(data2, x) | (BIT(data2, x + 4) << 1);
+			int const color= BIT(data1, x) | (BIT(data1, x + 4) << 1);
+			int const data = BIT(data2, x) | (BIT(data2, x + 4) << 1);
 			bitmap.pix(sy, (sx * 4 + (3 - x))) = color * 4 + data;
 		}
 	}
@@ -326,7 +330,7 @@ uint32_t meijinsn_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_state::interrupt)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if(scanline == 240)
 		m_maincpu->set_input_line(1, HOLD_LINE);
@@ -369,7 +373,7 @@ void meijinsn_state::meijinsn(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -410,7 +414,7 @@ ROM_START( meijinsn )
 	ROM_LOAD16_BYTE( "p8", 0x18001, 0x4000, CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
 	ROM_CONTINUE(          0x38001, 0x4000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p9",  0x00000, 0x04000, CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
 	ROM_LOAD( "p10", 0x04000, 0x04000, CRC(93b4d764) SHA1(4fedd3fd1f3ef6c5f60ca86219f877df68d3027d) )
 
@@ -418,7 +422,7 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-ROM_START( meijinsna ) // ROMs with location were in the archive, the others not, but they pass the ROM check so probably good and the dumper only included ROMs that differed from the set in MAME
+ROM_START( meijinsna ) // GRAPHIC-II PCB
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "p1.e12", 0x00000, 0x4000, CRC(fddea817) SHA1(497c5a197c53d0fea2eb2ef62a93f56cd930bd5a) )
 	ROM_CONTINUE(              0x20000, 0x4000 )
@@ -428,24 +432,24 @@ ROM_START( meijinsna ) // ROMs with location were in the archive, the others not
 	ROM_CONTINUE(              0x28000, 0x4000 )
 	ROM_LOAD16_BYTE( "p4.d10", 0x08001, 0x4000, CRC(efa31978) SHA1(dadf226b993ecbac3112b7b0ce5047f0d686866e) )
 	ROM_CONTINUE(              0x28001, 0x4000 )
-	ROM_LOAD16_BYTE( "p5",     0x10000, 0x4000, BAD_DUMP CRC(0ed10a47) SHA1(9e89ec69f1f4e1ffa712f2e0c590d067c8c63026) )
+	ROM_LOAD16_BYTE( "p5.c12", 0x10000, 0x4000, CRC(0ed10a47) SHA1(9e89ec69f1f4e1ffa712f2e0c590d067c8c63026) )
 	ROM_CONTINUE(              0x30000, 0x4000 )
-	ROM_LOAD16_BYTE( "p6",     0x10001, 0x4000, BAD_DUMP CRC(60b58755) SHA1(1786fc1b4c6d1793fb8e9311356fa4119611cfae) )
+	ROM_LOAD16_BYTE( "p6.c10", 0x10001, 0x4000, CRC(60b58755) SHA1(1786fc1b4c6d1793fb8e9311356fa4119611cfae) )
 	ROM_CONTINUE(              0x30001, 0x4000 )
-	ROM_LOAD16_BYTE( "p7",     0x18000, 0x4000, BAD_DUMP CRC(604c76f1) SHA1(37fdf904f5e4d69dc8cb711cf3dece8f3075254a) )
+	ROM_LOAD16_BYTE( "p7.b12", 0x18000, 0x4000, CRC(604c76f1) SHA1(37fdf904f5e4d69dc8cb711cf3dece8f3075254a) )
 	ROM_CONTINUE(              0x38000, 0x4000 )
-	ROM_LOAD16_BYTE( "p8",     0x18001, 0x4000, BAD_DUMP CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
+	ROM_LOAD16_BYTE( "p8.b10", 0x18001, 0x4000, CRC(e3eaef19) SHA1(b290922f252a790443109e5023c3c35b133275cc) )
 	ROM_CONTINUE(              0x38001, 0x4000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
-	ROM_LOAD( "p9",  0x00000, 0x04000, BAD_DUMP CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
-	ROM_LOAD( "p10", 0x04000, 0x04000, BAD_DUMP CRC(93b4d764) SHA1(4fedd3fd1f3ef6c5f60ca86219f877df68d3027d) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "p9.m4",  0x00000, 0x04000, CRC(aedfefdf) SHA1(f9d35737a0e942fe7d483f87c52efa92a1bbb3e5) )
+	ROM_LOAD( "p10.m5", 0x04000, 0x04000, CRC(93b4d764) SHA1(4fedd3fd1f3ef6c5f60ca86219f877df68d3027d) )
 
 	ROM_REGION( 0x20, "proms", 0 ) // Colour PROM
-	ROM_LOAD( "clr", 0x00, 0x20, BAD_DUMP CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
+	ROM_LOAD( "tbp18s030n.k5", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME( 1986, meijinsn,  0,        meijinsn, meijinsn, meijinsn_state, empty_init, ROT0, "SNK", "Meijinsen (set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

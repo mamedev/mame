@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, David Haywood
 /***************************************************************************
 
                             -= Jaleco Mega System 1 =-
@@ -199,18 +199,14 @@ actual code sent to the hardware.
 
 
 
-VIDEO_START_MEMBER(megasys1_state,megasys1)
+void megasys1_state::video_start()
 {
-	m_spriteram = &m_ram[0x8000/2];
-
 	m_buffer_objectram = std::make_unique<u16[]>(0x2000);
 	m_buffer_spriteram16 = std::make_unique<u16[]>(0x2000);
 	m_buffer2_objectram = std::make_unique<u16[]>(0x2000);
 	m_buffer2_spriteram16 = std::make_unique<u16[]>(0x2000);
 
 	m_active_layers = m_sprite_bank = m_screen_flag = m_sprite_flag = 0;
-
-	m_hardware_type_z = 0;
 
 	m_screen->register_screen_bitmap(m_sprite_buffer_bitmap);
 
@@ -221,13 +217,10 @@ VIDEO_START_MEMBER(megasys1_state,megasys1)
 	save_item(NAME(m_screen_flag));
 	save_item(NAME(m_active_layers));
 	save_item(NAME(m_sprite_flag));
+	save_item(NAME(m_sprite_bank)); // only on type C
 }
 
-VIDEO_START_MEMBER(megasys1_state,megasys1_z)
-{
-	VIDEO_START_CALL_MEMBER(megasys1);
-	m_hardware_type_z = 1;
-}
+
 
 /***************************************************************************
 
@@ -279,7 +272,7 @@ void megasys1_state::soundlatch_w(u16 data)
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-void megasys1_state::soundlatch_z_w(u16 data)
+void megasys1_typez_state::soundlatch_z_w(u16 data)
 {
 	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
@@ -340,26 +333,24 @@ void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
 	u16 const colorbase = decodegfx->colorbase();
 
-	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u16 const *const srcline = &m_sprite_buffer_bitmap.pix(y);
 		u16 *const dstline = &bitmap.pix(y);
 		u8 const *const prio = &screen.priority().pix(y);
 
-		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			u16 const pixel = srcline[x];
 
 			if ((pixel & 0xf) != 0xf)
 			{
-				int priority = (pixel & 0x4000) >> 14;
-				priority = (priority) ? 0x0c : 0x0a;
+				u32 const priority = BIT(pixel, 14) ? 0x0c : 0x0a;
 
-				if ((priority & (1 << (prio[x] & 0x1f))) == 0)
+				if (!BIT(priority, prio[x] & 0x1f))
 				{
-					u8 coldat = pixel & 0x3fff;
+					u16 const coldat = pixel & 0x3fff;
 					dstline[x] = coldat + colorbase;
-
 				}
 			}
 		}
@@ -368,11 +359,11 @@ void megasys1_state::mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitm
 
 void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 param)
 {
-	for (int y = cliprect.min_y;y <= cliprect.max_y;y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u16 *const srcline = &m_sprite_buffer_bitmap.pix(y);
 
-		for (int x = cliprect.min_x;x <= cliprect.max_x;x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			u16 const pixel = srcline[x];
 			srcline[x] = pixel & 0x7fff; // wipe our 'drawn here' marker otherwise trails will always have priority over new sprites, which is incorrect.
@@ -385,43 +376,44 @@ void megasys1_state::partial_clear_sprite_bitmap(screen_device &screen, bitmap_i
 }
 
 
-inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect, s32 code, s32 color, s32 sx, s32 sy, s32 flipx, s32 flipy, u8 mosaic, u8 mosaicsol, s32 priority)
+inline void megasys1_state::draw_single_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u32 code, u32 color, s32 sx, s32 sy, bool flipx, bool flipy, u8 mosaic, bool mosaicsol, u32 priority)
 {
 //  if (sy >= nScreenHeight || sy < -15 || sx >= nScreenWidth || sx < -15) return;
 	gfx_element *decodegfx = m_gfxdecode->gfx(0);
 	sy = sy + 16;
 
-	const u8* gfx = decodegfx->get_data(code);
+	u8 const *const gfx = decodegfx->get_data(code);
 
-	flipy = (flipy) ? 0x0f : 0;
-	flipx = (flipx) ? 0x0f : 0;
+	u8 const yxor = flipy ? 0x0f : 0;
+	u8 const xxor = flipx ? 0x0f : 0;
 
-	color = color * 16;
+	color <<= 4;
 
-
-	for (s32 y = 0; y < 16; y++, sy++, sx-=16)
+	for (s32 y = 0; y < 16; y++, sy++)
 	{
-	//  u16 *const dest = &bitmap.pix(sy)+ sx;
-	//  u8 *const prio = &screen.priority().pix(sy) + sx;
-		u16 *const dest = &m_sprite_buffer_bitmap.pix(sy)+ sx;
+		if (sy < cliprect.min_y || sy > cliprect.max_y)
+			continue;
 
-		for (s32 x = 0; x < 16; x++, sx++)
+	//  u16 *const dest = &bitmap.pix(sy);
+	//  u8 *const prio = &screen.priority().pix(sy);
+		u16 *const dest = &m_sprite_buffer_bitmap.pix(sy);
+		u8 const srcy = y ^ yxor;
+		u8 const *const src = &gfx[(mosaicsol ? (srcy | mosaic) : (srcy & ~mosaic)) * decodegfx->rowbytes()];
+
+		for (s32 x = 0, dstx = sx; x < 16; x++, dstx++)
 		{
-			if (sx < cliprect.min_x || sy < cliprect.min_y || sx > cliprect.max_x || sy > cliprect.max_y) continue;
+			if (dstx < cliprect.min_x || dstx > cliprect.max_x)
+				continue;
 
-			s32 pxl;
-
-			if (mosaicsol)
-				pxl = gfx[(((y ^ flipy) |  mosaic) * 16) + ((x ^ flipx) |  mosaic)];
-			else
-				pxl = gfx[(((y ^ flipy) & ~mosaic) * 16) + ((x ^ flipx) & ~mosaic)];
+			u8 const srcx = x ^ xxor;
+			u8 const pxl = src[mosaicsol ? (srcx | mosaic) : (srcx & ~mosaic)];
 
 			if (pxl != 0x0f)
 			{
-				if (!(dest[x] & 0x8000))
+				if (!(dest[dstx] & 0x8000))
 				{
-					dest[x] = (pxl+color) | (priority << 14);
-					dest[x] |= 0x8000;
+					dest[dstx] = (pxl + color) | (priority << 14);
+					dest[dstx] |= 0x8000;
 				}
 			}
 		}
@@ -429,130 +421,113 @@ inline void megasys1_state::draw_16x16_priority_sprite(screen_device &screen, bi
 
 }
 
-void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect)
+// Legend of Makai / Makai Densetsu only
+void megasys1_typez_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int color,code,sx,sy,flipx,flipy,attr,sprite;
+	u16 const *const spriteram16 = &m_ram[0x8000 / 2];
 
+	/* MS1-Z just draws Sprite Data, and in reverse order */
 
+	for (int sprite = 0x80 - 1; sprite >= 0; sprite--)
+	{
+		u16 const *const spritedata = &spriteram16[sprite * 0x10 / 2];
 
-/* objram: 0x100*4 entries      spritedata: 0x80 entries */
+		u16 const attr = spritedata[8 / 2];
+
+		int sx = util::sext(spritedata[0x0a / 2] & 0x1ff, 9);
+		int sy = util::sext(spritedata[0x0c / 2] & 0x1ff, 9);
+
+		u32 const code  = spritedata[0x0e / 2];
+		u32 const color = attr & 0x0f;
+
+		bool flipx = BIT(attr, 6);
+		bool flipy = BIT(attr, 7);
+
+		if (BIT(m_screen_flag, 0))
+		{
+			flipx = !flipx;
+			flipy = !flipy;
+			sx = 240 - sx;
+			sy = 240 - sy;
+		}
+
+		m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy,
+				screen.priority(),
+				BIT(attr, 3) ? 0x0c : 0x0a, 15);
+	}   /* sprite */
+}
+
+void megasys1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* objram: 0x100*4 entries      spritedata: 0x80 entries */
 
 	/* sprite order is from first in Sprite Data RAM (frontmost) to last */
 
-	if (m_hardware_type_z == 0)  /* standard sprite hardware */
-	{
-		if (!(m_sprite_flag&0x10))
-			m_sprite_buffer_bitmap.fill(0x7fff, cliprect);
-		else
-		{
-			// P47 sprite trails effect.. not quite right tho
-			// I think the low 4 bits are used to clear specific pens?
-			// when the hardware wants to clear the trails from the screen
-			// it increases the value from 0x00 to 0x0e
-			//printf("m_sprite_flag %02x\n", m_sprite_flag);
-			partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag&0x0f);
-		}
-
-		s32 color_mask = (m_sprite_flag & 0x100) ? 0x07 : 0x0f;
-
-		u16 *objectram = (u16*)m_buffer2_objectram.get();
-		u16 *spriteram = (u16*)m_buffer2_spriteram16.get();
-
-		for (s32 offs = (0x800-8)/2; offs >= 0; offs -= 4)
-		{
-			for (s32 sprite = 0; sprite < 4 ; sprite ++)
-			{
-				u16 *objectdata = &objectram[offs + (0x800/2) * sprite];
-				u16 *spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
-
-				s32 attr = spritedata[4];
-				if (((attr & 0xc0) >> 6) != sprite) continue;
-
-				s32 sx = (spritedata[5] + objectdata[1]) & 0x1ff;
-				s32 sy = (spritedata[6] + objectdata[2]) & 0x1ff;
-
-				if (sx > 255) sx -= 512;
-				if (sy > 255) sy -= 512;
-
-				s32 code  = spritedata[7] + objectdata[3];
-				s32 color = attr & color_mask;
-
-				s32 flipx = attr & 0x40;
-				s32 flipy = attr & 0x80;
-				//s32 pri  = (attr & 0x08) ? 0x0c : 0x0a;
-				s32 pri  = (attr & 0x08)>>3;
-				s32 mosaic = (attr & 0x0f00)>>8;
-				s32 mossol = (attr & 0x1000)>>8;
-
-				code = (code & 0xfff) + ((m_sprite_bank & 1) << 12);
-
-				if (m_screen_flag & 1)
-				{
-					flipx = !flipx;
-					flipy = !flipy;
-					sx = 240 - sx;
-					sy = 240 - sy;
-				}
-
-				draw_16x16_priority_sprite(screen,bitmap,cliprect,code, color, sx, sy - 16, flipx, flipy, mosaic, mossol, pri);
-			}
-		}
-	}   /* non Z hw */
+	if (!BIT(m_sprite_flag, 4))
+		m_sprite_buffer_bitmap.fill(0x7fff, cliprect);
 	else
 	{
-		u16 *spriteram16 = m_spriteram;
+		// P47 sprite trails effect.. not quite right tho
+		// I think the low 4 bits are used to clear specific pens?
+		// when the hardware wants to clear the trails from the screen
+		// it increases the value from 0x00 to 0x0e
+		//printf("m_sprite_flag %02x\n", m_sprite_flag);
+		partial_clear_sprite_bitmap(screen, bitmap, cliprect, m_sprite_flag & 0x0f);
+	}
 
-		/* MS1-Z just draws Sprite Data, and in reverse order */
+	u32 const color_mask = BIT(m_sprite_flag, 8) ? 0x07 : 0x0f;
 
-		for (sprite = 0x80-1;sprite >= 0;sprite--)
+	u16 const *const objectram = m_buffer2_objectram.get();
+	u16 const *const spriteram = m_buffer2_spriteram16.get();
+
+	for (s32 offs = (0x800 - 8) / 2; offs >= 0; offs -= 4)
+	{
+		for (s32 sprite = 0; sprite < 4; sprite++)
 		{
-			u16 *spritedata = &spriteram16[ sprite * 0x10/2];
+			u16 const *const objectdata = &objectram[offs + (0x800 / 2) * sprite];
+			u16 const *const spritedata = &spriteram[(objectdata[0] & 0x7f) * 8];
 
-			attr = spritedata[ 8/2 ];
+			u16 const attr = spritedata[4];
+			if (((attr & 0xc0) >> 6) != sprite) continue;
 
-			sx = spritedata[0x0A/2] % 512;
-			sy = spritedata[0x0C/2] % 512;
+			s32 sx = util::sext((spritedata[5] + objectdata[1]) & 0x1ff, 9);
+			s32 sy = util::sext((spritedata[6] + objectdata[2]) & 0x1ff, 9);
 
-			if (sx > 256-1) sx -= 512;
-			if (sy > 256-1) sy -= 512;
+			u32 code = spritedata[7] + objectdata[3];
+			u32 const color = attr & color_mask;
 
-			code  = spritedata[0x0E/2];
-			color = (attr & 0x0F);
+			bool flipx = BIT(attr, 6);
+			bool flipy = BIT(attr, 7);
+			//u32 const pri  = BIT(attr, 3) ? 0x0c : 0x0a;
+			u32 const pri  = BIT(attr, 3);
+			u32 const mosaic = (attr & 0x0f00) >> 8;
+			bool const mossol = BIT(attr, 12);
 
-			flipx = attr & 0x40;
-			flipy = attr & 0x80;
+			code = (code & 0xfff) + (BIT(m_sprite_bank, 0) << 12);
 
-			if (m_screen_flag & 1)
+			if (BIT(m_screen_flag, 0))
 			{
-				flipx = !flipx;     flipy = !flipy;
-				sx = 240-sx;        sy = 240-sy;
+				flipx = !flipx;
+				flipy = !flipy;
+				sx = 240 - sx;
+				sy = 240 - sy;
 			}
 
-			m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
-					code,
-					color,
-					flipx, flipy,
-					sx, sy,
-					screen.priority(),
-					(attr & 0x08) ? 0x0c : 0x0a,15);
-		}   /* sprite */
-	}   /* Z hw */
-
+			draw_single_sprite(screen,bitmap,cliprect,code, color, sx, sy - 16, flipx, flipy, mosaic, mossol, pri);
+		}
+	}
 }
 
 
 
 
 /***************************************************************************
-                        Convert the Priority Prom
+                        Convert the Priority PROM
 ***************************************************************************/
-
-struct priority
-{
-	const char *driver;
-	int priorities[16];
-};
-
 
 /*
     Layers order encoded as an int like: 0x01234, where
@@ -568,15 +543,12 @@ struct priority
     and the bottom layer is on the left (e.g. 0).
 
     The special value 0xfffff means that the order is either unknown
-    or no simple stack of layers can account for the values in the prom.
+    or no simple stack of layers can account for the values in the PROM.
     (the default value, 0x04132, will be used in those cases)
-
 */
 
-
-
 /*
-    Convert the 512 bytes in the Priority Prom into 16 ints, encoding
+    Convert the 512 bytes in the Priority PROM into 16 ints, encoding
     the layers order for 16 selectable priority schemes.
 
     INPUT (to the video chip):
@@ -603,7 +575,7 @@ struct priority
     (only if sprite splitting is active).
 
     Hence, during the conversion process we make sure each of the
-    16 priority scheme in the prom is a "simple" one like the above
+    16 priority scheme in the PROM is a "simple" one like the above
     and log a warning otherwise. The feasibility criterion is such:
 
     the opaque pens of the top layer must be above any other layer.
@@ -611,52 +583,52 @@ struct priority
     opaque or totally transparent with respects to the other layers:
     when the bit relative to the top layer is not set, the top layer's
     code must be either always absent (transparent case) or always
-    present (opaque case) in the prom.
+    present (opaque case) in the PROM.
 
     NOTE: This can't account for orders starting like: 030..
-    as found in peekaboo's prom. That's where sprites go below
+    as found in peekaboo's PROM. That's where sprites go below
     the bottom layer's opaque pens, but above its transparent
     pens.
 */
+
 void megasys1_state::priority_create()
 {
-	const u8 *color_prom = memregion("proms")->base();
-	int pri_code, offset, i, order;
+	u8 const *pri_prom = memregion("proms")->base();
 
 	/* convert PROM to something we can use */
 
-	for (pri_code = 0; pri_code < 0x10 ; pri_code++)    // 16 priority codes
+	for (int pri_code = 0; pri_code < 0x10; pri_code++)    // 16 priority codes
 	{
-		int layers_order[2];    // 2 layers orders (split sprites on/off)
+		u32 layers_order[2];    // 2 layers orders (split sprites on/off)
 
-		for (offset = 0; offset < 2; offset ++)
+		for (int offset = 0; offset < 2; offset ++)
 		{
-			int enable_mask = 0xf;  // start with every layer enabled
+			u8 enable_mask = 0xf;  // start with every layer enabled
 
 			layers_order[offset] = 0xfffff;
 
 			do
 			{
-				int top = color_prom[pri_code * 0x20 + offset + enable_mask * 2] & 3;   // this must be the top layer
-				int top_mask = 1 << top;
+				u8 const top      = pri_prom[pri_code * 0x20 + offset + enable_mask * 2] & 3;   // this must be the top layer
+				u8 const top_mask = 1 << top;
 
-				int result = 0;     // result of the feasibility check for this layer
+				u8 result = 0;     // result of the feasibility check for this layer
 
-				for (i = 0; i < 0x10 ; i++) // every combination of opaque and transparent pens
+				for (int i = 0; i < 0x10; i++) // every combination of opaque and transparent pens
 				{
-					int opacity =   i & enable_mask;    // only consider active layers
-					int layer   =   color_prom[pri_code * 0x20 + offset + opacity * 2];
+					u8 const opacity = i & enable_mask;    // only consider active layers
+					u8 const layer   = pri_prom[pri_code * 0x20 + offset + opacity * 2];
 
 					if (opacity)
 					{
 						if (opacity & top_mask)
 						{
-							if (layer != top )  result |= 1;    // error: opaque pens aren't always opaque!
+							if (layer != top)  result |= 1;    // error: opaque pens aren't always opaque!
 						}
 						else
 						{
-							if (layer == top)   result |= 2;    // transparent pen is opaque
-							else                result |= 4;    // transparent pen is transparent
+							if (layer == top)  result |= 2;    // transparent pen is opaque
+							else               result |= 4;    // transparent pen is transparent
 						}
 					}
 				}
@@ -664,7 +636,7 @@ void megasys1_state::priority_create()
 				/*  note: 3210 means that layer 0 is the bottom layer
 				    (the order is reversed in the hand-crafted data) */
 
-				layers_order[offset] = ( (layers_order[offset] << 4) | top ) & 0xfffff;
+				layers_order[offset] = ((layers_order[offset] << 4) | top) & 0xfffff;
 				enable_mask &= ~top_mask;
 
 				if (result & 1)
@@ -675,7 +647,7 @@ void megasys1_state::priority_create()
 					break;
 				}
 
-				if  ((result & 6) == 6)
+				if ((result & 6) == 6)
 				{
 					logerror("WARNING, pri $%X split %d - layer %d's transparent pens aren't always transparent nor always opaque\n",pri_code,offset,top);
 
@@ -683,21 +655,22 @@ void megasys1_state::priority_create()
 					break;
 				}
 
-				if (result == 2)    enable_mask = 0; // totally opaque top layer
+				if (result == 2)
+					enable_mask = 0; // totally opaque top layer
 
-			}   while (enable_mask);
+			} while (enable_mask);
 
 		}   // offset
 
 		/* merge the two layers orders */
 
-		order = 0xfffff;
+		u32 order = 0xfffff;
 
-		for (i = 5; i > 0 ; )   // 5 layers to write
+		for (int i = 5; i > 0;)   // 5 layers to write
 		{
 			int layer;
-			int layer0 = layers_order[0] & 0x0f;
-			int layer1 = layers_order[1] & 0x0f;
+			u8 const layer0 = layers_order[0] & 0x0f;
+			u8 const layer1 = layers_order[1] & 0x0f;
 
 			if (layer0 != 3)    // 0,1,2 or f
 			{
@@ -735,9 +708,9 @@ void megasys1_state::priority_create()
 			}
 
 			/* reverse the order now */
-			order = (order << 4 ) | layer;
+			order = (order << 4) | layer;
 
-			i --;       // layer written
+			i--;       // layer written
 
 			layers_order[0] >>= 4;
 			layers_order[1] >>= 4;
@@ -748,15 +721,11 @@ void megasys1_state::priority_create()
 
 	}   // pri_code
 
-
-
 #if 0
 	/* log the priority schemes */
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 		logerror("PROM %X] %05x\n", i, m_layers_order[i]);
 #endif
-
-
 }
 
 void megasys1_state::megasys1_palette(palette_device &palette)
@@ -764,19 +733,14 @@ void megasys1_state::megasys1_palette(palette_device &palette)
 	priority_create();
 }
 
-
-
-
-
 /***************************************************************************
               Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-
 u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i, flag, pri, primask;
-	int active_layers;
+	u32 pri;
+	u32 active_layers;
 
 	if (m_hardware_type_z)
 	{
@@ -786,10 +750,10 @@ u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 	else
 	{
-		int reallyactive = 0;
+		u32 reallyactive = 0;
 
 		/* get layers order */
-		pri = m_layers_order[(m_active_layers & 0x0f0f) >> 8];
+		pri = m_layers_order[(m_active_layers & 0x0f00) >> 8];
 
 #ifdef MAME_DEBUG
 		if (pri == 0xfffff)
@@ -801,30 +765,30 @@ u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		if (pri == 0xfffff) pri = 0x04132;
 
 		/* see what layers are really active (layers 4 & f will do no harm) */
-		for (i = 0;i < 5;i++)
+		for (int i = 0; i < 5; i++)
 			reallyactive |= 1 << ((pri >> (4 * i)) & 0x0f);
 
 		active_layers = m_active_layers & reallyactive;
 		active_layers |= 1 << ((pri & 0xf0000) >> 16);  // bottom layer can't be disabled
 	}
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		if (m_tmap[i].found())
 		{
-			m_tmap[i]->set_flip((m_screen_flag & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_tmap[i]->enable(active_layers & (1 << i));
+			m_tmap[i]->set_flip(BIT(m_screen_flag, 0) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+			m_tmap[i]->enable(BIT(active_layers, i));
 		}
 	}
 
 	screen.priority().fill(0, cliprect);
 
-	flag = TILEMAP_DRAW_OPAQUE;
-	primask = 0;
+	u32 flag = TILEMAP_DRAW_OPAQUE;
+	u8 primask = 0;
 
-	for (i = 0;i < 5;i++)
+	for (int i = 0; i < 5; i++)
 	{
-		int layer = (pri & 0xf0000) >> 16;
+		u8 const layer = (pri & 0xf0000) >> 16;
 		pri <<= 4;
 
 		switch (layer)
@@ -832,7 +796,7 @@ u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		case 0:
 		case 1:
 		case 2:
-			if (m_tmap[layer].found() && (active_layers & (1 << layer)))
+			if (m_tmap[layer].found() && BIT(active_layers, layer))
 			{
 				m_tmap[layer]->draw(screen, bitmap, cliprect, flag, primask);
 				flag = 0;
@@ -846,7 +810,7 @@ u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				bitmap.fill(0, cliprect);
 			}
 
-			if (m_sprite_flag & 0x100)  /* sprites are split */
+			if (BIT(m_sprite_flag, 8))  /* sprites are split */
 			{
 				/* following tilemaps will obscure this sprites layer */
 				primask |= 1 << (layer - 3);
@@ -859,7 +823,7 @@ u32 megasys1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 	}
 
-	if (active_layers & 0x08)
+	if (BIT(active_layers, 3))
 	{
 		draw_sprites(screen, bitmap, cliprect);
 
@@ -882,7 +846,7 @@ void megasys1_state::screen_vblank(int state)
 		memcpy(m_buffer_objectram.get(), m_objectram, 0x2000);
 	//spriteram16
 		memcpy(m_buffer2_spriteram16.get(), m_buffer_spriteram16.get(), 0x2000);
-		memcpy(m_buffer_spriteram16.get(), m_spriteram, 0x2000);
+		memcpy(m_buffer_spriteram16.get(), &m_ram[0x8000 / 2], 0x2000);
 	}
 
 }

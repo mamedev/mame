@@ -15,7 +15,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/timekpr.h"
+#include "timekpr.h"
+
 #include "machine/timehelp.h"
 
 #define LOG_TICKS   (1U << 1)
@@ -147,8 +148,8 @@ m48t37_device::m48t37_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = 0x7ff0;
 }
 
-m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: timekeeper_device(mconfig, M48T58, tag, owner, clock, 0x2000)
+m48t58_device::m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: timekeeper_device(mconfig, type, tag, owner, clock, 0x2000)
 {
 	m_offset_watchdog = -1;
 	m_offset_control = 0x1ff8;
@@ -163,8 +164,13 @@ m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, dev
 	m_offset_flags = -1;
 }
 
-m48t58_device::m48t58_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: timekeeper_device(mconfig, type, tag, owner, clock, 0x2000)
+m48t58_device::m48t58_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m48t58_device(mconfig, M48T58, tag, owner, clock)
+{
+}
+
+ds1643_device::ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: m48t58_device(mconfig, DS1643, tag, owner, clock)
 {
 }
 
@@ -197,11 +203,6 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 	m_offset_month = 0x7fe;
 	m_offset_year = 0x7ff;
 	m_offset_century = -1;
-}
-
-ds1643_device::ds1643_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: m48t58_device(mconfig, DS1643, tag, owner, clock)
-{
 }
 
 
@@ -431,13 +432,18 @@ u8 timekeeper_device::read(offs_t offset)
 	}
 	else if (offset == m_offset_flags && type() == M48T37)
 	{
-		// Clear the watchdog flag
-		m_data[m_offset_flags] &= ~FLAGS_WDF;
-		// Clear callbacks
-		m_reset_cb(CLEAR_LINE);
-		m_irq_cb(CLEAR_LINE);
+		if (!machine().side_effects_disabled())
+		{
+			// Clear the watchdog flag
+			m_data[m_offset_flags] &= ~FLAGS_WDF;
+			// Clear callbacks
+			m_reset_cb(CLEAR_LINE);
+			m_irq_cb(CLEAR_LINE);
+		}
 	}
-	LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
+	if (!machine().side_effects_disabled())
+		LOG("timekeeper_device::read: %04x (%02x)\n", offset, result);
+
 	return result;
 }
 
@@ -470,8 +476,8 @@ void timekeeper_device::nvram_default()
 
 bool timekeeper_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	if (file.read(&m_data[0], m_size, actual) || actual != m_size)
+	auto const [err, actual] = util::read(file, &m_data[0], m_size);
+	if (err || (actual != m_size))
 		return false;
 
 	counters_to_ram();
@@ -486,6 +492,6 @@ bool timekeeper_device::nvram_read(util::read_stream &file)
 
 bool timekeeper_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_data[0], m_size, actual) && actual == m_size;
+	auto const [err, actual] = util::write(file, &m_data[0], m_size);
+	return !err;
 }

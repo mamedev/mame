@@ -77,8 +77,8 @@ public:
 	void allied(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void ic1_b_w(u8 data);
@@ -100,7 +100,7 @@ private:
 	u8 ic7_a_r();
 	void ic8_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u32 m_player_score[6]{};
 	u8 m_display = 0U;
@@ -626,9 +626,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 void allied_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_leds.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_player_score));
 	save_item(NAME(m_display));
@@ -773,12 +770,12 @@ ROM_END
 } // anonymous namespace
 
 GAME( 1977, allied,   0,      allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Allied System",               MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME( 1977, suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Roy Clark Super Picker",      MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1977, royclark, allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1977, thndbolt, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Thunderbolt",                 MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1978, hoedown,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hoe Down",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1978, takefive, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Take Five",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978, heartspd, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hearts & Spades",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, heartspd, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hearts Spades",               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1978, foathens, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Flame of Athens",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, disco79,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Disco '79",                   MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, erosone,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Eros One",                    MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )

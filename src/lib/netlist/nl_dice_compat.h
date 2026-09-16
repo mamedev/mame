@@ -16,7 +16,7 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 | sed -e 's/) RES(/)\n    RES(/g' \
 | sed -e 's/) CAP(/)\n    CAP(/g' \
 | sed -e 's/) NET_C(/)\n    NET_C(/g' \
-| sed -e 's/NL_EMPTY//' \
+| sed -e 's/NL_EMPTY//'
 
  *
  */

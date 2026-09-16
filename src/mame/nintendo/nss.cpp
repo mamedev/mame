@@ -331,8 +331,8 @@ public:
 	int game_over_flag_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_bioscpu;
@@ -362,10 +362,10 @@ private:
 	void port_07_w(uint8_t data);
 
 	void nss_vblank_irq(int state);
-	void bios_io_map(address_map &map);
-	void bios_map(address_map &map);
-	void snes_map(address_map &map);
-	void spc_map(address_map &map);
+	void bios_io_map(address_map &map) ATTR_COLD;
+	void bios_map(address_map &map) ATTR_COLD;
+	void snes_map(address_map &map) ATTR_COLD;
+	void spc_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -656,7 +656,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("FP")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(nss_state, game_over_flag_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nss_state::game_over_flag_r))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")
@@ -666,27 +666,27 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Game 1 Button")
 
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, read_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, ready_line )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", FUNC(m6m80011ap_device::read_bit))
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", FUNC(m6m80011ap_device::ready_line))
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, set_clock_line)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, write_bit)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, set_cs_line)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", FUNC(m6m80011ap_device::set_clock_line))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", FUNC(m6m80011ap_device::write_bit))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m6m80011ap", FUNC(m6m80011ap_device::set_cs_line))
 
 	PORT_START("RTC_OSD")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_clock_line)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, write_bit)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", m50458_device, set_cs_line)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_clock_line)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, write_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_dir_line)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, set_cs_line)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", FUNC(m50458_device::set_clock_line))
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", FUNC(m50458_device::write_bit))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("m50458", FUNC(m50458_device::set_cs_line))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::set_clock_line))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::write_bit))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::set_dir_line))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::set_cs_line))
 
 	PORT_START("RTC")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", FUNC(s3520cf_device::read_bit))
 
 	PORT_START("SERIAL1_DATA1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
@@ -844,24 +844,23 @@ void nss_state::nss(machine_config &config)
 
 	M50458(config, m_m50458, 4000000, "osd"); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
-	RP5H01(config, m_rp5h01, 0);
+	RP5H01(config, m_rp5h01);
 	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &nss_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	m_screen->set_screen_update(FUNC(snes_state::screen_update));
@@ -872,7 +871,7 @@ void nss_state::nss(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// NSS
-	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	screen_device &osd(SCREEN(config, "osd"));
 	osd.set_refresh_hz(60);
 	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	osd.set_size(288+22, 216+22);

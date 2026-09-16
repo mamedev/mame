@@ -10,16 +10,16 @@ class polepos_sound_device : public device_t,
 								public device_sound_interface
 {
 public:
-	polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	~polepos_sound_device() { }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 public:
 	void clson_w(int state);
@@ -42,10 +42,12 @@ private:
 		double b0 = 0.0, b1 = 0.0, b2 = 0.0;  /* digital filter coefficients, numerator */
 	};
 
+	required_region_ptr<uint8_t> m_data;
+
 	uint32_t m_current_position;
-	int m_sample_msb;
-	int m_sample_lsb;
-	int m_sample_enable;
+	uint8_t m_sample_msb;
+	uint8_t m_sample_lsb;
+	bool m_sample_enable;
 	sound_stream *m_stream;
 	filter2_context m_filter_engine[3];
 };

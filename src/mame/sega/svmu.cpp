@@ -46,11 +46,11 @@ public:
 		, m_flash_icon(*this, "flash_icon")
 	{ }
 
-	void svmu(machine_config &config);
+	void svmu(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	LC8670_LCD_UPDATE(svmu_lcd_update);
@@ -63,8 +63,8 @@ private:
 	uint8_t p7_r();
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void svmu_io_mem(address_map &map);
-	void svmu_mem(address_map &map);
+	void svmu_io_mem(address_map &map) ATTR_COLD;
+	void svmu_mem(address_map &map) ATTR_COLD;
 
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
@@ -76,7 +76,7 @@ private:
 	output_finder<> m_clock_icon;
 	output_finder<> m_flash_icon;
 
-	uint8_t       m_page;
+	uint8_t m_page = 0;
 };
 
 
@@ -174,10 +174,7 @@ INPUT_PORTS_END
 
 void svmu_state::machine_start()
 {
-	m_file_icon.resolve();
-	m_game_icon.resolve();
-	m_clock_icon.resolve();
-	m_flash_icon.resolve();
+	save_item(NAME(m_page));
 }
 
 void svmu_state::machine_reset()
@@ -344,7 +341,7 @@ void svmu_state::svmu(machine_config &config)
 	m_maincpu->set_lcd_update_cb(FUNC(svmu_state::svmu_lcd_update));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(48 * (PIXEL_SIZE + PIXEL_DISTANCE), 32 * (PIXEL_SIZE + PIXEL_DISTANCE));

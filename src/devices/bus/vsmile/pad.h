@@ -45,8 +45,8 @@ protected:
 	vsmile_pad_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock = 0U);
 
 	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// vsmile_ctrl_device_base implementation
 	virtual void tx_complete() override;

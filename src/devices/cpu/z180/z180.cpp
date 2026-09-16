@@ -2,7 +2,6 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   z180.c
  *   Portable Z180 emulator V0.3
  *
  *****************************************************************************/
@@ -13,8 +12,8 @@
         - HALT processing is not yet perfect. The manual states that
           during HALT, all dma and internal i/o incl. timers continue to
           work. Currently, only timers are implemented. Ideally, the
-          burn_cycles routine would go away and halt processing be
-          implemented in cpu_execute.
+          (currently unused) burn_cycles routine would go away and halt
+          processing be implemented in execute_run.
 
         - Documentation for RXS/CTS1 pin is contradictory.
 
@@ -67,7 +66,7 @@ Package: P = 64-Pin Plastic SDIP
 Environmental Flow: C = Plastic Standard
 
 
-Example from Ms.Pac-Man/Galaga - 20 year Reunion hardware (see src/mame/drivers/20pacgal.c):
+Example from Ms.Pac-Man/Galaga - 20 year Reunion hardware (see src/mame/namco/20pacgal.cpp):
 
    CPU is Z8S18020VSC = Z180, 20MHz, 68-Pin PLCC, 0C to +70C, Plastic Standard
 
@@ -833,9 +832,9 @@ void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 			/* Force reload on state change */
 			m_tcr = (m_tcr & (Z180_TCR_TIF1 | Z180_TCR_TIF0)) | (data & ~(Z180_TCR_TIF1 | Z180_TCR_TIF0));
 			if (!(old & Z180_TCR_TDE0) && (m_tcr & Z180_TCR_TDE0))
-				m_tmdr_value[0] = 0; //m_rldr[0].w;
+				m_tmdr_value[0] = m_rldr[0].w;
 			if (!(old & Z180_TCR_TDE1) && (m_tcr & Z180_TCR_TDE1))
-				m_tmdr_value[1] = 0; //m_rldr[1].w;
+				m_tmdr_value[1] = m_rldr[1].w;
 		}
 
 		break;
@@ -849,7 +848,7 @@ void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 	case 0x15:
 		LOG("Z180 TMDR1H wr $%02x\n", data);
 		m_tmdr[1].b.h = data;
-		m_tmdr_value[1] = (m_tmdr_value[1] & 0x00ff) | m_tmdr[1].b.h;
+		m_tmdr_value[1] = (m_tmdr_value[1] & 0x00ff) | (m_tmdr[1].b.h << 8);
 		break;
 
 	case 0x16:
@@ -1248,8 +1247,10 @@ int z180_device::z180_dma0(int max_cycles)
 		m_tend0_cb(CLEAR_LINE);
 		m_dstat &= ~Z180_DSTAT_DE0;
 		/* terminal count interrupt enabled? */
-		if (m_dstat & Z180_DSTAT_DIE0 && m_IFF1)
+		if (m_dstat & Z180_DSTAT_DIE0)
+		{
 			m_int_pending[Z180_INT_DMA0] = 1;
+		}
 	}
 	return cycles;
 }
@@ -1308,8 +1309,10 @@ int z180_device::z180_dma1()
 	cycles += m_extra_cycles; // use extra_cycles for I/O wait states
 
 	/* edge sensitive DREQ1 ? */
-	if (m_dcntl & Z180_DCNTL_DIM1)
+	if (m_dcntl & Z180_DCNTL_DMS1)
+	{
 		m_iol &= ~Z180_DREQ1;
+	}
 
 	m_dma_mar1.d = mar1;
 	m_dma_bcr[1].w = bcr1;
@@ -1320,7 +1323,7 @@ int z180_device::z180_dma1()
 		m_iol &= ~Z180_TEND1;
 		m_tend1_cb(CLEAR_LINE);
 		m_dstat &= ~Z180_DSTAT_DE1;
-		if (m_dstat & Z180_DSTAT_DIE1 && m_IFF1)
+		if (m_dstat & Z180_DSTAT_DIE1)
 			m_int_pending[Z180_INT_DMA1] = 1;
 	}
 
@@ -1841,25 +1844,24 @@ int z180_device::check_interrupts()
 		m_int_pending[Z180_INT_CSIO] = m_csio->check_interrupt();
 		m_int_pending[Z180_INT_ASCI0] = m_asci[0]->check_interrupt();
 		m_int_pending[Z180_INT_ASCI1] = m_asci[1]->check_interrupt();
-	}
 
-	int cycles = 0;
-	for (int i = 0; i <= Z180_INT_MAX; i++)
-	{
-		if (m_int_pending[i])
+		for (int i = 0; i <= Z180_INT_MAX; i++)
 		{
-			cycles += take_interrupt(i);
-			m_int_pending[i] = 0;
-			switch (i)
+			if (m_int_pending[i])
 			{
-			case Z180_INT_ASCI0: m_asci[0]->clear_interrupt(); break;
-			case Z180_INT_ASCI1: m_asci[1]->clear_interrupt(); break;
+				int const cycles = take_interrupt(i);
+				m_int_pending[i] = 0;
+				switch (i)
+				{
+				case Z180_INT_ASCI0: m_asci[0]->clear_interrupt(); break;
+				case Z180_INT_ASCI1: m_asci[1]->clear_interrupt(); break;
+				}
+				return cycles;
 			}
-			break;
 		}
 	}
 
-	return cycles;
+	return 0;
 }
 
 /****************************************************************************
@@ -1919,7 +1921,7 @@ again:
 		if ((m_dstat & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(m_dmode & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(_PCD);
+			debugger_wait_hook();
 
 			/* FIXME z180_dma0 should be handled in handle_io_timers */
 			curcycles = z180_dma0(m_icount);
@@ -1935,21 +1937,23 @@ again:
 				handle_io_timers(curcycles);
 				m_after_EI = 0;
 
-				_PPC = _PCD;
-				debugger_instruction_hook(_PCD);
-
 				if (!m_HALT)
 				{
+					_PPC = _PCD;
+					debugger_instruction_hook(_PCD);
+
 					m_R++;
 					m_extra_cycles = 0;
 					curcycles = exec_op(ROP());
 					curcycles += m_extra_cycles;
 				}
 				else
+				{
+					debugger_wait_hook();
 					curcycles = 3;
+				}
 
 				m_icount -= curcycles;
-
 				handle_io_timers(curcycles);
 
 				/* if channel 0 was started in burst mode, go recheck the mode */
@@ -1993,18 +1997,21 @@ again:
 			handle_io_timers(curcycles);
 			m_after_EI = 0;
 
-			_PPC = _PCD;
-			debugger_instruction_hook(_PCD);
-
 			if (!m_HALT)
 			{
+				_PPC = _PCD;
+				debugger_instruction_hook(_PCD);
+
 				m_R++;
 				m_extra_cycles = 0;
 				curcycles = exec_op(ROP());
 				curcycles += m_extra_cycles;
 			}
 			else
+			{
+				debugger_wait_hook();
 				curcycles = 3;
+			}
 
 			m_icount -= curcycles;
 			handle_io_timers(curcycles);
@@ -2015,7 +2022,7 @@ again:
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-void z180_device::execute_burn(int32_t cycles)
+void z180_device::burn_cycles(int32_t cycles)
 {
 	int extra_cycles = memory_wait_states();
 

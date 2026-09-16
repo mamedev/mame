@@ -8,13 +8,15 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_CASSETTE_H
-#define MAME_DEVICES_IMAGEDEV_CASSETTE_H
+#ifndef MAME_IMAGEDEV_CASSETTE_H
+#define MAME_IMAGEDEV_CASSETTE_H
+
+#pragma once
 
 #include "formats/cassimg.h"
 
 
-enum cassette_state
+enum cassette_state : uint8_t
 {
 	// this part of the state is controlled by the UI
 	CASSETTE_STOPPED            = 0,
@@ -101,13 +103,13 @@ public:
 	void seek(double time, int origin);
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 	device_sound_interface& set_stereo() { m_stereo = true; return *this; }
 
 protected:
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual bool use_software_list_file_extension_for_filetype() const noexcept override { return true; }
 
 	// device_image_interface implementation
@@ -127,10 +129,11 @@ private:
 	char            m_extension_list[256];
 	const cassette_image::Format*    const *m_formats;
 	const cassette_image::Options    *m_create_opts;
-	cassette_state                  m_default_state;
-	const char *                    m_interface;
+	cassette_state  m_default_state;
+	const char *    m_interface;
 
 	std::error_condition internal_load(bool is_create);
+	bool has_any_extension(std::string_view candidate_extensions) const;
 	bool            m_stereo;
 	std::vector<s16> m_samples;
 };
@@ -141,4 +144,4 @@ DECLARE_DEVICE_TYPE(CASSETTE, cassette_image_device)
 // device iterator
 typedef device_type_enumerator<cassette_image_device> cassette_device_enumerator;
 
-#endif // MAME_DEVICES_IMAGEDEV_CASSETTE_H
+#endif // MAME_IMAGEDEV_CASSETTE_H

@@ -33,6 +33,7 @@
 /* extracts the source/destination register index from the opcode into 'sreg' or 'dreg' */
 #define GET_SREG sreg = (op >> 6) & 7
 #define GET_DREG dreg = op & 7
+#define EIS_SWAP op = ((op & 7) << 6) | ((op >> 6) & 7)
 
 /* for a byte-sized source operand: extracts 'sreg', computes 'ea', and loads the value into 'source' */
 #define GET_SB_RG  GET_SREG; source = REGB(sreg)
@@ -144,6 +145,11 @@
 #define SETW_NZV SETW_N; SETW_Z; SETW_V
 #define SETW_NZVC SETW_N; SETW_Z; SETW_V; SETW_C
 
+/* SIMH */
+#define GET_ZERO(v)     ((v) == 0)
+#define GET_SIGN_W(v)   (((v) >> 15) & 1)
+#define GET_SIGN_B(v)   (((v) >> 7) & 1)
+
 /* operations */
 /* ADC: dst += C */
 #define ADC_R(d)    int dreg, source, dest, result;     source = GET_C; GET_DW_##d; CLR_NZVC; result = dest + source; SETW_NZVC; PUT_DW_DREG(result)
@@ -187,9 +193,9 @@
 #define BR(c)       if (c) { PC += 2 * (signed char)(op & 0xff); }
 /* CLR: dst = 0 */
 #define CLR_R(d)    int dreg;     PUT_DW_##d(0); CLR_NZVC; SET_Z
-#define CLR_M(d)    int dreg, ea; PUT_DWT_##d(0); CLR_NZVC; SET_Z
+#define CLR_M(d)    int dreg, ea; if (c_insn_set & (IS_T11|IS_VM1)) { PUT_DWT_##d(0); } else { PUT_DW_##d(0); } CLR_NZVC; SET_Z
 #define CLRB_R(d)   int dreg;     PUT_DB_##d(0); CLR_NZVC; SET_Z
-#define CLRB_M(d)   int dreg, ea; PUT_DBT_##d(0); CLR_NZVC; SET_Z
+#define CLRB_M(d)   int dreg, ea; if (c_insn_set & (IS_T11|IS_VM1|IS_VM2)) { PUT_DBT_##d(0); } else { PUT_DB_##d(0); } CLR_NZVC; SET_Z
 /* CMP: flags = src - dst */
 #define CMP_R(s,d)  int sreg, dreg, source, dest, result;     GET_SW_##s; GET_DW_##d; CLR_NZVC; result = source - dest; SETW_NZVC;
 #define CMP_M(s,d)  int sreg, dreg, source, dest, result, ea; GET_SW_##s; GET_DW_##d; CLR_NZVC; result = source - dest; SETW_NZVC;
@@ -216,16 +222,16 @@
 #define JSR(d)      int sreg, dreg, ea; GET_SREG; GET_DREG; MAKE_EAW_##d(dreg); PUSH(REGW(sreg)); REGW(sreg) = PC; PC = ea
 /* MFPS: dst = flags */
 #define MFPS_R(d)   int dreg, result;     result = PSW; CLR_NZV; SETB_NZ; PUT_DW_##d((signed char)result)
-#define MFPS_M(d)   int dreg, result, ea; result = PSW; CLR_NZV; SETB_NZ; PUT_DB_##d(result)
+#define MFPS_M(d)   int dreg, result, ea; result = PSW; CLR_NZV; SETB_NZ; if (c_insn_set & (IS_VM1|IS_VM2)) { PUT_DBT_##d(result); } else { PUT_DB_##d(result); }
 /* MOV: dst = src */
 #define MOV_R(s,d)  int sreg, dreg, source, result;     GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DW_##d(result)
-#define MOV_M(s,d)  int sreg, dreg, source, result, ea; GET_SW_##s; CLR_NZV; result = source; SETW_NZ; PUT_DWT_##d(result)
+#define MOV_M(s,d)  int sreg, dreg, source, result, ea; GET_SW_##s; CLR_NZV; result = source; SETW_NZ; if (c_insn_set & IS_T11) { PUT_DWT_##d(result); } else { PUT_DW_##d(result); }
 #define MOVB_R(s,d) int sreg, dreg, source, result;     GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
 #define MOVB_X(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DW_##d((signed char)result)
-#define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; PUT_DBT_##d(result)
+#define MOVB_M(s,d) int sreg, dreg, source, result, ea; GET_SB_##s; CLR_NZV; result = source; SETB_NZ; if (c_insn_set & (IS_T11|IS_VM2)) { PUT_DBT_##d(result); } else { PUT_DB_##d(result); }
 /* MTPS: flags = src */
-#define MTPS_R(d)   int dreg, dest;     GET_DW_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
-#define MTPS_M(d)   int dreg, dest, ea; GET_DW_##d; PSW = (PSW & ~0xef) | (dest & 0xef); t11_check_irqs()
+#define MTPS_R(d)   int dreg, dest;     GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); m_check_irqs = true
+#define MTPS_M(d)   int dreg, dest, ea; GET_DB_##d; PSW = (PSW & ~0xef) | (dest & 0xef); m_check_irqs = true
 /* NEG: dst = -dst */
 #define NEG_R(d)    int dreg, dest, result;     GET_DW_##d; CLR_NZVC; result = -dest; SETW_NZ; if (dest == 0x8000) SET_V; if (result) SET_C; PUT_DW_DREG(result)
 #define NEG_M(d)    int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = -dest; SETW_NZ; if (dest == 0x8000) SET_V; if (result) SET_C; PUT_DW_EA(result)
@@ -258,7 +264,7 @@
 #define SWAB_M(d)   int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = ((dest >> 8) & 0xff) + (dest << 8); SETB_NZ; PUT_DW_EA(result)
 /* SXT: dst = sign-extend dst */
 #define SXT_R(d)    int dreg, result;     CLR_ZV; if (GET_N) result = -1; else { result = 0; SET_Z; } PUT_DW_##d(result)
-#define SXT_M(d)    int dreg, result, ea; CLR_ZV; if (GET_N) result = -1; else { result = 0; SET_Z; } PUT_DWT_##d(result)
+#define SXT_M(d)    int dreg, result, ea; CLR_ZV; if (GET_N) result = -1; else { result = 0; SET_Z; } if (c_insn_set & (IS_T11|IS_VM1)) { PUT_DWT_##d(result); } else { PUT_DW_##d(result); }
 /* TST: dst = ~dst */
 #define TST_R(d)    int dreg, dest, result;     GET_DW_##d; CLR_NZVC; result = dest; SETW_NZ;
 #define TST_M(d)    int dreg, dest, result, ea; GET_DW_##d; CLR_NZVC; result = dest; SETW_NZ;
@@ -268,6 +274,214 @@
 #define XOR_R(d)    int sreg, dreg, source, dest, result;     GET_SREG; source = REGW(sreg); GET_DW_##d; CLR_NZV; result = dest ^ source; SETW_NZ; PUT_DW_DREG(result)
 #define XOR_M(d)    int sreg, dreg, source, dest, result, ea; GET_SREG; source = REGW(sreg); GET_DW_##d; CLR_NZV; result = dest ^ source; SETW_NZ; PUT_DW_EA(result)
 
+/* test if insn is supported by the CPU */
+#define CHECK_IS(d) do { if (!(c_insn_set & (d))) { illegal(op); return; } } while (false)
+
+/* Extended Instruction Set -- SIMH impl */
+
+int t11_device::_mul(int src, int src2, int *psw)
+{
+	int dst;
+	int N, Z, V, C;
+
+	if (GET_SIGN_W (src2))
+		src2 = src2 | ~077777;
+	if (GET_SIGN_W (src))
+		src = src | ~077777;
+	dst = src * src2;
+	N = (dst < 0);
+	Z = GET_ZERO (dst);
+	V = 0;
+	C = ((dst > 077777) || (dst < -0100000));
+	*psw = (*psw & ~15) | ((N&1) << 3) | ((Z&1) << 2) | ((V&1) << 1) | (C&1);
+
+	return dst;
+}
+
+#define MUL_M(s) \
+		int sreg, dreg, source, dest, result, ea = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _mul(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+
+#define MUL_R(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _mul(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+
+int t11_device::_div(int source, int source1, int src2, int *remainder, int *psw)
+{
+	int src, dst = 0;
+	int N, Z, V, C;
+
+	src = (((uint32_t) source) << 16) | source1;
+	if (src2 == 0)
+	{
+		N = 0;                                  /* J11,11/70 compat */
+		Z = V = C = 1;                          /* N = 0, Z = 1 */
+		if (c_insn_set & IS_VM2) Z = 0;
+	}
+	else if ((((uint32_t)src) == 020000000000) && (src2 == 0177777))
+	{
+		V = 1;                                  /* J11,11/70 compat */
+		N = Z = C = 0;                          /* N = Z = 0 */
+	}
+	else
+	{
+		if (GET_SIGN_W (src2))
+			src2 = src2 | ~077777;
+		if (GET_SIGN_W (source))
+			src = src | ~017777777777;
+		dst = src / src2;
+		N = (dst < 0);                              /* N set on 32b result */
+		if ((dst > 077777) || (dst < -0100000))
+		{
+			V = 1;                                  /* J11,11/70 compat */
+			Z = C = 0;                              /* Z = C = 0 */
+			if (c_insn_set & IS_VM2) N = 0;
+		}
+		else
+		{
+			Z = GET_ZERO (dst);
+			V = C = 0;
+		}
+		*remainder = (src - (src2 * dst)) & 0177777;
+	}
+	*psw = (*psw & ~15) | ((N&1) << 3) | ((Z&1) << 2) | ((V&1) << 1) | (C&1);
+	return dst;
+}
+
+#define DIV_M(s) \
+		int sreg, dreg, source, dest, result, remainder = 0, ea = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _div(dest, REGD(dreg|1), source, &remainder, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		if (!(PSW & VFLAG)) { REGW((dreg|1)) = remainder; PUT_DW_DREG(result); }
+
+#define DIV_R(s) \
+		int sreg, dreg, source, dest, result, remainder = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _div(dest, REGD(dreg|1), source, &remainder, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		if (!(PSW & VFLAG)) { REGW((dreg|1)) = remainder; PUT_DW_DREG(result); }
+
+int t11_device::_ash(int source, int dest, int *psw)
+{
+	int src, src2, dst, sign, i;
+	int N, Z, V, C;
+
+	N = BIT(*psw, 3);
+	Z = BIT(*psw, 2);
+	V = BIT(*psw, 1);
+	C = BIT(*psw, 0);
+
+	src2 = dest & 077;
+	sign = GET_SIGN_W (source);
+	src = sign? source | ~077777: source;
+	if (src2 == 0)                              /* [0] */
+	{
+		dst = src;
+		V = C = 0;
+	}
+	else if (src2 <= 15)                        /* [1,15] */
+	{
+		dst = src << src2;
+		i = (src >> (16 - src2)) & 0177777;
+		V = (i != ((dst & 0100000)? 0177777: 0));
+		C = (i & 1);
+	}
+	else if (src2 <= 31)                        /* [16,31] */
+	{
+		dst = 0;
+		V = (src != 0);
+		C = (src << (src2 - 16)) & 1;
+	}
+	else if (src2 == 32)                        /* [32] = -32 */
+	{
+		dst = -sign;
+		V = 0;
+		C = sign;
+	}
+	else                                        /* [33,63] = -31,-1 */
+	{
+		dst = (src >> (64 - src2)) | (-sign << (src2 - 32));
+		V = 0;
+		C = ((src >> (63 - src2)) & 1);
+	}
+	N = GET_SIGN_W (dst);
+	Z = GET_ZERO (dst);
+	*psw = (*psw & ~15) | ((N&1) << 3) | ((Z&1) << 2) | ((V&1) << 1) | (C&1);
+	return dst & 0177777;
+}
+
+#define ASH_M(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW, ea = 0; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ash(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result)
+
+#define ASH_R(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ash(dest, source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result)
+
+int t11_device::_ashc(int source, int source1, int dest, int *psw)
+{
+	int src, src2, dst, sign, i;
+	int N, Z, V, C;
+
+	N = BIT(*psw, 3);
+	Z = BIT(*psw, 2);
+	V = BIT(*psw, 1);
+	C = BIT(*psw, 0);
+
+	src2 = dest & 077;
+	sign = GET_SIGN_W (source);
+
+	src = (((uint32_t) source) << 16) | source1;
+	if (src2 == 0)                              /* [0] */
+	{
+		dst = src;
+		V = C = 0;
+	}
+	else if (src2 <= 31)                        /* [1,31] */
+	{
+		dst = ((uint32_t) src) << src2;
+		i = (src >> (32 - src2)) | (-sign << src2);
+		V = (i != ((dst & 020000000000)? -1: 0));
+		C = (i & 1);
+	}
+	else if (src2 == 32)                        /* [32] = -32 */
+	{
+		dst = -sign;
+		V = 0;
+		C = sign;
+	}
+	else                                        /* [33,63] = -31,-1 */
+	{
+		dst = (src >> (64 - src2)) | (-sign << (src2 - 32));
+		V = 0;
+		C = ((src >> (63 - src2)) & 1);
+	}
+	i = (dst >> 16) & 0177777;
+	N = GET_SIGN_W (i);
+	Z = GET_ZERO (dst | i);
+	*psw = (*psw & ~15) | ((N&1) << 3) | ((Z&1) << 2) | ((V&1) << 1) | (C&1);
+	return dst;
+}
+
+#define ASHC_M(s) \
+		int sreg, dreg, source, dest, result, ea = 0, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ashc(dest, REGD(dreg|1), source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+
+#define ASHC_R(s) \
+		int sreg, dreg, source, dest, result, _psw = PSW; \
+		EIS_SWAP; GET_SW_##s; GET_DW_RG; \
+		result = _ashc(dest, REGD(dreg|1), source, &_psw); PSW = (PSW & ~15) | (_psw & 15); \
+		PUT_DW_DREG(result >> 16); REGW(dreg|1) = result
+
 
 void t11_device::trap_to(uint16_t vector)
 {
@@ -275,7 +489,7 @@ void t11_device::trap_to(uint16_t vector)
 	PUSH(PC);
 	PC = RWORD(vector);
 	PSW = RWORD(vector + 2);
-	t11_check_irqs();
+	m_check_irqs = true;
 }
 
 void t11_device::op_0000(uint16_t op)
@@ -284,12 +498,36 @@ void t11_device::op_0000(uint16_t op)
 	{
 		case 0x00:  /* HALT  */ halt(op); break;
 		case 0x01:  /* WAIT  */ m_icount = 0; m_wait_state = 1; break;
-		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); t11_check_irqs(); break;
-		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(0x0c); break;
-		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(0x10); break;
+		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); if (GET_T) m_trace_trap = true; m_check_irqs = true; break;
+		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(T11_BPT); break;
+		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(T11_IOT); break;
 		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
-		case 0x06:  /* RTT   */ m_icount -= 33; PC = POP(); PSW = POP(); t11_check_irqs(); break;
-		case 0x07:  /* MFPT  */ REGB(0) = 4; break;
+		case 0x06:  /* RTT   */ if (c_insn_set & IS_LEIS) { m_icount -= 33; PC = POP(); PSW = POP(); m_check_irqs = true; } else illegal(op); break;
+		case 0x07:  /* MFPT  */ if (c_insn_set & IS_MFPT) REGB(0) = 4; else illegal(op); break;
+
+		default:    illegal(op); break;
+	}
+}
+
+void t11_device::op_0001(uint16_t op)
+{
+	CHECK_IS(IS_VM1);
+
+	switch (op & 014)
+	{
+		case 010: // START
+			m_icount -= 24;
+			PC = RWORD(VM1_STACK);
+			PSW = RWORD(VM1_STACK + 2);
+			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+			break;
+		case 014: // STEP
+			m_icount -= 24;
+			PC = RWORD(VM1_STACK);
+			PSW = RWORD(VM1_STACK + 2);
+			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+			PC += 2;
+			break;
 
 		default:    illegal(op); break;
 	}
@@ -298,27 +536,47 @@ void t11_device::op_0000(uint16_t op)
 void t11_device::halt(uint16_t op)
 {
 	m_icount -= 48;
-	PUSH(PSW);
-	PUSH(PC);
-	PC = m_initial_pc + 4;
-	PSW = 0340;
-	t11_check_irqs();
+	if (c_insn_set & IS_VM1)
+	{
+		m_mcir = MCIR_HALT;
+		m_vsel = VM1_HALT;
+	}
+	else if (c_insn_set & IS_VM2)
+	{
+		m_mcir = MCIR_HALT;
+		m_vsel = VM2_HALT;
+		m_check_irqs = true;
+	}
+	else
+	{
+		PUSH(PSW);
+		PUSH(PC);
+		PC = m_initial_pc + 4;
+		PSW = 0340;
+	}
+	m_check_irqs = true;
 }
 
 void t11_device::illegal(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x08);
+	trap_to(T11_ILLINST);
 }
 
 void t11_device::illegal4(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x04);
+	trap_to(T11_TIMEOUT);
 }
 
 void t11_device::mark(uint16_t op)
 {
+	if ((c_insn_set & IS_T11) || !(c_insn_set & IS_LEIS))
+	{
+		illegal(op);
+		return;
+	}
+
 	m_icount -= 36;
 
 	SP = PC + 2 * (op & 0x3f);
@@ -479,14 +737,14 @@ void t11_device::asl_ded(uint16_t op)       { m_icount -= 30; { ASL_M(DED); } }
 void t11_device::asl_ix(uint16_t op)        { m_icount -= 30; { ASL_M(IX);  } }
 void t11_device::asl_ixd(uint16_t op)       { m_icount -= 36; { ASL_M(IXD); } }
 
-void t11_device::sxt_rg(uint16_t op)        { m_icount -= 12; { SXT_R(RG);  } }
-void t11_device::sxt_rgd(uint16_t op)       { m_icount -= 21; { SXT_M(RGD); } }
-void t11_device::sxt_in(uint16_t op)        { m_icount -= 21; { SXT_M(IN);  } }
-void t11_device::sxt_ind(uint16_t op)       { m_icount -= 27; { SXT_M(IND); } }
-void t11_device::sxt_de(uint16_t op)        { m_icount -= 24; { SXT_M(DE);  } }
-void t11_device::sxt_ded(uint16_t op)       { m_icount -= 30; { SXT_M(DED); } }
-void t11_device::sxt_ix(uint16_t op)        { m_icount -= 30; { SXT_M(IX);  } }
-void t11_device::sxt_ixd(uint16_t op)       { m_icount -= 36; { SXT_M(IXD); } }
+void t11_device::sxt_rg(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 12; { SXT_R(RG);  } }
+void t11_device::sxt_rgd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 21; { SXT_M(RGD); } }
+void t11_device::sxt_in(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 21; { SXT_M(IN);  } }
+void t11_device::sxt_ind(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 27; { SXT_M(IND); } }
+void t11_device::sxt_de(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 24; { SXT_M(DE);  } }
+void t11_device::sxt_ded(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 30; { SXT_M(DED); } }
+void t11_device::sxt_ix(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 30; { SXT_M(IX);  } }
+void t11_device::sxt_ixd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 36; { SXT_M(IXD); } }
 
 void t11_device::mov_rg_rg(uint16_t op)     { m_icount -=  9+ 3; { MOV_R(RG,RG);   } }
 void t11_device::mov_rg_rgd(uint16_t op)    { m_icount -=  9+12; { MOV_M(RG,RGD);  } }
@@ -878,18 +1136,56 @@ void t11_device::add_ixd_ded(uint16_t op)   { m_icount -= 30+21; { ADD_M(IXD,DED
 void t11_device::add_ixd_ix(uint16_t op)    { m_icount -= 30+21; { ADD_M(IXD,IX);  } }
 void t11_device::add_ixd_ixd(uint16_t op)   { m_icount -= 30+27; { ADD_M(IXD,IXD); } }
 
-void t11_device::xor_rg(uint16_t op)        { m_icount -= 12; { XOR_R(RG);  } }
-void t11_device::xor_rgd(uint16_t op)       { m_icount -= 21; { XOR_M(RGD); } }
-void t11_device::xor_in(uint16_t op)        { m_icount -= 21; { XOR_M(IN);  } }
-void t11_device::xor_ind(uint16_t op)       { m_icount -= 27; { XOR_M(IND); } }
-void t11_device::xor_de(uint16_t op)        { m_icount -= 24; { XOR_M(DE);  } }
-void t11_device::xor_ded(uint16_t op)       { m_icount -= 30; { XOR_M(DED); } }
-void t11_device::xor_ix(uint16_t op)        { m_icount -= 30; { XOR_M(IX);  } }
-void t11_device::xor_ixd(uint16_t op)       { m_icount -= 36; { XOR_M(IXD); } }
+void t11_device::xor_rg(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 12; { XOR_R(RG);  } }
+void t11_device::xor_rgd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 21; { XOR_M(RGD); } }
+void t11_device::xor_in(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 21; { XOR_M(IN);  } }
+void t11_device::xor_ind(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 27; { XOR_M(IND); } }
+void t11_device::xor_de(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 24; { XOR_M(DE);  } }
+void t11_device::xor_ded(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 30; { XOR_M(DED); } }
+void t11_device::xor_ix(uint16_t op)        { CHECK_IS(IS_LEIS); m_icount -= 30; { XOR_M(IX);  } }
+void t11_device::xor_ixd(uint16_t op)       { CHECK_IS(IS_LEIS); m_icount -= 36; { XOR_M(IXD); } }
+
+void t11_device::ash_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { ASH_R(RG);  } }   // FIXME: icount is fake
+void t11_device::ash_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { ASH_M(RGD); } }
+void t11_device::ash_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { ASH_M(IN);  } }
+void t11_device::ash_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { ASH_M(IND); } }
+void t11_device::ash_de(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 24; { ASH_M(DE);  } }
+void t11_device::ash_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; { ASH_M(DED); } }
+void t11_device::ash_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { ASH_M(IX);  } }
+void t11_device::ash_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { ASH_M(IXD); } }
+
+void t11_device::ashc_rg(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 12; { ASHC_R(RG);  } }  // FIXME: icount is fake
+void t11_device::ashc_rgd(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 21; { ASHC_M(RGD); } }
+void t11_device::ashc_in(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { ASHC_M(IN);  } }
+void t11_device::ashc_ind(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 27; { ASHC_M(IND); } }
+void t11_device::ashc_de(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 24; { ASHC_M(DE);  } }
+void t11_device::ashc_ded(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 30; { ASHC_M(DED); } }
+void t11_device::ashc_ix(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; { ASHC_M(IX);  } }
+void t11_device::ashc_ixd(uint16_t op)      { CHECK_IS(IS_EIS); m_icount -= 36; { ASHC_M(IXD); } }
+
+void t11_device::mul_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { MUL_R(RG);  } }   // FIXME: icount is fake
+void t11_device::mul_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { MUL_M(RGD); } }
+void t11_device::mul_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { MUL_M(IN);  } }
+void t11_device::mul_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { MUL_M(IND); } }
+void t11_device::mul_de(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 24; { MUL_M(DE);  } }
+void t11_device::mul_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; { MUL_M(DED); } }
+void t11_device::mul_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { MUL_M(IX);  } }
+void t11_device::mul_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { MUL_M(IXD); } }
+
+void t11_device::div_rg(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 12; { DIV_R(RG);  } }   // FIXME: icount is fake
+void t11_device::div_rgd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 21; { DIV_M(RGD); } }
+void t11_device::div_in(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 21; { DIV_M(IN);  } }
+void t11_device::div_ind(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 27; { DIV_M(IND); } }
+void t11_device::div_de(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 24; { DIV_M(DE);  } }
+void t11_device::div_ded(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 30; { DIV_M(DED); } }
+void t11_device::div_ix(uint16_t op)        { CHECK_IS(IS_EIS); m_icount -= 30; { DIV_M(IX);  } }
+void t11_device::div_ixd(uint16_t op)       { CHECK_IS(IS_EIS); m_icount -= 36; { DIV_M(IXD); } }
 
 void t11_device::sob(uint16_t op)
 {
 	int sreg, source;
+
+	CHECK_IS(IS_LEIS);
 
 	m_icount -= 18;
 	GET_SREG; source = REGD(sreg);
@@ -911,13 +1207,13 @@ void t11_device::bcs(uint16_t op)           { m_icount -= 12; { BR( GET_C); } }
 void t11_device::emt(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x18);
+	trap_to(T11_EMT);
 }
 
 void t11_device::trap(uint16_t op)
 {
 	m_icount -= 48;
-	trap_to(0x1c);
+	trap_to(T11_TRAP);
 }
 
 void t11_device::clrb_rg(uint16_t op)       { m_icount -= 12; { CLRB_R(RG);  } }
@@ -1028,23 +1324,23 @@ void t11_device::aslb_ded(uint16_t op)      { m_icount -= 30; { ASLB_M(DED); } }
 void t11_device::aslb_ix(uint16_t op)       { m_icount -= 30; { ASLB_M(IX);  } }
 void t11_device::aslb_ixd(uint16_t op)      { m_icount -= 36; { ASLB_M(IXD); } }
 
-void t11_device::mtps_rg(uint16_t op)       { m_icount -= 24; { MTPS_R(RG);  } }
-void t11_device::mtps_rgd(uint16_t op)      { m_icount -= 30; { MTPS_M(RGD); } }
-void t11_device::mtps_in(uint16_t op)       { m_icount -= 30; { MTPS_M(IN);  } }
-void t11_device::mtps_ind(uint16_t op)      { m_icount -= 36; { MTPS_M(IND); } }
-void t11_device::mtps_de(uint16_t op)       { m_icount -= 33; { MTPS_M(DE);  } }
-void t11_device::mtps_ded(uint16_t op)      { m_icount -= 39; { MTPS_M(DED); } }
-void t11_device::mtps_ix(uint16_t op)       { m_icount -= 39; { MTPS_M(IX);  } }
-void t11_device::mtps_ixd(uint16_t op)      { m_icount -= 45; { MTPS_M(IXD); } }
+void t11_device::mtps_rg(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 24; { MTPS_R(RG);  } }
+void t11_device::mtps_rgd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 30; { MTPS_M(RGD); } }
+void t11_device::mtps_in(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 30; { MTPS_M(IN);  } }
+void t11_device::mtps_ind(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 36; { MTPS_M(IND); } }
+void t11_device::mtps_de(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 33; { MTPS_M(DE);  } }
+void t11_device::mtps_ded(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 39; { MTPS_M(DED); } }
+void t11_device::mtps_ix(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 39; { MTPS_M(IX);  } }
+void t11_device::mtps_ixd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 45; { MTPS_M(IXD); } }
 
-void t11_device::mfps_rg(uint16_t op)       { m_icount -= 12; { MFPS_R(RG);  } }
-void t11_device::mfps_rgd(uint16_t op)      { m_icount -= 21; { MFPS_M(RGD); } }
-void t11_device::mfps_in(uint16_t op)       { m_icount -= 21; { MFPS_M(IN);  } }
-void t11_device::mfps_ind(uint16_t op)      { m_icount -= 27; { MFPS_M(IND); } }
-void t11_device::mfps_de(uint16_t op)       { m_icount -= 24; { MFPS_M(DE);  } }
-void t11_device::mfps_ded(uint16_t op)      { m_icount -= 30; { MFPS_M(DED); } }
-void t11_device::mfps_ix(uint16_t op)       { m_icount -= 30; { MFPS_M(IX);  } }
-void t11_device::mfps_ixd(uint16_t op)      { m_icount -= 36; { MFPS_M(IXD); } }
+void t11_device::mfps_rg(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 12; { MFPS_R(RG);  } }
+void t11_device::mfps_rgd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 21; { MFPS_M(RGD); } }
+void t11_device::mfps_in(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 21; { MFPS_M(IN);  } }
+void t11_device::mfps_ind(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 27; { MFPS_M(IND); } }
+void t11_device::mfps_de(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 24; { MFPS_M(DE);  } }
+void t11_device::mfps_ded(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 30; { MFPS_M(DED); } }
+void t11_device::mfps_ix(uint16_t op)       { CHECK_IS(IS_MXPS); m_icount -= 30; { MFPS_M(IX);  } }
+void t11_device::mfps_ixd(uint16_t op)      { CHECK_IS(IS_MXPS); m_icount -= 36; { MFPS_M(IXD); } }
 
 void t11_device::movb_rg_rg(uint16_t op)     { m_icount -=  9+ 3; { MOVB_R(RG,RG);   } }
 void t11_device::movb_rg_rgd(uint16_t op)    { m_icount -=  9+12; { MOVB_M(RG,RGD);  } }

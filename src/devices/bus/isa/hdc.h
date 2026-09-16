@@ -25,15 +25,15 @@ class xt_hdc_device :
 {
 public:
 	// construction/destruction
-	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xt_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 
-	int dack_r();
-	int dack_rs();
-	void dack_w(int data);
-	void dack_ws(int data);
+	uint8_t dack_r();
+	uint8_t dack_rs();
+	void dack_w(uint8_t data);
+	void dack_ws(uint8_t data);
 
 	void data_w(uint8_t data);
 	void reset_w(uint8_t data);
@@ -49,8 +49,8 @@ protected:
 	xt_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	harddisk_image_device *pc_hdc_file(int id);
 	void pc_hdc_result(bool set_error_info);
@@ -113,7 +113,8 @@ private:
 class ec1841_device : public xt_hdc_device
 {
 public:
-	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
 protected:
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -122,7 +123,7 @@ protected:
 class st11m_device : public xt_hdc_device
 {
 public:
-	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	st11m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	devcb_write_line m_irq_handler;
@@ -141,23 +142,23 @@ class isa8_hdc_device :
 {
 public:
 	// construction/destruction
-	isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t pc_hdc_r(offs_t offset);
 	void pc_hdc_w(offs_t offset, uint8_t data);
 	required_device<xt_hdc_device> m_hdc;
 
 protected:
-	isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	void irq_w(int state);
 	void drq_w(int state);
@@ -174,11 +175,12 @@ public:
 class isa8_hdc_ec1841_device : public isa8_hdc_device
 {
 public:
-	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return nullptr; }
 
 	required_device<ec1841_device> m_hdc;
 };

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+
+// HLE-like implementation for SPI flash ROMs.  Most hosts use the byte
+// interface; the pin-level adapter supports software-driven SPI buses.
+
 #include "emu.h"
 #include "generic_spi_flash.h"
 
@@ -9,172 +13,561 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(GENERIC_SPI_FLASH, generic_spi_flash_device, "generic_spi_flash", "Generic SPI Flash handling")
+DEFINE_DEVICE_TYPE(GENERIC_SPI_FLASH, generic_spi_flash_device, "generic_spi_flash", "Generic Byte HLE SPI Flash handling")
 
-generic_spi_flash_device::generic_spi_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+generic_spi_flash_device::generic_spi_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, GENERIC_SPI_FLASH, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, m_multibyte_status_read(1)
+	, m_multibyte_status_write(1)
 {
+	m_idbytes[0] = 0xfe;
+	m_idbytes[1] = 0xfe;
+	m_idbytes[2] = 0x00;
 }
 
 void generic_spi_flash_device::device_start()
 {
-	save_item(NAME(m_spiaddr));
+	save_item(NAME(m_spi_addr));
 	save_item(NAME(m_spi_state));
-	save_item(NAME(m_spilatch));
-	save_item(NAME(m_spidir));
+	save_item(NAME(m_spi_latch));
+	save_item(NAME(m_spi_state_step));
+	save_item(NAME(m_spi_statusreg));
+	save_item(NAME(m_spi_configreg));
+	save_item(NAME(m_bitbang_cs));
+	save_item(NAME(m_bitbang_sck));
+	save_item(NAME(m_bitbang_si));
+	save_item(NAME(m_bitbang_so));
+	save_item(NAME(m_bitbang_input));
+	save_item(NAME(m_bitbang_output));
+	save_item(NAME(m_bitbang_bits));
+
+	m_spi_statusreg = 0;
+	m_spi_configreg = 0;
+	m_spi_state_step = 0;
 }
 
 void generic_spi_flash_device::device_reset()
 {
-	m_spiaddr = 0;
+	m_spi_addr = 0;
 	m_spi_state = 0;
-	m_spilatch = 0;
-	m_spidir = false;
+	m_spi_latch = 0;
+	m_spi_state_step = 0;
+	m_bitbang_cs = 1;
+	m_bitbang_sck = 0;
+	m_bitbang_si = 1;
+	m_bitbang_so = 1;
+	m_bitbang_input = 0;
+	m_bitbang_output = 0xff;
+	m_bitbang_bits = 0;
 }
 
-void generic_spi_flash_device::write(uint8_t data)
+void generic_spi_flash_device::get_command(u8 data)
 {
-	if (!m_spidir) // Send to SPI
+	if (data == COMMAND_01_WRSR)
 	{
-		switch (m_spi_state)
-		{
-		case READY_FOR_COMMAND:
-			if (data == 0x03)
-			{
-				m_spi_state = READY_FOR_ADDRESS2;
-			}
-			else if (data == 0x05)
-			{
-				m_spi_state = READY_FOR_STATUS_READ;
-			}
-			else if (data == 0x0b)
-			{
-				m_spi_state = READY_FOR_HSADDRESS2;
-			}
-			else if (data == 0x06)
-			{
-				// write enable
-				m_spi_state = READY_FOR_COMMAND;
-			}
-			else if (data == 0x04)
-			{
-				// write disable
-				m_spi_state = READY_FOR_COMMAND;
-			}
-			else if (data == 0x02)
-			{
-				// page program
-				m_spi_state = READY_FOR_WRITEADDRESS2;
-			}
-			else if (data == 0x20)
-			{
-				// erase 4k sector
-				m_spi_state = READY_FOR_COMMAND;
-			}
-			else
-			{
-				fatalerror("SPI set to unknown mode %02x\n", data);
-			}
-			break;
-
-		case READY_FOR_WRITEADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_WRITEADDRESS1;
-			break;
-
-		case READY_FOR_WRITEADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_WRITEADDRESS0;
-			break;
-
-		case READY_FOR_WRITEADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_WRITE;
-			LOGMASKED(LOG_SPI, "SPI set to page WRITE mode with address %08x\n", m_spiaddr);
-			break;
-
-		case READY_FOR_WRITE:
-			LOGMASKED(LOG_SPI, "Write SPI data %02x\n", data);
-
-			m_spiptr[(m_spiaddr++) & (m_length-1)] = data;
-
-			break;
-
-
-		case READY_FOR_ADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_ADDRESS1;
-			break;
-
-		case READY_FOR_ADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_ADDRESS0;
-			break;
-
-		case READY_FOR_ADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_READ;
-			m_spidir = 1;
-			LOGMASKED(LOG_SPI, "SPI set to READ mode with address %08x\n", m_spiaddr);
-			break;
-
-		case READY_FOR_HSADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_HSADDRESS1;
-			break;
-
-		case READY_FOR_HSADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_HSADDRESS0;
-			break;
-
-		case READY_FOR_HSADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			m_spi_state = READY_FOR_HSDUMMY;
-			break;
-
-		case READY_FOR_HSDUMMY:
-			m_spi_state = READY_FOR_READ;
-			m_spidir = 1;
-			LOGMASKED(LOG_SPI, "SPI set to High Speed READ mode with address %08x\n", m_spiaddr);
-			break;
-
-		case READY_FOR_SECTORERASEADDRESS2:
-			m_spiaddr = (m_spiaddr & 0x00ffff) | (data << 16);
-			m_spi_state = READY_FOR_SECTORERASEADDRESS1;
-			break;
-
-		case READY_FOR_SECTORERASEADDRESS1:
-			m_spiaddr = (m_spiaddr & 0xff00ff) | (data << 8);
-			m_spi_state = READY_FOR_SECTORERASEADDRESS0;
-			break;
-
-		case READY_FOR_SECTORERASEADDRESS0:
-			m_spiaddr = (m_spiaddr & 0xffff00) | (data);
-			LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spiaddr);
-			break;
-
-		}
+		LOGMASKED(LOG_SPI, "Set SPI to WRSR, 1 or 2 params required\n");
+		m_spi_state = COMMAND_01_WRSR;
+	}
+	else if (data == COMMAND_9F_RDID)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to RDID (Read Identification)\n");
+		m_spi_state = COMMAND_9F_RDID;
+	}
+	else if (data == COMMAND_03_READ)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to READ (normal - 3 params needed)\n");
+		m_spi_state = COMMAND_03_READ;
+	}
+	else if (data == COMMAND_05_RDSR)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to RDSR (Read Status Register)\n");
+		m_spi_state = COMMAND_05_RDSR;
+	}
+	else if (data == COMMAND_0B_FAST_READ)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to FAST READ (fast - 4 params needed)\n");
+		m_spi_state = COMMAND_0B_FAST_READ;
+	}
+	else if (data == COMMAND_06_WREN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to WREN (Write Enable)\n");
+		m_spi_state = READY_FOR_COMMAND;
+		m_spi_statusreg |= 0x02;
+	}
+	else if (data == COMMAND_04_WRDI)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to WRDI (Write Disable)\n");
+		m_spi_state = READY_FOR_COMMAND;
+		m_spi_statusreg &= ~0x02;
+	}
+	else if (data == COMMAND_02_PP)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to PP (Page Program)\n");
+		m_spi_state = COMMAND_02_PP;
+	}
+	else if (data == COMMAND_11_UNKNOWN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_11_UNKNOWN\n");
+		m_spi_state = COMMAND_11_UNKNOWN;
+	}
+	else if (data == COMMAND_15_RDCR)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_15_RDCR (Read Configuration Register)\n");
+		m_spi_state = COMMAND_15_RDCR;
+	}
+	else if (data == COMMAND_20_SE)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to SE (Sector Erase)\n");
+		m_spi_state = COMMAND_20_SE;
+	}
+	else if (data == COMMAND_31_UNKNOWN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_31_UNKNOWN\n");
+		m_spi_state = COMMAND_31_UNKNOWN;
+	}
+	else if (data == COMMAND_35_RDSR2)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_35_RDSR2\n");
+		m_spi_state = COMMAND_35_RDSR2;
+	}
+	else if (data == COMMAND_50_VSR_WREN)
+	{
+		// TODO: Model the volatile status-register write-enable latch when
+		// software depends on it.  Current users write an already-zero status.
+		LOGMASKED(LOG_SPI, "Accept volatile status register write enable\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
+	else if (data == COMMAND_66_ENABLE_RESET)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to ENABLE_RESET\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
+	else if (data == COMMAND_90_REMS)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to REMS (Read Electronic Manufacturer & Device ID)\n");
+		m_spi_state = COMMAND_90_REMS;
+	}
+	else if (data == COMMAND_99_RESET)
+	{
+		// must be issued after 66
+		LOGMASKED(LOG_SPI, "Set SPI to RESET\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
+	else if (data == COMMAND_AB_RDP)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to RDP (Release from deep power down)\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
+	else if (data == COMMAND_B9_DP)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to DP (deep power down)\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
+	else if (data == COMMAND_EB_4READ)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to 4READ (Quad I/O read with configurable dummy bytes)\n");
+		m_spi_state = COMMAND_EB_4READ;
+	}
+	else if (data == COMMAND_EC_UNKNOWN)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_EC_UNKNOWN\n");
+		m_spi_state = COMMAND_EC_UNKNOWN;
+	}
+	else if (data == COMMAND_FF_CRMR)
+	{
+		LOGMASKED(LOG_SPI, "Set SPI to CRMR (Continuous Read Mode Reset)\n");
+		m_spi_state = READY_FOR_COMMAND;
 	}
 	else
 	{
-		if (m_spi_state == READY_FOR_READ)
+		fatalerror("SPI set to unknown/unhandled command %02x\n", data);
+	}
+
+	m_spi_state_step = 0;
+}
+
+u8 generic_spi_flash_device::next_bitbang_byte() const
+{
+	switch (m_spi_state)
+	{
+	case COMMAND_03_READ:
+		if (m_spi_state_step >= 3 && m_spiptr && m_length)
+			return m_spiptr[m_spi_addr & (m_length - 1)];
+		break;
+
+	case COMMAND_05_RDSR:
+		return m_spi_state_step ? 0x00 : m_spi_statusreg;
+
+	case COMMAND_0B_FAST_READ:
+		if (m_spi_state_step >= 4 && m_spiptr && m_length)
+			return m_spiptr[m_spi_addr & (m_length - 1)];
+		break;
+
+	case COMMAND_15_RDCR:
+		return m_spi_configreg;
+
+	case COMMAND_35_RDSR2:
+		return m_spi_statusreg;
+
+	case COMMAND_9F_RDID:
+		if (m_spi_state_step < std::size(m_idbytes))
+			return m_idbytes[m_spi_state_step];
+		break;
+
+	case COMMAND_EB_4READ:
+		if (m_spi_state_step >= 6 && m_spiptr && m_length)
+			return m_spiptr[m_spi_addr & (m_length - 1)];
+		break;
+	}
+
+	return 0xff;
+}
+
+void generic_spi_flash_device::cs_w(int state)
+{
+	state = state ? 1 : 0;
+	if (m_bitbang_cs == state)
+		return;
+
+	m_bitbang_cs = state;
+	m_spi_state = READY_FOR_COMMAND;
+	m_spi_state_step = 0;
+	m_bitbang_input = 0;
+	m_bitbang_output = 0xff;
+	m_bitbang_bits = 0;
+	m_bitbang_so = 1;
+}
+
+void generic_spi_flash_device::sck_w(int state)
+{
+	state = state ? 1 : 0;
+	if (m_bitbang_sck == state)
+		return;
+
+	if (!m_bitbang_cs)
+	{
+		if (state)
 		{
-			m_spilatch = m_spiptr[(m_spiaddr++) & (m_length-1)];
+			m_bitbang_input = (m_bitbang_input << 1) | m_bitbang_si;
+			if (++m_bitbang_bits == 8)
+				write(m_bitbang_input);
 		}
-		else if (m_spi_state == READY_FOR_STATUS_READ)
+		else if (m_bitbang_bits == 8)
 		{
-			m_spilatch = 0x00;
+			m_bitbang_input = 0;
+			m_bitbang_output = next_bitbang_byte();
+			m_bitbang_bits = 0;
+			m_bitbang_so = BIT(m_bitbang_output, 7);
 		}
 		else
 		{
-			m_spilatch = 0x00;
+			m_bitbang_so = BIT(m_bitbang_output, 7 - m_bitbang_bits);
 		}
+	}
+
+	m_bitbang_sck = state;
+}
+
+void generic_spi_flash_device::si_w(int state)
+{
+	m_bitbang_si = state ? 1 : 0;
+}
+
+int generic_spi_flash_device::so_r() const
+{
+	return m_bitbang_cs ? 1 : m_bitbang_so;
+}
+
+void generic_spi_flash_device::process_read_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		break;
+	case 0x01:
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		break;
+	case 0x02:
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
+		break;
+	default:
+		m_spi_latch = m_spiptr[(m_spi_addr++) & (m_length - 1)];
+		break;
 	}
 }
 
+void generic_spi_flash_device::process_hsread_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		break;
+	case 0x01:
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		break;
+	case 0x02:
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
+		break;
+	case 0x03:
+		/* dummy */  m_spi_state_step++;
+		break;
+	default:
+		m_spi_latch = m_spiptr[(m_spi_addr++) & (m_length - 1)];
+		break;
+	}
+}
 
+// has configurable dummy bytes?
+void generic_spi_flash_device::process_read4_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		break;
+	case 0x01:
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		break;
+	case 0x02:
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
+		break;
+	case 0x03: case 0x04: case 0x05:
+		/* dummy */  m_spi_state_step++;
+		break;
+	default:
+		m_spi_latch = m_spiptr[(m_spi_addr++) & (m_length - 1)];
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_write_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		break;
+	case 0x01:
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		break;
+	case 0x02:
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
+		break;
+	default:
+
+		if (m_spi_statusreg & 0x02)
+		{
+			LOGMASKED(LOG_SPI, "Write SPI data %02x at %08x\n", data, m_spi_addr);
+			m_spiptr[(m_spi_addr++) & (m_length - 1)] = data;
+		}
+		else
+		{
+			LOGMASKED(LOG_SPI, "Write SPI data %02x at %08x (but write protect enabled)\n", data, m_spi_addr);
+		}
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_sector_erase_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		m_spi_addr = (m_spi_addr & 0x00ffff) | (data << 16); m_spi_state_step++;
+		break;
+	case 0x01:
+		m_spi_addr = (m_spi_addr & 0xff00ff) | (data << 8); m_spi_state_step++;
+		break;
+	case 0x02:
+		m_spi_addr = (m_spi_addr & 0xffff00) | (data); m_spi_state_step++;
+		LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spi_addr);
+		break;
+	default:
+		LOGMASKED(LOG_SPI, "unexpected byte %02x when writing sector erase address\n", data);
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_status_write_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		LOGMASKED(LOG_SPI, "status write step 1 (config register)\n");
+		m_spi_configreg = data;
+		if (m_multibyte_status_write != 0)
+			m_spi_state_step++;
+		else
+			m_spi_state = READY_FOR_COMMAND;
+		break;
+
+	case 0x01:
+		LOGMASKED(LOG_SPI, "status write step 2 (status register)\n");
+		m_spi_statusreg = data;
+		m_spi_state = READY_FOR_COMMAND;
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_status_read_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		LOGMASKED(LOG_SPI, "status read step 1\n");
+		m_spi_latch = m_spi_statusreg;
+
+		if (m_multibyte_status_read != 0)
+			m_spi_state_step++;
+		else
+			m_spi_state = READY_FOR_COMMAND;
+		break;
+
+	case 0x01:
+		LOGMASKED(LOG_SPI, "status read step 2\n");
+		m_spi_latch = 0x00;
+		m_spi_state = READY_FOR_COMMAND;
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_config_read_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		LOGMASKED(LOG_SPI, "process_config_read_command\n");
+		m_spi_latch = m_spi_configreg;
+		m_spi_state = READY_FOR_COMMAND;
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_status2_read_command(u8 data)
+{
+	LOGMASKED(LOG_SPI, "status2 read\n");
+	m_spi_latch = m_spi_statusreg;
+	m_spi_state = READY_FOR_COMMAND;
+}
+
+void generic_spi_flash_device::process_status_rems_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		LOGMASKED(LOG_SPI, "REMS step 1\n");
+		m_spi_state_step++;
+		break;
+
+	case 0x01:
+		LOGMASKED(LOG_SPI, "REMS step 2\n");
+		m_spi_state_step++;
+		break;
+
+	case 0x02:
+		LOGMASKED(LOG_SPI, "REMS step 3\n");
+		m_spi_state_step++;
+		break;
+
+	case 0x03:
+		LOGMASKED(LOG_SPI, "REMS step 4\n");
+		m_spi_state_step++;
+		break;
+
+	case 0x04:
+		LOGMASKED(LOG_SPI, "REMS step 5\n");
+		m_spi_state = READY_FOR_COMMAND;
+		break;
+	}
+}
+
+void generic_spi_flash_device::process_status_rdid_command(u8 data)
+{
+	switch (m_spi_state_step)
+	{
+	case 0x00:
+		m_spi_latch = m_idbytes[0];
+		m_spi_state_step++;
+		break;
+
+	case 0x01:
+		m_spi_latch = m_idbytes[1];
+		m_spi_state_step++;
+		break;
+
+	case 0x02:
+		m_spi_latch = m_idbytes[2];
+		//m_spi_state = READY_FOR_COMMAND; // loops on reading the ID?
+		break;
+	}
+}
+
+void generic_spi_flash_device::write(u8 data)
+{
+	// not all commands have extra params/reads
+	switch (m_spi_state)
+	{
+	case READY_FOR_COMMAND:
+		get_command(data);
+		break;
+
+	case COMMAND_01_WRSR:
+		process_status_write_command(data);
+		break;
+
+	case COMMAND_02_PP:
+		process_write_command(data);
+		break;
+
+	case COMMAND_03_READ:
+		process_read_command(data);
+		break;
+
+	case COMMAND_05_RDSR:
+		process_status_read_command(data);
+		break;
+
+	case COMMAND_0B_FAST_READ:
+		process_hsread_command(data);
+		break;
+
+	case COMMAND_11_UNKNOWN:
+		break;
+
+	case COMMAND_15_RDCR:
+		process_config_read_command(data);
+		break;
+
+	case COMMAND_20_SE:
+		process_sector_erase_command(data);
+		break;
+
+	case COMMAND_31_UNKNOWN:
+		break;
+
+	case COMMAND_35_RDSR2:
+		process_status2_read_command(data);
+		break;
+
+	case COMMAND_90_REMS:
+		process_status_rems_command(data);
+		break;
+
+	case COMMAND_9F_RDID:
+		process_status_rdid_command(data);
+		break;
+
+	case COMMAND_EB_4READ:
+		process_read4_command(data);
+		break;
+
+	case COMMAND_EC_UNKNOWN:
+		break;
+	}
+}
 
 void generic_spi_flash_device::nvram_default()
 {
@@ -187,13 +580,12 @@ bool generic_spi_flash_device::nvram_read(util::read_stream &file)
 		return false;
 	}
 
-	size_t actual;
-	return !file.read(m_spiptr, m_length, actual) && actual == m_length;
+	auto const [err, actual] = util::read(file, m_spiptr, m_length);
+	return !err && (actual == m_length);
 }
 
 bool generic_spi_flash_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(m_spiptr, m_length, actual) && actual == m_length;
+	auto const [err, actual] = util::write(file, m_spiptr, m_length);
+	return !err;
 }
-

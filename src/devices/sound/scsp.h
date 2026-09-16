@@ -12,6 +12,7 @@
 #include "scspdsp.h"
 
 #include "dirom.h"
+#include "diserial.h"
 
 
 #define SCSP_FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
@@ -20,7 +21,8 @@
 
 class scsp_device : public device_t,
 	public device_sound_interface,
-	public device_rom_interface<20, 1, 0, ENDIANNESS_BIG>
+	public device_rom_interface<20, 1, 0, ENDIANNESS_BIG>,
+	public device_serial_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; } // DSP / EG incorrections, etc
@@ -29,25 +31,31 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 	auto main_irq_cb() { return m_main_irq_cb.bind(); }
+	auto midi_out_cb() { return m_midi_out_cb.bind(); }
 
 	// SCSP register access
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// MIDI I/O access (used for comms on Model 2/3)
-	void midi_in(u8 data);
-	u16 midi_out_r();
+	void midi_in(int state) { rx_w(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
 	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
+
+	// serial interface overrides
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
 
 private:
 	enum SCSP_STATE { SCSP_ATTACK, SCSP_DECAY1, SCSP_DECAY2, SCSP_RELEASE };
@@ -98,6 +106,7 @@ private:
 
 	devcb_write8       m_irq_cb;  /* irq callback */
 	devcb_write_line   m_main_irq_cb;
+	devcb_write_line   m_midi_out_cb;
 
 	union
 	{
@@ -117,7 +126,12 @@ private:
 	u32 m_IrqTimA;
 	u32 m_IrqTimBC;
 	u32 m_IrqMidi;
+	u32 m_IrqCPU;
+	u32 m_IrqDMA;
 
+	u8 m_latched_MSLC;
+	u16 m_latched_MSLC_data;
+	u8 m_MidiOutStack[32];
 	u8 m_MidiOutW, m_MidiOutR;
 	u8 m_MidiStack[32];
 	u8 m_MidiW, m_MidiR;
@@ -182,7 +196,7 @@ private:
 	void w16(u32 addr, u16 val);
 	u16 r16(u32 addr);
 	inline s32 UpdateSlot(SCSP_SLOT *slot);
-	void DoMasterSamples(std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
+	void DoMasterSamples(sound_stream &stream);
 
 	//LFO
 	void LFO_Init();

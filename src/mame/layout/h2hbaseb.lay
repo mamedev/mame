@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -17,55 +18,18 @@ license:CC0-1.0
 	<element name="static_yellowc"><disk><color red="0.77" green="0.7" blue="0.2" /></disk></element>
 	<element name="static_blue"><rect><color red="0.2" green="0.3" blue="1.0" /></rect></element>
 
-	<element name="text_balls">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="BALLS"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_strikes">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="STRIKES"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_outs">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="OUTS"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_inning">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="INNING"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_score">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="SCOREBOARD"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_away">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="AWAY"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
-	<element name="text_home">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="HOME"><color red="0.9" green="0.9" blue="0.9" /></text>
-	</element>
+	<element name="text_balls"><text string="BALLS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_strikes"><text string="STRIKES"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_outs"><text string="OUTS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_inning"><text string="INNING"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_score"><text string="SCOREBOARD"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_away"><text string="AWAY"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_home"><text string="HOME"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="text_pitcher">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="PITCHER"><color red="0.91" green="0.91" blue="0.91" /></text>
-	</element>
-	<element name="text_b1">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="1st"><color red="0.92" green="0.92" blue="0.92" /></text>
-	</element>
-	<element name="text_b2">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="2nd"><color red="0.92" green="0.92" blue="0.92" /></text>
-	</element>
-	<element name="text_b3">
-		<rect><color red="0.11" green="0.6" blue="0.31" /></rect>
-		<text string="3rd"><color red="0.92" green="0.92" blue="0.92" /></text>
-	</element>
-
-	<element name="text_home2">
-		<text string="HOME"><color red="0.87" green="0.87" blue="0.87" /></text>
-	</element>
+	<element name="text_pitcher"><text string="PITCHER"><color red="0.91" green="0.91" blue="0.91" /></text></element>
+	<element name="text_b1"><text string="1st"><color red="0.92" green="0.92" blue="0.92" /></text></element>
+	<element name="text_b2"><text string="2nd"><color red="0.92" green="0.92" blue="0.92" /></text></element>
+	<element name="text_b3"><text string="3rd"><color red="0.92" green="0.92" blue="0.92" /></text></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="0.2" green="1.0" blue="1.0" /></led7seg>
@@ -85,8 +49,7 @@ license:CC0-1.0
 			<bounds left="-50" right="150" top="-50" bottom="150" />
 		</element>
 
-	<!-- status/score panel -->
-
+		<!-- status/score panel -->
 		<element ref="static_white"><bounds x="12.3" y="6.7" width="54.4" height="35.6" /></element>
 		<element ref="static_green"><bounds x="12.7" y="7.1" width="53.6" height="13.5" /></element>
 		<element ref="static_black"><bounds x="12.7" y="21" width="53.6" height="13.5" /></element>
@@ -137,9 +100,7 @@ license:CC0-1.0
 		<element ref="static_white"><bounds x="30.3" y="6.8" width="0.4" height="28" /></element>
 		<element ref="static_white"><bounds x="36.3" y="6.8" width="0.4" height="35.4" /></element>
 
-
-	<!-- main bezel -->
-
+		<!-- main bezel -->
 		<element ref="static_whitec"><bounds x="0" y="50" width="80" height="80" /></element>
 		<element ref="static_yellowc"><bounds x="1" y="51" width="78" height="78" /></element>
 		<element ref="static_whitec"><bounds x="10.5" y="60.5" width="59" height="59" /></element>
@@ -183,11 +144,9 @@ license:CC0-1.0
 		<element ref="text_b2"><bounds x="37" y="66.5" width="6" height="2.3" /></element>
 		<element ref="text_b3"><bounds x="16.5" y="88.85" width="4" height="2.3" /></element>
 
-		<element ref="text_home2"><bounds x="30" y="124" width="20" height="3.6" /></element>
+		<element ref="text_home"><bounds x="30" y="124" width="20" height="3.6" /></element>
 
-
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="0.8" ref="led"><bounds x="38.3" y="81.3" width="3.4" height="3.4" /></element>
 		<element name="1.8" ref="led"><bounds x="38.3" y="93.3" width="3.4" height="3.4" /></element>
 		<element name="2.8" ref="led"><bounds x="38.3" y="105.3" width="3.4" height="3.4" /></element>
@@ -198,7 +157,6 @@ license:CC0-1.0
 		<element name="6.8" ref="led"><bounds x="70.3" y="88.3" width="3.4" height="3.4" /></element>
 		<element name="7.8" ref="led"><bounds x="38.3" y="56.3" width="3.4" height="3.4" /></element>
 		<element name="8.8" ref="led"><bounds x="6.3" y="88.3" width="3.4" height="3.4" /></element>
-
 
 	</view>
 </mamelayout>

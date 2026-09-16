@@ -20,11 +20,11 @@ public:
 
 	virtual void map_io(address_space_installer &space) override;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<m68000_device> m_cpu;
@@ -40,9 +40,9 @@ private:
 
 	uint32_t m_base_address;
 
-	void m6502_map(address_map &map);
-	void m68k_map(address_map &map);
-	void m68k_cs_map(address_map &map);
+	void m6502_map(address_map &map) ATTR_COLD;
+	void m68k_map(address_map &map) ATTR_COLD;
+	void m68k_cs_map(address_map &map) ATTR_COLD;
 
 	void control_w(u8 data);
 	void enable_w(u8 data);

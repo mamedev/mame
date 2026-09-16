@@ -15,16 +15,16 @@ class s97271p_device : public device_t
 {
 public:
 	// construction/destruction
-	s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s97271p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// daughterboard logic
 	void port_w(uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<samples_device> m_samples;

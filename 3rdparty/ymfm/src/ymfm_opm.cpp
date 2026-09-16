@@ -60,17 +60,17 @@ opm_registers::opm_registers() :
 	{
 		// waveform 0 is a sawtooth
 		uint8_t am = index ^ 0xff;
-		int8_t pm = int8_t(index);
+		uint8_t pm = index;
 		m_lfo_waveform[0][index] = am | (pm << 8);
 
 		// waveform 1 is a square wave
 		am = bitfield(index, 7) ? 0 : 0xff;
-		pm = int8_t(am ^ 0x80);
+		pm = am ^ 0x80;
 		m_lfo_waveform[1][index] = am | (pm << 8);
 
 		// waveform 2 is a triangle wave
 		am = bitfield(index, 7) ? (index << 1) : ((index ^ 0xff) << 1);
-		pm = int8_t(bitfield(index, 6) ? am : ~am);
+		pm = bitfield(index, 6) ? am : ~am;
 		m_lfo_waveform[2][index] = am | (pm << 8);
 
 		// waveform 3 is noise; it is filled in dynamically
@@ -330,7 +330,7 @@ uint32_t opm_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		if (pm_sensitivity < 6)
 			delta += lfo_raw_pm >> (6 - pm_sensitivity);
 		else
-			delta += lfo_raw_pm << (pm_sensitivity - 5);
+			delta += uint32_t(lfo_raw_pm) << (pm_sensitivity - 5);
 	}
 
 	// apply delta and convert to a frequency number
@@ -354,9 +354,9 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	uint32_t opnum = opoffs;
 
 	char buffer[256];
-	char *end = &buffer[0];
+	int end = 0;
 
-	end += sprintf(end, "%u.%02u freq=%04X dt2=%u dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	end += snprintf(&buffer[end], sizeof(buffer) - end, "%u.%02u freq=%04X dt2=%u dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		chnum, opnum,
 		ch_block_freq(choffs),
 		op_detune2(opoffs),
@@ -376,14 +376,14 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 
 	bool am = (lfo_am_depth() != 0 && ch_lfo_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%u/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " am=%u/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
 	bool pm = (lfo_pm_depth() != 0 && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%u/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " pm=%u/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
 	if (am || pm)
-		end += sprintf(end, " lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
 	if (noise_enable() && opoffs == 31)
-		end += sprintf(end, " noise=1");
+		end += snprintf(&buffer[end], sizeof(buffer) - end, " noise=1");
 
 	return buffer;
 }

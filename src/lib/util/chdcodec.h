@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    chdcodec.h
-
     Codecs used by the CHD format
 
 ***************************************************************************/
@@ -89,6 +87,7 @@ public:
 	using ptr = std::unique_ptr<chd_decompressor>;
 
 	// implementation
+	virtual void process(const uint8_t *src, uint32_t complen);
 	virtual void decompress(const uint8_t *src, uint32_t complen, uint8_t *dest, uint32_t destlen) = 0;
 };
 
@@ -104,8 +103,8 @@ public:
 	static chd_decompressor::ptr new_decompressor(chd_codec_type type, chd_file &file);
 
 	// utilities
-	static bool codec_exists(chd_codec_type type);
-	static const char *codec_name(chd_codec_type type);
+	static bool codec_exists(chd_codec_type type) noexcept;
+	static const char *codec_name(chd_codec_type type) noexcept;
 };
 
 
@@ -155,12 +154,14 @@ constexpr chd_codec_type CHD_CODEC_NONE     = 0;
 
 // general codecs
 constexpr chd_codec_type CHD_CODEC_ZLIB     = CHD_MAKE_TAG('z','l','i','b');
+constexpr chd_codec_type CHD_CODEC_ZSTD     = CHD_MAKE_TAG('z','s','t','d');
 constexpr chd_codec_type CHD_CODEC_LZMA     = CHD_MAKE_TAG('l','z','m','a');
 constexpr chd_codec_type CHD_CODEC_HUFFMAN  = CHD_MAKE_TAG('h','u','f','f');
 constexpr chd_codec_type CHD_CODEC_FLAC     = CHD_MAKE_TAG('f','l','a','c');
 
 // general codecs with CD frontend
 constexpr chd_codec_type CHD_CODEC_CD_ZLIB  = CHD_MAKE_TAG('c','d','z','l');
+constexpr chd_codec_type CHD_CODEC_CD_ZSTD  = CHD_MAKE_TAG('c','d','z','s');
 constexpr chd_codec_type CHD_CODEC_CD_LZMA  = CHD_MAKE_TAG('c','d','l','z');
 constexpr chd_codec_type CHD_CODEC_CD_FLAC  = CHD_MAKE_TAG('c','d','f','l');
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Bryan McPhail
-#ifndef MAME_CPU_V32MZ_V30MZ_H
-#define MAME_CPU_V32MZ_V30MZ_H
+#ifndef MAME_CPU_V30MZ_V30MZ_H
+#define MAME_CPU_V30MZ_V30MZ_H
 
 #include "cpu/nec/necdasm.h"
 
@@ -29,13 +29,12 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 80; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -133,10 +132,10 @@ protected:
 	inline void i_popf();
 
 	// sub implementations
-	inline void add_byte();
-	inline void add_word();
-	inline void sub_byte();
-	inline void sub_word();
+	inline void add_byte(uint8_t c = 0);
+	inline void add_word(uint8_t c = 0);
+	inline void sub_byte(uint8_t c = 0);
+	inline void sub_word(uint8_t c = 0);
 	inline void or_byte();
 	inline void or_word();
 	inline void and_byte();
@@ -230,4 +229,4 @@ protected:
 	uint16_t m_debugger_temp;
 };
 
-#endif // MAME_CPU_V32MZ_V30MZ_H
+#endif // MAME_CPU_V30MZ_V30MZ_H

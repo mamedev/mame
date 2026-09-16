@@ -15,7 +15,7 @@ Chou Zetsurinjin Berabowman        (c) 1988 Namco
 Alice In Wonderland / Marchen Maze (c) 1988 Namco
 Bakutotsu Kijuutei                 (c) 1988 Namco
 Pro Tennis World Court             (c) 1988 Namco
-Splatter House                     (c) 1988 Namco
+Splatterhouse                      (c) 1988 Namco
 Face Off                           (c) 1988 Namco
 Rompers                            (c) 1989 Namco
 Blast Off                          (c) 1989 Namco
@@ -196,10 +196,9 @@ Notes:
   RAM is cleared on purpose during boot and there is no default.
 
 - bakutotu:
-  The main and sub processors work closely together and the game
-  quickly runs into trouble when one of them lacks behind. Heavy
-  sync and overclocking will help but there's a particularly nasty
-  loop appearing in more than 40 places of the code:
+  The main and sub processors work closely together and the game quickly runs into
+  trouble when one of them lags behind. Heavy sync and overclocking will help but
+  there's a particularly nasty loop appearing in more than 40 places of the code:
 
   1) kick the watchdog
   2) raise a flag
@@ -317,7 +316,7 @@ Date  Name                                  Key  Screen
  7/88 Marchen Maze / Alice In Wonderland    152  H
  8/88 Bakutotsu Kijuutei / Baraduke 2       155  H
 10/88 Pro Tennis World Court                143  H
-11/88 Splatter House                        181  H
+11/88 Splatterhouse                         181  H
 12/88 Face Off                              C    H
  2/89 Rompers                               182  V
  3/89 Blast Off                             183  V
@@ -353,7 +352,7 @@ void namcos1_state::audiocpu_irq_ack_w(u8 data)
 
 void namcos1_state::mcu_irq_ack_w(u8 data)
 {
-	m_mcu->set_input_line(HD6301_IRQ_LINE, CLEAR_LINE);
+	m_mcu->set_input_line(HD6301_IRQ1_LINE, CLEAR_LINE);
 }
 
 
@@ -382,11 +381,11 @@ void namcos1_state::coin_w(offs_t offset, u8 data, u8 mem_mask)
 void namcos1_state::dac_gain_w(u8 data)
 {
 	/* DAC0 (GAIN0 = bit0, GAIN1 = bit2) */
-	int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);
+	const int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);
 	m_dac[0]->set_output_gain(ALL_OUTPUTS, (dac0_gain + 1) / 4.0f);
 
 	/* DAC1 (GAIN2 = bit3, GAIN3 = bit4) */
-	int dac1_gain = (BIT(data, 4) << 1) | BIT(data, 3);
+	const int dac1_gain = (BIT(data, 4) << 1) | BIT(data, 3);
 	m_dac[1]->set_output_gain(ALL_OUTPUTS, (dac1_gain + 1) / 4.0f);
 }
 
@@ -408,22 +407,24 @@ void namcos1_state::virtual_map(address_map &map)
 	map(0x2e0000, 0x2e7fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
 	map(0x2f0000, 0x2f7fff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram8_r), FUNC(namco_c123tmap_device::videoram8_w));
 	map(0x2f8000, 0x2f9fff).rw(FUNC(namcos1_state::no_key_r), FUNC(namcos1_state::no_key_w));
-	map(0x2fc000, 0x2fcfff).ram().w(FUNC(namcos1_state::spriteram_w)).share("spriteram");
+	map(0x2fc000, 0x2fc7ff).ram().share("scratchpad");
+	map(0x2fc800, 0x2fcfff).m(m_spritegen, FUNC(namcos1_sprite_device::spriteram_map));
 	map(0x2fd000, 0x2fd01f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control8_r), FUNC(namco_c123tmap_device::control8_w)).mirror(0xfe0);
-	map(0x2fe000, 0x2fe3ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
-	map(0x2ff000, 0x2ff7ff).ram().share("triram").mirror(0x800);
+	map(0x2fe000, 0x2fe3ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x2ff000, 0x2ff7ff).ram().share(m_triram).mirror(0x800);
 	map(0x300000, 0x307fff).ram();
-	map(0x400000, 0x7fffff).rom().region("user1", 0);
+	map(0x400000, 0x7fffff).rom().region("mainrom", 0);
 }
 
 
 void namcos1_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("soundbank");   /* Banked ROMs */
+	map(0x0000, 0x3fff).bankr(m_soundbank); /* Banked ROMs */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
-	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0x400); /* PSG ( Shared ) */
-	map(0x7000, 0x77ff).ram().share("triram");
+	map(0x5000, 0x53ff).m("namco", FUNC(namco_cus30_device::amap)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x7000, 0x77ff).ram().share(m_triram).mirror(0x800);
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
+	map(0xa000, 0xa000).nopr();
 	map(0xc000, 0xc001).w(FUNC(namcos1_state::sound_bankswitch_w)); /* ROM bank selector */
 	map(0xd001, 0xd001).w(m_c117, FUNC(namco_c117_device::sound_watchdog_w));
 	map(0xe000, 0xe000).w(FUNC(namcos1_state::audiocpu_irq_ack_w));
@@ -433,19 +434,23 @@ void namcos1_state::sound_map(address_map &map)
 
 void namcos1_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_mcu, FUNC(hd63701v0_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram(); /* built in RAM */
 	map(0x1000, 0x1003).r(FUNC(namcos1_state::dsw_r));
 	map(0x1400, 0x1400).portr("CONTROL0");
 	map(0x1401, 0x1401).portr("CONTROL1");
-	map(0x4000, 0xbfff).bankr("mcubank"); /* banked external ROM */
-	map(0xc000, 0xc7ff).ram().share("triram");
+	map(0x4000, 0xbfff).bankr(m_mcubank); /* banked external ROM */
+	map(0xc000, 0xc7ff).ram().share(m_triram);
 	map(0xc800, 0xcfff).ram().share("nvram"); /* EEPROM */
 	map(0xd000, 0xd000).w(m_dac[0], FUNC(dac_byte_interface::data_w));
 	map(0xd400, 0xd400).w(m_dac[1], FUNC(dac_byte_interface::data_w));
 	map(0xd800, 0xd800).w(FUNC(namcos1_state::mcu_bankswitch_w)); /* ROM bank selector */
 	map(0xf000, 0xf000).w(FUNC(namcos1_state::mcu_irq_ack_w));
-	map(0xf000, 0xffff).rom().region("mcu", 0); /* internal ROM */
+}
+
+
+void quester_state::quester_mcu_map(address_map &map)
+{
+	mcu_map(map);
+	map(0x1400, 0x1401).r(FUNC(quester_state::paddle_r));
 }
 
 
@@ -489,7 +494,7 @@ static INPUT_PORTS_START( ns1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)  // service switch from the edge connector
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)  // service switch from the edge connector
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -991,7 +996,7 @@ static const gfx_layout spritelayout =
 	32*32*4
 };
 
-static GFXDECODE_START( gfx_namcos1 )
+static GFXDECODE_START( gfx_namcos1_spr )
 	GFXDECODE_ENTRY( "sprite", 0, spritelayout, 0x0000, 128 )  /* sprites 32/16/8/4 dots */
 GFXDECODE_END
 
@@ -1021,7 +1026,7 @@ void namcos1_state::ns1(machine_config &config)
 	m_mcu->out_p1_cb().set(FUNC(namcos1_state::coin_w));
 	m_mcu->out_p2_cb().set(FUNC(namcos1_state::dac_gain_w));
 
-	NAMCO_C117(config, m_c117, 0);
+	NAMCO_C117(config, m_c117);
 	m_c117->set_addrmap(AS_PROGRAM, &namcos1_state::virtual_map);
 	m_c117->set_cpu_tags("maincpu", "subcpu");
 	m_c117->subres_cb().set(FUNC(namcos1_state::subres_w));
@@ -1031,49 +1036,57 @@ void namcos1_state::ns1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	LS157(config, m_dsw_sel, 0); // LS257 'A3'
+	LS157(config, m_dsw_sel); // LS257 'A3'
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8);
 	screen.set_screen_update(FUNC(namcos1_state::screen_update));
 	screen.screen_vblank().set(FUNC(namcos1_state::screen_vblank));
 	screen.set_palette(m_c116);
 
-	GFXDECODE(config, m_gfxdecode, m_c116, gfx_namcos1);
-
-	NAMCO_C116(config, m_c116, 0);
+	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	NAMCOS1_SPRITE(config, m_spritegen, XTAL(49'152'000), m_c116, gfx_namcos1_spr);
+	m_spritegen->set_shadow_callback(FUNC(namcos1_state::sprite_shadow_cb));
+	m_spritegen->set_pri_callback(FUNC(namcos1_state::sprite_pri_cb));
+	m_spritegen->set_gfxbank_callback(FUNC(namcos1_state::sprite_bank_cb));
+	m_spritegen->flip_callback().set(FUNC(namcos1_state::flip_screen_set));
+
+	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos1_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(FUNC(namcos1_state::TilemapCB));
 	m_c123tmap->set_color_base(0x0800);
 	m_c123tmap->set_offset(73, 16);
 	m_c123tmap->set_tmap3_half_height();
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	namco_cus30_device &cus30(NAMCO_CUS30(config, "namco", XTAL(49'152'000)/2048/2));
-	cus30.set_voices(8);
-	cus30.set_stereo(1);
-	cus30.add_route(0, "lspeaker", 0.50);
-	cus30.add_route(1, "rspeaker", 0.50);
+	cus30.set_stereo(true);
+	cus30.add_route(0, "speaker", 0.50, 0);
+	cus30.add_route(1, "speaker", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_dac[0], 0); // 10-pin 1Kx8R SIP with HC374 latch
-	m_dac[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_dac[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_dac[0]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_dac[0]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 	DAC_8BIT_R2R(config, m_dac[1], 0); // 10-pin 1Kx8R SIP with HC374 latch
-	m_dac[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_dac[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_dac[1]->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_dac[1]->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+}
+
+void quester_state::quester(machine_config &config)
+{
+	ns1(config);
+	m_mcu->set_addrmap(AS_PROGRAM, &quester_state::quester_mcu_map);
 }
 
 
@@ -1109,7 +1122,7 @@ ROM_START( shadowld )
 	ROM_LOAD( "yd1_s0.bin",         0x00000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
 	ROM_LOAD( "yd1_s1.bin",         0x10000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "yd1_p0.bin",      0x000000, CRC(07e49883) SHA1(b1e720b4d134893d3d9768d3f59162b31488a079) )
 	ROM_LOAD_512( "yd1_p1.bin",      0x080000, CRC(a8ea6bd3) SHA1(d8c34084c90ff9f5627d432359a1c64959372195) )
 	ROM_LOAD_512( "yd1_p2.bin",      0x100000, CRC(62e5bbec) SHA1(748482389a7e49d35d6c566e9d73e3bc4ab0e7c6) )
@@ -1155,7 +1168,7 @@ ROM_START( youkaidk2 )
 	ROM_LOAD( "yd1_s0.bin",         0x00000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
 	ROM_LOAD( "yd1_s1.bin",         0x10000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "yd1_p0.bin",      0x000000, CRC(07e49883) SHA1(b1e720b4d134893d3d9768d3f59162b31488a079) )
 	ROM_LOAD_512( "yd1_p1.bin",      0x080000, CRC(a8ea6bd3) SHA1(d8c34084c90ff9f5627d432359a1c64959372195) )
 	ROM_LOAD_512( "yd1_p2.bin",      0x100000, CRC(62e5bbec) SHA1(748482389a7e49d35d6c566e9d73e3bc4ab0e7c6) )
@@ -1200,7 +1213,7 @@ ROM_START( youkaidk1 )
 	ROM_LOAD( "yd1.sd0",            0x00000, 0x10000, CRC(a9cb51fb) SHA1(c46345b36306d35f73e25d0c8b1af53936927f0b) )
 	ROM_LOAD( "yd1.sd1",            0x10000, 0x10000, CRC(65d1dc0d) SHA1(e758fa5279c1a36c7dad941091694daed13f8b9a) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "yd1_p0.bin",      0x000000, CRC(07e49883) SHA1(b1e720b4d134893d3d9768d3f59162b31488a079) )
 	ROM_LOAD_512( "yd1_p1.bin",      0x080000, CRC(a8ea6bd3) SHA1(d8c34084c90ff9f5627d432359a1c64959372195) )
 	ROM_LOAD_512( "yd1_p2.bin",      0x100000, CRC(62e5bbec) SHA1(748482389a7e49d35d6c566e9d73e3bc4ab0e7c6) )
@@ -1245,7 +1258,7 @@ ROM_START( dspirit )
 	ROM_LOAD( "ds1_s0.bin",         0x00000, 0x10000, CRC(27100065) SHA1(e8fbacaa43a5b858fce2ca3b579b90c1e016396b) )
 	ROM_LOAD( "ds1_s1.bin",         0x10000, 0x10000, CRC(b398645f) SHA1(e83208e2aea7b57b4a26f123a43c112e30495aca) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "ds1_p0.bin",      0x000000, CRC(b22a2856) SHA1(8dea168e341460757c924bb510df4d4e9cdd908d) )
 	ROM_LOAD_512( "ds1_p1.bin",      0x080000, CRC(f7e3298a) SHA1(76c924ed1311e7e292bd67f57c1e831054625bb6) )
 	ROM_LOAD_512( "ds1_p2.bin",      0x100000, CRC(3c9b0100) SHA1(1def48a28b68e1e36cd1a165eb7127b05982c54d) )
@@ -1292,7 +1305,7 @@ ROM_START( dspirit2 )
 	ROM_LOAD( "ds1_s0.bin",         0x00000, 0x10000, CRC(27100065) SHA1(e8fbacaa43a5b858fce2ca3b579b90c1e016396b) )
 	ROM_LOAD( "ds1_s1.bin",         0x10000, 0x10000, CRC(b398645f) SHA1(e83208e2aea7b57b4a26f123a43c112e30495aca) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "ds1_p0.bin",     0x000000, CRC(b22a2856) SHA1(8dea168e341460757c924bb510df4d4e9cdd908d) )
 	ROM_LOAD_512( "ds1_p1.bin",     0x080000, CRC(f7e3298a) SHA1(76c924ed1311e7e292bd67f57c1e831054625bb6) )
 	ROM_LOAD_512( "ds1_p2.bin",     0x100000, CRC(3c9b0100) SHA1(1def48a28b68e1e36cd1a165eb7127b05982c54d) )
@@ -1339,7 +1352,7 @@ ROM_START( dspirit1 )
 	ROM_LOAD( "ds1_s0.bin",         0x00000, 0x10000, CRC(27100065) SHA1(e8fbacaa43a5b858fce2ca3b579b90c1e016396b) )
 	ROM_LOAD( "ds1_s1.bin",         0x10000, 0x10000, CRC(b398645f) SHA1(e83208e2aea7b57b4a26f123a43c112e30495aca) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "ds1_p0.bin",      0x000000, CRC(b22a2856) SHA1(8dea168e341460757c924bb510df4d4e9cdd908d) )
 	ROM_LOAD_512( "ds1_p1.bin",      0x080000, CRC(f7e3298a) SHA1(76c924ed1311e7e292bd67f57c1e831054625bb6) )
 	ROM_LOAD_512( "ds1_p2.bin",      0x100000, CRC(3c9b0100) SHA1(1def48a28b68e1e36cd1a165eb7127b05982c54d) )
@@ -1385,7 +1398,7 @@ ROM_START( blazer )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bz1_s0.bin",         0x00000, 0x10000, CRC(6c3a580b) SHA1(2b76ea0005245e30eb72fba3b044a885e47d588d) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512 ( "bz1_p0.bin",      0x000000, CRC(a7dd195b) SHA1(bd867ca54d25a4045c1f0a2bfd6c673982f88033) )
 	ROM_LOAD_512 ( "bz1_p1.bin",      0x080000, CRC(c54bbbf4) SHA1(82ec5b72203a80b44657bee73d4a7a3e522a86ae) )
 	ROM_LOAD_512 ( "bz1_p2.bin",      0x100000, CRC(5d700aed) SHA1(13ee900e73137dd5f09d54f2ee97faf696b16b8f) )
@@ -1431,7 +1444,7 @@ ROM_START( quester )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "qs1_s0.bin",         0x00000, 0x10000, CRC(c2ef3af9) SHA1(aa0766aad450660e216d817e41e030141e8d1f48) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -1465,7 +1478,7 @@ ROM_START( questers )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "qs1_s0.bin",         0x00000, 0x10000, CRC(c2ef3af9) SHA1(aa0766aad450660e216d817e41e030141e8d1f48) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -1497,109 +1510,109 @@ ROM_END
 /* Pac-Mania */
 ROM_START( pacmania )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "pn2_s0.bin",         0x00000, 0x10000, CRC(c10370fa) SHA1(f819a31075d3c8df5deee2919cd446b9e678c47d) )
-	ROM_LOAD( "pn2_s1.bin",         0x10000, 0x10000, CRC(f761ed5a) SHA1(1487932c86a6094ed01d5032904fd7ae3435d09c) )
+	ROM_LOAD( "pn2_s0.a10", 0x00000, 0x10000, CRC(c10370fa) SHA1(f819a31075d3c8df5deee2919cd446b9e678c47d) ) // silkscreened SOUND0
+	ROM_LOAD( "pn2_s1.b10", 0x10000, 0x10000, CRC(f761ed5a) SHA1(1487932c86a6094ed01d5032904fd7ae3435d09c) ) // silkscreened SOUND1
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) // 4M for ROMs
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
-	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
+	ROM_LOAD_1024( "pn1_p6.s10", 0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) ) // silkscreened PRG6
+	ROM_LOAD_512 ( "pn2_p7.t10", 0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) ) // silkscreened PRG7
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // 63701 MCU with internal ROM code
+	ROM_LOAD( "cus64-64a1.m4", 0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) )
 
-	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
-	ROM_LOAD_HS( "pn2_v0.bin",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
+	ROM_REGION( 0xc0000, "voice", 0 ) // MCU external ROM */
+	ROM_LOAD_HS( "pn2_v0.a4", 0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // silkscreened VOICE0
 
-	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
-	ROM_LOAD( "pn2_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 ) // character mask
+	ROM_LOAD( "pn1_c8.t8", 0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // silkscreened CHR8
 
-	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
-	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
-	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
-	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
-	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+	ROM_REGION( 0x100000, "c123tmap", 0 ) // characters
+	ROM_LOAD( "pn1_c0.a8", 0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) ) // silkscreened CHR0
+	ROM_LOAD( "pn1_c1.b8", 0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) ) // silkscreened CHR1
+	ROM_LOAD( "pn1_c2.e8", 0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) ) // silkscreened CHR2
+	ROM_LOAD( "pn1_c3.f8", 0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) ) // silkscreened CHR3
 
-	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
-	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
-	ROM_LOAD( "pnx_obj1.bin",       0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) )
+	ROM_REGION( 0x100000, "sprite", 0 ) // sprites - PN1 O1 @ B9 for World & Japanese PCBs should match! - which is a bad dump?
+	ROM_LOAD( "pn1_o0.a9", 0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) ) // silkscreened OBJ0
+	ROM_LOAD( "pn1_o1.b9", 0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) ) // silkscreened OBJ1
 ROM_END
 
 // all other roms are MASK roms matching the world set, possible prototype sound roms (handwritten / dated labels)
 ROM_START( pacmaniao )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "pac-mania_111187.sound0",         0x00000, 0x10000, CRC(845d6a2e) SHA1(bd541a5df0cbc0fe7f24fedcecb5b9f52a78d102) ) // different
-	ROM_LOAD( "pac-mania_111187.sound1",         0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // identical to japanese version
+	ROM_LOAD( "pac-mania_111187.sound0", 0x00000, 0x10000, CRC(845d6a2e) SHA1(bd541a5df0cbc0fe7f24fedcecb5b9f52a78d102) ) // unique
+	ROM_LOAD( "pac-mania_111187.sound1", 0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // == pn1_s1.b10 (Japanese version)
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
-	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
+	ROM_LOAD_1024( "pn1_p6.s10", 0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) ) // silkscreened PRG6
+	ROM_LOAD_512 ( "pn2_p7.t10", 0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) ) // silkscreened PRG7
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // 63701 MCU with internal ROM code
+	ROM_LOAD( "cus64-64a1.m4", 0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) )
 
-	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
-	ROM_LOAD_HS( "pac-mania_111187.voice0",      0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // identical to world version
+	ROM_REGION( 0xc0000, "voice", 0 ) // MCU external ROM
+	ROM_LOAD_HS( "pac-mania_111187.voice0", 0x00000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) ) // == pn2_v0.a4 (World version)
 
-	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
-	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // same as the Japanese version
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 ) // character mask
+	ROM_LOAD( "pn1_c8.t8", 0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // silkscreened CHR8
 
-	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
-	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
-	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
-	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
-	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+	ROM_REGION( 0x100000, "c123tmap", 0 ) // characters
+	ROM_LOAD( "pn1_c0.a8", 0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) ) // silkscreened CHR0
+	ROM_LOAD( "pn1_c1.b8", 0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) ) // silkscreened CHR1
+	ROM_LOAD( "pn1_c2.e8", 0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) ) // silkscreened CHR2
+	ROM_LOAD( "pn1_c3.f8", 0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) ) // silkscreened CHR3
 
-	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
-	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
-	ROM_LOAD( "pnx_obj1.bin",       0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) )
+	ROM_REGION( 0x100000, "sprite", 0 ) // sprites - PN1 O1 @ B9 for World & Japanese PCBs should match! - which is a bad dump?
+	ROM_LOAD( "pn1_o0.a9", 0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) ) // silkscreened OBJ0
+	ROM_LOAD( "pn1_o1.b9", 0x20000, 0x20000, CRC(4c08affe) SHA1(f8f60fdc31779e2abe496e36ba0e4f27546cbc54) ) // silkscreened OBJ1
 ROM_END
 
-/* Pac-Mania (Japan) diff o1,s0,s1,p7,v0 */
+/* Pac-Mania (Japan) diff S0, S1, P7, V0 - While O1 is different, it should match the World O1 which has been verified on 2 PCBs */
 ROM_START( pacmaniaj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "pn1_s0.bin",         0x00000, 0x10000, CRC(d5ef5eee) SHA1(6f263955662defe7a03cc89368b70d5fcb06ee3e) )
-	ROM_LOAD( "pn1_s1.bin",         0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) )
+	ROM_LOAD( "pn1_s0.a10", 0x00000, 0x10000, CRC(d5ef5eee) SHA1(6f263955662defe7a03cc89368b70d5fcb06ee3e) ) // silkscreened SOUND0
+	ROM_LOAD( "pn1_s1.b10", 0x10000, 0x10000, CRC(411bc134) SHA1(89960596def3580d19d9121d1efffbba2d1bdd94) ) // silkscreened SOUND1
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) // 4M for ROMs
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
-	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pn1_p7.bin",      0x380000, CRC(2aa99e2b) SHA1(1d5e8ce6eac03696d51b32c1d0f6c3e82f604422) )
+	ROM_LOAD_1024( "pn1_p6.s10", 0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) ) // silkscreened PRG6
+	ROM_LOAD_512 ( "pn1_p7.t10", 0x380000, CRC(2aa99e2b) SHA1(1d5e8ce6eac03696d51b32c1d0f6c3e82f604422) ) // silkscreened PRG7
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
-	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_REGION( 0x1000, "mcu", 0 ) // 63701 MCU with internal ROM code
+	ROM_LOAD( "cus64-64a1.m4", 0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) )
 
-	ROM_REGION( 0xc0000, "voice", 0 )  /* MCU external ROM */
-	ROM_LOAD_HS( "pn1_v0.bin",      0x00000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) )
+	ROM_REGION( 0xc0000, "voice", 0 ) // MCU external ROM
+	ROM_LOAD_HS( "pn1_v0.a4", 0x00000, 0x10000, CRC(e2689f79) SHA1(b88e3435f2932901cc0a3b379b31a764bb9b2e2b) ) // silkscreened VOICE0
 
-	ROM_REGION( 0x20000, "c123tmap:mask", 0 )  /* character mask */
-	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
+	ROM_REGION( 0x20000, "c123tmap:mask", 0 ) // character mask
+	ROM_LOAD( "pn1_c8.t8", 0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) ) // silkscreened CHR8
 
-	ROM_REGION( 0x100000, "c123tmap", 0 ) /* characters */
-	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )
-	ROM_LOAD( "pn_chr-1.bin",       0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) )
-	ROM_LOAD( "pn_chr-2.bin",       0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) )
-	ROM_LOAD( "pn_chr-3.bin",       0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) )
+	ROM_REGION( 0x100000, "c123tmap", 0 ) // characters
+	ROM_LOAD( "pn1_c0.a8", 0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) ) // silkscreened CHR0
+	ROM_LOAD( "pn1_c1.b8", 0x20000, 0x20000, CRC(7eaa67ed) SHA1(4ad6cfa31d781fa7169663bbc319fc79d8965290) ) // silkscreened CHR1
+	ROM_LOAD( "pn1_c2.e8", 0x40000, 0x20000, CRC(27e739ac) SHA1(be9dbd22d988b76f7044328e2056c3f26b703401) ) // silkscreened CHR2
+	ROM_LOAD( "pn1_c3.f8", 0x60000, 0x20000, CRC(1dfda293) SHA1(fa01b0b8a820c1d24ff0f84b857d2784f0dac1cf) ) // silkscreened CHR3
 
-	ROM_REGION( 0x100000, "sprite", 0 ) /* sprites */
-	ROM_LOAD( "pn_obj-0.bin",       0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) )
-	ROM_LOAD( "pn_obj-1.bin",       0x20000, 0x20000, CRC(27bdf440) SHA1(0be16dc73590eb71090e6a0e6ddd6e7f4f3dbfba) )
+	ROM_REGION( 0x100000, "sprite", 0 ) // sprites - PN1 O1 @ B9 for World & Japanese PCBs should match! - which is a bad dump?
+	ROM_LOAD( "pn1_o0.a9", 0x00000, 0x20000, CRC(fda57e8b) SHA1(16a72585268159d24f881dbb1aa6ae82bcc4bde7) ) // silkscreened OBJ0
+	ROM_LOAD( "pnx_o1.b9", 0x20000, 0x20000, CRC(27bdf440) SHA1(0be16dc73590eb71090e6a0e6ddd6e7f4f3dbfba) ) // silkscreened OBJ1
 ROM_END
 
 /* Galaga '88 */
@@ -1608,7 +1621,7 @@ ROM_START( galaga88 )
 	ROM_LOAD( "g81_s0.bin",         0x00000, 0x10000, CRC(164a3fdc) SHA1(d7b026f6a617bb444e3bce80cec2cbb4772cb533) )
 	ROM_LOAD( "g81_s1.bin",         0x10000, 0x10000, CRC(16a4b784) SHA1(a0d6f6ad4a68c9e10f2662e940ffaee691cafcac) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "g81_p0.bin",      0x000000, CRC(0f0778ca) SHA1(17cc03c6ff138cf947dafe05dc0759ff968a399e) )
 	ROM_LOAD_512( "g81_p1.bin",      0x080000, CRC(e68cb351) SHA1(1087c0d9a53f3a4d238f19d479856b502bde7b77) )
 	/* 100000-17ffff empty */
@@ -1653,7 +1666,7 @@ ROM_START( galaga88j )
 	ROM_LOAD( "g81_s0.bin",         0x00000, 0x10000, CRC(164a3fdc) SHA1(d7b026f6a617bb444e3bce80cec2cbb4772cb533) )
 	ROM_LOAD( "g81_s1.bin",         0x10000, 0x10000, CRC(16a4b784) SHA1(a0d6f6ad4a68c9e10f2662e940ffaee691cafcac) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "g81_p0.bin",      0x000000, CRC(0f0778ca) SHA1(17cc03c6ff138cf947dafe05dc0759ff968a399e) )
 	ROM_LOAD_512( "g81_p1.bin",      0x080000, CRC(e68cb351) SHA1(1087c0d9a53f3a4d238f19d479856b502bde7b77) )
 	/* 100000-17ffff empty */
@@ -1698,7 +1711,7 @@ ROM_START( galaga88a )
 	ROM_LOAD( "g81_s0.bin",         0x00000, 0x10000, CRC(164a3fdc) SHA1(d7b026f6a617bb444e3bce80cec2cbb4772cb533) )  // 12-11-87
 	ROM_LOAD( "g81_s1.bin",         0x10000, 0x10000, CRC(16a4b784) SHA1(a0d6f6ad4a68c9e10f2662e940ffaee691cafcac) )  // 11-12-87 - mistake?
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "g81_p0.bin",      0x000000, CRC(0f0778ca) SHA1(17cc03c6ff138cf947dafe05dc0759ff968a399e) )  // 12-11-87
 	ROM_LOAD_512( "g81_p1.bin",      0x080000, CRC(e68cb351) SHA1(1087c0d9a53f3a4d238f19d479856b502bde7b77) )  // 12-11-87
 	/* 100000-17ffff empty */
@@ -1744,7 +1757,7 @@ ROM_START( ws )
 	ROM_LOAD( "ws1_snd0.bin",       0x00000, 0x10000, CRC(45a87810) SHA1(b6537500cc6e862d97074f636248446d6fae5d07) )
 	ROM_LOAD( "ws1_snd1.bin",       0x10000, 0x10000, CRC(31bf74c1) SHA1(ddb7a91d6f3ae93be79914a435178a540fe05bfb) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "ws1_prg0.bin",    0x000000, CRC(b0234298) SHA1(b46a70109801d85332fb6658426bd795e03f492a) )
 	ROM_LOAD_512( "ws1_prg1.bin",    0x080000, CRC(dfd72bed) SHA1(5985e7112cb994b016b0027a933413d7edeba1f6) )
 	ROM_LOAD_512( "ws1_prg2.bin",    0x100000, CRC(bb09fa9b) SHA1(af5223daee89cf55dceb838d2f812efd74d21d23) )
@@ -1784,7 +1797,7 @@ ROM_START( berabohm )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "bm1_p0.bin",      0x000000, CRC(b57ff8c1) SHA1(8169c95e83ada1016eb070aa6b4b99b153656615) )
 	ROM_LOAD_1024( "bm1_p1.bin",      0x080000, CRC(b15f6407) SHA1(7d24510a663c8c647fe52f413c580dbbd08d0ddc) )
 	/* 100000-17ffff empty */
@@ -1829,7 +1842,7 @@ ROM_START( berabohmb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "bm1_p0.bin",      0x000000, CRC(b57ff8c1) SHA1(8169c95e83ada1016eb070aa6b4b99b153656615) )
 	ROM_LOAD_1024( "bm1_p1.bin",      0x080000, CRC(b15f6407) SHA1(7d24510a663c8c647fe52f413c580dbbd08d0ddc) )
 	/* 100000-17ffff empty */
@@ -1875,7 +1888,7 @@ ROM_START( mmaze )
 	ROM_LOAD( "mm_snd-0.bin",       0x00000, 0x10000, CRC(25d25e07) SHA1(b2293bfc380fd767ac2a51e8b32e24bbea866be2) )
 	ROM_LOAD( "mm_snd-1.bin",       0x10000, 0x10000, CRC(2c5849c8) SHA1(1073719c9f4d4e41cbfd7c749bff42a0be460baf) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "mm_prg-0.bin",    0x000000, CRC(e169a911) SHA1(0537536f5278a9e7ebad03b55d9904ccbac7b3b6) )
 	ROM_LOAD_1024( "mm_prg-1.bin",    0x080000, CRC(6ba14e41) SHA1(54d53a5653eb943210f519c85d190482957b3533) )
 	ROM_LOAD_1024( "mm_prg-2.bin",    0x100000, CRC(91bde09f) SHA1(d7f6f644f526e36b6fd930d80f78ad1aa646fdfb) )
@@ -1918,7 +1931,7 @@ ROM_START( mmaze2 )
 	ROM_LOAD( "mm_snd-0.bin",       0x00000, 0x10000, CRC(25d25e07) SHA1(b2293bfc380fd767ac2a51e8b32e24bbea866be2) )
 	ROM_LOAD( "mm_snd-1.bin",       0x10000, 0x10000, CRC(2c5849c8) SHA1(1073719c9f4d4e41cbfd7c749bff42a0be460baf) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "mm_prg-0.bin",    0x000000, CRC(e169a911) SHA1(0537536f5278a9e7ebad03b55d9904ccbac7b3b6) )
 	ROM_LOAD_1024( "mm_prg-1.bin",    0x080000, CRC(6ba14e41) SHA1(54d53a5653eb943210f519c85d190482957b3533) )
 	ROM_LOAD_1024( "mm_prg-2.bin",    0x100000, CRC(91bde09f) SHA1(d7f6f644f526e36b6fd930d80f78ad1aa646fdfb) )
@@ -1961,7 +1974,7 @@ ROM_START( bakutotu )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bk1_s0.bin",         0x00000, 0x10000, CRC(c35d7df6) SHA1(9ea534fc700581171536ad1df60263d31e7239a6) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "bk_prg-0.bin",    0x000000, CRC(4529c362) SHA1(beae2119fb6a5752885766fb5fba9c4fac5dd38f) )
 	ROM_LOAD_512 ( "bk1_p1.bin",      0x080000, CRC(d389d6d4) SHA1(04502f1670d96fb4c2369ca2f05edfd3181d63cf) )
 	ROM_LOAD_512 ( "bk1_p2.bin",      0x100000, CRC(7a686daa) SHA1(1313603f12e06eb2384bf156aee1bfb40e8fa39c) )
@@ -2005,7 +2018,7 @@ ROM_START( wldcourt )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "wc1_snd0.bin",       0x00000, 0x10000, CRC(17a6505d) SHA1(773636173947a656c3b5a21049c28eedc40e4654) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2039,7 +2052,7 @@ ROM_START( wldcourt )
 ROM_END
 
 /*
-Splatter House
+Splatterhouse
 Namco, 1988
 
 This game runs on Namco System 1 hardware
@@ -2098,7 +2111,7 @@ Notes:
 
       Namco Custom ICs -
                         123 (QFP80)
-                        181 (DIP28, KEYCUS, Splatter House)
+                        181 (DIP28, KEYCUS, Splatterhouse)
                         64A1 (DIP40, 63701 MCU)
 
 
@@ -2166,7 +2179,7 @@ ROM_START( splatter )
 	ROM_LOAD( "sh1_snd0b.bin",      0x00000, 0x10000, CRC(03b47a5c) SHA1(6fc1cb95347880d0fcadac4d5c2a46734211afc4) )
 	ROM_LOAD( "sh1_snd1.bin",       0x10000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "sh1_prg0.bin",    0x000000, CRC(4e07e6d9) SHA1(9bca8aca0041c311c403cf3b9a2365d704b39769) )
 	ROM_LOAD_512( "sh1_prg1.bin",    0x080000, CRC(7a3efe09) SHA1(2271356be580e29cf70dbb70f797fb3c49666ada) )
 	ROM_LOAD_512( "sh1_prg2.bin",    0x100000, CRC(434dbe7d) SHA1(40bb1d4ed8e6563f98732501e212d7324c714af2) )
@@ -2212,7 +2225,7 @@ ROM_START( splatter2 )
 	ROM_LOAD( "sh1_snd0.bin",       0x00000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
 	ROM_LOAD( "sh1_snd1.bin",       0x10000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "sh1_prg0.bin",    0x000000, CRC(4e07e6d9) SHA1(9bca8aca0041c311c403cf3b9a2365d704b39769) )
 	ROM_LOAD_512( "sh1_prg1.bin",    0x080000, CRC(7a3efe09) SHA1(2271356be580e29cf70dbb70f797fb3c49666ada) )
 	ROM_LOAD_512( "sh1_prg2.bin",    0x100000, CRC(434dbe7d) SHA1(40bb1d4ed8e6563f98732501e212d7324c714af2) )
@@ -2258,7 +2271,7 @@ ROM_START( splatterj )
 	ROM_LOAD( "sh1_snd0.bin",       0x00000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
 	ROM_LOAD( "sh1_snd1.bin",       0x10000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "sh1_prg0.bin",    0x000000, CRC(4e07e6d9) SHA1(9bca8aca0041c311c403cf3b9a2365d704b39769) )
 	ROM_LOAD_512( "sh1_prg1.bin",    0x080000, CRC(7a3efe09) SHA1(2271356be580e29cf70dbb70f797fb3c49666ada) )
 	ROM_LOAD_512( "sh1_prg2.bin",    0x100000, CRC(434dbe7d) SHA1(40bb1d4ed8e6563f98732501e212d7324c714af2) )
@@ -2304,7 +2317,7 @@ ROM_START( faceoff )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "fo1_s0.bin",         0x00000, 0x10000, CRC(9a00d97d) SHA1(f1dcad7b6c9adcdce720d7b336d9c34f37975b31) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2343,7 +2356,7 @@ ROM_START( rompers )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "rp1_snd0.bin",       0x00000, 0x10000, CRC(c7c8d649) SHA1(a60a58b4fc8e3f65e4e686b51fd2c17c9d74c444) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2383,7 +2396,7 @@ ROM_START( romperso )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "rp1_snd0.bin",       0x00000, 0x10000, CRC(c7c8d649) SHA1(a60a58b4fc8e3f65e4e686b51fd2c17c9d74c444) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2424,7 +2437,7 @@ ROM_START( blastoff )
 	ROM_LOAD( "bo1-snd0.bin",       0x00000, 0x10000, CRC(2ecab76e) SHA1(592f1f9ac06cea81517ad0ab7d2fd65bccf6a8d8) )
 	ROM_LOAD( "bo1-snd1.bin",       0x10000, 0x10000, CRC(048a6af1) SHA1(97b839c7c92053b1058f4c91fc5b6e398ee73045) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2468,7 +2481,7 @@ ROM_START( ws89 )
 	ROM_LOAD( "w91_snd0.bin",       0x00000, 0x10000, CRC(52b84d5a) SHA1(efe7921a565faa42793d581868aa3fa634d81103) )
 	ROM_LOAD( "ws1_snd1.bin",       0x10000, 0x10000, CRC(31bf74c1) SHA1(ddb7a91d6f3ae93be79914a435178a540fe05bfb) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "ws1_prg0.bin",    0x000000, CRC(b0234298) SHA1(b46a70109801d85332fb6658426bd795e03f492a) )
 	ROM_LOAD_512( "w91_prg1.bin",    0x080000, CRC(7ad8768f) SHA1(7698b005e2c371266f390b8e0992666c822577d0) )
 	ROM_LOAD_512( "w91_prg2.bin",    0x100000, CRC(522e5441) SHA1(e8448aabf3527e268b7b0722825be36978d32cf4) )
@@ -2508,7 +2521,7 @@ ROM_START( dangseed )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "dr1_snd0.bin",       0x00000, 0x20000, CRC(bcbbb21d) SHA1(0ec3e43b94733af69c0a68fd6f5ce5cda916aef7) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2548,7 +2561,7 @@ ROM_START( ws90 )
 	ROM_LOAD( "w91_snd0.bin",       0x00000, 0x10000, CRC(52b84d5a) SHA1(efe7921a565faa42793d581868aa3fa634d81103) )
 	ROM_LOAD( "ws1_snd1.bin",       0x10000, 0x10000, CRC(31bf74c1) SHA1(ddb7a91d6f3ae93be79914a435178a540fe05bfb) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "ws1_prg0.bin",    0x000000, CRC(b0234298) SHA1(b46a70109801d85332fb6658426bd795e03f492a) )
 	ROM_LOAD_512( "w91_prg1.bin",    0x080000, CRC(7ad8768f) SHA1(7698b005e2c371266f390b8e0992666c822577d0) )
 	ROM_LOAD_512( "w901prg2.bin",    0x100000, CRC(b9e98e2f) SHA1(65750e5c5073d35aa7c68b769afcfc3da7213041) )
@@ -2588,7 +2601,7 @@ ROM_START( pistoldm )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "pd1_snd0.bin",       0x00000, 0x20000, CRC(026da54e) SHA1(ffd710c57e59184b93eff864730123e672a0089d) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "pd1_prg0.bin",       0x000000, CRC(9db9b89c) SHA1(30eeaec74454e8401ce16aeb85613448984b6eac) )
 	/* 080000-0fffff empty */
 	/* 100000-17ffff empty */
@@ -2631,7 +2644,7 @@ ROM_START( boxyboy )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "sb1_snd0.bin",       0x00000, 0x10000, CRC(bf46a106) SHA1(cbc95759902c45869346973860cf27792860f781) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "sb1_prg0.bin",    0x000000, CRC(8af8cb73) SHA1(7c89ca0383e601a48d2f83449b2faf7b66a7a94d) )
 	ROM_LOAD_1024( "sb1_prg1.bin",    0x080000, CRC(5d1fdd94) SHA1(df1f1f33df3041c7eb46dc9287427785c7264c2a) )
 	/* 100000-17ffff empty */
@@ -2665,7 +2678,7 @@ ROM_START( boxyboya )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "sb1_snd0.bin",       0x00000, 0x10000, CRC(bf46a106) SHA1(cbc95759902c45869346973860cf27792860f781) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "sb1_prg0.bin",    0x000000, CRC(8af8cb73) SHA1(7c89ca0383e601a48d2f83449b2faf7b66a7a94d) )
 	ROM_LOAD_1024( "sb1_prg1.bin",    0x080000, CRC(5d1fdd94) SHA1(df1f1f33df3041c7eb46dc9287427785c7264c2a) )
 	/* 100000-17ffff empty */
@@ -2699,7 +2712,7 @@ ROM_START( soukobdx )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "sb1_snd0.bin",       0x00000, 0x10000, CRC(bf46a106) SHA1(cbc95759902c45869346973860cf27792860f781) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "sb1_prg0.bin",    0x000000, CRC(8af8cb73) SHA1(7c89ca0383e601a48d2f83449b2faf7b66a7a94d) )
 	ROM_LOAD_1024( "sb1_prg1.bin",    0x080000, CRC(5d1fdd94) SHA1(df1f1f33df3041c7eb46dc9287427785c7264c2a) )
 	/* 100000-17ffff empty */
@@ -2733,7 +2746,7 @@ ROM_START( puzlclub )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "pc1_s0.bin",         0x00000, 0x10000, CRC(44737c02) SHA1(bcacfed1c3522d6ecddd3ac79ded620e5334df35) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_512( "pc1_p0.bin",      0x000000, CRC(2db477c8) SHA1(4f34750b08a72d1a46fe5caa56ee1209fde4accd) )
 	ROM_LOAD_512( "pc1_p1.bin",      0x080000, CRC(dfd9108a) SHA1(07d246d50cdb5bc2c75490d21f87a60fbf559e72) )
 	/* 100000-17ffff empty */
@@ -2772,7 +2785,7 @@ ROM_START( tankfrce )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "tf1_snd0.bin",       0x00000, 0x20000, CRC(4d9cf7aa) SHA1(de51b9b36e9a530a7f3c35672ec72c19b607af04) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "tf1_prg0.bin",       0x000000, CRC(2ae4b9eb) SHA1(569d2754398b4276cf78a3dd038b5884778dc82e) )
 	ROM_LOAD_1024( "tf1_prg1.bin",       0x080000, CRC(4a8bb251) SHA1(1df46ccf0ad7260398b7965e3825e936ba357062) )
 	/* 100000-17ffff empty */
@@ -2810,7 +2823,7 @@ ROM_START( tankfrce4 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "tf1_snd0.bin",       0x00000, 0x20000, CRC(4d9cf7aa) SHA1(de51b9b36e9a530a7f3c35672ec72c19b607af04) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "tf1_prg0.bin",       0x000000, CRC(2ae4b9eb) SHA1(569d2754398b4276cf78a3dd038b5884778dc82e) )
 	ROM_LOAD_1024( "tf1_prg1.bin",       0x080000, CRC(4a8bb251) SHA1(1df46ccf0ad7260398b7965e3825e936ba357062) )
 	/* 100000-17ffff empty */
@@ -2848,7 +2861,7 @@ ROM_START( tankfrcej )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "tf1_snd0.bin",       0x00000, 0x20000, CRC(4d9cf7aa) SHA1(de51b9b36e9a530a7f3c35672ec72c19b607af04) )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_REGION( 0x400000, "mainrom", 0 ) /* 4M for ROMs */
 	ROM_LOAD_1024( "tf1_prg0.bin",       0x000000, CRC(2ae4b9eb) SHA1(569d2754398b4276cf78a3dd038b5884778dc82e) )
 	ROM_LOAD_1024( "tf1_prg1.bin",       0x080000, CRC(4a8bb251) SHA1(1df46ccf0ad7260398b7965e3825e936ba357062) )
 	/* 100000-17ffff empty */
@@ -2890,8 +2903,8 @@ GAME( 1987, dspirit,   0,        ns1,     dspirit,  namcos1_state, init_dspirit,
 GAME( 1987, dspirit2,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (DS2)", MACHINE_SUPPORTS_SAVE ) /* Atari had rights to US market */
 GAME( 1987, dspirit1,  dspirit,  ns1,     dspirit,  namcos1_state, init_dspirit,  ROT90,  "Namco", "Dragon Spirit (old version (DS1))", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, blazer,    0,        ns1,     ns1,      namcos1_state, init_blazer,   ROT90,  "Namco", "Blazer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, quester,   0,        ns1,     quester,  namcos1_state, init_quester,  ROT90,  "Namco", "Quester (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, questers,  quester,  ns1,     quester,  namcos1_state, init_quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, quester,   0,        quester, quester,  quester_state, init_quester,  ROT90,  "Namco", "Quester (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, questers,  quester,  quester, quester,  quester_state, init_quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pacmania,  0,        ns1,     pacmania, namcos1_state, init_pacmania, ROT270, "Namco", "Pac-Mania", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pacmaniao, pacmania, ns1,     pacmania, namcos1_state, init_pacmania, ROT270, "Namco", "Pac-Mania (111187 sound program)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, init_pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2905,9 +2918,9 @@ GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,  
 GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "Pro Tennis World Court (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatterhouse (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, init_faceoff,  ROT180, "Namco", "Face Off (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )

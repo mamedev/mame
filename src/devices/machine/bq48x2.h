@@ -59,7 +59,7 @@ protected:
 	bool nvram_read(util::read_stream &file) override;
 	bool nvram_write(util::write_stream &file) override;
 
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 
 	void set_watchdog_timer();
 
@@ -121,13 +121,13 @@ private:
 class bq4842_device : public bq48x2_device
 {
 public:
-	bq4842_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bq4842_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class bq4852_device : public bq48x2_device
 {
 public:
-	bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bq4852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(BQ4842, bq4842_device)

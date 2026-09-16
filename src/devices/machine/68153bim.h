@@ -45,11 +45,11 @@ class bim68153_channel : public device_t
 	friend class bim68153_device;
 
 public:
-	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bim68153_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// read register handlers
 	uint8_t do_bimreg_control_r();
@@ -102,7 +102,7 @@ class bim68153_device : public device_t
 
 public:
 	// construction/destruction
-	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	bim68153_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	u16 iack(int irqline);
 	int acknowledge();
@@ -136,9 +136,9 @@ protected:
 	bim68153_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void trigger_interrupt(int ch);
 	int get_channel_index(bim68153_channel *ch);

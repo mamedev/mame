@@ -12,7 +12,7 @@ class arm_aic_device : public device_t
 {
 public:
 	// construction/destruction
-	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	arm_aic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) :
 		device_t(mconfig, ARM_AIC, tag, owner, clock),
 		m_irq_out(*this)
 	{
@@ -20,13 +20,13 @@ public:
 
 	auto irq_callback() { return m_irq_out.bind(); }
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 	void set_irq(int line, int state);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint32_t m_irqs_enabled;

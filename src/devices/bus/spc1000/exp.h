@@ -46,7 +46,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_spc1000_card_interface* m_card;
 };

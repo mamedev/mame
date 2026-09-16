@@ -12,11 +12,11 @@
 
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/mc68681.h"
+#include "machine/mb8421.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
-#include "machine/mc68681.h"
-#include "machine/mb87078.h"
-#include "machine/mb8421.h"
+#include "sound/mb87077.h"
 
 class taito_en_device : public device_t, public device_mixer_interface
 
@@ -24,7 +24,7 @@ class taito_en_device : public device_t, public device_mixer_interface
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	m68000_device &audiocpu() { return *m_audiocpu; }
 
@@ -32,14 +32,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void en_sound_map(address_map &map);
-	void en_otis_map(address_map &map);
-	void fc7_map(address_map &map);
+	void en_sound_map(address_map &map) ATTR_COLD;
+	void en_otis_map(address_map &map) ATTR_COLD;
+	void fc7_map(address_map &map) ATTR_COLD;
 
 	// inherited devices/pointers
 	required_device<m68000_device> m_audiocpu;

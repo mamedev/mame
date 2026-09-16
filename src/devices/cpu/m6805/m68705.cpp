@@ -6,7 +6,7 @@
  *
  * TODO
  *   - INT2 and miscellaneous register
- *   - A/D peripheral
+ *   - improve A/D peripheral
  *   - SPI peripheral
  *   - multiple timer variants
  */
@@ -24,15 +24,17 @@
 #define LOG_IOPORT  (1U << 2)
 #define LOG_TIMER   (1U << 3)
 #define LOG_EPROM   (1U << 4)
+#define LOG_AD      (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM)
-//#define LOG_OUTPUT_FUNC printf
+//#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM | LOG_AD)
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGINT(...)     LOGMASKED(LOG_INT,    __VA_ARGS__)
 #define LOGIOPORT(...)  LOGMASKED(LOG_IOPORT, __VA_ARGS__)
 #define LOGTIMER(...)   LOGMASKED(LOG_TIMER,  __VA_ARGS__)
 #define LOGEPROM(...)   LOGMASKED(LOG_EPROM,  __VA_ARGS__)
+#define LOGAD(...)      LOGMASKED(LOG_AD,     __VA_ARGS__)
 
 
 namespace {
@@ -120,6 +122,8 @@ DEFINE_DEVICE_TYPE(M6805U2, m6805u2_device, "m6805u2", "Motorola MC6805U2")
 DEFINE_DEVICE_TYPE(M6805U3, m6805u3_device, "m6805u3", "Motorola MC6805U3")
 DEFINE_DEVICE_TYPE(HD6805S1, hd6805s1_device, "hd6805s1", "Hitachi HD6805S1")
 DEFINE_DEVICE_TYPE(HD6805U1, hd6805u1_device, "hd6805u1", "Hitachi HD6805U1")
+
+DEFINE_DEVICE_TYPE(M146805E2, m146805e2_device, "m146805e2", "Motorola MC146805E2")
 
 /****************************************************************************
  * M68705 base device
@@ -213,8 +217,8 @@ Ux Parts:
 
 */
 
-m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
-	: m6805_base_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_hmos_b_ops : s_hmos_s_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, address_map_constructor(FUNC(m6805_hmos_device::map), this))
+m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, configuration_params const &params, unsigned ram_size)
+	: m6805_base_device(mconfig, tag, owner, clock, type, params, address_map_constructor(FUNC(m6805_hmos_device::map), this))
 	, m_timer(*this)
 	, m_port_open_drain{ false, false, false, false }
 	, m_port_mask{ 0x00, 0x00, 0x00, 0x00 }
@@ -223,7 +227,13 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 	, m_port_ddr{ 0x00, 0x00, 0x00, 0x00 }
 	, m_port_cb_r(*this, 0xff)
 	, m_port_cb_w(*this)
+	, m_portan_cb_r(*this, 0xff)
 	, m_ram_size(ram_size)
+{
+}
+
+m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
+	: m6805_hmos_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_hmos_b_ops : s_hmos_s_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, ram_size)
 {
 }
 
@@ -237,6 +247,12 @@ m68705_device::m68705_device(machine_config const &mconfig, char const *tag, dev
 	, m_pl_addr(0xffff)
 {
 }
+
+m146805_device::m146805_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
+	: m6805_hmos_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_cmos_b_ops : s_cmos_s_ops, s_cmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, ram_size)
+{
+}
+
 
 template <offs_t B> u8 m68705_device::eprom_r(offs_t offset)
 {
@@ -319,7 +335,7 @@ template <std::size_t N> void m6805_hmos_device::port_ddr_w(u8 data)
 
 template <std::size_t N> void m6805_hmos_device::port_cb_w()
 {
-	u8 const data(m_port_open_drain[N] ? m_port_latch[N] | ~m_port_ddr[N] : m_port_latch[N]);
+	u8 const data(m_port_open_drain[N] ? (m_port_latch[N] | ~m_port_ddr[N]) : m_port_latch[N]);
 	u8 const mask(m_port_open_drain[N] ? (~m_port_latch[N] & m_port_ddr[N]) : m_port_ddr[N]);
 	m_port_cb_w[N](0, data, mask);
 }
@@ -359,8 +375,7 @@ void m68705_device::pcr_w(u8 data)
 
 u8 m6805_hmos_device::acr_r()
 {
-	logerror("unsupported read ACR\n");
-	return 0xff;
+	return m_acr_mux | 0x80 | 0x78;
 }
 
 void m6805_hmos_device::acr_w(u8 data)
@@ -388,18 +403,27 @@ void m6805_hmos_device::acr_w(u8 data)
 	// on completion, ACR7 is set, result is placed in ARR, and new conversion starts
 	// writing to ACR aborts current conversion, clears ACR7, and starts new conversion
 
-	logerror("unsupported write ACR = %02X\n", data);
+	m_acr_mux = data & 7;
+	LOGAD("write ACR MUX = %d\n", m_acr_mux);
 }
 
 u8 m6805_hmos_device::arr_r()
 {
-	logerror("unsupported read ARR\n");
-	return 0xff;
+	if (m_acr_mux < 4)
+	{
+		u8 val = m_portan_cb_r[m_acr_mux]();
+		LOGAD("read ARR AN%d = %02X\n", m_acr_mux, val);
+		return val;
+	}
+	else
+	{
+		logerror("unsupported read ARR VR, MUX = %d\n", m_acr_mux);
+		return 0xff;
+	}
 }
 
 void m6805_hmos_device::arr_w(u8 data)
 {
-	logerror("unsupported write ARR = %02X\n", data);
 }
 
 void m6805_hmos_device::device_start()
@@ -409,6 +433,8 @@ void m6805_hmos_device::device_start()
 	save_item(NAME(m_port_input));
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_ddr));
+	save_item(NAME(m_acr_mux));
+	save_item(NAME(m_mr));
 
 	// initialise digital I/O
 	for (u8 &input : m_port_input) input = 0xff;
@@ -420,6 +446,10 @@ void m6805_hmos_device::device_start()
 	add_port_ddr_state<0>();
 	add_port_ddr_state<1>();
 	add_port_ddr_state<2>();
+
+	// initialise misc
+	m_acr_mux = 0;
+	m_mr = 0;
 
 	m_timer.start(M6805_PS);
 }
@@ -535,14 +565,14 @@ void m68705_device::nvram_default()
 
 bool m68705_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	return !file.read(&m_user_rom[0], m_user_rom.bytes(), actual) && actual == m_user_rom.bytes();
+	auto const [err, actual] = read(file, &m_user_rom[0], m_user_rom.bytes());
+	return !err && (actual == m_user_rom.bytes());
 }
 
 bool m68705_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	return !file.write(&m_user_rom[0], m_user_rom.bytes(), actual) && actual == m_user_rom.bytes();
+	auto const [err, actual] = write(file, &m_user_rom[0], m_user_rom.bytes());
+	return !err;
 }
 
 void m6805_hmos_device::interrupt()
@@ -711,8 +741,6 @@ m68705r_device::m68705r_device(machine_config const &mconfig, char const *tag, d
 void m68705r_device::device_start()
 {
 	m68705u_device::device_start();
-
-	// TODO: ADC
 }
 
 std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()
@@ -866,20 +894,34 @@ hd6805u1_device::hd6805u1_device(machine_config const &mconfig, char const *tag,
 	m_timer.set_options(m6805_timer::TIMER_PGM | m6805_timer::TIMER_NPC);
 }
 
+m146805e2_device::m146805e2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: m146805_device(mconfig, tag, owner, clock, M146805E2, 13, 112)
+{
+	m_timer.set_options(m6805_timer::TIMER_PGM);
+
+	set_port_mask<2>(0xff); // Port C isn't present
+	set_port_mask<3>(0xff); // Port D isn't present
+}
+
 void m6805_hmos_device::internal_map(address_map &map)
 {
 	map.unmap_value_high();
 
 	map(0x0000, 0x0000).rw(FUNC(m6805_hmos_device::port_r<0>), FUNC(m6805_hmos_device::port_latch_w<0>));
 	map(0x0001, 0x0001).rw(FUNC(m6805_hmos_device::port_r<1>), FUNC(m6805_hmos_device::port_latch_w<1>));
-	map(0x0002, 0x0002).rw(FUNC(m6805_hmos_device::port_r<2>), FUNC(m6805_hmos_device::port_latch_w<2>));
 
 	map(0x0004, 0x0004).w(FUNC(m6805_hmos_device::port_ddr_w<0>));
 	map(0x0005, 0x0005).w(FUNC(m6805_hmos_device::port_ddr_w<1>));
-	map(0x0006, 0x0006).w(FUNC(m6805_hmos_device::port_ddr_w<2>));
 
 	map(0x0008, 0x0008).lrw8(NAME([this]() { return m_timer.tdr_r(); }), NAME([this](u8 data) { m_timer.tdr_w(data); }));
 	map(0x0009, 0x0009).lrw8(NAME([this]() { return m_timer.tcr_r(); }), NAME([this](u8 data) { m_timer.tcr_w(data); }));
+
+	// M146805Ex devices don't have Port C or D
+	if (m_port_mask[2] != 0xff)
+	{
+		map(0x0002, 0x0002).rw(FUNC(m6805_hmos_device::port_r<2>), FUNC(m6805_hmos_device::port_latch_w<2>));
+		map(0x0006, 0x0006).w(FUNC(m6805_hmos_device::port_ddr_w<2>));
+	}
 
 	// M68?05Px devices don't have Port D or the Miscellaneous register
 	if (m_port_mask[3] != 0xff)
@@ -930,7 +972,7 @@ void m6805_mrom_device::internal_map(address_map &map)
 
 void m6805r2_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::internal_map(map);
+	m6805_mrom_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m6805r2_device::acr_r), FUNC(m6805r2_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m6805r2_device::arr_r), FUNC(m6805r2_device::arr_w));
@@ -938,7 +980,7 @@ void m6805r2_device::internal_map(address_map &map)
 
 void m6805r3_device::internal_map(address_map &map)
 {
-	m6805_hmos_device::internal_map(map);
+	m6805_mrom_device::internal_map(map);
 
 	map(0x000e, 0x000e).rw(FUNC(m6805r3_device::acr_r), FUNC(m6805r3_device::acr_w));
 	map(0x000f, 0x000f).rw(FUNC(m6805r3_device::arr_r), FUNC(m6805r3_device::arr_w));

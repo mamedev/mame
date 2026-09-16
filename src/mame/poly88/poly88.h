@@ -39,8 +39,8 @@ public:
 	void poly8813(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	bool is_onboard(offs_t offset);
@@ -60,12 +60,12 @@ private:
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	void s100_mem(address_map &map);
-	void s100_io(address_map &map);
-	void poly88_mem(address_map &map);
-	void poly88_io(address_map &map);
-	void poly8813_mem(address_map &map);
-	void poly8813_io(address_map &map);
+	void s100_mem(address_map &map) ATTR_COLD;
+	void s100_io(address_map &map) ATTR_COLD;
+	void poly88_mem(address_map &map) ATTR_COLD;
+	void poly88_io(address_map &map) ATTR_COLD;
+	void poly8813_mem(address_map &map) ATTR_COLD;
+	void poly8813_io(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_onboard_io;

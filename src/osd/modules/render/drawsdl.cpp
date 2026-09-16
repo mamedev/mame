@@ -14,7 +14,7 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL)
+#if defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 // from specific OSD implementation
 #include "sdlopts.h"
@@ -126,13 +126,13 @@ private:
 
 // YUV overlays
 
-static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
-static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
-static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
-static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height);
 
 //============================================================
@@ -274,7 +274,7 @@ int renderer_sdl1::create()
 	m_blittimer = 0;
 
 	yuv_init();
-	osd_printf_verbose("Leave renderer_sdl2::create\n");
+	osd_printf_verbose("Leave renderer_sdl1::create\n");
 	return 0;
 }
 
@@ -552,7 +552,7 @@ void renderer_sdl1::yuv_init()
 
 //uint32_t *lookup = sdl->m_yuv_lookup;
 
-static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	int x, y;
@@ -606,7 +606,7 @@ static void yuv_RGB_to_YV12(const uint16_t *bitmap, uint8_t *ptr, const int pitc
 	}
 }
 
-static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	/* this one is used when scale==2 */
@@ -641,7 +641,7 @@ static void yuv_RGB_to_YV12X2(const uint16_t *bitmap, uint8_t *ptr, const int pi
 	}
 }
 
-static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	/* this one is used when scale==2 */
@@ -667,7 +667,7 @@ static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitc
 	}
 }
 
-static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
+static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch,
 		const uint32_t *lookup, const int width, const int height)
 {
 	/* this one is used when scale==2 */
@@ -777,12 +777,10 @@ sdl_scale_mode const video_sdl1::s_scale_modes[] = {
 
 } // namespace osd
 
-
-#else // defined(OSD_SDL)
+#else // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl1, OSD_RENDERER_PROVIDER, "soft") } }
 
-#endif // defined(OSD_SDL)
-
+#endif // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 MODULE_DEFINITION(RENDERER_SDL1, osd::video_sdl1)

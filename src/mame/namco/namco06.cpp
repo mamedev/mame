@@ -200,7 +200,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 	}
 	else
 	{
-		// NMI is cleared immediately if this is a read
+		// NMI is cleared immediately if this is a read.
 		// It will be suppressed the next clock cycle.
 		if (BIT(m_control, 4))
 		{
@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::ctrl_w_sync )
 		uint8_t divisor = 1 << num_shifts;
 		attotime period = attotime::from_hz(clock() / divisor) / 2;
 
-		// Delay to the next falling clock edge
+		// Delay to the next falling clock edge.
 		attotime now = machine().time();
 		u64 total_ticks = now.as_ticks(clock());
 		attotime delay = attotime::from_ticks(total_ticks + 1, clock()) - now;
@@ -229,7 +229,7 @@ void namco_06xx_device::set_nmi(int state)
 {
 	if (!m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		m_nmicpu->set_input_line(INPUT_LINE_NMI, state);
+		m_nmicpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

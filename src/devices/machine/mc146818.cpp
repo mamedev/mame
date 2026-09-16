@@ -12,7 +12,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "machine/mc146818.h"
+#include "mc146818.h"
 
 #include "coreutil.h"
 
@@ -56,22 +56,22 @@ ds1397_device::ds1397_device(const machine_config &mconfig, const char *tag, dev
 }
 
 mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_nvram_interface(mconfig, *this),
-		device_rtc_interface(mconfig, *this),
-		m_region(*this, DEVICE_SELF),
-		m_index(0),
-		m_clock_timer(nullptr),
-		m_update_timer(nullptr),
-		m_periodic_timer(nullptr),
-		m_write_irq(*this),
-		m_write_sqw(*this),
-		m_century_index(-1),
-		m_epoch(0),
-		m_binary(false),
-		m_hour(false),
-		m_sqw_state(false),
-		m_tuc(0)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
+	, m_region(*this, DEVICE_SELF)
+	, m_index(0)
+	, m_clock_timer(nullptr)
+	, m_update_timer(nullptr)
+	, m_periodic_timer(nullptr)
+	, m_write_irq(*this)
+	, m_write_sqw(*this)
+	, m_century_index(-1)
+	, m_epoch(0)
+	, m_binary(false)
+	, m_hour(false)
+	, m_sqw_state(false)
+	, m_tuc(0)
 {
 }
 
@@ -256,6 +256,7 @@ void mc146818_device::nvram_default()
 			bytes = data_size();
 
 		memcpy(&m_data[0], m_region->base(), bytes);
+		m_data[REG_D] |= REG_D_VRT;
 	}
 	else
 	{
@@ -279,10 +280,12 @@ void mc146818_device::nvram_default()
 
 bool mc146818_device::nvram_read(util::read_stream &file)
 {
-	size_t size = data_size();
-	size_t actual;
-	if (file.read(&m_data[0], size, actual) || actual != size)
+	size_t const size = data_size();
+	auto const [err, actual] = read(file, &m_data[0], size);
+	if (err || (actual != size))
 		return false;
+
+	m_data[REG_D] |= REG_D_VRT;
 
 	update_timer();
 	update_irq();
@@ -298,9 +301,9 @@ bool mc146818_device::nvram_read(util::read_stream &file)
 
 bool mc146818_device::nvram_write(util::write_stream &file)
 {
-	size_t size = data_size();
-	size_t actual;
-	return !file.write(&m_data[0], size, actual) && actual == size;
+	size_t const size = data_size();
+	auto const [err, actual] = write(file, &m_data[0], size);
+	return !err;
 }
 
 
@@ -663,8 +666,9 @@ uint8_t mc146818_device::internal_read(offs_t offset)
 		break;
 
 	case REG_D:
-		/* battery ok */
-		data = m_data[REG_D] | REG_D_VRT;
+		data = m_data[REG_D];
+		// valid RAM and time
+		m_data[REG_D] |= REG_D_VRT;
 		break;
 
 	default:

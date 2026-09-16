@@ -33,7 +33,7 @@ public:
 	auto baud_w()                             { return m_baud_w.bind(); }
 	auto kout_w()                             { return m_kout_w.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	uint32_t registers_r(offs_t offset, uint32_t mem_mask = ~0);
 	void registers_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -58,8 +58,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_serial_interface implementation
 	virtual void tra_callback() override;

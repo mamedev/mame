@@ -8,12 +8,14 @@
 #include "xbox_nv2a.h"
 #include "xbox_usb.h"
 
+#include "machine/idectrl.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ds128x.h"
 #include "machine/am9517a.h"
+
+#include "cpu/dsp563xx/dsp56362.h"
 
 /*
  * Host
@@ -28,14 +30,21 @@ public:
 		set_ids_host(0x10de02a5, 0, 0);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: nv2a_host_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag))
+	{
+		set_ids_host(0x10de02a5, 0, 0);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 			uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<device_memory_interface> cpu;
@@ -54,15 +63,15 @@ public:
 	{
 		ram_size = memory_size;
 	}
-	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	uint32_t config_register_r();
 	void config_register_w(uint32_t data);
@@ -105,7 +114,7 @@ public:
 class mcpx_isalpc_device : public pci_device, public lpcbus_host_interface {
 public:
 	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_dma_space(T &&bmtag, int bmspace) { m_dma_space.set_tag(std::forward<T>(bmtag), bmspace); }
 	template <bool R> void set_dma_space(const address_space_finder<R> &finder) { m_dma_space.set_tag(finder); }
 
@@ -171,9 +180,9 @@ public:
 	void dma2_dack3_w(int state) { set_dma_channel(7, state); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
@@ -184,8 +193,8 @@ protected:
 	void pit8254_out2_changed(int state);
 
 private:
-	void internal_io_map(address_map &map);
-	void lpc_io(address_map &map);
+	void internal_io_map(address_map &map) ATTR_COLD;
+	void lpc_io(address_map &map) ATTR_COLD;
 	void update_smi_line();
 	void speaker_set_spkrdata(uint8_t data);
 
@@ -239,7 +248,7 @@ public:
 class mcpx_smbus_device : public pci_device {
 public:
 	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
@@ -249,10 +258,10 @@ public:
 	void smbus1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	devcb_write_line m_interrupt_handler;
@@ -266,13 +275,11 @@ private:
 		smbus_interface *devices[128];
 		uint32_t words[256 / 4];
 	} smbusst[2];
-	void smbus_io0(address_map &map);
-	void smbus_io1(address_map &map);
-	void smbus_io2(address_map &map);
+	void smbus_io0(address_map &map) ATTR_COLD;
+	void smbus_io1(address_map &map) ATTR_COLD;
+	void smbus_io2(address_map &map) ATTR_COLD;
 	uint32_t smbus_read(int bus, offs_t offset, uint32_t mem_mask);
 	void smbus_write(int bus, offs_t offset, uint32_t data, uint32_t mem_mask);
-	uint8_t minimum_grant_r() { return 3; }
-	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
@@ -284,7 +291,7 @@ class usb_function_device;
 class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
 	void plug_usb_device(int port, device_usb_ohci_function_interface *function);
 
@@ -294,11 +301,11 @@ public:
 	void ohci_w(offs_t offset, uint32_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(usb_update);
 
@@ -308,14 +315,12 @@ private:
 	emu_timer *timer;
 	required_device<cpu_device> maincpu;
 	std::function<void(void)> hack_callback;
-	void ohci_mmio(address_map &map);
+	void ohci_mmio(address_map &map) ATTR_COLD;
 	struct dev_t {
 		device_usb_ohci_function_interface *dev;
 		int port;
 	} connecteds[4];
 	int connecteds_count;
-	uint8_t minimum_grant_r() { return 3; }
-	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
@@ -326,7 +331,7 @@ DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
 
 class mcpx_eth_device : public pci_device {
 public:
-	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t eth_r();
 	void eth_w(uint32_t data);
@@ -334,12 +339,12 @@ public:
 	void eth_io_w(uint32_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void eth_mmio(address_map &map);
-	void eth_io(address_map &map);
+	void eth_mmio(address_map &map) ATTR_COLD;
+	void eth_io(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MCPX_ETH, mcpx_eth_device)
@@ -357,27 +362,33 @@ public:
 		set_ids(0x10de01b0, 0xc2, 0x040100, subsystem_id);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 
 	uint32_t apu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void apu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void config_map(address_map &map) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(audio_update);
 
 private:
+	required_device<dsp56362_device> gpdsp; // global processor
+	required_device<dsp56362_device> epdsp; // encode processor
 	required_device<device_memory_interface> cpu;
 	// APU contains 3 dsps: voice processor (VP) global processor (GP) encode processor (EP)
 	struct apu_state {
 		uint32_t memory[0x60000 / 4]{};
 		uint32_t gpdsp_sgaddress = 0; // global processor scatter-gather
 		uint32_t gpdsp_sgblocks = 0;
+		uint32_t gpdsp_sgaddress2 = 0;
+		uint32_t gpdsp_sgblocks2 = 0;
 		uint32_t gpdsp_address = 0;
 		uint32_t epdsp_sgaddress = 0; // encoder processor scatter-gather
 		uint32_t epdsp_sgblocks = 0;
@@ -385,7 +396,7 @@ private:
 		uint32_t epdsp_sgblocks2 = 0;
 		int voice_number = 0;
 		uint32_t voices_heap_blockaddr[1024]{};
-		uint64_t voices_active[4]{}; //one bit for each voice: 1 playing 0 not
+		uint64_t voices_active[4]{}; // one bit for each voice: 1 playing 0 not
 		uint32_t voicedata_address = 0;
 		int voices_frequency[256]{}; // sample rate
 		int voices_position[256]{}; // position in samples * 1000
@@ -395,21 +406,21 @@ private:
 		emu_timer *timer = nullptr;
 		address_space *space = nullptr;
 	} apust;
-	void apu_mmio(address_map &map);
-	uint8_t minimum_grant_r() { return 1; }
-	uint8_t maximum_latency_r() { return 0xc; }
+	void apu_mmio(address_map &map) ATTR_COLD;
+	void p_map(address_map &map) ATTR_COLD;
+	uint32_t program_memory_r(offs_t offset);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
 
 /*
- * AC97 Audio Controller
+ * AC'97 Audio Controller
  */
 
 class mcpx_ac97_audio_device : public pci_device {
 public:
 	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t ac97_audio_r(offs_t offset, uint32_t mem_mask = ~0);
 	void ac97_audio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -419,21 +430,19 @@ public:
 	void ac97_audio_io1_w(uint32_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	struct ac97_state {
 		uint32_t mixer_regs[0x84 / 4];
 		uint32_t controller_regs[0x40 / 4];
 	} ac97st;
-	void ac97_mmio(address_map &map);
-	void ac97_io0(address_map &map);
-	void ac97_io1(address_map &map);
-	uint8_t minimum_grant_r() { return 2; }
-	uint8_t maximum_latency_r() { return 5; }
+	void ac97_mmio(address_map &map) ATTR_COLD;
+	void ac97_io0(address_map &map) ATTR_COLD;
+	void ac97_io1(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device)
@@ -444,7 +453,7 @@ DECLARE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device)
 
 class mcpx_ac97_modem_device : public pci_device {
 public:
-	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 DECLARE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device)
@@ -456,7 +465,7 @@ DECLARE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device)
 class mcpx_ide_device : public pci_device {
 public:
 	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id);
-	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_bus_master_space(T &&bmtag, int bmspace)
 	{
 		m_pri.lookup()->set_bus_master_space(bmtag, bmspace);
@@ -478,28 +487,26 @@ public:
 	void sec_write_cs1_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<bus_master_ide_controller_device> m_pri;
 	required_device<bus_master_ide_controller_device> m_sec;
 	devcb_write_line m_pri_interrupt_handler;
 	devcb_write_line m_sec_interrupt_handler;
-	void ide_pri_command(address_map &map);
-	void ide_pri_control(address_map &map);
-	void ide_sec_command(address_map &map);
-	void ide_sec_control(address_map &map);
-	void ide_io(address_map &map);
+	void ide_pri_command(address_map &map) ATTR_COLD;
+	void ide_pri_control(address_map &map) ATTR_COLD;
+	void ide_sec_command(address_map &map) ATTR_COLD;
+	void ide_sec_control(address_map &map) ATTR_COLD;
+	void ide_io(address_map &map) ATTR_COLD;
 	void ide_pri_interrupt(int state);
 	void ide_sec_interrupt(int state);
-	uint8_t minimum_grant_r() { return 3; }
-	uint8_t maximum_latency_r() { return 1; }
 };
 
 DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)
@@ -516,7 +523,7 @@ public:
 	{
 		set_ids_bridge(main_id, revision);
 	}
-	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void config_map(address_map& map) override;
 
@@ -524,8 +531,8 @@ public:
 	void unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(NV2A_AGP, nv2a_agp_device)
@@ -542,7 +549,13 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
-	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: nv2a_gpu_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag))
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+	nv2a_gpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 	nv2a_renderer *debug_get_renderer() { return nvidia_nv2a; }
 
@@ -554,16 +567,16 @@ public:
 	void nv2a_mirror_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	nv2a_renderer *nvidia_nv2a;
 	required_device<device_memory_interface> cpu;
 	devcb_write_line m_interrupt_handler;
 	address_space *m_program;
-	void nv2a_mmio(address_map &map);
-	void nv2a_mirror(address_map &map);
+	void nv2a_mmio(address_map &map) ATTR_COLD;
+	void nv2a_mirror(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(NV2A_GPU, nv2a_gpu_device)

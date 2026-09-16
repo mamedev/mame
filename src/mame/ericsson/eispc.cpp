@@ -122,7 +122,7 @@ public:
 		, m_lpt(*this, "lpt")
 		, m_kbd8251(*this, "kbd8251")
 		, m_keyboard(*this, "keyboard")
-		, m_leds(*this, "kbled%u")
+		, m_leds(*this, "kbled%u", 0U)
 		, m_pic8259(*this, "pic8259")
 		, m_pit8253(*this, "pit8253")
 		, m_speaker(*this, "speaker")
@@ -136,8 +136,8 @@ public:
 
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i8086_cpu_device> m_maincpu;
@@ -204,8 +204,8 @@ private:
 	bool m_pc4;
 	bool m_pc5;
 
-	void epc_map(address_map &map);
-	void epc_io(address_map &map);
+	void epc_map(address_map &map) ATTR_COLD;
+	void epc_io(address_map &map) ATTR_COLD;
 
 	// FDC
 	void check_fdc_irq();
@@ -492,8 +492,6 @@ void epc_state::machine_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
-
-	m_leds.resolve();
 }
 
 void epc_state::machine_reset()
@@ -911,6 +909,7 @@ void epc_state::epc(machine_config &config)
 		}
 	});
 
+	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, m_isabus, epc_isa8_cards, "epc_mda", false);
 	ISA8_SLOT(config, "isa2", 0, m_isabus, epc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, epc_isa8_cards, nullptr, false);

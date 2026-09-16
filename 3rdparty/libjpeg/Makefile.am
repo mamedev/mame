@@ -30,20 +30,22 @@ DISTMANS= cjpeg.1 djpeg.1 jpegtran.1 rdjpgcom.1 wrjpgcom.1
 
 # Other documentation files
 DOCS= README install.txt usage.txt wizard.txt example.c libjpeg.txt \
-        structure.txt coderules.txt filelist.txt change.log
+        structure.txt coderules.txt filelist.txt cdaltui.txt change.log
 
 # Makefiles for various systems
 MKFILES= configure Makefile.in makefile.ansi makefile.unix makefile.b32 \
         makefile.bcc makefile.mc6 makefile.dj makefile.wat makefile.vc \
-        makejdsw.vc6 makeadsw.vc6 makejdep.vc6 makejdsp.vc6 makejmak.vc6 \
-        makecdep.vc6 makecdsp.vc6 makecmak.vc6 makeddep.vc6 makeddsp.vc6 \
-        makedmak.vc6 maketdep.vc6 maketdsp.vc6 maketmak.vc6 makerdep.vc6 \
-        makerdsp.vc6 makermak.vc6 makewdep.vc6 makewdsp.vc6 makewmak.vc6 \
-        makejsln.v10 makeasln.v10 makejvcx.v10 makejfil.v10 makecvcx.v10 \
-        makecfil.v10 makedvcx.v10 makedfil.v10 maketvcx.v10 maketfil.v10 \
-        makervcx.v10 makerfil.v10 makewvcx.v10 makewfil.v10 makeproj.mac \
-        makcjpeg.st makdjpeg.st makljpeg.st maktjpeg.st makefile.manx \
-        makefile.sas makefile.mms makefile.vms makvms.opt
+        makefile.vs makejdsw.vc6 makeadsw.vc6 makejdep.vc6 makejdsp.vc6 \
+        makejmak.vc6 makecdep.vc6 makecdsp.vc6 makecmak.vc6 makeddep.vc6 \
+        makeddsp.vc6 makedmak.vc6 maketdep.vc6 maketdsp.vc6 maketmak.vc6 \
+        makerdep.vc6 makerdsp.vc6 makermak.vc6 makewdep.vc6 makewdsp.vc6 \
+        makewmak.vc6 makejsln.v16 makeasln.v16 makejvcx.v16 makejfil.v16 \
+        makecvcx.v16 makecfil.v16 makedvcx.v16 makedfil.v16 maketvcx.v16 \
+        maketfil.v16 makervcx.v16 makerfil.v16 makewvcx.v16 makewfil.v16 \
+        makejvcx.v17 makecvcx.v17 makedvcx.v17 maketvcx.v17 makervcx.v17 \
+        makewvcx.v17 makeproj.mac makcjpeg.st makdjpeg.st makljpeg.st \
+        maktjpeg.st makefile.manx makefile.sas makefile.mms makefile.vms \
+        makvms.opt
 
 # Configuration files
 CONFIGFILES= jconfig.cfg jconfig.bcc jconfig.mc6 jconfig.dj jconfig.wat \
@@ -55,11 +57,12 @@ CONFIGUREFILES= config.guess config.sub install-sh ltmain.sh depcomp \
         missing ar-lib
 
 # Miscellaneous support files
-OTHERFILES= jconfig.txt ckconfig.c jmemdosa.asm libjpeg.map
+OTHERFILES= jconfig.txt ckconfig.c jmemdosa.asm libjpeg.map libjpeg.pc.in \
+        cjpegalt.c djpegalt.c
 
 # Test support files
-TESTFILES= testorig.jpg testimg.ppm testimg.bmp testimg.jpg testprog.jpg \
-        testimgp.jpg
+TESTFILES= testorig.jpg testimg.ppm testimg.gif testimg.bmp testimg.jpg \
+        testprog.jpg testimgp.jpg
 
 # libtool libraries to build
 lib_LTLIBRARIES = libjpeg.la
@@ -103,9 +106,13 @@ noinst_HEADERS = $(OTHERINCLUDES)
 EXTRA_DIST =  $(DOCS) $(DISTMANS) $(MKFILES) $(CONFIGFILES) $(SYSDEPSOURCES) \
         $(OTHERFILES) $(TESTFILES)
 
+# pkg-config file
+pkgconfigdir = $(libdir)/pkgconfig
+nodist_pkgconfig_DATA = libjpeg.pc
+
 # Files to be cleaned
-CLEANFILES = testout.ppm testout.bmp testout.jpg testoutp.ppm testoutp.jpg \
-        testoutt.jpg
+CLEANFILES = testout.ppm testout.gif testout.bmp testout.jpg testoutp.ppm \
+        testoutp.jpg testoutt.jpg
 
 # Install jconfig.h
 install-data-local:
@@ -120,13 +127,15 @@ uninstall-local:
 test: check-local
 check-local:
 	rm -f testout*
-	./djpeg -dct int -ppm -outfile testout.ppm  $(srcdir)/testorig.jpg
-	./djpeg -dct int -bmp -colors 256 -outfile testout.bmp  $(srcdir)/testorig.jpg
-	./cjpeg -dct int -outfile testout.jpg  $(srcdir)/testimg.ppm
+	./djpeg -dct int -ppm -outfile testout.ppm $(srcdir)/testorig.jpg
+	./djpeg -dct int -gif -outfile testout.gif $(srcdir)/testorig.jpg
+	./djpeg -dct int -bmp -colors 256 -outfile testout.bmp $(srcdir)/testorig.jpg
+	./cjpeg -dct int -outfile testout.jpg $(srcdir)/testimg.ppm
 	./djpeg -dct int -ppm -outfile testoutp.ppm $(srcdir)/testprog.jpg
 	./cjpeg -dct int -progressive -opt -outfile testoutp.jpg $(srcdir)/testimg.ppm
 	./jpegtran -outfile testoutt.jpg $(srcdir)/testprog.jpg
 	cmp $(srcdir)/testimg.ppm testout.ppm
+	cmp $(srcdir)/testimg.gif testout.gif
 	cmp $(srcdir)/testimg.bmp testout.bmp
 	cmp $(srcdir)/testimg.jpg testout.jpg
 	cmp $(srcdir)/testimg.ppm testoutp.ppm

@@ -26,16 +26,15 @@
 #include "xbox_pci.h"
 
 #include "bus/ata/atadev.h"
+#include "bus/isa/isa.h"
+#include "bus/pci/virge_pci.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/athlon.h"
-#include "machine/pci-ide.h"
 #include "machine/pckeybrd.h"
-#include "bus/isa/isa.h"
-#include "video/virge_pci.h"
 
 #include "formats/naslite_dsk.h"
 
@@ -97,8 +96,7 @@ void crush11_host_device::device_start()
 {
 	pci_host_device::device_start();
 	set_multifunction_device(true);
-	memory_space = &cpu->space(AS_DATA);
-	io_space = &cpu->space(AS_IO);
+	set_spaces(&cpu->space(AS_DATA), &cpu->space(AS_IO));
 
 	memory_window_start = 0;
 	memory_window_end = 0xffffffff;
@@ -1091,14 +1089,14 @@ public:
 	nforcepc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 private:
-	void nforce_map(address_map &map);
-	void nforce_map_io(address_map &map);
+	void nforce_map(address_map &map) ATTR_COLD;
+	void nforce_map_io(address_map &map) ATTR_COLD;
 	void boot_state_award_w(uint8_t data);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void maincpu_interrupt(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mcpx_isalpc_device> isalpc;
@@ -1197,8 +1195,8 @@ void nforcepc_state::nforcepc(machine_config &config)
 	maincpu.set_irq_acknowledge_callback(FUNC(nforcepc_state::irq_callback));
 	//maincpu.smiact().set("pci:01.0", FUNC(???_host_device::smi_act_w));
 
-	PCI_ROOT(config, "pci", 0);
-	CRUSH11(config, "pci:00.0", 0, "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
+	PCI_ROOT(config, "pci");
+	CRUSH11(config, "pci:00.0", "maincpu", "bios"); // 10de:01a4 NVIDIA Corporation nForce CPU bridge
 	CRUSH11_MEMORY(config, "pci:00.1", 0, 0x10430c11, 2); // 10de:01ac NVIDIA Corporation nForce 220/420 Memory Controller
 	// 10de:01ad NVIDIA Corporation nForce 220/420 Memory Controller
 	// 10de:01ab NVIDIA Corporation nForce 420 Memory Controller (DDR)
@@ -1207,7 +1205,7 @@ void nforcepc_state::nforcepc(machine_config &config)
 	isa.boot_state_hook().set(FUNC(nforcepc_state::boot_state_award_w));
 	isa.interrupt_output().set(FUNC(nforcepc_state::maincpu_interrupt));
 	isa.set_dma_space("maincpu", AS_OPCODES);
-	it8703f_device &ite(IT8703F(config, "pci:01.0:0", 0));
+	it8703f_device &ite(IT8703F(config, "pci:01.0:0"));
 	ite.pin_reset().set_inputline("maincpu", INPUT_LINE_RESET);
 	ite.pin_gatea20().set_inputline("maincpu", INPUT_LINE_A20);
 	ite.txd1().set("serport0", FUNC(rs232_port_device::write_txd));
@@ -1217,17 +1215,17 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ite.ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
 	ite.nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
 	MCPX_SMBUS(config, "pci:01.1", 0, 0x10430c11); // 10de:01b4 NVIDIA Corporation nForce PCI System Management (SMBus)
-	SMBUS_ROM(config, "pci:01.1:050", 0, test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
-	SMBUS_LOGGER(config, "pci:01.1:051", 0);
-	SMBUS_LOGGER(config, "pci:01.1:052", 0);
-	SMBUS_LOGGER(config, "pci:01.1:108", 0); // these 4 are on smbus number 1
-	AS99127F(config, "pci:01.1:12d", 0);
-	AS99127F_SENSOR2(config, "pci:01.1:148", 0);
-	AS99127F_SENSOR3(config, "pci:01.1:149", 0);
+	SMBUS_ROM(config, "pci:01.1:050", test_spd_data, sizeof(test_spd_data)); // these 3 are on smbus number 0
+	SMBUS_LOGGER(config, "pci:01.1:051");
+	SMBUS_LOGGER(config, "pci:01.1:052");
+	SMBUS_LOGGER(config, "pci:01.1:108"); // these 4 are on smbus number 1
+	AS99127F(config, "pci:01.1:12d");
+	AS99127F_SENSOR2(config, "pci:01.1:148");
+	AS99127F_SENSOR3(config, "pci:01.1:149");
 	mcpx_ohci_device &ohci(MCPX_OHCI(config, "pci:02.0", 0, 0x10430c11)); // 10de:01c2 NVIDIA Corporation nForce USB Controller
 	ohci.interrupt_handler().set("pci:01.0", FUNC(mcpx_isalpc_device::irq1));
 	MCPX_OHCI(config, "pci:03.0", 0, 0x10430c11); // 10de:01c2 NVIDIA Corporation nForce USB Controller
-	MCPX_ETH(config, "pci:04.0", 0); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
+	MCPX_ETH(config, "pci:04.0"); // 10de:01c3 NVIDIA Corporation nForce Ethernet Controller
 	MCPX_APU(config, "pci:05.0", 0, 0x10430c11, m_maincpu); // 10de:01b0 NVIDIA Corporation nForce Audio Processing Unit
 	MCPX_AC97_AUDIO(config, "pci:06.0", 0, 0x10438384); // 10de:01b1 NVIDIA Corporation nForce AC'97 Audio Controller
 	PCI_BRIDGE(config, "pci:08.0", 0, 0x10de01b8, 0xc2); // 10de:01b8 NVIDIA Corporation nForce PCI-to-PCI bridge
@@ -1239,8 +1237,8 @@ void nforcepc_state::nforcepc(machine_config &config)
 	ide.subdevice<ide_controller_32_device>("ide1")->options(ata_devices, "hdd", nullptr, true);
 	ide.subdevice<ide_controller_32_device>("ide2")->options(ata_devices, "cdrom", nullptr, true);
 	NV2A_AGP(config, "pci:1e.0", 0, 0x10de01b7, 0xb2); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
-	VIRGEDX_PCI(config, "pci:0a.0", 0);
-	SST_49LF020(config, "bios", 0);
+	PCI_SLOT(config, "pci:1", pci_cards, 10, 0, 1, 2, 3, "virgedx");
+	SST_49LF020(config, "bios");
 
 	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:0", pc_hd_floppies, "35hd", floppy_formats);
 	FLOPPY_CONNECTOR(config, "pci:01.0:0:fdc:1", pc_hd_floppies, "35hd", floppy_formats);
@@ -1281,4 +1279,4 @@ ROM_END
 static INPUT_PORTS_START(nforcepc)
 INPUT_PORTS_END
 
-COMP(2002, nforcepc, 0, 0, nforcepc, nforcepc, nforcepc_state, empty_init, "Nvidia", "Nvidia nForce PC (CRUSH11/12)", MACHINE_IS_SKELETON)
+COMP(2002, nforcepc, 0, 0, nforcepc, nforcepc, nforcepc_state, empty_init, "Nvidia", "Nvidia nForce PC (CRUSH11/12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -34,8 +34,8 @@ protected:
 	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
 
 	// device_t overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint32_t rom_r(offs_t offset);
 	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -58,7 +58,7 @@ protected:
 	void handle_draw_command();
 	void handle_blit_command();
 
-	void base_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
 	enum
 	{
@@ -524,7 +524,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override;
 
 	// device_sbus_slot_interface overrides
@@ -540,7 +540,7 @@ public:
 
 protected:
 	// device_t overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	void device_add_mconfig(machine_config &config) override;
 
 	// device_sbus_slot_interface overrides

@@ -1,7 +1,7 @@
 // Windows/TimeUtils.h
 
-#ifndef __WINDOWS_TIME_UTILS_H
-#define __WINDOWS_TIME_UTILS_H
+#ifndef ZIP7_INC_WINDOWS_TIME_UTILS_H
+#define ZIP7_INC_WINDOWS_TIME_UTILS_H
 
 #include "../Common/MyTypes.h"
 #include "../Common/MyWindows.h"
@@ -65,6 +65,14 @@ inline bool FILETIME_IsZero(const FILETIME &ft)
   #define ST_MTIME(st) st.st_mtimespec
   #define ST_ATIME(st) st.st_atimespec
   #define ST_CTIME(st) st.st_ctimespec
+ #elif defined(__QNXNTO__) && defined(__ARM__) && !defined(__aarch64__)
+  // QNX armv7le (32-bit) for "struct stat" timestamps uses time_t instead of timespec
+  inline CFiTime ST_MTIME(const struct stat &st)
+    { timespec ts;  ts.tv_sec = st.st_mtime; ts.tv_nsec = 0;  return ts; }
+  inline CFiTime ST_ATIME(const struct stat &st)
+    { timespec ts;  ts.tv_sec = st.st_atime; ts.tv_nsec = 0;  return ts; }
+  inline CFiTime ST_CTIME(const struct stat &st)
+    { timespec ts;  ts.tv_sec = st.st_ctime; ts.tv_nsec = 0;  return ts; }
  #else
   #define ST_MTIME(st) st.st_mtim
   #define ST_ATIME(st) st.st_atim

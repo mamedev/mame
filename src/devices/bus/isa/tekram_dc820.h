@@ -24,7 +24,7 @@ public:
 protected:
 	tekram_eisa_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 latch_status_r();
 	void int0_ack_w(u8 data);
@@ -34,7 +34,7 @@ protected:
 	void mask_w(u8 data);
 	void eeprom_w(u8 data);
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 	void scsic_config(device_t *device);
 	void scsi_add(machine_config &config);
 
@@ -52,15 +52,15 @@ public:
 	tekram_dc320b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void eeprom_w(u8 data);
 	u8 latch_status_r();
 	u8 status_r();
 
-	void mpu_map(address_map &map);
+	void mpu_map(address_map &map) ATTR_COLD;
 };
 
 class tekram_dc320e_device : public tekram_eisa_scsi_device
@@ -69,11 +69,11 @@ public:
 	tekram_dc320e_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void mpu_map(address_map &map);
+	void mpu_map(address_map &map) ATTR_COLD;
 };
 
 class tekram_dc820_device : public tekram_eisa_scsi_device
@@ -82,13 +82,13 @@ public:
 	tekram_dc820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	void eeprom_w(u8 data);
 
-	void mpu_map(address_map &map);
+	void mpu_map(address_map &map) ATTR_COLD;
 };
 
 class tekram_dc820b_device : public tekram_eisa_scsi_device
@@ -97,11 +97,11 @@ public:
 	tekram_dc820b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void mpu_map(address_map &map);
+	void mpu_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(TEKRAM_DC320B, tekram_dc320b_device)

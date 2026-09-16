@@ -30,10 +30,10 @@ public:
 	vtech_printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
-	virtual void io_map(address_map &map) override;
+	virtual void io_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<centronics_device> m_centronics;

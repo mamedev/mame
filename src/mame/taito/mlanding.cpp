@@ -43,7 +43,6 @@
         * Determine correct video timing
         * Unknown sound writes (volume and body sonic control?)
         * Better document mecha drive CPU
-        * Use TMS32020(currently unemulated) device instead of TMS32025
 
 ****************************************************************************/
 
@@ -52,7 +51,7 @@
 #include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "taitoio_yoke.h"
@@ -62,6 +61,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
 
 
 namespace {
@@ -100,8 +101,8 @@ public:
 	void mlanding(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	static constexpr u32 c_dma_bank_words = 0x2000;
@@ -174,13 +175,13 @@ private:
 	u32 exec_dma();
 	void msm5205_update(unsigned chip);
 
-	void audio_map_io(address_map &map);
-	void audio_map_prog(address_map &map);
-	void dsp_map_data(address_map &map);
-	void dsp_map_prog(address_map &map);
-	void main_map(address_map &map);
-	void mecha_map_prog(address_map &map);
-	void sub_map(address_map &map);
+	void audio_map_io(address_map &map) ATTR_COLD;
+	void audio_map_prog(address_map &map) ATTR_COLD;
+	void dsp_map_data(address_map &map) ATTR_COLD;
+	void dsp_map_prog(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void mecha_map_prog(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -910,14 +911,14 @@ static INPUT_PORTS_START( mlanding )
 
 	// despite what the service mode claims limits are really active low.
 	PORT_START("LIMIT0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_right_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::slot_up_r))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::slot_down_r))
 
 	PORT_START("LIMIT1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_down_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_left_r))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", FUNC(taitoio_yoke_device::handle_up_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mlandingj )
@@ -955,7 +956,7 @@ void mlanding_state::mlanding(machine_config &config)
 	m_mechacpu->set_addrmap(AS_PROGRAM, &mlanding_state::mecha_map_prog);
 	m_mechacpu->set_vblank_int("screen", FUNC(mlanding_state::irq0_line_hold));
 
-	tms32025_device& dsp(TMS32025(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
+	auto &dsp(TMS32020(config, m_dsp, 16_MHz_XTAL)); // TMS32020GBL
 	dsp.set_addrmap(AS_PROGRAM, &mlanding_state::dsp_map_prog);
 	dsp.set_addrmap(AS_DATA, &mlanding_state::dsp_map_data);
 	dsp.hold_in_cb().set(FUNC(mlanding_state::dsp_hold_signal_r));
@@ -964,16 +965,16 @@ void mlanding_state::mlanding(machine_config &config)
 	Z80CTC(config, m_ctc, 16_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set(FUNC(mlanding_state::z80ctc_to0));
 
-	pc060ha_device& ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag(m_audiocpu);
+	pc060ha_device& ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline(m_audiocpu, INPUT_LINE_RESET);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TAITOIO_YOKE(config, m_yoke, 0);
+	TAITOIO_YOKE(config, m_yoke);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1076,5 +1077,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
-GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito Corporation",         "Midnight Landing (Japan)",   MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlanding,  0,        mlanding, mlanding,  mlanding_state, empty_init, ROT0, "Taito America", "Midnight Landing (Germany)",      MACHINE_SUPPORTS_SAVE ) // Japanese or German selectable via dip-switch. Copyright changes accordingly.
+GAME( 1987, mlandingj, mlanding, mlanding, mlandingj, mlanding_state, empty_init, ROT0, "Taito",         "Midnight Landing (Japan, rev 3)", MACHINE_SUPPORTS_SAVE ) // Japanese or English selectable via dip-switch. Copyright changes accordingly.

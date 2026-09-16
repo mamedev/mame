@@ -260,7 +260,7 @@ void driver_enumerator::find_approximate_matches(std::string const &string, std:
 	{
 		// allocate memory to track the penalty value
 		std::vector<std::pair<double, int> > penalty;
-		penalty.reserve(count);
+		penalty.reserve(count + 1);
 		std::u32string const search(ustr_from_utf8(normalize_unicode(string, unicode_normalization_form::D, true)));
 		std::string composed;
 		std::u32string candidate;
@@ -303,9 +303,9 @@ void driver_enumerator::find_approximate_matches(std::string const &string, std:
 				auto const it(std::upper_bound(penalty.begin(), penalty.end(), std::make_pair(curpenalty, index)));
 				if (penalty.end() != it)
 				{
-					if (penalty.size() >= count)
-						penalty.resize(count - 1);
 					penalty.emplace(it, curpenalty, index);
+					if (penalty.size() > count)
+						penalty.pop_back();
 				}
 				else if (penalty.size() < count)
 				{

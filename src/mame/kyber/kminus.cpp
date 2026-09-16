@@ -38,14 +38,14 @@ public:
 	void kminus(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	MC6845_UPDATE_ROW(update_row);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<uint8_t> m_chargen;
@@ -302,10 +302,10 @@ void kminus_state::kminus(machine_config &config)
 	rs232_port_device &rs232b(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set("dart", FUNC(z80dart_device::rxb_w));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(kminus_state::kbd_put));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(26_MHz_XTAL / 2, 840, 0, 640, 309, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

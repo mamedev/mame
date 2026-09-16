@@ -11,6 +11,8 @@
 
 #include "3dom2.h"
 
+#include "endianness.h"
+
 #include <cmath>
 #include <sstream>
 
@@ -785,13 +787,13 @@ uint32_t m2_te_device::read(offs_t offset)
 		}
 		case 3:
 		{
-			if (reg < 0x400/4)
+			if (reg < 0x400 / 4)
 			{
 				return m_pipram[reg];
 			}
-			else if ((reg - 0x400) < sizeof(m_tm) / 4)
+			else if ((reg - 0x400 / 4) < sizeof(m_tm) / 4)
 			{
-				return m_tm.m_regs[reg];
+				return m_tm.m_regs[reg - 0x400 / 4];
 			}
 
 			break;

@@ -76,7 +76,8 @@ SYSTEM commands:
 
 About the system80 - Asian version of trs80l2, known as EACA Video Genie. In USA called
     PMC-80, in South Africa called TRZ-80, and Dick Smith imported them to Australia and
-    New Zealand as the System 80. The Hungarian version is the ht1080z.
+    New Zealand as the System 80. Dismac Microcomputadores of Brazil sold an identical
+    system as the D8001.
     Inbuilt extensions:
     - SYSTEM then /12288 = enable extended keyboard and flashing block cursor
     - SYSTEM then /12299 = turn cursor back to normal
@@ -331,16 +332,17 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 
 	PORT_START("RESET") // special button
-	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
+	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<0>))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trs80l2)
 	PORT_INCLUDE (trs80)
+
 	PORT_START("CONFIG")
 	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(   0x80, DEF_STR( On ) )
-	PORT_BIT(0x7f, 0x7f, IPT_UNUSED)
+	PORT_BIT(0x7f, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("E9")    // these are the power-on uart settings
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -360,12 +362,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(sys80)
 	PORT_INCLUDE (trs80l2)
+
 	PORT_MODIFY("CONFIG")
 	PORT_CONFNAME(    0x08, 0x00,   "Video Cut")  // Toggle switch on the back
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(   0x08, DEF_STR( On ) )
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Page") PORT_CODE(KEYCODE_F6) PORT_TOGGLE  // extra keys above the main keyboard
 	//PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F7) PORT_TOGGLE  // this turns on the tape motor
+
 	PORT_START("BAUD")
 	PORT_DIPNAME( 0xff, 0x06, "Baud Rate")
 	PORT_DIPSETTING(    0x00, "110")
@@ -446,7 +450,7 @@ void trs80_state::level1(machine_config &config)      // the original model I, l
 	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10.6445_MHz_XTAL, 672, 0, 384, 264, 0, 192);
 	screen.set_screen_update(FUNC(trs80_state::screen_update_trs80));
 	screen.set_palette("palette");

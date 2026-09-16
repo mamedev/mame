@@ -81,7 +81,7 @@ void hp9871_device::preset_w(int state)
 
 void hp9871_device::device_add_mconfig(machine_config &config)
 {
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 	m_printer->online_callback().set(FUNC(hp9871_device::printer_online));
 }
 

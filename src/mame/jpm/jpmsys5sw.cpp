@@ -1406,7 +1406,7 @@ ROM_END
 
 
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_NO_SOUND|MACHINE_CLICKABLE_ARTWORK
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_NO_SOUND
 
 GAME(  199?, j5tstal,   0,        jpmsys5_ym, popeye, jpmsys5_state, empty_init, ROT0, "JPM", "JPM System 5 Alpha Display Test Utility (JPM) (SYSTEM5)", GAME_FLAGS )
 GAME(  199?, j5tst1,    0,        jpmsys5_ym, popeye, jpmsys5_state, empty_init, ROT0, "JPM", "JPM System 5 Test Set (JPM) (SYSTEM5, set 1)", GAME_FLAGS )

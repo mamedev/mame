@@ -22,6 +22,8 @@
        set of registers, we should really be producing 2 sprite bitmaps
        and manually mixing them.
 
+    TODO:
+     - verify sprite lag frames
 */
 
 #include "emu.h"
@@ -40,16 +42,15 @@ kaneko16_sprite_device::kaneko16_sprite_device(
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr)
 	, device_video_interface(mconfig, *this)
-	, m_gfx_region(*this, DEVICE_SELF)
+	, m_sprite_fliptype(0)
+	, m_sprite_xoffs(0)
+	, m_sprite_yoffs(0)
 	, m_colbase(0)
+	, m_sprite_flipx(false)
+	, m_sprite_flipy(false)
+	, m_keep_sprites(false) // default disabled for games not using it
+	, m_buffer(0)
 {
-	m_keep_sprites = 0; // default disabled for games not using it
-
-
-	m_sprite_xoffs = 0;
-	m_sprite_yoffs = 0;
-
-	m_sprite_fliptype = 0;
 /*
     Sx = Sprites with priority x, x = tiles with priority x,
     Sprites - Tiles Order (bottom -> top):
@@ -69,66 +70,70 @@ void kaneko16_sprite_device::device_start()
 {
 	m_first_sprite = std::make_unique<struct tempsprite_t[]>(0x400);
 	m_sprites_regs = make_unique_clear<u16[]>(0x20/2);
-	screen().register_screen_bitmap(m_sprites_bitmap);
-	screen().register_screen_bitmap(m_sprites_maskmap);
+
+	// actually 256x256x12bit (VU002) / 512x512x16bit (KC002), double buffered
+	// blazeon and wingforc uses 2 chips for double sprite bitmap size (see Notes)
+	for (int i = 0; i < 2; i++)
+	{
+		m_sprites_bitmap[i].allocate(512, 512);
+		m_sprites_maskmap[i].allocate(512, 512);
+		save_item(NAME(m_sprites_bitmap[i]), i);
+		save_item(NAME(m_sprites_maskmap[i]), i);
+	}
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
 	save_pointer(NAME(m_sprites_regs), 0x20/2);
 	save_item(NAME(m_keep_sprites));
-	save_item(NAME(m_sprites_bitmap));
-	save_item(NAME(m_sprites_maskmap));
+	save_item(NAME(m_buffer));
 }
+
+
+GFXDECODE_MEMBER(kaneko_vu002_sprite_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, gfx_8x8x4_row_2x2_group_packed_msb, 0, 0x40)
+GFXDECODE_END
 
 
 void kaneko_vu002_sprite_device::device_start()
 {
-	/*
-	    16x16x4 made of 4 8x8x4 blocks arrenged like:   01
-	                                                    23
-	*/
-	gfx_layout layout_16x16x4 =
-	{
-		16,16,
-		0,
-		4,
-		{ STEP4(0,1) },
-		{ STEP8(8*8*4*0,4),   STEP8(8*8*4*1,4)   },
-		{ STEP8(8*8*4*0,8*4), STEP8(8*8*4*2,8*4) },
-		16*16*4
-	};
-	layout_16x16x4.total = m_gfx_region->bytes() / ((16*16*4) / 8);
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colorbase(m_colbase);
 	kaneko16_sprite_device::device_start();
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x4, m_gfx_region->base(), 0, 0x40, m_colbase));
 }
+
+
+/*
+    16x16x8 made of 4 8x8x8 blocks arranged like:   01
+                                                    23
+*/
+static gfx_layout layout_16x16x8 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
+	{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
+	16*16*8
+};
+
+GFXDECODE_MEMBER(kaneko_kc002_sprite_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, layout_16x16x8, 0, 0x40)
+GFXDECODE_END
 
 
 void kaneko_kc002_sprite_device::device_start()
 {
-	/*
-	    16x16x8 made of 4 8x8x8 blocks arrenged like:   01
-	                                                    23
-	*/
-	gfx_layout layout_16x16x8 =
-	{
-		16,16,
-		0,
-		8,
-		{ STEP8(0,1) },
-		{ STEP8(0,8),   STEP8(8*8*8*1,8)   },
-		{ STEP8(0,8*8), STEP8(8*8*8*2,8*8) },
-		16*16*8
-	};
-	layout_16x16x8.total = m_gfx_region->bytes() / ((16*16*8) / 8);
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colorbase(m_colbase);
 	kaneko16_sprite_device::device_start();
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x8, m_gfx_region->base(), 0, 0x40, m_colbase));
 }
 
 
 void kaneko16_sprite_device::device_reset()
 {
-	m_sprite_flipx = 0;
-	m_sprite_flipy = 0;
+	m_sprite_flipx = false;
+	m_sprite_flipy = false;
 }
 
 /***************************************************************************
@@ -181,29 +186,29 @@ Offset:         Format:                     Value:
 
 ***************************************************************************/
 
-#define USE_LATCHED_XY      1
-#define USE_LATCHED_CODE    2
-#define USE_LATCHED_COLOR   4
+static constexpr u32 USE_LATCHED_XY    = 1;
+static constexpr u32 USE_LATCHED_CODE  = 2;
+static constexpr u32 USE_LATCHED_COLOR = 4;
 
 void kaneko_kc002_sprite_device::get_sprite_attributes(struct tempsprite_t *s, u16 attr)
 {
 	s->color    = (attr & 0x003f);
 	s->priority = (attr & 0x00c0) >> 6;
-	s->flipy    = (attr & 0x0100);
-	s->flipx    = (attr & 0x0200);
+	s->flipy    = BIT(attr, 8);
+	s->flipx    = BIT(attr, 9);
 	s->code    += (s->y & 1) << 16;   // bloodwar
 }
 
 void kaneko_vu002_sprite_device::get_sprite_attributes(struct tempsprite_t *s, u16 attr)
 {
-	s->flipy    = (attr & 0x0001);
-	s->flipx    = (attr & 0x0002);
+	s->flipy    = BIT(attr, 0);
+	s->flipx    = BIT(attr, 1);
 	s->color    = (attr & 0x00fc) >> 2;
 	s->priority = (attr & 0x0300) >> 8;
 }
 
 
-int kaneko16_sprite_device::parse_sprite_type012(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes)
+int kaneko16_sprite_device::parse_sprite(int i, struct tempsprite_t *s, u16* spriteram16, int spriteram16_bytes)
 {
 	const int offs = i * 8 / 2;
 
@@ -232,17 +237,16 @@ int kaneko16_sprite_device::parse_sprite_type012(int i, struct tempsprite_t *s, 
 		s->yoffs += screen().visible_area().min_y << 6;
 	}
 
-	return  ((attr & 0x2000) ? USE_LATCHED_XY    : 0) |
-			((attr & 0x4000) ? USE_LATCHED_COLOR : 0) |
-			((attr & 0x8000) ? USE_LATCHED_CODE  : 0) ;
+	return  (BIT(attr, 13) ? USE_LATCHED_XY    : 0) |
+			(BIT(attr, 14) ? USE_LATCHED_COLOR : 0) |
+			(BIT(attr, 15) ? USE_LATCHED_CODE  : 0) ;
 }
+
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
 
-
-void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip,gfx_element *gfx,
-		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int priority)
+void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int priority)
 {
 	const pen_t pen_base = gfx->granularity() * (color % gfx->colors());
 	const u8 *source_base = gfx->get_data(code % gfx->elements());
@@ -277,36 +281,40 @@ void kaneko16_sprite_device::draw_sprites_custom(const rectangle &clip,gfx_eleme
 	}
 
 	if (sx < clip.min_x)
-	{ /* clip left */
+	{
+		// clip left
 		int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += pixels * dx;
 	}
 	if (sy < clip.min_y)
-	{ /* clip top */
+	{
+		// clip top
 		int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += pixels * dy;
 	}
-	/* NS 980211 - fixed incorrect clipping */
 	if (ex > clip.max_x + 1)
-	{ /* clip right */
+	{
+		// clip right
 		int pixels = ex-clip.max_x - 1;
 		ex -= pixels;
 	}
 	if (ey > clip.max_y + 1)
-	{ /* clip bottom */
+	{
+		// clip bottom
 		int pixels = ey-clip.max_y - 1;
 		ey -= pixels;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ /* skip if inner loop doesn't draw anything */
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * gfx->rowbytes();
-			u16 *const dest = &m_sprites_bitmap.pix(y);
-			u8 *const pri = &m_sprites_maskmap.pix(y);
+			u16 *const dest = &m_sprites_bitmap[m_buffer].pix(y);
+			u8 *const pri = &m_sprites_maskmap[m_buffer].pix(y);
 
 			int x_index = x_index_base;
 			for (int x = sx; x < ex; x++)
@@ -352,12 +360,12 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 	int priority    =   0;
 	int xoffs       =   0;
 	int yoffs       =   0;
-	int flipx       =   0;
-	int flipy       =   0;
+	bool flipx      =   false;
+	bool flipy      =   false;
 
 	while (1)
 	{
-		int flags = parse_sprite_type012(i,s, spriteram16, spriteram16_bytes);
+		int flags = parse_sprite(i,s, spriteram16, spriteram16_bytes);
 
 		if (flags == -1)    // End of Sprites
 			break;
@@ -374,7 +382,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 			s->xoffs    = xoffs;
 			s->yoffs    = yoffs;
 
-			if (m_sprite_fliptype==0)
+			if (m_sprite_fliptype == 0)
 			{
 				s->flipx = flipx;
 				s->flipy = flipy;
@@ -387,7 +395,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 			xoffs    = s->xoffs;
 			yoffs    = s->yoffs;
 
-			if (m_sprite_fliptype==0)
+			if (m_sprite_fliptype == 0)
 			{
 				flipx = s->flipx;
 				flipy = s->flipy;
@@ -395,7 +403,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 		}
 
 		// brap boys explicitly doesn't want the flip to be latched, maybe there is a different bit to enable that behavior?
-		if (m_sprite_fliptype==1)
+		if (m_sprite_fliptype == 1)
 		{
 			flipx = s->flipx;
 			flipy = s->flipy;
@@ -529,11 +537,11 @@ void kaneko16_sprite_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 		case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				m_sprite_flipx = new_data & 2;
-				m_sprite_flipy = new_data & 1;
+				m_sprite_flipx = BIT(new_data, 1);
+				m_sprite_flipy = BIT(new_data, 0);
 
 				if (get_sprite_type() == 0)
-					m_keep_sprites = ~new_data & 4;
+					m_keep_sprites = BIT(~new_data, 2);
 			}
 
 			break;
@@ -549,17 +557,19 @@ void kaneko16_sprite_device::copybitmap(bitmap_rgb32 &bitmap, const rectangle &c
 template<class BitmapClass>
 void kaneko16_sprite_device::copybitmap_common(BitmapClass &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
+	rectangle clip = cliprect;
+	clip &= m_sprites_bitmap[m_buffer].cliprect();
 	pen_t const *const pal = gfx(0)->palette().pens();
 
 	constexpr bool rgb = sizeof(typename BitmapClass::pixel_t) != 2;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = clip.min_y; y <= clip.max_y; y++)
 	{
 		typename BitmapClass::pixel_t *const dstbitmap = &bitmap.pix(y);
 		u8 *const dstprimap = &priority_bitmap.pix(y);
-		u16 *const srcbitmap = &m_sprites_bitmap.pix(y);
+		u16 *const srcbitmap = &m_sprites_bitmap[m_buffer].pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
 			const u16 pri = (srcbitmap[x] & 0xc000) >> 14;
 			const u16 pix = srcbitmap[x] & 0x3fff;
@@ -578,15 +588,18 @@ void kaneko16_sprite_device::copybitmap_common(BitmapClass &bitmap, const rectan
 
 void kaneko16_sprite_device::render_sprites(const rectangle &cliprect, u16* spriteram16, int spriteram16_bytes)
 {
+	m_buffer ^= 1;
+	rectangle clip = cliprect;
+	clip &= m_sprites_bitmap[m_buffer].cliprect();
 	/* Sprites last (rendered with pdrawgfx, so they can slip
 	   in between the layers) */
 
-	m_sprites_maskmap.fill(0, cliprect);
+	m_sprites_maskmap[m_buffer].fill(0, clip);
 	/* keep sprites on screen - used by mgcrystl when you get the first gem and it shows instructions */
 	if (!m_keep_sprites)
-		m_sprites_bitmap.fill(0, cliprect);
+		m_sprites_bitmap[m_buffer].fill(0, clip);
 
-	draw_sprites(cliprect, spriteram16, spriteram16_bytes);
+	draw_sprites(clip, spriteram16, spriteram16_bytes);
 }
 
 kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -610,8 +623,8 @@ void kaneko16_sprite_device::bootleg_draw_sprites(bitmap_ind16 &bitmap, const re
 	{
 		const u32 code   =  spriteram16[offs + 1] & 0x1fff;
 		const u32 color  = (spriteram16[offs] & 0x003c) >> 2;
-		const bool flipx =  spriteram16[offs] & 0x0002;
-		const bool flipy =  spriteram16[offs] & 0x0001;
+		const bool flipx =  BIT(spriteram16[offs], 1);
+		const bool flipy =  BIT(spriteram16[offs], 0);
 
 		if ((spriteram16[offs] & 0x6000) == 0x6000) /* Link bits */
 		{

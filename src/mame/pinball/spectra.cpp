@@ -64,11 +64,11 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void spectra(machine_config &config);
+	void spectra(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 porta_r();
@@ -77,7 +77,7 @@ private:
 	void portb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
-	void spectra_map(address_map &map);
+	void spectra_map(address_map &map) ATTR_COLD;
 
 	u8 m_porta = 0U;
 	u8 m_portb = 0U;
@@ -246,8 +246,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 void spectra_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_digits.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
@@ -258,6 +256,7 @@ void spectra_state::machine_start()
 void spectra_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 

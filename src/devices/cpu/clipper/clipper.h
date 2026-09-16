@@ -151,13 +151,12 @@ protected:
 	clipper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const endianness_t endianness, const u32 cpuid);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 1; } // FIXME: don't know, especially macro instructions
-	virtual u32 execute_input_lines() const noexcept override { return 2; } // number of input/interrupt lines (irq/nmi)
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -357,7 +356,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	virtual u32 intrap(const u16 vector, const u32 old_pc) override;
 

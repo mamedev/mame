@@ -9,6 +9,8 @@
 #include "i386.h"
 #include "cache.h"
 
+#include "endianness.h"
+
 class athlonxp_device : public pentium_device
 {
 public:
@@ -22,8 +24,8 @@ protected:
 	virtual void cache_writeback() override;
 	virtual void cache_invalidate() override;
 	virtual void cache_clean() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void enter_smm() override;
 	virtual void leave_smm() override;
 

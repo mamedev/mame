@@ -28,12 +28,12 @@ public:
 	void tvcapcom(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
 
-	void gc_map(address_map &map);
+	void gc_map(address_map &map) ATTR_COLD;
 };
 
 void tvcapcom_state::gc_map(address_map &map)
@@ -69,7 +69,7 @@ void tvcapcom_state::tvcapcom(machine_config &config)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
@@ -94,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, empty_init, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )
+GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, empty_init, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

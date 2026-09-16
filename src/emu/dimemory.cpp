@@ -81,12 +81,30 @@ bool device_memory_interface::memory_translate(int spacenum, int intention, offs
 
 void device_memory_interface::interface_config_complete()
 {
+	const space_config_vector l = memory_logical_space_config();
+	for (const auto &entry : l) {
+		if (entry.first >= int(m_logical_address_config.size()))
+			m_logical_address_config.resize(entry.first + 1);
+		m_logical_address_config[entry.first] = entry.second;
+	}
+
 	const space_config_vector r = memory_space_config();
 	for (const auto &entry : r) {
 		if (entry.first >= int(m_address_config.size()))
 			m_address_config.resize(entry.first + 1);
 		m_address_config[entry.first] = entry.second;
 	}
+}
+
+
+//-------------------------------------------------
+//  memory_logical_space_config - default the logical
+//  spaces as identical to the physical ones
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector device_memory_interface::memory_logical_space_config() const
+{
+	return memory_space_config();
 }
 
 

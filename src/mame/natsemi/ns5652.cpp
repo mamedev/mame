@@ -26,7 +26,7 @@ public:
 	void ns5652(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pace_device> m_maincpu;
 	required_region_ptr<u8> m_ecprom;
@@ -94,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(19??, ns5652, 0, 0, ns5652, ns5652, ns5652_state, empty_init, "National Semiconductor", "unknown INS8900 Multibus card (980305652)", MACHINE_IS_SKELETON)
+COMP(19??, ns5652, 0, 0, ns5652, ns5652, ns5652_state, empty_init, "National Semiconductor", "unknown INS8900 Multibus card (980305652)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

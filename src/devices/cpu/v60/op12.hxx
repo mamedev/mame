@@ -273,7 +273,7 @@ uint32_t v60_device::opADDB() /* TRUSTED (C too!)*/
 
 	F12LOADOP2BYTE();
 
-	ADDB(appb, (uint8_t)m_op1);
+	ADDB(appb, (uint8_t)m_op1, 0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -286,7 +286,7 @@ uint32_t v60_device::opADDH() /* TRUSTED (C too!)*/
 
 	F12LOADOP2HALF();
 
-	ADDW(apph, (uint16_t)m_op1);
+	ADDW(apph, (uint16_t)m_op1, 0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -299,7 +299,7 @@ uint32_t v60_device::opADDW() /* TRUSTED (C too!) */
 
 	F12LOADOP2WORD();
 
-	ADDL(appw, (uint32_t)m_op1);
+	ADDL(appw, (uint32_t)m_op1, 0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -307,14 +307,12 @@ uint32_t v60_device::opADDW() /* TRUSTED (C too!) */
 
 uint32_t v60_device::opADDCB()
 {
-	uint8_t appb, temp;
-
+	uint8_t appb;
 	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
 	F12LOADOP2BYTE();
 
-	temp = ((uint8_t)m_op1 + (_CY?1:0));
-	ADDB(appb, temp);
+	ADDB(appb, (uint8_t)m_op1, _CY?1:0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -322,14 +320,12 @@ uint32_t v60_device::opADDCB()
 
 uint32_t v60_device::opADDCH()
 {
-	uint16_t apph, temp;
-
+	uint16_t apph;
 	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
 	F12LOADOP2HALF();
 
-	temp = ((uint16_t)m_op1 + (_CY?1:0));
-	ADDW(apph, temp);
+	ADDW(apph, (uint16_t)m_op1, _CY?1:0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -337,14 +333,12 @@ uint32_t v60_device::opADDCH()
 
 uint32_t v60_device::opADDCW()
 {
-	uint32_t appw, temp;
-
+	uint32_t appw;
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
 	F12LOADOP2WORD();
 
-	temp = m_op1 + (_CY?1:0);
-	ADDL(appw, temp);
+	ADDL(appw, (uint32_t)m_op1, _CY?1:0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -501,7 +495,7 @@ uint32_t v60_device::opCMPB() /* TRUSTED (C too!) */
 	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAM, 0);
 
 	appb = (uint8_t)m_op2;
-	SUBB(appb, (uint8_t)m_op1);
+	SUBB(appb, (uint8_t)m_op1, 0);
 
 	F12END();
 }
@@ -512,7 +506,7 @@ uint32_t v60_device::opCMPH() /* TRUSTED (C too!) */
 	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAM, 1);
 
 	apph = (uint16_t)m_op2;
-	SUBW(apph, (uint16_t)m_op1);
+	SUBW(apph, (uint16_t)m_op1, 0);
 
 	F12END();
 }
@@ -522,7 +516,7 @@ uint32_t v60_device::opCMPW() /* TRUSTED (C too!)*/
 {
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAM, 2);
 
-	SUBL(m_op2, (uint32_t)m_op1);
+	SUBL(m_op2, (uint32_t)m_op1, 0);
 
 	F12END();
 }
@@ -580,26 +574,17 @@ uint32_t v60_device::opDIVW() /* TRUSTED */
 
 uint32_t v60_device::opDIVX()
 {
-	uint32_t a, b;
+	int32_t a, b;
 	int64_t dv;
 
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 3);
 
 	if (m_flag2)
-	{
-		a = m_reg[m_op2 & 0x1F];
-		b = m_reg[(m_op2 & 0x1F) + 1];
-	}
+		dv = ((uint64_t)m_reg[(m_op2 & 0x1F) + 1] << 32) | m_reg[m_op2 & 0x1F];
 	else
-	{
-		a = m_program->read_dword_unaligned(m_op2);
-		b = m_program->read_dword_unaligned(m_op2 + 4);
-	}
+		dv = m_program->read_qword_unaligned(m_op2);
 
-	dv = ((uint64_t)b << 32) | ((uint64_t)a);
-
-	a = dv / (int64_t)((int32_t)m_op1);
-	b = dv % (int64_t)((int32_t)m_op1);
+	a = div_64x32_rem(dv, m_op1, b);
 
 	_S = ((a & 0x80000000) != 0);
 	_Z = (a == 0);
@@ -626,19 +611,11 @@ uint32_t v60_device::opDIVUX()
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 3);
 
 	if (m_flag2)
-	{
-		a = m_reg[m_op2 & 0x1F];
-		b = m_reg[(m_op2 & 0x1F) + 1];
-	}
+		dv = ((uint64_t)m_reg[(m_op2 & 0x1F) + 1] << 32) | m_reg[m_op2 & 0x1F];
 	else
-	{
-		a = m_program->read_dword_unaligned(m_op2);
-		b = m_program->read_dword_unaligned(m_op2 + 4);
-	}
+		dv = m_program->read_qword_unaligned(m_op2);
 
-	dv = (uint64_t)(((uint64_t)b << 32) | (uint64_t)a);
-	a = (uint32_t)(dv / (uint64_t)m_op1);
-	b = (uint32_t)(dv % (uint64_t)m_op1);
+	a = divu_64x32_rem(dv, m_op1, b);
 
 	_S = ((a & 0x80000000) != 0);
 	_Z = (a == 0);
@@ -756,7 +733,7 @@ uint32_t v60_device::opLDPR()
 	F12DecodeOperands(&v60_device::ReadAMAddress, 2,&v60_device::ReadAM, 2);
 	if (m_op2 <= 28)
 	{
-		if (m_flag1 &&(!(OpRead8(PC + 1)&0x80 && OpRead8(PC + 2) == 0xf4 ) ))
+		if (m_flag1)
 			m_reg[m_op2 + 36] = m_reg[m_op1];
 		else
 			m_reg[m_op2 + 36] = m_op1;
@@ -812,31 +789,22 @@ uint32_t v60_device::opLDTASK()
 
 uint32_t v60_device::opMOVD() /* TRUSTED */
 {
-	uint32_t a, b;
+	uint64_t d;
 
 	F12DecodeOperands(&v60_device::ReadAMAddress, 3,&v60_device::ReadAMAddress, 3);
 
 	if (m_flag1)
-	{
-		a = m_reg[m_op1 & 0x1F];
-		b = m_reg[(m_op1 & 0x1F) + 1];
-	}
+		d = ((uint64_t)m_reg[(m_op1 & 0x1F) + 1] << 32) | m_reg[m_op1 & 0x1F];
 	else
-	{
-		a = m_program->read_dword_unaligned(m_op1);
-		b = m_program->read_dword_unaligned(m_op1 + 4);
-	}
+		d = m_program->read_qword_unaligned(m_op1);
 
 	if (m_flag2)
 	{
-		m_reg[m_op2 & 0x1F] = a;
-		m_reg[(m_op2 & 0x1F) + 1] = b;
+		m_reg[m_op2 & 0x1F] = (uint32_t)d;
+		m_reg[(m_op2 & 0x1F) + 1] = (uint32_t)(d >> 32);
 	}
 	else
-	{
-		m_program->write_dword_unaligned(m_op2, a);
-		m_program->write_dword_unaligned(m_op2 + 4, b);
-	}
+		m_program->write_qword_unaligned(m_op2, d);
 
 	F12END();
 }
@@ -1033,7 +1001,7 @@ uint32_t v60_device::opMULW()
 
 	F12LOADOP2WORD();
 
-	tmp = (int32_t)appw * (int64_t)(int32_t)m_op1;
+	tmp = mul_32x32(appw, m_op1);
 	appw = tmp;
 	_Z = (appw == 0);
 	_S = ((appw & 0x80000000) != 0);
@@ -1087,7 +1055,7 @@ uint32_t v60_device::opMULUW()
 
 	F12LOADOP2WORD();
 
-	tmp = (uint64_t)appw * (uint64_t)m_op1;
+	tmp = mulu_32x32(appw, m_op1);
 	appw = tmp;
 	_Z = (appw == 0);
 	_S = ((appw & 0x80000000) != 0);
@@ -1102,7 +1070,7 @@ uint32_t v60_device::opNEGB() /* TRUSTED  (C too!)*/
 	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
 
 	m_modwritevalb = 0;
-	SUBB(m_modwritevalb, (int8_t)m_op1);
+	SUBB(m_modwritevalb, (int8_t)m_op1, 0);
 	_CY = m_modwritevalb ? 1 : 0;
 
 	F12WriteSecondOperand(0);
@@ -1114,7 +1082,7 @@ uint32_t v60_device::opNEGH() /* TRUSTED  (C too!)*/
 	F12DecodeFirstOperand(&v60_device::ReadAM, 1);
 
 	m_modwritevalh = 0;
-	SUBW(m_modwritevalh, (int16_t)m_op1);
+	SUBW(m_modwritevalh, (int16_t)m_op1, 0);
 	_CY = m_modwritevalh ? 1 : 0;
 
 	F12WriteSecondOperand(1);
@@ -1126,7 +1094,7 @@ uint32_t v60_device::opNEGW() /* TRUSTED  (C too!)*/
 	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
 
 	m_modwritevalw = 0;
-	SUBL(m_modwritevalw, (int32_t)m_op1);
+	SUBL(m_modwritevalw, (int32_t)m_op1, 0);
 	_CY = m_modwritevalw ? 1 : 0;
 
 	F12WriteSecondOperand(2);
@@ -1588,15 +1556,7 @@ uint32_t v60_device::opRVBIT()
 {
 	F12DecodeFirstOperand(&v60_device::ReadAM, 0);
 
-	m_modwritevalb =(uint8_t)
-								(((m_op1 & (1 << 0)) << 7) |
-									((m_op1 & (1 << 1)) << 5) |
-									((m_op1 & (1 << 2)) << 3) |
-									((m_op1 & (1 << 3)) << 1) |
-									((m_op1 & (1 << 4)) >> 1) |
-									((m_op1 & (1 << 5)) >> 3) |
-									((m_op1 & (1 << 6)) >> 5) |
-									((m_op1 & (1 << 7)) >> 7));
+	m_modwritevalb = bitswap<8>(m_op1, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	F12WriteSecondOperand(0);
 	F12END();
@@ -1606,10 +1566,7 @@ uint32_t v60_device::opRVBYT() /* TRUSTED */
 {
 	F12DecodeFirstOperand(&v60_device::ReadAM, 2);
 
-	m_modwritevalw = ((m_op1 & 0x000000FF) << 24) |
-									((m_op1 & 0x0000FF00) << 8)  |
-									((m_op1 & 0x00FF0000) >> 8)  |
-									((m_op1 & 0xFF000000) >> 24);
+	m_modwritevalw = swapendian_int32(m_op1);
 
 	F12WriteSecondOperand(2);
 	F12END();
@@ -2085,7 +2042,7 @@ uint32_t v60_device::opSHLW() /* TRUSTED */
 		}
 	}
 
-//  osd_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
+	//osd_printf_debug("SHLW: %x _CY: %d _Z: %d _OV: %d _S: %d\n", appw, _CY, _Z, _OV, _S);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -2112,7 +2069,7 @@ uint32_t v60_device::opSUBB() /* TRUSTED (C too!) */
 
 	F12LOADOP2BYTE();
 
-	SUBB(appb, (uint8_t)m_op1);
+	SUBB(appb, (uint8_t)m_op1, 0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -2125,7 +2082,7 @@ uint32_t v60_device::opSUBH() /* TRUSTED (C too!) */
 
 	F12LOADOP2HALF();
 
-	SUBW(apph, (uint16_t)m_op1);
+	SUBW(apph, (uint16_t)m_op1, 0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -2138,7 +2095,7 @@ uint32_t v60_device::opSUBW() /* TRUSTED (C too!) */
 
 	F12LOADOP2WORD();
 
-	SUBL(appw, (uint32_t)m_op1);
+	SUBL(appw, (uint32_t)m_op1, 0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -2148,13 +2105,11 @@ uint32_t v60_device::opSUBW() /* TRUSTED (C too!) */
 uint32_t v60_device::opSUBCB()
 {
 	uint8_t appb;
-	uint8_t src;
 	F12DecodeOperands(&v60_device::ReadAM, 0,&v60_device::ReadAMAddress, 0);
 
 	F12LOADOP2BYTE();
 
-	src = (uint8_t)m_op1 + (_CY?1:0);
-	SUBB(appb, src);
+	SUBB(appb, (uint8_t)m_op1, _CY?1:0);
 
 	F12STOREOP2BYTE();
 	F12END();
@@ -2163,14 +2118,11 @@ uint32_t v60_device::opSUBCB()
 uint32_t v60_device::opSUBCH()
 {
 	uint16_t apph;
-	uint16_t src;
-
 	F12DecodeOperands(&v60_device::ReadAM, 1,&v60_device::ReadAMAddress, 1);
 
 	F12LOADOP2HALF();
 
-	src = (uint16_t)m_op1 + (_CY?1:0);
-	SUBW(apph, src);
+	SUBW(apph, (uint16_t)m_op1, _CY?1:0);
 
 	F12STOREOP2HALF();
 	F12END();
@@ -2179,14 +2131,11 @@ uint32_t v60_device::opSUBCH()
 uint32_t v60_device::opSUBCW()
 {
 	uint32_t appw;
-	uint32_t src;
-
 	F12DecodeOperands(&v60_device::ReadAM, 2,&v60_device::ReadAMAddress, 2);
 
 	F12LOADOP2WORD();
 
-	src = (uint32_t)m_op1 + (_CY?1:0);
-	SUBL(appw, src);
+	SUBL(appw, (uint32_t)m_op1, _CY?1:0);
 
 	F12STOREOP2WORD();
 	F12END();
@@ -2329,7 +2278,7 @@ uint32_t v60_device::opMULX()
 		a = m_program->read_dword_unaligned(m_op2);
 	}
 
-	res = (int64_t)a * (int64_t)(int32_t)m_op1;
+	res = mul_32x32(a, m_op1);
 
 	b = (int32_t)((res >> 32)&0xffffffff);
 	a = (int32_t)(res & 0xffffffff);
@@ -2343,10 +2292,7 @@ uint32_t v60_device::opMULX()
 		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
-	{
-		m_program->write_dword_unaligned(m_op2, a);
-		m_program->write_dword_unaligned(m_op2 + 4, b);
-	}
+		m_program->write_qword_unaligned(m_op2, res);
 
 	F12END();
 }
@@ -2367,7 +2313,7 @@ uint32_t v60_device::opMULUX()
 		a = m_program->read_dword_unaligned(m_op2);
 	}
 
-	res = (uint64_t)a * (uint64_t)m_op1;
+	res = mulu_32x32(a, m_op1);
 	b = (int32_t)((res >> 32)&0xffffffff);
 	a = (int32_t)(res & 0xffffffff);
 
@@ -2380,10 +2326,7 @@ uint32_t v60_device::opMULUX()
 		m_reg[(m_op2 & 0x1F) + 1] = b;
 	}
 	else
-	{
-		m_program->write_dword_unaligned(m_op2, a);
-		m_program->write_dword_unaligned(m_op2 + 4, b);
-	}
+		m_program->write_qword_unaligned(m_op2, res);
 
 	F12END();
 }

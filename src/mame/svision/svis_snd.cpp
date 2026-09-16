@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "svis_snd.h"
 
+#include <algorithm>
+
 // configurable logging
 #define LOG_DMA     (1U << 1)
 #define LOG_NOISE   (1U << 2)
@@ -50,9 +52,9 @@ svision_sound_device::svision_sound_device(const machine_config &mconfig, const 
 
 void svision_sound_device::device_start()
 {
-	memset(&m_dma, 0, sizeof(m_dma));
-	memset(&m_noise, 0, sizeof(m_noise));
-	memset(m_channel, 0, sizeof(m_channel));
+	m_dma = DMA();
+	m_noise = NOISE();
+	std::fill(std::begin(m_channel), std::end(m_channel), CHANNEL());
 
 	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
 
@@ -92,12 +94,9 @@ void svision_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void svision_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &left = outputs[0];
-	auto &right = outputs[1];
-
-	for (int i = 0; i < left.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s32 lsum = 0;
 		s32 rsum = 0;
@@ -197,8 +196,8 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, std::vector
 				m_irq_cb(1);
 			}
 		}
-		left.put_int(i, lsum, 32768);
-		right.put_int(i, rsum, 32768);
+		stream.put_int(0, i, lsum, 32768);
+		stream.put_int(1, i, rsum, 32768);
 	}
 }
 

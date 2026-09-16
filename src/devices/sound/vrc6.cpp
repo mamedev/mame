@@ -8,8 +8,8 @@
     Emulation by R. Belmont
 
     References:
-    http://wiki.nesdev.com/w/index.php/VRC6_audio
-    http://nesdev.com/vrcvi.txt
+    https://www.nesdev.org/wiki/VRC6_audio
+    https://www.nesdev.org/vrcvi.txt
 
 ***************************************************************************/
 
@@ -101,16 +101,13 @@ u16 vrc6snd_device::period_to_ticks(u8 low, u8 high) const
 //  our sound stream
 //-------------------------------------------------
 
-void vrc6snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void vrc6snd_device::sound_stream_update(sound_stream &stream)
 {
 	// check global halt bit
 	if (m_freqctrl & 1)
-	{
-		outputs[0].fill(0);
 		return;
-	}
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		// update pulse1
 		if (m_pulsefrqh[0] & 0x80)
@@ -209,7 +206,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		// sum 2 4-bit pulses, 1 5-bit saw = unsigned 6 bit output
 		s16 tmp = (s16)(u8)(m_output[0] + m_output[1] + m_output[2]);
 
-		outputs[0].put_int(i, tmp, 128);
+		stream.put_int(0, i, tmp, 128);
 	}
 }
 

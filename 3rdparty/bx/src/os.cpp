@@ -19,17 +19,7 @@
 #	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <psapi.h>
-#elif  BX_PLATFORM_ANDROID    \
-	|| BX_PLATFORM_BSD        \
-	|| BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_HAIKU      \
-	|| BX_PLATFORM_HURD       \
-	|| BX_PLATFORM_IOS        \
-	|| BX_PLATFORM_LINUX      \
-	|| BX_PLATFORM_NX         \
-	|| BX_PLATFORM_OSX        \
-	|| BX_PLATFORM_PS4        \
-	|| BX_PLATFORM_RPI
+#elif  BX_PLATFORM_POSIX
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD       \
 	|| BX_PLATFORM_HAIKU     \
@@ -58,7 +48,7 @@
 #		include <mach/mach.h> // mach_task_basic_info
 #	elif BX_PLATFORM_HURD
 #		include <stdio.h>           // fopen
-#		include <pthread/pthread.h> // pthread_self
+#		include <pthread.h> // pthread_self
 #	elif BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID

@@ -24,16 +24,7 @@ MACHINE_RESET_MEMBER(scramble_state,scramble)
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-MACHINE_RESET_MEMBER(scramble_state,explorer)
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
-
-	MACHINE_RESET_CALL_MEMBER(galaxold);
-}
-
-
-CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_dial_r)
+ioport_value scramble_state::darkplnt_dial_r()
 {
 	static const uint8_t remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
 								0x33, 0x32, 0x30, 0x31, 0x11, 0x10, 0x12, 0x13,

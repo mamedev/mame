@@ -5,10 +5,11 @@
 
 Conchess, a series of modular chess computers by Consumenta Computer.
 
-Hardware development by Loproc (Germany), manufactured at Wallharn Electronics
-(Ireland). The core people involved were Ulf Rathsman for the chess engine,
-and Johan Enroth. After Consumenta went under in 1983, the Conchess brand was
-continued by Systemhuset.
+Hardware design by Loproc GmbH (Germany, formerly EES), manufactured at Waltham
+Electronics (Ireland). The core people involved were Ulf Rathsman for the chess
+engine, and Johan Enroth. After Consumenta went under in 1982 before production
+started, and then Waltham in 1983, the Conchess brand was continued by Princhess
+AB and Systemhuset.
 
 TODO:
 - concglap/concglapa rom labels
@@ -16,7 +17,7 @@ TODO:
 - concvicp unmapped reads/writes
 - verify irq/beeper for concvicp, though it is probably correct
 
---------------------------------------------------------------------------------
+================================================================================
 
 Hardware notes:
 
@@ -67,8 +68,8 @@ is integrated.
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
@@ -102,7 +103,7 @@ public:
 	void concvicp(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -112,16 +113,16 @@ private:
 	required_device<beep_device> m_beeper;
 	required_ioport_array<2> m_inputs;
 
+	u8 m_inp_mux = 0;
+
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void clear_irq();
 	u8 input_r();
 	void leds_w(offs_t offset, u8 data);
 	void sound_w(u8 data);
-
-	u8 m_inp_mux = 0;
 };
 
 void conchess_state::machine_start()
@@ -299,7 +300,7 @@ void conchess_state::concvicp(machine_config &config)
 	concams5(config);
 
 	// basic machine hardware
-	M65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
+	W65C02(config.replace(), m_maincpu, 12.288_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &conchess_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(12.288_MHz_XTAL / 0x4000);
@@ -328,14 +329,14 @@ ROM_START( conc ) // 2 bytes different (bookrom fix)
 	ROM_LOAD("ccp2.f", 0xf000, 0x1000, CRC(7a04b000) SHA1(72d702b91adc643201ac6cea7aeb9394a3afc8be) ) // "
 ROM_END
 
-ROM_START( conca ) // 6 EPROMs version also exists, same rom contents
+ROM_START( conca ) // 6 EPROMs version also exists, same ROM contents
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD("c87011.b3", 0xa000, 0x2000, CRC(915e414c) SHA1(80c94712d1c79fa469576c37b80ab66f77c77cc4) )
-	ROM_LOAD("c87010.b2", 0xc000, 0x2000, CRC(088c8737) SHA1(9f841b3c47de9ef1da8ce98c0a33a919cba873c6) )
-	ROM_LOAD("c87009.b1", 0xe000, 0x2000, CRC(e1c648e2) SHA1(725a6ac1c69f788a7bba0573e5609b55b12899ac) )
+	ROM_LOAD("c87011_ccp2ab.b3", 0xa000, 0x2000, CRC(915e414c) SHA1(80c94712d1c79fa469576c37b80ab66f77c77cc4) ) // C2C076 serial also seen, same ROM contents
+	ROM_LOAD("c87010_ccp2cd.b2", 0xc000, 0x2000, CRC(088c8737) SHA1(9f841b3c47de9ef1da8ce98c0a33a919cba873c6) )
+	ROM_LOAD("c87009_ccp2ef.b1", 0xe000, 0x2000, CRC(e1c648e2) SHA1(725a6ac1c69f788a7bba0573e5609b55b12899ac) )
 ROM_END
 
-ROM_START( concgla ) // 8 EPROMs version also exists, same rom contents
+ROM_START( concgla ) // 8 EPROMs version also exists, same ROM contents
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("9128c-0133", 0x8000, 0x4000, CRC(a6ac88eb) SHA1(d1fcd990e5196c00210d380e0e04155a5ea19824) ) // GI 9128C
 	ROM_LOAD("9128c-0134", 0xc000, 0x4000, CRC(b694a275) SHA1(e4e49379b4eb45402ca8bb82c20d0169db62ed7a) ) // "
@@ -376,14 +377,14 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, conc,      0,        0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, conca,     conc,     0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Loproc", "Conchess (standard, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1982, conc,      0,        0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Waltham Electronics", "Conchess (standard, set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, conca,     conc,     0,      conc,     conchess, conchess_state, empty_init, "Consumenta Computer / Waltham Electronics", "Conchess (standard, set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1984, concgla,   0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, concglap,  0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Glasgow Plus (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1984, concglapa, concglap, 0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Glasgow Plus (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1984, concgla,   0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Princhess AB", "Conchess Princhess Glasgow", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, concglap,  0,        0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Princhess AB", "Conchess Plymate Glasgow Plus (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, concglapa, concglap, 0,      concgla,  conchess, conchess_state, empty_init, "Systemhuset / Princhess AB", "Conchess Plymate Glasgow Plus (set 2)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1985, concams,   0,        0,      concams,  conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1985, concams5,  concams,  0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1985, concams,   0,        0,      concams,  conchess, conchess_state, empty_init, "Systemhuset / Princhess AB", "Conchess Plymate Amsterdam", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, concams5,  concams,  0,      concams5, conchess, conchess_state, empty_init, "Systemhuset / Princhess AB", "Conchess Plymate Amsterdam 5.5MHz", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, concvicp,  0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Loproc", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1990, concvicp,  0,        0,      concvicp, conchess, conchess_state, empty_init, "Systemhuset / Princhess AB", "Conchess Plymate Victoria (prototype)", MACHINE_SUPPORTS_SAVE )

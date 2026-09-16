@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+authors:hap
 -->
 <mamelayout version="2">
 
@@ -10,14 +11,8 @@ license:CC0-1.0
 	<element name="static_white"><rect><color red="0.98" green="0.98" blue="1.0" /></rect></element>
 	<element name="overlay_default" defstate="4"><text string=" "></text></element>
 
-	<element name="text_on">
-		<rect><color red="0.98" green="0.98" blue="1.0" /></rect>
-		<text string="ON"><color red="0.9" green="0.7" blue="0.6" /></text>
-	</element>
-	<element name="text_off">
-		<rect><color red="0.98" green="0.98" blue="1.0" /></rect>
-		<text string="OFF"><color red="0.44" green="0.55" blue="0.9" /></text>
-	</element>
+	<element name="text_on"><text string="ON"><color red="0.9" green="0.7" blue="0.6" /></text></element>
+	<element name="text_off"><text string="OFF"><color red="0.44" green="0.55" blue="0.9" /></text></element>
 
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.4" green="0.1" blue="0.11" /></disk>
@@ -45,6 +40,7 @@ license:CC0-1.0
 	<view name="Internal Layout">
 		<bounds left="3" right="71.8" top="9.7" bottom="71.8" />
 
+		<!-- FIXME: this is a bad design and it dosn't even work.  Just use an input for the overlay code like the Beena does. -->
 		<!-- this "overlay_code" example only works for 1 view, since MAME parses all views and not just current active one -->
 		<!-- you can also put the overlay code in the view name, as $XX where XX is the hex value of the overlay in tispeak.cpp -->
 		<element name="overlay_code" ref="overlay_default"><bounds x="0" y="0" width="1" height="1" /></element>

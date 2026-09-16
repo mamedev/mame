@@ -74,9 +74,9 @@ public:
 	void superwng(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -111,8 +111,8 @@ private:
 	void main_nmi_interrupt(int state);
 	INTERRUPT_GEN_MEMBER(sound_nmi_assert);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 void superwng_state::unk_a187_w(uint8_t data)
@@ -223,7 +223,7 @@ void superwng_state::palette(palette_device &palette) const
 
 		bit0 = BIT(colors[i], 6);
 		bit1 = BIT(colors[i], 7);
-		int const b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -377,7 +377,7 @@ static INPUT_PORTS_START( superwng )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -456,7 +456,7 @@ void superwng_state::superwng(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(32*8, 32*8);

@@ -54,10 +54,6 @@
         . COIN6    : adds coin(s)/credit(s) for player 3 depending on "Coin B" Dip Switch
         . SERVICE1 : adds coin(s)/credit(s) for all players depending on "Coin A" Dip Switch
 
-    Note that I had to map COIN5 and COIN6 to SERVICE2 and SERVICE3 to be
-    able to use the default parametrable keys. Let me know if there is a
-    another (better ?) way to do so.
-
     ----------------------------------------------------------------------------------------
 
     RansAckeR's notes:
@@ -100,9 +96,8 @@
 
 #include "emu.h"
 
-// src/mame
 #include "snk_bbusters_spr.h"
-// src/devices
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -110,7 +105,7 @@
 #include "machine/upd7004.h"
 #include "sound/ymopn.h"
 #include "video/bufsprite.h"
-// src/emu
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -130,18 +125,17 @@ public:
 		m_sprites(*this, "sprites%u", 1U),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_soundlatch(*this, "soundlatch%u", 1U),
-		m_tx_videoram(*this, "tx_videoram"),
-		m_pf_data(*this, "pf%u_data", 1U),
-		m_pf_scroll_data(*this, "pf%u_scroll_data", 1U),
+		m_tx_vram(*this, "tx_videoram"),
+		m_pf_vram(*this, "pf%u_vram", 1U),
+		m_pf_scroll_reg(*this, "pf%u_scroll_reg", 1U),
 		m_gun_recoil(*this, "Player%u_Gun_Recoil", 1U),
 		m_eprom_data(*this, "eeprom")
 	{ }
 
-	void bbusters(machine_config &config);
+	void bbusters(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -152,9 +146,9 @@ private:
 	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_tx_videoram;
-	required_shared_ptr_array<uint16_t, 2> m_pf_data;
-	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_data;
+	required_shared_ptr<uint16_t> m_tx_vram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_vram;
+	required_shared_ptr_array<uint16_t, 2> m_pf_scroll_reg;
 
 	output_finder<3> m_gun_recoil;
 	required_shared_ptr<uint16_t> m_eprom_data;
@@ -162,35 +156,28 @@ private:
 	tilemap_t *m_fix_tilemap = nullptr;
 	tilemap_t *m_pf_tilemap[2]{};
 
+	bitmap_ind16 m_bitmap_sprites[2];
+
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	template <int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
 
 	void sound_cpu_w(uint8_t data);
-	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	template<int Layer> void pf_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <int Layer> void pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coin_counter_w(uint8_t data);
 
-	void bbusters_map(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
-
 	uint16_t eprom_r(offs_t offset);
-	void three_gun_output_w(uint16_t data);
-
-	void mixlow(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect);
-	void mix(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect);
+	void gun_output_w(uint16_t data);
 
 	template <typename Proc>
 	void mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect, Proc MIX);
 
-	bitmap_ind16 m_bitmap_sprites[2];
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-};
 
-void bbusters_state::machine_start()
-{
-	m_gun_recoil.resolve();
-}
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+};
 
 void bbusters_state::sound_cpu_w(uint8_t data)
 {
@@ -204,16 +191,16 @@ uint16_t bbusters_state::eprom_r(offs_t offset)
 	return (m_eprom_data[offset] & 0xff) | 0xff00;
 }
 
-void bbusters_state::three_gun_output_w(uint16_t data)
+void bbusters_state::gun_output_w(uint16_t data)
 {
 	for (int i = 0; i < 3; i++)
 		m_gun_recoil[i] = BIT(data, i);
 }
 
 template <int Layer>
-void bbusters_state::pf_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bbusters_state::pf_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_pf_data[Layer][offset]);
+	COMBINE_DATA(&m_pf_vram[Layer][offset]);
 	m_pf_tilemap[Layer]->mark_tile_dirty(offset);
 }
 
@@ -226,27 +213,26 @@ void bbusters_state::coin_counter_w(uint8_t data)
 
 TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 {
-	uint16_t tile = m_tx_videoram[tile_index];
+	uint16_t const tile = m_tx_vram[tile_index];
 
-	tileinfo.set(0, tile&0xfff, tile>>12, 0);
+	tileinfo.set(0, tile & 0xfff, tile >> 12, 0);
 }
 
 template <int Layer, int Gfx>
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf_tile_info)
 {
-	uint16_t tile = m_pf_data[Layer][tile_index];
+	uint16_t const tile = m_pf_vram[Layer][tile_index];
 
-	tileinfo.set(Gfx, tile&0xfff, tile>>12, 0);
+	tileinfo.set(Gfx, tile & 0xfff, tile >> 12, 0);
 }
 
-void bbusters_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bbusters_state::tx_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_tx_videoram[offset]);
+	COMBINE_DATA(&m_tx_vram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 /******************************************************************************/
-
 
 void bbusters_state::video_start()
 {
@@ -258,15 +244,12 @@ void bbusters_state::video_start()
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 
-	for (int i = 0; i < 2; i++)
+	for (auto &bitmap : m_bitmap_sprites)
 	{
-		m_screen->register_screen_bitmap(m_bitmap_sprites[i]);
-		m_bitmap_sprites[i].fill(0xffff);
+		m_screen->register_screen_bitmap(bitmap);
+		bitmap.fill(0xffff);
 	}
-
 }
-
-/******************************************************************************/
 
 /******************************************************************************/
 
@@ -275,11 +258,11 @@ void bbusters_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, 
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *srcbuf = &srcbitmap.pix(y);
-		uint16_t *dstbuf = &bitmap.pix(y);
+		uint16_t const *const srcbuf = &srcbitmap.pix(y);
+		uint16_t *const dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			uint16_t srcdat = srcbuf[x];
+			uint16_t const srcdat = srcbuf[x];
 			if ((srcdat & 0xf) != 0xf)
 				MIX(srcdat, x, dstbuf);
 		}
@@ -293,10 +276,10 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sprites[1]->draw_sprites(m_bitmap_sprites[1], cliprect);
 	m_sprites[0]->draw_sprites(m_bitmap_sprites[0], cliprect);
 
-	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_data[0][0]);
-	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_data[0][1]);
-	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_data[1][0]);
-	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_data[1][1]);
+	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_reg[0][0]);
+	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_reg[0][1]);
+	m_pf_tilemap[1]->set_scrollx(0, m_pf_scroll_reg[1][0]);
+	m_pf_tilemap[1]->set_scrolly(0, m_pf_scroll_reg[1][1]);
 
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -313,20 +296,20 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 /*******************************************************************************/
 
-void bbusters_state::bbusters_map(address_map &map)
+void bbusters_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x08ffff).ram().share("ram");
-	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::video_w)).share("tx_videoram");
+	map(0x080000, 0x08ffff).ram();
+	map(0x090000, 0x090fff).ram().w(FUNC(bbusters_state::tx_vram_w)).share(m_tx_vram);
 	map(0x0a0000, 0x0a0fff).ram().share("spriteram1");
 	map(0x0a1000, 0x0a7fff).ram();     /* service mode */
 	map(0x0a8000, 0x0a8fff).ram().share("spriteram2");
 	map(0x0a9000, 0x0affff).ram();     /* service mode */
-	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf_w<0>)).share("pf1_data");
-	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf_w<1>)).share("pf2_data");
+	map(0x0b0000, 0x0b1fff).ram().w(FUNC(bbusters_state::pf_vram_w<0>)).share(m_pf_vram[0]);
+	map(0x0b2000, 0x0b3fff).ram().w(FUNC(bbusters_state::pf_vram_w<1>)).share(m_pf_vram[1]);
 	map(0x0b4000, 0x0b5fff).ram();     /* service mode */
-	map(0x0b8000, 0x0b8003).writeonly().share("pf1_scroll_data");
-	map(0x0b8008, 0x0b800b).writeonly().share("pf2_scroll_data");
+	map(0x0b8000, 0x0b8003).writeonly().share(m_pf_scroll_reg[0]);
+	map(0x0b8008, 0x0b800b).writeonly().share(m_pf_scroll_reg[1]);
 	map(0x0d0000, 0x0d0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0e0001).portr("COINS");  /* Coins */
 	map(0x0e0002, 0x0e0003).portr("IN0");    /* Player 1 & 2 */
@@ -336,9 +319,9 @@ void bbusters_state::bbusters_map(address_map &map)
 	map(0x0e0019, 0x0e0019).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x0e8000, 0x0e8003).rw("adc", FUNC(upd7004_device::read), FUNC(upd7004_device::write)).umask16(0x00ff);
 	map(0x0f0000, 0x0f0001).w(FUNC(bbusters_state::coin_counter_w));
-	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::three_gun_output_w));
+	map(0x0f0008, 0x0f0009).w(FUNC(bbusters_state::gun_output_w));
 	map(0x0f0019, 0x0f0019).w(FUNC(bbusters_state::sound_cpu_w));
-	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share("eeprom"); /* Eeprom */
+	map(0x0f8000, 0x0f80ff).r(FUNC(bbusters_state::eprom_r)).writeonly().share(m_eprom_data); /* Eeprom */
 }
 
 /*******************************************************************************/
@@ -399,19 +382,6 @@ static INPUT_PORTS_START( bbusters )
 	PORT_DIPSETTING(    0x06, "7 / 3" )
 	PORT_DIPSETTING(    0x02, "9 / 4" )
 	PORT_DIPSETTING(    0x00, "12 / 5" )
-	/* Manual (from a different revision/region?) says:
-	                    SW1:4   SW1:5   SW1:6
-	1C_1C 1 To continue OFF     OFF     OFF
-	2C_1C 1 To continue ON      OFF     OFF
-	1C_2C 1 To continue OFF     ON      OFF
-	2C_1C 2 To continue ON      ON      OFF
-	3C_1C 1 To continue OFF     OFF     ON
-	3C_1C 2 To continue ON      OFF     ON
-	4C_3C 1 To continue OFF     ON      ON
-	Free Play Mode      OFF     OFF     OFF
-
-	SW1:7 Unused
-	SW1:8 Blood color: ON=green OFF=red */
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -461,12 +431,61 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT(0x3ff, 0x212, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x14e, 0x33e) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bbustersu )
+	PORT_INCLUDE( bbusters )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x10, "3 Coins/1 Credit 2/1" )
+	PORT_DIPSETTING(    0x18, "3 Coins/1 Credit 1/1" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, "2 Coins/1 Credit 1/1" )
+	PORT_DIPSETTING(    0x08, "4 Coins/3 Credits 1/1" )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x28, "1 Coin/2 Credits 1/1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, "Blood Color" )               PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, "Green" )
+	PORT_DIPSETTING(    0x40, "Red" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bbustersja )
+	PORT_INCLUDE( bbusters )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	// remove player 3
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("GUNY3")
+	PORT_BIT(0x3ff, 0x000, IPT_UNUSED)
+
+	PORT_MODIFY("GUNX3")
+	PORT_BIT(0x3ff, 0x000, IPT_UNUSED)
+INPUT_PORTS_END
+
 /******************************************************************************/
 
 static GFXDECODE_START( gfx_bbusters )
-	GFXDECODE_ENTRY( "tx_tiles", 0, gfx_8x8x4_packed_msb,                      0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0,     gfx_8x8x4_col_2x2_group_packed_msb,      768, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0,     gfx_8x8x4_col_2x2_group_packed_msb, 1024+256, 16 )
+	GFXDECODE_ENTRY( "tx_tiles",  0, gfx_8x8x4_packed_msb,                      0, 16 )
+	GFXDECODE_ENTRY( "bg1_tiles", 0, gfx_8x8x4_col_2x2_group_packed_msb,      768, 16 )
+	GFXDECODE_ENTRY( "bg2_tiles", 0, gfx_8x8x4_col_2x2_group_packed_msb, 1024+256, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -475,7 +494,7 @@ void bbusters_state::bbusters(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::bbusters_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bbusters_state::irq6_line_hold));
 
 	Z80(config, m_audiocpu, 4000000); // Accurate
@@ -494,7 +513,7 @@ void bbusters_state::bbusters(machine_config &config)
 	adc.in_callback<5>().set_ioport("GUNX3");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
@@ -506,12 +525,12 @@ void bbusters_state::bbusters(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
 	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
-	SNK_BBUSTERS_SPR(config, m_sprites[0], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[0]);
 	m_sprites[0]->set_scaletable_tag("sprites1:scale_table");
 	m_sprites[0]->set_palette("palette");
 	m_sprites[0]->set_spriteram_tag("spriteram1");
 
-	SNK_BBUSTERS_SPR(config, m_sprites[1], 0);
+	SNK_BBUSTERS_SPR(config, m_sprites[1]);
 	m_sprites[1]->set_scaletable_tag("sprites2:scale_table");
 	m_sprites[1]->set_palette("palette");
 	m_sprites[1]->set_spriteram_tag("spriteram2");
@@ -520,18 +539,17 @@ void bbusters_state::bbusters(machine_config &config)
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(0, "rspeaker", 1.0);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(0, "speaker", 1.0, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 /******************************************************************************/
@@ -561,10 +579,10 @@ ROM_START( bbusters )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -607,10 +625,10 @@ ROM_START( bbustersu )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -625,7 +643,7 @@ ROM_START( bbustersu )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
-	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
 
 ROM_START( bbustersua )
@@ -653,10 +671,10 @@ ROM_START( bbustersua )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -671,7 +689,7 @@ ROM_START( bbustersua )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
-	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
+	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
 
 ROM_START( bbustersj )
@@ -699,10 +717,10 @@ ROM_START( bbustersj )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -745,10 +763,10 @@ ROM_START( bbustersja )
 	ROM_LOAD16_WORD_SWAP( "bb-f23.l13",  0x100000, 0x80000, CRC(c89fe0da) SHA1(92be860a7191e7473c42aa2da981eda873219d3d) )
 	ROM_LOAD16_WORD_SWAP( "bb-f24.l15",  0x180000, 0x80000, CRC(e0d81359) SHA1(2213c17651b6c023a456447f352b0739439f913a) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg1_tiles", 0 )
 	ROM_LOAD( "bb-back1.m4", 0x000000, 0x80000, CRC(b5445313) SHA1(3c99b557b2af30ff0fbc8a7dc6c40448c4f327db) )
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x80000, "bg2_tiles", 0 )
 	ROM_LOAD( "bb-back2.m6", 0x000000, 0x80000, CRC(8be996f6) SHA1(1e2c56f4c24793f806d7b366b92edc03145ae94c) )
 
 	ROM_REGION( 0x10000, "sprites1:scale_table", 0 ) /* Zoom table - same rom exists in 4 different locations on the board */
@@ -770,8 +788,8 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, bbusters,   0,        bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersu,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersua, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersj,  bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbustersja, bbusters, bbusters, bbusters, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbusters,   0,        bbusters, bbusters,   bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (World)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersu,  bbusters, bbusters, bbustersu,  bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 3)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersua, bbusters, bbusters, bbustersu,  bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (US, Version 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersj,  bbusters, bbusters, bbusters,   bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 3 Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbustersja, bbusters, bbusters, bbustersja, bbusters_state, empty_init, ROT0, "SNK", "Beast Busters (Japan, Version 2, 2 Player)", MACHINE_SUPPORTS_SAVE )

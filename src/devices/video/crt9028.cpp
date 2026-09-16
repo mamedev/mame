@@ -24,7 +24,8 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "video/crt9028.h"
+#include "crt9028.h"
+
 #include "screen.h"
 
 //**************************************************************************
@@ -124,7 +125,7 @@ void crt9028_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (screen().refresh_attoseconds() == 0)
+	if (!screen().has_been_setup())
 	{
 		int visible_scan_lines = m_char_rows * m_scans_per_char;
 		screen().set_raw(clock(), m_dots_per_char * (m_chars_per_row + m_horiz_blanking), 0, m_dots_per_char * m_chars_per_row,

@@ -85,15 +85,15 @@ INPUT_CHANGED_MEMBER( v9938_busmouse_device::mouse_pos_changed )
 
 INPUT_PORTS_START( busmouse )
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
-		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, v9938_busmouse_device, mouse_pos_changed, 1)
+		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(v9938_busmouse_device::mouse_pos_changed), 1)
 
 	PORT_START("MOUSEY") /* Mouse - Y AXIS */
-		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, v9938_busmouse_device, mouse_pos_changed, 2)
+		PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(v9938_busmouse_device::mouse_pos_changed), 2)
 
 	PORT_START("MOUSEBUT") /* mouse buttons */
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CHANGED_MEMBER(DEVICE_SELF, v9938_busmouse_device, mouse_button_changed, 4)
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CHANGED_MEMBER(DEVICE_SELF, v9938_busmouse_device, mouse_button_changed, 1)
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middle mouse button") PORT_CHANGED_MEMBER(DEVICE_SELF, v9938_busmouse_device, mouse_button_changed, 2)
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(v9938_busmouse_device::mouse_button_changed), 4)
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(v9938_busmouse_device::mouse_button_changed), 1)
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Middle mouse button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(v9938_busmouse_device::mouse_button_changed), 2)
 INPUT_PORTS_END
 
 ioport_constructor v9938_busmouse_device::device_input_ports() const

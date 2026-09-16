@@ -776,7 +776,7 @@ void lw30_state::lw30(machine_config &config)
 	maincpu->set_addrmap(AS_IO, &lw30_state::map_io);
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, screen);
 	screen->set_color(rgb_t(6, 245, 206));
 	screen->set_physical_aspect(480, 128);
 	screen->set_refresh_hz(78.1);

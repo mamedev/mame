@@ -32,7 +32,7 @@
     ------------------
       22  SAA5240
       A2  PCF8582
-      C0  ?
+      C0  SAB3036
 
     TODO:
     - implement keypad
@@ -75,7 +75,7 @@ public:
 	void datacast(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	uint8_t keypad_r();
@@ -83,8 +83,7 @@ private:
 	uint8_t i2c_r();
 	void i2c_w(uint8_t data);
 
-	void mem_map(address_map &map);
-	void saa5240_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -109,18 +108,12 @@ void datacast_state::mem_map(address_map &map)
 	map(0x00000, 0x7ffff).ram();
 	map(0xc0000, 0xc0000).rw(FUNC(datacast_state::keypad_r), FUNC(datacast_state::keypad_w)).umask16(0x00ff);
 	map(0xc0080, 0xc0080).lr8([]() { return 0xff; }, "dips"); // unknown purpose
-	map(0xc0100, 0xc010f).noprw(); //.rw(m_saa5250, FUNC(saa5250_device::read), FUNC(saa5250_device::write)).umask16(0x00ff);
+	map(0xc0100, 0xc010f).noprw(); //.rw(m_cidac, FUNC(saa5250_device::read), FUNC(saa5250_device::write)).umask16(0x00ff);
 	map(0xc0180, 0xc0180).rw(FUNC(datacast_state::i2c_r), FUNC(datacast_state::i2c_w)).umask16(0x00ff);
 	map(0xc0200, 0xc0203).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc0280, 0xc0280).w(m_dbrg, FUNC(com8116_device::stt_str_w));
 	map(0xc0300, 0xc0303).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xf0000, 0xfffff).rom().region("rom", 0);
-}
-
-void datacast_state::saa5240_map(address_map &map)
-{
-	map.global_mask(0x07ff);
-	map(0x0000, 0x07ff).ram();
 }
 
 
@@ -158,7 +151,7 @@ INPUT_PORTS_END
 uint8_t datacast_state::keypad_r()
 {
 	uint8_t data = (m_kb->read() << 0) | (m_kb->da_r() << 5);
-	logerror("keypad_r: %02x\n", data);
+	logerror("%s keypad_r: %02x\n", machine().describe_context(), data);
 	return data;
 }
 
@@ -166,13 +159,13 @@ void datacast_state::keypad_w(uint8_t data)
 {
 	m_key_col = data;
 
-	logerror("keypad_w: %02x\n", data);
+	logerror("%s keypad_w: %02x\n", machine().describe_context(), data);
 }
 
 
 uint8_t datacast_state::i2c_r()
 {
-	return m_i2cmem->read_sda() &  m_cct->read_sda();
+	return m_i2cmem->read_sda() & m_cct->read_sda();
 }
 
 void datacast_state::i2c_w(uint8_t data)
@@ -190,11 +183,11 @@ void datacast_state::datacast(machine_config &config)
 	I80186(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &datacast_state::mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(6_MHz_XTAL, 768, 0, 480, 312, 0, 250);
 	m_screen->set_screen_update("saa5240", FUNC(saa5240a_device::screen_update));
 
-	MM74C923(config, m_kb, 0);
+	MM74C923(config, m_kb);
 	m_kb->x1_rd_callback().set_ioport("X1");
 	m_kb->x2_rd_callback().set_ioport("X2");
 	m_kb->x3_rd_callback().set_ioport("X3");
@@ -203,10 +196,10 @@ void datacast_state::datacast(machine_config &config)
 	//SAA5231(config, m_saa5231, 13.875_MHz_XTAL);
 
 	SAA5240A(config, m_cct, 6_MHz_XTAL);
-	m_cct->set_addrmap(0, &datacast_state::saa5240_map);
+	m_cct->set_ram_size(0x800);
 
-	//SAA5250(config, m_saa5250, 0);
-	//m_saa5250->set_addrmap(0, &datacast_state::saa5250_map); // 2K RAM
+	//SAA5250(config, m_cidac);
+	//m_cidac->set_buffer_size(0x800);
 
 	I2C_PCF8582(config, m_i2cmem).set_e0(1);
 
@@ -219,7 +212,7 @@ void datacast_state::datacast(machine_config &config)
 	input_merger_device &usartint(INPUT_MERGER_ANY_HIGH(config, "usartint"));
 	usartint.output_handler().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	I8251(config, m_usart[0], 0);
+	I8251(config, m_usart[0]);
 	m_usart[0]->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
 	m_usart[0]->dtr_handler().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_usart[0]->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
@@ -230,7 +223,7 @@ void datacast_state::datacast(machine_config &config)
 	modem.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
 	modem.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
 
-	I8251(config, m_usart[1], 0);
+	I8251(config, m_usart[1]);
 	m_usart[1]->txd_handler().set("printer", FUNC(rs232_port_device::write_txd));
 	m_usart[1]->dtr_handler().set("printer", FUNC(rs232_port_device::write_dtr));
 	m_usart[1]->rts_handler().set("printer", FUNC(rs232_port_device::write_rts));
@@ -243,7 +236,7 @@ void datacast_state::datacast(machine_config &config)
 
 	// Teletext data is extracted from video signal by SAA5231.
 	// Use bitbanger to read a T42 teletext stream.
-	BITBANGER(config, m_ttd, 0);
+	BITBANGER(config, m_ttd);
 }
 
 

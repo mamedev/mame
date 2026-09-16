@@ -165,12 +165,12 @@ public:
 	void init_x2222();
 
 	int mirror_service_r();
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	ioport_value gstream_mirror_r();
 	int x2222_toggle_r();
 
 private:
 	/* devices */
-	required_device<e132xt_device> m_maincpu;
+	required_device<e132x_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
 
 	/* memory pointers */
@@ -196,9 +196,9 @@ private:
 	uint32_t gstream_speedup_r();
 	uint32_t x2222_speedup_r();
 	uint32_t x2222_speedup2_r();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_bg(bitmap_rgb32 &bitmap, const rectangle &cliprect, int map, uint32_t* ram);
 	void drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,gfx_element *gfx2,
@@ -209,10 +209,10 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void gstream_32bit_map(address_map &map);
-	void gstream_io(address_map &map);
-	void x2222_32bit_map(address_map &map);
-	void x2222_io(address_map &map);
+	void gstream_32bit_map(address_map &map) ATTR_COLD;
+	void gstream_io(address_map &map) ATTR_COLD;
+	void x2222_32bit_map(address_map &map) ATTR_COLD;
+	void x2222_io(address_map &map) ATTR_COLD;
 };
 
 int gstream_state::x2222_toggle_r() // or the game hangs when starting, might be a status flag for the sound?
@@ -232,7 +232,7 @@ int gstream_state::mirror_service_r()
 	return ~result;
 }
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
+ioport_value gstream_state::gstream_mirror_r()
 {
 	int result;
 
@@ -353,13 +353,13 @@ void gstream_state::gstream_oki_4040_w(uint32_t data)
 
 void gstream_state::gstream_io(address_map &map)
 {
-	map(0x4000, 0x4003).portr("IN0");
-	map(0x4010, 0x4013).portr("IN1");
-	map(0x4020, 0x4023).portr("IN2");    // extra coin switches etc
-	map(0x4030, 0x4033).w(FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
-	map(0x4040, 0x4043).w(FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
-	map(0x4053, 0x4053).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
-	map(0x4063, 0x4063).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
+	map(0x1000, 0x1000).portr("IN0");
+	map(0x1004, 0x1004).portr("IN1");
+	map(0x1008, 0x1008).portr("IN2");    // extra coin switches etc
+	map(0x100c, 0x100c).w(FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
+	map(0x1010, 0x1010).w(FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
+	map(0x1014, 0x1014).umask32(0x000000ff).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
+	map(0x1018, 0x1018).umask32(0x000000ff).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
 }
 
 
@@ -391,12 +391,12 @@ void gstream_state::x2222_sound_w(uint32_t data)
 
 void gstream_state::x2222_io(address_map &map)
 {
-	map(0x4000, 0x4003).portr("P1");
-	map(0x4004, 0x4007).portr("P2");
-	map(0x4008, 0x400b).portr("SYS");
-	map(0x4010, 0x4013).portr("DSW");
-	map(0x4028, 0x402b).w(FUNC(gstream_state::x2222_sound_w));
-	map(0x4034, 0x4037).portr("IN4");
+	map(0x1000, 0x1000).portr("P1");
+	map(0x1001, 0x1001).portr("P2");
+	map(0x1002, 0x1002).portr("SYS");
+	map(0x1004, 0x1004).portr("DSW");
+	map(0x100a, 0x100a).w(FUNC(gstream_state::x2222_sound_w));
+	map(0x100d, 0x100d).portr("IN4");
 }
 
 static INPUT_PORTS_START( gstream )
@@ -430,10 +430,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, mirror_service_r)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(gstream_state::mirror_service_r))
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gstream_state, gstream_mirror_r)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gstream_state::gstream_mirror_r))
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -525,7 +525,7 @@ static INPUT_PORTS_START( x2222 )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, x2222_toggle_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(gstream_state::x2222_toggle_r))
 INPUT_PORTS_END
 
 
@@ -832,7 +832,7 @@ void gstream_state::machine_reset()
 void gstream_state::gstream(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 16'000'000*4); // E1-32XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::gstream_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &gstream_state::gstream_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
@@ -840,7 +840,7 @@ void gstream_state::gstream(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 240);
@@ -861,7 +861,7 @@ void gstream_state::gstream(machine_config &config)
 void gstream_state::x2222(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 16'000'000*4); // E1-32XT (TQFP) 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::x2222_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &gstream_state::x2222_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
@@ -869,7 +869,7 @@ void gstream_state::x2222(machine_config &config)
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 240);

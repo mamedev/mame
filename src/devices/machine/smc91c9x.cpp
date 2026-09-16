@@ -179,8 +179,6 @@ void smc91c9x_device::device_reset()
 
 	m_reg[B3_ERCV]         = 0x331f;   m_regmask[B3_ERCV]         = 0x009f;
 
-	set_promisc(false);
-
 	update_ethernet_irq();
 
 	// Reset MMU
@@ -564,10 +562,8 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::tx_poll)
 		{
 			u32 crc = util::crc32_creator::simple(tx_buffer + 4, length - 4);
 
-			tx_buffer[length++] = (crc >> 0) & 0xff;
-			tx_buffer[length++] = (crc >> 8) & 0xff;
-			tx_buffer[length++] = (crc >> 16) & 0xff;
-			tx_buffer[length++] = (crc >> 24) & 0xff;
+			put_u32le(&tx_buffer[length], crc);
+			length += 4;
 		}
 
 		// Remove status, length
@@ -937,11 +933,6 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 				m_reg[B0_EPH_STATUS] |= LINK_OK;
 			}
 
-			if ((old_reg ^ new_reg) & PRMS)
-			{
-				set_promisc(new_reg & PRMS);
-			}
-
 			if (VERBOSE & LOG_GENERAL)
 			{
 				if (data & SOFT_RST)    LOG("   SOFT RST\n");
@@ -974,8 +965,6 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 		case B1_IA4_5:
 			if ( ACCESSING_BITS_8_15 )
 			{
-				set_promisc(m_reg[B0_RCR] & PRMS);
-
 				u8 mac[6];
 				put_u16le(&mac[0], m_reg[B1_IA0_1]);
 				put_u16le(&mac[2], m_reg[B1_IA2_3]);

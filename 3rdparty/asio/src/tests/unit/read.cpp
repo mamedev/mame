@@ -2,7 +2,7 @@
 // read.cpp
 // ~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,9 @@
 // Test that header file is self-contained.
 #include "asio/read.hpp"
 
+#include <array>
 #include <cstring>
+#include <functional>
 #include <vector>
 #include "archetypes/async_result.hpp"
 #include "asio/io_context.hpp"
@@ -24,19 +26,9 @@
 #include "asio/streambuf.hpp"
 #include "unit_test.hpp"
 
-#if defined(ASIO_HAS_BOOST_BIND)
-# include <boost/bind/bind.hpp>
-#else // defined(ASIO_HAS_BOOST_BIND)
-# include <functional>
-#endif // defined(ASIO_HAS_BOOST_BIND)
-
 #if defined(ASIO_HAS_BOOST_ARRAY)
 #include <boost/array.hpp>
 #endif // defined(ASIO_HAS_BOOST_ARRAY)
-
-#if defined(ASIO_HAS_STD_ARRAY)
-# include <array>
-#endif // defined(ASIO_HAS_STD_ARRAY)
 
 using namespace std; // For memcmp, memcpy and memset.
 
@@ -53,7 +45,7 @@ public:
   {
   }
 
-  executor_type get_executor() ASIO_NOEXCEPT
+  executor_type get_executor() noexcept
   {
     return io_context_.get_executor();
   }
@@ -121,12 +113,12 @@ public:
 
   template <typename Mutable_Buffers, typename Handler>
   void async_read_some(const Mutable_Buffers& buffers,
-      ASIO_MOVE_ARG(Handler) handler)
+      Handler&& handler)
   {
     size_t bytes_transferred = read_some(buffers);
     asio::post(get_executor(),
         asio::detail::bind_handler(
-          ASIO_MOVE_CAST(Handler)(handler),
+          static_cast<Handler&&>(handler),
           asio::error_code(), bytes_transferred));
   }
 
@@ -439,11 +431,7 @@ bool old_style_transfer_all(const asio::error_code& ec,
 struct short_transfer
 {
   short_transfer() {}
-#if defined(ASIO_HAS_MOVE)
   short_transfer(short_transfer&&) {}
-#else // defined(ASIO_HAS_MOVE)
-  short_transfer(const short_transfer&) {}
-#endif // defined(ASIO_HAS_MOVE)
   size_t operator()(const asio::error_code& ec,
       size_t /*bytes_transferred*/)
   {
@@ -2475,11 +2463,7 @@ void async_read_handler(const asio::error_code& e,
 
 void test_3_arg_mutable_buffer_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -2531,15 +2515,23 @@ void test_3_arg_mutable_buffer_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+    asio::async_read(s, buffers)(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 }
 
 void test_3_arg_boost_array_buffers_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -2593,20 +2585,27 @@ void test_3_arg_boost_array_buffers_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers)(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 #endif // defined(ASIO_HAS_BOOST_ARRAY)
 }
 
 void test_3_arg_std_array_buffers_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
-#if defined(ASIO_HAS_STD_ARRAY)
   asio::io_context ioc;
   test_stream s(ioc);
   char read_buf[sizeof(read_data)];
@@ -2656,16 +2655,23 @@ void test_3_arg_std_array_buffers_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
-#endif // defined(ASIO_HAS_STD_ARRAY)
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers)(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 }
 
 void test_3_arg_vector_buffers_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -2719,15 +2725,23 @@ void test_3_arg_vector_buffers_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers)(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 }
 
 void test_3_arg_dynamic_string_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -2784,16 +2798,25 @@ void test_3_arg_dynamic_string_async_read()
   ioc.run();
   ASIO_CHECK(sb.size() == sizeof(read_data));
   ASIO_CHECK(s.check_buffers(sb.data(0, sb.size()), sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  sb.consume(sb.size());
+  called = false;
+  asio::async_read(s, sb)(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(sb.size() == sizeof(read_data));
+  ASIO_CHECK(s.check_buffers(sb.data(0, sb.size()), sizeof(read_data)));
 }
 
 void test_3_arg_streambuf_async_read()
 {
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -2847,16 +2870,25 @@ void test_3_arg_streambuf_async_read()
   ioc.run();
   ASIO_CHECK(sb.size() == sizeof(read_data));
   ASIO_CHECK(s.check_buffers(sb.data(), sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  sb.consume(sb.size());
+  called = false;
+  asio::async_read(s, sb)(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(sb.size() == sizeof(read_data));
+  ASIO_CHECK(s.check_buffers(sb.data(), sizeof(read_data)));
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 }
 
 void test_4_arg_mutable_buffer_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -3189,15 +3221,23 @@ void test_4_arg_mutable_buffer_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers, short_transfer())(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 }
 
 void test_4_arg_boost_array_buffers_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -3532,20 +3572,27 @@ void test_4_arg_boost_array_buffers_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers, short_transfer())(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 #endif // defined(ASIO_HAS_BOOST_ARRAY)
 }
 
 void test_4_arg_std_array_buffers_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
-#if defined(ASIO_HAS_STD_ARRAY)
   asio::io_context ioc;
   test_stream s(ioc);
   char read_buf[sizeof(read_data)];
@@ -3876,16 +3923,23 @@ void test_4_arg_std_array_buffers_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
-#endif // defined(ASIO_HAS_STD_ARRAY)
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers, short_transfer())(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 }
 
 void test_4_arg_vector_buffers_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -4220,15 +4274,23 @@ void test_4_arg_vector_buffers_async_read()
   ioc.restart();
   ioc.run();
   ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  memset(read_buf, 0, sizeof(read_buf));
+  called = false;
+  asio::async_read(s, buffers, short_transfer())(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(s.check_buffers(buffers, sizeof(read_data)));
 }
 
 void test_4_arg_dynamic_string_async_read()
 {
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -4590,16 +4652,25 @@ void test_4_arg_dynamic_string_async_read()
   ioc.run();
   ASIO_CHECK(sb.size() == sizeof(read_data));
   ASIO_CHECK(s.check_buffers(sb.data(0, sb.size()), sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  sb.consume(sb.size());
+  called = false;
+  asio::async_read(s, sb, short_transfer())(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(sb.size() == sizeof(read_data));
+  ASIO_CHECK(s.check_buffers(sb.data(0, sb.size()), sizeof(read_data)));
 }
 
 void test_4_arg_streambuf_async_read()
 {
 #if !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
-#if defined(ASIO_HAS_BOOST_BIND)
-  namespace bindns = boost;
-#else // defined(ASIO_HAS_BOOST_BIND)
   namespace bindns = std;
-#endif // defined(ASIO_HAS_BOOST_BIND)
   using bindns::placeholders::_1;
   using bindns::placeholders::_2;
 
@@ -4956,6 +5027,19 @@ void test_4_arg_streambuf_async_read()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+  ASIO_CHECK(sb.size() == sizeof(read_data));
+  ASIO_CHECK(s.check_buffers(sb.data(), sizeof(read_data)));
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  sb.consume(sb.size());
+  called = false;
+  asio::async_read(s, sb, short_transfer())(
+      bindns::bind(async_read_handler,
+        _1, _2, sizeof(read_data), &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
   ASIO_CHECK(sb.size() == sizeof(read_data));
   ASIO_CHECK(s.check_buffers(sb.data(), sizeof(read_data)));
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)

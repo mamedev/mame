@@ -28,9 +28,9 @@ public:
 protected:
 	a78_xboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<a78_cart_slot_device> m_xbslot;
 	required_device<pokey_device> m_pokey;
@@ -54,9 +54,9 @@ public:
 	virtual uint8_t read_30xx(offs_t offset) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	required_device<ym2151_device> m_ym;
 	int m_ym_enabled;

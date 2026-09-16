@@ -71,15 +71,15 @@ private:
 	void astron_COLOR_write(offs_t offset, uint8_t data);
 	void astron_FIX_write(offs_t offset, uint8_t data);
 	void astron_io_bankswitch_w(uint8_t data);
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mainmem(address_map &map);
-	void mainport(address_map &map);
+	void mainmem(address_map &map) ATTR_COLD;
+	void mainport(address_map &map) ATTR_COLD;
 };
 
 /* VIDEO GOODS */
@@ -137,7 +137,7 @@ uint32_t segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 
 uint8_t segald_state::astron_DISC_read(offs_t offset)
 {
 	if (m_nmi_enable)
-		m_ldv1000_input_latch = m_laserdisc->status_r();
+		m_ldv1000_input_latch = m_laserdisc->data_r();
 
 	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", m_ldv1000_input_latch, offset, m_maincpu->pc());
 
@@ -382,10 +382,10 @@ void segald_state::astron(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &segald_state::mainport);
 	m_maincpu->set_periodic_int(FUNC(segald_state::nmi_line_pulse), attotime::from_hz(1000.0/59.94));
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(segald_state::screen_update_astron));
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
@@ -394,8 +394,7 @@ void segald_state::astron(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

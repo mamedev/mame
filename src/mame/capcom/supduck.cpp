@@ -77,9 +77,9 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -113,9 +113,9 @@ private:
 
 	void okibank_w(uint8_t data);
 
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
@@ -138,7 +138,6 @@ TILEMAP_MAPPER_MEMBER(supduck_state::tilemap_scan)
 
 	offset += (((row ^ 0x3f) & ~0x7) / 0x8) * 0x400;
 
-
 	return offset;
 }
 
@@ -151,13 +150,6 @@ void supduck_state::video_start()
 
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
-
-	m_text_tilemap->set_scrolldx(128, 128);
-	m_text_tilemap->set_scrolldy(  6,   6);
-	m_fore_tilemap->set_scrolldx(128, 128);
-	m_fore_tilemap->set_scrolldy(  6,   6);
-	m_back_tilemap->set_scrolldx(128, 128);
-	m_back_tilemap->set_scrolldy(  6,   6);
 }
 
 uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -336,7 +328,7 @@ static INPUT_PORTS_START( supduck )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // not sure, probably wrong
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // not sure, probably wrong
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -442,8 +434,8 @@ void supduck_state::supduck(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &supduck_state::sound_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(6000000, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(supduck_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
@@ -452,7 +444,7 @@ void supduck_state::supduck(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
-	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	TIGEROAD_SPRITE(config, m_spritegen);
 	m_spritegen->set_palette(m_palette);
 	m_spritegen->set_color_base(512);    // colors 512- 767
 

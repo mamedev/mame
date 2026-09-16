@@ -31,14 +31,15 @@ public:
 protected:
 	a2bus_titan3plus2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual u8 read_inh_rom(u16 offset) override;
 	virtual void write_inh_rom(u16 offset, u8 data) override;
 	virtual bool inh_check(uint16_t offset, bool bIsWrite) override;
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<apple2_gameio_device> m_gameio;

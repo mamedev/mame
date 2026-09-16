@@ -60,7 +60,7 @@ public:
 	void murogmbl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -72,7 +72,7 @@ private:
 	void murogmbl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void murogmbl_map(address_map &map);
+	void murogmbl_map(address_map &map) ATTR_COLD;
 };
 
 class slotunbl_state : public driver_device
@@ -89,7 +89,7 @@ public:
 	void slotunbl(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ private:
 	void slotunbl_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void slotunbl_map(address_map &map);
+	void slotunbl_map(address_map &map) ATTR_COLD;
 };
 
 void murogmbl_state::murogmbl_palette(palette_device &palette) const
@@ -358,7 +358,7 @@ void murogmbl_state::murogmbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_murogmbl);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -381,7 +381,7 @@ void slotunbl_state::slotunbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slotunbl);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

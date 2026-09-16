@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_I8089_I8089DASM_H
-#define MAME_CPU_I8089_I8089DASM_H
+#ifndef MAME_CPU_I8089_I8089_DASM_H
+#define MAME_CPU_I8089_I8089_DASM_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 	void load_instruction();
 };
 
-#endif
+#endif // MAME_CPU_I8089_I8089_DASM_H

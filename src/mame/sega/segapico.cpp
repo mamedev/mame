@@ -126,6 +126,8 @@ C = MB3514 / 9325 M36
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -156,7 +158,7 @@ protected:
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 
-	int m_version_hi_nibble;
+	uint8_t m_version_hi_nibble;
 
 	uint8_t m_page_register;
 
@@ -165,7 +167,7 @@ protected:
 	void pico_68k_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_cause_irq(int state);
 
-	void pico_mem(address_map &map);
+	void pico_mem(address_map &map) ATTR_COLD;
 };
 
 class pico_state : public pico_base_state
@@ -180,7 +182,7 @@ public:
 	void pico_pal(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<pico_cart_slot_device> m_picocart;
@@ -313,16 +315,16 @@ void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t m
 	switch (offset)
 	{
 		case 0x10/2:
-			if (mem_mask & 0xFF00)
-				m_sega_315_5641_pcm->port_w((data >> 8) & 0xFF);
-			if (mem_mask & 0x00FF)
-				m_sega_315_5641_pcm->port_w((data >> 0) & 0xFF);
+			if (mem_mask & 0xff00)
+				m_sega_315_5641_pcm->port_w((data >> 8) & 0xff);
+			if (mem_mask & 0x00ff)
+				m_sega_315_5641_pcm->port_w((data >> 0) & 0xff);
 			break;
 		case 0x12/2: // guess
 			// Note about uPD7759 lines:
 			//  reset line: 1 - normal, 1->0 - reset chip, 0 - playback disabled
 			//  start line: 0->1 - start playback
-			if (mem_mask & 0xFF00)
+			if (mem_mask & 0xff00)
 			{
 				// I assume that:
 				// value 8000 resets the FIFO? (always used with low reset line)
@@ -330,17 +332,9 @@ void pico_base_state::pico_68k_io_write(offs_t offset, uint16_t data, uint16_t m
 				// value 4000 maps to the uPD7759's start line (0->1 = start)
 				m_sega_315_5641_pcm->fifo_reset_w(BIT(data, 15));
 				m_sega_315_5641_pcm->reset_w(BIT(data, 11));
+				m_sega_315_5641_pcm->md_w(BIT(~data, 11));
 				m_sega_315_5641_pcm->start_w(BIT(data, 14));
 			}
-
-
-			/*m_sega_315_5641_pcm->reset_w(0);
-			m_sega_315_5641_pcm->start_w(0);
-			m_sega_315_5641_pcm->reset_w(1);
-			m_sega_315_5641_pcm->start_w(1);
-
-			if (ACCESSING_BITS_0_7) m_sega_315_5641_pcm->port_w(space,0,data&0xff);
-			if (ACCESSING_BITS_8_15) m_sega_315_5641_pcm->port_w(space,0,(data>>8)&0xff);*/
 
 			break;
 	}
@@ -402,19 +396,18 @@ void pico_state::pico_ntsc(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(pico_state::sound_cause_irq));
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 0);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 1);
 }
 
 void pico_state::pico_pal(machine_config &config)
@@ -423,19 +416,18 @@ void pico_state::pico_pal(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pico_state::pico_mem);
 
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	PICO_CART_SLOT(config, m_picocart, pico_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("pico");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK*2);
 	m_sega_315_5641_pcm->fifo_cb().set(FUNC(pico_state::sound_cause_irq));
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 0);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 1);
 }
 
 
@@ -585,28 +577,48 @@ public:
 	void copera(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
+	void copera_pcm_cb(int state);
+	uint16_t copera_io_read(offs_t offset);
+	void copera_io_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TIMER_CALLBACK_MEMBER(process_ext_timer);
 
 private:
-	void copera_mem(address_map &map);
+	void copera_mem(address_map &map) ATTR_COLD;
 
 	required_device<copera_cart_slot_device> m_picocart;
+
+	std::unique_ptr<uint16_t[]> m_ext_regs;
+	bool m_is_ext_requested;
+	emu_timer *m_ext_timer;
 };
 
-
+TIMER_CALLBACK_MEMBER(copera_state::process_ext_timer)
+{
+	// TODO: When is it enabled? Expected even if games don't set bit 3 of VDP mode register 3...
+	if (m_is_ext_requested)
+	{
+		m_maincpu->set_input_line(2, HOLD_LINE);
+		m_is_ext_requested = false;
+	}
+	else
+	{
+		m_maincpu->set_input_line(2, CLEAR_LINE);
+		m_is_ext_requested = true;
+	}
+}
 
 void copera_state::copera_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
-
 	map(0x800000, 0x80001f).rw(FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
-
+	map(0xbff800, 0xbff87f).rw(FUNC(copera_state::copera_io_read), FUNC(copera_state::copera_io_write)); // FIXME: Guessed range.
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
-
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
 }
-
-
 
 static void copera_cart(device_slot_interface &device)
 {
@@ -625,12 +637,29 @@ void copera_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::read_a15)), write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_a15)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16sm_delegate(*m_picocart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 
-	m_sega_315_5641_pcm->reset_w(0);
-	m_sega_315_5641_pcm->start_w(0);
-	m_sega_315_5641_pcm->reset_w(1);
-	m_sega_315_5641_pcm->start_w(1);
-
 	m_vdp->stop_timers();
+
+	m_ext_regs = make_unique_clear<uint16_t[]>(0x80/2);
+
+	// FIXME: Guessed timing.
+	//
+	// It must be less than HBLANK. Games have a busy loop where they read
+	// VDP status register and check if bit 7 (vertical interrupt pending) is
+	// set and then cleared (e.g. Copera no Chikyuu Daisuki @ 0xfb3c4).
+	// Too frequent EXT interrupts result in that subroutine only executing after
+	// scanline 224 and will never catch bit 7 set.
+	m_ext_timer = timer_alloc(FUNC(copera_state::process_ext_timer), this);
+	m_ext_timer->adjust(attotime::zero, 0, m_vdp->screen().scan_period() * 20);
+}
+
+void copera_state::machine_reset()
+{
+	pico_base_state::machine_reset();
+
+	m_is_ext_requested = true;
+	m_ext_regs[0] = 0;
+	m_ext_regs[0x2/2] = 0xffff;
+	m_ext_regs[0x4/2] = 0xffff;
 }
 
 void copera_state::copera(machine_config &config)
@@ -639,21 +668,50 @@ void copera_state::copera(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &copera_state::copera_mem);
 
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	COPERA_CART_SLOT(config, m_picocart, copera_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("copera");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SEGA_315_5641_PCM(config, m_sega_315_5641_pcm, upd7759_device::STANDARD_CLOCK);
-	m_sega_315_5641_pcm->fifo_cb().set(FUNC(copera_state::sound_cause_irq));
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "lspeaker", 0.16);
-	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "rspeaker", 0.16);
+	m_sega_315_5641_pcm->fifo_cb().set(FUNC(copera_state::copera_pcm_cb));
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 0);
+	m_sega_315_5641_pcm->add_route(ALL_OUTPUTS, "speaker", 0.16, 1);
 }
 
+void copera_state::copera_pcm_cb(int state)
+{
+	// TODO: Not IRQ3 (games assign an infinite loop handler), likely handled by an EXT callback.
+}
+
+uint16_t copera_state::copera_io_read(offs_t offset)
+{
+	LOG("COPERA IO r @ %08x: %08x = %04x\n", m_maincpu->pc(), 0xbff800 + offset * 2, m_ext_regs[offset]);
+	return m_ext_regs[offset];
+}
+
+void copera_state::copera_io_write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0x00ff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		m_ext_regs[offset] = (data & mem_mask) | (m_ext_regs[offset] & 0xff00);
+	}
+
+	// TODO: We only enable EXT handler callback 3.
+	if (((m_ext_regs[0x4/2] & 0xff) == 0xd) && ((m_ext_regs[0x2/2] & 0xff) == 0x3f))
+	{
+		m_ext_regs[0] |= 1 << 3;
+	}
+
+	LOG("COPERA IO w @ %08x: %08x = %04x (mask %08x)\n", m_maincpu->pc(), 0xbff800 + offset * 2, data, mem_mask);
+}
 
 
 ROM_START( copera )

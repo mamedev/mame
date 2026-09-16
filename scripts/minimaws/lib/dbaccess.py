@@ -1,13 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
 
 import sqlite3
-import sys
-
-if sys.version_info >= (3, 4):
-    import urllib.request
+import urllib.request
 
 
 class SchemaQueries(object):
@@ -574,7 +571,7 @@ class UpdateQueries(object):
 
 class QueryCursor(object):
     def __init__(self, dbconn, **kwargs):
-        super(QueryCursor, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbcurs = dbconn.cursor()
 
     def close(self):
@@ -777,14 +774,6 @@ class QueryCursor(object):
                 'WHERE slot.machine = ?',
                 (machine, ))
 
-    def get_ram_options(self, machine):
-        return self.dbcurs.execute(
-                'SELECT ramoption.name AS name, ramoption.size AS size, COUNT(ramdefault.machine) AS isdefault ' \
-                'FROM ramoption LEFT JOIN ramdefault USING (machine, size) WHERE ramoption.machine = ? ' \
-                'GROUP BY ramoption.machine, ramoption.size ' \
-                'ORDER BY ramoption.size',
-                (machine, ))
-
     def get_machine_softwarelists(self, machine):
         return self.dbcurs.execute(
                 'SELECT machinesoftwarelist.tag AS tag, machinesoftwareliststatustype.value AS status, softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
@@ -916,7 +905,7 @@ class QueryCursor(object):
 
 class UpdateCursor(object):
     def __init__(self, dbconn, **kwargs):
-        super(UpdateCursor, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbcurs = dbconn.cursor()
 
     def close(self):
@@ -1066,11 +1055,8 @@ class UpdateCursor(object):
 
 class QueryConnection(object):
     def __init__(self, database, **kwargs):
-        super(QueryConnection, self).__init__(**kwargs)
-        if sys.version_info >= (3, 4):
-            self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True, check_same_thread=False)
-        else:
-            self.dbconn = sqlite3.connect(database, check_same_thread=False)
+        super().__init__(**kwargs)
+        self.dbconn = sqlite3.connect('file:' + urllib.request.pathname2url(database) + '?mode=ro', uri=True, check_same_thread=False)
         self.dbconn.row_factory = sqlite3.Row
         self.dbconn.execute('PRAGMA foreign_keys = ON')
 
@@ -1083,7 +1069,7 @@ class QueryConnection(object):
 
 class UpdateConnection(object):
     def __init__(self, database, **kwargs):
-        super(UpdateConnection, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.dbconn = sqlite3.connect(database)
         self.dbconn.execute('PRAGMA page_size = 4096')
         self.dbconn.execute('PRAGMA foreign_keys = ON')

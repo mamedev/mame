@@ -34,8 +34,8 @@ public:
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_ioport m_dip;

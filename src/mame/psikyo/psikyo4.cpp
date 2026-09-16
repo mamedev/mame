@@ -132,6 +132,8 @@ ROMs -
 #include "emu.h"
 #include "psikyo4.h"
 
+#include "mahjong.h"
+
 #include "speaker.h"
 
 
@@ -166,16 +168,16 @@ INTERRUPT_GEN_MEMBER(psikyo4_state::interrupt)
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
+ioport_value psikyo4_state::mahjong_ctrl_r()/* used by hotgmck/hgkairak */
 {
-	int ret = 0xff;
+	int ret = 0x3f;
 
-	if (m_io_select & 1) ret &= m_keys[P+0]->read();
-	if (m_io_select & 2) ret &= m_keys[P+1]->read();
-	if (m_io_select & 4) ret &= m_keys[P+2]->read();
-	if (m_io_select & 8) ret &= m_keys[P+3]->read();
+	if (m_io_select & 1) ret &= m_keys[P][0]->read();
+	if (m_io_select & 2) ret &= m_keys[P][1]->read();
+	if (m_io_select & 4) ret &= m_keys[P][2]->read();
+	if (m_io_select & 8) ret &= m_keys[P][3]->read();
 
-	return ret;
+	return ret | 0xc0;
 }
 
 void psikyo4_state::paletteram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -297,25 +299,25 @@ void psikyo4_state::ps4_ymf_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(psikyo4_state::system_r)
+ioport_value psikyo4_state::system_r()
 {
 	return m_system->read();
 }
 
 static INPUT_PORTS_START( hotgmck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, system_r)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(FUNC(psikyo4_state::system_r))
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, mahjong_ctrl_r<0>)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(FUNC(psikyo4_state::mahjong_ctrl_r<0>))
 
 	PORT_START("P3_P4")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, system_r)
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(FUNC(psikyo4_state::system_r))
 	PORT_BIT( 0x00ffff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(psikyo4_state, mahjong_ctrl_r<4>)
+	PORT_BIT( 0xff000000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CUSTOM_MEMBER(FUNC(psikyo4_state::mahjong_ctrl_r<1>))
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 
 	PORT_START("SYSTEM")    /* system inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // Screen 1
@@ -329,85 +331,7 @@ static INPUT_PORTS_START( hotgmck )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )   // Screen 2
 
-	PORT_START("KEY.0")  /* fake player 1 controls 1st bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.1")  /* fake player 1 controls 2nd bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.2")  /* fake player 1 controls 3rd bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.3")  /* fake player 1 controls 4th bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.4")  /* fake player 2 controls 1st bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.5")  /* fake player 2 controls 2nd bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.6")  /* fake player 2 controls 3rd bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY.7")  /* fake player 2 controls 4th bank */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mahjong_matrix_2p)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( loderndf )
@@ -490,7 +414,7 @@ static INPUT_PORTS_START( loderndf )
 	PORT_DIPSETTING(          0x00000000, "Japan (Shows Version Number)" )
 	PORT_DIPSETTING(          0x00010000, "World (Does Not Show Version Number)" )
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 /* unused inputs also act as duplicate buttons */
@@ -569,7 +493,7 @@ static INPUT_PORTS_START( hotdebut )
 
 	PORT_START("JP4")/* jumper pads 'JP4' on the PCB */
 	/* EEPROM is read here */
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
 
@@ -605,7 +529,7 @@ void psikyo4_state::machine_reset()
 void psikyo4_state::ps4big(machine_config &config)
 {
 	/* basic machine hardware */
-	SH2_SH7604(config, m_maincpu, 57272700/2);
+	SH7604(config, m_maincpu, 57272700/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psikyo4_state::ps4_map);
 	m_maincpu->set_vblank_int("lscreen", FUNC(psikyo4_state::interrupt));
 
@@ -616,7 +540,7 @@ void psikyo4_state::ps4big(machine_config &config)
 	PALETTE(config, m_palette[0]).set_entries((0x2000/4) + 1); /* palette + clear colour */
 	PALETTE(config, m_palette[1]).set_entries((0x2000/4) + 1);
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_refresh_hz(60);
 	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_lscreen->set_size(40*8, 32*8);
@@ -624,7 +548,7 @@ void psikyo4_state::ps4big(machine_config &config)
 	m_lscreen->set_screen_update(FUNC(psikyo4_state::screen_update<0>));
 	m_lscreen->set_palette(m_palette[0]);
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	m_rscreen->set_refresh_hz(60);
 	m_rscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_rscreen->set_size(40*8, 32*8);
@@ -633,18 +557,17 @@ void psikyo4_state::ps4big(machine_config &config)
 	m_rscreen->set_palette(m_palette[1]);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf278b_device &ymf(YMF278B(config, "ymf", 57272700/2));
 	ymf.set_addrmap(0, &psikyo4_state::ps4_ymf_map);
 	ymf.irq_handler().set_inputline("maincpu", 12);
-	ymf.add_route(0, "rspeaker", 1.0); // Output for each screen
-	ymf.add_route(1, "lspeaker", 1.0);
-	ymf.add_route(2, "rspeaker", 1.0);
-	ymf.add_route(3, "lspeaker", 1.0);
-	ymf.add_route(4, "rspeaker", 1.0);
-	ymf.add_route(5, "lspeaker", 1.0);
+	ymf.add_route(0, "speaker", 1.0, 1); // Output for each screen
+	ymf.add_route(1, "speaker", 1.0, 0);
+	ymf.add_route(2, "speaker", 1.0, 1);
+	ymf.add_route(3, "speaker", 1.0, 0);
+	ymf.add_route(4, "speaker", 1.0, 1);
+	ymf.add_route(5, "speaker", 1.0, 0);
 }
 
 void psikyo4_state::ps4small(machine_config &config)

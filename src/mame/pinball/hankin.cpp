@@ -53,11 +53,12 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	void hankin(machine_config &config);
+
+	void hankin(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void ic10_ca2_w(int state);
@@ -76,8 +77,8 @@ private:
 	u8 ic2_a_r();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 
-	void main_map(address_map &map);
-	void audio_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
 
 	bool m_timer_sb = false;
 	u8 m_timer_s[3]{};
@@ -129,7 +130,7 @@ void hankin_state::audio_map(address_map &map)
 
 static INPUT_PORTS_START( hankin )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, hankin_state, self_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(hankin_state::self_test), 0)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR(Coinage))
@@ -441,10 +442,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
 
 void hankin_state::machine_start()
 {
-	m_digits.resolve();
-	m_io_leds.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_timer_sb));
 	save_item(NAME(m_timer_s));
 	save_item(NAME(m_vol));

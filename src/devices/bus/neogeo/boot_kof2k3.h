@@ -27,7 +27,7 @@ public:
 	virtual uint16_t addon_r(offs_t offset) override { return m_kof2k3bl_prot->overlay_r(); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -54,7 +54,7 @@ public:
 	virtual void protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override { m_kof2k3bl_prot->kof2003p_w(offset, data, mem_mask); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -82,7 +82,7 @@ public:
 	virtual uint16_t addon_r(offs_t offset) override { return m_kof2k3bl_prot->overlay_r(); }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;

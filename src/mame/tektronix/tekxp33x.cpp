@@ -55,12 +55,12 @@ public:
 	void tekxp330(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cpu_map(address_map &map);
-	void tms_map(address_map &map);
+	void cpu_map(address_map &map) ATTR_COLD;
+	void tms_map(address_map &map) ATTR_COLD;
 };
 
 /* Memory Maps */
@@ -110,7 +110,7 @@ void tekxp330_state::tekxp330(machine_config &config)
 	tms.set_addrmap(AS_PROGRAM, &tekxp330_state::tms_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(tekxp330_state::screen_update));
@@ -134,4 +134,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
-COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, empty_init, "Tektronix", "TekXpress XP330", MACHINE_IS_SKELETON )
+COMP( 1992, tekxp330, 0,      0,      tekxp330, tekxp330, tekxp330_state, empty_init, "Tektronix", "TekXpress XP330", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

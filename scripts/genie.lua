@@ -121,6 +121,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-emulator",
+	description = "Enable building emulator.",
+}
+
+newoption {
 	trigger = "with-tests",
 	description = "Enable building tests.",
 }
@@ -148,17 +153,6 @@ newoption {
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
 		{ "haiku",         "Haiku"                  },
-		{ "solaris",       "Solaris SunOS"          },
-	},
-}
-
-newoption {
-	trigger = "distro",
-	description = "Choose distribution",
-	allowed = {
-		{ "generic",           "generic"            },
-		{ "debian-stable",     "debian-stable"      },
-		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
 	},
 }
 
@@ -215,6 +209,11 @@ newoption {
 newoption {
 	trigger = "SYMLEVEL",
 	description = "Symbols level.",
+}
+
+newoption {
+	trigger = "PDB_SYMBOLS",
+	description = "Generate CodeView PDB symbols.",
 }
 
 newoption {
@@ -475,19 +474,8 @@ language "C++"
 
 flags {
 	"StaticRuntime",
-	"Cpp17",
 }
 
-configuration { "vs20*" }
-	buildoptions {
-		"/bigobj",
-	}
-	buildoptions_cpp {
-		"/Zc:__cplusplus",
-	}
-	flags {
-		"ExtraWarnings",
-	}
 	if not _OPTIONS["NOWERROR"] then
 		flags{
 			"FatalWarnings",
@@ -529,30 +517,32 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["PROJECT"] ~= nil) then
-	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
-	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
-		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
-	end
-	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
-elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
-	local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
-	local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
-	if os.isfile(subtargetscript) then
-		dofile(subtargetscript)
-	elseif os.isfile(subtargetfilter) then
-		local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
-		local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
-		local OUT_STR = os.outputof(
-			string.format(
-				"%s %s -r %s filterproject -t %s -f %s %s",
-				PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
-		if #OUT_STR == 0 then
-			error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+if _OPTIONS["with-emulator"] then
+	if (_OPTIONS["PROJECT"] ~= nil) then
+		PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+		if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+			error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 		end
-		load(OUT_STR)()
-	else
-		error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+	elseif (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
+		local subtargetscript = path.join("target", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".lua")
+		local subtargetfilter = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["subtarget"] .. ".flt")
+		if os.isfile(subtargetscript) then
+			dofile(subtargetscript)
+		elseif os.isfile(subtargetfilter) then
+			local makedep = path.join(MAME_DIR, "scripts", "build", "makedep.py")
+			local driverlist = path.join(MAME_DIR, "src", _OPTIONS["target"], _OPTIONS["target"] .. ".lst")
+			local OUT_STR = os.outputof(
+				string.format(
+					"%s %s -r %s filterproject -t %s -f %s %s",
+					PYTHON, makedep, MAME_DIR, _OPTIONS["subtarget"], subtargetfilter, driverlist))
+			if #OUT_STR == 0 then
+				error("Error creating projects from driver filter file for subtarget " .. _OPTIONS["subtarget"])
+			end
+			load(OUT_STR)()
+		else
+			error("Definition file for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+		end
 	end
 end
 
@@ -563,28 +553,20 @@ configuration { "gmake or ninja" }
 
 dofile ("toolchain.lua")
 
-if _OPTIONS["targetos"]=="windows" then
-	configuration { "x64" }
-		defines {
-			"X64_WINDOWS_ABI",
-		}
-	configuration { }
-end
-
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
-
--- define PTR64 if we are a 64-bit target
-configuration { "x64 or android-*64"}
-	defines { "PTR64=1" }
 
 -- define MAME_DEBUG if we are a debugging build
 configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
-		"MAME_PROFILER",
 --      "BGFX_CONFIG_DEBUG=1",
 	}
+if _OPTIONS["PROFILER"]~="0" then
+	defines {
+		"MAME_PROFILER",
+	}
+end
 
 configuration { }
 
@@ -673,19 +655,19 @@ else
 	end
 end
 
-if _OPTIONS["with-system-jpeg"]~=nil then
+if _OPTIONS["with-system-jpeg"] == "1" then
 	defines {
 		"XMD_H",
 	}
 end
 
-if not _OPTIONS["with-system-flac"]~=nil then
+if _OPTIONS["with-system-flac"] ~= "1" then
 	defines {
 		"FLAC__NO_DLL",
 	}
 end
 
-if not _OPTIONS["with-system-pugixml"] then
+if _OPTIONS["with-system-pugixml"] ~= "1" then
 	defines {
 		"PUGIXML_HEADER_ONLY",
 	}
@@ -695,31 +677,23 @@ else
 	}
 end
 
-if _OPTIONS["NOASM"]=="1" then
+if _OPTIONS["NOASM"] == "1" then
 	defines {
 		"MAME_NOASM"
 	}
 end
 
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-	if _OPTIONS["BIGENDIAN"]~="1" then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
-	end
+if _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	configuration { }
+		defines {
+			"NATIVE_DRC=drcbe_c",
+		}
+elseif (_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64") then
+	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 end
-
-	defines {
-		"LUA_COMPAT_ALL",
-		"LUA_COMPAT_5_1",
-		"LUA_COMPAT_5_2",
-	}
 
 	if _ACTION == "gmake" or _ACTION == "ninja" then
 
@@ -731,11 +705,11 @@ end
 
 local version = str_to_version(_OPTIONS["gcc_version"])
 	buildoptions_cpp {
-		"-std=c++17",
+		"-std=c++20",
 	}
 
 	buildoptions_objcpp {
-		"-std=c++17",
+		"-std=c++20",
 	}
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
 	buildoptions {
@@ -745,9 +719,12 @@ local version = str_to_version(_OPTIONS["gcc_version"])
 if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
 		"-g" .. _OPTIONS["SYMLEVEL"],
-		"-fno-omit-frame-pointer",
-		"-fno-optimize-sibling-calls",
 	}
+	if _OPTIONS["PDB_SYMBOLS"]~=nil and _OPTIONS["PDB_SYMBOLS"]~=0 then
+		buildoptions {
+			"-gcodeview",
+		}
+	end
 end
 
 --# we need to disable some additional implicit optimizations for profiling
@@ -1028,8 +1005,8 @@ end
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
 		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
-			if version < 60000 then
-				print("Clang version 6.0 or later needed")
+			if version < 130000 then
+				print("Clang version 13 or later needed")
 				os.exit(-1)
 			end
 			buildoptions {
@@ -1039,31 +1016,20 @@ end
 				"-Wno-extern-c-compat",
 				"-Wno-ignored-qualifiers",
 				"-Wno-pragma-pack", -- clang 6.0 complains when the packing change lifetime is not contained within a header file.
-				"-Wno-tautological-compare",
 				"-Wno-unknown-attributes",
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
 				"-Wno-unused-const-variable",
+				"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
 			}
-			if (version < 70000) or ((version < 100001) and (_OPTIONS["targetos"] == 'macosx')) then
-				buildoptions { -- clang 6.0 complains that [[maybe_unused]] is ignored for static data members
-					"-Wno-error=ignored-attributes",
-					"-Wno-error=unused-const-variable",
-				}
-			end
-			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
-				buildoptions {
-					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
-				}
-			end
 			if version >= 140000 then
 				buildoptions {
 					"-Wno-bitwise-instead-of-logical", -- clang 14.0 complains about &, | on bools in asmjit
 				}
 			end
 		else
-			if version < 70000 then
-				print("GCC version 7.0 or later needed")
+			if version < 110000 then
+				print("GCC version 11 or later needed")
 				os.exit(-1)
 			end
 			buildoptions_cpp {
@@ -1075,29 +1041,13 @@ end
 			buildoptions {
 				"-Wno-error=unused-result", -- needed for fgets,fread on linux
 				-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
-				"-Wno-array-bounds",
+				"-Wno-error=array-bounds",
 				"-Wno-error=attributes", -- GCC fails to recognize some uses of [[maybe_unused]]
+				"-Wno-error=stringop-truncation", -- ImGui again
+				"-Wno-stringop-overflow", -- generates false positives when assigning an int rvalue to a u8 variable without an explicit cast
+				"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
+				"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
 			}
-			if version < 100300 then
-				buildoptions_cpp {
-					"-flifetime-dse=1", -- GCC 10.2 and earlier take issue with Sol's get<std::optional<T> >() otherwise - possibly an issue with libstdc++ itself
-				}
-			end
-			if version >= 80000 then
-				buildoptions {
-					"-Wno-stringop-truncation", -- ImGui again
-					"-Wno-stringop-overflow",   -- formats/victor9k_dsk.cpp bugs the compiler
-				}
-				buildoptions_cpp {
-					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
-				}
-			end
-			if version >= 110000 then
-				buildoptions {
-					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
-					"-Wno-stringop-overread",       -- machine/bbc.cpp in GCC 11.1
-				}
-			end
 			if version >= 120000 then
 				buildoptions {
 					"-Wno-error=maybe-uninitialized",
@@ -1109,14 +1059,13 @@ end
 					"-Wno-xor-used-as-pow",
 				}
 			end
+			if version >= 160000 then
+				buildoptions_cpp {
+					"-Wno-sfinae-incomplete",
+				}
+			end
 		end
 	end
-
-if (_OPTIONS["PLATFORM"]=="alpha") then
-	defines {
-		"PTR64=1",
-	}
-end
 
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
@@ -1127,21 +1076,6 @@ end
 if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
-	}
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="riscv64") then
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="mips64") then
-	defines {
-		"PTR64=1",
 	}
 end
 
@@ -1160,37 +1094,53 @@ configuration { "asmjs" }
 	buildoptions {
 		"-std=gnu89",
 		"-Wno-implicit-function-declaration",
-		"-s USE_SDL_TTF=2",
+		"-s USE_SDL_TTF=3",
+		"-Wno-experimental",  -- sdl3 experimental for emcc
 	}
 	buildoptions_cpp {
-		"-std=c++17",
-		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN12cli_frontend7executeEiPPc','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
+		"-std=c++20",
+		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
+	}
+	defines {
+		"ASIO_HAS_PTHREADS",
+		"SOUND_DISABLE_THREADING",
 	}
 	linkoptions {
 		"-Wl,--start-group",
-		"-O" .. _OPTIONS["OPTIMIZE"],
-		"-s USE_SDL=2",
-		"-s USE_SDL_TTF=2",
-		"--memory-init-file 0",
+		"-s USE_SDL=3",
+		"-s USE_SDL_TTF=3",
 		"-s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\\$$ERRNO_CODES']\"",
-		"-s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\"",
+		"-s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\"",
 		"-s EXPORTED_RUNTIME_METHODS=\"['cwrap']\"",
 		"-s ERROR_ON_UNDEFINED_SYMBOLS=0",
-		"-s USE_WEBGL2=1",
-		"-s LEGACY_GL_EMULATION=1",
-		"-s GL_UNSAFE_OPTS=0",
+		"-s STACK_SIZE=5MB",
+		"-s MAX_WEBGL_VERSION=2",
+		"-s EXCEPTION_CATCHING_ALLOWED=\"['_ZN15running_machine17start_all_devicesEv','_ZN8chd_file11open_commonEb','_ZN8chd_file13read_metadataEjjRNSt3__212basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE','_ZN8chd_file13read_metadataEjjRNSt3__26vectorIhNS0_9allocatorIhEEEE','_ZNK19netlist_mame_device19base_validity_checkER16validity_checker']\"",
 		"--pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js",
 		"--post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/bgfx@artwork/bgfx",
+		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/lut-default.png@artwork/lut-default.png",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png",
 	}
+	if _OPTIONS["OPTIMIZE"]~=nil then
+		if _OPTIONS["OPTIMIZE"]=="3" then
+			-- emcc's link-time -O3 is very slow, max out at -O2 for now
+			-- we should still be getting the benefit of -O3 on the individual object files
+			linkoptions {
+				"-O2",
+			}
+		else
+			linkoptions {
+				"-O" .. _OPTIONS["OPTIMIZE"],
+			}
+		end
+	end
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],
-			"-s DEMANGLE_SUPPORT=1",
 		}
 	end
 	if _OPTIONS["WEBASSEMBLY"] then
@@ -1203,14 +1153,15 @@ configuration { "asmjs" }
 		}
 	end
 	if _OPTIONS["WEBASSEMBLY"]~=nil and _OPTIONS["WEBASSEMBLY"]=="0" then
-		-- define a fixed memory size because allowing memory growth disables asm.js optimizations
+		-- asm.js: fixed memory (growth disables asm.js optimizations)
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=0",
-			"-s TOTAL_MEMORY=268435456",
+			"-s INITIAL_MEMORY=256MB",
 		}
 	else
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=1",
+			"-s INITIAL_MEMORY=24MB",
 		}
 	end
 	archivesplit_size "20"
@@ -1230,12 +1181,6 @@ configuration { "linux-*" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}
-		if _OPTIONS["distro"]=="debian-stable" then
-			defines
-			{
-				"NO_AFFINITY_NP",
-			}
-		end
 
 
 configuration { "freebsd or netbsd" }
@@ -1249,18 +1194,12 @@ configuration { "osx*" }
 		}
 
 configuration { "mingw*" }
-		if _OPTIONS["osd"]=="sdl" then
-			linkoptions {
-				"-Wl,--start-group",
-			}
-		else
-			linkoptions {
-				"-static",
-			}
-			flags {
-				"LinkSupportCircularDependencies",
-			}
-		end
+		linkoptions {
+			"-static",
+		}
+		flags {
+			"LinkSupportCircularDependencies",
+		}
 		links {
 			"user32",
 			"winmm",
@@ -1297,13 +1236,15 @@ configuration { "vs20*" }
 			"userenv",
 		}
 
+if _OPTIONS["vs"]==nil then
 		buildoptions {
-			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
+			"/bigobj",
+			"/utf-8",
+			"/Zc:preprocessor",
 		}
 
 		buildoptions {
-			"/wd4003", -- warning C4003: not enough actual parameters for macro 'xxx'
-			"/wd4005", -- warning C4005: The macro identifier is defined twice. The compiler uses the second macro definition
+			"/w45038", -- warning C5038: data member 'member1' will be initialized after data member 'member2'
 			"/wd4018", -- warning C4018: 'x' : signed/unsigned mismatch
 			"/wd4060", -- warning C4060: switch statement contains no 'case' or 'default' labels
 			"/wd4065", -- warning C4065: switch statement contains 'default' but no 'case' labels
@@ -1315,6 +1256,7 @@ configuration { "vs20*" }
 			"/wd4245", -- warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
 			"/wd4250", -- warning C4250: 'xxx' : inherits 'xxx' via dominance
 			"/wd4267", -- warning C4267: 'var' : conversion from 'size_t' to 'type', possible loss of data
+			"/wd4305", -- warning C4305: 'conversion': truncation from 'type1' to 'type2'
 			"/wd4310", -- warning C4310: cast truncates constant value
 			"/wd4319", -- warning C4319: 'operator' : zero extending 'type' to 'type' of greater size
 			"/wd4324", -- warning C4324: 'xxx' : structure was padded due to __declspec(align())
@@ -1325,78 +1267,47 @@ configuration { "vs20*" }
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
 			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
+			"/wd4646", -- warning C4646: function declared with 'noreturn' has non-void return type
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'name' used
 			"/wd4702", -- warning C4702: unreachable code
-			"/wd4706", -- warning C4706: assignment within conditional expression
-			"/wd4804", -- warning C4804: '>>': unsafe use of type 'bool' in operation
 			"/wd4805", -- warning C4805: 'x' : unsafe mix of type 'xxx' and type 'xxx' in operation
+			"/wd4806", -- warning C4806: 'operation': unsafe operation: no value of type 'type' promoted to type 'type' can equal the given constant
 			"/wd4996", -- warning C4996: 'function': was declared deprecated
 		}
 
-if _OPTIONS["vs"]=="intel-15" then
-		buildoptions {
-			"/Qwd9",                -- remark #9: nested comment is not allowed
-			"/Qwd82",               -- remark #82: storage class is not first
-			"/Qwd111",              -- remark #111: statement is unreachable
-			"/Qwd128",              -- remark #128: loop is not reachable
-			"/Qwd177",              -- remark #177: function "xxx" was declared but never referenced
-			"/Qwd181",              -- remark #181: argument of type "UINT32={unsigned int}" is incompatible with format "%d", expecting argument of type "int"
-			"/Qwd185",              -- remark #185: dynamic initialization in unreachable code
-			"/Qwd280",              -- remark #280: selector expression is constant
-			"/Qwd344",              -- remark #344: typedef name has already been declared (with same type)
-			"/Qwd411",              -- remark #411: class "xxx" defines no constructor to initialize the following
-			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
-			"/Qwd2545",             -- remark #2545: empty dependent statement in "else" clause of if - statement
-			"/Qwd2553",             -- remark #2553: nonstandard second parameter "TCHAR={WCHAR = { __wchar_t } } **" of "main", expected "char *[]" or "char **" extern "C" int _tmain(int argc, TCHAR **argv)
-			"/Qwd2557",             -- remark #2557: comparison between signed and unsigned operands
-			"/Qwd3280",             -- remark #3280: declaration hides member "attotime::seconds" (declared at line 126) static attotime from_seconds(INT32 seconds) { return attotime(seconds, 0); }
-
-			"/Qwd170",              -- error #170: pointer points outside of underlying object
-			"/Qwd188",              -- error #188: enumerated type mixed with another type
-
-			"/Qwd63",               -- warning #63: shift count is too large
-			"/Qwd177",              -- warning #177: label "xxx" was declared but never referenced
-			"/Qwd186",              -- warning #186: pointless comparison of unsigned integer with zero
-			"/Qwd488",              -- warning #488: template parameter "_FunctionClass" is not used in declaring the parameter types of function template "device_delegate<_Signature>::device_delegate<_FunctionClass>(delegate<_Signature>:
-			"/Qwd1478",             -- warning #1478: function "xxx" (declared at line yyy of "zzz") was declared deprecated
-			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
-			"/Qwd3291",             -- warning #3291: invalid narrowing conversion from "double" to "int"
-			"/Qwd1195",             -- error #1195: conversion from integer to smaller pointer
-			"/Qwd47",               -- error #47: incompatible redefinition of macro "xxx"
-			"/Qwd265",              -- error #265: floating-point operation result is out of range
-			-- these occur on a release build, while we can increase the size limits instead some of the files do require extreme amounts
-			"/Qwd11074",            -- remark #11074: Inlining inhibited by limit max-size  / remark #11074: Inlining inhibited by limit max-total-size
-			"/Qwd11075",            -- remark #11075: To get full report use -Qopt-report:4 -Qopt-report-phase ipo
+		buildoptions_cpp {
+			"/Zc:__cplusplus",
+			"/Zc:enumTypes",
+			"/Zc:templateScope",
+			"/Zc:u8EscapeEncoding",
 		}
-end
 
-if _OPTIONS["vs"]=="clangcl" then
+		flags {
+			"Cpp20",
+			"ExtraWarnings",
+		}
+elseif _OPTIONS["vs"]=="clangcl" then
 		buildoptions {
-			"-Wno-enum-conversion",
 			"-Wno-ignored-qualifiers",
-			"-Wno-missing-braces",
-			"-Wno-missing-field-initializers",
 			"-Wno-new-returns-null",
-			"-Wno-nonportable-include-path",
-			"-Wno-pointer-bool-conversion",
-			"-Wno-pragma-pack",
-			"-Wno-switch",
-			"-Wno-tautological-constant-out-of-range-compare",
-			"-Wno-tautological-pointer-compare",
-			"-Wno-unknown-warning-option",
 			"-Wno-unused-const-variable",
-			"-Wno-unused-function",
 			"-Wno-unused-label",
-			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
-			"-Wno-unused-variable",
 			"-Wno-xor-used-as-pow",
-			"-Wno-microsoft-cast",
+			"-Wno-error=deprecated-declarations",
+		}
+	if _OPTIONS["DEPRECATED"]=="0" then
+		buildoptions {
+			"-Wno-deprecated-declarations"
+		}
+	end
+
+		flags {
+			"Cpp20",
+			-- don't set ExtraWarnings flag (/W4 == -Wall -Wextra); use default (/W3 == -Wall) instead
 		}
 end
 
-		linkoptions {
-			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
-		}
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}
@@ -1480,32 +1391,34 @@ group "core"
 
 dofile(path.join("src", "emu.lua"))
 
-if (STANDALONE~=true) then
-	dofile(path.join("src", "mame", "frontend.lua"))
-end
-
 group "devices"
 dofile(path.join("src", "devices.lua"))
 devicesProject(_OPTIONS["target"],_OPTIONS["subtarget"])
 
-if (STANDALONE~=true) then
-	group "drivers"
-	findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
-end
-
-group "emulator"
-dofile(path.join("src", "main.lua"))
-if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
-	if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
-		startproject (_OPTIONS["target"])
-	else
-		startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+if _OPTIONS["with-emulator"] then
+	if (STANDALONE~=true) then
+		dofile(path.join("src", "mame", "frontend.lua"))
 	end
-else
-	startproject (_OPTIONS["subtarget"])
+
+	if (STANDALONE~=true) then
+		group "drivers"
+		findfunction("createProjects_" .. _OPTIONS["target"] .. "_" .. _OPTIONS["subtarget"])(_OPTIONS["target"], _OPTIONS["subtarget"])
+	end
+
+	group "emulator"
+	dofile(path.join("src", "main.lua"))
+	if (_OPTIONS["SOURCES"] == nil) and (_OPTIONS["SOURCEFILTER"] == nil) then
+		if (_OPTIONS["target"] == _OPTIONS["subtarget"]) then
+			startproject (_OPTIONS["target"])
+		else
+			startproject (_OPTIONS["target"] .. _OPTIONS["subtarget"])
+		end
+	else
+		startproject (_OPTIONS["subtarget"])
+	end
+	mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
+	strip()
 end
-mainProject(_OPTIONS["target"],_OPTIONS["subtarget"])
-strip()
 
 if _OPTIONS["with-tools"] then
 	group "tools"
@@ -1530,10 +1443,15 @@ function generate_has_header(hashname, hash)
    file:write(string.format("#ifndef GENERATED_HAS_%s_H\n", hashname))
    file:write(string.format("#define GENERATED_HAS_%s_H\n", hashname))
    file:write("\n")
+   active = {}
    for k, v in pairs(hash) do
 	  if v then
-		 file:write(string.format("#define HAS_%s_%s\n", hashname, k))
+		 active[#active+1] = k
 	  end
+   end
+   table.sort(active)
+   for _, k in ipairs(active) do
+	  file:write(string.format("#define HAS_%s_%s\n", hashname, k))
    end
    file:write("\n")
    file:write("#endif\n")

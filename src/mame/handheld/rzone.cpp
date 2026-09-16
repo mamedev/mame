@@ -34,7 +34,7 @@ TODO:
 
 #include "machine/timer.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -57,7 +57,7 @@ public:
 	void rzindy500(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	output_finder<> m_led_out;
@@ -89,9 +89,6 @@ private:
 void rzone_state::machine_start()
 {
 	hh_sm510_state::machine_start();
-
-	// resolve handlers
-	m_led_out.resolve();
 
 	// register for savestates
 	save_item(NAME(m_led_pin));
@@ -249,10 +246,9 @@ void rzone_state::rzbatfor(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1368, 1080);
-	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
@@ -273,10 +269,9 @@ void rzone_state::rztoshden(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1392, 1080);
-	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
@@ -297,10 +292,9 @@ void rzone_state::rzindy500(machine_config &config)
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1425, 1080);
-	screen.set_visarea_full();
 
 	TIMER(config, m_led_off).configure_generic(FUNC(rzone_state::led_off_callback));
 	config.set_default_layout(layout_rzone);
@@ -352,6 +346,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE )
-SYST( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Takara)", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE )
-SYST( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics (licensed from Sega)", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE )
+SYST( 1995, rzbatfor,  0,      0,      rzbatfor,  rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Batman Forever", MACHINE_SUPPORTS_SAVE ) // licensed from DC Comics
+SYST( 1996, rztoshden, 0,      0,      rztoshden, rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Battle Arena Toshinden", MACHINE_SUPPORTS_SAVE ) // licensed from Takara
+SYST( 1996, rzindy500, 0,      0,      rzindy500, rzone, rzone_state, empty_init, "Tiger Electronics", "R-Zone: Indy 500", MACHINE_SUPPORTS_SAVE ) // licensed from Sega

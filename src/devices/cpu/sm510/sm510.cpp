@@ -152,7 +152,7 @@ void sm510_device::execute_one()
 			}
 			break; // 0xfc
 
-	} // big switch
+	} // 0xf0
 
 	// BM high bit is only valid for 1 step
 	m_bmask = (m_op == 0x02) ? 0x40 : 0;

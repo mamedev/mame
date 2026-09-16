@@ -56,12 +56,12 @@ public:
 	void h01jce(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void h01x_mem_map(address_map &map);
-	void h01x_io_map(address_map &map);
+	void h01x_mem_map(address_map &map) ATTR_COLD;
+	void h01x_io_map(address_map &map) ATTR_COLD;
 
 	uint8_t mem_0000_r(offs_t offset);
 	void mem_0000_w(uint8_t data);
@@ -112,7 +112,7 @@ void h01x_state::h01x(machine_config &config)
 	RAM(config, m_vram).set_default_size("16K").set_default_value(0xf0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10.6445_MHz_XTAL, 336, 0, 336, 192, 0, 192);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);

@@ -13,7 +13,7 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 //#include "video/saa5350.h"
 
@@ -33,9 +33,9 @@ public:
 	void feap90(machine_config &config);
 
 private:
-	void prog_map(address_map &map);
-	void ext_map(address_map &map);
-	void sub_prog_map(address_map &map);
+	void prog_map(address_map &map) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+	void sub_prog_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
 };
@@ -100,5 +100,5 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1986, t3210,  0, 0, t3210,  bitel, bitel_state, empty_init, "Siemens", "Bitel T3210", MACHINE_IS_SKELETON)
-COMP(1989, feap90, 0, 0, feap90, bitel, bitel_state, empty_init, "Siemens", "Multitel Fe Ap 90-1.1", MACHINE_IS_SKELETON)
+COMP(1986, t3210,  0, 0, t3210,  bitel, bitel_state, empty_init, "Siemens", "Bitel T3210", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1989, feap90, 0, 0, feap90, bitel, bitel_state, empty_init, "Siemens", "Multitel Fe Ap 90-1.1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

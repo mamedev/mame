@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ldresample.c
+    ldresample.cpp
 
     Laserdisc audio synchronizer and resampler.
 
@@ -18,6 +18,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <new>
 
 
@@ -249,7 +250,7 @@ static bool read_chd(chd_file &file, uint32_t field, movie_info &info, uint32_t 
 	file.codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 	// read the field
-	std::error_condition chderr = file.read_hunk(field, nullptr);
+	std::error_condition chderr = file.codec_process_hunk(field);
 	return !chderr;
 }
 

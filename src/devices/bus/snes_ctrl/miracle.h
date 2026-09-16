@@ -35,10 +35,10 @@ protected:
 	static constexpr int RECV_RING_SIZE = 64;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte

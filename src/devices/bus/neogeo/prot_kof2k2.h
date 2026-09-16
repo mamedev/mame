@@ -22,8 +22,8 @@ public:
 	void samsh5sp_decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 #endif // MAME_BUS_NEOGEO_PROT_KOF2K2_H

@@ -84,6 +84,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config& mconfig, device_type type, 
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this),
 	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, internal_map),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_scanline(0), // reset the scanline count
@@ -489,7 +490,7 @@ void ppu2c0x_device::start_nopalram() {
 	// Video allocation / palette initialization
 	// --------------------------------------------------
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	m_bitmap = std::make_unique<bitmap_rgb32>(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
+	m_bitmap.allocate(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
 	init_palette_tables();
 
 	// --------------------------------------------------
@@ -504,7 +505,7 @@ void ppu2c0x_device::start_nopalram() {
 	save_item(NAME(m_scanlines_per_frame));
 	save_item(NAME(m_vblank_first_scanline));
 	save_item(NAME(m_regs));
-	save_item(NAME(*m_bitmap));
+	save_item(NAME(m_bitmap));
 
 	// --------------------------------------------------
 	// Initial PPU state
@@ -1578,7 +1579,7 @@ void ppu2c0x_device::retro_fix_previous_pixel_after_ppumask_write() {
 	if (prev_pixel_scanline != scanline)
 		return;
 
-	bitmap_rgb32& bitmap = *m_bitmap;
+	bitmap_rgb32& bitmap = m_bitmap;
 	const unsigned pixel = prev_pixel_x;
 	unsigned pal_index = 0;
 	// Use the current visible PPUMASK state after the write.
@@ -2022,7 +2023,7 @@ unsigned ppu2c0x_device::get_sprite_pixel(unsigned& spr_pal, bool& spr_behind_bg
 }
 
 void ppu2c0x_device::do_pixel_output_and_sprite_zero() {
-	bitmap_rgb32& bitmap = *m_bitmap;
+	bitmap_rgb32& bitmap = m_bitmap;
 	unsigned pixel = dot - 2;
 	unsigned pal_index;
 
@@ -3552,7 +3553,7 @@ void ppu2c0x_device::set_vram_dest(uint16_t dest) {
 *************************************/
 
 void ppu2c0x_device::render(bitmap_rgb32& bitmap, int flipx, int flipy, int sx, int sy, const rectangle& cliprect) {
-	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, cliprect);
+	copybitmap(bitmap, m_bitmap, flipx, flipy, sx, sy, cliprect);
 }
 
 uint32_t ppu2c0x_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect) {
@@ -3569,7 +3570,17 @@ void ppu2c04_clone_device::draw_background(uint8_t* line_priority) {}
 void ppu2c0x_device::draw_back_pen(uint32_t* dest, int back_pen) {}
 void ppu2c0x_device::draw_background_pen() {}
 void ppu2c0x_device::read_sprite_plane_data(int address) {}
-void ppu2c0x_device::make_sprite_pixel_data(uint8_t& pixel_data, int flipx) {}
+void ppu2c0x_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx) {}
+
+void ppu2c0x_device::write_to_spriteram_with_increment(uint8_t data)
+{
+	write_oam_data_reg(data);
+}
+
+void ppu2c0x_device::reload_refresh_data()
+{
+	m_refresh_data = m_refresh_latch;
+}
 void ppu2c0x_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap) {}
 void ppu2c04_clone_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap) {}
 void ppu2c0x_device::read_extra_sprite_bits(int eval_sprite_tile) {}

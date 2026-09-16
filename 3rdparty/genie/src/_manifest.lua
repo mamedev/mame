@@ -57,6 +57,7 @@
 		-- Visual Studio actions
 		"actions/vstudio/_vstudio.lua",
 		"actions/vstudio/vstudio_solution.lua",
+		"actions/vstudio/vstudio_slnx.lua",
 		"actions/vstudio/vstudio_vcxproj.lua",
 		"actions/vstudio/vstudio_vcxproj_filters.lua",
 		"actions/vstudio/vs2010.lua",
@@ -65,7 +66,8 @@
 		"actions/vstudio/vs2015.lua",
 		"actions/vstudio/vs2017.lua",
 		"actions/vstudio/vs2019.lua",
-		"actions/vstudio/vsllvm.lua",
+		"actions/vstudio/vs2022.lua",
+		"actions/vstudio/vs2026.lua",
 
 		-- Xcode action
 		"actions/xcode/_xcode.lua",
@@ -76,11 +78,9 @@
 		"actions/xcode/xcode8.lua",
 		"actions/xcode/xcode9.lua",
 		"actions/xcode/xcode10.lua",
-
-		--FASTBuild action
-		"actions/fastbuild/_fastbuild.lua",
-		"actions/fastbuild/fastbuild_project.lua",
-		"actions/fastbuild/fastbuild_solution.lua",
+		"actions/xcode/xcode11.lua",
+		"actions/xcode/xcode14.lua",
+		"actions/xcode/xcode15.lua",
 
 		-- ninja action
 		"actions/ninja/_ninja.lua",
@@ -90,9 +90,7 @@
 		"actions/ninja/ninja_swift.lua",
 		"actions/ninja/ninja_swift_incremental.lua",
 
-		-- qbs action
-		"actions/qbs/_qbs.lua",
-		"actions/qbs/qbs_base.lua",
-		"actions/qbs/qbs_solution.lua",
-		"actions/qbs/qbs_cpp.lua",
+		-- jcdb action
+		"actions/jcdb/_jcdb.lua",
+		"actions/jcdb/jcdb_solution.lua",
 	}

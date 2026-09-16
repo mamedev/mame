@@ -31,10 +31,10 @@ public:
 private:
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void char_map(address_map &map);
-	void attr_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void char_map(address_map &map) ATTR_COLD;
+	void attr_map(address_map &map) ATTR_COLD;
 
 	required_device<z180_device> m_maincpu;
 	required_device<scn2674_device> m_avdc;
@@ -88,7 +88,7 @@ void cit101xl_state::cit101xl(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564APL-15 + battery?
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24.27_MHz_XTAL, 980, 0, 820, 413, 0, 364);
 	screen.set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
@@ -115,4 +115,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1987, cit101xl, 0, 0, cit101xl, cit101xl, cit101xl_state, empty_init, "CIE Terminals", "CIT-101XL Video Display Terminal", MACHINE_IS_SKELETON)
+COMP(1987, cit101xl, 0, 0, cit101xl, cit101xl, cit101xl_state, empty_init, "CIE Terminals", "CIT-101XL Video Display Terminal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

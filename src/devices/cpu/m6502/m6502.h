@@ -21,7 +21,8 @@ typedef device_delegate<void (uint8_t data)> mmc5_register_write_delegate;
 		IRQ_LINE = INPUT_LINE_IRQ0,
 		APU_IRQ_LINE = INPUT_LINE_IRQ1,
 		NMI_LINE = INPUT_LINE_NMI,
-		V_LINE   = INPUT_LINE_IRQ0 + 16
+		V_LINE   = INPUT_LINE_IRQ0 + 16,
+		RDY_LINE = INPUT_LINE_IRQ0 + 17
 	};
 	
 	class memory_interface {
@@ -29,6 +30,8 @@ typedef device_delegate<void (uint8_t data)> mmc5_register_write_delegate;
 		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache cprogram, csprogram;
 		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific program;
 		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific program14;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program, m_cprogram, m_csprogram;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_program14, m_cprogram14, m_csprogram14;
 
 		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -56,6 +59,7 @@ typedef device_delegate<void (uint8_t data)> mmc5_register_write_delegate;
 	auto sync_cb() { return sync_w.bind(); }
 
 	devcb_write_line sync_w;
+	devcb_write_line &m_sync_w = sync_w;
 	mmc5_reset_scanline_irq_delegate m_mmc5_reset_scanline_irq;
 	mmc5_register_write_delegate m_mmc5_ppuctrl_write;
 	mmc5_register_write_delegate m_mmc5_ppumask_write;
@@ -167,7 +171,6 @@ protected:
 	virtual bool cpu_is_interruptible() const override { return true; }
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
-	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
@@ -266,8 +269,22 @@ protected:
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
+	bool m_rdy_state = true, m_irq_sampled = false, m_nmi_sampled = false;
 	bool nmi_pending, irq_taken, sync, inhibit_interrupts;
 	bool uses_custom_memory_interface;
+
+	// Compatibility names used by current MAME 6502-derived devices.
+	address_space_config &m_program_config = program_config;
+	address_space_config &m_sprogram_config = sprogram_config;
+	uint16_t &m_PPC = PPC, &m_NPC = NPC, &m_PC = PC, &m_SP = SP, &m_TMP = TMP;
+	uint8_t &m_TMP2 = TMP2, &m_A = A, &m_X = X, &m_Y = Y, &m_P = P, &m_IR = IR;
+	int &m_inst_state_base = inst_state_base;
+	std::unique_ptr<memory_interface> &m_mintf = mintf;
+	int &m_inst_state = inst_state, &m_inst_substate = inst_substate;
+	int &m_icount = icount, &m_bcount = bcount, &m_count_before_instruction_step = count_before_instruction_step;
+	bool &m_nmi_state = nmi_state, &m_irq_state = irq_state, &m_apu_irq_state = apu_irq_state, &m_v_state = v_state;
+	bool &m_nmi_pending = nmi_pending, &m_irq_taken = irq_taken, &m_sync = sync, &m_inhibit_interrupts = inhibit_interrupts;
+	bool &m_uses_custom_memory_interface = uses_custom_memory_interface;
 	
 	uint8_t read(uint16_t adr);
 	uint8_t read_9(uint16_t adr);
@@ -276,15 +293,19 @@ protected:
 	void write_9(uint16_t adr, uint8_t val);
 	uint8_t read_arg(uint16_t adr);
 	uint8_t read_pc();
+	uint8_t read_pc_noirq() { return read_arg(PC); }
+	uint8_t read_arg_noirq(uint16_t adr) { return read_arg(adr); }
 	uint8_t read_sync(uint16_t adr);
 	void set_var_read();
 
 	void prefetch_start();
-	void prefetch_end();
+	virtual void prefetch_end();
 	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
+	void sample_interrupt() { m_irq_sampled = irq_state || apu_irq_state; m_nmi_sampled = nmi_pending; }
 
 	u32 XPC;
+	u32 &m_XPC = XPC;
 	virtual offs_t pc_to_external(u16 pc); // For paged PCs
 	virtual void do_exec_full();
 	virtual void do_exec_partial();

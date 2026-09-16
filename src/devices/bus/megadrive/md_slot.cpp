@@ -229,7 +229,7 @@ static const md_slot slot_list[] =
 	{ NBA_JAM, "rom_nbajam" },
 	{ NBA_JAM_ALT, "rom_nbajam_alt" },
 	{ NBA_JAM_TE, "rom_nbajamte" },
-	{ NFL_QB_96, "rom_nflqb" },
+	{ NFL_QB_96, "rom_nflqb96" },
 	{ C_SLAM, "rom_cslam" },
 	{ EA_NHLPA, "rom_nhlpa" },
 	{ BRIAN_LARA, "rom_blara" },
@@ -242,12 +242,10 @@ static const md_slot slot_list[] =
 
 	{ SSF2, "rom_ssf2" },
 	{ CM_2IN1, "rom_cm2in1" },
-	{ RADICA, "rom_radica" },
 //  { GAME_KANDUME, "rom_gkand" },  // what's needed by this?
 
 	{ TILESMJ2, "rom_16mj2" },
 	{ BUGSLIFE, "rom_bugs" },
-	{ CHINFIGHT3, "rom_chinf3" },
 	{ ELFWOR, "rom_elfwor" },
 	{ KAIJU, "rom_pokestad" },
 	{ KOF98, "rom_kof98" },
@@ -272,6 +270,7 @@ static const md_slot slot_list[] =
 	{ SRAM_ARG96, "rom_sram_arg96" },
 	{ TEKKENSP, "rom_tekkesp" },
 	{ TOPFIGHTER, "rom_topf" },
+	{ TITAN, "rom_titan" },
 
 	{ SEGA_SRAM_FULLPATH, "rom_sram" },
 	{ SEGA_SRAM_FALLBACK, "rom_sramsafe" }
@@ -374,7 +373,7 @@ std::error_condition base_md_cart_slot_device::load_list()
 		m_type = md_get_pcb_id(slot_name);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
-	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1)
+	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1 && m_type != TITAN)
 		m_cart->rom_map_setup(length);
 
 	return std::error_condition();
@@ -518,7 +517,7 @@ std::error_condition base_md_cart_slot_device::load_nonlist()
 	m_type = get_cart_type(ROM, tmplen - offset);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
-	if (m_type != SSF2 && m_type != PSOLAR)
+	if (m_type != SSF2 && m_type != PSOLAR && m_type != CM_2IN1 && m_type != TITAN)
 		m_cart->rom_map_setup(len);
 
 
@@ -624,7 +623,7 @@ void base_md_cart_slot_device::setup_nvram()
 			break;
 		case SEGA_FRAM:
 			m_cart->m_nvram_start = 0x200000;
-			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("fram") - 1;
+			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
@@ -688,13 +687,13 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 	smb_sig[]       = { 0x20, 0x4d, 0x41, 0x52, 0x49, 0x4f },
 	smb2_sig[]      = { 0x4e, 0xb9, 0x00, 0x0f, 0x25, 0x84 },
 	kaiju_sig[]     = { 0x19, 0x7c, 0x00, 0x01, 0x00, 0x00 },
-	chifi3_sig[]    = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a },
+//  chifi3_sig[]    = { 0xb6, 0x16, 0x66, 0x00, 0x00, 0x4a },
 	lionk2_sig[]    = { 0x26, 0x79, 0x00, 0xff, 0x00, 0xf4 },
 	rx3_sig[]       = { 0x66, 0x00, 0x00, 0x0e, 0x30, 0x3c },
 	kof98_sig[]     = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00 },
 	s15in1_sig[]    = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00 },
 	kof99_sig[]     = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1 }, // move.l  #$300000A1,d0
-	radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
+//  radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
 	soulb_sig[]     = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
 	s19in1_sig[]    = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 },
 	rockman_sig[]   = { 0xea, 0x80 };
@@ -774,8 +773,8 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 			if (!memcmp(&ROM[0x674e], kaiju_sig, sizeof(kaiju_sig)))
 				type = KAIJU;
 
-			if (!memcmp(&ROM[0x1780], chifi3_sig, sizeof(chifi3_sig)))
-				type = CHINFIGHT3;
+			//if (!memcmp(&ROM[0x1780], chifi3_sig, sizeof(chifi3_sig)))
+			//  type = CHINFIGHT3;
 
 			if (!memcmp(&ROM[0x03c2], lionk2_sig, sizeof(lionk2_sig)))
 				type = LIONK2;
@@ -833,9 +832,9 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 			break;
 
 		case 0x400000:
-			if (!memcmp(&ROM[0x3c031c], radica_sig, sizeof(radica_sig)) ||
-				!memcmp(&ROM[0x3f031c], radica_sig, sizeof(radica_sig))) // ssf+gng + radica vol1
-				type = RADICA;
+			//if (!memcmp(&ROM[0x3c031c], radica_sig, sizeof(radica_sig)) ||
+			//  !memcmp(&ROM[0x3f031c], radica_sig, sizeof(radica_sig))) // ssf+gng + radica vol1
+			//  type = RADICA;
 
 			if (!memcmp(&ROM[0x028460], soulb_sig, sizeof(soulb_sig)))
 				type = SOULBLAD;
@@ -909,8 +908,7 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
 		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		size_t actual;
-		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+		util::read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
 
 		uint32_t const offset = genesis_is_SMD(&rom[0x200], len - 0x200) ? 0x200 : 0;
 
@@ -920,7 +918,9 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
 		return std::string(slot_string);
 	}
 	else
+	{
 		return software_get_default_slot("rom");
+	}
 }
 
 

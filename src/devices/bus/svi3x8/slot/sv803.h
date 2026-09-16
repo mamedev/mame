@@ -30,8 +30,8 @@ public:
 	virtual void mreq_w(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint8_t[]> m_ram;

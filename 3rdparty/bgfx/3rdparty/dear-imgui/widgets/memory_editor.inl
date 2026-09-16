@@ -55,10 +55,10 @@ namespace ImGui
         int data_editing_addr_backup = DataEditingAddr;
         if (DataEditingAddr != -1)
         {
-            if (IsKeyPressed(GetKeyIndex(ImGuiKey_UpArrow)) && DataEditingAddr >= Rows)                    { DataEditingAddr -= Rows; DataEditingTakeFocus = true; }
-            else if (IsKeyPressed(GetKeyIndex(ImGuiKey_DownArrow))  && DataEditingAddr < mem_size - Rows)  { DataEditingAddr += Rows; DataEditingTakeFocus = true; }
-            else if (IsKeyPressed(GetKeyIndex(ImGuiKey_LeftArrow))  && DataEditingAddr > 0)                { DataEditingAddr -= 1;    DataEditingTakeFocus = true; }
-            else if (IsKeyPressed(GetKeyIndex(ImGuiKey_RightArrow)) && DataEditingAddr < mem_size - 1)     { DataEditingAddr += 1;    DataEditingTakeFocus = true; }
+            if (IsKeyPressed(ImGuiKey_UpArrow) && DataEditingAddr >= Rows)                    { DataEditingAddr -= Rows; DataEditingTakeFocus = true; }
+            else if (IsKeyPressed(ImGuiKey_DownArrow)  && DataEditingAddr < mem_size - Rows)  { DataEditingAddr += Rows; DataEditingTakeFocus = true; }
+            else if (IsKeyPressed(ImGuiKey_LeftArrow)  && DataEditingAddr > 0)                { DataEditingAddr -= 1;    DataEditingTakeFocus = true; }
+            else if (IsKeyPressed(ImGuiKey_RightArrow) && DataEditingAddr < mem_size - 1)     { DataEditingAddr += 1;    DataEditingTakeFocus = true; }
         }
 
         if ((DataEditingAddr / Rows) != (data_editing_addr_backup / Rows))
@@ -207,7 +207,7 @@ namespace ImGui
 
         AlignTextToFramePadding();
         PushItemWidth(50);
-        PushAllowKeyboardFocus(false);
+        PushItemFlag(ImGuiItemFlags_NoTabStop, true);
         int rows_backup = Rows;
         if (DragInt("##rows", &Rows, 0.2f, 4, 32, "%.0f rows"))
         {
@@ -216,7 +216,7 @@ namespace ImGui
             SetWindowSize(new_window_size);
         }
 
-        PopAllowKeyboardFocus();
+        PopItemFlag();
         PopItemWidth();
         SameLine();
         Text("Range %0*x..%0*x", addr_digits_count, (int)base_display_addr, addr_digits_count, (int)base_display_addr+mem_size-1);

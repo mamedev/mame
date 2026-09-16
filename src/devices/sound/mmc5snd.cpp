@@ -273,9 +273,9 @@ void mmc5snd_device::clock_frame_sequencer() {
 //  sound_stream_update
 //-------------------------------------------------
 
-void mmc5snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mmc5snd_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		clock_frame_sequencer();
 		clock_pulse_timers();
@@ -285,7 +285,7 @@ void mmc5snd_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		const s32 pulse = (pulse_output(0) + pulse_output(1)) * 4;
 		const s32 pcm = m_pcm_dac;
 
-		outputs[0].put_int(i, -(pulse + pcm), 768);
+		stream.put_int(0, i, -(pulse + pcm), 768);
 	}
 }
 

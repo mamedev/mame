@@ -22,7 +22,7 @@
 ***********************************************************************************/
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -69,9 +69,9 @@ public:
 		m_p1_unknown = 0x00;
 	}
 
-	void splus(machine_config &config);
+	void splus(machine_config &config) ATTR_COLD;
 
-	void init_splus();
+	void init_splus() ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -93,8 +93,8 @@ private:
 	void i2c_nvram_w(uint8_t data);
 	uint8_t splus_reel_optics_r();
 
-	void splus_iomap(address_map &map);
-	void splus_map(address_map &map);
+	void splus_datamap(address_map &map) ATTR_COLD;
+	void splus_map(address_map &map) ATTR_COLD;
 
 	// EEPROM States
 	int m_sda_dir;
@@ -116,12 +116,6 @@ private:
 
 	int16_t m_stepper_pos[5];
 	uint8_t m_stop_pos[5];
-
-	virtual void machine_start() override
-	{
-		m_digits.resolve();
-		m_leds.resolve();
-	}
 
 	// Pointers to External RAM
 	required_shared_ptr<uint8_t> m_cmosl_ram;
@@ -593,7 +587,7 @@ void splus_state::splus_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void splus_state::splus_iomap(address_map &map)
+void splus_state::splus_datamap(address_map &map)
 {
 	// Serial I/O
 	map(0x0000, 0x0000).r(FUNC(splus_state::splus_serial_r)).w(FUNC(splus_state::splus_serial_w));
@@ -683,7 +677,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 {
 	I80C32(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &splus_state::splus_map);
-	m_maincpu->set_addrmap(AS_IO, &splus_state::splus_iomap);
+	m_maincpu->set_addrmap(AS_DATA, &splus_state::splus_datamap);
 	m_maincpu->port_out_cb<1>().set(FUNC(splus_state::splus_p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(splus_state::splus_p3_r));
 
@@ -694,7 +688,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 	// video hardware (ALL FAKE, NO VIDEO)
 	PALETTE(config, "palette").set_entries(16*16);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(FUNC(splus_state::screen_update));

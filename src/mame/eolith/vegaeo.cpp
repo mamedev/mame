@@ -136,7 +136,7 @@ static INPUT_PORTS_START( crazywar )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vegaeo_state, speedup_vblank_r)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vegaeo_state::speedup_vblank_r))
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -188,10 +188,10 @@ void vegaeo_state::vega(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vegaeo_state::vega_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(vegaeo_state::eolith_speedup), "screen", 0, 1);
 
-	AT28C16(config, "at28c16", 0);
+	AT28C16(config, "at28c16");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 262);
@@ -203,8 +203,7 @@ void vegaeo_state::vega(machine_config &config)
 	m_palette->set_membits(16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
@@ -216,8 +215,8 @@ void vegaeo_state::vega(machine_config &config)
 	m_qs1000->p1_out().set(FUNC(vegaeo_state::qs1000_p1_w));
 	m_qs1000->p2_out().set(FUNC(vegaeo_state::qs1000_p2_w));
 	m_qs1000->p3_out().set(FUNC(vegaeo_state::qs1000_p3_w));
-	m_qs1000->add_route(0, "lspeaker", 1.0);
-	m_qs1000->add_route(1, "rspeaker", 1.0);
+	m_qs1000->add_route(0, "speaker", 1.0, 0);
+	m_qs1000->add_route(1, "speaker", 1.0, 1);
 }
 
 /*
@@ -299,7 +298,7 @@ ROM_END
 void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000->cpu().space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	init_speedup();

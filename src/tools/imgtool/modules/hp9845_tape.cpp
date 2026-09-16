@@ -120,6 +120,7 @@
 
 #include <bitset>
 #include <cstdio>
+#include <cstring>
 
 
 // Constants
@@ -1514,7 +1515,7 @@ static imgtoolerr_t hp9845data_write_file(imgtool::partition &partition, const c
 	return res;
 }
 
-void filter_hp9845data_getinfo(uint32_t state, union filterinfo *info)
+void filter_hp9845data_getinfo(uint32_t state, imgtool::filterinfo *info)
 {
 	switch (state) {
 	case FILTINFO_PTR_READFILE:

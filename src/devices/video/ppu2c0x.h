@@ -53,7 +53,8 @@ class m6502_device;
 
 class ppu2c0x_device : public device_t,
 						public device_memory_interface,
-						public device_video_interface
+						public device_video_interface,
+						public device_palette_interface
 {
 public:
 	typedef device_delegate<void (int scanline, bool vblank, bool blanked)> scanline_delegate;
@@ -128,7 +129,9 @@ public:
 	void draw_background_pen();
 
 	virtual void read_sprite_plane_data(int address);
-	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
+	virtual void make_sprite_pixel_data(uint8_t &pixel_data, bool flipx);
+	virtual void write_to_spriteram_with_increment(uint8_t data);
+	void reload_refresh_data();
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap);
 	virtual bool is_spritepixel_opaque(int pixel_data, int color);
 	virtual void draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
@@ -351,6 +354,7 @@ protected:
 	// Device overrides.
 	// ---------------------------------------------------------------------
 	virtual void device_start() override;
+	virtual u32 palette_entries() const noexcept override { return 0x40 * 8; }
 	virtual void device_config_complete() override;
 	virtual space_config_vector memory_space_config() const override;
 
@@ -390,7 +394,7 @@ protected:
 	int m_mapper_number;
 
 	uint16_t bg_pat_addr_tile;       // Latched background pattern table base used by BG fetches.
-	uint8_t m_planebuf[2];
+	uint8_t m_planebuf[16];
 	int m_scanline;
 
 	// Used by ppu2c0x_vt.cpp / derived legacy paths.
@@ -402,7 +406,8 @@ protected:
 	bool m_paletteram_in_ppuspace;
 
 	std::vector<uint8_t> m_palette_ram;
-	std::unique_ptr<bitmap_rgb32> m_bitmap;
+	bitmap_rgb32 m_bitmap;
+	uint16_t m_spriteramsize = 0x100;
 	int m_regs[PPU_MAX_REG];
 
 	// Legacy renderer / sh6578-related state.

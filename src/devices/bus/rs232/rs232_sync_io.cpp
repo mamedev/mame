@@ -108,7 +108,7 @@ ioport_constructor rs232_sync_io_device::device_input_ports() const
 
 void rs232_sync_io_device::device_add_mconfig(machine_config &config)
 {
-	BITBANGER(config , m_stream , 0);
+	BITBANGER(config , m_stream);
 }
 
 void rs232_sync_io_device::device_start()
@@ -198,4 +198,4 @@ void rs232_sync_io_device::update_serial(int state)
 	m_clk_timer->adjust(period , 0 , period);
 }
 
-DEFINE_DEVICE_TYPE(RS232_SYNC_IO, rs232_sync_io_device, "rs232_sync_io", "RS232 Synchronous I/O")
+DEFINE_DEVICE_TYPE(RS232_SYNC_IO, rs232_sync_io_device, "rs232_sync_io", "RS-232 Synchronous I/O")

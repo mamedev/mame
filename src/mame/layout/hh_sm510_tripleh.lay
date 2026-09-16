@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:hap
+-->
+<mamelayout version="2">
+
+	<element name="lcdm"><rect><color red="0.7" green="0.71" blue="0.72" /></rect></element>
+
+	<view name="LCD 0 Pixel Aspect (~scr0nativexaspect~:~scr0nativeyaspect~)">
+		<screen index="0"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds left="0" top="0" right="~scr0width~" bottom="~scr0height~" /></element>
+	</view>
+
+	<view name="LCD 1 Pixel Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
+		<screen index="1"><bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" /></element>
+	</view>
+
+	<view name="LCD 2 Pixel Aspect (~scr2nativexaspect~:~scr2nativeyaspect~)">
+		<screen index="1"><bounds left="0" top="0" right="~scr2width~" bottom="~scr2height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds left="0" top="0" right="~scr2width~" bottom="~scr2height~" /></element>
+	</view>
+
+	<!-- can't do a view with gaps -->
+	<view name="LCD Triple Side-by-Side (Gapless)">
+		<screen index="0"><bounds x="-~scr0width~" y="0" width="~scr0width~" height="~scr0height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="-~scr0width~" y="0" width="~scr0width~" height="~scr0height~" /></element>
+		<screen index="1"><bounds x="0" y="0" width="~scr1width~" height="~scr1height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="0" y="0" width="~scr1width~" height="~scr1height~" /></element>
+		<screen index="2"><bounds x="~scr1width~" y="0" width="~scr2width~" height="~scr2height~" /></screen>
+		<element ref="lcdm" blend="multiply"><bounds x="~scr1width~" y="0" width="~scr2width~" height="~scr2height~" /></element>
+	</view>
+
+</mamelayout>

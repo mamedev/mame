@@ -216,12 +216,12 @@ public:
 	void pokerout(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -371,7 +371,7 @@ void pokerout_state::pokerout(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(VDP_MEM);
 //  int line no connected, so no callback.
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

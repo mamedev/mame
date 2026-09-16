@@ -9,16 +9,17 @@
 
 
 Usage:
+
     When you're 100% sure there is a given crystal or resonator on a
     PCB, use XTAL(frequency) to document so.  That xtal object then
     collates multiplies or divides done to the base frequency to
     compute the final one.
 
-    If you recieve a XTAL object and want to turn it to a final
+    If you receive a XTAL object and want to turn it to a final
     frequency, use value() to get an integer or dvalue() to get a
     double.
 
-    If you recieve a XTAL object and want to check if the initial
+    If you receive a XTAL object and want to check if the initial
     crystal value is sane, use check(context message).  It will
     fatalerror if the value is not in the authorized value list.  It
     has a (small) cost, so don't do it in a hot path.
@@ -35,17 +36,19 @@ Usage:
 
 ***************************************************************************/
 
-
 #ifndef MAME_EMU_XTAL_H
 #define MAME_EMU_XTAL_H
 
-#include "emucore.h"
-
 #pragma once
 
-class XTAL {
-public:
+#include "emucore.h"
 
+#include <string_view>
+
+
+class XTAL
+{
+public:
 	constexpr explicit XTAL(double base_clock) : m_base_clock(base_clock), m_current_clock(base_clock) {}
 
 	constexpr double dvalue() const noexcept { return m_current_clock; }
@@ -59,8 +62,7 @@ public:
 	friend constexpr XTAL operator *(unsigned int mult, const XTAL &xtal);
 	friend constexpr XTAL operator *(double       mult, const XTAL &xtal);
 
-	void validate(const char *message) const;
-	void validate(const std::string &message) const;
+	void validate(std::string_view message) const;
 
 private:
 	double m_base_clock, m_current_clock;
@@ -69,7 +71,7 @@ private:
 
 	static const double known_xtals[];
 	static double last_correct_value, xtal_error_low, xtal_error_high;
-	static void fail(double base_clock, const std::string &message);
+	static void fail(double base_clock, std::string_view message);
 	static bool validate(double base_clock);
 	static void check_ordering();
 };

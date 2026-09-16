@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/ie15.h"
+#include "ie15.h"
 
 #include "emupal.h"
 
@@ -414,7 +414,7 @@ INPUT_PORTS_START( ie15 )
 
 	// Until the UART is implemented
 	PORT_START("RS232_RXBAUD")
-	PORT_CONFNAME(0xffff, 9600, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0xffff, 9600, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(300, "300")
 	PORT_CONFSETTING(600, "600")
 	PORT_CONFSETTING(1200, "1200")
@@ -424,7 +424,7 @@ INPUT_PORTS_START( ie15 )
 	PORT_CONFSETTING(19200, "19200")
 
 	PORT_START("RS232_TXBAUD")
-	PORT_CONFNAME(0xffff, 9600, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0xffff, 9600, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(300, "300")
 	PORT_CONFSETTING(600, "600")
 	PORT_CONFSETTING(1200, "1200")
@@ -434,12 +434,12 @@ INPUT_PORTS_START( ie15 )
 	PORT_CONFSETTING(19200, "19200")
 
 	PORT_START("RS232_DATABITS")
-	PORT_CONFNAME(0xf, 8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0xf, 8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(7, "7")
 	PORT_CONFSETTING(8, "8")
 
 	PORT_START("RS232_PARITY")
-	PORT_CONFNAME(0x7, 0, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0x7, 0, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(0, "None")
 	PORT_CONFSETTING(1, "Odd")
 	PORT_CONFSETTING(2, "Even")
@@ -447,7 +447,7 @@ INPUT_PORTS_START( ie15 )
 	PORT_CONFSETTING(4, "Space")
 
 	PORT_START("RS232_STOPBITS")
-	PORT_CONFNAME(0x3, 1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFNAME(0x3, 1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(ie15_device::update_serial))
 	PORT_CONFSETTING(1, "1")
 	PORT_CONFSETTING(2, "2")
 
@@ -472,15 +472,6 @@ void ie15_device::kbd_sdv(int state)
 
 void ie15_device::device_start()
 {
-	m_lat_led.resolve();
-	m_nr_led.resolve();
-	m_pch_led.resolve();
-	m_dup_led.resolve();
-	m_lin_led.resolve();
-	m_red_led.resolve();
-	m_sdv_led.resolve();
-	m_prd_led.resolve();
-
 	m_hblank_timer = timer_alloc(FUNC(ie15_device::hblank_onoff_tick), this);
 	m_hblank_timer->adjust(attotime::never);
 
@@ -494,7 +485,7 @@ void ie15_device::device_reset()
 {
 	update_serial(0);
 
-	memset(&m_video, 0, sizeof(m_video));
+	m_video = decltype(m_video)();
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
 	m_kbd_sdv = false;
@@ -672,7 +663,7 @@ void ie15_device::ie15core(machine_config &config)
 	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	IE15_KEYBOARD(config, m_keyboard, 0);
+	IE15_KEYBOARD(config, m_keyboard);
 	m_keyboard->keyboard_cb().set(FUNC(ie15_device::kbd_put));
 	m_keyboard->sdv_cb().set(FUNC(ie15_device::kbd_sdv));
 
@@ -698,7 +689,7 @@ ROM_END
 
 void ie15_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(ie15_device::screen_update));
 	m_screen->set_raw(XTAL(30'800'000)/2,

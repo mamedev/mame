@@ -107,13 +107,13 @@ void inder_vid_device::device_add_mconfig(machine_config &config)
 	m_tms->set_shiftreg_in_callback(FUNC(inder_vid_device::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(inder_vid_device::from_shiftreg));
 
-	screen_device &screen(SCREEN(config, "inder_screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "inder_screen"));
 	screen.set_raw(XTAL(40'000'000)/12, 424, 0, 338, 262, 0, 246);
 	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &inder_vid_device::ramdac_map);
 	ramdac.set_split_read(1);
 }

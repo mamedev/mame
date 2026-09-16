@@ -10,15 +10,15 @@ class pc_mssw_pad_device :  public device_t,
 {
 public:
 	pc_mssw_pad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual uint8_t btn() override { return m_state; }
 	// timing is guessed, calibrated for at486
 	virtual void port_write() override { if(!m_active) { m_timer->adjust(attotime::from_usec(50), 0, attotime::from_usec(5)); m_active = true; } }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 

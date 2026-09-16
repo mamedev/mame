@@ -48,12 +48,12 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void chance(machine_config &config);
-	void play_1(machine_config &config);
+	void chance(machine_config &config) ATTR_COLD;
+	void play_1(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	u8 port07_r();
@@ -70,9 +70,9 @@ private:
 	int ef4_r();
 	void clock_w(int state);
 
-	void chance_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void chance_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_resetcnt = 0U;
 	u16 m_clockcnt = 0U;
@@ -322,11 +322,6 @@ INPUT_PORTS_END
 void play_1_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_leds.resolve();
-	m_player_lamps.resolve();
-	m_io_outputs.resolve();
 
 	save_item(NAME(m_resetcnt));
 	save_item(NAME(m_clockcnt));
@@ -587,7 +582,7 @@ void play_1_state::play_1(machine_config &config)
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	CLOCK(config, m_monotone, 0); // sound device
+	CLOCK(config, m_monotone); // sound device
 	m_monotone->signal_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 }
 
@@ -675,10 +670,10 @@ ROM_END
 
 
 /* Big Town, Last Lap, Night Fever, Party and Third World all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Big Town",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Last Lap",      MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Party",         MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1979, ngtfever, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Night Fever",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, thrdwrld, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Third World",   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, empty_init, ROT0, "Playmatic", "Space Gambler", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1978, chance,   0,       chance, chance,   play_1_state, empty_init, ROT0, "Playmatic", "Chance",        MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Big Town",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Last Lap",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Playmatic", "Party",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1979, ngtfever, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Night Fever",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, thrdwrld, bigtown, play_1, play_1,   play_1_state, empty_init, ROT0, "Sonic",     "Third World",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, empty_init, ROT0, "Playmatic", "Space Gambler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1978, chance,   0,       chance, chance,   play_1_state, empty_init, ROT0, "Playmatic", "Chance",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -56,16 +56,19 @@ protected:
 	required_device<ram_device> m_ram;
 	optional_ioport_array<8> m_io_keypad[4];
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	uint8_t m_keylatch = 0U;
+	uint8_t m_psg_latch = 0U;
 
 private:
-	void crvision_map(address_map &map);
+	void crvision_map(address_map &map) ATTR_COLD;
 	uint8_t read_keyboard(u8 pa);
 
 	void pia_pa_w(uint8_t data);
 	uint8_t pia_pa_r();
 	uint8_t pia_pb_r();
+	void pia_pb_w(uint8_t data);
+	void pia_cb2_w(int state);
 };
 
 class crvision_pal_state : public crvision_state
@@ -109,8 +112,8 @@ private:
 	int pia_cb1_r();
 	void pia_cb2_w(int state);
 
-	void lasr2001_map(address_map &map);
-	virtual void machine_start() override;
+	void lasr2001_map(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 #endif // MAME_VTECH_CRVISION_H

@@ -12,7 +12,7 @@
 //        is currently no use made of it, and it is unlikely to
 //        ever be.
 //
-//  To-Do:
+//  TODO:
 //      - Test: SPARCv8 ops are untested
 //      - Extended-precision FPU support
 //      - Coprocessor support
@@ -1207,17 +1207,6 @@ uint32_t sparc_base_device::execute_min_cycles() const noexcept
 uint32_t sparc_base_device::execute_max_cycles() const noexcept
 {
 	return 4;
-}
-
-
-//-------------------------------------------------
-//  execute_input_lines - return the number of
-//  input/interrupt lines
-//-------------------------------------------------
-
-uint32_t sparc_base_device::execute_input_lines() const noexcept
-{
-	return 16;
 }
 
 
@@ -3403,12 +3392,12 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 	// bneg     bpos
 	// bvs      bvc
 
-	switch(COND)
+	switch (COND)
 	{
 		case 0:     return false;
 		case 1:     return ICC_Z_SET;
-		case 2:     return ICC_Z_SET || (ICC_N != ICC_Z);
-		case 3:     return (ICC_N != ICC_V);
+		case 2:     return ICC_Z_SET || (ICC_N != ICC_V);
+		case 3:     return ICC_N != ICC_V;
 		case 4:     return ICC_C_SET || ICC_Z_SET;
 		case 5:     return ICC_C_SET;
 		case 6:     return ICC_N_SET;
@@ -3416,8 +3405,8 @@ bool sparc_base_device::evaluate_condition(uint32_t op)
 
 		case 8:     return true;
 		case 9:     return ICC_Z_CLEAR;
-		case 10:    return ICC_Z_CLEAR && ICC_N_CLEAR;
-		case 11:    return (ICC_N == ICC_V);
+		case 10:    return ICC_Z_CLEAR && (ICC_N == ICC_V);
+		case 11:    return ICC_N == ICC_V;
 		case 12:    return ICC_C_CLEAR && ICC_Z_CLEAR;
 		case 13:    return ICC_C_CLEAR;
 		case 14:    return ICC_N_CLEAR;
@@ -4291,13 +4280,13 @@ void sparcv8_device::execute_mul(uint32_t op)
 	uint32_t result = 0;
 	if (UMUL || UMULCC)
 	{
-		uint64_t dresult = (uint64_t)RS1REG * (uint64_t)operand2;
+		uint64_t dresult = mulu_32x32(RS1REG, operand2);
 		Y = (uint32_t)(dresult >> 32);
 		result = (uint32_t)dresult;
 	}
 	else if (SMUL || SMULCC)
 	{
-		int64_t dresult = (int64_t)(int32_t)RS1REG * (int64_t)(int32_t)operand2;
+		int64_t dresult = mul_32x32(RS1REG, operand2);
 		Y = (uint32_t)(dresult >> 32);
 		result = (uint32_t)dresult;
 	}
@@ -4482,19 +4471,22 @@ void sparc_base_device::run_loop()
 		    continue;
 		}*/
 
-		if (CHECK_DEBUG)
-			debugger_instruction_hook(PC);
-
 		if (MODE == MODE_RESET)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			reset_step();
 		}
 		else if (MODE == MODE_ERROR)
 		{
+			if (CHECK_DEBUG)
+				debugger_wait_hook();
 			error_step();
 		}
 		else if (MODE == MODE_EXECUTE)
 		{
+			if (CHECK_DEBUG)
+				debugger_instruction_hook(PC);
 			execute_step();
 		}
 
@@ -4518,7 +4510,7 @@ void sparc_base_device::run_loop()
 
 void sparc_base_device::execute_run()
 {
-	bool debug = machine().debug_flags & DEBUG_FLAG_ENABLED;
+	const bool debug = debugger_enabled();
 
 	if (m_bp_reset_in)
 	{

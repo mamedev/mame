@@ -29,14 +29,11 @@
 #include <pty.h>
 #elif defined(__HAIKU__)
 #include <bsd/pty.h>
-#elif defined(__sun)
-#include <sys/types.h>
-#include <stropts.h>
-#include <sys/conf.h>
 #endif
 
 
 namespace {
+
 #if defined(__APPLE__)
 char const *const posix_ptty_identifier  = "/dev/pty";
 #else
@@ -112,55 +109,81 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 #if defined(__ANDROID__)
 	return std::errc::not_supported; // TODO: revisit this error code
 #else // defined(__ANDROID__)
-	// TODO: handling of the slave path is insecure - should use ptsname_r/ttyname_r in a loop
-#if (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
-	int access = O_NOCTTY;
-	if (openflags & OPEN_FLAG_WRITE)
-		access |= (openflags & OPEN_FLAG_READ) ? O_RDWR : O_WRONLY;
-	else if (openflags & OPEN_FLAG_READ)
-		access |= O_RDONLY;
-	else
-		return std::errc::invalid_argument;
-
-	int const masterfd = ::posix_openpt(access);
-	if (masterfd < 0)
-		return std::error_condition(errno, std::generic_category());
-
-	// grant access to slave device and check that it can be opened
-	char const *slavepath;
-	int slavefd;
-	if ((::grantpt(masterfd) < 0) ||
-		(::unlockpt(masterfd) < 0) ||
-		((slavepath = ::ptsname(masterfd)) == nullptr) ||
-		((slavefd = ::open(slavepath, O_RDWR | O_NOCTTY)) < 0))
-	{
-		std::error_condition err(errno, std::generic_category());
-		::close(masterfd);
-		return err;
-	}
-
-	// check that it's possible to stack BSD-compatibility STREAMS modules
-	if ((::ioctl(slavefd, I_PUSH, "ptem") < 0) ||
-		(::ioctl(slavefd, I_PUSH, "ldterm") < 0) ||
-		(::ioctl(slavefd, I_PUSH, "ttcompat") < 0))
-	{
-		std::error_condition err(errno, std::generic_category());
-		::close(slavefd);
-		::close(masterfd);
-		return err;
-	}
-#else
 	struct termios tios;
 	std::memset(&tios, 0, sizeof(tios));
-	::cfmakeraw(&tios); // TODO: this is a non-standard BSDism - should set flags some other way
+	tios.c_iflag = 0;
+	tios.c_oflag = 0;
+	tios.c_cflag = CS8;
+	tios.c_lflag = 0;
 
 	int masterfd = -1, slavefd = -1;
-	char slavepath[PATH_MAX];
-	if (::openpty(&masterfd, &slavefd, slavepath, &tios, nullptr) < 0)
+#if defined(TTY_NAME_MAX)
+	// TTY_NAME_MAX and ptsname_r were added to Open Group Base Specifications Issue 8
+	if (::openpty(&masterfd, &slavefd, nullptr, &tios, nullptr) < 0)
 		return std::error_condition(errno, std::generic_category());
-#endif
 
 	::close(slavefd);
+
+	char slavepath[TTY_NAME_MAX + 1];
+	auto const result = ::ptsname_r(masterfd, slavepath, std::size(slavepath));
+	if (result == -1)
+	{
+		// pre-standard implementations of ptsname_r (e.g. FreeBSD, Tru64, HP-UX) return -1 and set errno
+		std::error_condition err(errno, std::generic_category());
+		::close(masterfd);
+		return err;
+	}
+	else if (result != 0)
+	{
+		::close(masterfd);
+		return std::error_condition(result, std::generic_category());
+	}
+#elif defined(__linux__) || defined(__FreeBSD__)
+	// ptsname_r is present but there's no maximum length defined
+	if (::openpty(&masterfd, &slavefd, nullptr, &tios, nullptr) < 0)
+		return std::error_condition(errno, std::generic_category());
+
+	::close(slavefd);
+
+	std::vector<char> slavepath_storage;
+	try
+	{
+		int result;
+		do
+		{
+			if (slavepath_storage.empty())
+				slavepath_storage.resize(PATH_MAX);
+			else
+				slavepath_storage.resize(slavepath_storage.size() * 2);
+			result = ::ptsname_r(masterfd, slavepath_storage.data(), slavepath_storage.size());
+			if (result == -1)
+				result = errno; // pre-standard ptsname_r returns -1 and sets errno
+		}
+		while (result == ERANGE);
+		if (result != 0)
+		{
+			::close(masterfd);
+			return std::error_condition(result, std::generic_category());
+		}
+	}
+	catch (...)
+	{
+		::close(masterfd);
+		return std::errc::not_enough_memory;
+	}
+	char const *const slavepath = slavepath_storage.data();
+#else
+	// using openpty with a non-null slave path is considered unsafe
+#if defined(PATH_MAX)
+	char slavepath[PATH_MAX];
+#else // defined PATH_MAX
+	char slavepath[8192];
+#endif // defined PATH_MAX
+	if (::openpty(&masterfd, &slavefd, slavepath, &tios, nullptr) < 0)
+		return std::error_condition(errno, std::generic_category());
+
+	::close(slavefd);
+#endif
 
 	int const oldflags = ::fcntl(masterfd, F_GETFL, 0);
 	if (oldflags < 0)

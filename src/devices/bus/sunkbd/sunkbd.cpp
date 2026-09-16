@@ -167,6 +167,7 @@ device_sun_keyboard_port_interface::~device_sun_keyboard_port_interface()
 
 void default_sun_keyboard_devices(device_slot_interface &device)
 {
+	device.option_add("type2hle",   SUN_TYPE2_HLE_KEYBOARD);
 	device.option_add("type3hle",   SUN_TYPE3_HLE_KEYBOARD);
 	device.option_add("type4hle",   SUN_TYPE4_HLE_KEYBOARD);
 	device.option_add("type5hle",   SUN_TYPE5_HLE_KEYBOARD);

@@ -79,7 +79,7 @@ private:
 	uint8_t mato_io_r(offs_t offset);
 	void mato_io_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cassette_timer_callback);
 	uint8_t ppi0_porta_r();
@@ -110,16 +110,16 @@ private:
 	void ppi3_portb_w(uint8_t data);
 	void ppi3_portc_w(uint8_t data);
 
-	void alfa_mem(address_map &map);
-	void c2717_mem(address_map &map);
-	void mato_io(address_map &map);
-	void mato_mem(address_map &map);
-	void pmd852a_mem(address_map &map);
-	void pmd853_mem(address_map &map);
-	void pmd85_io(address_map &map);
-	void pmd85_mem(address_map &map);
+	void alfa_mem(address_map &map) ATTR_COLD;
+	void c2717_mem(address_map &map) ATTR_COLD;
+	void mato_io(address_map &map) ATTR_COLD;
+	void mato_mem(address_map &map) ATTR_COLD;
+	void pmd852a_mem(address_map &map) ATTR_COLD;
+	void pmd853_mem(address_map &map) ATTR_COLD;
+	void pmd85_io(address_map &map) ATTR_COLD;
+	void pmd85_mem(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void pmd851_update_memory();
 	void pmd852a_update_memory();

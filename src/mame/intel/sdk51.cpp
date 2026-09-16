@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 //#include "imagedev/cassette.h"
 #include "machine/bankdev.h"
@@ -38,15 +38,15 @@ public:
 	void sdk51(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void psen_map(address_map &map);
-	void movx_map(address_map &map);
-	void progmem_map(address_map &map);
-	void datamem_map(address_map &map);
-	void mem0_map(address_map &map);
+	void psen_map(address_map &map) ATTR_COLD;
+	void movx_map(address_map &map) ATTR_COLD;
+	void progmem_map(address_map &map) ATTR_COLD;
+	void datamem_map(address_map &map) ATTR_COLD;
+	void mem0_map(address_map &map) ATTR_COLD;
 
 	u8 psen_r(offs_t offset);
 	u8 datamem_r(offs_t offset);
@@ -265,7 +265,7 @@ void sdk51_state::sdk51(machine_config &config)
 {
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sdk51_state::psen_map);
-	m_maincpu->set_addrmap(AS_IO, &sdk51_state::movx_map);
+	m_maincpu->set_addrmap(AS_DATA, &sdk51_state::movx_map);
 
 	ADDRESS_MAP_BANK(config, m_progmem);
 	m_progmem->set_addrmap(0, &sdk51_state::progmem_map);
@@ -324,4 +324,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1981, sdk51, 0, 0, sdk51, sdk51, sdk51_state, empty_init, "Intel", "MCS-51 System Design Kit", MACHINE_IS_SKELETON)
+COMP(1981, sdk51, 0, 0, sdk51, sdk51, sdk51_state, empty_init, "Intel", "MCS-51 System Design Kit", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

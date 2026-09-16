@@ -29,7 +29,7 @@ public:
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<pic17c4x_device> m_maincpu;
 	required_device<pic17c4x_device> m_slavecpu;
@@ -63,7 +63,7 @@ void airbase99_state::airbase99(machine_config &config)
 	m_slavecpu->set_mode(pic17c43_device::mode::MICROCONTROLLER);
 	m_slavecpu->set_disable();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -73,7 +73,7 @@ void airbase99_state::airbase99(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(airbase99_state::pixel_update));
 }
@@ -92,4 +92,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1998, airbase99, 0, 0, airbase99, airbase99, airbase99_state, empty_init, "JoMoX", "AiRBase 99", MACHINE_IS_SKELETON)
+SYST(1998, airbase99, 0, 0, airbase99, airbase99, airbase99_state, empty_init, "JoMoX", "AiRBase 99", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

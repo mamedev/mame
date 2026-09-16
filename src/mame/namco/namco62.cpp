@@ -52,7 +52,7 @@ void namco_62xx_device::device_start()
 
 void namco_62xx_device::device_add_mconfig(machine_config &config)
 {
-	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); /* parent clock, internally divided by 6 (TODO: Correct?) */
+	MB8843(config, m_cpu, DERIVED_CLOCK(1,1)); // parent clock, internally divided by 6 (TODO: Correct?)
 //  m_cpu->read_k().set(FUNC(namco_62xx_device::namco_62xx_K_r));
 //  m_cpu->write_o().set(FUNC(namco_62xx_device::namco_62xx_O_w));
 //  m_cpu->read_r<0>().set(FUNC(namco_62xx_device::namco_62xx_R0_r));

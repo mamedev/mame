@@ -20,6 +20,7 @@
 
 #include "emu.h"
 #include "scc66470.h"
+
 #include "screen.h"
 
 #define CSR_REG  (m_csr)

@@ -13,6 +13,8 @@
 
 #include "opresolv.h"
 
+#include <cstring>
+
 struct pc_disk_sizes
 {
 	uint32_t image_size;

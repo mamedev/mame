@@ -24,7 +24,7 @@ Rev.2:
 - Uses a different layout, not coded.
 - Picture of display panel shows 52x 7seg digits, and 10x round LEDs.
 
-ToDo:
+TODO:
 - Rev 1: Mechanical sounds, outputs (need better schematic), electronic volume control.
 - Rev.2: Mechanical sounds, outputs, inputs, displays, sound (no info available)
 
@@ -47,20 +47,18 @@ namespace {
 
 class micropin_state : public genpin_class
 {
-public:
+protected:
 	micropin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_digits(*this, "digit%d", 0U)
 		, m_leds(*this, "led%d", 0U)
 	{ }
 
-	void pentacup2(machine_config &config);
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	u8 m_led_time[10]{}; // size must match m_leds
-	void mr_common();
-	void ms_common();
 	output_finder<76> m_digits;
 	output_finder<10> m_leds;
 };
@@ -75,7 +73,11 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
-	void pent6800(machine_config &config);
+	void pent6800(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 pia51_r(offs_t offset);
@@ -90,12 +92,10 @@ private:
 	void p50b_w(u8 data);
 	void p51a_w(u8 data);
 	void p51b_w(u8 data) { };  // volume control
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_row = 0U;
 	u8 m_counter = 0U;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	required_device<m6800_cpu_device> m_v1cpu;
 	required_device<pia6821_device> m_pia51;
 	required_device<beep_device> m_beep;
@@ -109,15 +109,14 @@ public:
 		, m_v2cpu(*this, "v2cpu")
 	{ }
 
-	void pent8085(machine_config &config);
+	void pent8085(machine_config &config) ATTR_COLD;
 
 private:
 	void clock_w(int state);
 	void disp_w(offs_t, u8);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
+
 	required_device<i8085a_cpu_device> m_v2cpu;
 };
 
@@ -429,27 +428,25 @@ void pent8085_state::clock_w(int state)
 		m_v2cpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
-void micropin_state::ms_common()
+void micropin_state::machine_start()
 {
 	genpin_class::machine_start();
-
-	m_digits.resolve();
-	m_leds.resolve();
-	//m_io_outputs.resolve();
 
 	save_item(NAME(m_led_time));
 }
 
 void pent6800_state::machine_start()
 {
-	ms_common();
+	micropin_state::machine_start();
+
 	save_item(NAME(m_row));
 	save_item(NAME(m_counter));
 }
 
-void micropin_state::mr_common()
+void micropin_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	//for (u8 i = 0; i < m_io_outputs.size(); i++)
 		//m_io_outputs[i] = 0;
 
@@ -459,18 +456,9 @@ void micropin_state::mr_common()
 
 void pent6800_state::machine_reset()
 {
-	mr_common();
+	micropin_state::machine_reset();
+
 	m_row = 0;
-}
-
-void pent8085_state::machine_start()
-{
-	ms_common();
-}
-
-void pent8085_state::machine_reset()
-{
-	mr_common();
 }
 
 
@@ -548,7 +536,25 @@ ROM_START(pentacup2)
 	// 2 undumped proms DMA-01, DMA-02
 ROM_END
 
-} // Anonymous namespace
+ROM_START(pentacupt)
+	ROM_REGION(0x10000, "v2cpu", 0)
+	ROM_LOAD("microt_1.bin", 0x0000, 0x0800, CRC(690646eb) SHA1(86253b61ac9554ee5bdcdf9c0a2302fc393b9ada))
+	ROM_LOAD("microt_2.bin", 0x0800, 0x0800, CRC(51d09098) SHA1(4efe3a05ad60f0fc52aa5402e660f34b99855b59))
+	ROM_LOAD("microt_3.bin", 0x1000, 0x0800, CRC(cefb0966) SHA1(836491745417fc0d5f88c01a9c69a5c322d194be))
+	ROM_LOAD("microt_4.bin", 0x1800, 0x0800, CRC(6f691929) SHA1(a18352312706e0f0af14a33fac31c3f5f7156ba8))
+ROM_END
 
-GAME(1978,  pentacup,  0,         pent6800,  pent6800, pent6800_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1980,  pentacup2, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+ROM_START(pentacups)
+	ROM_REGION(0x10000, "v2cpu", 0)
+	ROM_LOAD("micros_1.bin", 0x0000, 0x0800, CRC(c563c419) SHA1(b4e6711125c8222f4b299e23ee12edfe1c92b52f))
+	ROM_LOAD("micros_2.bin", 0x0800, 0x0800, CRC(46ffd9bf) SHA1(4feae6e8fe6929481d89b00d743fca02e40fb7b8))
+	ROM_LOAD("microt_3.bin", 0x1000, 0x0800, CRC(cefb0966) SHA1(836491745417fc0d5f88c01a9c69a5c322d194be)) // same as for rev. T
+	ROM_LOAD("micros_4.bin", 0x1800, 0x0800, CRC(c7fcb6d8) SHA1(2f6f7aa5705e938a9fedfa4e357e720a1f743a26))
+ROM_END
+
+} // anonymous namespace
+
+GAME(1978,  pentacup,  0,         pent6800,  pent6800, pent6800_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  pentacup2, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  pentacupt, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. T)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  pentacups, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. S)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

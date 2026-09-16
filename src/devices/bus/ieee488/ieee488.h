@@ -121,9 +121,9 @@ protected:
 		SIGNAL_COUNT
 	};
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	class daisy_entry
 	{
@@ -173,13 +173,10 @@ public:
 	ieee488_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, int address, T &&opts, char const *dflt)
 		: ieee488_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 		set_address(address);
 	}
-	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ieee488_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	static void add_cbm_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot);
 	static void add_cbm_defaults(machine_config &config, const char *_default_drive)
@@ -198,8 +195,8 @@ public:
 	void set_address(int address) { m_address = address; }
 	int get_address() { return m_address; }
 
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 protected:
 	int m_address;

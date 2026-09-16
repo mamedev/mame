@@ -29,7 +29,7 @@ namespace ui {
 class menu_custom_ui : public menu
 {
 public:
-	menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler);
+	menu_custom_ui(mame_ui_manager &mui, render_target &target, std::function<void ()> &&handler);
 
 protected:
 	virtual void menu_dismissed() override;
@@ -56,11 +56,11 @@ private:
 class menu_font_ui : public menu
 {
 public:
-	menu_font_ui(mame_ui_manager &mui, render_container &container, std::function<void (bool)> &&handler);
+	menu_font_ui(mame_ui_manager &mui, render_target &target, std::function<void (bool)> &&handler);
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 	virtual void menu_dismissed() override;
 
 private:
@@ -92,11 +92,11 @@ private:
 class menu_colors_ui : public menu
 {
 public:
-	menu_colors_ui(mame_ui_manager &mui, render_container &container);
+	menu_colors_ui(mame_ui_manager &mui, render_target &target);
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 	virtual void menu_dismissed() override;
 
 private:
@@ -141,11 +141,11 @@ private:
 class menu_rgb_ui : public menu
 {
 public:
-	menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *color, std::string &&title);
+	menu_rgb_ui(mame_ui_manager &mui, render_target &target, rgb_t *color, std::string &&title);
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
 
 private:
 	enum
@@ -175,7 +175,7 @@ private:
 class menu_palette_sel : public menu
 {
 public:
-	menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color);
+	menu_palette_sel(mame_ui_manager &mui, render_target &target, rgb_t &_color);
 
 private:
 	virtual void populate() override;

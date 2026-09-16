@@ -32,7 +32,7 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 };
 
 #endif // MAME_BUS_MSX_MINICART_MINICART_H

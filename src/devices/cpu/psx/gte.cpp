@@ -10,6 +10,8 @@
 #include "emu.h"
 #include "gte.h"
 
+#include <bit>
+
 #if 0
 #include <cstdarg>
 
@@ -217,7 +219,7 @@ void gte::setcp2dr( uint32_t pc, int reg, uint32_t value )
 		break;
 
 	case 30:
-		LZCR = (value & 0x80000000) == 0 ? count_leading_zeros_32(value) : count_leading_ones_32(value);
+		LZCR = (value & 0x80000000) == 0 ? std::countl_zero(value) : std::countl_one(value);
 		break;
 
 	case 31:
@@ -295,7 +297,7 @@ static inline uint32_t gte_divide( uint16_t numerator, uint16_t denominator )
 {
 	if( numerator < ( denominator * 2 ) )
 	{
-		static uint8_t table[] =
+		static const uint8_t table[] =
 		{
 			0xff, 0xfd, 0xfb, 0xf9, 0xf7, 0xf5, 0xf3, 0xf1, 0xef, 0xee, 0xec, 0xea, 0xe8, 0xe6, 0xe4, 0xe3,
 			0xe1, 0xdf, 0xdd, 0xdc, 0xda, 0xd8, 0xd6, 0xd5, 0xd3, 0xd1, 0xd0, 0xce, 0xcd, 0xcb, 0xc9, 0xc8,
@@ -316,14 +318,14 @@ static inline uint32_t gte_divide( uint16_t numerator, uint16_t denominator )
 			0x00
 		};
 
-		int shift = count_leading_zeros_32( denominator ) - 16;
+		int shift = std::countl_zero( denominator );
 
 		int r1 = ( denominator << shift ) & 0x7fff;
 		int r2 = table[ ( ( r1 + 0x40 ) >> 7 ) ] + 0x101;
 		int r3 = ( ( 0x80 - ( r2 * ( r1 + 0x8000 ) ) ) >> 8 ) & 0x1ffff;
 		uint32_t reciprocal = ( ( r2 * r3 ) + 0x80 ) >> 8;
 
-		return (uint32_t)( ( ( (uint64_t) reciprocal * ( numerator << shift ) ) + 0x8000 ) >> 16 );
+		return uint32_t( ( ( uint64_t(reciprocal) * ( numerator << shift ) ) + 0x8000 ) >> 16 );
 	}
 
 	return 0xffffffff;

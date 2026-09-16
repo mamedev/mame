@@ -160,9 +160,9 @@ public:
 	void spcpostn(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// memory pointers
@@ -202,15 +202,13 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n);
 
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 
 // Text Layer Tilemap
@@ -390,8 +388,6 @@ uint32_t angelkds_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	return 0;
 }
-
-// machine
 
 // CPU Banking
 
@@ -780,7 +776,7 @@ void angelkds_state::angelkds(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

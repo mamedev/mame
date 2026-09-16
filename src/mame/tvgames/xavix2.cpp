@@ -4,7 +4,7 @@
 
     XaviX 2
 
-    unknown architecture, does not appear to be 6502 derived like XaviX / SuperXaviX
+    RISC-like architecture, not 6502-derived like XaviX / SuperXaviX
 
     die is marked  "SSD 2002-2004 NEC 800208-51"
 
@@ -12,12 +12,15 @@
 
 #include "emu.h"
 
-#include "screen.h"
-#include "emupal.h"
-#include "softlist.h"
-#include "speaker.h"
 #include "cpu/xavix2/xavix2.h"
 #include "machine/i2cmem.h"
+
+#include "emupal.h"
+#include "input.h" // for keys to manually raise interrupts
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include <algorithm>
 
 
@@ -125,18 +128,18 @@ protected:
 
 	void pio_mode_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 pio_mode_r(offs_t offset);
-	virtual void pio_update() = 0;
+	virtual void pio_update();
 	void pio_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 pio_r();
 
 	void crtc_w(offs_t reg, u16 data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem(address_map &map);
+	void mem(address_map &map) ATTR_COLD;
 };
 
 class naruto_state : public xavix2_state
@@ -491,20 +494,20 @@ u32 xavix2_state::pio_mode_r(offs_t offset)
 	return m_pio_mode[offset];
 }
 
+void xavix2_state::pio_update()
+{
+}
+
 void naruto_state::pio_update()
 {
-	if (BIT(m_pio_mask_out, 21))
-		m_i2cmem->write_sda(BIT(m_pio_dataw, 21));
-	if (BIT(m_pio_mask_out, 20))
-		m_i2cmem->write_scl(BIT(m_pio_dataw, 20));
+	m_i2cmem->write_sda(BIT(m_pio_mask_out, 21) ? BIT(m_pio_dataw, 21) : 1);
+	m_i2cmem->write_scl(BIT(m_pio_mask_out, 20) ? BIT(m_pio_dataw, 20) : 0);
 }
 
 void domyos_state::pio_update()
 {
-	if (BIT(m_pio_mask_out, 16))
-		m_i2cmem->write_sda(BIT(m_pio_dataw, 16));
-	if (BIT(m_pio_mask_out, 17))
-		m_i2cmem->write_scl(BIT(m_pio_dataw, 17));
+	m_i2cmem->write_sda(BIT(m_pio_mask_out, 16) ? BIT(m_pio_dataw, 16) : 1);
+	m_i2cmem->write_scl(BIT(m_pio_mask_out, 17) ? BIT(m_pio_dataw, 17) : 0);
 }
 
 void xavix2_state::pio_w(offs_t offset, u32 data, u32 mem_mask)
@@ -656,7 +659,7 @@ static INPUT_PORTS_START( naruto )
 	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)
 	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)
 	PORT_BIT(0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM) // i2c clock
-	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x00200000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT(0x00400000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
 	PORT_BIT(0x00800000, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
 	PORT_BIT(0x01000000, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
@@ -687,7 +690,7 @@ static INPUT_PORTS_START(domyos)
 	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_BUTTON14)
 	PORT_BIT(0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON15)
 	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_BUTTON16)
-	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", i2cmem_device, read_sda)
+	PORT_BIT(0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT(0x00020000, IP_ACTIVE_HIGH, IPT_CUSTOM) // i2c clock
 	PORT_BIT(0x00040000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
 	PORT_BIT(0x00080000, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
@@ -705,6 +708,10 @@ static INPUT_PORTS_START(domyos)
 	PORT_BIT(0x80000000, IP_ACTIVE_HIGH, IPT_BUTTON16) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dabj )
+	PORT_START("pio")
+INPUT_PORTS_END
+
 void xavix2_state::config(machine_config &config)
 {
 	// unknown CPU 'SSD 2002-2004 NEC 800208-51'
@@ -712,7 +719,7 @@ void xavix2_state::config(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &xavix2_state::mem);
 	m_maincpu->set_vblank_int("screen", FUNC(xavix2_state::vblank_irq));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(xavix2_state::screen_update));
@@ -720,8 +727,7 @@ void xavix2_state::config(machine_config &config)
 	m_screen->set_visarea(0, 639, 0, 399);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// unknown sound hardware
 }
@@ -740,9 +746,68 @@ void domyos_state::config(machine_config& config)
 	I2C_24C64(config, m_i2cmem);
 }
 
-ROM_START( ltv_naru )
+ROM_START( ban_naru )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "naruto.bin", 0x000000, 0x800000, CRC(e3465ad2) SHA1(13e3d2de5d5a084635cab158f3639a1ea73265dc) )
+ROM_END
+
+ROM_START( ban_bldj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bldj.u2", 0x000000, 0x800000, CRC(aa865fe3) SHA1(2f5f4809a07a2f5671f81aa22e379c11c43943a0) )
+
+	// 24c04 at u3
+ROM_END
+
+
+ROM_START( ban_dbz )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dbz.u2a", 0x000000, 0x800000, CRC(7e535ea2) SHA1(6c746af763273bd9e47929c3ba857c7af563bf79) )
+
+	// also has a 24c02 at u3
+ROM_END
+
+ROM_START( ban_db2j )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "db2j.u3", 0x000000, 0x800000, CRC(7362ac0d) SHA1(f1880470f0db56135d9bc88d7193d037ac49b996) )
+
+	// also has a AT24C08
+ROM_END
+
+ROM_START( epo_dabj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dabj.u3", 0x000000, 0x800000, CRC(9ebc1384) SHA1(38abaebd05bc9ab300ee5fbf37bd88ce9cbd20e1) )
+ROM_END
+
+ROM_START( epo_dab2j )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dab2j.u4", 0x000000, 0x800000, CRC(e3d12ee6) SHA1(a2f930f4ffe778e02556b5e1a1836f88888e7c82) )
+ROM_END
+
+
+ROM_START( epo_dtcj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "dtcj.u2", 0x000000, 0x800000, CRC(64c2aabb) SHA1(14f02eb01f1c6e76202f7a70818c300ba23fd879) )
+
+	// SEEPROM is a AT24C04 at u4
+ROM_END
+
+ROM_START( epo_sskj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "sskj.u2", 0x000000, 0x800000, CRC(3344b2fc) SHA1(cda27bd1c7d6ccdb6da06cd837aa9cde5a58e5e4) )
+
+	// SEEPROM is a AT24C04 at u4
+ROM_END
+
+ROM_START( epo_ssk2 )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ssk2.u2", 0x000000, 0x800000, CRC(d5902e48) SHA1(010bc2417814ded24a474d9165f6b9523af7d1ef) )
+
+	// SEEPROM is a 24CS04
+ROM_END
+
+ROM_START( epo_pabj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "pabj.u3", 0x000000, 0x800000, CRC(ac46991c) SHA1(06c2b493824085502e96a7c1e46e9e89433e7301) )
 ROM_END
 
 ROM_START( domfitad )
@@ -757,15 +822,37 @@ ROM_END
 
 } // anonymous namespace
 
+// Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ!～ / バンダイ / 日本
+CONS( 2006, ban_naru,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Naruto Ninja Taikan: Dattebayo! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Let's!TVプレイ 影発動体感! ブルードラゴン -極めろ!ファイヤークライシス!-
+CONS( 2006, ban_bldj,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Kage Hatsudou Taikan! Blue Dragon: Kiwamero! Fire Crisis! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
+// Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波
+CONS( 2005, ban_dbz,   0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Dragon Ball Z: Battle Taikan Kamehameha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～
+CONS( 2006, ban_db2j,  0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company Ltd.",    "Let's! TV Play Dragon Ball Z: Battle Taikan Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// ドラえもん テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
+CONS( 2006, epo_dabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Doraemon: TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// ドラえもん 太鼓あいうえお図鑑
+CONS( 2010, epo_dab2j, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Doraemon Taiko AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// ドラえもん 体感タケコプター! 空とぶ大冒険
+CONS( 2006, epo_dtcj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦
+CONS( 2006, epo_sskj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// 究極! 筋肉(マッスル)スタジアム! サスケ完全制覇
+CONS( 2008, epo_ssk2,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "Kyuukyoku! Muscle Stadium! Sasuke Kanzen Seiha (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, epo_pabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix_2002.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
-CONS( 2008, domfitad, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, dombikec, 0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company LTD", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
-
-
-
+CONS( 2008, domfitad,  0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, dombikec,  0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company Ltd.", "Domyos Bike Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

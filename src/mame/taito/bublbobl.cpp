@@ -355,13 +355,6 @@ void bublbobl_state::sound_map(address_map &map)
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
-void bublbobl_state::mcu_map(address_map &map)
-{
-	map(0x0000, 0x0007).m(m_mcu, FUNC(m6801_cpu_device::m6801_io));
-	map(0x0040, 0x00ff).ram(); // internal
-	map(0xf000, 0xffff).rom();
-}
-
 void bublbobl_state::bootleg_map(address_map &map)
 {
 	common_maincpu_map(map);
@@ -681,7 +674,7 @@ static INPUT_PORTS_START( tokio_base )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "99 (Cheat)") // 6 in original version
+	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW B:7" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
@@ -722,8 +715,19 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", FUNC(taito68705_mcu_device::host_semaphore_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", FUNC(taito68705_mcu_device::mcu_semaphore_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tokiob )
+	PORT_INCLUDE( tokio_base )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW B:5,6")
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x00, "99 (Cheat)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bublboblp )
@@ -855,7 +859,7 @@ void bublbobl_state::tokio(machine_config &config)
 
 	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	config.set_perfect_quantum(m_maincpu); // is this necessary?
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -863,7 +867,7 @@ void bublbobl_state::tokio(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
 	m_screen->set_palette(m_palette);
@@ -950,7 +954,7 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -958,7 +962,7 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
 	m_screen->set_palette(m_palette);
@@ -989,8 +993,7 @@ void bublbobl_state::bublbobl(machine_config &config)
 	bublbobl_nomcu(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(bublbobl_state::mcram_vect_r));
 
-	auto &mcu(M6801(config, "mcu", XTAL(4'000'000))); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	mcu.set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
+	auto &mcu(M6801U4(config, "mcu", XTAL(4'000'000))); // xtal is 4MHz, divided by 4 internally
 	mcu.in_p1_cb().set_ioport("IN0");
 	mcu.out_p1_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port1_w));
 	mcu.out_p2_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port2_w));
@@ -998,7 +1001,7 @@ void bublbobl_state::bublbobl(machine_config &config)
 	mcu.in_p3_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port3_r));
 	mcu.out_p4_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 
-	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ1_LINE); // same clock latches the INT pin on the second Z80
 }
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
@@ -1325,8 +1328,8 @@ ROM_START( bublbobl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1374,8 +1377,8 @@ ROM_START( bublbobl1 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1423,8 +1426,8 @@ ROM_START( bublboblr )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1472,8 +1475,8 @@ ROM_START( bublboblr1 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "a78-07.46",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the MCU */
-	ROM_LOAD( "a78-01.17",    0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",    0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a78-09.12",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
@@ -1825,7 +1828,7 @@ ROM_START( bub68705 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the third CPU */
 	ROM_LOAD( "1.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x800, "mcu", 0 )   /* 64k for the MCU */
+	ROM_REGION( 0x800, "mcu", 0 )
 	ROM_LOAD( "68705.bin",    0x000, 0x800, CRC(78caa635) SHA1(a756e45b25b007843ba4f2204cad6081cf7260e9) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
@@ -1931,8 +1934,8 @@ ROM_START( bublcave )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
@@ -2002,8 +2005,8 @@ ROM_START( bublcave11 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
@@ -2034,8 +2037,8 @@ ROM_START( bublcave10 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a78-07.46",         0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "a78-01.17",         0xf000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "a78-01.17",         0x0000, 0x1000, CRC(b1bfb53d) SHA1(31b8f31acd3aa394acd80db362774749842e1285) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bublcave-09.12",    0x00000, 0x8000, CRC(b90b7eef) SHA1(de72e4635843ad76248aa3b4aa8f8a0bfd53879e) )    /* 1st plane */
@@ -2129,19 +2132,19 @@ void bublbobl_state::init_dland()
  *  Game driver(s)
  *
  *************************************/
-//    YEAR  NAME        PARENT    MACHINE    INPUT       STATE           INIT         ROT    COMPANY     FULLNAME      FLAGS
-GAME( 1986, tokio,      0,        tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokioo,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiou,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,    tokio_base, bublbobl_state, init_common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE    INPUT       STATE           INIT         ROT    COMPANY                            FULLNAME                                FLAGS
+GAME( 1986, tokio,      0,        tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokioo,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiou,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito America (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,    tokiob,     bublbobl_state, init_common, ROT90, "bootleg",                         "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl,   0,        bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublbobl1,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
-GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl,   0,        bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito",                           "Bubble Bobble (Japan, Ver 0.1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublbobl1,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito",                           "Bubble Bobble (Japan, Ver 0.0)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America (Romstar license)", "Bubble Bobble (US, Ver 5.1)",                 MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
+GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America (Romstar license)", "Bubble Bobble (US, Ver 1.0)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",                MACHINE_SUPPORTS_SAVE )

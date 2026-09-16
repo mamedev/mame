@@ -30,13 +30,6 @@ project ("geometryv")
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
 		links   { "SDL2" }
 
-		configuration { "linux or freebsd" }
-			if _OPTIONS["with-wayland"]  then
-				links {
-					"wayland-egl",
-				}
-			end
-
 		configuration { "x32", "windows" }
 			libdirs { "$(SDL2_DIR)/lib/x86" }
 
@@ -49,15 +42,6 @@ project ("geometryv")
 	if _OPTIONS["with-glfw"] then
 		defines { "ENTRY_CONFIG_USE_GLFW=1" }
 		links   { "glfw3" }
-
-		configuration { "linux or freebsd" }
-			links {
-				"Xrandr",
-				"Xinerama",
-				"Xi",
-				"Xxf86vm",
-				"Xcursor",
-			}
 
 		configuration { "osx*" }
 			linkoptions {

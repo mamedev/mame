@@ -9,6 +9,8 @@
 --
 ---------------------------------------------------------------------------
 
+if _OPTIONS["with-emulator"] then
+
 project ("emu")
 uuid ("e6fa15e4-a354-4526-acef-13c8e80fcacf")
 kind (LIBTYPE)
@@ -61,6 +63,7 @@ files {
 	MAME_DIR .. "src/emu/debugger.h",
 	MAME_DIR .. "src/emu/devdelegate.cpp",
 	MAME_DIR .. "src/emu/devdelegate.h",
+	MAME_DIR .. "src/emu/devdelegate.ipp",
 	MAME_DIR .. "src/emu/devcb.cpp",
 	MAME_DIR .. "src/emu/devcb.h",
 	MAME_DIR .. "src/emu/devcpu.cpp",
@@ -102,6 +105,8 @@ files {
 	MAME_DIR .. "src/emu/distate.h",
 	MAME_DIR .. "src/emu/divideo.cpp",
 	MAME_DIR .. "src/emu/divideo.h",
+	MAME_DIR .. "src/emu/divo.cpp",
+	MAME_DIR .. "src/emu/divo.h",
 	MAME_DIR .. "src/emu/divtlb.cpp",
 	MAME_DIR .. "src/emu/divtlb.h",
 	MAME_DIR .. "src/emu/drawgfx.cpp",
@@ -181,6 +186,7 @@ files {
 	MAME_DIR .. "src/emu/profiler.h",
 	MAME_DIR .. "src/emu/output.cpp",
 	MAME_DIR .. "src/emu/output.h",
+	MAME_DIR .. "src/emu/output.ipp",
 	MAME_DIR .. "src/emu/recording.cpp",
 	MAME_DIR .. "src/emu/recording.h",
 	MAME_DIR .. "src/emu/render.cpp",
@@ -192,6 +198,8 @@ files {
 	MAME_DIR .. "src/emu/rendlay.h",
 	MAME_DIR .. "src/emu/rendutil.cpp",
 	MAME_DIR .. "src/emu/rendutil.h",
+	MAME_DIR .. "src/emu/resampler.cpp",
+	MAME_DIR .. "src/emu/resampler.h",
 	MAME_DIR .. "src/emu/romload.cpp",
 	MAME_DIR .. "src/emu/romload.h",
 	MAME_DIR .. "src/emu/romentry.h",
@@ -202,6 +210,8 @@ files {
 	MAME_DIR .. "src/emu/schedule.h",
 	MAME_DIR .. "src/emu/screen.cpp",
 	MAME_DIR .. "src/emu/screen.h",
+	MAME_DIR .. "src/emu/screen_svg.cpp",
+	MAME_DIR .. "src/emu/screen_svg.h",
 	MAME_DIR .. "src/emu/softlist.cpp",
 	MAME_DIR .. "src/emu/softlist.h",
 	MAME_DIR .. "src/emu/softlist_dev.cpp",
@@ -216,6 +226,8 @@ files {
 	MAME_DIR .. "src/emu/uiinput.h",
 	MAME_DIR .. "src/emu/validity.cpp",
 	MAME_DIR .. "src/emu/validity.h",
+	MAME_DIR .. "src/emu/vector.cpp",
+	MAME_DIR .. "src/emu/vector.h",
 	MAME_DIR .. "src/emu/video.cpp",
 	MAME_DIR .. "src/emu/video.h",
 	MAME_DIR .. "src/emu/xtal.cpp",
@@ -235,20 +247,22 @@ files {
 	MAME_DIR .. "src/emu/debug/debughlp.h",
 	MAME_DIR .. "src/emu/debug/debugvw.cpp",
 	MAME_DIR .. "src/emu/debug/debugvw.h",
-	MAME_DIR .. "src/emu/debug/dvdisasm.cpp",
-	MAME_DIR .. "src/emu/debug/dvdisasm.h",
-	MAME_DIR .. "src/emu/debug/dvmemory.cpp",
-	MAME_DIR .. "src/emu/debug/dvmemory.h",
 	MAME_DIR .. "src/emu/debug/dvbpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvbpoints.h",
+	MAME_DIR .. "src/emu/debug/dvdisasm.cpp",
+	MAME_DIR .. "src/emu/debug/dvdisasm.h",
+	MAME_DIR .. "src/emu/debug/dvepoints.cpp",
+	MAME_DIR .. "src/emu/debug/dvepoints.h",
+	MAME_DIR .. "src/emu/debug/dvmemory.cpp",
+	MAME_DIR .. "src/emu/debug/dvmemory.h",
 	MAME_DIR .. "src/emu/debug/dvrpoints.cpp",
 	MAME_DIR .. "src/emu/debug/dvrpoints.h",
-	MAME_DIR .. "src/emu/debug/dvwpoints.cpp",
-	MAME_DIR .. "src/emu/debug/dvwpoints.h",
 	MAME_DIR .. "src/emu/debug/dvstate.cpp",
 	MAME_DIR .. "src/emu/debug/dvstate.h",
 	MAME_DIR .. "src/emu/debug/dvtext.cpp",
 	MAME_DIR .. "src/emu/debug/dvtext.h",
+	MAME_DIR .. "src/emu/debug/dvwpoints.cpp",
+	MAME_DIR .. "src/emu/debug/dvwpoints.h",
 	MAME_DIR .. "src/emu/debug/express.cpp",
 	MAME_DIR .. "src/emu/debug/express.h",
 	MAME_DIR .. "src/emu/debug/points.cpp",
@@ -261,13 +275,18 @@ files {
 	MAME_DIR .. "src/emu/video/generic.h",
 	MAME_DIR .. "src/emu/video/resnet.cpp",
 	MAME_DIR .. "src/emu/video/resnet.h",
+	MAME_DIR .. "src/emu/video/rgbutil.cpp",
 	MAME_DIR .. "src/emu/video/rgbutil.h",
-	MAME_DIR .. "src/emu/video/rgbgen.cpp",
-	MAME_DIR .. "src/emu/video/rgbgen.h",
-	MAME_DIR .. "src/emu/video/rgbsse.cpp",
-	MAME_DIR .. "src/emu/video/rgbsse.h",
-	MAME_DIR .. "src/emu/video/rgbvmx.cpp",
-	MAME_DIR .. "src/emu/video/rgbvmx.h",
+	MAME_DIR .. "src/emu/audio_effects/aeffect.h",
+	MAME_DIR .. "src/emu/audio_effects/aeffect.cpp",
+	MAME_DIR .. "src/emu/audio_effects/filter.h",
+	MAME_DIR .. "src/emu/audio_effects/filter.cpp",
+	MAME_DIR .. "src/emu/audio_effects/compressor.h",
+	MAME_DIR .. "src/emu/audio_effects/compressor.cpp",
+	MAME_DIR .. "src/emu/audio_effects/reverb.h",
+	MAME_DIR .. "src/emu/audio_effects/reverb.cpp",
+	MAME_DIR .. "src/emu/audio_effects/eq.h",
+	MAME_DIR .. "src/emu/audio_effects/eq.cpp",
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
@@ -308,6 +327,7 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "triphsxs"),
 	layoutbuildtask("emu/layout", "quadhsxs"),
 }
+end
 
 project ("precompile")
 uuid ("a6fb15d4-b123-4445-acef-13c8e80fcacf")

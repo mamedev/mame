@@ -1,17 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders: Nicola Salmoria
 
-/***************************************************************************
+/*******************************************************************************
 
 Finalizer (GX523) (c) 1985 Konami
 
 TODO:
-- does Konami SND01 MCU have anything custom or is it the same as 8049?
 - bootleg uses ENT0 CLK connected to T1 instead of internal timer, but it doesn't
   look like MAME can handle it with the speed it wants (eg. with set_t0_clk_cb and
   clock_device), so right now it's done with machine().time() when it reads T1.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -54,9 +53,9 @@ public:
 	void finalizrb(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -93,21 +92,19 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	void main_map(address_map &map);
-	void sound_io_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
 };
 
 
-// video
 
-
-/***************************************************************************
+/*******************************************************************************
 
   The palette PROMs are connected to the RGB output this way:
 
   bit 7 -- 220  ohm resistor  -- \
-        -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
-        -- 1   kohm resistor  -- |
+        -- 1   kohm resistor  -- | -- 470 ohm pulldown resistor -- GREEN
+        -- 470  ohm resistor  -- |
         -- 2.2 kohm resistor  -- /
         -- 220  ohm resistor  -- \
         -- 470  ohm resistor  -- | -- 470 ohm pulldown resistor -- RED
@@ -120,7 +117,7 @@ private:
         -- 1   kohm resistor  -- |
   bit 0 -- 2.2 kohm resistor  -- /
 
-***************************************************************************/
+*******************************************************************************/
 
 void finalizr_state::palette(palette_device &palette) const
 {
@@ -148,8 +145,8 @@ void finalizr_state::palette(palette_device &palette) const
 
 		// green component
 		bit0 = BIT(color_prom[i], 4);
-		bit1 = BIT(color_prom[i], 5);
-		bit2 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 5);
 		bit3 = BIT(color_prom[i], 7);
 		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
@@ -207,27 +204,25 @@ void finalizr_state::video_start()
 
 
 
-/**************************************************************************/
+/******************************************************************************/
 
 void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx1 = m_gfxdecode->gfx(1);
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
-	uint8_t const *sr = m_spriterambank ? m_spriteram[1] : m_spriteram[0];
+	uint8_t const *sr = m_spriteram[m_spriterambank];
 
 	for (int offs = 0; offs <= m_spriteram[0].bytes() - 5; offs += 5)
 	{
-		int sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
+		int sx = 40 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
 		int sy = sr[offs + 2];
 		int flipx = sr[offs + 4] & 0x20;
 		int flipy = sr[offs + 4] & 0x40;
 		int code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
 		int const color = ((sr[offs + 1] & 0xf0) >> 4);
-
-//      (sr[offs + 4] & 0x02) is used, meaning unknown
-
 		int const size = sr[offs + 4] & 0x1c;
+		//(sr[offs + 4] & 0x02) is used, meaning unknown
 
 		if (size >= 0x10)
 		{
@@ -292,7 +287,7 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 
-	m_bg_tilemap->set_scrollx(0, *m_scroll - 32);
+	m_bg_tilemap->set_scrollx(0, *m_scroll - 40);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
@@ -303,21 +298,19 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	if (flip_screen())
 	{
-		clip.min_x = visarea.max_x - 31;
+		clip.min_x = visarea.max_x - 39;
 		clip.max_x = visarea.max_x;
 	}
 	else
 	{
 		clip.min_x = visarea.min_x;
-		clip.max_x = visarea.min_x + 31;
+		clip.max_x = visarea.min_x + 39;
 	}
 
-	m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, clip & cliprect, 0, 0);
 
 	return 0;
 }
-
-// machine
 
 TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::scanline)
 {
@@ -333,22 +326,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::scanline)
 void finalizr_state::videoctrl_w(uint8_t data)
 {
 	m_charbank = data & 3;
-	m_spriterambank = data & 8;
+	m_spriterambank = BIT(data, 3);
 	// other bits unknown
 }
 
 void finalizr_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 void finalizr_state::flipscreen_w(uint8_t data)
 {
-	m_nmi_enable = data & 0x01;
-	m_irq_enable = data & 0x02;
+	m_nmi_enable = BIT(data, 0);
+	m_irq_enable = BIT(data, 1);
 
-	flip_screen_set(~data & 0x08);
+	flip_screen_set(BIT(data, 3));
 }
 
 void finalizr_state::sound_irq_w(uint8_t data)
@@ -379,12 +372,14 @@ int finalizr_state::bootleg_t1_r()
 
 void finalizr_state::main_map(address_map &map)
 {
+	// Konami 005885
 	map(0x0000, 0x0000).nopw();
 	map(0x0001, 0x0001).writeonly().share(m_scroll);
 	map(0x0002, 0x0002).nopw();
 	map(0x0003, 0x0003).w(FUNC(finalizr_state::videoctrl_w));
 	map(0x0004, 0x0004).w(FUNC(finalizr_state::flipscreen_w));
 //  map(0x0020, 0x003f).writeonly().share(m_scroll);
+
 	map(0x0800, 0x0800).portr("DSW3");
 	map(0x0808, 0x0808).portr("DSW2");
 	map(0x0810, 0x0810).portr("SYSTEM");
@@ -419,7 +414,7 @@ static INPUT_PORTS_START( finalizr )
 	KONAMI8_SYSTEM_10
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("P1")
 	KONAMI8_MONO_B12_UNK
@@ -455,9 +450,9 @@ static INPUT_PORTS_START( finalizr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
@@ -514,7 +509,7 @@ void finalizr_state::finalizr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &finalizr_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::scanline), "screen", 0, 1);
 
-	I8049(config, m_audiocpu, 18.432_MHz_XTAL / 3); // 6.144MHz
+	M58715(config, m_audiocpu, 18.432_MHz_XTAL / 3); // 6.144MHz
 	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::sound_irqen_w));
@@ -522,11 +517,8 @@ void finalizr_state::finalizr(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(36*8, 32*8);
-	screen.set_visarea(1*8, 35*8-1, 2*8, 30*8-1);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 288, 264, 16, 240);
 	screen.set_screen_update(FUNC(finalizr_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -540,7 +532,7 @@ void finalizr_state::finalizr(machine_config &config)
 
 	SN76489A(config, "snsnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "speaker", 0.75);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
 }
 
 void finalizr_state::finalizrb(machine_config &config)
@@ -556,11 +548,11 @@ void finalizr_state::finalizrb(machine_config &config)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
 ROM_START( finalizr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -639,7 +631,7 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE    INPUT      CLASS           INIT        ROT    COMPANY    FULLNAME                                      FLAGS
-GAME( 1985, finalizr,  0,        finalizr,  finalizr,  finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizra, finalizr, finalizr,  finalizra, finalizr_state, empty_init, ROT90, "Konami",  "Finalizer - Super Transformation (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizrb, finalizra, finalizr_state, empty_init, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE    INPUT      CLASS           INIT        ROT    COMPANY    FULLNAME                                     FLAGS
+GAME( 1985, finalizr,  0,        finalizr,  finalizr,  finalizr_state, empty_init, ROT90, "Konami",  "Finalizer: Super Transformation (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizra, finalizr, finalizr,  finalizra, finalizr_state, empty_init, ROT90, "Konami",  "Finalizer: Super Transformation (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizrb, finalizra, finalizr_state, empty_init, ROT90, "bootleg", "Finalizer: Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

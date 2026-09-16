@@ -30,7 +30,7 @@ public:
 	pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_pet_user_port_interface overrides
 	void write_up1(int state) { m_up1 = state; update_port1(); }
@@ -42,7 +42,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void update_port1();
 	void update_port2();

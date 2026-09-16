@@ -43,8 +43,8 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -127,9 +127,9 @@ void vicshoot_state::vicshoot(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
-	ciu.set_master_tag(m_maincpu);
-	ciu.set_slave_tag("audiocpu");
+	pc060ha_device &ciu(PC060HA(config, "ciu"));
+	ciu.nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	ciu.reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 
 	ym2203_device &opn(YM2203(config, "opn", 8_MHz_XTAL / 2)); // divider not verified
 	opn.irq_handler().set_inputline("audiocpu", 0);
@@ -162,4 +162,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, vicshoot, 0, vicshoot, vicshoot, vicshoot_state, empty_init, ROT0, "Taito Corporation", "Victory Shoot", MACHINE_IS_SKELETON ) // a website lists it as 1994, but it was publicized on 1995 magazines. Going with the latter for now
+GAME( 1995, vicshoot, 0, vicshoot, vicshoot, vicshoot_state, empty_init, ROT0, "Taito", "Victory Shoot", MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK ) // a website lists it as 1994, but it was publicized on 1995 magazines. Going with the latter for now

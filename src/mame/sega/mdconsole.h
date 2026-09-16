@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SEGACONS_MDCONSOLE_H
-#define MAME_SEGACONS_MDCONSOLE_H
+#ifndef MAME_SEGA_MDCONSOLE_H
+#define MAME_SEGA_MDCONSOLE_H
 
 #pragma once
 
@@ -31,15 +31,15 @@ public:
 	void init_genesis();
 	void init_md_eur();
 	void init_md_jpn();
+	void init_genesis_tmss();
 
 	void md_32x(machine_config &config);
 	void genesis_32x(machine_config &config);
 	void mdj_32x(machine_config &config);
-	void dcat16_megadriv(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void screen_vblank_console(int state);
 
@@ -64,10 +64,6 @@ private:
 
 	uint16_t tmss_r(offs_t offset);
 	void tmss_swap_w(uint16_t data);
-
-	void dcat16_megadriv_base(machine_config &config);
-
-	void dcat16_megadriv_map(address_map &map);
 };
 
 
@@ -78,16 +74,18 @@ public:
 		md_cons_state(mconfig, type, tag)
 	{ }
 
-	void ms_megadpal(machine_config &config);
 	void ms_megadriv(machine_config &config);
+	void ms_megadrivj(machine_config &config);
+	void ms_megadpal(machine_config &config);
 	void ms_megadriv2(machine_config &config);
+	void ms_nomad(machine_config &config);
 	void ms_megajet(machine_config &config);
 
 	void genesis_tmss(machine_config &config);
 
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 
@@ -110,7 +108,7 @@ public:
 	void md_32x_scd(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 };
 
-#endif // MAME_SEGACONS_MDCONSOLE_H
+#endif // MAME_SEGA_MDCONSOLE_H

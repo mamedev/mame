@@ -32,8 +32,8 @@
  output.  This makes implementing things like the tee connector easier.
  */
 
-#ifndef MAME_DEVICES_BUS_TI8X_TI8X_H
-#define MAME_DEVICES_BUS_TI8X_TI8X_H
+#ifndef MAME_BUS_TI8X_TI8X_H
+#define MAME_BUS_TI8X_TI8X_H
 
 #pragma once
 
@@ -52,10 +52,7 @@ public:
 	ti8x_link_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: ti8x_link_port_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	ti8x_link_port_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
@@ -77,7 +74,7 @@ protected:
 			device_t *owner,
 			u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
 
 	devcb_write_line m_tip_handler;
@@ -200,4 +197,4 @@ private:
 
 void default_ti8x_link_devices(device_slot_interface &device);
 
-#endif // MAME_DEVICES_BUS_TI8X_TI8X_H
+#endif // MAME_BUS_TI8X_TI8X_H

@@ -22,6 +22,7 @@ public:
 
 	template <typename... T> void set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); }
 	template <typename T> void set_device_rom_tag(T &&tag) { m_rom_region.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_space(T &&tag, int spacenum) { m_rom_space.set_tag(tag, spacenum); }
 
 	u8 read_byte(offs_t addr) { return m_rom_cache.read_byte(addr); }
 	u16 read_word(offs_t addr) { return m_rom_cache.read_word(addr); }
@@ -32,6 +33,8 @@ public:
 	void set_rom_bank(int bank);
 
 protected:
+	typename memory_access<AddrWidth, DataWidth, AddrShift, Endian>::cache m_rom_cache;
+
 	virtual void rom_bank_pre_change() { }
 	virtual void rom_bank_post_change() { }
 	virtual space_config_vector memory_space_config() const override;
@@ -40,8 +43,8 @@ protected:
 
 private:
 	optional_memory_region m_rom_region;
+	optional_address_space m_rom_space;
 	address_space_config m_rom_config;
-	typename memory_access<AddrWidth, DataWidth, AddrShift, Endian>::cache m_rom_cache;
 
 	memory_bank_creator m_bank;
 	u32 m_cur_bank, m_bank_count;

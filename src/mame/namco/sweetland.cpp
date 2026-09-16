@@ -98,7 +98,7 @@ public:
 	void sweetland(machine_config &config);
 
 private:
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 void sweetland_state::program_map(address_map &map)

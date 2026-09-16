@@ -11,7 +11,7 @@ class interpro_arbga_device : public device_t
 public:
 	interpro_arbga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map &map);
+	virtual void map(address_map &map) ATTR_COLD;
 
 	u32 sdepid_r() { return m_sdepid; }
 	void sdepid_w(u32 data) { m_sdepid = data; }
@@ -63,8 +63,8 @@ public:
 	void arbrev_w(u32 data) { m_arbrev = data; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u32 m_sdepid = 0;

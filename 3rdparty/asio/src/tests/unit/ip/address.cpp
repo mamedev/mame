@@ -2,7 +2,7 @@
 // address.cpp
 // ~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -69,18 +69,6 @@ void test()
     (void)addr_v6_value;
 
     std::string string_value = addr1.to_string();
-#if !defined(ASIO_NO_DEPRECATED)
-    string_value = addr1.to_string(ec);
-#endif // !defined(ASIO_NO_DEPRECATED)
-
-    // address static functions.
-
-#if !defined(ASIO_NO_DEPRECATED)
-    addr1 = ip::address::from_string("127.0.0.1");
-    addr1 = ip::address::from_string("127.0.0.1", ec);
-    addr1 = ip::address::from_string(string_value);
-    addr1 = ip::address::from_string(string_value, ec);
-#endif // !defined(ASIO_NO_DEPRECATED)
 
     // address comparisons.
 
@@ -128,10 +116,8 @@ void test()
     wos << addr1;
 #endif // !defined(BOOST_NO_STD_WSTREAMBUF)
 
-#if defined(ASIO_HAS_STD_HASH)
     std::size_t hash1 = std::hash<ip::address>()(addr1);
     (void)hash1;
-#endif // defined(ASIO_HAS_STD_HASH)
   }
   catch (std::exception&)
   {
@@ -145,5 +131,5 @@ void test()
 ASIO_TEST_SUITE
 (
   "ip/address",
-  ASIO_TEST_CASE(ip_address_compile::test)
+  ASIO_COMPILE_TEST_CASE(ip_address_compile::test)
 )

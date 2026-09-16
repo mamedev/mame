@@ -10,7 +10,7 @@ Hardware notes:
 - Zilog Z8400B PS, 6 MHz XTAL
 - 40KB ROM (4*2764 or equivalent, 4*MSM2716AS) + 1 socket for expansion
 - 5KB RAM (8*TMM314APL-1, 2*TC5514AP-8 battery-backed)
-- SN76489AN
+- SN76489AN sound
 - robot arm with 4 DC motors
 - 12+12 leds, 8*8 magnet sensors, printer port
 
@@ -40,11 +40,12 @@ TODO:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/sn76496.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
+
+#include <numbers>
 
 // internal artwork
 #include "novag_robotadv.lh"
@@ -67,11 +68,11 @@ public:
 		m_out_pos(*this, "pos_%c", unsigned('x'))
 	{ }
 
-	void robotadv(machine_config &config);
+	void robotadv(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { refresh(); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -83,24 +84,6 @@ private:
 	output_finder<6> m_out_motor;
 	output_finder<2> m_out_pos;
 
-	void main_map(address_map &map);
-	void io_map(address_map &map);
-
-	void control1_w(u8 data);
-	void control2_w(u8 data);
-	void latch_w(u8 data);
-	u8 limits_r();
-	u8 input_r();
-	u8 counters_r();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(refresh_timer) { refresh(); }
-	void clear_board(int state);
-	void refresh();
-	void update_counters();
-	void update_limits();
-	void update_clawpos(double *x, double *y);
-	void update_piece(double x, double y);
-
 	u8 m_control1 = 0;
 	u8 m_control2 = 0;
 	u8 m_latch = 0;
@@ -110,6 +93,25 @@ private:
 	s32 m_counter[4] = { };
 	attotime m_pwm_accum[4];
 	attotime m_pwm_last;
+	emu_timer *m_refresh_timer;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	void control1_w(u8 data);
+	void control2_w(u8 data);
+	void latch_w(u8 data);
+	u8 limits_r();
+	u8 input_r();
+	u8 counters_r();
+
+	void init_board(u8 data);
+	void clear_board(u8 data);
+	void refresh(s32 param = 0);
+	void update_counters();
+	void update_limits();
+	void update_clawpos(double *x, double *y);
+	void update_piece(double x, double y);
 };
 
 
@@ -120,10 +122,7 @@ private:
 
 void robotadv_state::machine_start()
 {
-	// resolve outputs
-	m_piece_hand.resolve();
-	m_out_motor.resolve();
-	m_out_pos.resolve();
+	m_refresh_timer = timer_alloc(FUNC(robotadv_state::refresh), this);
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -137,15 +136,26 @@ void robotadv_state::machine_start()
 	save_item(NAME(m_pwm_last));
 }
 
-void robotadv_state::machine_reset()
+void robotadv_state::init_board(u8 data)
 {
-	refresh();
+	m_board->preset_chess(data);
+
+	// reposition pieces if board will be rotated
+	if (data & 2)
+	{
+		for (int y = 0; y < 8; y++)
+			for (int x = 7; x >= 0; x--)
+			{
+				m_board->write_piece(x + 4, y, m_board->read_piece(x, y));
+				m_board->write_piece(x, y, 0);
+			}
+	}
 }
 
-void robotadv_state::clear_board(int state)
+void robotadv_state::clear_board(u8 data)
 {
 	m_piece_hand = 0;
-	m_board->clear_board();
+	m_board->clear_board(data);
 }
 
 
@@ -206,25 +216,26 @@ void robotadv_state::update_limits()
 
 void robotadv_state::update_clawpos(double *x, double *y)
 {
+	constexpr double PI = std::numbers::pi;
 	double r, d, a;
 
 	// upper arm
 	r = 5.43;
 	d = m_counter[3] / 12670.0;
-	a = d * (M_PI / 180.0) + M_PI;
+	a = d * (PI / 180.0) + PI;
 	*x = r * cos(a);
 	*y = r * sin(a);
 
 	// elbow (home position is at a slight angle)
 	r = 1.07;
 	d = m_counter[2] / 14730.0 + 8.8;
-	a += d * (M_PI / 180.0) + (1.5 * M_PI);
+	a += d * (PI / 180.0) + (1.5 * PI);
 	*x += r * cos(a);
 	*y += r * sin(a);
 
 	// forearm is perpendicular to elbow
 	r = 5.62;
-	a += 1.5 * M_PI;
+	a += 1.5 * PI;
 	*x += r * cos(a);
 	*y += r * sin(a);
 }
@@ -304,7 +315,7 @@ void robotadv_state::update_piece(double x, double y)
 	}
 }
 
-void robotadv_state::refresh()
+void robotadv_state::refresh(s32 param)
 {
 	if (machine().side_effects_disabled())
 		return;
@@ -325,6 +336,8 @@ void robotadv_state::refresh()
 	const int open = (m_limits & 1) ? 0x800 : 0; // put open state on x bit 11
 	m_out_pos[0] = int((x + 15.0) * 50.0 + 0.5) | open;
 	m_out_pos[1] = int((y + 15.0) * 50.0 + 0.5);
+
+	m_refresh_timer->adjust(attotime::from_hz(60));
 }
 
 
@@ -459,7 +472,6 @@ void robotadv_state::io_map(address_map &map)
 *******************************************************************************/
 
 static INPUT_PORTS_START( robotadv )
-
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Trace Forward")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Verify")
@@ -508,14 +520,12 @@ void robotadv_state::robotadv(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_usec(10)); // guessed
 	irq_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	TIMER(config, "refresh_timer").configure_periodic(FUNC(robotadv_state::refresh_timer), attotime::from_hz(60));
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->set_size(8+4, 8);
 	m_board->clear_cb().set(FUNC(robotadv_state::clear_board));
-	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->init_cb().set(FUNC(robotadv_state::init_board));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 
@@ -556,4 +566,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, robotadv, 0,      0,      robotadv, robotadv, robotadv_state, empty_init, "Novag", "Chess Robot Adversary", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )
+SYST( 1982, robotadv, 0,      0,      robotadv, robotadv, robotadv_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Chess Robot Adversary", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_IMPERFECT_CONTROLS )

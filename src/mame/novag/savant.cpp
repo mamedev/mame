@@ -21,9 +21,6 @@ Hardware overview:
 The display (both the LCD and the sensors) didn't last long, probably none exist
 anymore in original working order.
 
-TODO:
-- get rid of m_wait_in hack when Z80 core accurately emulates WAIT pin
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -37,7 +34,7 @@ TODO:
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -67,26 +64,33 @@ public:
 	void savant(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<f8_cpu_device> m_mcu;
 	required_device<f38t56_device> m_psu;
 	required_device<hlcd0538_device> m_lcd1;
 	required_device<hlcd0539_device> m_lcd2;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_inputs;
 
+	bool m_z80_wait = false;
+	u8 m_inp_mux = 0;
+	u8 m_databus = 0;
+	u8 m_control = 0;
+	u64 m_lcd_data = 0;
+
 	// address maps
-	void main_map(address_map &map);
-	void main_io(address_map &map);
-	void mcu_map(address_map &map);
-	void mcu_io(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void mcu_map(address_map &map) ATTR_COLD;
+	void mcu_io(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void nvram_w(offs_t offset, u8 data);
@@ -104,22 +108,21 @@ private:
 	void control_w(u8 data);
 	void lcd_w(u8 data);
 	u8 input_r();
-
-	bool m_wait_in = false;
-	u8 m_inp_mux = 0;
-	u8 m_databus = 0;
-	u8 m_control = 0;
-	u64 m_lcd_data = 0;
 };
 
 void savant_state::machine_start()
 {
 	// register for savestates
-	save_item(NAME(m_wait_in));
+	save_item(NAME(m_z80_wait));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_databus));
 	save_item(NAME(m_control));
 	save_item(NAME(m_lcd_data));
+}
+
+void savant_state::machine_reset()
+{
+	m_z80_wait = false;
 }
 
 
@@ -143,23 +146,25 @@ u8 savant_state::nvram_r(offs_t offset)
 
 void savant_state::stall_w(offs_t offset, u8 data)
 {
-	// any access to port C0 puts the Z80 into WAIT, sets BUSRQ, and sets MCU EXT INT
-	m_databus = offset >> 8;
-	m_psu->ext_int_w(1);
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+	// any access to port C0 puts the Z80 into WAIT, sets BUSREQ, and sets MCU EXT INT
+	if (!m_z80_wait)
+	{
+		m_databus = offset >> 8;
+		m_psu->ext_int_w(1);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
+		m_maincpu->retry_access();
+	}
+
+	m_z80_wait = !m_z80_wait;
 }
 
 u8 savant_state::stall_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
-	{
-		m_wait_in = true;
 		stall_w(offset);
-	}
 
-	// return value is databus (see control_w)
-	return 0;
+	return m_databus;
 }
 
 u8 savant_state::mcustatus_r()
@@ -206,18 +211,11 @@ void savant_state::control_w(u8 data)
 	{
 		m_psu->ext_int_w(0);
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-
-		// hack to set Z80 A after IN A,($C0)
-		if (m_wait_in)
-		{
-			m_maincpu->set_state_int(Z80_A, m_databus);
-			m_wait_in = false;
-		}
 	}
 
-	// d1: clear Z80 BUSRQ
+	// d1: clear Z80 BUSREQ
 	if (data & ~m_control & 2)
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
 
 	// d2: return data for Z80
 
@@ -359,7 +357,7 @@ void savant_state::savant(machine_config &config)
 	F8(config, m_mcu, 4_MHz_XTAL/2);
 	m_mcu->set_addrmap(AS_PROGRAM, &savant_state::mcu_map);
 	m_mcu->set_addrmap(AS_IO, &savant_state::mcu_io);
-	m_mcu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
+	m_mcu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
 	F38T56(config, m_psu, 4_MHz_XTAL/2);
 	m_psu->set_int_vector(0x0020);
@@ -380,10 +378,9 @@ void savant_state::savant(machine_config &config)
 	HLCD0538(config, m_lcd1).write_cols().set(FUNC(savant_state::lcd1_output_w));
 	HLCD0539(config, m_lcd2).write_cols().set(FUNC(savant_state::lcd2_output_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(958, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(8, 24+27);
 	config.set_default_layout(layout_novag_savant);
@@ -409,8 +406,8 @@ ROM_START( savant )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763958, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
+	ROM_REGION( 764183, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 764183, CRC(c3adac84) SHA1(e534aa0a3d339b5351a44aa0507c1ae6af8e1d75) )
 ROM_END
 
 ROM_START( savant2 )
@@ -423,8 +420,8 @@ ROM_START( savant2 )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763958, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
+	ROM_REGION( 764183, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 764183, CRC(c3adac84) SHA1(e534aa0a3d339b5351a44aa0507c1ae6af8e1d75) )
 ROM_END
 
 } // anonymous namespace
@@ -436,5 +433,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag", "Savant", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag", "Savant II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, savant,  0,      0,      savant,  savant, savant_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Savant", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, savant2, savant, 0,      savant,  savant, savant_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Savant II", MACHINE_SUPPORTS_SAVE )

@@ -64,14 +64,14 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void init_rr() { m_game = 1; }
-	void s9(machine_config &config);
+	void init_rr() ATTR_COLD { m_game = 1; }
+	void s9(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -90,7 +90,7 @@ private:
 	void pia28_cb2_w(int state) { m_comma12 = state; } // comma1&2
 	void pia_irq(int state);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_strobe = 0U;
 	u8 m_row = 0U;
@@ -192,7 +192,7 @@ static INPUT_PORTS_START( s9 )
 	PORT_START("X7")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s9_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s9_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 INPUT_PORTS_END
@@ -331,8 +331,6 @@ TIMER_CALLBACK_MEMBER(s9_state::irq_timer)
 void s9_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
 
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
@@ -348,6 +346,7 @@ void s9_state::machine_start()
 void s9_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 }
@@ -401,7 +400,7 @@ void s9_state::s9(machine_config &config)
 
 	/* Add the soundcard */
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S9_SOUND(config, m_s9sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S9_SOUND(config, m_s9sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

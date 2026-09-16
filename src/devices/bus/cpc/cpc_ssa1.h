@@ -56,33 +56,21 @@ public:
 	// construction/destruction
 	cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_lrq(uint8_t state) { m_lrq = state; }
-	uint8_t get_lrq() { return m_lrq; }
-	void set_sby(uint8_t state) { m_sby = state; }
-	uint8_t get_sby() { return m_sby; }
-
 	uint8_t ssa1_r();
 	void ssa1_w(uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void lrq_cb(int state);
-	void sby_cb(int state);
-
 	cpc_expansion_slot_device *m_slot;
-
 	uint8_t *m_rom;
-	uint8_t m_lrq;
-	uint8_t m_sby;
-
 	required_device<sp0256_device> m_sp0256_device;
 };
 
@@ -93,33 +81,21 @@ public:
 	// construction/destruction
 	cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_lrq(uint8_t state) { m_lrq = state; }
-	uint8_t get_lrq() { return m_lrq; }
-	void set_sby(uint8_t state) { m_sby = state; }
-	uint8_t get_sby() { return m_sby; }
-
 	uint8_t dkspeech_r();
 	void dkspeech_w(uint8_t data);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void lrq_cb(int state);
-	void sby_cb(int state);
-
 	cpc_expansion_slot_device *m_slot;
-
 	uint8_t *m_rom;
-	uint8_t m_lrq;
-	uint8_t m_sby;
-
 	required_device<sp0256_device> m_sp0256_device;
 };
 

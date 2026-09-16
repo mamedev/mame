@@ -71,8 +71,8 @@ public:
 	void informer_207_376(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -87,7 +87,7 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void unk_8400_w(uint8_t data);
 	void crt_brightness_w(uint8_t data);
@@ -262,7 +262,7 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	nmi_clk.set_stages(14);
 	nmi_clk.count_out_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).bit(13); // Q14
 
-	SCC85C30(config, m_scc, 0); // externally clocked?
+	SCC85C30(config, m_scc); // externally clocked?
 	m_scc->out_txda_callback().set("com1", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("com1", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("com1", FUNC(rs232_port_device::write_rts));
@@ -296,7 +296,7 @@ void informer_207_376_state::informer_207_376(machine_config &config)
 	kbd.tx_handler().set(m_acia[0], FUNC(acia6850_device::write_rxd));
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(36_MHz_XTAL / 2.5, 800, 0, 640, 300, 0, 286);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
@@ -343,5 +343,4 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE           INPUT             CLASS                   INIT        COMPANY     FULLNAME            FLAGS
-COMP( 1986, in207376, 0,       0,      informer_207_376, informer_207_376, informer_207_376_state, empty_init, "Informer", "Informer 207/376", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, in207376, 0, 0, informer_207_376, informer_207_376, informer_207_376_state, empty_init, "Informer Computer Terminals", "Informer 207/376", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

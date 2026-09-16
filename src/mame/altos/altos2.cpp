@@ -53,9 +53,9 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	virtual void machine_reset() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<x2210_device> m_novram;
@@ -165,7 +165,7 @@ void altos2_state::altos2(machine_config &config)
 
 	X2210(config, m_novram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(40_MHz_XTAL / 2, 960, 0, 800, 347, 0, 325);
 	screen.set_screen_update(FUNC(altos2_state::screen_update));
 

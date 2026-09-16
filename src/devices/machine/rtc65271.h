@@ -20,7 +20,7 @@ class rtc65271_device : public device_t,
 {
 public:
 	// construction/destruction
-	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto interrupt_cb() { return m_interrupt_cb.bind(); }
 
@@ -36,7 +36,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

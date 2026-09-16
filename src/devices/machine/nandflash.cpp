@@ -25,7 +25,15 @@ DEFINE_DEVICE_TYPE(SAMSUNG_K9F5608U0DJ, samsung_k9f5608u0dj_device, "samsung_k9f
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F5608U0B,  samsung_k9f5608u0b_device,  "samsung_k9f5608u0b",  "Samsung K9F5608U0B")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F2808U0B,  samsung_k9f2808u0b_device,  "samsung_k9f2808u0b",  "Samsung K9F2808U0B")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B,  samsung_k9f1g08u0b_device,  "samsung_k9f1g08u0b",  "Samsung K9F1G08U0B")
+DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M,  samsung_k9f1g08u0m_device,  "samsung_k9f1g08u0m",  "Samsung K9F1G08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M,  samsung_k9lag08u0m_device,  "samsung_k9lag08u0m",  "Samsung K9LAG08U0M")
+DEFINE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M,  samsung_k9f2g08u0m_device,  "samsung_k9f2g08u0m",  "Samsung K9F2G08U0M")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58256AFT,  toshiba_tc58256aft_device,  "toshiba_tc58256aft",  "Toshiba TC58256AFT")
+DEFINE_DEVICE_TYPE(GENERALPLUS_GPR27P512A,  generalplus_gpr27p512a,  "generalplus_gpr27p512a",  "GeneralPlus GPR27P512A")
+DEFINE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE,  sandisk_nand_128mb_512_device,  "sandisk_nand_128mb_512",  "Sandisk 128Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
+DEFINE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE,  sandisk_nand_256mb_512_device,  "sandisk_nand_256mb_512",  "Sandisk 256Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
+DEFINE_DEVICE_TYPE(HYNIX_HY27UF084G2M,  hynix_hy27uf084g2m_device,  "hynix_hy27uf084g2m",  "Hynix HY27UF084G2M")
+
 
 nand_device::nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, NAND, tag, owner, clock)
@@ -45,6 +53,8 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 	m_col_address_cycles(0),
 	m_row_address_cycles(0),
 	m_sequential_row_read(0),
+	m_read_time(attotime::never),
+	m_busy_until(attotime::never),
 	m_write_rnb(*this)
 {
 	memset(m_id, 0, sizeof(m_id));
@@ -128,6 +138,26 @@ samsung_k9f1g08u0b_device::samsung_k9f1g08u0b_device(const machine_config &mconf
 	m_sequential_row_read = 0;
 }
 
+samsung_k9f1g08u0m_device::samsung_k9f1g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, SAMSUNG_K9F1G08U0M, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[0] = 0xec;
+	m_id[1] = 0xf1;
+	m_id[2] = 0x00;
+	m_id[3] = 0x15;
+	m_page_data_size = 2048;
+	m_page_total_size = 2048 + 64;
+	m_log2_pages_per_block = compute_log2(64);
+	m_num_pages = 64 * 1024;
+	m_col_address_cycles = 2;
+	m_row_address_cycles = 2;
+	m_sequential_row_read = 0;
+	// Taken from the documentation for worst case read time, may require more measuring on a real pcb
+	// but the majority of cycle cost comes from reading the data out once it's ready
+	m_read_time = attotime::from_usec(25);
+}
+
 samsung_k9lag08u0m_device::samsung_k9lag08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, SAMSUNG_K9LAG08U0M, tag, owner, clock)
 {
@@ -145,6 +175,101 @@ samsung_k9lag08u0m_device::samsung_k9lag08u0m_device(const machine_config &mconf
 	m_row_address_cycles = 3;
 	m_sequential_row_read = 0;
 }
+
+samsung_k9f2g08u0m_device::samsung_k9f2g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, SAMSUNG_K9F2G08U0M, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[0] = 0xec;
+	m_id[1] = 0xda;
+	m_id[2] = 0x00;
+	m_id[3] = 0x15;
+	m_page_data_size = 2048;
+	m_page_total_size = 2048 + 64;
+	m_log2_pages_per_block = compute_log2(64);
+	m_num_pages = 128 * 1024;
+	m_col_address_cycles = 2;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 0;
+}
+
+hynix_hy27uf084g2m_device::hynix_hy27uf084g2m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, HYNIX_HY27UF084G2M, tag, owner, clock)
+{
+	m_id_len = 4;
+	m_id[0] = 0xad;
+	m_id[1] = 0xdc;
+	m_id[2] = 0x80;
+	m_id[3] = 0x95;
+	m_page_data_size = 2048;
+	m_page_total_size = 2048 + 64;
+	m_log2_pages_per_block = compute_log2(64);
+	m_num_pages = 64 * 4096;
+	m_col_address_cycles = 2;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 1; // uncertain
+}
+
+toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0x98;
+	m_id[1] = 0x75;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 2048;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 2;
+	m_sequential_row_read = 0;
+}
+
+generalplus_gpr27p512a::generalplus_gpr27p512a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, GENERALPLUS_GPR27P512A, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0xc2;
+	m_id[1] = 0x76;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 4096;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 1;
+}
+
+sandisk_nand_128mb_512_device::sandisk_nand_128mb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, SANDISK_NAND_128MB_512_DEVICE, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0x45;
+	m_id[1] = 0x79;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 8192;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 1;
+}
+
+sandisk_nand_256mb_512_device::sandisk_nand_256mb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, SANDISK_NAND_256MB_512_DEVICE, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0x45;
+	m_id[1] = 0xda;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(32);
+	m_num_pages = 32 * 16384;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 3;
+	m_sequential_row_read = 1; // uncertain
+}
+
 
 void nand_device::device_start()
 {
@@ -195,16 +320,16 @@ void nand_device::nvram_default()
 
 bool nand_device::nvram_read(util::read_stream &file)
 {
-	size_t actual;
-	uint32_t size = m_page_total_size * m_num_pages;
-	return !file.read(&m_feeprom_data[0], size, actual) && actual == size;
+	uint32_t const size = m_page_total_size * m_num_pages;
+	auto const [err, actual] = read(file, &m_feeprom_data[0], size);
+	return !err && (actual == size);
 }
 
 bool nand_device::nvram_write(util::write_stream &file)
 {
-	size_t actual;
-	uint32_t size = m_page_total_size * m_num_pages;
-	return !file.write(&m_feeprom_data[0], size, actual) && actual == size;
+	uint32_t const size = m_page_total_size * m_num_pages;
+	auto const [err, actual] = write(file, &m_feeprom_data[0], size);
+	return !err;
 }
 
 int nand_device::is_present()
@@ -219,6 +344,9 @@ int nand_device::is_protected()
 
 int nand_device::is_busy()
 {
+	if (m_busy_until != attotime::never && machine().time() < m_busy_until)
+		return 1;
+
 	return (m_status & 0x40) == 0;
 }
 
@@ -230,6 +358,7 @@ void nand_device::command_w(uint8_t data)
 	switch (data)
 	{
 	case 0xff: // Reset
+		m_busy_until = attotime::never;
 		m_mode = SM_M_INIT;
 		m_pointer_mode = SM_PM_A;
 		m_status = (m_status & 0x80) | 0x40;
@@ -242,7 +371,6 @@ void nand_device::command_w(uint8_t data)
 	case 0x00: // Read (1st cycle)
 		m_mode = SM_M_READ;
 		m_pointer_mode = SM_PM_A;
-		m_page_addr = 0;
 		m_addr_load_ptr = 0;
 		break;
 	case 0x01:
@@ -255,7 +383,6 @@ void nand_device::command_w(uint8_t data)
 		{
 			m_mode = SM_M_READ;
 			m_pointer_mode = SM_PM_B;
-			m_page_addr = 0;
 			m_addr_load_ptr = 0;
 		}
 		break;
@@ -269,13 +396,11 @@ void nand_device::command_w(uint8_t data)
 		{
 			m_mode = SM_M_READ;
 			m_pointer_mode = SM_PM_C;
-			m_page_addr = 0;
 			m_addr_load_ptr = 0;
 		}
 		break;
 	case 0x80: // Page Program (1st cycle)
 		m_mode = SM_M_PROGRAM;
-		m_page_addr = 0;
 		m_addr_load_ptr = 0;
 		m_program_byte_count = 0;
 		memset(m_pagereg.get(), 0xff, m_page_total_size);
@@ -362,7 +487,10 @@ void nand_device::command_w(uint8_t data)
 			else
 			{
 				m_write_rnb(0);
-				m_write_rnb(1);
+				if (m_read_time != attotime::never)
+					m_busy_until = machine().time() + m_read_time;
+				else
+					m_write_rnb(1);
 			}
 		}
 		break;
@@ -397,7 +525,11 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-			// do nothing
+			m_write_rnb(0);
+			if (m_read_time != attotime::never)
+				m_busy_until = machine().time() + m_read_time;
+			else
+				m_write_rnb(1);
 		}
 		break;
 	case 0x85: // Random Data Input
@@ -432,6 +564,10 @@ void nand_device::address_w(uint8_t data)
 		break;
 	case SM_M_READ:
 	case SM_M_PROGRAM:
+		if (m_addr_load_ptr == 0)
+		{
+			m_page_addr = 0;
+		}
 		if ((m_addr_load_ptr == 0) && (m_col_address_cycles == 1))
 		{
 			switch (m_pointer_mode)

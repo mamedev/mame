@@ -21,9 +21,9 @@ class isa16_cl_sh260_device : public device_t, public device_isa16_card_interfac
 protected:
 	isa16_cl_sh260_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
-	void i8031_map(address_map &map);
+	void i8031_map(address_map &map) ATTR_COLD;
 
 	required_device<upd765_family_device> m_fdc;
 };
@@ -36,11 +36,11 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void ext_map(address_map &map);
+	void ext_map(address_map &map) ATTR_COLD;
 };
 
 class isa16_jc1310_device : public isa16_cl_sh260_device
@@ -51,11 +51,11 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	void ext_map(address_map &map);
+	void ext_map(address_map &map) ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(EV346, isa16_ev346_device)

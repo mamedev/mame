@@ -47,7 +47,7 @@ public:
 	void dx9(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<hd6303r_cpu_device> m_maincpu;
@@ -131,11 +131,11 @@ private:
 
 	void palette_init(palette_device &palette);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void midi_r(int state) { m_rx_data = state; }
 
-	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->clock_serial(); }
 
 	/**
 	 * @brief Handle a write to the synth's IO Port 1.
@@ -175,7 +175,6 @@ private:
  */
 void yamaha_dx9_state::machine_start()
 {
-	m_leds.resolve();
 	m_rx_data = ASSERT_LINE;
 }
 
@@ -267,7 +266,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	m_maincpu->out_ser_tx_cb().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// Configure the LCD screen.
-	screen_device &lcd_screen(SCREEN(config, "lcd_screen", SCREEN_TYPE_LCD));
+	screen_device &lcd_screen(SCREEN(config, "lcd_screen").set_lcd());
 	lcd_screen.set_refresh_hz(60);
 	lcd_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	lcd_screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -277,7 +276,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(yamaha_dx9_state::palette_init), 3);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx9_state::lcd_pixel_update));
 
@@ -416,4 +415,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON | MACHINE_CLICKABLE_ARTWORK)
+SYST(1983, dx9, 0, 0, dx9, dx9, yamaha_dx9_state, empty_init, "Yamaha", "DX9 Digital Programmable Algorithm Synthesizer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

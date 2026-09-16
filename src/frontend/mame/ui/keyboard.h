@@ -20,7 +20,7 @@ namespace ui {
 class menu_keyboard_mode : public menu
 {
 public:
-	menu_keyboard_mode(mame_ui_manager &mui, render_container &container);
+	menu_keyboard_mode(mame_ui_manager &mui, render_target &target);
 	virtual ~menu_keyboard_mode();
 
 protected:

@@ -8,7 +8,6 @@
 SPC700 CPU Emulator V0.90
 
 Copyright Karl Stenerud
-All rights reserved.
 
 */
 

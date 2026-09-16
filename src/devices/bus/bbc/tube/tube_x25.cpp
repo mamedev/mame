@@ -11,16 +11,58 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "tube_x25.h"
 
+#include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/tube.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_TUBE_X25, bbc_tube_x25_device, "bbc_tube_x25", "Econet X25 Gateway Co-Processor")
+namespace {
+
+// ======================> bbc_tube_x25_device
+
+class bbc_tube_x25_device : public device_t, public device_bbc_tube_interface
+{
+public:
+	bbc_tube_x25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_TUBE_X25, tag, owner, clock)
+		, device_bbc_tube_interface(mconfig, *this)
+		, m_z80(*this, "z80_%u", 0)
+		, m_ula(*this, "ula")
+		, m_bank(*this, "bank%u", 0)
+		, m_ram(nullptr)
+	{
+	}
+
+	static constexpr feature_type unemulated_features() { return feature::LAN; }
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t host_r(offs_t offset) override;
+	virtual void host_w(offs_t offset, uint8_t data) override;
+
+private:
+	IRQ_CALLBACK_MEMBER( irq_callback );
+
+	required_device_array<z80_device, 2> m_z80;
+	required_device<tube_device> m_ula;
+	required_memory_bank_array<2> m_bank;
+	std::unique_ptr<uint8_t[]> m_ram;
+
+	void primary_mem(address_map &map) ATTR_COLD;
+	void primary_io(address_map &map) ATTR_COLD;
+	void secondary_mem(address_map &map) ATTR_COLD;
+	void secondary_io(address_map &map) ATTR_COLD;
+};
 
 
 //-------------------------------------------------
@@ -65,8 +107,9 @@ void bbc_tube_x25_device::secondary_io(address_map &map)
 	map(0x04, 0x07).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
 
+
 //-------------------------------------------------
-//  ROM( tube_x25 )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START(tube_x25)
@@ -77,6 +120,12 @@ ROM_START(tube_x25)
 	ROM_LOAD("0246,213_01-x25-lo-rom1.rom", 0x0000, 0x4000, CRC(43679e1d) SHA1(240a46f7fb9fb8eee834b36aa8526f1f3ff7e00c))
 	ROM_LOAD("0246,214_01-x25-hi-rom2.rom", 0x4000, 0x4000, CRC(e77ce291) SHA1(3d9e3f58f878d1f7c743b05e371845b3f7627129))
 ROM_END
+
+const tiny_rom_entry *bbc_tube_x25_device::device_rom_region() const
+{
+	return ROM_NAME( tube_x25 );
+}
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -107,10 +156,10 @@ void bbc_tube_x25_device::device_add_mconfig(machine_config &config)
 	m_z80[1]->set_addrmap(AS_IO, &bbc_tube_x25_device::secondary_io);
 	m_z80[1]->set_daisy_config(daisy_chain);
 
-	z80sio_device& sio(Z80SIO(config, "sio", 12_MHz_XTAL / 4));
+	z80sio_device &sio(Z80SIO(config, "sio", 12_MHz_XTAL / 4));
 	sio.out_int_callback().set_inputline(m_z80[1], INPUT_LINE_IRQ0);
 
-	z80ctc_device& ctc(Z80CTC(config, "ctc", 12_MHz_XTAL / 4));
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 12_MHz_XTAL / 4));
 	ctc.zc_callback<0>().set("sio", FUNC(z80sio_device::rxca_w));
 	ctc.zc_callback<0>().append("sio", FUNC(z80sio_device::txca_w));
 	ctc.zc_callback<1>().set("sio", FUNC(z80sio_device::rxcb_w));
@@ -118,32 +167,6 @@ void bbc_tube_x25_device::device_add_mconfig(machine_config &config)
 	ctc.intr_callback().set_inputline(m_z80[1], INPUT_LINE_IRQ0);
 }
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *bbc_tube_x25_device::device_rom_region() const
-{
-	return ROM_NAME( tube_x25 );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_tube_x25_device - constructor
-//-------------------------------------------------
-
-bbc_tube_x25_device::bbc_tube_x25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_TUBE_X25, tag, owner, clock)
-	, device_bbc_tube_interface(mconfig, *this)
-	, m_z80(*this, "z80_%u", 0)
-	, m_ula(*this, "ula")
-	, m_bank(*this, "bank%u", 0)
-	, m_ram(nullptr)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -184,3 +207,8 @@ IRQ_CALLBACK_MEMBER(bbc_tube_x25_device::irq_callback)
 {
 	return 0xfe;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_TUBE_X25, device_bbc_tube_interface, bbc_tube_x25_device, "bbc_tube_x25", "Econet X25 Gateway Co-Processor")

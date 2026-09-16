@@ -93,8 +93,8 @@ void eolith16_state::eolith16_map(address_map &map)
 
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith16_state, speedup_vblank_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(eolith16_state::speedup_vblank_r))
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
@@ -116,9 +116,9 @@ static INPUT_PORTS_START( eolith16 )
 	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 INPUT_PORTS_END
 
 void eolith16_state::video_start()
@@ -166,7 +166,7 @@ void eolith16_state::eolith16_palette(palette_device &palette) const
 
 void eolith16_state::eolith16(machine_config &config)
 {
-	E116T(config, m_maincpu, XTAL(60'000'000));        /* no internal multiplier */
+	E116(config, m_maincpu, 60_MHz_XTAL);        // E1-16T (TQFP), no internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith16_state::eolith16_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith16_state::eolith_speedup), "screen", 0, 1);
 
@@ -175,7 +175,7 @@ void eolith16_state::eolith16(machine_config &config)
 			.write_time(attotime::from_usec(250));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(512, 262);
@@ -185,12 +185,11 @@ void eolith16_state::eolith16(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(eolith16_state::eolith16_palette), 256);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 /*

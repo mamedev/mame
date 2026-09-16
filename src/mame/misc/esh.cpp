@@ -56,7 +56,7 @@ public:
 	void init_esh();
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -78,8 +78,8 @@ private:
 	required_device<beep_device> m_beep;
 	required_device<palette_device> m_palette;
 
-	void z80_0_io(address_map &map);
-	void z80_0_mem(address_map &map);
+	void z80_0_io(address_map &map) ATTR_COLD;
+	void z80_0_mem(address_map &map) ATTR_COLD;
 };
 
 
@@ -148,7 +148,7 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 uint8_t esh_state::ldp_read()
 {
-	return m_laserdisc->status_r();
+	return m_laserdisc->data_r();
 }
 
 void esh_state::misc_write(uint8_t data)
@@ -353,11 +353,11 @@ void esh_state::esh(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->command_strobe_callback().set(FUNC(esh_state::ld_command_strobe_cb));
 	m_laserdisc->set_overlay(256, 256, FUNC(esh_state::screen_update_esh));
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
@@ -366,8 +366,7 @@ void esh_state::esh(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_esh);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.25);

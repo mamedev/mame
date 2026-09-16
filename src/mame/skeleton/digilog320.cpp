@@ -98,8 +98,8 @@ public:
 	void digilog320(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -114,10 +114,10 @@ private:
 	required_shared_ptr<uint16_t> m_vram;
 	required_region_ptr<uint8_t> m_chargen;
 
-	void main_mem_map(address_map &map);
-	void main_io_map(address_map &map);
-	void sub_mem_map(address_map &map);
-	void sub_io_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sub_mem_map(address_map &map) ATTR_COLD;
+	void sub_io_map(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(update_row);
 
@@ -364,10 +364,10 @@ void digilog320_state::digilog320(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	AM9519(config, m_uic, 0);
+	AM9519(config, m_uic);
 	m_uic->out_int_callback().set_inputline(m_subcpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(5.6592_MHz_XTAL, 320, 0, 256, 262, 0, 192);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -385,11 +385,11 @@ void digilog320_state::digilog320(machine_config &config)
 	m_duart->outport_cb().set("usart", FUNC(i8251_device::write_txc)).bit(3);
 	m_duart->outport_cb().append("usart", FUNC(i8251_device::write_rxc)).bit(3);
 
-	I8251(config, "usart", 0);
+	I8251(config, "usart");
 
-	SCC8530N(config, m_scc[0], 3.6864_MHz_XTAL);
+	SCC8530(config, m_scc[0], 3.6864_MHz_XTAL);
 
-	SCC8530N(config, m_scc[1], 3.6864_MHz_XTAL);
+	SCC8530(config, m_scc[1], 3.6864_MHz_XTAL);
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));

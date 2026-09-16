@@ -11,8 +11,8 @@
 
 *****************************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_MFMHD_H
-#define MAME_DEVICES_IMAGEDEV_MFMHD_H
+#ifndef MAME_IMAGEDEV_MFMHD_H
+#define MAME_IMAGEDEV_MFMHD_H
 
 #pragma once
 
@@ -232,10 +232,7 @@ public:
 		const char *dflt, mfmhd_enc_t enc, int spinup, int cache, const mfmhd_format_type format, bool fixed = false)
 		: mfm_harddisk_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 		configure(enc, spinup, cache, format);
 	}
 
@@ -257,7 +254,7 @@ public:
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
 protected:
-	void device_start() override;
+	void device_start() override ATTR_COLD;
 	void device_config_complete() override;
 
 private:
@@ -269,4 +266,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MFM_HD_CONNECTOR, mfm_harddisk_connector)
 
-#endif // MAME_DEVICES_IMAGEDEV_MFMHD_H
+#endif // MAME_IMAGEDEV_MFMHD_H

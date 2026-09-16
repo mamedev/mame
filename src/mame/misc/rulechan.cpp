@@ -215,11 +215,11 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void rulechan(machine_config &config);
-	void rulechan_init();
+	void rulechan(machine_config &config) ATTR_COLD;
+	void rulechan_init() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port0_w(uint8_t data);
@@ -257,8 +257,8 @@ private:
 	required_ioport m_dsw;
 	required_ioport_array<6> m_keymx;
 
-	void main_io(address_map &map);
-	void main_map(address_map &map);
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 	void sound_sort();
 	void sound_off();
 
@@ -270,9 +270,6 @@ constexpr uint8_t rulechan_state::s_sndsrt[10];
 
 void rulechan_state::machine_start()
 {
-	m_lamps.resolve();
-	m_digits.resolve();
-
 	save_item(NAME(m_sline));
 	save_item(NAME(m_p30));
 	save_item(NAME(m_p31));
@@ -685,7 +682,7 @@ static INPUT_PORTS_START( rulechan )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_TOGGLE            PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   // bit 6 is EEPROM data.
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))   // bit 6 is EEPROM data.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CODE(KEYCODE_9)
 
 	PORT_START("DSW")
@@ -714,9 +711,9 @@ static INPUT_PORTS_START( rulechan )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)    // bit 3 is data (active high).
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)   // bit 4 is clock (active high).
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)    // bit 5 is cs.
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))    // bit 3 is data (active high).
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))   // bit 4 is clock (active high).
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))    // bit 5 is cs.
 
 INPUT_PORTS_END
 
@@ -758,7 +755,7 @@ void rulechan_state::rulechan(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	//v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware   */
 	SPEAKER(config, "mono").front_center();
@@ -810,6 +807,6 @@ void rulechan_state::rulechan_init()
 *           Game Driver(s)            *
 **************************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY          FULLNAME                            FLAGS                                                                   LAYOUT
-GAMEL(1991, rulechan, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N322)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK, layout_rulechan)
-GAMEL(1991, rulechab, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N165)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_CLICKABLE_ARTWORK, layout_rulechan)
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY          FULLNAME                            FLAGS                                       LAYOUT
+GAMEL(1991, rulechan, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N322)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_rulechan)
+GAMEL(1991, rulechab, 0,        rulechan, rulechan, rulechan_state, rulechan_init, ROT0, "ElectroChance", "Super Ball (Version EC-3.50 N165)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_rulechan)

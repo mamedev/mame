@@ -15,7 +15,7 @@ class msx_kanji12_device : public device_t,
 	public msx_switched_interface
 {
 public:
-	msx_kanji12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	msx_kanji12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	void set_rom_start(const char *region) { m_rom_region.set_tag(region); }
@@ -26,7 +26,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	static constexpr u8 MANUFACTURER_ID = 0xf7;

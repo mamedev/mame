@@ -7,7 +7,9 @@
 
 #include "machine/rescap.h"
 
+#include <iosfwd>
 #include <memory>
+#include <utility>
 #include <vector>
 
 
@@ -203,8 +205,8 @@
  * DISCRETE_INPUT_NOT(NODE)
  * DISCRETE_INPUTX_NOT(NODE,GAIN,OFFSET,INIT)
  * DISCRETE_INPUT_PULSE(NODE,INIT)
- * DISCRETE_INPUT_STREAM(NODE, NUM)
- * DISCRETE_INPUTX_STREAM(NODE,NUM, GAIN,OFFSET)
+ * DISCRETE_INPUT_STREAM(NODE,NUM)
+ * DISCRETE_INPUTX_STREAM(NODE,NUM,GAIN,OFFSET)
  *
  * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE)
  * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)
@@ -442,8 +444,8 @@
  *
  *  Declaration syntax
  *
- *     DISCRETE_INPUT_STREAM (name of node, stream number, )
- *     DISCRETE_INPUTX_STREAM(name of node, stream nubmer, gain, offset)
+ *     DISCRETE_INPUT_STREAM (name of node, stream number)
+ *     DISCRETE_INPUTX_STREAM(name of node, stream number, gain, offset)
  *
  * Note: The discrete system is floating point based.  So when routing a stream
  *       set it's gain to 100% and then use DISCRETE_INPUTX_STREAM to adjust
@@ -4031,26 +4033,26 @@ enum {
 #define NODE(_x)    (NODE_00 + (_x) * DISCRETE_MAX_OUTPUTS)
 #define NODE_SUB(_x, _y) ((_x) + (_y))
 
+constexpr uint32_t NODE_NC      = NODE_00;
+constexpr uint32_t NODE_SPECIAL = NODE(DISCRETE_MAX_NODES);
+
+constexpr uint32_t NODE_START   = NODE_00;
+constexpr uint32_t NODE_END     = NODE_SPECIAL;
+
 #if DISCRETE_MAX_OUTPUTS == 8
-#define NODE_CHILD_NODE_NUM(_x)     ((int)(_x) & 7)
-#define NODE_DEFAULT_NODE(_x)       ((int)(_x) & ~7)
-#define NODE_INDEX(_x)              (((int)(_x) - NODE_START)>>3)
+constexpr int NODE_CHILD_NODE_NUM(int x) { return x & 7; }
+constexpr int NODE_DEFAULT_NODE(int x) { return x & ~7; }
+constexpr int NODE_INDEX(int x) { return (x - NODE_START) >> 3; }
 #else
 #error "DISCRETE_MAX_OUTPUTS != 8"
 #endif
 
 #define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
 
-#define NODE_NC  NODE_00
-#define NODE_SPECIAL  NODE(DISCRETE_MAX_NODES)
-
-#define NODE_START  NODE_00
-#define NODE_END    NODE_SPECIAL
-
 #define IS_VALUE_A_NODE(val)    (((val) > NODE_START) && ((val) <= NODE_END))
 
 // Optional node such as used in CR_FILTER
-#define OPT_NODE(val)   (int) val
+#define OPT_NODE(val)   (int(val))
 /*************************************
  *
  *  Enumerated values for Node types
@@ -4164,7 +4166,7 @@ class discrete_sound_output_interface
 public:
 	virtual ~discrete_sound_output_interface() { }
 
-	virtual void set_output_ptr(write_stream_view &view) = 0;
+	virtual void set_output_ptr(sound_stream &stream, int output) = 0;
 };
 
 //**************************************************************************
@@ -4208,7 +4210,12 @@ public:
 	void process(int samples);
 
 	/* access to the discrete_logging facility */
-	void CLIB_DECL discrete_log(const char *text, ...) const ATTR_PRINTF(2,3);
+	void discrete_vlog(util::format_argument_pack<char> &&args);
+	template <typename Format, typename... Params>
+	void discrete_log(Format &&fmt, Params &&... args)
+	{
+		discrete_vlog(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
 
 	/* get pointer to a info struct node ref */
 	const double *node_output_ptr(int onode);
@@ -4228,9 +4235,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// configuration state
 	const discrete_block *m_intf;
@@ -4262,7 +4269,7 @@ private:
 	task_list_t             task_list;      /* discrete_task_context * */
 
 	/* debugging statistics */
-	FILE *                  m_disclogfile;
+	std::unique_ptr<std::ostream> m_disclogfile;
 
 	/* parallel tasks */
 	osd_work_queue *        m_queue;
@@ -4301,11 +4308,11 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	typedef std::vector<discrete_dss_input_stream_node *> istream_node_list_t;

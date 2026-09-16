@@ -82,8 +82,8 @@ public:
 	void init_sapizps3b();
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
@@ -111,16 +111,16 @@ private:
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sapi1_mem(address_map &map);
-	void sapi1_io(address_map &map);
-	void sapi2_mem(address_map &map);
-	void sapi2_io(address_map &map);
-	void sapi3_io(address_map &map);
-	void sapi3_mem(address_map &map);
-	void sapi3a_io(address_map &map);
-	void sapi3a_mem(address_map &map);
-	void sapi3b_io(address_map &map);
-	void sapi3b_mem(address_map &map);
+	void sapi1_mem(address_map &map) ATTR_COLD;
+	void sapi1_io(address_map &map) ATTR_COLD;
+	void sapi2_mem(address_map &map) ATTR_COLD;
+	void sapi2_io(address_map &map) ATTR_COLD;
+	void sapi3_io(address_map &map) ATTR_COLD;
+	void sapi3_mem(address_map &map) ATTR_COLD;
+	void sapi3a_io(address_map &map) ATTR_COLD;
+	void sapi3a_mem(address_map &map) ATTR_COLD;
+	void sapi3b_io(address_map &map) ATTR_COLD;
+	void sapi3b_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_term_data = 0U;
 	uint8_t m_keyboard_mask = 0U;
@@ -786,7 +786,7 @@ void sapi_state::sapi1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi1_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(40*6, 24*9);
@@ -823,7 +823,7 @@ void sapi_state::sapi2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sapi_state::sapi2_mem);
 	m_maincpu->set_addrmap(AS_IO, &sapi_state::sapi2_io);
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(sapi_state::kbd_put));
 }
 

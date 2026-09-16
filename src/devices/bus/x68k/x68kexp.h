@@ -101,10 +101,7 @@ public:
 	x68k_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
 		: x68k_expansion_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 	x68k_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~x68k_expansion_slot_device();
@@ -115,6 +112,7 @@ public:
 	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 	auto out_reset_callback() { return m_out_reset_cb.bind(); }
+	auto out_dtack_callback() { return m_out_dtack_cb.bind(); }
 
 	address_space &space() { return *m_space; }
 
@@ -122,26 +120,33 @@ public:
 	void irq4_w(int state);
 	void nmi_w(int state);
 	void reset_w(int state);
+	void dtack_w(int state);
+	bool exown() const { return m_exown; }
 
 	uint8_t iack2() { return (m_card != nullptr) ? m_card->iack2() : 0x18; }
 	uint8_t iack4() { return (m_card != nullptr) ? m_card->iack4() : 0x18; }
+	void exown_w(int state) { m_exown = !state; }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_space;
 
+private:
 	devcb_write_line    m_out_irq2_cb;
 	devcb_write_line    m_out_irq4_cb;
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_reset_cb;
+	devcb_write_line    m_out_dtack_cb;
 
 	device_x68k_expansion_card_interface *m_card;
+
+	bool m_exown;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(X68K_EXPANSION_SLOT, x68k_expansion_slot_device)
 
 #endif // MAME_BUS_X68K_X68KEXP_H

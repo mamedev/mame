@@ -10,6 +10,8 @@
 
 class st2xxx_device : public w65c02s_device {
 public:
+	using spi_exchange_delegate = device_delegate<u16 (u16 data, u8 bits)>;
+
 	enum {
 		ST_PAOUT = M6502_IR + 1,
 		ST_PBOUT,
@@ -83,12 +85,13 @@ public:
 	auto out_pf_callback() { return m_out_port_cb[5].bind(); }
 	auto in_pl_callback() { return m_in_port_cb[6].bind(); }
 	auto out_pl_callback() { return m_out_port_cb[6].bind(); }
+	template <typename... T> void set_spi_exchange_callback(T &&... args) { m_spi_exchange_cb.set(std::forward<T>(args)...); }
 
 protected:
 	st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual u16 st2xxx_ireq_mask() const = 0;
 	virtual const char *st2xxx_irq_name(int i) const = 0;
@@ -115,14 +118,14 @@ protected:
 	public:
 		virtual u8 read_vector(u16 adr) = 0;
 
-		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::cache dcache;
-		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific data;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific m_dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
-		bool irq_service;
-		bool irr_enable;
-		u16 irr;
-		u16 prr;
-		u16 drr;
+		bool m_irq_service;
+		bool m_irr_enable;
+		u16 m_irr;
+		u16 m_prr;
+		u16 m_drr;
 	};
 
 	void init_base_timer(u16 ireq);
@@ -132,12 +135,13 @@ protected:
 	virtual u8 read_vector(u16 adr) override;
 	virtual void end_interrupt() override { set_irq_service(false); }
 
-	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
-	void update_irq_state() { irq_state = (m_ireq & m_iena) != 0; }
+	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*m_mintf).m_irq_service = state; }
+	void update_irq_state() { m_irq_state = (m_ireq & m_iena) != 0; }
 	u8 active_irq_level() const;
 
 	TIMER_CALLBACK_MEMBER(bt_interrupt);
 	TIMER_CALLBACK_MEMBER(lcd_interrupt);
+	TIMER_CALLBACK_MEMBER(spi_complete);
 
 	u8 pdata_r(offs_t offset);
 	void pdata_w(offs_t offset, u8 data);
@@ -216,12 +220,17 @@ protected:
 
 	u8 sctr_r();
 	void sctr_w(u8 data);
+	u8 sdatal_r();
+	void sdatal_w(u8 data);
+	u8 sdatah_r();
+	void sdatah_w(u8 data);
 	u8 sckr_r();
 	void sckr_w(u8 data);
 	u8 ssr_r();
 	void ssr_w(u8 data);
 	u8 smod_r();
 	void smod_w(u8 data);
+	void spi_start();
 
 	u8 uctr_r();
 	void uctr_w(u8 data);
@@ -243,6 +252,7 @@ protected:
 
 	devcb_read8::array<7> m_in_port_cb;
 	devcb_write8::array<7> m_out_port_cb;
+	spi_exchange_delegate m_spi_exchange_cb;
 
 	const u16 m_prr_mask;
 	const u16 m_drr_mask;
@@ -287,6 +297,12 @@ protected:
 	u8 m_sckr;
 	u8 m_ssr;
 	u8 m_smod;
+	u16 m_sdata_tx;
+	u16 m_sdata_rx;
+	u16 m_spi_pending_rx;
+	bool m_spi_busy;
+	bool m_spi_tx_pending;
+	emu_timer *m_spi_timer;
 
 	u8 m_uctr;
 	u8 m_usr;

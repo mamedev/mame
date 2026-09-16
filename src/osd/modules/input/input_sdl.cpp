@@ -15,10 +15,11 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL)
+#if defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 #include "assignmenthelper.h"
 #include "input_common.h"
+#include "input_sdlcommon.h"
 
 #include "interface/inputseq.h"
 #include "modules/lib/osdobj_common.h"
@@ -33,6 +34,7 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <cstring>
 #include <initializer_list>
@@ -63,7 +65,7 @@ char const *const CONTROLLER_AXIS_XBOX[]{
 		"LT",
 		"RT" };
 
-[[maybe_unused]] char const *const CONTROLLER_AXIS_PS[]{
+char const *const CONTROLLER_AXIS_PS[]{
 		"LSX",
 		"LSY",
 		"RSX",
@@ -71,7 +73,7 @@ char const *const CONTROLLER_AXIS_XBOX[]{
 		"L2",
 		"R2" };
 
-[[maybe_unused]] char const *const CONTROLLER_AXIS_SWITCH[]{
+char const *const CONTROLLER_AXIS_SWITCH[]{
 		"LSX",
 		"LSY",
 		"RSX",
@@ -102,7 +104,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_XBOXONE[]{
+char const *const CONTROLLER_BUTTON_XBOXONE[]{
 		"A",
 		"B",
 		"X",
@@ -125,7 +127,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS3[]{
+char const *const CONTROLLER_BUTTON_PS3[]{
 		"Cross",
 		"Circle",
 		"Square",
@@ -148,7 +150,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS4[]{
+char const *const CONTROLLER_BUTTON_PS4[]{
 		"Cross",
 		"Circle",
 		"Square",
@@ -171,7 +173,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS5[]{
+char const *const CONTROLLER_BUTTON_PS5[]{
 		"Cross",
 		"Circle",
 		"Square",
@@ -194,7 +196,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
-[[maybe_unused]] char const *const CONTROLLER_BUTTON_SWITCH[]{
+char const *const CONTROLLER_BUTTON_SWITCH[]{
 		"A",
 		"B",
 		"X",
@@ -607,7 +609,8 @@ public:
 
 	virtual void reset() override
 	{
-		memset(&m_keyboard.state, 0, sizeof(m_keyboard.state));
+		sdl_device::reset();
+		memset(&m_keyboard, 0, sizeof(m_keyboard));
 		m_capslock_pressed = std::chrono::steady_clock::time_point::min();
 	}
 
@@ -617,16 +620,11 @@ public:
 		for (int keynum = 0; m_trans_table[keynum].mame_key != ITEM_ID_INVALID; keynum++)
 		{
 			input_item_id itemid = m_trans_table[keynum].mame_key;
-
-			// generate the default / modified name
-			char defname[20];
-			snprintf(defname, sizeof(defname) - 1, "%s", m_trans_table[keynum].ui_name);
-
 			device.add_item(
-					defname,
+					m_trans_table[keynum].ui_name,
 					std::string_view(),
 					itemid,
-					generic_button_get_state<s32>,
+					generic_button_get_state<u8>,
 					&m_keyboard.state[m_trans_table[keynum].sdl_scancode]);
 		}
 	}
@@ -635,9 +633,7 @@ private:
 	// state information for a keyboard
 	struct keyboard_state
 	{
-		s32 state[0x3ff];         // must be s32!
-		s8  oldkey[MAX_KEYS];
-		s8  currkey[MAX_KEYS];
+		u8  state[0x3ff];
 	};
 
 	keyboard_trans_table const &m_trans_table;
@@ -647,29 +643,18 @@ private:
 
 
 //============================================================
-//  sdl_mouse_device
+//  sdl_mouse_device_base
 //============================================================
 
-class sdl_mouse_device : public sdl_device
+class sdl_mouse_device_base : public sdl_device
 {
 public:
-	sdl_mouse_device(std::string &&name, std::string &&id, input_module &module) :
-		sdl_device(std::move(name), std::move(id), module),
-		m_mouse({0}),
-		m_x(0),
-		m_y(0),
-		m_v(0),
-		m_h(0)
-	{
-	}
-
 	virtual void poll(bool relative_reset) override
 	{
 		sdl_device::poll(relative_reset);
+
 		if (relative_reset)
 		{
-			m_mouse.lX = std::exchange(m_x, 0);
-			m_mouse.lY = std::exchange(m_y, 0);
 			m_mouse.lV = std::exchange(m_v, 0);
 			m_mouse.lH = std::exchange(m_h, 0);
 		}
@@ -677,13 +662,32 @@ public:
 
 	virtual void reset() override
 	{
+		sdl_device::reset();
 		memset(&m_mouse, 0, sizeof(m_mouse));
-		m_x = m_y = m_v = m_h = 0;
+		m_v = m_h = 0;
 	}
 
-	virtual void configure(input_device &device) override
+protected:
+	static constexpr unsigned MAX_BUTTONS = INPUT_MAX_BUTTONS;
+
+	// state information for a mouse
+	struct mouse_state
 	{
-		// add the axes
+		s32 lX, lY, lV, lH;
+		u8  buttons[MAX_BUTTONS];
+	};
+
+	sdl_mouse_device_base(std::string &&name, std::string &&id, input_module &module) :
+		sdl_device(std::move(name), std::move(id), module),
+		m_mouse({0}),
+		m_v(0),
+		m_h(0)
+	{
+	}
+
+	void add_common_items(input_device &device, unsigned buttons)
+	{
+		// add horizontal and vertical axes - relative for a mouse or absolute for a gun
 		device.add_item(
 				"X",
 				std::string_view(),
@@ -696,6 +700,62 @@ public:
 				ITEM_ID_YAXIS,
 				generic_axis_get_state<s32>,
 				&m_mouse.lY);
+
+		// add buttons
+		for (int button = 0; button < buttons; button++)
+		{
+			input_item_id itemid = input_item_id(ITEM_ID_BUTTON1 + button);
+			int const offset = button ^ (((1 == button) || (2 == button)) ? 3 : 0);
+			device.add_item(
+					default_button_name(button),
+					std::string_view(),
+					itemid,
+					generic_button_get_state<u8>,
+					&m_mouse.buttons[offset]);
+		}
+	}
+
+	mouse_state m_mouse;
+	s32 m_v, m_h;
+};
+
+
+//============================================================
+//  sdl_mouse_device
+//============================================================
+
+class sdl_mouse_device : public sdl_mouse_device_base
+{
+public:
+	sdl_mouse_device(std::string &&name, std::string &&id, input_module &module) :
+		sdl_mouse_device_base(std::move(name), std::move(id), module),
+		m_x(0),
+		m_y(0)
+	{
+	}
+
+	virtual void poll(bool relative_reset) override
+	{
+		sdl_mouse_device_base::poll(relative_reset);
+
+		if (relative_reset)
+		{
+			m_mouse.lX = std::exchange(m_x, 0);
+			m_mouse.lY = std::exchange(m_y, 0);
+		}
+	}
+
+	virtual void reset() override
+	{
+		sdl_mouse_device_base::reset();
+		m_x = m_y = 0;
+	}
+
+	virtual void configure(input_device &device) override
+	{
+		add_common_items(device, 5);
+
+		// add scroll axes
 		device.add_item(
 				"Scroll V",
 				std::string_view(),
@@ -708,19 +768,6 @@ public:
 				ITEM_ID_RZAXIS,
 				generic_axis_get_state<s32>,
 				&m_mouse.lH);
-
-		// add the buttons
-		for (int button = 0; button < 4; button++)
-		{
-			input_item_id itemid = (input_item_id)(ITEM_ID_BUTTON1 + button);
-			int const offset = button ^ (((1 == button) || (2 == button)) ? 3 : 0);
-			device.add_item(
-					default_button_name(button),
-					std::string_view(),
-					itemid,
-					generic_button_get_state<s32>,
-					&m_mouse.buttons[offset]);
-		}
 	}
 
 	virtual void process_event(SDL_Event const &event) override
@@ -741,27 +788,186 @@ public:
 			break;
 
 		case SDL_MOUSEWHEEL:
+			// adjust SDL 1-per-click to match Win32 120-per-click
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-			m_v += event.wheel.preciseY * input_device::RELATIVE_PER_PIXEL;
-			m_h += event.wheel.preciseX * input_device::RELATIVE_PER_PIXEL;
+			m_v += std::lround(event.wheel.preciseY * 120 * input_device::RELATIVE_PER_PIXEL);
+			m_h += std::lround(event.wheel.preciseX * 120 * input_device::RELATIVE_PER_PIXEL);
 #else
-			m_v += event.wheel.y * input_device::RELATIVE_PER_PIXEL;
-			m_h += event.wheel.x * input_device::RELATIVE_PER_PIXEL;
+			m_v += event.wheel.y * 120 * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.x * 120 * input_device::RELATIVE_PER_PIXEL;
 #endif
 			break;
 		}
 	}
 
 private:
-	// state information for a mouse
-	struct mouse_state
-	{
-		s32 lX, lY, lV, lH;
-		s32 buttons[MAX_BUTTONS];
-	};
+	s32 m_x, m_y;
+};
 
-	mouse_state m_mouse;
-	s32 m_x, m_y, m_v, m_h;
+
+//============================================================
+//  sdl_lightgun_device
+//============================================================
+
+class sdl_lightgun_device : public sdl_mouse_device_base
+{
+public:
+	sdl_lightgun_device(std::string &&name, std::string &&id, input_module &module) :
+		sdl_mouse_device_base(std::move(name), std::move(id), module),
+		m_x(0),
+		m_y(0),
+		m_window(0)
+	{
+	}
+
+	virtual void poll(bool relative_reset) override
+	{
+		sdl_mouse_device_base::poll(relative_reset);
+
+		SDL_Window *const win(m_window ? SDL_GetWindowFromID(m_window) : nullptr);
+		if (win)
+		{
+			int w, h;
+			SDL_GetWindowSize(win, &w, &h);
+			m_mouse.lX = normalize_absolute_axis(m_x, 0, w - 1);
+			m_mouse.lY = normalize_absolute_axis(m_y, 0, h - 1);
+		}
+		else
+		{
+			m_mouse.lX = 0;
+			m_mouse.lY = 0;
+		}
+	}
+
+	virtual void reset() override
+	{
+		sdl_mouse_device_base::reset();
+		m_x = m_y = 0;
+		m_window = 0;
+	}
+
+	virtual void configure(input_device &device) override
+	{
+		add_common_items(device, 5);
+
+		// add scroll axes
+		device.add_item(
+				"Scroll V",
+				std::string_view(),
+				ITEM_ID_ADD_RELATIVE1,
+				generic_axis_get_state<s32>,
+				&m_mouse.lV);
+		device.add_item(
+				"Scroll H",
+				std::string_view(),
+				ITEM_ID_ADD_RELATIVE2,
+				generic_axis_get_state<s32>,
+				&m_mouse.lH);
+	}
+
+	virtual void process_event(SDL_Event const &event) override
+	{
+		switch (event.type)
+		{
+		case SDL_MOUSEMOTION:
+			m_x = event.motion.x;
+			m_y = event.motion.y;
+			m_window = event.motion.windowID;
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			m_mouse.buttons[event.button.button - 1] = 0x80;
+			m_x = event.button.x;
+			m_y = event.button.y;
+			m_window = event.button.windowID;
+			break;
+
+		case SDL_MOUSEBUTTONUP:
+			m_mouse.buttons[event.button.button - 1] = 0;
+			m_x = event.button.x;
+			m_y = event.button.y;
+			m_window = event.button.windowID;
+			break;
+
+		case SDL_MOUSEWHEEL:
+			// adjust SDL 1-per-click to match Win32 120-per-click
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+			m_v += std::lround(event.wheel.preciseY * 120 * input_device::RELATIVE_PER_PIXEL);
+			m_h += std::lround(event.wheel.preciseX * 120 * input_device::RELATIVE_PER_PIXEL);
+#else
+			m_v += event.wheel.y * 120 * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.x * 120 * input_device::RELATIVE_PER_PIXEL;
+#endif
+			break;
+
+		case SDL_WINDOWEVENT:
+			if ((event.window.windowID == m_window) && (SDL_WINDOWEVENT_LEAVE == event.window.event))
+				m_window = 0;
+			break;
+		}
+	}
+
+private:
+	s32 m_x, m_y;
+	u32 m_window;
+};
+
+
+//============================================================
+//  sdl_dual_lightgun_device
+//============================================================
+
+class sdl_dual_lightgun_device : public sdl_mouse_device_base
+{
+public:
+	sdl_dual_lightgun_device(std::string &&name, std::string &&id, input_module &module, u8 index) :
+		sdl_mouse_device_base(std::move(name), std::move(id), module),
+		m_index(index)
+	{
+	}
+
+	virtual void configure(input_device &device) override
+	{
+		add_common_items(device, 2);
+	}
+
+	virtual void process_event(SDL_Event const &event) override
+	{
+		switch (event.type)
+		{
+		case SDL_MOUSEBUTTONDOWN:
+			{
+				SDL_Window *const win(SDL_GetWindowFromID(event.button.windowID));
+				u8 const button = translate_button(event);
+				if (win && ((button / 2) == m_index))
+				{
+					int w, h;
+					SDL_GetWindowSize(win, &w, &h);
+					m_mouse.buttons[(button & 1) << 1] = 0x80;
+					m_mouse.lX = normalize_absolute_axis(event.button.x, 0, w - 1);
+					m_mouse.lY = normalize_absolute_axis(event.button.y, 0, h - 1);
+				}
+			}
+			break;
+
+		case SDL_MOUSEBUTTONUP:
+			{
+				u8 const button = translate_button(event);
+				if ((button / 2) == m_index)
+					m_mouse.buttons[(button & 1) << 1] = 0;
+			}
+			break;
+		}
+	}
+
+private:
+	static u8 translate_button(SDL_Event const &event)
+	{
+		u8 const index(event.button.button - 1);
+		return index ^ (((1 == index) || (2 == index)) ? 3 : 0);
+	}
+
+	u8 const m_index;
 };
 
 
@@ -769,7 +975,7 @@ private:
 //  sdl_joystick_device_base
 //============================================================
 
-class sdl_joystick_device_base : public sdl_device, protected joystick_assignment_helper
+class sdl_joystick_device_base : public sdl_device
 {
 public:
 	std::optional<std::string> const &serial() const { return m_serial; }
@@ -821,7 +1027,7 @@ private:
 //  sdl_joystick_device
 //============================================================
 
-class sdl_joystick_device : public sdl_joystick_device_base
+class sdl_joystick_device : public sdl_joystick_device_base, public sdl_joystick_device_common
 {
 public:
 	sdl_joystick_device(
@@ -835,7 +1041,6 @@ public:
 				std::move(id),
 				module,
 				serial),
-		m_joystick({{0}}),
 		m_joydevice(joy),
 		m_hapdevice(SDL_HapticOpenFromJoystick(joy))
 	{
@@ -844,294 +1049,41 @@ public:
 
 	virtual void configure(input_device &device) override
 	{
-		input_device::assignment_vector assignments;
-		char tempname[32];
-
-		int const axiscount = SDL_JoystickNumAxes(m_joydevice);
-		int const buttoncount = SDL_JoystickNumButtons(m_joydevice);
-		int const hatcount = SDL_JoystickNumHats(m_joydevice);
-		int const ballcount = SDL_JoystickNumBalls(m_joydevice);
-
-		// loop over all axes
-		input_item_id axisactual[MAX_AXES];
-		for (int axis = 0; (axis < MAX_AXES) && (axis < axiscount); axis++)
-		{
-			input_item_id itemid;
-
-			if (axis < INPUT_MAX_AXIS)
-				itemid = input_item_id(ITEM_ID_XAXIS + axis);
-			else if (axis < (INPUT_MAX_AXIS + INPUT_MAX_ADD_ABSOLUTE))
-				itemid = input_item_id(ITEM_ID_ADD_ABSOLUTE1 + axis - INPUT_MAX_AXIS);
-			else
-				itemid = ITEM_ID_OTHER_AXIS_ABSOLUTE;
-
-			snprintf(tempname, sizeof(tempname), "A%d", axis + 1);
-			axisactual[axis] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_axis_get_state<s32>,
-					&m_joystick.axes[axis]);
-		}
-
-		// loop over all buttons
-		for (int button = 0; (button < MAX_BUTTONS) && (button < buttoncount); button++)
-		{
-			input_item_id itemid;
-
-			m_joystick.buttons[button] = 0;
-
-			if (button < INPUT_MAX_BUTTONS)
-				itemid = input_item_id(ITEM_ID_BUTTON1 + button);
-			else if (button < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
-				itemid = input_item_id(ITEM_ID_ADD_SWITCH1 + button - INPUT_MAX_BUTTONS);
-			else
-				itemid = ITEM_ID_OTHER_SWITCH;
-
-			input_item_id const actual = device.add_item(
-					default_button_name(button),
-					std::string_view(),
-					itemid,
-					generic_button_get_state<s32>,
-					&m_joystick.buttons[button]);
-
-			// there are sixteen action button types
-			if (button < 16)
-			{
-				input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, actual));
-				assignments.emplace_back(ioport_type(IPT_BUTTON1 + button), SEQ_TYPE_STANDARD, seq);
-
-				// assign the first few buttons to UI actions and pedals
-				switch (button)
-				{
-				case 0:
-					assignments.emplace_back(IPT_PEDAL, SEQ_TYPE_INCREMENT, seq);
-					assignments.emplace_back(IPT_UI_SELECT, SEQ_TYPE_STANDARD, seq);
-					break;
-				case 1:
-					assignments.emplace_back(IPT_PEDAL2, SEQ_TYPE_INCREMENT, seq);
-					assignments.emplace_back((3 > buttoncount) ? IPT_UI_CLEAR : IPT_UI_BACK, SEQ_TYPE_STANDARD, seq);
-					break;
-				case 2:
-					assignments.emplace_back(IPT_PEDAL3, SEQ_TYPE_INCREMENT, seq);
-					assignments.emplace_back(IPT_UI_CLEAR, SEQ_TYPE_STANDARD, seq);
-					break;
-				case 3:
-					assignments.emplace_back(IPT_UI_HELP, SEQ_TYPE_STANDARD, seq);
-					break;
-				}
-			}
-		}
-
-		// loop over all hats
-		input_item_id hatactual[MAX_HATS][4];
-		for (int hat = 0; (hat < MAX_HATS) && (hat < hatcount); hat++)
-		{
-			input_item_id itemid;
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Up", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][0] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<s32>,
-					&m_joystick.hatsU[hat]);
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Down", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][1] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<s32>,
-					&m_joystick.hatsD[hat]);
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Left", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][2] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<s32>,
-					&m_joystick.hatsL[hat]);
-
-			snprintf(tempname, sizeof(tempname), "Hat %d Right", hat + 1);
-			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
-			hatactual[hat][3] = device.add_item(
-					tempname,
-					std::string_view(),
-					itemid,
-					generic_button_get_state<s32>,
-					&m_joystick.hatsR[hat]);
-		}
-
-		// loop over all (track)balls
-		for (int ball = 0; (ball < (MAX_AXES / 2)) && (ball < ballcount); ball++)
-		{
-			int itemid;
-
-			if (ball * 2 < INPUT_MAX_ADD_RELATIVE)
-				itemid = ITEM_ID_ADD_RELATIVE1 + ball * 2;
-			else
-				itemid = ITEM_ID_OTHER_AXIS_RELATIVE;
-
-			snprintf(tempname, sizeof(tempname), "R%d X", ball + 1);
-			input_item_id const xactual = device.add_item(
-					tempname,
-					std::string_view(),
-					input_item_id(itemid),
-					generic_axis_get_state<s32>,
-					&m_joystick.balls[ball * 2]);
-
-			snprintf(tempname, sizeof(tempname), "R%d Y", ball + 1);
-			input_item_id const yactual = device.add_item(
-					tempname,
-					std::string_view(),
-					input_item_id(itemid + 1),
-					generic_axis_get_state<s32>,
-					&m_joystick.balls[ball * 2 + 1]);
-
-			if (0 == ball)
-			{
-				// assign the first trackball to dial, trackball, mouse and lightgun inputs
-				input_seq const xseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, xactual));
-				input_seq const yseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, yactual));
-				assignments.emplace_back(IPT_DIAL,        SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_DIAL_V,      SEQ_TYPE_STANDARD, yseq);
-				assignments.emplace_back(IPT_TRACKBALL_X, SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_TRACKBALL_Y, SEQ_TYPE_STANDARD, yseq);
-				assignments.emplace_back(IPT_LIGHTGUN_X,  SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_LIGHTGUN_Y,  SEQ_TYPE_STANDARD, yseq);
-				assignments.emplace_back(IPT_MOUSE_X,     SEQ_TYPE_STANDARD, xseq);
-				assignments.emplace_back(IPT_MOUSE_Y,     SEQ_TYPE_STANDARD, yseq);
-				if (2 > axiscount)
-				{
-					// use it for joystick inputs if axes are limited
-					assignments.emplace_back(IPT_AD_STICK_X, SEQ_TYPE_STANDARD, xseq);
-					assignments.emplace_back(IPT_AD_STICK_Y, SEQ_TYPE_STANDARD, yseq);
-				}
-				else
-				{
-					// use for non-centring throttle control
-					assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, yseq);
-				}
-			}
-			else if ((1 == ball) && (2 > axiscount))
-			{
-				// provide a non-centring throttle control
-				input_seq const yseq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, yactual));
-				assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, yseq);
-			}
-		}
-
-		// set up default assignments for axes and hats
-		add_directional_assignments(
-				assignments,
-				(1 <= axiscount) ? axisactual[0] : ITEM_ID_INVALID, // assume first axis is X
-				(2 <= axiscount) ? axisactual[1] : ITEM_ID_INVALID, // assume second axis is Y
-				(1 <= hatcount) ? hatactual[0][2] : ITEM_ID_INVALID,
-				(1 <= hatcount) ? hatactual[0][3] : ITEM_ID_INVALID,
-				(1 <= hatcount) ? hatactual[0][0] : ITEM_ID_INVALID,
-				(1 <= hatcount) ? hatactual[0][1] : ITEM_ID_INVALID);
-		if (2 <= axiscount)
-		{
-			// put pedals on the last of the second, third or fourth axis
-			input_item_id const pedalitem = axisactual[(std::min)(axiscount, 4) - 1];
-			assignments.emplace_back(
-					IPT_PEDAL,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, pedalitem)));
-			assignments.emplace_back(
-					IPT_PEDAL2,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, pedalitem)));
-		}
-		if (3 <= axiscount)
-		{
-			// assign X/Y to one of the twin sticks
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_LEFT : IPT_JOYSTICKRIGHT_LEFT,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_LEFT, axisactual[0])));
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_RIGHT : IPT_JOYSTICKRIGHT_RIGHT,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_RIGHT, axisactual[0])));
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_UP : IPT_JOYSTICKRIGHT_UP,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_UP, axisactual[1])));
-			assignments.emplace_back(
-					(4 <= axiscount) ? IPT_JOYSTICKLEFT_DOWN : IPT_JOYSTICKRIGHT_DOWN,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_DOWN, axisactual[1])));
-
-			// use third or fourth axis for Z
-			input_seq const seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, axisactual[(std::min)(axiscount, 4) - 1]));
-			assignments.emplace_back(IPT_AD_STICK_Z, SEQ_TYPE_STANDARD, seq);
-
-			// use this for focus next/previous to make system selection menu practical to navigate
-			input_seq const upseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axisactual[2]));
-			input_seq const downseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, axisactual[2]));
-			assignments.emplace_back(IPT_UI_FOCUS_PREV, SEQ_TYPE_STANDARD, upseq);
-			assignments.emplace_back(IPT_UI_FOCUS_NEXT, SEQ_TYPE_STANDARD, downseq);
-			if (4 <= axiscount)
-			{
-				// use for zoom as well if there's another axis to use for previous/next group
-				assignments.emplace_back(IPT_UI_ZOOM_IN, SEQ_TYPE_STANDARD, downseq);
-				assignments.emplace_back(IPT_UI_ZOOM_OUT, SEQ_TYPE_STANDARD, upseq);
-			}
-
-			// use this for twin sticks, too
-			assignments.emplace_back((4 <= axiscount) ? IPT_JOYSTICKRIGHT_LEFT : IPT_JOYSTICKLEFT_UP, SEQ_TYPE_STANDARD, upseq);
-			assignments.emplace_back((4 <= axiscount) ? IPT_JOYSTICKRIGHT_RIGHT : IPT_JOYSTICKLEFT_DOWN, SEQ_TYPE_STANDARD, downseq);
-
-			// put previous/next group on the last of the third or fourth axis
-			input_item_id const groupitem = axisactual[(std::min)(axiscount, 4) - 1];
-			assignments.emplace_back(
-					IPT_UI_PREV_GROUP,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, groupitem)));
-			assignments.emplace_back(
-					IPT_UI_NEXT_GROUP,
-					SEQ_TYPE_STANDARD,
-					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, groupitem)));
-		}
-		if (4 <= axiscount)
-		{
-			// use this for twin sticks
-			input_seq const upseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axisactual[3]));
-			input_seq const downseq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, axisactual[3]));
-			assignments.emplace_back(IPT_JOYSTICKRIGHT_UP, SEQ_TYPE_STANDARD, upseq);
-			assignments.emplace_back(IPT_JOYSTICKRIGHT_DOWN, SEQ_TYPE_STANDARD, downseq);
-		}
-
-		// set default assignments
-		device.set_default_assignments(std::move(assignments));
+		configure_common(
+				device,
+				SDL_JoystickNumAxes(m_joydevice),
+				SDL_JoystickNumButtons(m_joydevice),
+				SDL_JoystickNumHats(m_joydevice),
+				SDL_JoystickNumBalls(m_joydevice));
 	}
 
 	~sdl_joystick_device()
 	{
-		if (m_joydevice)
+		close_device();
+	}
+
+	virtual void poll(bool relative_reset) override
+	{
+		sdl_joystick_device_base::poll(relative_reset);
+
+		if (relative_reset)
 		{
-			if (m_hapdevice)
-			{
-				SDL_HapticClose(m_hapdevice);
-				m_hapdevice = nullptr;
-			}
-			SDL_JoystickClose(m_joydevice);
-			m_joydevice = nullptr;
+			for (unsigned i = 0; MAX_AXES > i; ++i)
+				m_joystick.balls[i] = std::exchange(m_ball[i], 0);
 		}
 	}
 
 	virtual void reset() override
 	{
-		memset(&m_joystick, 0, sizeof(m_joystick));
+		sdl_joystick_device_base::reset();
+		clear_buffer();
 	}
 
 	virtual void process_event(SDL_Event const &event) override
 	{
+		if (!m_joydevice)
+			return;
+
 		switch (event.type)
 		{
 		case SDL_JOYAXISMOTION:
@@ -1143,8 +1095,8 @@ public:
 			//printf("Ball %d %d\n", event.jball.xrel, event.jball.yrel);
 			if (event.jball.ball < (MAX_AXES / 2))
 			{
-				m_joystick.balls[event.jball.ball * 2] = event.jball.xrel * input_device::RELATIVE_PER_PIXEL;
-				m_joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * input_device::RELATIVE_PER_PIXEL;
+				m_ball[event.jball.ball * 2] += event.jball.xrel * input_device::RELATIVE_PER_PIXEL;
+				m_ball[event.jball.ball * 2 + 1] += event.jball.yrel * input_device::RELATIVE_PER_PIXEL;
 			}
 			break;
 
@@ -1167,17 +1119,8 @@ public:
 		case SDL_JOYDEVICEREMOVED:
 			osd_printf_verbose("Joystick: %s [ID %s] disconnected\n", name(), id());
 			clear_instance();
-			reset();
-			if (m_joydevice)
-			{
-				if (m_hapdevice)
-				{
-					SDL_HapticClose(m_hapdevice);
-					m_hapdevice = nullptr;
-				}
-				SDL_JoystickClose(m_joydevice);
-				m_joydevice = nullptr;
-			}
+			clear_buffer();
+			close_device();
 			break;
 		}
 	}
@@ -1199,21 +1142,23 @@ public:
 		osd_printf_verbose("Joystick: %s [ID %s] reconnected\n", name(), id());
 	}
 
-protected:
-	// state information for a joystick
-	struct sdl_joystick_state
-	{
-		s32 axes[MAX_AXES];
-		s32 buttons[MAX_BUTTONS];
-		s32 hatsU[MAX_HATS], hatsD[MAX_HATS], hatsL[MAX_HATS], hatsR[MAX_HATS];
-		s32 balls[MAX_AXES];
-	};
-
-	sdl_joystick_state m_joystick;
-
 private:
 	SDL_Joystick *m_joydevice;
 	SDL_Haptic *m_hapdevice;
+
+	void close_device()
+	{
+		if (m_joydevice)
+		{
+			if (m_hapdevice)
+			{
+				SDL_HapticClose(m_hapdevice);
+				m_hapdevice = nullptr;
+			}
+			SDL_JoystickClose(m_joydevice);
+			m_joydevice = nullptr;
+		}
+	}
 };
 
 
@@ -1258,7 +1203,7 @@ public:
 //  sdl_game_controller_device
 //============================================================
 
-class sdl_game_controller_device : public sdl_joystick_device_base
+class sdl_game_controller_device : public sdl_joystick_device_base, protected joystick_assignment_helper
 {
 public:
 	sdl_game_controller_device(
@@ -1280,11 +1225,7 @@ public:
 
 	~sdl_game_controller_device()
 	{
-		if (m_ctrldevice)
-		{
-			SDL_GameControllerClose(m_ctrldevice);
-			m_ctrldevice = nullptr;
-		}
+		close_device();
 	}
 
 	virtual void configure(input_device &device) override
@@ -1293,10 +1234,7 @@ public:
 		char const *const *axisnames = CONTROLLER_AXIS_XBOX;
 		char const *const *buttonnames = CONTROLLER_BUTTON_XBOX360;
 		bool digitaltriggers = false;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		bool avoidpaddles = false;
-#endif
-#if SDL_VERSION_ATLEAST(2, 0, 12)
 		auto const ctrltype = SDL_GameControllerGetType(m_ctrldevice);
 		switch (ctrltype)
 		{
@@ -1329,14 +1267,12 @@ public:
 			buttonnames = CONTROLLER_BUTTON_SWITCH;
 			digitaltriggers = true;
 			break;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		//case SDL_CONTROLLER_TYPE_VIRTUAL:
 		case SDL_CONTROLLER_TYPE_PS5:
 			osd_printf_verbose("Game Controller:   ...  PlayStation 5 type\n");
 			axisnames = CONTROLLER_AXIS_PS;
 			buttonnames = CONTROLLER_BUTTON_PS5;
 			break;
-#endif
 #if SDL_VERSION_ATLEAST(2, 0, 16)
 		//case SDL_CONTROLLER_TYPE_AMAZON_LUNA:
 		case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
@@ -1365,7 +1301,6 @@ public:
 			osd_printf_verbose("Game Controller:   ...  unrecognized type (%d)\n", int(ctrltype));
 			break;
 		}
-#endif
 
 		// keep track of item numbers as we add controls
 		std::pair<input_item_id, input_item_id> axisitems[SDL_CONTROLLER_AXIS_MAX];
@@ -1395,9 +1330,7 @@ public:
 		for (auto [axis, item, buttontest] : axes)
 		{
 			bool avail = !buttontest || !digitaltriggers;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 			avail = avail && SDL_GameControllerHasAxis(m_ctrldevice, axis);
-#endif
 			if (avail)
 			{
 				auto const binding = SDL_GameControllerGetBindForAxis(m_ctrldevice, axis);
@@ -1437,17 +1370,13 @@ public:
 				{ SDL_CONTROLLER_BUTTON_INVALID,       SDL_CONTROLLER_AXIS_TRIGGERRIGHT, true },
 				{ SDL_CONTROLLER_BUTTON_LEFTSTICK,     SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_RIGHTSTICK,    SDL_CONTROLLER_AXIS_INVALID,      true },
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				{ SDL_CONTROLLER_BUTTON_PADDLE1,       SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_PADDLE2,       SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_PADDLE3,       SDL_CONTROLLER_AXIS_INVALID,      true },
 				{ SDL_CONTROLLER_BUTTON_PADDLE4,       SDL_CONTROLLER_AXIS_INVALID,      true },
-#endif
 				{ SDL_CONTROLLER_BUTTON_GUIDE,         SDL_CONTROLLER_AXIS_INVALID,      false },
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				{ SDL_CONTROLLER_BUTTON_MISC1,         SDL_CONTROLLER_AXIS_INVALID,      false },
 				{ SDL_CONTROLLER_BUTTON_TOUCHPAD,      SDL_CONTROLLER_AXIS_INVALID,      false },
-#endif
 				};
 		input_item_id button_item = ITEM_ID_BUTTON1;
 		unsigned buttoncount = 0;
@@ -1457,9 +1386,7 @@ public:
 			input_item_id actual = ITEM_ID_INVALID;
 			if (SDL_CONTROLLER_BUTTON_INVALID != button)
 			{
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				avail = SDL_GameControllerHasButton(m_ctrldevice, button);
-#endif
 				if (avail)
 				{
 					auto const binding = SDL_GameControllerGetBindForButton(m_ctrldevice, button);
@@ -1478,7 +1405,7 @@ public:
 							buttonnames[button],
 							std::string_view(),
 							button_item++,
-							generic_button_get_state<s32>,
+							generic_button_get_state<u8>,
 							&m_controller.buttons[button]);
 					if (field && (std::size(numberedbuttons) > buttoncount))
 						std::get<1>(numberedbuttons[buttoncount]) = button;
@@ -1486,9 +1413,7 @@ public:
 			}
 			else
 			{
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 				avail = SDL_GameControllerHasAxis(m_ctrldevice, axis);
-#endif
 				if (avail)
 				{
 					auto const binding = SDL_GameControllerGetBindForAxis(m_ctrldevice, axis);
@@ -1538,9 +1463,7 @@ public:
 		for (auto [button, item] : fixedbuttons)
 		{
 			bool avail = true;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 			avail = SDL_GameControllerHasButton(m_ctrldevice, button);
-#endif
 			if (avail)
 			{
 				auto const binding = SDL_GameControllerGetBindForButton(m_ctrldevice, button);
@@ -1559,7 +1482,7 @@ public:
 						buttonnames[button],
 						std::string_view(),
 						item,
-						generic_button_get_state<s32>,
+						generic_button_get_state<u8>,
 						&m_controller.buttons[button]);
 			}
 		}
@@ -1611,7 +1534,6 @@ public:
 			{
 				// took trigger buttons
 			}
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 			else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
 			{
 				// took P1/P2
@@ -1620,7 +1542,6 @@ public:
 			{
 				// took P3/P4
 			}
-#endif
 		}
 
 		// prefer trigger axes for pedals, otherwise take half axes and buttons
@@ -1706,22 +1627,18 @@ public:
 		{
 			// took digital triggers
 		}
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
 		{
 			// took upper paddles
 		}
-#endif
 		else if (consume_trigger_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
 		{
 			// took analog triggers
 		}
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		else if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE3], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE4]))
 		{
 			// took lower paddles
 		}
-#endif
 		else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, diraxis[1][1]))
 		{
 			// took secondary Y
@@ -1732,7 +1649,6 @@ public:
 		}
 
 		// try to get a matching pair of buttons for page up/down
-#if SDL_VERSION_ATLEAST(2, 0, 14)
 		if (!avoidpaddles && consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, buttonitems[SDL_CONTROLLER_BUTTON_PADDLE1], buttonitems[SDL_CONTROLLER_BUTTON_PADDLE2]))
 		{
 			// took upper paddles
@@ -1741,9 +1657,7 @@ public:
 		{
 			// took lower paddles
 		}
-		else
-#endif
-		if (consume_trigger_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
+		else if (consume_trigger_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, axisitems[SDL_CONTROLLER_AXIS_TRIGGERLEFT].first, axisitems[SDL_CONTROLLER_AXIS_TRIGGERRIGHT].first))
 		{
 			// took analog triggers
 		}
@@ -1871,11 +1785,15 @@ public:
 
 	virtual void reset() override
 	{
-		memset(&m_controller, 0, sizeof(m_controller));
+		sdl_joystick_device_base::reset();
+		clear_buffer();
 	}
 
 	virtual void process_event(SDL_Event const &event) override
 	{
+		if (!m_ctrldevice)
+			return;
+
 		switch (event.type)
 		{
 		case SDL_CONTROLLERAXISMOTION:
@@ -1902,12 +1820,8 @@ public:
 		case SDL_CONTROLLERDEVICEREMOVED:
 			osd_printf_verbose("Game Controller: %s [ID %s] disconnected\n", name(), id());
 			clear_instance();
-			reset();
-			if (m_ctrldevice)
-			{
-				SDL_GameControllerClose(m_ctrldevice);
-				m_ctrldevice = nullptr;
-			}
+			clear_buffer();
+			close_device();
 			break;
 		}
 	}
@@ -1928,11 +1842,25 @@ private:
 	struct sdl_controller_state
 	{
 		s32 axes[SDL_CONTROLLER_AXIS_MAX];
-		s32 buttons[SDL_CONTROLLER_BUTTON_MAX];
+		u8  buttons[SDL_CONTROLLER_BUTTON_MAX];
 	};
 
 	sdl_controller_state m_controller;
 	SDL_GameController *m_ctrldevice;
+
+	void clear_buffer()
+	{
+		memset(&m_controller, 0, sizeof(m_controller));
+	}
+
+	void close_device()
+	{
+		if (m_ctrldevice)
+		{
+			SDL_GameControllerClose(m_ctrldevice);
+			m_ctrldevice = nullptr;
+		}
+	}
 };
 
 
@@ -1964,7 +1892,7 @@ protected:
 	{
 		// dispatch event to every device by default
 		this->devicelist().for_each_device(
-				[&event] (auto &device) { device.queue_events(&event, 1); });
+				[&event] (auto &device) { device.queue_event(event); });
 	}
 };
 
@@ -1977,8 +1905,7 @@ class sdl_keyboard_module : public sdl_input_module<sdl_keyboard_device>
 {
 public:
 	sdl_keyboard_module() :
-		sdl_input_module<sdl_keyboard_device>(OSD_KEYBOARDINPUT_PROVIDER, "sdl"),
-		m_key_trans_table(nullptr)
+		sdl_input_module<sdl_keyboard_device>(OSD_KEYBOARDINPUT_PROVIDER, "sdl")
 	{
 	}
 
@@ -1986,14 +1913,14 @@ public:
 	{
 		sdl_input_module<sdl_keyboard_device>::input_init(machine);
 
-		static int const event_types[] = {
+		constexpr int event_types[] = {
 				int(SDL_KEYDOWN),
 				int(SDL_KEYUP) };
 
 		subscribe(osd(), event_types);
 
 		// Read our keymap and store a pointer to our table
-		m_key_trans_table = sdlinput_read_keymap();
+		sdlinput_read_keymap();
 
 		osd_printf_verbose("Keyboard: Start initialization\n");
 
@@ -2009,12 +1936,27 @@ public:
 	}
 
 private:
-	keyboard_trans_table *sdlinput_read_keymap()
+	void sdlinput_read_keymap()
 	{
 		keyboard_trans_table &default_table = keyboard_trans_table::instance();
 
+		// Allocate a block of translation entries big enough to hold what's in the default table
+		auto key_trans_entries = std::make_unique<key_trans_entry []>(default_table.size());
+
+		// copy the elements from the default table and ask SDL for key names
+		for (int i = 0; i < default_table.size(); i++)
+		{
+			key_trans_entries[i] = default_table[i];
+			char const *const name = SDL_GetScancodeName(SDL_Scancode(default_table[i].sdl_scancode));
+			if (name && *name)
+				key_trans_entries[i].ui_name = name;
+		}
+
+		// Allocate the trans table to be associated with the machine so we don't have to free it
+		m_key_trans_table = std::make_unique<keyboard_trans_table>(std::move(key_trans_entries), default_table.size());
+
 		if (!options()->bool_value(SDLOPTION_KEYMAP))
-			return &default_table;
+			return;
 
 		const char *const keymap_filename = dynamic_cast<sdl_options const &>(*options()).keymap_file();
 		osd_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
@@ -2023,18 +1965,8 @@ private:
 		if (!keymap_file)
 		{
 			osd_printf_warning("Keymap: Unable to open keymap %s, using default\n", keymap_filename);
-			return &default_table;
+			return;
 		}
-
-		// Allocate a block of translation entries big enough to hold what's in the default table
-		auto key_trans_entries = std::make_unique<key_trans_entry[]>(default_table.size());
-
-		// copy the elements from the default table
-		for (int i = 0; i < default_table.size(); i++)
-			key_trans_entries[i] = default_table[i];
-
-		// Allocate the trans table to be associated with the machine so we don't have to free it
-		m_custom_table = std::make_unique<keyboard_trans_table>(std::move(key_trans_entries), default_table.size());
 
 		int line = 1;
 		int sdl2section = 0;
@@ -2068,7 +2000,7 @@ private:
 
 					if (sk >= 0 && index >= 0)
 					{
-						key_trans_entry &entry = (*m_custom_table)[index];
+						key_trans_entry &entry = (*m_key_trans_table)[index];
 						entry.sdl_scancode = sk;
 						entry.ui_name = const_cast<char *>(m_ui_names.emplace_back(kns).c_str());
 						osd_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
@@ -2083,12 +2015,9 @@ private:
 		}
 		fclose(keymap_file);
 		osd_printf_verbose("Keymap: Processed %d lines\n", line);
-
-		return m_custom_table.get();
 	}
 
-	keyboard_trans_table *m_key_trans_table;
-	std::unique_ptr<keyboard_trans_table> m_custom_table;
+	std::unique_ptr<keyboard_trans_table> m_key_trans_table;
 	std::list<std::string> m_ui_names;
 };
 
@@ -2108,7 +2037,7 @@ public:
 	{
 		sdl_input_module::input_init(machine);
 
-		static int const event_types[] = {
+		constexpr int event_types[] = {
 				int(SDL_MOUSEMOTION),
 				int(SDL_MOUSEBUTTONDOWN),
 				int(SDL_MOUSEBUTTONUP),
@@ -2126,6 +2055,73 @@ public:
 
 		osd_printf_verbose("Mouse: Registered %s\n", devinfo.name());
 		osd_printf_verbose("Mouse: End initialization\n");
+	}
+};
+
+
+//============================================================
+//  sdl_lightgun_module
+//============================================================
+
+class sdl_lightgun_module : public sdl_input_module<sdl_mouse_device_base>
+{
+public:
+	sdl_lightgun_module() : sdl_input_module<sdl_mouse_device_base>(OSD_LIGHTGUNINPUT_PROVIDER, "sdl")
+	{
+	}
+
+	virtual void input_init(running_machine &machine) override
+	{
+		auto &sdlopts = dynamic_cast<sdl_options const &>(*options());
+		sdl_input_module::input_init(machine);
+		bool const dual(sdlopts.dual_lightgun());
+
+		if (!dual)
+		{
+			constexpr int event_types[] = {
+					int(SDL_MOUSEMOTION),
+					int(SDL_MOUSEBUTTONDOWN),
+					int(SDL_MOUSEBUTTONUP),
+					int(SDL_MOUSEWHEEL),
+					int(SDL_WINDOWEVENT) };
+			subscribe(osd(), event_types);
+		}
+		else
+		{
+			constexpr int event_types[] = {
+					int(SDL_MOUSEBUTTONDOWN),
+					int(SDL_MOUSEBUTTONUP) };
+			subscribe(osd(), event_types);
+		}
+
+		osd_printf_verbose("Lightgun: Start initialization\n");
+
+		if (!dual)
+		{
+			auto &devinfo = create_device<sdl_lightgun_device>(
+					DEVICE_CLASS_LIGHTGUN,
+					"System pointer gun 1",
+					"System pointer gun 1");
+			osd_printf_verbose("Lightgun: Registered %s\n", devinfo.name());
+		}
+		else
+		{
+			auto &dev1info = create_device<sdl_dual_lightgun_device>(
+					DEVICE_CLASS_LIGHTGUN,
+					"System pointer gun 1",
+					"System pointer gun 1",
+					0);
+			osd_printf_verbose("Lightgun: Registered %s\n", dev1info.name());
+
+			auto &dev2info = create_device<sdl_dual_lightgun_device>(
+					DEVICE_CLASS_LIGHTGUN,
+					"System pointer gun 2",
+					"System pointer gun 2",
+					1);
+			osd_printf_verbose("Lightgun: Registered %s\n", dev2info.name());
+		}
+
+		osd_printf_verbose("Lightgun: End initialization\n");
 	}
 };
 
@@ -2201,10 +2197,7 @@ protected:
 		char guid_str[256];
 		guid_str[0] = '\0';
 		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-		char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-		serial = SDL_JoystickGetSerial(joy);
-#endif
+		char const *const serial = SDL_JoystickGetSerial(joy);
 		std::string id(guid_str);
 		if (serial)
 			id.append(1, '-').append(serial);
@@ -2222,8 +2215,8 @@ protected:
 				SDL_JoystickNumButtons(joy),
 				SDL_JoystickNumHats(joy),
 				SDL_JoystickNumBalls(joy));
-		if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
-			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
+		if (SDL_JoystickNumButtons(joy) > sdl_joystick_device::MAX_BUTTONS)
+			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), sdl_joystick_device::MAX_BUTTONS);
 
 		// instantiate device
 		sdl_joystick_device &devinfo = sixaxis
@@ -2245,7 +2238,7 @@ protected:
 
 		// if we find a matching joystick, dispatch the event to the joystick
 		if (target_device)
-			target_device->queue_events(&event, 1);
+			target_device->queue_event(event);
 	}
 
 	device_info *find_reconnect_match(SDL_JoystickGUID const &guid, char const *serial)
@@ -2316,7 +2309,7 @@ public:
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 			create_joystick_device(physical_stick, sixaxis_mode);
 
-		static int const event_types[] = {
+		constexpr int event_types[] = {
 				int(SDL_JOYAXISMOTION),
 				int(SDL_JOYBALLMOTION),
 				int(SDL_JOYHATMOTION),
@@ -2341,10 +2334,7 @@ public:
 			else
 			{
 				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-				char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-				serial = SDL_JoystickGetSerial(joy);
-#endif
+				char const *const serial = SDL_JoystickGetSerial(joy);
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
@@ -2440,7 +2430,7 @@ public:
 				create_game_controller_device(physical_stick, ctrl);
 		}
 
-		static int const joy_event_types[] = {
+		constexpr int joy_event_types[] = {
 				int(SDL_JOYAXISMOTION),
 				int(SDL_JOYBALLMOTION),
 				int(SDL_JOYHATMOTION),
@@ -2448,7 +2438,7 @@ public:
 				int(SDL_JOYBUTTONUP),
 				int(SDL_JOYDEVICEADDED),
 				int(SDL_JOYDEVICEREMOVED) };
-		static int const event_types[] = {
+		constexpr int event_types[] = {
 				int(SDL_JOYAXISMOTION),
 				int(SDL_JOYBALLMOTION),
 				int(SDL_JOYHATMOTION),
@@ -2494,10 +2484,7 @@ public:
 				}
 
 				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-				char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-				serial = SDL_JoystickGetSerial(joy);
-#endif
+				char const *const serial = SDL_JoystickGetSerial(joy);
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
@@ -2527,10 +2514,7 @@ public:
 				}
 
 				SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(event.cdevice.which);
-				char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-				serial = SDL_GameControllerGetSerial(ctrl);
-#endif
+				char const *const serial = SDL_GameControllerGetSerial(ctrl);
 				auto *const target_device = find_reconnect_match(guid, serial);
 				if (target_device)
 				{
@@ -2562,10 +2546,7 @@ private:
 		char guid_str[256];
 		guid_str[0] = '\0';
 		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-		char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-		serial = SDL_GameControllerGetSerial(ctrl);
-#endif
+		char const *const serial = SDL_GameControllerGetSerial(ctrl);
 		std::string id(guid_str);
 		if (serial)
 			id.append(1, '-').append(serial);
@@ -2607,25 +2588,10 @@ private:
 } // namespace osd
 
 
-#else // defined(SDLMAME_SDL2)
-
-namespace osd {
-
-namespace {
-
-MODULE_NOT_SUPPORTED(sdl_keyboard_module, OSD_KEYBOARDINPUT_PROVIDER, "sdl")
-MODULE_NOT_SUPPORTED(sdl_mouse_module, OSD_MOUSEINPUT_PROVIDER, "sdl")
-MODULE_NOT_SUPPORTED(sdl_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "sdljoy")
-MODULE_NOT_SUPPORTED(sdl_game_controller_module, OSD_JOYSTICKINPUT_PROVIDER, "sdlgame")
-
-} // anonymous namespace
-
-} // namespace osd
-
-#endif // defined(SDLMAME_SDL2)
-
-
 MODULE_DEFINITION(KEYBOARDINPUT_SDL, osd::sdl_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_SDL, osd::sdl_mouse_module)
+MODULE_DEFINITION(LIGHTGUNINPUT_SDL, osd::sdl_lightgun_module)
 MODULE_DEFINITION(JOYSTICKINPUT_SDLJOY, osd::sdl_joystick_module)
 MODULE_DEFINITION(JOYSTICKINPUT_SDLGAME, osd::sdl_game_controller_module)
+
+#endif // defined(OSD_SDL) && !defined(SDLMAME_SDL3)

@@ -7,11 +7,21 @@
     driver by Nicola Salmoria
 
     Notes:
-        * The subtitle of the two sets is slightly different:
-          "Dr. John's Adventure" vs. "Dr. Kick in Adventure".
-          The Dr John's is a bug fix. See the routine at 4376/4384 for example.
-          The old set thrashes the Y register, the new one saves in on
-          the stack. The newer set also resets the audio chips more often.
+    * The subtitle of the two sets is slightly different:
+      "Dr. John's Adventure" vs. "Dr. Kick in Adventure".
+      The Dr John's is a bug fix. See the routine at 4376/4384 for example.
+      The old set thrashes the Y register, the new one saves in on
+      the stack. The newer set also resets the audio chips more often.
+
+    TODO:
+    * Verify that it has 16 interrupts per frame like other Technos hardware.
+      It's currently presumed that it does, but need to find a PCB video
+      reference to double check via music tempo.
+
+      The vcount chain is probably same for all these Technos games, see
+      xain.cpp for example. The remaining question is the duration of the
+      software vblank flag on DSW1.7, whether or not it will receive two
+      interrupts with that flag active.
 
 ***************************************************************************/
 
@@ -32,8 +42,8 @@ namespace {
 class mystston_state : public driver_device
 {
 public:
-	mystston_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mystston_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ay8910(*this, "ay%u", 1U),
 		m_ay8910_data(*this, "ay8910_data"),
@@ -55,8 +65,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
-	virtual void video_start() override;
-	virtual void video_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 private:
 	static constexpr XTAL MASTER_CLOCK = XTAL(12'000'000);
@@ -105,11 +115,9 @@ private:
 	void set_palette();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip);
 	void on_scanline_interrupt();
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -137,8 +145,9 @@ TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
 
 	on_scanline_interrupt();
 
+	// 16 interrupts per frame
 	scanline = scanline + 16;
-	if (scanline >= VTOTAL)
+	if (scanline > VBSTART)
 		scanline = FIRST_INT_VPOS;
 
 	// the vertical synch chain is clocked by H256 -- this is probably not important, but oh well
@@ -367,8 +376,6 @@ static GFXDECODE_START( gfx_mystston )
 GFXDECODE_END
 
 
-// machine
-
 /*************************************
  *
  *  Interrupt system
@@ -468,8 +475,8 @@ static INPUT_PORTS_START( mystston )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mystston_state, coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mystston_state, coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mystston_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mystston_state::coin_inserted), 0)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -515,7 +522,7 @@ static INPUT_PORTS_START( mystston )
 	PORT_DIPNAME(0x40, 0x00, DEF_STR( Cabinet ) )       PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(   0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( myststonoi )
@@ -543,7 +550,7 @@ void mystston_state::mystston(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mystston);
 	PALETTE(config, m_palette).set_entries(0x40);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(mystston_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -677,6 +684,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, mystston,   0,        mystston, mystston,   mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. John's Adventure",              MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststono,  mystston, mystston, mystston,   mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, myststonoi, mystston, mystston, myststonoi, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones - Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mystston,   0,        mystston, mystston,   mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones: Dr. John's Adventure",              MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststono,  mystston, mystston, mystston,   mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones: Dr. Kick in Adventure",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, myststonoi, mystston, mystston, myststonoi, mystston_state, empty_init, ROT270, "Technos Japan", "Mysterious Stones: Dr. Kick in Adventure (Itisa PCB)", MACHINE_SUPPORTS_SAVE )

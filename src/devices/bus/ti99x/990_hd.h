@@ -13,7 +13,7 @@
 class ti990_hdc_device : public device_t
 {
 public:
-	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ti990_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -26,8 +26,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	int get_id_from_device( device_t *device );
 

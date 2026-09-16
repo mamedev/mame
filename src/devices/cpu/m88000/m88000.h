@@ -20,13 +20,13 @@ public:
 	// construction/destruction
 	mc88100_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_cmmu_d(T &&tag) { m_cmmu_d.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_cmmu_i(T &&tag) { m_cmmu_i.set_tag(std::forward<T>(tag)); }
+	void set_cmmu_code(std::function<mc88200_device &(u32 const address)> f) { m_cmmu_code = f; }
+	void set_cmmu_data(std::function<mc88200_device &(u32 const address)> f) { m_cmmu_data = f; }
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
 	virtual void execute_run() override;
@@ -43,17 +43,15 @@ protected:
 	void exception(unsigned vector, bool const trap = false);
 
 	// memory helpers
-	void fetch(u32 &address, u32 &inst);
-	template <typename T, bool Usr = false> void ld(u32 address, unsigned const reg);
-	template <typename T, bool Usr = false> void st(u32 address, unsigned const reg);
-	template <typename T, bool Usr = false> void xmem(u32 address, unsigned const reg);
+	void fetch(offs_t &address, u32 &inst);
+	template <typename T, bool Usr = false> void ld(offs_t address, unsigned const reg);
+	template <typename T, bool Usr = false> void st(offs_t address, unsigned const reg);
+	template <typename T, bool Usr = false> void xmem(offs_t address, unsigned const reg);
 
 	// integer helpers
 	void set_cr(unsigned const cr, u32 const data);
 	bool condition(unsigned const m5, u32 const src) const;
 	u32 cmp(u32 const src1, u32 const src2) const;
-	bool carry(u32 const src1, u32 const src2, u32 const dest) const;
-	bool overflow(u32 const src1, u32 const src2, u32 const dest) const;
 
 	// floating-point helpers
 	void set_fcr(unsigned const fcr, u32 const data);
@@ -64,11 +62,11 @@ private:
 	// address spaces
 	address_space_config m_code_config;
 	address_space_config m_data_config;
-	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_inst_space;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_code_space;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data_space;
 
-	optional_device<mc88200_device> m_cmmu_d;
-	optional_device<mc88200_device> m_cmmu_i;
+	std::function<mc88200_device &(u32 const address)> m_cmmu_code;
+	std::function<mc88200_device &(u32 const address)> m_cmmu_data;
 
 	// register storage
 	u32 m_xip; // execute instruction pointer

@@ -109,7 +109,7 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// ADPCM read/write callbacks
@@ -131,9 +131,9 @@ public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// internal state
 	required_region_ptr<u8> m_internal; // internal memory region
@@ -153,9 +153,9 @@ public:
 	ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// internal state
 	required_region_ptr<u8> m_internal; // internal memory region
@@ -175,9 +175,9 @@ public:
 	ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// internal state
 	required_region_ptr<u8> m_internal; // internal memory region
@@ -197,9 +197,9 @@ public:
 	ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// internal state
 	required_region_ptr<u8> m_internal; // internal memory region

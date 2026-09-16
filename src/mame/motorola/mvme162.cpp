@@ -209,7 +209,7 @@ private:
 	void bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	void mvme162_mem(address_map &map);
+	void mvme162_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc85230_device> m_sccterm;
@@ -296,7 +296,7 @@ void mvme162_state::mvme162(machine_config &config)
 	M68040(config, m_maincpu, 25_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mvme162_state::mvme162_mem);
 
-	M48T02(config, "m48t18", 0); /* t08 differs only in accepted voltage levels compared to t18 */
+	M48T02(config, "m48t18"); /* t08 differs only in accepted voltage levels compared to t18 */
 
 	/* Terminal Port config */
 	SCC85230(config, m_sccterm, SCC_CLOCK);

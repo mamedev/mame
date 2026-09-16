@@ -41,10 +41,10 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	void main_map(address_map &map);
-	void main_portmap(address_map &map);
-	void sound_map(address_map &map);
-	void sound_portmap(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void main_portmap(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
 };
 
 
@@ -133,10 +133,10 @@ void segacoin_state::westdrm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &segacoin_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &segacoin_state::main_portmap);
 
-	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit8253_device &pit(PIT8253(config, "pit"));
 	pit.set_clk<2>(1000000); // clock frequency unknown
 
-	SEGA_315_5338A(config, "io", 0);
+	SEGA_315_5338A(config, "io");
 
 	Z80(config, m_audiocpu, 8000000); // clock frequency unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segacoin_state::sound_map);
@@ -180,4 +180,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, westdrm, 0, westdrm, westdrm, segacoin_state, empty_init, ROT0, "Sega", "Western Dream", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, westdrm, 0, westdrm, westdrm, segacoin_state, empty_init, ROT0, "Sega", "Western Dream", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

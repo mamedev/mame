@@ -291,8 +291,8 @@ public:
 	void metalmx(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<m68ec020_device> m_maincpu;
@@ -323,12 +323,12 @@ private:
 	void timer_w(offs_t offset, uint32_t data);
 	void cage_irq_callback(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void adsp_data_map(address_map &map);
-	void adsp_program_map(address_map &map);
-	void dsp32c_1_map(address_map &map);
-	void dsp32c_2_map(address_map &map);
-	void gsp_map(address_map &map);
-	void main_map(address_map &map);
+	void adsp_data_map(address_map &map) ATTR_COLD;
+	void adsp_program_map(address_map &map) ATTR_COLD;
+	void dsp32c_1_map(address_map &map) ATTR_COLD;
+	void dsp32c_2_map(address_map &map) ATTR_COLD;
+	void gsp_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -748,7 +748,7 @@ void metalmx_state::metalmx(machine_config &config)
 	DSP32C(config, m_dsp32c[1], 40'000'000);      // Unverified
 	m_dsp32c[1]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_2_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 384);
@@ -760,19 +760,16 @@ void metalmx_state::metalmx(machine_config &config)
 
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
-	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+	SPEAKER(config, "speaker", 4).front().headrest_left(2).headrest_right(3);
+	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
-	ATARI_CAGE(config, m_cage, 0);
+	ATARI_CAGE(config, m_cage);
 	m_cage->set_speedup(0); // TODO: speedup address
 	m_cage->irq_handler().set(FUNC(metalmx_state::cage_irq_callback));
-	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
-	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
-	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
-	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
+	m_cage->add_route(0, "speaker", 1.0, 1); // Foward Right
+	m_cage->add_route(1, "speaker", 1.0, 2); // Back Left
+	m_cage->add_route(2, "speaker", 1.0, 0); // Foward Left
+	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 }
 
 

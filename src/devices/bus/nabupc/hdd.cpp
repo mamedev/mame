@@ -36,8 +36,8 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<wd1000_device> m_hdd;
@@ -58,7 +58,7 @@ hdd_device::hdd_device(const machine_config &mconfig, const char *tag, device_t 
 //-------------------------------------------------
 void hdd_device::device_add_mconfig(machine_config &config)
 {
-	WD1000(config, m_hdd, 0);
+	WD1000(config, m_hdd);
 
 	HARDDISK(config, "hdd:0", 0);
 }

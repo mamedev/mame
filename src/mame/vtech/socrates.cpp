@@ -98,6 +98,8 @@ TODO (socrates):
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "corefloat.h"
+
 
 namespace {
 
@@ -128,14 +130,14 @@ public:
 	void init_vpainter();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void socrates_mem(address_map &map);
-	void socrates_io(address_map &map);
-	void socrates_rambank_map(address_map &map);
-	void socrates_rombank_map(address_map &map);
+	void socrates_mem(address_map &map) ATTR_COLD;
+	void socrates_io(address_map &map) ATTR_COLD;
+	void socrates_rambank_map(address_map &map) ATTR_COLD;
+	void socrates_rombank_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
@@ -222,7 +224,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -231,10 +233,10 @@ private:
 	void video_regs_w(offs_t offset, uint8_t data);
 	uint8_t status_r();
 
-	void iqunlimz_io(address_map &map);
-	void iqunlimz_mem(address_map &map);
-	void iqunlimz_rambank_map(address_map &map);
-	void iqunlimz_rombank_map(address_map &map);
+	void iqunlimz_io(address_map &map) ATTR_COLD;
+	void iqunlimz_mem(address_map &map) ATTR_COLD;
+	void iqunlimz_rambank_map(address_map &map) ATTR_COLD;
+	void iqunlimz_rombank_map(address_map &map) ATTR_COLD;
 
 	int get_color(int index, int y);
 
@@ -383,7 +385,7 @@ void socrates_state::init_socrates()
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 0;
 }
 
@@ -392,7 +394,7 @@ void socrates_state::init_iqunlimz()
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen... is this even right for the iqunlimz? */
 	for (int i = 0; i < 0x20000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	//m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	//m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 1;
 }
 
@@ -401,7 +403,7 @@ void socrates_state::init_vpainter()
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 2;
 }
 
@@ -742,20 +744,17 @@ rgb_t socrates_state::create_color(uint8_t color)
 	int const chromaindex = color&0x0F;
 	int const swappedcolor = ((color&0xf0)>>4)|((color&0x0f)<<4);
 	double finalY = (1/LUMAMAX) * lumatable[swappedcolor];
-	double const finalI = (M_I * (cos((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
-	double const finalQ = (M_Q * (sin((phaseangle[chromaindex]/180)*M_PI)))* ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalI = (M_I * cos(DEGREE_TO_RADIAN(phaseangle[chromaindex]))) * ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
+	double const finalQ = (M_Q * sin(DEGREE_TO_RADIAN(phaseangle[chromaindex]))) * ((1/CHROMAMAX)*chromaintensity[swappedcolor]);
 	if (finalY > 1) finalY = 1; // clamp luma
 	// calculate the R, G and B values here, neato matrix math
 	double finalR = (finalY*1)+(finalI*0.9563)+(finalQ*0.6210);
 	double finalG = (finalY*1)+(finalI*-0.2721)+(finalQ*-0.6474);
 	double finalB = (finalY*1)+(finalI*-1.1070)+(finalQ*1.7046);
 	// scale/clamp to 0-255 range
-	if (finalR<0) finalR = 0;
-	if (finalR>1) finalR = 1;
-	if (finalG<0) finalG = 0;
-	if (finalG>1) finalG = 1;
-	if (finalB<0) finalB = 0;
-	if (finalB>1) finalB = 1;
+	finalR = std::clamp(finalR, 0.0, 1.0);
+	finalG = std::clamp(finalG, 0.0, 1.0);
+	finalB = std::clamp(finalB, 0.0, 1.0);
 	// gamma correction: 1.0 to GAMMA:
 	finalR = pow(finalR, 1/GAMMA)*255;
 	finalG = pow(finalG, 1/GAMMA)*255;
@@ -927,7 +926,7 @@ void iqunlimz_state::video_regs_w(offs_t offset, uint8_t data)
 	{
 		rectangle visarea = m_screen->visible_area();
 		visarea.set(0, (data & 0x02 ? 496 : 256) - 1, 0, 224 - 1);
-		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period());
 	}
 
 	m_video_regs[offset] = data;
@@ -1252,104 +1251,104 @@ static INPUT_PORTS_START( iqunlimz )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START( "IN1" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_N ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x10 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_M ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x11 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COMMA ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x12 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_B ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x13 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_C ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x14 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Z ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x15 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_V ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x16 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_X ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x17 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_N ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x10)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_M ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x11)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COMMA ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x12)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_B ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x13)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_C ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x14)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Z ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x15)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_V ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x16)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_X ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x17)
 
 	PORT_START( "IN2" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x20 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2_PAD ) PORT_CODE( KEYCODE_DOWN ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x21 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x22 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_DEL_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x23 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x24 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8_PAD ) PORT_CODE( KEYCODE_UP ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x25 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ASTERISK ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x26 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x27 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x20)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2_PAD ) PORT_CODE( KEYCODE_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x21)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x22)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_DEL_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x23)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x24)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8_PAD ) PORT_CODE( KEYCODE_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x25)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ASTERISK ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x26)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x27)
 
 	PORT_START( "IN3" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x30 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x31 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x32 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x33 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "Help" ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x34 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x35 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x36 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x37 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x30)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x31)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x32)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x33)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "Help" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x34)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x35)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x36)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x37)
 
 	PORT_START( "IN4" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_H ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x40 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_J ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x41 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_K ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x42 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_G ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x43 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_D ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x44 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x45 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x46 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_S ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x47 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_H ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x40)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_J ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x41)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_K ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x42)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_G ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x43)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_D ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x44)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x45)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x46)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_S ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x47)
 
 	PORT_START( "IN5" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x50 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x51 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x52 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x53 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x54 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x55 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_NUMLOCK ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x56 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_P ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x57 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x50)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x51)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x52)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x53)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x54)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x55)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_NUMLOCK ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x56)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_P ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x57)
 
 	PORT_START( "IN6" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Y ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x60 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_U ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x61 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_I ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x62 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_T ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x63 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_E ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x64 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x65 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_R ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x66 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_W ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x67 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Y ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x60)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_U ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x61)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_I ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x62)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_T ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x63)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_E ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x64)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x65)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_R ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x66)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_W ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x67)
 
 	PORT_START( "IN7" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x70 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x71 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x72 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_STOP ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x73 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x74 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x75 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ENTER ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x76 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COLON ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x77 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x70)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x71)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x72)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_STOP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x73)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x74)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x75)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ENTER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x76)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COLON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x77)
 
 	PORT_START( "IN8" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x80 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x81 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x82 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x83 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x84 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x85 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x86 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x87 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x80)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x81)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x82)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x83)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x84)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x85)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x86)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x87)
 
 	PORT_START( "IN9" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4_PAD ) PORT_CODE( KEYCODE_LEFT ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x90 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x91 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6_PAD ) PORT_CODE( KEYCODE_RIGHT ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x92 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_PLUS_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x93 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x94 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x95 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x96 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x97 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4_PAD ) PORT_CODE( KEYCODE_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x90)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x91)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6_PAD ) PORT_CODE( KEYCODE_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x92)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_PLUS_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x93)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x94)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x95)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x96)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x97)
 
 	PORT_START( "INA" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa0 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME("Answer") PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa4 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ESC ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa5 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa6 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_TAB ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa7 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa3)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME("Answer") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ESC ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa5)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SPACE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa6)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_TAB ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa7)
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -1463,7 +1462,7 @@ void socrates_state::socrates(machine_config &config)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
@@ -1522,7 +1521,7 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 	ADDRESS_MAP_BANK(config, "rambank2").set_map(&iqunlimz_state::iqunlimz_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));
@@ -1586,12 +1585,12 @@ ROM_START(socrates)
 
 	/* english speech cart has a green QC sticker */
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_eng_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
+	ROM_LOAD("speech_eng_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
+	ROM_LOAD("speech_eng_vsm1.bin", 0x0000, 0x4000, CRC(888e3ddd) SHA1(33af6a21ba6d826071c9d48557b1c9012752570b)) // 16k in serial rom
+	ROM_LOAD("speech_eng_vsm2.bin", 0x4000, 0x4000, CRC(de4ac89d) SHA1(3dfa853b02df756a9b72def94a39310992ee11c7)) // 16k in serial rom
+	ROM_LOAD("speech_eng_vsm3.bin", 0x8000, 0x4000, CRC(972384aa) SHA1(ffcb1d633ca6bffc7f481ec505da447e5b847f16)) // 16k in serial rom
 	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
@@ -1604,12 +1603,12 @@ ROM_START(socratfc)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("speech_fra_internal.bin", 0x0000, 0x2000, NO_DUMP)
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
-	ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
+	ROM_LOAD("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
 	ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
@@ -1625,10 +1624,10 @@ ROM_START(profweis)
 	ROM_LOAD("tmp42c40p1844.u6", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
 	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
-	ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, CRC(5ff0fdc6) SHA1(8ef128561a846762a20e3fe9513a4a22aaadc7f6))
+	ROM_LOAD("speech_ger_internal.bin", 0x0000, 0x2000, CRC(5ff0fdc6) SHA1(8ef128561a846762a20e3fe9513a4a22aaadc7f6))
 
 	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
-	ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, CRC(a979a00b) SHA1(0290844619dbdf336757003aaab3ffd0a75b7ee9)) // 16k in serial rom
+	ROM_LOAD("speech_ger_vsm1.bin", 0x0000, 0x4000, CRC(a979a00b) SHA1(0290844619dbdf336757003aaab3ffd0a75b7ee9)) // 16k in serial rom
 	ROM_FILL(0x4000, 0xc000, 0xff) // last 3 vsms aren't present, FF fill
 ROM_END
 

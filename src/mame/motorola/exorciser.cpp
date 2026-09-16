@@ -178,12 +178,12 @@ public:
 	void abort_key_w(int state);
 
 protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void dbg_map(address_map &map);
-	void mem_map(address_map &map);
+	void dbg_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	void irq_line_w(int state);
 	u8 m_irq;
@@ -282,12 +282,12 @@ void exorciser_state::mem_map(address_map &map)
 static INPUT_PORTS_START( exorciser )
 
 	PORT_START("ABORT_KEY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Abort") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, exorciser_state, abort_key_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Abort") PORT_WRITE_LINE_MEMBER(FUNC(exorciser_state::abort_key_w))
 
 	// The EXORciser I supported 1MHz, and the EXORciser II also supported
 	// 1.5 and 2.0MHz.
 	PORT_START("MAINCPU_CLOCK")
-	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, exorciser_state, maincpu_clock_change, 0)
+	PORT_CONFNAME(0xffffff, 1000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(exorciser_state::maincpu_clock_change), 0)
 	PORT_CONFSETTING(1000000, "1.0 MHz")
 	PORT_CONFSETTING(2000000, "1.5 MHz")
 	PORT_CONFSETTING(4000000, "2.0 MHz")
@@ -621,17 +621,8 @@ void exorciser_state::machine_start()
 	m_trace_timer = timer_alloc(FUNC(exorciser_state::assert_trace), this);
 }
 
-static DEVICE_INPUT_DEFAULTS_START(exorterm)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
-	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
-	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
-DEVICE_INPUT_DEFAULTS_END
-
 static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -651,7 +642,7 @@ void exorciser_state::exorciser(machine_config &config)
 	M6800(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &exorciser_state::dbg_map);
 
-	ADDRESS_MAP_BANK(config, m_bankdev, 0);
+	ADDRESS_MAP_BANK(config, m_bankdev);
 	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(8);
 	m_bankdev->set_addr_width(16);
@@ -668,13 +659,12 @@ void exorciser_state::exorciser(machine_config &config)
 	m_brg->out_f<9>().set(FUNC(exorciser_state::write_f9_clock));
 	m_brg->out_f<13>().set(FUNC(exorciser_state::write_f13_clock));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", exorciser_state::exorciser_rs232_devices, "exorterm155"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
-	rs232.set_option_device_input_defaults("exorterm155", DEVICE_INPUT_DEFAULTS_NAME(exorterm));
 
 	PIA6821(config, m_pia_dbg);
 	m_pia_dbg->writepa_handler().set(FUNC(exorciser_state::pia_dbg_pa_w));
@@ -690,17 +680,17 @@ void exorciser_state::exorciser(machine_config &config)
 	m_pia_lpt->ca2_handler().set(FUNC(exorciser_state::pia_lpt_ca2_w));
 	m_pia_lpt->readpb_handler().set(FUNC(exorciser_state::pia_lpt_pb_r));
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 
 	// MEX6850? Serial printer port
-	ACIA6850(config, m_acia_prn, 0);
+	ACIA6850(config, m_acia_prn);
 	m_acia_prn->txd_handler().set("rs232_prn", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232_prn(RS232_PORT(config, "rs232_prn", default_rs232_devices, "printer"));
 	rs232_prn.rxd_handler().set(m_acia_prn, FUNC(acia6850_device::write_rxd));
 	rs232_prn.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
 
-	M68SFDC(config, m_fdc, 0);
+	M68SFDC(config, m_fdc);
 	m_fdc->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 	m_fdc->nmi_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<3>));
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_BUS_PDS_TPDFPD_H
-#define MAME_BUS_PDS_TPDFPD_H
+#ifndef MAME_BUS_MACPDS_PDS_TPDFPD_H
+#define MAME_BUS_MACPDS_PDS_TPDFPD_H
 
 #pragma once
 
@@ -26,12 +26,12 @@ protected:
 	macpds_sedisplay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	uint16_t sedisplay_r(offs_t offset);
@@ -53,4 +53,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PDS_SEDISPLAY, macpds_sedisplay_device)
 
-#endif // MAME_BUS_PDS_TPDFPD_H
+#endif // MAME_BUS_MACPDS_PDS_TPDFPD_H

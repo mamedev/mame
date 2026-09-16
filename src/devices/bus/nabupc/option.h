@@ -66,10 +66,7 @@ public:
 	option_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&bus_tag, int slot, U &&opts, const char *dflt)
 		: option_slot_device(mconfig, tag, owner, bus_tag->clock())
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 		m_bus.set_tag(std::forward<T>(bus_tag));
 		m_slot = slot;
 	}
@@ -80,8 +77,8 @@ public:
 
 	void int_w(int state);
 protected:
-	// device-level overrides
-	virtual void device_start() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
 
 	// configuration
 	required_device<option_bus_device> m_bus;
@@ -115,9 +112,9 @@ public:
 	option_slot_device* operator[](int index) const {assert(index < m_slot_list.size()); return m_slot_list[index]; }
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	devcb_write_line::array<5> m_int_cb;
 
@@ -149,7 +146,7 @@ void option_bus_devices(device_slot_interface &device);
 } // namespace bus::nabupc
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE_NS(NABUPC_OPTION_BUS_SLOT, bus::nabupc, option_slot_device)
 DECLARE_DEVICE_TYPE_NS(NABUPC_OPTION_BUS, bus::nabupc, option_bus_device)
 

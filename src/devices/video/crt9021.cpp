@@ -95,7 +95,7 @@ crt9021_device::crt9021_device(const machine_config &mconfig, const char *tag, d
 
 void crt9021_device::device_start()
 {
-	m_display_cb.resolve();
+	m_display_cb.resolve_safe();
 
 	// register bitmap
 	screen().register_screen_bitmap(m_bitmap);
@@ -164,6 +164,8 @@ void crt9021_device::ld_sh_w(int state)
 
 		m_display_cb(m_bitmap, screen().vpos(), screen().hpos(), m_sr, m_intout);
 	}
+
+	m_ld_sh = state;
 }
 
 

@@ -79,8 +79,8 @@ public:
 	void qvt102(machine_config &config);
 
 protected:
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<m6800_cpu_device> m_maincpu;
@@ -101,7 +101,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<u8> m_char_rom;
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -646,7 +646,7 @@ void qvt102_state::qvt102(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x TC5514-APL + 3V battery
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(16.6698_MHz_XTAL, 882, 9, 729, 315, 0, 300); // 80x24+1
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
@@ -662,7 +662,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(qvt102_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(qvt102_state::vsync_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set(FUNC(qvt102_state::acia_txd_w));
 	m_acia->rts_handler().set(FUNC(qvt102_state::acia_rts_w));
 	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));

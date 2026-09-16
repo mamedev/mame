@@ -38,7 +38,7 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "minicom.lh"
 
 #define LOG_IO_PORTS (1U << 1)
@@ -75,15 +75,14 @@ private:
 	uint8_t m_p[4]{};
 	uint16_t m_display_data = 0;
 	int m_digit_index = 0;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_device<i87c52_device> m_maincpu;
 	output_finder<20> m_digits;
 };
 
 void minicom_state::machine_start()
 {
-	m_digits.resolve();
 	// zerofill
 	memset(m_p, 0, 4);
 	m_digit_index = 0;
@@ -223,7 +222,8 @@ void minicom_state::init_minicom()
 void minicom_state::minicom(machine_config &config)
 {
 	/* basic machine hardware */
-	I87C52(config, m_maincpu, XTAL(10'000'000)); /*FIX-ME: verify the correct clock frequency */
+	// FIXME: verify the correct clock frequency
+	I87C52(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->port_out_cb<0>().set(FUNC(minicom_state::i87c52_p0_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(minicom_state::i87c52_p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(minicom_state::i87c52_p1_w));

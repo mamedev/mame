@@ -25,10 +25,10 @@ Hardware notes:
 - buzzer, 64+12 leds, button chessboard
 - expansion slot at top-right (dummy empty cartridge by default)
 
-Expansion modules: (* denotes not dumped)
+Expansion modules:
 - Strong Play Module
 - Classical Style Super Strong
-- *Hyper Modern Super Strong
+- Hyper Modern Super Strong
 
 *******************************************************************************/
 
@@ -66,18 +66,21 @@ public:
 	void schess(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	required_device<dac_bit_interface> m_dac;
+	required_device<dac_1bit_device> m_dac;
 	required_ioport_array<3> m_inputs;
 
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+
 	// address maps
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void update_display();
@@ -85,9 +88,6 @@ private:
 	void leds2_w(offs_t offset, u8 data);
 	void control_w(u8 data);
 	u8 input_r();
-
-	u8 m_inp_mux = 0;
-	u8 m_led_data = 0;
 };
 
 void schess_state::machine_start()
@@ -212,12 +212,12 @@ INPUT_PORTS_END
 void schess_state::schess(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2000000); // approximation, no XTAL
+	M6502(config, m_maincpu, 2'000'000); // approximation, no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &schess_state::main_map);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_ticks(1115000, 2000000)); // see driver notes
+	m_board->set_delay(attotime::from_ticks(1'115'000, 2'000'000)); // see driver notes
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "schess_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_schess");
@@ -251,4 +251,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1981, schess, 0,      0,      schess,  schess, schess_state, empty_init, "SciSys", "Sensor Chess", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1981, schess, 0,      0,      schess,  schess, schess_state, empty_init, "SciSys / Heuristic Software", "Sensor Chess", MACHINE_SUPPORTS_SAVE )

@@ -36,7 +36,7 @@ void newhunterc_bitswaps(uint8_t *decrypt, int i)
 {
 	if ((i & 7) == 0) decrypt[i] = bitswap<8>(decrypt[i], 7, 2, 1, 0, 3, 6, 5, 4);
 	if ((i & 7) == 1) decrypt[i] = bitswap<8>(decrypt[i], 7, 6, 5, 0, 3, 2, 1, 4);
-	if ((i & 7) == 2) decrypt[i] = bitswap<8>(decrypt[i], 7, 2, 1, 0, 3, 6, 5, 4); // TODO: verify 7,6
+	if ((i & 7) == 2) decrypt[i] = bitswap<8>(decrypt[i], 7, 2, 1, 0, 3, 6, 5, 4);
 	if ((i & 7) == 3) decrypt[i] = bitswap<8>(decrypt[i], 7, 2, 1, 0, 3, 6, 5, 4);
 	if ((i & 7) == 4) decrypt[i] = bitswap<8>(decrypt[i], 7, 2, 5, 4, 3, 6, 1, 0);
 	if ((i & 7) == 5) decrypt[i] = bitswap<8>(decrypt[i], 7, 2, 5, 0, 3, 6, 1, 4);

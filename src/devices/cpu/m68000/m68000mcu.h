@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_CPU_M68000_M68000mcu_H
-#define MAME_CPU_M68000_M68000mcu_H
+#ifndef MAME_CPU_M68000_M68000MCU_H
+#define MAME_CPU_M68000_M68000MCU_H
 
 #pragma once
 
@@ -28,9 +28,9 @@ protected:
 	void internal_update();
 
 	virtual void internal_update(uint64_t current_time) = 0;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	void set_current_interrupt_level(u32 level);
 };
 
-#endif
+#endif // MAME_CPU_M68000_M68000MCU_H

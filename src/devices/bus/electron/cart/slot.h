@@ -91,8 +91,8 @@
    22      0V - Zero volts.
 
 **********************************************************************/
-#ifndef MAME_BUS_ELECTRON_CARTSLOT_H
-#define MAME_BUS_ELECTRON_CARTSLOT_H
+#ifndef MAME_BUS_ELECTRON_CART_SLOT_H
+#define MAME_BUS_ELECTRON_CART_SLOT_H
 
 #pragma once
 
@@ -124,10 +124,7 @@ public:
 	electron_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&slot_options, const char *default_option)
 		: electron_cartslot_device(mconfig, tag, owner, clock)
 	{
-		option_reset();
-		slot_options(*this);
-		set_default_option(default_option);
-		set_fixed(false);
+		set_options(std::forward<T>(slot_options), default_option, false);
 	}
 
 	electron_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -161,7 +158,7 @@ protected:
 	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	device_electron_cart_interface *m_cart;
 
@@ -206,10 +203,9 @@ protected:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(ELECTRON_CARTSLOT, electron_cartslot_device)
 
 void electron_cart(device_slot_interface &device);
 
-
-#endif // MAME_BUS_ELECTRON_CARTSLOT_H
+#endif // MAME_BUS_ELECTRON_CART_SLOT_H

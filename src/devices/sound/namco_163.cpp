@@ -151,15 +151,15 @@ u8 namco_163_sound_device::data_r()
 }
 
 
-void namco_163_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void namco_163_sound_device::sound_stream_update(sound_stream &stream)
 {
 	if (m_disable)
 	{
-		outputs[0].fill(0);
+		stream.fill(0, 0);
 		return;
 	}
 
-	for (int s = 0; s < outputs[0].samples(); s++)
+	for (int s = 0; s < stream.samples(); s++)
 	{
 		const u8 first_channel = 0x78 - ((m_ram[0x7f] & 0x70) >> 1);
 
@@ -191,6 +191,6 @@ void namco_163_sound_device::sound_stream_update(sound_stream &stream, std::vect
 		if (m_reg_addr >= 0x80)
 			m_reg_addr = first_channel;
 
-		outputs[0].put_int(s, output, 128);
+		stream.put_int(0, s, output, 128);
 	}
 }

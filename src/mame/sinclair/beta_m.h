@@ -23,7 +23,7 @@
 class beta_disk_device : public device_t
 {
 public:
-	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t status_r();
 	uint8_t track_r();
@@ -36,6 +36,7 @@ public:
 	void track_w(uint8_t data);
 	void sector_w(uint8_t data);
 	void data_w(uint8_t data);
+	void turbo_w(int state);
 
 	int is_active();
 	void enable();
@@ -43,10 +44,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	uint8_t m_betadisk_active;
@@ -58,8 +59,6 @@ private:
 	void motors_control();
 	u8 m_control;
 	bool m_motor_active;
-
-	static void floppy_formats(format_registration &fr);
 };
 
 DECLARE_DEVICE_TYPE(BETA_DISK, beta_disk_device)

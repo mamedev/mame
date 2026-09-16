@@ -10,6 +10,8 @@
 
 ***************************************************************************/
 
+#include <numbers>
+
 //Sprite Functions
 static void CX4_op00(address_space &space)
 {
@@ -132,7 +134,7 @@ static void CX4_op1f(address_space &space)
 	else
 	{
 		cx4.tanval = ((double)cx4.C41FYVal) / ((double)cx4.C41FXVal);
-		cx4.C41FAngleRes = (int16_t)(atan(cx4.tanval) / (M_PI * 2) * 512);
+		cx4.C41FAngleRes = (int16_t)(atan(cx4.tanval) / (std::numbers::pi * 2) * 512);
 		cx4.C41FAngleRes = cx4.C41FAngleRes;
 		if(cx4.C41FXVal < 0)
 		{

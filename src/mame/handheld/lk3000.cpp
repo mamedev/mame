@@ -47,6 +47,7 @@ public:
 	lk3000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_psu(*this, "psu"),
 		m_dl1414(*this, "dl1414_%u", 0),
 		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0),
@@ -59,18 +60,27 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
+	required_device<f38t56_device> m_psu;
 	required_device_array<dl1414_device, 4> m_dl1414;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_inputs;
 	output_finder<16> m_digits;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	u8 m_p0 = 0;
+	u8 m_p1 = 0;
+	u8 m_p4 = 0;
+	u8 m_p5 = 0;
+
+	bool m_has_ram = false;
+	u8 m_ram[0x400];
+
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	template <int N> void update_display(offs_t offset, u16 data);
@@ -83,19 +93,10 @@ private:
 	void p4_w(u8 data);
 	u8 p5_r();
 	void p5_w(u8 data);
-
-	u8 m_p0 = 0;
-	u8 m_p1 = 0;
-	u8 m_p4 = 0;
-	u8 m_p5 = 0;
-
-	bool m_has_ram = false;
-	u8 m_ram[0x400];
 };
 
 void lk3000_state::machine_start()
 {
-	m_digits.resolve();
 	memset(m_ram, 0xff, 0x400);
 
 	// register for savestates
@@ -233,7 +234,7 @@ void lk3000_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(lk3000_state::p0_r), FUNC(lk3000_state::p0_w));
 	map(0x01, 0x01).rw(FUNC(lk3000_state::p1_r), FUNC(lk3000_state::p1_w));
-	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
+	map(0x04, 0x07).rw(m_psu, FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
 
@@ -292,7 +293,7 @@ static INPUT_PORTS_START( lk3000 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("f")
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_MEMBER(DEVICE_SELF, lk3000_state, reset_button, 0) PORT_CHAR(127) PORT_NAME("clr")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(lk3000_state::reset_button), 0) PORT_CHAR(127) PORT_NAME("clr")
 INPUT_PORTS_END
 
 
@@ -307,15 +308,15 @@ void lk3000_state::lk3000(machine_config &config)
 	F8(config, m_maincpu, 4_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lk3000_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &lk3000_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
-	auto &psu(F38T56(config, "psu", 4_MHz_XTAL/2));
-	psu.set_int_vector(0x20);
-	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
-	psu.read_a().set(FUNC(lk3000_state::p4_r));
-	psu.write_a().set(FUNC(lk3000_state::p4_w));
-	psu.read_b().set(FUNC(lk3000_state::p5_r));
-	psu.write_b().set(FUNC(lk3000_state::p5_w));
+	F38T56(config, m_psu, 4_MHz_XTAL/2);
+	m_psu->set_int_vector(0x20);
+	m_psu->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	m_psu->read_a().set(FUNC(lk3000_state::p4_r));
+	m_psu->write_a().set(FUNC(lk3000_state::p4_w));
+	m_psu->read_b().set(FUNC(lk3000_state::p5_r));
+	m_psu->write_b().set(FUNC(lk3000_state::p5_w));
 
 	// video hardware
 	DL1414T(config, m_dl1414[0], 0U).update().set(FUNC(lk3000_state::update_display<0>));

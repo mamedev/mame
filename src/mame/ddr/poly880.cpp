@@ -80,7 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -90,9 +90,12 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<3> m_inputs;
 
-	void poly880_io(address_map &map);
-	void poly880_mem(address_map &map);
-	void poly880s_mem(address_map &map);
+	u8 m_matrix = 0;
+	bool m_nmi = false;
+
+	void poly880_io(address_map &map) ATTR_COLD;
+	void poly880_mem(address_map &map) ATTR_COLD;
+	void poly880s_mem(address_map &map) ATTR_COLD;
 
 	void cldig_w(u8 data);
 	void ctc_z0_w(int state);
@@ -100,9 +103,6 @@ private:
 	void pio1_pa_w(u8 data);
 	u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
-
-	u8 m_matrix = 0;
-	bool m_nmi = false;
 };
 
 
@@ -186,8 +186,8 @@ static INPUT_PORTS_START( poly880 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, poly880_state, trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MON") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, poly880_state, trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::trigger_reset), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MON") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::trigger_nmi), 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MCYCL") PORT_CODE(KEYCODE_F3)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CYCL") PORT_CODE(KEYCODE_F4)
 INPUT_PORTS_END

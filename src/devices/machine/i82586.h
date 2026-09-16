@@ -166,8 +166,8 @@ protected:
 	i82586_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth, u8 addrwidth);
 
 	// standard device_* overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -205,7 +205,6 @@ protected:
 	static u64 address_hash(u8 *buf, int length);
 	int fetch_bytes(u8 *buf, u32 src, int length);
 	int store_bytes(u32 dst, u8 *buf, int length);
-	void dump_bytes(u8 *buf, int length);
 
 	// device_* members
 	const address_space_config m_space_config;
@@ -268,8 +267,8 @@ public:
 
 protected:
 	// standard device_* overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// setup and scb
 	virtual void initialise() override;
@@ -327,8 +326,8 @@ protected:
 	i82596_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endian, u8 datawidth);
 
 	// standard device_* overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// setup and scb
 	virtual void initialise() override;

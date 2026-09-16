@@ -21,7 +21,9 @@ enum
 	PCE_CDSYS3U,
 	PCE_POPULOUS,
 	PCE_SF2,
-	PCE_TENNOKOE
+	PCE_TENNOKOE,
+	PCE_ACARD_DUO,
+	PCE_ACARD_PRO
 };
 
 
@@ -33,9 +35,7 @@ public:
 	// construction/destruction
 	virtual ~device_pce_cart_interface();
 
-	// reading and writing
-	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
-	virtual void write_cart(offs_t offset, uint8_t data) {}
+	virtual void install_memory_handlers(address_space &space) { }
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
@@ -70,15 +70,15 @@ public:
 	pce_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, const char *interface)
 		: pce_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 		set_intf(interface);
 	}
 
 	pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce_cart_slot_device();
+
+	// configuration
+	template <typename T> void set_address_space(T &&tag, int no) { m_address_space.set_tag(std::forward<T>(tag), no); }
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -96,22 +96,19 @@ public:
 
 	void set_intf(const char * interface) { m_interface = interface; }
 
-	// reading and writing
-	uint8_t read_cart(offs_t offset);
-	void write_cart(offs_t offset, uint8_t data);
-
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	const char *m_interface;
 	int m_type;
 	device_pce_cart_interface *m_cart;
+	required_address_space m_address_space;
 };
 
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(PCE_CART_SLOT, pce_cart_slot_device)
 
 #endif // MAME_BUS_PCE_PCE_SLOT_H

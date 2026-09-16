@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /************************************************************************************************
 
-    Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
+Sharp X1Twin = Sharp X1 + NEC PC Engine All-in-One
 
-    Both systems don't interact at all, according to info on the net they just share the
-    same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
+Both systems don't interact at all, according to info on the net they just share the
+same "house". It doesn't even do super-imposing, not even with the in-built X1 feature apparently
 
-    TODO:
-    - Find 100% trusted info about it.
-    - inherit pce_state into x1twin_state
-    - Needs video mods
+TODO:
+- Find 100% trusted info about it.
+- Work out this to really be a middleground for both pce_state & x1twin_state
+- Needs video mods
 
 ************************************************************************************************/
 
@@ -27,16 +27,14 @@
 #include "speaker.h"
 
 
-// copied from pce.h until it's turned into a device properly
-#define MAIN_CLOCK      21477270
 
 namespace {
 
 class x1twin_state : public x1_state
 {
 public:
-	x1twin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: x1_state(mconfig, type, tag)
+	x1twin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		x1_state(mconfig, type, tag)
 	{ }
 
 	void x1twin(machine_config &config);
@@ -46,17 +44,21 @@ public:
 
 private:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void pce_io(address_map &map);
-	void pce_mem(address_map &map);
-	void x1_io(address_map &map);
-	void x1_mem(address_map &map);
+#if 0
+	void pce_io(address_map &map) ATTR_COLD;
+	void pce_mem(address_map &map) ATTR_COLD;
+#endif
+	void x1_io(address_map &map) ATTR_COLD;
+	void x1_mem(address_map &map) ATTR_COLD;
 };
 
+// copied from pce.h until it's turned into a device properly
+static constexpr XTAL MAIN_CLOCK = 21.477272_MHz_XTAL;
 
-#define X1_MAIN_CLOCK 16_MHz_XTAL
-#define VDP_CLOCK  42.954545_MHz_XTAL
-#define MCU_CLOCK  6_MHz_XTAL
-#define PCE_MAIN_CLOCK      VDP_CLOCK / 2
+static constexpr XTAL X1_MAIN_CLOCK  = 16_MHz_XTAL;
+static constexpr XTAL VDP_CLOCK      = 42.954545_MHz_XTAL;
+static constexpr XTAL MCU_CLOCK      = 6_MHz_XTAL;
+static constexpr XTAL PCE_MAIN_CLOCK = VDP_CLOCK / 2;
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -66,7 +68,7 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 void x1twin_state::x1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(x1twin_state::mem_r), FUNC(x1twin_state::mem_w));
 }
 
 void x1twin_state::x1_io(address_map &map)
@@ -78,10 +80,10 @@ void x1twin_state::x1_io(address_map &map)
 #if 0
 void x1twin_state::pce_mem(address_map &map)
 {
-	map(0x000000, 0x09FFFF).rom();
-	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
-	map(0x1FE400, 0x1FE7FF).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
+	map(0x000000, 0x0fffff).rom();
+	map(0x1f0000, 0x1f1fff).ram().mirror(0x6000);
+	map(0x1fe000, 0x1fe3ff).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+	map(0x1fe400, 0x1fe7ff).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
 }
 
 void x1twin_state::pce_io(address_map &map)
@@ -103,7 +105,7 @@ INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	m_ram_bank = 0x00;
-	if(m_is_turbo) { m_ex_bank = 0x10; }
+	if (m_is_turbo) { m_ex_bank = 0x10; }
 	//anything else?
 }
 
@@ -115,8 +117,8 @@ INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 
 INPUT_PORTS_START( x1twin )
 	PORT_START("FP_SYS") //front panel buttons, hard-wired with the soft reset/NMI lines
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, ipl_reset,0) PORT_NAME("IPL reset")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1twin_state, nmi_reset,0) PORT_NAME("NMI reset")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(x1twin_state::ipl_reset), 0) PORT_NAME("IPL reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(x1twin_state::nmi_reset), 0) PORT_NAME("NMI reset")
 
 	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
@@ -434,7 +436,9 @@ void x1twin_state::x1twin(machine_config &config)
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
-	X1_KEYBOARD(config, "x1kb", 0);
+	auto &x1kb(X1_KEYBOARD(config, "x1kb"));
+	x1kb.flag_cb().set(FUNC(x1twin_state::key_irq_flag_r));
+	x1kb.ack_cb().set(FUNC(x1twin_state::key_irq_ack_r));
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
@@ -444,30 +448,28 @@ void x1twin_state::x1twin(machine_config &config)
 	ppi.out_pb_callback().set(FUNC(x1_state::x1_portb_w));
 	ppi.out_pc_callback().set(FUNC(x1_state::x1_portc_w));
 
-	MCFG_MACHINE_RESET_OVERRIDE(x1twin_state,x1)
-
 	#if 0
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
-	m_maincpu->set_addrmap(AS_IO, pce_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1twin_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1twin_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(x1twin_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(x1twin_state::pce_joystick_w));
-	m_maincpu->add_route(0, "pce_l", 0.5);
-	m_maincpu->add_route(1, "pce_r", 0.5);
+	m_maincpu->add_route(0, "pce", 0.5, 0);
+	m_maincpu->add_route(1, "pce", 0.5, 1);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(x1twin_state::pce_interrupt), "pce_screen", 0, 1);
 	#endif
 
 	config.set_default_layout(layout_dualhsxs);
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(x1twin_state::screen_update_x1));
 
-	screen_device &pce_screen(SCREEN(config, "pce_screen", SCREEN_TYPE_RASTER));
+	screen_device &pce_screen(SCREEN(config, "pce_screen"));
 	pce_screen.set_refresh_hz(60);
 	pce_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	pce_screen.set_raw(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242);
@@ -483,8 +485,6 @@ void x1twin_state::x1twin(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x1);
 
 	MB8877(config, m_fdc, MAIN_CLOCK / 16);
-	// TODO: guesswork, try to implicitly start the motor
-	m_fdc->hld_wr_callback().set(FUNC(x1_state::hdl_w));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", x1_floppies, "dd", x1_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", x1_floppies, "dd", x1_state::floppy_formats);
@@ -495,33 +495,28 @@ void x1twin_state::x1twin(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
-	SPEAKER(config, "x1_l").front_left();
-	SPEAKER(config, "x1_r").front_right();
-	SPEAKER(config, "pce_l").front_left();
-	SPEAKER(config, "pce_r").front_right();
+	SPEAKER(config, "x1", 2).front();
+	SPEAKER(config, "pce", 2).front();
 
-//  SPEAKER(config, "lspeaker").front_left();
-//  SPEAKER(config, "rspeaker").front_right();
+//  SPEAKER(config, "speaker", 2).front();
 
 	/* TODO:is the AY mono or stereo? Also volume balance isn't right. */
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(0, "x1_l", 0.25);
-	ay.add_route(0, "x1_r", 0.25);
-	ay.add_route(1, "x1_l", 0.5);
-	ay.add_route(2, "x1_r", 0.5);
+	ay.add_route(ALL_OUTPUTS, "x1", 0.25, 0);
+	ay.add_route(ALL_OUTPUTS, "x1", 0.25, 1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
+	m_cassette->add_route(ALL_OUTPUTS, "x1", 0.25, 0).add_route(ALL_OUTPUTS, "x1", 0.10, 1);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
-	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::x1_keyboard_callback), attotime::from_hz(250));
-	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::x1_cmt_wind_timer), attotime::from_hz(16));
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1twin_state::sub_keyboard_cb), attotime::from_hz(250));
+	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1twin_state::cmt_seek_cb), attotime::from_hz(16));
 }
 
 ROM_START( x1twin )
@@ -558,4 +553,4 @@ ROM_END
 } // Anonymous namespace
 
 
-COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )
+COMP( 1987, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

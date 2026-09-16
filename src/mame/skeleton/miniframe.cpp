@@ -50,8 +50,8 @@ private:
 
 	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint16_t ram_mmu_r(offs_t offset);
 	void ram_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -63,8 +63,8 @@ private:
 
 	required_shared_ptr<uint16_t> m_mapram;
 
-	void miniframe_mem(address_map &map);
-	void ramrombank_map(address_map &map);
+	void miniframe_mem(address_map &map) ATTR_COLD;
+	void ramrombank_map(address_map &map) ATTR_COLD;
 
 	uint16_t *m_ramptr = nullptr;
 	uint32_t m_ramsize = 0;
@@ -244,7 +244,7 @@ void miniframe_state::miniframe(machine_config &config)
 	FLOPPY_CONNECTOR(config, "wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	// 8263s
-	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<0>(76800);
 	pit8253.set_clk<1>(76800);
 	pit8253.out_handler<0>().set("pic8259", FUNC(pic8259_device::ir4_w)); // FIXME: fighting for IR4 - error, or needs input merger?
@@ -253,13 +253,13 @@ void miniframe_state::miniframe(machine_config &config)
 	// and ir4 on the PIC
 	pit8253.out_handler<1>().append("pic8259", FUNC(pic8259_device::ir4_w));
 
-	pit8253_device &baudgen(PIT8253(config, "baudgen", 0));
+	pit8253_device &baudgen(PIT8253(config, "baudgen"));
 	baudgen.set_clk<0>(1228800);
 	baudgen.set_clk<1>(1228800);
 	baudgen.set_clk<2>(1228800);
 
 	// PIC8259s
-	pic8259_device &pic8259(PIC8259(config, "pic8259", 0));
+	pic8259_device &pic8259(PIC8259(config, "pic8259"));
 	pic8259.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 	pic8259.in_sp_callback().set_constant(1);
 }

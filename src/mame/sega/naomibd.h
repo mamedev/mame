@@ -12,7 +12,7 @@ class naomi_board : public naomi_g1_device
 {
 public:
 	// Can be patched in the underlying class
-	virtual void submap(address_map &map) override;
+	virtual void submap(address_map &map) override ATTR_COLD;
 
 	void rom_offseth_w(uint16_t data);          // 5f7000
 	void rom_offsetl_w(uint16_t data);          // 5f7004
@@ -30,8 +30,8 @@ public:
 protected:
 	naomi_board(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void dma_get_position(uint8_t *&base, uint32_t &limit, bool to_mainram) override;
 	virtual void dma_advance(uint32_t size) override;

@@ -35,6 +35,8 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
+#include <tuple>
+
 
 #define D88_HEADER_LEN 0x2b0
 
@@ -411,9 +413,11 @@ int d88_format::identify(util::random_read &io, uint32_t form_factor, const std:
 		return 0;
 
 	uint8_t h[32];
-	size_t actual;
-	io.read_at(0, h, 32, actual);
-	if((little_endianize_int32(*(uint32_t *)(h+0x1c)) == size) &&
+	auto const [err, actual] = read_at(io, 0, h, 32);
+	if(err || (32 != actual))
+		return 0;
+
+	if(((get_u32le(h+0x1c) == size) || (get_u32le(h+0x1c) == (size >> 1))) &&
 		(h[0x1b] == 0x00 || h[0x1b] == 0x10 || h[0x1b] == 0x20 || h[0x1b] == 0x30 || h[0x1b] == 0x40))
 		return FIFID_SIZE|FIFID_STRUCT;
 
@@ -422,10 +426,13 @@ int d88_format::identify(util::random_read &io, uint32_t form_factor, const std:
 
 bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
+	std::error_condition err;
 	size_t actual;
 
 	uint8_t h[32];
-	io.read_at(0, h, 32, actual);
+	std::tie(err, actual) = read_at(io, 0, h, 32);
+	if(err || (32 != actual))
+		return false;
 
 	int cell_count = 0;
 	int track_count = 0;
@@ -470,8 +477,22 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if(!head_count)
 		return false;
 
+	int img_tracks, img_heads;
+	image.get_maximal_geometry(img_tracks, img_heads);
+	// HACK: smc777 .1dd files uses 0x30 as header but really expects SSQD format, override here
+	if (img_tracks >= 70 && h[0x1b] == 0x30)
+	{
+		track_count = 82;
+		image.set_variant(floppy_image::SSQD);
+	}
+	if (track_count > img_tracks)
+		osd_printf_warning("d88: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", track_count, img_tracks);
+
+	if (head_count > img_heads)
+		osd_printf_warning("d88: Floppy disk has excess of heads for this drive that will be discarded (floppy heads=%d, drive heads=%d).\n", head_count, img_heads);
+
 	uint32_t track_pos[164];
-	io.read_at(32, track_pos, 164*4, actual);
+	std::tie(err, actual) = read_at(io, 32, track_pos, 164*4); // FIXME: check for errors and premature EOF
 
 	uint64_t file_size;
 	if(io.length(file_size))
@@ -493,16 +514,16 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					return true;
 
 				uint8_t hs[16];
-				io.read_at(pos, hs, 16, actual);
+				std::tie(err, actual) = read_at(io, pos, hs, 16); // FIXME: check for errors and premature EOF
 				pos += 16;
 
-				uint16_t size = little_endianize_int16(*(uint16_t *)(hs+14));
+				uint16_t size = get_u16le(hs+14);
 
 				if(pos + size > file_size)
 					return true;
 
 				if(i == 0) {
-					sector_count = little_endianize_int16(*(uint16_t *)(hs+4));
+					sector_count = get_u16le(hs+4);
 					// Support broken vfman converter
 					if(sector_count == 0x1000)
 						sector_count = 0x10;
@@ -510,17 +531,19 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					density = hs[6];
 				}
 
-				sects[i].track       = hs[0];
-				sects[i].head        = hs[1];
-				sects[i].sector      = hs[2];
-				sects[i].size        = hs[3];
-				sects[i].actual_size = size;
-				sects[i].deleted     = hs[7] != 0;
-				sects[i].bad_crc     = hs[8] == 0xb0;  // according to hxc
+				sects[i].track        = hs[0];
+				sects[i].head         = hs[1];
+				sects[i].sector       = hs[2];
+				sects[i].size         = hs[3];
+				sects[i].actual_size  = size;
+				sects[i].deleted      = hs[7] != 0;
+				sects[i].bad_data_crc = hs[8] == 0xb0;  // according to hxc
+				sects[i].bad_addr_crc = hs[8] == 0xa0;
+				sects[i].weak         = false;
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;
-					io.read_at(pos, sects[i].data, size, actual);
+					std::tie(err, actual) = read_at(io, pos, sects[i].data, size); // FIXME: check for errors and premature EOF
 					pos += size;
 					sdatapos += size;
 
@@ -528,18 +551,15 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[i].data    = nullptr;
 			}
 
-			if(density == 0x40)
-				build_pc_track_fm(track, head, image, cell_count / 2, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
-			else
-				build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			if(head < img_heads) {
+				if(density == 0x40)
+					build_pc_track_fm(track, head, image, cell_count / 2, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+				else
+					build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
+			}
 		}
 
 	return true;
-}
-
-bool d88_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const d88_format FLOPPY_D88_FORMAT;

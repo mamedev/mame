@@ -67,7 +67,7 @@ public:
 	void init_suprloco();
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -107,13 +107,11 @@ private:
 	inline void draw_pixel(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color, int flip);
 	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int spr_number);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decrypted_opcodes_map(address_map &map);
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -335,8 +333,6 @@ uint32_t suprloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 void suprloco_state::main_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
@@ -364,8 +360,8 @@ void suprloco_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0xa000, 0xa003).w("sn1", FUNC(sn76496_device::write));
-	map(0xc000, 0xc003).w("sn2", FUNC(sn76496_device::write));
+	map(0xa000, 0xa003).w("sn1", FUNC(sn76489a_device::write));
+	map(0xc000, 0xc003).w("sn2", FUNC(sn76489a_device::write));
 	map(0xe000, 0xe000).r("ppi", FUNC(i8255_device::acka_r));
 }
 
@@ -489,7 +485,7 @@ void suprloco_state::suprloco(machine_config &config)
 	ppi.out_pc_callback().append_inputline(m_audiocpu, INPUT_LINE_NMI).bit(7).invert();
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000));
 	screen.set_size(32*8, 32*8);
@@ -503,9 +499,8 @@ void suprloco_state::suprloco(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "sn1", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	SN76496(config, "sn2", 2'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn1", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "sn2", 2'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -607,5 +602,5 @@ void suprloco_state::init_suprloco()
 } // anonymous namespace
 
 
-GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, suprloco,  0,        suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, init_suprloco, ROT0, "Sega", "Super Locomotive",         MACHINE_SUPPORTS_SAVE )

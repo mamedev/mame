@@ -8,7 +8,7 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 	{
 		// this 486 doesn't support the CPUID instruction
 		LOGMASKED(LOG_MSR, "CPUID not supported at %08x!\n", m_eip);
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	else
 	{
@@ -27,6 +27,7 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 			case 1:
 			{
 				REG32(EAX) = m_cpu_version;
+				REG32(EBX) = m_brand_id;
 				REG32(EDX) = m_feature_flags;
 				CYCLES(CYCLES_CPUID_EAX1);
 				break;
@@ -516,7 +517,7 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 	{
 		case 0:
 			CYCLES(CYCLES_MOV_REG_CR0);
-			if((oldcr ^ m_cr[cr]) & 0x80010000)
+			if((oldcr ^ m_cr[cr]) & (CR0_PG | CR0_WP))
 				vtlb_flush_dynamic();
 			if (PROTECTED_MODE != BIT(data, 0))
 				debugger_privilege_hook();
@@ -536,9 +537,9 @@ void i386_device::i486_mov_cr_r32()        // Opcode 0x0f 22
 
 void i386_device::i486_wait()
 {
-	if ((m_cr[0] & 0xa) == 0xa)
+	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	x87_mf_fault();

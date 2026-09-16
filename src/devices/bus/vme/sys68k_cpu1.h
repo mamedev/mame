@@ -24,11 +24,11 @@ public:
 	vme_sys68k_cpu1_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void fccpu1_eprom_sockets(machine_config &config);
@@ -61,7 +61,7 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return force68k_load_cart(image, m_cart); }
 	uint16_t read16_rom(offs_t offset);
 
-	void force68k_mem(address_map &map);
+	void force68k_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mm58167_device> m_rtc;

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -1056,7 +1056,7 @@ kept for now until finding out what those bytes affect...
 
 <!--
     <software name="synthsaua">
-        <description>Synth Saurus (Alt) (Jpn)</description>
+        <description>Synth Saurus (Japan, alt)</description>
         <year></year>
         <publisher>Bit²</publisher>
         <info name="alt_title" value="シンセサウルス" />
@@ -1213,6 +1213,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="1942 (zemina).rom" size="0x20000" crc="10d97b9e" sha1="ba07b1b585386f887d4c7e457210b3fce819709a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dbomber">
+		<description>3-D Bomberman (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="3-d bomberman (japan).rom" size="0x8000" crc="782989f0" sha1="1993ea04f59578a219a896bc423bf583231d1c92" />
 			</dataarea>
 		</part>
 	</software>
@@ -1391,6 +1403,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="slot" value="korean_hydlide2" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="adventure kid (korea).rom" size="0x20000" crc="01181477" sha1="0f984330ed5dc929e1207cf6afcc9a35837408d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akarui">
+		<description>Akarui Nouen (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="akarui nouen (japan).rom" size="0x4000" crc="30a5049d" sha1="8a05e795d5f548e256910acc0227bbb46851039d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2006,6 +2030,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="bablkund">
+		<description>Babbulkund 1999 (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="babbulkund 1999 (japan).rom" size="0x4000" crc="d90b7733" sha1="65f3b9a0aca59688b8c1afc883a2a5b1a7efa528" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="backtof">
 		<description>Back to the Future (Japan)</description>
 		<year>1986</year>
@@ -2502,6 +2538,30 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="binaryla">
+		<description>Binary Land (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="binary land (japan).rom" size="0x4000" crc="fbacbc7a" sha1="ef476e25fb6b7221ca778a379117885450dd36f0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biotech">
+		<description>Biotech (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="biotech (japan).rom" size="0x4000" crc="701ca810" sha1="565bca08b1a07a367548ea6b4dcb9f80a6e49b01" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blckonyx">
 		<description>The Black Onyx (Japan)</description>
 		<year>1985</year>
@@ -2524,7 +2584,7 @@ kept for now until finding out what those bytes affect...
 	<software name="blagger" supported="partial">
 		<description>Blagger MSX (Japan)</description>
 		<year>1984</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ブラッガー" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -2695,6 +2755,30 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
 				<rom name="bomber man (1986)(korea soft bank)[a].rom" size="0x2000" crc="c9a2c37e" sha1="8976f8b8ab2a82f626a73c781d0a21899ae68dae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmanspec">
+		<description>Bomber Man Special (Japan)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bomber man special (japan).rom" size="0x8000" crc="600f53de" sha1="7f9e577475e228dcbc97fffd7cb6e1f6e9ff36a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btexpsos">
+		<description>Bousou Tokkyuu SOS - Stop The Express (Japan)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bousou tokkyuu sos (japan).rom" size="0x8000" crc="334efc07" sha1="f2d1a057940b44c04ba08f4ff2767eef8b515833" />
 			</dataarea>
 		</part>
 	</software>
@@ -2975,6 +3059,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="buru to marty kikiippatsu - inspecteur z (japan).rom" size="0x8000" crc="9cf39bd6" sha1="613c741535c92dfb01afec4135ef8ebddb49f999" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="busyrday">
+		<description>Busy Rainy Day (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="busy rainy day (japan).rom" size="0x4000" crc="5b3748df" sha1="0bca4a0212e2f54062554f94a36b329e4bf4d450" />
 			</dataarea>
 		</part>
 	</software>
@@ -3599,6 +3695,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="chess (japan).rom" size="0x4000" crc="11eed1c7" sha1="2c0c71c549738d668518db317dd70aecefd4aa72" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chickfgt" cloneof="fireball">
+		<description>Chick Fighter (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="chick fighter (japan).rom" size="0x4000" crc="8884b37b" sha1="f0af202a8a2e44e3d224b40496549e331620f1f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -4644,6 +4752,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="dimsnwar">
+		<description>Dimensional Wars (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="dimensional wars (japan).rom" size="0x4000" crc="3578702d" sha1="81167e567cf50ecad5641b573096b87d5055bcaa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dipdip">
 		<description>Dip Dip (Spain)</description>
 		<year>1985</year>
@@ -4664,6 +4784,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="dip dip (spain) (alt).rom" size="0x4000" crc="6b42d0d7" sha1="067c90e90b8910de615d481aeabe145269a9920f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogfight" cloneof="zerofght">
+		<description>Dog Fighter (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="dog fighter (japan).rom" size="0x4000" crc="a2de4c29" sha1="f75244e00d0bc5a7a34b84067d09e1e48fe9c87c" />
 			</dataarea>
 		</part>
 	</software>
@@ -4833,6 +4965,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="drainer (japan).rom" size="0x8000" crc="db803e8a" sha1="e34161034364ef03df907d62976c2ac8f551404f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drilltnk">
+		<description>Driller Tanks (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="driller tanks (japan).rom" size="0x4000" crc="d78da5fc" sha1="d22817c519f5316f61c963580a620b0493a6232d" />
 			</dataarea>
 		</part>
 	</software>
@@ -5363,7 +5507,7 @@ kept for now until finding out what those bytes affect...
 	<software name="flstory">
 		<description>The Fairyland Story (Japan)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<info name="gtin" value="04967948000041"/>
 		<part name="cart" interface="msx_cart">
@@ -5378,7 +5522,7 @@ kept for now until finding out what those bytes affect...
 	<software name="flstorya" cloneof="flstory">
 		<description>The Fairyland Story (Japan, alt)</description>
 		<year>1987</year>
-		<publisher>Hot-B</publisher>
+		<publisher>Hot-B Co.</publisher>
 		<info name="alt_title" value="フェアリーランドストーリー" />
 		<info name="gtin" value="04967948000041"/>
 		<part name="cart" interface="msx_cart">
@@ -5509,6 +5653,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="KONAMI" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="final zone wolf (1986)(zemina).rom" size="0x20000" crc="06310fb1" sha1="90ea059c57f011a4fb33a558e868ee639882fe5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fireball">
+		<description>Fireball (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="fireball (japan).rom" size="0x4000" crc="53def17c" sha1="c44effbc66b9f71555e9193db9fbe0a6e065a745" />
 			</dataarea>
 		</part>
 	</software>
@@ -6078,6 +6234,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="gangman">
+		<description>Gang Man (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gang man (japan).rom" size="0x4000" crc="e7475152" sha1="807829a439d80aaa803742d457a3d3cf6f29030e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gangmstr">
 		<description>Gang Master (Japan)</description>
 		<year>1983</year>
@@ -6621,6 +6789,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="gunman">
+		<description>Gunman (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="gunman (japan).rom" size="0x4000" crc="ccb76418" sha1="8f73000ba6b6883c18f32ac0cecd5269719874bf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gyroadv">
 		<description>Gyro Adventure (Japan)</description>
 		<year>1984</year>
@@ -6833,6 +7013,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="help">
+		<description>Help (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="help (japan).rom" size="0x4000" crc="22416c88" sha1="24b2b3b58961d528dbe30fbc1e54c9d96c0af4b2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="highway">
 		<description>High Way Star (Japan)</description>
 		<year>1983</year>
@@ -6862,7 +7054,7 @@ kept for now until finding out what those bytes affect...
 	<software name="hisha">
 		<description>Hisha (Japan)</description>
 		<year>1985</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="飛車" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -7058,7 +7250,7 @@ kept for now until finding out what those bytes affect...
 	<software name="hfox">
 		<description>Hurry Fox MSX Special (Japan)</description>
 		<year>1986</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="serial" value="44780" />
 		<info name="alt_title" value="は～りぃふぉっくすＭＳＸスペシャル" />
 		<info name="gtin" value="04988608447808"/>
@@ -7076,9 +7268,9 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="hfox2">
-		<description>Hurry Fox - Yuki no Maou hen (Japan)</description>
+		<description>Hurry Fox: Yuki no Maou hen (Japan)</description>
 		<year>1985</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="は～りぃふぉっくす雪の魔王編" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -7724,6 +7916,18 @@ Character creation does not write the new character data.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="karamaru (japan).rom" size="0x4000" crc="12be29fc" sha1="223337db25c942ece732214aba5dd624b574e9c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaerusht">
+		<description>Kaeru Shooter (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="kaeru shooter (japan).rom" size="0x4000" crc="905ab323" sha1="80b1a435d570979d5898a0a4d06aaefa5a87d211" />
 			</dataarea>
 		</part>
 	</software>
@@ -10716,7 +10920,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="picopico">
 		<description>Pico Pico (Japan)</description>
 		<year>1983</year>
-		<publisher>Microcabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="ピコピコ" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -11090,7 +11294,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 			</dataarea>
 		</part>
 		<part name="cass" interface="msx_cass">
-			<dataarea name="cass" size="0">
+			<dataarea name="cass" size="1">
 				<rom name="cass" size="0" status="nodump"/>
 			</dataarea>
 		</part>
@@ -11951,7 +12155,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="shogimc">
 		<description>Shougi (Japan, MicroCabin)</description>
 		<year>1985</year>
-		<publisher>MicroCabin</publisher>
+		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="将棋" />
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
@@ -12088,7 +12292,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	<software name="skygaldo">
 		<description>Skygaldo (Japan)</description>
 		<year>1986</year>
-		<publisher>Magical Zoo</publisher>
+		<publisher>MagicalZoo</publisher>
 		<info name="serial" value="MXMH21052" />
 		<info name="alt_title" value="スカイギャルド" />
 		<info name="gtin" value="04988614000011"/>
@@ -14211,7 +14415,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 
 	<!-- This might not exist on cartridge, no photographic evidence yet. -->
 	<software name="yakyukyo">
-		<description>Yakyu Kyo (Japan)</description>
+		<description>Yakyuu Kyou (Japan)</description>
 		<year>1985</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="野球狂" />
@@ -14364,7 +14568,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	</software>
 
 	<software name="chima">
-		<description>Youkai Tantei Chimachima (Japan)</description>
+		<description>Youkai Tantei Chima Chima (Japan)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -14378,7 +14582,7 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 	</software>
 
 	<software name="chimaa">
-		<description>Youkai Tantei Chimachima (Japan, alt)</description>
+		<description>Youkai Tantei Chima Chima (Japan, alt)</description>
 		<year>1985</year>
 		<publisher>Bothtec</publisher>
 		<info name="serial" value="MK-7401" />
@@ -14393,10 +14597,10 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 
 	<!-- No photographic proof of a physical release. -->
 	<software name="chimak" cloneof="chima">
-		<description>Yogoetamjeong Chimagun Chimachima (Korea)</description>
+		<description>Yogoetamjeong Chimagun Chima Chima (Korea)</description>
 		<year>19??</year>
 		<publisher>Topia</publisher>
-		<info name="alt_title" value="요괴탐정 치마군 Chimachima"/>
+		<info name="alt_title" value="요괴탐정 치마군 Chima Chima"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14935,6 +15139,18 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 		</part>
 	</software>
 
+	<software name="hb8kdemo">
+		<description>Hotbit HB-8000 Demo (Brazil)</description> <!-- The cartridge says Vendedor Eletrônico -->
+		<year>19??</year>
+		<publisher>Sharp-Epcom</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="vendedor electronico - sharp-epcom.rom" size="0x4000" crc="c1cb6973" sha1="c1af87d32eb5816c1d4fec436154f19df327df04" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="joytelop">
 		<description>Joytelop (Japan)</description>
 		<year>1985</year>
@@ -15058,6 +15274,19 @@ Right/left cursor keys select tape baud rate 1200/2400 respectively.
 				<rom name="game master ii (japan) (alt 1).rom" size="0x20000" crc="2d93f9cc" sha1="fe74b4df9698a61dffd3ac88f47619675514ba1c" />
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liguesee">
+		<description>Ligue-se ao Expert (Brazil)</description>
+		<year>19??</year>
+		<publisher>Gradiente</publisher>
+		<notes>Demo cartridge that came with the Gradiente Expert system.</notes>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="ligue-se ao expert - gradiente.rom" size="0x4000" crc="5c7cf05b" sha1="91e22b727002ceeb0cf5fb1019a0c907c3cd24a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -17773,18 +18002,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
-	<!-- Software does not start -->
-	<software name="xy" supported="no">
+	<software name="xy">
 		<description>X &amp; Y (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="alt_title" value="س و ص"/>
-		<info name="serial" value="M022" />
-		<info name="usage" value="Requires an Arabic MSX" />
+		<info name="serial" value="M022"/>
+		<info name="usage" value="Does not work on all MSX models. Systems known to work include: ax170, hx10, phc23."/>
 		<part name="cart" interface="msx_cart">
-			<feature name="start_page" value="2"/>
-			<dataarea name="rom" size="0x8000">
-				<rom name="x y (1987)(al alamiah).rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="x y - al alamiah.rom" size="0x8000" crc="a2541660" sha1="4666e2fe5d8ed47c990a39cc345c744202228924"/>
+				<rom size="0x8000" offset="0x8000" loadflag="reload"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19073,9 +19301,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="disk_vy0010" />
 			<dataarea name="rom" size="0x4000">
-				<!-- Dump contains contents of the memory mapped FDC registers -->
-				<!-- ROM label taken from schematic, possibly incorrect -->
-				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" />
+				<rom name="vy0010_jvc.rom" size="0x4000" crc="4ad08ce4" sha1="28b683d5f6fd4a59046d5a8843233596fced104a" />
 			</dataarea>
 		</part>
 	</software>
@@ -19218,6 +19444,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="3,4 - cobinee (2019).rom" size="0x8000" crc="1fadb2f3" sha1="1cfc616035ccaf11f56bd1e726eb785f75ba2cef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4mastmel">
+		<description>The 4 Masters of Melody</description>
+		<year>2019</year>
+		<publisher>Clube MSX</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="2"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="the 4 masters of melody - matra.rom" size="0x4000" crc="56dc456b" sha1="74094836d6deeebd70ead949553b8d7918716ab2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19541,6 +19779,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="batlgojo">
+		<description>The Battle on Gojo Ohashi</description>
+		<year>2020</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="the battle on gojo ohashi - matra.rom" size="0x10000" crc="5d1e5d4e" sha1="1086d8795f344753d55cf358e3c274f14e408751"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="battlot">
 		<description>Battlot</description>
 		<year>2021</year>
@@ -19659,7 +19909,8 @@ legacy FM implementations cannot find it.
 		<description>BitLogic</description>
 		<year>2016</year>
 		<publisher>Matra</publisher>
-		<info name="developer" value="OXiAB Game Studio &amp; ThePetsMode"/>
+		<info name="developer" value="OXiAB Game Studio" />
+		<info name="developer" value="ThePetsMode" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x40000">
@@ -19672,7 +19923,8 @@ legacy FM implementations cannot find it.
 		<description>BitLogic (MSXdev)</description>
 		<year>2015</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="OXiAB Game Studio &amp; ThePetsMode"/>
+		<info name="developer" value="OXiAB Game Studio" />
+		<info name="developer" value="ThePetsMode" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
@@ -21061,7 +21313,8 @@ legacy FM implementations cannot find it.
 		<description>Destroyer</description>
 		<year>2014</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="CEZ / RetroWorks"/>
+		<info name="developer" value="CEZ" />
+		<info name="developer" value="RetroWorks" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -21074,7 +21327,8 @@ legacy FM implementations cannot find it.
 		<description>Destroyer (older)</description>
 		<year>2014</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="CEZ / RetroWorks"/>
+		<info name="developer" value="CEZ" />
+		<info name="developer" value="RetroWorks" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -21810,6 +22064,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="ghost">
+		<description>Ghost</description>
+		<year>2017</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ghost - matra.rom" size="0x10000" crc="48efb417" sha1="d26ea45f0b84f65df21fe54573ef2c37e21bc591"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gniffel">
 		<description>Gniffel</description>
 		<year>2004</year>
@@ -21865,7 +22131,9 @@ legacy FM implementations cannot find it.
 		<description>Gommy - Medieval Defender (English)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<info name="developer" value="Retroworks" />
+		<info name="developer" value="Dimension Z" />
+		<info name="developer" value="nenefranz" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -21878,7 +22146,9 @@ legacy FM implementations cannot find it.
 		<description>Gommy - Medieval Defender (Spanish)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<info name="developer" value="Retroworks" />
+		<info name="developer" value="Dimension Z" />
+		<info name="developer" value="nenefranz" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -22373,6 +22643,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="killrstn">
+		<description>Killer Station (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="killer station (japan).rom" size="0x4000" crc="2dff3b7f" sha1="fadb33a170d84d5f8d8f23dc740e0a224bd211da" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="klondike">
 		<description>Klondike Solitaire</description>
 		<year>2021</year>
@@ -22801,7 +23083,7 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
@@ -22814,7 +23096,7 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3 (alt)</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
@@ -22899,6 +23181,19 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="magtower">
+		<description>Magical Tower Adventure</description>
+		<year>2017</year>
+		<publisher>MSXdev</publisher>
+		<info name="developer" value="Timmy"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="magical tower adventure - timmy.rom" size="0x8000" crc="273c07c7" sha1="50cc78e08fcb36ce9fb1c57d77c8758f439ba525" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magnet">
 		<description>Magnet</description>
 		<year>19??</year>
@@ -22908,6 +23203,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x2000">
 				<rom name="magnet - unknown (-).rom" size="0x2000" crc="ff58f017" sha1="04f9fb981a2f21acf6593240dce155230369c1cf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjongc">
+		<description>Mah-Jong Crazy (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="mah-jong crazy (japan).rom" size="0x4000" crc="7382f3ac" sha1="17e1111b1d6aa80e8bc525be345c25e3b00ed504" />
 			</dataarea>
 		</part>
 	</software>
@@ -23461,6 +23768,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="mj05">
+		<description>MJ-05 (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="mj-05 (japan).rom" size="0x4000" crc="69b03a8b" sha1="20da51ccd50e7c6927a0f7a7898901a77233879e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monshunt">
 		<description>Monster Hunter (English)</description>
 		<year>2006</year>
@@ -23483,6 +23802,18 @@ legacy FM implementations cannot find it.
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="monster hunter - nerlaska studio (2006) (spanish).rom" size="0x20000" crc="b876a92f" sha1="ca45da2f9cd8edf4ab04ffd542b9c60ef6a9a254" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moodland">
+		<description>Mood Land</description>
+		<year>2018</year>
+		<publisher>GameCast Entertainment</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="konami_scc" />
+			<dataarea name="rom" size="0x10000">
+				<rom name="mood land - gamecast entertainment.rom" size="0x10000" crc="22fb60c5" sha1="6b10823a397e027f1745fda6487c01232414d438" />
 			</dataarea>
 		</part>
 	</software>
@@ -24160,7 +24491,7 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24173,7 +24504,7 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo (older)</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24414,6 +24745,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="policedg">
+		<description>Police Dog (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="police dog (japan).rom" size="0x4000" crc="601318e0" sha1="305e9d31118a6768032d11f547295e5d9358c9bf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msxpong">
 		<description>MSX Pong!</description>
 		<year>2015</year>
@@ -24423,6 +24766,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="pong - cesar rincon (2015).rom" size="0x4000" crc="a7935543" sha1="8435bf4fd322268b1bd2a5cb5d03b35fb957eeae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powrfail">
+		<description>Power Fail (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="power fail (japan).rom" size="0x4000" crc="1f3190e5" sha1="be7ee0430fa5f62fb03362d815c3c5f33e59dd47" />
 			</dataarea>
 		</part>
 	</software>
@@ -24453,11 +24808,37 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="prncsqst">
+		<description>Princess Quest</description>
+		<year>2012</year>
+		<publisher>Matra</publisher>
+		<info name="developer" value="Óscar Toledo Gutiérrez"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="princess quest - matra.rom" size="0x10000" crc="aa31ac36" sha1="405db36a0b57fa4871a7991ebe72695793d3b7c9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prsnrwar">
+		<description>Prisoner of War</description>
+		<year>2018</year>
+		<publisher>Matra</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="prisoner of war - matra.rom" size="0x10000" crc="49efb097" sha1="f07f68e873689e1d7083e21b805b8a5b174f50d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="psged">
 		<description>PSGed (v0.82b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24470,7 +24851,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.8b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24483,7 +24865,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.4b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8001">
@@ -24891,7 +25274,8 @@ legacy FM implementations cannot find it.
 		<description>Sacred Valley</description>
 		<year>2022</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Visualedu &amp; Bitcaffe"/>
+		<info name="developer" value="Visualedu" />
+		<info name="developer" value="Bitcaffe" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0x10000">
@@ -24935,6 +25319,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="sdsniper - kirem (2021).rom" size="0x4000" crc="f3337098" sha1="53f2f039e3c94be25dcb1032101c33b1ff036042" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seabombr">
+		<description>Sea Bomber (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="sea bomber (japan).rom" size="0x4000" crc="1301a0b1" sha1="7a9525162476e6a87199b3e2554b47e2cc1f3647" />
 			</dataarea>
 		</part>
 	</software>
@@ -25153,6 +25549,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
 				<rom name="skullrs - digiconcrete (2017) [msxdev 2017].rom" size="0x4000" crc="309dd40d" sha1="05108215d0f46fa9a369da35d4c8dec2d3c9366d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skydiver">
+		<description>Sky Diver (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="sky diver (japan).rom" size="0x4000" crc="04b4bfe5" sha1="218fbe857afb3f8097150d3e1665004255504cc4" />
 			</dataarea>
 		</part>
 	</software>
@@ -25397,6 +25805,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="starsold">
+		<description>Star Soldier (Japan)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="star soldier (japan).rom" size="0x8000" crc="f6d4e101" sha1="b58caf47c953b6f00935a201bfccf7ee968dff32" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="step">
 		<description>Step (v1.2)</description>
 		<year>2021</year>
@@ -25591,15 +26011,39 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="submarin">
+		<description>Submarine Shooter (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="submarine shooter (japan).rom" size="0x4000" crc="bdfe524f" sha1="aa0da0f570da8acb7d37e3902c1082dccbf25154" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sudoku">
 		<description>Sudoku</description>
 		<year>2006</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="sudoku - dvik &amp; joyrex (2006) [msx-dev06].rom" size="0x8000" crc="8a70a96b" sha1="120d477cd28b48b8a63efb34920ac331b54e66e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprdoor">
+		<description>Super Doors (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="super doors (japan).rom" size="0x4000" crc="6d0e9c3a" sha1="35a8a509692f308defb9dce0c2fe8a04848f8783" />
 			</dataarea>
 		</part>
 	</software>
@@ -25636,6 +26080,18 @@ legacy FM implementations cannot find it.
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="t game 4 - ochixn (2019) (alt).rom" size="0x8000" crc="238686bc" sha1="626f0f095f284f1fa700e1c4911fa14c9ee8079f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tplan">
+		<description>T-Plan (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="t-plan (japan).rom" size="0x8000" crc="7b473526" sha1="0203159c72fe7944c03bbda31f79c7760c89efe4" />
 			</dataarea>
 		</part>
 	</software>
@@ -25983,21 +26439,21 @@ legacy FM implementations cannot find it.
 			<feature name="part_id" value="Part 1"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 1] v1.1.1.rom" size="0x8000" crc="d33c34ea" sha1="7a32d06b0c51da09d2ccb33d5ed9cf33df6fcf32" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 1] v1.1.1.rom" size="0x8000" crc="d33c34ea" sha1="7a32d06b0c51da09d2ccb33d5ed9cf33df6fcf32" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="msx_cart">
 			<feature name="part_id" value="Part 2"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 2] v1.1.1.rom" size="0x8000" crc="4ef9e5da" sha1="9477b1f2b22a2acdfe2d162abe8daea5961a6128" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 2] v1.1.1.rom" size="0x8000" crc="4ef9e5da" sha1="9477b1f2b22a2acdfe2d162abe8daea5961a6128" />
 			</dataarea>
 		</part>
 		<part name="cart3" interface="msx_cart">
 			<feature name="part_id" value="Part 3"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 3] v1.1.1.rom" size="0x8000" crc="3513159a" sha1="d214330e49fa7fa8d05a904d3eb1cca994d5222c" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 3] v1.1.1.rom" size="0x8000" crc="3513159a" sha1="d214330e49fa7fa8d05a904d3eb1cca994d5222c" />
 			</dataarea>
 		</part>
 	</software>
@@ -26010,21 +26466,21 @@ legacy FM implementations cannot find it.
 			<feature name="part_id" value="Part 1"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 1] v1.0.rom" size="0x8000" crc="8137ae26" sha1="e01b59ce50743372440dd7e38e2fc2f92d653414" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 1] v1.0.rom" size="0x8000" crc="8137ae26" sha1="e01b59ce50743372440dd7e38e2fc2f92d653414" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="msx_cart">
 			<feature name="part_id" value="Part 2"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 2] v1.0.rom" size="0x8000" crc="9a8fba69" sha1="b0138ea39dc8eedd51907b18b2cef6696e5e8776" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 2] v1.0.rom" size="0x8000" crc="9a8fba69" sha1="b0138ea39dc8eedd51907b18b2cef6696e5e8776" />
 			</dataarea>
 		</part>
 		<part name="cart3" interface="msx_cart">
 			<feature name="part_id" value="Part 3"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="the queens footsteps  - davide bucci (2020) [part 3] v1.0.rom" size="0x8000" crc="3266f9ed" sha1="a090c258bcd16ddfc2d818a7c6a650a0f1016b2b" />
+				<rom name="the queens footsteps - davide bucci (2020) [part 3] v1.0.rom" size="0x8000" crc="3266f9ed" sha1="a090c258bcd16ddfc2d818a7c6a650a0f1016b2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -26699,6 +27155,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="vegetble">
+		<description>Vegetable Crash (Japan)</description>
+		<year>1984</year>
+		<publisher>HoneyBee Soft Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x2000">
+				<rom name="vegetable crash (japan).rom" size="0x2000" crc="6043cb58" sha1="28ef08637cb8290e23cdb9891f8988322872f964" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="viking">
 		<description>Viking (English)</description>
 		<year>2005</year>
@@ -26986,7 +27454,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(en).rom" size="0x8000" crc="4b608d0c" sha1="d5486e703ffebaaad873e38f57498f2b4a87c190"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(en).rom" size="0x8000" crc="4b608d0c" sha1="d5486e703ffebaaad873e38f57498f2b4a87c190"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26999,7 +27467,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(es).rom" size="0x8000" crc="f8eef078" sha1="7a88578fafae461a2268420f17d709977f58d911"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(es).rom" size="0x8000" crc="f8eef078" sha1="7a88578fafae461a2268420f17d709977f58d911"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27012,7 +27480,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(nl).rom" size="0x8000" crc="94013997" sha1="84ed9f4e514bbc6d2801773acbe5d6db0e2c9ed8"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(nl).rom" size="0x8000" crc="94013997" sha1="84ed9f4e514bbc6d2801773acbe5d6db0e2c9ed8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27025,7 +27493,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.1 -  patriks retro tech (2022)(se).rom" size="0x8000" crc="d8766aaf" sha1="9aa70aa7b8e5aa454383ce1b81f809c2e5162b6c"/>
+				<rom name="word v1.1 - patriks retro tech (2022)(se).rom" size="0x8000" crc="d8766aaf" sha1="9aa70aa7b8e5aa454383ce1b81f809c2e5162b6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27038,7 +27506,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(en).rom" size="0x8000" crc="fe57e6a8" sha1="1bf4c71293c6ecf65862eca858baec8189963c86"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(en).rom" size="0x8000" crc="fe57e6a8" sha1="1bf4c71293c6ecf65862eca858baec8189963c86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27051,7 +27519,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(es).rom" size="0x8000" crc="4237621f" sha1="68cfebaba6fb99930986cf61393143d88d493b6d"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(es).rom" size="0x8000" crc="4237621f" sha1="68cfebaba6fb99930986cf61393143d88d493b6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27064,7 +27532,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(nl).rom" size="0x8000" crc="fcec5a00" sha1="f90ca2098052dee403452c4f36af74b37ee53756"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(nl).rom" size="0x8000" crc="fcec5a00" sha1="f90ca2098052dee403452c4f36af74b37ee53756"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27077,7 +27545,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="word v1.0 -  patriks retro tech (2022)(se).rom" size="0x8000" crc="6af9a4a0" sha1="68ba3b6adb31fcc713a436ed7c33cb90c2aa6eb7"/>
+				<rom name="word v1.0 - patriks retro tech (2022)(se).rom" size="0x8000" crc="6af9a4a0" sha1="68ba3b6adb31fcc713a436ed7c33cb90c2aa6eb7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27348,7 +27816,7 @@ legacy FM implementations cannot find it.
 		<description>Yahtzee</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -27385,7 +27853,8 @@ legacy FM implementations cannot find it.
 		<description>Yazzie Remastered</description>
 		<year>2020</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RetroSouls &amp; FRS"/>
+		<info name="developer" value="RetroSouls" />
+		<info name="developer" value="FRS" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -27481,6 +27950,18 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="zerofght">
+		<description>Zero Fighter (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="zero fighter (japan).rom" size="0x4000" crc="e1ad6d52" sha1="5ea46575e492cef09f197926e4c7d252c4f757c1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zombiecp">
 		<description>Zombie Calavera Prologue</description>
 		<year>2021</year>
@@ -27571,6 +28052,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="video80">
+		<description>Video-80 80-column video card</description>
+		<year>1988</year>
+		<publisher>F.Ulivi</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="video80" />
+			<dataarea name="rom" size="0x1000">
+				<rom name="video80_101.bin" size="0x1000" crc="9b7e4743" sha1="bba13511c8d4f1efb753e653da1691c0fad08eb3" />
+			</dataarea>
+		</part>
+	</software>
 <!--
 
  Sets below are hacked games "converted" from their original format into cartridge.

@@ -55,8 +55,10 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
-#include "machine/amigafdc.h"
+
 #include "speaker.h"
+
+#include "endianness.h"
 
 
 namespace {
@@ -90,11 +92,11 @@ public:
 	void init_dlta();
 	void init_argh();
 
-	template <int Coin> DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
+	template <int Coin> ioport_value coin_counter_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void arcadia_multibios_change_game(uint16_t data);
 	void arcadia_cia_0_portb_w(uint8_t data);
@@ -102,12 +104,12 @@ protected:
 private:
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
-	void a500_mem(address_map &map);
-	void arcadia_map(address_map &map);
-	void argh_map(address_map &map);
-	void overlay_512kb_map(address_map &map);
+	void a500_mem(address_map &map) ATTR_COLD;
+	void arcadia_map(address_map &map) ATTR_COLD;
+	void argh_map(address_map &map) ATTR_COLD;
+	void overlay_512kb_map(address_map &map) ATTR_COLD;
 
-	optional_memory_region m_bios_region, m_rom_board;
+	optional_region_ptr<uint16_t> m_bios_region, m_rom_board;
 
 	uint8_t m_coin_counter[2];
 };
@@ -123,7 +125,7 @@ private:
 void arcadia_amiga_state::arcadia_multibios_change_game(uint16_t data)
 {
 	if (data == 0)
-		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x97ffff, m_rom_board->base());
+		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x97ffff, &m_rom_board[0]);
 	else
 		m_maincpu->space(AS_PROGRAM).nop_read(0x800000, 0x97ffff);
 }
@@ -167,7 +169,7 @@ void arcadia_amiga_state::arcadia_cia_0_portb_w(uint8_t data)
  *************************************/
 
 template <int Coin>
-CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
+ioport_value arcadia_amiga_state::coin_counter_r()
 {
 	/* return coin counter values */
 	return m_coin_counter[Coin] & 3;
@@ -260,15 +262,15 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<0>)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, coin_counter_r<1>)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::coin_counter_r<0>))
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::coin_counter_r<1>))
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<0>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::amiga_joystick_convert<0>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(arcadia_amiga_state, amiga_joystick_convert<1>)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(arcadia_amiga_state::amiga_joystick_convert<1>))
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
@@ -291,8 +293,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, arcadia_amiga_state,coin_changed_callback, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(arcadia_amiga_state::coin_changed_callback), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(arcadia_amiga_state::coin_changed_callback), 1)
 INPUT_PORTS_END
 
 // ar_ldrb manual specifically claims to have 4-way gate sticks.
@@ -328,9 +330,9 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&arcadia_amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&arcadia_amiga_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
-	m_copper->set_host_cpu_tag(m_maincpu);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->custom_write_cb().set(m_chipset, FUNC(address_map_bank_device::write16));
 	m_copper->set_ecs_mode(false);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -343,14 +345,13 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(arcadia_amiga_state,amiga)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
-	m_paula->add_route(0, "lspeaker", 0.50);
-	m_paula->add_route(1, "rspeaker", 0.50);
-	m_paula->add_route(2, "rspeaker", 0.50);
-	m_paula->add_route(3, "lspeaker", 0.50);
+	m_paula->add_route(0, "speaker", 0.50, 0);
+	m_paula->add_route(1, "speaker", 0.50, 1);
+	m_paula->add_route(2, "speaker", 0.50, 1);
+	m_paula->add_route(3, "speaker", 0.50, 0);
 	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
@@ -366,7 +367,7 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
 	/* fdc */
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
@@ -929,23 +930,22 @@ ROM_END
 
 void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	uint16_t *rom = (uint16_t *)memregion(tag)->base();
-	int i;
+	uint16_t *rom = &memregion(tag)->as_u16();
 
-	/* only the low byte of ROMs are encrypted in these games */
-	for (i = 0; i < 0x20000/2; i++)
+	// only the low byte of ROMs are encrypted in these games
+	for (unsigned i = 0; i < 0x20000/2; i++)
 		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
 	if (0)
 	{
-		uint8_t *ROM = memregion(tag)->base();
+		auto ROM = util::big_endian_cast<uint8_t>(&memregion(tag)->as_u16());
 	//  int size = memregion(tag)->bytes();
 
 		auto filename = "decrypted_" + std::string(machine().system().name);
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
-			for (i = 0; i < 0x20000; i++)
+			for (unsigned i = 0; i < 0x20000; i++)
 				fwrite(&ROM[i*2], 1, 1, fp);
 
 			fclose(fp);
@@ -966,15 +966,11 @@ void arcadia_amiga_state::init_arcadia()
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;
 
-	if (m_bios_region != nullptr)
+	if (m_bios_region)
 	{
-		/* OnePlay bios is encrypted, TenPlay is not */
-		uint16_t *rom = (uint16_t *)m_bios_region->base();
-
-		if (rom[0] != 0x4afc)
-		{
+		// OnePlay bios is encrypted, TenPlay is not
+		if (m_bios_region[0] != 0x4afc)
 			generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);
-		}
 	}
 }
 

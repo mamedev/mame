@@ -25,20 +25,17 @@ struct pcb_type
 class ti99_cartridge_device;
 class cartridge_connector_device;
 
-class gromport_device : public device_t, public device_slot_interface
+class gromport_device : public device_t, public device_single_card_slot_interface<cartridge_connector_device>
 {
 public:
 	template <typename U>
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
-		: gromport_device(mconfig, tag, owner, clock)
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, U &&opts, const char *dflt)
+		: gromport_device(mconfig, tag, owner)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<U>(opts), dflt, false);
 	}
 
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void readz(offs_t offset, uint8_t *value);
 	void write(offs_t offset, uint8_t data);
@@ -59,10 +56,10 @@ public:
 	gromport_device& extend() { m_mask = 0x3fff; return *this; }
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_config_complete() override;
-	ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_config_complete() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	cartridge_connector_device*    m_connector;
@@ -75,6 +72,8 @@ private:
 
 class cartridge_connector_device : public device_t
 {
+	friend class gromport_device;
+
 public:
 	virtual void readz(offs_t offset, uint8_t *value) = 0;
 	virtual void write(offs_t offset, uint8_t data) = 0;
@@ -90,16 +89,17 @@ public:
 
 	void ready_line(int state);
 
-	virtual void insert(int index, bus::ti99::gromport::ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); }
-	virtual void remove(int index) { }
+	virtual void insert() { m_gromport->cartridge_inserted(); }
+	virtual void remove() { }
 	virtual bool is_grom_idle() = 0;
 
 protected:
 	cartridge_connector_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
 	bool     m_grom_selected;
+
+	void set_port(gromport_device* gromport) { m_gromport = gromport; }
 };
 
 } // end namespace bus::ti99::gromport

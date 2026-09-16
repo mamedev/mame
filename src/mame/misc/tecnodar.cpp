@@ -67,7 +67,7 @@ public:
 	void tecnodar(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void bank_w(offs_t offset, u8 data);
@@ -78,8 +78,8 @@ private:
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -314,7 +314,7 @@ void tecnodar_state::tecnodar(machine_config &config)
 
 	EEPROM_93C46_8BIT(config, m_eeprom); // unknown 8-pin IC
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	tms9129_device &vdp(TMS9129(config, "vdp", 10.245_MHz_XTAL)); // surface-scratched 40-pin DIP; exact type unknown
 	vdp.set_screen("screen");

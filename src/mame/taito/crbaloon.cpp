@@ -16,6 +16,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "screen.h"
+#include "sound.h"
 
 #define LOG_PC3092 (1U << 1)
 #define LOG_PC3259 (1U << 2)
@@ -68,7 +69,7 @@ void crbaloon_state::pc3092_w(offs_t offset, uint8_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
+ioport_value crbaloon_state::pc3092_r()
 {
 	uint32_t ret;
 
@@ -295,7 +296,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Name Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(crbaloon_state, pc3092_r)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(crbaloon_state::pc3092_r))
 
 	PORT_START("PC3092")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -373,7 +374,7 @@ void crbaloon_state::crbaloon(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_crbaloon);
 	PALETTE(config, "palette", FUNC(crbaloon_state::crbaloon_palette), 32);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	screen.set_raw(CRBALOON_MASTER_XTAL / 2, 320, 0, 256, 262, 0, 224);
 	screen.set_screen_update(FUNC(crbaloon_state::screen_update_crbaloon));
@@ -433,5 +434,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, crbaloon,  0,        crbaloon, crbaloon, crbaloon_state, empty_init, ROT90, "Taito Corporation", "Crazy Balloon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, crbaloon2, crbaloon, crbaloon, crbaloon, crbaloon_state, empty_init, ROT90, "Taito Corporation", "Crazy Balloon (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, crbaloon,  0,        crbaloon, crbaloon, crbaloon_state, empty_init, ROT90, "Taito", "Crazy Balloon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, crbaloon2, crbaloon, crbaloon, crbaloon, crbaloon_state, empty_init, ROT90, "Taito", "Crazy Balloon (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

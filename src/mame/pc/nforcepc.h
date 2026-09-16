@@ -28,26 +28,34 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		biosrom.set_tag(bios_device_tag);
 	}
-	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, const char *bios_device_tag)
+		: crush11_host_device(mconfig, tag, owner, 0, std::forward<T>(cpu_tag), bios_device_tag)
+	{
+		set_ids_host(0x10de01a4, 0xb2, 0);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		biosrom.set_tag(bios_device_tag);
+	}
+	crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	const char *get_cpu_tag() { return cpu.finder_tag(); }
 	void set_ram_size(uint32_t size) { ram_size = size; }
 	address_space *get_cpu_space(int spacenum) { return &cpu->space(spacenum); }
 
-	void bios_map(address_map &map);
+	void bios_map(address_map &map) ATTR_COLD;
 	void aperture_map(address_map &map) {}
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<device_memory_interface> cpu;
@@ -73,13 +81,13 @@ public:
 	void set_ram_size(int ram_size);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	int ddr_ram_size = 0;
@@ -95,13 +103,13 @@ DECLARE_DEVICE_TYPE(CRUSH11_MEMORY, crush11_memory_device)
 class smbus_logger_device : public device_t, public smbus_interface
 {
 public:
-	smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smbus_logger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -115,12 +123,15 @@ class smbus_rom_device : public device_t, public smbus_interface
 {
 public:
 	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const uint8_t *data, int size);
-	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, const uint8_t *data, int size)
+		: smbus_rom_device(mconfig, tag, owner, 0, data, size)
+	{}
+	smbus_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	const uint8_t *buffer  = nullptr;
@@ -135,12 +146,12 @@ DECLARE_DEVICE_TYPE(SMBUS_ROM, smbus_rom_device)
 class as99127f_device : public device_t, public smbus_interface
 {
 public:
-	as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	as99127f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -151,12 +162,12 @@ DECLARE_DEVICE_TYPE(AS99127F, as99127f_device)
 class as99127f_sensor2_device : public device_t, public smbus_interface
 {
 public:
-	as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	as99127f_sensor2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -167,12 +178,12 @@ DECLARE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device)
 class as99127f_sensor3_device : public device_t, public smbus_interface
 {
 public:
-	as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	as99127f_sensor3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual int execute_command(int command, int rw, int data) override;
 	uint8_t *get_buffer() { return buffer; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint8_t buffer[0xff]{};
@@ -185,11 +196,11 @@ DECLARE_DEVICE_TYPE(AS99127F_SENSOR3, as99127f_sensor3_device)
 class it8703f_device : public device_t, public lpcbus_device_interface
 {
 public:
-	it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	it8703f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual void map_extra(address_space *memory_space, address_space *io_space) override;
 	virtual void set_host(int device_index, lpcbus_host_interface *host) override;
 	virtual uint32_t dma_transfer(int channel, dma_operation operation, dma_size size, uint32_t data) override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	auto pin_reset() { return pin_reset_callback.bind(); }
 	auto pin_gatea20() { return pin_gatea20_callback.bind(); }
@@ -200,10 +211,10 @@ public:
 	auto ndtr2() { return m_ndtr2_callback.bind(); }
 	auto nrts2() { return m_nrts2_callback.bind(); }
 
-	void map_lpt(address_map& map);
-	void map_serial1(address_map& map);
-	void map_serial2(address_map& map);
-	void map_keyboard(address_map &map);
+	void map_lpt(address_map &map) ATTR_COLD;
+	void map_serial1(address_map &map) ATTR_COLD;
+	void map_serial2(address_map &map) ATTR_COLD;
+	void map_keyboard(address_map &map) ATTR_COLD;
 
 	// floppy disk controller
 	void irq_floppy_w(int state);
@@ -253,7 +264,7 @@ public:
 	void keybc_command_w(uint8_t data);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum OperatingMode
@@ -302,8 +313,8 @@ private:
 	address_space *memspace = nullptr;
 	address_space *iospace = nullptr;
 
-	void internal_memory_map(address_map &map);
-	void internal_io_map(address_map &map);
+	void internal_memory_map(address_map &map) ATTR_COLD;
+	void internal_io_map(address_map &map) ATTR_COLD;
 	uint16_t get_base_address(int logical, int index);
 	void map_fdc_addresses();
 	void map_lpt_addresses();

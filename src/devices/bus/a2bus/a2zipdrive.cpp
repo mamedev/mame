@@ -100,16 +100,17 @@ protected:
 	// construction/destruction
 	a2bus_zipdrivebase_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual bool take_c800() const override { return true; }
 
 	required_device<ata_interface_device> m_ata;
 	required_region_ptr<uint8_t> m_rom;
@@ -129,8 +130,8 @@ public:
 	a2bus_focusdrive_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 };
@@ -220,10 +221,10 @@ uint8_t a2bus_zipdrivebase_device::read_c0nx(uint8_t offset)
 		case 5:
 		case 6:
 		case 7:
-			return m_ata->cs0_r(offset, 0xff);
+			return m_ata->cs0_r(offset);
 
 		case 8: // data port
-			m_lastdata = m_ata->cs0_r(0, 0xffff);
+			m_lastdata = m_ata->cs0_r(0);
 //          printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -250,10 +251,10 @@ uint8_t a2bus_focusdrive_device::read_c0nx(uint8_t offset)
 		case 0xd:
 		case 0xe:
 		case 0xf:
-			return m_ata->cs0_r(offset&7, 0xff);
+			return m_ata->cs0_r(offset&7);
 
 		case 0: // data port
-			m_lastdata = m_ata->cs0_r(0, 0xffff);
+			m_lastdata = m_ata->cs0_r(0);
 			//printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
@@ -285,7 +286,7 @@ void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 6:
 		case 7:
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->cs0_w(offset, data, 0xff);
+			m_ata->cs0_w(offset, data);
 			break;
 
 		case 8:
@@ -297,7 +298,7 @@ void a2bus_zipdrivebase_device::write_c0nx(uint8_t offset, uint8_t data)
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->cs0_w(0, m_lastdata, 0xffff);
+			m_ata->cs0_w(0, m_lastdata);
 			break;
 
 		default:
@@ -320,14 +321,14 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0xf:
 			// due to a bug in the 6502 firmware, eat data if DRQ is set
 			#if 0
-			while (m_ata->cs0_r(7, 0xff) & 0x08)
+			while (m_ata->cs0_r(7) & 0x08)
 			{
-				m_ata->cs0_r(0, 0xffff);
+				m_ata->cs0_r(0);
 				printf("eating 2 bytes to clear DRQ\n");
 			}
 			#endif
 //          printf("%02x to IDE controller @ %x\n", data, offset);
-			m_ata->cs0_w(offset & 7, data, 0xff);
+			m_ata->cs0_w(offset & 7, data);
 			break;
 
 		case 0:
@@ -339,7 +340,7 @@ void a2bus_focusdrive_device::write_c0nx(uint8_t offset, uint8_t data)
 //          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
-			m_ata->cs0_w(0, m_lastdata, 0xffff);
+			m_ata->cs0_w(0, m_lastdata);
 			break;
 
 		default:

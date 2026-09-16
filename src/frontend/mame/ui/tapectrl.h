@@ -13,22 +13,27 @@
 
 #pragma once
 
-#include "imagedev/cassette.h"
 #include "ui/devctrl.h"
+
+#include "imagedev/cassette.h"
+
+#include "notifier.h"
+
 
 namespace ui {
 
 class menu_tape_control : public menu_device_control<cassette_image_device>
 {
 public:
-	menu_tape_control(mame_ui_manager &mui, render_container &container, cassette_image_device *device);
+	menu_tape_control(mame_ui_manager &mui, render_target &target, cassette_image_device *device);
 	virtual ~menu_tape_control() override;
 
 private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);
+	util::notifier_subscription m_notifier;
+	int m_slider_item_index;
 };
 
 } // namespace ui

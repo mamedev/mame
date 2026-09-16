@@ -227,8 +227,8 @@ public:
 	void init_kas89();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void mux_w(uint8_t data);
@@ -240,10 +240,10 @@ private:
 	void led_mux_select_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_nmi_cb);
-	void audio_io(address_map &map);
-	void audio_map(address_map &map);
-	void kas89_io(address_map &map);
-	void kas89_map(address_map &map);
+	void audio_io(address_map &map) ATTR_COLD;
+	void audio_map(address_map &map) ATTR_COLD;
+	void kas89_io(address_map &map) ATTR_COLD;
+	void kas89_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_mux_data;
 	uint8_t m_main_nmi_enable;
@@ -269,8 +269,7 @@ private:
 
 void kas89_state::machine_start()
 {
-	m_lamps.resolve();
-	m_lamps[37] = 0;   // turning off the operator led
+	m_lamps[37] = 0;   // turning off the operator LED
 
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_main_nmi_enable));
@@ -761,7 +760,7 @@ void kas89_state::kas89(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

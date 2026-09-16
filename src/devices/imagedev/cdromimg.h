@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_DEVICES_IMAGEDEV_CHD_CD_H
-#define MAME_DEVICES_IMAGEDEV_CHD_CD_H
+#ifndef MAME_IMAGEDEV_CDROMIMG_H
+#define MAME_IMAGEDEV_CDROMIMG_H
 
 #pragma once
 
@@ -59,7 +59,9 @@ public:
 	virtual const char *image_brief_type_name() const noexcept override { return "cdrm"; }
 
 	int get_last_track() const;
+	int get_last_session() const;
 	uint32_t get_track(uint32_t frame) const;
+	uint32_t get_track_index(uint32_t frame) const;
 	uint32_t get_track_start(uint32_t track) const;
 	bool read_data(uint32_t lbasector, void *buffer, uint32_t datatype, bool phys=false);
 	bool read_subcode(uint32_t lbasector, void *buffer, bool phys=false);
@@ -76,8 +78,8 @@ protected:
 
 	// device_t implementation
 	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_stop() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
@@ -112,4 +114,4 @@ public:
 };
 
 
-#endif // MAME_DEVICES_IMAGEDEV_CHD_CD_H
+#endif // MAME_IMAGEDEV_CDROMIMG_H

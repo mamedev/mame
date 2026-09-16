@@ -31,22 +31,21 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_portfolio_expansion_slot_interface overrides
 	bool pdet() override { return 1; }
 
 	virtual uint8_t eack_r() override;
 
-	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) override;
-
 private:
 	required_device<ins8250_device> m_uart;
+	memory_passthrough_handler m_uart_tap;
+	memory_passthrough_handler m_vector_tap;
 
 	uint8_t m_vector;
 };

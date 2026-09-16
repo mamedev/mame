@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_TAITO_TAITSJSEC_H
-#define MAME_TAITO_TAITSJSEC_H
+#ifndef MAME_TAITO_TAITOSJSEC_H
+#define MAME_TAITO_TAITOSJSEC_H
 
 #pragma once
 
@@ -41,9 +41,9 @@ public:
 	void reset_w(int state);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_add_mconfig(machine_config &config) override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u8 mcu_pa_r();
 	u8 mcu_pc_r();
@@ -91,4 +91,4 @@ private:
 	bool m_busak, m_reset;
 };
 
-#endif // MAME_TAITO_TATISJSEC_H
+#endif // MAME_TAITO_TAITOSJSEC_H

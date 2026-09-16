@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ELECTRON_M2105_M
-#define MAME_BUS_ELECTRON_M2105_M
+#ifndef MAME_BUS_ELECTRON_M2105_H
+#define MAME_BUS_ELECTRON_M2105_H
 
 #pragma once
 
@@ -35,11 +35,11 @@ public:
 	electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual uint8_t expbus_r(offs_t offset) override;
 	virtual void expbus_w(offs_t offset, uint8_t data) override;
@@ -59,5 +59,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ELECTRON_M2105, electron_m2105_device)
 
-
-#endif // MAME_BUS_ELECTRON_M2105_M
+#endif // MAME_BUS_ELECTRON_M2105_H

@@ -61,8 +61,8 @@ public:
 	void init_decryption();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -96,13 +96,11 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_io_map(address_map &map);
-	void main_prg_map(address_map &map);
-	void sound_prg_map(address_map &map);
+	void main_io_map(address_map &map) ATTR_COLD;
+	void main_prg_map(address_map &map) ATTR_COLD;
+	void sound_prg_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 TILE_GET_INFO_MEMBER(slapfght_ms_state::get_pf1_tile_info)
 {
@@ -203,8 +201,6 @@ void slapfght_ms_state::video_start()
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
-
-// machine
 
 void slapfght_ms_state::vblank_irq(int state)
 {
@@ -372,7 +368,7 @@ void slapfght_ms_state::slapfighm(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_ms_state::irq_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*8, 32*8);
@@ -413,9 +409,9 @@ ROM_START( slapfighm )
 	ROM_LOAD( "1_snd_fi_0101.ic12", 0x0000, 0x4000, CRC(4e3ae13e) SHA1(4ab29064f3a4cb4fd70a9eb8ddbffb4f5ee74057) ) // 1xxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x4000, "chars", 0 ) // on one MOD 4/2 board, contains the same data as the original among the weirdness
-	ROM_LOAD( "4-2_fi_401.ic17", 0x0000, 0x4000, CRC(fbdc3ded) SHA1(5c1db5fe0ce32d996f40acf51b9ea09f7709a032) ) // BADADDR         --xxxxxxxxxxxxx, 4-2_fi_401.ic17  [3/4] a77_03.6g IDENTICAL
+	ROM_LOAD( "4-2_fi_401.ic17", 0x0000, 0x4000, CRC(fbdc3ded) SHA1(5c1db5fe0ce32d996f40acf51b9ea09f7709a032) ) // BADADDR  --xxxxxxxxxxxxx, 4-2_fi_401.ic17  [3/4] a77_03.6g IDENTICAL
 	ROM_CONTINUE(                0x0000, 0x4000 )
-	ROM_LOAD( "4-2_fi_402.ic16", 0x2000, 0x2000, CRC(6e9ce9ea) SHA1(9b80360050022fb7b938a874d5c9adb344907bab) ) // BADADDR         x-xxxxxxxxxxxxx, 4-2_fi_402.ic16  [3/4] a77_04.6f IDENTICAL
+	ROM_LOAD( "4-2_fi_402.ic16", 0x2000, 0x2000, CRC(6e9ce9ea) SHA1(9b80360050022fb7b938a874d5c9adb344907bab) ) // BADADDR  x-xxxxxxxxxxxxx, 4-2_fi_402.ic16  [3/4] a77_04.6f IDENTICAL
 	ROM_CONTINUE(                0x2000, 0x2000 )
 	ROM_CONTINUE(                0x2000, 0x2000 )
 	ROM_IGNORE(                          0x2000 )
@@ -439,8 +435,8 @@ ROM_START( slapfighm )
 	ROM_LOAD( "3-sub_cpu_p0312_82s147.bin", 0x300, 0x200, CRC(28d906a7) SHA1(da11a515aa798c0fb687d8617461b0372364b332) )
 	ROM_LOAD( "51-1_p0502.ic10",            0x500, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
 
-	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
-	ROM_LOAD( "4-2_0400_pal16r6acn.ic29", 0x000, 0x104, NO_DUMP )
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "4-2_0400_pal16r6acn.ic29", 0x000, 0x104, CRC(cfbed5c6) SHA1(5ec184b973ed4b82a49678a84ebaf9e8e33ccd90) )
 	ROM_LOAD( "4-2-b_pal16r6_p0400.ic29", 0x000, 0x104, CRC(19ac48ea) SHA1(bb79d2e1522f144609cdfe32a01defd19753668d) )
 	ROM_LOAD( "51-1_p0503_pal16r6.ic46",  0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
 ROM_END
@@ -465,4 +461,4 @@ void slapfght_ms_state::init_decryption() // same as the one for blktiger_ms
 } // anonymous namespace
 
 
-GAME( 199?, slapfighm, alcon, slapfighm, slapfighm, slapfght_ms_state, init_decryption, ROT270, "bootleg (Gaelco / Ervisa)", "Slap Fight (Modular System)", MACHINE_IS_SKELETON )
+GAME( 199?, slapfighm, alcon, slapfighm, slapfighm, slapfght_ms_state, init_decryption, ROT270, "bootleg (Gaelco / Ervisa)", "Slap Fight (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

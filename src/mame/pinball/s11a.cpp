@@ -123,8 +123,8 @@ static INPUT_PORTS_START( s11a )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP64")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11a_state, audio_nmi, 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s11a_state, main_nmi, 1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11a_state::audio_nmi), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s11a_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
@@ -245,7 +245,7 @@ void s11a_state::s11a_base(machine_config &config)
 	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
 	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
 	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
-	HC55516(config, m_hc55516, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
+	HC55516(config, m_hc55516).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
 
 	PIA6821(config, m_pias);
 	m_pias->readpa_handler().set(FUNC(s11a_state::sound_r));
@@ -542,8 +542,8 @@ GAME(1987, f14_p5,   f14_l1,  s11a,     s11a, s11a_state, init_s11a, ROT0, "Will
 GAME(1987, fire_l3,  0,       s11a,     s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-3)",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987, fire_l2,  fire_l3, s11a,     s11a, s11a_state, init_s11a, ROT0, "Williams", "Fire! (L-2)",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME(1987, milln_l3, 0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Millionaire (L-3)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, pb_l5,    0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, pb_l1,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, pb_l2,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, pb_l3,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(1986, pb_p4,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1986, pb_l5,    0,       s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-5)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, pb_l1,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-1)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, pb_l2,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-2)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, pb_l3,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (L-3)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1986, pb_p4,    pb_l5,   s11a_obg, s11a, s11a_state, init_s11a, ROT0, "Williams", "Pin-Bot (P-4)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

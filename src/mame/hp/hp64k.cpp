@@ -183,8 +183,8 @@ public:
 private:
 	virtual void driver_start() override;
 	//virtual void machine_start();
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t hp64k_crtc_filter(uint8_t data);
 	void hp64k_crtc_w(offs_t offset, uint16_t data);
@@ -244,8 +244,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 	void hp64k_baud_clk_w(int state);
-	void cpu_io_map(address_map &map);
-	void cpu_mem_map(address_map &map);
+	void cpu_io_map(address_map &map) ATTR_COLD;
+	void cpu_mem_map(address_map &map) ATTR_COLD;
 
 	required_device<hp_5061_3011_cpu_device> m_cpu;
 	required_device<i8275_device> m_crtc;
@@ -477,16 +477,17 @@ I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 		uint8_t chargen_byte = m_chargen[ linecount  | ((unsigned)charcode << 4) ];
 		uint16_t pixels_lvid , pixels_livid;
 
-		if (vsp) {
+		using namespace i8275_attributes;
+		if (BIT(attrcode , VSP)) {
 				pixels_lvid = pixels_livid = ~0;
-		} else if (lten) {
+		} else if (BIT(attrcode , LTEN)) {
 				pixels_livid = ~0;
-				if (rvv) {
+				if (BIT(attrcode , RVV)) {
 						pixels_lvid = ~0;
 				} else {
 						pixels_lvid = 0;
 				}
-		} else if (rvv) {
+		} else if (BIT(attrcode , RVV)) {
 				pixels_lvid = ~0;
 				pixels_livid = (uint16_t)chargen_byte << 1;
 		} else {
@@ -1388,7 +1389,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_crtc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_drq_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_vrtc_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(60);
@@ -1403,7 +1404,7 @@ void hp64k_state::hp64k(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 	FLOPPY_CONNECTOR(config, "fdc:1", hp64k_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats, true);
 
-	TTL74123(config, m_ss[0], 0);
+	TTL74123(config, m_ss[0]);
 	m_ss[0]->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ss[0]->set_resistor_value(RES_K(68.1));
 	// Warning! Duration formula is not correct for LS123, actual capacitor is 10 uF
@@ -1412,7 +1413,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_ss[0]->set_clear_pin_value(1);
 	m_ss[0]->out_cb().set(FUNC(hp64k_state::hp64k_floppy0_rdy));
 
-	TTL74123(config, m_ss[1], 0);
+	TTL74123(config, m_ss[1]);
 	m_ss[1]->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ss[1]->set_resistor_value(RES_K(68.1));
 	m_ss[1]->set_capacitor_value(CAP_U(16));
@@ -1428,7 +1429,7 @@ void hp64k_state::hp64k(machine_config &config)
 	COM8116(config, m_baud_rate, 5.0688_MHz_XTAL);
 	m_baud_rate->fr_handler().set(FUNC(hp64k_state::hp64k_baud_clk_w));
 
-	I8251(config, m_uart, 0);
+	I8251(config, m_uart);
 	m_uart->rxrdy_handler().set(FUNC(hp64k_state::hp64k_rxrdy_w));
 	m_uart->txrdy_handler().set(FUNC(hp64k_state::hp64k_txrdy_w));
 	m_uart->txd_handler().set(FUNC(hp64k_state::hp64k_txd_w));
@@ -1440,7 +1441,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_rs232->dcd_handler().set(FUNC(hp64k_state::hp64k_rs232_dcd_w));
 	m_rs232->cts_handler().set(FUNC(hp64k_state::hp64k_rs232_cts_w));
 
-	PHI(config, m_phi, 0);
+	PHI(config, m_phi);
 	m_phi->int_write_cb().set(FUNC(hp64k_state::hp64k_phi_int_w));
 	m_phi->dmarq_write_cb().set(m_cpu, FUNC(hp_5061_3011_cpu_device::halt_w));
 	m_phi->sys_cntrl_read_cb().set(FUNC(hp64k_state::hp64k_phi_sys_ctrl_r));

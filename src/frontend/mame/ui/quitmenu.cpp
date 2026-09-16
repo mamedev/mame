@@ -16,8 +16,8 @@
 
 namespace ui {
 
-menu_confirm_quit::menu_confirm_quit(mame_ui_manager &mui, render_container &container)
-	: autopause_menu<>(mui, container)
+menu_confirm_quit::menu_confirm_quit(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 {
 	set_one_shot(true);
 	set_needs_prev_menu_item(false);

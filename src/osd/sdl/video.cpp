@@ -62,7 +62,6 @@ bool sdl_osd_interface::video_init()
 	for (index = 0; index < video_config.numscreens; index++)
 	{
 		osd_window_config conf;
-		memset(&conf, 0, sizeof(conf));
 		get_resolution(options().resolution(), options().resolution(index), &conf, true);
 
 		// create window ...
@@ -74,7 +73,17 @@ bool sdl_osd_interface::video_init()
 	}
 
 	if (m_render->is_interactive())
-		SDL_RaiseWindow(dynamic_cast<sdl_window_info &>(*osd_common_t::s_window_list.front()).platform_window());
+	{
+		SDL_Window *const sdlwindow = dynamic_cast<sdl_window_info &>(*osd_common_t::s_window_list.front()).platform_window();
+		SDL_RaiseWindow(sdlwindow);
+
+#ifdef SDLMAME_MACOSX
+		// ensure focus is acquired before the input modules start polling
+		process_events();
+		if (!has_focus())
+			osd_printf_verbose("Window did not acquire input focus\n");
+#endif
+	}
 
 	return true;
 }

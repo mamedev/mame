@@ -103,7 +103,7 @@ public:
 	uint8_t& get_reg(unsigned idx) { return m_reg[ idx ]; }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	device_delegate<void (int)> m_co_handler;

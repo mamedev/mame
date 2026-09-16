@@ -7,16 +7,19 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-#ifndef MAME_HP_HP84_H
-#define MAME_HP_HP84_H
+#ifndef MAME_HP_HP48_H
+#define MAME_HP_HP48_H
 
 #pragma once
 
-#include "cpu/saturn/saturn.h"
 #include "hp48_port.h"
+
+#include "cpu/saturn/saturn.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
+
 
 /* model */
 typedef enum {
@@ -89,7 +92,7 @@ public:
 	hp48_module m_modules[6];
 
 private:
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 	void base_machine_start(hp48_models model);
 
 	void hp48_palette(palette_device &palette) const;
@@ -133,7 +136,7 @@ private:
 	/* keyboard interrupt system */
 	void rsi(int state);
 	void hp48_common(machine_config &config);
-	void hp48(address_map &map);
+	void hp48(address_map &map) ATTR_COLD;
 
 	required_device<saturn_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -215,4 +218,4 @@ private:
 #define HP48_NCE3 4
 #define HP48_NCE1 5
 
-#endif // MAME_HP_HP84_H
+#endif // MAME_HP_HP48_H

@@ -2,8 +2,8 @@
 // experimental/coro/simple_test.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2021 Klemens D. Morgenstern
-//                    (klemens dot morgenstern at gmx dot net)
+// Copyright (c) 2021-2023 Klemens D. Morgenstern
+//                         (klemens dot morgenstern at gmx dot net)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -82,7 +82,10 @@ asio::experimental::coro<int> generator_impl(
 
   int i = 0;
   while (true)
-    co_yield last = ++i;
+  {
+    last = ++i;
+    co_yield last;
+  }
 }
 
 asio::awaitable<void> generator_test()
@@ -190,8 +193,7 @@ asio::awaitable<void> completion_generator_test()
 
   ASIO_CHECK(!g.is_open());
   ASIO_CHECK((res == std::vector{0,1,2,3,4,5,6,7,8,9}));
-};
-
+}
 
 void run_completion_generator_test()
 {
@@ -243,7 +245,7 @@ asio::awaitable<void> symmetrical_test()
 
   ASIO_CHECK(45 == (co_await g.async_resume(9,
           asio::use_awaitable)).value_or(-1));
-};
+}
 
 void run_symmetrical_test()
 {

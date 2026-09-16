@@ -12,27 +12,18 @@
 #include "coco12.h"
 
 //-------------------------------------------------
-//  device_start
+//  machine_start
 //-------------------------------------------------
 
-void coco12_state::device_start()
+void coco12_state::machine_start()
 {
-	coco_state::device_start();
+	coco_state::machine_start();
 	configure_sam();
-}
 
-
-
-//-------------------------------------------------
-//  configure_sam
-//-------------------------------------------------
-
-void coco12_state::configure_sam()
-{
-	offs_t ramsize = m_ram->size();
-	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
-	if (ramsize < 65536)
-		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
+	// right joystick
+	m_joy_handlers[0] = std::make_unique<coco_joy_standard>(*this, 0, ioport(JOYSTICK_BUTTONS_TAG));
+	// left joystick
+	m_joy_handlers[1] = std::make_unique<coco_joy_standard>(*this, 2, ioport(JOYSTICK_BUTTONS_TAG));
 }
 
 
@@ -60,6 +51,20 @@ void coco12_state::field_sync(int state)
 
 
 //-------------------------------------------------
+//  coco12_state::configure_sam
+//-------------------------------------------------
+
+void coco12_state::configure_sam()
+{
+	offs_t ramsize = m_ram->size();
+	m_sam->space(0).install_ram(0, ramsize - 1, m_ram->pointer());
+	if (ramsize < 65536)
+		m_sam->space(0).nop_readwrite(ramsize, 0xffff);
+}
+
+
+
+//-------------------------------------------------
 //  sam_read
 //-------------------------------------------------
 
@@ -77,10 +82,10 @@ uint8_t coco12_state::sam_read(offs_t offset)
 //  pia1_pb_changed
 //-------------------------------------------------
 
-void coco12_state::pia1_pb_changed(uint8_t data)
+void coco12_state::pia1_pb_w(uint8_t data)
 {
 	/* call inherited function */
-	coco_state::pia1_pb_changed(data);
+	coco_state::pia1_pb_w(data);
 
 	m_vdg->css_w(data & 0x08);
 	m_vdg->intext_w(data & 0x10);
@@ -88,4 +93,73 @@ void coco12_state::pia1_pb_changed(uint8_t data)
 	m_vdg->gm1_w(data & 0x20);
 	m_vdg->gm2_w(data & 0x40);
 	m_vdg->ag_w(data & 0x80);
+}
+
+
+
+//-------------------------------------------------
+//  deluxecoco_state::machine_start
+//-------------------------------------------------
+
+void deluxecoco_state::machine_start()
+{
+	coco12_state::machine_start();
+	configure_sam();
+
+	m_ram_view.disable();
+	m_rom_view.select(0);
+}
+
+
+
+//-------------------------------------------------
+//  deluxecoco_state::configure_sam
+//-------------------------------------------------
+
+void deluxecoco_state::configure_sam()
+{
+	m_sam->space(0).install_view(0x4000, 0x7fff, m_ram_view);
+
+	m_ram_view[0].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x0000);
+	m_ram_view[1].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x4000);
+	m_ram_view[2].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0x8000);
+	m_ram_view[3].install_ram(0x4000, 0x7fff, m_ram->pointer() + 0xc000);
+}
+
+
+//-------------------------------------------------
+//  deluxecoco::ff30_write
+//-------------------------------------------------
+
+void deluxecoco_state::ff30_write(offs_t offset, uint8_t data)
+{
+	if (offset == 0)
+	{
+		if (BIT(data, 2))
+			m_ram_view.select(data & 0x03);
+		else
+			m_ram_view.disable();
+
+		m_rom_view.select(BIT(data, 7));
+
+		if (BIT(data, 6))
+		{
+			m_timer->adjust(attotime::from_hz(60));
+		}
+		else
+		{
+			m_timer->adjust(attotime::never);
+			m_irqs->in_w<3>(0);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  deluxecoco_state::perodic_timer
+//-------------------------------------------------
+
+TIMER_DEVICE_CALLBACK_MEMBER(deluxecoco_state::perodic_timer)
+{
+	m_irqs->in_w<3>(1);
 }

@@ -37,7 +37,8 @@ local function make_macro(setting)
 					local ipt = {
 						port = input.port,
 						mask = input.mask,
-						type = ioport:token_to_input_type(input.type) }
+						type = ioport:token_to_input_type(input.type),
+						value = input.value }
 					local port = ioport.ports[input.port]
 					if port then
 						local field = port:field(input.mask)
@@ -87,7 +88,8 @@ local function make_settings(macros)
 				local b = {
 					port = input.port,
 					mask = input.mask,
-					type = ioport:input_type_to_token(input.type) }
+					type = ioport:input_type_to_token(input.type),
+					value = input.value }
 				table.insert(s.inputs, b)
 			end
 		end

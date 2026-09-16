@@ -103,8 +103,8 @@ protected:
 	scn_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const u16 *br_div, bool is_enhanced, bool is_aci);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// receiver helpers
 	virtual void set_rxrdy(bool state);
@@ -214,7 +214,7 @@ class scn2651_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2651_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2651_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2661a_device
@@ -223,7 +223,7 @@ class scn2661a_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2661a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2661a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2661b_device
@@ -232,7 +232,7 @@ class scn2661b_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2661b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2661b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2661c_device
@@ -241,7 +241,7 @@ class scn2661c_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2661c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2661c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> scn2641_device
@@ -250,7 +250,7 @@ class scn2641_device : public scn_pci_device
 {
 public:
 	// device type constructor
-	scn2641_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	scn2641_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// callback configuration
 	auto intr_handler() { return m_intr_callback.bind(); }

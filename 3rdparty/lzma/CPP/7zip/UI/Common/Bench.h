@@ -1,7 +1,7 @@
 // Bench.h
 
-#ifndef __7ZIP_BENCH_H
-#define __7ZIP_BENCH_H
+#ifndef ZIP7_INC_7ZIP_BENCH_H
+#define ZIP7_INC_7ZIP_BENCH_H
 
 #include "../../../Windows/System.h"
 
@@ -71,32 +71,31 @@ struct CTotalBenchRes
 };
 
 
+const unsigned kBenchMinDicLogSize = 18;
 
-struct IBenchCallback
+UInt64 GetBenchMemoryUsage(UInt32 numThreads, int level, UInt64 dictionary, bool totalBench);
+
+Z7_PURE_INTERFACES_BEGIN
+DECLARE_INTERFACE(IBenchCallback)
 {
   // virtual HRESULT SetFreq(bool showFreq, UInt64 cpuFreq) = 0;
   virtual HRESULT SetEncodeResult(const CBenchInfo &info, bool final) = 0;
   virtual HRESULT SetDecodeResult(const CBenchInfo &info, bool final) = 0;
 };
 
-
-
-const unsigned kBenchMinDicLogSize = 18;
-
-UInt64 GetBenchMemoryUsage(UInt32 numThreads, int level, UInt64 dictionary, bool totalBench);
-
-struct IBenchPrintCallback
+DECLARE_INTERFACE(IBenchPrintCallback)
 {
   virtual void Print(const char *s) = 0;
   virtual void NewLine() = 0;
   virtual HRESULT CheckBreak() = 0;
 };
 
-struct IBenchFreqCallback
+DECLARE_INTERFACE(IBenchFreqCallback)
 {
   virtual HRESULT AddCpuFreq(unsigned numThreads, UInt64 freq, UInt64 usage) = 0;
   virtual HRESULT FreqsFinished(unsigned numThreads) = 0;
 };
+Z7_PURE_INTERFACES_END
 
 HRESULT Bench(
     DECL_EXTERNAL_CODECS_LOC_VARS
@@ -113,7 +112,7 @@ void GetSysInfo(AString &s1, AString &s2);
 void GetCpuName(AString &s);
 void AddCpuFeatures(AString &s);
 
-#ifdef _7ZIP_LARGE_PAGES
+#ifdef Z7_LARGE_PAGES
 void Add_LargePages_String(AString &s);
 #else
 // #define Add_LargePages_String

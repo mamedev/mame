@@ -61,12 +61,12 @@ public:
 	void base(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
-	void common_map(address_map &map);
-	void common_sound_map(address_map &map);
-	void hyperspt_common_main_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
+	void common_sound_map(address_map &map) ATTR_COLD;
+	void hyperspt_common_main_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -78,7 +78,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dac_8bit_r2r_device> m_dac;
-	required_device<sn76496_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 	required_device<trackfld_audio_device> m_soundbrd;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -88,17 +88,16 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 private:
-	uint8_t m_sn76496_latch = 0U;
+	uint8_t m_sn76489a_latch = 0U;
 
-	void konami_sn76496_latch_w(uint8_t data) { m_sn76496_latch = data; }
-	void konami_sn76496_w(uint8_t data) { m_sn->write(m_sn76496_latch); }
+	void konami_sn76489a_latch_w(uint8_t data) { m_sn76489a_latch = data; }
+	void konami_sn76489a_w(uint8_t data) { m_sn->write(m_sn76489a_latch); }
 
 	uint8_t m_irq_mask = 0U;
 	template <uint8_t Which> void coin_counter_w(int state);
 	void irq_mask_w(int state);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
-	void flipscreen_w(int state);
 
 	void palette(palette_device &palette) const;
 
@@ -121,7 +120,7 @@ public:
 private:
 	required_device<vlm5030_device> m_vlm;
 
-	void sound_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class hypersptb_state : public base_state
@@ -132,8 +131,8 @@ public:
 	void hypersptb(machine_config &config);
 
 private:
-	void sound_map(address_map &map);
-	void adpcm_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void adpcm_map(address_map &map) ATTR_COLD;
 };
 
 class roadf_state : public base_state
@@ -145,17 +144,15 @@ public:
 	void roadfu(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -244,12 +241,6 @@ void base_state::colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void base_state::flipscreen_w(int state)
-{
-	flip_screen_set(state);
-	machine().tilemap().mark_all_dirty();
-}
-
 TILE_GET_INFO_MEMBER(base_state::get_bg_tile_info)
 {
 	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1) + ((m_colorram[tile_index] & 0x40) << 3);
@@ -284,9 +275,7 @@ void base_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 		/* Note that this adjustment must be done AFTER handling flip_screen(), thus
 		   proving that this is a hardware related "feature" */
-
 		sy += 1;
-
 
 		m_gfxdecode->gfx(0)->transmask(bitmap, cliprect,
 		code, color,
@@ -334,12 +323,10 @@ void roadf_state::video_start()
 }
 
 
-// machine
-
 void base_state::machine_start()
 {
 	save_item(NAME(m_irq_mask));
-	save_item(NAME(m_sn76496_latch));
+	save_item(NAME(m_sn76489a_latch));
 }
 
 template <uint8_t Which>
@@ -393,8 +380,8 @@ void base_state::common_sound_map(address_map &map)
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).r(m_soundbrd, FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
 	map(0xe000, 0xe000).w(m_dac, FUNC(dac_byte_interface::data_w));
-	map(0xe001, 0xe001).w(FUNC(hyperspt_state::konami_sn76496_latch_w));  // Loads the snd command into the snd latch
-	map(0xe002, 0xe002).w(FUNC(hyperspt_state::konami_sn76496_w));  // This address triggers the SN chip to read the data port.
+	map(0xe001, 0xe001).w(FUNC(hyperspt_state::konami_sn76489a_latch_w));  // Loads the snd command into the snd latch
+	map(0xe002, 0xe002).w(FUNC(hyperspt_state::konami_sn76489a_w));  // This address triggers the SN chip to read the data port.
 }
 
 void hyperspt_state::sound_map(address_map &map)
@@ -628,7 +615,7 @@ void base_state::base(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(14'318'181) / 4);        // verified on PCB
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // F2
-	mainlatch.q_out_cb<0>().set(FUNC(base_state::flipscreen_w));
+	mainlatch.q_out_cb<0>().set(FUNC(base_state::flip_screen_set));
 	mainlatch.q_out_cb<1>().set(m_soundbrd, FUNC(trackfld_audio_device::sh_irqtrigger_w)); // SOUND ON
 	mainlatch.q_out_cb<2>().set_nop(); // END
 	mainlatch.q_out_cb<3>().set(FUNC(base_state::coin_counter_w<0>)); // COIN 1
@@ -641,7 +628,7 @@ void base_state::base(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -658,12 +645,12 @@ void base_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	TRACKFLD_AUDIO(config, m_soundbrd, 0, m_audiocpu, finder_base::DUMMY_TAG);
+	TRACKFLD_AUDIO(config, m_soundbrd, m_audiocpu, finder_base::DUMMY_TAG);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 
-	SN76496(config, m_sn, XTAL(14'318'181)/8);  // verified on PCB
-	m_sn->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// According to the schematics, part number scratched off
+	SN76489A(config, m_sn, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 1.0);  // clock verified on PCB
 }
 
 void hyperspt_state::hyperspt(machine_config &config)
@@ -691,7 +678,7 @@ void hypersptb_state::hypersptb(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	HYPROLYB_ADPCM(config, "hyprolyb_adpcm", 0);
+	HYPROLYB_ADPCM(config, "hyprolyb_adpcm");
 
 	msm5205_device &msm(MSM5205(config, "msm", 384'000));
 	msm.vck_legacy_callback().set("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::vck_callback));

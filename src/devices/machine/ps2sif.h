@@ -41,8 +41,8 @@ public:
 	static const size_t MAX_FIFO_DEPTH;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	required_device<ps2_intc_device> m_intc;
 

@@ -9,7 +9,7 @@ Floptool is part of the MAME project. It shares large portions of code with MAME
 
 
 Using Floptool
-==============
+--------------
 
 Floptool is a command line program that contains a simple set of instructions. Commands are invoked in a manner along the lines of this:
 
@@ -33,7 +33,7 @@ Example usage:
 
 
 Floptool Formats
-================
+----------------
 
 These are the formats supported by Floptool for conversion to other formats.
 
@@ -138,12 +138,6 @@ These are the formats supported by Floptool for conversion to other formats.
 	Apple II 16-sector disk image
 
 	File extensions: dsk, do, po
-
-**A2_RWTS18**
-
-	Apple II RWTS18-type image
-
-	File extensions: rti
 
 **A2_EDD**
 

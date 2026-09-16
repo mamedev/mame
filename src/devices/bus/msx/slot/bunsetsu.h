@@ -21,8 +21,8 @@ public:
 	void set_bunsetsu_region_tag(const char *tag) { m_bunsetsu_region.set_tag(tag); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 buns_read();

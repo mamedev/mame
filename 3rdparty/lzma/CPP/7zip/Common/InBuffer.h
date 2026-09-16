@@ -1,12 +1,12 @@
 // InBuffer.h
 
-#ifndef __IN_BUFFER_H
-#define __IN_BUFFER_H
+#ifndef ZIP7_INC_IN_BUFFER_H
+#define ZIP7_INC_IN_BUFFER_H
 
 #include "../../Common/MyException.h"
 #include "../IStream.h"
 
-#ifndef _NO_EXCEPTIONS
+#ifndef Z7_NO_EXCEPTIONS
 struct CInBufferException: public CSystemException
 {
   CInBufferException(HRESULT errorCode): CSystemException(errorCode) {}
@@ -31,7 +31,7 @@ protected:
   Byte ReadByte_FromNewBlock();
 
 public:
-  #ifdef _NO_EXCEPTIONS
+  #ifdef Z7_NO_EXCEPTIONS
   HRESULT ErrorCode;
   #endif
   UInt32 NumExtraBytes;
@@ -51,6 +51,7 @@ public:
   bool WasFinished() const { return _wasFinished; }
 
   void SetStream(ISequentialInStream *stream) { _stream = stream; }
+  void ClearStreamPtr() { _stream = NULL; }
   
   void SetBuf(Byte *buf, size_t bufSize, size_t end, size_t pos)
   {
@@ -60,7 +61,7 @@ public:
     _buf = buf + pos;
     _bufLim = buf + end;
     _wasFinished = false;
-    #ifdef _NO_EXCEPTIONS
+    #ifdef Z7_NO_EXCEPTIONS
     ErrorCode = S_OK;
     #endif
     NumExtraBytes = 0;
@@ -68,7 +69,7 @@ public:
 
   void Init() throw();
   
-  MY_FORCE_INLINE
+  Z7_FORCE_INLINE
   bool ReadByte(Byte &b)
   {
     if (_buf >= _bufLim)
@@ -77,7 +78,7 @@ public:
     return true;
   }
 
-  MY_FORCE_INLINE
+  Z7_FORCE_INLINE
   bool ReadByte_FromBuf(Byte &b)
   {
     if (_buf >= _bufLim)
@@ -86,7 +87,7 @@ public:
     return true;
   }
   
-  MY_FORCE_INLINE
+  Z7_FORCE_INLINE
   Byte ReadByte()
   {
     if (_buf >= _bufLim)
@@ -94,7 +95,18 @@ public:
     return *_buf++;
   }
   
+  size_t ReadBytesPart(Byte *buf, size_t size);
   size_t ReadBytes(Byte *buf, size_t size);
+  const Byte *Lookahead(size_t &rem)
+  {
+    rem = (size_t)(_bufLim - _buf);
+    if (!rem)
+    {
+      ReadBlock();
+      rem = (size_t)(_bufLim - _buf);
+    }
+    return _buf;
+  }
   size_t Skip(size_t size);
 };
 

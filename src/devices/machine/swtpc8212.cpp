@@ -136,8 +136,10 @@ swtp|ct8212|southwest technical products ct8212,
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/swtpc8212.h"
+#include "swtpc8212.h"
+
 #include "machine/input_merger.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -420,22 +422,22 @@ void swtpc8212_device::mem_map(address_map &map)
 INPUT_PORTS_START(swtpc8212)
 
 	PORT_START("KEYPAD")
-	PORT_BIT(0x0002U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7 / Form") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0004U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8 / Xmit") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9 / ??") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0008U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("\xC3\xB7 / ??") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0200U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4 / Scroll Up") PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0400U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5 / \xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0100U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6 / Insert") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0800U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("\xC3\x97 / ??") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0020U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1 / \xE2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0040U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2 / Home") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0010U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3 / \xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x0080U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("- / LF") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x2000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0 / Scroll Down") PORT_CODE(KEYCODE_PGUP) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x4000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0 / \xE2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x1000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(". / Delete") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
-	PORT_BIT(0x8000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("+ / CR") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc8212_device, keypad_changed, 0)
+	PORT_BIT(0x0002U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7 / Form") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0004U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8 / Xmit") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0001U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9 / ??") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0008U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"÷ / ??") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0200U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4 / Scroll Up") PORT_CODE(KEYCODE_PGDN) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0400U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"5 / \u2191") PORT_CODE(KEYCODE_UP) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0) // U+2191 = ↑
+	PORT_BIT(0x0100U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6 / Insert") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0800U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"× / ??") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0020U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"1 / \u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0) // U+2190 = ←
+	PORT_BIT(0x0040U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2 / Home") PORT_CODE(KEYCODE_HOME) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x0010U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"3 / \u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0) // U+2192 = →
+	PORT_BIT(0x0080U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("- / LF") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x2000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("0 / Scroll Down") PORT_CODE(KEYCODE_PGUP) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x4000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(u8"0 / \u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0) // U+2193 = ↓
+	PORT_BIT(0x1000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(". / Delete") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
+	PORT_BIT(0x8000U, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("+ / CR") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(swtpc8212_device::keypad_changed), 0)
 
 	PORT_START("DIP_SWITCHES")
 	PORT_DIPNAME(0x1f, 0x19, "Baud Rate") PORT_DIPLOCATION("DIP:5,4,3,2,1")
@@ -530,7 +532,7 @@ void swtpc8212_device::device_add_mconfig(machine_config &config)
 	m_uart->out_rts_callback().set(FUNC(swtpc8212_device::write_rts));
 	m_uart->out_int_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(17.0748_MHz_XTAL, 918, 0, 738, 310, 0, 280);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -540,14 +542,14 @@ void swtpc8212_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_update_row_callback(FUNC(swtpc8212_device::update_row));
 
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard"));
 	keyboard.set_keyboard_callback(FUNC(swtpc8212_device::keyboard_put));
 
 	SPEAKER(config, "bell").front_center();
 	BEEP(config, m_beeper, 2000);
 	m_beeper->add_route(ALL_OUTPUTS, "bell", 0.25);
 
-	PRINTER(config, m_printer, 0);
+	PRINTER(config, m_printer);
 }
 
 ioport_constructor swtpc8212_device::device_input_ports() const

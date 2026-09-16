@@ -2,14 +2,16 @@
 // copyright-holders:R. Belmont, Phil Stroffolino, Acho A. Tang, Nicola Salmoria
 
 #include "konamigx.h"
-#include "k053246_k053247_k055673.h"
 
-#include "sound/k054539.h"
-#include "machine/k053252.h"
-#include "k055555.h"
+#include "k053246_k053247_k055673.h"
 #include "k054000.h"
-#include "machine/k054321.h"
+#include "k055555.h"
+
+#include "machine/k053252.h"
 #include "machine/timer.h"
+#include "sound/k054321.h"
+#include "sound/k054539.h"
+
 #include "tilemap.h"
 
 class mystwarr_state : public konamigx_state
@@ -39,18 +41,19 @@ private:
 	std::unique_ptr<uint8_t[]> m_decoded;
 
 	uint8_t m_mw_irq_control = 0;
-	int m_cur_sound_region = 0;
-	int m_layer_colorbase[6]{};
-	int m_oinprion = 0;
-	int m_cbparam = 0;
-	int m_sprite_colorbase = 0;
-	int m_sub1_colorbase = 0;
-	int m_last_psac_colorbase = 0;
-	int m_gametype = 0;
-	int m_roz_enable = 0;
-	int m_roz_rombank = 0;
+	int32_t m_cur_sound_region = 0;
+	uint16_t m_layer_colorbase[6]{};
+	int32_t m_oinprion = 0;
+	int32_t m_cbparam = 0;
+	int32_t m_sprite_colorbase = 0;
+	int32_t m_sub1_colorbase = 0;
+	int32_t m_last_psac_colorbase = 0;
+	int32_t m_gametype = 0;
+	int32_t m_roz_enable = 0;
+	int32_t m_roz_rombank = 0;
 	tilemap_t *m_ult_936_tilemap = nullptr;
 	uint16_t m_clip = 0;
+	uint8_t m_last_alpha_tile_mix_code = 0;
 
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_nmi_clk = 0;
@@ -103,6 +106,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
 	K056832_CB_MEMBER(mystwarr_tile_callback);
+	K056832_CB_MEMBER(viostorm_tile_callback);
 	K056832_CB_MEMBER(game5bpp_tile_callback);
 	K056832_CB_MEMBER(game4bpp_tile_callback);
 	K055673_CB_MEMBER(mystwarr_sprite_callback);
@@ -110,14 +114,14 @@ private:
 	K055673_CB_MEMBER(gaiapols_sprite_callback);
 	K055673_CB_MEMBER(martchmp_sprite_callback);
 	void decode_tiles();
-	void dadandrn_map(address_map &map);
-	void gaiapols_map(address_map &map);
-	void martchmp_map(address_map &map);
-	void martchmp_sound_map(address_map &map);
-	void metamrph_map(address_map &map);
-	void mystwarr_map(address_map &map);
-	void mystwarr_sound_map(address_map &map);
-	void oki_map(address_map &map); // for viostormabbl
-	void viostorm_map(address_map &map);
-	void viostormbl_map(address_map &map);
+	void dadandrn_map(address_map &map) ATTR_COLD;
+	void gaiapols_map(address_map &map) ATTR_COLD;
+	void martchmp_map(address_map &map) ATTR_COLD;
+	void martchmp_sound_map(address_map &map) ATTR_COLD;
+	void metamrph_map(address_map &map) ATTR_COLD;
+	void mystwarr_map(address_map &map) ATTR_COLD;
+	void mystwarr_sound_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD; // for viostormabbl
+	void viostorm_map(address_map &map) ATTR_COLD;
+	void viostormbl_map(address_map &map) ATTR_COLD;
 };

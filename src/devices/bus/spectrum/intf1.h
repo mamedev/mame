@@ -30,19 +30,19 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK | feature::LAN; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void pre_opcode_fetch(offs_t offset) override;
 	virtual void post_opcode_fetch(offs_t offset) override;
 	virtual uint8_t mreq_r(offs_t offset) override;
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	virtual int romcs() override;
+	virtual bool romcs() override;
 
 	// passthru
 	virtual void pre_data_fetch(offs_t offset) override { m_exp->pre_data_fetch(offset); }
@@ -56,7 +56,7 @@ private:
 	required_device<microdrive_image_device> m_mdv2;
 	required_memory_region m_rom;
 
-	int m_romcs;
+	bool m_romcs;
 };
 
 

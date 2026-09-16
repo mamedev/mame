@@ -11,17 +11,26 @@
         * Danger Express (1992)
         * Guardians of the 'Hood (1992)
 
-    Known bugs:
-        * ASIC65 for Road Riot not quite perfect
-        * Missing DSPCOM board for Road Riot 4WD
-            +or shared ram pcb that bridges both pcbs for the twin cab kind of like in F1: Exhaust Note and Air Rescue from segas32.cpp
+    Note: Road Riot 4WD sports a communication link with another PCB allowing two players to
+    to compete with each other. The way both PCBs communicate depends on the program version.
+        * The kit version uses an optional com-link board consisting on an ADSP-2105 (10MHz XTAL)
+          routing game link data through the ADSP's serial port.
+        * The dedicated twin cab version uses dual port RAM to bridge the two PCBs together (not
+          networked).
+
+    TODO:
+        * ASIC65 for Road Riot tests bad with a "TIMEOUT ERROR" for the internal RAM test. Comm port and checksum test ok
+        * Hook com-link board ADSP-2105 (and serial port) for roadriot and roadriota
+        * Hook dual port RAM and dual PCB comms for roadriotb
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "atarig42.h"
+
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+
 #include "emupal.h"
 #include "speaker.h"
 
@@ -70,7 +79,7 @@ uint8_t atarig42_state::a2d_data_r(offs_t offset)
 	if (!m_adc.found())
 		return 0xff;
 
-	uint8_t result = m_adc->data_r();
+	uint8_t const result = m_adc->data_r();
 	if (!machine().side_effects_disabled())
 		m_adc->address_offset_start_w(offset, 0);
 	return result;
@@ -83,7 +92,7 @@ void atarig42_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 14 controls the ASIC65 reset line */
-		m_asic65->reset_line((~data >> 14) & 1);
+		m_asic65->reset_line(BIT(~data, 14));
 
 		/* bits 13-11 are the MO control bits */
 		m_rle->control_write((data >> 11) & 7);
@@ -93,8 +102,8 @@ void atarig42_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(data & 0x10))
+		m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+		if (BIT(~data, 4))
 			m_jsa->reset();
 
 		/* bit 5 is /XRESET, probably related to the ASIC */
@@ -107,7 +116,7 @@ void atarig42_state::io_latch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void atarig42_state::mo_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
-	m_rle->command_write((data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
+	m_rle->command_write((data == 0) ? atari_rle_objects_device::COMMAND_CHECKSUM : atari_rle_objects_device::COMMAND_DRAW);
 }
 
 
@@ -232,7 +241,8 @@ void atarig42_0x200_state::roadriot_sloop_tweak(int offset)
 
 uint16_t atarig42_0x200_state::roadriot_sloop_data_r(offs_t offset)
 {
-	roadriot_sloop_tweak(offset);
+	if (!machine().side_effects_disabled())
+		roadriot_sloop_tweak(offset);
 	if (offset < 0x78000/2)
 		return m_sloop_base[offset];
 	else
@@ -289,7 +299,8 @@ void atarig42_0x400_state::guardians_sloop_tweak(int offset)
 
 uint16_t atarig42_0x400_state::guardians_sloop_data_r(offs_t offset)
 {
-	guardians_sloop_tweak(offset);
+	if (!machine().side_effects_disabled())
+		guardians_sloop_tweak(offset);
 	if (offset < 0x78000/2)
 		return m_sloop_base[offset];
 	else
@@ -334,7 +345,7 @@ void atarig42_state::main_map(address_map &map)
 	map(0xff1000, 0xff1fff).ram();
 	map(0xff2000, 0xff5fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xff6000, 0xff6fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
-	map(0xff7000, 0xff7001).ram().w(FUNC(atarig42_state::mo_command_w)).share("mo_command");
+	map(0xff7000, 0xff7001).ram().w(FUNC(atarig42_state::mo_command_w)).share(m_mo_command);
 	map(0xff7002, 0xffffff).ram();
 }
 
@@ -359,11 +370,11 @@ static INPUT_PORTS_START( roadriot )
 
 	PORT_START("IN2")       /* e00010 */
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0808_device::eoc_r))
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* analog 0 */
@@ -410,7 +421,7 @@ INPUT_PORTS_START( dangerex )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* analog 0 */
@@ -461,7 +472,7 @@ static INPUT_PORTS_START( guardian )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -496,9 +507,9 @@ static const gfx_layout pftoplayout =
 };
 
 static GFXDECODE_START( gfx_atarig42 )
-	GFXDECODE_ENTRY( "gfx1", 0, pflayout, 0x000, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_msb, 0x000, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, pftoplayout, 0x000, 64 )
+	GFXDECODE_ENTRY( "tiles", 0, pflayout, 0x000, 64 )
+	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x4_packed_msb, 0x000, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, pftoplayout, 0x000, 64 )
 GFXDECODE_END
 
 
@@ -566,19 +577,19 @@ void atarig42_state::atarig42(machine_config &config)
 	m_playfield_tilemap->set_info_callback(FUNC(atarig42_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(atarig42_state::get_alpha_tile_info));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(atarig42_state::screen_update_atarig42));
+	m_screen->set_screen_update(FUNC(atarig42_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);
@@ -587,23 +598,23 @@ void atarig42_state::atarig42(machine_config &config)
 void atarig42_0x200_state::atarig42_0x200(machine_config &config)
 {
 	atarig42(config);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x200);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x200);
 
 	ADC0809(config, m_adc, 14.318181_MHz_XTAL / 16);
 	m_adc->in_callback<0>().set_ioport("A2D0");
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, 0, ASIC65_ROMBASED);
+	ASIC65(config, m_asic65, ASIC65_ROMBASED);
 }
 
 void atarig42_0x400_state::atarig42_0x400(machine_config &config)
 {
 	atarig42(config);
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc_0x400);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x400);
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, 0, ASIC65_GUARDIANS);
+	ASIC65(config, m_asic65, ASIC65_GUARDIANS);
 }
 
 
@@ -614,7 +625,7 @@ void atarig42_0x400_state::atarig42_0x400(machine_config &config)
  *
  *************************************/
 
-ROM_START( roadriot )
+ROM_START( roadriot ) // Test mode shows DSP COMM and DSP LINK tests; This is a conversion kit version.
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-3214.8d", 0x00000, 0x20000, CRC(6b4dc220) SHA1(43517d8adbc8771ac4e4dcde221def12e1859b61) )
 	ROM_LOAD16_BYTE( "136089-3213.8c", 0x00001, 0x20000, CRC(2f182b74) SHA1(b6b30bc068b5eeb52e0000236b7f58b1e88bb154) )
@@ -627,7 +638,7 @@ ROM_START( roadriot )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x00000, 0x10000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_LOAD( "136089-1041.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136089-1038.22c",    0x020000, 0x20000, CRC(90f3c6ee) SHA1(7607509e2d3b2080a918cfaf2879dbed6b79d029) )
 	ROM_LOAD( "136089-1037.2021d",  0x040000, 0x20000, CRC(d40de62b) SHA1(fa6dfd20bdad7874ae33a1027a9bb0ea200f86ca) ) /* playfield, planes 2-3 */
@@ -635,7 +646,7 @@ ROM_START( roadriot )
 	ROM_LOAD( "136089-1040.20d",    0x080000, 0x20000, CRC(a81ae93f) SHA1(b694ba5fab35f8fa505a02039ae62f7af3c7ae1d) ) /* playfield, planes 4-5 */
 	ROM_LOAD( "136089-1042.20c",    0x0a0000, 0x20000, CRC(b8a6d15a) SHA1(43d2be9d40a84b2c01d80bbcac737eda04d55999) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136089-1046.22j",    0x000000, 0x20000, CRC(0005bab0) SHA1(257e1b23eea117fe6701a67134b96d9d9fe10caf) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x200000, "rle", 0 )
@@ -669,9 +680,12 @@ ROM_START( roadriot )
 	ROM_LOAD( "136089-1001.20p",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.22p",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.21p",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
+
+	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another PCB
+	ROM_LOAD( "136087-1025.4e", 0x0000, 0x10000, CRC(4c645933) SHA1(7a1cf049e368059a79b03598de73c30d8dae5e90) )
 ROM_END
 
-ROM_START( roadriota )
+ROM_START( roadriota ) // Test mode shows DSP COMM and DSP LINK tests; This is a conversion kit version.
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-3114.8d", 0x00000, 0x20000, CRC(a2bd949c) SHA1(f96064d491b4d488cadebd3a63a6d3edf9236046) )
 	ROM_LOAD16_BYTE( "136089-3113.8c", 0x00001, 0x20000, CRC(68c45cb1) SHA1(e38c7ad3f3d301e59a1d9f53e8f2c28e91d691fe) )
@@ -684,7 +698,7 @@ ROM_START( roadriota )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x00000, 0x10000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_LOAD( "136089-1041.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136089-1038.22c",    0x020000, 0x20000, CRC(90f3c6ee) SHA1(7607509e2d3b2080a918cfaf2879dbed6b79d029) )
 	ROM_LOAD( "136089-1037.2021d",  0x040000, 0x20000, CRC(d40de62b) SHA1(fa6dfd20bdad7874ae33a1027a9bb0ea200f86ca) ) /* playfield, planes 2-3 */
@@ -692,7 +706,7 @@ ROM_START( roadriota )
 	ROM_LOAD( "136089-1040.20d",    0x080000, 0x20000, CRC(a81ae93f) SHA1(b694ba5fab35f8fa505a02039ae62f7af3c7ae1d) ) /* playfield, planes 4-5 */
 	ROM_LOAD( "136089-1042.20c",    0x0a0000, 0x20000, CRC(b8a6d15a) SHA1(43d2be9d40a84b2c01d80bbcac737eda04d55999) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136089-1046.22j",    0x000000, 0x20000, CRC(0005bab0) SHA1(257e1b23eea117fe6701a67134b96d9d9fe10caf) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x200000, "rle", 0 )
@@ -726,9 +740,12 @@ ROM_START( roadriota )
 	ROM_LOAD( "136089-1001.20p",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.22p",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
 	ROM_LOAD( "136089-1003.21p",  0x0400, 0x0200, CRC(1f571706) SHA1(26d5ea59163b3482ab1f8a26178d0849c5fd9692) )
+
+	ROM_REGION( 0x10000, "commcpu", 0 ) // ADSP-2105 code for communications with another PCB
+	ROM_LOAD( "136087-1025.4e", 0x0000, 0x10000, CRC(4c645933) SHA1(7a1cf049e368059a79b03598de73c30d8dae5e90) )
 ROM_END
 
-ROM_START( roadriotb )
+ROM_START( roadriotb ) // Test mode shows only COMM RAM test; This is a dedicated twin version.
 	ROM_REGION( 0x80004, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "136089-2014.8d", 0x00000, 0x20000, CRC(bf8aaafc) SHA1(1594d91b56609d49921c866d8f5796619e79217b) ) /* Program ROMs in Blue labels,  */
 	ROM_LOAD16_BYTE( "136089-2013.8c", 0x00001, 0x20000, CRC(5dd2dd70) SHA1(8f6a0e809ec1f6feea8a18197a789086a7b9dd6a) ) /* other ROMs in Yellow labels   */
@@ -741,7 +758,7 @@ ROM_START( roadriotb )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136089-1047.12c", 0x00000, 0x10000, CRC(849dd26c) SHA1(05a0b2a5f7ee4437448b5f076d3066d96dec2320) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_LOAD( "136089-1041.22d",    0x000000, 0x20000, CRC(b7451f92) SHA1(9fd17913630e457e406e596f2d86afff98787750) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136089-1038.22c",    0x020000, 0x20000, CRC(90f3c6ee) SHA1(7607509e2d3b2080a918cfaf2879dbed6b79d029) )
 	ROM_LOAD( "136089-1037.2021d",  0x040000, 0x20000, CRC(d40de62b) SHA1(fa6dfd20bdad7874ae33a1027a9bb0ea200f86ca) ) /* playfield, planes 2-3 */
@@ -749,7 +766,7 @@ ROM_START( roadriotb )
 	ROM_LOAD( "136089-1040.20d",    0x080000, 0x20000, CRC(a81ae93f) SHA1(b694ba5fab35f8fa505a02039ae62f7af3c7ae1d) ) /* playfield, planes 4-5 */
 	ROM_LOAD( "136089-1042.20c",    0x0a0000, 0x20000, CRC(b8a6d15a) SHA1(43d2be9d40a84b2c01d80bbcac737eda04d55999) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136089-1046.22j",    0x000000, 0x20000, CRC(0005bab0) SHA1(257e1b23eea117fe6701a67134b96d9d9fe10caf) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x200000, "rle", 0 )
@@ -800,7 +817,7 @@ ROM_START( dangerex )
 	ROM_LOAD( "dx12c-5.12c", 0x10000, 0x4000, CRC(d72621f7) SHA1(4bf5c98dd2434cc6ed1bddb6baf42f41cf138e1a) )
 	ROM_CONTINUE(            0x04000, 0xc000 )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_REGION( 0xc0000, "tiles", 0 )
 	ROM_LOAD( "dxc117-22d.22d",    0x000000, 0x20000, CRC(5532995a) SHA1(21e001c911adb91dbe43e895ae8582df65f2995d) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "dx82-22c.22c",      0x020000, 0x20000, CRC(9548599b) SHA1(d08bae8dabce0175f956631ddfbf091653af035e) )
 	ROM_LOAD( "dxc116-20-21d.21d", 0x040000, 0x20000, CRC(ebbf0fd8) SHA1(4ceb026c4231b675215110c16c8f75551cdfa461) ) /* playfield, planes 2-3 */
@@ -808,7 +825,7 @@ ROM_START( dangerex )
 	ROM_LOAD( "dxc115-20d.20d",    0x080000, 0x20000, CRC(2819ce54) SHA1(9a3c041d9046af41997dc1d9f41bf0e1be9489f9) ) /* playfield, planes 4-5 */
 	ROM_LOAD( "dxc80-20c.20c",     0x0a0000, 0x20000, CRC(a8ffe459) SHA1(92a10694c38a4fbe3022662f4e8e4e214aab31c9) )
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "dxc187-22j.22j",   0x000000, 0x20000, CRC(7231ecc2) SHA1(8b1b0aed3a0d907630e120395b0a97fd9a1ef8cc) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x800000, "rle", 0 )
@@ -858,12 +875,12 @@ ROM_START( guardian )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 6502 code */
 	ROM_LOAD( "136092-0080-snd.12c", 0x00000, 0x10000, CRC(0388f805) SHA1(49c11313bc4192dbe294cf68b652cb19047889fd) )
 
-	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_REGION( 0x180000, "tiles", 0 )
 	ROM_LOAD( "136092-0037a.23e",  0x000000, 0x80000, CRC(ca10b63e) SHA1(243a2a440e1bc9135d3dbe6553d39c54b9bdcd13) ) /* playfield, planes 0-1 */
 	ROM_LOAD( "136092-0038a.22e",  0x080000, 0x80000, CRC(cb1431a1) SHA1(d7b8f49a1e794ca2083e4bf0fa3870ce08caa53a) ) /* playfield, planes 2-3 */
 	ROM_LOAD( "136092-0039a.20e",  0x100000, 0x80000, CRC(2eee7188) SHA1(d3adbd7b20bc898fee35b6ba781e7775f82acd19) ) /* playfield, planes 4-5 */
 
-	ROM_REGION( 0x020000, "gfx2", 0 )
+	ROM_REGION( 0x020000, "chars", 0 )
 	ROM_LOAD( "136092-0030.23k",   0x000000, 0x20000, CRC(0fd7baa1) SHA1(7802d732e5173291628ed498ad0fab71aeef4688) ) /* alphanumerics */
 
 	ROM_REGION16_BE( 0x600000, "rle", 0 )
@@ -917,7 +934,7 @@ void atarig42_0x200_state::init_roadriot()
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
-	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
+	m_sloop_base = &memregion("maincpu")->as_u16();
 
 	/*
 	Road Riot color MUX
@@ -952,13 +969,13 @@ void atarig42_0x400_state::init_guardian()
 {
 	m_playfield_base = 0x000;
 
-	/* it looks like they jsr to $80000 as some kind of protection */
-	/* put an RTS there so we don't die */
-	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
+	// it looks like they jsr to $80000 as some kind of protection
+	// put an RTS there so we don't die
+	memregion("maincpu")->as_u16(0x80000 / 2) = 0x4e75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
-	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
+	m_sloop_base = &memregion("maincpu")->as_u16();
 
 	/*
 	Guardians color MUX
@@ -990,8 +1007,8 @@ void atarig42_0x400_state::init_guardian()
  *
  *************************************/
 
-GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 1, 04 Dec 1991)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 2, 13 Nov 1991)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (set 3, 04 Jun 1991)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Dec 1991, conversion kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (13 Nov 1991, conversion kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Jun 1991, dedicated twin)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1992, dangerex,  0,        atarig42_0x400, dangerex, atarig42_0x400_state, init_dangerex, ROT0, "Atari Games", "Danger Express (prototype)", 0 )
 GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, init_guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )

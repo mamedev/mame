@@ -38,14 +38,14 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	int m_bf;                   // busy flag
@@ -105,7 +105,7 @@ private:
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sed1330(address_map &map);
+	void sed1330(address_map &map) ATTR_COLD;
 };
 
 

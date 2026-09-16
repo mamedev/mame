@@ -69,11 +69,11 @@ public:
 
 private:
 	uint32_t screen_update_sys2900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	memory_passthrough_handler m_rom_shadow_tap;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -144,7 +144,7 @@ void sys2900_state::sys2900(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sys2900_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);
@@ -154,10 +154,10 @@ void sys2900_state::sys2900(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	Z80CTC(config, "ctc", 0);
-	Z80PIO(config, "pio", 0);
-	Z80SIO(config, "sio1", 0);
-	Z80SIO(config, "sio2", 0);
+	Z80CTC(config, "ctc");
+	Z80PIO(config, "pio");
+	Z80SIO(config, "sio1");
+	Z80SIO(config, "sio2");
 }
 
 /* ROM definition */
@@ -171,4 +171,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT          COMPANY          FULLNAME       FLAGS
-COMP( 1981, sys2900, 0,      0,      sys2900, sys2900, sys2900_state, empty_init, "Systems Group", "System 2900", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, sys2900, 0,      0,      sys2900, sys2900, sys2900_state, empty_init, "Systems Group", "System 2900", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

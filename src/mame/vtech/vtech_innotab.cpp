@@ -15,7 +15,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -41,7 +40,7 @@ public:
 	void vtech_innotab(machine_config &config);
 
 private:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
@@ -86,14 +85,13 @@ void vtech_innotab_state::vtech_innotab(machine_config& config)
 {
 	ARM9(config, m_maincpu, 240000000); // unknown ARM type
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320 - 1, 0, 240 - 1);
 	m_screen->set_screen_update(FUNC(vtech_innotab_state::screen_update_innotab));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_innotab_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -221,4 +219,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_innotab, vtech_innotab_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_IS_SKELETON )
+CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_innotab, vtech_innotab_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

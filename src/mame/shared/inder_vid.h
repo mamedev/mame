@@ -12,8 +12,9 @@
 #pragma once
 
 
-#include "video/ramdac.h"
 #include "cpu/tms34010/tms34010.h"
+#include "video/ramdac.h"
+
 #include "emupal.h"
 
 DECLARE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device)
@@ -24,7 +25,7 @@ class inder_vid_device : public device_t
 {
 public:
 	// construction/destruction
-	inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// probably set by a register somewhere either on TMS side or 68k side
 	void set_bpp(int bpp)
@@ -32,13 +33,13 @@ public:
 		m_bpp_mode = bpp;
 	}
 
-	void megaphx_tms_map(address_map &map);
-	void ramdac_map(address_map &map);
+	void megaphx_tms_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint16_t> m_vram;

@@ -14,10 +14,12 @@
 
 #include "cpu/m6809/m6809.h"
 
+#define LOG_SOUND    (1U << 1)
 
-#define SOUND_LOG       0
+//#define VERBOSE (LOG_SOUND)
+#include "logmacro.h"
+
 #define FADE_TO_ZERO    1
-
 
 /* internal caching */
 #define SAMPLE_BUFFER_LENGTH    1024                /* size of temporary decode buffer on the stack */
@@ -82,10 +84,10 @@ void exidy440_sound_device::device_add_mconfig(machine_config &config)
 	MC6809(config, m_audiocpu, EXIDY440_AUDIO_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &exidy440_sound_device::exidy440_audio_map);
 
-//  MC3418(config, "cvsd1", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-//  MC3418(config, "cvsd2", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-//  MC3417(config, "cvsd3", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-//  MC3417(config, "cvsd4", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+//  MC3418(config, "cvsd1", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  MC3418(config, "cvsd2", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  MC3417(config, "cvsd3", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  MC3417(config, "cvsd4", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 //-------------------------------------------------
@@ -141,19 +143,6 @@ void exidy440_sound_device::device_start()
 	/* allocate the mixer buffer */
 	m_mixer_buffer_left.resize(clock());
 	m_mixer_buffer_right.resize(clock());
-
-	if (SOUND_LOG)
-		m_debuglog = fopen("sound.log", "w");
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void exidy440_sound_device::device_stop()
-{
-	if (SOUND_LOG && m_debuglog)
-		fclose(m_debuglog);
 }
 
 /*************************************
@@ -205,15 +194,15 @@ void exidy440_sound_device::add_and_scale_samples(int ch, int32_t *dest, int sam
  *
  *************************************/
 
-void exidy440_sound_device::mix_to_16(write_stream_view &dest_left, write_stream_view &dest_right)
+void exidy440_sound_device::mix_to_16(sound_stream &stream)
 {
 	int32_t *mixer_left = &m_mixer_buffer_left[0];
 	int32_t *mixer_right = &m_mixer_buffer_right[0];
 
-	for (int i = 0; i < dest_left.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		dest_left.put_int_clamp(i, *mixer_left++, 32768);
-		dest_right.put_int_clamp(i, *mixer_right++, 32768);
+		stream.put_int_clamp(0, i, *mixer_left++, 32768);
+		stream.put_int_clamp(1, i, *mixer_right++, 32768);
 	}
 }
 
@@ -261,8 +250,7 @@ uint8_t exidy440_sound_device::sound_volume_r(offs_t offset)
 
 void exidy440_sound_device::sound_volume_w(offs_t offset, uint8_t data)
 {
-	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
+	LOGMASKED(LOG_SOUND, "Volume %02X=%02X\n", offset, data);
 
 	/* update the stream */
 	m_stream->update();
@@ -589,11 +577,10 @@ void exidy440_sound_device::play_cvsd(int ch)
 		return;
 	}
 
-	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
-				ch, m_sound_banks[ch],
-				m_m6844_channel[ch].address, m_m6844_channel[ch].counter,
-				m_sound_volume[ch * 2], m_sound_volume[ch * 2 + 1]);
+	LOGMASKED(LOG_SOUND, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
+			ch, m_sound_banks[ch],
+			m_m6844_channel[ch].address, m_m6844_channel[ch].counter,
+			m_sound_volume[ch * 2], m_sound_volume[ch * 2 + 1]);
 
 	/* set the pointer and count */
 	channel->base = base;
@@ -611,8 +598,7 @@ void exidy440_sound_device::stop_cvsd(int ch)
 	m_sound_channel[ch].remaining = 0;
 	m_stream->update();
 
-	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Channel %d stop\n", ch);
+	LOGMASKED(LOG_SOUND, "Channel %d stop\n", ch);
 }
 
 
@@ -789,17 +775,17 @@ void exidy440_sound_device::sound_banks_w(offs_t offset, uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void exidy440_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void exidy440_sound_device::sound_stream_update(sound_stream &stream)
 {
 	/* reset the mixer buffers */
-	std::fill_n(&m_mixer_buffer_left[0], outputs[0].samples(), 0);
-	std::fill_n(&m_mixer_buffer_right[0], outputs[0].samples(), 0);
+	std::fill_n(&m_mixer_buffer_left[0], stream.samples(), 0);
+	std::fill_n(&m_mixer_buffer_right[0], stream.samples(), 0);
 
 	/* loop over channels */
 	for (int ch = 0; ch < 4; ch++)
 	{
 		sound_channel_data *channel = &m_sound_channel[ch];
-		int length, volume, left = outputs[0].samples();
+		int length, volume, left = stream.samples();
 		int effective_offset;
 
 		/* if we're not active, bail */
@@ -830,12 +816,11 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 		m_m6844_channel[ch].counter = m_m6844_channel[ch].start_counter - effective_offset / 8;
 		if (m_m6844_channel[ch].counter <= 0)
 		{
-			if (SOUND_LOG && m_debuglog)
-				fprintf(m_debuglog, "Channel %d finished\n", ch);
+			LOGMASKED(LOG_SOUND, "Channel %d finished\n", ch);
 			m6844_finished(&m_m6844_channel[ch]);
 		}
 	}
 
 	/* all done, time to mix it */
-	mix_to_16(outputs[0], outputs[1]);
+	mix_to_16(stream);
 }

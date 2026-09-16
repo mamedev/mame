@@ -103,8 +103,6 @@ class LayoutChecker(Minifyer):
         self.elements = { }
         self.groups = { }
         self.views = { }
-        self.referenced_elements = { }
-        self.referenced_groups = { }
         self.group_collections = { }
         self.current_collections = None
 
@@ -173,6 +171,17 @@ class LayoutChecker(Minifyer):
         except:
             self.handle_error('Element %s attribute %s "%s" is not a number' % (name, key, val))
             return None
+
+    def check_bool_attribute(self, name, attrs, key, default):
+        if key not in attrs:
+            return default
+        val = attrs[key]
+        if self.VARPATTERN.match(val):
+            return None
+        elif val in self.YESNO:
+            return 'yes' == val
+        self.handle_error('Element %s attribute %s "%s" is not "yes" or "no"' % (name, key, val))
+        return None
 
     def check_parameter(self, attrs):
         if 'name' not in attrs:
@@ -253,8 +262,7 @@ class LayoutChecker(Minifyer):
         if self.check_int_attribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
             self.handle_error('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
         for name in ('swapxy', 'flipx', 'flipy'):
-            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs[name])):
-                self.handle_error('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
+            self.check_bool_attribute('orientation', attrs, name, None)
 
     def check_color(self, attrs):
         self.check_color_channel(attrs, 'red')
@@ -324,8 +332,8 @@ class LayoutChecker(Minifyer):
                 self.handle_error('Element %s has inputraw attribute without inputtag attribute' % (name, ))
         inputmask = self.check_int_attribute(name, attrs, 'inputmask', None)
         if (inputmask is not None) and (not inputmask):
-            if (inputraw is None) or (not inputraw):
-                self.handle_error('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+            self.handle_error('Element %s attribute inputmask "%s" is zero' % (name, attrs['inputmask']))
+        self.check_bool_attribute(name, attrs, 'clickthrough', None)
 
     def startViewItem(self, name):
         self.handlers.append((self.viewItemStartHandler, self.viewItemEndHandler))
@@ -399,6 +407,7 @@ class LayoutChecker(Minifyer):
                     self.views[attrs['name']] = self.format_location()
                 elif not self.VARPATTERN.match(attrs['name']):
                     self.handle_error('Element view has duplicate name "%s" (previous %s)' % (attrs['name'], self.views[attrs['name']]))
+            self.check_bool_attribute(name, attrs, 'showpointers', None)
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
             self.item_ids = { }
@@ -431,14 +440,6 @@ class LayoutChecker(Minifyer):
         if self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
-            if not self.generated_element_names:
-                for element in self.referenced_elements:
-                    if (element not in self.elements) and (not self.VARPATTERN.match(element)):
-                        self.handle_error('Element "%s" not found (first referenced at %s)' % (element, self.referenced_elements[element]))
-            if not self.generated_group_names:
-                for group in self.referenced_groups:
-                    if (group not in self.groups) and (not self.VARPATTERN.match(group)):
-                        self.handle_error('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
             if not self.views:
                 self.handle_error('No view elements found')
             del self.have_script
@@ -451,8 +452,8 @@ class LayoutChecker(Minifyer):
             if 'string' not in attrs:
                 self.handle_error('Element text missing attribute string')
             align = self.check_int_attribute(name, attrs, 'align', None)
-            if (align is not None) and ((0 > align) or (2 < align)):
-                self.handle_error('Element text attribute align "%s" not in valid range 0-2' % (attrs['align'], ))
+            if (align is not None) and ((0 > align) or (3 < align)):
+                self.handle_error('Element text attribute align "%s" not in valid range 0-3' % (attrs['align'], ))
             self.check_component(name, attrs)
         elif 'simplecounter' == name:
             maxstate = self.check_int_attribute(name, attrs, 'maxstate', None)
@@ -468,19 +469,6 @@ class LayoutChecker(Minifyer):
         elif 'image' == name:
             self.have_file = 'file' in attrs
             self.have_data = None
-            self.check_component(name, attrs)
-        elif 'reel' == name:
-            # TODO: validate symbollist and improve validation of other attributes
-            self.check_int_attribute(name, attrs, 'stateoffset', None)
-            numsymbolsvisible = self.check_int_attribute(name, attrs, 'numsymbolsvisible', None)
-            if (numsymbolsvisible is not None) and (0 >= numsymbolsvisible):
-                self.handle_error('Element reel attribute numsymbolsvisible "%s" not positive' % (attrs['numsymbolsvisible'], ))
-            reelreversed = self.check_int_attribute(name, attrs, 'reelreversed', None)
-            if (reelreversed is not None) and ((0 > reelreversed) or (1 < reelreversed)):
-                self.handle_error('Element reel attribute reelreversed "%s" not in valid range 0-1' % (attrs['reelreversed'], ))
-            beltreel = self.check_int_attribute(name, attrs, 'beltreel', None)
-            if (beltreel is not None) and ((0 > beltreel) or (1 < beltreel)):
-                self.handle_error('Element reel attribute beltreel "%s" not in valid range 0-1' % (attrs['beltreel'], ))
             self.check_component(name, attrs)
         else:
             self.handle_error('Encountered unexpected element %s' % (name, ))
@@ -540,8 +528,10 @@ class LayoutChecker(Minifyer):
         if 'element' == name:
             if 'ref' not in attrs:
                 self.handle_error('Element %s missing attribute ref' % (name, ))
-            elif attrs['ref'] not in self.referenced_elements:
-                self.referenced_elements[attrs['ref']] = self.format_location()
+            elif not self.generated_element_names:
+                element = attrs['ref']
+                if (element not in self.elements) and (not self.VARPATTERN.match(element)):
+                    self.handle_error('Element "%s" not found' % (element, ))
             self.check_view_item(name, attrs)
             self.startViewItem(name)
         elif 'screen' == name:
@@ -562,10 +552,12 @@ class LayoutChecker(Minifyer):
             if 'ref' not in attrs:
                 self.handle_error('Element group missing attribute ref')
             else:
-                if attrs['ref'] not in self.referenced_groups:
-                    self.referenced_groups[attrs['ref']] = self.format_location()
-                if (not self.VARPATTERN.match(attrs['ref'])) and (attrs['ref'] in self.group_collections):
-                    for n, l in self.group_collections[attrs['ref']].items():
+                group = attrs['ref']
+                if not self.generated_group_names:
+                    if (group not in self.groups) and (not self.VARPATTERN.match(group)):
+                        self.handle_error('Group "%s" not found' % (group, ))
+                if (not self.VARPATTERN.match(group)) and (group in self.group_collections):
+                    for n, l in self.group_collections[group].items():
                         if n not in self.current_collections:
                             self.current_collections[n] = l
                         else:
@@ -676,8 +668,7 @@ class LayoutChecker(Minifyer):
             else:
                 have_scroll[-1] = self.format_location()
                 self.check_float_attribute(name, attrs, 'size', 1.0)
-                if (attrs.get('wrap', 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['wrap'])):
-                    self.handle_error('Element %s attribute wrap "%s" is not "yes" or "no"' % (name, attrs['wrap']))
+                self.check_bool_attribute(name, attrs, 'wrap', False)
                 if 'inputtag' in attrs:
                     if 'name' in attrs:
                         self.handle_error('Element %s has both attribute inputtag and attribute name' % (name, ))
@@ -721,8 +712,6 @@ class LayoutChecker(Minifyer):
         self.elements.clear()
         self.groups.clear()
         self.views.clear()
-        self.referenced_elements.clear()
-        self.referenced_groups.clear()
         self.group_collections.clear()
         self.current_collections = None
         del self.handlers

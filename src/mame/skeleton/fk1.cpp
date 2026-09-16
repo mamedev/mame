@@ -64,14 +64,14 @@ private:
 	void reset_int_w(uint8_t data);
 	uint8_t m_video_rol;
 	uint8_t m_int_vector;
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(irq_callback);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
@@ -429,7 +429,7 @@ void fk1_state::fk1(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(fk1_state::irq_callback));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(fk1_state::screen_update));
@@ -439,7 +439,7 @@ void fk1_state::fk1(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	pit8253_device &pit8253(PIT8253(config, "pit", 0));
+	pit8253_device &pit8253(PIT8253(config, "pit"));
 	pit8253.set_clk<0>(50);
 	pit8253.out_handler<0>().set(FUNC(fk1_state::pit_out0));
 	pit8253.set_clk<1>(1000000);
@@ -470,7 +470,7 @@ void fk1_state::fk1(machine_config &config)
 	ppi3.out_pc_callback().set(FUNC(fk1_state::ppi3_c_w));
 
 	/* uart */
-	I8251(config, "uart", 0);
+	I8251(config, "uart");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K");  // 32 for banks1,2 + 16 for vram

@@ -70,7 +70,7 @@
 	{
 		trigger         = "xcode10",
 		shortname       = "Xcode 10",
-		description     = "Generate Apple Xcode 10 project files (experimental)",
+		description     = "Generate Apple Xcode 10 project files",
 		os              = "macosx",
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },

@@ -26,16 +26,17 @@ TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
-- add svg screen for nsmb3, nsmw
+- naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda
+  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
+  trspacadv, vesarif, uchitari
 
-********************************************************************************
+================================================================================
 
 Misc Nintendo Game & Watch notes:
 
@@ -120,7 +121,7 @@ The "Game Watch" wristwatches are by Nelsonic, not Nintendo.
 Bassmate Computer (BM-501) is on identical hardware as G&W Multi Screen,
 but it's not part of the game series.
 
-********************************************************************************
+================================================================================
 
 Regarding Электроника (Elektronika, translated: Electronics): It is not
 actually a company. It was a USSR brand name for consumer electronics,
@@ -138,7 +139,7 @@ Fire(FR-27), Octopus, Chef, Egg/Mickey Mouse, Donkey Kong Jr.(CJ-93),
 Spitball Sparky.
 
 The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
-КБ1013ВК1-2 for SM5A and КБ1013ВК4-2 for SM510.
+КБ1013ВК1-2 for SM5A, КБ1013ВК4-2 for SM510 and КБ1013ВК7-2 for SM511.
 
 *******************************************************************************/
 
@@ -147,24 +148,25 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 #include "sound/samples.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
-#include "gnw_dualv.lh"
-#include "gnw_dualh.lh"
+#include "hh_sm510_single.lh"
+#include "hh_sm510_dualv.lh"
+#include "hh_sm510_dualh.lh"
+#include "hh_sm510_tripleh.lh"
+
+#include "elbaskb.lh"
 
 //#include "hh_sm510_test.lh" // common test-layout - use external artwork
-#include "hh_sm500_test.lh" // "
+//#include "hh_sm500_test.lh" // "
 
 
 // machine start/reset
 
 void hh_sm510_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-
 	// determine number of input lines (set it in the subclass constructor if different)
 	if (m_inp_lines == 0 && m_inp_fixed < 0)
 	{
@@ -214,7 +216,7 @@ void hh_sm510_state::machine_reset()
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
 // deflicker here, especially needed for SM500/SM5A with the active shift register
 
-TIMER_CALLBACK_MEMBER(hh_sm510_state::display_decay_tick)
+void hh_sm510_state::update_display()
 {
 	u8 z_mask = (1 << m_display_z_len) - 1;
 	u8 zx_len = 1 << (m_display_x_len + m_display_z_len);
@@ -377,14 +379,6 @@ void hh_sm510_state::mcfg_cpu_sm5a(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
 }
 
-void hh_sm510_state::mcfg_cpu_kb1013vk12(machine_config &config)
-{
-	KB1013VK12(config, m_maincpu);
-	mcfg_cpu_common(config);
-	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm500_lcd_segment_w));
-}
-
 void hh_sm510_state::mcfg_cpu_sm510(machine_config &config)
 {
 	SM510(config, m_maincpu);
@@ -420,10 +414,14 @@ void hh_sm510_state::mcfg_cpu_sm530(machine_config &config)
 
 void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 height, const char *tag)
 {
-	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	if (width == 0 || height == 0)
+		return;
+
+	screen_svg_device &screen(SCREEN_SVG(config, tag));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
-	screen.set_visarea_full();
+
+	config.set_default_layout(layout_hh_sm510_single);
 }
 
 void hh_sm510_state::mcfg_sound_r1(machine_config &config)
@@ -441,14 +439,6 @@ void hh_sm510_state::mcfg_sound_r1(machine_config &config)
 void hh_sm510_state::sm5a_common(machine_config &config, u16 width, u16 height)
 {
 	mcfg_cpu_sm5a(config);
-	mcfg_sound_r1(config);
-	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
-	mcfg_svg_screen(config, width, height);
-}
-
-void hh_sm510_state::kb1013vk12_common(machine_config &config, u16 width, u16 height)
-{
-	mcfg_cpu_kb1013vk12(config);
 	mcfg_sound_r1(config);
 	m_maincpu->write_r().set(FUNC(hh_sm510_state::piezo_input_w));
 	mcfg_svg_screen(config, width, height);
@@ -487,7 +477,18 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
 	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
 
-	config.set_default_layout(layout_gnw_dualh);
+	config.set_default_layout(layout_hh_sm510_dualh);
+}
+
+void hh_sm510_state::sm511_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
+{
+	mcfg_cpu_sm511(config);
+	mcfg_sound_r1(config);
+	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
+	mcfg_svg_screen(config, middlewidth, middleheight, "screen_middle");
+	mcfg_svg_screen(config, rightwidth, rightheight, "screen_right");
+
+	config.set_default_layout(layout_hh_sm510_tripleh);
 }
 
 void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -496,7 +497,7 @@ void hh_sm510_state::dualv_common(machine_config &config, u16 topwidth, u16 toph
 	mcfg_svg_screen(config, topwidth, topheight, "screen_top");
 	mcfg_svg_screen(config, botwidth, botheight, "screen_bottom");
 
-	config.set_default_layout(layout_gnw_dualv);
+	config.set_default_layout(layout_hh_sm510_dualv);
 }
 
 void hh_sm510_state::sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight)
@@ -589,7 +590,7 @@ static INPUT_PORTS_START( gnw_ball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -664,7 +665,7 @@ static INPUT_PORTS_START( gnw_flagman )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -723,7 +724,7 @@ static INPUT_PORTS_START( gnw_vermin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -790,7 +791,7 @@ static INPUT_PORTS_START( gnw_fires )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
-	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x08, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
@@ -867,7 +868,7 @@ static INPUT_PORTS_START( gnw_judge )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Computer's Operation Time (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Increase Computer's Operation Time (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -947,7 +948,7 @@ static INPUT_PORTS_START( gnw_manholeg )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -1006,7 +1007,7 @@ static INPUT_PORTS_START( gnw_helmet )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1085,7 +1086,7 @@ public:
 
 static INPUT_PORTS_START( gnw_lion )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Increase Speed (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Increase Speed (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1108,7 +1109,7 @@ static INPUT_PORTS_START( gnw_lion )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // display test?
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -1163,7 +1164,7 @@ static INPUT_PORTS_START( gnw_pchute )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // R3
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- disable after boot
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- disable after boot
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1235,7 +1236,7 @@ public:
 
 static INPUT_PORTS_START( gnw_octopus )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1270,7 +1271,7 @@ void gnw_octopus_state::gnw_octopus(machine_config &config)
 
 void gnw_octopus_state::taynyoke(machine_config &config)
 {
-	kb1013vk12_common(config, 1647, 1080); // R mask option confirmed
+	sm5a_common(config, 1647, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1320,7 +1321,7 @@ public:
 
 static INPUT_PORTS_START( gnw_popeye )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1413,7 +1414,7 @@ static INPUT_PORTS_START( gnw_chef )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1427,7 +1428,7 @@ void gnw_chef_state::gnw_chef(machine_config &config)
 
 void gnw_chef_state::vespovar(machine_config & config)
 {
-	kb1013vk12_common(config, 1679, 1080); // R mask option confirmed
+	sm5a_common(config, 1679, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1462,32 +1463,7 @@ ROM_END
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
 
---------------------------------------------------------------------------------
-
-  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone:
-  Ну, погоди! (Nu, pogodi!). This was followed by several other titles that
-  were the same under the hood, only differing in graphics. They also made a
-  slightly modified version, adding a new game mode (by pressing A+B) where the
-  player/CPU roles are reversed. This version is known as Разведчики космоса
-  (Razvedchiki kosmosa, export version: Explorers of Space).
-
-  The following Mickey Mouse Elektronika clones are emulated in MAME:
-
-  Model  Title               Transliteration      Export version      Note
-  ------------------------------------------------------------------------------
-  ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
-  ИМ-10  Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
-  ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
-  ИМ-16  Охота               Okhota               Fowling             -
-  ИМ-19  Биатлон             Biathlon (Biatlon)   -                   -
-  ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
-  ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
-  ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
-  ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
-  ИМ-51  Морская атака       Morskaya ataka       -                   -
-  ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
-  -      Цирк                Circus (Tsirk)       -                   Unknown Model ID
+  This game was also cloned (a lot) by Elektronika, see nupogodi_state.
 
 *******************************************************************************/
 
@@ -1500,19 +1476,6 @@ public:
 
 	void gnw_mmouse(machine_config &config);
 	void gnw_egg(machine_config &config);
-	void nupogodi(machine_config &config);
-	void ehockey(machine_config &config);
-	void rkosmosa(machine_config &config);
-	void okhota(machine_config &config);
-	void biathlon(machine_config &config);
-	void vfutbol(machine_config &config);
-	void krybolov(machine_config &config);
-	void kvakazad(machine_config &config);
-	void nochnyev(machine_config &config);
-	void kosmicpt(machine_config &config);
-	void morataka(machine_config &config);
-	void atakaast(machine_config &config);
-	void ecircus(machine_config &config);
 };
 
 // inputs
@@ -1537,16 +1500,9 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB -- only works after power-on
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB -- only works after power-on
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( rkosmosa )
-	PORT_INCLUDE( gnw_mmouse )
-
-	PORT_MODIFY("BA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 // config
@@ -1559,71 +1515,6 @@ void gnw_mmouse_state::gnw_mmouse(machine_config &config)
 void gnw_mmouse_state::gnw_egg(machine_config &config)
 {
 	sm5a_common(config, 1690, 1080); // R mask option confirmed
-}
-
-void gnw_mmouse_state::nupogodi(machine_config &config)
-{
-	kb1013vk12_common(config, 1715, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::ehockey(machine_config &config)
-{
-	kb1013vk12_common(config, 1782, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::rkosmosa(machine_config &config)
-{
-	kb1013vk12_common(config, 1646, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::okhota(machine_config &config)
-{
-	kb1013vk12_common(config, 1632, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::biathlon(machine_config &config)
-{
-	kb1013vk12_common(config, 1633, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::vfutbol(machine_config &config)
-{
-	kb1013vk12_common(config, 1655, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::krybolov(machine_config &config)
-{
-	kb1013vk12_common(config, 1638, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::kvakazad(machine_config &config)
-{
-	kb1013vk12_common(config, 1660, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::nochnyev(machine_config &config)
-{
-	kb1013vk12_common(config, 1641, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::kosmicpt(machine_config &config)
-{
-	kb1013vk12_common(config, 1658, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::morataka(machine_config &config)
-{
-	kb1013vk12_common(config, 1648, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::atakaast(machine_config &config)
-{
-	kb1013vk12_common(config, 1620, 1080); // R mask option ?
-}
-
-void gnw_mmouse_state::ecircus(machine_config &config)
-{
-	kb1013vk12_common(config, 1657, 1080); // R mask option ?
 }
 
 // roms
@@ -1642,110 +1533,6 @@ ROM_START( gnw_egg )
 
 	ROM_REGION( 193119, "screen", 0)
 	ROM_LOAD( "gnw_egg.svg", 0, 193119, CRC(1e469fe5) SHA1(bc80114337feefca590e48c823e8488f6b63f896) )
-ROM_END
-
-ROM_START( nupogodi )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-02.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 154233, "screen", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 154233, CRC(42cfb84a) SHA1(249ca7ec78066b57f9a18e48ada64712c944e461) )
-ROM_END
-
-ROM_START( ehockey )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-10.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 94977, "screen", 0)
-	ROM_LOAD( "ehockey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
-ROM_END
-
-ROM_START( rkosmosa )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
-
-	ROM_REGION( 81420, "screen", 0)
-	ROM_LOAD( "rkosmosa.svg", 0, 81420, CRC(dc6632be) SHA1(0906d933f4cda39ee1e57b502651a821e61e95ef) )
-ROM_END
-
-ROM_START( okhota )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-16.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 117838, "screen", 0)
-	ROM_LOAD( "okhota.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
-ROM_END
-
-ROM_START( biathlon )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-19.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 116377, "screen", 0)
-	ROM_LOAD( "biathlon.svg", 0, 116377, CRC(fadf729e) SHA1(671f9496e2bfe7b4800ee7bad039485e19958428) )
-ROM_END
-
-ROM_START( vfutbol )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-22.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 131901, "screen", 0)
-	ROM_LOAD( "vfutbol.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
-ROM_END
-
-ROM_START( krybolov )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-32.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 132804, "screen", 0)
-	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
-ROM_END
-
-ROM_START( kvakazad )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 131961, "screen", 0)
-	ROM_LOAD( "kvakazad.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
-ROM_END
-
-ROM_START( nochnyev )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-49.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 136498, "screen", 0)
-	ROM_LOAD( "nochnyev.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
-ROM_END
-
-ROM_START( kosmicpt )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-50.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 110214, "screen", 0)
-	ROM_LOAD( "kosmicpt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
-ROM_END
-
-ROM_START( morataka )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-51.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 105057, "screen", 0)
-	ROM_LOAD( "morataka.svg", 0, 105057, CRC(c235c56c) SHA1(b6ef74ba7826221683243e23513270d0f0f2cfda) )
-ROM_END
-
-ROM_START( atakaast )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-53.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 105570, "screen", 0)
-	ROM_LOAD( "atakaast.svg", 0, 105570, CRC(3d79aacc) SHA1(bc25969f4d6fa75b320130c920ac0bdc8fb44cbd) )
-ROM_END
-
-ROM_START( ecircus )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "ecircus.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
-
-	ROM_REGION( 124643, "screen", 0)
-	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
 ROM_END
 
 
@@ -1784,7 +1571,7 @@ public:
 
 static INPUT_PORTS_START( gnw_fire )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -1819,7 +1606,7 @@ void gnw_fire_state::gnw_fire(machine_config &config)
 
 void gnw_fire_state::kosmicmt(machine_config & config)
 {
-	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
+	sm5a_common(config, 1673, 1080); // КБ1013ВК1-2, R mask option confirmed
 }
 
 // roms
@@ -1886,12 +1673,12 @@ static INPUT_PORTS_START( gnw_tbridge )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1955,12 +1742,12 @@ static INPUT_PORTS_START( gnw_fireatk )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2024,12 +1811,12 @@ static INPUT_PORTS_START( gnw_stennis )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2093,12 +1880,12 @@ static INPUT_PORTS_START( gnw_opanic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2169,7 +1956,7 @@ static INPUT_PORTS_START( gnw_dkong )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2236,7 +2023,7 @@ static INPUT_PORTS_START( gnw_mickdon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2312,12 +2099,12 @@ static INPUT_PORTS_START( gnw_ghouse )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2388,7 +2175,7 @@ static INPUT_PORTS_START( gnw_dkong2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2455,12 +2242,12 @@ static INPUT_PORTS_START( gnw_mario )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2533,12 +2320,12 @@ static INPUT_PORTS_START( gnw_rshower )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2605,12 +2392,12 @@ static INPUT_PORTS_START( gnw_lboat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2677,12 +2464,12 @@ static INPUT_PORTS_START( gnw_pinball )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2820,12 +2607,12 @@ static INPUT_PORTS_START( gnw_squish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Bonus Life (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2892,12 +2679,12 @@ static INPUT_PORTS_START( gnw_bsweep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Controller keys skips level when activated
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)" ) // " -- Controller keys skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2966,12 +2753,12 @@ static INPUT_PORTS_START( gnw_sbuster )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3045,12 +2832,12 @@ static INPUT_PORTS_START( gnw_gcliff )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)") // " -- Left or right skips level when activated
+	PORT_CONFNAME( 0x01, 0x01, "Level Skip (Cheat)" ) // " -- Left or right skips level when activated
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3124,12 +2911,12 @@ static INPUT_PORTS_START( gnw_zelda )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // " -- Invincibility when playing on bottom screen only
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // " -- Invincibility when playing on bottom screen only
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3205,12 +2992,12 @@ static INPUT_PORTS_START( gnw_mariocmt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3291,12 +3078,12 @@ static INPUT_PORTS_START( gnw_snoopyp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3370,12 +3157,12 @@ static INPUT_PORTS_START( gnw_popeyep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives and Stronger Punch (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives and Stronger Punch (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3417,6 +3204,11 @@ ROM_END
 
   The tabletop version was also licensed to Coleco.
 
+  Also cloned by Elektronika(USSR) as Винни-Пух (Vinni-Pukh, i.e. Winnie the
+  Pooh) (model ИМ-12), with different LCD graphics.
+  * КБ1515ХМ3-2 9009 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511 (same ROM contents as CJ-93)
+
 *******************************************************************************/
 
 class gnw_dkjrp_state : public hh_sm510_state
@@ -3427,6 +3219,7 @@ public:
 	{ }
 
 	void gnw_dkjrp(machine_config &config);
+	void vinnpukh(machine_config &config);
 };
 
 // inputs
@@ -3452,12 +3245,12 @@ static INPUT_PORTS_START( gnw_dkjrp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3469,6 +3262,11 @@ void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 	sm511_common(config, 1920, 1049);
 }
 
+void gnw_dkjrp_state::vinnpukh(machine_config &config)
+{
+	sm511_common(config, 1890, 1080); // 1638 x 936
+}
+
 // roms
 
 ROM_START( gnw_dkjrp )
@@ -3476,10 +3274,21 @@ ROM_START( gnw_dkjrp )
 	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
+	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
+ROM_END
+
+ROM_START( vinnpukh )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "vinnpukh.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "vinnpukh.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
+
+	ROM_REGION( 193376, "screen", 0)
+	ROM_LOAD( "vinnpukh.svg", 0, 193376, CRC(69c4e5c5) SHA1(313f164706c3d24e2fc1363ff9730a21e5b1ca6c) )
 ROM_END
 
 
@@ -3524,12 +3333,12 @@ static INPUT_PORTS_START( gnw_mbaway )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3606,12 +3415,12 @@ static INPUT_PORTS_START( gnw_mmousep )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3700,12 +3509,12 @@ static INPUT_PORTS_START( gnw_dkjr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3770,12 +3579,12 @@ static INPUT_PORTS_START( gnw_mariocm )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3843,12 +3652,12 @@ static INPUT_PORTS_START( gnw_manhole )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3912,7 +3721,7 @@ static INPUT_PORTS_START( gnw_tfish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -3989,7 +3798,7 @@ static INPUT_PORTS_START( gnw_smb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4086,7 +3895,7 @@ static INPUT_PORTS_START( gnw_climber )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4185,7 +3994,7 @@ static INPUT_PORTS_START( gnw_bfight )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4268,7 +4077,7 @@ static INPUT_PORTS_START( gnw_mariotj )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4335,12 +4144,12 @@ static INPUT_PORTS_START( gnw_ssparky )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4404,12 +4213,12 @@ static INPUT_PORTS_START( gnw_cgrab )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Do not release crabs (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4500,12 +4309,12 @@ static INPUT_PORTS_START( gnw_boxing )
 	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "P2 Decrease Health (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Health (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4559,7 +4368,7 @@ static INPUT_PORTS_START( gnw_dkong3 )
 	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "P1 Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4613,12 +4422,12 @@ static INPUT_PORTS_START( gnw_dkhockey )
 	PORT_INCLUDE( microvs_shared )
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Any Goal Scores 10 Points (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)") // "
+	PORT_CONFNAME( 0x01, 0x01, "P2 Goals Scores No Points (Cheat)" ) // "
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4696,7 +4505,7 @@ static INPUT_PORTS_START( bassmate )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Skip Compute Animation (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -4730,16 +4539,685 @@ ROM_END
 
 /*******************************************************************************
 
+  Elektronika Nu, pogodi! family (Egg game clones)
+  * KB1013VK1-2 MCU
+  * lcd screen with custom segments, 1-bit sound
+
+  In 1983, Электроника (Elektronika, USSR) released an unlicensed clone of
+  Nintendo G&W Egg: Ну, погоди! (Nu, pogodi!). This was followed by several other
+  titles that were the same under the hood, only differing in graphics. They also
+  made a slightly modified version, adding a new game mode (by pressing A+B)
+  where the player/CPU roles are reversed. This version is known as Разведчики
+  космоса (Razvedchiki kosmosa, export version: Explorers of Space).
+
+  Another variant of the game which also included a radiation scintillation
+  counter was released by Научприбор (Nauchpribor, USSR) in 1991. This unit was
+  named Альтаир (Altair). This unit uses the same screen as ИМ-22 (Весёлые
+  футболисты, export version: Monkey Goalkeeper). The ROM has been modified to
+  include showing radiation exposure ("Dosimeter Mode"). The dosimeter mode can
+  be entered by pressing the dosimeter mode button when the unit is showing time.
+  Radiation readings are shown in µSv/h. The dosimeter mode ends automatically
+  after 40 seconds. A gas-discharge counter (SBM-20-1) collects radiation exposure
+  and feeds info to the game board via the D0-D3 input lines.
+
+  The following Mickey Mouse Elektronika clones are emulated in MAME:
+
+  Model    Title               Transliteration      Export version      Note
+  --------------------------------------------------------------------------------
+  ИМ-02    Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-10    Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
+  ИМ-13    Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
+  ИМ-16    Охота               Okhota               Fowling             -
+  ИМ-19    Биатлон             Biathlon (Biatlon)   -                   -
+  ИМ-22    Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
+  ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
+  ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
+  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic)
+  ИМ-51    Морская атака       Morskaya ataka       -                   -
+  ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
+  -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
+  ДБГБ-06И Альтаир             Altair               -                   Modified ROM (see note above)
+
+*******************************************************************************/
+
+class nupogodi_state : public hh_sm510_state
+{
+public:
+	nupogodi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void nupogodi(machine_config &config);
+	void ehockey(machine_config &config);
+	void rkosmosa(machine_config &config);
+	void okhota(machine_config &config);
+	void biathlon(machine_config &config);
+	void vfutbol(machine_config &config);
+	void krybolov(machine_config &config);
+	void kvakazad(machine_config &config);
+	void nochnyev(machine_config &config);
+	void kosmicpt(machine_config &config);
+	void morataka(machine_config &config);
+	void atakaast(machine_config &config);
+	void ecircus(machine_config &config);
+	void naltair(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( rkosmosa )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( naltair )
+	PORT_INCLUDE( gnw_mmouse )
+
+	PORT_MODIFY("IN.0") // R2
+	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_CHANGED_CB(input_changed) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_NAME("Dosimeter Reading")
+
+	PORT_MODIFY("IN.1") // R3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("P1 Right Stick/Up / Dosimeter Mode")
+INPUT_PORTS_END
+
+// config
+
+void nupogodi_state::nupogodi(machine_config &config)
+{
+	sm5a_common(config, 1715, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::ehockey(machine_config &config)
+{
+	sm5a_common(config, 1782, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::rkosmosa(machine_config &config)
+{
+	sm5a_common(config, 1646, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::okhota(machine_config &config)
+{
+	sm5a_common(config, 1632, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::biathlon(machine_config &config)
+{
+	sm5a_common(config, 1633, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::vfutbol(machine_config &config)
+{
+	sm5a_common(config, 1655, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::krybolov(machine_config &config)
+{
+	sm5a_common(config, 1638, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::kvakazad(machine_config &config)
+{
+	sm5a_common(config, 1660, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::nochnyev(machine_config &config)
+{
+	sm5a_common(config, 1641, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::kosmicpt(machine_config &config)
+{
+	sm5a_common(config, 1658, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::morataka(machine_config &config)
+{
+	sm5a_common(config, 1648, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::atakaast(machine_config &config)
+{
+	sm5a_common(config, 1620, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+void nupogodi_state::ecircus(machine_config &config)
+{
+	sm5a_common(config, 1657, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+// roms
+
+ROM_START( nupogodi )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-02.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 154233, "screen", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 154233, CRC(42cfb84a) SHA1(249ca7ec78066b57f9a18e48ada64712c944e461) )
+ROM_END
+
+ROM_START( ehockey )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-10.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 94977, "screen", 0)
+	ROM_LOAD( "ehockey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
+ROM_END
+
+ROM_START( rkosmosa )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
+
+	ROM_REGION( 81420, "screen", 0)
+	ROM_LOAD( "rkosmosa.svg", 0, 81420, CRC(dc6632be) SHA1(0906d933f4cda39ee1e57b502651a821e61e95ef) )
+ROM_END
+
+ROM_START( okhota )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-16.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 117838, "screen", 0)
+	ROM_LOAD( "okhota.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
+ROM_END
+
+ROM_START( biathlon )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-19.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 116377, "screen", 0)
+	ROM_LOAD( "biathlon.svg", 0, 116377, CRC(fadf729e) SHA1(671f9496e2bfe7b4800ee7bad039485e19958428) )
+ROM_END
+
+ROM_START( vfutbol )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-22.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "vfutbol.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+ROM_END
+
+ROM_START( krybolov )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-32.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 132804, "screen", 0)
+	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
+ROM_END
+
+ROM_START( kvakazad )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 131961, "screen", 0)
+	ROM_LOAD( "kvakazad.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
+ROM_END
+
+ROM_START( nochnyev )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-49.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 136498, "screen", 0)
+	ROM_LOAD( "nochnyev.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
+ROM_END
+
+ROM_START( kosmicpt )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-50.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 110214, "screen", 0)
+	ROM_LOAD( "kosmicpt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
+ROM_END
+
+ROM_START( morataka )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-51.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 105057, "screen", 0)
+	ROM_LOAD( "morataka.svg", 0, 105057, CRC(c235c56c) SHA1(b6ef74ba7826221683243e23513270d0f0f2cfda) )
+ROM_END
+
+ROM_START( atakaast )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-53.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 105570, "screen", 0)
+	ROM_LOAD( "atakaast.svg", 0, 105570, CRC(3d79aacc) SHA1(bc25969f4d6fa75b320130c920ac0bdc8fb44cbd) )
+ROM_END
+
+ROM_START( ecircus )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "ecircus.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 124643, "screen", 0)
+	ROM_LOAD( "ecircus.svg", 0, 124643, CRC(079f25db) SHA1(defa784c80e01ce6affbb424930674114275bea1) )
+ROM_END
+
+ROM_START( naltair )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "dbgb-06i.bin", 0x0000, 0x0740, CRC(7e5bf42b) SHA1(588db84d8c9a1abaae77534321dec8466967eb5f) )
+
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "naltair.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Автослалом (Autoslalom) (model ИМ-23)
+  * KB1013VK1-2 MCU
+  * lcd screen with custom segments, 1-bit sound
+
+  This is not an unlicensed clone, but doing a hex compare with MC-25 still
+  shows around 30% similarity so clearly they used that as a base.
+
+*******************************************************************************/
+
+class auslalom_state : public hh_sm510_state
+{
+public:
+	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void auslalom(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( auslalom )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Запуск (Start)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Скорость (Speed)")
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void auslalom_state::auslalom(machine_config &config)
+{
+	sm5a_common(config, 1732, 1080); // КБ1013ВК1-2, R mask option ?
+}
+
+// roms
+
+ROM_START( auslalom )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
+
+	ROM_REGION( 117520, "screen", 0)
+	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Баскетбол (Basketbol) (model ИМ-55)
+  * PCB label: ЕНСК.758726.002/3
+  * КБ1013ВЕ1-2 93 (KB1013VE1-2 93) MCU
+  * 26 LEDs + 4 7seg LEDs, 1-bit sound
+
+  It's a LED game with an LCD driver MCU, that's unconventional.
+
+*******************************************************************************/
+
+class elbaskb_state : public hh_sm510_state
+{
+public:
+	elbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag),
+		m_digits(*this, "digit%u", 0U)
+	{ }
+
+	void elbaskb(machine_config &config);
+
+protected:
+	virtual void update_display() override;
+
+private:
+	output_finder<4> m_digits;
+};
+
+// handlers
+
+void elbaskb_state::update_display()
+{
+	hh_sm510_state::update_display();
+
+	// convert to digit segments
+	for (int i = 0; i < 4; i++)
+	{
+		u8 data = 0;
+		for (int seg = 0; seg < 7; seg++)
+		{
+			int x = ((i << 1) | (seg >> 2 ^ 1)) & 3;
+			int y = seg & 3;
+			int z = i >> 1 ^ 1;
+
+			data = data >> 1 | (m_out_x[x][y][z] ? 0x40 : 0);
+		}
+
+		m_digits[i] = data;
+	}
+}
+
+// inputs
+
+static INPUT_PORTS_START( elbaskb )
+	PORT_START("IN.0") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_COCKTAIL // Отбор
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) // Отбор
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x06, 0x02, DEF_STR( Difficulty ) ) PORT_CHANGED_CB(input_changed)
+	PORT_CONFSETTING(    0x02, "1" )
+	PORT_CONFSETTING(    0x04, "2" )
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Players ) )
+	PORT_CONFSETTING(    0x00, "1" )
+	PORT_CONFSETTING(    0x01, "2" )
+INPUT_PORTS_END
+
+// config
+
+void elbaskb_state::elbaskb(machine_config &config)
+{
+	sm5a_common(config, 0, 0); // КБ1013ВК1-2, R mask option ?
+	config.set_default_layout(layout_elbaskb);
+}
+
+// roms
+
+ROM_START( elbaskb )
+	ROM_REGION( 0x800, "maincpu", 0 )
+	ROM_LOAD( "im-55.bin", 0x0000, 0x0740, CRC(006f82d0) SHA1(aca582dcb387345cd09a08e42a954c43430772fc) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Суперкубики (Superkubiki) (model ИМ-20)
+  * unmarked MCU (no decap); seems to be compatible with КБ1013ВК4-2
+    which in turn is compatible with Sharp SM510
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class supkubik_state : public hh_sm510_state
+{
+public:
+	supkubik_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void supkubik(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( supkubik )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Режим (Mode)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Пауза (Pause)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Slow down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Вниз (Drop)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Поворот (Rotate)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_2WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void supkubik_state::supkubik(machine_config &config)
+{
+	sm510_common(config, 609, 1080); // 2084 x 3696
+}
+
+// roms
+
+ROM_START( supkubik )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-20", 0x0000, 0x1000, CRC(a490a1e9) SHA1(3815b52ff69891d9a4915e4ad396114404cb608c) )
+
+	ROM_REGION( 115698, "screen", 0)
+	ROM_LOAD( "supkubik.svg", 0, 115698, BAD_DUMP CRC(6f5840be) SHA1(2ac980f6b0c01bbada162c4f826684a932532c61) ) // original LCD scan needed
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Весёлая арифметика (model ИМ-50) or Amusing Arithmetic (export
+  version, model MG-50)
+  * КБ1515ХМ3-2 9202 006 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV, USSR, MOSCOW, 1990
+
+*******************************************************************************/
+
+class vesarif_state : public hh_sm510_state
+{
+public:
+	vesarif_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void vesarif(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( vesarif )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void vesarif_state::vesarif(machine_config &config)
+{
+	sm511_common(config, 1672, 1080); // 1326 x 856
+}
+
+// roms
+
+ROM_START( vesarif )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "vesarif.program", 0x0000, 0x1000, CRC(ae9053ef) SHA1(40dcda3616c9f430e04e20aef22e7db6b2b94f37) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "vesarif.melody", 0x000, 0x100, BAD_DUMP CRC(28fb8872) SHA1(18db11d27d8af2fddf8bba8080e05e2fa50b8215) ) // decap needed for verification
+
+	ROM_REGION( 81240, "screen", 0)
+	ROM_LOAD( "vesarif.svg", 0, 81240, CRC(27121109) SHA1(63d53e5718b1a014a5cfd7dffa5cb17469fa3182) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Учитель арифметики(?) (Uchitel' arifmetiki(?), model ???)
+  * КБ1515ХМ3-2 9108 001 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV USSR, MOSCOW
+
+  There is no evidence of a real unit yet. Only two hardware parts are
+  available at the moment: PCB with chip, and LCD (in fact, there must have been
+  two PCBs; the other one was for the keypad, battery compartment and speaker).
+  Both parts were found in ruins of the factory in Vinnytsia (Ukraine) formerly
+  producing LCD games.
+
+  As the device did not come into mass production, it's considered to be
+  just a prototype. The game title is not fully determined. There is a reference
+  to a game called "Учитель арифметики" in the Микропроцессорные средства и
+  системы magazine (year 1990, number 4, page 38), and this reference was
+  taken as the most probable name for this game.
+
+*******************************************************************************/
+
+class uchitari_state : public hh_sm510_state
+{
+public:
+	uchitari_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void uchitari(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( uchitari )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate Entry")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CHANGED_CB(input_changed) PORT_NAME("Start Exam")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate Division Entries")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x30, NOTEQUALS, 0x00) // Alarm / Exam Level
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // "0"/Minute
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_CB(input_changed) PORT_NAME("Clear entry / Correction")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x0c, NOTEQUALS, 0x00) // "1"/Hour
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("FAKE") // some of the buttons are presumed to be physically separate but electronically the same
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_CB(input_changed) PORT_NAME("Minute")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_CHANGED_CB(input_changed) PORT_NAME("Exam Level")
+INPUT_PORTS_END
+
+// config
+
+void uchitari_state::uchitari(machine_config &config)
+{
+	sm511_common(config, 1520, 1080); // 1341 x 953
+}
+
+// roms
+
+ROM_START( uchitari )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "uchitari.program", 0x0000, 0x1000, CRC(1d2d7abb) SHA1(10d90f63813cddc5c986ed3942c64ee6d67f545e) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "uchitari.melody", 0x000, 0x100, BAD_DUMP CRC(28041942) SHA1(a36e246b215499b7392c28fddf1aad499016a480) ) // decap needed for verification
+
+	ROM_REGION( 98294, "screen", 0)
+	ROM_LOAD( "uchitari.svg", 0, 98294, CRC(f84b9d59) SHA1(a05713d571824d11f037b7592c0d280e418dc8b3) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Konami Double Dribble (model BH001)
   * PCB label: BH001
   * Sharp SM510 under epoxy (die label CMS54C, KMS584)
   * lcd screen with custom segments, 1-bit sound
 
-  BTANB: At the basket, the ball goes missing sometimes for 1 frame, or
-  may show 2 balls at the same time. It's the same on the real handheld.
-  BTANB: players flicker (increasing LCD delay won't improve it much)
-  Another BTANB? If a period is over at the same time a defender on the
-  2nd column grabs the ball, his arm won't be erased until it's redrawn.
+  BTANB:
+  - At the basket, the ball goes missing sometimes for 1 frame, or may show 2 balls
+    at the same time. It's the same on the real handheld.
+  - players flicker (increasing LCD delay won't improve it much)
+  - If a period is over at the same time a defender on the 2nd column grabs the ball,
+    his arm won't be erased until it's redrawn (BTANB not verified).
 
 *******************************************************************************/
 
@@ -5072,7 +5550,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Skate or Die
+  Konami Skate or Die (licensed from Electronic Arts)
   * PCB label: BH006
   * Sharp SM511 under epoxy (die label KMS73B, 775)
   * lcd screen with custom segments, 1-bit sound
@@ -5344,12 +5822,16 @@ ROM_END
 
 /*******************************************************************************
 
-  Konami Bill Elliott's NASCAR Racing (model 13010)
-  * PCB label: BH010
-  * Sharp SM511 under epoxy (die label KMS73B, 783)
+  Konami Bill Elliott's NASCAR Racing (model 13010), Chequered Flag
+  * PCB label:
+    BH010 (Bill Elliott's NASCAR Racing)
+    BH016 (Chequered Flag)
+  * Sharp SM511 under epoxy
+    die label KMS73B, 783 (Bill Elliott's NASCAR Racing)
   * lcd screen with custom segments, 1-bit sound
 
-  Chequered Flag is presumed to have the same MCU ROM.
+  Chequered Flag is presumed to have the same MCU ROM as Bill Elliott's NASCAR
+  Racing. The MCU was not decapped, so it's not 100% certain.
 
 *******************************************************************************/
 
@@ -5361,6 +5843,7 @@ public:
 	{ }
 
 	void knascar(machine_config &config);
+	void kchqflag(machine_config &config);
 };
 
 // inputs
@@ -5389,6 +5872,11 @@ void knascar_state::knascar(machine_config &config)
 	sm511_common(config, 1491, 1080);
 }
 
+void knascar_state::kchqflag(machine_config &config)
+{
+	sm511_common(config, 1482, 1080);
+}
+
 // roms
 
 ROM_START( knascar )
@@ -5396,12 +5884,22 @@ ROM_START( knascar )
 	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f))
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
 
 	ROM_REGION( 474061, "screen", 0)
 	ROM_LOAD( "knascar.svg", 0, 474061, CRC(d30f639a) SHA1(6fd061eda61f925a9f85cf5fb4b7024f15e1e1fe) )
 ROM_END
 
+ROM_START( kchqflag )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "783.program", 0x0000, 0x1000, CRC(0a08536a) SHA1(199203fad96e0d2b173b876b9746064b0c30dc7b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "783.melody", 0x000, 0x100, CRC(ffeef4bc) SHA1(a3b21eefb170aa54eb53cf56f88b0c00dd29703f) )
+
+	ROM_REGION( 439251, "screen", 0)
+	ROM_LOAD( "kchqflag.svg", 0, 439251, CRC(8d477ab1) SHA1(eb0fe02a4f285081f0fd422df17bca48498112de) )
+ROM_END
 
 
 
@@ -6189,14 +6687,12 @@ INPUT_PORTS_END
 
 void gamewatch_state::nsmb3(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
-	config.set_default_layout(layout_hh_sm500_test);
+	sm530_common(config, 1203, 1080);
 }
 
 void gamewatch_state::nsmw(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
-	config.set_default_layout(layout_hh_sm500_test);
+	sm530_common(config, 1190, 1080);
 }
 
 // roms
@@ -6208,8 +6704,8 @@ ROM_START( nsmb3 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "633.melody", 0x000, 0x100, CRC(98340c46) SHA1(94b5865fc669b7f6487845647866c06f4f581f63) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmb3.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 373935, "screen", 0)
+	ROM_LOAD( "nsmb3.svg", 0, 373935, CRC(d3dd4ef9) SHA1(2e95bdf55b8ba050efbd8fd27442a1872d93685f) )
 ROM_END
 
 ROM_START( nsmw )
@@ -6219,8 +6715,8 @@ ROM_START( nsmw )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "636.melody", 0x000, 0x100, CRC(5df99e13) SHA1(98d5f78b5bcf59a232ccb5c61210568948c4501b) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmw.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 401273, "screen", 0)
+	ROM_LOAD( "nsmw.svg", 0, 401273, CRC(72cb618d) SHA1(cecf9bb7ad21896c9a68ca606359f2b6f9c08d5d) )
 ROM_END
 
 
@@ -6243,14 +6739,12 @@ ROM_END
 
 *******************************************************************************/
 
-class nstarfox_state : public hh_sm510_state
+class nstarfox_state : public gamewatch_state
 {
 public:
 	nstarfox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		inp_fixed_last();
-	}
+		gamewatch_state(mconfig, type, tag)
+	{ }
 
 	void nstarfox(machine_config &config);
 
@@ -6305,7 +6799,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Gauntlet (model 7-778)
+  Tiger Gauntlet (model 7-778) (licensed from Tengen)
   * Sharp SM510 under epoxy (die label CMS54C, KMS583)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6397,7 +6891,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Double Dragon (model 7-780)
+  Tiger Double Dragon (model 7-780) (licensed from Technos / Tradewest)
   * Sharp SM510 under epoxy (die label CMS54C, KMS570, 593)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6480,7 +6974,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Castlevania II: Simon's Quest (model 7-781)
+  Tiger Castlevania II: Simon's Quest (model 7-781) (licensed from Konami)
   * Sharp SM510 under epoxy (die label 581)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6564,7 +7058,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Karnov (model 7-783)
+  Tiger Karnov (model 7-783) (licensed from Data East)
   * Sharp SM510 under epoxy (die label CMS54C, KMS582)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6648,7 +7142,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Vindicators (model 7-786)
+  Tiger Vindicators (model 7-786) (licensed from Tengen)
   * Sharp SM510 under epoxy (die label CMS54C, KMS595)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6731,7 +7225,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Ninja Gaiden (model 7-787)
+  Tiger Ninja Gaiden (model 7-787) (licensed from Tecmo)
   * Sharp SM510 under epoxy (die label M82)
   * lcd screen with custom segments, 1 led, 1-bit sound
 
@@ -6749,20 +7243,11 @@ public:
 
 	void tgaiden(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
 	// R2 connects to a single LED behind the screen
-	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 	output_finder<> m_led_out;
+	void led_w(u8 data) { m_led_out = data >> 1 & 1; }
 };
-
-void tgaiden_state::machine_start()
-{
-	hh_sm510_state::machine_start();
-	m_led_out.resolve();
-}
 
 // inputs
 
@@ -6827,7 +7312,91 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Batman (model 7-799)
+  Tiger Double Dragon II: The Revenge (model 7-798) (licensed from Technos)
+  * Sharp SM510 under epoxy (die label M84)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tddragon2_state : public hh_sm510_state
+{
+public:
+	tddragon2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tddragon2(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tddragon2 )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) // Down
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick Right")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Punch")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Kick Left")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pause")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tddragon2_state::tddragon2(machine_config &config)
+{
+	sm510_tiger(config, 1451, 1080);
+}
+
+// roms
+
+ROM_START( tddragon2 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m84", 0x0000, 0x1000, CRC(fe4d3618) SHA1(44c6ad512a01126799cfbc87634fa04edf81b6af) )
+
+	ROM_REGION( 435894, "screen", 0)
+	ROM_LOAD( "tddragon2.svg", 0, 435894, CRC(6244f507) SHA1(578f1b3bf7fe757162d231cd0f93d05bbb120ed1) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger Batman (model 7-799) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label CMS54C, KMS597, 597)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6908,7 +7477,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Space Harrier II (model 7-814)
+  Tiger Space Harrier II (model 7-814) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M91)
   * lcd screen with custom segments, 1-bit sound
 
@@ -6991,7 +7560,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Strider (model 7-815)
+  Tiger Strider (model 7-815) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label M92)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7071,7 +7640,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Golden Axe (model 7-817)
+  Tiger Golden Axe (model 7-817) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M94)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7155,7 +7724,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Robocop 2 (model 7-830)
+  Tiger Robocop 2 (model 7-830) (licensed from Orion Pictures)
   * Sharp SM510 under epoxy (die label M96)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7241,7 +7810,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Altered Beast (model 7-831)
+  Tiger Altered Beast (model 7-831) (licensed from Sega)
   * Sharp SM510 under epoxy (die label M88)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7329,7 +7898,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Mega Man 3 (model 7-834)
+  Tiger Mega Man 3 (model 7-834) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label MA4)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7409,7 +7978,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Street Fighter 2010: The Final Fight (model 7-837)
+  Tiger Street Fighter 2010: The Final Fight (model 7-837) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label MA2)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7493,7 +8062,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Swamp Thing (model 7-851)
+  Tiger Swamp Thing (model 7-851) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MB0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7573,7 +8142,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Spider-Man (model 7-853)
+  Tiger Spider-Man (model 7-853) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MA5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7657,7 +8226,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger X-Men (model 7-854)
+  Tiger X-Men (model 7-854) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MA7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7741,7 +8310,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Double Dragon 3: The Rosetta Stone (model 7-858)
+  Tiger Double Dragon 3: The Rosetta Stone (model 7-858) (licensed from Technos)
   * Sharp SM510 under epoxy (die label MA6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7825,7 +8394,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Flash (model 7-859)
+  Tiger The Flash (model 7-859) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MB5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7909,7 +8478,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Robin Hood (model 7-861)
+  Tiger Robin Hood (model 7-861) (not licensed)
   * Sharp SM510 under epoxy (die label CMS54C, KMS583)
   * lcd screen with custom segments, 1-bit sound
 
@@ -7961,7 +8530,152 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger MC Hammer: U Can't Touch This (model 7-863)
+  Tiger Pit-Fighter (model 7-863) (licensed from Atari Games / Tengen)
+  * Sharp SM510 under epoxy (die label MA8)
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class tpitfight_state : public hh_sm510_state
+{
+public:
+	tpitfight_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tpitfight(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tpitfight )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack High")
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack Low")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Right Attack High")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Right")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Left Attack Low")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick On Left")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Select")
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tpitfight_state::tpitfight(machine_config &config)
+{
+	sm510_tiger(config, 1447, 1080);
+}
+
+// roms
+
+ROM_START( tpitfight )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ma8", 0x0000, 0x1000, CRC(8470a539) SHA1(f857da9a498dfbae10307c55f3c4e49c94fe4ea8) )
+
+	ROM_REGION( 330535, "screen", 0)
+	ROM_LOAD( "tpitfight.svg", 0, 330535, CRC(5407b415) SHA1(e489c63a4bbbf9f146a25a451227f1916df7e868) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger The Rocketeer (model 7-864) (licensed from Walt Disney)
+  * Sharp SM510 under epoxy (die label M96)
+  * lcd screen with custom segments, 1-bit sound
+
+  MCU ROM is the same for Robocop 2, The Rocketeer.
+
+*******************************************************************************/
+
+class trockteer_state : public hh_sm510_state
+{
+public:
+	trockteer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void trockteer(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trockteer )
+	PORT_INCLUDE( trobocop2 )
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("P1 Up/Rocket Pack")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Right")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
+INPUT_PORTS_END
+
+// config
+
+void trockteer_state::trockteer(machine_config &config)
+{
+	sm510_tiger(config, 1463, 1080);
+}
+
+// roms
+
+ROM_START( trockteer )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
+
+	ROM_REGION( 558128, "screen", 0)
+	ROM_LOAD( "trockteer.svg", 0, 558128, CRC(70ff1f46) SHA1(5cd94655654614206ed11844ba31650edb51eb22) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger MC Hammer: U Can't Touch This (model 7-865) (licensed from Winterland
+  Productions)
   * Sharp SM511 under epoxy (die label N63)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8049,66 +8763,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Rocketeer (model 7-864)
-  * Sharp SM510 under epoxy (die label M96)
-  * lcd screen with custom segments, 1-bit sound
-
-  MCU ROM is the same for Robocop 2, The Rocketeer.
-
-*******************************************************************************/
-
-class trockteer_state : public hh_sm510_state
-{
-public:
-	trockteer_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_sm510_state(mconfig, type, tag)
-	{
-		inp_fixed_last();
-	}
-
-	void trockteer(machine_config &config);
-};
-
-// inputs
-
-static INPUT_PORTS_START( trockteer )
-	PORT_INCLUDE( trobocop2 )
-
-	PORT_MODIFY("IN.0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("P1 Up/Rocket Pack")
-
-	PORT_MODIFY("IN.3")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Right")
-
-	PORT_MODIFY("IN.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire Left")
-INPUT_PORTS_END
-
-// config
-
-void trockteer_state::trockteer(machine_config &config)
-{
-	sm510_tiger(config, 1463, 1080);
-}
-
-// roms
-
-ROM_START( trockteer )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "m96", 0x0000, 0x1000, CRC(3704b60c) SHA1(04275833e1a79fd33226faf060890b66ae54e1d3) )
-
-	ROM_REGION( 558128, "screen", 0)
-	ROM_LOAD( "trockteer.svg", 0, 558128, CRC(70ff1f46) SHA1(5cd94655654614206ed11844ba31650edb51eb22) )
-ROM_END
-
-
-
-
-
-/*******************************************************************************
-
-  Tiger Battletoads (model 7-868)
+  Tiger Battletoads (model 7-868) (licensed from Rare / Tradewest)
   * Sharp SM510 under epoxy (die label MB3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8192,7 +8847,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Hook (model 7-869)
+  Tiger Hook (model 7-869) (licensed from Tri-Star Pictures)
   * Sharp SM510 under epoxy (die label MB7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8276,7 +8931,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Back to the Future (model 7-809)
+  Tiger Back to the Future (model 7-809) (licensed from UCS & Amblin)
   * Sharp SM510 under epoxy (die label MC3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8359,7 +9014,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Addams Family (model 7-829)
+  Tiger The Addams Family (model 7-829) (licensed from Paramount Pictures)
   * Sharp SM510 under epoxy (die label MC2)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8445,7 +9100,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Home Alone (model 78-502)
+  Tiger Home Alone (model 78-502) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MC7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8529,7 +9184,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Ninja Gaiden III (model 78-503)
+  Tiger Ninja Gaiden III (model 78-503) (licensed from Tecmo)
   * Sharp SM510 under epoxy (die label MD6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8609,7 +9264,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger X-Men: Project X (model 78-504)
+  Tiger X-Men: Project X (model 78-504) (licensed from Marvel Entertainment Group)
   * Sharp SM510 under epoxy (die label MD3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8689,7 +9344,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Home Alone 2: Lost in New York (model 78-506)
+  Tiger Home Alone 2: Lost in New York (model 78-506) (licensed from Twentieth
+  Century Fox)
   * Sharp SM510 under epoxy (die label MD7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8773,7 +9429,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Sonic The Hedgehog (model 78-513)
+  Tiger Sonic The Hedgehog (model 78-513) (licensed from Sega)
   * Sharp SM511 under epoxy (die label KMS73B, N71)
   * lcd screen with custom segments, 2-bit sound
 
@@ -8855,7 +9511,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Robocop 3 (model 78-514)
+  Tiger Robocop 3 (model 78-514) (licensed from Orion Pictures)
   * Sharp SM510 under epoxy (die label MC6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -8939,7 +9595,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Incredible Crash Dummies (model 78-516)
+  Tiger The Incredible Crash Dummies (model 78-516) (licensed from Tyco / LCI)
   * Sharp SM510 under epoxy (die label ME0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9019,7 +9675,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Street Fighter II (model 78-522)
+  Tiger Street Fighter II (model 78-522) (licensed from Capcom)
   * Sharp SM510 under epoxy (die label ME1)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9103,7 +9759,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Wayne's World (model 78-523)
+  Tiger Wayne's World (model 78-523) (licensed from Broadway Video / NBC)
   * Sharp SM510 under epoxy (die label ME7)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9187,7 +9843,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Jurassic Park (model 78-524)
+  Tiger Jurassic Park (model 78-524) (licensed from Universal City Studios & Amblin)
   * Sharp SM510 under epoxy (die label MF4)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9267,7 +9923,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Sonic The Hedgehog 2 (model 78-527)
+  Tiger Sonic The Hedgehog 2 (model 78-527) (licensed from Sega)
   * Sharp SM511 under epoxy (die label N86)
   * lcd screen with custom segments, 2-bit sound
 
@@ -9349,7 +10005,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Super Double Dragon (model 78-528)
+  Tiger Super Double Dragon (model 78-528) (licensed from Technos)
   * Sharp SM510 under epoxy (die label MF5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9438,7 +10094,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Dennis the Menace (model 78-532)
+  Tiger Dennis the Menace (model 78-532) (licensed from Warner Bros. / HKE)
   * Sharp SM510 under epoxy (die label MF9)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9523,7 +10179,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Nightmare Before Christmas (model 78-537)
+  Tiger Nightmare Before Christmas (model 78-537) (licensed from Touchstone Pictures)
   * Sharp SM510 under epoxy (die label MG0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9613,7 +10269,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Transformers: Generation 2 (model 78-541)
+  Tiger Transformers: Generation 2 (model 78-541) (not licensed: Transformers
+  was owned by parent company Hasbro)
   * Sharp SM510 under epoxy (die label MG2)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9697,9 +10354,16 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Operation: Aliens (model 78-552)
+  Tiger Operation: Aliens (model 78-552) (licensed from Twentieth Century Fox)
   * Sharp SM510 under epoxy (die label MJ1)
   * lcd screen with custom segments, 1-bit sound
+
+  BTANB: Energy and weapon power bars are the wrong way around. The manual does
+  show them correctly, but it appears to be a doctored picture.
+
+  There's also a newer version called Project Alien, presumed to be the same ROM.
+  The LCD is different (no Xenomorph aliens). The background inlay is different
+  too, and this time the weapon/energy labels are placed correctly.
 
 *******************************************************************************/
 
@@ -9777,7 +10441,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Mortal Kombat (model 78-553)
+  Tiger Mortal Kombat (model 78-553) (licensed from Midway)
   * Sharp SM510 under epoxy (die label MG6)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9862,7 +10526,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger The Shadow (model 78-559)
+  Tiger The Shadow (model 78-559) (licensed from The Conde Nast Publications)
   * Sharp SM510 under epoxy (die label MJ5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -9946,7 +10610,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Skeleton Warriors: The Dark Crusade (model 78-569)
+  Tiger Skeleton Warriors: The Dark Crusade (model 78-569) (licensed from Landmark
+  Entertainment Group)
   * Sharp SM510 under epoxy (die label MK0)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10030,7 +10695,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Batman Forever: Double Dose of Doom (model 78-572)
+  Tiger Batman Forever: Double Dose of Doom (model 78-572) (licensed from DC Comics)
   * Sharp SM510 under epoxy (die label MK3)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10115,7 +10780,8 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Judge Dredd (model 78-581)
+  Tiger Judge Dredd (model 78-581) (licensed from Cinergi / Egmont Foundation /
+  CPI / Surge Comic Prop.)
   * Sharp SM510 under epoxy (die label MK5)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10200,7 +10866,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Apollo 13 (model 78-591)
+  Tiger Apollo 13 (model 78-591) (licensed from UCS)
   * Sharp SM510 under epoxy (die label 10 07)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10285,7 +10951,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger 007: GoldenEye (model 78-594)
+  Tiger 007: GoldenEye (model 78-594) (licensed from Danjaq / United Artists)
   * Sharp SM510 under epoxy (die label 10 06)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10370,7 +11036,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Kazaam (model 78-613)
+  Tiger Kazaam (model 78-613) (licensed from Interscope Communications)
   * Sharp SM510 under epoxy (die label KMS10, 18)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10455,7 +11121,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Space Jam (model 78-621)
+  Tiger Space Jam (model 78-621) (licensed from Warner Bros.)
   * Sharp SM510 under epoxy (die label KMS10, 23)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10535,7 +11201,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Independence Day (model 78-624)
+  Tiger Independence Day (aka ID4) (model 78-624) (licensed from Fox)
   * Sharp SM510 under epoxy (die label 10 16)
   * lcd screen with custom segments, 1-bit sound
 
@@ -10615,7 +11281,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Batman: The Animated Series (model 72-505)
+  Tiger Batman: The Animated Series (model 72-505) (licensed from DC Comics)
   * Sharp SM511 under epoxy (die label N81)
   * lcd screen with custom segments, 2-bit sound
 
@@ -10637,14 +11303,14 @@ public:
 
 static INPUT_PORTS_START( tbatmana )
 	PORT_START("IN.0") // S2
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_NAME("Jump")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Jump")
 	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // S3
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S4
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fast")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY PORT_NAME("Fast")
 	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.3") // S5
@@ -10698,7 +11364,91 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Gargoyles: Night Flight (Tiger) (model 72-816)
+  Tiger Mighty Max (model 72-544) (licensed from Film Roman / Bluebird Toys / Canal+)
+  * Sharp SM511 under epoxy (die label KMS73B, ND1)
+  * lcd screen with custom segments, 2-bit sound
+
+*******************************************************************************/
+
+class tmigmax_state : public hh_sm510_state
+{
+public:
+	tmigmax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{
+		inp_fixed_last();
+	}
+
+	void tmigmax(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( tmigmax )
+	PORT_START("IN.0") // S2
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S3
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S4
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S5
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Pick")
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Call")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Max Score")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // GND!
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_CB(input_changed) PORT_NAME("Power On/Start")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) PORT_NAME("Sound")
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void tmigmax_state::tmigmax(machine_config &config)
+{
+	sm511_tiger2bit(config, 1474, 1080);
+}
+
+// roms
+
+ROM_START( tmigmax )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "nd1.program", 0x0000, 0x1000, CRC(0950a05e) SHA1(829c722bf2c9554cb22baa6e987034c417196cc4) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "nd1.melody", 0x000, 0x100, CRC(9f8e719a) SHA1(6bf2e3e8cecf9ec659ca587d53a2428521b702d8) )
+
+	ROM_REGION( 735451, "screen", 0)
+	ROM_LOAD( "tmigmax.svg", 0, 735451, CRC(4d83d754) SHA1(ade145888aee60aac1a184d5b35754711dab22a0) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tiger Gargoyles: Night Flight (Tiger) (model 72-816) (licensed from BVTV)
   * Sharp SM511 under epoxy (die label KMS73B, NE1)
   * lcd screen with custom segments, 2-bit sound
 
@@ -10725,8 +11475,8 @@ static INPUT_PORTS_START( tgargnf )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.1") // S3
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.2") // S4
@@ -10784,7 +11534,7 @@ ROM_END
 
 /*******************************************************************************
 
-  Tiger Superman (model 72-???)
+  Tiger Superman (model 72-???) (licensed from DC Comics)
   * Sharp SM511 under epoxy (no decap, dumped electronically)
   * lcd screen with custom segments, 2-bit sound
 
@@ -10911,6 +11661,11 @@ static INPUT_PORTS_START( trshutvoy )
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("FAKE") // Up/Sound are electronically the same button
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
@@ -10988,7 +11743,7 @@ static INPUT_PORTS_START( trsrescue )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -11068,12 +11823,12 @@ static INPUT_PORTS_START( trsgkeep )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
 
 	PORT_START("BA")
-	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("B")
-	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)") // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFNAME( 0x01, 0x01, "Increase Score (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
 	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 
@@ -11134,7 +11889,7 @@ public:
 
 static INPUT_PORTS_START( trspacmis )
 	PORT_START("IN.0") // R2
-	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
@@ -11196,62 +11951,283 @@ ROM_END
 
 /*******************************************************************************
 
-  Elektronika Автослалом (Autoslalom) (model ИМ-23)
-  * KB1013VK1-2 MCU
+  Tronica: Space Adventure (model SA-12)
+  * PCB labels: SA-12 111182 32-523-1
+  * Sharp SM511 label 1112 237C TRONICA (no decap)
   * lcd screen with custom segments, 1-bit sound
-
-  This is not an unlicensed clone, but doing a hex compare with MC-25
-  still shows around 30% similarity so clearly they used that as a base.
 
 *******************************************************************************/
 
-class auslalom_state : public hh_sm510_state
+class trspacadv_state : public hh_sm510_state
 {
 public:
-	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
+	trspacadv_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void auslalom(machine_config &config);
+	void trspacadv(machine_config &config);
 };
 
 // inputs
 
-static INPUT_PORTS_START( auslalom )
-	PORT_START("IN.0") // R2
+static INPUT_PORTS_START( trspacadv )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("=")
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_CHANGED_CB(input_changed) PORT_NAME("ALM")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_CHANGED_CB(input_changed) PORT_NAME("%")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CHANGED_CB(input_changed) PORT_NAME("C")
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Left/Sound
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Fire") // F
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.1") // R3
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Запуск (Start)")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Скорость (Speed)")
+	PORT_START("IN.7") // S8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN.2") // R4
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FAKE") // Left/Sound are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN ) PORT_CHANGED_CB(input_changed) PORT_NAME("Sound")
+INPUT_PORTS_END
+
+// config
+
+void trspacadv_state::trspacadv(machine_config &config)
+{
+	sm511_common(config, 1532, 1080);
+}
+
+// roms
+
+ROM_START( trspacadv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1112_237c.program", 0x0000, 0x1000, CRC(7c863fbc) SHA1(1c65f9f8166162c2cd203967ae3d0d49cc14baf7) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1112_237c.melody", 0x000, 0x100, BAD_DUMP CRC(685a3305) SHA1(31b948dbd0fbae3517db505bc58904092c2b077f) ) // decap needed for verification
+
+	ROM_REGION( 117824, "screen", 0)
+	ROM_LOAD( "trspacadv.svg", 0, 117824, CRC(5b7c7f28) SHA1(3851eb2221660a33c521bbd3b01d7a76a558d07c) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tronica Treasure Island (model TI-31)
+  * PCB labels: TI-31 160383 32-537-1
+  * Sharp SM511 label 1113 239B TRONICA (no decap)
+  * horizontal triple lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trtreisl_state : public hh_sm510_state
+{
+public:
+	trtreisl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trtreisl(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trtreisl )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Button/Hour
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Min")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x00, "Score Booster (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("FAKE") // SJP and Hour are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start/Jump/Pick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+INPUT_PORTS_END
+
+// config
+
+void trtreisl_state::trtreisl(machine_config &config)
+{
+	sm511_tripleh(config, 525, 675, 870, 675, 525, 675); // 1555 x 547
+}
+
+// roms
+
+ROM_START( trtreisl )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1113_239b.program", 0x0000, 0x1000, CRC(fec16266) SHA1(f2725a077cff9dbed9cd324ff802d10dcbdb4451) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1113_239b.melody", 0x000, 0x100, BAD_DUMP CRC(2de3f974) SHA1(17e7a3947a457580efefa544c3132e93e20cbc71) ) // decap needed for verification
+
+	ROM_REGION( 59803, "screen_left", 0)
+	ROM_LOAD( "trtreisl_left.svg", 0, 59803, CRC(92f5f11e) SHA1(fdf8edf7742d2e0d2893e2226872c897e966f64e) )
+
+	ROM_REGION( 94316, "screen_middle", 0)
+	ROM_LOAD( "trtreisl_middle.svg", 0, 94316, CRC(adcf5308) SHA1(0c7932e4ba7a3daba24f0ff385c21035b86f4e23) )
+
+	ROM_REGION( 46905, "screen_right", 0)
+	ROM_LOAD( "trtreisl_right.svg", 0, 46905, CRC(26e6b4bd) SHA1(7469f2d5291f20621dc3f2b7f260cf4b4681f95b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Tronica: Diver's Adventure (model DA-37), Clever Chicken (model CC-38V)
+  * PCB labels: DA-37 260383 32-541-1 (DA-37)
+                CC38V 210483 32-545-1 (CC-38V)
+  * Sharp SM510 labels (no decap): 0029 235D TRONICA (DA-37)
+                                   0029 238C TRONICA (CC-38V)
+  * lcd screen with custom segments, 1-bit sound
+
+  DA-37 and CC-38V are the exact same MCU, but with different graphics. The
+  player moves horizontally in DA-37 and vertically in CC-38V.
+
+*******************************************************************************/
+
+class trdivadv_state : public hh_sm510_state
+{
+public:
+	trdivadv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trdivadv(machine_config &config);
+	void trclchick(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trdivadv )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("IN.1") // S2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
 
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x01, "Invincibility (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("ACL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( trclchick )
+	PORT_INCLUDE( trdivadv )
+
+	PORT_MODIFY("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+INPUT_PORTS_END
+
 // config
 
-void auslalom_state::auslalom(machine_config &config)
+void trdivadv_state::trdivadv(machine_config &config)
 {
-	kb1013vk12_common(config, 1732, 1080); // R mask option ?
+	sm510_common(config, 1520, 1080);
+}
+
+void trdivadv_state::trclchick(machine_config &config)
+{
+	sm510_common(config, 811, 1080);
 }
 
 // roms
 
-ROM_START( auslalom )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
+ROM_START( trdivadv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0029_235d", 0x0000, 0x1000, CRC(8977a1cf) SHA1(9ac413efedcff8b53b859420c0575c66e7be6e73) )
 
-	ROM_REGION( 117520, "screen", 0)
-	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
+	ROM_REGION( 165418, "screen", 0)
+	ROM_LOAD( "trdivadv.svg", 0, 165418, CRC(727040f1) SHA1(2318d6973a165eedcd369bd11342eca7efd24c39) )
+ROM_END
+
+ROM_START( trclchick )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0029_238c", 0x0000, 0x1000, CRC(8977a1cf) SHA1(9ac413efedcff8b53b859420c0575c66e7be6e73) )
+
+	ROM_REGION( 122284, "screen", 0)
+	ROM_LOAD( "trclchick.svg", 0, 122284, CRC(c8e67d54) SHA1(d3d113c7bcb597fafddb0fab5410808360ad9a4b) )
 ROM_END
 
 
@@ -11436,24 +12412,32 @@ SYST( 1984, gnw_dkhockey, 0,           0,      gnw_dkhockey, gnw_dkhockey, gnw_d
 // Nintendo G&W hardware licensed to other companies (not part of G&W series)
 SYST( 1984, bassmate,     0,           0,      bassmate,     bassmate,     bassmate_state,     empty_init, "Telko / Nintendo", "Bassmate Computer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-// Elektronika (mostly G&W clones)
+// Elektronika (G&W clones)
 SYST( 1988, taynyoke,     gnw_octopus, 0,      taynyoke,     gnw_octopus,  gnw_octopus_state,  empty_init, "bootleg (Elektronika)", "Tayny okeana", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, vespovar,     gnw_chef,    0,      vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1984, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, biathlon,     gnw_mmouse,  0,      biathlon,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, vfutbol,      gnw_mmouse,  0,      vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, krybolov,     gnw_mmouse,  0,      krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kvakazad,     gnw_mmouse,  0,      kvakazad,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, nochnyev,     gnw_mmouse,  0,      nochnyev,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     nupogodi_state,     empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, biathlon,     gnw_mmouse,  0,      biathlon,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, vfutbol,      gnw_mmouse,  0,      vfutbol,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, krybolov,     gnw_mmouse,  0,      krybolov,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kvakazad,     gnw_mmouse,  0,      kvakazad,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, nochnyev,     gnw_mmouse,  0,      nochnyev,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, kosmicpt,     gnw_mmouse,  0,      kosmicpt,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, morataka,     gnw_mmouse,  0,      morataka,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      nupogodi_state,     empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, vinnpukh,     gnw_dkjrp,   0,      vinnpukh,     gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "bootleg (Elektronika)", "Vinni-Pukh", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+
+// Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
+SYST( 199?, supkubik,     0,           0,      supkubik,     supkubik,     supkubik_state,     empty_init, "Elektronika", "Superkubiki", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 
 // Konami
 SYST( 1989, kdribble,     0,           0,      kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11461,11 +12445,12 @@ SYST( 1989, kcontra,      0,           0,      kcontra,      kcontra,      kcont
 SYST( 1989, ktopgun,      0,           0,      ktopgun,      ktopgun,      ktopgun_state,      empty_init, "Konami", "Top Gun (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, kgradius,     0,           0,      kgradius,     kgradius,     kgradius_state,     empty_init, "Konami", "Gradius (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, ktmnt,        0,           0,      ktmnt,        ktmnt,        ktmnt_state,        empty_init, "Konami", "Teenage Mutant Ninja Turtles (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami (licensed from Electronic Arts)", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, kskatedie,    0,           0,      kskatedie,    kskatedie,    kskatedie_state,    empty_init, "Konami", "Skate or Die (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kbilly,       0,           0,      kbilly,       kbilly,       kbilly_state,       empty_init, "Konami", "The Adventures of Bayou Billy (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kbottom9,     0,           0,      kbottom9,     kbottom9,     kbottom9_state,     empty_init, "Konami", "Bottom of the Ninth (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kloneran,     0,           0,      kloneran,     kloneran,     kloneran_state,     empty_init, "Konami", "The Lone Ranger (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, knascar,      0,           0,      knascar,      knascar,      knascar_state,      empty_init, "Konami", "Bill Elliott's NASCAR Racing (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, kchqflag,     knascar,     0,      kchqflag,     knascar,      knascar_state,      empty_init, "Konami", "Chequered Flag (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, kblades,      0,           0,      kblades,      kblades,      kblades_state,      empty_init, "Konami", "Blades of Steel (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, ktmnt2,       0,           0,      ktmnt2,       ktmnt2,       ktmnt2_state,       empty_init, "Konami", "Teenage Mutant Ninja Turtles II: Splinter Speaks (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 SYST( 1990, knfl,         0,           0,      knfl,         knfl,         knfl_state,         empty_init, "Konami", "NFL Football (Konami, handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -11477,66 +12462,69 @@ SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbuck
 SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nelsonic Game Watch series
-SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic (licensed from Nintendo)", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic (licensed from Nintendo)", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic (licensed from Nintendo)", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
+SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
 // Tiger 7-xxx/78-xxx models
-SYST( 1989, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics (licensed from Tengen)", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics (licensed from Technos/Tradewest)", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics (licensed from Konami)", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics (licensed from Data East)", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics (licensed from Tengen)", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tgaunt,       0,           0,      tgaunt,       tgaunt,       tgaunt_state,       empty_init, "Tiger Electronics", "Gauntlet (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tddragon,     0,           0,      tddragon,     tddragon,     tddragon_state,     empty_init, "Tiger Electronics", "Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tsimquest,    0,           0,      tsimquest,    tsimquest,    tsimquest_state,    empty_init, "Tiger Electronics", "Castlevania II: Simon's Quest (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1988, tkarnov,      0,           0,      tkarnov,      tkarnov,      tkarnov_state,      empty_init, "Tiger Electronics", "Karnov (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tvindictr,    0,           0,      tvindictr,    tvindictr,    tvindictr_state,    empty_init, "Tiger Electronics", "Vindicators (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1989, tgaiden,      0,           0,      tgaiden,      tgaiden,      tgaiden_state,      empty_init, "Tiger Electronics", "Ninja Gaiden (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tddragon2,    0,           0,      tddragon2,    tddragon2,    tddragon2_state,    empty_init, "Tiger Electronics", "Double Dragon II: The Revenge (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, tbatman,      0,           0,      tbatman,      tbatman,      tbatman_state,      empty_init, "Tiger Electronics", "Batman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tgoldnaxe,    0,           0,      tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Golden Axe (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tsharr2,      0,           0,      tsharr2,      tsharr2,      tsharr2_state,      empty_init, "Tiger Electronics", "Space Harrier II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tstrider,     0,           0,      tstrider,     tstrider,     tstrider_state,     empty_init, "Tiger Electronics", "Strider (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, tgoldnaxe,    0,           0,      tgoldnaxe,    tgoldnaxe,    tgoldnaxe_state,    empty_init, "Tiger Electronics", "Golden Axe (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1990, trobocop2,    0,           0,      trobocop2,    trobocop2,    trobocop2_state,    empty_init, "Tiger Electronics", "Robocop 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, taltbeast,    0,           0,      taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics (licensed from Sega)", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tmegaman3,    0,           0,      tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics (licensed from Capcom)", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1990, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1990, taltbeast,    0,           0,      taltbeast,    taltbeast,    taltbeast_state,    empty_init, "Tiger Electronics", "Altered Beast (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tmegaman3,    0,           0,      tmegaman3,    tmegaman3,    tmegaman3_state,    empty_init, "Tiger Electronics", "Mega Man 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tsf2010,      0,           0,      tsf2010,      tsf2010,      tsf2010_state,      empty_init, "Tiger Electronics", "Street Fighter 2010: The Final Fight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tswampt,      0,           0,      tswampt,      tswampt,      tswampt_state,      empty_init, "Tiger Electronics", "Swamp Thing (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tspidman,     0,           0,      tspidman,     tspidman,     tspidman_state,     empty_init, "Tiger Electronics", "Spider-Man (Tiger, 1991 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, txmen,        0,           0,      txmen,        txmen,        txmen_state,        empty_init, "Tiger Electronics", "X-Men (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tddragon3,    0,           0,      tddragon3,    tddragon3,    tddragon3_state,    empty_init, "Tiger Electronics", "Double Dragon 3: The Rosetta Stone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, tflash,       0,           0,      tflash,       tflash,       tflash_state,       empty_init, "Tiger Electronics", "The Flash (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trobhood,     tgaunt,      0,      trobhood,     trobhood,     trobhood_state,     empty_init, "Tiger Electronics", "Robin Hood (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tpitfight,    0,           0,      tpitfight,    tpitfight,    tpitfight_state,    empty_init, "Tiger Electronics", "Pit-Fighter (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, trockteer,    trobocop2,   0,      trockteer,    trockteer,    trockteer_state,    empty_init, "Tiger Electronics", "The Rocketeer (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics (licensed from Rare/Tradewest)", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tmchammer,    0,           0,      tmchammer,    tmchammer,    tmchammer_state,    empty_init, "Tiger Electronics", "MC Hammer: U Can't Touch This (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, tbtoads,      0,           0,      tbtoads,      tbtoads,      tbtoads_state,      empty_init, "Tiger Electronics", "Battletoads (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, thook,        0,           0,      thook,        thook,        thook_state,        empty_init, "Tiger Electronics", "Hook (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, tbttf,        0,           0,      tbttf,        tbttf,        tbttf_state,        empty_init, "Tiger Electronics", "Back to the Future (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, taddams,      0,           0,      taddams,      taddams,      taddams_state,      empty_init, "Tiger Electronics", "The Addams Family (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, thalone,      0,           0,      thalone,      thalone,      thalone_state,      empty_init, "Tiger Electronics", "Home Alone (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1992, tgaiden3,     0,           0,      tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics (licensed from Tecmo)", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tgaiden3,     0,           0,      tgaiden3,     tgaiden3,     tgaiden3_state,     empty_init, "Tiger Electronics", "Ninja Gaiden III (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, txmenpx,      0,           0,      txmenpx,      txmenpx,      txmenpx_state,      empty_init, "Tiger Electronics", "X-Men: Project X (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, thalone2,     0,           0,      thalone2,     thalone2,     thalone2_state,     empty_init, "Tiger Electronics", "Home Alone 2: Lost in New York (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1992, tsonic,       0,           0,      tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1992, tsonic,       0,           0,      tsonic,       tsonic,       tsonic_state,       empty_init, "Tiger Electronics", "Sonic The Hedgehog (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, trobocop3,    0,           0,      trobocop3,    trobocop3,    trobocop3_state,    empty_init, "Tiger Electronics", "Robocop 3 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tdummies,     0,           0,      tdummies,     tdummies,     tdummies_state,     empty_init, "Tiger Electronics", "The Incredible Crash Dummies (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tsfight2,     0,           0,      tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics (licensed from Capcom)", "Street Fighter II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsfight2,     0,           0,      tsfight2,     tsfight2,     tsfight2_state,     empty_init, "Tiger Electronics", "Street Fighter II (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1992, twworld,      0,           0,      twworld,      twworld,      twworld_state,      empty_init, "Tiger Electronics", "Wayne's World (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tjpark,       0,           0,      tjpark,       tjpark,       tjpark_state,       empty_init, "Tiger Electronics", "Jurassic Park (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tsonic2,      0,           0,      tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics (licensed from Sega)", "Sonic The Hedgehog 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics (licensed from Technos)", "Super Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsonic2,      0,           0,      tsonic2,      tsonic2,      tsonic2_state,      empty_init, "Tiger Electronics", "Sonic The Hedgehog 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tsddragon,    0,           0,      tsddragon,    tsddragon,    tsddragon_state,    empty_init, "Tiger Electronics", "Super Double Dragon (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tdennis,      0,           0,      tdennis,      tdennis,      tdennis_state,      empty_init, "Tiger Electronics", "Dennis the Menace (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, tnmarebc,     0,           0,      tnmarebc,     tnmarebc,     tnmarebc_state,     empty_init, "Tiger Electronics", "Nightmare Before Christmas (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: title has no "The"
 SYST( 1993, ttransf2,     0,           0,      ttransf2,     ttransf2,     ttransf2_state,     empty_init, "Tiger Electronics", "Transformers: Generation 2 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, topaliens,    0,           0,      topaliens,    topaliens,    topaliens_state,    empty_init, "Tiger Electronics", "Operation: Aliens (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics (licensed from Midway)", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1993, tmkombat,     0,           0,      tmkombat,     tmkombat,     tmkombat_state,     empty_init, "Tiger Electronics", "Mortal Kombat (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tshadow,      0,           0,      tshadow,      tshadow,      tshadow_state,      empty_init, "Tiger Electronics", "The Shadow (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1994, tskelwarr,    0,           0,      tskelwarr,    tskelwarr,    tskelwarr_state,    empty_init, "Tiger Electronics", "Skeleton Warriors: The Dark Crusade (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tbatfor,      0,           0,      tbatfor,      tbatfor,      tbatfor_state,      empty_init, "Tiger Electronics", "Batman Forever: Double Dose of Doom (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tjdredd,      0,           0,      tjdredd,      tjdredd,      tjdredd_state,      empty_init, "Tiger Electronics", "Judge Dredd (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tapollo13,    0,           0,      tapollo13,    tapollo13,    tapollo13_state,    empty_init, "Tiger Electronics", "Apollo 13 (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1995, tgoldeye,     0,           0,      tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1996, tgoldeye,     0,           0,      tgoldeye,     tgoldeye,     tgoldeye_state,     empty_init, "Tiger Electronics", "007: GoldenEye (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tkazaam,      0,           0,      tkazaam,      tkazaam,      tkazaam_state,      empty_init, "Tiger Electronics", "Kazaam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tsjam,        0,           0,      tsjam,        tsjam,        tsjam_state,        empty_init, "Tiger Electronics", "Space Jam (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tinday,       0,           0,      tinday,       tinday,       tinday_state,       empty_init, "Tiger Electronics", "Independence Day (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Tiger 72-xxx models
 SYST( 1992, tbatmana,     0,           0,      tbatmana,     tbatmana,     tbatmana_state,     empty_init, "Tiger Electronics", "Batman: The Animated Series (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1994, tmigmax,      0,           0,      tmigmax,      tmigmax,      tmigmax_state,      empty_init, "Tiger Electronics", "Mighty Max (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1995, tgargnf,      0,           0,      tgargnf,      tgargnf,      tgargnf_state,      empty_init, "Tiger Electronics", "Gargoyles: Night Flight (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1996, tsuperman,    tgargnf,     0,      tsuperman,    tsuperman,    tsuperman_state,    empty_init, "Tiger Electronics", "Superman (Tiger)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
@@ -11548,6 +12536,10 @@ SYST( 1983, trthuball,    trsrescue,   0,      trthuball,    trsrescue,    trsre
 SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgkeep_state,     empty_init, "Tronica", "Super Goal Keeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1982, trspacadv,    0,           0,      trspacadv,    trspacadv,    trspacadv_state,    empty_init, "Tronica", "Space Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trtreisl,     0,           0,      trtreisl,     trtreisl,     trtreisl_state,     empty_init, "Tronica", "Treasure Island (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trdivadv,     0,           0,      trdivadv,     trdivadv,     trdivadv_state,     empty_init, "Tronica", "Diver's Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trclchick,    trdivadv,    0,      trclchick,    trclchick,    trdivadv_state,     empty_init, "Tronica", "Clever Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
 SYST( 1989, nummunch,     0,           0,      nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )

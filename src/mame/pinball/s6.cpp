@@ -88,14 +88,14 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void s6(machine_config &config);
-	void s6a(machine_config &config);
+	void s6(machine_config &config) ATTR_COLD;
+	void s6a(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -119,7 +119,7 @@ private:
 	void pia30_cb2_w(int state) { m_io_outputs[18] = state; } //ST3
 	void pia_irq(int state);
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	u8 m_strobe = 0;
 	u8 m_row = 0;
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( s6 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("INP59")
 
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, s6_state, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(s6_state::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Manual/Auto") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD)
@@ -433,9 +433,6 @@ void s6_state::pia_irq(int state)
 void s6_state::machine_start()
 {
 	genpin_class::machine_start();
-	m_io_outputs.resolve();
-	m_digits.resolve();
-	m_leds.resolve();
 
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
@@ -449,6 +446,7 @@ void s6_state::machine_start()
 void s6_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 }
@@ -523,7 +521,7 @@ void s6_state::s6(machine_config &config)
 
 	/* Add the soundcard */
 	SPEAKER(config, "mono").front_center();
-	WILLIAMS_S6_SOUND(config, m_s6sound, 0).add_route(ALL_OUTPUTS, "mono", 1.0);
+	WILLIAMS_S6_SOUND(config, m_s6sound).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void s6_state::s6a(machine_config &config)

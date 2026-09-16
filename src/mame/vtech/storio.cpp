@@ -24,7 +24,6 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -50,8 +49,8 @@ public:
 	void vtech_storio(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void vtech_storio_base(machine_config &config);
 
@@ -103,14 +102,13 @@ void vtech_storio_state::vtech_storio_base(machine_config &config)
 {
 	ARM9(config, m_maincpu, 240000000); // ARM926EJ-S CPU core (probably 240MHz, but not sure)
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(vtech_storio_state::screen_update_storio));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_storio_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -185,12 +183,12 @@ ROM_END
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 2011, vreader,      0,       0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (US, English, 2011-10-17)", MACHINE_IS_SKELETON )
-CONS( 2011, vreadercaen,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, English, 2011-10-17)", MACHINE_IS_SKELETON )
-CONS( 2011, vreadercafr,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, French, 2011-10-17)",  MACHINE_IS_SKELETON )
-CONS( 2011, storio,       vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (GB, English, 2011-10-17)",   MACHINE_IS_SKELETON )
-CONS( 2011, storiode,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (DE, German, 2011-10-17)",    MACHINE_IS_SKELETON )
-CONS( 2011, storioes,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-10-17)",   MACHINE_IS_SKELETON )
-CONS( 2011, storioesa,    vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-06-17?)",  MACHINE_IS_SKELETON )
-CONS( 2011, storiofr,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (FR, French, 2011-10-17)",    MACHINE_IS_SKELETON )
-CONS( 2011, storionl,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (NL, Dutch, 2011-10-17)",     MACHINE_IS_SKELETON )
+CONS( 2011, vreader,      0,       0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (US, English, 2011-10-17)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, vreadercaen,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, English, 2011-10-17)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, vreadercafr,  vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (CA, French, 2011-10-17)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, storio,       vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (GB, English, 2011-10-17)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, storiode,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (DE, German, 2011-10-17)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, storioes,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-10-17)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, storioesa,    vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (ES, Spanish, 2011-06-17?)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, storiofr,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (FR, French, 2011-10-17)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, storionl,     vreader, 0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "Storio (NL, Dutch, 2011-10-17)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

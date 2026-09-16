@@ -2,14 +2,29 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcbeut.c
-
     Utility functions for dynamic recompiling backends.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "drcbeut.h"
+
+#include <algorithm>
+#include <numeric>
+
+
+namespace drc {
+
+namespace {
+
+template <typename T>
+std::size_t block_bytes(unsigned count, std::align_val_t align)
+{
+	std::size_t const blocksize = count * sizeof(T);
+	return ((blocksize + (std::size_t(align) - 1)) / std::size_t(align)) * std::size_t(align);
+}
+
+} // anonymous namespace
 
 using namespace uml;
 
@@ -30,20 +45,59 @@ using namespace uml;
 //  drc_hash_table - constructor
 //-------------------------------------------------
 
-drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits)
-	: m_cache(cache),
-		m_modes(modes),
-		m_nocodeptr(nullptr),
-		m_l1bits((addrbits - ignorebits) / 2),
-		m_l2bits((addrbits - ignorebits) - m_l1bits),
-		m_l1shift(ignorebits + m_l2bits),
-		m_l2shift(ignorebits),
-		m_l1mask((1 << m_l1bits) - 1),
-		m_l2mask((1 << m_l2bits) - 1),
-		m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
-		m_emptyl1(nullptr),
-		m_emptyl2(nullptr)
+drc_hash_table::drc_hash_table(
+		drc_cache &cache,
+		uint32_t modes,
+		uint8_t addrbits,
+		uint8_t ignorebits,
+		uint32_t max_sequence_length,
+		std::align_val_t modealign,
+		std::align_val_t l1align,
+		std::align_val_t l2align) :
+	m_invariant_modes(modes, false),
+	m_next_l1_block(0),
+	m_next_l2_block(0),
+	m_invariant_mode_count(0),
+	m_cache(cache),
+	m_modealign(std::align_val_t(std::lcm(std::size_t(modealign), alignof(drccodeptr **)))),
+	m_l1align(std::align_val_t(std::lcm(std::size_t(l1align), alignof(drccodeptr *)))),
+	m_l2align(std::align_val_t(std::lcm(std::size_t(l2align), alignof(drccodeptr)))),
+	m_nocodeptr(nullptr),
+	m_modes(modes),
+	m_max_sequence_length(max_sequence_length),
+	m_l1bits((addrbits - ignorebits) / 2),
+	m_l2bits((addrbits - ignorebits) - m_l1bits),
+	m_l1shift(ignorebits + m_l2bits),
+	m_l2shift(ignorebits),
+	m_l1mask((1 << m_l1bits) - 1),
+	m_l2mask((1 << m_l2bits) - 1),
+	m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(drccodeptr **), m_modealign))),
+	m_emptyl1(reinterpret_cast<drccodeptr **>(m_cache.alloc(sizeof(drccodeptr *) << m_l1bits, m_l1align))),
+	m_emptyl2(reinterpret_cast<drccodeptr *>(m_cache.alloc(sizeof(drccodeptr) << m_l2bits, m_l2align))),
+	m_l1alloc(std::min<std::size_t>(L1_ALLOCATION, m_modes) * block_bytes<drccodeptr *>(1 << m_l1bits, m_l1align)),
+	m_l2alloc(L2_ALLOCATION * block_bytes<drccodeptr>(1 << m_l2bits, m_l2align))
 {
+#if defined(MAME_DEBUG)
+	osd_printf_verbose(
+			"drc_hash_table: parameters:\n"
+			"%u modes, %u address bits, %u ignored, %u L1 bits ((pc >> %u) & 0x%x), %u L2 bits ((pc >> %u) >> 0x%x)\n"
+			"L1 allocation %u (%u * %u), L2 allocation %u (%u * %u)\n",
+			m_modes, addrbits, ignorebits,
+			m_l1bits, m_l1shift, m_l1mask,
+			m_l2bits, m_l2shift, m_l2mask,
+			m_l1alloc, block_bytes<drccodeptr *>(1 << m_l1bits, m_l1align), std::min<std::size_t>(L1_ALLOCATION, m_modes),
+			m_l2alloc, block_bytes<drccodeptr>(1 << m_l2bits, m_l2align), L2_ALLOCATION);
+#endif
+
+	m_l1blocks.reserve(std::min<std::size_t>(L1_ALLOCATION, m_modes));
+	m_l2blocks.reserve(L2_ALLOCATION);
+
+	if (m_emptyl1)
+		std::fill_n(m_emptyl1, 1 << m_l1bits, m_emptyl2);
+
+	if (m_emptyl2)
+		std::fill_n(m_emptyl2, 1 << m_l2bits, m_nocodeptr);
+
 	reset();
 }
 
@@ -53,29 +107,58 @@ drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbit
 //  new ones
 //-------------------------------------------------
 
-bool drc_hash_table::reset()
+bool drc_hash_table::reset() noexcept
 {
-	// allocate an empty l2 hash table
-	m_emptyl2 = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
-	if (m_emptyl2 == nullptr)
+	// start from the beginning of the allocated blocks
+	m_next_l1_block = m_invariant_mode_count;
+	m_next_l2_block = 0;
+
+	if (!m_base || !m_emptyl1 || !m_emptyl2)
 		return false;
 
-	// populate it with pointers to the recompile_exit code
-	for (int entry = 0; entry < (1 << m_l2bits); entry++)
-		m_emptyl2[entry] = m_nocodeptr;
+	// reset the top-level table
+	for (uint32_t i = 0; m_modes > i; ++i)
+	{
+		if (!m_invariant_modes[i])
+			m_base[i] = m_emptyl1;
+		else
+			std::fill_n(m_base[i], 1 << m_l1bits, m_emptyl2);
+	}
 
-	// allocate an empty l1 hash table
-	m_emptyl1 = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
-	if (m_emptyl1 == nullptr)
-		return false;
+	return true;
+}
 
-	// populate it with pointers to the empty l2 table
-	for (int entry = 0; entry < (1 << m_l1bits); entry++)
-		m_emptyl1[entry] = m_emptyl2;
 
-	// reset the hash tables
-	for (int modenum = 0; modenum < m_modes; modenum++)
-		m_base[modenum] = m_emptyl1;
+//-------------------------------------------------
+//  populate_mode - try to populate mode table
+//  entry
+//-------------------------------------------------
+
+bool drc_hash_table::populate_mode(uint32_t mode) noexcept
+{
+	assert(mode < m_modes);
+	if (m_base[mode] != m_emptyl1)
+		return true;
+
+	// copy-on-write for the L1 hash table
+	if (m_l1blocks.size() == m_next_l1_block)
+	{
+		try { m_l1blocks.reserve(m_l1blocks.size() + std::min<std::size_t>(L1_ALLOCATION, m_modes)); }
+		catch (std::bad_alloc const &) { return false; }
+
+		drccodeptr **const l1block = reinterpret_cast<drccodeptr **>(m_cache.alloc(m_l1alloc, m_l1align));
+		if (!l1block)
+			return false;
+
+		for (unsigned i = 0; std::min<std::size_t>(L1_ALLOCATION, m_modes) > i; ++i)
+		{
+			void *const table = reinterpret_cast<uint8_t *>(l1block) + (block_bytes<drccodeptr *>(1 << m_l1bits, m_l1align) * i);
+			m_l1blocks.emplace_back(reinterpret_cast<drccodeptr **>(table));
+		}
+	}
+
+	m_base[mode] = m_l1blocks[m_next_l1_block++];
+	std::fill_n(m_base[mode], 1 << m_l1bits, m_emptyl2);
 
 	return true;
 }
@@ -92,23 +175,40 @@ void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *in
 	{
 		const uml::instruction &inst = instlist[inum];
 
-		// if the opcode is a hash, verify that it makes sense and then set a nullptr entry
 		if (inst.opcode() == OP_HASH)
 		{
-			assert(inst.numparams() == 2);
+			// if the opcode is a hash, verify that it makes sense and then set a nullptr entry
+			if (UNEXPECTED(block.invariant()))
+				throw emu_fatalerror("UML HASH is not permitted in invariant blocks.\n");
 
 			// if we fail to allocate, we must abort the block
 			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), nullptr))
 				block.abort();
 		}
-
-		// if the opcode is a hashjmp to a fixed location, make sure we preallocate the tables
-		if (inst.opcode() == OP_HASHJMP && inst.param(0).is_immediate() && inst.param(1).is_immediate())
+		else if (inst.opcode() == OP_HASHJMP)
 		{
-			// if we fail to allocate, we must abort the block
-			drccodeptr code = get_codeptr(inst.param(0).immediate(), inst.param(1).immediate());
-			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), code))
-				block.abort();
+			if (inst.param(0).is_immediate())
+			{
+				const uint32_t mode = inst.param(0).immediate();
+				if (block.invariant())
+				{
+					// mark mode as used in invariant code
+					assert(m_next_l1_block == m_invariant_mode_count);
+
+					if (!populate_mode(mode))
+						block.abort();
+
+					m_invariant_modes[mode] = true;
+					m_invariant_mode_count = m_next_l1_block;
+				}
+				else if (inst.param(1).is_immediate())
+				{
+					// preallocate the tables for hashjmp to fixed location in transient code
+					drccodeptr const code = get_codeptr(mode, inst.param(1).immediate());
+					if (!set_codeptr(mode, inst.param(1).immediate(), code))
+						block.abort();
+				}
+			}
 		}
 	}
 }
@@ -129,26 +229,26 @@ void drc_hash_table::block_end(drcuml_block &block)
 //  codeptr
 //-------------------------------------------------
 
-void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
+void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr) noexcept
 {
 	// nothing to do if the same
-	drccodeptr old = m_nocodeptr;
+	drccodeptr const old = m_nocodeptr;
 	if (old == nocodeptr)
 		return;
 	m_nocodeptr = nocodeptr;
 
 	// update the empty L2 table first
-	for (int l2entry = 0; l2entry < (1 << m_l2bits); l2entry++)
-		m_emptyl2[l2entry] = nocodeptr;
+	std::fill_n(m_emptyl2, 1 << m_l2bits, nocodeptr);
 
-	// now scan all existing hashtables for entries
-	for (int modenum = 0; modenum < m_modes; modenum++)
-		if (m_base[modenum] != m_emptyl1)
-			for (int l1entry = 0; l1entry < (1 << m_l1bits); l1entry++)
-				if (m_base[modenum][l1entry] != m_emptyl2)
-					for (int l2entry = 0; l2entry < (1 << m_l2bits); l2entry++)
-						if (m_base[modenum][l1entry][l2entry] == old)
-							m_base[modenum][l1entry][l2entry] = nocodeptr;
+	// now scan all existing L2 tables for entries
+	for (uint32_t i = 0; m_next_l2_block > i; ++i)
+	{
+		for (uint32_t l2entry = 0; (1 << m_l2bits > l2entry); ++l2entry)
+		{
+			if (m_l2blocks[i][l2entry] == old)
+				m_l2blocks[i][l2entry] = nocodeptr;
+		}
+	}
 }
 
 
@@ -157,34 +257,90 @@ void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
 //  mode/pc
 //-------------------------------------------------
 
-bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
+bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
 {
-	// copy-on-write for the l1 hash table
-	assert(mode < m_modes);
-	if (m_base[mode] == m_emptyl1)
-	{
-		drccodeptr **newtable = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
-		if (newtable == nullptr)
-			return false;
-		memcpy(newtable, m_emptyl1, sizeof(drccodeptr *) << m_l1bits);
-		m_base[mode] = newtable;
-	}
+	if (!populate_mode(mode))
+		return false;
 
-	// copy-on-write for the l2 hash table
-	uint32_t l1 = (pc >> m_l1shift) & m_l1mask;
+	// copy-on-write for the L2 hash table
+	uint32_t const l1 = (pc >> m_l1shift) & m_l1mask;
 	if (m_base[mode][l1] == m_emptyl2)
 	{
-		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
-		if (newtable == nullptr)
-			return false;
-		memcpy(newtable, m_emptyl2, sizeof(drccodeptr) << m_l2bits);
-		m_base[mode][l1] = newtable;
+		if (m_l2blocks.size() == m_next_l2_block)
+		{
+			try { m_l2blocks.reserve(m_l2blocks.size() + L2_ALLOCATION); }
+			catch (std::bad_alloc const &) { return false; }
+
+			drccodeptr *const l2block = reinterpret_cast<drccodeptr *>(m_cache.alloc(m_l2alloc, m_l2align));
+			if (!l2block)
+				return false;
+
+			for (unsigned i = 0; L2_ALLOCATION > i; ++i)
+			{
+				void *const table = reinterpret_cast<uint8_t *>(l2block) + (block_bytes<drccodeptr>(1 << m_l2bits, m_l2align) * i);
+				m_l2blocks.emplace_back(reinterpret_cast<drccodeptr *>(table));
+			}
+		}
+
+		m_base[mode][l1] = m_l2blocks[m_next_l2_block++];
+		std::fill_n(m_base[mode][l1], 1 << m_l2bits, m_nocodeptr);
 	}
 
 	// set the new entry
-	uint32_t l2 = (pc >> m_l2shift) & m_l2mask;
+	uint32_t const l2 = (pc >> m_l2shift) & m_l2mask;
 	m_base[mode][l1][l2] = code;
 	return true;
+}
+
+
+//-------------------------------------------------
+//  invalidate_range - force all blocks in the
+//  given PC range to recompile on their next entry
+//
+//  TODO: Will need to reconsider this in the future
+//  when the DRC system is expanded to handle 64-bit
+//  program counters.
+//-------------------------------------------------
+
+void drc_hash_table::invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
+{
+	// Sequences are hashed on their starting address, so a sequence at the start of this
+	// block may have crossed over from a previous block.  Back up the starting address by
+	// the maximum size (in bytes) of a generated sequence for this DRC.
+	pcstart -= std::min(pcstart, m_max_sequence_length);
+
+	for (uint32_t mode = 0; mode < m_modes; mode++)
+	{
+		if (m_base[mode] == m_emptyl1)
+		{
+			continue;
+		}
+
+		uint32_t pc = pcstart;
+		while (true)
+		{
+			const uint32_t slotend = std::min<uint64_t>(uint64_t(pc) | ((uint32_t(1) << m_l1shift) - 1), pcend);
+			drccodeptr *const l2 = m_base[mode][(pc >> m_l1shift) & m_l1mask];
+			if (l2 != m_emptyl2)
+			{
+				for (uint32_t p = pc; p <= slotend; p += uint32_t(1) << m_l2shift)
+				{
+					l2[(p >> m_l2shift) & m_l2mask] = m_nocodeptr;
+					if (p > 0xffff'ffff - (uint32_t(1) << m_l2shift))
+					{
+						break;
+					}
+				}
+			}
+
+			if (slotend >= pcend)
+			{
+				break;
+			}
+
+			pc = slotend + 1;
+		}
+	}
 }
 
 
@@ -197,11 +353,11 @@ bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
 //  drc_map_variables - constructor
 //-------------------------------------------------
 
-drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue)
-	: m_cache(cache),
-		m_uniquevalue(uniquevalue)
+drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue) :
+	m_cache(cache),
+	m_uniquevalue(uniquevalue)
 {
-	memset(m_mapvalue, 0, sizeof(m_mapvalue));
+	std::fill(std::begin(m_mapvalue), std::end(m_mapvalue), 0);
 }
 
 
@@ -211,9 +367,6 @@ drc_map_variables::drc_map_variables(drc_cache &cache, uint64_t uniquevalue)
 
 drc_map_variables::~drc_map_variables()
 {
-	// must detach all items from the entry list so that the list object
-	// doesn't try to free them on exit
-	m_entry_list.detach_all();
 }
 
 
@@ -224,12 +377,11 @@ drc_map_variables::~drc_map_variables()
 void drc_map_variables::block_begin(drcuml_block &block)
 {
 	// release any remaining live entries
-	map_entry *entry;
-	while ((entry = m_entry_list.detach_head()) != nullptr)
-		m_cache.dealloc(entry, sizeof(*entry));
+	m_entry_list.clear();
+	m_entry_list.reserve(128);
 
 	// reset the variable values
-	memset(m_mapvalue, 0, sizeof(m_mapvalue));
+	std::fill(std::begin(m_mapvalue), std::end(m_mapvalue), 0);
 }
 
 
@@ -240,79 +392,92 @@ void drc_map_variables::block_begin(drcuml_block &block)
 void drc_map_variables::block_end(drcuml_block &block)
 {
 	// only process if we have data
-	if (m_entry_list.first() == nullptr)
+	if (m_entry_list.empty())
 		return;
 
-	// begin "code generation" aligned to an 8-byte boundary
-	drccodeptr *top = m_cache.begin_codegen(sizeof(uint64_t) + sizeof(uint32_t) + 2 * sizeof(uint32_t) * m_entry_list.count());
-	if (top == nullptr)
-		block.abort();
-	uint32_t *dest = (uint32_t *)(((uintptr_t)*top + 7) & ~7);
-
-	// store the cookie first
-	*(uint64_t *)dest = m_uniquevalue;
-	dest += 2;
-
-	// get the pointer to the first item and store an initial backwards offset
-	drccodeptr lastptr = m_entry_list.first()->m_codeptr;
-	*dest = (drccodeptr)dest - lastptr;
-	dest++;
-
 	// now iterate over entries and store them
-	uint32_t curvalue[MAPVAR_COUNT] = { 0 };
-	bool changed[MAPVAR_COUNT] = { false };
-	for (map_entry *entry = m_entry_list.first(); entry != nullptr; entry = entry->next())
+	std::array<uint32_t, MAPVAR_COUNT> curvalue;
+	std::array<bool, MAPVAR_COUNT> changed;
+	std::fill(curvalue.begin(), curvalue.end(), 0);
+	std::fill(changed.begin(), changed.end(), false);
+	m_out_temp.clear();
+	m_out_temp.reserve(m_entry_list.size() * 2);
+	drccodeptr lastptr = m_entry_list.front().codeptr;
+	auto entry = m_entry_list.begin();
+	while (m_entry_list.end() != entry)
 	{
 		// update the current value of the variable and detect changes
-		if (curvalue[entry->m_mapvar] != entry->m_newval)
+		if (curvalue[entry->mapvar] != entry->newval)
 		{
-			curvalue[entry->m_mapvar] = entry->m_newval;
-			changed[entry->m_mapvar] = true;
+			curvalue[entry->mapvar] = entry->newval;
+			changed[entry->mapvar] = true;
 		}
 
 		// if the next code pointer is different, or if we're at the end, flush changes
-		if (entry->next() == nullptr || entry->next()->m_codeptr != entry->m_codeptr)
+		auto const next = std::next(entry);
+		if ((m_entry_list.end() == next) || (next->codeptr != entry->codeptr))
 		{
 			// build a mask of changed variables
 			int numchanged = 0;
 			uint32_t varmask = 0;
 			for (int varnum = 0; varnum < std::size(changed); varnum++)
+			{
 				if (changed[varnum])
 				{
 					changed[varnum] = false;
 					varmask |= 1 << varnum;
 					numchanged++;
 				}
+			}
 
 			// if nothing really changed, skip it
-			if (numchanged == 0)
-				continue;
-
-			// first word is a code delta plus mask of changed variables
-			uint32_t codedelta = entry->m_codeptr - lastptr;
-			while (codedelta > 0xffff)
+			if (numchanged)
 			{
-				*dest++ = 0xffff << 16;
-				codedelta -= 0xffff;
+				// first word is a code delta plus mask of changed variables
+				uint32_t codedelta = entry->codeptr - lastptr;
+				while (codedelta > 0xffff)
+				{
+					m_out_temp.emplace_back(uint32_t(0xffff) << 16);
+					codedelta -= 0xffff;
+				}
+				m_out_temp.emplace_back((codedelta << 16) | (varmask << 4) | numchanged);
+
+				// now output updated variable values
+				for (int varnum = 0; varnum < changed.size(); varnum++)
+				{
+					if (BIT(varmask, varnum))
+						m_out_temp.emplace_back(curvalue[varnum]);
+				}
+
+				// remember our lastptr
+				lastptr = entry->codeptr;
 			}
-			*dest++ = (codedelta << 16) | (varmask << 4) | numchanged;
-
-			// now output updated variable values
-			for (int varnum = 0; varnum < std::size(changed); varnum++)
-				if ((varmask >> varnum) & 1)
-					*dest++ = curvalue[varnum];
-
-			// remember our lastptr
-			lastptr = entry->m_codeptr;
 		}
+		entry = next;
 	}
 
 	// add a terminator
-	*dest++ = 0;
+	m_out_temp.emplace_back(0);
 
-	// complete codegen
-	*top = (drccodeptr)dest;
-	m_cache.end_codegen();
+	// begin "code generation" aligned to an 8-byte boundary
+	auto const required = sizeof(uint64_t) + sizeof(uint32_t) + (sizeof(uint32_t) * m_out_temp.size());
+	auto const align = std::align_val_t(std::lcm<std::size_t>(alignof(uint64_t), 8));
+	auto dest = reinterpret_cast<uint32_t *>(block.invariant()
+			? m_cache.alloc_invariant(required, align)
+			: m_cache.alloc_transient(required, align));
+	if (!dest)
+		block.abort();
+
+	// store the cookie first
+	*(uint64_t *)dest = m_uniquevalue;
+	dest += 2;
+
+	// get the pointer to the first item and store an initial backwards offset
+	*dest = drccodeptr(dest) - m_entry_list.front().codeptr;
+	dest++;
+
+	// copy the actual entries
+	dest = std::copy(m_out_temp.begin(), m_out_temp.end(), dest);
 }
 
 
@@ -323,21 +488,17 @@ void drc_map_variables::block_end(drcuml_block &block)
 
 void drc_map_variables::set_value(drccodeptr codebase, uint32_t mapvar, uint32_t newvalue)
 {
-	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
+	assert((mapvar >= MAPVAR_M0) && (mapvar < MAPVAR_END));
 
 	// if this value isn't different, skip it
 	if (m_mapvalue[mapvar - MAPVAR_M0] == newvalue)
 		return;
 
 	// allocate a new entry and fill it in
-	map_entry *entry = (map_entry *)m_cache.alloc(sizeof(*entry));
-	entry->m_next = nullptr;
-	entry->m_codeptr = codebase;
-	entry->m_mapvar = mapvar - MAPVAR_M0;
-	entry->m_newval = newvalue;
-
-	// hook us into the end of the list
-	m_entry_list.append(*entry);
+	auto &entry = m_entry_list.emplace_back();
+	entry.codeptr = codebase;
+	entry.mapvar = mapvar - MAPVAR_M0;
+	entry.newval = newvalue;
 
 	// update our state in the table as well
 	m_mapvalue[mapvar - MAPVAR_M0] = newvalue;
@@ -351,27 +512,27 @@ void drc_map_variables::set_value(drccodeptr codebase, uint32_t mapvar, uint32_t
 
 uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) const
 {
-	assert(mapvar >= MAPVAR_M0 && mapvar < MAPVAR_END);
+	assert((mapvar >= MAPVAR_M0) && (mapvar < MAPVAR_END));
 	mapvar -= MAPVAR_M0;
 
 	// get an aligned pointer to start scanning
-	uint64_t *curscan = (uint64_t *)(((uintptr_t)codebase | 7) + 1);
-	uint64_t *endscan = (uint64_t *)m_cache.top();
+	auto curscan = reinterpret_cast<uint64_t const *>((uintptr_t(codebase) | 7) + 1);
+	auto const endscan = reinterpret_cast<uint64_t const *>(m_cache.top());
 
 	// look for the signature
-	while (curscan < endscan && *curscan++ != m_uniquevalue) {};
+	while ((curscan < endscan) && (*curscan++ != m_uniquevalue)) { }
 	if (curscan >= endscan)
 		return 0;
 
 	// switch to 32-bit pointers for processing the rest
-	uint32_t *data = (uint32_t *)curscan;
+	auto data = reinterpret_cast<uint32_t const *>(curscan);
 
 	// first get the 32-bit starting offset to the code
 	drccodeptr curcode = (drccodeptr)data - *data;
 	data++;
 
 	// now loop until we advance past our target
-	uint32_t varmask = 0x10 << mapvar;
+	uint32_t const varmask = 0x10 << mapvar;
 	uint32_t result = 0;
 	while (true)
 	{
@@ -386,7 +547,7 @@ uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) cons
 			break;
 
 		// if our mapvar has changed, process this word
-		if ((controlword & varmask) != 0)
+		if (controlword & varmask)
 		{
 			// count how many words precede the one we care about
 			int dataoffs = 0;
@@ -403,11 +564,6 @@ uint32_t drc_map_variables::get_value(drccodeptr codebase, uint32_t mapvar) cons
 	if (LOG_RECOVER)
 		printf("recover %d @ %p = %08X\n", mapvar, codebase, result);
 	return result;
-}
-
-uint32_t drc_map_variables::static_get_value(drc_map_variables &map, drccodeptr codebase, uint32_t mapvar)
-{
-	return map.get_value(codebase, mapvar);
 }
 
 
@@ -433,9 +589,7 @@ uint32_t drc_map_variables::get_last_value(uint32_t mapvar)
 //  drc_label_list - constructor
 //-------------------------------------------------
 
-drc_label_list::drc_label_list(drc_cache &cache)
-	: m_cache(cache),
-		m_oob_callback_delegate(&drc_label_list::oob_callback, this)
+drc_label_list::drc_label_list()
 {
 }
 
@@ -446,9 +600,6 @@ drc_label_list::drc_label_list(drc_cache &cache)
 
 drc_label_list::~drc_label_list()
 {
-	// must detach all items from the entry list so that the list object
-	// doesn't try to free them on exit
-	m_list.detach_all();
 }
 
 
@@ -469,16 +620,12 @@ void drc_label_list::block_begin(drcuml_block &block)
 
 void drc_label_list::block_end(drcuml_block &block)
 {
-	// can't free until the cache is clean of our OOB requests
-	assert(!m_cache.generating_code());
+	// service fixup requests
+	for (auto const &fixup : m_fixup_list)
+		fixup.callback(fixup.param, fixup.label->codeptr);
 
 	// free all of the pending fixup requests
-	label_fixup *fixup;
-	while ((fixup = m_fixup_list.detach_head()) != nullptr)
-	{
-		fixup->~label_fixup();
-		m_cache.dealloc(fixup, sizeof(*fixup));
-	}
+	m_free_fixups.splice(m_free_fixups.begin(), m_fixup_list);
 
 	// make sure the label list is clear, and fatalerror if we missed anything
 	reset(true);
@@ -493,18 +640,22 @@ void drc_label_list::block_end(drcuml_block &block)
 
 drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_delegate const &callback, void *param)
 {
-	label_entry *const curlabel = find_or_allocate(label);
+	label_entry &curlabel = find_or_allocate(label);
 
 	// if no code pointer, request an OOB callback
-	if (!curlabel->m_codeptr && !callback.isnull())
+	if (!curlabel.codeptr && !callback.isnull())
 	{
-		label_fixup *fixup = reinterpret_cast<label_fixup *>(m_cache.alloc(sizeof(*fixup)));
-		new (fixup) label_fixup{ nullptr, curlabel, callback };
-		m_fixup_list.append(*fixup);
-		m_cache.request_oob_codegen(drc_oob_delegate(m_oob_callback_delegate), fixup, param);
+		label_fixup_list::iterator fixup = m_free_fixups.begin();
+		if (m_free_fixups.end() == fixup)
+			fixup = m_fixup_list.emplace(m_fixup_list.end());
+		else
+			m_fixup_list.splice(m_fixup_list.end(), m_free_fixups, fixup);
+		fixup->label = &curlabel;
+		fixup->param = param;
+		fixup->callback = callback;
 	}
 
-	return curlabel->m_codeptr;
+	return curlabel.codeptr;
 }
 
 
@@ -515,9 +666,9 @@ drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_de
 void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 {
 	// set the code pointer
-	label_entry *curlabel = find_or_allocate(label);
-	assert(curlabel->m_codeptr == nullptr);
-	curlabel->m_codeptr = codeptr;
+	label_entry &curlabel = find_or_allocate(label);
+	assert(!curlabel.codeptr);
+	curlabel.codeptr = codeptr;
 }
 
 
@@ -529,15 +680,14 @@ void drc_label_list::set_codeptr(uml::code_label label, drccodeptr codeptr)
 void drc_label_list::reset(bool fatal_on_leftovers)
 {
 	// loop until out of labels
-	label_entry *curlabel;
-	while ((curlabel = m_list.detach_head()) != nullptr)
+	while (!m_list.empty())
 	{
 		// fatal if we were a leftover
-		if (fatal_on_leftovers && curlabel->m_codeptr == nullptr)
-			fatalerror("Label %08X never defined!\n", curlabel->m_label.label());
+		if (fatal_on_leftovers && !m_list.front().codeptr)
+			throw emu_fatalerror("Label %08X never defined!\n", m_list.front().label.label());
 
 		// free the label
-		m_cache.dealloc(curlabel, sizeof(*curlabel));
+		m_free_labels.splice(m_free_labels.begin(), m_list, m_list.begin());
 	}
 }
 
@@ -547,33 +697,64 @@ void drc_label_list::reset(bool fatal_on_leftovers)
 //  allocate a new one if not found
 //-------------------------------------------------
 
-drc_label_list::label_entry *drc_label_list::find_or_allocate(uml::code_label label)
+drc_label_list::label_entry &drc_label_list::find_or_allocate(uml::code_label label)
 {
 	// find the label, or else allocate a new one
-	label_entry *curlabel;
-	for (curlabel = m_list.first(); curlabel != nullptr; curlabel = curlabel->next())
-		if (curlabel->m_label == label)
-			break;
+	for (auto curlabel = m_list.begin(); m_list.end() != curlabel; ++curlabel)
+	{
+		if (curlabel->label == label)
+			return *curlabel;
+	}
 
 	// if none found, allocate
-	if (curlabel == nullptr)
-	{
-		curlabel = (label_entry *)m_cache.alloc(sizeof(*curlabel));
-		curlabel->m_label = label;
-		curlabel->m_codeptr = nullptr;
-		m_list.append(*curlabel);
-	}
-	return curlabel;
+	auto newlabel = m_free_labels.begin();
+	if (m_free_labels.end() == newlabel)
+		newlabel = m_list.emplace(m_list.end());
+	else
+		m_list.splice(m_list.end(), m_free_labels, newlabel);
+	newlabel->label = label;
+	newlabel->codeptr = nullptr;
+	return *newlabel;
 }
 
 
+
+//**************************************************************************
+//  RESOLVED MEMORY ACCESSORS
+//**************************************************************************
+
 //-------------------------------------------------
-//  oob_callback - out-of-band codegen callback
-//  for labels
+//  set - bind to address space
 //-------------------------------------------------
 
-void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param2)
+void resolved_memory_accessors::set(address_space &space)
 {
-	label_fixup *fixup = reinterpret_cast<label_fixup *>(param1);
-	fixup->m_callback(param2, fixup->m_label->m_codeptr);
+	read_byte          .set(space, static_cast<u8  (address_space::*)(offs_t)     >(&address_space::read_byte));
+	read_byte_masked   .set(space, static_cast<u8  (address_space::*)(offs_t, u8) >(&address_space::read_byte));
+	read_word          .set(space, static_cast<u16 (address_space::*)(offs_t)     >(&address_space::read_word));
+	read_word_masked   .set(space, static_cast<u16 (address_space::*)(offs_t, u16)>(&address_space::read_word));
+	read_dword         .set(space, static_cast<u32 (address_space::*)(offs_t)     >(&address_space::read_dword));
+	read_dword_masked  .set(space, static_cast<u32 (address_space::*)(offs_t, u32)>(&address_space::read_dword));
+	read_qword         .set(space, static_cast<u64 (address_space::*)(offs_t)     >(&address_space::read_qword));
+	read_qword_masked  .set(space, static_cast<u64 (address_space::*)(offs_t, u64)>(&address_space::read_qword));
+
+	write_byte         .set(space, static_cast<void (address_space::*)(offs_t, u8)      >(&address_space::write_byte));
+	write_byte_masked  .set(space, static_cast<void (address_space::*)(offs_t, u8, u8)  >(&address_space::write_byte));
+	write_word         .set(space, static_cast<void (address_space::*)(offs_t, u16)     >(&address_space::write_word));
+	write_word_masked  .set(space, static_cast<void (address_space::*)(offs_t, u16, u16)>(&address_space::write_word));
+	write_dword        .set(space, static_cast<void (address_space::*)(offs_t, u32)     >(&address_space::write_dword));
+	write_dword_masked .set(space, static_cast<void (address_space::*)(offs_t, u32, u32)>(&address_space::write_dword));
+	write_qword        .set(space, static_cast<void (address_space::*)(offs_t, u64)     >(&address_space::write_qword));
+	write_qword_masked .set(space, static_cast<void (address_space::*)(offs_t, u64, u64)>(&address_space::write_qword));
+
+	if (
+			!read_byte  || !read_byte_masked  || !write_byte  || !write_byte_masked  ||
+			!read_word  || !read_word_masked  || !write_word  || !write_word_masked  ||
+			!read_dword || !read_dword_masked || !write_dword || !write_dword_masked ||
+			!read_qword || !read_qword_masked || !write_qword || !write_qword_masked)
+	{
+		throw emu_fatalerror("Error resolving address space accessor member functions!\n");
+	}
 }
+
+} // namespace drc

@@ -52,9 +52,9 @@ public:
 	void brandt8641(machine_config &config);
 
 private:
-	virtual void machine_start() override;
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	virtual void machine_start() override ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 	u8 port08_r();
 	void port08_w(u8 data);
 	void port09_w(u8 data);

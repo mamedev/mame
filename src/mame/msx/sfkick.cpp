@@ -153,12 +153,14 @@ DIPSW-2
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/v9938.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/ymopn.h"
+#include "video/v9938.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -168,8 +170,8 @@ namespace {
 class sfkick_state : public driver_device
 {
 public:
-	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sfkick_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_page(*this, "page%u", 0U),
@@ -184,8 +186,8 @@ public:
 	void sfkick(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	uint8_t mem_r(offs_t offset);
@@ -194,15 +196,15 @@ private:
 	uint8_t ppi_port_b_r();
 	void ppi_port_a_w(uint8_t data);
 	void ppi_port_c_w(uint8_t data);
-	void irqhandler(int state);
-	void sfkick_io_map(address_map &map);
-	void sfkick_map(address_map &map);
-	void sfkick_sound_io_map(address_map &map);
-	void sfkick_sound_map(address_map &map);
-	void bank_mem(address_map &map);
+	IRQ_CALLBACK_MEMBER(sound_vector_r);
+	void sfkick_io_map(address_map &map) ATTR_COLD;
+	void sfkick_map(address_map &map) ATTR_COLD;
+	void sfkick_sound_io_map(address_map &map) ATTR_COLD;
+	void sfkick_sound_map(address_map &map) ATTR_COLD;
+	void bank_mem(address_map &map) ATTR_COLD;
 
-	uint8_t m_primary_slot_reg;
-	int m_input_mux;
+	uint8_t m_primary_slot_reg = 0;
+	uint8_t m_input_mux = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -328,7 +330,7 @@ static INPUT_PORTS_START( sfkick )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(-20)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_REVERSE
 
 	PORT_START("DSW1") // bitswapped at read! 76543210 -> 45673210
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:1")
@@ -399,9 +401,10 @@ void sfkick_state::machine_reset()
 		m_bank[i]->set_entry(i);
 }
 
-void sfkick_state::irqhandler(int state)
+IRQ_CALLBACK_MEMBER(sfkick_state::sound_vector_r)
 {
-	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
+	// IM0
+	return 0xff;
 }
 
 void sfkick_state::sfkick(machine_config &config)
@@ -415,6 +418,7 @@ void sfkick_state::sfkick(machine_config &config)
 	Z80(config, m_soundcpu, MASTER_CLOCK/6);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sfkick_state::sfkick_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &sfkick_state::sfkick_sound_io_map);
+	m_soundcpu->set_irq_acknowledge_callback(FUNC(sfkick_state::sound_vector_r));
 
 	ADDRESS_MAP_BANK(config, m_page[0]).set_map(&sfkick_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
 	ADDRESS_MAP_BANK(config, m_page[1]).set_map(&sfkick_state::bank_mem).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
@@ -425,7 +429,7 @@ void sfkick_state::sfkick(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(0x80000);
 	v9938.int_cb().set_inputline(m_maincpu, 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	i8255_device &ppi(I8255A(config, "ppi8255"));
 	ppi.out_pa_callback().set(FUNC(sfkick_state::ppi_port_a_w));
@@ -437,7 +441,7 @@ void sfkick_state::sfkick(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 
 	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK/6));
-	ym1.irq_handler().set(FUNC(sfkick_state::irqhandler));
+	ym1.irq_handler().set_inputline(m_soundcpu, 0);
 	ym1.add_route(0, "mono", 0.25);
 	ym1.add_route(1, "mono", 0.25);
 	ym1.add_route(2, "mono", 0.25);

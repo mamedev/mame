@@ -101,8 +101,8 @@ protected:
 	output_finder<> m_cass_led;
 
 private:
-	void machine_reset() override;
-	void machine_start() override;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 	void portf1_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
@@ -112,10 +112,10 @@ private:
 	uint32_t screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void super80_io(address_map &map);
-	void super80_map(address_map &map);
-	void super80e_io(address_map &map);
-	void super80m_map(address_map &map);
+	void super80_io(address_map &map) ATTR_COLD;
+	void super80_map(address_map &map) ATTR_COLD;
+	void super80e_io(address_map &map) ATTR_COLD;
+	void super80m_map(address_map &map) ATTR_COLD;
 
 	u8 m_int_sw = 0;
 	u16 m_vidpg = 0;
@@ -140,14 +140,13 @@ public:
 	void super80v(machine_config &config);
 
 protected:
-	void super80v_map(address_map &map);
-	void super80v_io(address_map &map);
-	void machine_reset() override;
-	void machine_start() override;
+	void super80v_map(address_map &map) ATTR_COLD;
+	void super80v_io(address_map &map) ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 	void port3f_w(u8 data);
 	u8 port3e_r();
 	std::unique_ptr<u8[]> m_vram;
-	void busreq_w(int state);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
@@ -177,7 +176,7 @@ public:
 	void super80r(machine_config &config);
 
 private:
-	void super80r_map(address_map &map);
+	void super80r_map(address_map &map) ATTR_COLD;
 	void low_w(offs_t offset, u8 data);
 	void high_w(offs_t offset, u8 data);
 	u8 low_r(offs_t offset);

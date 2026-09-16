@@ -908,8 +908,6 @@ void tek4051_state::write_acia_clock(int state)
 
 void tek4051_state::machine_start()
 {
-	m_lamps.resolve();
-
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// configure RAM
@@ -961,14 +959,10 @@ void tek4051_state::tek4051(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tek4051_state::tek4051_mem);
 
 	// video hardware
-	VECTOR(config, "vector", 0);
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
-	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(1024, 780);
-	screen.set_visarea(0, 1024-1, 0, 780-1);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_color(rgb_t::green());
+	vector.set_refresh_hz(50);
+	vector.set_visarea(0, 1024-1, 0, 780-1);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -1037,7 +1031,7 @@ void tek4051_state::tek4051(machine_config &config)
 	m_com_pia->irqa_handler().set(FUNC(tek4051_state::com_pia_irqa_w));
 	m_com_pia->irqb_handler().set(FUNC(tek4051_state::com_pia_irqb_w));
 
-	ACIA6850(config, m_acia, 0);
+	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set(FUNC(tek4051_state::acia_irq_w));
 
 	CLOCK(config, m_acia_clock, 38400);
@@ -1062,14 +1056,10 @@ void tek4052_state::tek4052(machine_config &config)
 	cpu.set_addrmap(AS_PROGRAM, &tek4052_state::tek4052_mem);
 
 	// video hardware
-	VECTOR(config, "vector", 0);
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
-	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(1024, 780);
-	screen.set_visarea(0, 1024-1, 0, 780-1);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_color(rgb_t::green());
+	vector.set_refresh_hz(50);
+	vector.set_visarea(0, 1024-1, 0, 780-1);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 

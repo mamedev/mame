@@ -50,22 +50,22 @@ public:
 	void ir6_w(int state) { set_irq_line(6, state); }
 	void ir7_w(int state) { set_irq_line(7, state); }
 
+	void set_irq_line(int irq, int state);
+
 	IRQ_CALLBACK_MEMBER(inta_cb);
 
 protected:
 	pic8259_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device_t implementation
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool is_x86() const { return m_is_x86; }
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
-	void set_irq_line(int irq, int state);
-
 	enum class state_t : u8
 	{
 		ICW1,

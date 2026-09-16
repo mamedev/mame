@@ -86,9 +86,10 @@
 #define LOG_MOTOR          (1U << 9)   // Motor activity
 #define LOG_STATUS         (1U << 10)  // Main status register
 #define LOG_FIFO           (1U << 11)  // Data register
+#define LOG_CONFIG         (1U << 12)  // Configuration
 
 // Minimum log should be config and warnings
-#define VERBOSE (LOG_GENERAL | LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_CONFIG)
 
 #include "logmacro.h"
 
@@ -103,6 +104,9 @@
 #define RAM2_TAG      "u19_ram"
 #define ROM1_TAG      "u25_rom"
 #define ROM2_TAG      "u29_rom"
+
+#define FLOP0           "d0"
+#define FLOP1           "d1"
 
 #define MOTOR_TIMER 1
 #define UNDEF -1
@@ -138,6 +142,8 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 	m_dack(false),
 	m_dacken(false),
 	m_wait(false),
+	m_flopcon0(*this, FLOP0),
+	m_flopcon1(*this, FLOP1),
 	m_current_floppy(nullptr),
 	m_floppy_select(0),
 	m_floppy_select_last(UNDEF),
@@ -581,13 +587,21 @@ void hx5102_device::update_drive_select()
 */
 void hx5102_device::device_start()
 {
-	m_floppy[0] = m_floppy[1] = nullptr;
-
-	if (subdevice("d0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("d0")->subdevices().first());
-	if (subdevice("d1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("d1")->subdevices().first());
-
 	m_rom1 = (uint8_t*)memregion(DSR_TAG)->base();
 	m_rom2 = (uint8_t*)memregion(DSR_TAG)->base() + 0x2000;
+
+	m_floppy[0] = m_flopcon0->get_device();
+	m_floppy[1] = m_flopcon1->get_device();
+
+	if (m_floppy[0] != nullptr)
+		LOGMASKED(LOG_CONFIG, "Internal floppy drive connected\n");
+	else
+		LOGMASKED(LOG_WARN, "Internal floppy drive not found\n");
+
+	if (m_floppy[1] != nullptr)
+		LOGMASKED(LOG_CONFIG, "External floppy drive connected\n");
+	else
+		LOGMASKED(LOG_CONFIG, "External floppy drive not connected\n");
 }
 
 /*
@@ -664,12 +678,12 @@ INPUT_PORTS_END
 void hx5102_device::device_add_mconfig(machine_config& config)
 {
 	// Hexbus controller
-	IBC(config, m_hexbus_ctrl, 0);
+	IBC(config, m_hexbus_ctrl);
 	m_hexbus_ctrl->hexbus_cb().set(FUNC(hx5102_device::hexbus_out));
 	m_hexbus_ctrl->hsklatch_cb().set(FUNC(hx5102_device::hsklatch_out));
 
 	// Outgoing socket for downstream devices
-	HEXBUS(config, "hexbus", 0, hexbus_options, nullptr);
+	HEXBUS(config, "hexbus", hexbus_options, nullptr);
 
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_flopcpu, 12_MHz_XTAL);
@@ -686,8 +700,8 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, "d0", hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "d1", hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon0, hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon1, hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
 
 	// Addressable latches
 	LS259(config, m_crulatch[0]); // U18
@@ -723,7 +737,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_speedmf->out_cb().set(FUNC(hx5102_device::mspeed_w));
 
 	// READY flipflop
-	TTL7474(config, m_readyff, 0);
+	TTL7474(config, m_readyff);
 	m_readyff->comp_output_cb().set(FUNC(hx5102_device::board_ready));
 
 	// RAM

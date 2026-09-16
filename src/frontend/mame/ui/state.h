@@ -17,6 +17,7 @@
 #include "iptseqpoll.h"
 
 #include <chrono>
+#include <tuple>
 #include <unordered_map>
 
 
@@ -30,15 +31,16 @@ public:
 protected:
 	menu_load_save_state_base(
 			mame_ui_manager &mui,
-			render_container &container,
+			render_target &target,
 			std::string_view header,
 			std::string_view footer,
 			bool must_exist,
 			bool one_shot);
 
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual void handle_keys(uint32_t flags, int &iptkey) override;
+	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
+	virtual bool handle_keys(uint32_t flags, int &iptkey) override;
+	virtual std::tuple<int, bool, bool> custom_pointer_updated(bool changed, ui_event const &uievt) override;
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
@@ -91,7 +93,7 @@ private:
 class menu_load_state : public menu_load_save_state_base
 {
 public:
-	menu_load_state(mame_ui_manager &mui, render_container &container, bool one_shot);
+	menu_load_state(mame_ui_manager &mui, render_target &target, bool one_shot);
 
 protected:
 	virtual void process_file(std::string &&file_name) override;
@@ -101,7 +103,7 @@ protected:
 class menu_save_state : public menu_load_save_state_base
 {
 public:
-	menu_save_state(mame_ui_manager &mui, render_container &container, bool one_shot);
+	menu_save_state(mame_ui_manager &mui, render_target &target, bool one_shot);
 
 protected:
 	virtual void process_file(std::string &&file_name) override;

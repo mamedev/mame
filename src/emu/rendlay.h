@@ -16,6 +16,8 @@
 #include "rendertypes.h"
 #include "screen.h"
 
+#include "interface/uievents.h"
+
 #include <array>
 #include <functional>
 #include <map>
@@ -71,6 +73,7 @@ class layout_element
 {
 public:
 	using environment = emu::render::detail::layout_environment;
+	using draw_delegate = delegate<void (int, bitmap_argb32 &)>;
 
 	// construction/destruction
 	layout_element(environment &env, util::xml::data_node const &elemnode);
@@ -81,8 +84,13 @@ public:
 	int default_state() const { return m_defstate; }
 	render_texture *state_texture(int state);
 
+	// set handlers
+	void set_draw_callback(draw_delegate &&handler);
+
 	// operations
 	void preload();
+	void invalidate() { m_invalidated = true; }
+	void prepare();
 
 private:
 	/// \brief A drawing component within a layout element
@@ -192,6 +200,8 @@ private:
 	int                         m_statemask;    // mask to apply to state values
 	bool                        m_foldhigh;     // whether we need to fold state values above the mask range
 	std::vector<texture>        m_elemtex;      // array of element textures used for managing the scaled bitmaps
+	draw_delegate               m_draw;         // draw delegate (called after components are drawn)
+	bool                        m_invalidated;  // force redrawing on next frame if set
 };
 
 
@@ -271,7 +281,7 @@ public:
 	// getters
 	std::string const &id() const { return m_id; }
 	layout_element *element() const { return m_element; }
-	screen_device *screen() const { return m_screen; }
+	device_video_output_interface *screen() const { return m_screen; }
 	bool bounds_animated() const { return m_bounds.size() > 1U; }
 	bool color_animated() const { return m_color.size() > 1U; }
 	render_bounds bounds() const { return m_get_bounds(); }
@@ -314,7 +324,7 @@ public:
 	void set_scroll_pos_y_callback(scroll_pos_delegate &&handler);
 
 	// resolve tags, if any
-	void resolve_tags();
+	void resolve_tags(device_t &device);
 
 private:
 	using bounds_vector = emu::render::detail::bounds_vector;
@@ -360,10 +370,10 @@ private:
 	scroll_size_delegate    m_get_scroll_size_y;    // resolved vertical scroll window size function
 	scroll_pos_delegate     m_get_scroll_pos_x;     // resolved horizontal scroll position function
 	scroll_pos_delegate     m_get_scroll_pos_y;     // resolved vertical scroll position function
-	output_finder<>         m_output;               // associated output
-	output_finder<>         m_animoutput;           // associated output for animation if different
-	output_finder<>         m_scrollxoutput;        // associated output for horizontal scroll position
-	output_finder<>         m_scrollyoutput;        // associated output for vertical scroll position
+	output_proxy            m_output;               // associated output
+	output_proxy            m_animoutput;           // associated output for animation if different
+	output_proxy            m_scrollxoutput;        // associated output for horizontal scroll position
+	output_proxy            m_scrollyoutput;        // associated output for vertical scroll position
 	ioport_port *           m_animinput_port;       // input port used for animation
 	ioport_port *           m_scrollxinput_port;    // input port used for horizontal scrolling
 	ioport_port *           m_scrollyinput_port;    // input port used for vertical scrolling
@@ -389,7 +399,7 @@ private:
 	ioport_value const      m_input_mask;           // input mask of this item
 	u8 const                m_input_shift;          // input mask rightshift for raw (trailing 0s)
 	bool                    m_clickthrough;         // should click pass through to lower elements
-	screen_device *         m_screen;               // pointer to screen
+	device_video_output_interface *         m_screen;               // pointer to screen
 	int const               m_orientation;          // orientation of this item
 	bounds_vector           m_bounds;               // bounds of the item
 	color_vector const      m_color;                // color of the item
@@ -403,11 +413,11 @@ private:
 	std::string const       m_scrollxinput_tag;     // tag of input port for horizontal scroll position
 	std::string const       m_scrollyinput_tag;     // tag of input port for vertical scroll position
 	bounds_vector const     m_rawbounds;            // raw (original) bounds of the item
-	bool const              m_have_output;          // whether we actually have an output
+	std::string const       m_output_name;          // configured output name
+	std::string const       m_animoutput_name;      // configured output name for animation
+	std::string const       m_scrollxoutput_name;   // configured output name for horizontal scroll
+	std::string const       m_scrollyoutput_name;   // configured output name for vertical scroll
 	bool const              m_input_raw;            // get raw data from input port
-	bool const              m_have_animoutput;      // whether we actually have an output for animation
-	bool const              m_have_scrollxoutput;   // whether we actually have an output for horizontal scroll
-	bool const              m_have_scrollyoutput;   // whether we actually have an output for vertical scroll
 	bool const              m_has_clickthrough;     // whether clickthrough was explicitly configured
 };
 
@@ -424,10 +434,13 @@ public:
 	using view_environment = emu::render::detail::view_environment;
 	using element_map = layout_view_item::element_map;
 	using group_map = std::unordered_map<std::string, layout_group>;
-	using screen_ref_vector = std::vector<std::reference_wrapper<screen_device const>>;
+	using screen_ref_vector = std::vector<std::reference_wrapper<device_video_output_interface const>>;
 	using prepare_items_delegate = delegate<void ()>;
 	using preload_delegate = delegate<void ()>;
 	using recomputed_delegate = delegate<void ()>;
+	using pointer_updated_delegate = delegate<void (osd::ui_event_handler::pointer, u16, u16, float, float, u32, u32, u32, s16)>;
+	using pointer_left_delegate = delegate<void (osd::ui_event_handler::pointer, u16, u16, float, float, u32, s16)>;
+	using forget_pointers_delegate = delegate<void ()>;
 
 	using item = layout_view_item;
 	using item_list = std::list<item>;
@@ -498,13 +511,13 @@ public:
 	// getters
 	item *get_item(std::string const &id);
 	item_list &items() { return m_items; }
-	bool has_screen(screen_device const &screen) const;
+	bool has_screen(device_video_output_interface const &screen) const;
 	const std::string &name() const { return m_name; }
 	const std::string &unqualified_name() const { return m_unqualified_name; }
 	size_t visible_screen_count() const { return m_screens.size(); }
 	float effective_aspect() const { return m_effaspect; }
 	const render_bounds &bounds() const { return m_bounds; }
-	bool has_visible_screen(screen_device const &screen) const;
+	bool has_visible_screen(device_video_output_interface const &screen) const;
 	const item_ref_vector &visible_items() const { return m_visible_items; }
 	const item_ref_vector &visible_screen_items() const { return m_screen_items; }
 	const item_ref_vector &interactive_items() const { return m_interactive_items; }
@@ -514,19 +527,51 @@ public:
 	const visibility_toggle_vector &visibility_toggles() const { return m_vistoggles; }
 	u32 default_visibility_mask() const { return m_defvismask; }
 	bool has_art() const { return m_has_art; }
+	bool show_pointers() const { return m_show_ptr; }
+	bool hide_inactive_pointers() const { return m_ptr_time_out; }
+
+	// setters
+	void set_show_pointers(bool value) noexcept;
+	void set_hide_inactive_pointers(bool value) noexcept ATTR_COLD;
 
 	// set handlers
-	void set_prepare_items_callback(prepare_items_delegate &&handler);
-	void set_preload_callback(preload_delegate &&handler);
-	void set_recomputed_callback(recomputed_delegate &&handler);
+	void set_prepare_items_callback(prepare_items_delegate &&handler) ATTR_COLD;
+	void set_preload_callback(preload_delegate &&handler) ATTR_COLD;
+	void set_recomputed_callback(recomputed_delegate &&handler) ATTR_COLD;
+	void set_pointer_updated_callback(pointer_updated_delegate &&handler) ATTR_COLD;
+	void set_pointer_left_callback(pointer_left_delegate &&handler) ATTR_COLD;
+	void set_pointer_aborted_callback(pointer_left_delegate &&handler) ATTR_COLD;
+	void set_forget_pointers_callback(forget_pointers_delegate &&handler) ATTR_COLD;
 
 	// operations
-	void prepare_items() { if (!m_prepare_items.isnull()) m_prepare_items(); }
+	void prepare_items();
 	void recompute(u32 visibility_mask, bool zoom_to_screens);
 	void preload();
 
 	// resolve tags, if any
-	void resolve_tags();
+	void resolve_tags(device_t &device);
+
+	// pointer input
+	void pointer_updated(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 buttons, u32 pressed, u32 released, s16 clicks)
+	{
+		if (!m_pointer_updated.isnull())
+			m_pointer_updated(type, ptrid, device, x, y, buttons, pressed, released, clicks);
+	}
+	void pointer_left(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 released, s16 clicks)
+	{
+		if (!m_pointer_left.isnull())
+			m_pointer_left(type, ptrid, device, x, y, released, clicks);
+	}
+	void pointer_aborted(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, float x, float y, u32 released, s16 clicks)
+	{
+		if (!m_pointer_aborted.isnull())
+			m_pointer_aborted(type, ptrid, device, x, y, released, clicks);
+	}
+	void forget_pointers()
+	{
+		if (!m_forget_pointers.isnull())
+			m_forget_pointers();
+	}
 
 private:
 	struct layer_lists;
@@ -568,15 +613,23 @@ private:
 	prepare_items_delegate      m_prepare_items;    // prepare items for adding to render container
 	preload_delegate            m_preload;          // additional actions when visible items change
 	recomputed_delegate         m_recomputed;       // additional actions on resizing/visibility change
+	pointer_updated_delegate    m_pointer_updated;  // pointer state updated
+	pointer_left_delegate       m_pointer_left;     // pointer left normally
+	pointer_left_delegate       m_pointer_aborted;  // pointer left abnormally
+	forget_pointers_delegate    m_forget_pointers;  // stop processing pointer input
 
 	// cold items
 	std::string                 m_name;             // display name for the view
 	std::string                 m_unqualified_name; // the name exactly as specified in the layout file
+	element_map &               m_elemmap;          // reference to shared elements
 	item_id_map                 m_items_by_id;      // items with non-empty ID indexed by ID
 	visibility_toggle_vector    m_vistoggles;       // collections of items that can be shown/hidden
 	render_bounds               m_expbounds;        // explicit bounds of the view
 	u32                         m_defvismask;       // default visibility mask
 	bool                        m_has_art;          // true if the layout contains non-screen elements
+	bool                        m_show_ptr;         // whether pointers should be displayed
+	bool                        m_ptr_time_out;     // whether pointers should be hidden after inactivity
+	s8                          m_exp_show_ptr;     // explicitly configured pointer visibility
 };
 
 
@@ -598,6 +651,7 @@ public:
 
 	// getters
 	device_t &device() const { return m_device; }
+	element_map &elements() { return m_elemmap; }
 	element_map const &elements() const { return m_elemmap; }
 	view_list &views() { return m_viewlist; }
 	view_list const &views() const { return m_viewlist; }

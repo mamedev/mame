@@ -26,11 +26,11 @@ class system_list;
 class menu_select_game : public menu_select_launch
 {
 public:
-	menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename);
+	menu_select_game(mame_ui_manager &mui, render_target &target, const char *gamename);
 	virtual ~menu_select_game();
 
 	// force game select menu
-	static void force_game_select(mame_ui_manager &mui, render_container &container);
+	static void force_game_select(mame_ui_manager &mui, render_target &target);
 
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
@@ -62,11 +62,12 @@ private:
 	virtual bool handle(event const *ev) override;
 
 	// drawing
-	virtual float draw_left_panel(float x1, float y1, float x2, float y2) override;
+	virtual void draw_left_panel(u32 flags) override;
 	virtual render_texture *get_icon_texture(int linenum, void *selectedref) override;
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, ui_system_info const *&system) const override;
+	virtual void show_config_menu(int index) override;
 	virtual bool accept_search() const override { return !isfavorite(); }
 
 	// text for main top/bottom panels
@@ -74,13 +75,10 @@ private:
 	virtual std::string make_software_description(ui_software_info const &software, ui_system_info const *system) const override;
 
 	// filter navigation
-	virtual void filter_selected() override;
+	virtual void filter_selected(int index) override;
 
 	// toolbar
 	virtual void inkey_export() override;
-
-	// internal methods
-	bool change_info_pane(int delta);
 
 	void build_available_list();
 

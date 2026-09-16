@@ -51,15 +51,15 @@ public:
 
 	auto notify_dma_source_callback() { return m_notify_dma_source_cb.bind(); }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	void dma_check();
 
 	bool is_dma_activated(int vector);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	enum {
@@ -143,15 +143,15 @@ public:
 		m_chan[1].lookup()->notify_dma_source_callback().set(std::forward<T>(args)...);
 	}
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	int is_dma_activated(int vector);
 	bool is_transfer_allowed();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	enum {

@@ -2,11 +2,11 @@
 // copyright-holders:Raphael Nabet
 /*****************************************************************************
  *
- * includes/pdp1.h
+ * dec/pdp1.h
  *
  ****************************************************************************/
-#ifndef MAME_PDP1_PDP1_H
-#define MAME_PDP1_PDP1_H
+#ifndef MAME_DEC_PDP1_H
+#define MAME_DEC_PDP1_H
 
 #pragma once
 
@@ -17,78 +17,69 @@
 #include "emupal.h"
 
 /* defines for each bit and mask in input port "CSW" */
-enum
-{
-	/* bit numbers */
-	pdp1_control_bit = 0,
+/* bit numbers */
+constexpr unsigned pdp1_control_bit    = 0;
 
-	pdp1_extend_bit     = 1,
-	pdp1_start_nobrk_bit= 2,
-	pdp1_start_brk_bit  = 3,
-	pdp1_stop_bit       = 4,
-	pdp1_continue_bit   = 5,
-	pdp1_examine_bit    = 6,
-	pdp1_deposit_bit    = 7,
-	pdp1_read_in_bit    = 8,
-	pdp1_reader_bit     = 9,
-	pdp1_tape_feed_bit  = 10,
-	pdp1_single_step_bit= 11,
-	pdp1_single_inst_bit= 12,
+constexpr unsigned pdp1_extend_bit     = 1;
+constexpr unsigned pdp1_start_nobrk_bit= 2;
+constexpr unsigned pdp1_start_brk_bit  = 3;
+constexpr unsigned pdp1_stop_bit       = 4;
+constexpr unsigned pdp1_continue_bit   = 5;
+constexpr unsigned pdp1_examine_bit    = 6;
+constexpr unsigned pdp1_deposit_bit    = 7;
+constexpr unsigned pdp1_read_in_bit    = 8;
+constexpr unsigned pdp1_reader_bit     = 9;
+constexpr unsigned pdp1_tape_feed_bit  = 10;
+constexpr unsigned pdp1_single_step_bit= 11;
+constexpr unsigned pdp1_single_inst_bit= 12;
 
-	/* masks */
-	pdp1_control = (1 << pdp1_control_bit),
-	pdp1_extend = (1 << pdp1_extend_bit),
-	pdp1_start_nobrk = (1 << pdp1_start_nobrk_bit),
-	pdp1_start_brk = (1 << pdp1_start_brk_bit),
-	pdp1_stop = (1 << pdp1_stop_bit),
-	pdp1_continue = (1 << pdp1_continue_bit),
-	pdp1_examine = (1 << pdp1_examine_bit),
-	pdp1_deposit = (1 << pdp1_deposit_bit),
-	pdp1_read_in = (1 << pdp1_read_in_bit),
-	pdp1_reader = (1 << pdp1_reader_bit),
-	pdp1_tape_feed = (1 << pdp1_tape_feed_bit),
-	pdp1_single_step = (1 << pdp1_single_step_bit),
-	pdp1_single_inst = (1 << pdp1_single_inst_bit)
-};
+/* masks */
+constexpr unsigned pdp1_control     = 1 << pdp1_control_bit;
+constexpr unsigned pdp1_extend      = 1 << pdp1_extend_bit;
+constexpr unsigned pdp1_start_nobrk = 1 << pdp1_start_nobrk_bit;
+constexpr unsigned pdp1_start_brk   = 1 << pdp1_start_brk_bit;
+constexpr unsigned pdp1_stop        = 1 << pdp1_stop_bit;
+constexpr unsigned pdp1_continue    = 1 << pdp1_continue_bit;
+constexpr unsigned pdp1_examine     = 1 << pdp1_examine_bit;
+constexpr unsigned pdp1_deposit     = 1 << pdp1_deposit_bit;
+constexpr unsigned pdp1_read_in     = 1 << pdp1_read_in_bit;
+constexpr unsigned pdp1_reader      = 1 << pdp1_reader_bit;
+constexpr unsigned pdp1_tape_feed   = 1 << pdp1_tape_feed_bit;
+constexpr unsigned pdp1_single_step = 1 << pdp1_single_step_bit;
+constexpr unsigned pdp1_single_inst = 1 << pdp1_single_inst_bit;
 
 /* defines for each bit in input port pdp1_spacewar_controllers*/
-#define ROTATE_LEFT_PLAYER1       0x01
-#define ROTATE_RIGHT_PLAYER1      0x02
-#define THRUST_PLAYER1            0x04
-#define FIRE_PLAYER1              0x08
-#define ROTATE_LEFT_PLAYER2       0x10
-#define ROTATE_RIGHT_PLAYER2      0x20
-#define THRUST_PLAYER2            0x40
-#define FIRE_PLAYER2              0x80
-#define HSPACE_PLAYER1            0x100
-#define HSPACE_PLAYER2            0x200
+constexpr unsigned ROTATE_LEFT_PLAYER1       = 0x01;
+constexpr unsigned ROTATE_RIGHT_PLAYER1      = 0x02;
+constexpr unsigned THRUST_PLAYER1            = 0x04;
+constexpr unsigned FIRE_PLAYER1              = 0x08;
+constexpr unsigned ROTATE_LEFT_PLAYER2       = 0x10;
+constexpr unsigned ROTATE_RIGHT_PLAYER2      = 0x20;
+constexpr unsigned THRUST_PLAYER2            = 0x40;
+constexpr unsigned FIRE_PLAYER2              = 0x80;
+constexpr unsigned HSPACE_PLAYER1            = 0x100;
+constexpr unsigned HSPACE_PLAYER2            = 0x200;
 
 /* defines for each field in input port pdp1_config */
-enum
-{
-	pdp1_config_extend_bit          = 0,
-	pdp1_config_extend_mask         = 0x3,  /* 2 bits */
-	pdp1_config_hw_mul_div_bit      = 2,
-	pdp1_config_hw_mul_div_mask     = 0x1,
-	/*pdp1_config_hw_obsolete_bit   = 3,
-	pdp1_config_hw_obsolete_mask    = 0x1,*/
-	pdp1_config_type_20_sbs_bit     = 4,
-	pdp1_config_type_20_sbs_mask    = 0x1,
-	pdp1_config_lightpen_bit        = 5,
-	pdp1_config_lightpen_mask       = 0x1
-};
+constexpr unsigned pdp1_config_extend_bit          = 0;
+constexpr unsigned pdp1_config_extend_mask         = 0x3;  /* 2 bits */
+constexpr unsigned pdp1_config_hw_mul_div_bit      = 2;
+constexpr unsigned pdp1_config_hw_mul_div_mask     = 0x1;
+//constexpr unsigned pdp1_config_hw_obsolete_bit   = 3;
+//constexpr unsigned pdp1_config_hw_obsolete_mask  = 0x1;
+constexpr unsigned pdp1_config_type_20_sbs_bit     = 4;
+constexpr unsigned pdp1_config_type_20_sbs_mask    = 0x1;
+constexpr unsigned pdp1_config_lightpen_bit        = 5;
+constexpr unsigned pdp1_config_lightpen_mask       = 0x1;
 
 /* defines for each field in input port pdp1_lightpen_state */
-enum
-{
-	pdp1_lightpen_down_bit          = 0,
-	pdp1_lightpen_smaller_bit       = 1,
-	pdp1_lightpen_larger_bit        = 2,
+constexpr unsigned pdp1_lightpen_down_bit          = 0;
+constexpr unsigned pdp1_lightpen_smaller_bit       = 1;
+constexpr unsigned pdp1_lightpen_larger_bit        = 2;
 
-	pdp1_lightpen_down              = (1 << pdp1_lightpen_down_bit),
-	pdp1_lightpen_smaller           = (1 << pdp1_lightpen_smaller_bit),
-	pdp1_lightpen_larger            = (1 << pdp1_lightpen_larger_bit)
-};
+constexpr unsigned pdp1_lightpen_down              = 1 << pdp1_lightpen_down_bit;
+constexpr unsigned pdp1_lightpen_smaller           = 1 << pdp1_lightpen_smaller_bit;
+constexpr unsigned pdp1_lightpen_larger            = 1 << pdp1_lightpen_larger_bit;
 
 /* defines for our font */
 enum
@@ -99,43 +90,35 @@ enum
 	pdp1_fontdata_size = 8 * pdp1_charnum
 };
 
-enum
-{
-	/* size and position of crt window */
-	crt_window_width = 512,
-	crt_window_height = 512,
-	crt_window_offset_x = 0,
-	crt_window_offset_y = 0,
-	/* size and position of operator control panel window */
-	panel_window_width = 384,
-	panel_window_height = 128,
-	panel_window_offset_x = crt_window_width,
-	panel_window_offset_y = 0,
-	/* size and position of typewriter window */
-	typewriter_window_width = 640,
-	typewriter_window_height = 160,
-	typewriter_window_offset_x = 0,
-	typewriter_window_offset_y = crt_window_height
-};
+/* size and position of crt window */
+constexpr int crt_window_width = 512;
+constexpr int crt_window_height = 512;
+constexpr int crt_window_offset_x = 0;
+constexpr int crt_window_offset_y = 0;
+/* size and position of operator control panel window */
+constexpr int panel_window_width = 384;
+constexpr int panel_window_height = 128;
+constexpr int panel_window_offset_x = crt_window_width;
+constexpr int panel_window_offset_y = 0;
+/* size and position of typewriter window */
+constexpr int typewriter_window_width = 640;
+constexpr int typewriter_window_height = 160;
+constexpr int typewriter_window_offset_x = 0;
+constexpr int typewriter_window_offset_y = crt_window_height;
 
-enum
-{
-	total_width = crt_window_width + panel_window_width,
-	total_height = crt_window_height + typewriter_window_height,
+constexpr int total_width = crt_window_width + panel_window_width;
+constexpr int total_height = crt_window_height + typewriter_window_height;
 
-	/* respect 4:3 aspect ratio to keep pixels square */
-	virtual_width_1 = ((total_width+3)/4)*4,
-	virtual_height_1 = ((total_height+2)/3)*3,
-	virtual_width_2 = virtual_height_1*4/3,
-	virtual_height_2 = virtual_width_1*3/4,
-	virtual_width = (virtual_width_1 > virtual_width_2) ? virtual_width_1 : virtual_width_2,
-	virtual_height = (virtual_height_1 > virtual_height_2) ? virtual_height_1 : virtual_height_2
-};
+/* respect 4:3 aspect ratio to keep pixels square */
+constexpr int virtual_width_1 = ((total_width+3)/4)*4;
+constexpr int virtual_height_1 = ((total_height+2)/3)*3;
+constexpr int virtual_width_2 = virtual_height_1*4/3;
+constexpr int virtual_height_2 = virtual_width_1*3/4;
+constexpr int virtual_width = (virtual_width_1 > virtual_width_2) ? virtual_width_1 : virtual_width_2;
+constexpr int virtual_height = (virtual_height_1 > virtual_height_2) ? virtual_height_1 : virtual_height_2;
 
-enum
-{   /* refresh rate in Hz: can be changed at will */
-	refresh_rate = 60
-};
+/* refresh rate in Hz: can be changed at will */
+constexpr int refresh_rate = 60;
 
 /* Color codes */
 enum
@@ -189,7 +172,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
@@ -234,7 +217,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
@@ -276,7 +259,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return false; }
@@ -333,7 +316,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -414,9 +397,9 @@ public:
 	emu_timer *m_dpy_timer;
 	lightpen_t m_lightpen;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void pdp1_palette(palette_device &palette) const;
 	uint32_t screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_pdp1(int state);
@@ -442,7 +425,7 @@ public:
 	template <int Mask> void io_status_w(int state);
 
 	void pdp1(machine_config &config);
-	void pdp1_map(address_map &map);
+	void pdp1_map(address_map &map) ATTR_COLD;
 private:
 	void iot_dpy(int op2, int nac, int mb, int &io, int ac);
 
@@ -477,4 +460,4 @@ public:
 	required_ioport m_lighty;
 };
 
-#endif // MAME_PDP1_PDP1_H
+#endif // MAME_DEC_PDP1_H

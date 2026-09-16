@@ -1,9 +1,9 @@
 // Windows/COM.h
 
-#ifndef __WINDOWS_COM_H
-#define __WINDOWS_COM_H
+#ifndef ZIP7_INC_WINDOWS_COM_H
+#define ZIP7_INC_WINDOWS_COM_H
 
-#include "../Common/MyString.h"
+// #include "../Common/MyString.h"
 
 namespace NWindows {
 namespace NCOM {
@@ -21,17 +21,18 @@ public:
     // it's single thread. Do we need multithread?
     CoInitialize(NULL);
     #endif
-  };
+  }
   ~CComInitializer() { CoUninitialize(); }
 };
 
-class CStgMedium
+/*
+class CStgMedium2
 {
   STGMEDIUM _object;
-public:
   bool _mustBeReleased;
-  CStgMedium(): _mustBeReleased(false) {}
-  ~CStgMedium() { Free(); }
+public:
+  CStgMedium2(): _mustBeReleased(false) {}
+  ~CStgMedium2() { Free(); }
   void Free()
   {
     if (_mustBeReleased)
@@ -41,6 +42,21 @@ public:
   const STGMEDIUM* operator->() const { return &_object;}
   STGMEDIUM* operator->() { return &_object;}
   STGMEDIUM* operator&() { return &_object; }
+};
+*/
+
+struct CStgMedium: public STGMEDIUM
+{
+  CStgMedium()
+  {
+    tymed = TYMED_NULL; // 0
+    hGlobal = NULL;
+    pUnkForRelease = NULL;
+  }
+  ~CStgMedium()
+  {
+    ReleaseStgMedium(this);
+  }
 };
 
 #endif

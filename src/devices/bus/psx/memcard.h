@@ -15,7 +15,7 @@ class psxcard_device :  public device_t,
 						public device_memcard_image_interface
 {
 public:
-	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "mc"; }
@@ -31,8 +31,8 @@ public:
 	bool ack_r() { return m_ack; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void read_card(const unsigned short addr, unsigned char *buf);

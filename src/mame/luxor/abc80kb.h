@@ -22,24 +22,24 @@ class abc80_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto keydown_wr_callback() { return m_write_keydown.bind(); }
 
 	uint8_t data_r();
 
-	void keyboard_mem(address_map &map);
-	void keyboard_io(address_map &map);
+	void keyboard_mem(address_map &map) ATTR_COLD;
+	void keyboard_io(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	devcb_write_line m_write_keydown;

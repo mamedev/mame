@@ -1,26 +1,43 @@
-[![Travis CI Build Status](https://travis-ci.org/libexpat/libexpat.svg?branch=master)](https://travis-ci.org/libexpat/libexpat)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/libexpat/libexpat?svg=true)](https://ci.appveyor.com/project/libexpat/libexpat)
+[![Run Linux CI tasks](https://github.com/libexpat/libexpat/actions/workflows/linux.yml/badge.svg)](https://github.com/libexpat/libexpat/actions/workflows/linux.yml)
 [![Packaging status](https://repology.org/badge/tiny-repos/expat.svg)](https://repology.org/metapackage/expat/versions)
+[![Downloads SourceForge](https://img.shields.io/sourceforge/dt/expat?label=Downloads%20SourceForge)](https://sourceforge.net/projects/expat/files/)
+[![Downloads GitHub](https://img.shields.io/github/downloads/libexpat/libexpat/total?label=Downloads%20GitHub)](https://github.com/libexpat/libexpat/releases)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10205/badge)](https://www.bestpractices.dev/projects/10205)
+
+> [!CAUTION]
+>
+> Expat has **unfixed security issues**!
+> Please see https://github.com/libexpat/libexpat/issues/1160 for details.
+
+> [!NOTE]
+>
+> Starting 2026-08-01, for up to six months my work maintaining libexpat
+> will be funded by the [City of Munich](https://en.wikipedia.org/wiki/Munich)
+> as part of their [Open Source Sabbatical](https://opensource.muenchen.de/software/libexpat.html#open-source-sabbatical).
+> Thank you! :heart: :pray:
 
 
-# Expat, Release 2.2.10
+# Expat, Release 2.8.3
 
-This is Expat, a C library for parsing XML, started by
-[James Clark](https://en.wikipedia.org/wiki/James_Clark_(programmer)) in 1997.
+This is Expat, a C99 library for parsing
+[XML 1.0 Fourth Edition](https://www.w3.org/TR/2006/REC-xml-20060816/), started by
+[James Clark](https://en.wikipedia.org/wiki/James_Clark_%28programmer%29) in 1997.
 Expat is a stream-oriented XML parser.  This means that you register
 handlers with the parser before starting the parse.  These handlers
 are called when the parser discovers the associated structures in the
 document being parsed.  A start tag is an example of the kind of
 structures for which you may register handlers.
 
-Expat supports the following compilers:
-- GNU GCC >=4.5
+Expat supports the following C99 compilers:
+
+- GNU GCC >=4.5 (for use from C) or GNU GCC >=4.8.1 (for use from C++)
 - LLVM Clang >=3.5
-- Microsoft Visual Studio >=9.0/2008
+- Microsoft Visual Studio >=17.0/2022
+  (the oldest version supported by the [official GitHub Actions Windows images](https://github.com/actions/runner-images))
 
 Windows users can use the
-[`expat_win32` package](https://sourceforge.net/projects/expat/files/expat_win32/),
-which includes both precompiled libraries and executables, and source code for
+[`expat-win32bin-*.*.*.{exe,zip}` download](https://github.com/libexpat/libexpat/releases),
+which includes both pre-compiled libraries and executables, and source code for
 developers.
 
 Expat is [free software](https://www.gnu.org/philosophy/free-sw.en.html).
@@ -29,6 +46,101 @@ contained in the file
 [`COPYING`](https://github.com/libexpat/libexpat/blob/master/expat/COPYING)
 distributed with this package.
 This license is the same as the MIT/X Consortium license.
+
+
+## Using libexpat in your CMake-Based Project
+
+There are three documented ways of using libexpat with CMake:
+
+### a) `find_package` with Module Mode
+
+This approach leverages CMake's own [module `FindEXPAT`](https://cmake.org/cmake/help/latest/module/FindEXPAT.html).
+
+Notice the *uppercase* `EXPAT` in the following example:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+
+project(hello VERSION 1.0.0)
+
+find_package(EXPAT 2.2.8 MODULE REQUIRED)
+
+add_executable(hello
+    hello.c
+)
+
+target_link_libraries(hello PUBLIC EXPAT::EXPAT)
+```
+
+### b) `find_package` with Config Mode
+
+This approach requires files from…
+
+- libexpat >=2.2.8 where packaging uses the CMake build system
+or
+- libexpat >=2.3.0 where packaging uses the GNU Autotools build system
+  on Linux
+or
+- libexpat >=2.4.0 where packaging uses the GNU Autotools build system
+  on macOS or MinGW.
+
+Notice the *lowercase* `expat` in the following example:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+
+project(hello VERSION 1.0.0)
+
+find_package(expat 2.2.8 CONFIG REQUIRED char dtd ns)
+
+add_executable(hello
+    hello.c
+)
+
+target_link_libraries(hello PUBLIC expat::expat)
+```
+
+### c) The `FetchContent` module
+
+This approach — as demonstrated below — requires CMake >=3.18 for both the
+[`FetchContent` module](https://cmake.org/cmake/help/latest/module/FetchContent.html)
+and its support for the `SOURCE_SUBDIR` option to be available.
+
+Please note that:
+- Use of the `FetchContent` module with *non-release* SHA1s or `master`
+  of libexpat is neither advised nor considered officially supported.
+- Pinning to a specific commit is great for robust CI.
+- Pinning to a specific commit needs updating every time there is a new
+  release of libexpat — either manually or through automation —,
+  to not miss out on libexpat security updates.
+
+For an example that pulls in libexpat via Git:
+
+```cmake
+cmake_minimum_required(VERSION 3.18)
+
+include(FetchContent)
+
+project(hello VERSION 1.0.0)
+
+FetchContent_Declare(
+    expat
+    GIT_REPOSITORY https://github.com/libexpat/libexpat/
+    GIT_TAG        000000000_GIT_COMMIT_SHA1_HERE_000000000  # i.e. Git tag R_X_Y_Z
+    SOURCE_SUBDIR  expat/
+)
+
+FetchContent_MakeAvailable(expat)
+
+add_executable(hello
+    hello.c
+)
+
+target_link_libraries(hello PUBLIC expat)
+```
+
+
+## Building from a Git Clone
 
 If you are building Expat from a check-out from the
 [Git repository](https://github.com/libexpat/libexpat/),
@@ -42,6 +154,11 @@ autoconf 2.58 or newer. Run the script like this:
 
 Once this has been done, follow the same instructions as for building
 from a source distribution.
+
+
+## Building from a Source Distribution
+
+### a) Building with the configure script (i.e. GNU Autotools)
 
 To build Expat from a source distribution, you first run the
 configuration shell script in the top level distribution directory:
@@ -88,10 +205,10 @@ support this mode of compilation (yet):
 
 1. Mass-patch `Makefile.am` files to use `libexpatw.la` for a library name:
    <br/>
-   `find -name Makefile.am -exec sed
+   `find . -name Makefile.am -exec sed
        -e 's,libexpat\.la,libexpatw.la,'
        -e 's,libexpat_la,libexpatw_la,'
-       -i {} +`
+       -i.bak {} +`
 
 1. Run `automake` to re-write `Makefile.in` files:<br/>
    `automake`
@@ -123,17 +240,18 @@ overrides the in-makefile set `DESTDIR`, because variable-setting priority is
 Note: This only applies to the Expat library itself, building UTF-16 versions
 of xmlwf and the tests is currently not supported.
 
-When using Expat with a project using autoconf for configuration, you
-can use the probing macro in `conftools/expat.m4` to determine how to
-include Expat.  See the comments at the top of that file for more
-information.
-
 A reference manual is available in the file `doc/reference.html` in this
 distribution.
 
 
-The CMake build system is still *experimental* and will replace the primary
+### b) Building with CMake
+
+The CMake build system is still *experimental* and may replace the primary
 build system based on GNU Autotools at some point when it is ready.
+
+
+#### Available Options
+
 For an idea of the available (non-advanced) options for building with CMake:
 
 ```console
@@ -147,48 +265,39 @@ CMAKE_INSTALL_PREFIX:PATH=/usr/local
 // Path to a program.
 DOCBOOK_TO_MAN:FILEPATH=/usr/bin/docbook2x-man
 
-// build man page for xmlwf
+// Build man page for xmlwf
 EXPAT_BUILD_DOCS:BOOL=ON
 
-// build the examples for expat library
+// Build the examples for expat library
 EXPAT_BUILD_EXAMPLES:BOOL=ON
 
-// build fuzzers for the expat library
+// Build fuzzers for the expat library
 EXPAT_BUILD_FUZZERS:BOOL=OFF
 
-// build pkg-config file
+// Build pkg-config file
 EXPAT_BUILD_PKGCONFIG:BOOL=ON
 
-// build the tests for expat library
+// Build the tests for expat library
 EXPAT_BUILD_TESTS:BOOL=ON
 
-// build the xmlwf tool for expat library
+// Build the xmlwf tool for expat library
 EXPAT_BUILD_TOOLS:BOOL=ON
 
 // Character type to use (char|ushort|wchar_t) [default=char]
 EXPAT_CHAR_TYPE:STRING=char
 
-// install expat files in cmake install target
+// Install expat files in cmake install target
 EXPAT_ENABLE_INSTALL:BOOL=ON
 
 // Use /MT flag (static CRT) when compiling in MSVC
 EXPAT_MSVC_STATIC_CRT:BOOL=OFF
 
-// build fuzzers via ossfuzz for the expat library
-EXPAT_OSSFUZZ_BUILD:BOOL=OFF
-
-// build a shared expat library
+// Build a shared expat library
 EXPAT_SHARED_LIBS:BOOL=ON
+
+// Define to provide symbol versioning for dependency generation
+EXPAT_SYMBOL_VERSIONING:BOOL=OFF
 
 // Treat all compiler warnings as errors
 EXPAT_WARNINGS_AS_ERRORS:BOOL=OFF
-
-// Make use of getrandom function (ON|OFF|AUTO) [default=AUTO]
-EXPAT_WITH_GETRANDOM:STRING=AUTO
-
-// utilize libbsd (for arc4random_buf)
-EXPAT_WITH_LIBBSD:BOOL=OFF
-
-// Make use of syscall SYS_getrandom (ON|OFF|AUTO) [default=AUTO]
-EXPAT_WITH_SYS_GETRANDOM:STRING=AUTO
 ```

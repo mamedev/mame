@@ -20,17 +20,20 @@ namespace osd {
 // state information for a keyboard
 struct keyboard_state
 {
+	static constexpr unsigned MAX_KEYS = 256;
+
 	uint8_t state[MAX_KEYS];
 	int8_t  oldkey[MAX_KEYS];
 	int8_t  currkey[MAX_KEYS];
 };
 
-// state information for a mouse (matches DIMOUSESTATE exactly)
+// state information for a mouse
 struct mouse_state
 {
 	LONG    lX;
 	LONG    lY;
-	LONG    lZ;
+	LONG    lV;
+	LONG    lH;
 	BYTE    rgbButtons[8];
 };
 

@@ -25,16 +25,16 @@ public:
 	auto error_ia_cb() { return m_error_ia_w.bind(); }
 	auto error_ov_cb() { return m_error_ov_w.bind(); }
 
-	void amap(address_map &map);
+	void amap(address_map &map) ATTR_COLD;
 
 	void hw_irq_trigger_hs(u32 normal_ist, u32 ext_ist);
 
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
-	//virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	//virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(dma_end_tick);
 
@@ -64,7 +64,7 @@ private:
 		u32 top_addr;
 	} m_g2apro;
 
-	template <u8 Channel> void channel_map(address_map &map);
+	template <u8 Channel> void channel_map(address_map &map) ATTR_COLD;
 
 	template <u8 Channel> u32 stag_r();
 	template <u8 Channel> void stag_w(offs_t offset, u32 data, u32 mem_mask = ~0);

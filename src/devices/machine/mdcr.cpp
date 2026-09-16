@@ -87,6 +87,7 @@ void mdcr_device::device_add_mconfig(machine_config &config)
 {
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
+	// TODO: interface naming should be more generic, for non-p2000 targets
 	m_cassette->set_interface("p2000_cass");
 	m_cassette->set_formats(p2000t_cassette_formats);
 }

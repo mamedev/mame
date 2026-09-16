@@ -27,7 +27,7 @@ class pgm2_memcard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pgm2_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pgm2_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "pg2,bin,mem"; }
@@ -49,7 +49,7 @@ public:
 
 private:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	u8 m_memcard_data[0x100];
 	u8 m_protection_data[4];

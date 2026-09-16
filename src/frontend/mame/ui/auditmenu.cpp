@@ -22,7 +22,9 @@
 #include "uiinput.h"
 
 #include "util/corestr.h"
+#include "util/ioprocsstream.h"
 
+#include <locale>
 #include <numeric>
 #include <sstream>
 #include <thread>
@@ -40,8 +42,8 @@ void *const ITEMREF_START_FAST = reinterpret_cast<void *>(std::uintptr_t(2));
 } // anonymous namespace
 
 
-menu_audit::menu_audit(mame_ui_manager &mui, render_container &container)
-	: menu(mui, container)
+menu_audit::menu_audit(mame_ui_manager &mui, render_target &target)
+	: menu(mui, target)
 	, m_availablesorted(system_list::instance().sorted_list())
 	, m_unavailable(
 			std::accumulate(
@@ -83,7 +85,7 @@ void menu_audit::recompute_metrics(uint32_t width, uint32_t height, float aspect
 }
 
 
-void menu_audit::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
+void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	switch (m_phase)
 	{
@@ -92,7 +94,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 		{
 			draw_text_box(
 					&m_prompt, &m_prompt + 1,
-					x, x2, y2 + tb_border(), y2 + bottom,
+					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_GREEN_COLOR);
 		}
@@ -113,7 +115,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 					total);
 			text << '\n' << m_prompt;
 			ui().draw_text_box(
-					container(),
+					target(),
 					std::move(text).str(),
 					text_layout::text_justify::CENTER,
 					0.5F, 0.5F,
@@ -123,7 +125,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 
 	case phase::CANCELLATION:
 		ui().draw_text_box(
-				container(),
+				target(),
 				util::string_format(
 					_("Cancel audit?\n\nPress %1$s to cancel\nPress %2$s to continue"),
 					ui().get_general_input_setting(IPT_UI_SELECT),
@@ -239,16 +241,21 @@ void menu_audit::save_available_machines()
 	emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (!file.open(std::string(emulator_info::get_configname()) + "_avail.ini"))
 	{
-		// generate header
-		file.printf("#\n%s%s\n#\n\n", UI_VERSION_TAG, emulator_info::get_bare_build_version());
-
-		// generate available list
-		for (ui_system_info const &info : m_availablesorted)
 		{
-			if (info.available)
-				file.printf("%s\n", info.driver->name);
-		}
+			util::owritestream str(file);
+			str.imbue(std::locale::classic());
 
+			// generate header
+			util::stream_format(str, "#\n%s%s\n#\n\n", UI_VERSION_TAG, emulator_info::get_bare_build_version());
+
+			// generate available list
+			for (ui_system_info const &info : m_availablesorted)
+			{
+				if (info.available)
+					str << info.driver->name << '\n';
+			}
+			str << std::flush;
+		}
 		file.close();
 	}
 }

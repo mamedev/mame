@@ -24,7 +24,7 @@ public:
 		set_tile_mask(_tile_mask);
 	}
 
-	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas24_tile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_tile_mask(uint16_t _tile_mask) { tile_mask = _tile_mask; }
@@ -43,7 +43,7 @@ public:
 	auto xvout_write_callback() { return m_xvout_write_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum {
@@ -65,9 +65,9 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info_1w);
 
 	void draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const uint16_t *mask,
-					uint16_t tpri, uint8_t lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
+					uint16_t tpri, uint8_t lpri, int flags, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
 	void draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const uint16_t *mask,
-					uint16_t tpri, uint8_t lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
+					uint16_t tpri, uint8_t lpri, int flags, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);
 
 	template<class BitmapClass>
 	void draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
@@ -81,7 +81,7 @@ class segas24_sprite_device : public device_t
 	friend class segas24_sprite_config;
 
 public:
-	segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas24_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -89,7 +89,7 @@ public:
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	std::unique_ptr<uint16_t[]> sprite_ram;
@@ -101,7 +101,7 @@ class segas24_mixer_device : public device_t
 	friend class segas24_mixer_config;
 
 public:
-	segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	segas24_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t read(offs_t offset);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -109,7 +109,7 @@ public:
 	uint16_t get_reg(int reg);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	uint16_t mixer_reg[16];
@@ -118,5 +118,7 @@ private:
 DECLARE_DEVICE_TYPE(S24TILE,   segas24_tile_device)
 DECLARE_DEVICE_TYPE(S24SPRITE, segas24_sprite_device)
 DECLARE_DEVICE_TYPE(S24MIXER,  segas24_mixer_device)
+
+extern const internal_layout layout_vr; // for games that support a 16:9 option (Model 1 and Model 2 use this)
 
 #endif // MAME_SEGA_SEGAIC24_H

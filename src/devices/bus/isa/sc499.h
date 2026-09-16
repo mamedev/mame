@@ -28,7 +28,7 @@ class sc499_ctape_image_device : public microtape_image_device
 {
 public:
 	// construction/destruction
-	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sc499_ctape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -46,7 +46,7 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	std::vector<uint8_t> m_ctape_data;
 };
@@ -65,10 +65,10 @@ protected:
 
 private:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// ISA overrides
 	virtual uint8_t dack_r(int line) override;

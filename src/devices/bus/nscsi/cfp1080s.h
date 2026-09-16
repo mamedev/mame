@@ -8,7 +8,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class cfp1080s_device : public nscsi_device, public nscsi_slot_card_interface
+class cfp1080s_device : public device_t, public nscsi_device_interface, public nscsi_slot_card_interface
 {
 public:
 	cfp1080s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -16,9 +16,9 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u8 ff081_r();
@@ -28,7 +28,7 @@ private:
 	void addrptrm_w(u8 data);
 	void addrptrh_w(u8 data);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_hdcpu;
 

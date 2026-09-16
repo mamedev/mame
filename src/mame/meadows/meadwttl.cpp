@@ -59,10 +59,10 @@ private:
 	required_device<fixedfreq_device> m_video;
 
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 };
 
 
@@ -100,7 +100,7 @@ void meadwttl_state::meadows(machine_config &config)
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_meadows);
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
 	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
@@ -168,7 +168,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship [TTL]", MACHINE_IS_SKELETON )
-GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1 [TTL]", MACHINE_IS_SKELETON )
+GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, ckidzo,    0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Ckidzo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, cgunship,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Cobra Gunship", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1976, mead4in1,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Meadows 4 in 1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

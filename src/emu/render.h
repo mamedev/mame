@@ -48,6 +48,8 @@
 
 #include "rendertypes.h"
 
+#include "interface/uievents.h"
+
 #include <cmath>
 #include <list>
 #include <memory>
@@ -376,7 +378,7 @@ class render_container
 
 public:
 	// construction/destruction
-	render_container(render_manager &manager, screen_device *screen = nullptr);
+	render_container(render_manager &manager, device_video_output_interface *screen = nullptr);
 	~render_container();
 
 	// user settings describes the collected user-controllable settings
@@ -397,7 +399,7 @@ public:
 	};
 
 	// getters
-	screen_device *screen() const { return m_screen; }
+	device_video_output_interface *screen() const { return m_screen; }
 	render_manager &manager() const { return m_manager; }
 	render_texture *overlay() const { return m_overlaytexture; }
 	int orientation() const { return m_user.m_orientation; }
@@ -473,7 +475,7 @@ private:
 	render_manager &        m_manager;              // reference back to the owning manager
 	simple_list<item>       m_itemlist;             // head of the item list
 	fixed_allocator<item>   m_item_allocator;       // free container items
-	screen_device *         m_screen;               // the screen device
+	device_video_output_interface *         m_screen;               // the screen device
 	user_settings           m_user;                 // user settings
 	bitmap_argb32 *         m_overlaybitmap;        // overlay bitmap
 	render_texture *        m_overlaytexture;       // overlay texture
@@ -486,20 +488,21 @@ private:
 // ======================> render_target
 
 // a render_target describes a surface that is being rendered to
-class render_target
+class render_target final : public osd::ui_event_handler
 {
 	friend class simple_list<render_target>;
 	friend class render_manager;
 
 	// construction/destruction
-	render_target(render_manager &manager, const internal_layout *layoutfile = nullptr, u32 flags = 0);
-	render_target(render_manager &manager, util::xml::data_node const &layout, u32 flags = 0);
+	render_target(render_manager &manager, render_container *ui, const internal_layout *layoutfile, u32 flags);
+	render_target(render_manager &manager, render_container *ui, util::xml::data_node const &layout, u32 flags);
 	~render_target();
 
 public:
 	// getters
 	render_target *next() const { return m_next; }
 	render_manager &manager() const { return m_manager; }
+	render_container *ui_container() const { return m_ui_container; }
 	u32 width() const { return m_width; }
 	u32 height() const { return m_height; }
 	float pixel_aspect() const { return m_pixel_aspect; }
@@ -524,6 +527,13 @@ public:
 	void set_transform_container(bool transform_container) { m_transform_container = transform_container; }
 	void set_keepaspect(bool keepaspect) { m_keepaspect = keepaspect; }
 	void set_scale_mode(int scale_mode) { m_scale_mode = scale_mode; }
+
+	// pointer input handling
+	void pointer_updated(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks);
+	void pointer_left(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks);
+	void pointer_aborted(osd::ui_event_handler::pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks);
+	void forget_pointers();
+	void update_pointer_fields();
 
 	// layer config getters
 	bool screen_overlay_enabled() const { return m_layerconfig.screen_overlay_enabled(); }
@@ -550,7 +560,6 @@ public:
 
 	// hit testing
 	bool map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y);
-	bool map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y);
 
 	// reference tracking
 	void invalidate_all(void *refptr);
@@ -558,16 +567,34 @@ public:
 	// resolve tag lookups
 	void resolve_tags();
 
+	// osd::ui_event_handler implementation
+	virtual void push_window_focus_event() override;
+	virtual void push_window_defocus_event() override;
+	virtual void push_mouse_wheel_event(s32 x, s32 y, short delta, int lines) override;
+	virtual void push_pointer_update(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 buttons, u32 pressed, u32 released, s16 clicks) override;
+	virtual void push_pointer_leave(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
+	virtual void push_pointer_abort(pointer type, u16 ptrid, u16 device, s32 x, s32 y, u32 released, s16 clicks) override;
+	virtual void push_char_event(char32_t ch) override;
+
 private:
+	// constants
+	static inline constexpr int NUM_PRIMLISTS = 3;
+	static inline constexpr int MAX_CLEAR_EXTENTS = 1000;
+
 	using view_mask_pair = std::pair<layout_view &, u32>;
 	using view_mask_vector = std::vector<view_mask_pair>;
 
 	// private classes declared in render.cpp
 	struct object_transform;
+	struct pointer_info;
+	struct hit_test;
+
+	using pointer_info_vector = std::vector<pointer_info>;
+	using hit_test_vector = std::vector<hit_test>;
 
 	// internal helpers
 	enum constructor_impl_t { CONSTRUCTOR_IMPL };
-	template <typename T> render_target(render_manager &manager, T&& layout, u32 flags, constructor_impl_t);
+	template <typename T> render_target(render_manager &manager, render_container *ui, T&& layout, u32 flags, constructor_impl_t);
 	void update_layer_config();
 	void load_layout_files(const internal_layout *layoutfile, bool singlefile);
 	void load_layout_files(util::xml::data_node const &rootnode, bool singlefile);
@@ -578,6 +605,7 @@ private:
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_view_item &item);
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
+	std::pair<float, float> map_point_layout(s32 target_x, s32 target_y);
 
 	// config callbacks
 	void config_load(util::xml::data_node const *targetnode);
@@ -593,13 +621,11 @@ private:
 	void add_clear_extents(render_primitive_list &list);
 	void add_clear_and_optimize_primitive_list(render_primitive_list &list);
 
-	// constants
-	static constexpr int NUM_PRIMLISTS = 3;
-	static constexpr int MAX_CLEAR_EXTENTS = 1000;
-
 	// internal state
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
+	ui_event_sink &         m_event_sink;               // handler for incoming UI events
+	render_container *const m_ui_container;             // container for drawing UI elements
 	std::list<layout_file>  m_filelist;                 // list of layout files
 	view_mask_vector        m_views;                    // views we consider
 	unsigned                m_curview;                  // current view index
@@ -618,7 +644,8 @@ private:
 	float                   m_max_refresh;              // maximum refresh rate, 0 or if none
 	int                     m_orientation;              // orientation
 	render_layer_config     m_layerconfig;              // layer configuration
-	std::vector<bool>       m_hit_test;                 // used when mapping points to inputs
+	pointer_info_vector     m_pointers;                 // state of pointers over this target
+	hit_test_vector         m_clickable_items;          // for tracking clicked elements
 	layout_view *           m_base_view;                // the view at the time of first frame
 	int                     m_base_orientation;         // the orientation at the time of first frame
 	render_layer_config     m_base_layerconfig;         // the layer configuration at the time of first frame
@@ -641,14 +668,14 @@ class render_manager
 
 public:
 	// construction/destruction
-	render_manager(running_machine &machine);
+	render_manager(running_machine &machine, ui_event_sink &event_sink);
 	~render_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
 
 	// global queries
-	bool is_live(screen_device &screen) const;
+	bool is_live(device_video_output_interface &screen) const;
 	float max_update_rate() const;
 
 	// targets
@@ -662,10 +689,11 @@ public:
 	// UI targets
 	render_target &ui_target() const { assert(m_ui_target != nullptr); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
-	float ui_aspect(render_container *rc = nullptr);
+	float ui_aspect(render_target &target);     // gets result for target's UI container - target must not be a hidden target with no UI container
+	float ui_aspect(render_container &rc);      // rc must be a screen container or a UI container for a render target; requires an O(n) scan of render targets
 
 	// UI containers
-	render_container &ui_container() const { assert(m_ui_container != nullptr); return *m_ui_container; }
+	render_container &ui_container() const { assert(ui_target().ui_container()); return *ui_target().ui_container(); }
 
 	// textures
 	render_texture *texture_alloc(texture_scaler_func scaler = nullptr, void *param = nullptr);
@@ -686,20 +714,21 @@ private:
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// internal state
-	running_machine &               m_machine;          // reference back to the machine
+	running_machine &               m_machine;                  // reference back to the machine
+	ui_event_sink &                 m_event_sink;
 
 	// array of live targets
-	simple_list<render_target>      m_targetlist;       // list of targets
-	render_target *                 m_ui_target;        // current UI target
+	simple_list<render_target>      m_targetlist;               // list of targets
+	render_target *                 m_ui_target;                // current UI target
 
 	// texture lists
-	u32                             m_live_textures;    // number of live textures
-	u64                             m_texture_id;       // rolling texture ID counter
-	fixed_allocator<render_texture> m_texture_allocator;// texture allocator
+	u32                             m_live_textures;            // number of live textures
+	u64                             m_texture_id;               // rolling texture ID counter
+	fixed_allocator<render_texture> m_texture_allocator;        // texture allocator
 
-	// containers for the UI and for screens
-	std::unique_ptr<render_container> m_ui_container;   // UI container
-	std::list<render_container>     m_screen_container_list; // list of containers for the screen
+	// containers for UI elements and for screens
+	std::list<render_container>     m_ui_containers;            // containers for drawing UI elements
+	std::list<render_container>     m_screen_container_list;    // list of containers for the screen
 };
 
 #endif  // MAME_EMU_RENDER_H

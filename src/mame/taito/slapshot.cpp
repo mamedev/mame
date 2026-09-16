@@ -30,7 +30,7 @@ The palette generator is 8 bits per color gun like the Taito F3 system.
 Like Metal Black the palette space is doubled, and the first half used
 for sprites only so the second half can be devoted to tilemaps.
 
-The main cpu is a 68000.
+The main CPU is a 68000.
 
 There is a slave Z80 which interfaces with a YM2610B for sound.
 Commands are written to it by the 68000 (as in the Taito F2 games).
@@ -179,10 +179,10 @@ u16 slapshot_state::service_input_r(offs_t offset)
 
 void slapshot_state::coin_control_w(u8 data)
 {
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 
 /*****************************************************
@@ -202,8 +202,8 @@ void slapshot_state::slapshot_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x500000, 0x50ffff).ram(); /* main RAM */
-	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
-	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
+	map(0x600000, 0x60ffff).ram().share(m_spriteram);   /* sprite ram */
+	map(0x700000, 0x701fff).ram().share(m_spriteext);   /* debugging */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));    /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -219,8 +219,8 @@ void slapshot_state::opwolf3_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x500000, 0x50ffff).ram(); /* main RAM */
-	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
-	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
+	map(0x600000, 0x60ffff).ram().share(m_spriteram);   /* sprite ram */
+	map(0x700000, 0x701fff).ram().share(m_spriteext);   /* debugging */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));    /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -240,7 +240,7 @@ void slapshot_state::opwolf3_map(address_map &map)
 void slapshot_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0x4000, 0x7fff).bankr(m_z80bank);
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
@@ -378,8 +378,8 @@ static const gfx_layout layout_6bpp_hi =
 };
 
 static GFXDECODE_START( gfx_slapshot )
-	GFXDECODE_ENTRY( "sprites",    0x0, gfx_16x16x4_packed_lsb, 0, 256 ) // low 4bpp of 6bpp sprites
-	GFXDECODE_ENTRY( "sprites_hi", 0x0, layout_6bpp_hi,         0, 256 ) // hi 2bpp of 6bpp sprites
+	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0, 256 ) // low 4bpp of 6bpp sprites
+	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_hi,         0, 256 ) // hi 2bpp of 6bpp sprites
 GFXDECODE_END
 
 
@@ -407,7 +407,7 @@ void slapshot_state::slapshot(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
 	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
@@ -415,7 +415,7 @@ void slapshot_state::slapshot(machine_config &config)
 	m_tc0640fio->read_7_callback().set_ioport("JOY");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -427,31 +427,30 @@ void slapshot_state::slapshot(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	TC0140SYT(config, m_tc0140syt);
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 void slapshot_state::opwolf3(machine_config &config)
@@ -473,7 +472,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	adc.in_callback<2>().set_ioport("GUN2X");
 	adc.in_callback<3>().set_ioport("GUN2Y");
 
-	TC0640FIO(config, m_tc0640fio, 0);
+	TC0640FIO(config, m_tc0640fio);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
 	m_tc0640fio->read_2_callback().set_ioport("BUTTONS");
 	m_tc0640fio->read_3_callback().set_ioport("SYSTEM");
@@ -481,7 +480,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	m_tc0640fio->read_7_callback().set_ioport("JOY");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -493,31 +492,30 @@ void slapshot_state::opwolf3(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_slapshot);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 8192);
 
-	TC0480SCP(config, m_tc0480scp, 0);
+	TC0480SCP(config, m_tc0480scp);
 	m_tc0480scp->set_palette(m_palette);
 	m_tc0480scp->set_offsets(30 + 3, 9);
 	m_tc0480scp->set_offsets_tx(-1, -1);
 	m_tc0480scp->set_offsets_flip(0, 2);
 	m_tc0480scp->set_col_base(4096);
 
-	TC0360PRI(config, m_tc0360pri, 0);
+	TC0360PRI(config, m_tc0360pri);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 
-	MK48T08(config, "mk48t08", 0);
+	MK48T08(config, "mk48t08");
 
-	TC0140SYT(config, m_tc0140syt, 0);
-	m_tc0140syt->set_master_tag(m_maincpu);
-	m_tc0140syt->set_slave_tag("audiocpu");
+	TC0140SYT(config, m_tc0140syt);
+	m_tc0140syt->nmi_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	m_tc0140syt->reset_callback().set_inputline("audiocpu", INPUT_LINE_RESET);
 }
 
 
@@ -616,6 +614,14 @@ ROM_START( opwolf3 )
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d74-08",    0x000, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-09.8",  0x200, 0x117, CRC(f1bf65c3) SHA1(c42f8f115cef9e5bbc608177b26d52c92e65c653) ) // PALCE16V8Q-15PC4
+	ROM_LOAD( "d74-10.40", 0x400, 0x157, CRC(c9ce583a) SHA1(372ba0f04c66e713c25eadb5029fb48a86e0bd52) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-11",    0x600, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-12.1",  0x800, 0x157, CRC(6965e38a) SHA1(9df15de347b7960cfdddb15dbd936df8e139f437) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-13.2",  0xa00, 0x157, CRC(c52df77c) SHA1(7acc4e24d2841191800f63bb96a568d8aa0d874e) ) // PALCE20V8Q-15PC4
 ROM_END
 
 ROM_START( opwolf3u )
@@ -643,6 +649,14 @@ ROM_START( opwolf3u )
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d74-08",    0x000, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-09.8",  0x200, 0x117, CRC(f1bf65c3) SHA1(c42f8f115cef9e5bbc608177b26d52c92e65c653) ) // PALCE16V8Q-15PC4
+	ROM_LOAD( "d74-10.40", 0x400, 0x157, CRC(c9ce583a) SHA1(372ba0f04c66e713c25eadb5029fb48a86e0bd52) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-11",    0x600, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-12.1",  0x800, 0x157, CRC(6965e38a) SHA1(9df15de347b7960cfdddb15dbd936df8e139f437) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-13.2",  0xa00, 0x157, CRC(c52df77c) SHA1(7acc4e24d2841191800f63bb96a568d8aa0d874e) ) // PALCE20V8Q-15PC4
 ROM_END
 
 ROM_START( opwolf3j )
@@ -670,6 +684,14 @@ ROM_START( opwolf3j )
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
+
+	ROM_REGION( 0xc00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "d74-08",    0x000, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-09.8",  0x200, 0x117, CRC(f1bf65c3) SHA1(c42f8f115cef9e5bbc608177b26d52c92e65c653) ) // PALCE16V8Q-15PC4
+	ROM_LOAD( "d74-10.40", 0x400, 0x157, CRC(c9ce583a) SHA1(372ba0f04c66e713c25eadb5029fb48a86e0bd52) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-11",    0x600, 0x117, NO_DUMP ) // type unknown
+	ROM_LOAD( "d74-12.1",  0x800, 0x157, CRC(6965e38a) SHA1(9df15de347b7960cfdddb15dbd936df8e139f437) ) // PALCE20V8Q-15PC4
+	ROM_LOAD( "d74-13.2",  0xa00, 0x157, CRC(c52df77c) SHA1(7acc4e24d2841191800f63bb96a568d8aa0d874e) ) // PALCE20V8Q-15PC4
 ROM_END
 
 
@@ -711,8 +733,8 @@ void slapshot_state::driver_init()
 	m_gfxdecode->set_gfx(1, nullptr);
 }
 
-GAME( 1994, slapshot,  0,        slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito Corporation Japan",   "Slap Shot (Ver 3.0 O)",    MACHINE_SUPPORTS_SAVE ) // 7/1  12:00  Ver 3.0 O
-GAME( 1994, slapshotj, slapshot, slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito Corporation",         "Slap Shot (Ver 2.2 J)",    MACHINE_SUPPORTS_SAVE ) // 6/8  12:00  Ver 2.2 J
-GAME( 1994, opwolf3,   0,        opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3j,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito Corporation",         "Operation Wolf 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot,  0,        slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito",         "Slap Shot (Ver 3.0 O)",    MACHINE_SUPPORTS_SAVE ) // 7/1  12:00  Ver 3.0 O
+GAME( 1994, slapshotj, slapshot, slapshot, slapshot, slapshot_state, driver_init, ROT0, "Taito",         "Slap Shot (Ver 2.2 J)",    MACHINE_SUPPORTS_SAVE ) // 6/8  12:00  Ver 2.2 J
+GAME( 1994, opwolf3,   0,        opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito",         "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito America", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3j,  opwolf3,  opwolf3,  opwolf3,  slapshot_state, driver_init, ROT0, "Taito",         "Operation Wolf 3 (Japan)", MACHINE_SUPPORTS_SAVE )

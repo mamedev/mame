@@ -5,6 +5,12 @@
     Toshiba T6963C Dot Matrix LCD Controller
     Sharp LM24014H Dot Matrix LCD Unit
 
+    TODO:
+    - cursor
+    - screen peek
+    - screen copy
+    - auto read mode
+
 **********************************************************************/
 
 #include "emu.h"
@@ -51,6 +57,7 @@ t6963c_device::t6963c_device(const machine_config &mconfig, const char *tag, dev
 	, m_font_size(6)
 	, m_number_cols(40)
 	, m_number_lines(8)
+	, m_read_data(0)
 {
 }
 
@@ -89,6 +96,7 @@ void t6963c_device::device_start()
 	save_item(NAME(m_font_size));
 	save_item(NAME(m_number_cols));
 	save_item(NAME(m_number_lines));
+	save_item(NAME(m_read_data));
 }
 
 
@@ -117,7 +125,7 @@ void t6963c_device::device_reset()
 
 u8 t6963c_device::read(offs_t offset)
 {
-	return BIT(offset, 0) ? 0x2b : 0x00;
+	return BIT(offset, 0) ? 0x2b : m_read_data;
 }
 
 
@@ -219,7 +227,7 @@ void t6963c_device::do_command(u8 cmd)
 		if (cmd == 0x90)
 			LOG("%s: Display off\n", machine().describe_context());
 		else
-			LOG("%s: Text %s, graphic %s, cursor %s, blink %s\n",
+			LOG("%s: Graphic %s, text %s, cursor %s, blink %s\n",
 				machine().describe_context(),
 				BIT(cmd, 3) ? "on" : "off",
 				BIT(cmd, 2) ? "on" : "off",
@@ -251,6 +259,8 @@ void t6963c_device::do_command(u8 cmd)
 					: (cmd & 0x0e) == 0x02 ? "decrement"
 					: (cmd & 0x0e) == 0x04 ? "nonvariable"
 					: "invalid");
+
+			m_read_data = m_display_ram->read_byte(m_adp);
 		}
 		else
 		{
@@ -327,7 +337,7 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(0, cliprect);
 
 	// Text layer
-	if (BIT(m_display_mode, 3))
+	if (BIT(m_display_mode, 2))
 	{
 		offs = m_text_home;
 		for(int y=0; y<m_number_lines; y++)
@@ -354,7 +364,7 @@ uint32_t t6963c_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			}
 	}
 	// Graphic layer
-	if (BIT(m_display_mode, 2))
+	if (BIT(m_display_mode, 3))
 	{
 		offs = m_graphic_home;
 		for(int y=0; y<m_number_lines*8; y++)
@@ -442,7 +452,7 @@ void lm24014h_device::device_add_mconfig(machine_config &config)
 	T6963C(config, m_lcdc, 0); // XTAL is unknown
 	m_lcdc->set_addrmap(0, &lm24014h_device::ram_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(240, 64);

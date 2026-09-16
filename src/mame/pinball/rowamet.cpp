@@ -29,6 +29,7 @@ ToDO:
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "rowamet.lh"
@@ -46,21 +47,23 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void rowamet(machine_config &config);
+	void rowamet(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	u8 sound_r();
 	void mute_w(u8 data);
 	u8 io_r(offs_t offset);
 	void io_w(offs_t offset, u8 data);
-	void main_mem_map(address_map &map);
-	void audio_mem_map(address_map &map);
-	void audio_io_map(address_map &map);
+	void main_mem_map(address_map &map) ATTR_COLD;
+	void audio_mem_map(address_map &map) ATTR_COLD;
+	void audio_io_map(address_map &map) ATTR_COLD;
 
 	u8 m_sndcmd = 0xffU;
 	u8 m_io[32]{};
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	output_finder<32> m_digits;
@@ -266,9 +269,6 @@ void rowamet_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_sndcmd));
 }
 
@@ -326,4 +326,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, empty_init, ROT0, "Rowamet", "Heavy Metal", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(198?, heavymtl, 0, rowamet, rowamet, rowamet_state, empty_init, ROT0, "Rowamet", "Heavy Metal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

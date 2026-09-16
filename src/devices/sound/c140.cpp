@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-c140.cpp
+
+Namco C140
 
 Simulator based on AMUSE sources.
 The C140 sound chip is used by Namco System 2 and System 21
@@ -10,44 +11,45 @@ This chip controls 24 channels (C140) or 16 (219) of PCM.
 16 bytes are associated with each channel.
 Channels can be 8 bit compressed PCM, or 12 bit signed PCM.
 
+2000.06.26: CAB fixed compressed pcm playback
+2002.07.20: R. Belmont added support for multiple banking types
+2006.01.08: R. Belmont added support for NA-1/2 "219" derivative
+2020.05.06: cam900 implemented some features from QuattroPlay sources, by superctr
+
 TODO:
 - What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
 - Acknowledge A9 bit (9th address bit) of host interface
 - Verify data bus bits of C219
 - Verify C219 LFSR algorithm (same as c352.cpp?)
-- Verify unknown mode bits (0x40 for C140, 0x02 for C219)
+- Verify unknown mode bits (eg. Final Lap & Winning Run games)
+- Verify status register (see keyon_status_read)
 
 --------------
 
-    ASIC "219" notes
+ASIC "219" notes
 
-    On the 219 ASIC used on NA-1 and NA-2, the high registers have the following
-    meaning instead:
-    0x1f7: bank for voices 0-3
-    0x1f1: bank for voices 4-7
-    0x1f3: bank for voices 8-11
-    0x1f5: bank for voices 12-15
+On the 219 ASIC used on NA-1 and NA-2, the high registers have the following
+meaning instead:
+0x1f7: bank for voices 0-3
+0x1f1: bank for voices 4-7
+0x1f3: bank for voices 8-11
+0x1f5: bank for voices 12-15
 
-    Some games (bkrtmaq, xday2) write to 0x1fd for voices 12-15 instead.  Probably the bank registers
-    mirror at 1f8, in which case 1ff is also 0-3, 1f9 is also 4-7, 1fb is also 8-11, and 1fd is also 12-15.
+Some games (bkrtmaq, xday2) write to 0x1fd for voices 12-15 instead.  Probably the bank registers
+mirror at 1f8, in which case 1ff is also 0-3, 1f9 is also 4-7, 1fb is also 8-11, and 1fd is also 12-15.
 
-    Each bank is 0x20000 (128k), and the voice addresses on the 219 are all multiplied by 2.
-    Additionally, the 219's base pitch is the same as the C352's (42667).  But these changes
-    are IMO not sufficient to make this a separate file - all the other registers are
-    fully compatible.
+Each bank is 0x20000 (128k), and the voice addresses on the 219 are all multiplied by 2.
+Additionally, the 219's base pitch is the same as the C352's (42667).  But these changes
+are IMO not sufficient to make this a separate file - all the other registers are
+fully compatible.
 
-    Finally, the 219 only has 16 voices.
+Finally, the 219 only has 16 voices.
+
 */
-/*
-    2000.06.26  CAB     fixed compressed pcm playback
-    2002.07.20  R. Belmont   added support for multiple banking types
-    2006.01.08  R. Belmont   added support for NA-1/2 "219" derivative
-    2020.05.06  cam900       Implement some features from QuattroPlay sources, by superctr
-*/
-
 
 #include "emu.h"
 #include "c140.h"
+
 #include <algorithm>
 
 struct voice_registers
@@ -166,6 +168,7 @@ void c140_device::device_start()
 void c219_device::device_start()
 {
 	c140_device::device_start();
+
 	// generate mulaw table (Verified from Wii Virtual Console Arcade Knuckle Heads)
 	// same as c352.cpp
 	int j = 0;
@@ -213,15 +216,12 @@ void c140_device::rom_bank_pre_change()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void c140_device::sound_stream_update(sound_stream &stream)
 {
-	s32   dt;
+	float pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
+	s16 *lmix, *rmix;
 
-	float  pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
-
-	s16   *lmix, *rmix;
-
-	int samples = outputs[0].samples();
+	int samples = stream.samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
@@ -298,7 +298,7 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 				}
 
 				/* Caclulate the sample value */
-				dt = ((dltdt * offset) >> 16) + prevdt;
+				s32 dt = ((dltdt * offset) >> 16) + prevdt;
 
 				/* Write the data to the sample buffers */
 				*lmix++ += (dt * lvol) >> (5 + 4);
@@ -318,25 +318,20 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	lmix = m_mixer_buffer_left.get();
 	rmix = m_mixer_buffer_right.get();
 	{
-		auto &dest1 = outputs[0];
-		auto &dest2 = outputs[1];
 		for (int i = 0; i < samples; i++)
 		{
-			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
-			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
+			stream.put_int_clamp(0, i, *lmix++, 32768 / 8);
+			stream.put_int_clamp(1, i, *rmix++, 32768 / 8);
 		}
 	}
 }
 
-void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void c219_device::sound_stream_update(sound_stream &stream)
 {
-	s32   dt;
+	float pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
+	s16 *lmix, *rmix;
 
-	float  pbase = (float)m_baserate * 2.0f / (float)m_sample_rate;
-
-	s16   *lmix, *rmix;
-
-	int samples = outputs[0].samples();
+	int samples = stream.samples();
 	if (samples > m_sample_rate) samples = m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
@@ -432,7 +427,7 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 				}
 
 				/* Caclulate the sample value */
-				dt = ((dltdt * offset) >> 16) + prevdt;
+				s32 dt = ((dltdt * offset) >> 16) + prevdt;
 
 				/* Write the data to the sample buffers */
 				*lmix++ += ((ch_inv_lout(v)) ? -(dt * lvol) : (dt * lvol)) >> (5 + shift);
@@ -452,12 +447,10 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	lmix = m_mixer_buffer_left.get();
 	rmix = m_mixer_buffer_right.get();
 	{
-		auto &dest1 = outputs[0];
-		auto &dest2 = outputs[1];
 		for (int i = 0; i < samples; i++)
 		{
-			dest1.put_int_clamp(i, *lmix++, 32768 / 8);
-			dest2.put_int_clamp(i, *rmix++, 32768 / 8);
+			stream.put_int_clamp(0, i, *lmix++, 32768 / 8);
+			stream.put_int_clamp(1, i, *rmix++, 32768 / 8);
 		}
 	}
 }
@@ -467,9 +460,11 @@ inline u8 c140_device::keyon_status_read(u16 offset)
 	m_stream->update();
 	C140_VOICE const &v = m_voi[offset >> 4];
 
-	// suzuka 8 hours and final lap games read from here, expecting bit 6 to be an in-progress sample flag.
-	// four trax also expects bit 4 high for some specific channels to make engine noises to work properly
-	// (sounds kinda bogus when player crashes in an object and jump spin, needs real HW verification)
+	// Suzuka 8 Hours and Final Lap games read from here, expecting bit 6 to be
+	// an in-progress sample flag. Simply returning the register value, even after
+	// clearing the highest 2 bits after keyoff won't work.
+	// Four Trax also expects bit 4 high for some specific channels (the loop flag),
+	// so assume that part of register 0x5 is still returned as normal.
 	return (v.key ? 0x40 : 0x00) | (m_REG[offset] & 0x3f);
 }
 
@@ -477,11 +472,19 @@ inline u8 c140_device::keyon_status_read(u16 offset)
 u8 c140_device::c140_r(offs_t offset)
 {
 	offset &= 0x1ff;
+	u8 data = m_REG[offset];
 
 	if ((offset & 0xf) == 0x5 && offset < 0x180)
-		return keyon_status_read(offset);
+	{
+		data = keyon_status_read(offset);
+	}
+	else if (offset == 0x1f8)
+	{
+		// timer reload value = written reg data + 1
+		data++;
+	}
 
-	return m_REG[offset];
+	return data;
 }
 
 
@@ -499,7 +502,7 @@ void c140_device::c140_w(offs_t offset, u8 data)
 
 		if ((offset & 0xf) == 0x5)
 		{
-			if (data & 0x80)
+			if (data & 0x80 || (data & 0x40 && v->key))
 			{
 				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset & 0x1f0];
 				v->key = 1;
@@ -511,12 +514,9 @@ void c140_device::c140_w(offs_t offset, u8 data)
 				v->bank = vreg->bank;
 				v->mode = data;
 
-				const u32 loop = (vreg->loop_msb << 8) + vreg->loop_lsb;
-				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
-				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
-				v->sample_loop = loop;
-				v->sample_start = start;
-				v->sample_end = end;
+				v->sample_loop = (vreg->loop_msb << 8) | vreg->loop_lsb;
+				v->sample_start = (vreg->start_msb << 8) | vreg->start_lsb;
+				v->sample_end = (vreg->end_msb << 8) | vreg->end_lsb;
 			}
 			else
 			{
@@ -524,29 +524,39 @@ void c140_device::c140_w(offs_t offset, u8 data)
 			}
 		}
 	}
-	else if (offset == 0x1fa)
-	{
-		m_int1_callback(CLEAR_LINE);
 
-		// timing not verified
-		unsigned div = m_REG[0x1f8] != 0 ? m_REG[0x1f8] : 256;
-		attotime interval = attotime::from_ticks(div * 2, m_baserate);
-		if (BIT(m_REG[0x1fe], 0))
-			m_int1_timer->adjust(interval);
-	}
-	else if (offset == 0x1fe)
+	else switch (offset)
 	{
-		if (BIT(data, 0))
-		{
-			// kyukaidk and marvlandj want the first interrupt to happen immediately
-			if (!m_int1_timer->enabled())
-				m_int1_callback(ASSERT_LINE);
-		}
-		else
-		{
+		// timer reload value
+		case 0x1f8:
+			break;
+
+		// set INT1 timer
+		case 0x1fa:
 			m_int1_callback(CLEAR_LINE);
-			m_int1_timer->enable(false);
-		}
+
+			if (BIT(m_REG[0x1fe], 0))
+				m_int1_timer->adjust(attotime::from_ticks((m_REG[0x1f8] + 1) * 2, m_baserate));
+
+			break;
+
+		// enable INT1 timer
+		case 0x1fe:
+			if (BIT(data, 0))
+			{
+				// kyukaidk and marvlandj want the first interrupt to happen immediately
+				if (m_int1_timer->expire().is_never())
+					m_int1_callback(ASSERT_LINE);
+			}
+			else
+			{
+				m_int1_callback(CLEAR_LINE);
+				m_int1_timer->adjust(attotime::never);
+			}
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -555,12 +565,16 @@ u8 c219_device::c219_r(offs_t offset)
 {
 	offset &= 0x1ff;
 
-	// assume same as c140
 	// TODO: what happens here on reading unmapped voice regs?
-	if ((offset & 0xf) == 0x5 && offset < 0x100)
-		return keyon_status_read(offset);
+	u8 data = m_REG[offset];
 
-	return m_REG[offset];
+	if ((offset & 0xf) == 0x5 && offset < 0x100)
+	{
+		// assume same as c140
+		data = keyon_status_read(offset);
+	}
+
+	return data;
 }
 
 
@@ -596,13 +610,10 @@ void c219_device::c219_w(offs_t offset, u8 data)
 				v->bank = vreg->bank;
 				v->mode = data;
 
-				const u32 loop = (vreg->loop_msb << 8) + vreg->loop_lsb;
-				const u32 start = (vreg->start_msb << 8) + vreg->start_lsb;
-				const u32 end = (vreg->end_msb << 8) + vreg->end_lsb;
 				// on the 219 asic, addresses are in words
-				v->sample_loop = loop << 1;
-				v->sample_start = start << 1;
-				v->sample_end = end << 1;
+				v->sample_loop = ((vreg->loop_msb << 8) | vreg->loop_lsb) << 1;
+				v->sample_start = ((vreg->start_msb << 8) | vreg->start_lsb) << 1;
+				v->sample_end = ((vreg->end_msb << 8) | vreg->end_lsb) << 1;
 
 				#if 0
 				logerror("219: play v %d mode %02x start %x loop %x end %x\n",
@@ -643,7 +654,7 @@ void c140_device::init_voice(C140_VOICE *v)
 
 
 /*
-   find_sample: compute the actual address of a sample given it's
+   find_sample: compute the actual address of a sample given its
    address and banking registers, as well as the chip type.
  */
 int c140_device::find_sample(int adrs, int bank, int voice)

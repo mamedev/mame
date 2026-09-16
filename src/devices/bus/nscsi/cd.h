@@ -6,7 +6,7 @@
 #pragma once
 
 #include "imagedev/cdromimg.h"
-#include "machine/nscsi_bus.h"
+#include "machine/nscsi_hle.h"
 #include "sound/cdda.h"
 
 #include "cdrom.h"
@@ -35,18 +35,30 @@ protected:
 		this->compliance = compliance;
 	}
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 
-	void return_no_cd();
+	virtual void return_no_cd();
 	static int to_msf(int frame);
 
+	void update_directory();
+
+	bool m_removal_prevented;
+
 private:
+	struct toolbox_directory_entry
+	{
+		std::string name;
+		osd::directory::entry::entry_type type;
+		uint64_t size;
+	};
+
 	static constexpr uint32_t bytes_per_sector = 2048;
 
 	u32 sequence_counter;
@@ -63,6 +75,24 @@ private:
 	uint8_t compliance;
 
 	uint8_t cdda_sotc;
+
+	uint32_t m_xfer_position;
+	uint16_t m_write_length;
+	uint32_t m_write_offset;
+	bool m_write_is_setup;
+	std::string m_write_path;
+	std::vector<toolbox_directory_entry> m_directory;
+	std::vector<uint8_t> m_xfer_buffer;
+};
+
+class nscsi_cdrom_2x_device : public nscsi_cdrom_device
+{
+public:
+	nscsi_cdrom_2x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual attotime scsi_data_byte_period() override;
+	virtual attotime scsi_data_command_delay() override;
 };
 
 class nscsi_cdrom_sgi_device : public nscsi_cdrom_device
@@ -127,19 +157,32 @@ class nscsi_cdrom_apple_device : public nscsi_cdrom_device
 {
 public:
 	nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 protected:
+	nscsi_cdrom_apple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual void return_no_cd() override;
 
 private:
 	bool m_stopped;
 	uint32_t m_stop_position;
 };
 
+class nscsi_cdrom_apple_ext_device : public nscsi_cdrom_apple_device
+{
+public:
+	nscsi_cdrom_apple_ext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+};
+
 DECLARE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device)
+DECLARE_DEVICE_TYPE(NSCSI_CDROM_2X, nscsi_cdrom_2x_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_SGI, nscsi_cdrom_sgi_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_NEWS, nscsi_cdrom_news_device)
 DECLARE_DEVICE_TYPE(NSCSI_RRD45, nscsi_dec_rrd45_device)
@@ -150,5 +193,6 @@ DECLARE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device)
+DECLARE_DEVICE_TYPE(NSCSI_CDROM_APPLE_EXT, nscsi_cdrom_apple_ext_device)
 
 #endif // MAME_BUS_NSCSI_CD_H

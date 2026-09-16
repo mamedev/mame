@@ -141,26 +141,18 @@
 #if defined(MAME_DELEGATE_FORCE_COMPATIBLE)
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 #elif defined(__GNUC__)
-	// 32bit MINGW asks for different convention
-	#if defined(__MINGW32__) && !defined(__x86_64__) && defined(__i386__)
+	// 32-bit MINGW uses thiscall convention
+	#if defined(__MINGW32__) && defined(__i386__) && !defined(__x86_64__)
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
-		//#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
-		//#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 1
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
 	#else
 		#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_ITANIUM
-		#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#endif
 #elif defined(_MSC_VER) && (defined(_M_X64) || defined(_M_ARM64))
-	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_MSVC
 #else
 	#define MAME_DELEGATE_USE_TYPE MAME_DELEGATE_TYPE_COMPATIBLE
-#endif
-
-#if MAME_DELEGATE_USE_TYPE == MAME_DELEGATE_TYPE_COMPATIBLE
-	#define MAME_DELEGATE_DIFFERENT_MEMBER_ABI 0
 #endif
 
 
@@ -604,14 +596,14 @@ using delegate_mfp_conventional_return = std::bool_constant<
 		std::is_scalar_v<ReturnType> ||
 		std::is_reference_v<ReturnType> >;
 
-template <typename ReturnType, typename Enable = void>
+template <typename ReturnType>
 struct delegate_mfp;
 
-template <typename ReturnType>
-struct delegate_mfp<ReturnType, std::enable_if_t<delegate_mfp_conventional_return<ReturnType>::value> > { using type = delegate_mfp_msvc; };
+template <typename ReturnType> requires delegate_mfp_conventional_return<ReturnType>::value
+struct delegate_mfp<ReturnType> { using type = delegate_mfp_msvc; };
 
-template <typename ReturnType>
-struct delegate_mfp<ReturnType, std::enable_if_t<!delegate_mfp_conventional_return<ReturnType>::value> > { using type = delegate_mfp_compatible; };
+template <typename ReturnType> requires (!delegate_mfp_conventional_return<ReturnType>::value)
+struct delegate_mfp<ReturnType> { using type = delegate_mfp_compatible; };
 
 #endif
 
@@ -678,7 +670,6 @@ public:
 	// define our traits
 	template <class FunctionClass> using traits = delegate_traits<FunctionClass, ReturnType, Params...>;
 	using generic_static_func = typename traits<delegate_generic_class>::static_func_type;
-	typedef MAME_ABI_CXX_MEMBER_CALL generic_static_func generic_member_func;
 
 	// generic constructor
 	delegate_base() noexcept = default;
@@ -759,10 +750,7 @@ public:
 	// call the function
 	ReturnType operator()(Params... args) const
 	{
-		if ((MAME_DELEGATE_DIFFERENT_MEMBER_ABI) && is_mfp())
-			return (*reinterpret_cast<generic_member_func>(m_function))(m_object, std::forward<Params>(args)...);
-		else
-			return (*m_function)(m_object, std::forward<Params>(args)...);
+		return (*m_function)(m_object, std::forward<Params>(args)...);
 	}
 
 	// getters
@@ -925,7 +913,7 @@ public:
 	template <class FunctionClass> delegate(static_ref_func_type<FunctionClass> funcptr, FunctionClass *object) : basetype(funcptr, object) { }
 
 	template <typename T>
-	explicit delegate(T &&functoid, std::enable_if_t<suitable_functoid<T>::value, int> = 0)
+	explicit delegate(T &&functoid) requires (suitable_functoid<T>::value)
 		: basetype()
 		, m_functoid(std::forward<T>(functoid))
 		, m_set_functoid(make_functoid_setter<T>())

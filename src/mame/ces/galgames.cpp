@@ -20,6 +20,9 @@ To Do:
 
 Notes:
 
+- v1.71 program ROMs were preproduction ROMs and there are known issue with memory management. Using v1.71 with StarPak carts
+  will produce freezing and possible stability issues.
+
 - 4 known game carts where produced, these are:
 
     Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Magic Black Jack,
@@ -28,12 +31,14 @@ Notes:
     Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
     Star Pak 4: Berzerk, Neon Nightmare, Battle Checkers, Orbit, Deep Sea Shadow, Star Tiger & Orbit Freefall
 
-- Allegedly there is a hard lock that SP1 and the PAC-MAN games (on SP2) cannot play together. Was a licensing issue with Namco.
+- There is a hard lock that SP1 and the PAC-MAN games (on SP2) cannot play together. Was a licensing issue with Namco.
   The system checks for cartridges on power up by querying the PIC parts. If the system sees SP1 & SP2 it disables SP2.
 
 - Early flyers show "Star Pak 1" titled as Cardmania!
 - Early flyers show "Star Pak 2" titled as Galaxy Games Volume 2
 - There is an early flyer showing a Cardmania! cartridge in front of a partialy blocked cartridge labeled Casino
+   According to a developer: "The casino cart was just a concept. We did a version that was in a small standup cabinet and
+   put it on test in bars as potential grey area gaming device with some of the card games but it never went anywhere"
 
 ***************************************************************************/
 
@@ -113,8 +118,8 @@ protected:
 			u32 clock);
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	bool is_selected();
 
@@ -154,7 +159,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_BIOS_CART, galgames_bios_cart_device, "galgames_bios_cart", "Galaxy Games BIOS Cartridge")
@@ -180,7 +185,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK2_CART, galgames_starpak2_cart_device, "starpak2_cart", "Galaxy Games StarPak 2 Cartridge")
@@ -210,7 +215,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DEFINE_DEVICE_TYPE(GALGAMES_STARPAK3_CART, galgames_starpak3_cart_device, "starpak3_cart", "Galaxy Games StarPak 3 Cartridge")
@@ -238,9 +243,9 @@ class galgames_slot_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void slot_map(address_map &map);
+	void slot_map(address_map &map) ATTR_COLD;
 
 	u16 read(offs_t offset, u16 mem_mask = ~0)               { return m_space->read_word(offset * 2, mem_mask); }
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0)   { m_space->write_word(offset * 2, data, mem_mask); }
@@ -272,8 +277,8 @@ public:
 protected:
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_space_config;
@@ -351,7 +356,7 @@ void galgames_cart_device::set_pic_reset_line(int state)
 
 //  logerror("reset line = %x\n", state);
 
-	if (!m_pic->input_state(INPUT_LINE_RESET) && state)
+	if (!m_pic->input_line_state(INPUT_LINE_RESET) && state)
 		pic_comm_reset();
 
 	m_pic->set_input_line(INPUT_LINE_RESET, state);
@@ -742,6 +747,27 @@ public:
 		m_okiram(*this, "okiram")
 	{ }
 
+	void galgames_base(machine_config &config) ATTR_COLD;
+	void galgbase(machine_config &config) ATTR_COLD;
+	void galgame2(machine_config &config) ATTR_COLD;
+	void galgame3(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<cesblit_device> m_blitter;
+	required_device<okim6295_device> m_oki;
+	required_device<galgames_slot_device> m_slot;
+	required_shared_ptr<u8> m_okiram;
+
+	u8 m_palette_offset = 0;
+	u8 m_palette_index = 0;
+	u8 m_palette_data[3]{};
+
 	void blitter_irq_callback(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
@@ -756,28 +782,9 @@ public:
 	u16 fpga_status_r();
 	void outputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void galgames_base(machine_config &config);
-	void galgbios(machine_config &config);
-	void galgame2(machine_config &config);
-	void galgame3(machine_config &config);
-	void blitter_map(address_map &map);
-	void galgames_map(address_map &map);
-	void oki_map(address_map &map);
-
-protected:
-	virtual void video_start() override;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<cesblit_device> m_blitter;
-	required_device<okim6295_device> m_oki;
-	required_device<galgames_slot_device> m_slot;
-	required_shared_ptr<u8> m_okiram;
-
-	u8 m_palette_offset = 0;
-	u8 m_palette_index = 0;
-	u8 m_palette_data[3]{};
+	void blitter_map(address_map &map) ATTR_COLD;
+	void galgames_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 void galgames_state::blitter_irq_callback(int state)
@@ -1001,11 +1008,11 @@ void galgames_state::galgames_base(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(galgames_state::scanline_interrupt), "screen", 0, 1);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	GALGAMES_SLOT(config, m_slot, 0);
+	GALGAMES_SLOT(config, m_slot);
 	GALGAMES_BIOS_CART(config, "cart0", 0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(400, 256);
@@ -1027,7 +1034,7 @@ void galgames_state::galgames_base(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void galgames_state::galgbios(machine_config &config)
+void galgames_state::galgbase(machine_config &config)
 {
 	galgames_base(config);
 	GALGAMES_CART(config, "cart1", 1);
@@ -1079,9 +1086,11 @@ Board silkscreened  237-0211-00
 
 Cartridge based mother board
 Holds up to 4 cartridges
-Chips labeled
+Most recent chips labeled
     GALAXY U1 V1.90 12/1/98
     GALAXY U2 V1.90 12/1/98
+
+NOTE: PCB labels the program ROMs as CARTRIDGE0
 
 Motorola MC68HC000FN12
 24 MHz oscillator
@@ -1101,28 +1110,32 @@ Copyright notice in rom states: Creative Electronics & Software Written by Keith
 
 ***************************************************************************/
 
-#define ROM_LOAD16_BYTE_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
+#define ROM_LOAD16_BYTE_BIOS( bios, name, offset, length, hash ) \
+	ROMX_LOAD( name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios) )
 
 #define GALGAMES_BIOS_ROMS \
-	ROM_SYSTEM_BIOS(0, "1.90",   "v1.90 12/01/98") \
-	ROM_LOAD16_BYTE_BIOS(0, "galaxy_u2__v1.90_12-01-98.u2", 0x000000, 0x100000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083)) \
-	ROM_LOAD16_BYTE_BIOS(0, "galaxy_u1__v1.90_12-01-98.u1", 0x000001, 0x100000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760)) \
+	ROM_SYSTEM_BIOS( 0, "1.90",   "v1.90 12/01/98" ) \
+	ROM_LOAD16_BYTE_BIOS( 0, "galaxy_u2__v1.90_12-01-98.u2", 0x000000, 0x100000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083) ) \
+	ROM_LOAD16_BYTE_BIOS( 0, "galaxy_u1__v1.90_12-01-98.u1", 0x000001, 0x100000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760) ) \
 	\
-	ROM_SYSTEM_BIOS(1, "1.80",   "v1.80 10/05/98") \
-	ROM_LOAD16_BYTE_BIOS(1, "galaxy_u2__v1.80_10-15-98.u2", 0x000000, 0x100000, CRC(73cff284) SHA1(e6f7d92999cdb478c21c3b65a04eade84299ac12)) \
-	ROM_LOAD16_BYTE_BIOS(1, "galaxy_u1__v1.80_10-15-98.u1", 0x000001, 0x100000, CRC(e3ae423c) SHA1(66d1964845a99a5ed4b19b4135b55cde6b5fe295))
+	ROM_SYSTEM_BIOS( 1, "1.80",   "v1.80 10/05/98" ) \
+	ROM_LOAD16_BYTE_BIOS( 1, "galaxy_u2__v1.80_10-15-98.u2", 0x000000, 0x100000, CRC(73cff284) SHA1(e6f7d92999cdb478c21c3b65a04eade84299ac12) ) \
+	ROM_LOAD16_BYTE_BIOS( 1, "galaxy_u1__v1.80_10-15-98.u1", 0x000001, 0x100000, CRC(e3ae423c) SHA1(66d1964845a99a5ed4b19b4135b55cde6b5fe295) ) \
+	\
+	ROM_SYSTEM_BIOS( 2, "1.71",   "v1.71 07/08/98" ) \
+	ROM_LOAD16_BYTE_BIOS( 2, "galaxy_u2__v1.71_7-8-98.u2", 0x000000, 0x100000, CRC(d1c3dbb3) SHA1(ebe74ed7f2d8c4abcd6743b9d9c77cc347efc444) ) \
+	ROM_LOAD16_BYTE_BIOS( 2, "galaxy_u1__v1.71_7-8-98.u1", 0x000001, 0x100000, CRC(604415c8) SHA1(6c67c3be1aca03d009b6244e3bd911caaa2ca666) )
 
 #define GALGAMES_MB_PALS \
-	ROM_REGION(0xa00, "pals", 0) \
-	ROM_LOAD("16v8h-blue.u24",    0x000, 0x117, NO_DUMP) \
-	ROM_LOAD("16v8h-yellow.u25",  0x200, 0x117, NO_DUMP) \
-	ROM_LOAD("16v8h-magenta.u26", 0x400, 0x117, NO_DUMP) \
-	ROM_LOAD("16v8h-green.u27",   0x600, 0x117, NO_DUMP) \
-	ROM_LOAD("16v8h-red.u45",     0x800, 0x117, NO_DUMP)
+	ROM_REGION( 0xa00, "pals", 0 ) \
+	ROM_LOAD( "16v8h-blue.u24",    0x000, 0x117, NO_DUMP) \
+	ROM_LOAD( "16v8h-yellow.u25",  0x200, 0x117, NO_DUMP) \
+	ROM_LOAD( "16v8h-magenta.u26", 0x400, 0x117, NO_DUMP) \
+	ROM_LOAD( "16v8h-green.u27",   0x600, 0x117, NO_DUMP) \
+	ROM_LOAD( "16v8h-red.u45",     0x800, 0x117, NO_DUMP)
 
-ROM_START(galgbios)
-	ROM_REGION16_BE(0x200000, "cart0", 0)
+ROM_START( galgames )
+	ROM_REGION16_BE( 0x200000, "cart0", 0 )
 	GALGAMES_BIOS_ROMS
 
 	ROM_REGION(0x200000, "cart1", ROMREGION_ERASEFF)
@@ -1137,7 +1150,9 @@ ROM_END
 
 Galaxy Games StarPak 2
 
-NAMCO 307 Cartridge, has surface mount Flash chips in it:
+Cartridge with 7 games, including Namco licensed Pac-Man & Ms. Pac-Man.
+
+AKA NAMCO 307 Cartridge
 
 .U1 AM29F800BB
 .U2 AM29F800BB
@@ -1150,20 +1165,20 @@ Board silkscreened  237-0209-00
 
 ***************************************************************************/
 
-ROM_START(galgame2)
-	ROM_REGION16_BE(0x200000, "cart0", 0)
+ROM_START( galgame2 )
+	ROM_REGION16_BE( 0x200000, "cart0", 0 )
 	GALGAMES_BIOS_ROMS
 
-	ROM_REGION(0x200000, "cart1", 0)
-	ROM_LOAD16_BYTE("am29f800bb.u2", 0x000000, 0x100000, CRC(f43c0c54) SHA1(4a13946c3d173b0e4ab25b01849574fa3302b417))
-	ROM_LOAD16_BYTE("am29f800bb.u1", 0x000001, 0x100000, CRC(b8c34a8b) SHA1(40d3b35f573d2bd2ae1c7d876c55fc436864fa3f))
+	ROM_REGION( 0x200000, "cart1", 0 )
+	ROM_LOAD16_BYTE( "am29f800bb.u2", 0x000000, 0x100000, CRC(f43c0c54) SHA1(4a13946c3d173b0e4ab25b01849574fa3302b417) ) // MAY 29, 1998
+	ROM_LOAD16_BYTE( "am29f800bb.u1", 0x000001, 0x100000, CRC(b8c34a8b) SHA1(40d3b35f573d2bd2ae1c7d876c55fc436864fa3f) ) // ""
 
-	ROM_REGION(0x2000, "cart1:pic", 0)
-	ROM_LOAD("pic12c508.u4", 0x0000, 0x2000, CRC(bb253913) SHA1(eace069344da6dda7c05673e422876d130ed5d48))  // includes config word at fff, hence size is 2*1000
+	ROM_REGION( 0x2000, "cart1:pic", 0 )
+	ROM_LOAD( "pic12c508.u4", 0x0000, 0x2000, CRC(bb253913) SHA1(eace069344da6dda7c05673e422876d130ed5d48) )  // includes config word at fff, hence size is 2*1000
 
-	ROM_REGION(0x200000, "cart2", ROMREGION_ERASEFF)
-	ROM_REGION(0x200000, "cart3", ROMREGION_ERASEFF)
-	ROM_REGION(0x200000, "cart4", ROMREGION_ERASEFF)
+	ROM_REGION( 0x200000, "cart2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart4", ROMREGION_ERASEFF )
 
 	GALGAMES_MB_PALS
 ROM_END
@@ -1185,20 +1200,20 @@ Board silkscreened  237-0228-00
 
 ***************************************************************************/
 
-ROM_START(galgame3)
-	ROM_REGION16_BE(0x200000, "cart0", 0)
+ROM_START( galgame3 )
+	ROM_REGION16_BE( 0x200000, "cart0", 0 )
 	GALGAMES_BIOS_ROMS
 
-	ROM_REGION(0x800000, "cart1", 0)
-	ROM_LOAD16_BYTE("am29f032b.u2", 0x000000, 0x400000, CRC(a4ffc70a) SHA1(328c6ceef025af7ff5b7998df59a10d90c654d53))
-	ROM_LOAD16_BYTE("am29f032b.u1", 0x000001, 0x400000, CRC(b0876751) SHA1(487f052989e4b2df2df2293b283e8e03ffc3ddf4))
+	ROM_REGION( 0x800000, "cart1", 0 )
+	ROM_LOAD16_BYTE( "am29f032b.u2", 0x000000, 0x400000, CRC(a4ffc70a) SHA1(328c6ceef025af7ff5b7998df59a10d90c654d53) )
+	ROM_LOAD16_BYTE( "am29f032b.u1", 0x000001, 0x400000, CRC(b0876751) SHA1(487f052989e4b2df2df2293b283e8e03ffc3ddf4) )
 
-	ROM_REGION(0x800, "cart1:pic", 0)
-	ROM_LOAD("pic16c56.u6", 0x000, 0x800, CRC(cf901ed8) SHA1(ebb2da0f50ba82a038f315aab7e6b20b9a1af3a1))
+	ROM_REGION( 0x800, "cart1:pic", 0 )
+	ROM_LOAD( "pic16c56.u6", 0x000, 0x800, CRC(cf901ed8) SHA1(ebb2da0f50ba82a038f315aab7e6b20b9a1af3a1) )
 
-	ROM_REGION(0x200000, "cart2", ROMREGION_ERASEFF)
-	ROM_REGION(0x200000, "cart3", ROMREGION_ERASEFF)
-	ROM_REGION(0x200000, "cart4", ROMREGION_ERASEFF)
+	ROM_REGION( 0x200000, "cart2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart4", ROMREGION_ERASEFF )
 
 	GALGAMES_MB_PALS
 ROM_END
@@ -1206,30 +1221,76 @@ ROM_END
 /***************************************************************************
 
 Galaxy Games StarPak 4
-(Cartridge not dumped, but files from a dev board provided by the developer)
+
+Cartridge with 7 games, including Berzerk.
+
+.U1 AM29F032B
+.U2 AM29F032B
+.U5 93AA76/SN
+.U6 PIC 16C56-XT/P
+.L1 Led
+
+Board silkscreened  237-0228-00
+                    REV.-B
+
+NOTE: Unlike previous cartridges, there is no licensing information shown for
+      Berzerk as was done for Pac-Man / Ms. Pac-Man in StarPak 2 and Centipede
+      in StarPak 3
 
 ***************************************************************************/
 
-ROM_START(galgame4)
-	ROM_REGION16_BE(0x200000, "cart0", 0)
+ROM_START( galgame4 )
+	ROM_REGION16_BE( 0x200000, "cart0", 0 )
 	GALGAMES_BIOS_ROMS
 
-	ROM_REGION(0x800000, "cart1", 0)
-	ROM_LOAD16_BYTE("sp4.u2",  0x000000, 0x100000, CRC(e51bc5e1) SHA1(dacf6cefd792713b34382b827952b66e2cb5c2b4)) // JANUARY 12, 1998
-	ROM_LOAD16_BYTE("sp4.u1",  0x000001, 0x100000, CRC(695ab775) SHA1(e88d5f982df19e70be6124e6fdf20830475641e0)) // ""
-	ROM_LOAD16_BYTE("sp4.u6",  0x200000, 0x100000, CRC(7716895d) SHA1(8f86ffe2d94d3e756a3b7661d480e3a8c53cf178))
-	ROM_LOAD16_BYTE("sp4.u5",  0x200001, 0x100000, CRC(6c699ba3) SHA1(f675997e1b808758f79a21b883161526242990b4))
-	ROM_LOAD16_BYTE("sp4.u8",  0x400000, 0x100000, CRC(cdf45446) SHA1(da4e1667c7c47239e770018a7d3b8c1e4e2f4a63))
-	ROM_LOAD16_BYTE("sp4.u7",  0x400001, 0x100000, CRC(813c46c8) SHA1(3fd4192ec7e8d5e6bfbc2a37d9b4bbebe6132b99))
-	ROM_LOAD16_BYTE("sp4.u10", 0x600000, 0x100000, CRC(52dbf088) SHA1(da7c37366e884f40f1dea243d4aea0b2d2b314db))
-	ROM_LOAD16_BYTE("sp4.u9",  0x600001, 0x100000, CRC(9ded1dc2) SHA1(5319edfccf47d02dfd3664cb3782cc2281c769c4))
+	ROM_REGION( 0x800000, "cart1", 0 )
+	ROM_LOAD16_BYTE( "am29f032b.u2", 0x000000, 0x400000, CRC(60f14d02) SHA1(581511898338246476ac8359a7427ffed26e233e) ) // JANUARY 12, 1998
+	ROM_LOAD16_BYTE( "am29f032b.u1", 0x000001, 0x400000, CRC(9dc6c588) SHA1(a242de749a563cb26fce6901f202d5fc4ae1beb0) ) // ""
 
-	ROM_REGION(0x2000, "cart1:pic", 0)
-	ROM_LOAD("sp4.pic", 0x000, 0x2000, CRC(008ef1ba) SHA1(4065fcf00922de3e629084f4f4815355f271c954))
+	ROM_REGION( 0x2000, "cart1:pic", 0 )
+	ROM_LOAD( "pic16c56.u6", 0x000, 0x2000, CRC(ea994ab7) SHA1(4d59355f11e86f43e6a553140fb89aebbd8981a6) ) // unprotected
 
-	ROM_REGION(0x200000, "cart2", ROMREGION_ERASEFF)
-	ROM_REGION(0x200000, "cart3", ROMREGION_ERASEFF)
-	ROM_REGION(0x200000, "cart4", ROMREGION_ERASEFF)
+	ROM_REGION( 0x200000, "cart2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart4", ROMREGION_ERASEFF )
+
+	GALGAMES_MB_PALS
+ROM_END
+
+/***************************************************************************
+
+Galaxy Games StarPak 4 (prototype)
+
+Files from a dev board provided by the developer.
+
+NOTE: The graphics tiles are misaligned for the games Star Tiger and Battle
+      Checkers for this prototype set. This isn't an issue with the release
+      version above.
+
+NOTE: PIC images are NOT interchangable between release and prototype sets.
+
+***************************************************************************/
+
+ROM_START( galgame4p )
+	ROM_REGION16_BE( 0x200000, "cart0", 0 )
+	GALGAMES_BIOS_ROMS
+
+	ROM_REGION( 0x800000, "cart1", 0 )
+	ROM_LOAD16_BYTE( "sp4.u2",  0x000000, 0x100000, CRC(e51bc5e1) SHA1(dacf6cefd792713b34382b827952b66e2cb5c2b4) ) // JANUARY 12, 1998
+	ROM_LOAD16_BYTE( "sp4.u1",  0x000001, 0x100000, CRC(695ab775) SHA1(e88d5f982df19e70be6124e6fdf20830475641e0) ) // ""
+	ROM_LOAD16_BYTE( "sp4.u6",  0x200000, 0x100000, CRC(7716895d) SHA1(8f86ffe2d94d3e756a3b7661d480e3a8c53cf178) )
+	ROM_LOAD16_BYTE( "sp4.u5",  0x200001, 0x100000, CRC(6c699ba3) SHA1(f675997e1b808758f79a21b883161526242990b4) )
+	ROM_LOAD16_BYTE( "sp4.u8",  0x400000, 0x100000, CRC(cdf45446) SHA1(da4e1667c7c47239e770018a7d3b8c1e4e2f4a63) )
+	ROM_LOAD16_BYTE( "sp4.u7",  0x400001, 0x100000, CRC(813c46c8) SHA1(3fd4192ec7e8d5e6bfbc2a37d9b4bbebe6132b99) )
+	ROM_LOAD16_BYTE( "sp4.u10", 0x600000, 0x100000, CRC(52dbf088) SHA1(da7c37366e884f40f1dea243d4aea0b2d2b314db) )
+	ROM_LOAD16_BYTE( "sp4.u9",  0x600001, 0x100000, CRC(9ded1dc2) SHA1(5319edfccf47d02dfd3664cb3782cc2281c769c4) )
+
+	ROM_REGION( 0x2000, "cart1:pic", 0 )
+	ROM_LOAD( "sp4.pic", 0x000, 0x2000, CRC(008ef1ba) SHA1(4065fcf00922de3e629084f4f4815355f271c954) )
+
+	ROM_REGION( 0x200000, "cart2", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "cart4", ROMREGION_ERASEFF )
 
 	GALGAMES_MB_PALS
 ROM_END
@@ -1237,7 +1298,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT)
-GAME(1998, galgame2, galgbios, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0)
-GAME(1998, galgame3, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0)
-GAME(1998, galgame4, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS)
+GAME(1998, galgames,  0,        galgbase, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games",                                 MACHINE_IS_BIOS_ROOT)
+GAME(1998, galgame2,  galgames, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games + StarPak 2 cartridge",           0)
+GAME(1998, galgame3,  galgames, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games + StarPak 3 cartridge",           0)
+GAME(1998, galgame4,  galgames, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games + StarPak 4 cartridge",           0)
+GAME(1998, galgame4p, galgame4, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games + prototype StarPak 4 cartridge", MACHINE_IMPERFECT_GRAPHICS)

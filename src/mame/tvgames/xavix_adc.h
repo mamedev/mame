@@ -7,7 +7,7 @@
 class xavix_adc_device : public device_t
 {
 public:
-	xavix_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	xavix_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto read_0_callback() { return m_in0_cb.bind(); }
 	auto read_1_callback() { return m_in1_cb.bind(); }
@@ -25,8 +25,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	devcb_read8 m_in0_cb;

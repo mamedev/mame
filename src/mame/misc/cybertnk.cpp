@@ -209,7 +209,7 @@ public:
 	void cybertnk(machine_config &config);
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -223,7 +223,7 @@ private:
 	required_shared_ptr_array<uint16_t, 3> m_scroll;
 	required_shared_ptr<uint16_t> m_roadram;
 
-	required_memory_region m_spr_gfx;
+	required_region_ptr<uint32_t> m_spr_gfx;
 	required_ioport m_traverse_io;
 	required_ioport m_elevate_io;
 	required_ioport m_accel_io;
@@ -246,9 +246,9 @@ private:
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void master_mem(address_map &map);
-	void slave_mem(address_map &map);
-	void sound_mem(address_map &map);
+	void master_mem(address_map &map) ATTR_COLD;
+	void slave_mem(address_map &map) ATTR_COLD;
+	void sound_mem(address_map &map) ATTR_COLD;
 };
 
 /* tile format
@@ -315,7 +315,6 @@ void cybertnk_state::draw_road(screen_device &screen, bitmap_ind16 &bitmap, cons
 // check if these are similar / the same as weclemans
 void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
-	const uint32_t *sprrom = (uint32_t*)m_spr_gfx->base();
 	const pen_t *paldata = m_palette->pens();
 
 	int miny = cliprect.min_y;
@@ -400,9 +399,7 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 				for(int xi=start;xi != end;xi+=inc)
 				{ // start x loop
-					uint32_t color;
-
-					color = sprrom[spr_offs+xi/8];
+					uint32_t color = m_spr_gfx[spr_offs+xi/8];
 
 					uint16_t dot;
 					int x_dec; //helpers
@@ -840,7 +837,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(32*8, 32*8);
@@ -848,7 +845,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	lscreen.set_screen_update(FUNC(cybertnk_state::screen_update_cybertnk_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(32*8, 32*8);
@@ -860,16 +857,15 @@ void cybertnk_state::cybertnk(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
 	// Split output per chip
-	Y8950(config, "ym1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	Y8950(config, "ym1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
-	Y8950(config, "ym2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	Y8950(config, "ym2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 /***************************************************************************
@@ -916,8 +912,8 @@ ROM_START( cybertnk )
 	ROM_LOAD( "s07", 0x20000, 0x10000, CRC(70220567) SHA1(44b48ded8581a6d78b27a3af833f62413ff31c76) )
 	ROM_LOAD( "s08", 0x30000, 0x10000, CRC(988c4fcb) SHA1(68d32be70605ad5415f2b6aeabbd92e269f0c9af) )
 
-	/* TODO: fix the rom loading accordingly*/
-	ROM_REGION( 0x200000, "spr_gfx", 0 )
+	/* TODO: fix the ROM loading accordingly*/
+	ROM_REGION32_LE( 0x200000, "spr_gfx", 0 )
 	ROM_LOAD32_BYTE( "c01.93" , 0x180001, 0x20000, CRC(b5ee3de2) SHA1(77b9a2818f36826891e510e8550f1025bacfa496) )
 	ROM_LOAD32_BYTE( "c02.92" , 0x180000, 0x20000, CRC(1f857d79) SHA1(f410d50970c10814b80baab27cbe69965bf0ccc0) )
 	ROM_LOAD32_BYTE( "c03.91" , 0x180003, 0x20000, CRC(d70a93e2) SHA1(e64bb10c58b27def4882f3006784be56de11b812) )
@@ -965,15 +961,13 @@ ROM_END
 
 void cybertnk_state::init_cybertnk()
 {
-	uint32_t *spr = (uint32_t*)m_spr_gfx->base();
 	for (int x = 0; x< 0x200000/4;x++)
 	{
 		// reorder the data to simplify sprite drawing
 		// we draw 8 pixels at a time, each each nibble contains a pixel, however the original order of 32-bits (8 pixels)
 		// is along the lines of 04 15 26 37 which is awkward to use
-		spr[x] = bitswap<32>(spr[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
+		m_spr_gfx[x] = bitswap<32>(m_spr_gfx[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
 	}
-
 }
 
 } // anonymous namespace

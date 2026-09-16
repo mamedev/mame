@@ -11,7 +11,7 @@
 class cheekyms_audio_device : public device_t
 {
 public:
-	cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cheekyms_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void mute_w(int state);         // 15
 	void cheese_w(int state);       // 13
@@ -24,8 +24,8 @@ public:
 	void coin_extra_w(int state);   // 16
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	required_device<netlist_mame_logic_input_device>    m_mute;

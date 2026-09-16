@@ -43,10 +43,10 @@ public:
 	required_device<ay8913_device> m_ay2;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
 	u8 p2_r() { return m_rx_state<<3; };
@@ -56,7 +56,7 @@ private:
 
 	void c000_w(u8 data) { m_c000_latch = data; };
 
-	void m6803_mem(address_map &map);
+	void m6803_mem(address_map &map) ATTR_COLD;
 	int m_rx_state;
 	u8 m_c000_latch;
 };
@@ -78,12 +78,11 @@ void mockingboard_d_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_p1_cb().set(FUNC(mockingboard_d_device::p1_w));
 	m_cpu->out_ser_tx_cb().set(FUNC(mockingboard_d_device::ser_tx_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	AY8913(config, m_ay1, 1022727);
-	m_ay1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 	AY8913(config, m_ay2, 1022727);
-	m_ay2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 }
 
 const tiny_rom_entry *mockingboard_d_device::device_rom_region() const

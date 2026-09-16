@@ -32,7 +32,7 @@ public:
 	void clk_w(int state);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	enum : uint8_t {

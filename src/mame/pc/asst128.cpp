@@ -2,13 +2,13 @@
 // copyright-holders:Sergey Svishchev
 
 #include "emu.h"
-#include "machine/genpc.h"
 
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
+#include "machine/genpc.h"
 #include "machine/pc_fdc.h"
 
 #include "formats/asst128_dsk.h"
@@ -24,14 +24,14 @@ public:
 		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, tag, owner, clock)
 	{ }
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 };
 
 void asst128_mb_device::map(address_map &map)
 {
-	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0020, 0x002f).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x006f).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0080, 0x008f).w(FUNC(asst128_mb_device::pc_page_w));
 	map(0x00a0, 0x00a1).w(FUNC(asst128_mb_device::nmi_enable_w));
 }
@@ -60,9 +60,9 @@ private:
 	static void asst128_formats(format_registration &fr);
 	void asst128_fdc_dor_w(uint8_t data);
 
-	void machine_start() override;
-	void asst128_io(address_map &map);
-	void asst128_map(address_map &map);
+	void machine_start() override ATTR_COLD;
+	void asst128_io(address_map &map) ATTR_COLD;
+	void asst128_map(address_map &map) ATTR_COLD;
 };
 
 void asst128_state::machine_start()
@@ -133,7 +133,7 @@ void asst128_state::asst128(machine_config &config)
 	kbd.out_clock_cb().set("mb", FUNC(asst128_mb_device::keyboard_clock_w));
 	kbd.out_data_cb().set("mb", FUNC(asst128_mb_device::keyboard_data_w));
 
-	PC_FDC_XT(config, m_fdc, 0);
+	PC_FDC_XT(config, m_fdc);
 	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", asst128_floppies, "525ssqd", asst128_state::asst128_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", asst128_floppies, "525ssqd", asst128_state::asst128_formats);

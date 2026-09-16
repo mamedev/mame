@@ -19,8 +19,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-#include "utf8.h"
-
 #include "tx81z.lh"
 
 
@@ -39,17 +37,17 @@ public:
 	void tx81z(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void palette_init(palette_device &palette);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 
 	u8 p2_r();
 	void midi_rx_r(int state) { m_rx_data = state; }
-	void midiclock_w(int state) { if (state) m_maincpu->m6801_clock_serial(); }
+	void midiclock_w(int state) { if (state) m_maincpu->clock_serial(); }
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_ioport m_port2;
@@ -78,9 +76,6 @@ void ymtx81z_state::machine_start()
 
 void ymtx81z_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
-	map(0x001b, 0x001b).noprw();
-	map(0x0040, 0x00ff).ram(); // internal RAM
 	map(0x2000, 0x2001).mirror(0x1ffe).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x4000, 0x4001).mirror(0x1ffe).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x6000, 0x7fff).ram().share("nvram");
@@ -102,8 +97,8 @@ static INPUT_PORTS_START(tx81z)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // actually MIDI In data
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Cursor")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_VOLUME_UP) PORT_NAME("Master Volume " UTF8_RIGHT)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_VOLUME_DOWN) PORT_NAME("Master Volume " UTF8_LEFT)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_VOLUME_UP) PORT_NAME(u8"Master Volume \u2192") // →
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_VOLUME_DOWN) PORT_NAME(u8"Master Volume \u2190") // ←
 
 	PORT_START("P5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED) // actually INT1 from YM2414
@@ -112,8 +107,8 @@ static INPUT_PORTS_START(tx81z)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Data Entry Inc")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Data Entry Dec")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Voice Parameter " UTF8_RIGHT)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Voice Parameter " UTF8_LEFT)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME(u8"Voice Parameter \u2192") // →
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME(u8"Voice Parameter \u2190") // ←
 
 	PORT_START("P6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Play/Perform")
@@ -146,7 +141,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
 	m_maincpu->out_ser_tx_cb().set(mdout, FUNC(midi_port_device::write_txd));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -158,17 +153,16 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	config.set_default_layout(layout_tx81z);
 
-	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
+	hd44780_device &lcdc(HD44780(config, "lcdc", 270'000)); // TODO: clock not measured, datasheet typical clock used
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(ymtx81z_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2414_device &ymsnd(YM2414(config, "ymsnd", 7.15909_MHz_XTAL / 2));
-	ymsnd.irq_handler().set_inputline(m_maincpu, HD6301_IRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	ymsnd.irq_handler().set_inputline(m_maincpu, HD6301_IRQ1_LINE);
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START(tx81z)
@@ -192,4 +186,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IMPERFECT_SOUND)

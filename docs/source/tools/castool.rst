@@ -9,7 +9,7 @@ Castool is part of the MAME project. It shares large portions of code with MAME,
 
 
 Using Castool
-=============
+-------------
 
 Castool is a command line program that contains a simple set of instructions. Commands are invoked in a manner along the lines of this:
 
@@ -30,7 +30,7 @@ Example usage:
 
 
 Castool Formats
-===============
+---------------
 
 These are the formats supported by Castool for conversion to .WAV files.
 

@@ -490,7 +490,7 @@ void argus_state::argus(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(54);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* This value is referred to psychic5 driver */
 	m_screen->set_size(32*16, 32*16);
@@ -500,7 +500,7 @@ void argus_state::argus(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_argus);
 	PALETTE(config, m_palette).set_entries(896);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -529,7 +529,7 @@ void valtric_state::valtric(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(54);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* This value is referred to psychic5 driver */
 	m_screen->set_size(32*16, 32*16);
@@ -539,7 +539,7 @@ void valtric_state::valtric(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_valtric);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -574,7 +574,7 @@ void butasan_state::butasan(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(54);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* This value is taken from psychic5 driver */
 	m_screen->set_size(32*16, 32*16);
@@ -584,7 +584,7 @@ void butasan_state::butasan(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_butasan);
 	PALETTE(config, m_palette).set_entries(768);
 
-	JALECO_BLEND(config, m_blend, 0);
+	JALECO_BLEND(config, m_blend);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

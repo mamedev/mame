@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cd90_015.h"
+#include "formats/sap_dsk.h"
 #include "formats/thom_dsk.h"
 
 DEFINE_DEVICE_TYPE(CD90_015, cd90_015_device, "cd90_015", "Thomson CD 90-015 floppy drive controller")
@@ -61,13 +62,13 @@ ud90_070_device::ud90_070_device(const machine_config &mconfig, const char *tag,
 
 void ud90_070_device::setup_characteristics()
 {
-	form_factor = floppy_image::FF_525;
-	tracks = 40;
-	sides = 1;
-	has_trk00_sensor = false;
+	m_form_factor = floppy_image::FF_525;
+	m_tracks = 40;
+	m_sides = 1;
+	m_has_trk00_sensor = false;
 	set_rpm(300);
 
-	variants.push_back(floppy_image::SSSD);
+	m_variants.push_back(floppy_image::SSSD);
 }
 
 void cd90_015_device::floppy_drives(device_slot_interface &device)
@@ -78,6 +79,7 @@ void cd90_015_device::floppy_drives(device_slot_interface &device)
 void cd90_015_device::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_THOMSON_525_FORMAT);
+	fr.add(FLOPPY_SAP_FORMAT);
 }
 
 void cd90_015_device::device_add_mconfig(machine_config &config)

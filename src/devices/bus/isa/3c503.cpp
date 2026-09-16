@@ -9,7 +9,7 @@
 
 void el2_3c503_device::device_add_mconfig(machine_config &config)
 {
-	DP8390D(config, m_dp8390, 0);
+	DP8390D(config, m_dp8390);
 	m_dp8390->irq_callback().set(FUNC(el2_3c503_device::el2_3c503_irq_w));
 	m_dp8390->mem_read_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_read));
 	m_dp8390->mem_write_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_write));
@@ -53,7 +53,7 @@ void el2_3c503_device::device_start() {
 }
 
 void el2_3c503_device::device_reset() {
-	memcpy(m_prom, m_dp8390->get_mac(), 6);
+	memcpy(m_prom, &m_dp8390->get_mac()[0], 6);
 	memset(&m_regs, 0, sizeof(m_regs));
 	m_regs.bcfr = 0x80; // port 0x300
 	m_regs.pcfr = 0x20; // address 0xcc000

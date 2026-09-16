@@ -53,7 +53,7 @@ class z80scc_channel : public device_t,
 	friend class z80scc_device;
 
 public:
-	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	z80scc_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// device_serial_interface implementation
 	virtual void tra_callback() override;
@@ -229,10 +229,11 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	unsigned int get_brg_rate();
+	unsigned int get_rtxc_rate();
 	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
@@ -248,6 +249,7 @@ protected:
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
 	void check_dma_request();
+	void check_receive_interrupt();
 
 	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;
@@ -385,9 +387,9 @@ protected:
 	z80scc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
 
 	// device_t implementation
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_state() override;
@@ -461,49 +463,49 @@ protected:
 class scc8030_device : public z80scc_device
 {
 public:
-	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc80c30_device : public z80scc_device
 {
 public:
-	scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc80c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc80230_device : public z80scc_device
 {
 public:
-	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc80230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc8530_device : public z80scc_device
 {
 public:
-	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc85c30_device : public z80scc_device
 {
 public:
-	scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc85c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc85230_device : public z80scc_device
 {
 public:
-	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc85230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc85233_device : public z80scc_device
 {
 public:
-	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc85233_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class scc8523l_device : public z80scc_device
 {
 public:
-	scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8523l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 // device type definition
@@ -511,7 +513,7 @@ DECLARE_DEVICE_TYPE(Z80SCC_CHANNEL, z80scc_channel)
 DECLARE_DEVICE_TYPE(SCC8030,        scc8030_device)
 DECLARE_DEVICE_TYPE(SCC80C30,       scc80c30_device)
 DECLARE_DEVICE_TYPE(SCC80230,       scc80230_device)
-DECLARE_DEVICE_TYPE(SCC8530N,       scc8530_device) // remove trailing N when 8530scc.c is fully replaced and removed
+DECLARE_DEVICE_TYPE(SCC8530,        scc8530_device)
 DECLARE_DEVICE_TYPE(SCC85C30,       scc85c30_device)
 DECLARE_DEVICE_TYPE(SCC85230,       scc85230_device)
 DECLARE_DEVICE_TYPE(SCC85233,       scc85233_device)

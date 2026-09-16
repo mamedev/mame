@@ -69,8 +69,8 @@ public:
 	void tv950(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void via_a_w(uint8_t data);
@@ -83,7 +83,7 @@ private:
 	void row_addr_w(uint8_t data);
 	void via_crtc_reset_w(int state);
 
-	void tv950_mem(address_map &map);
+	void tv950_mem(address_map &map) ATTR_COLD;
 
 	uint8_t m_via_row = 0;
 	uint8_t m_attr_row = 0;
@@ -292,7 +292,7 @@ void tv950_state::tv950(machine_config &config)
 	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	mainirq.output_handler().append(m_via, FUNC(via6522_device::write_pa6)).invert();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250);   // not real values
 	screen.set_screen_update("crtc", FUNC(r6545_1_device::screen_update));
 

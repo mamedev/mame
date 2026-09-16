@@ -9,13 +9,13 @@
 class sis950_smbus_device : public device_t {
 public:
 
-	sis950_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis950_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	u8 smb_sts_r();

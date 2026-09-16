@@ -14,7 +14,7 @@ offs_t upd78k2_disassembler::dasm_01xx(std::ostream &stream, u8 op2, offs_t pc, 
 	if (op2 == 0x05)
 	{
 		u8 op3 = opcodes.r8(pc + 2);
-		if ((op3 & 0xed) == 0x89)
+		if ((op3 & 0xed) == 0x8c)
 		{
 			util::stream_format(stream, "%-8s&[%s]", BIT(op3, 4) ? "ROL4" : "ROR4", BIT(op3, 1) ? "HL" : "DE");
 			return 3 | SUPPORTED;
@@ -127,7 +127,7 @@ offs_t upd78k2_disassembler::dasm_05xx(std::ostream &stream, u8 op2, offs_t pc, 
 		util::stream_format(stream, "%-8s%s", BIT(op2, 4) ? "CALL" : "BR", s_rp_names[(op2 & 0x06) >> 1]);
 		return 2 | (BIT(op2, 4) ? STEP_OVER : 0) | SUPPORTED;
 	}
-	else if ((op2 & 0xed) == 0x89)
+	else if ((op2 & 0xed) == 0x8c)
 	{
 		util::stream_format(stream, "%-8s[%s]", BIT(op2, 4) ? "ROL4" : "ROR4", BIT(op2, 1) ? "HL" : "DE");
 		return 2 | SUPPORTED;

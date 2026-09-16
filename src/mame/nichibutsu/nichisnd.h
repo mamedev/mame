@@ -11,10 +11,6 @@
 
 #pragma once
 
-#include "cpu/z80/tmpz84c011.h"
-#include "sound/dac.h"
-#include "sound/ymopl.h"
-#include "speaker.h"
 #include "machine/gen_latch.h"
 
 
@@ -24,24 +20,23 @@
 
 // ======================> nichisnd_device
 
-class nichisnd_device : public device_t
+class nichisnd_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
-	nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// I/O operations
 	void sound_host_command_w(uint8_t data);
 
-	void nichisnd_io_map(address_map &map);
-	void nichisnd_map(address_map &map);
+	void nichisnd_io_map(address_map &map) ATTR_COLD;
+	void nichisnd_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
-	//virtual void device_validity_check(validity_checker &valid) const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -52,15 +47,7 @@ private:
 	void soundbank_w(uint8_t data);
 };
 
-
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NICHISND, nichisnd_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 
 #endif // MAME_NICHIBUTSU_NICHISND_H

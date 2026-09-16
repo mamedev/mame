@@ -24,13 +24,13 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 	auto vblank_irq_cb() { return m_vblank_irq_cb.bind(); }
 	auto space_read_cb() { return m_space_read_cb.bind(); }
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint32_t regs_r(offs_t offset, uint32_t mem_mask);
 	void regs_w(offs_t offset, uint32_t data, uint32_t mem_mask);

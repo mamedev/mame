@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SHARED_SEGACDCD_H
-#define MAME_SHARED_SEGACDCD_H
+#ifndef MAME_SHARED_MEGACDCD_H
+#define MAME_SHARED_MEGACDCD_H
 
 #include "imagedev/cdromimg.h"
 #include "machine/timer.h"
@@ -26,7 +26,7 @@ public:
 	template <typename T> void set_68k_tag(T &&tag) { m_68k.set_tag(std::forward<T>(tag)); }
 
 
-	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint16_t get_segacd_irq_mask() const { return segacd_irq_mask; }
 
@@ -150,10 +150,10 @@ protected:
 	void CDD_Resume();
 	void CDD_FF();
 	void CDD_RW();
-	void CDD_Open(void);
-	void CDD_Close(void);
+	void CDD_OpenTray(void);
+	void CDD_CloseTray(void);
 	void CDD_Init(void);
-	void CDD_Default(void);
+	void CDD_Unknown(u8 which);
 	void CDD_Reset(void);
 	void CDC_Reset(void);
 	void lc89510_Reset(void);
@@ -184,13 +184,13 @@ protected:
 	void LC8951UpdateHeader();
 
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( segacd_access_timer_callback );
 };
 
 DECLARE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device)
 
-#endif // MAME_SHARED_SEGACDCD_H
+#endif // MAME_SHARED_MEGACDCD_H

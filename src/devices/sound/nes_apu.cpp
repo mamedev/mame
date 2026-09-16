@@ -296,7 +296,7 @@ void nesapu_device::device_start()
 
 	for (int i = 0; i < 31; i++)
 	{
-		stream_buffer::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
+		sound_stream::sample_t pulse_out = (i == 0) ? 0.0 : 95.88 / ((8128.0 / i) + 100.0);
 		m_square_lut[i] = pulse_out;
 	}
 
@@ -306,7 +306,7 @@ void nesapu_device::device_start()
 		{
 			for (int d = 0; d < 128; d++)
 			{
-				stream_buffer::sample_t tnd_out = (t / 8227.0) + (n / 12241.0) + (d / 22638.0);
+				sound_stream::sample_t tnd_out = (t / 8227.0) + (n / 12241.0) + (d / 22638.0);
 				tnd_out = (tnd_out == 0.0) ? 0.0 : 159.79 / ((1.0 / tnd_out) + 100.0);
 				m_tnd_lut[t][n][d] = tnd_out;
 			}
@@ -3040,7 +3040,7 @@ u8 nesapu_device::status_r()
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
-void nesapu_device::push_out_sample(stream_buffer::sample_t sample)
+void nesapu_device::push_out_sample(sound_stream::sample_t sample)
 {
 	const uint32_t next_w = (m_out_fifo_w + 1) % OUT_FIFO_SIZE;
 
@@ -3054,7 +3054,7 @@ void nesapu_device::push_out_sample(stream_buffer::sample_t sample)
 	m_last_out_sample = sample;
 }
 
-bool nesapu_device::pop_out_sample(stream_buffer::sample_t &sample)
+bool nesapu_device::pop_out_sample(sound_stream::sample_t &sample)
 {
 	if (m_out_fifo_r == m_out_fifo_w) {
 		++m_audio_fifo_underflows;
@@ -3066,7 +3066,7 @@ bool nesapu_device::pop_out_sample(stream_buffer::sample_t &sample)
 	return true;
 }
 
-void nesapu_device::accumulate_output_sample(stream_buffer::sample_t level)
+void nesapu_device::accumulate_output_sample(sound_stream::sample_t level)
 {
 	// Assert that m_resample_step is valid
     assert(m_resample_step > 0); // Ensures resample step is correctly initialized
@@ -3084,14 +3084,14 @@ void nesapu_device::accumulate_output_sample(stream_buffer::sample_t level)
 				: 0;
 		uint64_t slice = (remaining < to_boundary) ? remaining : to_boundary;
 
-		m_output_accum += level * stream_buffer::sample_t(double(slice) / double(ONE));
+		m_output_accum += level * sound_stream::sample_t(double(slice) / double(ONE));
 		m_resample_phase += slice;
 		remaining -= slice;
 
 		if (m_resample_phase >= m_resample_step)
 		{
-			stream_buffer::sample_t sample =
-				m_output_accum / stream_buffer::sample_t(double(m_resample_step) / double(ONE));
+			sound_stream::sample_t sample =
+				m_output_accum / sound_stream::sample_t(double(m_resample_step) / double(ONE));
 
 			sample = apply_analog_filter(sample);
 			push_out_sample(sample);
@@ -3102,7 +3102,7 @@ void nesapu_device::accumulate_output_sample(stream_buffer::sample_t level)
 	}
 }
 
-stream_buffer::sample_t nesapu_device::apply_analog_filter(stream_buffer::sample_t in)
+sound_stream::sample_t nesapu_device::apply_analog_filter(sound_stream::sample_t in)
 {
 	const double sr = double(m_stream->sample_rate());
 
@@ -3112,24 +3112,24 @@ stream_buffer::sample_t nesapu_device::apply_analog_filter(stream_buffer::sample
 	//   1st-order high-pass around 90 Hz
 	//   1st-order high-pass around 440 Hz
 	//   1st-order low-pass around 14 kHz
-	const stream_buffer::sample_t a_hp90 =
-		stream_buffer::sample_t(std::exp(-2.0 * M_PI * 90.0 / sr));
+	const sound_stream::sample_t a_hp90 =
+		sound_stream::sample_t(std::exp(-2.0 * M_PI * 90.0 / sr));
 
-	const stream_buffer::sample_t a_hp440 =
-		stream_buffer::sample_t(std::exp(-2.0 * M_PI * 440.0 / sr));
+	const sound_stream::sample_t a_hp440 =
+		sound_stream::sample_t(std::exp(-2.0 * M_PI * 440.0 / sr));
 
-	const stream_buffer::sample_t a_lp14k =
-		stream_buffer::sample_t(1.0 - std::exp(-2.0 * M_PI * 14000.0 / sr));
+	const sound_stream::sample_t a_lp14k =
+		sound_stream::sample_t(1.0 - std::exp(-2.0 * M_PI * 14000.0 / sr));
 
 	// HPF 90 Hz
-	const stream_buffer::sample_t hp90 =
+	const sound_stream::sample_t hp90 =
 		a_hp90 * (m_hp90_prev_out + in - m_hp90_prev_in);
 
 	m_hp90_prev_in = in;
 	m_hp90_prev_out = hp90;
 
 	// HPF 440 Hz
-	const stream_buffer::sample_t hp440 =
+	const sound_stream::sample_t hp440 =
 		a_hp440 * (m_hp440_prev_out + hp90 - m_hp440_prev_in);
 
 	m_hp440_prev_in = hp90;
@@ -3142,7 +3142,7 @@ stream_buffer::sample_t nesapu_device::apply_analog_filter(stream_buffer::sample
 	return m_lp14k_prev_out;
 }
 
-stream_buffer::sample_t nesapu_device::calc_current_output()
+sound_stream::sample_t nesapu_device::calc_current_output()
 {
 	const int pulse_sum =
 		m_APU.pulse[0].output_level + m_APU.pulse[1].output_level;
@@ -3161,23 +3161,17 @@ stream_buffer::sample_t nesapu_device::calc_current_output()
 		m_tnd_lut[tri_mixer_level][noise_output_level][dmc_counter];
 }
 
-void nesapu_device::sound_stream_update(
-	sound_stream &stream,
-	std::vector<read_stream_view> const &inputs,
-	std::vector<write_stream_view> &outputs)
+void nesapu_device::sound_stream_update(sound_stream &stream)
 {
-	auto &output = outputs[0];
-
-	for (int sampindex = 0; sampindex < output.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		stream_buffer::sample_t sample;
+		sound_stream::sample_t sample;
 
 		if (!pop_out_sample(sample))
 			sample = m_last_out_sample;
 
-		output.put(sampindex, sample);
+		stream.put(0, sampindex, sample);
 	}
 }
-
 
 

@@ -1,7 +1,7 @@
 // ComTry.h
 
-#ifndef __COM_TRY_H
-#define __COM_TRY_H
+#ifndef ZIP7_INC_COM_TRY_H
+#define ZIP7_INC_COM_TRY_H
 
 #include "MyWindows.h"
 // #include "Exception.h"

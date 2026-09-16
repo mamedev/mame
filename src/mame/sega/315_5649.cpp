@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "315_5649.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -52,7 +52,7 @@ sega_315_5649_device::sega_315_5649_device(const machine_config &mconfig, const 
 void sega_315_5649_device::device_start()
 {
 	// register for save states
-	save_pointer(NAME(m_port_value), 7);
+	save_item(NAME(m_port_value));
 	save_item(NAME(m_port_config));
 	save_item(NAME(m_analog_channel));
 	save_item(NAME(m_mode));

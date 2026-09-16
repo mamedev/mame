@@ -40,7 +40,7 @@
  *      nopping bit 0 writes to 0x40081e makes gfxs to draw better!?
  *    - fix Gynotai row scroll glitches;
  *    - fix attract mode garbage for Namco Collection Vol. 2 (either transparent or page banking select registers) (done);
- *    - fix tilemap dirty flags, move tilemap data in own space prolly helps;
+ *    - fix tilemap dirty flags, move tilemap data in own space probably helps;
  *    - DMA from/to ROM;
  *    - color palette accessors presumably accesses an internal RAMDAC with controllable auto-increment, convert to that;
  *    - fix char getting cut off from GAME SELECT msg in NCV2 (done, sprite wraparound for sx & sy);
@@ -138,7 +138,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "YGV608 VDP")
+DEFINE_DEVICE_TYPE(YGV608, ygv608_device, "ygv608", "Yamaha YGV608 PVDC2")
 
 /* text-layer characters */
 
@@ -1199,7 +1199,7 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		source_tilemap->draw(screen, bitmap, cliprect, 0, 0 );
 }
 
-void ygv608_device::ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
+void ygv608_device::draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
 {
 	if (n <= 0)
 	{
@@ -1218,7 +1218,7 @@ void ygv608_device::ygv608_draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cl
 	}
 }
 
-uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ygv608_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef _SHOW_VIDEO_DEBUG
 	char buffer[64];
@@ -1363,7 +1363,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	{
 		draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_B);
 		if(m_mosaic_bplane > 0)
-			ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_bplane);
+			draw_mosaic(m_work_bitmap, finalclip, m_mosaic_bplane);
 
 		if(m_planeB_trans_enable == true)
 			copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -1382,7 +1382,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 
 	draw_layer_roz(screen, m_work_bitmap, finalclip, m_tilemap_A);
 	if(m_mosaic_aplane > 0)
-		ygv608_draw_mosaic(m_work_bitmap, finalclip, m_mosaic_aplane);
+		draw_mosaic(m_work_bitmap, finalclip, m_mosaic_aplane);
 
 	if(m_planeA_trans_enable == true)
 		copybitmap_trans( bitmap, m_work_bitmap, 0, 0, 0, 0, finalclip, 0);
@@ -2295,8 +2295,7 @@ inline uint32_t ygv608_device::roz_convert_raw24(uint32_t *raw_reg, uint8_t offs
 
 	// convert raw to the given register
 	res = *raw_reg & roz_data_mask24;
-	res <<= 7;
-	if( res & 0x08000000 ) res |= 0xf8000000;   // 2s complement
+	res = util::sext(res << 7, 28);
 
 	return res;
 }
@@ -2313,8 +2312,7 @@ inline uint32_t ygv608_device::roz_convert_raw16(uint16_t *raw_reg, uint8_t offs
 
 	// convert raw to the given register
 	res = *raw_reg & roz_data_mask16;
-	res <<= 7;
-	if( res & 0x00080000 ) res |= 0xfff80000;   // 2s complement
+	res = util::sext(res << 7, 20);
 
 	return res;
 }
@@ -2421,7 +2419,7 @@ void ygv608_device::screen_configure()
 
 	// TODO: Dig Dug Original wants this to be 60.60 Hz (like original Namco HW), lets compensate somehow
 	//      (clock is really 6144000 x 8 = 49152000, so it must have same parameters in practice)
-	attoseconds_t period = HZ_TO_ATTOSECONDS(screen().clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
+	attotime period = attotime::from_hz(screen().clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
 
 	screen().configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
 

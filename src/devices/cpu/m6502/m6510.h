@@ -22,8 +22,8 @@ public:
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
 
-	auto read_callback() { return read_port.bind(); }
-	auto write_callback() { return write_port.bind(); }
+	auto read_callback() { return m_read_port.bind(); }
+	auto write_callback() { return m_write_port.bind(); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
@@ -34,7 +34,7 @@ protected:
 
 	class mi_6510 : public memory_interface {
 	public:
-		m6510_device *base;
+		m6510_device *m_base;
 
 		mi_6510(m6510_device *base);
 		virtual ~mi_6510() {}
@@ -44,13 +44,13 @@ protected:
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
-	devcb_read8  read_port;
-	devcb_write8 write_port;
+	devcb_read8  m_read_port;
+	devcb_write8 m_write_port;
 
-	uint8_t pullup, floating, dir, port, drive;
+	uint8_t m_pullup, m_floating, m_dir, m_port, m_drive;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t dir_r();
 	void dir_w(uint8_t data);
@@ -79,11 +79,11 @@ public:
 	m6508_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	class mi_6508 : public memory_interface {
 	public:
-		m6508_device *base;
+		m6508_device *m_base;
 
 		mi_6508(m6508_device *base);
 		virtual ~mi_6508() {}
@@ -93,12 +93,13 @@ protected:
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
-	std::unique_ptr<uint8_t[]> ram_page;
+	std::unique_ptr<uint8_t[]> m_ram_page;
 };
 
 enum {
 	M6510_IRQ_LINE = m6502_device::IRQ_LINE,
-	M6510_NMI_LINE = m6502_device::NMI_LINE
+	M6510_NMI_LINE = m6502_device::NMI_LINE,
+	M6510_RDY_LINE = m6502_device::RDY_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6510, m6510_device)

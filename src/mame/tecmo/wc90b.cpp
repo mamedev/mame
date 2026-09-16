@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+
 /*
 World Cup 90 bootleg driver
 ---------------------------
@@ -128,8 +129,8 @@ public:
 	void init_wc90b();
 
 protected:
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -155,8 +156,8 @@ protected:
 	void bankswitch_w(uint8_t data);
 	void adpcm_int(int state);
 
-	void sound_map(address_map &map);
-	void sub_map(address_map &map);
+	void sound_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
@@ -166,7 +167,7 @@ private:
 	optional_shared_ptr_array<uint8_t, 2> m_scrolly;
 	optional_shared_ptr<uint8_t> m_scroll_x_lo;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_msm5205next;
 	uint8_t m_toggle;
@@ -201,11 +202,9 @@ private:
 	void master_irq_ack_w(uint8_t data);
 	required_shared_ptr<uint8_t> m_bgscroll;
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// video
 
 /***************************************************************************
 
@@ -414,8 +413,6 @@ uint32_t eurogael_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-// machine
-
 void wc90b_state::bankswitch_w(uint8_t data)
 {
 	m_mainbank->set_entry(data >> 3);
@@ -549,7 +546,7 @@ static INPUT_PORTS_START( wc90b )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 7C_1C ) )
@@ -676,7 +673,7 @@ void wc90b_state::wc90b(machine_config &config)
 	// IRQs are triggered by the main CPU
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -722,7 +719,7 @@ void eurogael_state::eurogael(machine_config &config)
 	// IRQs are triggered by the main CPU
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -973,7 +970,7 @@ ROM_START( twcup90bb )
 ROM_END
 
 
-// Modular System is a stack of boards in a cage, there are apparently other games on this 'system' that wouldn't even share any hardware with this apart from the metal cage itself.
+// Modular System is a stack of boards in a cage, there are other games on this 'system'.
 ROM_START( eurogael )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3z-1_fu301.ic17", 0x00000, 0x10000, CRC(74acc161) SHA1(d8660dd6d05164df4a66125c68627e955b35bef3) )  // c000-ffff is not used
@@ -1015,17 +1012,16 @@ ROM_START( eurogael )
 	ROM_REGION( 0x100, "prom", ROMREGION_ERASEFF )
 	ROM_LOAD( "r4_p0502_82s129.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
 
-	ROM_REGION( 0x1000, "plds", ROMREGION_ERASEFF )
-	ROM_LOAD( "r2_p0403_pal16r8a.ic29", 0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
-	ROM_LOAD( "r3_p0403_pal16r8a.ic29", 0x000, 0x104, CRC(d8c6ac25) SHA1(d6184e491313ff8da5b1ce60ffe8ef517716807c) )
-	ROM_LOAD( "r4_p0503_pal16r6.ic46",  0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
-	// these were read protected
-	ROM_LOAD( "3z-1_3138_gal16v8.ic22",    0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "3z-1_3238_gal16v8.ic24",    0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "r1_403_gal16v8.ic29",       0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "system2_9138_gal16v8.ic42", 0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "system2_9238_gal20v8.ic18", 0x0, 0x1, NO_DUMP )
-	ROM_LOAD( "system2_9338_gal16v8.ic10", 0x0, 0x1, NO_DUMP )
+	ROM_REGION( 0x157, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "r2_p0403_pal16r8a.ic29",    0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
+	ROM_LOAD( "r3_p0403_pal16r8a.ic29",    0x000, 0x104, CRC(d8c6ac25) SHA1(d6184e491313ff8da5b1ce60ffe8ef517716807c) )
+	ROM_LOAD( "r4_p0503_pal16r6.ic46",     0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
+	ROM_LOAD( "3z-1_3138_gal16v8.ic22",    0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) ) // Same as Gaelco Goldart ?
+	ROM_LOAD( "3z-1_3238_gal16v8.ic24",    0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) ) // Same as Gaelco Goldart ?
+	ROM_LOAD( "r1_403_gal16v8.ic29",       0x000, 0x117, CRC(c136de93) SHA1(116f6d3b456d20621ab07a005c1421f57569915c) )
+	ROM_LOAD( "system2_9138_gal16v8.ic42", 0x000, 0x117, CRC(bd9ad8c3) SHA1(50e00b0cf7d075f9daed0338bc336a74caa3b66b) )
+	ROM_LOAD( "system2_9238_gal20v8.ic18", 0x000, 0x157, CRC(dd571a59) SHA1(ef2c7b33922dd79513a4fbe6f04a2f2c2c795ada) )
+	ROM_LOAD( "system2_9338_gal16v8.ic10", 0x000, 0x117, CRC(54b4160f) SHA1(0156a2eda97a9d8e0adb3a3795f6ed547c6e06fc) )
 ROM_END
 
 
@@ -1062,4 +1058,3 @@ GAME( 1989, twcup90bb, twcup90, wc90b, wc90b, wc90b_state, init_wc90b, ROT0, "bo
 // not sure if it best fits here, in wc90.cpp, or in a new driver, it shares the weird tile decoding with the bootlegs tho
 // Gaelco requested the registry of the "Euro League" trademark on 1990, and it was a Gaelco protected trademark (in Spain) until 1999 (they paid a 5-year renew in 1994): https://www.patentes-y-marcas.com/marca/euro-league-m1546246
 GAME( 1989, eurogael,  twcup90, eurogael, wc90b, eurogael_state, init_wc90b, ROT0, "bootleg (Gaelco / Ervisa)", "Euro League (Gaelco bootleg, Modular System)", MACHINE_IMPERFECT_SOUND )
-

@@ -3,16 +3,9 @@
 #include "emu.h"
 #include "breakpointswindow.h"
 
-#include "debug/debugcon.h"
-#include "debug/debugcpu.h"
-
 #include "util/xmlfile.h"
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QtGui/QActionGroup>
-#else
-#include <QtWidgets/QActionGroup>
-#endif
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
@@ -73,6 +66,12 @@ BreakpointsWindow::BreakpointsWindow(DebuggerQt &debugger, QWidget *parent) :
 	typeRegister->setActionGroup(typeGroup);
 	typeRegister->setShortcut(QKeySequence("Ctrl+3"));
 
+	QAction *typeException = new QAction("Exceptionpoints", this);
+	typeException->setObjectName("typeexception");
+	typeException->setCheckable(true);
+	typeException->setActionGroup(typeGroup);
+	typeException->setShortcut(QKeySequence("Ctrl+4"));
+
 	typeBreak->setChecked(true);
 	connect(typeGroup, &QActionGroup::triggered, this, &BreakpointsWindow::typeChanged);
 
@@ -119,6 +118,9 @@ void BreakpointsWindow::saveConfigurationToNode(util::xml::data_node &node)
 		case DVT_REGISTER_POINTS:
 			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 2);
 			break;
+		case DVT_EXCEPTION_POINTS:
+			node.set_attribute_int(ATTR_WINDOW_POINTS_TYPE, 3);
+			break;
 		default:
 			break;
 		}
@@ -149,6 +151,11 @@ void BreakpointsWindow::typeChanged(QAction* changedTo)
 	{
 		m_breakpointsView = new DebuggerView(DVT_REGISTER_POINTS, m_machine, this);
 		setWindowTitle("Debug: All Registerpoints");
+	}
+	else if (changedTo->text() == "Exceptionpoints")
+	{
+		m_breakpointsView = new DebuggerView(DVT_EXCEPTION_POINTS, m_machine, this);
+		setWindowTitle("Debug: All Exceptionpoints");
 	}
 
 	// Re-register

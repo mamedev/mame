@@ -24,11 +24,11 @@ public:
 	virtual void do_exec_partial() override;
 
 protected:
-	address_space *io;
-	address_space_config io_config;
+	address_space *m_io;
+	address_space_config m_io_config;
 
 	virtual space_config_vector memory_space_config() const override;
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 #define O(o) void o ## _full(); void o ## _partial()
 

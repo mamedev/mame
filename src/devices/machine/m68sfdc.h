@@ -19,7 +19,7 @@ INPUT_PORTS_EXTERN(m68sfdc);
 
 class m68sfdc_device : public device_t {
 public:
-	m68sfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m68sfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void write(offs_t reg, uint8_t val);
 	uint8_t read(offs_t reg);
@@ -30,10 +30,10 @@ public:
 	void set_floppies_4(floppy_connector*, floppy_connector*, floppy_connector*, floppy_connector*);
 
 private:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	required_device<pia6821_device> m_pia;
 	required_device<mc6852_device> m_ssda;

@@ -30,7 +30,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_aquarius_cartridge_interface overrides
 	virtual uint8_t mreq_ce_r(offs_t offset) override;

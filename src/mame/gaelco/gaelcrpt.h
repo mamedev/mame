@@ -20,8 +20,8 @@ public:
 	uint16_t gaelco_decrypt(cpu_device &cpu, int offset, int data);
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	int decrypt(int const enc_prev_word, int const dec_prev_word, int const enc_word);

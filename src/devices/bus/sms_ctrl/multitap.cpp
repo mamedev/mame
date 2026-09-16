@@ -39,9 +39,9 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_resolve_objects() override;
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	TIMER_CALLBACK_MEMBER(reset_timeout);
@@ -139,7 +139,7 @@ void sms_multitap_device::out_w(uint8_t data, uint8_t mem_mask)
 void sms_multitap_device::device_add_mconfig(machine_config &config)
 {
 	// TH not connected, no point configuring screen when power isn't passed through
-	for (auto port : m_subctrl_ports)
+	for (auto &port : m_subctrl_ports)
 		SMS_CONTROL_PORT(config, port, sms_control_port_passive_devices, SMS_CTRL_OPTION_JOYPAD);
 }
 

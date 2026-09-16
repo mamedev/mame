@@ -27,7 +27,7 @@
 #include "ra3.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
-#include "cpu/upd7810/upd7811.h"
+#include "cpu/upd7810/upd7810.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "sound/upd933.h"
@@ -76,11 +76,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(power_w);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void maincpu_map(address_map &map);
+	void maincpu_map(address_map &map) ATTR_COLD;
 
 	void port_b_w(uint8_t data);
 	void port_c_w(uint8_t data);
@@ -94,7 +94,7 @@ private:
 	required_device<upd7810_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
 	required_device<upd933_device> m_upd933;
-	required_device<casio_ra3_device> m_cart;
+	required_device<casio_ram_cart_device> m_cart;
 	required_ioport_array<16> m_keys;
 	output_finder<16> m_leds;
 	output_finder<3, 4> m_led_env;
@@ -117,7 +117,7 @@ void cz101_state::maincpu_map(address_map &map)
 
 	map(0x0000, 0x7fff).rom().region("program", 0);
 	map(0x8000, 0x8fff).ram().share("nvram");
-	map(0x9000, 0x97ff).rw(m_cart, FUNC(casio_ra3_device::read), FUNC(casio_ra3_device::write));
+	map(0x9000, 0x97ff).rw(m_cart, FUNC(casio_ram_cart_device::read), FUNC(casio_ram_cart_device::write));
 	map(0x9800, 0x9fff).w(FUNC(cz101_state::led_4_w));
 	map(0xa000, 0xa7ff).w(FUNC(cz101_state::led_3_w));
 	map(0xa800, 0xafff).w(FUNC(cz101_state::led_2_w));
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( cz101 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL)    PORT_NAME("Env. Point End")
 
 	PORT_START("kc13")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", casio_ra3_device, present)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("cart", FUNC(casio_ram_cart_device::sense))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Vibrato")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("DCO1 Wave Form")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("DCO1 Envelope")
@@ -280,9 +280,9 @@ static INPUT_PORTS_START( cz101 )
 
 	PORT_START("PB")
 	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933", upd933_device, rq_r)
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd933", FUNC(upd933_device::rq_r))
 	PORT_BIT(0x60, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_NAME("Power") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, cz101_state, power_w, 0)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_NAME("Power") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cz101_state::power_w), 0)
 
 	PORT_START("AN1")
 	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
@@ -420,10 +420,6 @@ void cz101_state::port_c_w(uint8_t data)
 
 void cz101_state::machine_start()
 {
-	m_leds.resolve();
-	m_led_env.resolve();
-	m_led_tone.resolve();
-
 	// register for save states
 	save_item(NAME(m_power));
 	save_item(NAME(m_port_b));
@@ -465,7 +461,7 @@ void cz101_state::cz101(machine_config &config)
 	m_maincpu->txd_func().set("mdout", FUNC(midi_port_device::write_txd));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16 + 1, 19);
@@ -475,7 +471,7 @@ void cz101_state::cz101(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(cz101_state::cz101_palette), 3);
 
-	HD44780(config, m_hd44780, 0);
+	HD44780(config, m_hd44780, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_hd44780->set_lcd_size(2, 16);
 	m_hd44780->set_function_set_at_any_time();
 	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));
@@ -522,4 +518,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
-CONS( 1984, cz101, 0,      0,      cz101,   cz101, cz101_state, empty_init, "Casio", "CZ-101", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1984, cz101, 0,      0,      cz101,   cz101, cz101_state, empty_init, "Casio", "CZ-101", MACHINE_SUPPORTS_SAVE )

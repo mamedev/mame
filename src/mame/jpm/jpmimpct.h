@@ -15,16 +15,14 @@
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "video/bt47x.h"
+#include "video/roc10937.h"
 
 #include "diserial.h"
 #include "emupal.h"
-
-
 
 
 class jpmtouch_device : public device_t,
@@ -42,8 +40,8 @@ public:
 protected:
 	jpmtouch_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
@@ -74,15 +72,15 @@ public:
 		, m_duart(*this, "main_duart")
 		, m_vfd(*this, "vfd")
 		, m_upd7759(*this, "upd")
-		, m_reel(*this, "reel%u", 0U)
+		, m_reel(*this, "reel%u", 1U)
 		, m_lamp_output(*this, "lamp%u", 0U)
 		, m_pwrled(*this, "PWRLED")
 		, m_statled(*this, "STATLED")
 	{ }
 
-	void impact_nonvideo(machine_config &config);
-	void impact_nonvideo_altreels(machine_config &config);
-	void impact_nonvideo_disc(machine_config &config);
+	void impact_nonvideo(machine_config &config) ATTR_COLD;
+	void impact_nonvideo_altreels(machine_config &config) ATTR_COLD;
+	void impact_nonvideo_disc(machine_config &config) ATTR_COLD;
 
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
@@ -95,9 +93,9 @@ public:
 	int hopper_c_7_r();
 
 protected:
-	void impact_nonvideo_base(machine_config &config);
+	void impact_nonvideo_base(machine_config &config) ATTR_COLD;
 
-	void base(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<meters_device> m_meters;
@@ -110,7 +108,7 @@ protected:
 	uint16_t unk_r();
 	void unk_w(uint16_t data);
 
-	void common_map(address_map &map);
+	void common_map(address_map &map) ATTR_COLD;
 
 	int m_lamp_strobe = 0;
 
@@ -121,9 +119,10 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_set_ip5);
 
 	virtual void update_irqs();
+
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	template <unsigned N> void reel_optic_cb(int state) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -150,10 +149,8 @@ private:
 	void digits_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-
-
 	void duart_irq_handler(int state);
-	void impact_non_video_map(address_map &map);
+	void impact_non_video_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_Lamps[256]{};
 	uint8_t m_optic_pattern = 0;
@@ -192,20 +189,20 @@ public:
 	{
 	}
 
-	void impact_video(machine_config &config);
-	void impact_video_touch(machine_config &config);
+	void impact_video(machine_config &config) ATTR_COLD;
+	void impact_video_touch(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(touch_port_changed);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void impact_video_map(address_map &map);
+	void impact_video_map(address_map &map) ATTR_COLD;
 
 	void slides_video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void tms_program_map(address_map &map);
+	void tms_program_map(address_map &map) ATTR_COLD;
 
 	void tms_irq(int state);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);

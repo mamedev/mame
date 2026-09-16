@@ -10,8 +10,10 @@
 
 #include "emu.h"
 #include "points.h"
+
 #include "debugger.h"
 #include "debugcon.h"
+#include "debugcpu.h"
 
 
 //**************************************************************************
@@ -321,13 +323,13 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 	// adjust address, size & value_to_write based on mem_mask.
 	offs_t size = 0;
 	int ashift = m_space.addr_shift();
-	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
-	u64 unit_mask = make_bitmask<u64>(unit_size);
+	offs_t const unit_size = (ashift <= 0) ? (8 << -ashift) : (8 >> ashift);
+	u64 const unit_mask = make_bitmask<u64>(unit_size);
 
 	offs_t address_offset = 0;
 
-	if(!mem_mask)
-		mem_mask = 0xff;
+	if (!mem_mask)
+		mem_mask = 0xff; // TODO: should this be unit_mask?
 
 	while (!(mem_mask & unit_mask))
 	{
@@ -339,7 +341,10 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 	while (mem_mask)
 	{
 		size++;
-		mem_mask >>= unit_size;
+		if ((sizeof(mem_mask) * 8) > unit_size)
+			mem_mask >>= unit_size;
+		else
+			mem_mask = 0;
 	}
 
 	data &= make_bitmask<u64>(size * unit_size);

@@ -40,8 +40,8 @@ public:
 	void mpz80(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -96,8 +96,8 @@ private:
 	int m_trap_stop;
 	int m_trap_aux;
 	void init_mpz80();
-	void mpz80_io(address_map &map);
-	void mpz80_mem(address_map &map);
+	void mpz80_io(address_map &map) ATTR_COLD;
+	void mpz80_mem(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_MORROW_MPZ80_H

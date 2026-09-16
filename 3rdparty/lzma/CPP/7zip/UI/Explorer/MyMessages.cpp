@@ -11,19 +11,25 @@
 
 using namespace NWindows;
 
+extern bool g_DisableUserQuestions;
+
 void ShowErrorMessage(HWND window, LPCWSTR message)
 {
-  ::MessageBoxW(window, message, L"7-Zip", MB_OK | MB_ICONSTOP);
+  if (!g_DisableUserQuestions)
+    ::MessageBoxW(window, message, L"7-Zip", MB_OK | MB_ICONSTOP);
 }
 
-void ShowErrorMessageHwndRes(HWND window, UINT resID)
+void ShowErrorMessageHwndRes(HWND window, UInt32 resID)
 {
-  ShowErrorMessage(window, LangString(resID));
+  UString s = LangString(resID);
+  if (s.IsEmpty())
+    s.Add_UInt32(resID);
+  ShowErrorMessage(window, s);
 }
 
-void ShowErrorMessageRes(UINT resID)
+void ShowErrorMessageRes(UInt32 resID)
 {
-  ShowErrorMessageHwndRes(0, resID);
+  ShowErrorMessageHwndRes(NULL, resID);
 }
 
 static void ShowErrorMessageDWORD(HWND window, DWORD errorCode)

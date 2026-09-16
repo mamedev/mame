@@ -32,6 +32,7 @@ cg_parallel_slot_device::cg_parallel_slot_device(const machine_config &mconfig, 
 	device_single_card_slot_interface<device_cg_parallel_interface>(mconfig, *this),
 	m_cart(nullptr)
 {
+	set_options(cg_parallel_slot_carts, nullptr, false);
 }
 
 //-------------------------------------------------

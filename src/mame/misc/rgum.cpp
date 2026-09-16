@@ -17,11 +17,13 @@ Main components
 
 TODO:
 - stuck at the play screen with 'attendere' (wait) message after coining up;
+- Pressing "pin's switch" causes a "Micro Palline Err" (micro balls error),
+  is this some kind of pachinko-like machine?
 - some devices aren't mapped and others may be mapped wrong.
 */
 
 #include "emu.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/w65c02.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -52,8 +54,8 @@ public:
 	int heartbeat_r();
 
 protected:
-	virtual void video_start() override;
-	virtual void machine_reset() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
@@ -75,7 +77,7 @@ private:
 	uint8_t upd_reset_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -198,13 +200,13 @@ static INPUT_PORTS_START( rgum )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "PIN'S SW."
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(rgum_state, heartbeat_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pin's Switch")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(rgum_state::heartbeat_r))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Stop Reel 5") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP5 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "GUM SW."
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gum Switch")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // "PAY LOT"
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -287,7 +289,7 @@ GFXDECODE_END
 void rgum_state::rgum(machine_config &config)
 {
 	// basic machine hardware
-	M65C02(config, m_maincpu, 24_MHz_XTAL / 16);  // divisor not verified
+	W65C02(config, m_maincpu, 24_MHz_XTAL / 16);  // divisor not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &rgum_state::main_map);
 
 	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z08
@@ -301,7 +303,7 @@ void rgum_state::rgum(machine_config &config)
 	I8255A(config, "ppi8255_1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -358,4 +360,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1993, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING )
+GAME( 1993, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

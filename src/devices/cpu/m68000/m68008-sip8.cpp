@@ -143738,6 +143738,7 @@ void m68008_device::stop_i16u_ip8() // 4e72 ffff
 	m_icount -= 2;
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
 	m_inst_substate = 0;
+	debugger_wait_hook();
 	return;
 	}
 }
@@ -143847,9 +143848,6 @@ void m68008_device::rte_ip8() // 4e73 ffff
 		return;
 	}
 	[[fallthrough]]; case 10:
-	m_sr = m_new_sr;
-	update_user_super();
-	update_interrupt();
 	[[fallthrough]]; case 11:
 	m_edb |= m_mmu8->read_data(m_aob | 1);
 	m_icount -= 4;

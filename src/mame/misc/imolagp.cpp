@@ -2,7 +2,9 @@
 // copyright-holders:Phil Stroffolino
 /***************************************************************************
 
-  IMOLA GP by RB Bologna (Alberici?)
+  IMOLA GP by Roberto Bacchilega Bologna "RB BO" (Alberici?)
+
+- https://www.tilt.it/deb/rb-en.html
 
 TODO:
 - document remaining dips
@@ -130,12 +132,12 @@ public:
 
 	void imolagp(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+	ioport_value imolagp_steerlatch_r();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -166,10 +168,10 @@ private:
 
 	void imolagp_palette(palette_device &palette) const;
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void imolagp_master_io(address_map &map);
-	void imolagp_master_map(address_map &map);
-	void imolagp_slave_io(address_map &map);
-	void imolagp_slave_map(address_map &map);
+	void imolagp_master_io(address_map &map) ATTR_COLD;
+	void imolagp_master_map(address_map &map) ATTR_COLD;
+	void imolagp_slave_io(address_map &map) ATTR_COLD;
+	void imolagp_slave_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -416,7 +418,7 @@ void imolagp_state::imolagp_slave_io(address_map &map)
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(imolagp_state::imolagp_steerlatch_r)
+ioport_value imolagp_state::imolagp_steerlatch_r()
 {
 	return m_steerlatch & 0xf;
 }
@@ -475,7 +477,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(imolagp_state::imolagp_steerlatch_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -506,7 +508,7 @@ static INPUT_PORTS_START( imolagpo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(imolagp_state::imolagp_steerlatch_r))
 INPUT_PORTS_END
 
 
@@ -519,8 +521,6 @@ INPUT_PORTS_END
 
 void imolagp_state::machine_start()
 {
-	m_digits.resolve();
-
 	save_item(NAME(m_vcontrol));
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_scroll));
@@ -560,7 +560,7 @@ void imolagp_state::imolagp(machine_config &config)
 	/* video hardware */
 	// Part of the screen is obscured by the cabinet - this is handled by the visible area and physical aspect ratio here
 	// It would be better to move this into the layout so that the video output can be used with a restored cabinet.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256,256);
@@ -627,5 +627,5 @@ ROM_END
 
 
 //    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    CLASS,         INIT,       MONITOR, COMPANY,      FULLNAME,                   FLAGS
-GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  imolagp_state, empty_init, ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
-GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, imolagp_state, empty_init, ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "
+GAMEL(1981?, imolagp,  0,       imolagp, imolagp,  imolagp_state, empty_init, ROT90,   "Roberto Bacchilega Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
+GAMEL(1981?, imolagpo, imolagp, imolagp, imolagpo, imolagp_state, empty_init, ROT90,   "Roberto Bacchilega Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "

@@ -40,7 +40,7 @@ public:
 	typedef delegate<void (philips_22vp931_device &, int)> data_ready_delegate;
 
 	// construction/destruction
-	philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	philips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// input and output
 	void data_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(philips_22vp931_device::process_deferred_data), this), data); }
@@ -54,10 +54,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// subclass overrides
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
@@ -88,7 +88,7 @@ private:
 	int i8049_t0_r();
 	int i8049_t1_r();
 
-	void vp931_portmap(address_map &map);
+	void vp931_portmap(address_map &map) ATTR_COLD;
 
 	// internal state
 	required_device<i8049_device> m_i8049_cpu;        // CPU index of the 8049

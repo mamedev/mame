@@ -125,8 +125,8 @@ private:
 
 	uint8_t m_input_select = 0;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	uint32_t s3c2440_gpio_port_r(offs_t offset);
 	void s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t s3c2440_core_pin_r(offs_t offset);
@@ -137,7 +137,7 @@ private:
 	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
 	uint32_t s3c2440_adc_data_r();
 
-	void hapyfish_map(address_map &map);
+	void hapyfish_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -512,17 +512,16 @@ void hapyfish_state::hapyfish(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 639, 0, 479);
 	screen.set_screen_update("s3c2440", FUNC(s3c2440_device::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
-	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
+	SPEAKER(config, "speaker", 2).front();
+	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // uda1341ts.u12
+	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // uda1341ts.u12
 
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");
@@ -537,10 +536,10 @@ void hapyfish_state::hapyfish(machine_config &config)
 	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
 
-	SAMSUNG_K9LAG08U0M(config, m_nand, 0);
+	SAMSUNG_K9LAG08U0M(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 
-	SAMSUNG_K9LAG08U0M(config, m_nand2, 0);
+	SAMSUNG_K9LAG08U0M(config, m_nand2);
 	m_nand2->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
 }
 
@@ -606,4 +605,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_IS_SKELETON )
+GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

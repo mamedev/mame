@@ -114,7 +114,7 @@ static INPUT_PORTS_START( ondra )
 		PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1)       PORT_CODE(KEYCODE_0_PAD) PORT_CODE(JOYCODE_BUTTON1)        PORT_PLAYER(1)
 		PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT)PORT_CODE(KEYCODE_6_PAD) PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
 	PORT_START("NMI")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, ondra_state, nmi_button, 0)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ondra_state::nmi_button), 0)
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(ondra_state::nmi_button)
@@ -165,7 +165,7 @@ void ondra_state::ondra(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ondra_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(320, 256);

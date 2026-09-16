@@ -21,14 +21,14 @@ public:
 	// construction/destruction
 	sed1375_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u32 get_pixel(int screen_idx, int x, int y);
 

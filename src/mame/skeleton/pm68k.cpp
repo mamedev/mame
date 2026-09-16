@@ -31,8 +31,8 @@ public:
 	void pm68k(machine_config &config);
 
 private:
-	void mem_map(address_map &map);
-	virtual void machine_reset() override;
+	void mem_map(address_map &map) ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 };
@@ -65,7 +65,7 @@ void pm68k_state::pm68k(machine_config &config)
 	M68000(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pm68k_state::mem_map);
 
-	i8274_device& mpsc(I8274(config, "mpsc", 0));
+	i8274_device& mpsc(I8274(config, "mpsc"));
 	mpsc.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	mpsc.out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	mpsc.out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));

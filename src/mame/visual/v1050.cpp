@@ -1083,7 +1083,7 @@ void v1050_state::v1050(machine_config &config)
 	clock_kb.signal_handler().set(FUNC(v1050_state::write_keyboard_clock));
 
 	// keyboard
-	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG, 0));
+	v1050_keyboard_device &keyboard(V1050_KEYBOARD(config, V1050_KEYBOARD_TAG));
 	keyboard.out_tx_handler().set(m_uart_kb, FUNC(i8251_device::write_rxd));
 
 	I8251(config, m_uart_sio, 0/*16_MHz_XTAL/8,*/);
@@ -1109,7 +1109,7 @@ void v1050_state::v1050(machine_config &config)
 	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	// SASI bus
-	SCSI_PORT(config, m_sasibus, 0);
+	SCSI_PORT(config, m_sasibus);
 	m_sasibus->set_data_input_buffer(m_sasi_data_in);
 	m_sasibus->req_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit0)).exor(1);
 	m_sasibus->bsy_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit1));

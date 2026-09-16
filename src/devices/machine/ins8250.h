@@ -48,8 +48,8 @@ protected:
 
 	ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dev_type device_type);
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -101,22 +101,22 @@ private:
 class ins8250_device : public ins8250_uart_device
 {
 public:
-	ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ns16450_device : public ins8250_uart_device
 {
 public:
-	ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ns16550_device : public ins8250_uart_device
 {
 public:
-	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
@@ -139,13 +139,13 @@ private:
 class pc16552_device : public device_t
 {
 public:
-	pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 read(offs_t offset) { return ((offset & 8) ? m_chan1 : m_chan0)->ins8250_r(offset & 7); }
 	void write(offs_t offset, u8 data) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(offset & 7, data); }
 
 protected:
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	ns16550_device *m_chan0;

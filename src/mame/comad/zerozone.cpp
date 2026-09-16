@@ -3,11 +3,13 @@
 
 /*********************************************************************************
 
-    Zero Zone memory map
+    Zero Zone hardware
 
     driver by Brad Oliver
 
     CPU 1 : 68000, uses irq 1
+
+    memory map :
 
     0x000000 - 0x01ffff : ROM
     0x080000 - 0x08000f : input ports and dipswitches
@@ -82,13 +84,13 @@ public:
 		, m_vram(*this, "videoram")
 	{ }
 
-	void zerozone(machine_config &config);
+	void zerozone(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// devices
@@ -112,14 +114,12 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
-	void sound_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 };
 
-
-// video
 
 void zerozone_state::tilemap_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -139,8 +139,8 @@ TILE_GET_INFO_MEMBER(zerozone_state::get_tile_info)
 	int tileno = m_vram[tile_index] & 0x07ff;
 	int const colour = m_vram[tile_index] & 0xf000;
 
-	if (m_vram[tile_index] & 0x0800)
-		tileno += m_tilebank * 0x800;
+	if (BIT(m_vram[tile_index], 11))
+		tileno += m_tilebank << 11;
 
 	tileinfo.set(0, tileno, colour >> 12, 0);
 }
@@ -159,13 +159,10 @@ uint32_t zerozone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-
-// machine
-
 void zerozone_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 
@@ -264,7 +261,7 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_zerozone )
-	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb, 0, 256 )         // sprites & playfield
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb, 0, 16 ) // tilemap only
 GFXDECODE_END
 
 
@@ -297,7 +294,7 @@ void zerozone_state::zerozone(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -320,7 +317,6 @@ void zerozone_state::zerozone(machine_config &config)
 }
 
 
-
 /***************************************************************************
 
   Game driver(s)
@@ -332,7 +328,7 @@ ROM_START( zerozone ) // PCB 'COMAD MADE IN KOREA 93 EDIT00', sticker 'COMAD-078
 	ROM_LOAD16_BYTE( "zz-4.rom", 0x0000, 0x10000, CRC(83718b9b) SHA1(b3fc6da5816142b9c92a7b8615eb5bcb2c78ea46) )
 	ROM_LOAD16_BYTE( "zz-5.rom", 0x0001, 0x10000, CRC(18557f41) SHA1(6ef908732b7775c1ea2b33f799635075db5756de) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "zz-1.rom", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
 	ROM_REGION( 0x080000, "gfx", 0 )
@@ -352,7 +348,7 @@ ROM_START( lvgirl94 ) // PCB 'COMAD MADE IN KOREA 93 EDIT00', sticker 'COMAD-078
 	ROM_LOAD( "rom6", 0x00000, 0x40000, CRC(eeeb94ba) SHA1(9da09312c090ef2d40f596247d9a7decf3724e54) )
 
 	// sound ROMs are the same as zerozone
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "rom1", 0x00000, 0x08000, CRC(223ccce5) SHA1(3aa25ca914960b929dc853d07a958ed874e42fee) )
 
 	ROM_REGION( 0x40000, "oki", 0 )      // ADPCM samples

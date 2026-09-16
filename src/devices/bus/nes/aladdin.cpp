@@ -145,9 +145,9 @@ std::string nes_aladdin_slot_device::get_default_card_software(get_default_card_
 			return "algn";
 
 		uint8_t header[0x10] = { };
-		size_t actual = 0;
+		auto const [err, actual] = util::read(*hook.image_file(), header, sizeof(header));
 
-		if (hook.image_file()->read(header, sizeof(header), actual))
+		if (err)
 			return "algn";
 
 		if (actual != sizeof(header))

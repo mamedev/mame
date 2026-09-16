@@ -21,6 +21,7 @@
 #include "winutil.h"
 #include "winfile.h"
 #include "modules/diagnostics/diagnostics_module.h"
+#include "modules/lib/osdlib.h"
 #include "modules/monitor/monitor_common.h"
 
 // standard C headers
@@ -28,6 +29,7 @@
 #include <clocale>
 #include <cstdarg>
 #include <cstdio>
+#include <locale>
 #include <mutex>
 #include <optional>
 #include <sstream>
@@ -53,13 +55,26 @@
 #define UNICODE_POSTFIX "A"
 #endif
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-//============================================================
-//  winui_output_error
-//============================================================
+template <typename CharT>
+class [[maybe_unused]] suppress_grouping : public std::numpunct<CharT>
+{
+public:
+	suppress_grouping(std::locale const &base) : m_base(std::use_facet<std::numpunct<CharT> >(base)) { }
+protected:
+	virtual typename std::numpunct<CharT>::char_type do_decimal_point() const override { return m_base.decimal_point(); }
+	virtual typename std::numpunct<CharT>::char_type do_thousands_sep() const override { return m_base.thousands_sep(); }
+	virtual std::string do_grouping() const override { return std::string(); }
+	virtual typename std::numpunct<CharT>::string_type do_truename() const override { return m_base.truename(); }
+	virtual typename std::numpunct<CharT>::string_type do_falsename() const override { return m_base.falsename(); }
+	std::numpunct<CharT> const &m_base;
+};
+
 
 class winui_output_error : public osd_output
 {
@@ -136,6 +151,9 @@ public:
 	}
 };
 
+} // anonymous namespace
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -171,14 +189,34 @@ static int is_double_click_start(int argc);
 
 int main(int argc, char *argv[])
 {
+#if defined(_UCRT)
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+	std::setlocale(LC_ALL, ".UTF-8");
+#if defined(_LIBCPP_VERSION)
+	// suppress digit grouping for now - too many things don't take it into consideration
+	std::locale const syslocale(".UTF-8");
+	std::locale const customlocale(std::locale(syslocale, new suppress_grouping<char>(syslocale)), new suppress_grouping<wchar_t>(syslocale));
+	std::locale::global(customlocale);
+#endif // defined(_LIBCPP_VERSION)
+#else // defined(_UCRT)
 	std::setlocale(LC_ALL, "");
+#endif // defined(_UCRT)
+
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
+	bool const is_console = !win_is_gui_application() && !is_double_click_start(args.size());
 
 	// use small output buffers on non-TTYs (i.e. pipes)
 	if (!isatty(fileno(stdout)))
-		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
+		setvbuf(stdout, nullptr, _IOFBF, 64);
 	if (!isatty(fileno(stderr)))
-		setvbuf(stderr, (char *) nullptr, _IOFBF, 64);
+		setvbuf(stderr, nullptr, _IOFBF, 64);
+
+	// Disable legacy mouse to pointer event translation - it's broken:
+	// * No WM_POINTERLEAVE event when mouse pointer moves directly to an
+	//   overlapping window from the same process.
+	// * Still receive occasional WM_MOUSEMOVE events.
+	EnableMouseInPointer(FALSE);
 
 	// initialize common controls
 	InitCommonControls();
@@ -198,7 +236,7 @@ int main(int argc, char *argv[])
 		// Initialize this after the osd interface so that we are first in the
 		// output order
 		winui_output_error winerror;
-		if (win_is_gui_application() || is_double_click_start(args.size()))
+		if (!is_console)
 		{
 			// if we are a GUI app, output errors to message boxes
 			osd_output::push(&winerror);
@@ -207,7 +245,8 @@ int main(int argc, char *argv[])
 		}
 		osd.register_options();
 		result = emulator_info::start_frontend(options, osd, args);
-		osd_output::pop(&winerror);
+		if (!is_console)
+			osd_output::pop(&winerror);
 	}
 
 	return result;
@@ -339,12 +378,6 @@ void windows_osd_interface::init(running_machine &machine)
 
 	// initialize the subsystems
 	osd_common_t::init_subsystems();
-
-	// notify listeners of screen configuration
-	for (const auto &info : osd_common_t::window_list())
-	{
-		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()), dynamic_cast<win_window_info &>(*info).m_targetorient);
-	}
 
 	// hook up the debugger log
 	if (options.oslog())

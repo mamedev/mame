@@ -71,16 +71,16 @@ public:
 	void pulsar(machine_config &config);
 
 private:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void ppi_pa_w(u8 data);
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 	u8 ppi_pc_r();
 
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map(address_map &map) ATTR_COLD;
 
 	floppy_image_device *m_floppy;
 	memory_passthrough_handler m_rom_shadow_tap;

@@ -70,7 +70,7 @@ protected:
 			uint32_t clock);
 
 	// first-time setup
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 private:
 	// internal state

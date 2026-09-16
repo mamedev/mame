@@ -10,7 +10,7 @@ LCD pin can be driven manually, or oscillating.
 */
 
 #include "emu.h"
-#include "video/hlcd0438.h"
+#include "hlcd0438.h"
 
 
 DEFINE_DEVICE_TYPE(HLCD0438, hlcd0438_device, "hlcd0438", "Hughes HLCD 0438 LCD Driver")

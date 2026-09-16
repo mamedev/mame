@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "stkbd.h"
 
-#include "utf8.h"
-
 DEFINE_DEVICE_TYPE(ST_KBD, st_kbd_device, "st_kbd", "Atari ST Keyboard/Mouse/Joystick")
 
 ROM_START( st_kbd )
@@ -16,17 +14,9 @@ ROM_END
 const int st_kbd_device::mouse_xya[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
 const int st_kbd_device::mouse_xyb[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
 
-void st_kbd_device::map(address_map &map)
-{
-	map(0x0000, 0x001f).m(m_cpu, FUNC(hd6301_cpu_device::m6801_io));
-	map(0x0080, 0x00ff).ram();
-	map(0xf000, 0xffff).rom().region("cpu", 0);
-}
-
 void st_kbd_device::device_add_mconfig(machine_config &config)
 {
 	HD6301V1(config, m_cpu, 4_MHz_XTAL);
-	m_cpu->set_addrmap(AS_PROGRAM, &st_kbd_device::map);
 	m_cpu->in_p1_cb().set(FUNC(st_kbd_device::port1_r));
 	m_cpu->in_p2_cb().set(FUNC(st_kbd_device::port2_r));
 	m_cpu->out_p2_cb().set(FUNC(st_kbd_device::port2_w));
@@ -65,8 +55,6 @@ st_kbd_device::st_kbd_device(const machine_config &mconfig, const char *tag, dev
 
 void st_kbd_device::device_start()
 {
-	m_led.resolve();
-
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_mouse));
 	save_item(NAME(m_mouse_x));
@@ -151,14 +139,14 @@ uint8_t st_kbd_device::port2_r()
 	//  2       JOY 1-6 / mouse button 2
 	//  3       serial from cpu
 
-	uint8_t data;
+	uint8_t data = 0xf1;
 
 	if ((m_config->read() & 0x01) == 0)
-		data = m_mouseb->read();
+		data |= m_mouseb->read();
 	else
-		data = m_joy[0]->read();
+		data |= m_joy[1]->read();
 
-	return (data & 0x06) | (m_tx << 3);
+	return (data & 0xf7) | (m_tx << 3);
 }
 
 void st_kbd_device::port2_w(uint8_t data)
@@ -317,11 +305,11 @@ static INPUT_PORTS_START(stkbd)
 
 	PORT_START("P45")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Undo") PORT_CODE(KEYCODE_F12)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2191") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP)) // U+2191 = ↑
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Clr Home") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) // U+2190 = ←
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2193") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) // U+2193 = ↓
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2192") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) // U+2192 = →
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
 
@@ -356,19 +344,18 @@ static INPUT_PORTS_START(stkbd)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("MOUSEB")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
 INPUT_PORTS_END
 
 ioport_constructor st_kbd_device::device_input_ports() const

@@ -1,7 +1,7 @@
 // Common/CommandLineParser.h
 
-#ifndef __COMMON_COMMAND_LINE_PARSER_H
-#define __COMMON_COMMAND_LINE_PARSER_H
+#ifndef ZIP7_INC_COMMON_COMMAND_LINE_PARSER_H
+#define ZIP7_INC_COMMON_COMMAND_LINE_PARSER_H
 
 #include "MyString.h"
 

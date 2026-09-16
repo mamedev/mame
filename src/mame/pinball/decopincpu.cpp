@@ -48,7 +48,7 @@ void decocpu_type2_device::decocpu2_map(address_map &map)
 
 static INPUT_PORTS_START( decocpu1 )
 	PORT_START("DIAGS")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, decocpu_type1_device, main_nmi, 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(decocpu_type1_device::main_nmi), 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_2_PAD) PORT_TOGGLE
 	PORT_CONFNAME( 0x10, 0x10, "Language" )
@@ -288,7 +288,6 @@ void decocpu_type1_device::device_start()
 
 	m_cpu->space(AS_PROGRAM).install_rom(0x4000, 0xffff, &m_rom[0x4000]);
 
-	m_io_outputs.resolve();
 	save_item(NAME(m_lamp_data));
 }
 

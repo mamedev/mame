@@ -10,12 +10,12 @@
         * Give us a Break [8 sets]
         * Criss Cross (Sweden) [non-working - need disk image]
         * Ten Up [2 sets]
+        * Treasure Trail [non-working - need disk image]
 
     Looking for:
         * Numbers Game
         * Pac Quiz
         * Suit Pursuit
-        * Treasure Trail?
 
     Known issues:
         * Coin data has to go through the datalogger to be counted
@@ -82,7 +82,7 @@ public:
 	void guab(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	EF9369_COLOR_UPDATE(ef9369_color_update);
@@ -104,7 +104,7 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	void guab_map(address_map &map);
+	void guab_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34061_device> m_tms34061;
@@ -300,8 +300,6 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
 
 void guab_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 
@@ -457,7 +455,7 @@ void guab_state::guab(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &guab_state::guab_map);
 
 	/* TODO: Use real video timings */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -470,7 +468,7 @@ void guab_state::guab(machine_config &config)
 
 	EF9369(config, "ef9369").set_color_update_callback(FUNC(guab_state::ef9369_color_update));
 
-	TMS34061(config, m_tms34061, 0);
+	TMS34061(config, m_tms34061);
 	m_tms34061->set_rowshift(8);  /* VRAM address is (row << rowshift) | col */
 	m_tms34061->set_vram_size(0x40000);
 	m_tms34061->int_callback().set_inputline("maincpu", 5);
@@ -508,9 +506,9 @@ void guab_state::guab(machine_config &config)
 	ppi4.in_pc_callback().set(FUNC(guab_state::watchdog_r));
 	ppi4.out_pc_callback().set(FUNC(guab_state::watchdog_w));
 
-	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
+	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta"));
 
-	acia6850_device &acia1(ACIA6850(config, "acia6850_1", 0));
+	acia6850_device &acia1(ACIA6850(config, "acia6850_1"));
 	acia1.txd_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 	acia1.irq_handler().set_inputline("maincpu", 4);
 
@@ -520,7 +518,7 @@ void guab_state::guab(machine_config &config)
 	acia_clock.signal_handler().set("acia6850_1", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia6850_1", FUNC(acia6850_device::write_rxc));
 
-	ACIA6850(config, "acia6850_2", 0);
+	ACIA6850(config, "acia6850_2");
 
 	// floppy
 	WD1773(config, m_fdc, 8000000);
@@ -559,6 +557,14 @@ ROM_START( tenup )
 	ROM_LOAD16_BYTE( "tu-14.bin", 0x10001, 0x8000, CRC(fd8a0c3c) SHA1(f87289ce6f0d2bc9b7d3a0b6deff38ba3aadf391) )
 ROM_END
 
+ROM_START( ttrail )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ic49.bin", 0x00000, 0x8000, CRC(01395ff1) SHA1(69e0f0d9893c2b4edf7f2c4547bf7674ddeb10ef) )
+	ROM_LOAD16_BYTE( "ic48.bin", 0x00001, 0x8000, CRC(8dfd2165) SHA1(a239258b2b9e9773f97937506e04680422c6c396) )
+	ROM_LOAD16_BYTE( "ic57.bin", 0x10000, 0x8000, CRC(82775064) SHA1(17437022f76bd8faebdbcc94be8ace482a145382) )
+	ROM_LOAD16_BYTE( "ic56.bin", 0x10001, 0x8000, CRC(70264d8a) SHA1(107b9eb72fd587deb1ba9821645f3ab86e6040c8) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -570,3 +576,4 @@ ROM_END
 GAME( 1986, guab,     0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Give us a Break",      0 )
 GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
 GAME( 1988, tenup,    0,      guab,    tenup, guab_state, empty_init, ROT0,     "JPM",   "Ten Up",               0 )
+GAME( 198?, ttrail,   0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Treasure Trail (JPM)", MACHINE_NOT_WORKING )

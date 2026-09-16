@@ -228,20 +228,9 @@ uint32_t suna16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 uint32_t suna16_state::screen_update_bestbest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
-#ifdef MAME_DEBUG
-if (machine().input().code_pressed(KEYCODE_Z))
-{   int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
-
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	if (layers_ctrl & 1)    draw_sprites(bitmap, cliprect, m_spriteram,  0);
-	if (layers_ctrl & 2)    draw_sprites(bitmap, cliprect, m_spriteram2, 1);
+	draw_sprites(bitmap, cliprect, m_spriteram,  0);
+	draw_sprites(bitmap, cliprect, m_spriteram2, 1);
 	return 0;
 }

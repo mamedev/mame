@@ -784,7 +784,7 @@ void pcw_state::mcu_printer_p2_w(uint8_t data)
 
 	// handle shift/store
 	m_printer_serial = data & 0x04;  // data
-	if((data & 0x02) != 0)  // clock
+	if (!BIT(m_printer_p2_prev, 1) && BIT(data, 1))  // only update when clock goes positive
 	{
 		m_printer_shift <<= 1;
 		if(m_printer_serial == 0)
@@ -1079,7 +1079,7 @@ static INPUT_PORTS_START(pcw)
 
 	PORT_START("LINE1")     /* 0x03ff1 */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Exit") PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(F10))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ptr") //PORT_CODE(KEYCODE_END)     PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ptr") PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR(UCHAR_MAMEKEY(PRTSCR))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cut") PORT_CODE(KEYCODE_SLASH_PAD)   PORT_CHAR(UCHAR_MAMEKEY(F11))
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Copy") PORT_CODE(KEYCODE_ASTERISK)   PORT_CHAR(UCHAR_MAMEKEY(F12))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)                        PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
@@ -1236,7 +1236,7 @@ static void pcw_ssfloppies(device_slot_interface &device)
 
 static void pcw_dsfloppies(device_slot_interface &device)
 {
-	device.option_add("3dsdd", FLOPPY_3_DSDD);
+	device.option_add("3dsqd", FLOPPY_3_DSQD);
 }
 
 static void pcw_35floppies(device_slot_interface &device)
@@ -1273,7 +1273,7 @@ void pcw_state::pcw(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32_MHz_XTAL / 3, 720 + 20, 8, 720 + 8, 256 + 32, 8, 256 + 8); // Hand tuned to get 50Hz, it is all in the Amstrad ASIC, 32MHz in and video out
 	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -1294,7 +1294,7 @@ void pcw_state::pcw(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("256K");
 
-	TIMER(config, "pcw_timer", 0).configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
+	TIMER(config, "pcw_timer").configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
 }
 
 void pcw_state::pcw8256(machine_config &config)
@@ -1305,7 +1305,7 @@ void pcw_state::pcw8256(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
-	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	screen_device &printer(SCREEN(config, "printer"));
 	printer.set_refresh_hz(50);
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
@@ -1321,9 +1321,9 @@ void pcw_state::pcw8512(machine_config &config)
 	m_palette->set_init(FUNC(pcw_state::set_8xxx_palette));
 
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 
-	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	screen_device &printer(SCREEN(config, "printer"));
 	printer.set_refresh_hz(50);
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
@@ -1342,7 +1342,7 @@ void pcw_state::pcw9512(machine_config &config)
 	pcw(config);
 	m_palette->set_init(FUNC(pcw_state::set_9xxx_palette));
 
-	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	m_maincpu->set_addrmap(AS_IO, &pcw_state::pcw9512_io);

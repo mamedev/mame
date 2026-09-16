@@ -303,21 +303,17 @@ const char *dsk_format::extensions() const noexcept
 	return "dsk";
 }
 
-bool dsk_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[16];
-
-	size_t actual;
-	io.read_at(0, &header, sizeof(header), actual);
-	if ( memcmp( header, DSK_FORMAT_HEADER, 8 ) ==0) {
+	auto const [err, actual] = read_at(io, 0, &header, sizeof(header));
+	if (err) {
+		return 0;
+	}
+	if ((8 <= actual) && !memcmp(header, DSK_FORMAT_HEADER, 8)) {
 		return FIFID_SIGN;
 	}
-	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
+	if ((16 <= actual) && !memcmp(header, EXT_FORMAT_HEADER, 16)) {
 		return FIFID_SIGN;
 	}
 	return 0;
@@ -356,8 +352,6 @@ struct sector_header
 
 bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	size_t actual;
-
 	uint8_t header[0x100];
 	bool extendformat = false;
 
@@ -365,7 +359,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	if (io.length(image_size))
 		return false;
 
-	io.read_at(0, &header, sizeof(header), actual);
+	read_at(io, 0, &header, sizeof(header)); // FIXME: check for errors and premature EOF
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
 		extendformat = true;
 	}
@@ -431,7 +425,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			if(track_offsets[(track<<1)+side] >= image_size)
 				continue;
 			track_header tr;
-			io.read_at(track_offsets[(track<<1)+side], &tr, sizeof(tr), actual);
+			read_at(io, track_offsets[(track<<1)+side], &tr, sizeof(tr)); // FIXME: check for errors and premature EOF
 
 			// skip if there are no sectors in this track
 			if (tr.number_of_sector == 0)
@@ -441,7 +435,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			int first_sector_code = -1;
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
+				read_at(io, track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector)); // FIXME: check for errors and premature EOF
 
 				if (j == 0)
 					first_sector_code = sector.sector_size_code;
@@ -460,7 +454,7 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
-				io.read_at(track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector), actual);
+				read_at(io, track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j), &sector, sizeof(sector)); // FIXME: check for errors and premature EOF
 
 				sects[j].track       = sector.track;
 				sects[j].head        = sector.side;
@@ -479,13 +473,15 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[j].actual_size = 128 << tr.sector_size_code;
 
 				sects[j].deleted = (sector.fdc_status_reg2 & 0x40);
-				sects[j].bad_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
+				sects[j].bad_data_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
+				sects[j].bad_addr_crc = false;
+				sects[j].weak = false;
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
-					io.read_at(pos, sects[j].data, sects[j].actual_size, actual);
+					read_at(io, pos, sects[j].data, sects[j].actual_size); // FIXME: check for errors and premature EOF
 					sdatapos += sects[j].actual_size;
-
+					sects[j].weak = sects[j].bad_data_crc && !sects[j].deleted;
 				} else
 					sects[j].data = nullptr;
 
@@ -494,8 +490,15 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				else
 					pos += 128 << tr.sector_size_code;
 			}
-			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
-			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
+			// A double-density track at 300 rpm holds 100000 2 us cells; padding standard
+			// tracks to more makes the disc spin faster than a real drive. Allow larger
+			// out-of-spec layouts (theatre europe on einstein) by sizing to the layout
+			// when it genuinely needs the extra cells.
+			int min_cells = 0;
+			for(int j=0;j<tr.number_of_sector;j++)
+				min_cells += sects[j].actual_size;
+			min_cells = 149*16 + (tr.number_of_sector*62 + min_cells)*16;
+			build_pc_track_mfm(track, side, image, min_cells > 100000 ? min_cells : 100000, tr.number_of_sector, sects, tr.gap3_length);
 		}
 	}
 	return true;

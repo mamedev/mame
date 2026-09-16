@@ -72,7 +72,7 @@ public:
 	void dx7(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
@@ -100,8 +100,8 @@ private:
 
 	void dx7_dac_w  (offs_t offset, u8 data) {}; // TODO: DAC control
 
-	void main_map(address_map &map);
-	void sub_map (address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map (address_map &map) ATTR_COLD;
 
 	required_device<hd6303r_cpu_device> m_maincpu;
 	required_device<hd6805s1_device> m_subcpu;
@@ -291,18 +291,18 @@ void yamaha_dx7_state::dx7(machine_config &config)
 
 	M58990(config, m_adc, 8_MHz_XTAL / 16); // M58990P-1; divider not verified (actually clocked by P26 output of sub CPU)
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 8*2);
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(yamaha_dx7_state::palette_init), 2);
 
-	HD44780(config, m_lcdc, 0);
+	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 	m_lcdc->set_pixel_update_cb(FUNC(yamaha_dx7_state::lcd_pixel_update));
 }

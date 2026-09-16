@@ -93,9 +93,9 @@ protected:
 	void pcw16_write_mem(uint8_t bank, uint16_t offset, uint8_t data);
 	uint8_t read_bank_data(uint8_t type, uint16_t offset);
 	void write_bank_data(uint8_t type, uint16_t offset, uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void pcw16_colours(palette_device &palette) const;
 	uint32_t screen_update_pcw16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw16_timer_callback);
@@ -111,8 +111,8 @@ protected:
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
 	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
 
-	void pcw16_io(address_map &map);
-	void pcw16_map(address_map &map);
+	void pcw16_io(address_map &map) ATTR_COLD;
+	void pcw16_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

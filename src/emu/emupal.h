@@ -79,7 +79,7 @@
 
     3) (optional) set shadow darkness or highlight brightness by
         set_shadow_factor(0.0-1.0) or
-        _set_highlight_factor(1.0-n.n)
+        set_highlight_factor(1.0-n.n)
 
     4) before calling drawgfx use
         palette_set_shadow_mode(0) to arm shadows or
@@ -195,6 +195,9 @@ public:
 	enum brg_3b_t       { BRG_3BIT };
 	enum bgr_3b_t       { BGR_3BIT };
 
+	// 6-bit
+	enum bgr_222_t      { BGR_222, RRGGBB };
+
 	// 8-bit
 	enum rgb_332_t      { RGB_332, RRRGGGBB };
 	enum bgr_233_t      { BGR_233, BBGGGRRR };
@@ -210,11 +213,14 @@ public:
 	enum xrgb_333_t     { xRGB_333, xxxxxxxRRRGGGBBB };
 	enum xrbg_333_t     { xRBG_333, xxxxxxxRRRBBBGGG };
 	enum xbgr_333_t     { xBGR_333, xxxxxxxBBBGGGRRR };
+	enum xbgr_333_nib_t { xBGR_333_nibble, xxxxxBBBxGGGxRRR };
 	enum xrgb_444_t     { xRGB_444, xxxxRRRRGGGGBBBB };
 	enum xrbg_444_t     { xRBG_444, xxxxRRRRBBBBGGGG };
 	enum xbrg_444_t     { xBRG_444, xxxxBBBBRRRRGGGG };
+	enum xgrb_444_t     { xGRB_444, xxxxGGGGRRRRBBBB };
 	enum xbgr_444_t     { xBGR_444, xxxxBBBBGGGGRRRR };
 	enum rgbx_444_t     { RGBx_444, RRRRGGGGBBBBxxxx };
+	enum grbx_444_t     { GRBx_444, GGGGRRRRBBBBxxxx };
 	enum gbrx_444_t     { GBRx_444, GGGGBBBBRRRRxxxx };
 	enum irgb_4444_t    { IRGB_4444, IIIIRRRRGGGGBBBB };
 	enum rgbi_4444_t    { RGBI_4444, RRRRGGGGBBBBIIII };
@@ -262,6 +268,7 @@ public:
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_222_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t);
@@ -277,11 +284,11 @@ public:
 	}
 
 	template <typename F>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, F &&init, const char *name, u32 entries = 0U, u32 indirect = 0U) requires (init_delegate::supports_callback<F>::value)
 		: palette_device(mconfig, tag, owner, 0U)
 	{ set_init(std::forward<F>(init), name).set_entries(entries, indirect); }
 	template <typename T, typename F>
-	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&devname, F &&init, std::enable_if_t<init_delegate::supports_callback<F>::value, const char *> name, u32 entries = 0U, u32 indirect = 0U)
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&devname, F &&init, const char *name, u32 entries = 0U, u32 indirect = 0U) requires (init_delegate::supports_callback<F>::value)
 		: palette_device(mconfig, tag, owner, 0U)
 	{ set_init(std::forward<T>(devname), std::forward<F>(init), name).set_entries(entries, indirect); }
 
@@ -296,11 +303,14 @@ public:
 	palette_device &set_format(xrgb_333_t, u32 entries);
 	palette_device &set_format(xrbg_333_t, u32 entries);
 	palette_device &set_format(xbgr_333_t, u32 entries);
+	palette_device &set_format(xbgr_333_nib_t, u32 entries);
 	palette_device &set_format(xrgb_444_t, u32 entries);
 	palette_device &set_format(xrbg_444_t, u32 entries);
 	palette_device &set_format(xbrg_444_t, u32 entries);
+	palette_device &set_format(xgrb_444_t, u32 entries);
 	palette_device &set_format(xbgr_444_t, u32 entries);
 	palette_device &set_format(rgbx_444_t, u32 entries);
+	palette_device &set_format(grbx_444_t, u32 entries);
 	palette_device &set_format(gbrx_444_t, u32 entries);
 	palette_device &set_format(irgb_4444_t, u32 entries);
 	palette_device &set_format(rgbi_4444_t, u32 entries);
@@ -335,7 +345,7 @@ public:
 	palette_device &set_entries(u32 entries, u32 indirect) { m_entries = entries; m_indirect_entries = indirect; return *this; }
 	palette_device &set_indirect_entries(u32 entries) { m_indirect_entries = entries; return *this; }
 	palette_device &enable_shadows() { m_enable_shadows = true; return *this; }
-	palette_device &enable_hilights() { m_enable_hilights = true; return *this; }
+	palette_device &enable_highlights() { m_enable_highlights = true; return *this; }
 	template <typename T> palette_device &set_prom_region(T &&region) { m_prom_region.set_tag(std::forward<T>(region)); return *this; }
 
 	// palette RAM accessors
@@ -363,20 +373,22 @@ public:
 	void write16(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	void write16_ext(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	u32 read32(offs_t offset);
+	u32 read32_ext(offs_t offset);
 	void write32(offs_t offset, u32 data, u32 mem_mask = u32(~0));
+	void write32_ext(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_palette_interface overrides
 	virtual u32 palette_entries() const noexcept override { return m_entries; }
 	virtual u32 palette_indirect_entries() const noexcept override { return m_indirect_entries; }
 	virtual bool palette_shadows_enabled() const noexcept override { return m_enable_shadows; }
-	virtual bool palette_hilights_enabled() const noexcept override { return m_enable_hilights; }
+	virtual bool palette_highlights_enabled() const noexcept override { return m_enable_highlights; }
 
 	// generic palette init routines
 	void palette_init_all_black(palette_device &palette);
@@ -389,6 +401,7 @@ protected:
 	void palette_init_3bit_grb(palette_device &palette);
 	void palette_init_3bit_gbr(palette_device &palette);
 	void palette_init_3bit_bgr(palette_device &palette);
+	void palette_init_bgr_222(palette_device &palette);
 	void palette_init_rgb_444_proms(palette_device &palette);
 	void palette_init_rgb_555(palette_device &palette);
 	void palette_init_grb_555(palette_device &palette);
@@ -403,7 +416,7 @@ private:
 	u32                 m_entries;              // number of entries in the palette
 	u32                 m_indirect_entries;     // number of indirect colors in the palette
 	bool                m_enable_shadows;       // are shadows enabled?
-	bool                m_enable_hilights;      // are hilights enabled?
+	bool                m_enable_highlights;    // are highlights enabled?
 	int                 m_membits;              // width of palette RAM, if different from native
 	bool                m_membits_supplied;     // true if membits forced in static config
 	endianness_t        m_endianness;           // endianness of palette RAM, if different from native

@@ -6,7 +6,9 @@
 
     Skeleton Driver - For note keeping.
 
-    This system is not emulated.
+    TODO:
+    - post conversion to MCF5206E device this now hangs out of bad interrupt executed.
+      Requires a Timer irq with line 5 vector 0x8c.
 
 ISS 3 ADDER 5 VIDEO CARD
 
@@ -115,7 +117,6 @@ A21 |30| CE1
 
 #include "emu.h"
 #include "bfm_ad5.h"
-#include "machine/mcf5206e.h"
 #include "bfm_sc45_helper.h"
 #include "speaker.h"
 
@@ -123,14 +124,14 @@ void adder5_state::init_ad5()
 {
 	// sc5 roms always start with SC5
 	uint8_t *src = memregion( "maincpu" )->base();
-//  printf("%02x %02x %02x %02x\n", src[0], src[1], src[2], src[3]);
+//  logerror("%02x %02x %02x %02x\n", src[0], src[1], src[2], src[3]);
 	if (((src[0] == 0x20) && (src[2] == 0x43)) || ((src[1] == 0x35) && (src[3] == 0x53)))
 	{
-		printf("Confirmed SC5 ROM\n");
+		logerror("Confirmed SC5 ROM\n");
 	}
 	else
 	{
-		printf("NOT AN SC5 ROM!!!!!\n");
+		logerror("NOT AN SC5 ROM!!!!!\n");
 	}
 
 
@@ -139,7 +140,7 @@ void adder5_state::init_ad5()
 	int found = find_project_string(machine(), 3, 0);
 	if (!found)
 	{
-		printf("Normal rom pair string not found, checking mismatched / missing rom string\n");
+		logerror("Normal rom pair string not found, checking mismatched / missing rom string\n");
 	}
 
 	// help identify roms where one of the pair is missing too
@@ -155,7 +156,7 @@ void adder5_state::init_ad5()
 
 	if (!found)
 	{
-		printf("No suitable string found\n");
+		logerror("No suitable string found\n");
 	}
 
 }
@@ -168,26 +169,17 @@ void adder5_state::ad5_map(address_map &map)
 	map(0x80000000, 0x8000ffff).ram();
 	map(0x80800000, 0x8080ffff).ram();
 
-	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//  map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 INPUT_PORTS_START( bfm_ad5 )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
-{
-	// this should be coming from the Timer / SIM modules of the Coldfire
-//  m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x8c); // MCF5206E but disabled
-}
-
 void adder5_state::bfm_ad5(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
 	m_maincpu->set_addrmap(AS_PROGRAM, &adder5_state::ad5_map);
-	m_maincpu->set_periodic_int(FUNC(adder5_state::ad5_fake_timer_int), attotime::from_hz(1000));
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound */
 }

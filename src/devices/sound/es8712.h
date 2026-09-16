@@ -21,7 +21,7 @@
 class es8712_device : public device_t, public device_rom_interface<20> // TODO : 20 address bits?
 {
 public:
-	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	template <typename T> void set_msm_tag(T &&tag) { m_msm.set_tag(std::forward<T>(tag)); }
@@ -37,9 +37,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void es8712_state_save_register();

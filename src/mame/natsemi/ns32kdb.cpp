@@ -63,11 +63,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override ATTR_COLD;
 
 	// address maps
-	template <unsigned ST> void cpu_map(address_map &map);
+	template <unsigned ST> void cpu_map(address_map &map) ATTR_COLD;
 
 public:
 	// machine config
@@ -89,15 +88,11 @@ protected:
 
 	required_ioport m_cfg;
 	output_finder<4> m_led;
+
 private:
 	u8 pa_r();
 	void pb_w(u8);
 };
-
-void ns32kdb_state::machine_start()
-{
-	m_led.resolve();
-}
 
 void ns32kdb_state::machine_reset()
 {

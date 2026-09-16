@@ -57,7 +57,7 @@ public:
 		, m_i8251_1(*this, INS8251_1_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_memory_region m_char_rom;
@@ -78,8 +78,8 @@ public:
 	required_device<i8251_device> m_i8251_0;
 	required_device<i8251_device> m_i8251_1;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void cgc7900_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -95,7 +95,7 @@ public:
 	void z_mode_w(u16 data);
 	void color_status_w(u16 data);
 	u16 sync_r();
-	u16 unmapped_r();
+	u16 int_ack_r(offs_t offset);
 
 	template <unsigned N> void irq(int state) { irq_encoder(N, state); }
 
@@ -116,15 +116,16 @@ public:
 
 	void cgc7900(machine_config &config);
 	void cgc7900_video(machine_config &config);
-	void cgc7900_mem(address_map &map);
-	void keyboard_mem(address_map &map);
-	void cpu_space_map(address_map &map);
+	void cgc7900_mem(address_map &map) ATTR_COLD;
+	void keyboard_mem(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 private:
 	u16 kbd_mods = 0U;
 	u8 kbd_data = 0U;
 	bool kbd_ready = false;
 
 	void irq_encoder(int pin, int state);
+	void update_interrupts();
 };
 
 #endif // MAME_CHROMATICS_CGC7900_H

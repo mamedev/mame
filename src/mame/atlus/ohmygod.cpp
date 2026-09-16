@@ -46,9 +46,9 @@ public:
 	void init_naname();
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -59,8 +59,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void main_map(address_map &map);
-	void oki_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_videoram;
@@ -93,10 +93,8 @@ TILE_GET_INFO_MEMBER(ohmygod_state::get_tile_info)
 {
 	uint16_t code = m_videoram[2 * tile_index + 1];
 	uint16_t attr = m_videoram[2 * tile_index];
-	tileinfo.set(0,
-			code,
-			(attr & 0x0f00) >> 8,
-			0);
+
+	tileinfo.set(0, code, (attr & 0x0f00) >> 8, 0);
 }
 
 
@@ -210,7 +208,7 @@ void ohmygod_state::main_map(address_map &map)
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x700000, 0x703fff).ram().share(m_spriteram);
 	map(0x704000, 0x707fff).ram();
-	map(0x708000, 0x70ffff).ram();     // Work RAM
+	map(0x708000, 0x70ffff).ram(); // Work RAM
 	map(0x800000, 0x800001).portr("P1");
 	map(0x800002, 0x800003).portr("P2");
 	map(0x900000, 0x900001).w(FUNC(ohmygod_state::ctrl_w));
@@ -461,11 +459,10 @@ void ohmygod_state::ohmygod(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ohmygod_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(ohmygod_state::irq1_line_hold));
 
-	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3));  // a guess, and certainly wrong
-
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(3)); // a guess, and certainly wrong
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -480,7 +477,7 @@ void ohmygod_state::ohmygod(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	okim6295_device &oki(OKIM6295(config, "oki", 14000000 / 8, okim6295_device::PIN7_HIGH));
+	okim6295_device &oki(OKIM6295(config, "oki", 12000000 / 6, okim6295_device::PIN7_HIGH));
 	oki.set_addrmap(0, &ohmygod_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }

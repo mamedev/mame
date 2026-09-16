@@ -43,8 +43,8 @@ public:
 	uint8_t m_row_reg = 0U;
 	uint8_t m_col_reg = 0U;
 	uint8_t port_read_with_latch(uint8_t ext, uint8_t latch_state);
-	virtual void video_start() override;
-	virtual void machine_start() override;
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	void channelf_palette(palette_device &palette) const;
 	uint32_t screen_update_ntsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -58,8 +58,8 @@ public:
 	void sabavpl2(machine_config &config);
 	void sabavdpl(machine_config &config);
 	void channlf2(machine_config &config);
-	void channelf_io(address_map &map);
-	void channelf_map(address_map &map);
+	void channelf_io(address_map &map) ATTR_COLD;
+	void channelf_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_FAIRCHILD_CHANNELF_H

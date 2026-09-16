@@ -76,17 +76,17 @@ private:
 	void slalom03_oki_bank_w(uint8_t data);
 	void vck_w(int state);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void bldyrolr_maincpu_map(address_map &map);
-	void joctronic_sound_io_map(address_map &map);
-	void joctronic_sound_map(address_map &map);
-	void maincpu_io_map(address_map &map);
-	void maincpu_map(address_map &map);
-	void slalom03_maincpu_map(address_map &map);
-	void slalom03_sound_io_map(address_map &map);
-	void slalom03_sound_map(address_map &map);
+	void bldyrolr_maincpu_map(address_map &map) ATTR_COLD;
+	void joctronic_sound_io_map(address_map &map) ATTR_COLD;
+	void joctronic_sound_map(address_map &map) ATTR_COLD;
+	void maincpu_io_map(address_map &map) ATTR_COLD;
+	void maincpu_map(address_map &map) ATTR_COLD;
+	void slalom03_maincpu_map(address_map &map) ATTR_COLD;
+	void slalom03_sound_io_map(address_map &map) ATTR_COLD;
+	void slalom03_sound_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
@@ -372,10 +372,10 @@ void joctronic_state::joctronic(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0, ASSERT_LINE); //SINT
 
-	LS259(config, "drivers1", 0); // IC4
-	LS259(config, "drivers2", 0); // IC3
-	LS259(config, "drivers3", 0); // IC2
-	LS259(config, "drivers4", 0); // IC1
+	LS259(config, "drivers1"); // IC4
+	LS259(config, "drivers2"); // IC3
+	LS259(config, "drivers3"); // IC2
+	LS259(config, "drivers4"); // IC1
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -415,12 +415,12 @@ void joctronic_state::slalom03(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	//ctc.zc_callback<0>().set_inputline(m_soundcpu, INPUT_LINE_IRQ0, ASSERT_LINE); //SINT
 
-	HC259(config, "drivers1", 0); // IC1
-	HC259(config, "drivers2", 0); // IC2
-	HC259(config, "drivers3", 0); // IC3
-	HC259(config, "drivers4", 0); // IC4
-	HC259(config, "drivers5", 0); // IC5
-	HC259(config, "drivers6", 0); // IC6
+	HC259(config, "drivers1"); // IC1
+	HC259(config, "drivers2"); // IC2
+	HC259(config, "drivers3"); // IC3
+	HC259(config, "drivers4"); // IC4
+	HC259(config, "drivers5"); // IC5
+	HC259(config, "drivers6"); // IC6
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -436,7 +436,7 @@ void joctronic_state::slalom03(machine_config &config)
 
 	DAC_8BIT_R2R(config, "r2r", 0).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	LS157(config, m_adpcm_select, 0);
+	LS157(config, m_adpcm_select);
 	m_adpcm_select->out_callback().set("oki", FUNC(msm5205_device::data_w));
 
 	MSM5205(config, m_oki, XTAL(12'000'000)/2/16); // 375 kHz
@@ -512,8 +512,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, jpinball, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Pin Ball",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, punkywil, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Punky Willy",     MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, walkyria, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Walkyria",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, bldyrolr, 0, bldyrolr,  joctronic, joctronic_state, empty_init, ROT0, "Playbar",   "Bloody Roller",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, slalom03, 0, slalom03,  joctronic, joctronic_state, empty_init, ROT0, "Stargame",  "Slalom Code 0.3", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, jpinball, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Pin Ball",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1986, punkywil, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Punky Willy",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1986, walkyria, 0, joctronic, joctronic, joctronic_state, empty_init, ROT0, "Joctronic", "Walkyria",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, bldyrolr, 0, bldyrolr,  joctronic, joctronic_state, empty_init, ROT0, "Playbar",   "Bloody Roller",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, slalom03, 0, slalom03,  joctronic, joctronic_state, empty_init, ROT0, "Stargame",  "Slalom Code 0.3", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

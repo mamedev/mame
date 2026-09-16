@@ -232,7 +232,7 @@ static int kc_handle_sss(int16_t *buffer, const uint8_t *casdata)
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kc_kcc_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kc_kcc_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes, int)
 {
 	return kc_handle_kcc(buffer, bytes);
 }
@@ -243,7 +243,7 @@ static int kc_kcc_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 ********************************************************************/
 static int kc_kcc_to_wav_size(const uint8_t *casdata, int caslen)
 {
-	kc_image_size = caslen ;
+	kc_image_size = caslen;
 
 	return kc_handle_kcc( nullptr, casdata );
 }
@@ -284,7 +284,7 @@ static const cassette_image::Format kc_kcc_format =
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kc_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kc_tap_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes, int)
 {
 	return kc_handle_tap(buffer, bytes);
 }
@@ -295,7 +295,7 @@ static int kc_tap_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 ********************************************************************/
 static int kc_tap_to_wav_size(const uint8_t *casdata, int caslen)
 {
-	kc_image_size = caslen ;
+	kc_image_size = caslen;
 
 	return kc_handle_tap( nullptr, casdata );
 }
@@ -336,7 +336,7 @@ static const cassette_image::Format kc_tap_format =
 /*******************************************************************
    Generate samples for the tape image
 ********************************************************************/
-static int kc_sss_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
+static int kc_sss_fill_wave(int16_t *buffer, int sample_count, const uint8_t *bytes, int)
 {
 	return kc_handle_sss(buffer, bytes);
 }
@@ -347,7 +347,7 @@ static int kc_sss_fill_wave(int16_t *buffer, int sample_count, uint8_t *bytes)
 ********************************************************************/
 static int kc_sss_to_wav_size(const uint8_t *casdata, int caslen)
 {
-	kc_image_size = caslen ;
+	kc_image_size = caslen;
 
 	return kc_handle_sss( nullptr, casdata );
 }

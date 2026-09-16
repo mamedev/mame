@@ -166,8 +166,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_clock_output);
 
@@ -186,17 +186,17 @@ class mm5837_stream_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5837_stream_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	// configuration
-	void set_vdd(double voltage) { m_vdd = voltage; }
+	mm5837_stream_device &set_vdd(double voltage) { m_vdd = voltage; return *this; }
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream;           // sound stream

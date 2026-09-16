@@ -2,9 +2,10 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    ramcard128k.c
+    ramcard128k.cpp
 
-    Implemention of the Saturn Systems 128K extended language card
+    Implemention of the 128K extended language card from Saturn
+    Systems, Inc. (later Titan Technologies, Inc.)
 
 *********************************************************************/
 
@@ -57,10 +58,16 @@ void a2bus_ssramcard_device::device_start()
 
 void a2bus_ssramcard_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_ssramcard_device::reset_from_bus()
+{
 	m_inh_state = INH_NONE;
 	m_dxxx_bank = 0;
 	m_main_bank = 0;
 	m_last_offset = -1;
+	recalc_slot_inh();
 }
 
 void a2bus_ssramcard_device::do_io(int offset)
@@ -138,8 +145,9 @@ void a2bus_ssramcard_device::do_io(int offset)
 
 uint8_t a2bus_ssramcard_device::read_c0nx(uint8_t offset)
 {
-	do_io(offset & 0xf);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		do_io(offset & 0xf);
+	return get_open_bus();
 }
 
 

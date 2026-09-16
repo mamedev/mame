@@ -124,9 +124,9 @@ public:
 	void jantotsu(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -139,17 +139,16 @@ private:
 	required_ioport m_coins, m_dsw2;
 
 	// sound-related
-	uint32_t   m_adpcm_pos;
-	uint8_t    m_adpcm_idle;
-	uint8_t    m_adpcm_data;
-	uint8_t    m_adpcm_trigger;
+	uint32_t m_adpcm_pos = 0;
+	uint8_t m_adpcm_idle = 0;
+	uint8_t m_adpcm_data = 0;
+	uint8_t m_adpcm_trigger = 0;
 
 	// misc
-	uint8_t    m_mux_data;
+	uint8_t m_mux_data = 0;
+	uint8_t m_col_bank = 0;
+	uint8_t m_display_on = 0;
 
-	// video-related
-	uint8_t    m_col_bank;
-	uint8_t    m_display_on;
 	void bankaddr_w(uint8_t data);
 	uint8_t mux_r();
 	void mux_w(uint8_t data);
@@ -158,8 +157,8 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void adpcm_int(int state);
-	void io_map(address_map &map);
-	void prg_map(address_map &map);
+	void io_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -246,7 +245,7 @@ void jantotsu_state::palette(palette_device &palette) const
 // Multiplexer is mapped as 6-bits reads, bits 6 & 7 are always connected to the coin mechs.
 uint8_t jantotsu_state::mux_r()
 {
-	//  printf("%02x\n", m_mux_data);
+	//printf("%02x\n", m_mux_data);
 	uint8_t res = m_coins->read();
 
 	for (uint8_t  i = 0; i < 8; i++)
@@ -284,13 +283,13 @@ void jantotsu_state::adpcm_w(offs_t offset, uint8_t data)
 			   (i.e. I'll probably never do a "nagare" in my entire life ;-) ) */
 			if (data & 0x20)
 				popmessage("ADPCM called with data = %02x, contact MAMEdev", data);
-//          printf("%02x 0\n", data);
+			//printf("%02x 0\n", data);
 			break;
 		//same write as port 2? MSM sample ack?
 		case 1:
-//          m_adpcm_idle = 1;
-//          m_adpcm->reset_w(1);
-//          printf("%02x 1\n", data);
+			//m_adpcm_idle = 1;
+			//m_adpcm->reset_w(1);
+			//printf("%02x 1\n", data);
 			break;
 	}
 }
@@ -498,7 +497,7 @@ void jantotsu_state::jantotsu(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &jantotsu_state::io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	screen.set_size(256, 256);

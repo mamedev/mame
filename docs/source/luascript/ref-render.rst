@@ -480,10 +480,9 @@ emu.bitmap_yuy16(source, [x0, y0, x1, y1])
     format.  Raises an error if coordinates are specified representing a
     rectangle not fully contained within the source bitmap’s clipping rectangle.
 emu.bitmap_rgb32(source, [x0, y0, x1, y1])
-    Creates an RGB format bitmap with 4:2:2 chroma subsampling representing a
-    view of a portion of an existing bitmap.  The initial clipping rectangle is
-    set to the bounds of the view.  The source bitmap will be locked, preventing
-    resizing and reallocation.
+    Creates an RGB format bitmap representing a view of a portion of an existing
+    bitmap.  The initial clipping rectangle is set to the bounds of the view.
+    The source bitmap will be locked, preventing resizing and reallocation.
 
     If no coordinates are specified, the new bitmap will represent a view of the
     source bitmap’s current clipping rectangle.  If coordinates are specified,
@@ -496,10 +495,10 @@ emu.bitmap_rgb32(source, [x0, y0, x1, y1])
     format.  Raises an error if coordinates are specified representing a
     rectangle not fully contained within the source bitmap’s clipping rectangle.
 emu.bitmap_argb32(source, [x0, y0, x1, y1])
-    Creates an ARGB format bitmap with 4:2:2 chroma subsampling representing a
-    view of a portion of an existing bitmap.  The initial clipping rectangle is
-    set to the bounds of the view.  The source bitmap will be locked, preventing
-    resizing and reallocation.
+    Creates an ARGB format bitmap representing a view of a portion of an
+    existing bitmap.  The initial clipping rectangle is set to the bounds of the
+    view.  The source bitmap will be locked, preventing resizing and
+    reallocation.
 
     If no coordinates are specified, the new bitmap will represent a view of the
     source bitmap’s current clipping rectangle.  If coordinates are specified,
@@ -619,6 +618,12 @@ bitmap:plot_box(x, y, width, height, color)
     Fills the intersection of the clipping rectangle and the rectangle with top
     left (x, y) and the specified height and width with the specified colour
     value.  Coordinates and dimensions are in units of pixels.
+bitmap:resample(dest, [color])
+    Copies the bitmap into the destination bitmap, scaling to fill the
+    destination bitmap and using a re-sampling filter.  Only ARGB format source
+    and destination bitmaps are supported.  The source pixel values will be
+    multiplied by the colour if it is supplied.  It must be a
+    :ref:`render colour <luascript-ref-rendercolor>`.
 
 Properties
 ~~~~~~~~~~
@@ -749,6 +754,10 @@ manager.machine.video.snapshot_target
 Properties
 ~~~~~~~~~~
 
+target.ui_container (read-only)
+    The :ref:`render container <luascript-ref-rendercontainer>` for drawing user
+    interface elements over this render target, or ``nil`` for hidden render
+    targets (targets that are not shown to the user directly).
 target.index (read-only)
     The 1-based index of the render target.  This has O(n) complexity.
 target.width (read-only)
@@ -805,6 +814,9 @@ Instantiation
 manager.machine.render.ui_container
     Gets the render container used to draw the user interface, including menus,
     sliders and pop-up messages.
+manager.machine.render.targets[index].ui_container
+    Gets the render container used to draw user interface elements over a
+    particular render target.
 manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
 
@@ -987,6 +999,11 @@ Properties
 layout.device (read-only)
     The device that caused the layout file to be loaded.  Usually the root
     machine device for external layouts.
+layout.elements[] (read-only)
+    The :ref:`elements <luascript-ref-renderlayelem>` created from the layout
+    file.  Elements are indexed by name (i.e. the value of the ``name``
+    attribute).  The index get method has O(1) complexity, and the ``at`` and
+    ``index_of`` methods have O(n) complexity.
 layout.views[] (read-only)
     The :ref:`views <luascript-ref-renderlayview>` created from the layout file.
     Views are indexed by unqualified name (i.e. the value of the ``name``
@@ -1047,6 +1064,66 @@ view:set_recomputed_callback(cb)
     View coordinates are recomputed in various events, including the window
     being resized, entering or leaving full-screen mode, and changing the zoom
     to screen area setting.
+view:set_pointer_updated_callback(cb)
+    Set a function to receive notifications when a pointer enters, moves or
+    changes button states over the view.  The function must accept nine
+    arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the currently pressed buttons.
+    * A bit mask representing the buttons that were pressed in this update.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_pointer_left_callback(cb)
+    Set a function to receive notifications when a pointer leaves the view
+    normally.  The function must accept seven arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).  The ID may be reused for a new pointer after
+      receiving this notification.
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_pointer_aborted_callback(cb)
+    Set a function to receive notifications when a pointer leaves the view
+    abnormally.  The function must accept seven arguments:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that will not change for the
+      lifetime of a pointer).  The ID may be reused for a new pointer after
+      receiving this notification.
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in layout coordinates.
+    * Vertical position in layout coordinates.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    Call with ``nil`` to remove the callback.
+view:set_forget_pointers_callback(cb)
+    Set a function to receive notifications when the view should stop processing
+    pointer input.  The function must accept no arguments.  Call with ``nil`` to
+    remove the callback.
+
+    This can happen in a number of situations, including the view configuration
+    changing or a menu taking over input handling.
 
 Properties
 ~~~~~~~~~~
@@ -1075,10 +1152,16 @@ view.bounds (read-only)
     effective bounds of the view in its current configuration.  The coordinates
     are in view units, which are arbitrary but assumed to have square aspect
     ratio.
-view.has_art
+view.has_art (read-only)
     A Boolean indicating whether the view has any non-screen items, including
     items that are not visible because the user has hidden the item collection
     that they belong to.
+view.show_pointers (read/write)
+    A Boolean that sets whether mouse and pen pointers should be displayed for
+    the view.
+view.hide_inactive_pointers (read/write)
+    A Boolean that sets whether mouse pointers for the view should be hidden
+    after a period of inactivity.
 
 
 .. _luascript-ref-renderlayitem:
@@ -1194,6 +1277,9 @@ Properties
 item.id (read-only)
     Get the optional item identifier.  This is the value of the ``id`` attribute
     in the XML layout file if present, or ``nil``.
+item.element (read-only)
+    The :ref:`element <luascript-ref-renderlayelem>` used to draw the item, or
+    ``nil`` for screen items.
 item.bounds_animated (read-only)
     A Boolean indicating whether the item’s bounds depend on its animation
     state.
@@ -1246,3 +1332,43 @@ item.element_state (read-only)
 item.animation_state (read-only)
     Get the current animation state.  This will call the animation state
     callback function to handle bindings.
+
+
+.. _luascript-ref-renderlayelem:
+
+Layout element
+--------------
+
+Wraps MAME’s ``layout_element`` class, representing a visual element that can be
+drawn in a :ref:`layout view <luascript-ref-renderlayview>`.  Elements are
+created from XML layout files, which may be loaded from external artwork or
+internal to MAME.  Note that layout element callbacks are not run as coroutines.
+
+Instantiation
+~~~~~~~~~~~~~
+
+layout.elements[name]
+    Gets a layout element by name.
+layout.views[name].items[id].element
+    Gets the layout element used to draw a
+    :ref:`view item <luascript-ref-renderlayitem>`.
+
+Methods
+~~~~~~~
+
+element:invalidate()
+    Invalidate all cached textures for the element, ensuring it will be redrawn
+    when the next video frame is drawn.
+element.set_draw_callback(cb)
+    Set a function to call the perform additional drawing after the element’s
+    components have been drawn.  The function is passed two arguments: the
+    element state (an integer) and the 32-bit ARGB
+    :ref:`bitmap <luascript-ref-bitmap>` at the required size.  The function
+    must not attempt to resize the bitmap.  Call with ``nil`` to remove the
+    callback.
+
+Properties
+~~~~~~~~~~
+
+element.default_state (read-only)
+    The integer default state for the element if set or ``nil``.

@@ -77,8 +77,8 @@ public:
 	void f4431(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -92,8 +92,8 @@ private:
 	required_region_ptr<uint8_t> m_chargen;
 	required_ioport m_switches;
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	uint8_t latch_r();
 	void latch_w(uint8_t data);
@@ -374,7 +374,7 @@ void f4431_state::f4431(machine_config &config)
 	m_ctc->set_clk<2>(4_MHz_XTAL / 13);
 	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(9.828_MHz_XTAL * 2, 1020, 0, 800, 268, 0, 250); // probably wrong
 	m_screen->set_screen_update(FUNC(f4431_state::screen_update));

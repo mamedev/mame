@@ -7,8 +7,8 @@
   Also see tms9900.h for types of TMS99xx processors.
 */
 
-#ifndef MAME_CPU_TMS9995_TMS9995_H
-#define MAME_CPU_TMS9995_TMS9995_H
+#ifndef MAME_CPU_TMS9900_TMS9995_H
+#define MAME_CPU_TMS9900_TMS9995_H
 
 #pragma once
 
@@ -68,7 +68,6 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t    execute_min_cycles() const noexcept override;
 	virtual uint32_t    execute_max_cycles() const noexcept override;
-	virtual uint32_t    execute_input_lines() const noexcept override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 
@@ -417,4 +416,4 @@ public:
 	}
 };
 
-#endif // MAME_CPU_TMS9995_TMS9995_H
+#endif // MAME_CPU_TMS9900_TMS9995_H

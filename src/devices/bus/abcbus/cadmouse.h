@@ -23,16 +23,16 @@ public:
 	static constexpr feature_type unemulated_features() { return feature::MOUSE | feature::GRAPHICS; }
 
 protected:
-	void abc_cadmouse_mem(address_map &map);
-	void abc_cadmouse_io(address_map &map);
+	void abc_cadmouse_mem(address_map &map) ATTR_COLD;
+	void abc_cadmouse_io(address_map &map) ATTR_COLD;
 
 	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;

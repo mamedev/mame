@@ -92,10 +92,10 @@ private:
 	u32 screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void mem_map2(address_map &map);
-	void io_map2(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void mem_map2(address_map &map) ATTR_COLD;
+	void io_map2(address_map &map) ATTR_COLD;
 	void mainppi_portb_w(u8);
 	void mainppi_portc_w(u8);
 
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( meritum )
 	PORT_BIT(0xFC, 0x00, IPT_UNUSED)
 
 	PORT_START("NMI")
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<1>)
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", FUNC(input_merger_device::in_w<1>))
 INPUT_PORTS_END
 
 u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -357,7 +357,7 @@ void meritum_state::meritum1(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, "nmigate").output_handler().set("mainpit", FUNC(pit8253_device::write_gate2)).invert();
 
-	pit8253_device &pit(PIT8253(config, "mainpit", 0));
+	pit8253_device &pit(PIT8253(config, "mainpit"));
 	pit.set_clk<0>(10_MHz_XTAL / 5); // 2 MHz
 	pit.set_clk<1>(10_MHz_XTAL / 10); // 1 MHz
 	pit.set_clk<2>(10_MHz_XTAL / 4); // same as CPU clock
@@ -379,10 +379,10 @@ void meritum_state::meritum1(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	PIT8253(config, "audiopit", 0); // optional audio interface
+	PIT8253(config, "audiopit"); // optional audio interface
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192);
 	m_screen->set_screen_update(FUNC(meritum_state::screen_update_meritum1));
 	m_screen->set_palette("palette");
@@ -408,7 +408,7 @@ void meritum_state::meritum2(machine_config &config)
 	meritum1(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &meritum_state::mem_map2);
 	m_maincpu->set_addrmap(AS_IO, &meritum_state::io_map2);
-	I8255(config, "flopppi", 0); // floppy disk interface
+	I8255(config, "flopppi"); // floppy disk interface
 	m_screen->set_screen_update(FUNC(meritum_state::screen_update_meritum2));
 	SOFTWARE_LIST(config.replace(), "quik_list").set_original("trs80_quik").set_filter("M2");
 }

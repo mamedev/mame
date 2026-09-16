@@ -18,6 +18,7 @@ is the same as SL90259.
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "video/pwm.h"
@@ -34,6 +35,7 @@ public:
 	borisdpl_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_psu(*this, "psu"),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -44,16 +46,22 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 protected:
-	virtual void machine_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	// devices/pointers
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
+	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<4> m_inputs;
 
-	void main_map(address_map &map);
-	void main_io(address_map &map);
+	std::unique_ptr<u8[]> m_ram;
+	u8 m_ram_address = 0;
+	u8 m_matrix = 0;
+	u8 m_digit_data = 0;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
 
 	void update_display();
 	void digit_w(u8 data);
@@ -65,11 +73,6 @@ private:
 	void ram_address_w(u8 data) { m_ram_address = data; }
 	u8 ram_data_r() { return m_ram[m_ram_address]; }
 	void ram_data_w(u8 data) { m_ram[m_ram_address] = data; }
-
-	std::unique_ptr<u8[]> m_ram;
-	u8 m_ram_address = 0;
-	u8 m_matrix = 0;
-	u8 m_digit_data = 0;
 };
 
 void borisdpl_state::machine_start()
@@ -136,7 +139,7 @@ void borisdpl_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(borisdpl_state::input_r), FUNC(borisdpl_state::matrix_w));
 	map(0x01, 0x01).w(FUNC(borisdpl_state::digit_w));
-	map(0x04, 0x07).rw("psu", FUNC(f38t56_device::read), FUNC(f38t56_device::write));
+	map(0x04, 0x07).rw(m_psu, FUNC(f38t56_device::read), FUNC(f38t56_device::write));
 }
 
 
@@ -171,7 +174,7 @@ static INPUT_PORTS_START( borisdpl )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE") // clear entry
 
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, borisdpl_state, reset_button, 0) PORT_NAME("Reset")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(borisdpl_state::reset_button), 0) PORT_NAME("Reset")
 INPUT_PORTS_END
 
 
@@ -183,18 +186,18 @@ INPUT_PORTS_END
 void borisdpl_state::borisdpl(machine_config &config)
 {
 	// basic machine hardware
-	F8(config, m_maincpu, 3000000/2); // frequency approximated from video reference
+	F8(config, m_maincpu, 3'000'000/2); // frequency approximated from video reference
 	m_maincpu->set_addrmap(AS_PROGRAM, &borisdpl_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &borisdpl_state::main_io);
-	m_maincpu->set_irq_acknowledge_callback("psu", FUNC(f38t56_device::int_acknowledge));
+	m_maincpu->int_cycle_callback().set(m_psu, FUNC(f38t56_device::int_acknowledge));
 
-	f38t56_device &psu(F38T56(config, "psu", 3000000/2));
-	psu.set_int_vector(0x5020);
-	psu.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
-	psu.read_a().set(FUNC(borisdpl_state::ram_data_r));
-	psu.write_a().set(FUNC(borisdpl_state::ram_data_w));
-	psu.read_b().set(FUNC(borisdpl_state::ram_address_r));
-	psu.write_b().set(FUNC(borisdpl_state::ram_address_w));
+	F38T56(config, m_psu, 3'000'000/2);
+	m_psu->set_int_vector(0x5020);
+	m_psu->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	m_psu->read_a().set(FUNC(borisdpl_state::ram_data_r));
+	m_psu->write_a().set(FUNC(borisdpl_state::ram_data_w));
+	m_psu->read_b().set(FUNC(borisdpl_state::ram_address_r));
+	m_psu->write_b().set(FUNC(borisdpl_state::ram_address_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
@@ -222,4 +225,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+SYST( 1979, borisdpl, 0,      0,      borisdpl, borisdpl, borisdpl_state, empty_init, "Applied Concepts", "Boris Diplomat", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

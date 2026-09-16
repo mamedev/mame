@@ -11,8 +11,7 @@
 
 #pragma once
 
-#include "cpu/arm/arm.h"
-#include "machine/timer.h"
+#include "cpu/arm7/arm7.h"
 
 
 class chessmachine_device : public device_t
@@ -31,35 +30,30 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset_after_children() override { reset_w(1); }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
-	required_region_ptr<u32> m_bootrom;
-	required_shared_ptr<u32> m_ram;
-	required_device<timer_device> m_disable_bootrom;
+	required_device<arm2_cpu_device> m_maincpu;
+	memory_view m_boot_view;
 
 	devcb_write_line m_data_out;
 
 	u8 m_latch[2];
-	void data0_w_sync(int param);
-	void data1_w_sync(int param);
-	void reset_w_sync(int param);
 
-	bool m_bootrom_enabled;
-	void install_bootrom(bool enable);
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	void data0_w_sync(s32 param);
+	void data1_w_sync(s32 param);
+	void reset_w_sync(s32 param);
+
 	u32 disable_bootrom_r();
 
 	u8 internal_r() { return m_latch[0]; }
 	void internal_w(u8 data) { m_latch[1] = data & 1; m_data_out(m_latch[1]); }
 
-	void main_map(address_map &map);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
