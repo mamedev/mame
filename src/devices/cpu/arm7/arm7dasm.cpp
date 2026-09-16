@@ -99,25 +99,38 @@ uint32_t arm7_disassembler::ExtractImmediateOperand( uint32_t opcode )
 	return std::rotr(imm, r);
 }
 
-void arm7_disassembler::WriteShiftCount( std::ostream &stream, uint32_t opcode )
+static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
+
+void arm7_disassembler::WriteShiftCount( std::ostream &stream, int type, int count, bool printType )
 {
-	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
+	if (count == 0)
 	{
-		util::stream_format( stream, "R%d", (opcode>>8)&0xf );
+		if (type == 0)
+		{
+			// ignore LSL #0 for register shift
+			if (printType)
+				return;
+		}
+		else if (type == 3)
+		{
+			// RRX does not take a count
+			if (printType)
+				stream << ", RRX";
+			return;
+		}
+		else
+			count = 32;
 	}
-	else /* Shift amount immediate 5 bit unsigned integer */
-	{
-		int c=(opcode>>7)&0x1f;
-		if( c==0 ) c = 32;
-		util::stream_format( stream, "#%d", c );
-	}
+
+	if (printType)
+		util::stream_format(stream, ", %s #%d", pRegOp[type], count);
+	else
+		util::stream_format(stream, ", #%d", count);
 }
 
 void arm7_disassembler::WriteDataProcessingOperand( std::ostream &stream, uint32_t opcode, bool printOp0, bool printOp1 )
 {
 	/* ccccctttmmmm */
-	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
-
 	if (printOp0)
 		util::stream_format(stream, "R%d, ", (opcode>>12)&0xf);
 	if (printOp1)
@@ -134,43 +147,33 @@ void arm7_disassembler::WriteDataProcessingOperand( std::ostream &stream, uint32
 	/* Register Op2 */
 	util::stream_format(stream, "R%d", (opcode>>0)&0xf);
 
-	//SJE: ignore if LSL#0 for register shift
-	if( ((opcode>>4) & 0xff)==0 )
-		return;
-	else if ( ((opcode>>4) & 0xff)==0x06 )
+	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		stream << ", RRX";
-		return;
+		util::stream_format( stream, ", %s R%d", pRegOp[(opcode>>5)&3], (opcode>>8)&0xf );
 	}
-
-	util::stream_format(stream, ", %s ", pRegOp[(opcode>>5)&3]);
-	WriteShiftCount(stream, opcode);
+	else /* Shift amount immediate 5 bit unsigned integer */
+	{
+		WriteShiftCount(stream, (opcode>>5)&3, (opcode>>7)&0x1f, true);
+	}
 }
 
 void arm7_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t opcode )
 {
 	/* ccccctttmmmm */
-	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
-
 	util::stream_format(
 		stream,
 		", %sR%d", /* Operand 1 register, (optional) sign, Operand 2 register, shift type */
 		(opcode&0x800000)?"":"-",
 		(opcode >> 0) & 0xf);
 
-	//check for LSL 0
-	if( ((opcode>>4) & 0xff)==0 )
-		return;
-	else if ( ((opcode>>4) & 0xff)==0x06 )
+	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		stream << ", RRX";
-		return;
+		util::stream_format( stream, ", %s R%d", pRegOp[(opcode>>5)&3], (opcode>>8)&0xf );
 	}
-
-	//Add rotation type
-	util::stream_format(stream, ", %s ", pRegOp[(opcode >> 5) & 3]);
-
-	WriteShiftCount(stream, opcode);
+	else /* Shift amount immediate 5 bit unsigned integer */
+	{
+		WriteShiftCount(stream, (opcode>>5)&3, (opcode>>7)&0x1f, true);
+	}
 } /* WriteRegisterOperand */
 
 void arm7_disassembler::WriteRegisterList( std::ostream &stream, uint16_t operand )
@@ -525,27 +528,11 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 				stream << "ADR";
 			else if( is_shift )
 			{
-				switch( (opcode>>5) & 3 )
-				{
-				case 0:
-					stream << "LSL";
-					break;
-
-				case 1:
-					stream << "LSR";
-					break;
-
-				case 2:
-					stream << "ASR";
-					break;
-
-				case 3:
-					if ( (opcode & 0x00000f90) == 0 )
-						stream << "RRX";
-					else
-						stream << "ROR";
-					break;
-				}
+				int type = (opcode>>5) & 3;
+				if ( type == 3 && (opcode & 0x00000f90) == 0 )
+					stream << "RRX";
+				else
+					stream << pRegOp[type];
 			}
 			else
 				stream << pOperation[op];
@@ -611,10 +598,13 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 					if ( rd != rs )
 						util::stream_format( stream, "R%d, ", rd );
 					util::stream_format( stream, "R%d", rs );
-					if ( (opcode & 0x00000ff0) != 0x00000060 )
+					if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 					{
-						stream << ", ";
-						WriteShiftCount(stream, opcode);
+						util::stream_format( stream, ", R%d", (opcode>>8)&0xf );
+					}
+					else /* Shift amount immediate 5 bit unsigned integer */
+					{
+						WriteShiftCount( stream, (opcode>>5)&3, (opcode>>7)&0x1f, false );
 					}
 					break;
 				}
