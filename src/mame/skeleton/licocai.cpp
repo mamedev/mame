@@ -90,7 +90,8 @@ void licocai_state::vdp_data_upload(uint16_t data, uint16_t mem_mask)
 		m_vram[(m_vdp_addr + 0) & 0xffff] = (data >> 8) & 0x00ff;
 		m_vram[(m_vdp_addr + 1) & 0xffff] = (data >> 0) & 0x00ff;
 
-		m_gfxdecode->gfx(0)->mark_dirty(m_vdp_addr / 0x80);
+		m_gfxdecode->gfx(1)->mark_dirty(m_vdp_addr / 0x80);
+		m_gfxdecode->gfx(2)->mark_dirty(m_vdp_addr / 0x20);
 		m_vdp_addr += 2;
 	}
 	else if (m_vdp_write_type == 0x00c8)
