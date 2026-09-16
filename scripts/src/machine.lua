@@ -5564,6 +5564,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/citizen120d.h,MACHINES["CITIZEN120D"] = true
+---------------------------------------------------
+if MACHINES["CITIZEN120D"] then
+	files {
+		MAME_DIR .. "src/devices/machine/citizen120d.cpp",
+		MAME_DIR .. "src/devices/machine/citizen120d.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ns32382.h,MACHINES["NS32382"] = true
 ---------------------------------------------------
 if MACHINES["NS32382"] then

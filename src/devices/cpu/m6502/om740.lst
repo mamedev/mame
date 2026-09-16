@@ -275,7 +275,7 @@ adc_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	do_adc(m_TMP2);
 	prefetch();
 
@@ -328,7 +328,7 @@ and_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_A &= m_TMP2;
 	set_nz(m_A);
 	prefetch();
@@ -530,7 +530,7 @@ cmp_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	do_cmp(m_A, m_TMP2);
 	prefetch();
 
@@ -631,7 +631,7 @@ eor_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_A ^= m_TMP2;
 	set_nz(m_A);
 	prefetch();
@@ -754,7 +754,7 @@ lda_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_A = read_data(m_TMP);
+	m_A = read(m_TMP);
 	set_nz(m_A);
 	prefetch();
 
@@ -888,7 +888,7 @@ ora_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_A |= m_TMP2;
 	set_nz(m_A);
 	prefetch();
@@ -1070,7 +1070,7 @@ sbc_m_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	do_sbc(m_TMP2);
 	prefetch();
 
@@ -1129,7 +1129,7 @@ sta_m_idx
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
 	read_dummy(m_TMP);
-	write_data(m_TMP, m_A);
+	write(m_TMP, m_A);
 	prefetch();
 
 sta_m_idy
@@ -1254,7 +1254,7 @@ adct_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_TMP = read(m_X);
 	read_dummy(m_X);
 	do_adct(m_TMP2);
@@ -1364,7 +1364,7 @@ andt_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_TMP = read(m_X);
 	read_dummy(m_X);
 	m_TMP &= m_TMP2;
@@ -1450,7 +1450,7 @@ cmpt_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_TMP = read(m_X);
 	do_cmp(m_TMP, m_TMP2);
 	prefetch();
@@ -1540,7 +1540,7 @@ eort_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_TMP = read(m_X);
 	read_dummy(m_X);
 	m_TMP ^= m_TMP2;
@@ -1639,7 +1639,7 @@ ldt_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	read_dummy(m_X);
 	set_nz(m_TMP2);
 	write(m_X, m_TMP2);
@@ -1744,7 +1744,7 @@ ort_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_TMP = read(m_X);
 	read_dummy(m_X);
 	m_TMP |= m_TMP2;
@@ -1836,7 +1836,7 @@ sbct_idx
 	m_TMP2 += m_X;
 	m_TMP = read(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
-	m_TMP2 = read_data(m_TMP);
+	m_TMP2 = read(m_TMP);
 	m_TMP = read(m_X);
 	read_dummy(m_X);
 	do_sbct(m_TMP2);
