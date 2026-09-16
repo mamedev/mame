@@ -46,7 +46,7 @@ static constexpr uint64_t DOUBLE_ZERO = 0;
 
 static constexpr uint32_t CODEPAGE_SIZE = 0x1'0000'0000ULL / 4096 / 8;
 
-static constexpr uint32_t SPR60X_HID0_ICFI			= 0x0000'0800;
+static constexpr uint32_t SPR60X_HID0_ICFI          = 0x0000'0800;
 
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
@@ -801,6 +801,7 @@ void ppc_device::device_start()
 	{
 		save_item(NAME(m_core->mmu603_cmp));
 		save_item(NAME(m_core->mmu603_hash));
+		save_item(NAME(m_core->mmu603_key));
 		save_item(NAME(m_core->mmu603_r));
 	}
 	save_item(NAME(m_core->irq_pending));
@@ -1428,10 +1429,10 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 	}
 #endif
 
-	/* look up the segment register */
+	// look up the segment register; a fetch from a no-execute segment is an ISI with SRR1[3] set
 	segreg = m_core->sr[address >> 28];
 	if (transtype == TR_FETCH && (segreg & 0x10000000))
-		return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
+		return DSISR_NOEXEC;
 
 	/* check for memory-forced I/O */
 	if (m_cap & PPCCAP_MFIOC)
@@ -1452,17 +1453,30 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 	hashmask = ((m_core->spr[SPROEA_SDR1] & 0x1ff) << 16) | 0xffff;
 	hash = (segreg & 0x7ffff) ^ ((address >> 12) & 0xffff);
 
-	/* if we're simulating the 603 MMU, fill in the data and stop here */
+	// If we're simulating the 603 MMU, fill in the table search registers and stop here
 	if (m_cap & PPCCAP_603_MMU)
 	{
 		uint32_t entry = vtlb_table()[address >> 12];
 		m_core->mmu603_cmp = 0x80000000 | ((segreg & 0xffffff) << 7) | (0 << 6) | ((address >> 22) & 0x3f);
 		m_core->mmu603_hash[0] = hashbase | ((hash << 6) & hashmask);
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
+		m_core->mmu603_key = (segreg >> (29 + transpriv)) & 1;   // SRR1[KEY]: SR[Ks] for a supervisor access, SR[Kp] for a user access
+
+		// Entries loaded by tlbld/tlbli carry per-mode permissions derived from the PTE's PP bits and the segment key
 		if ((entry & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID))
 		{
-			address = (entry & 0xfffff000) | (address & 0x00000fff);
-			return 0x001;
+			if (entry & (1 << (intention & (TR_TYPE | TR_USER))))
+			{
+				address = (entry & 0xfffff000) | (address & 0x00000fff);
+				return 0x001;
+			}
+
+			// A store to a page whose C bit is clear takes the TLB miss on store exception so the handler
+			// can check protection and set C (603e User's Manual Table 5-4).
+			// Anything else the hardware refuses on a TLB hit is a page protection violation (Table 5-3)
+			if (transtype == TR_WRITE && !(entry & VTLB_603_CHANGED))
+				return DSISR_NOT_FOUND | DSISR_STORE;
+			return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 		}
 		return DSISR_NOT_FOUND | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 	}
@@ -1532,6 +1546,18 @@ bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address, 
 
 
 /*-------------------------------------------------
+    ppccom_fetch_intention - translation intent for an
+    instruction fetch at the current privilege
+    level
+-------------------------------------------------*/
+
+int ppc_device::ppccom_fetch_intention() const
+{
+	return TR_FETCH | ((m_core->msr & MSR_PR) ? TR_USER : 0);
+}
+
+
+/*-------------------------------------------------
     ppccom_tlb_fill - handle a missing TLB entry
 -------------------------------------------------*/
 
@@ -1540,8 +1566,9 @@ void ppc_device::ppccom_tlb_fill()
 	offs_t address = m_core->param0;
 	if (ppccom_translate_address_internal(m_core->param1, false, address) > 1)
 	{
-		// The page tables no longer translate this address, so kick it out of the TLB
-		vtlb_flush_address(m_core->param0);
+		// The page tables no longer translate this address, so kick it out of the TLB, except on the 603.
+		if (!(m_cap & PPCCAP_603_MMU))
+			vtlb_flush_address(m_core->param0);
 		return;
 	}
 	vtlb_fill(m_core->param0, address, m_core->param1);
@@ -1570,7 +1597,7 @@ void ppc_device::ppccom_tlb_flush()
 void ppc_device::ppc_check_translation(ppc_entry_check *chk)
 {
 	offs_t addr = chk->pc;
-	if (ppccom_translate_address_internal(TR_FETCH, false, addr) <= 1 && addr == chk->physpc)
+	if (ppccom_translate_address_internal(ppccom_fetch_intention(), false, addr) <= 1 && addr == chk->physpc)
 	{
 		// mapping unchanged; the block stays valid for the current generation
 		chk->generation = m_core->m_translation_generation;
@@ -1641,14 +1668,16 @@ void ppc_device::ppccom_execute_mtsr()
 		m_core->sr[seg] = newval;
 		vtlb_flush_dynamic();
 
+		// 603 TLB entries are tagged with the VSID, so a new VSID retires the segment's fixed entries.
+		if (m_cap & PPCCAP_603_MMU)
+		{
+			vtlb_flush_fixed(seg << 28, 0xf000'0000);
+		}
+
 		// Only a change to the VSID (or the T bit) actually remaps the segment.
 		// If that happens, bump the translation generation.
 		if (((oldval ^ newval) & 0x80ff'ffff) != 0)
 		{
-			// 603 TLB entries are tagged with the VSID, so the segment's fixed entries are now stale
-			if (m_cap & PPCCAP_603_MMU)
-				vtlb_flush_fixed(seg << 28, 0xf000'0000);
-
 			m_core->m_translation_generation++;
 		}
 	}
@@ -1743,12 +1772,12 @@ void ppc_device::ppccom_get_dsisr()
 void ppc_device::ppccom_dcbz_check()
 {
 	/*
-		HACK: Mac OS 9 uses DCBZ to pre-warm a cache line over the ATI Rage,
-		but it doesn't expect it to flush out to the hardware until it's written
-		non-zero data there.  Fixing this correctly needs proper data cache
-		emulation, which is under investigation.  Until then, this allows us to
-		deal with other issues and since it's gated by PPCDRC_MACOS_CACHE_HACK,
-		the blast radius is confined solely to slotted PCI PowerMacs.
+	    HACK: Mac OS 9 uses DCBZ to pre-warm a cache line over the ATI Rage,
+	    but it doesn't expect it to flush out to the hardware until it's written
+	    non-zero data there.  Fixing this correctly needs proper data cache
+	    emulation, which is under investigation.  Until then, this allows us to
+	    deal with other issues and since it's gated by PPCDRC_MACOS_CACHE_HACK,
+	    the blast radius is confined solely to slotted PCI PowerMacs.
 	*/
 	offs_t address = m_core->param0;
 	m_core->param1 = 1;
@@ -1817,24 +1846,50 @@ void ppc_device::ppccom_execute_tlbia()
 
 void ppc_device::ppccom_execute_tlbl()
 {
-	uint32_t address = m_core->param0;
-	int isitlb = m_core->param1;
-	vtlb_entry flags;
-	int entrynum;
+	uint32_t const address = m_core->param0;
+	int const isitlb = m_core->param1;
 
 	if (m_flavor == PPC_MODEL_602) // TODO
 		return;
 
 	// determine entry number; we use machine().rand() for associativity
-	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
+	int const entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
-	// Determine the access flags, for both supervisor and user modes.
-	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED | USER_READ_ALLOWED | USER_FETCH_ALLOWED;
-	if (m_core->spr[SPR603_RPA] & 0x80)
-		flags |= WRITE_ALLOWED | USER_WRITE_ALLOWED;
+	// The real TLB stores the PTE's PP bits and applies the segment's Ks/Kp key at access time.
+	// The VTLB holds per-mode permissions instead, so derive them here from the RPA and the segment
+	// register of the missed address.
+	uint32_t const rpa = m_core->spr[SPR603_RPA];
+	uint32_t const segreg = m_core->sr[address >> 28];
+	uint8_t const pp = rpa & 3;
+	uint8_t const ks = (segreg >> 30) & 1;
+	uint8_t const kp = (segreg >> 29) & 1;
+
+	vtlb_entry flags = FLAG_VALID;
+	if (page_access_allowed(TR_READ, ks, pp))
+	{
+		flags |= READ_ALLOWED | FETCH_ALLOWED;
+	}
+	if (page_access_allowed(TR_READ, kp, pp))
+	{
+		flags |= USER_READ_ALLOWED | USER_FETCH_ALLOWED;
+	}
+
+	// A store to a page with C = 0 must take the TLB miss on store exception so the handler can set C.
+	if (rpa & 0x80)
+	{
+		flags |= VTLB_603_CHANGED;
+		if (page_access_allowed(TR_WRITE, ks, pp))
+		{
+			flags |= WRITE_ALLOWED;
+		}
+		if (page_access_allowed(TR_WRITE, kp, pp))
+		{
+			flags |= USER_WRITE_ALLOWED;
+		}
+	}
 
 	// load the entry
-	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
+	vtlb_load(entrynum, 1, address, (rpa & 0xfffff000) | flags);
 }
 
 
@@ -2099,6 +2154,17 @@ void ppc_device::ppccom_execute_mtspr()
 						{
 							remapped = (((oldupper ^ newupper) & 0xfffe'1fff) | ((oldlower ^ newlower) & 0xfffe'0000)) != 0;
 						}
+					}
+
+					// A 603 BAT hit takes priority over the TLB, but the VTLB is consulted before the BATs, so
+					// fixed entries loaded by tlbld/tlbli inside the BAT's new range would keep shadowing it.
+					// Only the upper register sets the range and the valid bits.
+					const bool is_bat_upper = (m_core->param0 != SPROEA_SDR1) && !(m_core->param0 & 1);
+					if ((m_cap & PPCCAP_603_MMU) && is_bat_upper && (m_core->param1 & 0x3)
+							&& (((m_core->spr[m_core->param0] ^ m_core->param1) & 0xfffe'1fff) != 0))
+					{
+						const uint32_t newupper = m_core->param1;
+						vtlb_flush_fixed(newupper, (~newupper << 15) & 0xfffe'0000);
 					}
 
 					m_core->spr[m_core->param0] = m_core->param1;

@@ -253,6 +253,7 @@ public:
 	void ppc_cfunc_unimplemented();
 	void ppc_cfunc_ppccom_mismatch();
 	void ppccom_tlb_fill();
+	int  ppccom_fetch_intention() const;
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();
 	void ppccom_dcbz_check();
@@ -358,6 +359,7 @@ protected:
 		// PowerPC 603-specific state
 		uint32_t mmu603_cmp;
 		uint32_t mmu603_hash[2];
+		uint32_t mmu603_key;                 // SRR1[KEY] for the pending TLB miss: SR[Ks] or SR[Kp]
 		uint32_t mmu603_r[4];
 
 		// parameters for subroutines
@@ -638,7 +640,7 @@ protected:
 		uint32_t checkcount; // number of entry checks the block was generated with
 	};
 	std::unordered_map<uint64_t, reuse_entry> m_reuse_cache; // key = (mode << 32) | pc
-	uint64_t m_last_reuse = ~uint64_t(0);					 // key handed back by the last compile, if it was a reuse
+	uint64_t m_last_reuse = ~uint64_t(0);                    // key handed back by the last compile, if it was a reuse
 
 	bool reuse_entry_checks(uint32_t first, uint32_t count);
 
