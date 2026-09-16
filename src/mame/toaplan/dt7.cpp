@@ -196,7 +196,7 @@ void dt7_state::write_port_2(u8 data)
 		m_shift_chain[0] |= 0xff000000;
 
 		// chain 1: 2P / linked unit side
-		u8 c0 = p2 & 0x7f;
+		u8 c0 = (p2 & 0x7f) | ((sys & 0x40) ? 0x80 : 0x00);
 		m_shift_chain[1] = (~c0 & 0xff) | 0xffffff00;
 	}
 
