@@ -21,6 +21,7 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/timer.h"
+#include "sound/ymopl.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -219,7 +220,7 @@ void licocai_state::pal_addr_high_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 void licocai_state::update_pen(u16 pen)
 {
-/*
+	/* disabled for now as it wipes palette
 	u16 pal = m_pallow[pen] | (m_palhigh[pen] << 8);
 
 	const u8 r = (pal >> 6) & 0x07;
@@ -227,7 +228,7 @@ void licocai_state::update_pen(u16 pen)
 	const u8 b = (pal >> 0) & 0x07;
 
 	m_palette->set_pen_color(pen, rgb_t(r << 5, g << 5, b << 5));
-*/
+	*/
 }
 
 void licocai_state::pal_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -375,8 +376,8 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 void licocai_state::licocai_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).mirror(0x100000).rom();
-	// there are data reads from 19E564 etc. why? (is the ROM the proper size?) - handled with mirror for now
+	map(0x000000, 0x0fffff).rom();//.mirror(0x100000);
+	// there are data reads from 19E564 etc. why? (is the ROM the proper size?)
 	// could be there's a gap in how the ROM maps?
 
 	// some kind of RAM DAC?
@@ -387,6 +388,9 @@ void licocai_state::licocai_map(address_map &map)
 
 	map(0x210000, 0x210001).rw(FUNC(licocai_state::vdp_status_r), FUNC(licocai_state::vdp_dest_select_w));
 	map(0x210002, 0x210003).rw(FUNC(licocai_state::vdp_data_r), FUNC(licocai_state::vdp_data_w));
+
+	map(0x220000, 0x220001).umask16(0xff00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x220002, 0x220003).umask16(0xff00).w("ymsnd", FUNC(ym3812_device::data_w));
 
 	map(0x2a0000, 0x2a0001).r(FUNC(licocai_state::lico_2a0000_r));
 	map(0x2a000a, 0x2a000b).r(FUNC(licocai_state::lico_2a000a_r));
@@ -410,7 +414,7 @@ void licocai_state::licocai(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &licocai_state::licocai_map);
 	// wrong, just to keep things moving
 	m_maincpu->set_periodic_int(FUNC(licocai_state::irq3_line_hold), attotime::from_hz(30));
-	m_maincpu->set_periodic_int(FUNC(licocai_state::irq5_line_hold), attotime::from_hz(40));
+	m_maincpu->set_periodic_int(FUNC(licocai_state::irq5_line_hold), attotime::from_hz(60)); // music tempo driven by this in kshs
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
@@ -423,6 +427,8 @@ void licocai_state::licocai(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x400);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_licocai);
+
+	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.80);
 
 	SPEAKER(config, "speaker", 2).front();
 
