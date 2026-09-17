@@ -73,7 +73,7 @@ private:
 	void licocai_map(address_map &map) ATTR_COLD;
 
 	u16 m_vdp_dest;
-	u16 m_vdp_write_type;
+	u16 m_vdp_enable_flags;
 	u32 m_vdp_write_addr;
 	u32 m_vdp_read_addr;
 
@@ -143,8 +143,8 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x0005: // init to 0000
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (write type?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
-		m_vdp_write_type = data;
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (enable flags?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		m_vdp_enable_flags = data;
 		break;
 
 	case 0x0006: // inited to 0000
@@ -160,8 +160,8 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (unknown)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 		break;
 
-	case 0x0013: // more than once, always 7800
-		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (unknown - writes 7800)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+	case 0x0013: // more than once, always 7800 (which is where it uploads the sprite list)
+		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (sprite base?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
 		break;
 
 
@@ -318,7 +318,7 @@ void licocai_state::machine_start()
 {
 	save_item(NAME(m_vdp_dest));
 	save_item(NAME(m_vdp_write_addr));
-	save_item(NAME(m_vdp_write_type));
+	save_item(NAME(m_vdp_enable_flags));
 	save_item(NAME(m_vdp_read_addr));
 	save_item(NAME(m_paladdr));
 
@@ -342,7 +342,7 @@ void licocai_state::machine_reset()
 	m_vdp_dest = 0;
 	m_vdp_write_addr = 0;
 	m_vdp_read_addr = 0;
-	m_vdp_write_type = 0;
+	m_vdp_enable_flags = 0;
 	m_paladdr = 0;
 }
 
@@ -353,10 +353,15 @@ void licocai_state::video_start()
 uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
+
+	// bits 0x40, 0x8 and 0x4 are also used at least
+	if (!(m_vdp_enable_flags & 0x80))
+		return 0;
+
 	// there's a tilemap (or large sprite) at the start of RAM (maybe it can be relocated)
 	gfx_element *gfx = m_gfxdecode->gfx(3);
 	int count = 0;
-	// left side of screen
+
 	for (int y = 0; y < 32; y++)
 	{
 		for (int x = 0; x < 32; x++)
