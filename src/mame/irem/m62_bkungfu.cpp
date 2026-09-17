@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Jonas Jago
+// copyright-holders:Jonas Jago, Andrea Bogazzi
 /*******************************************************************************
 
 Beyond Kung-Fu
