@@ -1242,14 +1242,14 @@ uint8_t c64_state::cia2_pb_r()
 
 void c64_state::cia2_pb_w(uint8_t data)
 {
-	m_user->write_c((data>>0)&1);
-	m_user->write_d((data>>1)&1);
-	m_user->write_e((data>>2)&1);
-	m_user->write_f((data>>3)&1);
-	m_user->write_h((data>>4)&1);
-	m_user->write_j((data>>5)&1);
-	m_user->write_k((data>>6)&1);
-	m_user->write_l((data>>7)&1);
+	m_user->write_c(BIT(data, 0));
+	m_user->write_d(BIT(data, 1));
+	m_user->write_e(BIT(data, 2));
+	m_user->write_f(BIT(data, 3));
+	m_user->write_h(BIT(data, 4));
+	m_user->write_j(BIT(data, 5));
+	m_user->write_k(BIT(data, 6));
+	m_user->write_l(BIT(data, 7));
 }
 
 //-------------------------------------------------
@@ -1575,7 +1575,7 @@ void c64_state::ntsc(machine_config &config)
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
 	m_iec->srq_callback().set(FUNC(c64_state::iec_srq_w));
-	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
@@ -1743,7 +1743,7 @@ void c64_state::pal(machine_config &config)
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
 	m_iec->srq_callback().set(FUNC(c64_state::iec_srq_w));
-	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
@@ -1901,7 +1901,7 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
-	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
