@@ -73,7 +73,7 @@ DEFINE_DEVICE_TYPE(PADDINGTON, paddington_device, "paddington", "Apple Paddingto
 */
 void macio_device::base_map(address_map &map)
 {
-	map(0x00000, 0x00fff).rw(FUNC(grandcentral_device::macio_r), FUNC(grandcentral_device::macio_w));
+	map(0x00000, 0x00fff).rw(FUNC(macio_device::macio_r), FUNC(macio_device::macio_w));
 	map(0x08000, 0x0801f).m(m_dma_scsi0, FUNC(dbdma_device::map));
 	map(0x08100, 0x0811f).m(m_dma_floppy, FUNC(dbdma_device::map));
 	map(0x08400, 0x0841f).m(m_dma_sccatx, FUNC(dbdma_device::map));
@@ -82,11 +82,11 @@ void macio_device::base_map(address_map &map)
 	map(0x08700, 0x0871f).m(m_dma_sccbrx, FUNC(dbdma_device::map));
 	map(0x08800, 0x0881f).m(m_dma_audio_out, FUNC(dbdma_device::map));
 	map(0x08900, 0x0891f).m(m_dma_audio_in, FUNC(dbdma_device::map));
-	map(0x12000, 0x12fff).rw(FUNC(grandcentral_device::scc_r), FUNC(grandcentral_device::scc_w));
-	map(0x13000, 0x13fff).rw(FUNC(grandcentral_device::scc_macrisc_r), FUNC(grandcentral_device::scc_macrisc_w));
-	map(0x14000, 0x140ff).rw(FUNC(grandcentral_device::codec_r), FUNC(grandcentral_device::codec_w));
-	map(0x15000, 0x15fff).rw(FUNC(grandcentral_device::fdc_r), FUNC(grandcentral_device::fdc_w));
-	map(0x16000, 0x17fff).rw(FUNC(grandcentral_device::mac_via_r), FUNC(grandcentral_device::mac_via_w));
+	map(0x12000, 0x12fff).rw(FUNC(macio_device::scc_r), FUNC(macio_device::scc_w));
+	map(0x13000, 0x13fff).rw(FUNC(macio_device::scc_macrisc_r), FUNC(macio_device::scc_macrisc_w));
+	map(0x14000, 0x140ff).rw(FUNC(macio_device::codec_r), FUNC(macio_device::codec_w));
+	map(0x15000, 0x15fff).rw(FUNC(macio_device::fdc_r), FUNC(macio_device::fdc_w));
+	map(0x16000, 0x17fff).rw(FUNC(macio_device::mac_via_r), FUNC(macio_device::mac_via_w));
 	map(0x1a000, 0x1afff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_a>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_a>));
 	map(0x1b000, 0x1bfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_b>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_b>));
 	map(0x1c000, 0x1cfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_c>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_c>));
@@ -415,7 +415,7 @@ void ohare_device::ohare_start()
 void ohare_device::device_start()
 {
 	common_init();
-	add_map(0x80000, M_MEM, FUNC(grandcentral_device::map));
+	add_map(0x80000, M_MEM, FUNC(ohare_device::map));
 	set_ids(0x106b0007, 0x01, 0xff0000, 0x000000);
 	ohare_start();
 }
