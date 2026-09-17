@@ -482,4 +482,4 @@ ROM_END
 } // anonymous namespace
 
 // or is Cai System the publisher?
-GAME( 1992?, licocai,     0,        licocai,    licocai,    licocai_state, empty_init, ROT0,  "Socrates / C&E", "LICO Cai System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1992?, licocai, 0, 0, licocai, licocai, licocai_state, empty_init, "Socrates / C&E", "LICO Cai System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
