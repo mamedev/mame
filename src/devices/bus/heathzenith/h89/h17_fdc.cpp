@@ -50,8 +50,6 @@ class heath_h17_fdc_device : public device_t, public device_h89bus_right_card_in
 public:
 	heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto floppy_ram_wp_cb() { return m_floppy_ram_wp.bind(); }
-
 	[[maybe_unused]] void side_select_w(int state);
 
 protected:
@@ -76,8 +74,6 @@ protected:
 	void sync_character_received(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tx_timer_cb);
-
-	devcb_write_line m_floppy_ram_wp;
 
 	required_device<s2350_device> m_s2350;
 	required_device_array<floppy_connector, MAX_FLOPPY_DRIVES> m_floppies;
@@ -112,7 +108,6 @@ protected:
 heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, H89BUS_H_17_FDC, tag, owner, 0)
 	, device_h89bus_right_card_interface(mconfig, *this)
-	, m_floppy_ram_wp(*this)
 	, m_s2350(*this, "s2350")
 	, m_floppies(*this, "floppy%u", 0U)
 	, m_tx_timer(*this, "tx_timer")
@@ -153,6 +148,7 @@ void heath_h17_fdc_device::set_floppy(floppy_image_device *floppy)
 	m_floppy = floppy;
 
 	// set any latched signals
+	if (m_floppy)
 	{
 		m_floppy->ss_w(m_side);
 	}
@@ -244,7 +240,7 @@ void heath_h17_fdc_device::ctrl_w(u8 val)
 
 	step_w(!BIT(val, CTRL_STEP_COMMAND));
 
-	m_floppy_ram_wp(BIT(val, CTRL_WRITE_ENABLE_RAM));
+	set_slot_fmwe(BIT(val, CTRL_WRITE_ENABLE_RAM));
 }
 
 u8 heath_h17_fdc_device::read(offs_t offset)
@@ -280,13 +276,13 @@ u8 heath_h17_fdc_device::floppy_status_r()
 	if (m_floppy)
 	{
 		// index/sector hole
-		val |= m_floppy->idx_r() ? 0x00 : 0x01;
+		val |= m_floppy->idx_r() ? 0x01 : 0x00;
 
 		// track 0
 		val |= m_floppy->trk00_r() ? 0x00 : 0x02;
 
 		// disk is write-protected
-		val |= m_floppy->wpt_r() ? 0x00 : 0x04;
+		val |= m_floppy->wpt_r() ? 0x04 : 0x00;
 	}
 	else
 	{
