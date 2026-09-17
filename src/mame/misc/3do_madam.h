@@ -164,7 +164,8 @@ private:
 		DRAW
 	};
 
-	static constexpr u32 CEL_TRANSPARENT = 1 << 16;
+	static constexpr u32 CEL_TRANSPARENT = 1 << 31;
+	// TODO: base for alt_multiply for PIXC interactions here
 
 	struct {
 		cel_state_t state;
@@ -179,9 +180,13 @@ private:
 		double hdx, hdy, vdx, vdy;
 		double hddx, hddy;
 		u32 pixc, pre0, pre1;
+		u8 pixc_1s[2];
 		u8 pixc_ms[2];
 		u8 pixc_mf[2];
 		u8 pixc_df[2];
+		u8 pixc_2s[2];
+		u8 pixc_av[2];
+		u8 pixc_2d[2];
 		u16 pover_force_high, pover_mask;
 		// NOTE: u16 + 1 bit for marking pixel as transparent.
 		// This is done by the Pixel Decoder (PDC) internally.

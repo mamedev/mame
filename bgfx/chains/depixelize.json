@@ -1,0 +1,177 @@
+// license:MIT
+// copyright-holders:Felix Kreuzer
+//============================================================
+//
+//  depixelize.json - "Depixelizing Pixel Art" upscaler
+//
+//  Vectorizes the screen with the algorithm of Kopf & Lischinski
+//  (SIGGRAPH 2011) and renders the resulting smooth contours at
+//  the output resolution, after the GPU implementation of Felix
+//  Kreuzer (TU Wien, 2014). Works best on clean, low-resolution
+//  pixel art; noisy or dithered content shows little effect.
+//
+//  Passes (see the shader sources for details):
+//    similarity graph: which neighboring pixels belong together
+//    cell graph:       B-spline control points (knots) between them
+//    optimization:     smooths the splines while keeping corners ("Smooth Splines" slider)
+//    rasterization:    Gaussian blend of the pixels on the near side of every contour
+//
+//============================================================
+{
+	"name": "Depixelize",
+	"author": "Felix Kreuzer, Johannes Kopf & Dani Lischinski",
+	"sliders": [
+		{ "type": "intenum",
+		  "name": "smooth",
+		  "text": "Smooth Splines",
+		  "default": 1,
+		  "max": 1,
+		  "min": 0,
+		  "step": 1,
+		  "format": "%s",
+		  "screen": "raster",
+		  "strings": [ "Off", "On" ] }
+	],
+	"targets": [
+		{ "name": "pixels",        "mode": "guest", "bilinear": false, "doublebuffer": false },
+		{ "name": "graph_a",       "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2 },
+		{ "name": "graph_b",       "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2 },
+		{ "name": "knot_pos",      "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2, "format": "rgba32f" },
+		{ "name": "knot_flags",    "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2, "format": "rgba32f" },
+		{ "name": "knot_nbr",      "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2, "format": "rgba32f" },
+		{ "name": "knot_tmp",      "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2, "format": "rgba32f" },
+		{ "name": "knot_opt",      "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2, "format": "rgba32f" },
+		{ "name": "knot_cps",      "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 2, "format": "rgba32f" },
+		{ "name": "segments",      "mode": "guest", "bilinear": false, "doublebuffer": false, "scale": 3, "format": "rgba32f" }
+	],
+	"passes": [
+		{   "effect": "misc/blit",
+			"name": "Copy screen to an unpadded texture",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "pixels"
+		},
+		{   "effect": "depixelize/similarity",
+			"name": "Similarity graph",
+			"input": [
+				{ "sampler": "s_source", "target": "pixels" }
+			],
+			"output": "graph_a"
+		},
+		{   "effect": "depixelize/valence",
+			"name": "Node valences",
+			"input": [
+				{ "sampler": "s_graph", "target": "graph_a" }
+			],
+			"output": "graph_b"
+		},
+		{   "effect": "depixelize/crossings",
+			"name": "Crossing diagonal elimination",
+			"input": [
+				{ "sampler": "s_graph", "target": "graph_b" }
+			],
+			"output": "graph_a"
+		},
+		{   "effect": "depixelize/valence",
+			"name": "Node valences (final)",
+			"input": [
+				{ "sampler": "s_graph", "target": "graph_a" }
+			],
+			"output": "graph_b"
+		},
+		{   "effect": "depixelize/construct_position",
+			"name": "Knot positions",
+			"input": [
+				{ "sampler": "s_graph",  "target": "graph_b" },
+				{ "sampler": "s_source", "target": "pixels" }
+			],
+			"output": "knot_pos"
+		},
+		{   "effect": "depixelize/construct_flags",
+			"name": "Knot flags",
+			"input": [
+				{ "sampler": "s_graph",  "target": "graph_b" },
+				{ "sampler": "s_source", "target": "pixels" }
+			],
+			"output": "knot_flags"
+		},
+		{   "effect": "depixelize/construct_neighbors",
+			"name": "Knot neighbors",
+			"input": [
+				{ "sampler": "s_graph",  "target": "graph_b" },
+				{ "sampler": "s_source", "target": "pixels" }
+			],
+			"output": "knot_nbr"
+		},
+		{   "effect": "depixelize/optimize",
+			"name": "Spline optimization, pass 1",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "smooth", "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_positions", "target": "knot_pos" },
+				{ "sampler": "s_flags",     "target": "knot_flags" },
+				{ "sampler": "s_neighbors", "target": "knot_nbr" }
+			],
+			"output": "knot_tmp"
+		},
+		{   "effect": "depixelize/optimize",
+			"name": "Spline optimization, pass 2",
+			"disablewhen": [
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "smooth", "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_positions", "target": "knot_tmp" },
+				{ "sampler": "s_flags",     "target": "knot_flags" },
+				{ "sampler": "s_neighbors", "target": "knot_nbr" }
+			],
+			"output": "knot_opt"
+		},
+		{   "effect": "misc/blit",
+			"name": "Unoptimized knots",
+			"disablewhen": [
+				{ "type": "slider", "condition": "notequal", "combine": "or", "name": "smooth", "value": 0 }
+			],
+			"input": [
+				{ "sampler": "s_tex", "target": "knot_pos" }
+			],
+			"output": "knot_opt"
+		},
+		{   "effect": "depixelize/correct",
+			"name": "T-junction positions",
+			"input": [
+				{ "sampler": "s_positions", "target": "knot_opt" },
+				{ "sampler": "s_flags",     "target": "knot_flags" },
+				{ "sampler": "s_neighbors", "target": "knot_nbr" }
+			],
+			"output": "knot_tmp"
+		},
+		{   "effect": "depixelize/knot_cps",
+			"name": "Knot control points",
+			"input": [
+				{ "sampler": "s_flags",     "target": "knot_flags" },
+				{ "sampler": "s_neighbors", "target": "knot_nbr" }
+			],
+			"output": "knot_cps"
+		},
+		{   "effect": "depixelize/cell_segments",
+			"name": "Cell segments",
+			"input": [
+				{ "sampler": "s_positions", "target": "knot_tmp" },
+				{ "sampler": "s_flags",     "target": "knot_flags" },
+				{ "sampler": "s_cps",       "target": "knot_cps" }
+			],
+			"output": "segments"
+		},
+		{   "effect": "depixelize/rasterize",
+			"name": "Rasterize",
+			"input": [
+				{ "sampler": "s_segments", "target": "segments" },
+				{ "sampler": "s_source",   "target": "pixels" },
+				{ "sampler": "s_graph",    "target": "graph_b" }
+			],
+			"output": "output"
+		}
+	]
+}
