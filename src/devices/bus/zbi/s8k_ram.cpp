@@ -149,7 +149,8 @@ bool zbi_s8k_parity_ram_card_device::check_parity(offs_t offset, uint8_t data, b
 	}
 	else if (BIT(checkbyte, bit) != parity)
 	{
-		card_memerr_w(ASSERT_LINE);
+		m_bus->memerr_w(ASSERT_LINE);
+		m_bus->memerr_w(CLEAR_LINE);
 		return false;
 	}
 
@@ -158,13 +159,23 @@ bool zbi_s8k_parity_ram_card_device::check_parity(offs_t offset, uint8_t data, b
 
 uint8_t zbi_s8k_parity_ram_card_device::card_ram8_r(offs_t offset)
 {
-	return (offset < m_ram->size()) ? m_ram->pointer()[offset] : 0;
+	if (offset < m_ram->size())
+	{
+		const uint8_t data = m_ram->pointer()[offset];
+		check_parity(offset, data, false);
+		return data;
+	}
+
+	return 0;
 }
 
 void zbi_s8k_parity_ram_card_device::card_ram8_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_ram->size())
+	{
 		m_ram->pointer()[offset] = data;
+		check_parity(offset, data, true);
+	}
 }
 
 uint16_t zbi_s8k_parity_ram_card_device::card_ram16_r(offs_t offset, uint16_t mask)
@@ -172,6 +183,10 @@ uint16_t zbi_s8k_parity_ram_card_device::card_ram16_r(offs_t offset, uint16_t ma
 	if (offset < m_ram->size())
 	{
 		const uint8_t *memptr = m_ram->pointer() + offset;
+		if (mask & 0xff00)
+			check_parity(offset + 0, memptr[0], false);
+		if (mask & 0x00ff)
+			check_parity(offset + 1, memptr[1], false);
 
 		return (mask & big_endianize_int16(reinterpret_cast<const uint16_t*>(memptr)[0]));
 	}
@@ -186,9 +201,15 @@ void zbi_s8k_parity_ram_card_device::card_ram16_w(offs_t offset, uint16_t data, 
 		uint8_t *memptr = m_ram->pointer() + offset;
 
 		if (mask & 0xff00)
+		{
 			memptr[0] = (uint8_t)(data >> 8);
+			check_parity(offset + 0, memptr[0], true);
+		}
 		if (mask & 0x00ff)
+		{
 			memptr[1] = (uint8_t)(data);
+			check_parity(offset + 1, memptr[1], true);
+		}
 	}
 }
 
@@ -197,6 +218,14 @@ uint32_t zbi_s8k_parity_ram_card_device::card_ram32_r(offs_t offset, uint32_t ma
 	if (offset < m_ram->size())
 	{
 		const uint8_t *memptr = m_ram->pointer() + offset;
+		if (mask & 0xff000000)
+			check_parity(offset + 0, memptr[0], false);
+		if (mask & 0x00ff0000)
+			check_parity(offset + 1, memptr[1], false);
+		if (mask & 0x0000ff00)
+			check_parity(offset + 2, memptr[2], false);
+		if (mask & 0x000000ff)
+			check_parity(offset + 3, memptr[3], false);
 
 		return (mask & big_endianize_int32(reinterpret_cast<const uint32_t*>(memptr)[0]));
 	}
@@ -211,13 +240,25 @@ void zbi_s8k_parity_ram_card_device::card_ram32_w(offs_t offset, uint32_t data, 
 		uint8_t *memptr = m_ram->pointer() + offset;
 
 		if (mask & 0xff000000)
+		{
 			memptr[0] = (uint8_t)(data >> 24);
+			check_parity(offset + 0, memptr[0], true);
+		}
 		if (mask & 0x00ff0000)
+		{
 			memptr[1] = (uint8_t)(data >> 16);
+			check_parity(offset + 1, memptr[1], true);
+		}
 		if (mask & 0x0000ff00)
+		{
 			memptr[2] = (uint8_t)(data >> 8);
+			check_parity(offset + 2, memptr[2], true);
+		}
 		if (mask & 0x000000ff)
+		{
 			memptr[3] = (uint8_t)(data);
+			check_parity(offset + 3, memptr[3], true);
+		}
 	}
 }
 
@@ -234,7 +275,6 @@ void zbi_s8k_parity_ram_card_device::device_start()
 
 void zbi_s8k_parity_ram_card_device::device_reset()
 {
-	memset(&m_checkbits[0], 0, m_checksize);
 }
 
 

@@ -89,6 +89,9 @@ void s8k_cpu_base::base_device_start()
 	save_item(NAME(m_lad_low));
 	save_item(NAME(m_if1_low));
 	save_item(NAME(m_segt_state));
+	save_item(NAME(m_nmi_code));
+	save_item(NAME(m_memory_error_enabled));
+	save_item(NAME(m_memory_error_latched));
 }
 
 void s8k_cpu_base::base_device_reset()
@@ -102,6 +105,10 @@ void s8k_cpu_base::base_device_reset()
 	m_lad_low = 0;
 	m_if1_low = 0;
 	m_segt_state = false;
+	m_nmi_code = 0;
+	m_memory_error_enabled = false;
+	m_memory_error_latched = false;
+	m_maincpu->set_input_line(z8001_device::NMI_LINE, CLEAR_LINE);
 
 	m_view_code.select(0);
 	m_view_data.select(0);
@@ -196,16 +203,40 @@ uint16_t s8k_cpu_base::nmiack_r()
 
 	uint16_t code = m_nmi_code;
 
-	m_nmi_code = 0;
-
 	if (code == 0)
 	{
 		code = m_bus->nmiack_r();
 	}
 
+	// Manual and power-fail sources are acknowledged here.  The memory-error
+	// identifier is driven by the CPU-board parity latch until SCR D3 clears it.
+	m_nmi_code = m_memory_error_latched ? NMI_ECCERR : 0;
 	m_maincpu->set_input_line(z8001_device::NMI_LINE, CLEAR_LINE);
 
 	return code;
+}
+
+void s8k_cpu_base::card_memerr_w(int state)
+{
+	if (state && m_memory_error_enabled && !m_memory_error_latched)
+	{
+		m_memory_error_latched = true;
+		m_nmi_code |= NMI_ECCERR;
+		card_nmi_w(ASSERT_LINE);
+	}
+}
+
+void s8k_cpu_base::memory_error_control_w(bool enable)
+{
+	m_memory_error_enabled = enable;
+
+	if (!enable)
+	{
+		m_memory_error_latched = false;
+		m_nmi_code &= ~NMI_ECCERR;
+		if (m_nmi_code == 0)
+			card_nmi_w(CLEAR_LINE);
+	}
 }
 
 void s8k_cpu_base::nmi_switch_w(int state)
@@ -360,6 +391,7 @@ void s8k_cpu_base::install_memory(offs_t lrom_end, offs_t lram_start, offs_t lme
 	LROM = memregion("maincpu")->base();
 	LRAM = memshare("local_ram")->ptr();
 	m_view_code[0].install_rom(0x0000, lrom_end, LROM);
+	m_view_code[0].install_ram(lram_start, lram_start + 0x7ff, LRAM);
 	m_view_data[0].install_rom(0x0000, lrom_end, LROM);
 	m_view_data[0].install_ram(lram_start, lram_start + 0x7ff, LRAM);
 	m_view_stck[0].install_ram(lram_start, lram_start + 0x7ff, LRAM);
@@ -459,6 +491,9 @@ void zbi_s8k_cpu10_card_device::reg_scr_w(uint16_t data)
 	{
 		m_is_seg_user = !!(data & SCR_SEG_USER);
 	}
+
+	if (diff & SCR_CLR_PARITY)
+		memory_error_control_w(BIT(data, 3));
 
 	m_reg_scr = (m_reg_scr & 0xf0) | ( data & 0x0f );   // Mask off read-only nibble
 }
@@ -1131,6 +1166,9 @@ void zbi_s8k_hpcpu_card_device::reg_scr_w(uint16_t data)
 	{
 		m_is_seg_user = !!(data & SCR_SEG_USER);
 	}
+
+	if (diff & SCR_CLR_PARITY)
+		memory_error_control_w(BIT(data, 3));
 
 	m_reg_scr = (m_reg_scr & 0x0ff0) | ( data & 0xf00f );   // Mask off read-only parts
 }
