@@ -64,7 +64,8 @@ void mylife_state::pa_w(u16 data)
 
 void mylife_state::prog_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom();
+	// TODO: banked accesses in range 0x8000..0xffff
+	map(0x0000, 0xffff).rom();
 }
 
 static INPUT_PORTS_START( mylife )
@@ -79,10 +80,11 @@ void mylife_state::mylife(machine_config &config)
 
 	I2C_24C02(config, m_seeprom);
 
+	// GiantPlus GPG48238QS1 / LG48236QS31-1B
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 256); // unknown resolution
-	m_screen->set_visarea(0, 256-1, 0, 256-1);
+	m_screen->set_size(320, 240);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(mylife_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();
@@ -119,6 +121,11 @@ ROM_START( mylifei )
 	ROM_LOAD( "af24bc02.u8", 0x000, 0x100, CRC(17c6eb00) SHA1(2b30cb3a924f4905f98cc8220edaee156eaf59ae) )
 ROM_END
 
+ROM_START( mylifei4 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF ) // no TSOP pads; board marked "MY LIFE ML-01 Rev:04"; no date marked between ICs
+	ROM_LOAD( "mylife_ml-01.rev04.u1", 0x000000, 0x800000, CRC(cf147585) SHA1(cca04b12f46ca7e0ba82503182fc1fcdb4ba2df7) )
+ROM_END
+
 ROM_START( mylifes )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF ) // no TSOP pads
 	ROM_LOAD( "mylife_spain.bin", 0x000000, 0x800000, CRC(83bb90bf) SHA1(44d3e62577e03766af5a92f421ed3a96616a5857) )
@@ -126,9 +133,9 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates", "My Life - Another life in your hands (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
-CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",             "My Life - Un'altra vita nelle tue mani (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-// who was the Spanish distributor, what's the Spanish subtitle?
-CONS( 200?, mylifes,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",             "My Life (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, mylife,       0,              0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi / Playmates",  "My Life - Another life in your hands (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // maybe US, found in UK
+CONS( 200?, mylifei,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",              "My Life - Un'altra vita nelle tue mani (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dump with biker sprite identical to the one illustrated in manual dated 2007
+CONS( 200?, mylifei4,     mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi",              "My Life - Un'altra vita nelle tue mani (Italy, Rev 4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // could be a later revision from 2008?
+CONS( 200?, mylifes,      mylife,         0,      mylife,  mylife, mylife_state, empty_init, "Giochi Preziosi España, S.L.", "My Life - Another life in your hands (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // there was a follow-up system 'My Real Life' featuring a camera, unknown if it's the same tech
