@@ -50,6 +50,8 @@ minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/pub
 
 nanosvg - [zlib license](http://opensource.org/licenses/Zlib)
 
+pl_mpeg - [The MIT License (MIT)](http://opensource.org/licenses/MIT), with local changes for the CD-i Digital Video Cartridge marked "MAME CD-i DVC"
+
 portaudio - [The MIT License (MIT)](http://opensource.org/licenses/MIT) explanation at [their site](http://www.portaudio.com/license.html)
 
 portmidi - [The MIT License (MIT)](http://opensource.org/licenses/MIT)

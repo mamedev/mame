@@ -318,10 +318,17 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
-uint32_t mcd212_device::get_backdrop_plane()
+uint32_t mcd212_device::get_backdrop_plane(int x, int y)
 {
 	if (BIT(m_image_coding_method, ICM_EV_BIT))
-		return 0; // External Video Background. Default to Black since there is no DVC.
+	{
+		// External Video Background: the DVC drives it when one is fitted and
+		// is showing a picture, otherwise it stays black.
+		uint32_t argb = 0;
+		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
+			return argb;
+		return 0;
+	}
 	else
 		return s_4bpp_color[m_backdrop_color];
 }
@@ -677,7 +684,7 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = get_backdrop_plane();
+			out[x] = get_backdrop_plane(x + border_width, m_display_line);
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -976,6 +983,9 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	// FIXME this should use the clipping rectangle to determine which lines need drawing
 	int scanline = screen.vpos() / 2;
+
+	// line number within active video, for the external video source
+	m_display_line = scanline - m_ica_height;
 
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
