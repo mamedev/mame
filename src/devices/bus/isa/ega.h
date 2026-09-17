@@ -107,6 +107,7 @@ public:
 	uint8_t   m_display_enable;
 	uint8_t   m_irq;
 	int     m_video_mode;
+	uint8_t   m_last_pixel_value;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };

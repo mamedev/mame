@@ -74,6 +74,7 @@ void dspp_device::data_clio_map(address_map &map)
 	map(0x0ea, 0x0ea).r(FUNC(dspp_device::noise_r));
 //  map(0x0eb, 0x0eb) audio output status read
 //  map(0x0ec, 0x0ec) semaphore status read
+	map(0x0ec, 0x0ec).nopr(); // noisy, suppress for now
 //  map(0x0ed, 0x0ed) semaphore data word
 	map(0x0ee, 0x0ee).rw(FUNC(dspp_device::pc_r), FUNC(dspp_device::pc_w));
 	map(0x0ef, 0x0ef).rw(FUNC(dspp_device::clock_r), FUNC(dspp_device::clock_w));

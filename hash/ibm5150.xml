@@ -8549,6 +8549,18 @@ Corrupt files
 		</part>
 	</software>
 
+	<software name="ega350">
+		<description>Paradise AutoSwitch EGA 350 Special Features Utility v2.1</description>
+		<year>1987</year>
+		<publisher>Paradise</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="ega350.img" size="184320" crc="0ca6892c" sha1="5dff66e683abf5d57df5674bc8620abace70ca7c"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !DOS-based non-auto bootable games -->
 
 	<software name="2400ad" supported="no">

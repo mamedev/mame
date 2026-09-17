@@ -2206,6 +2206,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
+			st1 &= ~ST1_MA;
+			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
@@ -2217,7 +2219,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
-			st1 &= ~ST1_MA;
+			st1 &= ~ST1_ND;
 			xfer_in_progress = true;
 			LOGRW("writing sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],

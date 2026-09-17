@@ -35,7 +35,7 @@ NOTES:
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
 [Sport] leaves trails on SSI intro (uncoded 16bpp with PXOR=1)
-[Madam] requires ACW/ACCW to fill 3d quads in gameplay
+[Madam] requires ACW/ACCW region fills in gameplay
 Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="Slayer"/>
@@ -54,9 +54,10 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Mizuki</publisher>
 		<notes><![CDATA[
-[Madam] Mermaid Mode: minor RMW glitches, stage select is offset in some places (check skipx)
+[Madam] Mermaid Mode stage select is offset in some places (check skipx)
 ]]></notes>
-		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo -->
+		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo, -->
+		<!-- pressing play/pause between game 3do logo and now loading will pause with no feedback -->
 		<info name="alt_title" value="アクア・ワールド ～海美物語～"/>
 		<info name="barcode" value="T4984824055261"/>
 		<info name="release" value="19951013"/>
@@ -142,8 +143,7 @@ May optionally use a [Player] mouse
 		<year>1996</year>
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
-[Madam] has no pointer in main menu (check PIXC)
-Has RMW bugs in gameplay
+[Madam] PIXC bugs: has no pointer in main menu, requires additive blending for status bar boxes
 Not extensively tested, untested preview section
 ]]></notes>
 		<info name="barcode" value="7 90561 02379 1"/>
@@ -174,8 +174,28 @@ Laggy inputs on opponent select, looks stuck
 	</software>
 
 	<!-- https://redump.info/disc/19365 -->
-	<!-- TODO: crshburn: Crash 'n Burn (USA "not for resale" version, a.k.a. the only English version) -->
-	<!-- ... -->
+	<software name="crshburn" supported="no">
+		<!-- "not for resale" version, a.k.a. the only pure English version -->
+		<!-- bundled with fz1 -->
+		<description>Crash 'n Burn (USA)</description>
+		<year>1993</year>
+		<publisher>Crystal Dynamics</publisher>
+		<notes><![CDATA[
+[Sport] issues at startup (Crystal Dynamics FMV drawn out of 1MB VRAM) and main menu
+Has heavy tearing on character select FMVs
+[Madam] requires ACW/ACCW region fills in gameplay, ducks colors too much in tunnels, has PIXC uses here and there
+[DSPP] noisy scratches during gameplay
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 65979 61107 6"/>
+		<info name="serial" value="DFJN5002ZAZ"/>
+		<!-- CD serial: 61100-C -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crash 'n burn (usa) (not for resale)" sha1="c1d5e4fc427ae04b2ac6aa07893bedc5ca4e52dc"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- https://redump.info/disc/49372 -->
 	<software name="demoman" supported="no">
@@ -200,6 +220,29 @@ Not extensively tested
 	<!-- TODO: docthauz: Doctor Hauzer (Japan only, multi indices CD) -->
 	<!-- ... -->
 
+	<!-- https://redump.info/disc/19223 -->
+	<software name="doom" supported="no">
+		<!-- Japanese version published by Basho House thru mail order only, matches USA -->
+		<description>Doom (USA, Japan)</description>
+		<year>1996</year>
+		<publisher>Art Data Interactive</publisher>
+		<notes><![CDATA[
+[Sport] Art Data FMV doesn't get cleared completely
+[Madam] blackened colors for floor and roof, check why it uses plenty of PIXC=0000xxxx with no pover
+Has pixel glitches with very small objects (verify)
+Requires ACW/ACCW to fill 3d quads in gameplay
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 99924 35333 9"/>
+		<info name="developer" value="Logicware"/>
+		<!-- release date: April 26, 1996? -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom (usa)" sha1="a90a3a65d56833cd5c9a07de192e5be5362a9c2c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- https://redump.info/disc/47940/ -->
 	<software name="espnfit" supported="partial">
 		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
@@ -211,6 +254,29 @@ Not extensively tested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="espn fitness pros - step aerobics (usa)" sha1="2edafbf67c30d57b6729e585b44ea513f4057e31"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/19366 -->
+	<software name="fifa" supported="no">
+		<description>FIFA International Soccer (USA, Korea)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[Madam] has multiple PIXC bugs between main menu and gameplay
+Corrupted Packed CEL displays for name entries and time indicator in gameplay,
+Blackened field lines
+Requires ACW/ACCW region fills in places
+]]></notes>
+		<!-- Korean alt title: FIFA Chuggu / 피파　축구 -->
+		<!-- Is it really the same disc? -->
+		<info name="barcode" value="0 14633 07385 0"/>
+		<info name="developer" value="Extended Play Productions"/>
+		<!-- Disc serials: 7461 / GDT-GA-201 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fifa international soccer (usa, korea)" sha1="0fafab265af9daecfa374e5d410d59cbab485ad7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -243,7 +309,7 @@ Hangs after second FMV, regardless of skipping or not
 		<year>1995</year>
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
-Occasional [Madam] RMW bugs
+[Madam] PIXC for game over animation drawing
 ]]></notes>
 		<info name="barcode" value="0 37988 83026 8"/>
 		<info name="serial" value="FZ-SW0001"/>
@@ -366,7 +432,6 @@ Bonus section (3rd option) is untested
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
 [DSPP] sometimes hiccups SFXs during gameplay
-[Madam] occasional RMW corruption on playfield, particularly on drain balls
 ]]></notes>
 		<info name="barcode" value="0 37988 83005 3"/>
 		<info name="developer" value="Japan DataWorks"/>
@@ -378,9 +443,81 @@ Bonus section (3rd option) is untested
 		</part>
 	</software>
 
-	<!-- TODO: retfire: Return Fire (USA, Europe) -->
+	<!-- https://redump.info/disc/45881 -->
+	<software name="retfire" supported="no">
+		<description>Return Fire (USA)</description>
+		<year>1995</year>
+		<publisher>Prolific</publisher>
+		<notes><![CDATA[
+[Sport] doesn't clear main menu graphics when entering gameplay
+[Madam] dots in main menu, has PIXC samples in gameplay, doesn't entirely mask radar
+Requires ACW/ACCW region fills particularly for zoomed in cameras
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 0204-90001-2 5"/>
+		<info name="developer" value="Silent Software"/>
+		<!-- ISBN: 1-886688-00-1 -->
+		<!-- Disc Serial -->
+		<info name="serial" value="PRO - RF3DO001"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="return fire (usa)" sha1="2f973ca92ced6a70bcd13f0efb8de0d99de8dcf0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: retfiree: Return Fire (USA, Europe) -->
+	<!-- Later release or just Europe set that happens to work with USA?-->
 	<!-- https://redump.info/disc/14759 -->
 	<!-- ... -->
+
+	<!-- https://redump.info/disc/14757 -->
+	<software name="nfs" supported="no">
+		<description>Road &amp; Track Presents: The Need for Speed (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[CD drive] hangs when trying to start a game in main menu
+[Madam] CEL packed corruptions in Hall of Fame screens
+Assume needing ACW/ACCW region fills in gameplay
+]]></notes>
+		<info name="barcode" value="0 14633 07355 3"/>
+		<info name="developer" value="Electronic Arts Canada"/>
+		<info name="developer" value="Pioneer Productions"/>
+		<!-- alt barcode: 5 015839 315220 > -->
+		<!-- Electronic Arts ID: E315DCXD (Europe), 7355 (USA) -->
+		<!-- ISBN: 0-7845-0236-6 (USA) -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="road &amp; track presents - the need for speed (usa, europe)" sha1="8ef8e70e98f283c4a0dee069339c94a642f5e2c7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Japanese version of Need for Speed is named OverDrivin' -->
+
+	<!-- https://redump.info/disc/14581 -->
+	<!-- original version bundled with audio CD https://redump.info/disc/59870 -->
+	<software name="roadrash" supported="no">
+		<description>Road Rash (USA)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[DSPP] doesn't playback any BGM on main menu (starts playing when selecting a race)
+Bike engine sounds possibly worse than actual
+[Madam] uses plenty of PIXC additive blending effect, requires ACW/ACCW region fills in gameplay
+]]></notes>
+		<info name="barcode" value="014633 07221 1"/>
+		<info name="developer" value="Monkey Do"/>
+		<info name="developer" value="Electronic Arts Advanced Technology Group"/>
+		<!-- Electronic Arts ID: 7221 -->
+		<!-- ISBN: 1-55543-986-1 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="road rash (usa)" sha1="b8b5b07b43c76b935f276931f3e7b60799c8dc6d"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- https://redump.info/disc/45884 -->
 	<software name="shanghtt" supported="no">
@@ -427,7 +564,7 @@ Not extensively tested
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
 [Madam] corrupted CEL for Krisalis logo at startup
-Title screen, options and pause menu have RMW or PIXC bugs
+Title screen, options and pause menu have PIXC bugs
 ]]></notes>
 		<!-- 7 90561 02500 9 for other pressings (same content?) -->
 		<info name="barcode" value="7 90561 00942 9"/>
@@ -448,10 +585,8 @@ Title screen, options and pause menu have RMW or PIXC bugs
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-[AMY] sets wrong strips on intro logos
-[Sport] missing layer clearances
-[Madam] minor RMW bug in options menu, offset "select game speed" in character select
-Sensitive to CEL timings
+[Sport] missing layer clearances, doesn't draw Capcom logo at startup
+[Madam] Sensitive to CEL timings
 Eventually requires support for [Player] Capcom fighting pad
 ]]></notes>
 		<info name="alt_title" value="スーパーストリートファイターIIX"/>
@@ -522,7 +657,7 @@ Not extensively tested
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
 Pixelated elements in main menu and gameplay, check [Madam] CEL output
-[Madam] Center of screen is too dim in gameplay, likely PIXC
+[Madam] Center of screen is too dim in gameplay (player doesn't get drawn), check PIXC and ALSC
 ]]></notes>
 		<info name="barcode" value="0 13252 01900 3"/>
 		<info name="developer" value="Elite Systems"/>
@@ -530,6 +665,26 @@ Pixelated elements in main menu and gameplay, check [Madam] CEL output
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtuoso (usa)" sha1="53dae9f7bc34f28aeb27ac4060fdc7c12ca54dd9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/45731 -->
+	<software name="waywarr" supported="no">
+		<description>Way of the Warrior (USA)</description>
+		<year>1995</year>
+		<publisher>Universal Interactive Studios</publisher>
+		<notes><![CDATA[
+[Madam] has PIXC bugs in places, zoomed-out camera requires ACW/ACCW region fills
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 85670 10022 8"/>
+		<info name="developer" value="Naughty Dog"/>
+		<!-- Serial on the box: EX-3DO-346-0 (3DO Maniac Pack) -->
+		<!-- ISBN: 1-885310-01-3 (Original) -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="way of the warrior (usa)" sha1="d7e511bfd3ddae722358031244870e092ec39567"/>
 			</diskarea>
 		</part>
 	</software>
@@ -549,6 +704,26 @@ Eventually has optional [Player] lightgun and maybe mouse support
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="who shot johnny rock (usa)" sha1="20d52a017e46aaadd0a0da8be77644653a94199e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/16087 -->
+	<software name="wolf3d" supported="no">
+		<description>Wolfenstein 3D (USA)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<notes><![CDATA[
+[Madam] check PIXC outputs in main menu
+Never color fills floor and roof in gameplay
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="0 40421 29247 9"/>
+		<info name="developer" value="Logicware"/>
+		<info name="serial" value="CD-3DO-247-0, BX-3DO-247-0"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wolfenstein 3d (usa)" sha1="6c335bea22b365379dc9f5b2f0cf0ee0f5b2d933"/>
 			</diskarea>
 		</part>
 	</software>

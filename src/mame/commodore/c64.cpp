@@ -1478,15 +1478,8 @@ void c64_state::machine_start()
 
 void c64_state::machine_reset()
 {
-	m_maincpu->reset();
-
-	m_vic->reset();
-	m_sid->reset();
-	m_cia1->reset();
-	m_cia2->reset();
-
-	m_iec->reset();
-	m_exp->reset();
+	m_iec->host_reset_w(0);
+	m_iec->host_reset_w(1);
 
 	m_user->write_3(0);
 	m_user->write_3(1);

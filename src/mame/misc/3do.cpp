@@ -106,7 +106,8 @@ Models:
 - Goldstar 3DO ALIVE II (South Korea)
 - Samsung DMB-800 (South Korea)
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
-- Creative 3DO Blaster - PC Card (ISA)
+- Creative 3DO Blaster, (ISA16 card, PCB marked CTM6110) with a MCT MVM121A VGA passthrough,
+  and a bunch of Creative-style feature connectors
 - Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter
   built-in
 - a Scientific Atlanta Set Top Terminal, with a Nicky device in BIGTRACE space

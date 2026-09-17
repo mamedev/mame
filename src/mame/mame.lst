@@ -1418,6 +1418,10 @@ macqd610
 macqd650
 macqd800
 
+@source:apple/macquadraav.cpp
+macqd660av
+macqd840av
+
 @source:apple/newton.cpp
 emate
 motmarco
@@ -18664,14 +18668,24 @@ twinsed2
 @source:efo/cedar_magnet.cpp
 cedmag
 mag_boob
+mag_boobcc
 mag_burn
+mag_coco
 mag_day
+mag_ddrg
+mag_ddrgec
+mag_dodg
 mag_drac
 mag_exzi
+mag_exzi2
+mag_fsha
 mag_pdak
+mag_scon
+mag_sconcc
 mag_time
 mag_war
 mag_wara
+mag_wwar
 mag_xain
 
 @source:efo/cidelsa.cpp
@@ -40955,6 +40969,7 @@ puckpkmn
 puckpkmnb
 shuifeng
 songjang
+xmvsfmb
 
 @source:sega/megaplay.cpp
 megaplay
@@ -42312,8 +42327,11 @@ pclub26w
 pclub26wa
 pclub27s
 pclub2bb
+pclub2bu
+pclub2ev
 pclub2fc
 pclub2kc
+pclub2lc
 pclub2mb
 pclub2pe
 pclub2pf
@@ -42352,6 +42370,7 @@ sfish2j
 shanhigw
 shienryu
 skychal
+slotbatt
 smleague
 sokyugrt
 sss

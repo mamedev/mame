@@ -41,9 +41,10 @@ private:
 	void DasmCoProc_DT(std::ostream &stream, u32 opcode, const char *pConditionCode, std::streampos start_position);
 	void DasmCoProc_DO(std::ostream &stream, u32 opcode, const char *pConditionCode, std::streampos start_position);
 	static u32 ExtractImmediateOperand( u32 opcode );
-	void WriteShiftCount( std::ostream &stream, u32 opcode );
+	void WriteShiftCount( std::ostream &stream, int type, int count, bool printType );
 	void WriteDataProcessingOperand( std::ostream &stream, u32 opcode, bool printOp0, bool printOp1 );
 	void WriteRegisterOperand1( std::ostream &stream, u32 opcode );
+	void WriteRegisterList( std::ostream &stream, u16 operand );
 	void WriteBranchAddress( std::ostream &stream, u32 pc, u32 opcode, bool h_bit );
 	u32 arm7_disasm( std::ostream &stream, u32 pc, u32 opcode );
 	u32 thumb_disasm(std::ostream &stream, u32 pc, u16 opcode);

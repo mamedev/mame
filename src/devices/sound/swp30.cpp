@@ -426,7 +426,7 @@ void swp30_device::streaming_block::scale_and_clamp(s16 &val0, s16 &val1, s16 &v
 
 void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos : m_pos;
+	s32 spos = (m_loop & 0x80000000) ? (-m_pos - 1) : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 1);
 	switch(spos & 1) {
@@ -459,7 +459,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 
 void swp30_device::streaming_block::read_12(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos : m_pos;
+	s32 spos = (m_loop & 0x80000000) ? (-m_pos - 1) : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 3)*3;
 	switch(spos & 7) {
@@ -560,7 +560,7 @@ void swp30_device::streaming_block::read_12(memory_access<25, 2, -2, ENDIANNESS_
 
 void swp30_device::streaming_block::read_8(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
 {
-	s32 spos = m_loop & 0x80000000 ? -m_pos : m_pos;
+	s32 spos = (m_loop & 0x80000000) ? (-m_pos - 1) : m_pos;
 	offs_t base_address = m_address & 0x1ffffff;
 	offs_t adr = base_address + (spos >> 2);
 	switch(spos & 3) {
@@ -684,6 +684,15 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 	case 1: read_12(wave, val0, val1, val2, val3); break;
 	case 2: read_8 (wave, val0, val1, val2, val3); break;
 	case 3: read_8c(wave, val0, val1, val2, val3); break;
+	}
+	// When playing backwards, the four values are read in address order,
+	// which is the reverse of the playback order.  The read starts one
+	// sample earlier and the values are swapped here to get previous,
+	// current, next and the one after, as when playing forwards.
+	if((m_loop & 0x80000000) && (m_address >> 30) != 3) {
+		using std::swap;
+		swap(val0, val3);
+		swap(val1, val2);
 	}
 	if(m_first)
 		val0 = 0;
@@ -1423,7 +1432,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 		k0 -= 9;
 		u32 a = (4 << k0) - 1;
 		u32 b = (2 << k0) - 1;
-		static const u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
+		constexpr u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
 		return ((mx[k1] >> (sample_counter & 7)) & 1) ? a : b;
 	}
 
@@ -1431,7 +1440,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 		if(sample_counter & 1)
 			return 1;
 		u32 s1 = (sample_counter & 0xe) >> 1;
-		static const u8 mx[8] = { 0x00, 0x01, 0x22, 0xa8, 0x55, 0xab, 0x77, 0xfd };
+		constexpr u8 mx[8] = { 0x00, 0x01, 0x22, 0xa8, 0x55, 0xab, 0x77, 0xfd };
 		return (mx[k1] >> s1) & 1;
 	}
 
@@ -1440,7 +1449,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 	if(sample_counter & util::make_bitmask<u32>(k0))
 		return 0;
 
-	static const u16 mx[8] = { 0x5555, 0x5557, 0x5757, 0x5777, 0x7777, 0x777f, 0x7f7f, 0x7fff };
+	constexpr u16 mx[8] = { 0x5555, 0x5557, 0x5757, 0x5777, 0x7777, 0x777f, 0x7f7f, 0x7fff };
 	return (mx[k1] >> ((sample_counter >> k0) & 0xf)) & 1;
 }
 
@@ -2012,7 +2021,7 @@ void swp30_device::map(address_map &map)
 	rctrl(map, 0x3a).rw(FUNC(swp30_device::meg_map_r<5>), FUNC(swp30_device::meg_map_w<5>));
 	rctrl(map, 0x3c).rw(FUNC(swp30_device::meg_map_r<6>), FUNC(swp30_device::meg_map_w<6>));
 	rctrl(map, 0x3e).rw(FUNC(swp30_device::meg_map_r<7>), FUNC(swp30_device::meg_map_w<7>));
-	rctrl(map, 0x40).w (FUNC(swp30_device::revram_enable_w));
+	rctrl(map, 0x40).rw(FUNC(swp30_device::revram_enable_r), FUNC(swp30_device::revram_enable_w));
 	rctrl(map, 0x41).w (FUNC(swp30_device::revram_clear_w));
 	rctrl(map, 0x42).r (FUNC(swp30_device::revram_status_r));
 	rctrl(map, 0x4a).w (FUNC(swp30_device::revram_adr_w<1>));
@@ -2258,6 +2267,11 @@ u32 swp30_device::meg_state::revram_decode(u16 v)
 }
 
 
+u16 swp30_device::revram_enable_r()
+{
+	return m_revram_enable;
+}
+
 void swp30_device::revram_enable_w(u16 data)
 {
 	logerror("revram enable = %04x\n", data);
@@ -2289,14 +2303,17 @@ template<int Sel> void swp30_device::revram_data_w(u16 data)
 	else
 		m_revram_data = (m_revram_data & 0xffff0000) |  data;
 
+	// The value is 16.16 with the sample in the upper word, while the MEG
+	// writes its memory at p >> 15 where 1.0 is 1 << 23.  Scale it the
+	// same way, keeping the sign.
 	if(!Sel)
-		m_reverb->write_word(m_revram_adr, meg_state::revram_encode(m_revram_data >> 5));
+		m_reverb->write_word(m_revram_adr, meg_state::revram_encode(s32(m_revram_data) >> 8));
 }
 
 template<int Sel> u16 swp30_device::revram_data_r()
 {
 	if(Sel)
-		m_revram_data = meg_state::revram_decode(m_reverb->read_word(m_revram_adr)) << 5;
+		m_revram_data = meg_state::revram_decode(m_reverb->read_word(m_revram_adr)) << 8;
 
 	return Sel ? m_revram_data >> 16 : m_revram_data;
 }
@@ -2913,7 +2930,7 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 
 //    33333333 33333333 22222222 22222222 11111111 11111111 00000000 00000000
 //    fedcba98 76543210 fedcba98 76543210 fedcba98 76543210 fedcba98 76543210
-//    ABCDEFFF Grrrrrrr HHHmmmmm m-II--J- KKLLMMNN OOPPQRrr rrrrrSmm mmmm----
+//    ABCDEFFF Grrrrrrr HHHmmmmm m-IIT-J- KKLLMMNN OOPPQRrr rrrrrSmm mmmm----
 //    +                               + +                                ++++ = bits set at least once in the mu100 programs
 
 //    m = low is read port, high is write port, memory register
@@ -2929,6 +2946,11 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 //    H = m register write source (0, 1, 3 unknown, 2 lfo, 4 mem read, 5 rand, 6 p, 7 m register)
 //    I = memory mode, none/read/write/read+1
 //    J = add index to address on memory access
+//    T = memory read at an absolute address: offset (+ index) (+1), without
+//        the sample counter and the mappings.  The firmware uploads lookup
+//        tables there through the revram address/data registers (waveforms,
+//        curves) when it loads effects like ring mod, auto pan or the
+//        multiband compressor.
 //    K = saturation mode (0 = none, 1 = 24.15, 2 = 0 to max positive 24.15, 3 = abs then max positive 24.15)
 //    L = shift left writing to p
 //    M = adder mode (0 = add, 1 = sub, 2 = add abs, 3 = binary and)
@@ -3302,7 +3324,7 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			o = util::string_format("(%s) << %d", o, shift == 3 ? 4 : shift);
 
 		u32 sat = BIT(opcode, 0x1e, 2);
-		static const char *const satmode[4] = { "=", "=s", "=_", "=a" };
+		static char const *const satmode[4] = { "=", "=s", "=_", "=a" };
 
 		append(r, util::string_format("p %s %s", satmode[sat], o));
 	}
@@ -3345,8 +3367,8 @@ offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 	u32 memmode = BIT(opcode, 0x24, 2);
 	if(memmode) {
-		static const char *modes[4] = { nullptr, "w", "r", "1r" };
-		append(r, util::string_format("mem_%s +%s%s", modes[memmode], goffset(pc/3), BIT(opcode, 0x21) ? "+idx" : ""));
+		static char const *const modes[4] = { nullptr, "w", "r", "1r" };
+		append(r, util::string_format("mem_%s %s%s%s", modes[memmode], memmode != 1 && BIT(opcode, 0x23) ? "@" : "+", goffset(pc/3), BIT(opcode, 0x21) ? "+idx" : ""));
 	}
 
 	if(opcode == 0)
@@ -3672,9 +3694,9 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 	if(dr) {
 		if(BIT(opcode, 0x37)) {
 			if(sr)
-				UML_DMOV(block, mem(&m_rw_value[index3]), mem(&m_r[sr]));
+				UML_MOV(block, mem(&m_rw_value[index3]), mem(&m_r[sr]));
 			else
-				UML_DMOV(block, mem(&m_rw_value[index3]), 0);
+				UML_MOV(block, mem(&m_rw_value[index3]), 0);
 		} else {
 			UML_DMOV(block, I0, mem(&m_p));
 			if(!BIT(opcode, 0x0a)) {
@@ -3713,7 +3735,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 
 	if(BIT(opcode, 0x3e)) {
 		UML_DSAR(block, I0, mem(&m_p), 15+8);
-		UML_STORE(block, m_index_value.data(), index3, I0, SIZE_WORD, SCALE_x2);
+		UML_MOV(block, mem(&m_index_value[index3]), I0);
 	}
 
 	// Memory access
@@ -3726,15 +3748,22 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 				break;
 		u16 mapr = m_map[bank];
 		u32 mask = (1 << (10+BIT(mapr, 8, 3))) - 1;
-		u32 offset = BIT(mapr, 0, 8) << 10;
-		if(amem == 3)
-			offset ++;
+		u32 base = BIT(mapr, 0, 8) << 10;
 		UML_LOAD(block, I0, m_offset.data(), pc/3, SIZE_WORD, SCALE_x2);
-		UML_SUB(block, I0, I0, mem(&m_sample_counter));
-		UML_ADD(block, I0, I0, offset);
+		if(amem == 3)
+			UML_ADD(block, I0, I0, 1);
 		if(BIT(opcode, 0x21))
 			UML_ADD(block, I0, I0, mem(&m_ram_index));
-		UML_AND(block, I0, I0, mask);
+		if(amem != 1 && BIT(opcode, 0x23)) {
+			// Absolute address, no sample counter and no bank mapping
+			UML_AND(block, I0, I0, 0x3ffff);
+		} else {
+			UML_SUB(block, I0, I0, mem(&m_sample_counter));
+			// Mask within the bank, then move to the bank start
+			UML_AND(block, I0, I0, mask);
+			if(base)
+				UML_ADD(block, I0, I0, base);
+		}
 		if(amem == 1) {
 			UML_MOV(block, mem(&m_retval), mem(&m_ram_write));
 			UML_CALLC(block, call_revram_encode, this);
@@ -3923,7 +3952,9 @@ void swp30_device::meg_state::step()
 		break;
 	}
 	case 2: {
-		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
+		u32 address = BIT(opcode, 0x23) ?
+			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
+			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
 		if(address != 0xffffffff) {
 			u16 val = m_swp->m_reverb_cache.read_word(address);
 			m_memr_value[m_delay_2] = revram_decode(val);
@@ -3932,7 +3963,9 @@ void swp30_device::meg_state::step()
 		break;
 	}
 	case 3: {
-		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
+		u32 address = BIT(opcode, 0x23) ?
+			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
+			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
 		if(address != 0xffffffff) {
 			u16 val = m_swp->m_reverb_cache.read_word(address);
 			m_memr_value[m_delay_2] = revram_decode(val);

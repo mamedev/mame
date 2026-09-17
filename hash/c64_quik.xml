@@ -311,4 +311,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ciadetect">
+		<description>CIA Detector</description>
+		<year>2026</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="481">
+				<rom name="cia_detect.prg" size="481" crc="028c7816" sha1="440488738fe52c89c4dda6b01a03b7deabd16364"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

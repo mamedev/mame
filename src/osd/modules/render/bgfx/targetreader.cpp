@@ -22,6 +22,13 @@ const target_reader::string_to_enum target_reader::STYLE_NAMES[target_reader::ST
 	{ "custom", TARGET_STYLE_CUSTOM }
 };
 
+const target_reader::string_to_enum target_reader::FORMAT_NAMES[target_reader::FORMAT_COUNT] = {
+	{ "bgra8",   bgfx::TextureFormat::BGRA8 },
+	{ "rgba8",   bgfx::TextureFormat::RGBA8 },
+	{ "rgba16f", bgfx::TextureFormat::RGBA16F },
+	{ "rgba32f", bgfx::TextureFormat::RGBA32F }
+};
+
 bgfx_target* target_reader::read_from_value(
 		const Value& value,
 		const std::string &prefix,
@@ -39,6 +46,7 @@ bgfx_target* target_reader::read_from_value(
 	uint32_t mode = uint32_t(get_enum_from_value(value, "mode", TARGET_STYLE_NATIVE, STYLE_NAMES, STYLE_COUNT));
 	bool bilinear = get_bool(value, "bilinear", true);
 	bool double_buffer = get_bool(value, "doublebuffer", true);
+	auto format = bgfx::TextureFormat::Enum(get_enum_from_value(value, "format", bgfx::TextureFormat::BGRA8, FORMAT_NAMES, FORMAT_COUNT));
 	int scale = 1;
 	if (value.HasMember("scale"))
 	{
@@ -87,18 +95,29 @@ bgfx_target* target_reader::read_from_value(
 			break;
 	}
 
-	return chains.targets().create_target(std::move(target_name), bgfx::TextureFormat::BGRA8, width, height, xprescale, yprescale, mode, double_buffer, bilinear, scale, screen_index);
+	return chains.targets().create_target(std::move(target_name), format, width, height, xprescale, yprescale, mode, double_buffer, bilinear, scale, screen_index);
 }
 
 bool target_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
 	if (!READER_CHECK(value.HasMember("name"), "%sMust have string value 'name'\n", prefix)) return false;
 	if (!READER_CHECK(value["name"].IsString(), "%sValue 'name' must be a string\n", prefix)) return false;
+	// these are the textures and targets the chain manager creates for every screen
+	const std::string name = value["name"].GetString();
+	if (!READER_CHECK((name != "screen") && (name != "source") && (name != "palette") && (name != "output"), "%sTarget name '%s' is reserved\n", prefix, name)) return false;
 	if (!READER_CHECK(value.HasMember("mode"), "%sMust have string enum 'mode'\n", prefix)) return false;
 	if (!READER_CHECK(value["mode"].IsString(), "%sValue 'mode' must be a string (what screens does this apply to?)\n", prefix)) return false;
 	if (!READER_CHECK(!value.HasMember("bilinear") || value["bilinear"].IsBool(), "%sValue 'bilinear' must be a boolean\n", prefix)) return false;
 	if (!READER_CHECK(!value.HasMember("doublebuffer") || value["doublebuffer"].IsBool(), "%sValue 'doublebuffer' must be a boolean\n", prefix)) return false;
 	if (!READER_CHECK(!value.HasMember("user_prescale") || value["user_prescale"].IsBool(), "%sValue 'user_prescale' must be a boolean\n", prefix)) return false;
 	if (!READER_CHECK(!value.HasMember("scale") || value["scale"].IsNumber(), "%sValue 'scale' must be a numeric value\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("format") || value["format"].IsString(), "%sValue 'format' must be a string\n", prefix)) return false;
+	if (value.HasMember("format"))
+	{
+		bool known = false;
+		for (const auto &entry : FORMAT_NAMES)
+			known = known || (entry.m_string == value["format"].GetString());
+		if (!READER_CHECK(known, "%sValue 'format' must be one of bgra8, rgba8, rgba16f, rgba32f\n", prefix)) return false;
+	}
 	return true;
 }

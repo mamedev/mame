@@ -266,4 +266,4 @@ ROM_END
 }
 
 COMP(1983, chameleon, 0, 0, chameleon, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC)", MACHINE_NOT_WORKING)
-COMP(1983, champroto, 0, 0, champroto, 0, chameleon_state, empty_init, "Seequa", "Chameleon Prototype (Seequa PC)", MACHINE_NOT_WORKING)
+COMP(1983, champroto, chameleon, 0, champroto, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC, prototype)", MACHINE_NOT_WORKING)
