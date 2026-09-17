@@ -1412,7 +1412,7 @@ static INPUT_PORTS_START( f1superb )
 
 	PORT_START("AN0")   // Acceleration
 	// pot rests at 0x50 and decreases when pressed: the game stores the rest value at boot and computes throttle as rest - current (same scheme as f1gpstar in cischeat.cpp)
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x50) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x50) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("AN1")   // Steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
