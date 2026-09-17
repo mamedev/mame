@@ -333,15 +333,14 @@ void zbi_s8k_smdc_card_device::write(uint16_t data)
 
 	if (data & SMD_CR_RI)
 	{
+		// HRM 03-3237-04, p. 4-32: RI resets IP/IUS; DI separately disables interrupts.
 		m_status &= ~(SMD_SR_IP | SMD_SR_IUS);
-		m_ie = false;
 	}
 
 	if (data & SMD_CR_WK)
 	{
 		m_wakeup = true;
 		m_status |= SMD_SR_BZ;
-		m_update_timer->adjust(attotime::from_nsec(180));   /* bus frequency */
 	}
 
 	if (data & SMD_CR_EI)
@@ -379,6 +378,14 @@ void zbi_s8k_smdc_card_device::write(uint16_t data)
 	}
 
 	LOGCMD("%s SMDC command: %02x\n", machine().describe_context(), data & SMD_CR_CMD_MASK);
+
+	// A wakeup may be queued by the interrupt handler before it resets the
+	// previous completion.  Do not let that reset discard the next completion.
+	// HRM pp. 4-32, 4-38 describe the IP/IUS handshake and wait-for-clear state.
+	if (m_wakeup && !(m_status & (SMD_SR_IP | SMD_SR_IUS)) && !m_busreq_state)
+		m_update_timer->adjust(attotime::from_nsec(180));
+
+	m_bus->vi_w((z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -389,12 +396,15 @@ TIMER_CALLBACK_MEMBER(zbi_s8k_smdc_card_device::update_buffers)
 {
 	if (m_wakeup)
 	{
+		if (m_status & (SMD_SR_IP | SMD_SR_IUS))
+			return;
+
+		/* reset wakeup bit before requesting the bus */
+		m_wakeup = false;
+
 		/* tell the CPU to relinquish the bus */
 		m_busreq_state = ASSERT_LINE;
 		m_bus->busreq_w(m_busreq_state);
-
-		/* reset wakeup bit */
-		m_wakeup = false;
 	}
 	else
 	{
@@ -452,6 +462,9 @@ void zbi_s8k_smdc_card_device::z80daisy_irq_reti()
 	{
 		/* clear the IEO state and update the IRQs */
 		m_status &= ~SMD_SR_IUS;
+
+		if (m_wakeup && !(m_status & SMD_SR_IP) && !m_busreq_state)
+			m_update_timer->adjust(attotime::from_nsec(180));
 
 		int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
 		m_bus->vi_w(state);
