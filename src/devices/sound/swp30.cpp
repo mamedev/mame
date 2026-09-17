@@ -215,11 +215,23 @@ added to the accumulator, which gives the current sample value.
 Then the current delta is, depending on the mode bits, multiplied
 by either 0.875 (7/8), 0.75 (3/4), 0.5 (1/2) or 0 (e.g. cleared).
 
-The multiplier on the delta is buggy and bias towards negative
-numbers, but it's not entirely clear how exactly.  Even worse, the
-multiplier results change depending on whether the scaling is zero
-or non-zero, and also has some kind of context or extra state bits
-hidden somewhere.
+The accumulator does not leak.  It is clamped (see scaling below),
+and the next delta is computed from what was actually added to it,
+which is smaller than the delta when the accumulator clamped.  The
+multiplication keeps its remainder for the next sample instead of
+dropping it: with k/d the multiplier and r the remainder taken on
+the negative side (-d < r <= 0),
+
+  y     = k * added + r
+  delta = floor(y / d)
+  r     = (y mod d) ? (y mod d) - d : 0
+
+This matches the output captured from a swp00 (mu50, one format)
+and a swp20 (mu80, all 32 formats) playing the same compressed
+sample, including where the accumulator clamps.  The swp20 shows
+more bits, which hides the delta sequence at scaling 0, but the 28
+formats with scaling 1-7 match on every sample.  The swp20 mode 2
+form was first worked out by TaleTN.
 
 
   Sample scaling
@@ -385,6 +397,7 @@ void swp30_device::streaming_block::clear()
 	m_dpcm_s0 = m_dpcm_s1 = m_dpcm_s2 = m_dpcm_s3 = 0;
 	m_dpcm_pos = 0;
 	m_dpcm_delta = 0;
+	m_dpcm_rem = 0;
 	m_first = false;
 	m_done = false;
 	m_last = 0;
@@ -397,6 +410,7 @@ void swp30_device::streaming_block::keyon()
 	m_dpcm_s0 = m_dpcm_s1 = m_dpcm_s2 = m_dpcm_s3 = 0;
 	m_dpcm_pos = m_pos+1;
 	m_dpcm_delta = 0;
+	m_dpcm_rem = 0;
 	m_first = true;
 	m_finetune_active = false;
 	m_done = false;
@@ -621,28 +635,24 @@ void swp30_device::streaming_block::dpcm_step(u8 input)
 	m_dpcm_s1 = m_dpcm_s2;
 	m_dpcm_s2 = m_dpcm_s3;
 
-	s32 delta = m_dpcm_delta + dpcm_expand[input];
-	s32 acc = m_dpcm_s3;
-	if(mode != 3)
-		acc -= s32((s64(acc) * 3) >> 7);
-	s32 sample = acc + (delta << scale);
+	s32 acc = m_dpcm_s3 >> scale;
+	s32 sample = (acc + m_dpcm_delta + dpcm_expand[input]) << scale;
 
-	if(sample < -0x8000) {
+	if(sample < -0x8000)
 		sample = -0x8000;
-		delta = 0;
-	} else if(sample > limit) {
+	else if(sample > limit)
 		sample = limit;
-		delta = 0;
-	}
 	m_dpcm_s3 = sample;
 
+	// The next delta comes from what was actually added
+	s32 added = (sample >> scale) - acc;
+	s32 y, m;
 	switch(mode) {
-	case 0: delta = delta * 7 / 8; break;
-	case 1: delta = delta * 3 / 4; break;
-	case 2: delta = delta     / 2; break;
-	case 3: delta = 0; break;
+	case 0: y = added * 7 + m_dpcm_rem; m = y & 7; m_dpcm_delta = y >> 3; m_dpcm_rem = m ? m - 8 : 0; break;
+	case 1: y = added * 3 + m_dpcm_rem; m = y & 3; m_dpcm_delta = y >> 2; m_dpcm_rem = m ? m - 4 : 0; break;
+	case 2: y = added     + m_dpcm_rem; m = y & 1; m_dpcm_delta = y >> 1; m_dpcm_rem = m ? m - 2 : 0; break;
+	case 3: m_dpcm_delta = 0; m_dpcm_rem = 0; break;
 	}
-	m_dpcm_delta = delta;
 }
 
 void swp30_device::streaming_block::read_8c(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
@@ -1791,6 +1801,7 @@ void swp30_device::device_start()
 	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_s3));
 	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_pos));
 	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_delta));
+	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_rem));
 	save_item(STRUCT_MEMBER(m_streaming, m_first));
 	save_item(STRUCT_MEMBER(m_streaming, m_finetune_active));
 	save_item(STRUCT_MEMBER(m_streaming, m_done));
@@ -2262,7 +2273,7 @@ u32 swp30_device::meg_state::revram_decode(u16 v)
 	u32 m = v & 0x7ff;
 	u32 vb = e ? (m | 0x800) << (e-1) : m;
 	if(s)
-		vb ^= e ? (0xffffffff << (e-1)) & 0xffffffff : 0xffffffe0;
+		vb ^= e ? (0xffffffff << (e-1)) & 0xffffffff : 0xffffffff;
 	return vb;
 }
 
@@ -3409,6 +3420,60 @@ void swp30_device::meg_state::call_revram_decode(void *ms)
 	ms1->m_retval = revram_decode(ms1->m_retval);
 }
 
+// Pack p (27.15) into a 24-bit register.  The value is truncated
+// towards zero, and a p sitting on a saturation limit that the dither
+// pushed one step over is kept at the limit.  Otherwise the value wraps,
+// which phase accumulators rely on.
+
+s32 swp30_device::meg_state::pack24(s64 p)
+{
+	s64 q = p / 32768;
+	if(q == 0x800000)
+		q = 0x7fffff;
+	else if(q == -0x800001)
+		q = -0x800000;
+	return util::sext(s32(q), 24);
+}
+
+// pack24 inline, result in I0
+
+void swp30_device::meg_state::drc_pack24(drcuml_block &block, bool dither, uml::code_label label)
+{
+	UML_DMOV(block, I0, mem(&m_p));
+	if(dither) {
+		UML_CALLC(block, call_rand, this);
+		UML_AND(block, I1, mem(&m_retval), 0x07e0);
+		UML_DADD(block, I0, I0, I1);
+	}
+	UML_DCMP(block, I0, 0);
+	UML_JMPc(block, COND_GE, label);
+	UML_DADD(block, I0, I0, 0x7fff);
+	UML_LABEL(block, label);
+	UML_DSAR(block, I0, I0, 15);
+	UML_DMOV(block, I1, 0x7fffff);
+	UML_DCMP(block, I0, 0x800000);
+	UML_DMOVc(block, COND_E, I0, I1);
+	UML_DMOV(block, I1, -0x800000);
+	UML_DCMP(block, I0, -0x800001);
+	UML_DMOVc(block, COND_E, I0, I1);
+	UML_SHL(block, I0, I0, 8);
+	UML_SAR(block, I0, I0, 8);
+}
+
+// p >> 23 saturated to 16 bits into the t value source
+
+void swp30_device::meg_state::drc_t_value(drcuml_block &block, u32 index2)
+{
+	UML_DSAR(block, I0, mem(&m_p), 15+8);
+	UML_DMOV(block, I1, -0x8000);
+	UML_DCMP(block, I0, I1);
+	UML_DMOVc(block, COND_L, I0, I1);
+	UML_DMOV(block, I1, 0x7fff);
+	UML_DCMP(block, I0, I1);
+	UML_DMOVc(block, COND_G, I0, I1);
+	UML_STORE(block, m_t_value.data(), index2, I0, SIZE_WORD, SCALE_x2);
+}
+
 void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 {
 	enum {
@@ -3419,6 +3484,8 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		L_M1_M5,   // m1 expansion, exp < 5
 		L_LFO1,    // lfo, first label
 		L_LFO2,    // lfo, second label
+		L_PACK_M,  // truncation towards zero, m write
+		L_PACK_R,  // truncation towards zero, r write
 		L_MEM_OFF, // memory access on a bank turned off in the tlb enable
 		L_MEM_DONE,// memory access, end
 	};
@@ -3461,9 +3528,10 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 	int t  = BIT(opcode, 0x38, 3);
 
 	u32 mmode = BIT(opcode, 0x16, 2);
-	if(mmode != 0 && !BIT(opcode, 0x3f)) {
+	// Without a multiplier the adder, shift and saturation still apply
+	if(!BIT(opcode, 0x3f) && (mmode != 0 || BIT(opcode, 0x1a, 6))) {
 		u32 m1t = BIT(opcode, 0x14, 2);
-		if(mmode != 3) {
+		if(mmode == 1 || mmode == 2) {
 			// Needs m1
 			if(m1t == 1 || m1t == 2)
 				UML_DLOADS(block, I1, m_t.data(), t, SIZE_WORD, SCALE_x2);
@@ -3497,7 +3565,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			}
 		}
 
-		if(mmode != 1) {
+		if(mmode == 2 || mmode == 3) {
 			// Needs m2
 			if(BIT(opcode, 0x12)) {
 				if(sm)
@@ -3513,6 +3581,9 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		}
 
 		switch(mmode) {
+		case 0:
+			UML_DMOV(block, I0, 0);
+			break;
 		case 1:
 			UML_DSHL(block, I0, I1, 8+15);
 			break;
@@ -3574,25 +3645,20 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			break;
 		}
 
-		// Shift and wrap to 42 bits
-		switch(BIT(opcode, 0x1c, 2)) {
-		case 0:
-			UML_DSHL(block, I0, I0, 0 + (64-42));
-			break;
-		case 1:
-			UML_DSHL(block, I0, I0, 1 + (64-42));
-			break;
-		case 2:
-			UML_DSHL(block, I0, I0, 2 + (64-42));
-			break;
-		case 3:
-			UML_DSHL(block, I0, I0, 4 + (64-42));
-			break;
-		}
-		UML_DSAR(block, I0, I0, (64-42));
+		static const u32 shifts[4] = { 0, 1, 2, 4 };
+		u32 shift = shifts[BIT(opcode, 0x1c, 2)];
+		u32 sat = BIT(opcode, 0x1e, 2);
+
+		if(sat == 0) {
+			// Shift and wrap to 42 bits
+			UML_DSHL(block, I0, I0, shift + (64-42));
+			UML_DSAR(block, I0, I0, (64-42));
+		} else if(shift)
+			// Saturating modes clamp the unwrapped value
+			UML_DSHL(block, I0, I0, shift);
 
 		// Clamp/saturate as requested
-		switch(BIT(opcode, 0x1e, 2)) {
+		switch(sat) {
 		case 0:
 			break;
 		case 1:
@@ -3690,14 +3756,8 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_SAR(block, mem(&m_mw_value[index3]), I0, 8);
 			break;
 		case 6:
-			UML_DMOV(block, I0, mem(&m_p));
-			if(!BIT(opcode, 0x0a)) {
-				UML_CALLC(block, call_rand, this);
-				UML_AND(block, I1, mem(&m_retval), 0x07e0);
-				UML_DADD(block, I0, I0, I1);
-			}
-			UML_DSAR(block, I0, I0, (15-8));
-			UML_SAR(block, mem(&m_mw_value[index3]), I0, 8);
+			drc_pack24(block, !BIT(opcode, 0x0a), (pc << 4) | L_PACK_M);
+			UML_MOV(block, mem(&m_mw_value[index3]), I0);
 			break;
 		case 7:
 			UML_MOV(block, mem(&m_mw_value[index3]), mem(&m_m[sm]));
@@ -3712,14 +3772,8 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			else
 				UML_MOV(block, mem(&m_rw_value[index3]), 0);
 		} else {
-			UML_DMOV(block, I0, mem(&m_p));
-			if(!BIT(opcode, 0x0a)) {
-				UML_CALLC(block, call_rand, this);
-				UML_AND(block, I1, mem(&m_retval), 0x07e0);
-				UML_DADD(block, I0, I0, I1);
-			}
-			UML_DSAR(block, I0, I0, (15-8));
-			UML_SAR(block, mem(&m_rw_value[index3]), I0, 8);
+			drc_pack24(block, !BIT(opcode, 0x0a), (pc << 4) | L_PACK_R);
+			UML_MOV(block, mem(&m_rw_value[index3]), I0);
 		}
 	}
 
@@ -3736,10 +3790,8 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_DSAR(block, I0, mem(&m_p), 8);
 			UML_AND(block, I0, I0, 0x7fff);
 			UML_STORE(block, m_t_value.data(), index2, I0, SIZE_WORD, SCALE_x2);
-		} else {
-			UML_DSAR(block, I0, mem(&m_p), 15+8);
-			UML_STORE(block, m_t_value.data(), index2, I0, SIZE_WORD, SCALE_x2);
-		}
+		} else
+			drc_t_value(block, index2);
 	}
 
 	if(BIT(opcode, 0x3d)) {
@@ -3843,7 +3895,8 @@ void swp30_device::meg_state::step()
 	int t  = BIT(opcode, 0x38, 3);
 
 	u32 mmode = BIT(opcode, 0x16, 2);
-	if(mmode != 0) {
+	// Without a multiplier the adder, shift and saturation still apply
+	if(mmode != 0 || BIT(opcode, 0x1a, 6)) {
 		u32 m1t = BIT(opcode, 0x14, 2);
 		s64 m1 = m1t == 1 || m1t == 2 ? m_t[t] : m_const[m_pc];
 		if(BIT(opcode, 0x13))
@@ -3853,6 +3906,9 @@ void swp30_device::meg_state::step()
 
 		s64 m;
 		switch(mmode) {
+		case 0:
+			m = 0;
+			break;
 		case 1:
 			m = m1 << (8+15);
 			break;
@@ -3892,11 +3948,11 @@ void swp30_device::meg_state::step()
 		if(shift)
 			r <<= shift == 3 ? 4 : shift;
 
-		// wrap at 42 bits (27.15)
-		r = util::sext(r, 42);
-
 		switch(BIT(opcode, 0x1e, 2)) {
 		case 0:
+			// wrap at 42 bits (27.15), the saturating modes clamp the
+			// unwrapped value
+			r = util::sext(r, 42);
 			break;
 		case 1:
 			r = std::clamp<s64>(r, -0x4000000000, 0x3fffffffff);
@@ -3925,9 +3981,7 @@ void swp30_device::meg_state::step()
 			s64 p = m_p;
 			if(!BIT(opcode, 0x0a))
 				p += m_swp->machine().rand() & 0x07e0;
-			v = (p >> 15) & 0xffffff;
-			if(v & 0x00800000)
-				v |= 0xff000000;
+			v = pack24(p);
 			break;
 		}
 		case 7: v = m_m[sm]; break;
@@ -3944,9 +3998,7 @@ void swp30_device::meg_state::step()
 			s64 p = m_p;
 			if(!BIT(opcode, 0x0a))
 				p += m_swp->machine().rand() & 0x07e0;
-			v = (p >> 15) & 0xffffff;
-			if(v & 0x00800000)
-				v |= 0xff000000;
+			v = pack24(p);
 		}
 		m_rw_value[m_delay_3] = v;
 	}
@@ -3971,7 +4023,7 @@ void swp30_device::meg_state::step()
 		else
 			m_t[t] = m_const[m_pc];
 	}
-	m_t_value[m_delay_2] = BIT(opcode, 0x3e) ? (m_p >> 8) & 0x7fff : m_p >> (15+8);
+	m_t_value[m_delay_2] = s16(BIT(opcode, 0x3e) ? (m_p >> 8) & 0x7fff : std::clamp<s64>(m_p >> (15+8), -0x8000, 0x7fff));
 
 	// Memory access.  A bank turned off in the tlb enable register drops
 	// writes and reads as zero, absolute reads excepted since they do not

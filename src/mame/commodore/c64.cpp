@@ -382,7 +382,8 @@ offs_t c64_state::dasm_vector(std::ostream &stream, offs_t pc, const util::disas
 			std::ostringstream buffer;
 			util::stream_format(buffer, opname, cbm_kernal_vectors[item].name);
 			stream << buffer.str();
-			return 3 | util::disasm_interface::SUPPORTED;
+			return 3 | util::disasm_interface::SUPPORTED |
+					(opcodes.r8(pc) == 0x20 ? util::disasm_interface::STEP_OVER : 0);
 		}
 		item++;
 	}
@@ -515,7 +516,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 			data = m_ram->pointer()[(!m_va15 << 15) | (!m_va14 << 14) | va];
 		}
 	}
-	if (!BIT(plaout, PLA_OUT_BASIC))
+	if (!BIT(plaout, PLA_OUT_BASIC) && m_basic)
 	{
 		data = m_basic[offset & 0x1fff];
 	}
@@ -924,7 +925,9 @@ uint8_t c64_state::sid_potx_r()
 	case 3:
 		if (cur1->has_pot_x() && cur2->has_pot_x())
 		{
-			data = 1 / (1 / cur1->read_pot_x() + 1 / cur2->read_pot_x());
+			const unsigned pot1 = cur1->read_pot_x();
+			const unsigned pot2 = cur2->read_pot_x();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (cur1->has_pot_x())
 		{
@@ -953,7 +956,9 @@ uint8_t c64_state::sid_poty_r()
 	case 3:
 		if (cur1->has_pot_y() && cur2->has_pot_y())
 		{
-			data = 1 / (1 / cur1->read_pot_y() + 1 / cur2->read_pot_y());
+			const unsigned pot1 = cur1->read_pot_y();
+			const unsigned pot2 = cur2->read_pot_y();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (cur1->has_pot_y())
 		{
@@ -1040,7 +1045,8 @@ void c64_state::cia1_pa_w(uint8_t data)
 
 	*/
 
-	m_joy2->joy_w(data & 0x1f);
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
+	cur2->joy_w(data & 0x1f);
 }
 
 uint8_t c64_state::cia1_pb_r()
@@ -1242,14 +1248,14 @@ uint8_t c64_state::cia2_pb_r()
 
 void c64_state::cia2_pb_w(uint8_t data)
 {
-	m_user->write_c((data>>0)&1);
-	m_user->write_d((data>>1)&1);
-	m_user->write_e((data>>2)&1);
-	m_user->write_f((data>>3)&1);
-	m_user->write_h((data>>4)&1);
-	m_user->write_j((data>>5)&1);
-	m_user->write_k((data>>6)&1);
-	m_user->write_l((data>>7)&1);
+	m_user->write_c(BIT(data, 0));
+	m_user->write_d(BIT(data, 1));
+	m_user->write_e(BIT(data, 2));
+	m_user->write_f(BIT(data, 3));
+	m_user->write_h(BIT(data, 4));
+	m_user->write_j(BIT(data, 5));
+	m_user->write_k(BIT(data, 6));
+	m_user->write_l(BIT(data, 7));
 }
 
 //-------------------------------------------------
@@ -1446,10 +1452,16 @@ void c64_state::machine_start()
 		m_basic = memregion("basic")->base();
 		m_kernal = memregion("kernal")->base();
 	}
-	else
+	else if (memregion("kernal")->bytes() == 0x4000)
 	{
 		m_basic = memregion("kernal")->base();
 		m_kernal = &m_basic[0x2000];
+	}
+	else
+	{
+		// Clipper has a standalone KERNAL and no BASIC ROM region.
+		m_basic = nullptr;
+		m_kernal = memregion("kernal")->base();
 	}
 	m_charom = memregion("charom")->base();
 
@@ -1505,6 +1517,7 @@ void c64_state::cia_config(machine_config &config, int tod_clock)
 	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
 	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
 	m_cia1->pa_rd_callback().set(FUNC(c64_state::cia1_pa_r));
+	m_cia1->pa_wr_callback().set(FUNC(c64_state::cia1_pa_w));
 	m_cia1->pb_rd_callback().set(FUNC(c64_state::cia1_pb_r));
 	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
 
@@ -1575,7 +1588,7 @@ void c64_state::ntsc(machine_config &config)
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
 	m_iec->srq_callback().set(FUNC(c64_state::iec_srq_w));
-	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
@@ -1743,7 +1756,7 @@ void c64_state::pal(machine_config &config)
 
 	cbm_iec_slot_device::add(config, m_iec, "c1541");
 	m_iec->srq_callback().set(FUNC(c64_state::iec_srq_w));
-	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
@@ -1901,7 +1914,7 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
-	m_iec->data_callback().set(m_user, FUNC(pet_user_port_device::write_9));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
 	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));

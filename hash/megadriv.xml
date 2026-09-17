@@ -3348,6 +3348,7 @@ Crashes with NTSC machines after EOA logo (verify)
 		<description>FIFA International Soccer (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Extended Play Productions" />
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="German" />
@@ -7517,6 +7518,7 @@ Unemulated HeartBeat peripheral
 		<description>Rings of Power (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Naughty Dog"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nhlpa"/>
 			<feature name="pcb" value="?? (Electronic Arts)"/>

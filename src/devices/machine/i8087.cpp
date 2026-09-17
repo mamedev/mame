@@ -457,7 +457,7 @@ void i8087_device::device_reset()
 	m_pc = 0;
 	m_ppc = 0;
 	m_int_handler(0);
-	m_busy_handler(0);
+	m_busy_handler(1);
 }
 
 

@@ -170,13 +170,12 @@ bool device_vtlb_interface::vtlb_fill(offs_t address, offs_t taddress, int inten
 
 		m_dynindex = (m_dynindex + 1) % m_dynamic;
 
-		// if an entry already exists at this index, free it
+		// If an entry already exists at this index, free it
 		if (m_live[liveindex] != 0)
 		{
-			if (m_refcnt[m_live[liveindex] - 1] <= 1)
-				m_table[m_live[liveindex] - 1] = 0;
-			else
-				m_refcnt[m_live[liveindex] - 1]--;
+			const offs_t oldtableindex = m_live[liveindex] - 1;
+			if (!(m_table[oldtableindex] & FLAG_FIXED))
+				m_table[oldtableindex] = 0;
 		}
 
 
@@ -353,18 +352,34 @@ void device_vtlb_interface::vtlb_flush_fixed(offs_t address, offs_t mask)
 	const offs_t pagemask = mask >> m_pageshift;
 	const offs_t target = (address >> m_pageshift) & pagemask;
 
-	// walk the live entries rather than the table; like vtlb_flush_address, leave the live array alone
+	// walk the live entries rather than the table, since flushing by address would mean visiting
+	// every page of a large range
 	for (int liveindex = m_dynamic; liveindex < m_dynamic + m_fixed; liveindex++)
 	{
-		if (m_live[liveindex] != 0)
+		if (m_live[liveindex] == 0)
+			continue;
+
+		const offs_t first = m_live[liveindex] - 1;
+		const int pages = m_fixedpages[liveindex - m_dynamic];
+		int matched = 0;
+		for (int page = 0; page < pages; page++)
 		{
-			const offs_t first = m_live[liveindex] - 1;
-			const int pages = m_fixedpages[liveindex - m_dynamic];
-			for (int page = 0; page < pages; page++)
+			if (((first + page) & pagemask) == target)
 			{
-				if (((first + page) & pagemask) == target && (m_table[first + page] & FLAG_FIXED))
+				// a page can be shared by an instruction and a data entry, so it may already be gone
+				if (m_table[first + page] & FLAG_FIXED)
 					m_table[first + page] = 0;
+				matched++;
 			}
+		}
+
+		// Once none of the entry's pages are mapped any more, retire it.
+		if (pages != 0 && matched == pages)
+		{
+			if (m_refcnt[first] != 0)
+				m_refcnt[first]--;
+			m_live[liveindex] = 0;
+			m_fixedpages[liveindex - m_dynamic] = 0;
 		}
 	}
 }
