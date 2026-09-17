@@ -1418,6 +1418,10 @@ macqd610
 macqd650
 macqd800
 
+@source:apple/macquadraav.cpp
+macqd660av
+macqd840av
+
 @source:apple/newton.cpp
 emate
 motmarco
