@@ -113,6 +113,75 @@ as the level structures above are each 0x70 bytes wide, this likely means that e
 
 several other games in m62.cpp also draw their backgrounds in 4 tile wide strips
 
+Additional notes from Andrea Bogazzi:
+-------------------------------------
+
+Later traces of a real one-player start resolved the table numbering above.
+The Z80 sends index 00 for the initial Precinct layout, then index 08 for its
+corresponding post-intro/redraw layout.  Therefore 00-07 are the initial states
+for gameplay stages 1-8 and 08-0f are their matching redraw states.  The older
+1,2,3,4,5,6,7,0 interpretation came from following the attract-mode path.
+
+All multi-byte values described below are little-endian.  Bytes at ROM offsets
+0000-153c are plaintext.  Starting at 153d, each byte is independently decoded
+with a 256-byte key table K.  For ROM address A:
+
+    s = (A_low + A_high) & ff
+    first = (s & 1) ? (K[s] - cipher) : (cipher ^ K[s])
+
+This transform is address-local: it has no feedback from preceding bytes and
+can be performed as data is read.  No shorter generator for K is known.
+
+Level/object payload bytes and the pointers stored inside those payloads use a
+second address-dependent transform after the first one:
+
+    if (s & 1)
+        value = 60 - first
+    else
+        value = ((first & 20) ? a0 : 60) - first
+                - ((first & 1) ? 0 : 2)
+
+All arithmetic is modulo 256.  Structure tokens are recognised at the stage
+used by their format, rather than blindly applying the payload transform to
+every byte.
+
+The level directory at 0200 contains sixteen pointers.  Each points to a
+70-byte block of 56 two-byte entry pointers.  Consecutive entry pairs describe
+two adjacent four-tile-wide columns: the even entry supplies the upper ten
+tile rows and the odd entry supplies the lower sixteen rows.  Each entry points
+to an eight-byte record containing four payload-encoded stream pointers.  Each
+stream supplies two adjacent tiles per row; four streams therefore form the
+eight tiles across the column pair.  Upper streams contain 20 literal cells
+and lower streams contain 32.  In a level stream, 00 terminates the stream,
+01 followed by a payload byte changes the current attribute, and all other
+payload bytes are tile codes.  The current attribute is written beside every
+tile code in tilemap RAM.
+
+Object IDs 80-90 select seventeen pointers in the table at 0100.  The selected
+five-byte record is:
+
+    width, destination_low, destination_high, stream_low, stream_high
+
+The object stream is row-major and wraps after the record's width.  Token 5f
+is followed by a payload-encoded attribute; 5e or 60 terminates the stream;
+other bytes are payload-encoded tile codes.  This same format describes both
+title dragons, both flame animation frames and the later-stage moving objects.
+
+ROM text commands use a two-byte pointer table indexed by the command's text
+number.  Text streams use 00 as terminator, 01 followed by an attribute, 02
+followed by a little-endian tilemap position, and literal tile bytes otherwise.
+The fixed HUD uses the same grammar through the pointer at 0140.  Command 0c
+uses an equivalent stream prepared by the Z80 in shared RAM.  Text positions
+advance by two bytes per character and wrap within a 64-tile (0x80-byte) row.
+
+The data format contains the tile codes and palette attributes.  In tilemap
+RAM they are emitted as adjacent bytes, tile first and attribute second.  The
+tile byte supplies code bits 0-7; attribute bits 5-7 supply code bits 8-10 and
+attribute bits 0-4 select the palette.  The separate background-bank latch
+supplies code bit 11.  The solid-colour low tile codes 04-0b in each bank are
+ordinary tiles aligned with the palette colours; they do not require a special
+fill opcode.
+
 
 *******************************************************************************/
 
