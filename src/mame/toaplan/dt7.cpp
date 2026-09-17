@@ -608,53 +608,53 @@ ROM_START( dt7 )
 	ROMS_DT7
 ROM_END
 
-//ROM_START( dt7et )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7et )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7u )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7u )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7ut )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7ut )
+	ROMS_DT7
+ROM_END
 
 ROM_START( dt7j )
 	ROMS_DT7
 ROM_END
 
-//ROM_START( dt7jt )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7jt )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7a )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7a )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7at )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7at )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7tw )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7tw )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7twt )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7twt )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7hk )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7hk )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7hkt )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7hkt )
+	ROMS_DT7
+ROM_END
 
-//ROM_START( dt7k )
-//	ROMS_DT7
-//ROM_END
+ROM_START( dt7k )
+	ROMS_DT7
+ROM_END
 
 ROM_START( dt7kt )
 	ROMS_DT7
@@ -664,16 +664,16 @@ ROM_END
 
 // flyer shows "Survival Battle Dynamic Trial 7"; the Korean sets title as "Car Fighting"
 GAME( 1993, dt7,    0,   dt7, dt7, dt7_state, init_region<0x09>, ROT270, "Toaplan",                         "DT7 (Europe) (prototype)",                          MACHINE_NOT_WORKING )
-//GAME( 1993, dt7et,  dt7, dt7, dt7, dt7_state, init_region<0x08>, ROT270, "Toaplan (Taito license)",         "DT7 (Europe, Taito license) (prototype)",           MACHINE_NOT_WORKING )
-//GAME( 1993, dt7u,   dt7, dt7, dt7, dt7_state, init_region<0x0b>, ROT270, "Toaplan",                         "DT7 (USA) (prototype)",                             MACHINE_NOT_WORKING )
-//GAME( 1993, dt7ut,  dt7, dt7, dt7, dt7_state, init_region<0x0a>, ROT270, "Toaplan (Taito America license)", "DT7 (USA, Taito America license) (prototype)",      MACHINE_NOT_WORKING )
+GAME( 1993, dt7et,  dt7, dt7, dt7, dt7_state, init_region<0x08>, ROT270, "Toaplan (Taito license)",         "DT7 (Europe, Taito license) (prototype)",           MACHINE_NOT_WORKING )
+GAME( 1993, dt7u,   dt7, dt7, dt7, dt7_state, init_region<0x0b>, ROT270, "Toaplan",                         "DT7 (USA) (prototype)",                             MACHINE_NOT_WORKING )
+GAME( 1993, dt7ut,  dt7, dt7, dt7, dt7_state, init_region<0x0a>, ROT270, "Toaplan (Taito America license)", "DT7 (USA, Taito America license) (prototype)",      MACHINE_NOT_WORKING )
 GAME( 1993, dt7j,   dt7, dt7, dt7, dt7_state, init_region<0x0e>, ROT270, "Toaplan",                         "DT7 (Japan) (prototype)",                           MACHINE_NOT_WORKING )
-//GAME( 1993, dt7jt,  dt7, dt7, dt7, dt7_state, init_region<0x0f>, ROT270, "Toaplan (Taito license)",         "DT7 (Japan, Taito license) (prototype)",            MACHINE_NOT_WORKING )
-//GAME( 1993, dt7a,   dt7, dt7, dt7, dt7_state, init_region<0x07>, ROT270, "Toaplan",                         "DT7 (Southeast Asia) (prototype)",                  MACHINE_NOT_WORKING )
-//GAME( 1993, dt7at,  dt7, dt7, dt7, dt7_state, init_region<0x06>, ROT270, "Toaplan (Taito license)",         "DT7 (Southeast Asia, Taito license) (prototype)",   MACHINE_NOT_WORKING )
-//GAME( 1993, dt7tw,  dt7, dt7, dt7, dt7_state, init_region<0x05>, ROT270, "Toaplan",                         "DT7 (Taiwan) (prototype)",                          MACHINE_NOT_WORKING )
-//GAME( 1993, dt7twt, dt7, dt7, dt7, dt7_state, init_region<0x04>, ROT270, "Toaplan (Taito license)",         "DT7 (Taiwan, Taito license) (prototype)",           MACHINE_NOT_WORKING )
-//GAME( 1993, dt7hk,  dt7, dt7, dt7, dt7_state, init_region<0x03>, ROT270, "Toaplan",                         "DT7 (Hong Kong) (prototype)",                       MACHINE_NOT_WORKING )
-//GAME( 1993, dt7hkt, dt7, dt7, dt7, dt7_state, init_region<0x02>, ROT270, "Toaplan (Taito license)",         "DT7 (Hong Kong, Taito license) (prototype)",        MACHINE_NOT_WORKING )
-//GAME( 1993, dt7k,   dt7, dt7, dt7, dt7_state, init_region<0x01>, ROT270, "Toaplan",                         "Car Fighting (Korea) (prototype)",                  MACHINE_NOT_WORKING )
+GAME( 1993, dt7jt,  dt7, dt7, dt7, dt7_state, init_region<0x0f>, ROT270, "Toaplan (Taito license)",         "DT7 (Japan, Taito license) (prototype)",            MACHINE_NOT_WORKING )
+GAME( 1993, dt7a,   dt7, dt7, dt7, dt7_state, init_region<0x07>, ROT270, "Toaplan",                         "DT7 (Southeast Asia) (prototype)",                  MACHINE_NOT_WORKING )
+GAME( 1993, dt7at,  dt7, dt7, dt7, dt7_state, init_region<0x06>, ROT270, "Toaplan (Taito license)",         "DT7 (Southeast Asia, Taito license) (prototype)",   MACHINE_NOT_WORKING )
+GAME( 1993, dt7tw,  dt7, dt7, dt7, dt7_state, init_region<0x05>, ROT270, "Toaplan",                         "DT7 (Taiwan) (prototype)",                          MACHINE_NOT_WORKING )
+GAME( 1993, dt7twt, dt7, dt7, dt7, dt7_state, init_region<0x04>, ROT270, "Toaplan (Taito license)",         "DT7 (Taiwan, Taito license) (prototype)",           MACHINE_NOT_WORKING )
+GAME( 1993, dt7hk,  dt7, dt7, dt7, dt7_state, init_region<0x03>, ROT270, "Toaplan",                         "DT7 (Hong Kong) (prototype)",                       MACHINE_NOT_WORKING )
+GAME( 1993, dt7hkt, dt7, dt7, dt7, dt7_state, init_region<0x02>, ROT270, "Toaplan (Taito license)",         "DT7 (Hong Kong, Taito license) (prototype)",        MACHINE_NOT_WORKING )
+GAME( 1993, dt7k,   dt7, dt7, dt7, dt7_state, init_region<0x01>, ROT270, "Toaplan",                         "Car Fighting (Korea) (prototype)",                  MACHINE_NOT_WORKING )
 GAME( 1993, dt7kt,  dt7, dt7, dt7, dt7_state, init_region<0x00>, ROT270, "Toaplan (Taito license)",         "Car Fighting (Korea, Taito license) (prototype)",   MACHINE_NOT_WORKING )
