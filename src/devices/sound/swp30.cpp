@@ -2286,7 +2286,12 @@ u16 swp30_device::revram_enable_r()
 void swp30_device::revram_enable_w(u16 data)
 {
 	logerror("revram enable = %04x\n", data);
+	if(data == m_revram_enable)
+		return;
 	m_revram_enable = data;
+	// The drc generates the memory accesses for the banks that are on at the
+	// time, so the cache has to go when that changes
+	m_meg_program_changed = true;
 }
 
 void swp30_device::revram_clear_w(u16 data)
@@ -3486,8 +3491,6 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		L_LFO2,    // lfo, second label
 		L_PACK_M,  // truncation towards zero, m write
 		L_PACK_R,  // truncation towards zero, r write
-		L_MEM_OFF, // memory access on a bank turned off in the tlb enable
-		L_MEM_DONE,// memory access, end
 	};
 
 	UML_DEBUG(block, pc);
@@ -3817,11 +3820,13 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		u32 base = BIT(mapr, 0, 8) << 10;
 		// A bank turned off in the tlb enable register drops writes and reads
 		// as zero.  Absolute reads do not go through the map, so they are not
-		// affected
-		const bool mapped = amem == 1 || !BIT(opcode, 0x23);
-		if(mapped) {
-			UML_TEST(block, mem(&m_swp->m_revram_enable), 1 << bank);
-			UML_JMPc(block, COND_NZ, (pc << 4) | L_MEM_OFF);
+		// affected.  Which banks are on is part of the state the block is
+		// generated for: a write to the register marks the program changed,
+		// which throws the cache away and generates it again
+		if((amem == 1 || !BIT(opcode, 0x23)) && BIT(m_swp->m_revram_enable, bank)) {
+			if(amem != 1)
+				UML_MOV(block, mem(&m_memr_value[index2]), 0);
+			return;
 		}
 		UML_LOAD(block, I0, m_offset.data(), pc/3, SIZE_WORD, SCALE_x2);
 		if(amem == 3)
@@ -3843,19 +3848,11 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_CALLC(block, call_revram_encode, this);
 			UML_MOV(block, I1, mem(&m_retval));
 			UML_WRITE(block, I0, I1, SIZE_WORD, memory_space(swp30_device::AS_REVERB));
-			if(mapped)
-				UML_LABEL(block, (pc << 4) | L_MEM_OFF);
 		} else {
 			UML_READ(block, I1, I0, SIZE_WORD, memory_space(swp30_device::AS_REVERB));
 			UML_MOV(block, mem(&m_retval), I1);
 			UML_CALLC(block, call_revram_decode, this);
 			UML_MOV(block, mem(&m_memr_value[index2]), mem(&m_retval));
-			if(mapped) {
-				UML_JMP(block, (pc << 4) | L_MEM_DONE);
-				UML_LABEL(block, (pc << 4) | L_MEM_OFF);
-				UML_MOV(block, mem(&m_memr_value[index2]), 0);
-				UML_LABEL(block, (pc << 4) | L_MEM_DONE);
-			}
 		}
 	}
 }
