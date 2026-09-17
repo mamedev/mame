@@ -215,11 +215,23 @@ added to the accumulator, which gives the current sample value.
 Then the current delta is, depending on the mode bits, multiplied
 by either 0.875 (7/8), 0.75 (3/4), 0.5 (1/2) or 0 (e.g. cleared).
 
-The multiplier on the delta is buggy and bias towards negative
-numbers, but it's not entirely clear how exactly.  Even worse, the
-multiplier results change depending on whether the scaling is zero
-or non-zero, and also has some kind of context or extra state bits
-hidden somewhere.
+The accumulator does not leak.  It is clamped (see scaling below),
+and the next delta is computed from what was actually added to it,
+which is smaller than the delta when the accumulator clamped.  The
+multiplication keeps its remainder for the next sample instead of
+dropping it: with k/d the multiplier and r the remainder taken on
+the negative side (-d < r <= 0),
+
+  y     = k * added + r
+  delta = floor(y / d)
+  r     = (y mod d) ? (y mod d) - d : 0
+
+This matches the output captured from a swp00 (mu50, one format)
+and a swp20 (mu80, all 32 formats) playing the same compressed
+sample, including where the accumulator clamps.  The swp20 shows
+more bits, which hides the delta sequence at scaling 0, but the 28
+formats with scaling 1-7 match on every sample.  The swp20 mode 2
+form was first worked out by TaleTN.
 
 
   Sample scaling
@@ -385,6 +397,7 @@ void swp30_device::streaming_block::clear()
 	m_dpcm_s0 = m_dpcm_s1 = m_dpcm_s2 = m_dpcm_s3 = 0;
 	m_dpcm_pos = 0;
 	m_dpcm_delta = 0;
+	m_dpcm_rem = 0;
 	m_first = false;
 	m_done = false;
 	m_last = 0;
@@ -397,6 +410,7 @@ void swp30_device::streaming_block::keyon()
 	m_dpcm_s0 = m_dpcm_s1 = m_dpcm_s2 = m_dpcm_s3 = 0;
 	m_dpcm_pos = m_pos+1;
 	m_dpcm_delta = 0;
+	m_dpcm_rem = 0;
 	m_first = true;
 	m_finetune_active = false;
 	m_done = false;
@@ -621,28 +635,24 @@ void swp30_device::streaming_block::dpcm_step(u8 input)
 	m_dpcm_s1 = m_dpcm_s2;
 	m_dpcm_s2 = m_dpcm_s3;
 
-	s32 delta = m_dpcm_delta + dpcm_expand[input];
-	s32 acc = m_dpcm_s3;
-	if(mode != 3)
-		acc -= s32((s64(acc) * 3) >> 7);
-	s32 sample = acc + (delta << scale);
+	s32 acc = m_dpcm_s3 >> scale;
+	s32 sample = (acc + m_dpcm_delta + dpcm_expand[input]) << scale;
 
-	if(sample < -0x8000) {
+	if(sample < -0x8000)
 		sample = -0x8000;
-		delta = 0;
-	} else if(sample > limit) {
+	else if(sample > limit)
 		sample = limit;
-		delta = 0;
-	}
 	m_dpcm_s3 = sample;
 
+	// The next delta comes from what was actually added
+	s32 added = (sample >> scale) - acc;
+	s32 y, m;
 	switch(mode) {
-	case 0: delta = delta * 7 / 8; break;
-	case 1: delta = delta * 3 / 4; break;
-	case 2: delta = delta     / 2; break;
-	case 3: delta = 0; break;
+	case 0: y = added * 7 + m_dpcm_rem; m = y & 7; m_dpcm_delta = y >> 3; m_dpcm_rem = m ? m - 8 : 0; break;
+	case 1: y = added * 3 + m_dpcm_rem; m = y & 3; m_dpcm_delta = y >> 2; m_dpcm_rem = m ? m - 4 : 0; break;
+	case 2: y = added     + m_dpcm_rem; m = y & 1; m_dpcm_delta = y >> 1; m_dpcm_rem = m ? m - 2 : 0; break;
+	case 3: m_dpcm_delta = 0; m_dpcm_rem = 0; break;
 	}
-	m_dpcm_delta = delta;
 }
 
 void swp30_device::streaming_block::read_8c(memory_access<25, 2, -2, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1, s16 &val2, s16 &val3)
@@ -1791,6 +1801,7 @@ void swp30_device::device_start()
 	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_s3));
 	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_pos));
 	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_delta));
+	save_item(STRUCT_MEMBER(m_streaming, m_dpcm_rem));
 	save_item(STRUCT_MEMBER(m_streaming, m_first));
 	save_item(STRUCT_MEMBER(m_streaming, m_finetune_active));
 	save_item(STRUCT_MEMBER(m_streaming, m_done));
