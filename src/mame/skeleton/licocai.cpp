@@ -13,6 +13,8 @@
 //
 // CPU: MC68000P10
 // custom chip "SOCRATES A.F-810620-001 9422 Z13 JAPAN"
+//
+// current system ROM is half size, the system attempts to fetch graphical data from outside of it
 
 #include "emu.h"
 
@@ -76,8 +78,10 @@ private:
 	u16 m_vdp_enable_flags;
 	u32 m_vdp_write_addr;
 	u32 m_vdp_read_addr;
+	u32 m_vdp_spritebase_addr;
 
 	u16 m_paladdr;
+
 
 	std::unique_ptr<u8[]> m_vram;
 	std::unique_ptr<u8[]> m_palhigh;
@@ -162,6 +166,7 @@ void licocai_state::vdp_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	case 0x0013: // more than once, always 7800 (which is where it uploads the sprite list)
 		logerror("%s: write to vdp_data_w with m_vdp_dest %02x: %04x %04x (sprite base?)\n", machine().describe_context(), m_vdp_dest, data, mem_mask);
+		m_vdp_spritebase_addr = data << 1;
 		break;
 
 
@@ -320,6 +325,7 @@ void licocai_state::machine_start()
 	save_item(NAME(m_vdp_write_addr));
 	save_item(NAME(m_vdp_enable_flags));
 	save_item(NAME(m_vdp_read_addr));
+	save_item(NAME(m_vdp_spritebase_addr));
 	save_item(NAME(m_paladdr));
 
 	// clears 0x10000 bytes on startup, so assume main VRAM is that size
@@ -344,6 +350,7 @@ void licocai_state::machine_reset()
 	m_vdp_read_addr = 0;
 	m_vdp_enable_flags = 0;
 	m_paladdr = 0;
+	m_vdp_spritebase_addr = 0;
 }
 
 void licocai_state::video_start()
@@ -376,14 +383,39 @@ uint32_t licocai_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		}
 	}
 
+	gfx_element *spgfx = m_gfxdecode->gfx(1);
+	for (int i = m_vdp_spritebase_addr; i < m_vdp_spritebase_addr + 0x100; i += 8)
+	{
+		u16 spritex = (m_vram[i + 2] << 8) | m_vram[i + 3];
+		u16 spritey = (m_vram[i + 0] << 8) | m_vram[i + 1];
+		u16 tile = ((m_vram[i + 4] << 8) | m_vram[i + 5]) >> 1;
+
+		spritex -= 32;
+		spritey -= 64;
+
+		u16 ysize = (m_vram[i + 6] & 0x70) >> 4;
+		u16 xsize = (m_vram[i + 6] & 0x07);
+
+		u8 xflip = (m_vram[i + 6] & 0x08) >> 3;
+
+		for (int yc = 0; yc <= ysize; yc++)
+		{
+			for (int xc = 0; xc <= xsize; xc++)
+			{
+				if (xflip)
+					spgfx->transpen(bitmap, cliprect, tile++, 0x10, 1, 0, spritex + (xsize * 16) - (xc * 16), spritey + (yc * 16), 0);
+				else
+					spgfx->transpen(bitmap, cliprect, tile++, 0x10, 0, 0, spritex + (xc * 16), spritey + (yc * 16), 0);
+			}
+		}
+	}
+
 	return 0;
 }
 
 void licocai_state::licocai_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();//.mirror(0x100000);
-	// there are data reads from 19E564 etc. why? (is the ROM the proper size?)
-	// could be there's a gap in how the ROM maps?
+	map(0x000000, 0x1fffff).rom();
 
 	// some kind of RAM DAC?
 	map(0x200004, 0x200005).w(FUNC(licocai_state::pal_addr_low_w));
@@ -443,8 +475,8 @@ void licocai_state::licocai(machine_config &config)
 }
 
 ROM_START( licocai )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "systemrom.bin", 0x000000, 0x100000, CRC(29b5942f) SHA1(3a035f64848b4da6c0cc7e7667418360e0527fc4) )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "systemrom.bin", 0x000000, 0x100000, BAD_DUMP CRC(29b5942f) SHA1(3a035f64848b4da6c0cc7e7667418360e0527fc4) ) // half size
 ROM_END
 
 } // anonymous namespace
