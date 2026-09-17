@@ -260,9 +260,11 @@ bool jaleco_fpu_device::condition(u8 code)
 	case 0x4: return m_c7 != 0;
 	case 0x5: return m_c7-- != 0;
 	case 0x8: return m_flags & F_Z;
-	case 0x9: return n != v;
-	case 0xa: return n == v;
-	case 0xb: return (n == v) && !(m_flags & F_Z);
+	case 0x9: return n != v; // signed <
+	// signed >: greater-or-equal here makes the road line loop (program 270-306)
+	// emit one line past the y target when the road reaches the screen bottom,
+	// overflowing the host's line buffer (game hangs jumping a crest at full speed)
+	case 0xa: return (n == v) && !(m_flags & F_Z);
 	case 0xd: return m_flags & F_C;
 	case 0xe: return n;
 	case 0xf: return v;
@@ -384,22 +386,21 @@ void jaleco_fpu_device::execute_one(u32 op)
 			break;
 		case 0x27:
 		{
+			// on overflow and divide by zero the quotient saturates: the program
+			// consumes results with no V check and clamps only one side (22c-231),
+			// and the perspective divide at 2df overflows routinely in-game.
+			// Inferred, not verified against hardware.
 			u32 const dividend = (u32(m_s[b]) << 16) | m_s[0xd];
 			u16 const divisor = m_s[a];
-			if (!divisor)
+			if (!divisor || (dividend / divisor) > 0xffff)
 			{
-				LOGUNIMPL("%03x: divide by zero\n", m_ppc);
+				LOGUNIMPL("%03x: unsigned divide %s\n", m_ppc, divisor ? "overflow" : "by zero");
 				m_flags |= F_V;
+				m_s[0xd] = 0xffff;
+				set_nz(m_s[0xd]);
 				break;
 			}
-			u32 const quotient = dividend / divisor;
-			if (quotient > 0xffff)
-			{
-				LOGUNIMPL("%03x: unsigned divide overflow\n", m_ppc);
-				m_flags |= F_V;
-				break;
-			}
-			m_s[0xd] = quotient;
+			m_s[0xd] = dividend / divisor;
 			m_s[b] = dividend % divisor;
 			set_nz(m_s[0xd]);
 			break;
@@ -408,17 +409,13 @@ void jaleco_fpu_device::execute_one(u32 op)
 		{
 			s64 const dividend = s32((u32(m_s[b]) << 16) | m_s[0xd]);
 			s16 const divisor = s16(m_s[a]);
-			if (!divisor)
+			s64 const quotient = divisor ? dividend / divisor : (dividend < 0 ? -0x8000 : 0x7fff);
+			if (!divisor || (quotient < -0x8000) || (quotient > 0x7fff))
 			{
-				LOGUNIMPL("%03x: divide by zero\n", m_ppc);
+				LOGUNIMPL("%03x: signed divide %s\n", m_ppc, divisor ? "overflow" : "by zero");
 				m_flags |= F_V;
-				break;
-			}
-			s64 const quotient = dividend / divisor;
-			if ((quotient < -0x8000) || (quotient > 0x7fff))
-			{
-				LOGUNIMPL("%03x: signed divide overflow\n", m_ppc);
-				m_flags |= F_V;
+				m_s[0xd] = (quotient < 0) ? 0x8000 : 0x7fff;
+				set_nz(m_s[0xd]);
 				break;
 			}
 			m_s[0xd] = quotient;
