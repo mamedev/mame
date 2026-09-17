@@ -703,7 +703,7 @@ u32 ms32_f1superbattle_state::analog_r()
 	a = m_io_analog[2]->read(); // unused?
 	b = m_io_analog[2]->read(); // unused?
 	c = m_io_analog[1]->read();
-	d = (m_io_analog[0]->read() - 0xb0) & 0xff;
+	d = m_io_analog[0]->read();
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
@@ -1382,7 +1382,7 @@ static INPUT_PORTS_START( f1superb )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift") PORT_TOGGLE
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Brake")
 	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00c00000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00000001, 0x00000001, "Credit Counter" ) PORT_DIPLOCATION("SW2:8")
@@ -1408,11 +1408,11 @@ static INPUT_PORTS_START( f1superb )
 	PORT_DIPSETTING(          0x0040, "Europe" )
 	PORT_DIPSETTING(          0x00c0, DEF_STR( Japan ) )
 	PORT_DIPUNUSED_DIPLOC( 0x00000100, 0x00000100, "SW1:8" )
-	PORT_DIPUNUSED_DIPLOC( 0x00000200, 0x00000200, "SW1:7" )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")   // Acceleration
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	// pot rests at 0x50 and decreases when pressed: the game stores the rest value at boot and computes throttle as rest - current (same scheme as f1gpstar in cischeat.cpp)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0x50) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("AN1")   // Steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
