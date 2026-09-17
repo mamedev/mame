@@ -45,6 +45,11 @@ public:
 	uint16_t host_fifo_status_r(int channel);
 	void host_tick_reset(bool default_period);
 
+	template <unsigned N> void semaphore_delayed_write(s32 param);
+
+	void host_semaphore_w(uint32_t data);
+	void host_semaphore_ack_w(uint16_t data);
+
 	uint16_t read_output_fifo();
 
 	void dump_state(std::ostream &str); // TODO: DEBUG REMOVE ME
@@ -66,6 +71,10 @@ public:
 	uint16_t clock_r();
 	void clock_w(uint16_t data);
 	uint16_t noise_r();
+	uint16_t semaphore_status_r();
+	uint16_t semaphore_data_r();
+	void semaphore_data_w(uint16_t data);
+	void semaphore_ack_w(uint16_t data);
 
 	void update_fifo_dma();
 	void print_sums() { printf("%04x: %04x\n", (uint16_t)m_core->m_arg0, (uint16_t)m_core->m_arg1); }
@@ -170,6 +179,9 @@ private:
 	devcb_read8         m_dma_read_handler;
 	devcb_write8        m_dma_write_handler;
 	devcb_write32       m_dma_rollover_handler;
+
+	uint16_t    m_semaphore_status;
+	uint16_t    m_semaphore_data;
 
 	// Audio frame model
 	uint32_t    m_frame_period;

@@ -73,9 +73,8 @@ void dspp_device::data_clio_map(address_map &map)
 	map(0x0e0, 0x0e3).r(FUNC(dspp_device::outfifo_status_r));
 	map(0x0ea, 0x0ea).r(FUNC(dspp_device::noise_r));
 //  map(0x0eb, 0x0eb) audio output status read
-//  map(0x0ec, 0x0ec) semaphore status read
-	map(0x0ec, 0x0ec).nopr(); // noisy, suppress for now
-//  map(0x0ed, 0x0ed) semaphore data word
+	map(0x0ec, 0x0ec).r(FUNC(dspp_device::semaphore_status_r));
+	map(0x0ed, 0x0ed).r(FUNC(dspp_device::semaphore_data_r));
 	map(0x0ee, 0x0ee).rw(FUNC(dspp_device::pc_r), FUNC(dspp_device::pc_w));
 	map(0x0ef, 0x0ef).rw(FUNC(dspp_device::clock_r), FUNC(dspp_device::clock_w));
 	// input FIFOs (reading pops a sample)
@@ -90,8 +89,8 @@ void dspp_device::data_clio_map(address_map &map)
 			m_core->m_flag_audlock = BIT(data, 15);
 		})
 	);
-//  map(0x3ec, 0x3ec) semaphore ACK
-//  map(0x3ed, 0x3ed) semaphore write
+	map(0x3ec, 0x3ec).w(FUNC(dspp_device::semaphore_ack_w));
+	map(0x3ed, 0x3ed).w(FUNC(dspp_device::semaphore_data_w));
 	// host CPU irq, the word is the audio folio tick counter (read back by the host at $3fb8)
 	map(0x3ee, 0x3ee).rw(FUNC(dspp_device::tick_r), FUNC(dspp_device::tick_w));
 	// clock reload: instruments write $4000 at the top of the frame and read back $0ef
@@ -267,6 +266,9 @@ void dspp_device::device_start()
 	save_item(NAME(m_frame_sync));
 	save_item(NAME(m_tick));
 
+	save_item(NAME(m_semaphore_data));
+	save_item(NAME(m_semaphore_status));
+
 	save_item(NAME(m_outputs));
 	save_item(NAME(m_output_fifo_start));
 	save_item(NAME(m_output_fifo_count));
@@ -317,6 +319,7 @@ void dspp_device::device_start()
 	set_icountptr(m_core->m_icount);
 
 	m_cache_dirty = true;
+
 }
 
 
@@ -331,6 +334,8 @@ void dspp_device::device_reset()
 	m_core->m_stack_ptr = 0;
 	m_output_fifo_start = 0;
 	m_output_fifo_count = 0;
+	m_semaphore_status = 0;
+	m_semaphore_data = 0;
 
 	m_core->m_flag_audlock = 0;
 	m_core->m_flag_sleep = 0;
@@ -2025,7 +2030,49 @@ uint16_t dspp_device::noise_r()
 	return machine().rand();
 }
 
+//-------------------------------------------------
+//  semaphore section
+//-------------------------------------------------
 
+uint16_t dspp_device::semaphore_status_r()
+{
+	return m_semaphore_status;
+}
+
+uint16_t dspp_device::semaphore_data_r()
+{
+	return m_semaphore_data;
+}
+
+template <unsigned N> void dspp_device::semaphore_delayed_write(s32 param)
+{
+	m_semaphore_status = 1 << (3 - N);
+	m_semaphore_data = param & 0xffff;
+}
+
+void dspp_device::host_semaphore_w(uint32_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<0>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::host_semaphore_ack_w(uint16_t data)
+{
+	 m_semaphore_status |= 1 << 1;
+}
+
+void dspp_device::semaphore_data_w(uint16_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<1>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::semaphore_ack_w(uint16_t data)
+{
+	m_semaphore_status |= 1 << 0;
+}
 
 //**************************************************************************
 //  EXTERNAL INTERFACE AND CONTROL REGISTERS
