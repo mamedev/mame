@@ -510,7 +510,7 @@ void namcos1_state::subres_w(int state)
 
 void namcos1_state::watchdog_cb(int state)
 {
-	if (state || m_reset)
+	if (state)
 	{
 		m_watchdog->watchdog_reset();
 		m_watchdog_input->in_clear<0>();
@@ -526,6 +526,8 @@ void namcos1_state::kick_watchdog_w(u8 data)
 		case 0: m_watchdog_input->in_set<0>(); break;
 		case 1: m_watchdog_input->in_set<1>(); break;
 	}
+	if (m_reset)
+		watchdog_cb(ASSERT_LINE);
 }
 
 // FIXME: the sound CPU watchdog is probably in CUS121, and definitely isn't in CUS117
