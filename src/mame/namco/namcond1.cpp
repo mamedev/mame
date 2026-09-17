@@ -11,17 +11,17 @@
             Walter Fath
 
     abcheck TODOs:
-    - Ending has a rowscroll GFX bug, scroll X the wrong GFX part
-      (expect to bounce upper kanji strip and regular scroll the two "abnormal check" strings,
-       goes in the middle of playfield instead);
+    - Ending rowscroll: ygv608 get_row_division now uses SLH strip size (was page_y/2 wrap).
+      Still verify: upper kanji strip bounces, the two "abnormal check" strings scroll,
+      not a copy in the middle of the playfield.
     - Where is the extra data ROM mapped?
       Ending reads $68'xxxx-$6f'xxxx areas for bitbanging serial device at $70'0000
 
     gynotai TODOs:
     - printer (disable it in service mode to suppress POST error);
     - ball sensors aren't understood;
-    - Seems to dislike our YGV608 row/colscroll handling
-      (for example vertical bounding box is halved offset & size wise for Pac-Man goal stage);
+    - YGV608 row/colscroll: pixmap/flagsmap blit with screen-strip SLH/SLV.
+      Pac-Man goal bounding box still PCB-check;
 
     To make abcheck run when the EEPROM is clear:
     - F2 to enter service mode
@@ -244,6 +244,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_shared_ram;
 
+	uint32_t m_gfxbank = 0;
 	uint8_t m_h8_irq5_enabled = 0;
 	uint8_t m_p8 = 0;
 
@@ -254,6 +255,8 @@ private:
 	void cuskey_w(offs_t offset, uint16_t data);
 	uint16_t printer_r();
 
+	uint32_t gfxbank_cb(uint32_t addr);
+
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 	void abcheck_main_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -261,11 +264,18 @@ private:
 };
 
 
+uint32_t namcond1_state::gfxbank_cb(uint32_t addr)
+{
+	return addr | (m_gfxbank << 21);
+}
+
+
 // Perform basic machine initialisation
 
 
 void namcond1_state::machine_start()
 {
+	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_h8_irq5_enabled));
 	// save_item(NAME(m_p8)); //isn't read anywhere for the time being
 }
@@ -330,8 +340,12 @@ void namcond1_state::cuskey_w(offs_t offset, uint16_t data)
 			break;
 
 		case (0x0c >> 1):
-			m_ygv608->set_gfxbank(data & 0x0003);
-			// bit 0 used in abcheck during garbage screens, tile/color select of some kind?
+			if (m_gfxbank != (data & 0x0003))
+			{
+				m_gfxbank = data & 0x0003;
+				m_ygv608->set_tilemap_dirty();
+				// bit 0 used in abcheck during garbage screens, tile/color select of some kind?
+			}
 			break;
 
 		default:
@@ -353,16 +367,12 @@ void namcond1_state::main_map(address_map &map)
 
 void namcond1_state::abcheck_main_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
-	map(0x400000, 0x40ffff).ram().share(m_shared_ram);
+	main_map(map);
 	map(0x600000, 0x607fff).ram().share("zpr1");
 	map(0x608000, 0x60ffff).ram().share("zpr2");
 	map(0x700000, 0x700001).nopw();
 	map(0x740000, 0x740001).nopw();
 	map(0x780000, 0x780001).r(FUNC(namcond1_state::printer_r));
-	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
-	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
-	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
 }
 
 uint16_t namcond1_state::printer_r()
@@ -512,6 +522,7 @@ void namcond1_state::namcond1(machine_config &config)
 	YGV608(config, m_ygv608);
 	m_ygv608->vblank_callback().set_inputline(m_maincpu, 1);
 	m_ygv608->raster_callback().set_inputline(m_maincpu, 2);
+	m_ygv608->set_gfxbank_callback(FUNC(namcond1_state::gfxbank_cb));
 	m_ygv608->set_screen("screen");
 
 	// video hardware
