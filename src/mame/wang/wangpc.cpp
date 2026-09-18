@@ -10,14 +10,6 @@
 
 */
 
-/*
-
-    TODO:
-
-    - with quantum perfect cpu gets stuck @ 49c3 mov ss,cs:[52ah]
-
-*/
-
 #include "emu.h"
 #include "softlist_dev.h"
 #include "bus/centronics/ctronics.h"
