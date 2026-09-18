@@ -15,6 +15,8 @@ NOTES:
    later models with Anvil chipset, where the BIOS is newer instead (e.g. Road Rash, Bust a Move)
 - As per https://github.com/mamedev/mame/issues/10308#issuecomment-3779261350 several games have
   multiple indices over a given track. These are intentionally omitted until we have a solution.
+- Prototypes and unlicensed/homebrew SWs requires the norsa BIOSes from base driver out of being
+  unencrypted images.
 - This SW list is USA first then Japan then Europe when it comes to cloneof priority (fwiw).
 - Japanese release dates from https://refuge.tokyo/3do/3do.html
 
@@ -33,7 +35,7 @@ NOTES:
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
 [Sport] leaves trails on SSI intro (uncoded 16bpp with PXOR=1)
-[Madam] requires ACW/ACCW to fill 3d quads in gameplay, uses lrform for map display
+[Madam] requires ACW/ACCW region fills in gameplay
 Not extensively tested
 ]]></notes>
 		<info name="alt_title" value="Slayer"/>
@@ -47,15 +49,15 @@ Not extensively tested
 	</software>
 
 	<!-- https://redump.info/disc/20101 -->
-	<software name="aquawrld" supported="no">
+	<software name="aquawrld" supported="partial">
 		<description>Aqua World: Umi Monogatari (Japan)</description>
 		<year>1995</year>
 		<publisher>Mizuki</publisher>
 		<notes><![CDATA[
-[CD drive] intro FMV stutter frames (note the English text running too fast is a btanb)
-[Madam] Option GFX on main menu has RMW transparency bug
+[Madam] Mermaid Mode stage select is offset in some places (check skipx)
 ]]></notes>
-		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo -->
+		<!-- NOTE: pressing C will punt to credit screen then back to 3do logo, -->
+		<!-- pressing play/pause between game 3do logo and now loading will pause with no feedback -->
 		<info name="alt_title" value="アクア・ワールド ～海美物語～"/>
 		<info name="barcode" value="T4984824055261"/>
 		<info name="release" value="19951013"/>
@@ -76,9 +78,10 @@ Not extensively tested
 		<publisher>Bandai</publisher>
 		<notes><![CDATA[
 [CD drive] FMVs have skipping artifacts with audio (should be fixed)
-[Madam] glitchy character select cursor, no blink on title screen "Press P button"
+[Madam] no blink on title screen "Press P button"
+Needs PIXC for shadows in gameplay (common with other fighting games but ssf2xj)
 [DSPP] ducks BGM volume too much on main menu, no speech
-[Clio] runs too slow
+[Clio] runs too slow, particularly in gameplay
 ]]></notes>
 		<info name="alt_title" value="美少女戦士セーラームーンS"/>
 		<info name="barcode" value="T4984824070851"/>
@@ -98,8 +101,9 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
-[Madam] Packed CEL bugs for intro and title screen
+[Madam] Packed CEL setups for intro and title screen [CD Drive]?
 Sensitive to CEL timings
+Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 37988 83036 7"/>
 		<info name="developer" value="Micro Cabin"/>
@@ -116,14 +120,12 @@ Sensitive to CEL timings
 	<!-- ... -->
 
 	<!-- https://redump.info/disc/45883 -->
-	<software name="cfodder" supported="no">
+	<software name="cfodder" supported="partial">
 		<description>Cannon Fodder (USA)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-"War Has Never Been So Much Fun" intro theme (after the cartoon) has low [DSPP] pitch (verify Europe too)
 [Sport] shows uncleared dots at sides during gameplay
-Not extensively tested
 May optionally use a [Player] mouse
 ]]></notes>
 		<info name="barcode" value="0 52145 93011 7"/>
@@ -141,8 +143,7 @@ May optionally use a [Player] mouse
 		<year>1996</year>
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
-[Madam] has no pointer in main menu (check PIXC)
-Has RMW bugs in gameplay
+[Madam] PIXC bugs: has no pointer in main menu, requires additive blending for status bar boxes
 Not extensively tested, untested preview section
 ]]></notes>
 		<info name="barcode" value="7 90561 02379 1"/>
@@ -159,7 +160,7 @@ Not extensively tested, untested preview section
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
 		<notes><![CDATA[
-[Madam] IntelliPlay logo at startup seems to need a transparency pen
+IntelliPlay logo at startup seems to need a transparency pen (btanb)
 Laggy inputs on opponent select, looks stuck
 [CD Block] Eventually hangs afterwards, on opponent FMV
 ]]></notes>
@@ -173,8 +174,28 @@ Laggy inputs on opponent select, looks stuck
 	</software>
 
 	<!-- https://redump.info/disc/19365 -->
-	<!-- TODO: crshburn: Crash 'n Burn (USA "not for resale" version, a.k.a. the only English version) -->
-	<!-- ... -->
+	<software name="crshburn" supported="no">
+		<!-- "not for resale" version, a.k.a. the only pure English version -->
+		<!-- bundled with fz1 -->
+		<description>Crash 'n Burn (USA)</description>
+		<year>1993</year>
+		<publisher>Crystal Dynamics</publisher>
+		<notes><![CDATA[
+[Sport] issues at startup (Crystal Dynamics FMV drawn out of 1MB VRAM) and main menu
+Has heavy tearing on character select FMVs
+[Madam] requires ACW/ACCW region fills in gameplay, ducks colors too much in tunnels, has PIXC uses here and there
+[DSPP] noisy scratches during gameplay
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 65979 61107 6"/>
+		<info name="serial" value="DFJN5002ZAZ"/>
+		<!-- CD serial: 61100-C -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crash 'n burn (usa) (not for resale)" sha1="c1d5e4fc427ae04b2ac6aa07893bedc5ca4e52dc"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- https://redump.info/disc/49372 -->
 	<software name="demoman" supported="no">
@@ -182,8 +203,10 @@ Laggy inputs on opponent select, looks stuck
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-Kinda playable with [Madam] Packed CEL glitches
+[Sport] doesn't clear FB layer on FMV playback after beating a stage
+[Madam] after stage 1-1 starts using PIXC for foreground objects (currently all solid white)
 Eventually requires optional [Player] mouse and lightgun
+Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 52145 93003 2"/>
 		<part name="cdrom" interface="cdrom">
@@ -197,21 +220,63 @@ Eventually requires optional [Player] mouse and lightgun
 	<!-- TODO: docthauz: Doctor Hauzer (Japan only, multi indices CD) -->
 	<!-- ... -->
 
+	<!-- https://redump.info/disc/19223 -->
+	<software name="doom" supported="no">
+		<!-- Japanese version published by Basho House thru mail order only, matches USA -->
+		<description>Doom (USA, Japan)</description>
+		<year>1996</year>
+		<publisher>Art Data Interactive</publisher>
+		<notes><![CDATA[
+[Sport] Art Data FMV doesn't get cleared completely
+[Madam] blackened colors for floor and roof, check why it uses plenty of PIXC=0000xxxx with no pover
+Has pixel glitches with very small objects (verify)
+Requires ACW/ACCW to fill 3d quads in gameplay
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 99924 35333 9"/>
+		<info name="developer" value="Logicware"/>
+		<!-- release date: April 26, 1996? -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="doom (usa)" sha1="a90a3a65d56833cd5c9a07de192e5be5362a9c2c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- https://redump.info/disc/47940/ -->
-	<software name="espnfit" supported="no">
+	<software name="espnfit" supported="partial">
 		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
 		<year>1994</year>
 		<publisher>IntelliPlay</publisher>
-		<notes><![CDATA[
-[Madam] revisit 8bpp Packed CEL colors (same as slayer?)
-Not extensively tested, may have another GFX glitch on main menu
-]]></notes>
 		<info name="alt_title" value="ESPN Step Aerobics"/>
 		<info name="barcode" value="7 69139 84500 4"/>
 		<info name="serial" value="SEF-01-3DO"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="espn fitness pros - step aerobics (usa)" sha1="2edafbf67c30d57b6729e585b44ea513f4057e31"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/19366 -->
+	<software name="fifa" supported="no">
+		<description>FIFA International Soccer (USA, Korea)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[Madam] has multiple PIXC bugs between main menu and gameplay
+Corrupted Packed CEL displays for name entries and time indicator in gameplay,
+Blackened field lines
+Requires ACW/ACCW region fills in places
+]]></notes>
+		<!-- Korean alt title: FIFA Chuggu / 피파　축구 -->
+		<!-- Is it really the same disc? -->
+		<info name="barcode" value="0 14633 07385 0"/>
+		<info name="developer" value="Extended Play Productions"/>
+		<!-- Disc serials: 7461 / GDT-GA-201 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fifa international soccer (usa, korea)" sha1="0fafab265af9daecfa374e5d410d59cbab485ad7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -233,6 +298,39 @@ Hangs after second FMV, regardless of skipping or not
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gex (usa, europe)" sha1="673f7932418baf31aae4d23a44c1832ab32a5552"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/59959 -->
+	<!-- Not to be confused with the CPC/Spectrum game of the same name (hence different romset ID) -->
+	<software name="icebrk" supported="partial">
+		<description>Icebreaker (USA)</description>
+		<year>1995</year>
+		<publisher>Panasonic</publisher>
+		<notes><![CDATA[
+[Madam] PIXC for game over animation drawing
+]]></notes>
+		<info name="barcode" value="0 37988 83026 8"/>
+		<info name="serial" value="FZ-SW0001"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="icebreaker (usa)" sha1="3f2123bc747ae6441a6c3fccdda2d5f6b541a7e7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="lemmings" supported="partial">
+		<description>Lemmings (USA)</description>
+		<year>1993</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Optional [Player] mouse support
+]]></notes>
+		<info name="barcode" value="0 53203 01017 8"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="lemmings (usa)" sha1="15e60bffcf3ded63ac1dff20b0b20f609e3e8709"/>
 			</diskarea>
 		</part>
 	</software>
@@ -268,16 +366,10 @@ Not extensively tested
 	<!-- TODO: Japanese version released by Multisoft -->
 
 	<!-- https://redump.info/disc/39303 -->
-	<software name="conandl" supported="no">
+	<software name="conandl" supported="partial">
 		<description>Mirai Shounen Conan: Digital Library (Japan)</description>
 		<year>1995</year>
 		<publisher>Bandai Visual</publisher>
-		<notes><![CDATA[
-[Madam] lrform=1 CELs when playing back FMVs (fixed)
-Patapata has only Conan (verify, does SW expect watching stuff first?)
-[Player] Patapata also keep spinning rather than giving user chance to return back
-Hangs on Puzzle, no [Player] input works
-]]></notes>
 		<info name="alt_title" value="未来少年コナン DIGITAL LIBRARY"/>
 		<info name="release" value="19951012"/>
 		<info name="serial" value="FZ-SJ7151"/>
@@ -298,9 +390,9 @@ Hangs on Puzzle, no [Player] input works
 		<year>1995</year>
 		<publisher>Warp</publisher>
 		<notes><![CDATA[
-Has gameplay RNG bugs, background is always cyan and starting hands are always same-y, [ARM]?
-[DSPP] non FMV portions sounds ugly
-[Madam] PIXC example on title screen, ugly 1bpp CEL in versus screen, doesn't repeat CEL background properly in gameplay
+Gameplay RNG heavily depends on [DSPP] noise, non FMV portions sounds ugly
+[Madam] PIXC example on title screen
+Calling tiles draws solid colored (common with other mahjong games)
 Bonus section (3rd option) is untested
 ]]></notes>
 		<!-- TODO: must have a cheat for selecting stage, game doesn't use NVRAM -->
@@ -321,7 +413,7 @@ Bonus section (3rd option) is untested
 		<year>1994</year>
 		<publisher>Kirin Entertainment</publisher>
 		<notes><![CDATA[
-[DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro)
+[DSPP] low pitched sounds, doesn't sync correctly vs. video (cfr. new game intro) (fixed)
 [Madam] choice screen CELs uses PIXC for selections
 ]]></notes>
 		<!-- assume barcode 8 10148 57406 2 is for the Limited Run Games version (same content?) -->
@@ -333,9 +425,99 @@ Bonus section (3rd option) is untested
 		</part>
 	</software>
 
-	<!-- TODO: retfire: Return Fire (USA, Europe) -->
+	<!-- https://redump.info/disc/66011 -->
+	<software name="realpinb" supported="partial">
+		<description>Real Pinball (USA)</description>
+		<year>1994</year>
+		<publisher>Panasonic</publisher>
+		<notes><![CDATA[
+[DSPP] sometimes hiccups SFXs during gameplay
+]]></notes>
+		<info name="barcode" value="0 37988 83005 3"/>
+		<info name="developer" value="Japan DataWorks"/>
+		<info name="serial" value="FZ-SM0801"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="real pinball (usa)" sha1="5bf838dc0f90bb92f420c87d7df499fafd1ae5c5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/45881 -->
+	<software name="retfire" supported="no">
+		<description>Return Fire (USA)</description>
+		<year>1995</year>
+		<publisher>Prolific</publisher>
+		<notes><![CDATA[
+[Sport] doesn't clear main menu graphics when entering gameplay
+[Madam] dots in main menu, has PIXC samples in gameplay, doesn't entirely mask radar
+Requires ACW/ACCW region fills particularly for zoomed in cameras
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 0204-90001-2 5"/>
+		<info name="developer" value="Silent Software"/>
+		<!-- ISBN: 1-886688-00-1 -->
+		<!-- Disc Serial -->
+		<info name="serial" value="PRO - RF3DO001"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="return fire (usa)" sha1="2f973ca92ced6a70bcd13f0efb8de0d99de8dcf0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: retfiree: Return Fire (USA, Europe) -->
+	<!-- Later release or just Europe set that happens to work with USA?-->
 	<!-- https://redump.info/disc/14759 -->
 	<!-- ... -->
+
+	<!-- https://redump.info/disc/14757 -->
+	<software name="nfs" supported="no">
+		<description>Road &amp; Track Presents: The Need for Speed (USA, Europe)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[CD drive] hangs when trying to start a game in main menu
+[Madam] CEL packed corruptions in Hall of Fame screens
+Assume needing ACW/ACCW region fills in gameplay
+]]></notes>
+		<info name="barcode" value="0 14633 07355 3"/>
+		<info name="developer" value="Electronic Arts Canada"/>
+		<info name="developer" value="Pioneer Productions"/>
+		<!-- alt barcode: 5 015839 315220 > -->
+		<!-- Electronic Arts ID: E315DCXD (Europe), 7355 (USA) -->
+		<!-- ISBN: 0-7845-0236-6 (USA) -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="road &amp; track presents - the need for speed (usa, europe)" sha1="8ef8e70e98f283c4a0dee069339c94a642f5e2c7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- TODO: Japanese version of Need for Speed is named OverDrivin' -->
+
+	<!-- https://redump.info/disc/14581 -->
+	<!-- original version bundled with audio CD https://redump.info/disc/59870 -->
+	<software name="roadrash" supported="no">
+		<description>Road Rash (USA)</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[DSPP] doesn't playback any BGM on main menu (starts playing when selecting a race)
+Bike engine sounds possibly worse than actual
+[Madam] uses plenty of PIXC additive blending effect, requires ACW/ACCW region fills in gameplay
+]]></notes>
+		<info name="barcode" value="014633 07221 1"/>
+		<info name="developer" value="Monkey Do"/>
+		<info name="developer" value="Electronic Arts Advanced Technology Group"/>
+		<!-- Electronic Arts ID: 7221 -->
+		<!-- ISBN: 1-55543-986-1 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="road rash (usa)" sha1="b8b5b07b43c76b935f276931f3e7b60799c8dc6d"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- https://redump.info/disc/45884 -->
 	<software name="shanghtt" supported="no">
@@ -343,7 +525,9 @@ Bonus section (3rd option) is untested
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<notes><![CDATA[
-[Madam] has no backgrounds in gameplay (PIXC), flashes rather than color fade-ins/-outs [AMY]?
+[Madam] has no backgrounds in gameplay (PIXC)
+Flashes rather than color fade-ins/-outs, uses PIXC=0xff40 (p-mode 1) extensively
+[DSPP] sound hiccups during gameplay, may play wrong BGM in Arcade Mode when low on timer (verify)
 Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 47875 11052 6"/>
@@ -373,22 +557,36 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- TODO: soccerkd: Soccer Kid (USA) -->
 	<!-- https://redump.info/disc/35971 -->
-	<!-- ... -->
+	<software name="soccerkd" supported="partial">
+		<description>Soccer Kid (USA)</description>
+		<year>1994</year>
+		<publisher>The 3DO Company</publisher>
+		<notes><![CDATA[
+[Madam] corrupted CEL for Krisalis logo at startup
+Title screen options (B button) and pause menu requires Projector for cursor
+]]></notes>
+		<!-- 7 90561 02500 9 for other pressings (same content?) -->
+		<info name="barcode" value="7 90561 00942 9"/>
+		<info name="developer" value="Krisalis"/>
+		<info name="release" value="19940502"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="soccer kid (usa)" sha1="4ac480a20cec48213b7786dfb769fa08a0878095"/>
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- TODO: ssf2t published by Panasonic overseas -->
 
 	<!-- https://redump.info/disc/16131 -->
-	<software name="ssf2xj" supported="no">
+	<software name="ssf2xj" supported="partial">
 		<description>Super Street Fighter II X: Grand Master Challenge (Japan)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-[AMY] sets wrong strips on intro logos
-[Sport] missing layer clearances
-[Madam] minor RMW bug in options menu, offset "select game speed" in character select
-Sensitive to CEL timings
+[Sport] missing layer clearances, doesn't draw Capcom logo at startup
+[Madam] Sensitive to CEL timings
 Eventually requires support for [Player] Capcom fighting pad
 ]]></notes>
 		<info name="alt_title" value="スーパーストリートファイターIIX"/>
@@ -403,6 +601,30 @@ Eventually requires support for [Player] Capcom fighting pad
 		</part>
 	</software>
 
+	<!-- TODO: tokimjps: Tokimeki Mahjong Paradise Special: Koi no Tenpai Beat (Japan) -->
+	<!-- https://redump.info/disc/20113 -->
+	<!-- ... -->
+
+	<!-- https://redump.info/disc/59853 -->
+	<software name="twisted" supported="partial">
+		<description>Twisted: The Game Show (USA)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+[Madam] uses P-Mode separation for PIXC effects on character select
+Departure Lounge presumably needs back-face removal (verify if using TWD)
+May require [AMY] cornerweight on FMVs currently drawing with moire pattern
+]]></notes>
+		<info name="barcode" value="0 14633 07308 9"/>
+		<!-- Electronic Arts ID (serial?): 7308 -->
+		<!-- ISBN: 0-7845-0145-9 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="twisted - the game show (usa)" sha1="6870f9e089e4e5543bddf8ebde448e162a63ae22"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- TODO: vgoalsc96: V Goal Soccer '96 (Japan) -->
 	<!-- https://redump.info/disc/57610 -->
 	<!-- ... -->
@@ -413,7 +635,6 @@ Eventually requires support for [Player] Capcom fighting pad
 		<year>1994</year>
 		<publisher>Kuki</publisher>
 		<notes><![CDATA[
-[Madam] doesn't draw middle video on New gameplay (opacity issue? twd=1 bgnd=1 noblk=1)
 https://youtu.be/wmSQZxUQHds likely buggy, TBD
 Not extensively tested
 ]]></notes>
@@ -435,8 +656,8 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
-Pixelated elements in main menu and gameplay, [AMY] cornerweight?
-[Madam] Center of screen is too dim in gameplay (PIXC)
+Pixelated elements in main menu and gameplay, check [Madam] CEL output
+[Madam] Center of screen is too dim in gameplay (player doesn't get drawn), check PIXC and ALSC
 ]]></notes>
 		<info name="barcode" value="0 13252 01900 3"/>
 		<info name="developer" value="Elite Systems"/>
@@ -444,6 +665,26 @@ Pixelated elements in main menu and gameplay, [AMY] cornerweight?
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtuoso (usa)" sha1="53dae9f7bc34f28aeb27ac4060fdc7c12ca54dd9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/45731 -->
+	<software name="waywarr" supported="no">
+		<description>Way of the Warrior (USA)</description>
+		<year>1995</year>
+		<publisher>Universal Interactive Studios</publisher>
+		<notes><![CDATA[
+[Madam] has PIXC bugs in places, zoomed-out camera requires ACW/ACCW region fills
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="7 85670 10022 8"/>
+		<info name="developer" value="Naughty Dog"/>
+		<!-- Serial on the box: EX-3DO-346-0 (3DO Maniac Pack) -->
+		<!-- ISBN: 1-885310-01-3 (Original) -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="way of the warrior (usa)" sha1="d7e511bfd3ddae722358031244870e092ec39567"/>
 			</diskarea>
 		</part>
 	</software>
@@ -463,6 +704,26 @@ Eventually has optional [Player] lightgun and maybe mouse support
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="who shot johnny rock (usa)" sha1="20d52a017e46aaadd0a0da8be77644653a94199e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://redump.info/disc/16087 -->
+	<software name="wolf3d" supported="no">
+		<description>Wolfenstein 3D (USA)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<notes><![CDATA[
+[Madam] check PIXC outputs in main menu
+[Sport] Never color fills floor and roof in gameplay
+Not extensively tested
+]]></notes>
+		<info name="barcode" value="0 40421 29247 9"/>
+		<info name="developer" value="Logicware"/>
+		<info name="serial" value="CD-3DO-247-0, BX-3DO-247-0"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wolfenstein 3d (usa)" sha1="6c335bea22b365379dc9f5b2f0cf0ee0f5b2d933"/>
 			</diskarea>
 		</part>
 	</software>

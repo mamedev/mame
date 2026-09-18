@@ -33,6 +33,20 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_SLAVE_HLE, cdislave_hle_device, "cdislavehle", "CD-i Mono-I Slave HLE")
 
+namespace {
+
+const u8 s_attenuation_table[46] =
+{
+	0xff, 0xe4, 0xcb, 0xb5, 0xa2, 0x90, 0x80, 0x72,
+	0x66, 0x5b, 0x51, 0x48, 0x40, 0x39, 0x33, 0x2e,
+	0x29, 0x24, 0x20, 0x1d, 0x1a, 0x17, 0x14, 0x12,
+	0x10, 0x0e, 0x0d, 0x0b, 0x0a, 0x09, 0x08, 0x07,
+	0x06, 0x06, 0x05, 0x05, 0x04, 0x04, 0x03, 0x03,
+	0x03, 0x02, 0x02, 0x02, 0x02, 0x01,
+};
+
+}
+
 
 //**************************************************************************
 //  MEMBER FUNCTIONS
@@ -132,6 +146,20 @@ uint16_t cdislave_hle_device::slave_r(offs_t offset)
 	return 0xff;
 }
 
+uint8_t cdislave_hle_device::disc_type()
+{
+	if (!m_cdrom->exists())
+		return 0x00;
+
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
+	for (uint32_t i = 0; i < toc.numtrks; i++)
+	{
+		if (toc.tracks[i].trktype != cdrom_file::CD_TRACK_AUDIO)
+			return 0x02;
+	}
+	return 0x01;
+}
+
 void cdislave_hle_device::set_mouse_position()
 {
 	m_device_mouse_x = ((m_in_buf[1] & 0x70) << 3) | (m_in_buf[2] & 0x7f);
@@ -219,10 +247,21 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					{
 						case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 						case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
-							m_atten_w((((u32)m_in_buf[1]) << 24) | (((u32)m_in_buf[2]) << 16) | (((u32)m_in_buf[3]) << 8) | (((u32)m_in_buf[4])));
+						{
+							u32 gains = 0;
+							for (int i = 1; i <= 4; i++)
+							{
+								gains <<= 8;
+								if (m_in_buf[i] < std::size(s_attenuation_table))
+								{
+									gains |= s_attenuation_table[m_in_buf[i]];
+								}
+							}
+							m_atten_w(gains);
 							m_in_index = 0;
 							m_in_count = 0;
 							break;
+						}
 						case 0xf0: // Set Front Panel LCD
 							memset(m_in_buf + 1, 0, 16);
 							m_in_count = 17;
@@ -284,7 +323,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					switch (m_in_buf[0])
 					{
 						case 0xb0: // Request Disc Status
-							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, 0x02, 0x15, 0xb0);
+							prepare_readback(attotime::from_hz(4), 3, 4, 0xb0, 0x00, disc_type(), 0x15, 0xb0);
 							break;
 						//case 0xb1: // Request Disc Base
 							//prepare_readback(attotime::from_hz(10000), 3, 4, 0xb1, 0x00, 0x00, 0x00, 0xb1);
@@ -381,6 +420,7 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_atten_w(*this)
 	, m_testplug_cb(*this, 0)
+	, m_cdrom(*this, ":cdrom")
 {
 }
 

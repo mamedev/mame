@@ -717,6 +717,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/adbhost.h,MACHINES["ADBHOST"] = true
+---------------------------------------------------
+
+if MACHINES["ADBHOST"] then
+	files {
+		MAME_DIR .. "src/devices/machine/adbhost.cpp",
+		MAME_DIR .. "src/devices/machine/adbhost.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 
@@ -4183,6 +4195,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/wd1015.h,MACHINES["WD1015"] = true
+---------------------------------------------------
+
+if MACHINES["WD1015"] then
+	files {
+		MAME_DIR .. "src/devices/machine/wd1015.cpp",
+		MAME_DIR .. "src/devices/machine/wd1015.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd1002_hd0.h,MACHINES["WD1002_HD0"] = true
 ---------------------------------------------------
 
@@ -5536,6 +5560,28 @@ if MACHINES["UNIHAMMER"] then
 	files {
 		MAME_DIR .. "src/devices/machine/unihammer.cpp",
 		MAME_DIR .. "src/devices/machine/unihammer.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/alpsdpg23.h,MACHINES["ALPSDPG23"] = true
+---------------------------------------------------
+if MACHINES["ALPSDPG23"] then
+	files {
+		MAME_DIR .. "src/devices/machine/alpsdpg23.cpp",
+		MAME_DIR .. "src/devices/machine/alpsdpg23.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/citizen120d.h,MACHINES["CITIZEN120D"] = true
+---------------------------------------------------
+if MACHINES["CITIZEN120D"] then
+	files {
+		MAME_DIR .. "src/devices/machine/citizen120d.cpp",
+		MAME_DIR .. "src/devices/machine/citizen120d.h",
 	}
 end
 

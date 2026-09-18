@@ -39,18 +39,19 @@ public:
 		m_dac(*this, "dac%u", 0U),
 		m_overlay_view(*this, "overlay_view"),
 		m_bankdev(*this, "bankdev"),
-		m_p1_r(*this, "P1.%u", 0)
+		m_p1_r(*this, "P1.%u", 0),
+		m_p2_r(*this, "P2.%u", 0)
 	{ }
 
-	void _3do(machine_config &config);
-	void _3do_pal(machine_config &config);
-	void arcade_ntsc(machine_config &config);
+	void _3do(machine_config &config) ATTR_COLD;
+	void _3do_pal(machine_config &config) ATTR_COLD;
+	void arcade_ntsc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void green_config(machine_config &config);
+	void green_config(machine_config &config) ATTR_COLD;
 
 private:
 	struct SLOW2 {
@@ -95,6 +96,7 @@ private:
 protected:
 	required_ioport_array<2> m_p1_r;
 private:
+	optional_ioport_array<2> m_p2_r;
 
 	SLOW2 m_slow2;
 	UNCLE m_uncle;
@@ -128,7 +130,7 @@ public:
 		, m_raw_analog(*this, "RAW_ANALOG.%u", 0)
 	{ }
 
-	void orbatak(machine_config &config);
+	void orbatak(machine_config &config) ATTR_COLD;
 
 	template <unsigned P> ioport_value analog_0_r()
 	{
@@ -162,7 +164,7 @@ public:
 		: _3do_state(mconfig, type, tag)
 	{ }
 
-	void alg_gun(machine_config &config);
+	void alg_gun(machine_config &config) ATTR_COLD;
 };
 
 #endif // MAME_MISC_3DO_H

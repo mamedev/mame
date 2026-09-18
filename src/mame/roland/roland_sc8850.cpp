@@ -35,12 +35,25 @@
     LCD.  Its own CPU is not dumped, and its USB controller is the one time
     PROM part M37640E8FP at IC2, undumped as well.
 
+    The SC-8820 has no gate array either.  Its eleven lamps - two four lamp
+    strips that double as level meters and map indicator, the INST MAP key's
+    own lamp and the USB lamp - hang on the SH-2's port pins as a three by
+    four matrix, its two keys are two more pins, and the USB controller's
+    two mailbox events arrive as falling edges on IRQ1 and IRQ2 instead of
+    through a gate array source.  Its rear panel COMPUTER switch is on the
+    controller's own pins, and the controller reports it in the power-on
+    handshake.
+
+    Both machines take MIDI IN A on RXD0 and send MIDI OUT on TXD0.  The
+    SC-8850's SCI1 is switched between MIDI IN B and the rear COMPUTER
+    port; on the SC-8820 SCI1 is the COMPUTER port alone.
+
     Not emulated yet: the USB controller, which the firmware reports as a
     hardware error and then carries on without - and without it the machine
     cannot reach its second MIDI port, so half of its 64 parts are out of
-    reach - the program flash's writes, which is where the settings are
-    kept (see the memory map), and on the SC-8820 the panel and the
-    display, which do not go through a gate array there.
+    reach - and the program flash's writes, which is where the settings are
+    kept (see the memory map).  Neither machine has a layout, so the lamps
+    are outputs that nothing draws.
 
 ****************************************************************************/
 
@@ -79,6 +92,8 @@ public:
 		, m_lsp(*this, "lsp")
 		, m_lcdc(*this, "lcdc")
 		, m_computer_sw(*this, "COMPUTER")
+		, m_uipc_sw(*this, "SWITCH")
+		, m_panel(*this, "PANEL")
 		, m_keys(*this, "KEY%u", 0U)
 		, m_dial(*this, "VALUE")
 		, m_leds(*this, "led%u", 0U)
@@ -113,6 +128,11 @@ private:
 	TIMER_CALLBACK_MEMBER(ga_sequencer);
 	u16 porta_r();
 
+	u16 sc8820_porte_r();
+	void sc8820_porta_w(u16 data);
+	void sc8820_porte_w(u16 data);
+	void sc8820_panel_update();
+
 	template <int Channel> u8 uipc_r(offs_t offset);
 	template <int Channel> void uipc_w(offs_t offset, u8 data);
 
@@ -121,7 +141,7 @@ private:
 	void pump_slave(int state);
 	u32 master_link_r(offs_t strobe);
 	u32 slave_link_r(offs_t strobe);
-	void lsp_serial_w(offs_t port, u32 data);
+	template <int Send> void lsp_serial_w(offs_t port, u32 data);
 	u32 lsp_serial_r(offs_t group);
 
 	required_device<sh7014_device> m_maincpu;
@@ -130,6 +150,8 @@ private:
 	required_device<roland_lsp_device> m_lsp;
 	optional_device<sed1330_device> m_lcdc;
 	optional_ioport m_computer_sw;
+	optional_ioport m_uipc_sw;
+	optional_ioport m_panel;
 	optional_ioport_array<4> m_keys;
 	optional_ioport m_dial;
 	output_finder<16> m_leds;
@@ -153,6 +175,9 @@ private:
 	u8 m_dial_position = 0;
 	s32 m_encoder = 0;
 	u32 m_uipc_step = 0;
+	u16 m_porta = 0xffff;
+	u16 m_porte = 0xffff;
+	u8 m_lamp_rows[3]{};
 };
 
 
@@ -205,6 +230,9 @@ void roland_sc8850_state::machine_start()
 	save_item(NAME(m_dial_position));
 	save_item(NAME(m_encoder));
 	save_item(NAME(m_uipc_step));
+	save_item(NAME(m_porta));
+	save_item(NAME(m_porte));
+	save_item(NAME(m_lamp_rows));
 }
 
 void roland_sc8850_state::machine_reset()
@@ -220,6 +248,9 @@ void roland_sc8850_state::machine_reset()
 	m_dial_position = 0;
 	m_encoder = 0;
 	m_uipc_step = 0;
+	m_porta = 0xffff;
+	m_porte = 0xffff;
+	std::fill(std::begin(m_lamp_rows), std::end(m_lamp_rows), 0);
 
 	if (m_keys[0].found())
 	{
@@ -400,6 +431,54 @@ u16 roland_sc8850_state::porta_r()
 
 
 //-------------------------------------------------
+//  the SC-8820's panel, which has no gate array between it and the CPU: the
+//  INST MAP key on PE6 and the volume knob's push on PE7, both pulled up, and
+//  a three by four lamp matrix the firmware scans row by row every fifth
+//  kernel tick.  A row is on while its pin is low and a column while its pin
+//  is high, so each pass writes the columns of the one row it has pulled
+//  down; keeping the last columns written under each row holds the eleven
+//  lamps steady between passes.
+//-------------------------------------------------
+
+u16 roland_sc8850_state::sc8820_porte_r()
+{
+	return m_panel.read_safe(0xffff);
+}
+
+void roland_sc8850_state::sc8820_porta_w(u16 data)
+{
+	m_porta = data;
+	sc8820_panel_update();
+}
+
+void roland_sc8850_state::sc8820_porte_w(u16 data)
+{
+	m_porte = data;
+	sc8820_panel_update();
+}
+
+void roland_sc8850_state::sc8820_panel_update()
+{
+	const u8 columns = BIT(m_porte, 1) | (BIT(m_porte, 0) << 1) | (BIT(m_porte, 3) << 2) | (BIT(m_porte, 2) << 3);
+
+	if (!BIT(m_porte, 15))
+		m_lamp_rows[0] = columns;
+	if (!BIT(m_porte, 14))
+		m_lamp_rows[1] = columns;
+	if (!BIT(m_porta, 15))
+		m_lamp_rows[2] = columns;
+
+	// 0-3 the PART A strip, 4-7 the PART B strip, 8 the INST MAP key's lamp,
+	// 9 the USB lamp and 10 the POWER lamp
+	for (int i = 0; i < 8; i++)
+		m_leds[i] = BIT(m_lamp_rows[i >> 2], i & 3);
+	m_leds[8] = BIT(m_lamp_rows[2], 1);
+	m_leds[9] = BIT(m_lamp_rows[2], 3);
+	m_leds[10] = !BIT(m_porte, 4);
+}
+
+
+//-------------------------------------------------
 //  the two host channels of the M37640 USB controller, "UIPC" to the
 //  firmware: +0 data, +1 status, with bit 0 of the status saying a byte has
 //  arrived on channel 1 and bit 1 that channel 0 will take one.  A byte
@@ -421,8 +500,15 @@ u8 roland_sc8850_state::uipc_r(offs_t offset)
 	if (Channel == 0)
 		return offset ? 0x02 : 0x00;
 
-	constexpr u8 boot[][2] = {
-		{ 0x01, 0xfa }, { 0xf1, 0x00 }, { 0x01, 0xfb }, { 0x01, 0xfc }, { 0x01, 0xfd }, { 0x01, 0xff }
+	// what an absent controller looks like to both handshakes: the untagged
+	// fa the SC-8850's download aborts on, then the tag 9 byte the SC-8820
+	// asks for either way, then the ff that ends the exchange.  That byte
+	// carries the SC-8820's rear COMPUTER switch, whose four positions go to
+	// the controller's IFSEL0 to IFSEL3 pins and not to the CPU's A/D; the
+	// firmware picks its MIDI routing tables by it - 0 USB, 1 MIDI, 2 and 3
+	// the two serial positions.  The SC-8850 has no such port.
+	const u8 boot[][2] = {
+		{ 0x01, 0xfa }, { 0x91, u8(m_uipc_sw.read_safe(0)) }, { 0x01, 0xff }
 	};
 
 	if (m_uipc_step >= std::size(boot))
@@ -481,12 +567,15 @@ u32 roland_sc8850_state::slave_link_r(offs_t strobe)
 //  return on port B, which the program reads with `col 0x1c`.  The chip
 //  refreshes that node at each group's first strobe, after the strobe's own
 //  instruction, so the program's read on the strobe sees the other half's
-//  word: the half-frame rotation is the chip's, on both machines.
+//  word: the half-frame rotation is the chip's, on both machines.  The
+//  SC-8820's one chip takes the pair of lines the SC-8850 keeps for that
+//  link: its send leaves on SDOB and the return arrives on SDIA.
 //-------------------------------------------------
 
+template <int Send>
 void roland_sc8850_state::lsp_serial_w(offs_t port, u32 data)
 {
-	if ((port >> 1) != roland_xp_device::PORT_C)
+	if ((port >> 1) != Send)
 		return;
 	m_lsp->ser_w(port & 1, s32(data));
 	if (port & 1)
@@ -650,15 +739,23 @@ static INPUT_PORTS_START(sc8850)
 	PORT_CONFSETTING(0x3ff, "USB")
 INPUT_PORTS_END
 
-// the SC-8820's panel does not go through a gate array and is not identified,
-// so it has no switch matrix for the scanner to walk
+// the SC-8820's rear COMPUTER switch is wired to the USB controller rather
+// than the A/D, and the firmware asks for it over the mailbox.  The rear panel
+// names the positions MIDI, PC, Mac and USB; the firmware treats PC and Mac
+// alike, so which of them is 2 and which 3 is unknown and they keep the
+// SC-8850's numbering.
 static INPUT_PORTS_START(sc8820)
-	PORT_START("COMPUTER")
-	PORT_CONFNAME(0x3ff, 0x000, "Computer Switch")
-	PORT_CONFSETTING(0x000, "MIDI")
-	PORT_CONFSETTING(0x180, "PC-1")
-	PORT_CONFSETTING(0x280, "PC-2")
-	PORT_CONFSETTING(0x3ff, "USB")
+	PORT_START("SWITCH")
+	PORT_CONFNAME(0x7f, 0x01, "Computer Switch")
+	PORT_CONFSETTING(0x01, "MIDI")
+	PORT_CONFSETTING(0x03, "PC")
+	PORT_CONFSETTING(0x02, "Mac")
+	PORT_CONFSETTING(0x00, "USB")
+
+	PORT_START("PANEL")
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Inst Map")
+	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Preview")
+	PORT_BIT(0xff3f, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void roland_sc8850_state::sc8850(machine_config &config)
@@ -717,7 +814,7 @@ void roland_sc8850_state::sc8850(machine_config &config)
 	ROLAND_LSP(config, m_lsp, 24.576_MHz_XTAL);
 
 	// the EFX send leaves the slave on SDOC; the return comes back on port B
-	m_slave->port_out_callback().set(FUNC(roland_sc8850_state::lsp_serial_w));
+	m_slave->port_out_callback().set(FUNC(roland_sc8850_state::lsp_serial_w<roland_xp_device::PORT_C>));
 	m_slave->port_b_in_callback().set(FUNC(roland_sc8850_state::lsp_serial_r));
 }
 
@@ -725,19 +822,35 @@ void roland_sc8850_state::sc8820(machine_config &config)
 {
 	SH7014(config, m_maincpu, 28.224_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_sc8850_state::sc8820_map);
+	m_maincpu->sci_tx_w<0>().set("mdout", FUNC(midi_port_device::write_txd));
+	m_maincpu->read_porte().set(FUNC(roland_sc8850_state::sc8820_porte_r));
+	m_maincpu->write_porte().set(FUNC(roland_sc8850_state::sc8820_porte_w));
+	m_maincpu->write_porta().set(FUNC(roland_sc8850_state::sc8820_porta_w));
+
+	// one MIDI IN and one MIDI OUT/THRU, both on SCI0; SCI1 is the COMPUTER
+	// serial port alone here, and nothing answers it
+	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set(m_maincpu, FUNC(sh7014_device::sci_rx_w<0>));
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
 	SPEAKER(config, "output1", 2).front();
 	SPEAKER(config, "output2", 2).front();
 
 	ROLAND_XP(config, m_master, 24.576_MHz_XTAL);
 	m_master->set_addrmap(roland_xp_device::AS_WAVE, &roland_sc8850_state::sc8820_xp_rom_map);
-	m_master->int_callback().set_inputline(m_maincpu, 1);
+	// one chip, and the firmware installs one vector for it: 64, IRQ0
+	m_master->int_callback().set_inputline(m_maincpu, 0);
 	// its program puts the DAC pair on the third strobe of each group, SDOD under the rotation the
 	// other machines follow, where the schematic runs the DAC from SDOC
 	m_master->add_route(4, "output1", 1.0, 0);
 	m_master->add_route(5, "output1", 1.0, 1);
 
 	ROLAND_LSP(config, m_lsp, 24.576_MHz_XTAL);
+
+	// with no second chip to talk to, the insertion effect takes the link's
+	// lines: the send leaves on SDOB and the return arrives on SDIA
+	m_master->port_out_callback().set(FUNC(roland_sc8850_state::lsp_serial_w<roland_xp_device::PORT_B>));
+	m_master->port_a_in_callback().set(FUNC(roland_sc8850_state::lsp_serial_r));
 }
 
 
@@ -757,6 +870,7 @@ ROM_START(sc8850)
 	ROM_LOAD("roland-r01678145.ic9", 0x00000, 0x100000, CRC(3ef69f93) SHA1(e594de1f5be17c11ef4f4d7efd142053bbf44085))
 
 	ROM_REGION32_BE(0x200000, "toneprm", 0)
+	// same part number as sc8820 but different contents, unprogrammed from factory?
 	ROM_LOAD("roland-r01561945.ic10", 0x000000, 0x200000, CRC(390faa62) SHA1(d9af1c75b277de2258ed74982d7a754f60c0826e))
 
 	ROM_REGION(0x2000000, "waverom", ROMREGION_ERASE00)
@@ -766,9 +880,11 @@ ROM_END
 
 ROM_START(sc8820)
 	ROM_REGION32_BE(0x10000, "cpurom", 0)
-	// the SC-8820's own CPU (Roland R02015367) is undumped; the SC-8850's
-	// on-chip ROM stands in for it and jumps to the SC-8850's flash base
-	ROM_LOAD("roland-r01783490.ic1", 0x00000, 0x10000, BAD_DUMP CRC(4b2f36e3) SHA1(99b414c5129960e3e58af1fb147a1474ccccca84))
+	// not a dump: this machine's part has not been read out, and what stands
+	// here is a reconstruction of it, written to the addresses the program
+	// flash calls into with the SC-8850's ROM routines carried over to this
+	// machine's addresses and voice count
+	ROM_LOAD("roland-r02015367.ic1", 0x00000, 0x10000, BAD_DUMP CRC(d439b8d3) SHA1(6e6ff8f0ee7bd3bfb119c97016d849e5dc00c1ce))
 
 	// M37640E8FP here, the one time PROM member of the group
 	ROM_REGION(0x8000, "usbmcu", 0)
@@ -776,6 +892,7 @@ ROM_START(sc8820)
 
 	ROM_REGION32_BE(0x200000, "progrom", 0)
 	// program and tone parameters in one flash, built 11/28/2000
+	// same part number as sc8850 but different contents, unprogrammed from factory?
 	ROM_LOAD("roland-r01561945.ic5", 0x000000, 0x200000, CRC(352ad418) SHA1(4b23624d6317eb43dc63bf07d04bcce5c415e202))
 
 	ROM_REGION(0x1800000, "waverom", ROMREGION_ERASEFF)

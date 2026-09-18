@@ -695,11 +695,25 @@ void clio_device::map(address_map &map)
 		})
 	);
 
-	// TODO: should really map these directly in DSPP core
-//  map(0x17d0, 0x17d3) Semaphore
-	// HACK: temporary to allow 3do_gdo101 boot
-	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
+	// Semaphore
+	// - gex, nfs, cpubach, sailormn depends on this
+	map(0x17d0, 0x17d3).lrw32(
+		NAME([this] () {
+			return (m_dspp->semaphore_status_r() << 16) | m_dspp->semaphore_data_r();
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask)
+		{
+			m_dspp->host_semaphore_w(data);
+		})
+	);
 //  map(0x17d4, 0x17d7) Semaphore ACK
+	map(0x17d4, 0x17d7).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask)
+		{
+			if (ACCESSING_BITS_16_31)
+				m_dspp->host_semaphore_ack_w(data >> 16);
+		})
+	);
 //  map(0x17e0, 0x17e3) DSPP DMA
 	// DSPPRST0 (use current reload)
 	map(0x17e4, 0x17e7).lw32(
@@ -715,7 +729,14 @@ void clio_device::map(address_map &map)
 			m_dspp->host_tick_reset(true);
 		})
 	);
-//  map(0x17f0, 0x17f3) Read noise value (Red only?)
+	// Read noise value (Red only? Nope: definitely wants RNG from here)
+	// - conandl Patapata randomness
+	// - tokimjps would hang on Tsumo/Ron
+	// - oyajihmj background color changes and tile distribution,
+	//   must read as 16-bit value to work properly
+	map(0x17f0, 0x17f3).lr32(NAME([this] () {
+		return m_dspp->noise_r();
+	}));
 //  map(0x17f4, 0x17f7) Read DSPP PC (bits 15:0 only)
 //  map(0x17f8, 0x17fb) Read DSPP NR (bits 15:0 only)
 	/*

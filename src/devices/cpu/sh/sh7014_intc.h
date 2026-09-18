@@ -77,6 +77,8 @@ public:
 
 	void set_interrupt(int vector, int state);
 
+	void interrupt_taken(int vector);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -137,6 +139,7 @@ private:
 
 	uint32_t m_irq_type[8];
 	bool m_nmi_input;
+	uint8_t m_irq_input;
 
 	uint32_t m_pending_irqs[MAX_VECTORS/32];
 };

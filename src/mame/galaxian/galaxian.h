@@ -524,6 +524,7 @@ public:
 	void skybase(machine_config &config) ATTR_COLD;
 
 	void init_pisces() ATTR_COLD;
+	void init_porterb() ATTR_COLD;
 
 protected:
 	void pisces_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);

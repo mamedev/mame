@@ -18,6 +18,7 @@
 #define LOG_INIT    (1U << 1)
 #define LOG_TIMER   (1U << 2)
 #define LOG_TIMER_X (1U << 3)
+#define LOG_INT     (1U << 4)
 #define VERBOSE     (0)
 #include "logmacro.h"
 
@@ -30,8 +31,12 @@ m50734_device::m50734_device(const machine_config &mconfig, const char *tag, dev
 	, m_port_in_cb(*this, 0)
 	, m_port_out_cb(*this)
 	, m_analog_in_cb(*this, 0)
+	, m_sclk_cb(*this)
+	, m_sio_out_cb(*this)
+	, m_sio_in_cb(*this, 1)
 	, m_port_latch{0, 0, 0, 0}
 	, m_port_3state{0, 0, 0, 0}
+	, m_p1_latch(0)
 	, m_ad_control(0)
 	, m_ad_register(0)
 	, m_prescaler_reload{0xff, 0xff, 0xff}
@@ -41,6 +46,13 @@ m50734_device::m50734_device(const machine_config &mconfig, const char *tag, dev
 	, m_smcon{0, 0}
 	, m_tx_count(0)
 	, m_tx_reload(0xffff)
+	, m_timer_w_count(0xff)
+	, m_timer_w_base(0)
+	, m_sio_data(0)
+	, m_sio_counter(0)
+	, m_sclk_state(true)
+	, m_int_state{false, false}
+	, m_cntr_state(false)
 {
 	m_program_config.m_internal_map = address_map_constructor(FUNC(m50734_device::internal_map), this);
 }
@@ -116,9 +128,12 @@ void m50734_device::device_start()
 	m_timer[1] = timer_alloc(FUNC(m50734_device::timer_interrupt<1>), this);
 	m_timer[2] = timer_alloc(FUNC(m50734_device::timer_interrupt<2>), this);
 	m_timer_x = timer_alloc(FUNC(m50734_device::timer_x_interrupt), this);
+	m_timer_s = timer_alloc(FUNC(m50734_device::timer_s_strobe), this);
+	m_sio_timer = timer_alloc(FUNC(m50734_device::sio_clock), this);
 
 	save_item(NAME(m_port_latch));
 	save_item(NAME(m_port_direction));
+	save_item(NAME(m_p1_latch));
 	save_item(NAME(m_p0_function));
 	save_item(NAME(m_p2_p3_function));
 	save_item(NAME(m_ad_control));
@@ -130,6 +145,13 @@ void m50734_device::device_start()
 	save_item(NAME(m_smcon));
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_tx_reload));
+	save_item(NAME(m_timer_w_count));
+	save_item(NAME(m_timer_w_base));
+	save_item(NAME(m_sio_data));
+	save_item(NAME(m_sio_counter));
+	save_item(NAME(m_sclk_state));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_cntr_state));
 	save_item(NAME(m_interrupt_control));
 }
 
@@ -155,9 +177,21 @@ void m50734_device::device_reset()
 
 	// Reset interrupts
 	std::fill(std::begin(m_interrupt_control), std::end(m_interrupt_control), 0x00);
+	m_int_state[0] = m_int_state[1] = false;
+	m_cntr_state = false;
+	set_input_line(M740_INT0_LINE, CLEAR_LINE);
+	set_input_line(M740_INT1_LINE, CLEAR_LINE);
 	set_input_line(M740_INT2_LINE, CLEAR_LINE);
 	set_input_line(M740_INT3_LINE, CLEAR_LINE);
 	set_input_line(M740_INT4_LINE, CLEAR_LINE);
+
+	m_sio_counter = 0;
+	m_sclk_state = true;
+	m_sio_timer->adjust(attotime::never);
+	m_timer_s->adjust(attotime::never);
+
+	m_timer_w_count = 0xff;
+	m_timer_w_base = total_cycles();
 
 	// Initialize Timer X
 	set_timer_x(0x0200);
@@ -168,9 +202,16 @@ void m50734_device::read_dummy(u16 adr)
 	// M50734 outputs RD and WR strobes rather than R/W, so dummy accesses should do nothing
 }
 
+// P05 only strobes DME while it is both selected as that function and an output, which is
+// how firmware reaches program memory through an addressing mode that would otherwise bank
+bool m50734_device::dme_active() const
+{
+	return BIT(m_p0_function, 5) && BIT(m_port_direction[0], 5);
+}
+
 u8 m50734_device::read_data(u16 adr)
 {
-	if (BIT(m_p0_function, 5))
+	if (dme_active())
 		return m_data.read_interruptible(adr);
 	else
 		return m740_device::read(adr);
@@ -178,10 +219,57 @@ u8 m50734_device::read_data(u16 adr)
 
 void m50734_device::write_data(u16 adr, u8 val)
 {
-	if (BIT(m_p0_function, 5))
+	if (dme_active())
 		m_data.write_interruptible(adr, val);
 	else
 		m740_device::write(adr, val);
+}
+
+void m50734_device::execute_set_input(int inputnum, int state)
+{
+	if (inputnum == M50734_CNTR_LINE)
+	{
+		bool level = state != CLEAR_LINE;
+		if (m_cntr_state == level)
+			return;
+		m_cntr_state = level;
+
+		if (level != BIT(m_interrupt_control[2], 3))
+			return;
+		if (!BIT(m_interrupt_control[2], 7))
+		{
+			LOGMASKED(LOG_INT, "CNTR interrupt requested at %s\n", machine().time().to_string());
+			m_interrupt_control[2] |= 0x80;
+			if (BIT(m_interrupt_control[2], 6))
+				m740_device::execute_set_input(M740_INT4_LINE, ASSERT_LINE);
+		}
+		return;
+	}
+
+	if (inputnum != M50734_INT1_LINE && inputnum != M50734_INT2_LINE)
+	{
+		m740_device::execute_set_input(inputnum, state);
+		return;
+	}
+
+	int n = inputnum - M50734_INT1_LINE;
+	bool asserted = state != CLEAR_LINE;
+	if (m_int_state[n] == asserted)
+		return;
+	m_int_state[n] = asserted;
+	if (!asserted)
+		return;
+
+	if (n == 0)
+		m_p1_latch = m_port_in_cb[1]();
+
+	if (!BIT(m_interrupt_control[0], n * 2 + 1))
+	{
+		LOGMASKED(LOG_INT, "_INT%d interrupt requested at %s\n", n + 1, machine().time().to_string());
+		m_interrupt_control[0] |= 1 << (n * 2 + 1);
+		if (BIT(m_interrupt_control[0], n * 2))
+			m740_device::execute_set_input(n == 0 ? M740_INT1_LINE : M740_INT0_LINE, ASSERT_LINE);
+	}
 }
 
 u8 m50734_device::interrupt_control_r(offs_t offset)
@@ -205,6 +293,16 @@ void m50734_device::interrupt_control_w(offs_t offset, u8 data)
 	u8 old_control = std::exchange(m_interrupt_control[2 - offset], data);
 	if (offset == 2)
 	{
+		for (int n = 0; n < 2; n++)
+		{
+			bool int_interrupt = (data & (data >> 1) & (1 << (n * 2))) != 0;
+			bool old_int_interrupt = (old_control & (old_control >> 1) & (1 << (n * 2))) != 0;
+			if (int_interrupt != old_int_interrupt)
+			{
+				LOGMASKED(LOG_INT, "%s: _INT%d interrupt %sactivated by write to interrupt control register 1 ($%02X -> $%02X)\n", machine().describe_context(), n + 1, int_interrupt ? "": "de", old_control, data);
+				m740_device::execute_set_input(n == 0 ? M740_INT1_LINE : M740_INT0_LINE, int_interrupt ? ASSERT_LINE : CLEAR_LINE);
+			}
+		}
 		bool he_ve_interrupt = (data & (data >> 1) & 0x50) != 0;
 		bool old_interrupt = (old_control & (old_control >> 1) & 0x50) != 0;
 		if (he_ve_interrupt != old_interrupt)
@@ -240,11 +338,11 @@ void m50734_device::interrupt_control_w(offs_t offset, u8 data)
 			m_timer_x->adjust(clocks_to_attotime(16 * (m_tx_count != 0 ? m_tx_count : m_tx_reload + 1)));
 			m_timer_x->enable(true);
 		}
-		bool tx_interrupt = (data & (data >> 1) & 0x15) != 0;
-		bool old_interrupt = (old_control & (old_control >> 1) & 0x15) != 0;
+		bool tx_interrupt = (data & (data >> 1) & 0x50) != 0;
+		bool old_interrupt = (old_control & (old_control >> 1) & 0x50) != 0;
 		if (tx_interrupt != old_interrupt)
 		{
-			LOGMASKED(LOG_TIMER_X, "%s: Timer X interrupt %sactivated by write to interrupt control register 3 ($%02X -> $%02X)\n", machine().describe_context(), tx_interrupt ? "": "de", old_control, data);
+			LOGMASKED(LOG_TIMER_X, "%s: Timer X/CNTR interrupt %sactivated by write to interrupt control register 3 ($%02X -> $%02X)\n", machine().describe_context(), tx_interrupt ? "": "de", old_control, data);
 			set_input_line(M740_INT4_LINE, tx_interrupt ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
@@ -255,7 +353,7 @@ u8 m50734_device::port_r(offs_t offset)
 {
 	if (BIT(offset, 0))
 		return m_port_direction[N];
-	else if (m_port_direction[0] == 0xff)
+	else if (m_port_direction[N] == 0xff)
 		return m_port_latch[N];
 	else
 		return (m_port_in_cb[N]() & ~m_port_direction[N]) | (m_port_latch[N] & m_port_direction[N]);
@@ -281,6 +379,89 @@ u8 m50734_device::p4_r()
 {
 	// P4 has only 4 pins and no output drivers
 	return m_port_in_cb[4]() & 0x0f;
+}
+
+u8 m50734_device::p1_latch_r()
+{
+	// transparent except while _INT1 is held low
+	if (!m_int_state[0])
+		m_p1_latch = m_port_in_cb[1]();
+	return m_p1_latch;
+}
+
+u8 m50734_device::sio_r()
+{
+	return m_sio_data;
+}
+
+void m50734_device::sio_w(u8 data)
+{
+	m_sio_data = data;
+	m_sio_counter = 8;
+	m_sio_out_cb(BIT(data, 7));
+	m_sclk_state = false;
+	m_sclk_cb(0);
+
+	m_sio_timer->adjust(clocks_to_attotime(2));
+}
+
+TIMER_CALLBACK_MEMBER(m50734_device::sio_clock)
+{
+	m_sclk_state = !m_sclk_state;
+	if (m_sclk_state)
+	{
+		// MSB out first, the level on Sio re-enters at the LSB
+		int in = m_sio_in_cb();
+		m_sclk_cb(1);
+		m_sio_data = (m_sio_data << 1) | (in & 1);
+		if (--m_sio_counter == 0)
+			return;
+		m_sio_out_cb(BIT(m_sio_data, 7));
+	}
+	else
+		m_sclk_cb(0);
+
+	m_sio_timer->adjust(clocks_to_attotime(2));
+}
+
+unsigned m50734_device::timer_s_divider() const
+{
+	return BIT(m_p2_p3_function, 2) ? 16 : 64;
+}
+
+u8 m50734_device::timer_s_r()
+{
+	if (!m_timer_s->enabled())
+		return 0;
+
+	return std::min<u32>(attotime_to_clocks(m_timer_s->remaining()) / timer_s_divider(), 0xff);
+}
+
+void m50734_device::timer_s_w(u8 data)
+{
+	m_timer_s->adjust(clocks_to_attotime(timer_s_divider() * (data + 1)));
+}
+
+TIMER_CALLBACK_MEMBER(m50734_device::timer_s_strobe)
+{
+	// terminal count sets the P04 latch, ending the strobe the program began by clearing it
+	if (BIT(m_p0_function, 4) && !BIT(m_port_latch[0], 4))
+	{
+		m_port_latch[0] |= 0x10;
+		m_port_out_cb[0]((m_port_latch[0] & m_port_direction[0]) | (m_port_3state[0] & ~m_port_direction[0]));
+	}
+}
+
+u8 m50734_device::timer_w_r()
+{
+	// free-running 8-bit counter behind a 10-bit prescaler on f(Xin)/16
+	return m_timer_w_count - u8((total_cycles() - m_timer_w_base) / (4 * 1024));
+}
+
+void m50734_device::timer_w_w(u8 data)
+{
+	m_timer_w_count = data;
+	m_timer_w_base = total_cycles();
 }
 
 u8 m50734_device::p0_function_r()
@@ -454,10 +635,11 @@ void m50734_device::timer_x_w(offs_t offset, u8 data)
 
 void m50734_device::internal_map(address_map &map)
 {
-	// TODO: other timers, UART, etc.
+	// TODO: UART, baud rate generator
 	map(0x00da, 0x00db).rw(FUNC(m50734_device::timer_x_r), FUNC(m50734_device::timer_x_w));
 	map(0x00dc, 0x00e1).rw(FUNC(m50734_device::timer_r), FUNC(m50734_device::timer_w));
 	map(0x00e2, 0x00e3).rw(FUNC(m50734_device::step_counter_r), FUNC(m50734_device::step_counter_w));
+	map(0x00e8, 0x00e8).rw(FUNC(m50734_device::sio_r), FUNC(m50734_device::sio_w));
 	map(0x00e9, 0x00e9).rw(FUNC(m50734_device::ad_control_r), FUNC(m50734_device::ad_control_w));
 	map(0x00ea, 0x00ea).r(FUNC(m50734_device::ad_r));
 	map(0x00eb, 0x00eb).r(FUNC(m50734_device::p4_r));
@@ -465,9 +647,12 @@ void m50734_device::internal_map(address_map &map)
 	map(0x00ed, 0x00ed).rw(FUNC(m50734_device::p2_p3_function_r), FUNC(m50734_device::p2_p3_function_w));
 	map(0x00ee, 0x00ef).rw(FUNC(m50734_device::port_r<3>), FUNC(m50734_device::port_w<3>));
 	map(0x00f0, 0x00f1).rw(FUNC(m50734_device::port_r<2>), FUNC(m50734_device::port_w<2>));
+	map(0x00f2, 0x00f2).r(FUNC(m50734_device::p1_latch_r));
 	map(0x00f3, 0x00f4).rw(FUNC(m50734_device::port_r<1>), FUNC(m50734_device::port_w<1>));
 	map(0x00f5, 0x00f5).rw(FUNC(m50734_device::p0_function_r), FUNC(m50734_device::p0_function_w));
 	map(0x00f6, 0x00f7).rw(FUNC(m50734_device::port_r<0>), FUNC(m50734_device::port_w<0>));
 	map(0x00f8, 0x00f9).rw(FUNC(m50734_device::smcon_r), FUNC(m50734_device::smcon_w));
+	map(0x00fa, 0x00fa).rw(FUNC(m50734_device::timer_s_r), FUNC(m50734_device::timer_s_w));
+	map(0x00fc, 0x00fc).rw(FUNC(m50734_device::timer_w_r), FUNC(m50734_device::timer_w_w));
 	map(0x00fd, 0x00ff).rw(FUNC(m50734_device::interrupt_control_r), FUNC(m50734_device::interrupt_control_w));
 }

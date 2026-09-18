@@ -6,15 +6,15 @@ bootleg handheld with standard NES game library
 probably emulation based as the games have a brief animated loading graphic
 and the game data appears to be compressed in the ROM
 
-SoC / CPU is an unmarked 48-pin chip, architecture unknown, there is what looks like native code
-at 0x4000
+SoC / CPU is an unmarked 48-pin chip, ARM based, there is what looks like Thumb-2 code
+at 0x4104
 
 has T1FF signature at the start of the ROM
- 
-other similar devices are S+Core, but the code in the ROM doesn't appear to disassemble as such
 */
 
 #include "emu.h"
+
+#include "cpu/arm7/arm7.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -27,6 +27,7 @@ class gc71_nes_bootleg_state : public driver_device
 public:
 	gc71_nes_bootleg_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{
 	}
@@ -39,12 +40,20 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void mem_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };
 
 u32 gc71_nes_bootleg_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
+}
+
+void gc71_nes_bootleg_state::mem_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).rom().region("maincpu", 0);
 }
 
 void gc71_nes_bootleg_state::machine_start()
@@ -57,7 +66,8 @@ INPUT_PORTS_END
 
 void gc71_nes_bootleg_state::gc71hh(machine_config &config)
 {
-	// unknown CPU
+	ARM11(config, m_maincpu, 12'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gc71_nes_bootleg_state::mem_map);
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);

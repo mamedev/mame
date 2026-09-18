@@ -8,9 +8,10 @@
 #include "emu.h"
 #include "m6805.h"
 
+#include "machine/adbhost.h"
 #include "machine/macseconds.h"
 
-class m68hc05pge_device : public m6805_base_device, public device_nvram_interface, public macseconds_interface
+class m68hc05pge_device : public m6805_base_device, public device_nvram_interface, public macseconds_interface, public adb_hle_host_interface
 {
 public:
 	const address_space_config m_program_config;
@@ -48,6 +49,11 @@ public:
 	auto spi_mosi_callback() { return write_spi_mosi.bind(); }
 	auto spi_clock_callback() { return write_spi_clock.bind(); }
 	void spi_miso_w(int state) { m_spi_miso = state; }
+	auto adb_linechange_callback()
+	{
+		return m_adb_linechange.bind();
+	}
+	void set_adb_line(int state) { adb_host_line_w(state); }
 
 protected:
 	// construction/destruction
@@ -110,8 +116,20 @@ protected:
 	TIMER_CALLBACK_MEMBER(seconds_tick);
 	TIMER_CALLBACK_MEMBER(cpi_tick);
 	TIMER_CALLBACK_MEMBER(spi_tick);
-	TIMER_CALLBACK_MEMBER(adb_tick);
 	TIMER_CALLBACK_MEMBER(keyscan_tick);
+
+	void adb_update_irq();
+	void adb_set_status(u8 mask);
+	void adb_clear_status(u8 mask);
+
+	// adb_hle_host_interface implementation
+	virtual void adb_host_drive_line(int state) override;
+	virtual void adb_host_tx_empty() override;
+	virtual bool adb_host_listen_more() const override;
+	virtual void adb_host_command_sent(bool srq) override;
+	virtual bool adb_host_rx_byte(u8 data) override;
+	virtual void adb_host_transaction_done(adb_host_status status) override;
+	virtual void adb_host_reset_done() override;
 
 	required_shared_ptr<u8> m_internal_ram;
 
@@ -127,6 +145,7 @@ protected:
 	devcb_write8::array<4> m_pwm_out;
 
 	devcb_write_line write_spi_mosi, write_spi_clock;
+	devcb_write_line m_adb_linechange;
 
 	u8 m_ports[11], m_ddrs[11], m_pullups[11];
 	u8 m_pll_ctrl;
@@ -144,7 +163,7 @@ protected:
 	u8 m_pwmbcr, m_pwmb0, m_pwmb1;
 	u8 m_plmcr, m_plmt1, m_plmt2;
 	u8 m_kcsr;
-	emu_timer *m_seconds_timer, *m_cpi_timer, *m_spi_timer, *m_adb_timer, *m_keyscan_timer;
+	emu_timer *m_seconds_timer, *m_cpi_timer, *m_spi_timer, *m_keyscan_timer;
 	u32 m_rtc;
 	u8 m_sram[0x8000];
 };

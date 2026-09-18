@@ -178,8 +178,7 @@ private:
 	virtual void sound_stream_update(sound_stream &stream) override;
 	sound_stream*   m_sound;
 
-	TIMER_CALLBACK_MEMBER(spin_start_timeout);
-	attotime spin_start_delay() const;
+	TIMER_CALLBACK_MEMBER(spin_start_delay);
 
 	floppy_sound_samples* m_samplelist;
 	floppy_sound_samples m_default_samples;

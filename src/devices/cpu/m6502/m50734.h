@@ -51,6 +51,14 @@
 class m50734_device : public m740_device
 {
 public:
+	// external interrupt pins, active low
+	enum : int
+	{
+		M50734_INT1_LINE = M740_MAX_INT_LINE + 1,
+		M50734_INT2_LINE,
+		M50734_CNTR_LINE
+	};
+
 	m50734_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// port callback configuration
@@ -67,6 +75,11 @@ public:
 	auto an1_in_cb() { return m_analog_in_cb[1].bind(); }
 	auto an2_in_cb() { return m_analog_in_cb[2].bind(); }
 	auto an3_in_cb() { return m_analog_in_cb[3].bind(); }
+
+	// clocked serial I/O (P31/Sclk, P32/Sio; these bypass the port P3 callbacks)
+	auto sclk_cb() { return m_sclk_cb.bind(); }
+	auto sio_out_cb() { return m_sio_out_cb.bind(); }
+	auto sio_in_cb() { return m_sio_in_cb.bind(); }
 
 	// port three-state output configuration
 	void set_p0_3state(u8 value) { assert(!configured()); m_port_3state[0] = value; }
@@ -87,8 +100,13 @@ protected:
 	// device_memory_interface implementation
 	space_config_vector memory_space_config() const override;
 
+	// device_execute_interface implementation
+	virtual void execute_set_input(int inputnum, int state) override;
+
 	// m740_device overrides
 	virtual void read_dummy(u16 adr) override;
+	bool dme_active() const;
+
 	virtual uint8_t read_data(u16 adr) override;
 	virtual void write_data(u16 adr, u8 val) override;
 
@@ -103,6 +121,20 @@ private:
 	void p0_function_w(u8 data);
 	u8 p2_p3_function_r();
 	void p2_p3_function_w(u8 data);
+
+	u8 p1_latch_r();
+
+	u8 sio_r();
+	void sio_w(u8 data);
+	TIMER_CALLBACK_MEMBER(sio_clock);
+
+	unsigned timer_s_divider() const;
+	u8 timer_s_r();
+	void timer_s_w(u8 data);
+	TIMER_CALLBACK_MEMBER(timer_s_strobe);
+
+	u8 timer_w_r();
+	void timer_w_w(u8 data);
 
 	u8 ad_control_r();
 	void ad_control_w(u8 data);
@@ -133,14 +165,20 @@ private:
 	devcb_read8::array<5> m_port_in_cb;
 	devcb_write8::array<4> m_port_out_cb;
 	devcb_read8::array<4> m_analog_in_cb;
+	devcb_write_line m_sclk_cb;
+	devcb_write_line m_sio_out_cb;
+	devcb_read_line m_sio_in_cb;
 
 	emu_timer *m_ad_timer;
 	emu_timer *m_timer[3];
 	emu_timer *m_timer_x;
+	emu_timer *m_timer_s;
+	emu_timer *m_sio_timer;
 
 	u8 m_port_latch[4];
 	u8 m_port_direction[4];
 	u8 m_port_3state[4];
+	u8 m_p1_latch;
 	u8 m_p0_function;
 	u8 m_p2_p3_function;
 	u8 m_ad_control;
@@ -152,6 +190,13 @@ private:
 	u8 m_smcon[2];
 	u16 m_tx_count;
 	u16 m_tx_reload;
+	u8 m_timer_w_count;
+	u64 m_timer_w_base;
+	u8 m_sio_data;
+	u8 m_sio_counter;
+	bool m_sclk_state;
+	bool m_int_state[2];
+	bool m_cntr_state;
 	u8 m_interrupt_control[3];
 };
 

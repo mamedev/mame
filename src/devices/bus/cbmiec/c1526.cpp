@@ -4,8 +4,6 @@
 
     Commodore 1526/MPS-802/4023 Printer emulation
 
-	MPS-802 is the European model number, CBM 4023 is the IEEE-488 version
-
 **********************************************************************/
 
 #include "emu.h"

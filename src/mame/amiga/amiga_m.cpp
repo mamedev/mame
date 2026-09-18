@@ -1052,7 +1052,7 @@ void amiga_state::gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 ioport_value amiga_state::floppy_drive_status()
 {
-	return m_fdc->ciaapra_r();
+	return m_fdc->ciaapra_r() | 0x03;
 }
 
 void amiga_state::cia_0_port_a_write(uint8_t data)
@@ -1091,11 +1091,16 @@ uint8_t amiga_state::cia_1_port_a_read()
 	data |= m_rs232_cts << 4;
 	data |= m_rs232_dcd << 5;
 
+	data |= 0xc0;
+
 	return data;
 }
 
 void amiga_state::cia_1_port_a_write(uint8_t data)
 {
+	m_cia_1->sp_w(BIT(data, 0));
+	m_cia_1->cnt_w(BIT(data, 1));
+
 	if (m_rs232)
 	{
 		m_rs232->write_rts(BIT(data, 6));
@@ -1391,7 +1396,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			}
 			else
 			{
-				int scale = m_agnus_id & 0x10 ? 525 : 625;
+				int scale = m_agnus_id & 0x10 ? SCREEN_HEIGHT_NTSC : SCREEN_HEIGHT_PAL;
 
 				m_pot0dat  = (int) ((double) m_pot0x / scale) * 0xff;
 				m_pot0dat |= (int)(((double) m_pot0y / scale) * 0xff) << 8;
@@ -1406,7 +1411,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			}
 			else
 			{
-				int scale = m_agnus_id & 0x10 ? 525 : 625;
+				int scale = m_agnus_id & 0x10 ? SCREEN_HEIGHT_NTSC : SCREEN_HEIGHT_PAL;
 
 				m_pot1dat  = (int) ((double) m_pot1x / scale) * 0xff;
 				m_pot1dat |= (int)(((double) m_pot1y / scale) * 0xff) << 8;

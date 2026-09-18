@@ -10,7 +10,7 @@
 
     TODO:
 
-    - ZX8301 memory access slowdown
+    - More accurate ZX8301 memory contention
     - use resnet.h to create palette
     - Tyche bios is broken
     - several disk interfaces (720K/1.44MB/3.2MB)
