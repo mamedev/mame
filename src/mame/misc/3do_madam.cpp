@@ -985,9 +985,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			}
 			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
 
-			// - cpquazar uses all the !ldsize/!ldprs/!ldpixc in gameplay, minus !yoxy
+			// TODO: verify what "current" means
+			// is it the previously CEL loaded address or the actual pointer at the end of a CEL drawing?
 			if (yoxy)
 			{
+				// +0x10 normal base
 				const s32 xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
 				const s32 ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
 				// TODO: can be in 17.15 format (?)
@@ -998,18 +1000,26 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			}
 			LOGCEL("    xpos=%f ypos=%f\n", m_cel.xpos, m_cel.ypos );
 
+			// from here onward the params are marked optional in "Working With a CCB"
+			// - cpquazar uses all the !ldsize/!ldprs/!ldpixc in gameplay, minus !yoxy
+			// - fifa, srmp4 and srmp5 depends on adjust base accordingly to not throw illegal setup
+			//   glitches
+			u32 opt_base = 0x18;
+
 			if (ldsize)
 			{
-				const s32 hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
-				const s32 hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
-				const s32 vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
-				const s32 vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
+				// +0x18 normal base
+				const s32 hdx = (s32)m_dma32_read_cb(m_cel.address + opt_base + 0x00);
+				const s32 hdy = (s32)m_dma32_read_cb(m_cel.address + opt_base + 0x04);
+				const s32 vdx = (s32)m_dma32_read_cb(m_cel.address + opt_base + 0x08);
+				const s32 vdy = (s32)m_dma32_read_cb(m_cel.address + opt_base + 0x0c);
 				m_cel.hdx = (double)hdx / 1048576.0;
 				m_cel.hdy = (double)hdy / 1048576.0;
 				m_cel.vdx = (double)vdx / 65536.0;
 				m_cel.vdy = (double)vdy / 65536.0;
 
 				tick_time += 4;
+				opt_base += 0x10;
 			}
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
 				, m_cel.hdx, m_cel.hdy
@@ -1018,18 +1028,21 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 			if (ldprs)
 			{
-				const s32 hddx = (s32)m_dma32_read_cb(m_cel.address + 0x28);
-				const s32 hddy = (s32)m_dma32_read_cb(m_cel.address + 0x2c);
+				// +0x28 normal base
+				const s32 hddx = (s32)m_dma32_read_cb(m_cel.address + opt_base + 0x00);
+				const s32 hddy = (s32)m_dma32_read_cb(m_cel.address + opt_base + 0x04);
 				m_cel.hddx = (double)hddx / 1048576.0;
 				m_cel.hddy = (double)hddy / 1048576.0;
 
 				tick_time += 2;
+				opt_base += 8;
 			}
 			LOGCEL("    hddx=%f hddy=%f\n", m_cel.hddx, m_cel.hddy);
 
 			if (ldpixc)
 			{
-				m_cel.pixc = m_dma32_read_cb(m_cel.address + 0x30);
+				// +0x30 normal base
+				m_cel.pixc = m_dma32_read_cb(m_cel.address + opt_base);
 				tick_time += 1;
 				LOGCEL("    pixc=%08x\n", m_cel.pixc);
 
@@ -1064,7 +1077,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 					// 16 / 0: 2D secondary divider value (value + 1)
 					m_cel.pixc_2d[i] = BIT(m_cel.pixc, 0 + nibble);
-					LOGCEL("    P[%d]: 1S %d MS %d MF %d DF %d | 2S %d AV %d 2D %d\n"
+					LOGCEL("    P[%d]: 1S %d MS %d MF %d DF %d | 2S %d AV %02x 2D %d\n"
 						, i
 						, m_cel.pixc_1s[i], m_cel.pixc_ms[i], m_cel.pixc_mf[i], m_cel.pixc_df[i]
 						, m_cel.pixc_2s[i], m_cel.pixc_av[i], m_cel.pixc_2d[i]
@@ -1074,20 +1087,25 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 					if (m_cel.useav && (m_cel.pixc_av[i] & 0x18) == 0x18)
 						popmessage("3do_madam.cpp: unemulated USEAV with PIXC AV[%d] SDV == 3", i);
 				}
+
+				opt_base += 4;
 			}
 
 			// fetch the Preamble words
 			// May as well do it here because ...
 			if (m_cel.ccbpre)
 			{
-				m_cel.pre0 = m_dma32_read_cb(m_cel.address + 0x34);
+				// +0x34/+0x38 normal bases
+				m_cel.pre0 = m_dma32_read_cb(m_cel.address + opt_base);
 				tick_time ++;
+				opt_base += 4;
 				LOGCEL("    pre0=%08x ", m_cel.pre0);
 				if (!m_cel.packed)
 				{
-					m_cel.pre1 = m_dma32_read_cb(m_cel.address + 0x38);
+					m_cel.pre1 = m_dma32_read_cb(m_cel.address + opt_base);
 					LOGCEL("pre1=%08x", m_cel.pre1);
 					tick_time ++;
+					opt_base += 4;
 				}
 				LOGCEL("\n");
 			}
