@@ -9,6 +9,16 @@
     on the Quadra 630, though, so these boards could be used as drop-in replacements
     in the "Bongo" all-in-one case.
 
+	Basic architecture:
+	- PowerPC 603e
+	- PSX (DRAM/ROM controller + Bandit PCI)
+	- Valkyrie-AR (Valkyrie from Quadra 630 and Cordyceps but mapped differently)
+	- O'Hare PCI-to-Mac I/O chip, same as in Power Mac 7500 "TNT"
+	
+	Current status: Tries to play the boot chime, but the DMA engine hangs
+	and so does the CPU. Skipping this gets us to a point where the 68k
+	emulator runs, but we have a black screen.
+
  ****************************************************************************/
 
 #include "emu.h"
@@ -53,6 +63,7 @@ public:
 	    m_bandit(*this, "pci:00.0"),
         m_ohare(*this, "pci:10.0"),
 		m_video(*this, "valkyrie"),
+		m_scsibus(*this, "scsi"),
 		m_adbbus(*this, "adb"),
 		m_cuda(*this, "cuda"),
 		m_ram(*this, RAM_TAG),
@@ -72,6 +83,7 @@ private:
     required_device<bandit_host_device> m_bandit;
     required_device<ohare_device> m_ohare;
 	required_device<valkyrie_device> m_video;
+	required_device<nscsi_bus_device> m_scsibus;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
@@ -84,6 +96,11 @@ private:
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+	}
+
+	void nmi_irq(int state)
+	{
+		// ??
 	}
 
 
@@ -205,9 +222,22 @@ void pmac6400_state::pmac6400(machine_config &config)
 	screamer_device &screamer(SCREAMER(config, "codec", 45.1584_MHz_XTAL / 2));
 	screamer.dma_output().set(m_ohare, FUNC(ohare_device::codec_dma_read));
 	screamer.dma_input().set(m_ohare, FUNC(ohare_device::codec_dma_write));
-
 	m_ohare->codec_r_callback().set(screamer, FUNC(screamer_device::read_macrisc));
 	m_ohare->codec_w_callback().set(screamer, FUNC(screamer_device::write_macrisc));
+	
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+			[] (device_t *device)
+			{
+				device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+				device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
+			});
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
 
 	VALKYRIE(config, m_video, 31.3344_MHz_XTAL);
 	m_video->write_irq().set(m_ohare, FUNC(ohare_device::set_irq_line<0x18>));
@@ -225,7 +255,11 @@ void pmac6400_state::pmac6400(machine_config &config)
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pmac6400_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
-    
+	m_cuda->via_clock_callback().set(m_ohare, FUNC(ohare_device::cb1_w));
+	m_cuda->via_data_callback().set(m_ohare, FUNC(ohare_device::cb2_w));
+	m_cuda->nmi_callback().set(FUNC(pmac6400_state::nmi_irq));
+	
+
 	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 
@@ -238,9 +272,27 @@ void pmac6400_state::pmac6400(machine_config &config)
 }
 
 
+#define PPC_MAKE_BRANCH_ALWAYS(x) \
+	ROM_FILL(x,   1, 0x48) \
+	ROM_FILL(x+1, 1, 0x00) \
+	// .
+
+#define PPC_ASSEMBLE_NOP(x) \
+	ROM_FILL(x,   1, 0x7f) \
+	ROM_FILL(x+1, 1, 0xff) \
+	ROM_FILL(x+2, 1, 0xfb) \
+	ROM_FILL(x+3, 1, 0x78) \
+	// .
+
 ROM_START( pmac6400 )
 	ROM_REGION64_BE(0x400000, "bootrom", 0)
 	ROM_LOAD( "6f5724c0.bin", 0x000000, 0x400000, CRC(ec9914be) SHA1(822ab19b360b8fa25238e531dcb85a4459f7c8be) )
+
+	// HACK: there's a bug somewhere that will cause the
+	// bootrom to hang when it tries to play the chime.
+	// disable that function for now so we can focus on bringing up other stuff
+	PPC_ASSEMBLE_NOP(0x303044)
+
 ROM_END
 
 } // anonymous namespace
