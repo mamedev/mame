@@ -2051,6 +2051,18 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!-- https://www.diroccovision.com/games/speak-spell-cv.php -->
+	<software name="speaksp">
+		<description>Speak &amp; Spell</description>
+		<year>2026</year>
+		<publisher>DiRoccoVision</publisher>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="speak-and-spell.rom" size="32768" crc="bfd9c4d5" sha1="30c409e4234fda030c7978a67ee3d5565f780ae8" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spectar">
 		<description>Spectar</description>
 		<year>2006</year>
