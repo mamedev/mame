@@ -64,8 +64,7 @@ void mylife_state::pa_w(u16 data)
 
 void mylife_state::prog_map(address_map &map)
 {
-	// TODO: banked accesses in range 0x8000..0xffff
-	map(0x0000, 0xffff).rom();
+	map(0x000000, 0x3fffff).rom();
 }
 
 static INPUT_PORTS_START( mylife )
