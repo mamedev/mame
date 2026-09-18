@@ -1490,9 +1490,6 @@ void c64_state::machine_start()
 
 void c64_state::machine_reset()
 {
-	m_iec->host_reset_w(0);
-	m_iec->host_reset_w(1);
-
 	m_user->write_3(0);
 	m_user->write_3(1);
 }
