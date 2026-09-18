@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Harris, Quench
+// copyright-holders:Mike Harris, Quench, Ben Bruscella
 /***************************************************************************
 
     bally.cpp
@@ -22,6 +22,7 @@ DEFINE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,      bally_sounds_plus_device,      "sound
 DEFINE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,     bally_cheap_squeak_device,     "cheap_squeak",     "Bally Cheap Squeak Board")
 DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK,    bally_squawk_n_talk_device,    "squawk_n_talk",    "Bally Squawk & Talk Board")
 DEFINE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK_AY, bally_squawk_n_talk_ay_device, "squawk_n_talk_ay", "Bally Squawk & Talk w/ AY8910 Board")
+DEFINE_DEVICE_TYPE(BALLY_SAY_IT_AGAIN,      bally_say_it_again_device,     "say_it_again",     "Bally Say It Again Board")
 
 
 //**************************************************************************
@@ -861,5 +862,124 @@ void bally_squawk_n_talk_ay_device::update_ay_bus()
 	else if (!m_bc1 && m_bdir)
 	{
 		m_ay->data_w(m_ay_data);
+	}
+}
+
+
+//**************************************************************************
+//  SAY IT AGAIN
+//**************************************************************************
+
+//-------------------------------------------------
+//  bally_say_it_again_device - constructor
+//-------------------------------------------------
+
+bally_say_it_again_device::bally_say_it_again_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock) :
+	device_t(mconfig, BALLY_SAY_IT_AGAIN, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_bbd(*this, "bbd"),
+	m_stream(nullptr),
+	m_bbd_clock(2048.0f / 0.170f),
+	m_accum(0.0f),
+	m_delayed(0.0f),
+	m_lowpass(0.0f),
+	m_regen(0.45f),
+	m_wet(0.8f)
+{
+}
+
+bally_say_it_again_device &bally_say_it_again_device::set_delay_ms(float ms)
+{
+	// delay is buckets over clock, so the Delay pot is really a clock adjustment
+	m_stream->update();
+	m_bbd_clock = 2048.0f / (std::clamp(ms, 20.0f, 800.0f) / 1000.0f);
+	return *this;
+}
+
+bally_say_it_again_device &bally_say_it_again_device::set_regen(float regen)
+{
+	regen = std::clamp(regen, 0.0f, 0.95f);
+	if (regen != m_regen)
+	{
+		if (m_stream) m_stream->update();
+		m_regen = regen;
+	}
+	return *this;
+}
+
+bally_say_it_again_device &bally_say_it_again_device::set_wet(float wet)
+{
+	if (m_stream) m_stream->update();
+	m_wet = wet;
+	return *this;
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void bally_say_it_again_device::device_add_mconfig(machine_config &config)
+{
+	// The delay line is clocked by this device rather than routed through, because
+	// the Regen pot puts the output back into the input and a route cannot loop.
+	SAD4096(config, m_bbd, 0);
+}
+
+void bally_say_it_again_device::device_start()
+{
+	m_stream = stream_alloc(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+
+	save_item(NAME(m_bbd_clock));
+	save_item(NAME(m_accum));
+	save_item(NAME(m_delayed));
+	save_item(NAME(m_lowpass));
+	save_item(NAME(m_regen));
+	save_item(NAME(m_wet));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void bally_say_it_again_device::device_reset()
+{
+	m_accum = 0.0f;
+	m_delayed = 0.0f;
+	m_lowpass = 0.0f;
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void bally_say_it_again_device::sound_stream_update(sound_stream &stream)
+{
+	float const rate = float(stream.sample_rate());
+	// buckets to shift per output sample, and the line's own bandwidth limit at the
+	// rate the buckets are actually moving
+	float const step = m_bbd_clock / rate;
+	float const alpha = 1.0f - std::exp(-2.0f * float(M_PI) * 3000.0f / m_bbd_clock);
+
+	for (int i = 0; i < stream.samples(); i++)
+	{
+		sound_stream::sample_t const in = stream.get(0, i);
+
+		m_accum += step;
+		while (m_accum >= 1.0f)
+		{
+			m_accum -= 1.0f;
+			// one pole low pass inside the loop, so each repeat comes back duller
+			// than the one before it rather than ringing forever
+			m_lowpass += alpha * (m_delayed - m_lowpass);
+			m_delayed = m_bbd->clock_sample(in + m_regen * m_lowpass);
+		}
+
+		// the board sits between the sound board and the amplifier; keep some headroom
+		// for the sum of the direct signal and the repeats
+		stream.put(0, i, 0.6f * (in + m_wet * m_delayed));
 	}
 }
