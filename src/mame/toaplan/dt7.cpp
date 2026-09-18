@@ -14,17 +14,21 @@
    invalid, e/f Japan - even values are Taito licensed except Japan,
    where it is the odd one.
 
+   Service menu controls: the test switch advances pages (colorbars /
+   crosshatch -> INPUT CHECK -> menu -> exit, which resets the game);
+   on list pages any P1 button steps the cursor down (it wraps) and
+   1P START changes the value or enters the submenu.  Leaving the
+   CONFIGURATION page also saves and resets.
+
    TODO:
     - verify remaining unknown audio CPU opcodes (see toaplan_v25_tables.h); the ones
       the game actually executes are now covered
     - serial comms (needs support in V25 core?) for linked units
     - verify frequencies on chips
-    - verify alt titles, some regions have 'Car Fighting' as a subtitle, region comes
-      from EEPROM word 2; add per-region clones with EEPROM defaults like fixeight
     - verify the exact byte/bit layout of the second input chain and the 0x58008 /
       0x5800a latches (2P / linked unit side)
     - verify text layer palettes
-    - service mode doesn't display properly and its pages don't advance
+    - lineram xscroll words (0x1e0 / 0x1e4) are ignored (crosshatch label column)
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
@@ -447,7 +451,7 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_TILT )
-	TOAPLAN_TEST_SWITCH( 0x80, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Switch")
 
 	// per-seat auxiliary input latches; the sound CPU forwards them into the
 	// ring buffer half that is exchanged over the cabinet link, so they are
