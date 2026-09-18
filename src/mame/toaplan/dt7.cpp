@@ -4,48 +4,54 @@
 /* This is derived from toaplan2.cpp, but there are enough hardware
    differences to keep it separate
 
-   The region (title, notice screen and license text) comes from EEPROM
-   settings byte 2 and can be rewritten on real hardware with a hidden
-   operator combo: enter the CONFIGURATION page of service mode, hold
-   2P START plus the 1P buttons encoding the region value (SHOT1 = +1,
-   SHOT2 = +2, SHOT3 = +4, 1P START = +8), then toggle the test switch
-   to save and exit.  Values: 0/1 Korea (Car Fighting title), 2/3 Hong
-   Kong, 4/5 Taiwan, 6/7 Southeast Asia, 8/9 Europe, a/b USA, c/d
-   invalid, e/f Japan - even values are Taito licensed except Japan,
-   where it is the odd one.
-
-   Coins never credit with the prototype's 68K code as assembled: the
-   four coinage rate lookups at 0x2b09e / 0x2b0a8 / 0x2b0c6 / 0x2b0d0
-   encode displacements to the rate tables at 0x2b13c / 0x2b15c that no
-   longer fit in the signed 8-bit (d8,PC,Xn) field, so at runtime they
-   fetch garbage from code bytes.  Batsugun ships the identical routine
-   with its tables still in reach, and every dt7 lookup misses its
-   table by exactly 0x100; init_region() applies that correction so
-   coins credit at the intended default rates (1 coin 1 credit; Europe
-   coin B 1 coin 2 credits).  Remaining coin quirks are the prototype's
-   own and are kept: the COIN SW service menu items never reach the
-   rate logic (it reads a RAM mirror populated only later in the boot),
-   the USA regions have a settings bit (EEPROM byte 1, bit 5) selecting
-   a hardcoded 1 coin / 1 credit mode, the Service input always
-   credits, and the FREE PLAY configuration item works everywhere.
-
-   Service menu controls: the test switch advances pages (colorbars /
-   crosshatch -> INPUT CHECK -> menu -> exit, which resets the game);
-   on list pages any P1 button steps the cursor down (it wraps) and
-   1P START changes the value or enters the submenu.  Leaving the
-   CONFIGURATION page also saves and resets.
+   Notes:
+    - the region (title, notice screen and license text) comes from EEPROM
+      settings byte 2 and can be rewritten on real hardware with a hidden
+      operator combo: in the CONFIGURATION page of service mode, hold 2P START
+      plus the 1P buttons encoding the region value (SHOT1 = +1, SHOT2 = +2,
+      SHOT3 = +4, 1P START = +8), then toggle the test switch to save.
+      Values: 0/1 Korea (Car Fighting title), 2/3 Hong Kong, 4/5 Taiwan,
+      6/7 Southeast Asia, 8/9 Europe, a/b USA, c/d invalid, e/f Japan -
+      even values are Taito licensed except Japan, where it is the odd one
+    - coins never credit with the 68K code as assembled: the four coinage
+      rate lookups at 0x2b09e / 0x2b0a8 / 0x2b0c6 / 0x2b0d0 encode
+      displacements to the rate tables at 0x2b13c / 0x2b15c that no longer
+      fit in the signed 8-bit (d8,PC,Xn) field, so at runtime they fetch
+      garbage from code bytes.  Batsugun ships the identical routine with
+      its tables still in reach, and every dt7 lookup misses its table by
+      exactly 0x100; init_region() applies that correction so coins credit
+      at the intended default rates (1 coin 1 credit; Europe coin B 1 coin
+      2 credits)
+    - remaining coin quirks are the prototype's own and are kept: the
+      COIN SW service menu items never reach the rate logic (it reads a RAM
+      mirror populated only later in the boot), the USA regions have a
+      settings bit (EEPROM byte 1, bit 5) selecting a hardcoded 1 coin /
+      1 credit mode, the Service input always credits, and the FREE PLAY
+      configuration item works everywhere
+    - service menu controls: the test switch advances pages (colorbars /
+      crosshatch -> INPUT CHECK -> menu -> exit, which resets the game); on
+      list pages any P1 button steps the cursor down (it wraps) and 1P START
+      changes the value or enters the submenu.  Leaving the CONFIGURATION
+      page also saves and resets
+    - the colored flecks in the service crosshatch's hex labels are
+      authentic: the test screen uses palette entries 4-7 of every color
+      group as its gradient ramp steps, and the label glyphs' shadow pixels
+      index the same entries
+    - the 0x58008 / 0x5800a latches are two extra per-seat input bytes on
+      the sound CPU bus: the V25 samples each with a double read every
+      input scan and stores them in the per-seat input exchange record
+      (offsets +0x02 / +0x12) that the cabinet link mirrors to the other
+      board, but nothing in this build ever consumes them - the 68K never
+      reads those record fields, local or remote.  Provision for extra
+      cabinet inputs, possibly the HANDLE control hardware offered by the
+      configuration menu
 
    TODO:
     - verify remaining unknown audio CPU opcodes (see toaplan_v25_tables.h); the ones
       the game actually executes are now covered
     - serial comms (needs support in V25 core?) for linked units
     - verify frequencies on chips
-    - verify the exact purpose of the 0x58008 / 0x5800a latches (local per-seat
-      aux inputs forwarded over the cabinet link, possibly handle-mode related)
-    - the colored flecks in the service crosshatch's hex labels are authentic:
-      the test screen uses palette entries 4-7 of every color group as its
-      gradient ramp steps, and the label glyphs' shadow pixels index the same
-      entries
+    - identify the hardware meant to feed the 0x58008 / 0x5800a latches
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
