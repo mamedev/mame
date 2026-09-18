@@ -1421,6 +1421,8 @@ macro take_exception %vector
 90    f8    movg_w        e:!regw  -      -
 	if (BIT(m_ir[0], OP_WIDTH)) {
 		m_tmp1 = r16_r(op_byte());
+		if ((m_ir[0] & 0xf0) == 0xb0 && !((m_ir[0] ^ op_byte()) & 7))
+			m_tmp1 = (m_tmp1 - 2) & 0xffff;
 		write_ea_16(m_tmp1);
 		set_flags_nzv16 m_tmp1
 		cycles 2
