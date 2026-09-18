@@ -335,7 +335,7 @@ Is this game really CART-AM as the header says?
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
-	<software name="thuntk" supported="no" cloneof="sandr">
+	<software name="thuntk" cloneof="sandr" supported="no">
 		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
 		<year>1997</year>
 		<publisher>Sega / Deniam</publisher>
