@@ -167,6 +167,17 @@ enum : uint16_t
 	SMD_DS_SKE      = 0x1000    /* ports 0-3 seek end */
 };
 
+/* Format ID words */
+enum : uint16_t
+{
+	SMD_ID_ET          = 0x8000,   /* last sector on track */
+	SMD_ID_EC          = 0x4000,   /* last sector on cylinder */
+	SMD_ID_EP          = 0x2000,   /* last sector on pack */
+	SMD_ID_FL          = 0x8000,   /* bad sector */
+	SMD_ID_SP          = 0x4000,   /* spare sector */
+	SMD_ID_SECTOR_MASK = 0x3fff
+};
+
 constexpr uint16_t SMD_FW_VERSION = 0x1234;
 
 namespace {
@@ -217,7 +228,6 @@ private:
 
 	void smd_init();
 	void smd_do_drive(int drv);
-	int get_lbasector();
 
 	optional_device_array<harddisk_image_device, 4> m_drives;
 	int m_cyl[4];
@@ -240,6 +250,9 @@ private:
 	uint8_t m_iv;       /* interrupt vector */
 	bool m_ie;          /* interrupt enable */
 	bool m_wakeup;
+	bool m_format_overflow[4]; /* unflagged IDs exceed active + spare capacity */
+	bool m_extra_sector[4];    /* physical sector after the CHD sectors is active */
+	uint8_t m_extra_data[4][512];
 
 	int m_init_left;
 	int m_busreq_state;
@@ -266,6 +279,9 @@ zbi_s8k_smdc_card_device::zbi_s8k_smdc_card_device(const machine_config &mconfig
 	, m_iv(0)
 	, m_ie(false)
 	, m_wakeup(false)
+	, m_format_overflow{ false, false, false, false }
+	, m_extra_sector{ false, false, false, false }
+	, m_extra_data{}
 	, m_init_left(5)
 	, m_busreq_state(0)
 {
@@ -282,6 +298,9 @@ void zbi_s8k_smdc_card_device::smd_init()
 	memset(&m_pkt[0], 0, 32);
 
 	m_cyl[0] = m_cyl[1] = m_cyl[2] = m_cyl[3] = 0;
+	m_format_overflow[0] = m_format_overflow[1] = m_format_overflow[2] = m_format_overflow[3] = false;
+	m_extra_sector[0] = m_extra_sector[1] = m_extra_sector[2] = m_extra_sector[3] = false;
+	memset(m_extra_data, 0, sizeof(m_extra_data));
 
 	m_ie = false;
 	m_iv = 0;
@@ -443,7 +462,6 @@ int zbi_s8k_smdc_card_device::z80daisy_irq_state()
 int zbi_s8k_smdc_card_device::z80daisy_irq_ack()
 {
 	m_status |= SMD_SR_IUS;
-	m_status &= ~SMD_SR_IP;
 	m_ie = false;
 
 	LOGINT("%s SMD interrupt: iv=%02x, es=%02x, drv=%d\n", machine().describe_context(), m_iv, m_es, m_drv);
@@ -544,41 +562,6 @@ void zbi_s8k_smdc_card_device::busdaisy_req_ack()
 }
 
 //-------------------------------------------------
-//  get_lbasector - translate to lba
-//-------------------------------------------------
-
-int zbi_s8k_smdc_card_device::get_lbasector()
-{
-	harddisk_image_device *file = m_drives[m_drv];
-	const hard_disk_file::info &info = file->get_info();
-	smd_packet *pkt = reinterpret_cast<smd_packet*>(m_pkt);
-	int lbasector;
-
-	if (pkt->CY > info.cylinders)
-	{
-		LOGDATA("%s: Unexpected cylinder %d for range 0 to %d\n", machine().describe_context(), pkt->CY, info.cylinders - 1);
-	}
-
-	if (pkt->HD >= info.heads)
-	{
-		LOGDATA("%s: Unexpected head %d for range 0 to %d\n", machine().describe_context(), pkt->HD, info.heads - 1);
-	}
-
-	if (pkt->SC >= info.sectors)
-	{
-		LOGDATA("%s: Unexpected sector number %d for range 0 to %d\n", machine().describe_context(), pkt->SC, info.sectors - 1);
-	}
-
-	lbasector = pkt->CY;
-	lbasector *= info.heads;
-	lbasector += pkt->HD;
-	lbasector *= info.sectors;
-	lbasector += pkt->SC;
-
-	return lbasector;
-}
-
-//-------------------------------------------------
 //  smd_do_drive - peform drive operations
 //-------------------------------------------------
 
@@ -586,10 +569,12 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 {
 	offs_t dma_idx;
 	int unit, block;
+	unsigned active_sectors, cylinder, head, sector, sectors_per_track;
 	smd_dispatch_table *dt = reinterpret_cast<smd_dispatch_table*>(m_dt);
 	smd_packet *pkt = reinterpret_cast<smd_packet*>(m_pkt);
 	harddisk_image_device *file;
 	bool drv_good;
+	bool virtual_spare;
 
 	unit = pkt->UN & 3;
 
@@ -638,6 +623,115 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		}
 		break;
 
+	case SMD_CM_CMD_WFMT:       /* write format */
+		if (!drv_good)
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+		if (file->get_info().sectorbytes > sizeof(m_buffer))
+		{
+			m_es = SMD_ES_BADCT;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		dma_idx = (pkt->AH << 16) | pkt->AL;
+		if (dma_idx & 1)
+		{
+			m_es = SMD_ES_BADDMA;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		// A CHD has no representation for the physical sector IDs or their
+		// ECC.  Consume the supplied ID list and initialise the corresponding
+		// data sectors; bad and spare sectors have no LBA in the image.
+		memset(m_buffer, 0, file->get_info().sectorbytes);
+		m_format_overflow[unit] = false;
+		m_extra_sector[unit] = false;
+		active_sectors = 0;
+		for (unsigned n = 0; n < pkt->CT; n++, dma_idx += 8)
+		{
+			uint16_t const cylinder = m_bus->ram16_r(dma_idx + 2);
+			uint16_t const head = m_bus->ram16_r(dma_idx + 4);
+			uint16_t const sector = m_bus->ram16_r(dma_idx + 6);
+
+			if (sector & (SMD_ID_FL | SMD_ID_SP))
+				continue;
+
+			if ((cylinder >= file->get_info().cylinders) || (head >= file->get_info().heads))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			m_format_overflow[unit] |= ++active_sectors > (file->get_info().sectors + 1);
+			m_extra_sector[unit] |= (sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors;
+			// CHD geometry describes active sectors.  IDs beyond that capacity
+			// affect physical track layout but have no image LBA.
+			if ((sector & SMD_ID_SECTOR_MASK) >= file->get_info().sectors)
+			{
+				if ((sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors)
+					memset(m_extra_data[unit], 0, file->get_info().sectorbytes);
+				continue;
+			}
+
+			block = ((cylinder * file->get_info().heads) + head) * file->get_info().sectors + (sector & SMD_ID_SECTOR_MASK);
+			if (!file->write(block, m_buffer))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+		}
+		break;
+
+	case SMD_CM_CMD_RFMT:       /* read format */
+		if (!drv_good)
+		{
+			m_es = SMD_ES_NOSECTOR;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		dma_idx = (pkt->AH << 16) | pkt->AL;
+		if (dma_idx & 1)
+		{
+			m_es = SMD_ES_BADDMA;
+			pkt->DS |= SMD_DS_FT;
+			break;
+		}
+
+		// Model a normally formatted track with the CHD's active sectors and
+		// one physical spare.  READ FORMAT returns four ID words followed by
+		// two ID-ECC words for each sector (HRM 03-3237-04, pp. 4-34--4-35).
+		for (unsigned n = 0; n < pkt->CT; n++, dma_idx += 12)
+		{
+			unsigned const physical_sectors = file->get_info().sectors + 1;
+			unsigned const position = (pkt->SC + n) % physical_sectors;
+			unsigned const track = (pkt->SC + n) / physical_sectors;
+			unsigned const head = (pkt->HD + track) % file->get_info().heads;
+			unsigned const cylinder = pkt->CY + (pkt->HD + track) / file->get_info().heads;
+			uint16_t flags = (position == file->get_info().sectors) ? SMD_ID_ET : 0;
+
+			if ((position == file->get_info().sectors) && (head == file->get_info().heads - 1))
+				flags |= SMD_ID_EC;
+			if ((position == file->get_info().sectors) && (head == file->get_info().heads - 1) && (cylinder == file->get_info().cylinders - 1))
+				flags |= SMD_ID_EP;
+
+			m_bus->ram16_w(dma_idx + 0, flags);
+			m_bus->ram16_w(dma_idx + 2, cylinder);
+			m_bus->ram16_w(dma_idx + 4, head);
+			uint16_t const sector = (m_format_overflow[unit] && !position) ? 1 : position;
+			m_bus->ram16_w(dma_idx + 6, sector);
+			m_bus->ram16_w(dma_idx + 8, 0);
+			m_bus->ram16_w(dma_idx + 10, 0);
+		}
+		break;
+
 	case SMD_CM_CMD_WRITE:      /* write */
 		LOGWRITE("%s SMD write: unit=%d cyl=%d hd=%d sec=%d count=%d addr=%04x:%04x\n", machine().describe_context(),
 				 unit, pkt->CY, pkt->HD, pkt->SC, pkt->CT, pkt->AH, pkt->AL);
@@ -672,17 +766,30 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			break;
 		}
 
-		block = get_lbasector();
-
-		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+		cylinder = pkt->CY;
+		head = pkt->HD;
+		sector = pkt->SC;
+		sectors_per_track = file->get_info().sectors + unsigned(m_extra_sector[unit]);
 
 		// CT is the total transfer size and may span sectors (swap I/O uses up to 0xfe00 bytes).
-		for (unsigned remaining = pkt->CT; remaining != 0; block++)
+		for (unsigned remaining = pkt->CT; remaining != 0; )
 		{
 			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
+			if ((cylinder >= file->get_info().cylinders) || (head >= file->get_info().heads) || (sector >= sectors_per_track))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
+
+			virtual_spare = sector == file->get_info().sectors;
+			block = ((cylinder * file->get_info().heads) + head) * file->get_info().sectors + sector;
+			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
 
 			// Preserve the unused part of a sector for a short final transfer.
-			if ((count != file->get_info().sectorbytes) && !file->read(block, m_buffer))
+			if (virtual_spare)
+				memcpy(m_buffer, m_extra_data[unit], file->get_info().sectorbytes);
+			else if ((count != file->get_info().sectorbytes) && !file->read(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
 				pkt->DS |= SMD_DS_FT;
@@ -692,7 +799,9 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			for (unsigned n = 0; n < count; n++)
 				m_buffer[n] = m_bus->ram8_r(dma_idx++);
 
-			if (!file->write(block, m_buffer))
+			if (virtual_spare)
+				memcpy(m_extra_data[unit], m_buffer, file->get_info().sectorbytes);
+			else if (!file->write(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
 				pkt->DS |= SMD_DS_FT;
@@ -700,6 +809,15 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			}
 
 			remaining -= count;
+			if (++sector == sectors_per_track)
+			{
+				sector = 0;
+				if (++head == file->get_info().heads)
+				{
+					head = 0;
+					cylinder++;
+				}
+			}
 		}
 		break;
 
@@ -737,15 +855,28 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			break;
 		}
 
-		block = get_lbasector();
+		cylinder = pkt->CY;
+		head = pkt->HD;
+		sector = pkt->SC;
+		sectors_per_track = file->get_info().sectors + unsigned(m_extra_sector[unit]);
 
-		LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
-
-		for (unsigned remaining = pkt->CT; remaining != 0; block++)
+		for (unsigned remaining = pkt->CT; remaining != 0; )
 		{
 			unsigned const count = std::min<unsigned>(remaining, file->get_info().sectorbytes);
+			if ((cylinder >= file->get_info().cylinders) || (head >= file->get_info().heads) || (sector >= sectors_per_track))
+			{
+				m_es = SMD_ES_NOSECTOR;
+				pkt->DS |= SMD_DS_FT;
+				break;
+			}
 
-			if (!file->read(block, m_buffer))
+			virtual_spare = sector == file->get_info().sectors;
+			block = ((cylinder * file->get_info().heads) + head) * file->get_info().sectors + sector;
+			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
+
+			if (virtual_spare)
+				memcpy(m_buffer, m_extra_data[unit], file->get_info().sectorbytes);
+			else if (!file->read(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
 				pkt->DS |= SMD_DS_FT;
@@ -756,6 +887,15 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 				m_bus->ram8_w(dma_idx++, m_buffer[n]);
 
 			remaining -= count;
+			if (++sector == sectors_per_track)
+			{
+				sector = 0;
+				if (++head == file->get_info().heads)
+				{
+					head = 0;
+					cylinder++;
+				}
+			}
 		}
 		break;
 
@@ -819,6 +959,9 @@ void zbi_s8k_smdc_card_device::device_start()
 	save_item(NAME(m_iv));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_wakeup));
+	save_item(NAME(m_format_overflow));
+	save_item(NAME(m_extra_sector));
+	save_item(NAME(m_extra_data));
 	save_item(NAME(m_init_left));
 	save_item(NAME(m_dta_seg));
 	save_item(NAME(m_dta_ofs));
