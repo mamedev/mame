@@ -1,55 +1,94 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-/* This is derived from toaplan2.cpp, but there are enough hardware
-   differences to keep it separate
+/*  DT7 / Dynamic Trial 7 - Toaplan 1993 (prototype)
 
-   Notes:
-    - the region (title, notice screen and license text) comes from EEPROM
-      settings byte 2 and can be rewritten on real hardware with a hidden
-      operator combo: in the CONFIGURATION page of service mode, hold 2P START
-      plus the 1P buttons encoding the region value (SHOT1 = +1, SHOT2 = +2,
-      SHOT3 = +4, 1P START = +8), then toggle the test switch to save.
-      Values: 0/1 Korea (Car Fighting title), 2/3 Hong Kong, 4/5 Taiwan,
-      6/7 Southeast Asia, 8/9 Europe, a/b USA, c/d invalid, e/f Japan -
-      even values are Taito licensed except Japan, where it is the odd one
-    - coins never credit with the 68K code as assembled: the four coinage
-      rate lookups at 0x2b09e / 0x2b0a8 / 0x2b0c6 / 0x2b0d0 encode
-      displacements to the rate tables at 0x2b13c / 0x2b15c that no longer
-      fit in the signed 8-bit (d8,PC,Xn) field, so at runtime they fetch
-      garbage from code bytes.  Batsugun ships the identical routine with
-      its tables still in reach, and every dt7 lookup misses its table by
-      exactly 0x100; init_region() applies that correction so coins credit
-      at the intended default rates (1 coin 1 credit; Europe coin B 1 coin
-      2 credits)
-    - remaining coin quirks are the prototype's own and are kept: the
-      COIN SW service menu items never reach the rate logic (it reads a RAM
-      mirror populated only later in the boot), the USA regions have a
-      settings bit (EEPROM byte 1, bit 5) selecting a hardcoded 1 coin /
-      1 credit mode, the Service input always credits, and the FREE PLAY
-      configuration item works everywhere
-    - service menu controls: the test switch advances pages (colorbars /
-      crosshatch -> INPUT CHECK -> menu -> exit, which resets the game); on
-      list pages any P1 button steps the cursor down (it wraps) and 1P START
-      changes the value or enters the submenu.  Leaving the CONFIGURATION
-      page also saves and resets
-    - the colored flecks in the service crosshatch's hex labels are
-      authentic: the test screen uses palette entries 4-7 of every color
-      group as its gradient ramp steps, and the label glyphs' shadow pixels
-      index the same entries
-    - the 0x58008 / 0x5800a latches are two extra per-seat input bytes on
-      the sound CPU bus: the V25 samples each with a double read every
-      input scan and stores them in the per-seat input exchange record
-      (offsets +0x02 / +0x12) that the cabinet link mirrors to the other
-      board, but nothing in this build ever consumes them - the 68K never
-      reads those record fields, local or remote.  Provision for extra
-      cabinet inputs, possibly the HANDLE control hardware offered by the
-      configuration menu
+	Notes:
+
+	As this is a prototype game a number of features are incomplete or broken,
+	some of these have been verified against the code.  There are also some
+	debug features left in.
+
+-------------------------------------------------------------------------------------
+
+	- The coin support is broken on the prototype
+
+	The four coinage rate lookups at 0x2b09e / 0x2b0a8 / 0x2b0c6 / 0x2b0d0
+	encode displacements to the rate tables at 0x2b13c / 0x2b15c
+
+	These displacements no longer fit in the signed 8-bit (d8,PC,Xn) field
+	so instead invalid coinage values are fetched from surrounding code bytes.
+
+    Batsugun ships the identical routine with its tables still in reach
+	Every dt7 lookup misses its table by exactly 0x100.
+
+	The following ROM patch can be used to fix the coinage behavior.
+
+	u16 *rom = reinterpret_cast<u16 *>(memregion("maincpu")->base());
+	for (int i = 0; i < 16; i++)
+		rom[0x2b11c / 2 + i] += 0x100; // 0x2b13c / 0x2b15c rate tables
+	rom[0x2abdc / 2] += 0x100; // cmpi.w #$10 -> #$110 (Europe entry)
+
+    For the USA regions the 'Discount Coin' setting bypasses the coinage
+	table entirely and hardcodes the game to 2 coins / 1 credit
+
+
+	- Game hangs at title if "Handle, 2 Pedals & Buttons" mode is selected
+
+	Does this prototype support the alt control method? there's code for
+	reading these devices in the ROM.
+
+	- Game at hangs car selection if "Goal De Shi-Nu" mode is selected
+
+	This might require linked cabinet support, it is unknown if the link
+	feature is complete in the prototype code.
+
+	- If Invincibility mode is turned on the game also shows debug markers
+	  on the track, and has a very crude level selection (intentional
+	  behavior)
+
+	- The Palette Bar screen tiles sometimes get corrupted when entering
+	  service mode (TODO: check if this is a problem with the CPU comms)
+
+	- The arrow for the Service menu is shown on screen 2, but the text
+	  is not (TODO: check if this is just a problem in the prototype code)
+
+	- Sound still dies sometimes, especially when starting a 2 player gamme
+
+-------------------------------------------------------------------------------------
+
+	Hidden Region Selection:
+
+	Much like Fixeight, The region (title, notice screen and license text) come
+	from byte 2 of the EEPROM and can be rewritten on real hardware with a hidden
+	operator combo.
+
+	in the CONFIGURATION page of service mode
+
+	hold 2P START plus the 1P buttons encoding the region value
+	SHOT1 = +1
+	SHOT2 = +2
+	SHOT3 = +4
+	1P START = +8
+
+	then toggle the test switch to save.
+	Values:
+	0/1 Korea (Car Fighting title)
+	2/3 Hong Kong
+	4/5 Taiwan
+	6/7 Southeast Asia
+	8/9 Europe
+	a/b USA
+	c/d invalid
+	e/f Japan
+
+	Even values give a Taito license string, except for Japan where
+	the odd value does
+
+-------------------------------------------------------------------------------------
 
    TODO:
-    - verify remaining unknown audio CPU opcodes (see toaplan_v25_tables.h); the ones
-      the game actually executes are now covered
-    - serial comms (needs support in V25 core?) for linked units
+    - serial comms (needs support in V25 core?) for linked units (if supported)
     - verify frequencies on chips
     - identify the hardware meant to feed the 0x58008 / 0x5800a latches
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
@@ -143,9 +182,8 @@ private:
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
 
-	u8 dt7_shared_ram_hack_r(offs_t offset);
+	u8 dt7_shared_ram_r(offs_t offset);
 	void shared_ram_w(offs_t offset, u8 data);
-	void shared_ram_audio_w(offs_t offset, u8 data);
 
 	void screen_vblank(int state);
 
@@ -247,7 +285,7 @@ void dt7_state::write_port_2(u8 data)
 	m_ioport_state = data;
 }
 
-u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
+u8 dt7_state::dt7_shared_ram_r(offs_t offset)
 {
 	return m_shared_ram[offset];
 }
@@ -257,22 +295,12 @@ void dt7_state::shared_ram_w(offs_t offset, u8 data)
 	m_shared_ram[offset] = data;
 }
 
-void dt7_state::shared_ram_audio_w(offs_t offset, u8 data)
-{
-	// just a helper function to try and debug the sound CPU a bit more easily
-	//int pc = m_audiocpu->pc();
-	//if (offset == 0xf004 / 2)
-	//  logerror("%08x: shared_ram_audio_w address %08x data %02x\n", pc, offset, data);
-	shared_ram_w(offset, data);
-}
-
 void dt7_state::dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x8000) ? CLEAR_LINE : ASSERT_LINE);
 	logerror("%s: dt7_sndreset_coin_w %04x %04x\n", machine().describe_context(), data, mem_mask);
-	// coin counters in lower byte?
+	// TODO: coin counters in lower byte?
 }
-
 
 void dt7_state::dt7_68k_0_mem(address_map &map)
 {
@@ -291,8 +319,7 @@ void dt7_state::dt7_68k_0_mem(address_map &map)
 
 	dt7_shared_mem(map);
 
-	map(0x610000, 0x61ffff).rw(FUNC(dt7_state::dt7_shared_ram_hack_r), FUNC(dt7_state::shared_ram_w)).umask16(0x00ff);
-//  map(0x620000, 0x62ffff).rw(FUNC(dt7_state::dt7_shared_ram_hack_r), FUNC(dt7_state::shared_ram_w)).umask16(0x00ff);
+	map(0x610000, 0x61ffff).rw(FUNC(dt7_state::dt7_shared_ram_r), FUNC(dt7_state::shared_ram_w)).umask16(0x00ff);
 }
 
 void dt7_state::dt7_shared_mem(address_map &map)
@@ -301,8 +328,8 @@ void dt7_state::dt7_shared_mem(address_map &map)
 	// is this really in the middle of shared RAM, or is there a DMA to get it out?
 	map(0x509000, 0x50afff).ram().w(FUNC(dt7_state::tx_videoram_dt7_w)).share("tx_videoram");
 	map(0x50f000, 0x50ffff).ram().share("lineram");
-
 }
+
 void dt7_state::dt7_68k_1_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().mirror(0x080000); // mirror needed or road doesn't draw
@@ -318,23 +345,6 @@ u8 dt7_state::unmapped_v25_io1_r()
 u8 dt7_state::unmapped_v25_io2_r()
 {
 	return m_miscport[1]->read();
-}
-
-// the region byte lives in the synthesized EEPROM default image (see the ROM
-// definitions); patched here because ROM_FILL offsets in a 16-bit region are
-// not host endian safe
-template <u8 Region>
-void dt7_state::init_region()
-{
-	reinterpret_cast<u16 *>(memregion("eeprom")->base())[1] = Region;
-
-	// restore the intended coinage rates (see the coin note in the header):
-	// bias the region-offset table so the out-of-range rate lookups land on
-	// their tables again, and match the Europe compare in the display code
-	u16 *rom = reinterpret_cast<u16 *>(memregion("maincpu")->base());
-	for (int i = 0; i < 16; i++)
-		rom[0x2b11c / 2 + i] += 0x100; // 0x2b13c / 0x2b15c rate tables
-	rom[0x2abdc / 2] += 0x100; // cmpi.w #$10 -> #$110 (Europe entry)
 }
 
 void dt7_state::machine_start()
@@ -355,13 +365,8 @@ void dt7_state::dt7_v25_mem(address_map &map)
 {
 	// exact mirroring unknown, don't cover up where the inputs/sound maps
 	// is it meant to mirror in all these locations, or is there a different issue in play?
-	map(0x00000, 0x07fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
-	map(0x20000, 0x27fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
-	map(0x28000, 0x2ffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
-	map(0x60000, 0x67fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
-	map(0x68000, 0x6ffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
-	map(0x70000, 0x77fff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
-	map(0xf8000, 0xfffff).ram().w(FUNC(dt7_state::shared_ram_audio_w)).share("shared_ram");
+	map(0x00000, 0x07fff).mirror(0x38000).ram().share("shared_ram");
+	map(0x60000, 0x67fff).mirror(0x98000).ram().share("shared_ram");
 
 	map(0x58000, 0x58001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -408,7 +413,6 @@ void dt7_state::dt7(machine_config &config)
 	audiocpu.p1_in_cb().set(FUNC(dt7_state::eeprom_r));
 	audiocpu.p1_out_cb().set(FUNC(dt7_state::eeprom_w));
 
-	// eeprom type confirmed, and gets inited after first boot, but then game won't boot again?
 	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -507,23 +511,40 @@ static INPUT_PORTS_START( dt7 )
 	PORT_START("MISC1") // latched at 0x5800a
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
+	// The following should be the analog inputs, but the game hangs at the title screen if analog
+	// controls are enabled in the service mode, so they might not be functional in the supported prototype
 	PORT_START("AN0") // digitized against the port 0 DAC, calibrated via EEPROM words 0xfc/0xfe
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	//PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	//PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN2")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	//PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	//PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+INPUT_PORTS_END
+
+// as the coin code is broken for most regions, just hook it up to the service coin
+static INPUT_PORTS_START( dt7_altcoin )
+	PORT_INCLUDE( dt7 )
+
+	PORT_MODIFY("SYS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN1, but doesn't work
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN2, but doesn't work
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_MODIFY("SYS2") // second seat's coin unit
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN3, but doesn't work
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN4, but doesn't work
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
 
 TILE_GET_INFO_MEMBER(dt7_state::get_tx_dt7_tile_info)
@@ -626,9 +647,7 @@ void dt7_state::screen_vblank(int state)
 
 // All sets share the single dumped ROM set; the region (and with it the title,
 // notice screen and license text) comes from EEPROM settings byte 2, so each set
-// below only provides a different EEPROM default. These are synthesized images
-// (region byte only - the game writes its own defaults on first boot), not
-// factory EEPROM dumps.
+// below only provides a different EEPROM default.
 #define ROMS_DT7 \
 	ROM_REGION( 0x080000, "maincpu", 0 ) \
 	ROM_LOAD16_WORD_SWAP( "main.11", 0x000000, 0x080000, CRC(01646c22) SHA1(4b87f00dc99e1206b3b9eaee425fc05e1a033bee) ) \
@@ -660,79 +679,38 @@ void dt7_state::screen_vblank(int state)
 	ROM_LOAD( "7adpcm.37", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) ) \
 	ROM_REGION( 0x40000, "oki2", 0 ) \
 	ROM_LOAD( "7adpcm.43", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) ) \
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
-
 
 ROM_START( dt7 )
 	ROMS_DT7
-ROM_END
 
-ROM_START( dt7et )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7u )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7ut )
-	ROMS_DT7
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
+	// defaulted to 'Discount Continue' so that the regular coin slots work
+	ROM_LOAD16_WORD_SWAP( "eeprom_usa", 0x000, 0x200, CRC(4c546ede) SHA1(7892b54dafe5782d4900063377b956e3bf7bca07) )
 ROM_END
 
 ROM_START( dt7j )
 	ROMS_DT7
-ROM_END
 
-ROM_START( dt7jt )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7a )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7at )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7tw )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7twt )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7hk )
-	ROMS_DT7
-ROM_END
-
-ROM_START( dt7hkt )
-	ROMS_DT7
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "eeprom_japan", 0x000, 0x200, CRC(e8af8958) SHA1(4284ba45323bbd3679b8e4e7b96fa8cf37b939c0) )
 ROM_END
 
 ROM_START( dt7k )
 	ROMS_DT7
-ROM_END
 
-ROM_START( dt7kt )
-	ROMS_DT7
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "eeprom_korea", 0x000, 0x200, CRC(910b4058) SHA1(ca52306ed5a6b12b5c8fc92f9cc36e7639e5570a) )
 ROM_END
 
 } // anonymous namespace
 
-// flyer shows "Survival Battle Dynamic Trial 7"; the Korean sets title as "Car Fighting"
-GAME( 1993, dt7,    0,   dt7, dt7, dt7_state, init_region<0x09>, ROT270, "Toaplan",                         "DT7 (Europe) (prototype)",                          MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7et,  dt7, dt7, dt7, dt7_state, init_region<0x08>, ROT270, "Toaplan (Taito license)",         "DT7 (Europe, Taito license) (prototype)",           MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7u,   dt7, dt7, dt7, dt7_state, init_region<0x0b>, ROT270, "Toaplan",                         "DT7 (USA) (prototype)",                             MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7ut,  dt7, dt7, dt7, dt7_state, init_region<0x0a>, ROT270, "Toaplan (Taito America license)", "DT7 (USA, Taito America license) (prototype)",      MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7j,   dt7, dt7, dt7, dt7_state, init_region<0x0e>, ROT270, "Toaplan",                         "DT7 (Japan) (prototype)",                           MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7jt,  dt7, dt7, dt7, dt7_state, init_region<0x0f>, ROT270, "Toaplan (Taito license)",         "DT7 (Japan, Taito license) (prototype)",            MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7a,   dt7, dt7, dt7, dt7_state, init_region<0x07>, ROT270, "Toaplan",                         "DT7 (Southeast Asia) (prototype)",                  MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7at,  dt7, dt7, dt7, dt7_state, init_region<0x06>, ROT270, "Toaplan (Taito license)",         "DT7 (Southeast Asia, Taito license) (prototype)",   MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7tw,  dt7, dt7, dt7, dt7_state, init_region<0x05>, ROT270, "Toaplan",                         "DT7 (Taiwan) (prototype)",                          MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7twt, dt7, dt7, dt7, dt7_state, init_region<0x04>, ROT270, "Toaplan (Taito license)",         "DT7 (Taiwan, Taito license) (prototype)",           MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7hk,  dt7, dt7, dt7, dt7_state, init_region<0x03>, ROT270, "Toaplan",                         "DT7 (Hong Kong) (prototype)",                       MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7hkt, dt7, dt7, dt7, dt7_state, init_region<0x02>, ROT270, "Toaplan (Taito license)",         "DT7 (Hong Kong, Taito license) (prototype)",        MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7k,   dt7, dt7, dt7, dt7_state, init_region<0x01>, ROT270, "Toaplan",                         "Car Fighting (Korea) (prototype)",                  MACHINE_NODEVICE_LAN )
-GAME( 1993, dt7kt,  dt7, dt7, dt7, dt7_state, init_region<0x00>, ROT270, "Toaplan (Taito license)",         "Car Fighting (Korea, Taito license) (prototype)",   MACHINE_NODEVICE_LAN )
+// The flyer shows "Survival Battle Dynamic Trial 7"; the Korean sets title as "Car Fighting"
+
+// While the EEPROM can provide more regions than this, these ones have been selected for
+// the following resaons
+// The USA region can have working coin slots and English langauge
+// The Japanese region has Japanese language
+// The Korean region has a unique title screen
+GAME( 1993, dt7,    0,   dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "DT7 (USA) (prototype)",            MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dt7j,   dt7, dt7, dt7_altcoin, dt7_state, empty_init, ROT270, "Toaplan", "DT7 (Japan) (prototype)",          MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dt7k,   dt7, dt7, dt7_altcoin, dt7_state, empty_init, ROT270, "Toaplan", "Car Fighting (Korea) (prototype)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
