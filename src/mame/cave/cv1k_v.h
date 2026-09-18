@@ -18,6 +18,7 @@ public:
 	cv1k_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto port_r_callback() { return m_port_r_cb.bind(); }
+	auto config_r_callback() { return m_config_r_cb.bind(); }
 	void set_rambase(u16* rambase) { m_ram16 = rambase; }
 
 	void set_mainramsize(size_t ramsize)
@@ -898,6 +899,7 @@ private:
 
 	// internal states
 	devcb_read32 m_port_r_cb;
+	devcb_read32 m_config_r_cb;
 };
 
 

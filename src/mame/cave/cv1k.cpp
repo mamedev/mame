@@ -463,6 +463,11 @@ static INPUT_PORTS_START( cv1k_base )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(rtc9701_device::write_bit))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(rtc9701_device::set_clock_line))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(rtc9701_device::set_cs_line))
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Low Latency Blitter" ) // Reduce blitter flip delay by 1 frame, default Off
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cv1k )
@@ -600,6 +605,7 @@ void cv1k_state::cv1k(machine_config &config)
 	m_blitter->set_maincpu(m_maincpu); // timing tracking of uncached blitter r/w access
 	m_blitter->set_screen("screen");
 	m_blitter->port_r_callback().set_ioport("DSW");
+	m_blitter->config_r_callback().set_ioport("CONFIG");
 	m_blitter->set_mainramsize(0x800000);
 }
 

@@ -73,6 +73,7 @@ cv1k_blitter_device::cv1k_blitter_device(const machine_config &mconfig, const ch
 	, m_curr_screen_height(0)
 #endif
 	, m_port_r_cb(*this, 0)
+	, m_config_r_cb(*this, 0)
 {
 }
 
@@ -897,8 +898,10 @@ u32 cv1k_blitter_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	else
 #endif
 	{
-		const int scroll_x = -m_gfx_scroll_x;
-		const int scroll_y = -m_gfx_scroll_y;
+		// In cv1k low latency mode use the clip values instead of scroll values to grab the latest buffer
+		const bool low_latency = (m_config_r_cb() & 1) != 0;
+		const int scroll_x = low_latency ? -m_gfx_clip_x : -m_gfx_scroll_x;
+		const int scroll_y = low_latency ? -m_gfx_clip_y : -m_gfx_scroll_y;
 
 		copyscrollbitmap(bitmap, m_bitmaps, 1, &scroll_x, 1, &scroll_y, cliprect);
 	}
@@ -964,6 +967,9 @@ void cv1k_blitter_device::blitter_w(address_space &space, offs_t offset, u32 dat
 
 		case 0x40:
 			COMBINE_DATA(&m_gfx_clip_x);
+			// When cv1k low latency mode is enabled on clip_x writes also set scroll_x
+			if (m_config_r_cb() & 1)
+				m_gfx_scroll_x = m_gfx_clip_x;
 			break;
 
 		case 0x44:
