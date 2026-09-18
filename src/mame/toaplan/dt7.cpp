@@ -40,8 +40,8 @@
       the game actually executes are now covered
     - serial comms (needs support in V25 core?) for linked units
     - verify frequencies on chips
-    - verify the exact byte/bit layout of the second input chain and the 0x58008 /
-      0x5800a latches (2P / linked unit side)
+    - verify the exact purpose of the 0x58008 / 0x5800a latches (local per-seat
+      aux inputs forwarded over the cabinet link, possibly handle-mode related)
     - verify text layer palettes
     - lineram xscroll words (0x1e0 / 0x1e4) are ignored (crosshatch label column)
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
@@ -87,6 +87,7 @@ public:
 		, m_lineram(*this, "lineram")
 		, m_eepromport(*this, "EEPROM")
 		, m_sysport(*this, "SYS")
+		, m_sys2port(*this, "SYS2")
 		, m_p1port(*this, "IN1")
 		, m_p2port(*this, "IN2")
 		, m_miscport(*this, "MISC%u", 0U)
@@ -160,6 +161,7 @@ private:
 	required_shared_ptr<u16> m_lineram;
 	required_ioport m_eepromport;
 	required_ioport m_sysport;
+	required_ioport m_sys2port;
 	required_ioport m_p1port;
 	required_ioport m_p2port;
 	required_ioport_array<2> m_miscport;
@@ -222,8 +224,9 @@ void dt7_state::write_port_2(u8 data)
 		m_shift_chain[0] = ~(p1 | (m_sysport->read() << 8) | ((p2 & 0x80) << 16)) & 0x00ffffff;
 		m_shift_chain[0] |= 0xff000000;
 
-		// chain 1: 2P / linked unit side
-		m_shift_chain[1] = (~p2 & 0xff) | 0xffffff00;
+		// chain 1: 2P side, mirroring chain 0 (controls, system byte, 1P start echo, gate)
+		m_shift_chain[1] = ~(p2 | (m_sys2port->read() << 8) | ((p1 & 0x80) << 16)) & 0x00ffffff;
+		m_shift_chain[1] |= 0xff000000;
 	}
 
 	// rising edge on bit 3: shift both chains one bit
@@ -475,6 +478,16 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Test Switch")
+
+	PORT_START("SYS2") // second seat's coin unit
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	// per-seat auxiliary input latches; the sound CPU forwards them into the
 	// ring buffer half that is exchanged over the cabinet link, so they are
