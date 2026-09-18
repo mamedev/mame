@@ -483,6 +483,20 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!-- https://www.diroccovision.com/games/cloud-racer-cv.php -->
+	<software name="cloudr">
+		<description>Cloud Racer</description>
+		<year>2026</year>
+		<publisher>DiRoccoVision</publisher>
+		<info name="version" value="BETA TEST REV 9" />
+		<info name="usage" value="supports the Lundy Speech Synthesizer" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="cloud-racer.rom" size="24576" crc="6149a65f" sha1="92f7aa2e62c462af4081ee50d3962dee2875ccde" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="coldbld">
 		<description>Cold Blood</description>
 		<year>2017</year>
@@ -1236,6 +1250,20 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!-- https://www.diroccovision.com/games/laser-strike.php -->
+	<software name="laserst">
+		<description>Laser Strike</description>
+		<year>2026</year>
+		<publisher>DiRoccoVision</publisher>
+		<info name="version" value="BETA TEST REV 14" />
+		<info name="usage" value="supports the Lundy Speech Synthesizer" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="laser-strike.rom" size="24576" crc="87269ced" sha1="ef246ea42bc1bb1053c8dbfb994dbf0211a75559" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lift">
 		<description>Lift</description>
 		<year>2022</year>
@@ -1856,6 +1884,20 @@ Unoffical software releases for the Coleco Colecovision
 		</part>
 	</software>
 
+	<!-- https://www.diroccovision.com/games/cv-round-up.php -->
+	<software name="roundup">
+		<description>Round Up</description>
+		<year>2026</year>
+		<publisher>DiRoccoVision</publisher>
+		<info name="version" value="BETA TEST REV 8" />
+		<info name="usage" value="supports the Lundy Speech Synthesizer" />
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="24576">
+				<rom name="round-up.rom" size="24576" crc="49627081" sha1="d7cb0091f9c26a3e39faa6942365dc116e1d8ea0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ruptus">
 		<description>Ruptus</description>
 		<year>2022</year>
@@ -2056,6 +2098,7 @@ Unoffical software releases for the Coleco Colecovision
 		<description>Speak &amp; Spell</description>
 		<year>2026</year>
 		<publisher>DiRoccoVision</publisher>
+		<info name="usage" value="req. the Lundy Speech Synthesizer or the EVE speech card" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="speak-and-spell.rom" size="32768" crc="bfd9c4d5" sha1="30c409e4234fda030c7978a67ee3d5565f780ae8" />
