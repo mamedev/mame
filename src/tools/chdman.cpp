@@ -588,7 +588,7 @@ public:
 
 				// loop over channels and read the samples
 				uint32_t const channels = m_info.channels;
-				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
+				std::array<int16_t *, AVHUFF_MAX_CHANNELS> samplesptr;
 				for (uint32_t chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
@@ -614,7 +614,7 @@ public:
 				}
 
 				// assemble the data into final form
-				avhuff_error averr = avhuff_encoder::assemble_data(m_rawdata, subbitmap, channels, samples, samplesptr);
+				avhuff_error averr = avhuff_encoder::assemble_data(m_rawdata, subbitmap, channels, samples, samplesptr.data());
 				if (averr != AVHERR_NONE)
 					report_error(1, "Error assembling data for frame %d", framenum);
 				if (m_rawdata.size() < m_info.bytes_per_frame)
