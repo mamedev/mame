@@ -14,6 +14,21 @@
    invalid, e/f Japan - even values are Taito licensed except Japan,
    where it is the odd one.
 
+   Coins never credit with the prototype's 68K code as assembled: the
+   four coinage rate lookups at 0x2b09e / 0x2b0a8 / 0x2b0c6 / 0x2b0d0
+   encode displacements to the rate tables at 0x2b13c / 0x2b15c that no
+   longer fit in the signed 8-bit (d8,PC,Xn) field, so at runtime they
+   fetch garbage from code bytes.  Batsugun ships the identical routine
+   with its tables still in reach, and every dt7 lookup misses its
+   table by exactly 0x100; init_region() applies that correction so
+   coins credit at the intended default rates (1 coin 1 credit; Europe
+   coin B 1 coin 2 credits).  Remaining coin quirks are the prototype's
+   own and are kept: the COIN SW service menu items never reach the
+   rate logic (it reads a RAM mirror populated only later in the boot),
+   the USA regions have a settings bit (EEPROM byte 1, bit 5) selecting
+   a hardcoded 1 coin / 1 credit mode, the Service input always
+   credits, and the FREE PLAY configuration item works everywhere.
+
    Service menu controls: the test switch advances pages (colorbars /
    crosshatch -> INPUT CHECK -> menu -> exit, which resets the game);
    on list pages any P1 button steps the cursor down (it wraps) and
@@ -301,6 +316,14 @@ template <u8 Region>
 void dt7_state::init_region()
 {
 	reinterpret_cast<u16 *>(memregion("eeprom")->base())[1] = Region;
+
+	// restore the intended coinage rates (see the coin note in the header):
+	// bias the region-offset table so the out-of-range rate lookups land on
+	// their tables again, and match the Europe compare in the display code
+	u16 *rom = reinterpret_cast<u16 *>(memregion("maincpu")->base());
+	for (int i = 0; i < 16; i++)
+		rom[0x2b11c / 2 + i] += 0x100; // 0x2b13c / 0x2b15c rate tables
+	rom[0x2abdc / 2] += 0x100; // cmpi.w #$10 -> #$110 (Europe entry)
 }
 
 void dt7_state::machine_start()
