@@ -2,17 +2,16 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    RCA VIP Super Sound System VP550 emulation
+    RCA VP551 Super Sound 4-channel Expander Package emulation
 
 **********************************************************************/
 
-#ifndef MAME_BUS_VIP_VP550_H
-#define MAME_BUS_VIP_VP550_H
+#ifndef MAME_BUS_VIP_VP576_H
+#define MAME_BUS_VIP_VP576_H
 
 #pragma once
 
 #include "exp.h"
-#include "sound/cdp1863.h"
 
 
 
@@ -20,13 +19,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vp550_device
+// ======================> vp576_device
 
-class vp550_device : public device_t, public device_vip_expansion_card_interface
+class vp576_device : public device_t, public device_vip_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vp576_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -39,21 +38,21 @@ protected:
 	virtual void vip_q_w(int state) override;
 	virtual void vip_run_w(int state) override;
 
-	TIMER_CALLBACK_MEMBER(sync_tick);
-
 private:
-	void octave_w(uint8_t data);
-	void vlmna_w(uint8_t data);
-	void vlmnb_w(uint8_t data);
-	void sync_w(uint8_t data);
+	static constexpr unsigned MAX_SLOTS = 2;
 
-	required_device_array<cdp1863_device, 2> m_pfg;
+	void exp1_int_w(int state) { m_int[0] = state; update_interrupts(); }
+	void exp2_int_w(int state) { m_int[1] = state; update_interrupts(); }
 
-	emu_timer *m_sync_timer;
+	void update_interrupts();
+
+	required_device_array<vip_expansion_slot_device, MAX_SLOTS> m_expansion_slot;
+
+	int m_int[MAX_SLOTS];
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(VP550, vp550_device)
+DECLARE_DEVICE_TYPE(VP576, vp576_device)
 
-#endif // MAME_BUS_VIP_VP550_H
+#endif // MAME_BUS_VIP_VP576_H
