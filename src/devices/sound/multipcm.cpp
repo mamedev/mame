@@ -7,7 +7,7 @@
  * Information by R. Belmont and the YMF278B (OPL4) manual.
  *
  * voice registers:
- * 0: Pan
+ * 0: Pan (high nibble), effect send level (low nibble, 0-8)
  * 1: Index of sample
  * 2: LSB of pitch (low 2 bits seem unused so)
  * 3: MSB of pitch (ooooppppppppppxx) (o=octave (4 bit signed), p=pitch (10 bits), x=unused?
@@ -16,6 +16,7 @@
  *    bits 1-7 = volume attenuate (0=max, 7f=min)
  * 6: LFO frequency + Phase LFO depth
  * 7: Amplitude LFO size
+ * 9: unknown, the TG100 writes FF at every key on
  *
  * The first sample ROM contains a variable length metadata table with 12
  * bytes per instrument sample. This is very similar to the YMF278B 'OPL4'.
@@ -37,6 +38,9 @@
 
 #include "emu.h"
 #include "multipcm.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 const int32_t multipcm_device::VALUE_TO_CHANNEL[32] =
 {
@@ -74,6 +78,7 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 	{
 		case 0: // PANPOT
 			slot.m_pan = (data >> 4) & 0xf;
+			slot.m_dsp_send = data & 0xf;
 			break;
 
 		case 1: // Sample
@@ -160,14 +165,21 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0: // Data write
-			write_slot(m_slots[m_cur_slot], m_address, data);
+			if (m_address < 8)
+				write_slot(m_slots[m_cur_slot], m_address, data);
+			else
+				LOG("unknown voice register %02x = %02x (slot %d)\n", m_address, data, m_cur_slot);
 			break;
 		case 1:
 			m_cur_slot = VALUE_TO_CHANNEL[data & 0x1f];
 			break;
 
 		case 2:
-			m_address = (data > 7) ? 7 : data;
+			m_address = data;
+			break;
+
+		case 0xd: // control data for the effect DSP, shifted out on DSPCDS
+			m_dsp_cd_cb(data);
 			break;
 	}
 }
@@ -179,6 +191,7 @@ DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 
 multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	gew_pcm_device(mconfig, MULTIPCM, tag, owner, clock, 28, 224),
+	m_dsp_cd_cb(*this),
 	m_cur_slot(0),
 	m_address(0)
 {
