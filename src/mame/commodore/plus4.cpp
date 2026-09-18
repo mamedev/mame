@@ -958,6 +958,7 @@ void plus4_state::plus4p(machine_config &config)
 	plus4(config);
 	m_maincpu->set_clock(XTAL(17'734'470)/20);
 	m_ted->set_clock(XTAL(17'734'470));
+	m_exp->set_clock(XTAL(17'734'470)/20);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");
