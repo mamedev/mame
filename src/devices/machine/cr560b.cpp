@@ -14,7 +14,8 @@ NOTES:
   https://github.com/trapexit/portfolio_os/blob/bee7b0c8e4287083c73cb5497b658880c9e7af8e/utils/discdata.h#L52
 
 TODO:
-- Enough to load a few sectors and nothing else;
+- Port status handling from cr511b;
+- Implement flush command (starts triggering with above);
 - Find common points with other MKE drives, generate a streamlined interface;
 
 **************************************************************************************************/

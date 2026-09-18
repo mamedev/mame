@@ -77,6 +77,8 @@ static inline uint8_t get_texel_alt_4bit(const void *base, int y, int x, int wid
 static inline uint8_t get_texel_8bit(const void *base, int y, int x, int width);
 static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int width);
 
+static uint8_t *s_waveram_base;     // m_waveram[0] start, for WAVERAM_WRAP
+
 
 /*************************************
  *
@@ -87,7 +89,10 @@ static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int wid
 #define WAVERAM_BLOCK0(blocknum)                ((void *)((uint8_t *)m_waveram[0].get() + 8 * (blocknum)))
 #define WAVERAM_BLOCK1(blocknum)                ((void *)((uint8_t *)m_waveram[1].get() + 8 * (blocknum)))
 
-#define WAVERAM_PTR8(base, bytenum)             ((uint8_t *)(base) + BYTE4_XOR_LE(bytenum))
+// Texel fetches wrap within waveram: the address lines are finite, so a fetch off the end continues from the start
+#define WAVERAM_WRAP(base, bytenum)             (s_waveram_base + (uint32_t((uint8_t *)(base) - s_waveram_base + (bytenum)) & (WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 - 1)))
+
+#define WAVERAM_PTR8(base, bytenum)             WAVERAM_WRAP(base, BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)            (*WAVERAM_PTR8(base, bytenum))
 #define WAVERAM_WRITE8(base, bytenum, data)     do { *WAVERAM_PTR8(base, bytenum) = (data); } while (0)
 
@@ -239,6 +244,7 @@ void midzeus_state::video_start()
 	// allocate memory for "wave" RAM
 	m_waveram[0] = std::make_unique<uint32_t[]>(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	m_waveram[1] = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8/4);
+	s_waveram_base = reinterpret_cast<uint8_t *>(m_waveram[0].get());
 
 	// initialize polygon engine
 	m_poly = std::make_unique<midzeus_renderer>(*this);

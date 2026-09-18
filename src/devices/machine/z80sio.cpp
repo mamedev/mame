@@ -1421,8 +1421,6 @@ void z80sio_channel::transmit_enable()
 			else if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 			{
 				async_tx_setup();
-				// when starting from idle reset m_tx_count
-				m_tx_count = 0;
 			}
 		}
 	}
@@ -2165,6 +2163,8 @@ uint8_t z80sio_channel::data_read()
 //-------------------------------------------------
 void z80sio_channel::data_write(uint8_t data)
 {
+	bool const was_all_sent = bool(m_rr1 & RR1_ALL_SENT);
+
 	if (!(m_rr0 & RR0_TX_BUFFER_EMPTY))
 		LOGTX("Z80SIO \"%s\" Channel %c : Dropped Data Byte '%02x'\n", owner()->tag(), 'A' + m_index, m_tx_data);
 	LOGTX("Z80SIO Channel %c : Queue Data Byte '%02x'\n", 'A' + m_index, data);
@@ -2194,9 +2194,11 @@ void z80sio_channel::data_write(uint8_t data)
 	// may be possible to transmit immediately (synchronous mode will load when sync pattern completes)
 	if (async && is_tx_idle() && transmit_allowed())
 	{
+		// when starting from fully idle reset m_tx_count
+		if (was_all_sent)
+			m_tx_count = 0;
+
 		async_tx_setup();
-		// when starting from idle reset m_tx_count
-		m_tx_count = 0;
 	}
 }
 

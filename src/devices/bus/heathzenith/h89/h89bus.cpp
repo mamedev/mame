@@ -363,7 +363,7 @@ h89bus::addr_ranges heath_io_decoder_socket::get_address_ranges(u8 select_bits, 
 {
 	if (m_decoder)
 	{
-		return m_decoder->get_address_ranges(select_bits);
+		return m_decoder->get_address_ranges(select_bits, p506_signals);
 	}
 
 	LOGSETUP("m_decoder not set\n");

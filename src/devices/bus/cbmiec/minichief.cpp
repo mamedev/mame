@@ -48,7 +48,10 @@ DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief Di
 mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	c1571_device(mconfig, MINI_CHIEF, tag, owner, clock),
 	m_isa(*this, "isa"),
-	m_boss(*this, "BOSS")
+	m_boss(*this, "BOSS"),
+	m_isa_offs(0),
+	m_isa_din(0),
+	m_isa_dout(0)
 {
 }
 
@@ -57,7 +60,8 @@ void mini_chief_device::device_start()
 	c1571_device::device_start();
 
 	save_item(NAME(m_isa_offs));
-	save_item(NAME(m_isa_data));
+	save_item(NAME(m_isa_din));
+	save_item(NAME(m_isa_dout));
 }
 
 ROM_START( minichief )
@@ -91,11 +95,11 @@ void mini_chief_device::cia_pb_w(uint8_t data)
 
 	if (BIT(data, 4) && !BIT(data, 3))
 	{
-		m_isa->io_w(0x320 | m_isa_offs, m_isa_data);
+		m_isa->io_w(0x320 | m_isa_offs, m_isa_dout);
 	}
 	else if (BIT(data, 3) && !BIT(data, 4))
 	{
-		m_isa_data = m_isa->io_r(0x320 | m_isa_offs);
+		m_isa_din = m_isa->io_r(0x320 | m_isa_offs);
 	}
 
 	if (BIT(data, 5))

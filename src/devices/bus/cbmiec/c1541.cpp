@@ -500,6 +500,8 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 void c1541c_device::device_add_mconfig(machine_config &config)
 {
 	c1541_device_base::device_add_mconfig(config);
+
+	m_via0->readpa_handler().set(FUNC(c1541c_device::via0_pa_r));
 }
 
 

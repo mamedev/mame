@@ -1388,6 +1388,18 @@ end
 
 
 ---------------------------------------------------
+-- Yamaha YM3413 LDSP
+--@src/devices/sound/ym3413.h,SOUNDS["YM3413"] = true
+---------------------------------------------------
+
+if SOUNDS["YM3413"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ym3413.cpp",
+		MAME_DIR .. "src/devices/sound/ym3413.h",
+	}
+end
+
+---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2154.h,SOUNDS["YM2154"] = true
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true

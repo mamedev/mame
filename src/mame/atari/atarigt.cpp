@@ -397,7 +397,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
 	uint16_t result;
-	if (m_xga->read16(offset - 0xd80000, result, !machine().side_effects_disabled()))
+	if (m_xga->read16(offset - 0xd80000, result))
 		*data = result;
 }
 

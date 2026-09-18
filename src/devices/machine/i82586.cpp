@@ -304,6 +304,9 @@ void i82586_base_device::process_scb()
 		CUC_NAME[(m_scb_cs & CUC) >> 24],
 		RUC_NAME[(m_scb_cs & RUC) >> 20]);
 
+	// the command word has been accepted, clear it
+	m_space->write_word(m_scb_address + 2, 0);
+
 	// clear interrupt flags when acknowledged
 	if (m_scb_cs & ACK_CX)
 		m_cx = false;
@@ -384,9 +387,11 @@ void i82586_base_device::process_scb()
 
 void i82586_base_device::update_scb()
 {
-	// write the status word and clear the command word of the scb
+	// write the status word only; the command word beside it is written by the
+	// host and cleared in process_scb() when a channel attention is accepted.
+	// Clearing it here as well loses commands issued while the cu is running.
 	// TODO: T (throttle) status flag
-	m_space->write_dword(m_scb_address,
+	m_space->write_word(m_scb_address,
 		(m_cx ? CX : 0) |
 		(m_fr ? FR : 0) |
 		(m_cna ? CNA : 0) |
@@ -479,8 +484,11 @@ void i82586_base_device::cu_complete(const u16 status)
 			// fetch link address
 			m_cba = address(m_cba, 4, 4);
 
-			// restart timer
-			m_cu_timer->adjust(attotime::zero);
+			// restart timer; the delay must not be zero, as command lists may be
+			// circular, and a zero delay retriggers the timer endlessly at the
+			// same time. 16 clocks is the minimum for a nop: four bus cycles of
+			// four clocks.
+			m_cu_timer->adjust(attotime::from_ticks(16, clock()));
 		}
 	}
 	else

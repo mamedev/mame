@@ -1418,6 +1418,10 @@ macqd610
 macqd650
 macqd800
 
+@source:apple/macquadraav.cpp
+macqd660av
+macqd840av
+
 @source:apple/newton.cpp
 emate
 motmarco
@@ -18664,6 +18668,7 @@ twinsed2
 @source:efo/cedar_magnet.cpp
 cedmag
 mag_boob
+mag_boobcc
 mag_burn
 mag_coco
 mag_day
@@ -44135,6 +44140,9 @@ arthurkn100
 circus2
 fruitcat
 pharmyst
+
+@source:skeleton/licocai.cpp
+licocai
 
 @source:skeleton/lilith.cpp
 lilith

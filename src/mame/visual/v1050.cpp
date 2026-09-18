@@ -142,7 +142,6 @@ Notes:
 
     TODO:
 
-    - floppy 1 is broken
     - write to banked RAM at 0x0000-0x1fff when ROM is active
     - real keyboard w/i8049
     - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
@@ -688,18 +687,22 @@ void v1050_state::misc_ppi_pa_w(uint8_t data)
 	// floppy drive select
 	floppy_image_device *floppy = nullptr;
 
-	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (!BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (!BIT(data, 3)) floppy = m_floppy3->get_device();
+	for (int i = 0; i < 4; i++)
+		if (!BIT(data, i)) floppy = m_floppy[i]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
-	// floppy side select
-	if (floppy) floppy->ss_w(BIT(data, 4));
+	// side select and motor are bussed to every drive, so an unselected drive keeps spinning
+	for (auto &connector : m_floppy)
+	{
+		floppy_image_device *drive = connector->get_device();
 
-	// floppy motor
-	if (floppy) floppy->mon_w(BIT(data, 6));
+		if (drive)
+		{
+			drive->ss_w(BIT(data, 4));
+			drive->mon_w(BIT(data, 6));
+		}
+	}
 
 	// density select
 	m_fdc->dden_w(BIT(data, 7));

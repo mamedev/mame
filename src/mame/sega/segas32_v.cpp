@@ -23,15 +23,9 @@
     - Sonic while globally flipped via the service menu, fails to flip
       the "SEGA" and "SEGASONIC" sprite based logos on the title screen.
 
-    - titlef NBG0 and NBG2 layers are currently hidden during gameplay.
-      It sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
-      Game actually uses the "rowscroll/rowselect" tables for a line window
-      effect to draw the boxing ring over NBG0.
-      Same deal for ga2 when in stage 2 cave a wall torch is lit.
-
     - Wrong priority cases (parenthesis for the level setup):
       dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
-      dbzvrvs: Sheng-Long speech balloon during Piccoro ending (fixme: check levels).
+      dbzvrvs: Shen-Long speech balloon during Piccolo ending (fixme: check levels).
       f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
       f1lap: attract mode map display (after aforementioned), sprite-based turn names
       ($a) are hidden by map ($d) again;
@@ -89,6 +83,8 @@
                  -------- ------d-  Disable tilemap layer 1
                  -------- -------d  Disable tilemap layer 0
         F04      tttttttt --------  Rowscroll/select table page number
+                 -------- --l-----  Enable per-line clipping window 3 (overrides rowscroll/select table)
+                 -------- ---l----  Enable per-line clipping window 2 (overrides rowscroll/select table)
                  -------- ----s---  Enable rowselect for tilemap layer 3
                  -------- -----s--  Enable rowselect for tilemap layer 2
                  -------- ------c-  Enable rowscroll for tilemap layer 3
@@ -384,7 +380,7 @@ void segas32_state::videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		const int page = offset >> 9;
 		offset &= 0x1ff;
 
-		/* scan the cache for a matching pages */
+		/* scan the cache for a matching page */
 		for (entry = m_cache_head; entry != nullptr; entry = entry->next)
 			if (entry->page == page)
 				entry->tmap->mark_tile_dirty(offset);
@@ -562,9 +558,11 @@ TILE_GET_INFO_MEMBER(segas32_state::get_text_tile_info)
 bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable, bool clipout, int clipmask, const rectangle &cliprect, extents_list *list)
 {
 	const bool flip = BIT(m_videoram[0x1ff00 / 2], 9);
+	const bool perlineclip2 = BIT(m_videoram[0x1ff04 / 2], 4);
+	const bool perlineclip3 = BIT(m_videoram[0x1ff04 / 2], 5);
 	rectangle tempclip;
 
-	// expand our cliprect to exclude the bottom-right
+	// expand our cliprect to include the bottom-right
 	tempclip = cliprect;
 	tempclip.max_x++;
 	tempclip.max_y++;
@@ -580,7 +578,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		return 1;
 	}
 
-	// extract the from videoram into locals, and apply the cliprect
+	// extract the clips from videoram into locals, and apply the cliprect
 	rectangle clips[5];
 	int sorted[5];
 	for (int i = 0; i < 5; i++)
@@ -605,10 +603,19 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		sorted[i] = i;
 	}
 
-	// bubble sort them by min_x
-	for (int i = 0; i < 5; i++)
-		for (int j = i + 1; j < 5; j++)
-			if (clips[sorted[i]].min_x > clips[sorted[j]].min_x) { int temp = sorted[i]; sorted[i] = sorted[j]; sorted[j] = temp; }
+	// insertion sort them by min_x
+	for (int i = 1; i < 5; i++)
+	{
+		int j = i - 1;
+		int key = sorted[i];
+
+		while (j >= 0 && clips[sorted[j]].min_x > clips[key].min_x)
+		{
+			sorted[j + 1] = sorted[j];
+			j--;
+		}
+		sorted[j + 1] = key;
+	}
 
 	// create all valid extent combinations
 	for (int i = 1; i < 32; i++)
@@ -656,7 +663,134 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 		for (int i = 0; i < 5; i++)
 			if ((BIT(clipmask , i)) && y >= clips[i].min_y && y < clips[i].max_y)
 				sect |= 1 << i;
-		list->scan_extent[y] = sect;
+
+		/*
+		 * $1FF04 bits 4/5 enable per-line clip windows.
+		 *
+		 * clip 2:
+		 *   +000 = min X
+		 *   +200 = max X
+		 *
+		 * clip 3:
+		 *   +100 = min X
+		 *   +300 = max X
+		 */
+		if (perlineclip2 || perlineclip3)
+		{
+			rectangle lineclips[5];
+			int linesorted[5];
+			const rectangle &visarea = screen.visible_area();
+			int line = flip ? (visarea.max_y - y) : y;
+			uint16_t *table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
+
+			for (int i = 0; i < 5; i++)
+			{
+				lineclips[i] = clips[i];
+				linesorted[i] = i;
+			}
+
+			// clip window 2
+			if (perlineclip2 && BIT(clipmask, 2))
+			{
+				uint16_t minx = table[0x000 + line];
+				uint16_t maxx = table[0x200 + line];
+
+				if (minx == 0xffff || maxx == 0xffff)
+				{
+					sect &= ~(1 << 2);
+				}
+				else if (!flip)
+				{
+					lineclips[2].min_x = minx & 0x1ff;
+					lineclips[2].max_x = (maxx & 0x1ff) + 1;
+				}
+				else
+				{
+					lineclips[2].min_x = (visarea.max_x + 1) - ((maxx & 0x1ff) + 1);
+					lineclips[2].max_x = (visarea.max_x + 1) - (minx & 0x1ff);
+				}
+
+				lineclips[2] &= tempclip;
+
+				if (lineclips[2].min_x >= lineclips[2].max_x)
+					sect &= ~(1 << 2);
+			}
+
+			// clip window 3
+			if (perlineclip3 && BIT(clipmask, 3))
+			{
+				uint16_t minx = table[0x100 + line];
+				uint16_t maxx = table[0x300 + line];
+
+				if (minx == 0xffff || maxx == 0xffff)
+				{
+					sect &= ~(1 << 3);
+				}
+				else if (!flip)
+				{
+					lineclips[3].min_x = minx & 0x1ff;
+					lineclips[3].max_x = (maxx & 0x1ff) + 1;
+				}
+				else
+				{
+					lineclips[3].min_x = (visarea.max_x + 1) - ((maxx & 0x1ff) + 1);
+					lineclips[3].max_x = (visarea.max_x + 1) - (minx & 0x1ff);
+				}
+
+				lineclips[3] &= tempclip;
+
+				if (lineclips[3].min_x >= lineclips[3].max_x)
+					sect &= ~(1 << 3);
+			}
+
+			/*
+			 * Build the extent for this individual scanline.
+			 * 0-31 remain the normal combinations.
+			 * 32+y is the per-line extent.
+			 */
+
+			for (int i = 1; i < 5; i++)
+			{
+				int j = i - 1;
+				int key = linesorted[i];
+
+				while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[key].min_x)
+				{
+					linesorted[j + 1] = linesorted[j];
+					j--;
+				}
+				linesorted[j + 1] = key;
+			}
+
+			uint16_t *extent = &list->extent[32 + y][0];
+			*extent++ = tempclip.min_x;
+			for (int j = 0; j < 5; j++)
+			{
+				if (BIT(sect, linesorted[j]))
+				{
+					const rectangle &cur = lineclips[linesorted[j]];
+
+					if (extent != &list->extent[32 + y][1] && cur.min_x <= extent[-1])
+					{
+						if (cur.max_x > extent[-1])
+							extent[-1] = cur.max_x;
+					}
+					else
+					{
+						*extent++ = cur.min_x;
+						*extent++ = cur.max_x;
+					}
+				}
+			}
+
+			*extent++ = tempclip.max_x;
+
+			list->scan_extent[y] = 32 + y;
+		}
+		else
+		{
+			list->scan_extent[y] = sect;
+		}
 	}
 
 	return clipout;
@@ -1127,9 +1261,12 @@ void segas32_state::update_background(segas32_state::layer_info &layer, const re
 {
 	bitmap_ind16 &bitmap = layer.bitmap;
 
+	// determine if we're flipped
+	bool flip = BIT(m_videoram[0x1ff00 / 2], 9);
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *const dst = &bitmap.pix(y);
+		uint16_t *const dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y);
 		int color;
 
 		/* determine the color */
@@ -1469,7 +1606,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 					uint32_t pixels = spritedata[++curaddr & addrmask];
 
 					/* draw four pixels */
-					pix = (pixels >> 28) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(transp)  x += xdelta; xacc += hzoom; } xacc -= 0x10000;
+					pix = (pixels >> 28) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(transp); x += xdelta; xacc += hzoom; } xacc -= 0x10000;
 					pix = (pixels >> 24) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(0);      x += xdelta; xacc += hzoom; } xacc -= 0x10000;
 					pix = (pixels >> 20) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(0);      x += xdelta; xacc += hzoom; } xacc -= 0x10000;
 					pix = (pixels >> 16) & 0xf; while (xacc < 0x10000 && x != xtarget) { sprite_draw_pixel_16(0);      x += xdelta; xacc += hzoom; } xacc -= 0x10000;

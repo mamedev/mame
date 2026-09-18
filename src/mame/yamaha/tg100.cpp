@@ -16,8 +16,10 @@
     - 28 voices polyphony
     - 2MB sample ROM containing 140 12-bit PCM samples
     Effect DSP: Yamaha YM3413
-    - clocked by sound generator
+    - clocked by sound generator (64 * fs)
     - Effect memory: 64kb (2x HM65256 PSRAM)
+    - send/return effect: serial audio and control data both come from the
+      sound generator, which also mixes the DSP output with its own
     LCD:
     - 1x16 characters
 
@@ -25,7 +27,6 @@
     HG62E11R54FS (XK462A00) Gate array (LCD control, glue logic)
 
     TODO:
-    - Investigate YM3413 effect DSP
     - LEDs
     - Layout
 */
@@ -36,6 +37,7 @@
 #include "cpu/h8500/h8520.h"
 #include "machine/eepromser.h"
 #include "sound/multipcm.h"
+#include "sound/ym3413.h"
 #include "video/hd44780.h"
 
 #include "emupal.h"
@@ -53,6 +55,7 @@ public:
 		m_screen(*this, "screen"),
 		m_lcd(*this, "lcd"),
 		m_ymw258(*this, "ymw258"),
+		m_ldsp(*this, "ldsp"),
 		m_eeprom(*this, "eeprom"),
 		m_mdout(*this, "mdout"),
 		m_host_select(*this, "HOST_SELECT"),
@@ -71,6 +74,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<hd44780_device> m_lcd;
 	required_device<multipcm_device> m_ymw258;
+	required_device<ym3413_device> m_ldsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<midi_port_device> m_mdout;
 	required_ioport m_host_select;
@@ -143,7 +147,7 @@ HD44780_PIXEL_UPDATE(tg100_state::lcd_pixel_update)
 void tg100_state::tg100_map(address_map &map)
 {
 	map(0x0000'0000, 0x0000'7fff).rom().region("prgrom", 0x00000);
-	map(0x0000'9000, 0x0000'9003).rw(m_ymw258, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0xffff);
+	map(0x0000'9000, 0x0000'900f).rw(m_ymw258, FUNC(multipcm_device::read), FUNC(multipcm_device::write)).umask16(0xffff);
 	map(0x0000'a000, 0x0000'a000).portr("BUTTONS");
 	map(0x0000'e000, 0x0000'e001).w(m_lcd, FUNC(hd44780_device::write));
 	map(0x0000'f000, 0x0000'f001).r(m_lcd, FUNC(hd44780_device::read));
@@ -199,8 +203,16 @@ void tg100_state::tg100(machine_config &config)
 
 	MULTIPCM(config, m_ymw258, 9.4_MHz_XTAL);
 	m_ymw258->set_addrmap(0, &tg100_state::ymw258_map);
+	m_ymw258->enable_dsp_send();
+	m_ymw258->dsp_cd_callback().set(m_ldsp, FUNC(ym3413_device::cd_w));
 	m_ymw258->add_route(0, "speaker", 1.0, 0);
 	m_ymw258->add_route(1, "speaker", 1.0, 1);
+	m_ymw258->add_route(2, m_ldsp, 1.0, 0);
+
+	YM3413(config, m_ldsp, 9.4_MHz_XTAL * 2 / 7); // 64 * fs
+	m_ldsp->set_ram_words(0x8000);
+	m_ldsp->add_route(0, "speaker", 1.0, 0);
+	m_ldsp->add_route(1, "speaker", 1.0, 1);
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(80);
