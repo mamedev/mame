@@ -48,6 +48,7 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_irq_dply_cb(*this)
 	, m_dspp_dma_read_cb(*this, 0)
 	, m_dspp_dma_write_cb(*this)
+	, m_memory_config_cb(*this)
 	, m_is_pal(false)
 {
 }
@@ -147,11 +148,19 @@ void madam_device::map(address_map &map)
 	);
 
 	// 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM
+	// ---- ---- ---- ---- ---- ---- -xx- ---- DRAM set 0 size (0 none, 1 1MB, 2 4MB)
+	// ---- ---- ---- ---- ---- ---- ---x x--- DRAM set 1 size (0 none, 1 1MB, 2 4MB, 3 16MB)
+	// ---- ---- ---- ---- ---- ---- ---- -xxx VRAM size in MB
+	// The sets are decoded back to back from address zero with these sizes, fitted or not,
+	// which is what the boot ROM relies on to find out how much memory there is.
 	map(0x0004, 0x0007).lrw32(
 		NAME([this] () { return m_msysbits; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("msysbits: %08x & %08x\n", data, mem_mask);
+			const u8 old_config = memory_config();
 			COMBINE_DATA(&m_msysbits);
+			if (memory_config() != old_config)
+				m_memory_config_cb(memory_config());
 		})
 	);
 	map(0x0008, 0x000b).rw(FUNC(madam_device::mctl_r), FUNC(madam_device::mctl_w));

@@ -152,10 +152,8 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x0000'0000, 0x001F'FFFF).ram();
-	map(0x0000'0000, 0x001F'FFFF).view(m_overlay_view);
-	m_overlay_view[0](0x0000'0000, 0x001F'FFFF).rom().region("bios", 0).lw8(NAME([this] (offs_t offset) { m_overlay_view.disable(); }));
-	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
+	// DRAM and VRAM, placed by Madam's memory configuration; [0] has the boot ROM overlaid, [1] doesn't
+	map(0x0000'0000, 0x00FF'FFFF).view(m_overlay_view);
 	map(0x0300'0000, 0x030F'FFFF).m(m_bankdev, FUNC(address_map_bank_device::amap32));   /* BIOS */
 	// slow bus
 	map(0x0310'0000, 0x0313'FFFF).ram();                                                 /* Brooktree? */
@@ -305,6 +303,13 @@ void _3do_state::machine_start()
 	m_uncle.rev = 0x03800000;
 
 	save_item(NAME(m_svf.sport));
+
+	memory_config_w(m_madam->memory_config());
+}
+
+void _3do_state::device_post_load()
+{
+	memory_config_w(m_madam->memory_config());
 }
 
 void _3do_state::machine_reset()
@@ -312,6 +317,49 @@ void _3do_state::machine_reset()
 	// start with overlay enabled, and bank pointing at BIOS
 	m_overlay_view.select(0);
 	m_bankdev->set_bank(0);
+}
+
+/*
+ * Madam decodes DRAM set 0, DRAM set 1 and VRAM back to back from address zero, each with the size it has
+ * been told about rather than the size of what is fitted.  The boot ROM tries configurations from the
+ * largest down and settles on the first one where every megabyte holds its own data, so a set that is
+ * declared larger than it is has to alias, and one that is declared but missing must not respond.
+ */
+void _3do_state::memory_config_w(uint8_t data)
+{
+	constexpr offs_t MB = 0x10'0000;
+	constexpr offs_t SPACE_SIZE = 16 * MB;
+
+	// 0, 1, 4 or 16MB per DRAM set; VRAM sits on top of DRAM and DRAM gives way if the two don't fit
+	const offs_t set_size[2] = { ((1 << (BIT(data, 5, 2) * 2)) >> 2) * MB, ((1 << (BIT(data, 3, 2) * 2)) >> 2) * MB };
+	const offs_t vram_size = std::min<offs_t>(BIT(data, 0, 3) * MB, SPACE_SIZE);
+	const offs_t dram_size = std::min<offs_t>(set_size[0] + set_size[1], SPACE_SIZE - vram_size);
+
+	for (int entry = 0; entry < 2; entry++)
+	{
+		memory_view::memory_view_entry &view = m_overlay_view[entry];
+		view.unmap_readwrite(0, SPACE_SIZE - 1);
+
+		// each set has 1MB fitted
+		for (offs_t base = 0; base < dram_size; base += MB)
+			view.install_ram(base, base + MB - 1, &m_dram[((base < set_size[0]) ? 0 : 1) * (MB / 4)]);
+
+		// only the first VRAM bank is fitted
+		if (vram_size)
+			view.install_ram(dram_size, dram_size + MB - 1, &m_vram[0]);
+
+		if (entry == 0)
+		{
+			// any write drops the overlay
+			view.install_rom(0x0000'0000, 0x001F'FFFF, &m_bios[0]);
+			view.install_write_handler(0x0000'0000, 0x001F'FFFF, write32smo_delegate(*this, FUNC(_3do_state::overlay_w)));
+		}
+	}
+}
+
+void _3do_state::overlay_w(uint32_t data)
+{
+	m_overlay_view.select(1);
 }
 
 void _3do_state::soft_reset_w(int state)
@@ -377,9 +425,12 @@ void _3do_state::green_config(machine_config &config)
 		if (offset == 0)
 			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16) | (m_p2_r[0]->read() << 8) | (m_p2_r[1]->read() << 0);
 
-		return 0;
+		// past the last pod the bus is pulled up, which the event broker reads as PODID_END_CHAIN;
+		// zeroes would log in a bogus pod of type 0
+		return 0xffffffff;
 	});
 	m_madam->irq_dply_cb().set(m_clio, FUNC(clio_device::dply_w));
+	m_madam->memory_config_cb().set(FUNC(_3do_state::memory_config_w));
 	m_madam->set_amy_tag("amy");
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);

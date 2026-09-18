@@ -37,6 +37,9 @@ public:
 	// DSPP DMA stack registers (channels 0-12 and 16-19), offset = channel * 4 + register
 	auto dspp_dma_read_cb()     { return m_dspp_dma_read_cb.bind(); }
 	auto dspp_dma_write_cb()    { return m_dspp_dma_write_cb.bind(); }
+	// DRAM/VRAM size fields of MSYSBits, which place system memory in the address space
+	auto memory_config_cb()     { return m_memory_config_cb.bind(); }
+	u8 memory_config() const    { return m_msysbits & 0x7f; }
 
 	// init setter
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
@@ -68,6 +71,7 @@ private:
 	devcb_write_line m_irq_dply_cb;
 	devcb_read32     m_dspp_dma_read_cb;
 	devcb_write32    m_dspp_dma_write_cb;
+	devcb_write8     m_memory_config_cb;
 
 	uint32_t  m_revision = 0;       /* 03300000 */
 	uint32_t  m_msysbits = 0;       /* 03300004 */
