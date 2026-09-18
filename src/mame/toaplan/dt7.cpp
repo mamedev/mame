@@ -42,7 +42,10 @@
     - verify frequencies on chips
     - verify the exact purpose of the 0x58008 / 0x5800a latches (local per-seat
       aux inputs forwarded over the cabinet link, possibly handle-mode related)
-    - verify text layer palettes
+    - the colored flecks in the service crosshatch's hex labels are authentic:
+      the test screen uses palette entries 4-7 of every color group as its
+      gradient ramp steps, and the label glyphs' shadow pixels index the same
+      entries
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
