@@ -2840,12 +2840,12 @@ CONS( 2000,  rad_opusp, rad_opus, 0,  xavixp_1mb_nv,        rad_opusp, xavix_sta
 // older release, or region where the Play TV / Connectv trademarks weren't used?
 CONS( 2000,  rad_opusa, rad_opus, 0,  xavixp_1mb_nv,        rad_opus,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Plug & Play Opus (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2000,  rad_hnt,   0,        0,  xavix_1mb_nv,         rad_hnt,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
+CONS( 2000,  rad_hnt,   0,        0,  xavix_1mb_nv,         rad_hnt,   xavix_state,               init_xavix,         "Radica / Human Code Presage Studios / SSD Company Ltd.", "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun (box shows 'Play TV' ingame just shows 'Plug & Play')
 
 CONS( 2003,  rad_hnt2,  0,        0,  xavix_2mb_nv,         rad_hnt,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need to map gun, crashes on pause
 
-CONS( 2003,  rad_mtrk,  0,        0, xavix_mtrk,            rad_mtrk,  xavix_mtrk_state,          init_xavix,         "Radica / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_mtrkp,           rad_mtrkp, xavix_mtrk_state,          init_xavix,         "Radica / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  rad_mtrk,  0,        0, xavix_mtrk,            rad_mtrk,  xavix_mtrk_state,          init_xavix,         "Radica / Sennari Interactive / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_mtrkp,           rad_mtrkp, xavix_mtrk_state,          init_xavix,         "Radica / Sennari Interactive / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 200?,  rad_box,   0,        0, xavix_2mb,             rad_box,   xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_2mb,            rad_boxp,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -2855,8 +2855,8 @@ CONS( 200?,  rad_crdnp, rad_crdn, 0, xavixp_1mb,            rad_crdnp, xavix_sta
 
 CONS( 2000,  rad_bb,    0,        0, xavix_1mb,             rad_bb,    xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Play TV branding used on box, not ingame
 
-CONS( 2001,  rad_bass,  0,        0, xavix_1mb,             rad_bass,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2001,  rad_bassp, rad_bass, 0, xavixp_1mb,            rad_bassp, xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Connectv Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  rad_bass,  0,        0, xavix_1mb,             rad_bass,  xavix_state,               init_xavix,         "Radica / Human Code Presage Studios / SSD Company Ltd.", "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2001,  rad_bassp, rad_bass, 0, xavixp_1mb,            rad_bassp, xavix_state,               init_xavix,         "Radica / Human Code Presage Studios / SSD Company Ltd.", "Connectv Bass Fishin' (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001,  rad_snow,  0,        0, xavix_1mb_nv,          rad_snow,  xavix_state,               init_xavix,         "Radica / SSD Company Ltd.", "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IMPERFECT_SOUND )
@@ -2864,7 +2864,7 @@ CONS( 2001,  rad_snowp, rad_snow, 0, xavixp_1mb_nv,         rad_snowp, xavix_sta
 
 CONS( 2003,  rad_madf,  0,        0, xavix_madfb,           rad_fb,    xavix_madfb_state,         init_xavix,         "Radica / Electronic Arts / SSD Company Ltd.", "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // no Play TV branding, USA only release?
 
-CONS( 200?,  rad_fb,    0,        0, xavix_madfb,           rad_fb,    xavix_madfb_state,         init_xavix,         "Radica / SSD Company Ltd.", "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
+CONS( 2005,  rad_fb,    0,        0, xavix_madfb,           rad_fb,    xavix_madfb_state,         init_xavix,         "Radica / FarSight Studios / SSD Company Ltd.", "Play TV Football (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // USA only release? doesn't change logo for PAL.
 
 CONS( 2003,  rad_rh,    0,        0, xavix_2mb,             rad_rh,    xavix_state,               init_xavix,         "Radica / Fisher-Price / Pronto Games / SSD Company Ltd.", "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
@@ -2975,10 +2975,10 @@ CONS( 2001,  tak_gin,   0,        0, xavix_2mb,             tak_gin,   xavix_sta
 // ぽこぽこハンマーズ
 CONS( 2002,  tak_hamr,  0,        0, xavix_i2c_24c02_4mb,   tak_hamr,  xavix_i2c_state,           init_xavix,         "Takara / SSD Company Ltd.", "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2003,  tak_beyu,  0,        0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Takara / Hasbro / SSD Company Ltd.", "Beyblade Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003,  tak_beyu,  0,        0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Takara / Hasbro / SSD Company Ltd.", "Beyblade V-Force: Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-//ベイブレード　アルティメットシューター
-CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Takara / SSD Company Ltd.",          "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//爆転シュートベイブレード2002 ベイアルティメットシューター
+CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_2mb,             xavix,     xavix_state,               init_xavix,         "Takara / SSD Company Ltd.",          "Bakuten Shoot Beyblade 2002: Bey Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
 // ジャラジャランド
