@@ -7,6 +7,8 @@
 #include "corefloat.h"
 
 #include <algorithm>
+#include <cmath>
+#include <limits>
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
@@ -218,6 +220,65 @@ uint32_t i960_cpu_device::get_ea(uint32_t opcode)
 			fatalerror("I960: %x: unhandled MEMB mode %x\n", m_PIP, mode);
 		}
 	}
+}
+
+// i960 Extended-real register image: words 0/1 hold the 64-bit fraction with
+// an explicit integer bit in bit 63, word 2 holds the sign in bit 15 and the
+// 15-bit biased exponent (bias 16383) in bits 14:0, with the upper 16 bits zero.
+static void double_to_extended(double val, uint32_t *words)
+{
+	const uint64_t bits = d2u(val);
+	const uint32_t sign = uint32_t(bits >> 63) << 15;
+	uint64_t frac;
+	uint32_t e;
+
+	if(std::isnan(val) || std::isinf(val))
+	{
+		frac = (1ULL << 63) | ((bits & 0x000fffffffffffffULL) << 11);
+		e = 0x7fff;
+	}
+	else if(val == 0.0)
+	{
+		frac = 0;
+		e = 0;
+	}
+	else
+	{
+		int exp2;
+		const double m = frexp(fabs(val), &exp2);   // 0.5 <= m < 1, exact for denormals too
+		frac = uint64_t(ldexp(m, 64));              // integer bit lands in bit 63
+		e = exp2 - 1 + 16383;
+	}
+
+	words[0] = uint32_t(frac);
+	words[1] = uint32_t(frac >> 32);
+	words[2] = sign | e;
+}
+
+static double extended_to_double(const uint32_t *words)
+{
+	const uint64_t frac = words[0] | (uint64_t(words[1]) << 32);
+	const uint32_t e = words[2] & 0x7fff;
+	double val;
+
+	if(e == 0x7fff)
+	{
+		if(!(frac << 1))    // integer bit only: infinity
+		{
+			val = std::numeric_limits<double>::infinity();
+		}
+		else                // NaN: keep whatever payload fits, always quiet
+		{
+			val = u2d(0x7ff8000000000000ULL | ((frac & 0x7fffffffffffffffULL) >> 11));
+		}
+	}
+	else
+	{
+		// value = fraction * 2^(exponent - bias - 63); e == 0 is a denormal (exponent 1)
+		val = ldexp(double(frac), int(e ? e : 1) - 16383 - 63);
+	}
+
+	return BIT(words[2], 15) ? -val : val;
 }
 
 uint32_t i960_cpu_device::get_1_ri(uint32_t opcode)
@@ -505,9 +566,9 @@ void i960_cpu_device::take_interrupt(int vector, int lvl)
 	// store the vector
 	m_program.write_dword(m_r[I960_FP]-8, vector-8);
 
-	m_PC &= ~0x1f00;    // clear priority, state, trace-fault pending, and trace enable
-	m_PC |= (lvl<<16);  // set CPU level to current IRQ level
-	m_PC |= 0x2002; // set supervisor mode & interrupt flag
+	m_PC &= ~0x001f0401;    // clear priority (bits 16-20), trace-fault pending (bit 10) and trace enable (bit 0)
+	m_PC |= (lvl<<16);      // set CPU level to current IRQ level
+	m_PC |= 0x2002;         // set supervisor mode & interrupt flag
 }
 
 void i960_cpu_device::check_immediate_irqs()
@@ -1314,10 +1375,11 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 					m_icount -= 2;
 					t1 = get_1_ri(opcode);
 					t2 = get_2_ri(opcode);
-					res = t2-(t1+((m_AC>>1)&1));
+					// dst = src2 - src1 - 1 + C, or src2 + ~src1 + C
+					res = (uint64_t)t2 + (uint64_t)(uint32_t)~t1 + ((m_AC>>1)&1);
 					set_ri(opcode, res&0xffffffff);
 
-					m_AC &= ~0x3;   // clear C and V
+					m_AC &= ~0x7;   // cc = 0CV
 					// set carry
 					m_AC |= ((res) & (((uint64_t)1) << 32)) ? 0x2 : 0;
 					// set overflow
@@ -1819,28 +1881,42 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 		case 0x6e:
 			switch((opcode >> 7) & 0xf) {
-			case 0x1: // movre
+			case 0x1: // movre (undocumented encoding, used by Dead or Alive to save/restore fp0-fp3)
+			case 0x9: // movre
 				{
-					uint32_t *src=nullptr, *dst=nullptr;
+					uint32_t v[3];
 
 					m_icount -= 8;
 
-					if(!(opcode & 0x00000800)) {
-						src = (uint32_t *)&m_r[opcode & 0x1e];
-					} else {
-						int idx = opcode & 0x1f;
+					// source: three g/l registers (multiple of 4), a floating-point register or a literal
+					if(!(opcode & 0x00000800))
+					{
+						const int src = opcode & 0x1c;
+						v[0] = m_r[src];
+						v[1] = m_r[src+1];
+						v[2] = m_r[src+2] & 0xffff;    // upper 16 bits of the third word are truncated
+					}
+					else
+					{
+						const int idx = opcode & 0x1f;
 						if(idx < 4)
-							src = (uint32_t *)&m_fp[idx];
+							double_to_extended(m_fp[idx], v);
+						else
+							double_to_extended((idx == 0x16) ? 1.0 : 0.0, v);
 					}
 
-					if(!(opcode & 0x00002000)) {
-						dst = (uint32_t *)&m_r[(opcode>>19) & 0x1e];
-					} else if(!(opcode & 0x00e00000))
-						dst = (uint32_t *)&m_fp[(opcode>>19) & 3];
-
-					dst[0] = src[0];
-					dst[1] = src[1];
-					dst[2] = src[2]&0xffff;
+					// destination: three g/l registers (multiple of 4) or a floating-point register
+					if(!(opcode & 0x00002000))
+					{
+						const int dst = (opcode>>19) & 0x1c;
+						m_r[dst] = v[0];
+						m_r[dst+1] = v[1];
+						m_r[dst+2] = v[2];
+					}
+					else if(!(opcode & 0x00e00000))
+						m_fp[(opcode>>19) & 3] = extended_to_double(v);
+					else
+						fatalerror("i960: %x: movre to literal?\n", m_PIP);
 				}
 				break;
 			case 0x2: // cpysre
@@ -1911,7 +1987,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				src1 = (int32_t)get_1_ri(opcode);
 				src2 = (int32_t)get_2_ri(opcode);
 				dst = src2 - ((src2/src1)*src1);
-				if(((src2*src1) < 0) && (dst != 0))
+				if(((src1 ^ src2) < 0) && (dst != 0))   // operands of opposite sign (the product would overflow)
 					dst += src1;
 				set_ri(opcode, dst);
 				break;
