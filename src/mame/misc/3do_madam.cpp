@@ -706,7 +706,9 @@ void madam_device::vdlp_continue_w(int state)
 			m_amy->clut_write(m_dma32_read_cb(m_vdlp.address + 0x10 + c));
 
 		m_vdlp.link = m_dma32_read_cb(m_vdlp.address + 0x0c);
-		m_vdlp.y_src = 0;
+		// - virtuoso does this per-scanline setup where even/odd selection needs to be taken
+		//   into account from the get-go.
+		m_vdlp.y_src = (m_vdlp.fb_address & 2) >> 1;
 
 		if (m_vdlp.scanlines == 0)
 			m_vdlp.address = m_vdlp.link;
