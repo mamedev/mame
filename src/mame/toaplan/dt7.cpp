@@ -43,7 +43,6 @@
     - verify the exact purpose of the 0x58008 / 0x5800a latches (local per-seat
       aux inputs forwarded over the cabinet link, possibly handle-mode related)
     - verify text layer palettes
-    - lineram xscroll words (0x1e0 / 0x1e4) are ignored (crosshatch label column)
     - merge tilemap emulation into toaplan/toaplan_txtilemap.cpp?
 */
 
@@ -558,7 +557,11 @@ void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, con
 	// but there were 2 empty sockets / sockets with blank tx ROMs, so
 	// it's likely only one of them is used
 
-	// see comments in other toaplan drivers, this is likely per-line
+	// per-line entries: word 0 = line select (bit 15 clear = flipped), word 1 =
+	// xscroll; the game's init writes 0x8900+y / 0x1e0+2*table when the screen is
+	// normal and 0x9ef-y / 0x15f-2*table when it is flipped (screens flip
+	// independently, service menu items 2 and 3), so the y mirroring comes from
+	// the line select values themselves and only x needs the flipped origin
 	int flipx = m_lineram[(table * 2)] & 0x8000;
 	m_tx_tilemap[table / 2]->set_flip(flipx ? 0 : TILEMAP_FLIPX);
 
@@ -568,12 +571,19 @@ void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, con
 		clip.min_y = clip.max_y = y;
 
 		u16 scroll1 = m_lineram[((y * 8) + (table * 2) + 0) & 0x7ff]; // lineselect
-		//u16 scroll2 = m_lineram[((y * 8) + (table * 2) + 1) & 0x7ff]; // xscroll
+		u16 scroll2 = m_lineram[((y * 8) + (table * 2) + 1) & 0x7ff]; // xscroll
 
 		scroll1 &= 0x7fff; // 0x8000 is per-line flip
-		scroll1 -= 0x0900; // are all these scroll bits?
+		scroll1 -= 0x0900;
+
+		int xscroll;
+		if (flipx)
+			xscroll = scroll2 - (0x1e0 + table * 2);
+		else
+			xscroll = -(scroll2 - (0x15f - table * 2));
 
 		m_tx_tilemap[table / 2]->set_scrolly(0, scroll1 - y);
+		m_tx_tilemap[table / 2]->set_scrollx(0, xscroll);
 		m_tx_tilemap[table / 2]->draw(screen, bitmap, clip, 0);
 	}
 }
