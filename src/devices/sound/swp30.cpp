@@ -648,9 +648,9 @@ void swp30_device::streaming_block::dpcm_step(u8 input)
 	s32 added = (sample >> scale) - acc;
 	s32 y, m;
 	switch(mode) {
-	case 0: y = added * 7 + m_dpcm_rem; m = y & 7; m_dpcm_delta = y >> 3; m_dpcm_rem = m ? m - 8 : 0; break;
-	case 1: y = added * 3 + m_dpcm_rem; m = y & 3; m_dpcm_delta = y >> 2; m_dpcm_rem = m ? m - 4 : 0; break;
-	case 2: y = added     + m_dpcm_rem; m = y & 1; m_dpcm_delta = y >> 1; m_dpcm_rem = m ? m - 2 : 0; break;
+	case 0: y = added * 7 + m_dpcm_rem; m = y & 7; m_dpcm_delta = y >> 3; m_dpcm_rem = m ? (m - 8) : 0; break;
+	case 1: y = added * 3 + m_dpcm_rem; m = y & 3; m_dpcm_delta = y >> 2; m_dpcm_rem = m ? (m - 4) : 0; break;
+	case 2: y = added     + m_dpcm_rem; m = y & 1; m_dpcm_delta = y >> 1; m_dpcm_rem = m ? (m - 2) : 0; break;
 	case 3: m_dpcm_delta = 0; m_dpcm_rem = 0; break;
 	}
 }
@@ -1443,7 +1443,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 		u32 a = (4 << k0) - 1;
 		u32 b = (2 << k0) - 1;
 		constexpr u8 mx[8] = { 0x00, 0x20, 0x44, 0xa2, 0x55, 0x75, 0xee, 0xfe };
-		return ((mx[k1] >> (sample_counter & 7)) & 1) ? a : b;
+		return BIT(mx[k1], sample_counter & 7) ? a : b;
 	}
 
 	if(level >= 0x40) {
@@ -1451,7 +1451,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 			return 1;
 		u32 s1 = (sample_counter & 0xe) >> 1;
 		constexpr u8 mx[8] = { 0x00, 0x01, 0x22, 0xa8, 0x55, 0xab, 0x77, 0xfd };
-		return (mx[k1] >> s1) & 1;
+		return BIT(mx[k1], s1);
 	}
 
 	k0 = 8 - k0;
@@ -1460,7 +1460,7 @@ u16 swp30_device::envelope_block::level_step(u32 level, u32 sample_counter)
 		return 0;
 
 	constexpr u16 mx[8] = { 0x5555, 0x5557, 0x5757, 0x5777, 0x7777, 0x777f, 0x7f7f, 0x7fff };
-	return (mx[k1] >> ((sample_counter >> k0) & 0xf)) & 1;
+	return BIT(mx[k1], (sample_counter >> k0) & 0xf);
 }
 
 u16 swp30_device::envelope_block::step(u32 sample_counter)
@@ -1496,7 +1496,6 @@ u16 swp30_device::envelope_block::step(u32 sample_counter)
 		if(level == limit) {
 			if(m_envelope_mode == DECAY1)
 				m_envelope_mode = DECAY2;
-
 			else if(m_release_glo & 0xff00)
 				m_envelope_mode = RELEASE;
 		}
@@ -2326,7 +2325,7 @@ template<int Sel> u16 swp30_device::revram_data_r()
 	if(Sel)
 		m_revram_data = meg_state::revram_decode(m_reverb->read_word(m_revram_adr)) << 8;
 
-	return Sel ? m_revram_data >> 16 : m_revram_data;
+	return Sel ? (m_revram_data >> 16) : m_revram_data;
 }
 
 
@@ -2784,7 +2783,7 @@ void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
 
 		const std::array<u16, 3> &vol = m_mixer[mix].vol;
 		for(int out = 0; out != 16; out++) {
-			int mode = ((route >> (out+32-2)) & 4) | ((route >> (out+16-1)) & 2) | ((route >> (out+0-0)) & 1);
+			int mode = bitswap<3>(route, out+32, out+16, out+0);
 			switch(mode) {
 			case 0: // No routing
 				break;
@@ -3631,7 +3630,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			break;
 		}
 
-		static const u32 shifts[4] = { 0, 1, 2, 4 };
+		constexpr u32 shifts[4] = { 0, 1, 2, 4 };
 		u32 shift = shifts[BIT(opcode, 0x1c, 2)];
 		u32 sat = BIT(opcode, 0x1e, 2);
 
@@ -3639,9 +3638,10 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			// Shift and wrap to 42 bits
 			UML_DSHL(block, I0, I0, shift + (64-42));
 			UML_DSAR(block, I0, I0, (64-42));
-		} else if(shift)
+		} else if(shift) {
 			// Saturating modes clamp the unwrapped value
 			UML_DSHL(block, I0, I0, shift);
+		}
 
 		// Clamp/saturate as requested
 		switch(sat) {
@@ -3776,8 +3776,9 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_DSAR(block, I0, mem(&m_p), 8);
 			UML_AND(block, I0, I0, 0x7fff);
 			UML_STORE(block, m_t_value.data(), index2, I0, SIZE_WORD, SCALE_x2);
-		} else
+		} else {
 			drc_t_value(block, index2);
+		}
 	}
 
 	if(BIT(opcode, 0x3d)) {
@@ -3868,7 +3869,7 @@ void swp30_device::meg_state::step()
 	// Without a multiplier the adder, shift and saturation still apply
 	if(mmode != 0 || BIT(opcode, 0x1a, 6)) {
 		u32 m1t = BIT(opcode, 0x14, 2);
-		s64 m1 = m1t == 1 || m1t == 2 ? m_t[t] : m_const[m_pc];
+		s64 m1 = (m1t == 1 || m1t == 2) ? m_t[t] : m_const[m_pc];
 		if(BIT(opcode, 0x13))
 			m1 = m1_expand(m1);
 
@@ -3893,8 +3894,8 @@ void swp30_device::meg_state::step()
 		s64 a;
 		switch(BIT(opcode, 0x18, 2)) {
 		case 0: a = m_p; break;
-		case 1: a = sr ? s64(m_r[sr]) << 15 : m_p >> 15; break;
-		case 2: a = sm ? s64(m_m[sm]) << 15 : m_p >> 15; break;
+		case 1: a = sr ? (s64(m_r[sr]) << 15) : (m_p >> 15); break;
+		case 2: a = sm ? (s64(m_m[sm]) << 15) : (m_p >> 15); break;
 		case 3: a = 0; break;
 		}
 
@@ -3907,7 +3908,7 @@ void swp30_device::meg_state::step()
 			r = m - a;
 			break;
 		case 2:
-			r = m + (a < 0 ? -a : a);
+			r = m + ((a < 0) ? -a : a);
 			break;
 		case 3:
 			r = m & a;
@@ -3916,7 +3917,7 @@ void swp30_device::meg_state::step()
 
 		int shift = BIT(opcode, 0x1c, 2);
 		if(shift)
-			r <<= shift == 3 ? 4 : shift;
+			r <<= (shift == 3) ? 4 : shift;
 
 		switch(BIT(opcode, 0x1e, 2)) {
 		case 0:
@@ -3931,7 +3932,7 @@ void swp30_device::meg_state::step()
 			r = std::clamp<s64>(r, 0, 0x3fffffffff);
 			break;
 		case 3:
-			r = std::min<s64>(r < 0 ? -r : r, 0x3fffffffff);
+			r = std::min<s64>((r < 0) ? -r : r, 0x3fffffffff);
 			break;
 		}
 

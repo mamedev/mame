@@ -52,6 +52,7 @@
 
 #include "emu.h"
 #include "ygv608.h"
+
 #include "screen.h"
 
 
@@ -118,10 +119,7 @@ static constexpr u8 HDW_MASK  = 0x3f;
 static constexpr u8 VDW_SHIFT = 0;
 static constexpr u8 VDW_MASK  = 0x3f;
 
-#define _ENABLE_SPRITES
-#define _ENABLE_SCROLLX
-#define _ENABLE_SCROLLY
-//#define _ENABLE_SCREEN_RESIZE
+static constexpr bool ENABLE_SPRITES = true;
 //#define _SHOW_VIDEO_DEBUG
 
 static constexpr u8 GFX_8X8_4BIT   = 0;
@@ -548,7 +546,7 @@ TILE_GET_INFO_MEMBER(ygv608_device::get_tile_info_A_8)
 
 	u8 attr = 0;
 	const int pattern_name_base = 0;
-	const int set = (m_md == MD_1PLANE_256COLOUR ? GFX_8X8_8BIT : GFX_8X8_4BIT);
+	const int set = (m_md == MD_1PLANE_256COLOUR) ? GFX_8X8_8BIT : GFX_8X8_4BIT;
 	const int base = row >> m_base_y_shift;
 
 	if (col >= m_page_x)
@@ -743,7 +741,7 @@ TILE_GET_INFO_MEMBER(ygv608_device::get_tile_info_A_16)
 
 	u8 attr = 0;
 	const int pattern_name_base = 0;
-	const int set = (m_md == MD_1PLANE_256COLOUR ? GFX_16X16_8BIT : GFX_16X16_4BIT);
+	const int set = (m_md == MD_1PLANE_256COLOUR) ? GFX_16X16_8BIT : GFX_16X16_4BIT;
 	const int base = row >> m_base_y_shift;
 
 	if (col >= m_page_x)
@@ -1037,14 +1035,16 @@ void ygv608_device::register_state_save()
 
 void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef _ENABLE_SPRITES
+	if (!ENABLE_SPRITES)
+		return;
+
 	static constexpr int sprite_limits[4] = { 512-8, 512-16, 512-32, 512-64 };
 	static constexpr u8 bank_shift[4] = { 5, 7, 9, 11 };
 	static constexpr int sprite_shift[4] = { 8, 6, 4, 2 };
 	static constexpr int sprite_mask[4] = { 0xff, 0xfc, 0xf0, 0xc0 };
 	static constexpr int spf_shift[4] = { -1, 0, +1, +2 };
 	/* ensure that sprites are enabled */
-	if ((!m_dspe) || (m_sprite_disable))
+	if (!m_dspe || m_sprite_disable)
 		return;
 
 	// sprites are always clipped to 512x512
@@ -1118,20 +1118,7 @@ void ygv608_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		}
 
 	}
-
-#endif
 }
-
-#ifdef _SHOW_VIDEO_DEBUG
-static const char *const mode[] = {
-	"2PLANE_8BIT",
-	"2PLANE_16BIT",
-	"1PLANE_16COLORS",
-	"1PLANE_256COLORS"
-};
-
-static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
-#endif
 
 /***************************************
  *
@@ -1165,7 +1152,7 @@ inline int wrap_camera(int v, int domain)
 		return 0;
 
 	v %= domain;
-	return (v < 0) ? v + domain : v;
+	return (v < 0) ? (v + domain) : v;
 }
 
 // Step 2: camera coordinate -> pixmap coordinate.  wrap == false means the chip
@@ -1346,9 +1333,7 @@ void ygv608_device::draw_layer_scroll(screen_device &screen, bitmap_ind16 &bitma
 void ygv608_device::draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect, int n)
 {
 	if (n <= 0)
-	{
 		return;
-	}
 
 	// mask to drop the lowest n-bits
 	const int mask = ~((1 << n) - 1);
@@ -1364,9 +1349,6 @@ void ygv608_device::draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 u32 ygv608_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#ifdef _SHOW_VIDEO_DEBUG
-	char buffer[64];
-#endif
 	rectangle finalclip;
 	const rectangle &visarea = screen.visible_area();
 
@@ -1495,8 +1477,18 @@ u32 ygv608_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 #ifdef _SHOW_VIDEO_DEBUG
 	/* show screen control information */
+	static const char *const mode[] = {
+		"2PLANE_8BIT",
+		"2PLANE_16BIT",
+		"1PLANE_16COLORS",
+		"1PLANE_256COLORS"
+	};
+
+	static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
+
+	char buffer[64];
 	ui_draw_text(mode[m_md], 0, 0);
-	sprintf(buffer, "%02ux%02u", m_page_x, m_page_y);
+	snprintf(buffer, std::size(buffer), "%02ux%02u", m_page_x, m_page_y);
 	ui_draw_text(buffer, 0, 16);
 	ui_draw_text(psize[m_pattern_size], 0, 32);
 	sprintf(buffer, "A: SX:%d SY:%d",
@@ -1505,7 +1497,7 @@ u32 ygv608_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 			(int)m_scroll_data_table[0][0x00] +
 			(((int)m_scroll_data_table[0][0x01] & 0x0f) << 8));
 	ui_draw_text(buffer, 0, 48);
-	sprintf(buffer, "B: SX:%d SY:%d",
+	snprintf(buffer, std::size(buffer), "B: SX:%d SY:%d",
 			(int)m_scroll_data_table[1][0x80] +
 			(((int)m_scroll_data_table[1][0x81] & 0x0f) << 8),
 			(int)m_scroll_data_table[1][0x00] +
@@ -1645,14 +1637,14 @@ u8 ygv608_device::register_data_r()
 		{
 			m_register_address ++;
 			m_register_address &= 0x3f;
-			#if 0
+#if 0
 			// we'll catch this in the logerror anyway
 			if (regnum == 50)
 			{
 				regnum = 0;
 				logerror("warning: rn=50 after read increment\n");
 			}
-			#endif
+#endif
 		}
 	}
 
@@ -1819,17 +1811,17 @@ void ygv608_device::register_data_w(u8 data)
 
 	if (m_register_autoinc_w)
 	{
-		m_register_address ++;
+		m_register_address++;
 		m_register_address &= 0x3f;
 
-		#if 0
+#if 0
 		// we'll catch this in the logerror anyway
 		if (regnum == 50)
 		{
 			regnum = 0;
 			logerror("warning: rn=50 after write increment\n");
 		}
-		#endif
+#endif
 	}
 }
 
@@ -2113,7 +2105,7 @@ void ygv608_device::screen_ctrl_7_w(u8 data)
 	m_md = new_md;
 	m_dspe = BIT(data, 0);
 
-	m_na8_mask = ((m_flip) ? 0x03 : 0x0f);
+	m_na8_mask = m_flip ? 0x03 : 0x0f;
 
 	// changing mode resets the pattern name table states (Mappy Arrange)
 	m_p0_state = 0;
@@ -2127,10 +2119,12 @@ inline void ygv608_device::pattern_mode_setup()
 	const u32 old_page_x = m_page_x;
 	const u32 old_page_y = m_page_y;
 
-	m_bits16 = (m_md == MD_2PLANE_8BIT ? 0 : 1);
+	m_bits16 = (m_md == MD_2PLANE_8BIT) ? 0 : 1;
 
 	if (m_md == MD_2PLANE_16BIT)
+	{
 		m_page_x = m_page_y = 32;
+	}
 	else
 	{
 		if (!m_page_size)
@@ -2144,10 +2138,10 @@ inline void ygv608_device::pattern_mode_setup()
 			m_page_y = 64;
 		}
 	}
-	m_pny_shift = (m_page_x == 32 ? 5 : 6);
+	m_pny_shift = (m_page_x == 32) ? 5 : 6;
 
 	/* bits to shift pattern y coordinate to extract base */
-	m_base_y_shift = (m_page_y == 32 ? 2 : 3);
+	m_base_y_shift = (m_page_y == 32) ? 2 : 3;
 
 	// The tilemap cache is picked by page size, so a MD (R#7) or PGS (R#8) change
 	// that resizes the page has to re-select it - screen_ctrl_9_w only does this on

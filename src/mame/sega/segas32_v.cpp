@@ -680,7 +680,7 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			rectangle lineclips[5];
 			int linesorted[5];
 			const rectangle &visarea = screen.visible_area();
-			int line = flip ? visarea.max_y - y : y;
+			int line = flip ? (visarea.max_y - y) : y;
 			uint16_t *table = &m_videoram[(m_videoram[0x1ff04/2] >> 10) * 0x400];
 
 			for (int i = 0; i < 5; i++)
@@ -748,45 +748,42 @@ bool segas32_state::compute_clipping_extents(screen_device &screen, bool enable,
 			 * 0-31 remain the normal combinations.
 			 * 32+y is the per-line extent.
 			 */
+
+			for (int i = 1; i < 5; i++)
 			{
-				uint16_t *extent = &list->extent[32 + y][0];
+				int j = i - 1;
+				int key = linesorted[i];
 
-				for (int i = 1; i < 5; i++)
+				while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[key].min_x)
 				{
-					int j = i - 1;
-					int key = linesorted[i];
-
-					while (j >= 0 && lineclips[linesorted[j]].min_x > lineclips[key].min_x)
-					{
-						linesorted[j + 1] = linesorted[j];
-						j--;
-					}
-					linesorted[j + 1] = key;
+					linesorted[j + 1] = linesorted[j];
+					j--;
 				}
-
-				*extent++ = tempclip.min_x;
-
-				for (int j = 0; j < 5; j++)
-				{
-					if (BIT(sect, linesorted[j]))
-					{
-						const rectangle &cur = lineclips[linesorted[j]];
-
-						if (extent != &list->extent[32 + y][1] && cur.min_x <= extent[-1])
-						{
-							if (cur.max_x > extent[-1])
-								extent[-1] = cur.max_x;
-						}
-						else
-						{
-							*extent++ = cur.min_x;
-							*extent++ = cur.max_x;
-						}
-					}
-				}
-
-				*extent++ = tempclip.max_x;
+				linesorted[j + 1] = key;
 			}
+
+			uint16_t *extent = &list->extent[32 + y][0];
+			*extent++ = tempclip.min_x;
+			for (int j = 0; j < 5; j++)
+			{
+				if (BIT(sect, linesorted[j]))
+				{
+					const rectangle &cur = lineclips[linesorted[j]];
+
+					if (extent != &list->extent[32 + y][1] && cur.min_x <= extent[-1])
+					{
+						if (cur.max_x > extent[-1])
+							extent[-1] = cur.max_x;
+					}
+					else
+					{
+						*extent++ = cur.min_x;
+						*extent++ = cur.max_x;
+					}
+				}
+			}
+
+			*extent++ = tempclip.max_x;
 
 			list->scan_extent[y] = 32 + y;
 		}
@@ -1269,7 +1266,7 @@ void segas32_state::update_background(segas32_state::layer_info &layer, const re
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *const dst = &bitmap.pix(flip ? cliprect.max_y - y : y);
+		uint16_t *const dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y);
 		int color;
 
 		/* determine the color */

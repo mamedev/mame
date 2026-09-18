@@ -1,27 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+/*
+Cai System LICO 立可遊戲教學系統
+(Lìkě Yóuxì Jiàoxué Xìtǒng - "LICO" is an alternate transliteration of "立可")
 
-// Educational system, TV Paint style with touchpad and tool/palette selection area
-// also has a controller featuring
-// circular D-Pad
-// 3 regular buttons (A-Red, B-Blue, C-Green)
-// 3 buttons above those (turbo?)
-// 1 Start button
-// 
-// SOCRATES is printed on the cart ROM chips and system customs, but this
-// doesn't seem to be related to the VTech Socrates system
-//
-// CPU: MC68000P10
-// custom chip "SOCRATES A.F-810620-001 9422 Z13 JAPAN"
-//
-// current system ROM is half size, the system attempts to fetch graphical data from outside of it
+Educational system, TV Paint style with touchpad and tool/palette selection area
+also has a controller featuring
+circular D-Pad
+3 regular buttons (A-Red, B-Blue, C-Green)
+3 buttons above those with function labels
+1 Start button
+
+SOCRATES is printed on the cart ROM chips and system customs, but this
+doesn't seem to be related to the VTech Socrates system
+
+CPU: MC68000P10
+custom chip "SOCRATES A.F-810620-001 9422 Z13 JAPAN"
+
+current system ROM is half size, the system attempts to fetch graphical data from outside of it
+*/
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
-
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/ymopl.h"
 
@@ -51,11 +54,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void vdp_data_upload(uint16_t data, uint16_t mem_mask);
@@ -73,6 +71,11 @@ private:
 	void pal_high_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void licocai_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 
 	u16 m_vdp_dest;
 	u16 m_vdp_enable_flags;
@@ -113,17 +116,20 @@ u16 licocai_state::vdp_data_r(offs_t offset, uint16_t mem_mask)
 	{
 	case 0x0002:
 	{
-		logerror("%s: vdp_data_r with m_vdp_dest %02x addr %04x (data read)\n", machine().describe_context(), m_vdp_dest, m_vdp_read_addr);
-		u16 dat = (m_vram[(m_vdp_read_addr + 0) & 0xffff] << 8) | m_vram[(m_vdp_read_addr + 1) & 0xffff];
-		m_vdp_read_addr += 2;
+		u16 dat = (uint16_t(m_vram[(m_vdp_read_addr + 0) & 0xffff]) << 8) | m_vram[(m_vdp_read_addr + 1) & 0xffff];
+		if (!machine().side_effects_disabled())
+		{
+			logerror("%s: vdp_data_r with m_vdp_dest %02x addr %04x (data read)\n", machine().describe_context(), m_vdp_dest, m_vdp_read_addr);
+			m_vdp_read_addr += 2;
+		}
 		return dat;
 	}
 
 	default:
-		logerror("%s: vdp_data_r with m_vdp_dest %02x addr %04x (register read)\n", machine().describe_context(), m_vdp_dest, m_vdp_read_addr);
+		if (!machine().side_effects_disabled())
+			logerror("%s: vdp_data_r with m_vdp_dest %02x addr %04x (register read)\n", machine().describe_context(), m_vdp_dest, m_vdp_read_addr);
 		return 0x00;
 	}
-	return 0x00;
 }
 
 
@@ -225,7 +231,7 @@ void licocai_state::pal_addr_high_w(offs_t offset, uint16_t data, uint16_t mem_m
 
 void licocai_state::update_pen(u16 pen)
 {
-	/* disabled for now as it wipes palette
+#if 0 // disabled for now as it wipes palette
 	u16 pal = m_pallow[pen] | (m_palhigh[pen] << 8);
 
 	const u8 r = (pal >> 6) & 0x07;
@@ -233,7 +239,7 @@ void licocai_state::update_pen(u16 pen)
 	const u8 b = (pal >> 0) & 0x07;
 
 	m_palette->set_pen_color(pen, rgb_t(r << 5, g << 5, b << 5));
-	*/
+#endif
 }
 
 void licocai_state::pal_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -481,5 +487,4 @@ ROM_END
 
 } // anonymous namespace
 
-// or is Cai System the publisher?
-CONS( 1992?, licocai, 0, 0, licocai, licocai, licocai_state, empty_init, "Socrates / C&E", "LICO Cai System", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1992?, licocai, 0, 0, licocai, licocai, licocai_state, empty_init, "Cai System / C&E", "LICO", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
