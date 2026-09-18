@@ -43,7 +43,7 @@ void gew_pcm_device::retrigger_sample(slot_t &slot)
 
 	envelope_generator_calc(slot);
 	slot.m_envelope_gen.m_state = state_t::ATTACK;
-	slot.m_envelope_gen.m_volume = 0;
+	slot.m_envelope_gen.m_volume = (0x3ff - 0x2a0) << EG_SHIFT;
 
 #if MULTIPCM_LOG_SAMPLES
 	dump_sample(slot);
@@ -83,7 +83,7 @@ int32_t gew_pcm_device::envelope_generator_update(slot_t &slot)
 	switch (slot.m_envelope_gen.m_state)
 	{
 	case state_t::ATTACK:
-		slot.m_envelope_gen.m_volume += slot.m_envelope_gen.m_attack_rate;
+		slot.m_envelope_gen.m_volume += (int64_t((0x817 << (EG_SHIFT - 1)) - slot.m_envelope_gen.m_volume) * slot.m_envelope_gen.m_attack_rate) >> 24;
 		if (slot.m_envelope_gen.m_volume >= (0x3ff << EG_SHIFT))
 		{
 			slot.m_envelope_gen.m_state = state_t::DECAY1;
