@@ -15,8 +15,11 @@
  * 5: bit 0: 0: interpolate volume changes, 1: direct set volume,
  *    bits 1-7 = volume attenuate (0=max, 7f=min)
  * 6: LFO frequency + Phase LFO depth
- * 7: Amplitude LFO size
- * 9: unknown, the TG100 writes FF at every key on
+ * 7: Attack rate (high nibble), decay 1 rate (low nibble)
+ * 8: Decay level (high nibble), decay 2 rate (low nibble)
+ * 9: Rate correction (high nibble), release rate (low nibble)
+ * 10: Amplitude LFO size
+ * Registers 6-10 are loaded from the sample header when the sample is selected.
  *
  * The first sample ROM contains a variable length metadata table with 12
  * bytes per instrument sample. This is very similar to the YMF278B 'OPL4'.
@@ -28,9 +31,9 @@
  * Bit 21 is used by the MU5 on some samples for as-yet unknown purposes. (YMW-258-F has 22 address pins.)
  * The next 2 bytes are the loop start point, in samples (big endian) (3, 4)
  * The next 2 are the 2's complement negation of of the total number of samples (big endian) (5, 6)
- * The next byte is LFO freq + depth (copied to reg 6 ?) (7, 8)
- * The next 3 are envelope params (Attack, Decay1 and 2, sustain level, release, Key Rate Scaling) (9, 10, 11)
- * The next byte is Amplitude LFO size (copied to reg 7 ?)
+ * The next byte is LFO freq + depth (copied to reg 6) (7)
+ * The next 3 are envelope params (Attack, Decay1 and 2, sustain level, release, Key Rate Scaling) (copied to reg 7-9) (8, 9, 10)
+ * The next byte is Amplitude LFO size (copied to reg 10) (11)
  *
  * TODO
  * - http://dtech.lv/techarticles_yamaha_chips.html indicates FM support, which we don't have yet.
@@ -85,8 +88,11 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 		{
 			// according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
 			init_sample(slot.m_sample, slot.m_regs[1] | ((slot.m_regs[2] & 1) << 8));
+			slot.m_regs[7] = (slot.m_sample.m_attack_reg << 4) | slot.m_sample.m_decay1_reg;
+			slot.m_regs[8] = (slot.m_sample.m_decay_level << 4) | slot.m_sample.m_decay2_reg;
+			slot.m_regs[9] = (slot.m_sample.m_key_rate_scale << 4) | slot.m_sample.m_release_reg;
 			write_slot(slot, 6, slot.m_sample.m_lfo_vibrato_reg);
-			write_slot(slot, 7, slot.m_sample.m_lfo_amplitude_reg);
+			write_slot(slot, 10, slot.m_sample.m_lfo_amplitude_reg);
 
 			// retrigger if key is on
 			if (slot.m_playing)
@@ -142,15 +148,26 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 			}
 			break;
 		case 6: // LFO frequency + Pitch LFO
-		case 7: // Amplitude LFO
+		case 10: // Amplitude LFO
 			slot.m_lfo_frequency = (slot.m_regs[6] >> 3) & 7;
 			slot.m_vibrato = slot.m_regs[6] & 7;
-			slot.m_tremolo = slot.m_regs[7] & 7;
+			slot.m_tremolo = slot.m_regs[10] & 7;
 			if (data)
 			{
 				lfo_compute_step(slot.m_pitch_lfo, slot.m_lfo_frequency, slot.m_vibrato, 0);
 				lfo_compute_step(slot.m_amplitude_lfo, slot.m_lfo_frequency, slot.m_tremolo, 1);
 			}
+			break;
+		case 7: // Attack rate + Decay 1 rate
+		case 8: // Decay level + Decay 2 rate
+		case 9: // Rate correction + Release rate
+			slot.m_sample.m_attack_reg = slot.m_regs[7] >> 4;
+			slot.m_sample.m_decay1_reg = slot.m_regs[7] & 0xf;
+			slot.m_sample.m_decay_level = slot.m_regs[8] >> 4;
+			slot.m_sample.m_decay2_reg = slot.m_regs[8] & 0xf;
+			slot.m_sample.m_key_rate_scale = slot.m_regs[9] >> 4;
+			slot.m_sample.m_release_reg = slot.m_regs[9] & 0xf;
+			envelope_generator_calc(slot);
 			break;
 	}
 }
@@ -165,7 +182,7 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0: // Data write
-			if (m_address < 8)
+			if (m_address < 11)
 				write_slot(m_slots[m_cur_slot], m_address, data);
 			else
 				LOG("unknown voice register %02x = %02x (slot %d)\n", m_address, data, m_cur_slot);

@@ -82,7 +82,7 @@ protected:
 
 	struct slot_t
 	{
-		uint8_t m_regs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+		uint8_t m_regs[11] = { };
 		bool m_playing = false;
 		sample_t m_sample;
 		uint32_t m_offset = 0;
