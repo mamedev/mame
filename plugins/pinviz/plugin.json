@@ -1,0 +1,10 @@
+{
+	"plugin": {
+		"name": "pinviz",
+		"description": "Minimal pinball playfield simulation for testing pinball drivers",
+		"version": "0.1.0",
+		"author": "Ben Bruscella",
+		"type": "plugin",
+		"start": "false"
+	}
+}

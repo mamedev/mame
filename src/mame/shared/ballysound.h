@@ -19,6 +19,7 @@
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "sound/bbd.h"
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/flt_rc.h"
@@ -37,6 +38,7 @@ DECLARE_DEVICE_TYPE(BALLY_SOUNDS_PLUS,      bally_sounds_plus_device)
 DECLARE_DEVICE_TYPE(BALLY_CHEAP_SQUEAK,     bally_cheap_squeak_device)
 DECLARE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK,    bally_squawk_n_talk_device)
 DECLARE_DEVICE_TYPE(BALLY_SQUAWK_N_TALK_AY, bally_squawk_n_talk_ay_device)
+DECLARE_DEVICE_TYPE(BALLY_SAY_IT_AGAIN,      bally_say_it_again_device)
 
 
 //**************************************************************************
@@ -338,5 +340,79 @@ private:
 	void update_ay_bus();
 };
 
+
+
+// ======================> bally_say_it_again_device
+
+// AS-2518-81 "Say It Again" echo board, used with the Squawk & Talk on Centaur and
+// Centaur II. Schematic W-1258c in the Centaur manual; reference designators below
+// are from it.
+//
+// Audio arrives from the Squawk & Talk at J2-9, passes through three LM3900 stages,
+// a Reticon SAD4096 bucket brigade delay line at U2, three more LM3900 stages, and
+// returns to the sound board at J2-7. The "Regen" pot R29, 50K, takes the output
+// back to the input summing node, which is what makes the echo repeat, so the
+// filters below sit inside that loop and every repeat passes through them again.
+//
+// The filtering is not a simple RC. Each LM3900 stage is an active filter, and the
+// poles that matter are:
+//
+//   before the line   R7 330K with C3 470pf     1.0 kHz
+//                     R11 330K with C5 100pf    4.8 kHz
+//   after the line    R23 330K with C7 680pf    709 Hz
+//                     R27 680K with C9 270pf    867 Hz
+//   output stage      R31 470K with C10 120pf   2.8 kHz
+//
+// so the round trip is dominated by the three poles below about a kilohertz. They
+// are computed from the component values in sound_stream_update rather than written
+// out as frequencies, so the working is visible. FILTER_BIQUAD would be the device
+// for stages like these, and FILTER_RC is the wrong shape entirely, but neither can
+// be used here: they would have to sit in the feedback path, and a loop in the
+// stream routes is a fatal error in sound.cpp.
+//
+// The bucket clock comes from a CD4046 at U5 with R40 350K and C13 470pf. That puts
+// it in the single digit kilohertz, so one pass through 2048 buckets is some
+// hundreds of milliseconds; the exact figure depends on the VCO control voltage,
+// which is what the Delay adjustment adjusts, and is not settled here. The "Bias"
+// pot R45, 10K, trims the SAD4096's operating point and is not modelled.
+class bally_say_it_again_device : public device_t, public device_sound_interface
+{
+public:
+	bally_say_it_again_device(
+			const machine_config &mconfig,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock = 0);
+
+	// delay of one pass through the BBD, in milliseconds. The Delay pot trims the
+	// CD4046's frequency, so this sets the clock the buckets are shifted at.
+	bally_say_it_again_device &set_delay_ms(float ms);
+	// feedback of the delayed signal into the input, 0 to just under 1
+	bally_say_it_again_device &set_regen(float regen);
+	// level of the delayed signal in the output
+	bally_say_it_again_device &set_wet(float wet);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream) override;
+
+private:
+	// the delay line itself, 2048 buckets
+	required_device<sad4096_device> m_bbd;
+
+	sound_stream *m_stream;
+	float m_bbd_clock;                      // what the CD4046 is running the buckets at
+	float m_accum;                          // buckets owed at the stream's rate
+	sound_stream::sample_t m_delayed;       // what last fell out of the line
+	sound_stream::sample_t m_pre;           // the stage ahead of the line
+	sound_stream::sample_t m_post1, m_post2;// the two after it
+	float m_regen;
+	float m_wet;
+};
 
 #endif // MAME_SHARED_BALLYSOUND_H

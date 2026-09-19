@@ -16,6 +16,12 @@ class bbd_device_base : public device_t, public device_sound_interface
 public:
 	void tick();
 
+	// Shift one sample through the line and return the one that falls out, for a
+	// circuit that cannot be expressed as a route because it has to see the output
+	// before it can decide the next input. An echo unit whose regeneration pot feeds
+	// the output back into the input is the usual case.
+	sound_stream::sample_t clock_sample(sound_stream::sample_t in);
+
 protected:
 	// internal constructor
 	bbd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
@@ -93,5 +99,16 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(MN3207, mn3207_device)
+
+
+// ======================> sad4096_device
+
+class sad4096_device : public bbd_device_base
+{
+public:
+	sad4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+DECLARE_DEVICE_TYPE(SAD4096, sad4096_device)
 
 #endif // MAME_SOUND_BBD_H
