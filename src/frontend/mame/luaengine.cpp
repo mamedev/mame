@@ -734,6 +734,11 @@ void lua_engine::register_function(sol::function func, const char *id)
 		sol().registry().create_named(id, 1, func);
 }
 
+void lua_engine::on_machine_before_startup_screens()
+{
+	execute_function("LUA_ON_BEFORE_STARTUP_SCREENS");
+}
+
 void lua_engine::on_machine_prestart()
 {
 	execute_function("LUA_ON_PRESTART");
@@ -904,6 +909,7 @@ void lua_engine::initialize()
  * emu.step() - advance one frame
  * emu.keypost(keys) - post keys to natural keyboard
  *
+ * emu.register_before_startup_screens(callback) - register callback before startup screens
  * emu.register_prestart(callback) - register callback before reset
  * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
  * emu.register_sound_update(callback) - register callback after sound update has generated new samples
@@ -1024,6 +1030,7 @@ void lua_engine::initialize()
 			mame_machine_manager::instance()->ui().set_single_step(true);
 			machine().resume();
 		};
+	emu["register_before_startup_screens"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_STARTUP_SCREENS"); };
 	emu["register_prestart"] = [this] (sol::function func) { register_function(func, "LUA_ON_PRESTART"); };
 	emu["register_frame_done"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_sound_update"] = [this] (sol::function func) { register_function(func, "LUA_ON_SOUND_UPDATE"); };

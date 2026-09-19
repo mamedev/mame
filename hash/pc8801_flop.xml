@@ -4909,10 +4909,12 @@ Note: cannot mix party from disk 1 and 2
 		<!--combined image-->
 		<!--rom name="the blade of blackpoole.d88" size="720144" crc="3e206ced" sha1="b60ba4fc2b8da86a58ec69f79b809d2ff517e6a8"/-->
 
+		<!-- ordered in a way where by default flop2 goes to second drive and -->
+		<!-- user just need to substitute first disk after prompt -->
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="344496">
-				<rom name="the blade of blackpoole (disk a).d88" size="344496" crc="11d1a93e" sha1="1ca5eb64981218ee432f74600bba9eb70bbf5273"/>
+			<feature name="part_id" value="Disk BASIC" />
+			<dataarea name="flop" size="26800">
+				<rom name="the blade of blackpoole (disk basic).d88" size="26800" crc="3b20e875" sha1="6d6be0e50c412a84ddb0527d9dc1e5b2485461ac"/>
 			</dataarea>
 		</part>
 
@@ -4924,9 +4926,9 @@ Note: cannot mix party from disk 1 and 2
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="26800">
-				<rom name="the blade of blackpoole (disk basic).d88" size="26800" crc="3b20e875" sha1="6d6be0e50c412a84ddb0527d9dc1e5b2485461ac"/>
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="344496">
+				<rom name="the blade of blackpoole (disk a).d88" size="344496" crc="11d1a93e" sha1="1ca5eb64981218ee432f74600bba9eb70bbf5273"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30771,7 +30773,7 @@ Hangs or crashes at title screen
 		<!--rom name="sherwood forest.d88" size="720112" crc="d3889115" sha1="d25095ad26f23e8303a6a285b6e9bd32e47f1903"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="sherwood forest (disk basic).d88" size="26800" crc="ca2e1031" sha1="c659991217a256b94f361948211ac24e9518f803"/>
 			</dataarea>
@@ -35890,7 +35892,7 @@ Runs too fast, requires [V1S] support
 		<!--rom name="transylvania.d88" size="720112" crc="212b6c2c" sha1="4132b2c81bf50abae2f2a003eba4f2431a08097a"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="transylvania (disk basic).d88" size="26800" crc="ca2e1031" sha1="c659991217a256b94f361948211ac24e9518f803"/>
 			</dataarea>
@@ -35926,7 +35928,7 @@ ExtractDisk  [02]"PROGRAM        " -> "transylvania_02.d88"
 		<!--rom name="transylvania.d88" size="375632" crc="d36aba7d" sha1="b8a1852507b399ea1607ddbcacc694a7af7a1875"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="transylvania (disk basic).d88" size="26800" crc="ca2e1031" sha1="c659991217a256b94f361948211ac24e9518f803"/>
 			</dataarea>
@@ -49924,7 +49926,7 @@ Not extensively tested
 		<!--rom name="mystery of egypt.d88" size="375648" crc="bc7820c2" sha1="08e98e154f46b612c2f2097bc0c4e0bb3804f9c3"/-->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk Basic" />
+			<feature name="part_id" value="Disk BASIC" />
 			<dataarea name="flop" size="26800">
 				<rom name="mystery of egypt (disk basic).d88" size="26800" crc="d8cf19a6" sha1="e548f6e1200319301a47336a78dc454bd7d6e750"/>
 			</dataarea>

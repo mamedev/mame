@@ -29,11 +29,15 @@ protected:
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	// device_execute_interface implementation
 	virtual void execute_run() override;
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
+
+	// device_state_interface implementation
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// register access
 	u16 sr_r();
@@ -55,6 +59,7 @@ private:
 	u16 add(u16 s, u16 t, bool c) noexcept;
 	bool test_condition(u8 cond) const noexcept;
 	u16 read_program_word(u16 addr);
+	u16 fetch_program_word();
 
 	const address_space_config m_program_config;
 	const address_space_config m_data_config;

@@ -6598,14 +6598,14 @@ ROM_START( hjdmg )
 	ROM_LOAD16_WORD_SWAP( "goldmaj_v-739c.u25", 0x00000, 0x80000, CRC(8b2523af) SHA1(04a9805be2cb49a722a10dbaacc65be3af66af33) )
 
 	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
-	ROM_LOAD( "m0901.u5",      0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) BAD_DUMP) // not dumped for this set, FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_LOAD( "m0901.u5",      0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 	ROM_LOAD( "goldmaj-cg.u4", 0x200000, 0x080000, CRC(bb97d83a) SHA1(836635d2805297d3f9fd09cb1d7bfc3f6f9e87a6) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
 	ROM_LOAD( "text.u6", 0x000000, 0x020000, CRC(cb34cbc0) SHA1(ceedbdda085fd1acc9a575502bdf7cf998f54f05) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) BAD_DUMP) // not dumped for this set
+	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
 ROM_END
 
 /***************************************************************************

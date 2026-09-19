@@ -19,6 +19,7 @@ public:
 	virtual ~valkyrie_device() = default;
 
 	void map(address_map &map) ATTR_COLD;
+	void valkyrievr_map(address_map &map) ATTR_COLD;
 
 	auto write_irq() { return m_irq.bind(); }
 

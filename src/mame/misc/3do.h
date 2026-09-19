@@ -29,7 +29,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dram(*this, "dram", 0x200000, ENDIANNESS_BIG),
-		m_vram(*this, "vram"),
+		m_vram(*this, "vram", 0x100000, ENDIANNESS_BIG),
+		m_bios(*this, "bios"),
 		m_nvram(*this, "nvram"),
 		m_madam(*this, "madam"),
 		m_clio(*this, "clio"),
@@ -43,15 +44,16 @@ public:
 		m_p2_r(*this, "P2.%u", 0)
 	{ }
 
-	void _3do(machine_config &config);
-	void _3do_pal(machine_config &config);
-	void arcade_ntsc(machine_config &config);
+	void _3do(machine_config &config) ATTR_COLD;
+	void _3do_pal(machine_config &config) ATTR_COLD;
+	void arcade_ntsc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
-	void green_config(machine_config &config);
+	void green_config(machine_config &config) ATTR_COLD;
 
 private:
 	struct SLOW2 {
@@ -78,8 +80,9 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	memory_share_creator<uint32_t> m_dram;
-	required_shared_ptr<uint32_t> m_vram;
+	memory_share_creator<uint32_t> m_dram; // two sets of 1MB
+	memory_share_creator<uint32_t> m_vram; // one bank of 1MB
+	required_region_ptr<uint32_t> m_bios;
 	required_device<nvram_device> m_nvram;
 	// HACK: protected for adapting with Arcade systems
 	// The only thing required being protected will eventually be the Player Bus only
@@ -116,6 +119,8 @@ private:
 
 	void m_slow2_init( void );
 
+	void memory_config_w(uint8_t data);
+	void overlay_w(uint32_t data);
 	void soft_reset_w(int state);
 	TIMER_CALLBACK_MEMBER(soft_reset_cb);
 };
@@ -130,7 +135,7 @@ public:
 		, m_raw_analog(*this, "RAW_ANALOG.%u", 0)
 	{ }
 
-	void orbatak(machine_config &config);
+	void orbatak(machine_config &config) ATTR_COLD;
 
 	template <unsigned P> ioport_value analog_0_r()
 	{
@@ -164,7 +169,7 @@ public:
 		: _3do_state(mconfig, type, tag)
 	{ }
 
-	void alg_gun(machine_config &config);
+	void alg_gun(machine_config &config) ATTR_COLD;
 };
 
 #endif // MAME_MISC_3DO_H

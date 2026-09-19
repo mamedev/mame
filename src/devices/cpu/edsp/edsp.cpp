@@ -16,7 +16,7 @@ constexpr u16 SR_GIE = 0x0020; // 0x8000 on eSL/eSLS
 
 edsp_device::edsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, -1, program_map)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, -1, 16, 15, program_map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, data_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 7, -1, io_map)
 	, m_sp(0)
@@ -84,6 +84,14 @@ std::unique_ptr<util::disasm_interface> edsp_device::create_disassembler()
 	return std::make_unique<edsp_disassembler>();
 }
 
+bool edsp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	target_space = &space(spacenum);
+	if (spacenum == AS_PROGRAM && BIT(address, 15))
+		address += u32(BIT(m_bank, 0, 9)) << 15;
+	return true;
+}
+
 void edsp_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
@@ -96,6 +104,7 @@ void edsp_device::device_start()
 	state_add(EDSP_PC, "PC", m_pc);
 	state_add(STATE_GENPC, "GENPC", m_pc).noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%5s").noshow();
 	state_add(EDSP_SP, "SP", m_sp);
 	state_add(EDSP_RC, "RC", m_rcr);
 	state_add(EDSP_LC, "LC", m_lcr);
@@ -370,6 +379,11 @@ u16 edsp_device::read_program_word(u16 addr)
 	return m_program.read_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr);
 }
 
+u16 edsp_device::fetch_program_word()
+{
+	return m_cache.read_word(m_pc >= 0x8000 ? m_pc + (u32(BIT(m_bank, 0, 9)) << 15) : m_pc);
+}
+
 void edsp_device::execute_run()
 {
 	do
@@ -390,7 +404,7 @@ void edsp_device::execute_run()
 		{
 			m_ppc = m_pc;
 			debugger_instruction_hook(m_pc);
-			const u16 op = m_cache.read_word(m_pc);
+			const u16 op = fetch_program_word();
 			if (m_rcr)
 				m_rcr--;
 			else
@@ -445,7 +459,7 @@ void edsp_device::execute_run()
 			else if ((op & 0xf810) == 0x3800 && BIT(op, 0, 3) != 7)
 			{
 				const u16 s = m_r[BIT(op, 5, 3)];
-				const u16 imm16 = m_cache.read_word(m_pc);
+				const u16 imm16 = fetch_program_word();
 
 				u16 d = 0;
 				switch (BIT(op, 0, 3))
@@ -489,6 +503,51 @@ void edsp_device::execute_run()
 				m_pc++;
 				m_icount -= 2;
 			}
+			else if ((op & 0xf818) == 0x3810 && BIT(op, 0, 3) != 7)
+			{
+				const u16 s = m_r[BIT(op, 5, 3)];
+				const u16 ramaddr = fetch_program_word();
+				const u16 data16 = m_data.read_word(ramaddr);
+
+				u16 d = 0;
+				switch (BIT(op, 0, 3))
+				{
+				case 0: // ADD
+					d = add(s, data16, false);
+					break;
+
+				case 1: // ADC
+					d = add(s, data16, BIT(m_sr, 0));
+					break;
+
+				case 2: // SUB
+					d = add(s, ~data16, true);
+					break;
+
+				case 3: // SUBB
+					d = add(s, ~data16, BIT(m_sr, 0));
+					break;
+
+				case 4: // AND
+					d = s & data16;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+
+				case 5: // OR
+					d = s | data16;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+
+				case 6: // XOR
+					d = s ^ data16;
+					m_sr = (m_sr & 0xfff0) | (s16(d) < 0 ? 0x0008 : 0) | (d == 0 ? 0x0004 : 0);
+					break;
+				}
+
+				m_r[BIT(op, 8, 3)] = d;
+				m_pc++;
+				m_icount -= 2;
+			}
 			else if ((op & 0xf8ff) == 0x3817)
 			{
 				// RPT Rn
@@ -500,7 +559,7 @@ void edsp_device::execute_run()
 				// IF cond JMP Long_addr
 				if (test_condition(BIT(op, 7, 4)))
 				{
-					const u16 addr = m_cache.read_word(m_pc);
+					const u16 addr = fetch_program_word();
 					m_pc = addr;
 				}
 				else
@@ -510,7 +569,7 @@ void edsp_device::execute_run()
 			else if (op == 0x3819)
 			{
 				// CALL Long_addr
-				const u16 addr = m_cache.read_word(m_pc);
+				const u16 addr = fetch_program_word();
 				m_data.write_word(m_sp, m_pc + 1);
 				m_sp--;
 				m_pc = addr;
@@ -604,7 +663,9 @@ void edsp_device::execute_run()
 				// ASR
 				const u16 s = m_r[BIT(op, 5, 3)];
 				m_r[BIT(op, 8, 3)] = s16(s) >> 1;
-				m_sr = (m_sr & 0xfff0) | (s16(s) < 0 ? 0x0008 : 0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0001 : 0);
+				m_sr = (m_sr & 0xfff0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
+				if (s16(s) < 0)
+					m_sr ^= 0x000a;
 				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x5809)
@@ -663,26 +724,41 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf8ff) == 0x585e)
 			{
+				// JMP Rn
+				m_pc = m_r[BIT(op, 8, 3)];
+				m_icount -= 2;
+			}
+			else if ((op & 0xf8ff) == 0x587e)
+			{
+				// CALL Rn
+				m_data.write_word(m_sp, m_pc);
+				m_sp--;
 				m_pc = m_r[BIT(op, 8, 3)];
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x589e)
 			{
-				m_r[BIT(op, 8, 3)] = m_data.read_word(m_cache.read_word(m_pc));
+				m_r[BIT(op, 8, 3)] = m_data.read_word(fetch_program_word());
 				m_pc++;
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x58be)
 			{
-				m_data.write_word(m_cache.read_word(m_pc), m_r[BIT(op, 8, 3)]);
+				m_data.write_word(fetch_program_word(), m_r[BIT(op, 8, 3)]);
 				m_pc++;
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x58de)
 			{
-				m_data.write_word(m_r[BIT(op, 8, 3)], m_cache.read_word(m_pc));
+				m_data.write_word(m_r[BIT(op, 8, 3)], fetch_program_word());
 				m_pc++;
 				m_icount -= 2;
+			}
+			else if ((op & 0xf81f) == 0x581f)
+			{
+				--m_r[BIT(op, 8, 3)];
+				m_data.write_word(m_r[BIT(op, 8, 3)], m_r[BIT(op, 5, 3)]);
+				m_icount -= 1;
 			}
 			else if ((op & 0xf800) == 0x6000)
 			{
@@ -790,4 +866,19 @@ void edsp_device::execute_run()
 		}
 	}
 	while (m_icount > 0);
+}
+
+void edsp_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	case STATE_GENFLAGS:
+		str = util::string_format("%c%c%c%c%c",
+				BIT(m_sr, 4) ? 'T' : '.',
+				BIT(m_sr, 3) ? 'N' : '.',
+				BIT(m_sr, 2) ? 'Z' : '.',
+				BIT(m_sr, 1) ? 'V' : '.',
+				BIT(m_sr, 0) ? 'C' : '.');
+		break;
+	}
 }

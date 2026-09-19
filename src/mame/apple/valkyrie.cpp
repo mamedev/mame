@@ -50,6 +50,14 @@ void valkyrie_device::map(address_map &map)
 	map(0xf9000000, 0xf90fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
 }
 
+void valkyrie_device::valkyrievr_map(address_map &map)
+{
+	map(0xf130a000, 0xf130bfff).rw(FUNC(valkyrie_device::regs_r), FUNC(valkyrie_device::regs_w));
+	map(0xf1304000, 0xf1305fff).rw(FUNC(valkyrie_device::ramdac_r), FUNC(valkyrie_device::ramdac_w));
+
+	map(0xf1000000, 0xf10fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
+}
+
 valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VALKYRIE, tag, owner, clock),
 	i2c_hle_interface(mconfig, *this, 0x28),

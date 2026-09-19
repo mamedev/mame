@@ -213,7 +213,7 @@ void quizard_state::machine_reset()
 	cdi_state::machine_reset();
 
 	m_boot_press = false;
-	m_boot_timer->adjust(attotime::from_seconds(13), 1);
+	m_boot_timer->adjust(attotime::from_seconds(22), 1);
 	m_mcu_p3 = 0x05; // RTS|RXD
 }
 
@@ -699,9 +699,36 @@ ROM_END
 	DISK_IMAGE_READONLY( "quizard18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 
 // MCU Type: Intel D8751H MCU
-#define QUIZARD1_MCU_DE \
-	ROM_REGION(0x1000, "mcu", 0) \
-	ROM_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) ) // German
+#define QUIZARD1_MCU \
+	ROM_REGION(0x1000, "mcu", 0) /* Intel D8751H MCU */ \
+	ROM_SYSTEM_BIOS( 0, "de021f", "German, DE 11 D3 (0x021F)" ) \
+	ROMX_LOAD( "de_11_d3.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "de019c", "German alt. (0x019C)" ) \
+	ROMX_LOAD( "quizard_mcu_de_019c.bin", 0x0000, 0x1000, CRC(c7b48c71) SHA1(7fd950f110c4616a040339d7c72b115be8c8552e) BAD_DUMP, ROM_BIOS(1) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 2, "en00c5", "English (0x00C5)" ) \
+	ROMX_LOAD( "quizard_mcu_en_00c5.bin", 0x0000, 0x1000, CRC(ded29c61) SHA1(b190d5401c3bf8a01e45b151dc78eaf3e4900e5e) BAD_DUMP, ROM_BIOS(2) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 3, "it0162", "Italian (0x0162)" ) \
+	ROMX_LOAD( "quizard_mcu_it_0162.bin", 0x0000, 0x1000, CRC(fb560b5a) SHA1(1ed9c892e8c7fcd0c25d9248fec467b7b1798f33) BAD_DUMP, ROM_BIOS(3) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 4, "fr0114", "French (0x0114)" ) \
+	ROMX_LOAD( "quizard_mcu_fr_0114.bin", 0x0000, 0x1000, CRC(237ddd99) SHA1(f14d54fde957a29eea01ef7d97e2bcdf83237824) BAD_DUMP, ROM_BIOS(4) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 5, "es02f6", "Spanish (0x02F6)" ) \
+	ROMX_LOAD( "quizard_mcu_es_02f6.bin", 0x0000, 0x1000, CRC(2335fbdf) SHA1(a9a3a0eb5df5cb65029d1b0faf7a30c3f988f729) BAD_DUMP, ROM_BIOS(5) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 6, "gr01e8", "Greek #1 (0x01E8)" ) \
+	ROMX_LOAD( "quizard_mcu_gr_01e8.bin", 0x0000, 0x1000, CRC(db265c13) SHA1(fa3323a0574b7d705aa05512af6448f70aed03dc) BAD_DUMP, ROM_BIOS(6) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 7, "gr0126", "Greek #2 (0x0126)" ) \
+	ROMX_LOAD( "quizard_mcu_gr_0126.bin", 0x0000, 0x1000, CRC(8932a3ae) SHA1(a7db610e481e3a1556ddae03bb9c0667381b237c) BAD_DUMP, ROM_BIOS(7) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 8, "gr0293", "Greek #3 (0x0293)" ) \
+	ROMX_LOAD( "quizard_mcu_gr_0293.bin", 0x0000, 0x1000, CRC(233e0180) SHA1(7ffd22afcf92ae65ca5ea7c5a5aa4d4ac5b9c3a9) BAD_DUMP, ROM_BIOS(8) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 9, "hr0343", "Croatian (0x0343)" ) \
+	ROMX_LOAD( "quizard_mcu_hr_0343.bin", 0x0000, 0x1000, CRC(51754008) SHA1(c5e5c732579bfdf7170f03d990d4173585aa5eed) BAD_DUMP, ROM_BIOS(9) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 10, "sl00fd", "Slovenian (0x00FD)" ) \
+	ROMX_LOAD( "quizard_mcu_sl_00fd.bin", 0x0000, 0x1000, CRC(1422f2f1) SHA1(a1332c103c1cbdf0db9194c8fe75ff09560d3db7) BAD_DUMP, ROM_BIOS(10) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 11, "cz00a9", "Czech (0x00A9)" ) \
+	ROMX_LOAD( "quizard_mcu_cz_00a9.bin", 0x0000, 0x1000, CRC(f53b7048) SHA1(7f89ee667652ef71cb3a960247a1d416a3b0ca8c) BAD_DUMP, ROM_BIOS(11) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 12, "ar0001", "Arabic (0x0001)" ) \
+	ROMX_LOAD( "quizard_mcu_ar_0001.bin", 0x0000, 0x1000, CRC(ec79737b) SHA1(802b7fc3ca7ca4d8afb1c769a92d7841cd41be3b) BAD_DUMP, ROM_BIOS(12) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 13, "ae02de", "American English (0x02DE)" ) \
+	ROMX_LOAD( "quizard_mcu_ae_02de.bin", 0x0000, 0x1000, CRC(7ab8bf02) SHA1(6c11b8771ebd39cfb8dbec8593733f81b6b9c161) BAD_DUMP, ROM_BIOS(13) ) /* AI-modified, needs proper dump */
 
 #define QUIZARD1_MCU_IT \
 	ROM_REGION(0x1000, "mcu", 0) \
@@ -710,25 +737,25 @@ ROM_END
 ROM_START( quizard )
 	QUIZARD_BIOS_ROM
 	QUIZARD1_CHD_18
-	QUIZARD1_MCU_DE
+	QUIZARD1_MCU
 ROM_END
 
 ROM_START( quizard_17 )
 	QUIZARD_BIOS_ROM
 	QUIZARD1_CHD_17
-	QUIZARD1_MCU_DE
+	QUIZARD1_MCU
 ROM_END
 
 ROM_START( quizard_12 )
 	QUIZARD_BIOS_ROM
 	QUIZARD1_CHD_12
-	QUIZARD1_MCU_DE
+	QUIZARD1_MCU
 ROM_END
 
 ROM_START( quizard_10 )
 	QUIZARD_BIOS_ROM
 	QUIZARD1_CHD_10
-	QUIZARD1_MCU_DE
+	QUIZARD1_MCU
 ROM_END
 
 ROM_START( quizardi )
@@ -753,14 +780,31 @@ ROM_END
 //                     Quizard 2
 //********************************************************
 
+#define QUIZARD2_MCU \
+	ROM_REGION(0x1000, "mcu", 0) /* Intel D8751H MCU */ \
+	ROM_SYSTEM_BIOS( 0, "de02c7", "German, DN 122 D3 (0x02C7)" ) \
+	ROMX_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "de0188", "German alt. (0x0188)" ) \
+	ROMX_LOAD( "quizard2_mcu_de1_0188.bin", 0x0000, 0x1000, CRC(5020df9a) SHA1(199c3f5dbe6abb1fa1e9834e4c8a51125713caaf) BAD_DUMP, ROM_BIOS(1) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 2, "it02b1", "Italian (0x02B1)" ) \
+	ROMX_LOAD( "quizard2_mcu_it_02b1.bin", 0x0000, 0x1000, CRC(9026f8ed) SHA1(3ab343bb11a9065451d5a5dd912ac18d55364901) BAD_DUMP, ROM_BIOS(2) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 3, "cz0083", "Czech (0x0083)" ) \
+	ROMX_LOAD( "quizard2_mcu_cz_0083.bin", 0x0000, 0x1000, CRC(10488cef) SHA1(2dadfea1334d79a8ed4a6b4e4a4a612526344313) BAD_DUMP, ROM_BIOS(3) ) /* AI-modified, needs proper dump */
+
+#define QUIZARD2_22_MCU \
+	ROM_REGION(0x1000, "mcu", 0) /* Intel D8751H MCU */ \
+	ROM_SYSTEM_BIOS( 0, "de02c7", "German, DN 122 D3 (0x02C7)" ) \
+	ROMX_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "en0343", "English (0x0343)" ) \
+	ROMX_LOAD( "quizard2_2_mcu_en_0343.bin", 0x0000, 0x1000, CRC(59466774) SHA1(eb7cb6af175ba11d3e34060c69219220d9a0d73c) BAD_DUMP, ROM_BIOS(1) ) /* AI-modified, needs proper dump */
+
 ROM_START( quizard2 ) /* CD-ROM printed ??/?? */
 	QUIZARD_BIOS_ROM
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc) ) // German language - DE 122 D3 known to exist
+	QUIZARD2_MCU
 ROM_END
 
 ROM_START( quizard2_22 )
@@ -769,8 +813,7 @@ ROM_START( quizard2_22 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "dn_122_d3.bin", 0x0000, 0x1000, CRC(d48063ea) SHA1(b512fa5e53f296a180340e09b53613dd1c0d38bc) ) // German language - DE 122 D3 known to exist
+	QUIZARD2_22_MCU
 ROM_END
 
 
@@ -778,14 +821,36 @@ ROM_END
 //                     Quizard 3
 //********************************************************
 
+#define QUIZARD3_MCU \
+	ROM_REGION(0x1000, "mcu", 0) /* Intel D8751H MCU */ \
+	ROM_SYSTEM_BIOS( 0, "de00ae", "German, DE 132 D3 (0x00AE)" ) \
+	ROMX_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "de026d", "German alt. #1 (0x026D)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_de_2_026d.bin", 0x0000, 0x1000, CRC(100bfe36) SHA1(710ae406e3de153edcc9f196da05d2dd080fabfb) BAD_DUMP, ROM_BIOS(1) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 2, "de0181", "German alt. #2 (0x0181)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_de_3_0181.bin", 0x0000, 0x1000, CRC(b4efe412) SHA1(0cccfdaf70d1694aeda639d7a094da669d3384e8) BAD_DUMP, ROM_BIOS(2) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 3, "en0001", "English (0x0001)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_en_0001.bin", 0x0000, 0x1000, CRC(3798f723) SHA1(4ec6ca3399a6a7b0898083535edd752cac764e1e) BAD_DUMP, ROM_BIOS(3) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 4, "fr0002", "French (0x0002)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_fr_0002.bin", 0x0000, 0x1000, CRC(95221971) SHA1(cd9808fd8cdddb8597b998d39213f90cd0ca2bf0) BAD_DUMP, ROM_BIOS(4) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 5, "es0003", "Spanish (0x0003)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_es_0003.bin", 0x0000, 0x1000, CRC(4264be80) SHA1(943f2ad0d39faff3ab2bb89baf1b1559f865698d) BAD_DUMP, ROM_BIOS(5) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 6, "it01c3", "Italian (0x01C3)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_it_01c3.bin", 0x0000, 0x1000, CRC(a512abd9) SHA1(8c6b321a8fd36f6e34d69806bede23ee9f2c0e09) BAD_DUMP, ROM_BIOS(6) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 7, "gr00ef", "Greek #1 (0x00EF)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_gr_1_00ef.bin", 0x0000, 0x1000, CRC(3b1f8487) SHA1(68f175b37fc4a3a71e1c7258b64161789b3cced3) BAD_DUMP, ROM_BIOS(7) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 8, "gr0335", "Greek #2 (0x0335)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_gr_2_0335.bin", 0x0000, 0x1000, CRC(2aff86e8) SHA1(f6b7ef0f0fac0a2b9076c3107519abc0906661d5) BAD_DUMP, ROM_BIOS(8) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 9, "cz02c0", "Czech (0x02C0)" ) \
+	ROMX_LOAD( "quizard3_4_mcu_cz_02c0.bin", 0x0000, 0x1000, CRC(da3765a8) SHA1(1942ce822a4937ebc625e3a1d91c650d0d5279c0) BAD_DUMP, ROM_BIOS(9) ) /* AI-modified, needs proper dump */
+
 ROM_START( quizard3 ) /* CD-ROM printed ??/?? */
 	QUIZARD_BIOS_ROM
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // German language
+	QUIZARD3_MCU
 ROM_END
 
 ROM_START( quizard3a ) /* CD-ROM printed ??/?? */
@@ -804,8 +869,7 @@ ROM_START( quizard3_32 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "de_132_d3.bin", 0x0000, 0x1000, CRC(8858251e) SHA1(2c1005a74bb6f0c2918dff4ab6326528eea48e1f) ) // German language
+	QUIZARD3_MCU
 ROM_END
 
 
@@ -813,14 +877,74 @@ ROM_END
 //                     Quizard 4
 //********************************************************
 
+// these are also valid for quizard4_41
+#define QUIZARD4_42_MCU \
+	ROM_REGION(0x1000, "mcu", 0) /* Intel D8751H MCU */ \
+	ROM_SYSTEM_BIOS( 0, "de142d3", "DE 142 D3 - G_SCREEN, German questions, English UI, erotic on (code 01, 0x004D)" ) \
+	ROMX_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "en_on2", "G_SCREEN, German questions, English UI, erotic on (code 03, 0x011F)" ) \
+	ROMX_LOAD( "quizard4.2_mcu_code03_011f.bin", 0x0000, 0x1000, CRC(81fc7b0b) SHA1(6e4e47716befb7db9c1c1eb3244412f14a359682) BAD_DUMP, ROM_BIOS(1) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 2, "en_on3", "G_SCREEN, German questions, English UI, erotic on (code 05, 0x03CC)" ) \
+	ROMX_LOAD( "quizard4.2_mcu_code05_03cc.bin", 0x0000, 0x1000, CRC(b5008f8b) SHA1(0e90c23e677b2ae91a6be8a3f0548cd2dabda67f) BAD_DUMP, ROM_BIOS(2) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 3, "en_on4", "G_SCREEN, German questions, English UI, erotic on (code 07, 0x00DE)" ) \
+	ROMX_LOAD( "quizard4.2_mcu_code07_00de.bin", 0x0000, 0x1000, CRC(a98d4c59) SHA1(16c646347d0da86bc6e87014c8a7fb86749afb5c) BAD_DUMP, ROM_BIOS(3) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 4, "cz_on", "C_SCREEN, Czech questions and UI, erotic on (code 09, 0x0277)" ) \
+	ROMX_LOAD( "quizard4.2_mcu_code09_0277.bin", 0x0000, 0x1000, CRC(cb53afd4) SHA1(6ee895475d6d2ebeb86af6017912be8ee38af323) BAD_DUMP, ROM_BIOS(4) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 5, "cz_off", "CO_SCREEN, Czech questions and UI, erotic off (code 10, 0x0139)" ) \
+	ROMX_LOAD( "quizard4.2_mcu_code10_0139.bin", 0x0000, 0x1000, CRC(9cc85f3c) SHA1(d91223dd120c0460b8a33311138528feeb12c8c9) BAD_DUMP, ROM_BIOS(5) ) /* AI-modified, needs proper dump */
+
+/*
+    The following are theoretically all good MCU codes, but the CD doesn't support the erotic off path for the German questions.
+
+    ROM_SYSTEM_BIOS( 6, "alt1", "A_SCREEN, erotic off path (code 02, 0x0195) - black screen on the dumped disc" )
+    ROMX_LOAD( "quizard4.2_mcu_code02_0195.bin", 0x0000, 0x1000, CRC(67c5dcc9) SHA1(7bc12ae26c17a1e7f03432ecfdbaa607189a5094) BAD_DUMP, ROM_BIOS(6) ) // AI-modified, needs proper dump
+    ROM_SYSTEM_BIOS( 7, "alt2", "A_SCREEN, erotic off path (code 04, 0x0234) - black screen on the dumped disc" )
+    ROMX_LOAD( "quizard4.2_mcu_code04_0234.bin", 0x0000, 0x1000, CRC(4787aeaa) SHA1(30591fd6da9c45f613e2b2611234a8caf1cb6895) BAD_DUMP, ROM_BIOS(7) ) // AI-modified, needs proper dump
+    ROM_SYSTEM_BIOS( 8, "alt3", "A_SCREEN, erotic off path (code 06, 0x017B) - black screen on the dumped disc" )
+    ROMX_LOAD( "quizard4.2_mcu_code06_017b.bin", 0x0000, 0x1000, CRC(61d7f867) SHA1(dd981c3dcaa329ee9c619515744b2d3e5fa64bd1) BAD_DUMP, ROM_BIOS(8) ) // AI-modified, needs proper dump
+    ROM_SYSTEM_BIOS( 9, "alt4", "A_SCREEN, erotic off path (code 08, 0x0177) - black screen on the dumped disc" )
+    ROMX_LOAD( "quizard4.2_mcu_code08_0177.bin", 0x0000, 0x1000, CRC(45375b18) SHA1(f3b09d65aab174652b16399154e4f01a450bfe23) BAD_DUMP, ROM_BIOS(9) ) // AI-modified, needs proper dump
+*/
+
+
+#define QUIZARD4_40_MCU \
+	ROM_REGION(0x1000, "mcu", 0) /* Intel D8751H MCU */ \
+	ROM_SYSTEM_BIOS( 0, "de142d3", "DE 142 D3 - English UI, German questions, erotic on (code 01, 0x004D)" ) \
+	ROMX_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS( 1, "en_off1", "English UI, German questions, erotic off (code 02, 0x0195)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code02_0195.bin", 0x0000, 0x1000, CRC(67c5dcc9) SHA1(7bc12ae26c17a1e7f03432ecfdbaa607189a5094) BAD_DUMP, ROM_BIOS(1) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 2, "en_on2", "English UI, German questions, erotic on (code 03, 0x011F)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code03_011f.bin", 0x0000, 0x1000, CRC(81fc7b0b) SHA1(6e4e47716befb7db9c1c1eb3244412f14a359682) BAD_DUMP, ROM_BIOS(2) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 3, "en_off2", "English UI, German questions, erotic off (code 04, 0x0234)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code04_0234.bin", 0x0000, 0x1000, CRC(4787aeaa) SHA1(30591fd6da9c45f613e2b2611234a8caf1cb6895) BAD_DUMP, ROM_BIOS(3) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 4, "en_on3", "English UI, German questions, erotic on (code 05, 0x03CC)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code05_03cc.bin", 0x0000, 0x1000, CRC(b5008f8b) SHA1(0e90c23e677b2ae91a6be8a3f0548cd2dabda67f) BAD_DUMP, ROM_BIOS(4) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 5, "en_off3", "English UI, German questions, erotic off (code 06, 0x017B)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code06_017b.bin", 0x0000, 0x1000, CRC(61d7f867) SHA1(dd981c3dcaa329ee9c619515744b2d3e5fa64bd1) BAD_DUMP, ROM_BIOS(5) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 6, "en_on4", "English UI, German questions, erotic on (code 07, 0x00DE)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code07_00de.bin", 0x0000, 0x1000, CRC(a98d4c59) SHA1(16c646347d0da86bc6e87014c8a7fb86749afb5c) BAD_DUMP, ROM_BIOS(6) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 7, "en_off4", "English UI, German questions, erotic off (code 08, 0x0177)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code08_0177.bin", 0x0000, 0x1000, CRC(45375b18) SHA1(f3b09d65aab174652b16399154e4f01a450bfe23) BAD_DUMP, ROM_BIOS(7) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 8, "en_on5", "English UI, German questions, erotic on (code 09, 0x0315)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code09_0315.bin", 0x0000, 0x1000, CRC(ae935263) SHA1(67b83a37d3b4ab700a1487409920ad2a7e36db2c) BAD_DUMP, ROM_BIOS(8) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 9, "it_on", "Italian UI, German questions, erotic on (code 10, 0x0180)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code10_0180.bin", 0x0000, 0x1000, CRC(7b2f9f6d) SHA1(a0ad7035d16ac2f790aed30751763de0fba5ff25) BAD_DUMP, ROM_BIOS(9) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 10, "fr_on", "French UI, German questions, erotic on (code 11, 0x0388)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code11_0388.bin", 0x0000, 0x1000, CRC(b7d7fa4f) SHA1(3474c2150995fa8c7c1e3ddc2ac99b66ebf2fe8d) BAD_DUMP, ROM_BIOS(10) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 11, "es_on", "Spanish UI, German questions, erotic on (code 12, 0x00C2)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code12_00c2.bin", 0x0000, 0x1000, CRC(fc139472) SHA1(35858407d41451000177aeaeeccc20d3c015b768) BAD_DUMP, ROM_BIOS(11) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 12, "gr_on1", "Greek UI, German questions, erotic on (code 13, 0x007B)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code13_007b.bin", 0x0000, 0x1000, CRC(1bf45423) SHA1(8f144fbe05a67deb8ee45dcdfc79d56c448aff42) BAD_DUMP, ROM_BIOS(12) ) /* AI-modified, needs proper dump */ \
+	ROM_SYSTEM_BIOS( 13, "gr_on2", "Greek UI, German questions, erotic on (code 14, 0x02BA)" ) \
+	ROMX_LOAD( "quizard4.0_mcu_code14_02ba.bin", 0x0000, 0x1000, CRC(bde197bd) SHA1(dc379f9fe708f2f518768e5600897358cdf42fe4) BAD_DUMP, ROM_BIOS(13) ) /* AI-modified, needs proper dump */
+
 ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	QUIZARD_BIOS_ROM
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
+	QUIZARD4_42_MCU
 ROM_END
 
 ROM_START( quizard4cz ) /* CD-ROM printed 09/98 */
@@ -839,8 +963,7 @@ ROM_START( quizard4_41 )
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
+	QUIZARD4_42_MCU
 ROM_END
 
 ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
@@ -849,11 +972,9 @@ ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "quizard4r40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 
-	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "de_142_d3.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) ) // German language
+	QUIZARD4_40_MCU
 ROM_END
 
-// only the CD was dumped, MCU not available
 ROM_START( quizardff ) /* CD-ROM printed 01/96 */
 	QUIZARD_BIOS_ROM
 
@@ -861,7 +982,7 @@ ROM_START( quizardff ) /* CD-ROM printed 01/96 */
 	DISK_IMAGE_READONLY( "quizardff", 0, SHA1(ac533040379c1350066e778e3a86d1beb11c6f71) )
 
 	ROM_REGION(0x1000, "mcu", 0) // Intel D8751H MCU
-	ROM_LOAD( "8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "quizard_french_special_mcu_027f.bin", 0x0000, 0x1000, CRC(4818aa47) SHA1(d6bd62717a2381e925d00f7c802d101bcc04123f) BAD_DUMP ) // AI-modified, needs proper dump
 ROM_END
 
 

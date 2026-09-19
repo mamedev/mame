@@ -282,7 +282,6 @@ uint8_t fd2000_device::rtc_r(offs_t offset)
 
 void fd4000_device::mtr0_w(int state)
 {
-	printf("mtr0_w state: %d\n", state);
 	m_maincpu->set_unscaled_clock(XTAL(24'000'000)/(state ? 6 : 12));
 }
 

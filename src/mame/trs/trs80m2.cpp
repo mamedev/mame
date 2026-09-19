@@ -12,8 +12,6 @@
 
     TODO:
 
-    - CP/M won't load prompt (z80dma_do_operation: invalid mode 0 when reading track 0)
-    - keyboard CPU ROM
     - graphics board
     - Tandy 6000 HD
 
@@ -26,9 +24,6 @@
 
 #include "screen.h"
 #include "softlist_dev.h"
-
-
-#define KEYBOARD_TAG "keyboard"
 
 
 //**************************************************************************
@@ -162,7 +157,7 @@ uint8_t trs80m2_state::keyboard_r()
 	{
 		m_kbirq = 1;
 		m_ctc->trg3(m_kbirq);
-		m_kb->busy_w(m_kbirq);
+		m_kb->busy_w(!m_kbirq);
 	}
 
 	m_key_bit = 0;
@@ -474,32 +469,22 @@ void trs80m2_state::kb_clock_w(int state)
 			// trigger keyboard interrupt
 			m_kbirq = 0;
 			m_ctc->trg3(m_kbirq);
-			m_kb->busy_w(m_kbirq);
+			m_kb->busy_w(!m_kbirq);
 		}
 	}
 	else
 	{
-		if (!m_kbclk && state)
+		if (m_kbclk && !state)
 		{
-			// shift in keyboard data bit
-			m_key_data <<= 1;
-			m_key_data |= kbdata;
+			// shift in keyboard data bit, LSB first
+			m_key_data >>= 1;
+			m_key_data |= kbdata << 7;
 			m_key_bit++;
 		}
 	}
 
 	m_kbdata = kbdata;
 	m_kbclk = state;
-}
-
-void trs80m2_state::kbd_w(u8 data)
-{
-	// latch key data
-	m_key_data = data;
-
-	// trigger keyboard interrupt
-	m_kbirq = 0;
-	m_ctc->trg3(m_kbirq);
 }
 
 //-------------------------------------------------
@@ -641,7 +626,6 @@ void trs80m2_state::machine_start()
 	save_item(NAME(m_boot_rom));
 	save_item(NAME(m_bank));
 	save_item(NAME(m_msel));
-	save_item(NAME(m_key_latch));
 	save_item(NAME(m_key_data));
 	save_item(NAME(m_key_bit));
 	save_item(NAME(m_kbclk));
@@ -674,7 +658,7 @@ void trs80m2_state::machine_reset()
 	// clear keyboard interrupt
 	m_kbirq = 1;
 	m_ctc->trg3(m_kbirq);
-	m_kb->busy_w(m_kbirq);
+	m_kb->busy_w(!m_kbirq);
 
 	// enable boot ROM
 	m_boot_rom = 1;
@@ -767,8 +751,6 @@ void trs80m2_state::trs80m2(machine_config &config)
 
 	TRS80M2_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
-	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("32K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K");
@@ -864,8 +846,6 @@ void trs80m16_state::trs80m16(machine_config &config)
 
 	TRS80M2_KEYBOARD(config, m_kb);
 	m_kb->clock_wr_callback().set(FUNC(trs80m2_state::kb_clock_w));
-	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));
-	keyboard.set_keyboard_callback(FUNC(trs80m2_state::kbd_w));
 
 	// internal RAM
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,768K,1M");

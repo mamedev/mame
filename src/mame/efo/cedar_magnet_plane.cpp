@@ -129,6 +129,9 @@ void cedar_magnet_plane_device::device_start()
 {
 	m_framebuffer = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_framebuffer), 0x10000);
+	save_item(NAME(m_pio0_pb_data));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 }
 
 u32 cedar_magnet_plane_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase)
@@ -138,16 +141,20 @@ u32 cedar_magnet_plane_device::draw(screen_device &screen, bitmap_ind16 &bitmap,
 	if (!(m_pio0_pa_data & 0x40))
 		return 0;
 
+	// PIO0 PB0 reverses both display address counters.  Apply the scroll
+	// presets after inversion; the program includes the visible-area offset.
+	const int flip = BIT(m_pio0_pb_data, 0) ? 0xff : 0;
+
 	for (int y = 0; y < 256;y++)
 	{
-		u16 *const dst = &bitmap.pix((y - m_scrolly) & 0xff);
+		u16 *const dst = &bitmap.pix(((y ^ flip) - m_scrolly) & 0xff);
 
 		for (int x = 0; x < 256;x++)
 		{
 			u8 pix = m_framebuffer[count];
 			count++;
 
-			if (pix) dst[(x - m_scrollx) & 0xff] = pix + palbase * 0x100;
+			if (pix) dst[((x ^ flip) - m_scrollx) & 0xff] = pix + palbase * 0x100;
 		}
 	}
 

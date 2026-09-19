@@ -351,7 +351,7 @@ bool ppc_device::reuse_entry_checks(uint32_t first, uint32_t count)
 	{
 		ppc_entry_check *const chk = m_entry_checks[first + i];
 		offs_t addr = chk->pc;
-		if ((ppccom_translate_address_internal(TR_FETCH, false, addr) > 1) || (addr != chk->physpc))
+		if ((ppccom_translate_address_internal(ppccom_fetch_intention(), false, addr) > 1) || (addr != chk->physpc))
 			return false;
 
 		chk->generation = m_core->m_translation_generation;
@@ -907,7 +907,7 @@ void ppc_device::static_generate_out_of_cycles()
 
 void ppc_device::static_generate_tlb_mismatch()
 {
-	int isi, exit;
+	int isi, exit, itlbmiss;
 	uml::code_label label = 1;
 
 	// forward references
@@ -925,11 +925,17 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
 	UML_LOAD(block, I2, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i2,[vtlb],i1,dword
 	UML_MOV(block, mem(&m_core->param0), I0);                               // mov     [param0],i0
-	UML_MOV(block, mem(&m_core->param1), TR_FETCH);                         // mov     [param1],TR_FETCH
+
+	// the fetch is checked with the permissions of the current privilege level (MSR[PR] is bit 2 of the mode)
+	UML_MOV(block, I3, TR_FETCH);                                           // mov     i3,TR_FETCH
+	UML_TEST(block, mem(&m_core->mode), MODE_USER);                         // test    [mode],MODE_USER
+	UML_MOVc(block, COND_NZ, I3, TR_UFETCH);                                // mov     i3,TR_UFETCH,nz
+	UML_MOV(block, mem(&m_core->param1), I3);                               // mov     [param1],i3
 	UML_CALLC(block, cfunc_ppccom_mismatch, this);
 	UML_CALLC(block, cfunc_ppccom_tlb_fill, this);                          // callc   tlbfill,ppc
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i1,[vtlb],i1,dword
-	UML_TEST(block, I1, FETCH_ALLOWED);                                     // test    i1,FETCH_ALLOWED
+	UML_SHL(block, I3, 1, I3);                                              // shl     i3,1,i3
+	UML_TEST(block, I1, I3);                                                // test    i1,i3   ; (USER_)FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                 // jmp     isi,z
 	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
 	UML_JMPc(block, COND_NZ, exit = label++);                               // jmp     exit,nz
@@ -940,22 +946,31 @@ void ppc_device::static_generate_tlb_mismatch()
 	save_fast_fregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                  // exit    EXECUTE_MISSING_CODE
 	UML_LABEL(block, isi);                                                  // isi:
+
+	// an ISI reports its fault reason in SRR1 (passed as the exception parameter)
+	UML_MOV(block, mem(&m_core->param1), TR_FETCH);                         // this was an instruction fetch (get_dsisr adds the privilege level)
+	UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                         // get reason to param1
+	UML_MOV(block, I1, mem(&m_core->param1));                               // mov     i1,[param1]
+	UML_AND(block, I1, I1, DSISR_NOT_FOUND | DSISR_PROTECTED | DSISR_NOEXEC);   // keep the SRR1 ISI reason bits
 	if (!(m_cap & PPCCAP_603_MMU))
 	{
-		// an ISI reports its fault reason in SRR1 (passed as the exception parameter)
-		UML_MOV(block, mem(&m_core->param1), TR_FETCH);                     // this was an instruction fetch
-		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                     // get reason to param1
-		UML_MOV(block, I0, mem(&m_core->param1));                           // mov i0, [param1]
-		UML_AND(block, I0, I0, DSISR_NOT_FOUND | DSISR_PROTECTED);          // keep the SRR1 ISI reason bits
-		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh isi,i0
+		UML_MOV(block, I0, I1);                                             // mov     i0,i1
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh     isi,i0
 	}
 	else
 	{
-		UML_MOV(block, SPR32(SPR603_IMISS), I0);                                        // mov     [imiss],i0
-		UML_MOV(block, SPR32(SPR603_ICMP), mem(&m_core->mmu603_cmp));                          // mov     [icmp],[mmu603_cmp]
-		UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                     // mov     [hash1],[mmu603_hash][0]
-		UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                     // mov     [hash2],[mmu603_hash][1]
-		UML_EXH(block, *m_exception[EXCEPTION_ITLBMISS], I0);              // exh     itlbmiss,i0
+		// The 603 takes the ISI itself when a BAT, the segment or a loaded TLB entry refuses the fetch.
+		// Only a page with no TLB entry is left to the software table search (Table 5-3 of the MPC603e User's Manual).
+		UML_TEST(block, I1, DSISR_PROTECTED | DSISR_NOEXEC);                // test    i1,protected|noexec
+		UML_JMPc(block, COND_Z, itlbmiss = label++);                        // jmp     itlbmiss,z
+		UML_MOV(block, I0, I1);                                             // mov     i0,i1
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh     isi,i0
+		UML_LABEL(block, itlbmiss);                                         // itlbmiss:
+		UML_MOV(block, SPR32(SPR603_IMISS), I0);                            // mov     [imiss],i0
+		UML_MOV(block, SPR32(SPR603_ICMP), mem(&m_core->mmu603_cmp));       // mov     [icmp],[mmu603_cmp]
+		UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));  // mov     [hash1],[mmu603_hash][0]
+		UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));  // mov     [hash2],[mmu603_hash][1]
+		UML_EXH(block, *m_exception[EXCEPTION_ITLBMISS], I0);               // exh     itlbmiss,i0
 	}
 
 	block.end();
@@ -1029,10 +1044,13 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		{
 			if (exception == EXCEPTION_ITLBMISS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);      // or      [srr1],0x00040000
-			else if (exception == EXCEPTION_DTLBMISSL)
+			else if (exception == EXCEPTION_DTLBMISSS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00010000);      // or      [srr1],0x00010000
 			if (exception == EXCEPTION_ITLBMISS || exception == EXCEPTION_DTLBMISSL || exception == EXCEPTION_DTLBMISSS)
-				UML_ROLINS(block, SPR32(SPROEA_SRR1), CR32(0), 28, CRMASK(0));  // rolins  [srr1],[cr0],28,crmask(0)
+			{
+				UML_ROLINS(block, SPR32(SPROEA_SRR1), mem(&m_core->mmu603_key), 19, 0x00080000);    // rolins  [srr1],[mmu603_key],19,0x00080000 ; SRR1[KEY]
+				UML_ROLINS(block, SPR32(SPROEA_SRR1), CR32(0), 28, CRMASK(0));                      // rolins  [srr1],[cr0],28,crmask(0)
+			}
 		}
 
 		// update MSR

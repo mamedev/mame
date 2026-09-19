@@ -45,6 +45,11 @@ public:
 	uint16_t host_fifo_status_r(int channel);
 	void host_tick_reset(bool default_period);
 
+	template <unsigned N> void semaphore_delayed_write(s32 param);
+
+	void host_semaphore_w(uint32_t data);
+	void host_semaphore_ack_w(uint16_t data);
+
 	uint16_t read_output_fifo();
 
 	void dump_state(std::ostream &str); // TODO: DEBUG REMOVE ME
@@ -66,8 +71,13 @@ public:
 	uint16_t clock_r();
 	void clock_w(uint16_t data);
 	uint16_t noise_r();
+	uint16_t semaphore_status_r();
+	uint16_t semaphore_data_r();
+	void semaphore_data_w(uint16_t data);
+	void semaphore_ack_w(uint16_t data);
 
 	void update_fifo_dma();
+	void set_rmap_from_args() { set_rmap(m_core->m_arg0, m_core->m_arg1); }
 	void print_sums() { printf("%04x: %04x\n", (uint16_t)m_core->m_arg0, (uint16_t)m_core->m_arg1); }
 	void print_branches() { printf("Branch: %d %d %d %d %d\n", m_core->m_arg0 ? 1 : 0, m_core->m_arg1 ? 1 : 0, m_core->m_arg2 ? 1 : 0, m_core->m_arg3 ? 1 : 0, m_core->m_arg4 ? 1 : 0); }
 	void print_value() { printf("Value is %08x\n", m_core->m_arg0); }
@@ -99,8 +109,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
-	inline void update_ticks();
-	inline void execute_one(bool check_debugger);
+	void update_ticks();
+	void execute_one(bool check_debugger);
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
@@ -171,6 +181,9 @@ private:
 	devcb_write8        m_dma_write_handler;
 	devcb_write32       m_dma_rollover_handler;
 
+	uint16_t    m_semaphore_status;
+	uint16_t    m_semaphore_data;
+
 	// Audio frame model
 	uint32_t    m_frame_period;
 	int32_t     m_frame_counter;
@@ -188,23 +201,22 @@ private:
 
 	// Internal functions
 	uint16_t read_op(offs_t pc);
-	inline uint16_t read_data(offs_t addr);
-	inline void write_data(offs_t addr, uint16_t data);
+	uint16_t read_data(offs_t addr);
+	void write_data(offs_t addr, uint16_t data);
 
-	inline void update_pc();
-	inline void exec_control();
-	inline void exec_super_special();
-	inline void exec_special();
-	inline void exec_branch();
-	inline void exec_complex_branch();
-	inline void exec_arithmetic();
+	void update_pc();
+	void exec_control();
+	void exec_super_special();
+	void exec_special();
+	void exec_branch();
+	void exec_complex_branch();
+	void exec_arithmetic();
 	void parse_operands(uint32_t numops);
 	uint16_t read_next_operand();
 	void write_next_operand(uint16_t value);
-	inline void push_pc();
-	inline uint16_t pop_pc();
-	inline void set_rbase(uint32_t base, uint32_t addr);
-	inline uint16_t translate_reg(uint16_t reg);
+	void push_pc();
+	uint16_t pop_pc();
+	uint16_t translate_reg(uint16_t reg);
 
 	void process_next_dma(int32_t channel);
 	void service_input_dma(int32_t channel);
@@ -230,6 +242,9 @@ protected:
 	uint32_t read_ext_control(offs_t offset);
 	void write_ext_control(offs_t offset, uint32_t data);
 
+	void set_rbase(uint32_t base, uint32_t addr);
+	void set_rmap(uint32_t rmap, uint32_t rbase);
+
 	bool m_isdrc;
 
 	// Address spaces
@@ -248,6 +263,8 @@ private:
 		uint16_t    m_stack[PC_STACK_DEPTH];
 		uint32_t    m_stack_ptr;
 		uint16_t    m_rbase[4];
+		uint32_t    m_rmap;
+		uint32_t    m_rbase_xor;
 		uint32_t    m_acc;
 		uint32_t    m_tclock;
 
@@ -427,6 +444,8 @@ public:
 	void host_write(offs_t offset, uint32_t data);
 
 protected:
+	virtual void device_reset() override ATTR_COLD;
+
 	// device_execute_interface implementation
 	virtual void execute_run() override;
 

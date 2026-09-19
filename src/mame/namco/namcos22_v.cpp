@@ -36,14 +36,14 @@ void namcos22_renderer::init()
 
 void namcos22_renderer::renderscanline_poly(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
-	float z = extent.param[0].start;
-	float u = extent.param[1].start;
-	float v = extent.param[2].start;
-	float i = extent.param[3].start;
-	float dz = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float di = extent.param[3].dpdx;
+	double z = extent.param[0].start;
+	double u = extent.param[1].start;
+	double v = extent.param[2].start;
+	double i = extent.param[3].start;
+	double dz = extent.param[0].dpdx;
+	double du = extent.param[1].dpdx;
+	double dv = extent.param[2].dpdx;
+	double di = extent.param[3].dpdx;
 	const int bn = extra.bn * 0x1000;
 	const pen_t *pens = extra.pens;
 	const int fogfactor = 0xff - extra.fogfactor;
@@ -78,7 +78,7 @@ void namcos22_renderer::renderscanline_poly(int32_t scanline, const extent_t &ex
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		const float ooz = 1.0f / z;
+		const float ooz = 1.0f / (float)z;
 
 		// texture mapping
 		if (texture_enabled)
@@ -116,14 +116,14 @@ void namcos22_renderer::renderscanline_poly(int32_t scanline, const extent_t &ex
 
 void namcos22_renderer::renderscanline_poly_ss22(int32_t scanline, const extent_t &extent, const namcos22_object_data &extra, int threadid)
 {
-	float z = extent.param[0].start;
-	float u = extent.param[1].start;
-	float v = extent.param[2].start;
-	float i = extent.param[3].start;
-	float dz = extent.param[0].dpdx;
-	float du = extent.param[1].dpdx;
-	float dv = extent.param[2].dpdx;
-	float di = extent.param[3].dpdx;
+	double z = extent.param[0].start;
+	double u = extent.param[1].start;
+	double v = extent.param[2].start;
+	double i = extent.param[3].start;
+	double dz = extent.param[0].dpdx;
+	double du = extent.param[1].dpdx;
+	double dv = extent.param[2].dpdx;
+	double di = extent.param[3].dpdx;
 	const int bn = extra.bn * 0x1000;
 	const pen_t *pens = extra.pens;
 	int fogfactor = 0xff - extra.fogfactor;
@@ -169,7 +169,7 @@ void namcos22_renderer::renderscanline_poly_ss22(int32_t scanline, const extent_
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		const float ooz = 1.0f / z;
+		const float ooz = 1.0f / (float)z;
 
 		// texture mapping
 		if (texture_enabled)

@@ -1330,6 +1330,7 @@ pmac7200_120
 
 @source:apple/maccordyceps.cpp
 pmac6200
+pmac5200
 
 @source:apple/macii.cpp
 mac2fdhd
@@ -1416,6 +1417,10 @@ macct650
 macqd610
 macqd650
 macqd800
+
+@source:apple/macquadraav.cpp
+macqd660av
+macqd840av
 
 @source:apple/newton.cpp
 emate
@@ -18663,14 +18668,24 @@ twinsed2
 @source:efo/cedar_magnet.cpp
 cedmag
 mag_boob
+mag_boobcc
 mag_burn
+mag_coco
 mag_day
+mag_ddrg
+mag_ddrgec
+mag_dodg
 mag_drac
 mag_exzi
+mag_exzi2
+mag_fsha
 mag_pdak
+mag_scon
+mag_sconcc
 mag_time
 mag_war
 mag_wara
+mag_wwar
 mag_xain
 
 @source:efo/cidelsa.cpp
@@ -19948,6 +19963,7 @@ pisces
 piscesb
 porter
 portera
+porterb
 quaak
 redufo
 redufob
@@ -29169,6 +29185,11 @@ mtchxlti
 pubtimed
 pubtimeda
 
+@source:metro/blzntrnd.cpp
+blzntrnd
+gstrik2
+gstrik2j
+
 @source:metro/hyprduel.cpp
 hyprduel
 hyprduel2
@@ -29179,7 +29200,6 @@ magerror
 balcube
 bangball
 batlbubl
-blzntrnd
 daitorid
 daitorida
 dharma
@@ -29191,8 +29211,6 @@ dokyusp
 gakusai
 gakusai2
 gakusaia
-gstrik2
-gstrik2j
 gunmast
 karatour
 karatourj
@@ -35009,6 +35027,9 @@ mini5sx
 @source:nec/ews4800.cpp
 ews4800_310
 
+@source:nec/mobilepro.cpp
+mbpro450
+
 @source:nec/pc_h98.cpp
 pc_h98s
 
@@ -37661,6 +37682,9 @@ pm5644p00
 
 @source:philips/philipsbo.cpp
 pbo
+
+@source:philips/velo.cpp
+pvelo1
 
 @source:philips/vg5k.cpp
 vg5k
@@ -40344,6 +40368,9 @@ s50
 s550
 w30
 
+@source:roland/roland_sb55.cpp
+sb55
+
 @source:roland/roland_sc55.cpp
 sc55
 sc155
@@ -40639,6 +40666,7 @@ xy168
 
 @source:seequa/chameleon.cpp
 chameleon
+champroto
 
 @source:sega/angelkds.cpp
 angelkds
@@ -40941,6 +40969,7 @@ puckpkmn
 puckpkmnb
 shuifeng
 songjang
+xmvsfmb
 
 @source:sega/megaplay.cpp
 megaplay
@@ -42298,8 +42327,11 @@ pclub26w
 pclub26wa
 pclub27s
 pclub2bb
+pclub2bu
+pclub2ev
 pclub2fc
 pclub2kc
+pclub2lc
 pclub2mb
 pclub2pe
 pclub2pf
@@ -42338,6 +42370,7 @@ sfish2j
 shanhigw
 shienryu
 skychal
+slotbatt
 smleague
 sokyugrt
 sss
@@ -44107,6 +44140,9 @@ arthurkn100
 circus2
 fruitcat
 pharmyst
+
+@source:skeleton/licocai.cpp
+licocai
 
 @source:skeleton/lilith.cpp
 lilith
