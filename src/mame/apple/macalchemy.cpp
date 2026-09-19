@@ -229,8 +229,6 @@ void pmac6400_state::pmac6400(machine_config &config)
 	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 
-	config.set_perfect_quantum(m_maincpu);
-
 	m_ohare->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_ohare->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_ohare->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
