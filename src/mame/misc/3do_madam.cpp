@@ -211,14 +211,7 @@ void madam_device::map(address_map &map)
 	// SPRCNTU - Continue the CEL engine (W)
 	map(0x0108, 0x010b).w(FUNC(madam_device::cel_continue_w));
 //  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
-	// TODO: these contains CEL master switches, to be converted as typed fn
-	map(0x0110, 0x0113).lrw32(
-		NAME([this] () { return m_ccobctl0; }),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGCEL("ccobtcl0: %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_ccobctl0);
-		})
-	);
+	map(0x0110, 0x0113).lr32(NAME([this] () { return m_ccobctl0; })).w(FUNC(madam_device::ccobctl0_w));
 	map(0x0120, 0x0123).lrw32(
 		NAME([this] () { return m_ppmpc; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -822,6 +815,41 @@ void madam_device::cel_continue_w(offs_t offset, u32 data, u32 mem_mask)
 	// ...
 }
 
+// These contains CEL master switches
+// - <most SWs>: 0xe150'0000
+// - virtuoso: 0xc800'0000
+// xx-- ---- ---- ---- PPMP bit 15 out selector
+// --xx ---- ---- ---- PPMP bit 0 out selector
+// ---- x--- ---- ---- SWAPHV swap H/V before entering PPMP
+// ---- -x-- ---- ---- ASCALL Allow super clipping
+// ---- ---x ---- ---- CFBDSUB Use HV from CEL source
+// ---- ---- xx-- ---- CFBDLSB PPMP Blue LSB source
+// ---- ---- --xx ---- IPNLSB PPMP Blue LSB source
+void madam_device::ccobctl0_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// cache the effect, will often be pinged
+	if (ACCESSING_BITS_16_31 && data != m_ccobctl0)
+	{
+		LOGREGIS("ccobtcl0: %08x & %08x\n", data, mem_mask);
+		const u8 b15pos = BIT(data, 30, 2);
+		const u8 b0pos = BIT(data, 28, 2);
+
+		m_cel_master_sw.v_output_force_high = b15pos == 1 ? 1 : 0;
+		m_cel_master_sw.v_output_mask = b15pos == 0 ? 0 : 1;
+
+		const bool swaphv = BIT(data, 27);
+		m_cel_master_sw.v_output_bit = swaphv ? 0 : 15;
+		//m_cel_master_sw.h_output_bit = swaphv ? 15 : 0;
+
+		LOGREGIS("    b15pos=%d b0pos=%d swaphv=%d\n", b15pos, b0pos, swaphv);
+
+		m_cel_master_sw.ascall = BIT(data, 26);
+		if (m_cel_master_sw.ascall)
+			popmessage("3do_madam.cpp: enable ASCALL master switch");
+	}
+	COMBINE_DATA(&m_ccobctl0);
+}
+
 // TODO: timings are sketchy and not known
 // ARM lock line is directly tied to Madam, which is raised when CEL engine is running.
 // CEL is paused when any irq is issued at the end of current CEL (so during fetch phase)
@@ -915,19 +943,26 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, ldplut
 				, m_cel.ccbpre
 				, yoxy
+				// ACSC/ALSC: CEL super clipping/line super clipping
+				// (both needs ASCALL to be enabled first)
 				, BIT(m_cel.current_ccb, 20)
 				, BIT(m_cel.current_ccb, 19)
+				// ACW/ACCW: enable clockwise/counterclockwise rendering
 				, BIT(m_cel.current_ccb, 18)
 				, BIT(m_cel.current_ccb, 17)
+				// TWD: terminate CEL if wrong direction is encountered
 				, BIT(m_cel.current_ccb, 16)
 			);
 			m_cel.pxor = !!BIT(m_cel.current_ccb, 11);
 			m_cel.useav = !!BIT(m_cel.current_ccb, 10);
 			m_cel.packed = !!BIT(m_cel.current_ccb, 9);
 			LOGCEL("        lce=%d ace=%d maria=%d pxor=%d useav=%d packed=%d\n"
+				// LCE: Lock the 2 corner engines
 				, BIT(m_cel.current_ccb, 15)
+				// ACE: Allow second corner option
 				, BIT(m_cel.current_ccb, 14)
 				//, BIT(m_cel.current_ccb, 13) spare
+				// MARIA: '1' Regional fill '0' Speed fill (i.e. disable Projector action?)
 				, BIT(m_cel.current_ccb, 12)
 				, m_cel.pxor
 				, m_cel.useav
@@ -942,6 +977,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			// - aquawrld forces PIXC to use the upper nibble in Mermaid mode, cfr. below
 			const u8 pover = (m_cel.current_ccb & 0x180) >> 7;
 
+			m_cel.plutpos = !!BIT(m_cel.current_ccb, 6);
 			// cache rather than storing the raw value for performance,
 			// assume reserved setting to read from decoder.
 			m_cel.pover_force_high = pover == 3 ? 0x0000'8000 : 0x0000'0000;
@@ -949,7 +985,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
 				, pover
-				, BIT(m_cel.current_ccb, 6)
+				, m_cel.plutpos
 				, m_cel.bgnd
 				, BIT(m_cel.current_ccb, 4)
 				, m_cel.pluta
@@ -987,7 +1023,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			}
 			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
 
-			// TODO: verify what "current" means
+			// TODO: verify what "current" means in context of X/Y base positions
 			// is it the previously CEL loaded address or the actual pointer at the end of a CEL drawing?
 			if (yoxy)
 			{
@@ -1216,7 +1252,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 					{
 						// According to "The Projector" section this floors down,
 						// discarding the fractional part
-						// TODO: understand how enlarging truly works (check acw/accw)
+						// TODO: convert to fn, need to recalc thru Projector
 						int ypos = (s32)(m_cel.ypos + y * m_cel.vdy + x * actual_hdy);
 
 						if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
@@ -1240,10 +1276,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						const bool p_mode = BIT(src_data, 15);
 						const u8 pixc_mode = pixc_mode_setting[p_mode];
 
-						const u16 res_data = (this->*pixc_mix_table[pixc_mode])(xpos, ypos, src_data, p_mode, op_mode);
+						// TODO: Projector enlarging pixels should be done here
+						// The ACW/ACCW part ...
 
-						// TODO: output b15 and b0 as VH cornerweight selector
-						// (with force bits coming from m_ccobctl0)
+						u16 res_data = (this->*pixc_mix_table[pixc_mode])(xpos, ypos, src_data, p_mode, op_mode);
+						res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos, ypos, res_data);
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * dst_pitch) << 2;
@@ -1529,7 +1566,7 @@ u16 madam_device::pixc_fb_cel(int xpos, int ypos, u32 cel_data, bool p_mode, u8 
 }
 
 /******************
- * Math
+ * PIXC Math
  *****************/
 
 const madam_device::pixc_math_func madam_device::pixc_math_table[4] =
@@ -1631,6 +1668,35 @@ u16 madam_device::pixc_math_pxor(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u
 
 /******************
  *
+ * VH interpolator
+ *
+ *****************/
+
+const madam_device::vh_interpolate_func madam_device::vh_interpolate_table[2] =
+{
+	&madam_device::vh_interpolate_subposition,
+	&madam_device::vh_interpolate_plut
+};
+
+// TODO: stub
+u16 madam_device::vh_interpolate_subposition(int xpos, int ypos, u16 pix_data)
+{
+	return pix_data;
+}
+
+// TODO: enough for virtuoso and not much else
+// wants bit 0 as CLUT separator for the player avatar, which goes in AMY fixed at 0 due of swaphv
+u16 madam_device::vh_interpolate_plut(int xpos, int ypos, u16 pix_data)
+{
+	bool v_bit = BIT(pix_data, m_cel_master_sw.v_output_bit);
+	v_bit |= m_cel_master_sw.v_output_force_high;
+	v_bit &= m_cel_master_sw.v_output_mask;
+
+	return (v_bit << 15) | (pix_data & 0x7fff);
+}
+
+/******************
+ *
  * Decompression
  *
  *****************/
@@ -1697,6 +1763,7 @@ const madam_device::fetch_rle_func madam_device::fetch_rle_table[16] =
 
 // Stub for unemulated/illegal paths
 // bpp = 0 coded: ssf2xj in versus mode
+// TODO: verify me again, may be superseded by CEL relative addressing fix
 std::tuple<u32, u32> madam_device::get_unemulated(u32 ptr, u8 frac)
 {
 	return std::make_tuple(0, ptr + 1);
@@ -1765,10 +1832,10 @@ std::tuple<u32, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 	// idx &= 0x1f;
 	idx >>= 1;
 	idx &= 0x3e;
-	// TODO: bit 5 is really p/w selector
 
 	const u16 plut_data = ((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1));
 
+	// what the PLUT says should be ignored in this
 	return std::make_tuple((plut_data & 0x7fff) | p_mode, ptr);
 //	return std::make_tuple(plut_data, ptr);
 }
@@ -1828,7 +1895,7 @@ std::tuple<u32, u32> madam_device::get_uncoded_16bpp(u32 ptr, u8 frac)
 }
 
 // LZ77 / LZSS alike
-// NOTE: documentation claims that is actually faster to use packed CEL
+// NOTE: documentation claims that is actually faster to use packed CEL (RAM overhead?)
 u32 madam_device::cel_decompress()
 {
 	u32 tick_time = 1;
@@ -2031,7 +2098,8 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 
 u32 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 {
-	// arbitrary mesh pattern so it will be obvious if triggered
+	// arbitrary moire/mesh pattern so it will be obvious if triggered
+	// (outputs a yellow-blue checkered flag)
 	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
 	return src_data;
 }

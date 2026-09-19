@@ -168,6 +168,14 @@ private:
 		DRAW
 	};
 
+	struct {
+		u16 v_output_force_high, v_output_mask;
+		//u16 h_output_force_high, h_output_mask;
+		u8 v_output_bit;
+		//u8 h_output_bit;
+		bool ascall;
+	} m_cel_master_sw;
+
 	static constexpr u32 PACKED_PITCH = 0x400;
 
 	static constexpr u32 CEL_TRANSPARENT = 1 << 31;
@@ -178,6 +186,7 @@ private:
 		u32 address;
 		u32 current_ccb;
 		bool skip, last, ccbpre, packed, bgnd, useav, pxor;
+		bool plutpos;
 		u8 pluta;
 		u32 next_ptr;
 		u32 source_ptr;
@@ -214,6 +223,8 @@ private:
 	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_continue_w(offs_t offset, u32 data, u32 mem_mask);
+	void ccobctl0_w(offs_t offset, u32 data, u32 mem_mask);
+
 	u32 cel_decompress();
 
 	typedef u32 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
@@ -283,6 +294,12 @@ private:
 	u16 pixc_math_useav(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
 	u16 pixc_math_pxor(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
 //	u16 pixc_math_useav_pxor(u8 av_mode, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
+
+	typedef u16 (madam_device::*vh_interpolate_func)(int xpos, int ypos, u16 pix_data);
+	static const vh_interpolate_func vh_interpolate_table[2];
+
+	u16 vh_interpolate_subposition(int xpos, int ypos, u16 pix_data);
+	u16 vh_interpolate_plut(int xpos, int ypos, u16 pix_data);
 
 	emu_timer *m_cel_timer;
 	TIMER_CALLBACK_MEMBER(cel_tick_cb);
