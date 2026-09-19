@@ -7,6 +7,7 @@
 #include "machine/scc68070.h"
 #include "cdislavehle.h"
 #include "cdicdic.h"
+#include "cdidvc.h"
 #include "cdi220_lcd.h"
 #include "sound/dmadac.h"
 #include "mcd212.h"
@@ -33,10 +34,12 @@ public:
 		, m_cdrom(*this, "cdrom")
 		, m_mcd212(*this, "mcd212")
 		, m_dmadac(*this, "dac%u", 1U)
+		, m_dvc_slot(*this, "dvc")
 	{ }
 
 	void cdimono1_base(machine_config &config);
 	void cdimono1(machine_config &config);
+	void cdimono1n(machine_config &config);
 	void cdimono2(machine_config &config);
 	void cdi910(machine_config &config);
 
@@ -60,6 +63,11 @@ protected:
 	required_device<mcd212_device> m_mcd212;
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
+	optional_device<cdi_dvc_slot_device> m_dvc_slot;
+	cdi_dvc_device *m_dvc = nullptr;  // the cartridge in m_dvc_slot, if any
+
+	void dvc_config(device_t *device, bool pal);
+	virtual void machine_start() override ATTR_COLD;
 
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override ATTR_COLD;
@@ -77,6 +85,25 @@ protected:
 
 	uint16_t dvc_r(offs_t offset, uint16_t mem_mask = ~0);
 	void dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// The 512KB of DVC decoder RAM must bus error until the driver has enabled
+	// it, otherwise the OS RAM crawler finds it and mis-sizes system memory.
+	uint16_t dvc_rom_r(offs_t offset);
+	uint16_t dvc_ram_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dvc_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// The CDIC and the DVC share IN4; a 74ACT74 flip flop arbitrates
+	// between them.
+	enum in4_owner : uint8_t { IN4_IDLE = 0, IN4_CDIC, IN4_DVC };
+
+	void cdic_intreq_w(int state);
+	void dvc_intreq_w(int state);
+	void update_in4();
+	uint8_t in4_iack_r();
+
+	bool m_cdic_intreq = false;
+	bool m_dvc_intreq = false;
+	in4_owner m_in4_owner = IN4_IDLE;
 
 	uint16_t bus_error_r(offs_t offset);
 	void bus_error_w(offs_t offset, uint16_t data);

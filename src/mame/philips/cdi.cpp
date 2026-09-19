@@ -36,7 +36,8 @@ TODO:
   MCD-212 documentation states in both tables and timing diagrams that vertical retrace
   has an additional half-line even in non-interlaced mode, which cannot be represented
   in the current screen-timing framework. The input clock has been adjusted downward
-  to factor out this half-line, resulting in the expected 50Hz exactly in PAL mode.
+  to factor out this half-line, resulting in the expected 50Hz exactly in PAL mode,
+  and 59.94Hz in NTSC mode.
 
 - Proper abstraction of the 68070's internal devices (UART, DMA, Timers, etc.)
 
@@ -64,8 +65,9 @@ TODO:
 
 #include "cdi.lh"
 
-// TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
-#define CLOCK_A 30_MHz_XTAL
+// TODO: additional 4.9152 MHz XTAL provided for UART
+#define CLOCK_A 30_MHz_XTAL         // PAL system clock
+#define CLOCK_A_NTSC 30.2098_MHz_XTAL  // NTSC system clock, 1920x the NTSC line rate
 
 #define LOG_DVC             (1U << 1)
 #define LOG_QUIZARD_READS   (1U << 2)
@@ -99,8 +101,9 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 	map(0x500000, 0x57ffff).ram();
 	map(0xd00000, 0xdfffff).ram(); // DVC RAM block 1
-	map(0xe00000, 0xe7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
-	map(0xe80000, 0xefffff).ram(); // DVC RAM block 2
+	map(0xe00000, 0xe3ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
+	map(0xe40000, 0xe7ffff).r(FUNC(cdi_state::dvc_rom_r)); // DVC OS-9 driver ROM
+	map(0xe80000, 0xefffff).rw(FUNC(cdi_state::dvc_ram_r), FUNC(cdi_state::dvc_ram_w)); // DVC RAM block 2
 }
 
 void cdi_state::cdimono2_mem(address_map &map)
@@ -191,15 +194,29 @@ INPUT_PORTS_END
 *  Machine Initialization  *
 ***************************/
 
+void cdi_state::machine_start()
+{
+	m_dvc = m_dvc_slot ? m_dvc_slot->get_card_device() : nullptr;
+}
+
 void cdi_state::machine_reset()
 {
 	uint16_t *src = &m_main_rom[0];
 	uint16_t *dst = &m_plane_ram[0][0];
 	memcpy(dst, src, 0x8);
+
+	// when a DVC is fitted it feeds the MCD212's external video plane
+	m_mcd212->set_ext_video_source(m_dvc);
+
+	m_cdic_intreq = false;
+	m_dvc_intreq = false;
+	m_in4_owner = IN4_IDLE;
 }
 
 void quizard_state::machine_start()
 {
+	cdi_state::machine_start();
+
 	save_item(NAME(m_boot_press));
 
 	m_boot_timer = timer_alloc(FUNC(quizard_state::boot_press_tick), this);
@@ -354,13 +371,113 @@ void quizard_state::mcu_p3_w(uint8_t data)
 
 uint16_t cdi_state::dvc_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DVC, "%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), mem_mask);
+	if (m_dvc)
+		return m_dvc->regs_r(offset, mem_mask);
+
+	LOGMASKED(LOG_DVC, "%s: dvc_r: %08x = 0000 & %04x\n", machine().describe_context(), 0xe00000 + (offset << 1), mem_mask);
 	return 0;
 }
 
 void cdi_state::dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_DVC, "%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe80000 + (offset << 1), data, mem_mask);
+	if (m_dvc)
+	{
+		m_dvc->regs_w(offset, data, mem_mask);
+		return;
+	}
+
+	LOGMASKED(LOG_DVC, "%s: dvc_w: %08x = %04x & %04x\n", machine().describe_context(), 0xe00000 + (offset << 1), data, mem_mask);
+}
+
+uint16_t cdi_state::dvc_rom_r(offs_t offset)
+{
+	return m_dvc ? m_dvc->rom_r(offset) : 0;
+}
+
+uint16_t cdi_state::dvc_ram_r(offs_t offset, uint16_t mem_mask)
+{
+	if (m_dvc && !m_dvc->mpeg_ram_enabled())
+		return bus_error_r((0xe80000 >> 1) + offset);
+
+	if (m_dvc)
+		return m_dvc->ram_r(offset, mem_mask);
+
+	return 0;
+}
+
+void cdi_state::dvc_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (m_dvc && !m_dvc->mpeg_ram_enabled())
+	{
+		bus_error_w((0xe80000 >> 1) + offset, data);
+		return;
+	}
+
+	if (m_dvc)
+		m_dvc->ram_w(offset, data, mem_mask);
+}
+
+/*************************
+*   IN4 IRQ arbitration  *
+*************************/
+
+// The CDIC and the DVC both drive IN4.  A small SR flip flop in the real
+// machine decides which of them owns the line and therefore which vector the
+// CPU gets back during the interrupt acknowledge cycle.
+
+void cdi_state::cdic_intreq_w(int state)
+{
+	m_cdic_intreq = bool(state);
+	update_in4();
+}
+
+void cdi_state::dvc_intreq_w(int state)
+{
+	m_dvc_intreq = bool(state);
+	update_in4();
+}
+
+void cdi_state::update_in4()
+{
+	switch (m_in4_owner)
+	{
+	case IN4_CDIC:
+		if (!m_cdic_intreq)
+			m_in4_owner = IN4_IDLE;
+		break;
+
+	case IN4_DVC:
+		if (!m_dvc_intreq)
+			m_in4_owner = IN4_IDLE;
+		break;
+
+	default:
+		break;
+	}
+
+	if (m_in4_owner == IN4_IDLE)
+	{
+		if (m_cdic_intreq)
+			m_in4_owner = IN4_CDIC;
+		else if (m_dvc_intreq)
+			m_in4_owner = IN4_DVC;
+	}
+
+	const bool active = ((m_in4_owner == IN4_CDIC) && m_cdic_intreq)
+			|| ((m_in4_owner == IN4_DVC) && m_dvc_intreq);
+
+	m_maincpu->in4_w(active ? 1 : 0);
+}
+
+uint8_t cdi_state::in4_iack_r()
+{
+	if (m_in4_owner == IN4_DVC && m_dvc)
+		return m_dvc->intack_r();
+
+	if (m_cdic)
+		return m_cdic->intack_r();
+
+	return 0;
 }
 
 /*************************
@@ -386,7 +503,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 {
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
-	m_maincpu->iack4_callback().set(m_cdic, FUNC(cdicdic_device::intack_r));
+	m_maincpu->iack4_callback().set(FUNC(cdi_state::in4_iack_r));
 
 	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
@@ -412,7 +529,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	// DSP input clock is 7.5264 MHz
 	CDI_CDIC(config, m_cdic, 45.1584_MHz_XTAL / 2);
 	m_cdic->set_clock2(45.1584_MHz_XTAL * 3 / 7); // generated by PLL circuit incorporating 19.3575 MHz XTAL
-	m_cdic->intreq_callback().set(m_maincpu, FUNC(scc68070_device::in4_w));
+	m_cdic->intreq_callback().set(FUNC(cdi_state::cdic_intreq_w));
 
 	CDI_SLAVE_HLE(config, m_slave_hle);
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
@@ -532,8 +649,48 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
 	m_slave_hle->testplug_callback().set_ioport("TESTPLUG");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	// Digital Video Cartridge, fitted by default; -dvc "" removes it
+	CDI_DVC_SLOT(config, m_dvc_slot, cdi_dvc_cards, "vmpeg");
+	m_dvc_slot->set_option_machine_config("vmpeg", [this] (device_t *device) { dvc_config(device, true); });
+	m_dvc_slot->add_route(0, "speaker", 1.0, 0);
+	m_dvc_slot->add_route(1, "speaker", 1.0, 1);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("cdi");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
+}
+
+// Wire the Digital Video Cartridge into the player: it drives DMA channel 1
+// of the SCC68070, feeds the MCD212's external video plane and shares IN4
+// with the CDIC.
+void cdi_state::dvc_config(device_t *device, bool pal)
+{
+	cdi_dvc_device &dvc = downcast<cdi_dvc_device &>(*device);
+	dvc.set_scc(m_maincpu);
+	dvc.set_screen(*this, "screen");
+	dvc.set_pal(pal);
+	dvc.intreq_callback().set(*this, FUNC(cdi_state::dvc_intreq_w));
+	dvc.add_route(0, m_dvc_slot, 1.0, 0);
+	dvc.add_route(1, m_dvc_slot, 1.0, 1);
+}
+
+// The same player reporting NTSC.  The OS asks the slave for the video
+// standard at boot and sets itself up from the answer: with NTSC it programs
+// the MCD212 for 60 Hz, and NTSC-only discs such as Coneheads (USA) run.
+void cdi_state::cdimono1n(machine_config &config)
+{
+	cdimono1(config);
+
+	// NTSC players run from a 30.2098 MHz system clock rather than 30 MHz
+	m_maincpu->set_clock(CLOCK_A_NTSC);
+	m_mcd212->set_clock(CLOCK_A_NTSC);
+
+	// as for PAL, the pixel clock is lowered to factor out the MCD212's half
+	// line, here 262 of 262.5 lines, which gives 59.94 Hz
+	screen_device &screen = *subdevice<screen_device>("screen");
+	screen.set_raw(u32(CLOCK_A_NTSC.dvalue() * 262 / 262.5), 960, 0, 768, 262*2, 22*2, 262*2); // x2 for interlace
+
+	m_slave_hle->ntsc_callback().set_constant(1);
+	m_dvc_slot->set_option_machine_config("vmpeg", [this] (device_t *device) { dvc_config(device, false); });
 }
 
 void quizard_state::quizard(machine_config &config)
@@ -596,6 +753,9 @@ ROM_START( cdimono1 )
 	ROM_LOAD( "zx405042p__cdi_slave_2.0__b43t__zzmk9213.mc68hc705c8a_withtestrom.7206", 0x0000, 0x2000, CRC(688cda63) SHA1(56d0acd7caad51c7de703247cd6d842b36173079) BAD_DUMP )
 ROM_END
 
+// same board and ROMs, see cdi_state::cdimono1n
+#define rom_cdimono1n rom_cdimono1
+
 ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "cdi910", "CD-I 910-17P Mini-MMC" )
@@ -633,11 +793,10 @@ ROM_START( cdi490a )
 	ROM_SYSTEM_BIOS( 0, "cdi490", "CD-i 490" )
 	ROMX_LOAD( "cdi490a.rom", 0x000000, 0x80000, CRC(e2f200f6) SHA1(c9bf3c4c7e4fe5cbec3fe3fc993c77a4522ca547), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE  )
 
-	ROM_REGION(0x60000, "mpegs", 0) // keep these somewhere
+	// The IMPEG variant of the DVC.  The VMPEG card's ROM now lives in the
+	// cdi_dvc_device that actually uses it.
+	ROM_REGION(0x40000, "mpegs", 0) // keep these somewhere
 	ROM_LOAD( "impega.rom", 0x00000, 0x40000, CRC(84d6f6aa) SHA1(02526482a0851ea2a7b582d8afaa8ef14a8bd914) ) // 1ST AND 2ND HALF IDENTICAL
-	// Philips CD-i - DVC card 22ER9141
-	ROM_LOAD16_BYTE( "fmv ffd9 p7308 r4.1 vmpeg.bin", 0x40000, 0x10000, CRC(30ba9273) SHA1(d8adca0627b356ced6131b9458ac1175e43e6548) )
-	ROM_LOAD16_BYTE( "fmv 4ba9 p7307 r4.1 vmpeg.bin", 0x40001, 0x10000, CRC(623edb1f) SHA1(4c6b11e28ad4c2f5c2e439f7910a783e0a79d1a9) )
 ROM_END
 
 ROM_START( gpi1200 )
@@ -993,6 +1152,7 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
 // BIOS / System
 CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, cdimono1n, cdimono1, 0,   cdimono1n, cdi,     cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (NTSC)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
