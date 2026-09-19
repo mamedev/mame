@@ -33,7 +33,7 @@
 #define LOG_RAMDAC      (1U << 3)
 #define LOG_CLOCKGEN    (1U << 4)
 
-#define VERBOSE (1)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
@@ -333,7 +333,6 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			break;
 
 		case 0x18: // screen enable
-			printf("screen enable...\n");
 			// at startup, the screen isn't wanted on until 0x81 is written.
 			// if the Video Startup extension is installed, it later sets this to 0x02.
 			if ((data & 0x80) || (data == 0x02))
@@ -384,12 +383,17 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 	}
 }
 
-// this behavior is inherited from the dingusppc implementation.
-// while it seems like the Valkyrie expects data on a 32-bit alignment,
-// and the Valkyrie-AR on a 64-bit alignment, their driver does this instead.
-// without real hardware to test, it's not clear what the right approach is...
+/*
+   this behavior with regs64_w and regs64_r is inherited from dingusppc.
+   while it seems like the Valkyrie expects data on a 32-bit alignment,
+   and the Valkyrie-AR on a 64-bit alignment, their driver instead shifts
+   the address right a certain number of places.
+   this would cause the possibly unintentional behavior of registers
+   being mirrored where they shouldn't.
+   
+   without real hardware to test, it's not clear what the right approach is...
+*/
 
-// ---
 void valkyrie_device::regs64_w(offs_t offset, u8 data)
 {
 	regs_w(offset >> 1, data);

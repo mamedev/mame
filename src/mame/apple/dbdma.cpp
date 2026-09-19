@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "dbdma.h"
 
-#define VERBOSE (1)
+#define VERBOSE (0)
 #define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 

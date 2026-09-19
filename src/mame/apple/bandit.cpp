@@ -114,9 +114,9 @@ void applpsx_host_device::device_start()
 u32 applpsx_host_device::regs_r(offs_t offset, u32 mem_mask)
 {
 	int reg = (offset >> 1) & 0x1f;
-
 	switch(reg) {
 		case PSX_SYSTEM_ID:
+			// alchemy plays blind if you don't give it this exactly
 			return 0x10000000;
 
 		case PSX_REVISION:
