@@ -1541,7 +1541,7 @@ void i386_device::i386_pop_rm32()          // Opcode 0x8f
 			catch(uint64_t e)
 			{
 				REG32(ESP) = temp_sp;
-				throw e;
+				throw emu_fatalerror("i386_pop_rm32: %llx", e);
 			}
 		}
 	}
