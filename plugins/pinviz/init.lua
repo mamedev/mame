@@ -35,6 +35,10 @@ function pinviz.startplugin()
 	local autopilot = os.getenv('PINVIZ_AUTOPILOT') == '1'
 	local fliptest = tonumber(os.getenv('PINVIZ_FLIPTEST') or '0')   -- ball speed for the flipper test, 0 = off
 	local console_log = os.getenv('PINVIZ_LOG') == '1'
+	-- the cradle test: drop a ball onto a flipper at rest, let it settle, then flip it.
+	-- That is the shot a player takes most often, and it exercises what throwing balls
+	-- at the bat does not: whether the ball stays on the flipper at all.
+	local cradletest = os.getenv('PINVIZ_CRADLETEST') == '1'
 	-- the flipper test drops the ball at five points along the bat; set to 0 to drop it
 	-- at one point, which makes a run repeatable and any spread left the physics
 	local flipspread = os.getenv('PINVIZ_FLIPSPREAD') ~= '0'
@@ -43,6 +47,12 @@ function pinviz.startplugin()
 	local FLIPPER_THICKNESS = 0.22   -- half width of the bat, inches
 	local FLIPPER_RESTITUTION = 0.35 -- flipper rubber, bouncier than a wall
 	local FLIPPER_FRICTION = 0.12    -- drag along the rubber, gives a ball met off centre some curve
+	-- The coil drives the bat through its stroke in about twenty milliseconds, which
+	-- over fifty odd degrees is a good deal faster than the spring brings it back.
+	-- Shot speed comes almost entirely from this: the bat's surface speed at the
+	-- contact is omega times the distance out along the bat.
+	local FLIPPER_RATE_UP = 2800     -- degrees per second, driven
+	local FLIPPER_RATE_DOWN = 1100   -- returning on the spring
 	local FRAME_DT = 1 / 60
 	local SWITCH_FRAMES = 5     -- how long a hit holds a matrix switch closed
 	local BALL_RESTITUTION_MIN_SPEED = 2.0
@@ -598,18 +608,79 @@ function pinviz.startplugin()
 	local function update_flippers(s)
 		-- the flipper test drives the bat itself, so it does not wait for the game to
 		-- energise the relay
-		local enabled = fliptest > 0 or s.tbl.flipper_enable == nil or output_on(s, s.tbl.flipper_enable)
+		local enabled = fliptest > 0 or cradletest or s.tbl.flipper_enable == nil or output_on(s, s.tbl.flipper_enable)
 		local input = manager.machine.input
 		for i, f in ipairs(s.flippers) do
-			local pressed = enabled and (input:code_pressed(f.code) or ((autopilot or fliptest > 0) and s.auto_flip[i] > 0))
+			local pressed = enabled and (input:code_pressed(f.code) or ((autopilot or fliptest > 0 or cradletest) and s.auto_flip[i] > 0))
 			f.target = pressed and f.up or f.rest
-			f.rate = 1400 -- degrees per second
+			f.rate = pressed and FLIPPER_RATE_UP or FLIPPER_RATE_DOWN
 		end
 		s.flippers_enabled = enabled
 	end
 
 	-- Flipper regression test: drop a fast ball onto the left flipper, flip when it
 	-- arrives, and count whether it was hit or passed through the bat.
+	local function update_cradletest(s)
+		local ct = s.ct
+		if not ct then ct = { phase = 0, frames = 0, trials = 0, settled = 0, lost = 0, exits = {}, rests = {} }; s.ct = ct end
+		ct.frames = ct.frames + 1
+		local f = s.flippers[1]
+		local b = s.ball
+		-- the bat is held up for the whole approach, which is what a player does to trap
+		-- a ball; on a bat at rest the ball is meant to roll off towards the tip
+		if ct.phase == 1 or ct.phase == 0 then s.auto_flip[1] = 4 end
+		if ct.phase == 0 and ct.frames > 45 then
+			-- well above the bat and at rest: the bat only moves while a ball is in
+			-- play, so it needs the ball's fall to finish rising before contact
+			new_ball(s, f.pivot[1] + 1.5, f.pivot[2] - 6.0, 0, 0)
+			s.state = 'play'; s.flippers_enabled = true; ct.phase = 1; ct.frames = 0
+		elseif ct.phase == 1 then
+			-- settled means resting on the bat rather than rolling off it
+			local speed = b and math.sqrt(b.vx * b.vx + b.vy * b.vy) or 0
+			if b and speed < 6 and b.y < f.pivot[2] + 2.5 then
+				ct.still = (ct.still or 0) + 1
+			else
+				ct.still = 0
+			end
+			if (ct.still or 0) > 20 then
+				ct.settled = ct.settled + 1
+				ct.rests[#ct.rests + 1] = math.sqrt((b.x - f.pivot[1]) ^ 2 + (b.y - f.pivot[2]) ^ 2)
+				s.auto_flip[1] = 0; ct.phase = 2; ct.frames = 0; ct.still = 0
+			elseif ct.frames > 180 then
+				ct.lost = ct.lost + 1
+				if ct.lost <= 3 and b then
+					print(string.format('[cradle] ball ended at (%.2f, %.2f), pivot is (%.2f, %.2f), state %s',
+						b.x, b.y, f.pivot[1], f.pivot[2], s.state))
+				elseif ct.lost <= 3 then
+					print(string.format('[cradle] ball gone, state %s', s.state))
+				end
+				ct.phase = 3
+			end
+		elseif ct.phase == 2 then
+			-- let the bat fall, then shoot
+			if ct.frames == 12 then s.auto_flip[1] = 10 end
+			if ct.frames > 14 and b and not ct.exit and b.vy < 0 then
+				ct.exit = math.sqrt(b.vx * b.vx + b.vy * b.vy)
+			end
+			if ct.frames > 60 then ct.phase = 3 end
+		elseif ct.phase == 3 then
+			ct.trials = ct.trials + 1
+			if ct.exit then ct.exits[#ct.exits + 1] = ct.exit end
+			if ct.trials % 10 == 0 then
+				local n = #ct.exits
+				local lo, hi, sum = math.huge, -math.huge, 0
+				for i = 1, n do lo = math.min(lo, ct.exits[i]); hi = math.max(hi, ct.exits[i]); sum = sum + ct.exits[i] end
+				local rsum = 0
+				for i = 1, #ct.rests do rsum = rsum + ct.rests[i] end
+				print(string.format('[cradle] trials %d settled %d rolled off %d | shot n=%d mean %.0f range %.0f-%.0f | rested %.2f in from the pivot',
+					ct.trials, ct.settled, ct.lost, n, n > 0 and sum / n or 0, lo == math.huge and 0 or lo, hi == -math.huge and 0 or hi,
+					#ct.rests > 0 and rsum / #ct.rests or 0))
+			end
+			ct.exit = nil
+			ct.phase = 0; ct.frames = 0
+		end
+	end
+
 	local function update_fliptest(s)
 		local ft = s.ft
 		if not ft then ft = { phase = 0, frames = 0, hits = 0, through = 0, trials = 0, exits = {}, angs = {} }; s.ft = ft end
@@ -619,9 +690,9 @@ function pinviz.startplugin()
 			new_ball(s, f.pivot[1] + 1.6 + (flipspread and (ft.trials % 5) * 0.3 or 0.6), f.pivot[2] - 6, 0, fliptest)
 			s.state = 'play'; s.flippers_enabled = true; ft.phase = 1; ft.frames = 0
 		elseif ft.phase == 1 then
-			-- flip early enough that the bat is mid sweep when the ball arrives, which
-			-- is what a player does; the lead scales with the ball's speed
-			if s.ball.y > f.pivot[2] - 1.2 - fliptest * 0.020 then s.auto_flip[1] = 10; ft.phase = 2; ft.frames = 0 end
+			-- flip so the bat is mid sweep when the ball arrives, which is what a player
+			-- does; the lead is half the stroke, and scales with the ball's speed
+			if s.ball.y > f.pivot[2] - 1.2 - fliptest * 0.010 then s.auto_flip[1] = 10; ft.phase = 2; ft.frames = 0 end
 			if ft.frames > 120 then ft.phase = 3 end
 		elseif ft.phase == 2 then
 			-- the shot is whatever the bat threw: record the ball the moment it is
@@ -710,9 +781,11 @@ function pinviz.startplugin()
 		-- a flip request is a countdown of frames, raised by the autopilot or by the
 		-- flipper test; it has to come down for both, or the bat sticks up for good
 		for i = 1, #s.flippers do s.auto_flip[i] = math.max(0, s.auto_flip[i] - 1) end
-		if fliptest > 0 then update_fliptest(s) else update_autopilot(s) end
+		if cradletest then update_cradletest(s)
+		elseif fliptest > 0 then update_fliptest(s)
+		else update_autopilot(s) end
 		update_flippers(s)
-		if fliptest > 0 then s.flippers_enabled = true end
+		if fliptest > 0 or cradletest then s.flippers_enabled = true end
 
 		-- drop target resets
 		for i, tg in ipairs(tbl.targets or {}) do
@@ -1088,7 +1161,7 @@ function pinviz.startplugin()
 		local input = manager.machine.input
 		for i, f in ipairs(tbl.flippers) do
 			s.flippers[i] = { pivot = f.pivot, length = f.length, rest = f.rest, up = f.up,
-				angle = f.rest, prev_angle = f.rest, target = f.rest, rate = 1400, omega = 0, code = input:code_from_token(f.key) }
+				angle = f.rest, prev_angle = f.rest, target = f.rest, rate = FLIPPER_RATE_DOWN, omega = 0, code = input:code_from_token(f.key) }
 			s.auto_flip[i] = 0
 		end
 		s.plunge_code = input:code_from_token('KEYCODE_SPACE')

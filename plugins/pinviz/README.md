@@ -29,6 +29,11 @@ Environment variables:
   reports how many were hit, how many passed through, and the speed and angle
   the shots left at. A ball that went back up the table was hit, even if it has
   come down again by the end of the trial.
+- `PINVIZ_CRADLETEST=1` holds a flipper up, drops a ball onto it, and reports
+  whether the ball settles there rather than rolling off, where along the bat it
+  comes to rest, and how hard it leaves when the bat is dropped and flipped. This
+  is the shot a player takes most often, and throwing balls at the bat does not
+  exercise it.
 - `PINVIZ_DUMP=1` prints the table's walls and its resolved features once at
   startup, so the geometry can be checked outside the plugin: a rubber laid
   across a rail, or anything reaching past the layout's playfield panel.

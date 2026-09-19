@@ -115,6 +115,26 @@ def check_flippers(mame, machine, rompath, speeds):
     return failures, rows
 
 
+def check_cradle(mame, machine, rompath):
+    out = run(mame, machine, 45, rompath, { 'PINVIZ_CRADLETEST': '1' })
+    line = None
+    for l in out.splitlines():
+        if l.startswith('[cradle]') and 'trials' in l:
+            line = l
+    if not line:
+        return ['the cradle test produced no result'], { }
+    m = re.search(r'trials (\d+) settled (\d+) rolled off (\d+).*mean (\d+).*rested ([\d.]+)', line)
+    if not m:
+        return ['could not read the cradle result: %s' % line], { }
+    trials, settled, lost, shot, rest = int(m.group(1)), int(m.group(2)), int(m.group(3)), int(m.group(4)), float(m.group(5))
+    failures = [ ]
+    if settled < trials:
+        failures.append('%d of %d balls would not sit on a raised flipper' % (lost, trials))
+    if shot < 60:
+        failures.append('a cradled ball left the flipper at only %d in/s' % shot)
+    return failures, { 'settled': '%d/%d' % (settled, trials), 'shot': shot, 'rest in': rest }
+
+
 def check_play(mame, machine, rompath, seconds):
     out = run(mame, machine, seconds, rompath,
               { 'PINVIZ_AUTOPILOT': '1', 'PINVIZ_LOG': '1' }, timeout=seconds * 3 + 120)
@@ -169,6 +189,13 @@ def main():
         for f in flip_failures:
             sys.stdout.write('  FAIL flipper: %s\n' % f)
         bad = bad or bool(flip_failures)
+
+        cradle_failures, cradle = check_cradle(args.mame, machine, args.rompath)
+        if cradle:
+            sys.stdout.write('  cradle: %s\n' % ', '.join('%s %s' % (k, v) for k, v in sorted(cradle.items())))
+        for f in cradle_failures:
+            sys.stdout.write('  FAIL cradle: %s\n' % f)
+        bad = bad or bool(cradle_failures)
 
         play_failures, play = check_play(args.mame, machine, args.rompath, play_seconds)
         sys.stdout.write('  play: %s\n' % ', '.join('%s %s' % (k, v) for k, v in sorted(play.items())))
