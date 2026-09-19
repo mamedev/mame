@@ -97,16 +97,16 @@ void aspen_host_device::device_start()
 {
 	bandit_host_device::device_start();
 
-	m_cpu_space->install_read_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_r)));
-	m_cpu_space->install_write_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_w)));
+	m_cpu_space->install_read_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_r)));
+	m_cpu_space->install_write_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_w)));
 }
 
 void applpsx_host_device::device_start()
 {
 	bandit_host_device::device_start();
 
-	m_cpu_space->install_read_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_r)));
-	m_cpu_space->install_write_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_w)));
+	m_cpu_space->install_read_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_r)));
+	m_cpu_space->install_write_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_w)));
 
 	m_sys_config = 0x03000000;
 }
