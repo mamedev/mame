@@ -138,16 +138,6 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - write to banked RAM at 0x0000-0x1fff when ROM is active
-    - real keyboard w/i8049
-    - keyboard beeper (NE555 wired in strange mix of astable/monostable modes)
-
-*/
-
 #include "emu.h"
 #include "v1050.h"
 
@@ -176,37 +166,12 @@ void v1050_state::set_interrupt(int line, int state)
 
 void v1050_state::bankswitch()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	int bank = (m_bank >> 1) & 0x03;
+	m_bank_view.select((m_bank >> 1) & 0x03);
 
 	if (BIT(m_bank, 0))
-	{
-		program.install_readwrite_bank(0x0000, 0x1fff, membank("bank1"));
-		membank("bank1")->set_entry(bank);
-	}
+		m_rom_view.disable();
 	else
-	{
-		program.install_read_bank(0x0000, 0x1fff, membank("bank1"));
-		program.unmap_write(0x0000, 0x1fff);
-		membank("bank1")->set_entry(3);
-	}
-
-	membank("bank2")->set_entry(bank);
-
-	if (bank == 2)
-	{
-		program.unmap_readwrite(0x4000, 0xbfff);
-	}
-	else
-	{
-		program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
-		program.install_readwrite_bank(0x8000, 0xbfff, membank("bank4"));
-		membank("bank3")->set_entry(bank);
-		membank("bank4")->set_entry(bank);
-	}
-
-	membank("bank5")->set_entry(bank);
+		m_rom_view.select(0);
 }
 
 // Keyboard HACK
@@ -471,11 +436,10 @@ void v1050_state::sasi_ctrl_w(uint8_t data)
 void v1050_state::v1050_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).bankrw("bank1");
-	map(0x2000, 0x3fff).bankrw("bank2");
-	map(0x4000, 0x7fff).bankrw("bank3");
-	map(0x8000, 0xbfff).bankrw("bank4");
-	map(0xc000, 0xffff).bankrw("bank5");
+	map(0x0000, 0xbfff).view(m_bank_view);
+	map(0x0000, 0x1fff).view(m_rom_view);
+	// the ROM only overrides reads; writes fall through to the RAM banked in underneath
+	m_rom_view[0](0x0000, 0x1fff).rom().region(m_rom, 0);
 }
 
 void v1050_state::v1050_io(address_map &map)
@@ -981,22 +945,17 @@ void v1050_state::machine_start()
 	// setup memory banking
 	uint8_t *ram = m_ram->pointer();
 
-	membank("bank1")->configure_entries(0, 2, ram, 0x10000);
-	membank("bank1")->configure_entry(2, ram + 0x1c000);
-	membank("bank1")->configure_entry(3, m_rom->base());
+	// the top 16K is common to every bank
+	program.install_ram(0xc000, 0xffff, ram + 0xc000);
 
-	program.install_readwrite_bank(0x2000, 0x3fff, membank("bank2"));
-	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);
-	membank("bank2")->configure_entry(2, ram + 0x1e000);
+	m_bank_view[0].install_ram(0x0000, 0xbfff, ram);
+	m_bank_view[1].install_ram(0x0000, 0xbfff, ram + 0x10000);
 
-	program.install_readwrite_bank(0x4000, 0x7fff, membank("bank3"));
-	membank("bank3")->configure_entries(0, 2, ram + 0x4000, 0x10000);
+	// bank 2 exposes the last 16K of the second 64K, which bank 1 cannot reach through the common area
+	m_bank_view[2].install_ram(0x0000, 0x3fff, ram + 0x1c000);
 
-	program.install_readwrite_bank(0x8000, 0xbfff, membank("bank4"));
-	membank("bank4")->configure_entries(0, 2, ram + 0x8000, 0x10000);
-
-	program.install_readwrite_bank(0xc000, 0xffff, membank("bank5"));
-	membank("bank5")->configure_entries(0, 3, ram + 0xc000, 0);
+	// bank 3 is not decoded
+	m_bank_view[3].unmap_readwrite(0x0000, 0xbfff);
 
 	bankswitch();
 

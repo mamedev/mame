@@ -87,6 +87,8 @@ public:
 		m_sasi_data_in(*this, "scsi_data_in"),
 		m_sasi_ctrl_in(*this, "scsi_ctrl_in"),
 		m_rom(*this, Z80_TAG),
+		m_rom_view(*this, "rom_view"),
+		m_bank_view(*this, "bank_view"),
 		m_video_ram(*this, "video_ram"),
 		m_attr_ram(*this, "attr_ram", V1050_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_int_mask(0),
@@ -192,6 +194,8 @@ private:
 	required_device<input_buffer_device> m_sasi_data_in;
 	required_device<input_buffer_device> m_sasi_ctrl_in;
 	required_memory_region m_rom;
+	memory_view m_rom_view;
+	memory_view m_bank_view;
 	required_shared_ptr<uint8_t> m_video_ram;
 	memory_share_creator<uint8_t> m_attr_ram;
 
