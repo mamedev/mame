@@ -16,6 +16,7 @@
 #pragma once
 
 #include "sh.h"
+#include "sh7709_scif.h"
 
 #define SH4_INT_NONE    -1
 enum
@@ -630,12 +631,21 @@ class sh3_base_device : public sh34_base_device
 public:
 	virtual ~sh3_base_device();
 
+	// SCIF channel 2 (SH7709/SH7709S only)
+	auto scif_txd_handler() { return m_scif.lookup()->write_txd(); }
+	void scif_rxd_w(int state) { m_scif->rxd_w(state); }
+
+	// peripheral clock feeding the SCIF baud rate generator, defaults to CPU clock / 8
+	void set_scif_clock(uint32_t clock) { m_scif.lookup()->set_clock(clock); }
+	void set_scif_clock(const XTAL &xtal) { m_scif.lookup()->set_clock(xtal); }
+
 protected:
 	// construction/destruction
 	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void sh3_internal_map(address_map &map) ATTR_COLD;
 	virtual void sh3_register_map(address_map& map) ATTR_COLD {}
@@ -977,24 +987,6 @@ protected:
 	uint16_t scfdr1_r(offs_t offset, uint16_t mem_mask);
 	void scfdr1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	// SCIF 7709
-	uint8_t scsmr2_r(offs_t offset, uint8_t mem_mask);
-	void scsmr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scbrr2_r(offs_t offset, uint8_t mem_mask);
-	void scbrr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scscr2_r(offs_t offset, uint8_t mem_mask);
-	void scscr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scftdr2_r(offs_t offset, uint8_t mem_mask);
-	void scftdr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint16_t scssr2_r(offs_t offset, uint16_t mem_mask);
-	void scssr2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t scfrdr2_r(offs_t offset, uint8_t mem_mask);
-	void scfrdr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scfcr2_r(offs_t offset, uint8_t mem_mask);
-	void scfcr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint16_t scfdr2_r(offs_t offset, uint16_t mem_mask);
-	void scfdr2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-
 	// UDI 7709S
 	uint16_t sdir_r(offs_t offset, uint16_t mem_mask);
 	void sdir_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -1162,14 +1154,7 @@ protected:
 	uint16_t m_scfdr1;
 
 	// SCIF 7709
-	uint8_t m_scsmr2;
-	uint8_t m_scbrr2;
-	uint8_t m_scscr2;
-	uint8_t m_scftdr2;
-	uint16_t m_scssr2;
-	uint16_t m_scfrdr2;
-	uint8_t m_scfcr2;
-	uint8_t m_scfdr2;
+	required_device<sh7709_scif_device> m_scif;
 
 	// UDI 7709S
 	uint16_t m_sdir;

@@ -901,14 +901,7 @@ void sh3_base_device::irda_7709_map(address_map& map)
 
 void sh3_base_device::scif_7709_map(address_map& map)
 {
-	map(0x04000150, 0x04000150).rw(FUNC(sh3_base_device::scsmr2_r), FUNC(sh3_base_device::scsmr2_w));
-	map(0x04000152, 0x04000152).rw(FUNC(sh3_base_device::scbrr2_r), FUNC(sh3_base_device::scbrr2_w));
-	map(0x04000154, 0x04000154).rw(FUNC(sh3_base_device::scscr2_r), FUNC(sh3_base_device::scscr2_w));
-	map(0x04000156, 0x04000156).rw(FUNC(sh3_base_device::scftdr2_r), FUNC(sh3_base_device::scftdr2_w));
-	map(0x04000158, 0x04000159).rw(FUNC(sh3_base_device::scssr2_r), FUNC(sh3_base_device::scssr2_w));
-	map(0x0400015a, 0x0400015a).rw(FUNC(sh3_base_device::scfrdr2_r), FUNC(sh3_base_device::scfrdr2_w));
-	map(0x0400015c, 0x0400015c).rw(FUNC(sh3_base_device::scfcr2_r), FUNC(sh3_base_device::scfcr2_w));
-	map(0x0400015e, 0x0400015f).rw(FUNC(sh3_base_device::scfdr2_r), FUNC(sh3_base_device::scfdr2_w));
+	map(0x04000150, 0x0400015f).m(m_scif, FUNC(sh7709_scif_device::map));
 }
 
 void sh3_base_device::udi_7709s_map(address_map& map)
@@ -964,6 +957,7 @@ bool sh34_base_device::memory_translate(int spacenum, int intention, offs_t& add
 
 sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh3_base_device::sh3_internal_map), this))
+	, m_scif(*this, "scif")
 {
 	m_cpu_type = CPU_TYPE_SH3;
 	m_am = SH34_AM;
@@ -971,6 +965,15 @@ sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type
 
 sh3_base_device::~sh3_base_device()
 {
+}
+
+void sh3_base_device::device_add_mconfig(machine_config &config)
+{
+	// only the SH7709/SH7709S actually map this (see scif_7709_map), it is harmless
+	// on the SH7708 variants.  the peripheral clock is derived from the CPU clock by
+	// the CPG, which isn't emulated - the default matches what the CV1000 boards use,
+	// drivers for other systems can override it with set_scif_clock()
+	SH7709_SCIF(config, m_scif, DERIVED_CLOCK(1, 8));
 }
 
 
@@ -2779,16 +2782,6 @@ void sh3_base_device::device_reset()
 	m_scfcr1 = 0;
 	m_scfdr1 = 0;
 
-	// SCIF 7709
-	m_scsmr2 = 0;
-	m_scbrr2 = 0xff;
-	m_scscr2 = 0;
-	m_scftdr2 = 0;
-	m_scssr2 = 0x60;
-	m_scfrdr2 = 0;
-	m_scfcr2 = 0;
-	m_scfdr2 = 0;
-
 	// UDI 7709S
 	m_sdir = 0xffff;
 }
@@ -3351,16 +3344,6 @@ void sh3_base_device::device_start()
 	save_item(NAME(m_scfrdr1));
 	save_item(NAME(m_scfcr1));
 	save_item(NAME(m_scfdr1));
-
-	// SCIF 7709
-	save_item(NAME(m_scsmr2));
-	save_item(NAME(m_scbrr2));
-	save_item(NAME(m_scscr2));
-	save_item(NAME(m_scftdr2));
-	save_item(NAME(m_scssr2));
-	save_item(NAME(m_scfrdr2));
-	save_item(NAME(m_scfcr2));
-	save_item(NAME(m_scfdr2));
 
 	// UDI 7709S
 	save_item(NAME(m_sdir));
