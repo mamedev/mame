@@ -1,7 +1,6 @@
 /****************************************************************************
 
     Power Macintosh x360/x400 "Alchemy" hardware
-    Loosely based off the DingusPPC driver
 
     The "Alchemy" board is the replacement for the much maligned Cordyceps (aka "Elixir").
     It ditches the copypasted Quadra 630 architecture for a new PCI-based one
@@ -54,7 +53,7 @@
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
-#define MAIN_BUS_FREQUENCY 40_MHz_XTAL
+#define MAIN_BUS_FREQUENCY 40'000'000
 
 namespace { // anonymous namespace
 
@@ -164,12 +163,12 @@ void pmac6400_state::pmac6400(machine_config &config)
 	PPC603E(config, m_maincpu, 180'000'000);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_MACOS_CACHE_HACK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6400_state::pmac6400_map);
-	m_maincpu->set_bus_frequency(40'000'000);
+	m_maincpu->set_bus_frequency(MAIN_BUS_FREQUENCY);
 	m_maincpu->set_tb_divisor(4);
 	config.set_perfect_quantum(m_maincpu);
 
 	PCI_ROOT(config, m_pci_root, 0);
-	APPLPSX(config, m_psx, 40'000'000, "maincpu");
+	APPLPSX(config, m_psx, MAIN_BUS_FREQUENCY, "maincpu");
 	m_psx->set_dev_offset(1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

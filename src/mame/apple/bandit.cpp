@@ -31,6 +31,9 @@ enum
 	ASPEN_GPIO_OUT
 };
 
+
+// the PSX registers are 32-bits, but are aligned on 64-bit boundaries.
+// the bootrom only seems to care about the upper 32-bit words.
 enum
 {
 	PSX_SYSTEM_ID = 0, 		 // read only
@@ -46,13 +49,6 @@ enum
 	PSX_MEMPAGE_MAPPINGS_4,
 	PSX_MEMPAGE_MAPPINGS_5,
 	PSX_BUS_TIMEOUT,
-};
-
-std::map<int,int> psx_bus_speeds{
-	{ 0, 38'000'000 },
-	{ 1, 33'000'000 },
-	{ 2, 40'000'000 },
-	{ 3, 50'000'000 },
 };
 
 DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "banditpci", "Apple Bandit PowerPC-to-PCI bridge")
@@ -111,42 +107,34 @@ void applpsx_host_device::device_start()
 	m_sys_config = 0x03000000;
 }
 
-u32 applpsx_host_device::regs_r(offs_t offset, u32 mem_mask)
+u64 applpsx_host_device::regs_r(offs_t offset, u64 mem_mask)
 {
-	int reg = (offset >> 1) & 0x1f;
-	switch(reg) {
+	switch(offset)
+	{
 		case PSX_SYSTEM_ID:
-			// alchemy plays blind if you don't give it this exactly
-			return 0x10000000;
+			return 0x10000000'00000000;
 
 		case PSX_REVISION:
-			return 0x10000000;
+			return 0x10000000'00000000;
 		
 		case PSX_SYS_CONFIG:
-			return m_sys_config;
+			return (m_sys_config & 0xffffffff) << 32;
 
 		default:
-			logerror("%s: psx reg: read unmapped register %02x\n", tag(), reg);
-			return 0xffffffff;
+			logerror("%s: psx reg: read unmapped register %02x\n", tag(), offset);
+			return 0xffffffff'ffffffff;
 	}
 }
 
-void applpsx_host_device::regs_w(offs_t offset, u32 data, u32 mem_mask)
+void applpsx_host_device::regs_w(offs_t offset, u64 data, u64 mem_mask)
 {
-	int reg = (offset >> 1) & 0x1f;
-
-	switch(reg) {
-
-		default:
-			logerror("%s: psx reg: write unmapped register %02x: d %08x mask %08x\n",
-					 tag(),
-					 reg,
-					 data,
-					 mem_mask);
-			break;
-	}
+	// just log writes for now; the bootrom works without it
+	logerror("%s: psx reg: write unmapped register %02x: d %08x mask %08x\n",
+				tag(),
+				offset,
+				data,
+				mem_mask);
 }
-
 
 u32 aspen_host_device::regs_r(offs_t offset, u32 mem_mask)
 {

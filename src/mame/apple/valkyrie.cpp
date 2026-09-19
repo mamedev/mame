@@ -38,6 +38,55 @@
 
 DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
 
+// Valkyrie aligns its (often byte-wide) registers to the left-hand side of 32-bit addresses
+enum
+{
+	VALKYRIEREG_VIDEO_TIMING        = 0x00,
+	VALKYRIEREG_VIDEO_MODE          = 0x04,
+	VALKYRIEREG_VIDEO_DEPTH         = 0x0C,
+	VALKYRIEREG_CONFIG              = 0x10,
+	VALKYRIEREG_VBLANK              = 0x14,
+	VALKYRIEREG_SCREEN_ENABLE       = 0x18,
+	VALKYRIEREG_MONITOR_SENSE       = 0x1C,
+
+	VALKYRIEREG_VIDEO_IN_CONTROL    = 0x20,
+	VALKYRIEREG_VIDEO_WINDOW_XPOS   = 0x60, // 16-bit
+	VALKYRIEREG_VIDEO_WINDOW_YPOS   = 0x64, // 16-bit
+	VALKYRIEREG_VIDEO_WINDOW_WIDTH  = 0x70, // 16-bit
+	VALKYRIEREG_VIDEO_WINDOW_HEIGHT = 0x74, // 16-bit
+	VALKYRIEREG_VIDEO_FIELD_X_PIXEL = 0x80, // 16-bit
+	VALKYRIEREG_VIDEO_FIELD_Y_PIXEL = 0x84, // 16-bit
+};
+
+// Valkyrie-AR is aligned to 64-bit addresses and not 32-bit ones,
+// so this lookup table translates 64-bit addressing to 32-bit addressing
+// without creating unwanted mirroring
+#define OFF64(x) (x<<1)
+std::map<offs_t,int> valkyrie_ar_to_std_mappings
+{
+	{ OFF64(VALKYRIEREG_VIDEO_TIMING), 	 VALKYRIEREG_VIDEO_TIMING },
+	{ OFF64(VALKYRIEREG_VIDEO_MODE),	 VALKYRIEREG_VIDEO_MODE },
+	{ OFF64(VALKYRIEREG_VIDEO_DEPTH), 	 VALKYRIEREG_VIDEO_DEPTH },
+	{ OFF64(VALKYRIEREG_CONFIG), 		 VALKYRIEREG_CONFIG },
+	{ OFF64(VALKYRIEREG_VBLANK), 		 VALKYRIEREG_VBLANK },
+	{ OFF64(VALKYRIEREG_SCREEN_ENABLE),	 VALKYRIEREG_SCREEN_ENABLE },
+	{ OFF64(VALKYRIEREG_MONITOR_SENSE),  VALKYRIEREG_MONITOR_SENSE },
+
+	{ OFF64(VALKYRIEREG_VIDEO_IN_CONTROL),      VALKYRIEREG_VIDEO_IN_CONTROL      },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_XPOS),     VALKYRIEREG_VIDEO_WINDOW_XPOS     },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_XPOS)+1,   VALKYRIEREG_VIDEO_WINDOW_XPOS+1   },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_YPOS),     VALKYRIEREG_VIDEO_WINDOW_YPOS     },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_YPOS)+1,   VALKYRIEREG_VIDEO_WINDOW_YPOS+1   },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_WIDTH),    VALKYRIEREG_VIDEO_WINDOW_WIDTH    },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_WIDTH)+1,  VALKYRIEREG_VIDEO_WINDOW_WIDTH+1  },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_HEIGHT),   VALKYRIEREG_VIDEO_WINDOW_HEIGHT   },
+	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_HEIGHT)+1, VALKYRIEREG_VIDEO_WINDOW_HEIGHT+1 },
+	{ OFF64(VALKYRIEREG_VIDEO_FIELD_X_PIXEL),   VALKYRIEREG_VIDEO_FIELD_X_PIXEL   },
+	{ OFF64(VALKYRIEREG_VIDEO_FIELD_X_PIXEL)+1, VALKYRIEREG_VIDEO_FIELD_X_PIXEL+1 },
+	{ OFF64(VALKYRIEREG_VIDEO_FIELD_Y_PIXEL),   VALKYRIEREG_VIDEO_FIELD_Y_PIXEL   },
+	{ OFF64(VALKYRIEREG_VIDEO_FIELD_Y_PIXEL)+1, VALKYRIEREG_VIDEO_FIELD_Y_PIXEL+1 },
+};
+
 //-------------------------------------------------
 //  ADDRESS_MAP
 //-------------------------------------------------
@@ -252,19 +301,19 @@ u8 valkyrie_device::regs_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0:
+		case VALKYRIEREG_VIDEO_TIMING:
 			return m_video_timing;
 
-		case 4:
+		case VALKYRIEREG_VIDEO_MODE:
 			return m_mode;
 
-		case 0x10: // config
+		case VALKYRIEREG_CONFIG: // config
 			return m_config;
 
-		case 0x14:
+		case VALKYRIEREG_VBLANK:
 			return m_screen->vblank();
 
-		case 0x1c:  // monitor sense in upper nibble, write monitor sense in lower nibble
+		case VALKYRIEREG_MONITOR_SENSE:  // monitor sense in upper nibble, write monitor sense in lower nibble
 			{
 				u8 mon = m_monitor_config->read();
 				u8 res;
@@ -303,7 +352,7 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		case 0: // video mode.  hardcoded!
+		case VALKYRIEREG_VIDEO_TIMING: // video mode.  hardcoded!
 			m_video_timing = data & 0xff;
 			if (!(data & 0x80))
 			{
@@ -311,19 +360,19 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			}
 			break;
 
-		case 4: // video depth: 0=1bpp, 1=2bpp, 2=4bpp, 3=8bpp, 4=16bpp
+		case VALKYRIEREG_VIDEO_MODE: // video depth: 0=1bpp, 1=2bpp, 2=4bpp, 3=8bpp, 4=16bpp
 			LOG("Mode set to %d\n", data & 7);
 			m_mode = data & 7;
 			break;
 
-		case 0xc:   // subsystem configuration register
+		case VALKYRIEREG_VIDEO_DEPTH:   // subsystem configuration register
 			if (data == 0x1)
 			{
 				recalc_mode();
 			}
 			break;
 
-		case 0x10:
+		case VALKYRIEREG_CONFIG:
 			m_config = data;
 
 			m_int_status &= ~1;
@@ -332,7 +381,7 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			break;
 
-		case 0x18: // screen enable
+		case VALKYRIEREG_SCREEN_ENABLE: // screen enable
 			// at startup, the screen isn't wanted on until 0x81 is written.
 			// if the Video Startup extension is installed, it later sets this to 0x02.
 			if ((data & 0x80) || (data == 0x02))
@@ -345,36 +394,36 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			}
 			break;
 
-		case 0x1c: // drive monitor sense lines. 1 = drive, 0 = tri-state
+		case VALKYRIEREG_MONITOR_SENSE: // drive monitor sense lines. 1 = drive, 0 = tri-state
 			m_monitor_id = (data & 0x7);
 			LOGMASKED(LOG_MONSENSE, "%x to sense drive\n", data & 0xf);
 			break;
 
-		case 0x20: // video in control
+		case VALKYRIEREG_VIDEO_IN_CONTROL:    // video in control
 			break;
 
-		case 0x60: // video window X position
-		case 0x61:
+		case VALKYRIEREG_VIDEO_WINDOW_XPOS:   // video window X position
+		case VALKYRIEREG_VIDEO_WINDOW_XPOS+1:
 			break;
 
-		case 0x64: // video window Y position
-		case 0x65:
+		case VALKYRIEREG_VIDEO_WINDOW_YPOS:   // video window Y position
+		case VALKYRIEREG_VIDEO_WINDOW_YPOS+1:
 			break;
 
-		case 0x70: // video window width
-		case 0x71:
+		case VALKYRIEREG_VIDEO_WINDOW_WIDTH:   // video window width
+		case VALKYRIEREG_VIDEO_WINDOW_WIDTH+1:
 			break;
 
-		case 0x74: // video window height
-		case 0x75:
+		case VALKYRIEREG_VIDEO_WINDOW_HEIGHT:   // video window height
+		case VALKYRIEREG_VIDEO_WINDOW_HEIGHT+1:
 			break;
 
-		case 0x80: // video field starting X pixel
-		case 0x81:
+		case VALKYRIEREG_VIDEO_FIELD_X_PIXEL:   // video field starting X pixel
+		case VALKYRIEREG_VIDEO_FIELD_X_PIXEL+1:
 			break;
 
-		case 0x84: // video field starting Y pixel
-		case 0x85:
+		case VALKYRIEREG_VIDEO_FIELD_Y_PIXEL:   // video field starting Y pixel
+		case VALKYRIEREG_VIDEO_FIELD_Y_PIXEL+1:
 			break;
 
 		default:
@@ -383,25 +432,30 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 	}
 }
 
-/*
-   this behavior with regs64_w and regs64_r is inherited from dingusppc.
-   while it seems like the Valkyrie expects data on a 32-bit alignment,
-   and the Valkyrie-AR on a 64-bit alignment, their driver instead shifts
-   the address right a certain number of places.
-   this would cause the possibly unintentional behavior of registers
-   being mirrored where they shouldn't.
-   
-   without real hardware to test, it's not clear what the right approach is...
-*/
-
 void valkyrie_device::regs64_w(offs_t offset, u8 data)
 {
-	regs_w(offset >> 1, data);
+	auto legacy_reg_id = valkyrie_ar_to_std_mappings.find(offset);
+	if (legacy_reg_id == valkyrie_ar_to_std_mappings.end())
+	{
+		logerror("%s regs64_w(): untranslatable write to reg 0x%02x\n", tag(), offset);
+		return;
+	}
+
+	regs_w(legacy_reg_id->second, data);
 }
 
 u8 valkyrie_device::regs64_r(offs_t offset)
 {
-	return regs_r(offset >> 1);
+	auto legacy_reg_id = valkyrie_ar_to_std_mappings.find(offset);
+	if (legacy_reg_id == valkyrie_ar_to_std_mappings.end())
+	{
+		logerror("%s regs64_r(): untranslatable read from reg at 8-bit address 0x%02x\n",
+				 tag(),
+				 offset);
+		return 0;
+	}
+
+	return regs_r(legacy_reg_id->second);
 }
 
 u32 valkyrie_device::ramdac_r(offs_t offset)

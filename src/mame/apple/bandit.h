@@ -99,12 +99,12 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	// virtual void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+	// registers on PSX appear to be aligned to 64 bit boundaries
+	
+	u64 regs_r(offs_t offset, u64 mem_mask = ~0);
+	void regs_w(offs_t offset, u64 data, u64 mem_mask = ~0);
 
-	u32 regs_r(offs_t offset, u32 mem_mask = ~0);
-	void regs_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	u32 m_sys_config;
+	u64 m_sys_config;
 };
 
 DECLARE_DEVICE_TYPE(BANDIT, bandit_host_device)
