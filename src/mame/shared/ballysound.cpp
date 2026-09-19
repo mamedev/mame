@@ -886,7 +886,9 @@ bally_say_it_again_device::bally_say_it_again_device(
 	m_bbd_clock(2048.0f / 0.170f),
 	m_accum(0.0f),
 	m_delayed(0.0f),
-	m_lowpass(0.0f),
+	m_pre(0.0f),
+	m_post1(0.0f),
+	m_post2(0.0f),
 	m_regen(0.45f),
 	m_wet(0.8f)
 {
@@ -936,7 +938,9 @@ void bally_say_it_again_device::device_start()
 	save_item(NAME(m_bbd_clock));
 	save_item(NAME(m_accum));
 	save_item(NAME(m_delayed));
-	save_item(NAME(m_lowpass));
+	save_item(NAME(m_pre));
+	save_item(NAME(m_post1));
+	save_item(NAME(m_post2));
 	save_item(NAME(m_regen));
 	save_item(NAME(m_wet));
 }
@@ -949,7 +953,9 @@ void bally_say_it_again_device::device_reset()
 {
 	m_accum = 0.0f;
 	m_delayed = 0.0f;
-	m_lowpass = 0.0f;
+	m_pre = 0.0f;
+	m_post1 = 0.0f;
+	m_post2 = 0.0f;
 }
 
 //-------------------------------------------------
@@ -959,10 +965,19 @@ void bally_say_it_again_device::device_reset()
 void bally_say_it_again_device::sound_stream_update(sound_stream &stream)
 {
 	float const rate = float(stream.sample_rate());
-	// buckets to shift per output sample, and the line's own bandwidth limit at the
-	// rate the buckets are actually moving
+	// buckets to shift per output sample
 	float const step = m_bbd_clock / rate;
-	float const alpha = 1.0f - std::exp(-2.0f * float(M_PI) * 3000.0f / m_bbd_clock);
+
+	// The three poles of the round trip that matter, from the schematic: R7 with C3
+	// ahead of the line, R23 with C7 and R27 with C9 after it. They are inside the
+	// regeneration loop, so a repeat passes through them once per lap and comes back
+	// duller than the one before.
+	auto pole = [this] (double r, double c) {
+		return 1.0f - std::exp(-2.0f * float(M_PI) * float(1.0 / (2.0 * M_PI * r * c)) / m_bbd_clock);
+	};
+	float const a_pre = pole(RES_K(330), CAP_P(470));
+	float const a_post1 = pole(RES_K(330), CAP_P(680));
+	float const a_post2 = pole(RES_K(680), CAP_P(270));
 
 	for (int i = 0; i < stream.samples(); i++)
 	{
@@ -972,14 +987,14 @@ void bally_say_it_again_device::sound_stream_update(sound_stream &stream)
 		while (m_accum >= 1.0f)
 		{
 			m_accum -= 1.0f;
-			// one pole low pass inside the loop, so each repeat comes back duller
-			// than the one before it rather than ringing forever
-			m_lowpass += alpha * (m_delayed - m_lowpass);
-			m_delayed = m_bbd->clock_sample(in + m_regen * m_lowpass);
+			m_post1 += a_post1 * (m_delayed - m_post1);
+			m_post2 += a_post2 * (m_post1 - m_post2);
+			m_pre += a_pre * ((in + m_regen * m_post2) - m_pre);
+			m_delayed = m_bbd->clock_sample(m_pre);
 		}
 
 		// the board sits between the sound board and the amplifier; keep some headroom
 		// for the sum of the direct signal and the repeats
-		stream.put(0, i, 0.6f * (in + m_wet * m_delayed));
+		stream.put(0, i, 0.6f * (in + m_wet * m_post2));
 	}
 }
