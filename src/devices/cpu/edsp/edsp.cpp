@@ -756,8 +756,8 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf81f) == 0x581f)
 			{
-				--m_r[BIT(op, 8, 3)];
 				m_data.write_word(m_r[BIT(op, 8, 3)], m_r[BIT(op, 5, 3)]);
+				--m_r[BIT(op, 8, 3)];
 				m_icount -= 1;
 			}
 			else if ((op & 0xf800) == 0x6000)
