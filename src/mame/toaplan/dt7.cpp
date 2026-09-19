@@ -53,8 +53,6 @@
 	- The arrow for the Service menu is shown on screen 2, but the text
 	  is not (TODO: check if this is just a problem in the prototype code)
 
-	- Sound still dies sometimes, especially when starting a 2 player gamme
-
 -------------------------------------------------------------------------------------
 
 	Hidden Region Selection:
