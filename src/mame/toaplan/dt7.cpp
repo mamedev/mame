@@ -359,10 +359,11 @@ void dt7_state::machine_reset()
 
 void dt7_state::dt7_v25_mem(address_map &map)
 {
-	// exact mirroring unknown, don't cover up where the inputs/sound maps
-	// is it meant to mirror in all these locations, or is there a different issue in play?
-	map(0x00000, 0x07fff).mirror(0x38000).ram().share("shared_ram");
-	map(0x60000, 0x67fff).mirror(0x98000).ram().share("shared_ram");
+	// the mirroring is unclear, these are the mirrors needed by the game
+	map(0x00000, 0x07fff).ram().share("shared_ram");
+	map(0x08000, 0x0ffff).ram().share("shared_ram");
+	map(0x40000, 0x47fff).ram().share("shared_ram");
+	map(0x60000, 0x67fff).ram().share("shared_ram");
 
 	map(0x58000, 0x58001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -370,6 +371,9 @@ void dt7_state::dt7_v25_mem(address_map &map)
 	map(0x58006, 0x58006).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x58008, 0x58008).r(FUNC(dt7_state::unmapped_v25_io1_r));
 	map(0x5800a, 0x5800a).r(FUNC(dt7_state::unmapped_v25_io2_r));
+
+	map(0x70000, 0x77fff).ram().share("shared_ram");
+	map(0xf8000, 0xfffff).ram().share("shared_ram");
 }
 
 void dt7_state::dt7_reset(int state)
