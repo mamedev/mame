@@ -695,11 +695,25 @@ void clio_device::map(address_map &map)
 		})
 	);
 
-	// TODO: should really map these directly in DSPP core
-//  map(0x17d0, 0x17d3) Semaphore
-	// HACK: temporary to allow 3do_gdo101 boot
-	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
+	// Semaphore
+	// - gex, nfs, cpubach, sailormn depends on this
+	map(0x17d0, 0x17d3).lrw32(
+		NAME([this] () {
+			return (m_dspp->semaphore_status_r() << 16) | m_dspp->semaphore_data_r();
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask)
+		{
+			m_dspp->host_semaphore_w(data);
+		})
+	);
 //  map(0x17d4, 0x17d7) Semaphore ACK
+	map(0x17d4, 0x17d7).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask)
+		{
+			if (ACCESSING_BITS_16_31)
+				m_dspp->host_semaphore_ack_w(data >> 16);
+		})
+	);
 //  map(0x17e0, 0x17e3) DSPP DMA
 	// DSPPRST0 (use current reload)
 	map(0x17e4, 0x17e7).lw32(

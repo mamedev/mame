@@ -50,11 +50,22 @@ Notes:
 
     TODO:
 
-    - memory banking is broken
     - z80dart wait/ready
     - IMI 7710 Winchester controller
         chdman createhd -o imi7710.chd -chs 350,3,10 -ss 1024
     - revision E model
+    - revision F boot PROM is not dumped. sr70x.u8 is the earlier part and polls
+      port 0x19 for the FDC interrupt/data request lines, which is the SCSI data
+      port on revision F, so the machine never gets past the boot loader.
+
+*/
+
+/*
+
+    Drive 0 defaults to an 80 track drive, which is what the CP/M 3.0 disks in
+    the software list need. cpm22 is a 40 track disk and has to be booted with
+    -flop1 cpm22 -u55:0 525dd, otherwise the format loader places the image on
+    the even tracks only and the BIOS fails to seek past track 0.
 
 */
 
@@ -213,33 +224,24 @@ void bullet_state::exdsk_w(uint8_t data)
 
 	if (m_exdsk_sw)
 	{
-		// drive select
-		m_floppy = nullptr;
-
-		switch (data & 0x07)
-		{
-		// 5.25"
-		case 0: m_floppy = m_floppy0->get_device(); break;
-		case 1: m_floppy = m_floppy1->get_device(); break;
-		case 2: m_floppy = m_floppy2->get_device(); break;
-		case 3: m_floppy = m_floppy3->get_device(); break;
-		// 8"
-		case 4: m_floppy = m_floppy4->get_device(); break;
-		case 5: m_floppy = m_floppy5->get_device(); break;
-		case 6: m_floppy = m_floppy6->get_device(); break;
-		case 7: m_floppy = m_floppy7->get_device(); break;
-		}
+		// drive select, 0-3 are 5.25" and 4-7 are 8"
+		m_floppy = m_floppies[data & 0x07]->get_device();
 
 		m_fdc->set_floppy(m_floppy);
 	}
 
-	if (m_floppy)
+	// side select and the spindle motor line are bussed, so they reach the drives that aren't selected too
+	for (int i = 0; i < 8; i++)
 	{
-		// side select
-		m_floppy->ss_w(BIT(data, 4));
+		floppy_image_device *floppy = m_floppies[i] ? m_floppies[i]->get_device() : nullptr;
 
-		// floppy motor
-		m_floppy->mon_w(BIT(data, 5));
+		if (floppy)
+		{
+			floppy->ss_w(BIT(data, 4));
+
+			// only the 5.25" drives have a switched spindle, the 8" ones run continuously
+			floppy->mon_w((i < 4) ? BIT(data, 5) : 0);
+		}
 	}
 }
 
@@ -463,35 +465,23 @@ void bulletf_state::xfdc_w(uint8_t data)
 
 	*/
 
-	// drive select
-	m_floppy = nullptr;
-
-	switch (data & 0x0f)
-	{
-	// 5.25"
-	case 0: m_floppy = m_floppy0->get_device(); break;
-	case 1: m_floppy = m_floppy1->get_device(); break;
-	case 2: m_floppy = m_floppy2->get_device(); break;
-	case 3: m_floppy = m_floppy3->get_device(); break;
-	// 8"
-	case 4: m_floppy = m_floppy4->get_device(); break;
-	case 5: m_floppy = m_floppy5->get_device(); break;
-	case 6: m_floppy = m_floppy6->get_device(); break;
-	case 7: m_floppy = m_floppy7->get_device(); break;
-	// 3.5"
-	case 8: m_floppy = m_floppy8->get_device(); break;
-	case 9: m_floppy = m_floppy9->get_device(); break;
-	}
+	// drive select, 0-3 are 5.25", 4-7 are 8" and 8-9 are 3.5"
+	m_floppy = ((data & 0x0f) < 10) ? m_floppies[data & 0x0f]->get_device() : nullptr;
 
 	m_fdc->set_floppy(m_floppy);
 
-	if (m_floppy)
+	// side select and the spindle motor line are bussed, so they reach the drives that aren't selected too
+	for (int i = 0; i < 10; i++)
 	{
-		// side select
-		m_floppy->ss_w(BIT(data, 4));
+		floppy_image_device *floppy = m_floppies[i] ? m_floppies[i]->get_device() : nullptr;
 
-		// floppy motor
-		m_floppy->mon_w(BIT(data, 5));
+		if (floppy)
+		{
+			floppy->ss_w(BIT(data, 4));
+
+			// only the 3.5" and 5.25" drives have a switched spindle, the 8" ones run continuously
+			floppy->mon_w((i >= 4 && i < 8) ? 0 : BIT(data, 5));
+		}
 	}
 
 	// FDC clock
@@ -1065,11 +1055,11 @@ void bullet_state::machine_reset()
 
 	if (mini)
 	{
-		m_floppy = m_floppy0->get_device();
+		m_floppy = m_floppies[0]->get_device();
 	}
 	else
 	{
-		m_floppy = m_floppy4->get_device();
+		m_floppy = m_floppies[4]->get_device();
 	}
 
 	m_fdc->set_floppy(m_floppy);
@@ -1305,5 +1295,5 @@ ROM_END
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME               FLAGS
 // the setname 'bullet' is used by Sega's Bullet in MAME.
-COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  empty_init, "Wave Mate", "Bullet",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  empty_init, "Wave Mate", "Bullet",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1984, wmbulletf, wmbullet, 0,      bulletf, bulletf, bulletf_state, empty_init, "Wave Mate", "Bullet (Revision F)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

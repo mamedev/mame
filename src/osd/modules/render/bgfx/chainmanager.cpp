@@ -545,7 +545,8 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		const std::string screen_name = "screen" + screen_index;
 		const std::string palette_name = "palette" + screen_index;
 		const std::string &full_name = (needs_conversion || needs_adjust) ? source_name : screen_name;
-		if (texture && (texture->width() != tex_width || texture->height() != tex_height))
+		// the GPU texture is rowpixels wide, and rowpixels can change without the visible area changing (e.g. a new htotal)
+		if (texture && (texture->width() != tex_width || texture->height() != tex_height || texture->rowpixels() != prim.m_rowpixels))
 		{
 			m_textures.remove_provider(full_name);
 			m_textures.remove_provider(palette_name);

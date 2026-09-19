@@ -44,8 +44,8 @@ protected:
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
-	virtual uint8_t abcbus_inp() override;
-	virtual void abcbus_out(uint8_t data) override;
+	virtual uint8_t abcbus_inp(offs_t offset) override;
+	virtual void abcbus_out(offs_t offset, uint8_t data) override;
 	virtual uint8_t abcbus_stat() override;
 	virtual void abcbus_c1(uint8_t data) override;
 	virtual void abcbus_c3(uint8_t data) override;

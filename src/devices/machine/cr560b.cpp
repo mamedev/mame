@@ -404,7 +404,7 @@ void cr560b_device::write(uint8_t data)
 		case 0x03: cmd_motor_off(); break;
 		//case 0x04: cmd_diag(); break;
 		case 0x05: cmd_read_status(); break;
-		// TODO: drawer_open is issued by fz10e just after purging the disc avatars
+		// TODO: eventually need this for multi-CDs swapping
 		//case 0x06: cmd_drawer_open(); break;
 		//case 0x07: cmd_drawer_close(); break;
 		case 0x09: cmd_set_mode(); break;
@@ -439,6 +439,8 @@ void cr560b_device::write(uint8_t data)
 
 		default:
 		{
+			// NOTE: on 3do if 06 is triggered at startup then the BIOS purged the CD.
+			// If the CD is a prototype or an homebrew SW then user needs a -norsa BIOS (btanb).
 			popmessage("cr560b.cpp: unknown command %02x", m_input_fifo[0]);
 			LOG("Unknown command: %02x\n", m_input_fifo[0]);
 			// answer with an error so that callers waiting for a status byte don't hang

@@ -47,7 +47,6 @@ Notes:
 
     TODO:
 
-    - RS232 RI interrupt
     - PCB layouts
 
 */
@@ -126,6 +125,7 @@ private:
 	void rxrdy_w(int state);
 	void txrdy_w(int state);
 	void fdc_intrq_w(int state);
+	void ri_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
 	uint8_t opram_r(offs_t offset);
@@ -168,15 +168,17 @@ private:
 
 	int m_srq = 1;
 	int m_atn = 1;
-	int m_enb_srq_int = 0;
-	int m_enb_atn_int = 0;
+	int m_enb_srq_int = 1;
+	int m_enb_atn_int = 1;
+
+	int m_ri = 1;
 
 	int m_rxrdy = 0;
 	int m_txrdy = 0;
 	int m_int_clk = 0;
-	int m_enb_xmt_int = 0;
-	int m_enb_rcv_int = 0;
-	int m_enb_ring_int = 0;
+	int m_enb_xmt_int = 1;
+	int m_enb_rcv_int = 1;
+	int m_enb_ring_int = 1;
 
 	// video state
 	bool m_alt = false;
@@ -191,7 +193,8 @@ private:
 
 void vixen_state::update_interrupt()
 {
-	int state = (m_cmd_d1 && m_fdint) || m_vsync;// || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
+	int state = (m_cmd_d1 && m_fdint) || m_vsync || (!m_enb_ring_int && !m_ri) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
+	// TODO: IEEE-488 interrupts || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn)
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -347,7 +350,7 @@ uint8_t vixen_state::port3_r()
 	uint8_t data = 0xfc;
 
 	// ring indicator
-	data |= m_rs232->ri_r();
+	data |= m_ri;
 
 	// data carrier detect
 	data |= m_rs232->dcd_r() << 1;
@@ -694,6 +697,8 @@ void vixen_state::io_i8155_pc_w(uint8_t data)
 	m_enb_xmt_int = BIT(data, 3);
 	m_enb_atn_int = BIT(data, 4);
 	m_enb_srq_int = BIT(data, 5);
+
+	update_interrupt();
 }
 
 void vixen_state::io_i8155_to_w(int state)
@@ -749,6 +754,17 @@ void vixen_state::fdc_intrq_w(int state)
 }
 
 
+//-------------------------------------------------
+//  RS232 interface
+//-------------------------------------------------
+
+void vixen_state::ri_w(int state)
+{
+	m_ri = state;
+	update_interrupt();
+}
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -781,6 +797,7 @@ void vixen_state::machine_start()
 	save_item(NAME(m_atn));
 	save_item(NAME(m_enb_srq_int));
 	save_item(NAME(m_enb_atn_int));
+	save_item(NAME(m_ri));
 	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_txrdy));
 	save_item(NAME(m_int_clk));
@@ -797,6 +814,11 @@ void vixen_state::machine_reset()
 	m_vsync = 0;
 	m_cmd_d0 = 0;
 	m_cmd_d1 = 0;
+	m_enb_ring_int = 1;
+	m_enb_xmt_int = 1;
+	m_enb_rcv_int = 1;
+	m_enb_atn_int = 1;
+	m_enb_srq_int = 1;
 	update_interrupt();
 
 	m_fdc->reset();
@@ -856,11 +878,15 @@ void vixen_state::vixen(machine_config &config)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
 	m_rs232->dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
+	m_rs232->ri_handler().set(FUNC(vixen_state::ri_w));
+	m_rs232->cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));
+	
 	FLOPPY_CONNECTOR(config, m_floppy[0], vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
 	IEEE488(config, m_ieee488);
 	m_ieee488->srq_callback().set(FUNC(vixen_state::srq_w));
 	m_ieee488->atn_callback().set(FUNC(vixen_state::atn_w));

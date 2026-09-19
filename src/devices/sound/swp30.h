@@ -75,7 +75,7 @@ private:
 		s32 m_pos_dec;
 		s16 m_dpcm_s0, m_dpcm_s1, m_dpcm_s2, m_dpcm_s3;
 		u32 m_dpcm_pos;
-		s32 m_dpcm_delta;
+		s32 m_dpcm_delta, m_dpcm_rem;
 
 		bool m_first, m_finetune_active, m_done;
 		s16 m_last;
@@ -309,6 +309,7 @@ private:
 		static u16 revram_encode(u32 v);
 		static u32 revram_decode(u16 v);
 		static s16 m1_expand(s16 v);
+		static s32 pack24(s64 p);
 
 		static void call_rand(void *ms);
 		static void call_revram_encode(void *ms);
@@ -316,6 +317,8 @@ private:
 
 		void step();
 		void drc(drcuml_block &block, u16 pc);
+		void drc_pack24(drcuml_block &block, bool dither, uml::code_label label);
+		void drc_t_value(drcuml_block &block, u32 index2);
 		void reset();
 	};
 
