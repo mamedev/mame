@@ -103,11 +103,6 @@ private:
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
-	void nmi_irq(int state)
-	{
-		// ??
-	}
-
 	u32 machine_id_r(offs_t offset, u32 mem_mask);
 
 	void slot_irq_handler(int line, int state);
@@ -230,8 +225,6 @@ void pmac6400_state::pmac6400(machine_config &config)
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_ohare, FUNC(ohare_device::cb1_w));
 	m_cuda->via_data_callback().set(m_ohare, FUNC(ohare_device::cb2_w));
-	m_cuda->nmi_callback().set(FUNC(pmac6400_state::nmi_irq));
-	
 
 	m_adbbus->out_adb_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	m_adbbus->out_poweron_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
