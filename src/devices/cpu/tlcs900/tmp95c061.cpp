@@ -116,7 +116,7 @@ void tmp95c061_device::internal_mem(address_map &map)
 	map(0x00000d, 0x00000d).rw(FUNC(tmp95c061_device::port_r<PORT_5>), FUNC(tmp95c061_device::port_w<PORT_5>));
 	map(0x000010, 0x000010).w(FUNC(tmp95c061_device::port_cr_w<PORT_5>));
 	map(0x000011, 0x000011).w(FUNC(tmp95c061_device::port_fc_w<PORT_5>));
-	map(0x000012, 0x000012).rw(FUNC(tmp95c061_device::port_r<PORT_6>), FUNC(tmp95c061_device::port_w<PORT_7>));
+	map(0x000012, 0x000012).rw(FUNC(tmp95c061_device::port_r<PORT_6>), FUNC(tmp95c061_device::port_w<PORT_6>));
 	map(0x000013, 0x000013).rw(FUNC(tmp95c061_device::port_r<PORT_7>), FUNC(tmp95c061_device::port_w<PORT_7>));
 	map(0x000015, 0x000015).w(FUNC(tmp95c061_device::port_fc_w<PORT_6>));
 	map(0x000016, 0x000016).w(FUNC(tmp95c061_device::port_cr_w<PORT_7>));
