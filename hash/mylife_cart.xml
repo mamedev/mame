@@ -4,15 +4,30 @@
 license:CC0-1.0
 -->
 
-<!-- multiple cartridge types exist, some with ROM, some with only SEEPROM (for settings?)
+<!--
 
-    NO ROM:
-    Revista - SEEPROM only (was blank)
+Multiple cartridge types exist:
+- Expansion carts with ROM
+- "My Magic Cards" / "My Stuff Keys" with only SEEPROM (for unlocking in-game content, stored in settings?)
+- "My Magic Keys" (for unlocking in-game content and additional mini-games, inserts into expansion cart slot)
+- "My World Keys" (Playmates expansion carts without "My Magic Keys" slot?)
 
-    the ROM cartridges appear to be data only
+Known "My Magic Cards":
+- 14(?) Accessori
+- 14(?) Fashion
+
+Known "My Magic Keys":
+- 6 Special Summer Gold
+- 12 Special Summer Fashion
+
+NO ROM:
+- Revista - SEEPROM only (was blank)
+
 -->
 
 <!--
+
+Cartridge slot pinout (74ac00 on expansion carts has 2 output pins used as additional ROM address lines):
 
  NC|01|VCC
 CEi|02|WE (Internal ROM)
@@ -52,13 +67,37 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 
 <softwarelist name="mylife_cart" description="Giochi Preziosi / Playmates My Life cartridges">
 
+	<software name="mmcacc4" supported="no">
+		<description>My Magic Cards Accessori - Key 4 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="l24c02-si.bin" size="0x100" crc="d906ab75" sha1="b7c816ae8c08063778879db2ddd0a0010e28ded8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcacc5" supported="no">
+		<description>My Magic Cards Accessori - Key 5 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="l24c02-si.bin" size="0x100" crc="5db13252" sha1="2e2a09ce67bc0ca8284e9f428fd9aef9198e00ca"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hannah" supported="no">
 		<description>Hannah Montana (Italy)</description>
 		<year>200?</year>
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="hannah.bin" size="0x800000" crc="f695fe8e" sha1="b5db32e659a35b6ce6d7f633cecf073e028dd45b"/>
+				<rom name="hannah.bin" size="0x800000" crc="f695fe8e" sha1="b5db32e659a35b6ce6d7f633cecf073e028dd45b" status="baddump"/>
 			</dataarea>
 			<!-- blank -->
 			<!--
@@ -74,8 +113,9 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<year>200?</year>
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="summerparty.bin" size="0x800000" crc="24ee4969" sha1="9252f77fd8ff60d1e0cd68cfe363b0ee846343f2"/>
+			<feature name="pcb" value="MWA-R07301A-R12A+0.1" />
+			<dataarea name="rom" size="0x2000000">
+				<rom name="summerparty.bin" size="0x2000000" crc="b87cfdfb" sha1="7e6fe140e33df920727abe4ddb20e214b8deaa53"/>
 			</dataarea>
 			<!-- blank -->
 			<!--
@@ -92,7 +132,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="clubdisco.bin" size="0x800000" crc="d18006e7" sha1="ad2282766899610dc7fb32118b2eb7b434d01d01"/>
+				<rom name="clubdisco.bin" size="0x800000" crc="d18006e7" sha1="ad2282766899610dc7fb32118b2eb7b434d01d01" status="baddump"/>
 			</dataarea>
 			<!-- blank -->
 			<!--
@@ -109,7 +149,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
 			<dataarea name="rom" size="0x800000">
-				<rom name="clubdisco_spain.bin" size="0x800000" crc="8f200051" sha1="253a7bf48908eee8084c01fcc22b07db729d4714"/>
+				<rom name="clubdisco_spain.bin" size="0x800000" crc="8f200051" sha1="253a7bf48908eee8084c01fcc22b07db729d4714" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
