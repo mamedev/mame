@@ -174,8 +174,8 @@ protected:
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
 	bool m_can_instruction_restart; /* Save DA regs for potential instruction restart */
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
-	u8 m_fpu_pending_exception = 0;
-	std::array<u32, 25> m_fpu_frame{}; // 68040 revision $41 busy FSAVE frame
+	u8 m_fpu_pending_exception;
+	std::array<u32, 25> m_fpu_frame; // 68040 revision $41 busy FSAVE frame
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
 	/* Clocks required for instructions / exceptions */
@@ -283,7 +283,6 @@ protected:
 
 	/* 68307 / 68340 internal address map */
 	address_space *m_internal;
-
 
 
 	void init_cpu_common(void);
