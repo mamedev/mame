@@ -1433,7 +1433,7 @@ void roland_xp_device::execute(const dsp_slot &s)
 		default: taken = false; break;
 		}
 		if (taken)
-			m_pc = u16((BIT(s.cram, 9) ? m_pc + 1 + s8(s.cram) : (s.cram & 0xff)) % DSP_SLOTS) - 1;
+			m_pc = (BIT(s.cram, 9) ? m_pc + 1 + s8(s.cram) : (s.cram & 0xff)) - 1;
 	}
 
 	if (multiply_issued)
@@ -1510,6 +1510,9 @@ void roland_xp_device::dsp_step()
 	if (!m_dsp_enabled)
 		return;
 
+	if (m_pc < 0 || m_pc >= DSP_SLOTS)
+		return;
+
 	const dsp_slot &s = m_program[m_pc];
 	dsp_state &d = m_dsp;
 
@@ -1568,7 +1571,7 @@ void roland_xp_device::dsp_step()
 
 	strobe(s);
 
-	m_pc = (m_pc + 1) % DSP_SLOTS;
+	m_pc++;
 }
 
 void roland_xp_device::frame_end()
@@ -1607,7 +1610,8 @@ void roland_xp_device::cycle()
 		}
 	}
 
-	debugger_instruction_hook(m_pc);
+	if (m_pc >= 0 && m_pc < DSP_SLOTS)
+		debugger_instruction_hook(m_pc);
 	dsp_step();
 
 	if (++m_cycle >= slot_count())
