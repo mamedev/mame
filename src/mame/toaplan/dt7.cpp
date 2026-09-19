@@ -144,8 +144,6 @@ public:
 public:
 	void dt7(machine_config &config) ATTR_COLD;
 
-	template <u8 Region> void init_region() ATTR_COLD;
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
