@@ -459,10 +459,6 @@ void debug_view_disasm::redraw()
 			if(m_dasm[effrow].m_is_pc)
 				attrib = DCA_CURRENT;
 
-			// if we're on a line with a breakpoint, tag it changed
-			else if(m_dasm[effrow].m_is_bp)
-				attrib = DCA_CHANGED;
-
 			// if we're on the active column and everything is couth, highlight it
 			if(m_cursor_visible && effrow == m_cursor.y)
 				attrib |= DCA_SELECTED;
@@ -471,7 +467,11 @@ void debug_view_disasm::redraw()
 			if(m_dasm[effrow].m_is_visited)
 				attrib |= DCA_VISITED;
 
-			print(row, ' ' + m_dasm[effrow].m_tadr, 0, divider1, attrib | DCA_ANCILLARY);
+			// if we're on a line with a breakpoint, tag it changed
+			if(m_dasm[effrow].m_is_bp)
+				print(row, '*' + m_dasm[effrow].m_tadr + '*', 0, divider1, attrib | DCA_CHANGED | DCA_ANCILLARY);
+			else
+				print(row, ' ' + m_dasm[effrow].m_tadr, 0, divider1, attrib | DCA_ANCILLARY);
 			print(row, ' ' + m_dasm[effrow].m_dasm, divider1, divider2, attrib);
 
 			if(m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED) {
