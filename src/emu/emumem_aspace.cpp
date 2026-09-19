@@ -645,20 +645,17 @@ void address_space::prepare_map_generic(address_map &map, bool allow_alloc)
 			// if we can't find it, add it to our map if we're allowed to
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
 			memory_share *share = m_manager.share_find(fulltag);
+			size_t const range_bytes = address_to_byte(entry.m_addrend + 1 - entry.m_addrstart);
+			size_t const share_offset = address_to_byte(entry.m_share_offset);
 			if (!share)
 			{
 				if (!allow_alloc)
 					fatalerror("Trying to create share '%s' too late\n", fulltag);
 				VPRINTF("Creating share '%s' of length 0x%X\n", fulltag, entry.m_addrend + 1 - entry.m_addrstart);
-				share = m_manager.share_alloc(m_device, fulltag, m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
+				share = m_manager.share_alloc(m_device, fulltag, m_config.data_width(), range_bytes, endianness());
 			}
-			else
-			{
-				std::string result = share->compare(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
-				if (!result.empty())
-					fatalerror("%s\n", result);
-			}
-			entry.m_memory = share->ptr();
+			share->record_mapping(share_offset, range_bytes);
+			entry.m_memory = static_cast<u8 *>(share->ptr()) + share_offset;
 		}
 
 		// if this is a ROM handler without a specified region and not shared, attach it to the implicit region

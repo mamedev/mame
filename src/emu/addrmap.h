@@ -103,7 +103,7 @@ public:
 	address_map_entry &mirror(offs_t _mirror) { m_addrmirror = _mirror; return *this; }
 	address_map_entry &select(offs_t _select) { m_addrselect = _select; return *this; }
 	address_map_entry &region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; return *this; }
-	address_map_entry &share(const char *tag) { m_share = tag; return *this; }
+	address_map_entry &share(const char *tag, offs_t offset = 0) { m_share = tag; m_share_offset = offset; return *this; }
 
 	// slightly less simple inline setters
 	template<bool _reqd> address_map_entry &region(const memory_region_finder<_reqd> &finder, offs_t offset) {
@@ -116,15 +116,15 @@ public:
 		assert(&target.first == &m_devbase);
 		return region(target.second, offset);
 	}
-	template<typename _ptrt, bool _reqd> address_map_entry &share(const shared_ptr_finder<_ptrt, _reqd> &finder) {
+	template<typename _ptrt, bool _reqd> address_map_entry &share(const shared_ptr_finder<_ptrt, _reqd> &finder, offs_t offset = 0) {
 		const std::pair<device_t &, const char *> target(finder.finder_target());
 		assert(&target.first == &m_devbase);
-		return share(target.second);
+		return share(target.second, offset);
 	}
-	template<typename _ptrt> address_map_entry &share(const memory_share_creator<_ptrt> &finder) {
+	template<typename _ptrt> address_map_entry &share(const memory_share_creator<_ptrt> &finder, offs_t offset = 0) {
 		const std::pair<device_t &, const char *> target(finder.finder_target());
 		assert(&target.first == &m_devbase);
-		return share(target.second);
+		return share(target.second, offset);
 	}
 
 	address_map_entry &rom() { m_read.m_type = AMH_ROM; return *this; }
@@ -437,6 +437,7 @@ public:
 	map_handler_data        m_read;                 // data for read handler
 	map_handler_data        m_write;                // data for write handler
 	const char *            m_share;                // tag of a shared memory block
+	offs_t                  m_share_offset;         // offset of this range within the share
 	const char *            m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
 	ws_time_delegate        m_before_time;          // before-time wait-state
