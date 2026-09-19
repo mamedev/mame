@@ -176,7 +176,7 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<part name="cart" interface="mylife_cart">
 			<feature name="pcb" value="MWA-R07301A-R12A+0.1" />
 			<dataarea name="rom" size="0x2000000">
-				<!-- One cart yielded at offset 0x013d75a0 value 0x4c instead of 0x0c, maybe bad dump? -->
+				<!-- One cart yielded at offset 0x013d75a8 value 0x4c instead of 0x0c, maybe bad dump? -->
 				<rom name="summerparty.bin" size="0x2000000" crc="66489756" sha1="a0b17ba6224a36050d5a56f25500044d8fdc7a66" />
 			</dataarea>
 			<!-- blank -->
