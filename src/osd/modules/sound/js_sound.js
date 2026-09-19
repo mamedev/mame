@@ -15,8 +15,8 @@ var context = null;
 var gain_node = null;
 var eventNode = null;
 var sampleScale = 32766;
-var inputBuffer = new Float32Array(44100);
-var bufferSize = 44100;
+var inputBuffer = new Float32Array(16384);
+var bufferSize = 16384;
 var start = 0;
 var rear = 0;
 var watchDogDateLast = null;
@@ -54,11 +54,11 @@ function init_event() {
 	//Generate a streaming node point:
 	if (typeof context.createScriptProcessor == "function") {
 		//Current standard compliant way:
-		eventNode = context.createScriptProcessor(4096, 0, 2);
+		eventNode = context.createScriptProcessor(2048, 0, 2);
 	}
 	else {
 		//Deprecated way:
-		eventNode = context.createJavaScriptNode(4096, 0, 2);
+		eventNode = context.createJavaScriptNode(2048, 0, 2);
 	}
 	//Make our tick function the audio callback function:
 	eventNode.onaudioprocess = tick;
@@ -144,7 +144,8 @@ function tick (event) {
 		buffers[bufferCount] = event.outputBuffer.getChannelData(bufferCount);
 	}
 	//Copy samples from the input buffer to the Web Audio API:
-	for (var index = 0; index < 4096 && start != rear; ++index) {
+	var quantum = buffers[0].length;
+	for (var index = 0; index < quantum && start != rear; ++index) {
 		buffers[0][index] = inputBuffer[start++];
 		buffers[1][index] = inputBuffer[start++];
 		if (start == bufferSize) {
@@ -153,7 +154,7 @@ function tick (event) {
 	}
 	//Pad with latest if we're underrunning:
 	var idx = (index == 0 ? bufferSize : index) - 1;
-	while (index < 4096) {
+	while (index < quantum) {
 		buffers[0][index] = buffers[0][idx];
 		buffers[1][index++] = buffers[1][idx];
 	}
@@ -192,5 +193,7 @@ return {
 
 })();
 
-window.jsmame_stream_sink_update = jsmame_web_audio.stream_sink_update;
-window.jsmame_sample_count = jsmame_web_audio.sample_count;
+if (typeof window !== "undefined") {
+	window.jsmame_stream_sink_update = jsmame_web_audio.stream_sink_update;
+	window.jsmame_sample_count = jsmame_web_audio.sample_count;
+}
