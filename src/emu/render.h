@@ -108,6 +108,7 @@ constexpr u32 PRIMFLAG_VECTORBUF_MASK = 1 << PRIMFLAG_VECTORBUF_SHIFT;
 constexpr int PRIMFLAG_TYPE_SHIFT = 19;
 constexpr u32 PRIMFLAG_TYPE_MASK = 3 << PRIMFLAG_TYPE_SHIFT;
 constexpr u32 PRIMFLAG_TYPE_LINE = 0 << PRIMFLAG_TYPE_SHIFT;
+constexpr u32 PRIMFLAG_TYPE_VECTOR = 2 << PRIMFLAG_TYPE_SHIFT;
 constexpr u32 PRIMFLAG_TYPE_QUAD = 1 << PRIMFLAG_TYPE_SHIFT;
 
 constexpr int PRIMFLAG_PACKABLE_SHIFT = 21;
@@ -217,6 +218,7 @@ public:
 	{
 		INVALID = 0,                        // invalid type
 		LINE,                               // a single line
+		VECTOR,                             // a single line with additional timing information
 		QUAD                                // a rectilinear quad
 	};
 
@@ -240,6 +242,7 @@ public:
 	float               width = 0.0F;       // width (for line primitives)
 	render_texinfo      texture;            // texture info (for quad primitives)
 	render_quad_texuv   texcoords;          // texture coordinates (for quad primitives)
+	double              draw_duration;      // period of time in milliseconds that the emulated machine took to draw this (for vector primitives)
 	render_container *  container = nullptr;// the render container we belong to
 
 private:
@@ -419,6 +422,7 @@ public:
 
 	// add items to the list
 	void add_line(float x0, float y0, float x1, float y1, float width, rgb_t argb, u32 flags);
+	void add_vector(float x0, float y0, float x1, float y1, float width, rgb_t argb, double draw_duration, u32 flags);
 	void add_quad(float x0, float y0, float x1, float y1, rgb_t argb, render_texture *texture, u32 flags);
 	void add_char(float x0, float y0, float height, float aspect, rgb_t argb, render_font &font, u16 ch);
 	void add_point(float x0, float y0, float diameter, rgb_t argb, u32 flags) { add_line(x0, y0, x0, y0, diameter, argb, flags); }
@@ -438,7 +442,7 @@ private:
 		friend class simple_list<item>;
 
 	public:
-		item() : m_next(nullptr), m_type(0), m_flags(0), m_internal(0), m_width(0), m_texture(nullptr) { }
+		item() : m_next(nullptr), m_type(0), m_flags(0), m_internal(0), m_width(0), m_texture(nullptr), m_draw_duration(0) { }
 
 		// getters
 		item *next() const { return m_next; }
@@ -449,17 +453,19 @@ private:
 		u32 internal() const { return m_internal; }
 		float width() const { return m_width; }
 		render_texture *texture() const { return m_texture; }
+		double draw_duration() const { return m_draw_duration; }
 
 	private:
 		// internal state
 		item *              m_next;             // pointer to the next element in the list
-		u8                  m_type;             // type of element
+		u8                  m_type;             // type of element (eg. CONTAINER_ITEM_LINE)
 		render_bounds       m_bounds;           // bounds of the element
 		render_color        m_color;            // RGBA factors
 		u32                 m_flags;            // option flags
 		u32                 m_internal;         // internal flags
 		float               m_width;            // width of the line (lines only)
 		render_texture *    m_texture;          // pointer to the source texture (quads only)
+		double              m_draw_duration;    // period of time in milliseconds that the emulated machine took to draw this (vectors only)
 	};
 
 	// generic screen overlay scaler
