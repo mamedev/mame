@@ -227,7 +227,8 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					switch (m_in_buf[0])
 					{
 						case 0xf0: // Set Front Panel LCD
-							memcpy(m_lcd_state, m_in_buf + 1, 16);
+							for (uint8_t i = 0; i < 16; i++)
+								m_lcd_w(i, m_in_buf[i + 1]);
 							break;
 						default:
 							break;
@@ -419,6 +420,7 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_read_mousebtn(*this, 0x00)
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_atten_w(*this)
+	, m_lcd_w(*this)
 	, m_testplug_cb(*this, 0)
 	, m_cdrom(*this, ":cdrom")
 {
@@ -467,8 +469,6 @@ void cdislave_hle_device::device_start()
 
 	save_item(NAME(m_xbus_interrupt_enable));
 
-	save_item(NAME(m_lcd_state));
-
 	save_item(NAME(m_input_mouse_x));
 	save_item(NAME(m_input_mouse_y));
 
@@ -506,8 +506,6 @@ void cdislave_hle_device::device_reset()
 	m_debug_mode = 0;
 
 	m_xbus_interrupt_enable = 0;
-
-	memset(m_lcd_state, 0, 16);
 
 	m_input_mouse_x = 0xffff;
 	m_input_mouse_y = 0xffff;
