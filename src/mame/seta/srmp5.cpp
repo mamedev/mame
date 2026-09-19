@@ -617,4 +617,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, empty_init, ROT0, "Seta", "Super Real Mahjong P5", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, srmp5, 0, srmp5, srmp5, srmp5_state, empty_init, ROT0, "Seta", "Super Real Mahjong P.V (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
