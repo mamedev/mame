@@ -1878,6 +1878,8 @@ if BUSES["COLECO_EXPANSION"] then
 		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.h",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/lundy_speech.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/lundy_speech.h",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.h",
 	}
@@ -6292,6 +6294,8 @@ if BUSES["VIP"] then
 		MAME_DIR .. "src/devices/bus/vip/vp570.h",
 		MAME_DIR .. "src/devices/bus/vip/vp575.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp575.h",
+		MAME_DIR .. "src/devices/bus/vip/vp576.cpp",
+		MAME_DIR .. "src/devices/bus/vip/vp576.h",
 		MAME_DIR .. "src/devices/bus/vip/vp585.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp585.h",
 		MAME_DIR .. "src/devices/bus/vip/vp590.cpp",

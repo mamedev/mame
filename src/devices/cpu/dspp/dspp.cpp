@@ -73,9 +73,8 @@ void dspp_device::data_clio_map(address_map &map)
 	map(0x0e0, 0x0e3).r(FUNC(dspp_device::outfifo_status_r));
 	map(0x0ea, 0x0ea).r(FUNC(dspp_device::noise_r));
 //  map(0x0eb, 0x0eb) audio output status read
-//  map(0x0ec, 0x0ec) semaphore status read
-	map(0x0ec, 0x0ec).nopr(); // noisy, suppress for now
-//  map(0x0ed, 0x0ed) semaphore data word
+	map(0x0ec, 0x0ec).r(FUNC(dspp_device::semaphore_status_r));
+	map(0x0ed, 0x0ed).r(FUNC(dspp_device::semaphore_data_r));
 	map(0x0ee, 0x0ee).rw(FUNC(dspp_device::pc_r), FUNC(dspp_device::pc_w));
 	map(0x0ef, 0x0ef).rw(FUNC(dspp_device::clock_r), FUNC(dspp_device::clock_w));
 	// input FIFOs (reading pops a sample)
@@ -90,8 +89,8 @@ void dspp_device::data_clio_map(address_map &map)
 			m_core->m_flag_audlock = BIT(data, 15);
 		})
 	);
-//  map(0x3ec, 0x3ec) semaphore ACK
-//  map(0x3ed, 0x3ed) semaphore write
+	map(0x3ec, 0x3ec).w(FUNC(dspp_device::semaphore_ack_w));
+	map(0x3ed, 0x3ed).w(FUNC(dspp_device::semaphore_data_w));
 	// host CPU irq, the word is the audio folio tick counter (read back by the host at $3fb8)
 	map(0x3ee, 0x3ee).rw(FUNC(dspp_device::tick_r), FUNC(dspp_device::tick_w));
 	// clock reload: instruments write $4000 at the top of the frame and read back $0ef
@@ -252,6 +251,8 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_stack));
 	save_item(NAME(m_core->m_stack_ptr));
 	save_item(NAME(m_core->m_rbase));
+	save_item(NAME(m_core->m_rmap));
+	save_item(NAME(m_core->m_rbase_xor));
 	save_item(NAME(m_core->m_acc));
 	save_item(NAME(m_core->m_tclock));
 
@@ -266,6 +267,9 @@ void dspp_device::device_start()
 	save_item(NAME(m_frame_counter));
 	save_item(NAME(m_frame_sync));
 	save_item(NAME(m_tick));
+
+	save_item(NAME(m_semaphore_data));
+	save_item(NAME(m_semaphore_status));
 
 	save_item(NAME(m_outputs));
 	save_item(NAME(m_output_fifo_start));
@@ -317,6 +321,7 @@ void dspp_device::device_start()
 	set_icountptr(m_core->m_icount);
 
 	m_cache_dirty = true;
+
 }
 
 
@@ -331,6 +336,8 @@ void dspp_device::device_reset()
 	m_core->m_stack_ptr = 0;
 	m_output_fifo_start = 0;
 	m_output_fifo_count = 0;
+	m_semaphore_status = 0;
+	m_semaphore_data = 0;
 
 	m_core->m_flag_audlock = 0;
 	m_core->m_flag_sleep = 0;
@@ -338,7 +345,7 @@ void dspp_device::device_reset()
 	m_core->m_writeback = ~1; // TODO
 	m_frame_counter = m_frame_period;
 	m_frame_sync = false;
-	set_rbase(0, 0);
+	set_rmap(0, 0);
 
 	// TODO: CLEAR DMA CHANNELS
 
@@ -347,6 +354,14 @@ void dspp_device::device_reset()
 	update_host_interrupt();
 
 	m_cache_dirty = true;
+}
+
+void dspp_bulldog_device::device_reset()
+{
+	dspp_device::device_reset();
+
+	// the register bases are plain addresses here
+	set_rbase(0, 0);
 }
 
 
@@ -700,6 +715,38 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 
 
 //-------------------------------------------------
+//  set_rmap - Set register address map and base
+//-------------------------------------------------
+
+// Rather than Bulldog's four bases, this version builds a register address out of the register number:
+// bit 9 is register bit 3, bit 8 is picked from register bits 3 and 2 by RMAP, bits 2-0 are register
+// bits 2-0, and RBASE is XORed over bits 7-2.  RMAP 0, the only mode the audio folio uses, puts R0-R3
+// in EI memory, R4-R11 in I memory and R12-R15 in EO memory.
+void dspp_device::set_rmap(uint32_t rmap, uint32_t rbase)
+{
+	m_core->m_rmap = rmap;
+	m_core->m_rbase_xor = rbase;
+
+	for (uint32_t group = 0; group < 4; group++)
+	{
+		const bool x = BIT(group, 0);
+		const bool y = BIT(group, 1);
+		bool sel;
+
+		switch (rmap)
+		{
+			case 4:  sel = y; break;
+			case 5:  sel = !y; break;
+			case 6:  sel = x && y; break;
+			case 7:  sel = x || y; break;
+			default: sel = x; break;
+		}
+		m_core->m_rbase[group] = ((y << 9) | (sel << 8) | (x << 2)) ^ rbase;
+	}
+}
+
+
+//-------------------------------------------------
 //  translate_reg - Translate register address
 //-------------------------------------------------
 
@@ -860,6 +907,16 @@ inline void dspp_device::exec_super_special()
 			m_core->m_pc = m_core->m_acc >> 4;
 			break;
 		}
+		case 2: // RBASE (not on Bulldog, which has the special op instead)
+		{
+			set_rmap(m_core->m_rmap, (m_core->m_op & 0x3f) << 2);
+			break;
+		}
+		case 3: // RMAP (not on Bulldog)
+		{
+			set_rmap(m_core->m_op & 7, m_core->m_rbase_xor);
+			break;
+		}
 		case 4: // RTS
 		{
 			m_core->m_pc = pop_pc();
@@ -880,9 +937,7 @@ inline void dspp_device::exec_super_special()
 		}
 
 		case 0: // NOP
-		case 2: // Unused
-		case 3:
-		case 6:
+		case 6: // Unused
 			break;
 	}
 }
@@ -2025,7 +2080,49 @@ uint16_t dspp_device::noise_r()
 	return machine().rand();
 }
 
+//-------------------------------------------------
+//  semaphore section
+//-------------------------------------------------
 
+uint16_t dspp_device::semaphore_status_r()
+{
+	return m_semaphore_status;
+}
+
+uint16_t dspp_device::semaphore_data_r()
+{
+	return m_semaphore_data;
+}
+
+template <unsigned N> void dspp_device::semaphore_delayed_write(s32 param)
+{
+	m_semaphore_status = 1 << (3 - N);
+	m_semaphore_data = param & 0xffff;
+}
+
+void dspp_device::host_semaphore_w(uint32_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<0>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::host_semaphore_ack_w(uint16_t data)
+{
+	 m_semaphore_status |= 1 << 1;
+}
+
+void dspp_device::semaphore_data_w(uint16_t data)
+{
+	machine().scheduler().synchronize(
+		timer_expired_delegate(FUNC(dspp_device::semaphore_delayed_write<1>), this),
+			unsigned(data & 0xffff));
+}
+
+void dspp_device::semaphore_ack_w(uint16_t data)
+{
+	m_semaphore_status |= 1 << 0;
+}
 
 //**************************************************************************
 //  EXTERNAL INTERFACE AND CONTROL REGISTERS

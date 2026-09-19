@@ -19342,4 +19342,16 @@ Hangs at credits screen
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=e8ziXxs027g -->
+	<software name="3sg">
+		<description>Three Shades of Gray</description>
+		<year>2016</year>
+		<publisher>Alumni</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="3shades.dsk" size="368640" crc="b0c7a559" sha1="70ecd4d9e1335bc985369cc77a52e7bbbb4e72f8"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

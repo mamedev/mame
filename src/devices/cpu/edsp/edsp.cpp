@@ -16,7 +16,7 @@ constexpr u16 SR_GIE = 0x0020; // 0x8000 on eSL/eSLS
 
 edsp_device::edsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program_map, address_map_constructor data_map, address_map_constructor io_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, -1, program_map)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, -1, 16, 15, program_map)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, data_map)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 7, -1, io_map)
 	, m_sp(0)
@@ -82,6 +82,14 @@ device_memory_interface::space_config_vector edsp_device::memory_space_config() 
 std::unique_ptr<util::disasm_interface> edsp_device::create_disassembler()
 {
 	return std::make_unique<edsp_disassembler>();
+}
+
+bool edsp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	target_space = &space(spacenum);
+	if (spacenum == AS_PROGRAM && BIT(address, 15))
+		address += u32(BIT(m_bank, 0, 9)) << 15;
+	return true;
 }
 
 void edsp_device::device_start()
@@ -371,6 +379,11 @@ u16 edsp_device::read_program_word(u16 addr)
 	return m_program.read_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr);
 }
 
+u16 edsp_device::fetch_program_word()
+{
+	return m_cache.read_word(m_pc >= 0x8000 ? m_pc + (u32(BIT(m_bank, 0, 9)) << 15) : m_pc);
+}
+
 void edsp_device::execute_run()
 {
 	do
@@ -391,7 +404,7 @@ void edsp_device::execute_run()
 		{
 			m_ppc = m_pc;
 			debugger_instruction_hook(m_pc);
-			const u16 op = m_cache.read_word(m_pc);
+			const u16 op = fetch_program_word();
 			if (m_rcr)
 				m_rcr--;
 			else
@@ -446,7 +459,7 @@ void edsp_device::execute_run()
 			else if ((op & 0xf810) == 0x3800 && BIT(op, 0, 3) != 7)
 			{
 				const u16 s = m_r[BIT(op, 5, 3)];
-				const u16 imm16 = m_cache.read_word(m_pc);
+				const u16 imm16 = fetch_program_word();
 
 				u16 d = 0;
 				switch (BIT(op, 0, 3))
@@ -493,7 +506,7 @@ void edsp_device::execute_run()
 			else if ((op & 0xf818) == 0x3810 && BIT(op, 0, 3) != 7)
 			{
 				const u16 s = m_r[BIT(op, 5, 3)];
-				const u16 ramaddr = m_cache.read_word(m_pc);
+				const u16 ramaddr = fetch_program_word();
 				const u16 data16 = m_data.read_word(ramaddr);
 
 				u16 d = 0;
@@ -546,7 +559,7 @@ void edsp_device::execute_run()
 				// IF cond JMP Long_addr
 				if (test_condition(BIT(op, 7, 4)))
 				{
-					const u16 addr = m_cache.read_word(m_pc);
+					const u16 addr = fetch_program_word();
 					m_pc = addr;
 				}
 				else
@@ -556,7 +569,7 @@ void edsp_device::execute_run()
 			else if (op == 0x3819)
 			{
 				// CALL Long_addr
-				const u16 addr = m_cache.read_word(m_pc);
+				const u16 addr = fetch_program_word();
 				m_data.write_word(m_sp, m_pc + 1);
 				m_sp--;
 				m_pc = addr;
@@ -711,26 +724,41 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf8ff) == 0x585e)
 			{
+				// JMP Rn
+				m_pc = m_r[BIT(op, 8, 3)];
+				m_icount -= 2;
+			}
+			else if ((op & 0xf8ff) == 0x587e)
+			{
+				// CALL Rn
+				m_data.write_word(m_sp, m_pc);
+				m_sp--;
 				m_pc = m_r[BIT(op, 8, 3)];
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x589e)
 			{
-				m_r[BIT(op, 8, 3)] = m_data.read_word(m_cache.read_word(m_pc));
+				m_r[BIT(op, 8, 3)] = m_data.read_word(fetch_program_word());
 				m_pc++;
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x58be)
 			{
-				m_data.write_word(m_cache.read_word(m_pc), m_r[BIT(op, 8, 3)]);
+				m_data.write_word(fetch_program_word(), m_r[BIT(op, 8, 3)]);
 				m_pc++;
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x58de)
 			{
-				m_data.write_word(m_r[BIT(op, 8, 3)], m_cache.read_word(m_pc));
+				m_data.write_word(m_r[BIT(op, 8, 3)], fetch_program_word());
 				m_pc++;
 				m_icount -= 2;
+			}
+			else if ((op & 0xf81f) == 0x581f)
+			{
+				m_data.write_word(m_r[BIT(op, 8, 3)], m_r[BIT(op, 5, 3)]);
+				--m_r[BIT(op, 8, 3)];
+				m_icount -= 1;
 			}
 			else if ((op & 0xf800) == 0x6000)
 			{

@@ -865,7 +865,7 @@ uint8_t luxor_55_21046_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t luxor_55_21046_device::abcbus_inp()
+uint8_t luxor_55_21046_device::abcbus_inp(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -883,7 +883,7 @@ uint8_t luxor_55_21046_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_out(uint8_t data)
+void luxor_55_21046_device::abcbus_out(offs_t offset, uint8_t data)
 {
 	if (m_cs)
 	{

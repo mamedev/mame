@@ -25517,7 +25517,7 @@ Not extensively tested
 
 	<!-- Identifying Super Real Mahjong P V (J) (T-16501G)... -->
 	<software name="srmp5" supported="no">
-		<description>Super Real Mahjong P V (Japan)</description>
+		<description>Super Real Mahjong P.V (Japan)</description>
 		<year>1995</year>
 		<publisher>Seta</publisher>
 		<info name="serial" value="T-16501G"/>

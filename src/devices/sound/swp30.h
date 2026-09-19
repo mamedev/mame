@@ -75,7 +75,7 @@ private:
 		s32 m_pos_dec;
 		s16 m_dpcm_s0, m_dpcm_s1, m_dpcm_s2, m_dpcm_s3;
 		u32 m_dpcm_pos;
-		s32 m_dpcm_delta;
+		s32 m_dpcm_delta, m_dpcm_rem;
 
 		bool m_first, m_finetune_active, m_done;
 		s16 m_last;

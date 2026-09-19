@@ -31,7 +31,6 @@
         CMP Rs, P[Rt++]
         CMP [Rs++], P[Rt--]
         CMP [Rs++], P[Rt++]
-        CALL Rd
         LOOP Rn
         LOOP #imm6
         TRAP #imm6
@@ -515,6 +514,11 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "jmp r%d", BIT(op, 8, 3));
 		return 1 | SUPPORTED;
 	}
+	else if ((op & 0xf8ff) == 0x587e)
+	{
+		util::stream_format(stream, "call r%d", BIT(op, 8, 3));
+		return 1 | STEP_OVER | SUPPORTED;
+	}
 	else if ((op & 0xf8ff) == 0x589e)
 	{
 		// MOV RAM16 to register direct
@@ -535,7 +539,6 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x581f)
 	{
-		// not used in mylife
 		util::stream_format(stream, "[r%d--] = r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}

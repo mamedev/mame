@@ -508,6 +508,7 @@ const double XTAL::known_xtals[] = {
 	 53'203'424, // 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier)
 	 53'693'175, // 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier)
 	 54'000'000, // 54_MHz_XTAL            Taito JC
+	 54'285'700, // 54.2857_MHz_XTAL       Qume QVT-82
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
 	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)

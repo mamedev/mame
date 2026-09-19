@@ -712,7 +712,7 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 	m_flush_flag(false),
 	m_fbram(nullptr),
 	m_fbmask(0),
-	m_rgboffs{ u32(~0), u32(~0), u32(~0) },
+	m_rgboffs{ ~u32(0), ~u32(0), ~u32(0) },
 	m_auxoffs(~0),
 	m_frontbuf(0),
 	m_backbuf(1),
