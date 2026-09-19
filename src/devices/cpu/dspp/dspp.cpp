@@ -251,6 +251,8 @@ void dspp_device::device_start()
 	save_item(NAME(m_core->m_stack));
 	save_item(NAME(m_core->m_stack_ptr));
 	save_item(NAME(m_core->m_rbase));
+	save_item(NAME(m_core->m_rmap));
+	save_item(NAME(m_core->m_rbase_xor));
 	save_item(NAME(m_core->m_acc));
 	save_item(NAME(m_core->m_tclock));
 
@@ -343,7 +345,7 @@ void dspp_device::device_reset()
 	m_core->m_writeback = ~1; // TODO
 	m_frame_counter = m_frame_period;
 	m_frame_sync = false;
-	set_rbase(0, 0);
+	set_rmap(0, 0);
 
 	// TODO: CLEAR DMA CHANNELS
 
@@ -352,6 +354,14 @@ void dspp_device::device_reset()
 	update_host_interrupt();
 
 	m_cache_dirty = true;
+}
+
+void dspp_bulldog_device::device_reset()
+{
+	dspp_device::device_reset();
+
+	// the register bases are plain addresses here
+	set_rbase(0, 0);
 }
 
 
@@ -705,6 +715,38 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 
 
 //-------------------------------------------------
+//  set_rmap - Set register address map and base
+//-------------------------------------------------
+
+// Rather than Bulldog's four bases, this version builds a register address out of the register number:
+// bit 9 is register bit 3, bit 8 is picked from register bits 3 and 2 by RMAP, bits 2-0 are register
+// bits 2-0, and RBASE is XORed over bits 7-2.  RMAP 0, the only mode the audio folio uses, puts R0-R3
+// in EI memory, R4-R11 in I memory and R12-R15 in EO memory.
+void dspp_device::set_rmap(uint32_t rmap, uint32_t rbase)
+{
+	m_core->m_rmap = rmap;
+	m_core->m_rbase_xor = rbase;
+
+	for (uint32_t group = 0; group < 4; group++)
+	{
+		const bool x = BIT(group, 0);
+		const bool y = BIT(group, 1);
+		bool sel;
+
+		switch (rmap)
+		{
+			case 4:  sel = y; break;
+			case 5:  sel = !y; break;
+			case 6:  sel = x && y; break;
+			case 7:  sel = x || y; break;
+			default: sel = x; break;
+		}
+		m_core->m_rbase[group] = ((y << 9) | (sel << 8) | (x << 2)) ^ rbase;
+	}
+}
+
+
+//-------------------------------------------------
 //  translate_reg - Translate register address
 //-------------------------------------------------
 
@@ -865,6 +907,16 @@ inline void dspp_device::exec_super_special()
 			m_core->m_pc = m_core->m_acc >> 4;
 			break;
 		}
+		case 2: // RBASE (not on Bulldog, which has the special op instead)
+		{
+			set_rmap(m_core->m_rmap, (m_core->m_op & 0x3f) << 2);
+			break;
+		}
+		case 3: // RMAP (not on Bulldog)
+		{
+			set_rmap(m_core->m_op & 7, m_core->m_rbase_xor);
+			break;
+		}
 		case 4: // RTS
 		{
 			m_core->m_pc = pop_pc();
@@ -885,9 +937,7 @@ inline void dspp_device::exec_super_special()
 		}
 
 		case 0: // NOP
-		case 2: // Unused
-		case 3:
-		case 6:
+		case 6: // Unused
 			break;
 	}
 }
