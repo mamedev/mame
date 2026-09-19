@@ -77,12 +77,33 @@ public:
 	decode_result decode(std::span<const u8> input, std::size_t &consumed, const picture_buffers &buffers,
 						int &width, int &height, double &frame_rate);
 
+	// Complete the current picture once its last macroblock is decoded,
+	// without waiting for the start code that follows it, for when no more
+	// input is expected.  Takes the buffers bound at PICTURE_HEADER and
+	// returns PICTURE, or NEED_DATA if the picture is not complete.
+	decode_result complete_picture(const picture_buffers &buffers, int &width, int &height, double &frame_rate);
+
 	picture_type coding_type() const { return picture_type(m_picture_coding_type); }
 	u16 temporal_reference() const { return m_temporal_reference; }
 	bool picture_ends_sequence() const { return m_picture_ends_sequence; }
 
+	// At PICTURE_HEADER: whether a sequence header or a group of pictures
+	// header was parsed since the previous picture header.
+	bool picture_follows_sequence_header() const { return m_picture_follows_sequence_header; }
+	bool picture_follows_group() const { return m_picture_follows_group; }
+
+	// picture_rate code of the sequence header
+	u8 picture_rate_code() const { return m_picture_rate_code; }
+
+	// 25-bit time_code of the last group of pictures header
+	u32 time_code() const { return m_time_code; }
+
 	// Clear persistent decoding state.
 	void clear() ATTR_COLD;
+
+	// Discard buffered input and any partial picture, but keep the sequence
+	// parameters, so a stream can resume without a new sequence header.
+	void reset_input();
 
 	// Register persistent decoding state with an owning device.
 	void register_save_state(device_t &device, int index = 0) ATTR_COLD;
@@ -204,9 +225,16 @@ private:
 	u8 m_intra_quantizer_matrix[64];
 	u8 m_non_intra_quantizer_matrix[64];
 
+	u8 m_picture_rate_code;
+	u32 m_time_code;
+	bool m_sequence_header_seen;
+	bool m_group_seen;
+
 	s32 m_picture_coding_type;
 	u16 m_temporal_reference;
 	bool m_picture_ends_sequence;
+	bool m_picture_follows_sequence_header;
+	bool m_picture_follows_group;
 	bool m_full_pel_forward_vector;
 	bool m_full_pel_backward_vector;
 	s32 m_forward_f;
