@@ -112,8 +112,10 @@ unsigned adb_hle_mouse_device::adb_talk(u8 reg, std::span<u8> data)
 		return 0;
 	}
 
-	s16 const delta_x = std::clamp(s16(x - m_last_x), (s16)-0x40, (s16)0x3f);
-	s16 const delta_y = std::clamp(s16(y - m_last_y), (s16)-0x40, (s16)0x3f);
+	s16 constexpr MIN_DELTA = -0x40;
+	s16 constexpr MAX_DELTA = 0x3f;
+	s16 const delta_x = std::clamp(s16(x - m_last_x), MIN_DELTA, MAX_DELTA);
+	s16 const delta_y = std::clamp(s16(y - m_last_y), MIN_DELTA, MAX_DELTA);
 	data[0] = (BIT(~buttons, 0) << 7) | (u8(delta_y) & 0x7f);
 	data[1] = (BIT(~buttons, 1) << 7) | (u8(delta_x) & 0x7f);
 
