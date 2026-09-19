@@ -621,9 +621,7 @@ void cv1k_state::cv1k_touch(machine_config &config)
 {
 	cv1k(config);
 
-	// touch panel on P5, wired to SCIF channel 2 of the SH3.  the game selects
-	// entry 4 of its baud rate table, which with a 12.8MHz peripheral clock is
-	// 4878 baud - close enough to the nominal 4800 the panel runs at
+	// Touch panel on P5, wired to SCIF channel 2 of the SH3.
 	CV1K_TOUCHSCREEN(config, m_touchscreen, 4800);
 	m_touchscreen->txd_handler().set(m_maincpu, FUNC(sh3_base_device::scif_rxd_w));
 	m_maincpu->scif_txd_handler().set(m_touchscreen, FUNC(cv1k_touchscreen_device::rxd_w));
@@ -1183,4 +1181,4 @@ GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 //GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k_touch, mmmbanc, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                     MACHINE_IMPERFECT_TIMING )
+GAME( 2007, mmmbanc,    0,        cv1k_touch, mmmbanc, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                     0 )

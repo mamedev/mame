@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:buffis
+// copyright-holders:buffi
 /***************************************************************************
 
-    Serial touch screen used by the CV1000 medal games
+    Serial touch screen used by mmmbanc.
 
 ***************************************************************************/
 
@@ -18,10 +18,10 @@ class cv1k_touchscreen_device : public device_t, public device_serial_interface
 public:
 	cv1k_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// serial data out, to the host's RXD
+	// Serial data out, to the host's RXD.
 	auto txd_handler() { return m_txd_cb.bind(); }
 
-	// serial data in, from the host's TXD
+	// Serial data in, from the host's TXD.
 	void rxd_w(int state);
 
 protected:
@@ -36,7 +36,7 @@ protected:
 private:
 	static constexpr unsigned TX_BUFFER_SIZE = 8;
 
-	// commands sent by the host
+	// Commands sent by the host.
 	enum : uint8_t
 	{
 		CMD_RESET  = 0x55, // -> ACK
@@ -46,7 +46,7 @@ private:
 		CMD_STREAM = 0x21  // start reporting
 	};
 
-	// bytes sent by the panel
+	// Bytes sent by the panel.
 	enum : uint8_t
 	{
 		RSP_ACK     = 0x06,

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:buffis
+// copyright-holders:buffi
 /***************************************************************************
 
   SH7709 SCIF (Serial Communication Interface with FIFO)
@@ -18,17 +18,18 @@ class sh7709_scif_device : public device_t, public device_serial_interface
 public:
 	sh7709_scif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// serial data out (to the peripheral's RXD)
+	// Serial data out (to the peripheral's RXD).
 	auto write_txd() { return m_txd_cb.bind(); }
 
-	// interrupt request lines.  the SH3 INTC has no SCIF sources wired up yet, so these
-	// are normally left unconnected - see the TODO in the .cpp
+	// Interrupt request lines.
+	// The SH3 INTC has no SCIF sources wired up yet, so these
+	// are left unconnected.
 	auto write_eri() { return m_eri_cb.bind(); }
 	auto write_rxi() { return m_rxi_cb.bind(); }
 	auto write_bri() { return m_bri_cb.bind(); }
 	auto write_txi() { return m_txi_cb.bind(); }
 
-	// serial data in (from the peripheral's TXD)
+	// Serial data in (from the peripheral's TXD).
 	void rxd_w(int state);
 
 	void map(address_map &map) ATTR_COLD;
@@ -73,7 +74,7 @@ private:
 		SCSSR_TEND = 1 << 6,
 		SCSSR_ER   = 1 << 7,
 
-		// bits software is allowed to clear by writing 0 after reading 1
+		// Bits software is allowed to clear by writing 0 after reading 1.
 		SCSSR_RW   = SCSSR_DR | SCSSR_RDF | SCSSR_BRK | SCSSR_TDFE | SCSSR_ER
 	};
 

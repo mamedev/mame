@@ -635,7 +635,7 @@ public:
 	auto scif_txd_handler() { return m_scif.lookup()->write_txd(); }
 	void scif_rxd_w(int state) { m_scif->rxd_w(state); }
 
-	// peripheral clock feeding the SCIF baud rate generator, defaults to CPU clock / 8
+	// Peripheral clock feeding the SCIF baud rate generator, defaults to CPU clock / 8.
 	void set_scif_clock(uint32_t clock) { m_scif.lookup()->set_clock(clock); }
 	void set_scif_clock(const XTAL &xtal) { m_scif.lookup()->set_clock(xtal); }
 

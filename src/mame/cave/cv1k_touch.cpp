@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:buffis
+// copyright-holders:buffi
 /***************************************************************************
 
     Serial touch screen used by the CV1000 medal games
 
-    Medal Mahjong Moukari Bancho is the only dumped CV1000 title that has the
-    P5 D9 connector and the MAX3244E RS-232 transceiver fitted.  The panel is
-    an unidentified Japanese controller hanging off SCIF channel 2 of the
-    SH7709S at 8N1.  Everything below was worked out from the game code.
+    Medal Mahjong Moukari Bancho is the only CV1000 title that has touch screen
+    support.  The panel is an unidentified Japanese controller hanging off SCIF
+    channel 2 of the SH7709S at 8N1. Everything below was worked out from the
+    game code.
 
     Startup handshake, each step separated by a short sleep.  If any expected
     reply does not turn up the game closes the port and starts over:
@@ -40,11 +40,11 @@
 #include "logmacro.h"
 
 
-// the panel is physically larger than the visible picture, so the screen only
-// covers the middle ~80% of the reported range.  the limits below were measured
+// The panel is physically larger than the visible picture, so the screen only
+// covers the middle ~80% of the reported range. The limits below were measured
 // against mmmbanc's factory calibration by walking the on-screen touch marker,
-// and make a click land where the pointer is.  the full 10 bit range is still
-// representable, the game's own calibration screen just never needs the edges
+// and make a click land where the pointer is. The full 10 bit range is still
+// representable, the game's own calibration screen just never needs the edges.
 static INPUT_PORTS_START( cv1k_touchscreen )
 	PORT_START("TOUCH")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Touch Screen")
@@ -144,7 +144,7 @@ void cv1k_touchscreen_device::start_transmit()
 	if (!is_transmit_register_empty())
 		return;
 
-	// the panel never lets the line go idle once it has been told to report
+	// The panel never lets the line go idle once it has been told to report.
 	if (!m_tx_count && m_streaming)
 		queue_report();
 
@@ -199,7 +199,7 @@ void cv1k_touchscreen_device::rcv_complete()
 
 	case CMD_ID:
 		LOGMASKED(LOG_COMMAND, "identify\n");
-		// the game only stores these for display, the values are a guess
+		// The game only stores these for display, the values are a guess.
 		queue_byte(0x01);
 		queue_byte(0x00);
 		break;

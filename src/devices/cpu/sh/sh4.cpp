@@ -969,10 +969,10 @@ sh3_base_device::~sh3_base_device()
 
 void sh3_base_device::device_add_mconfig(machine_config &config)
 {
-	// only the SH7709/SH7709S actually map this (see scif_7709_map), it is harmless
-	// on the SH7708 variants.  the peripheral clock is derived from the CPU clock by
+	// Only the SH7709/SH7709S actually map this (see scif_7709_map) but it is harmless
+	// on the SH7708 variants. The peripheral clock is derived from the CPU clock by
 	// the CPG, which isn't emulated - the default matches what the CV1000 boards use,
-	// drivers for other systems can override it with set_scif_clock()
+	// drivers for other systems can override it with set_scif_clock().
 	SH7709_SCIF(config, m_scif, DERIVED_CLOCK(1, 8));
 }
 

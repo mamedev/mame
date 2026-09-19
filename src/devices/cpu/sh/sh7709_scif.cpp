@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:buffis
+// copyright-holders:buffi
 /***************************************************************************
 
   SH7709 SCIF (Serial Communication Interface with FIFO)
@@ -199,7 +199,7 @@ uint16_t sh7709_scif_device::scssr_r()
 
 void sh7709_scif_device::scssr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// a status bit that has been read as 1 is cleared by writing 0 to it
+	// A status bit that has been read as 1 is cleared by writing 0 to it.
 	const uint16_t old = m_scssr;
 	m_scssr &= data | ~(SCSSR_RW & mem_mask);
 
@@ -208,7 +208,7 @@ void sh7709_scif_device::scssr_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	LOGMASKED(LOG_REGISTERS, "scssr_w %04x & %04x: %04x -> %04x\n", data, mem_mask, old, m_scssr);
 
-	// the hardware re-asserts the FIFO driven flags as long as their condition holds
+	// The hardware re-asserts the FIFO driven flags as long as their condition holds.
 	update_status();
 	update_tx_state();
 }
@@ -342,7 +342,7 @@ void sh7709_scif_device::update_data_format()
 
 void sh7709_scif_device::update_clock()
 {
-	// N = P / (64 * 2^(2n - 1) * B) - 1, so B = P / (32 * 4^n * (N + 1))
+	// Baud rate = PERIPHERAL_CLOCK / (32 * 4^CKS * (SCBRR + 1))
 	const unsigned divider = 32 * (1 << (2 * (m_scsmr & SCSMR_CKS))) * (m_scbrr + 1);
 	const attotime clock_speed = attotime::from_ticks(divider, clock());
 
