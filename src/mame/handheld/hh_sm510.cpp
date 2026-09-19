@@ -33,8 +33,8 @@ TODO:
   verification, or a re-dump with the new method, is wanted for: bassmate,
   gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp,
   gnw_dkong3, gnw_gcliff, gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway,
-  gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda,
-  trtreisl, trspacadv, vesarif, uchitari
+  gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, trtreisl,
+  trspacadv, vesarif, uchitari
 
 ================================================================================
 
@@ -2935,7 +2935,7 @@ ROM_START( gnw_zelda )
 	ROM_LOAD( "zl-65.program", 0x0000, 0x1000, CRC(b96aa64e) SHA1(d1f0c64104eb3ecbf370674d5078a3a85b2b7227) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "zl-65.melody", 0x000, 0x100, BAD_DUMP CRC(3a281b0f) SHA1(7a236775557939050bbcd6f9d0a598d219a032f2) ) // decap needed for verification
+	ROM_LOAD( "zl-65.melody", 0x000, 0x100, CRC(5e8abd36) SHA1(44899ff1c31cf69b105ed83a8bb6576551649379) )
 
 	ROM_REGION( 283029, "screen_top", 0)
 	ROM_LOAD( "gnw_zelda_top.svg", 0, 283029, CRC(aaab1d7e) SHA1(fe01e8a92e6dcf457da87afe6bf39fcf511da9db) )
