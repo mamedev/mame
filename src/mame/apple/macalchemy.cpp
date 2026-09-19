@@ -19,6 +19,8 @@
 	and so does the CPU. Skipping this gets us to a point where the 68k
 	emulator runs, but we have a black screen.
 
+
+
  ****************************************************************************/
 
 #include "emu.h"
@@ -60,7 +62,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 	    m_pci_root(*this, "pci"),
-	    m_bandit(*this, "pci:00.0"),
+	    m_psx(*this, "pci:00.0"),
         m_ohare(*this, "pci:10.0"),
 		m_video(*this, "valkyrie"),
 		m_scsibus(*this, "scsi"),
@@ -80,7 +82,7 @@ public:
 private:
 	required_device<ppc603e_device> m_maincpu;
 	required_device<pci_root_device> m_pci_root;
-    required_device<bandit_host_device> m_bandit;
+    required_device<applpsx_host_device> m_psx;
     required_device<ohare_device> m_ohare;
 	required_device<valkyrie_device> m_video;
 	required_device<nscsi_bus_device> m_scsibus;
@@ -184,9 +186,9 @@ void pmac6400_state::slot_irq_handler(int line, int state)
 
 void pmac6400_state::pmac6400_map(address_map &map)
 {
-    map(0x00000000, 0x007fffff).ram();
+    map(0x00000000, 0x03ffffff).ram();
 
-	map(0x00000000, 0xffffffff).m(m_video, FUNC(valkyrie_device::valkyrievr_map));
+	map(0x00000000, 0xffffffff).m(m_video, FUNC(valkyrie_device::valkyriear_map));
 
     map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
@@ -205,8 +207,8 @@ void pmac6400_state::pmac6400(machine_config &config)
 
     // Bandit actually integrated into the PSX chip
 	PCI_ROOT(config, m_pci_root, 0);
-	BANDIT(config, m_bandit, 50_MHz_XTAL, "maincpu");
-	m_bandit->set_dev_offset(1);
+	APPLPSX(config, m_psx, 50_MHz_XTAL, "maincpu");
+	m_psx->set_dev_offset(1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

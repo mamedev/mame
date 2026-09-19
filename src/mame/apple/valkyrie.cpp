@@ -33,7 +33,7 @@
 #define LOG_RAMDAC      (1U << 3)
 #define LOG_CLOCKGEN    (1U << 4)
 
-#define VERBOSE (0)
+#define VERBOSE (1)
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
@@ -50,9 +50,9 @@ void valkyrie_device::map(address_map &map)
 	map(0xf9000000, 0xf90fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
 }
 
-void valkyrie_device::valkyrievr_map(address_map &map)
+void valkyrie_device::valkyriear_map(address_map &map)
 {
-	map(0xf130a000, 0xf130bfff).rw(FUNC(valkyrie_device::regs_r), FUNC(valkyrie_device::regs_w));
+	map(0xf130a000, 0xf130bfff).rw(FUNC(valkyrie_device::regs64_r), FUNC(valkyrie_device::regs64_w));
 	map(0xf1304000, 0xf1305fff).rw(FUNC(valkyrie_device::ramdac_r), FUNC(valkyrie_device::ramdac_w));
 
 	map(0xf1000000, 0xf10fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
@@ -333,6 +333,7 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			break;
 
 		case 0x18: // screen enable
+			printf("screen enable...\n");
 			// at startup, the screen isn't wanted on until 0x81 is written.
 			// if the Video Startup extension is installed, it later sets this to 0x02.
 			if ((data & 0x80) || (data == 0x02))
@@ -381,6 +382,22 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			LOG("Valkyrie: Unk write %08x @ %x\n", data, offset<<2);
 			break;
 	}
+}
+
+// this behavior is inherited from the dingusppc implementation.
+// while it seems like the Valkyrie expects data on a 32-bit alignment,
+// and the Valkyrie-AR on a 64-bit alignment, their driver does this instead.
+// without real hardware to test, it's not clear what the right approach is...
+
+// ---
+void valkyrie_device::regs64_w(offs_t offset, u8 data)
+{
+	regs_w(offset >> 1, data);
+}
+
+u8 valkyrie_device::regs64_r(offs_t offset)
+{
+	return regs_r(offset >> 1);
 }
 
 u32 valkyrie_device::ramdac_r(offs_t offset)
@@ -582,3 +599,4 @@ void valkyrie_device::write_data(u16 offset, u8 data)
 	LOGMASKED(LOG_CLOCKGEN, "Valkyrie: M = %d %02x, N = %d %02x P = %d, pixel clock %d\n", m_M, m_M, m_N, m_N, m_P, m_pixel_clock);
 	recalc_mode();
 }
+

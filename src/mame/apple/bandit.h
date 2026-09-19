@@ -84,7 +84,31 @@ private:
 	void regs_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
 
+class applpsx_host_device : public bandit_host_device
+{
+public:
+	template <typename T>
+	applpsx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
+		: applpsx_host_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+	applpsx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	// virtual void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+
+	u32 regs_r(offs_t offset, u32 mem_mask = ~0);
+	void regs_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	u32 m_sys_config;
+};
+
 DECLARE_DEVICE_TYPE(BANDIT, bandit_host_device)
 DECLARE_DEVICE_TYPE(ASPEN, aspen_host_device)
+DECLARE_DEVICE_TYPE(APPLPSX, applpsx_host_device)
 
 #endif // MAME_APPLE_BANDIT_H

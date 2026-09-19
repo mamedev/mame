@@ -2,13 +2,17 @@
 // copyright-holders:R. Belmont
 /**********************************************************************
 
-    bandit.cpp - Apple "Bandit" and "Aspen" 60x bus/PCI bridges
+    bandit.cpp - Apple "Bandit", "Aspen", "PSX" 60x bus/PCI bridges
+
+	The "Aspen" and "PSX" chips unify memory/ROM control, system
+	version detection, and a "Bandit" PCI host controller onto a single chip.
+	While both appear at 0xF8xxxxxx, their register maps and functions are different.
 
 **********************************************************************/
 #include "emu.h"
 #include "bandit.h"
 
-#define VERBOSE (0)
+#define VERBOSE (1)
 #include "logmacro.h"
 
 enum
@@ -27,8 +31,34 @@ enum
 	ASPEN_GPIO_OUT
 };
 
+enum
+{
+	PSX_SYSTEM_ID = 0, 		 // read only
+	PSX_REVISION,			 // read only
+	PSX_SYS_CONFIG,			 // r+w
+	PSX_ROM_CONFIG,			
+	PSX_DRAM_CONFIG,
+	PSX_DRAM_REFRESH,
+	PSX_FLASH_CONFIG,
+	PSX_MEMPAGE_MAPPINGS_1 = 8,	
+	PSX_MEMPAGE_MAPPINGS_2,
+	PSX_MEMPAGE_MAPPINGS_3,
+	PSX_MEMPAGE_MAPPINGS_4,
+	PSX_MEMPAGE_MAPPINGS_5,
+	PSX_BUS_TIMEOUT,
+};
+
+std::map<int,int> psx_bus_speeds{
+	{ 0, 38'000'000 },
+	{ 1, 33'000'000 },
+	{ 2, 40'000'000 },
+	{ 3, 50'000'000 },
+};
+
 DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "banditpci", "Apple Bandit PowerPC-to-PCI bridge")
 DEFINE_DEVICE_TYPE(ASPEN, aspen_host_device, "aspenpci", "Apple Aspen PowerPC-to-PCI bridge and memory controller")
+DEFINE_DEVICE_TYPE(APPLPSX, applpsx_host_device, "aspenpci", "Apple PSX PowerPC-to-PCI bridge and memory controller")
+
 
 void bandit_host_device::config_map(address_map &map)
 {
@@ -57,13 +87,66 @@ aspen_host_device::aspen_host_device(const machine_config &mconfig, const char *
 {
 }
 
+
+applpsx_host_device::applpsx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: bandit_host_device(mconfig, APPLPSX, tag, owner, clock)
+{
+}
+
 void aspen_host_device::device_start()
 {
 	bandit_host_device::device_start();
 
-	m_cpu_space->install_read_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_r)));
-	m_cpu_space->install_write_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_w)));
+	m_cpu_space->install_read_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_r)));
+	m_cpu_space->install_write_handler(0xf8000000, 0xf800006f, emu::rw_delegate(*this, FUNC(aspen_host_device::regs_w)));
 }
+
+void applpsx_host_device::device_start()
+{
+	bandit_host_device::device_start();
+
+	m_cpu_space->install_read_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_r)));
+	m_cpu_space->install_write_handler(0xf8000000, 0xf80007ff, emu::rw_delegate(*this, FUNC(applpsx_host_device::regs_w)));
+
+	m_sys_config = 0x03000000;
+}
+
+u32 applpsx_host_device::regs_r(offs_t offset, u32 mem_mask)
+{
+	int reg = (offset >> 1) & 0x1f;
+
+	switch(reg) {
+		case PSX_SYSTEM_ID:
+			return 0x10000000;
+
+		case PSX_REVISION:
+			return 0x10000000;
+		
+		case PSX_SYS_CONFIG:
+			return m_sys_config;
+
+		default:
+			logerror("%s: psx reg: read unmapped register %02x\n", tag(), reg);
+			return 0xffffffff;
+	}
+}
+
+void applpsx_host_device::regs_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	int reg = (offset >> 1) & 0x1f;
+
+	switch(reg) {
+
+		default:
+			logerror("%s: psx reg: write unmapped register %02x: d %08x mask %08x\n",
+					 tag(),
+					 reg,
+					 data,
+					 mem_mask);
+			break;
+	}
+}
+
 
 u32 aspen_host_device::regs_r(offs_t offset, u32 mem_mask)
 {
