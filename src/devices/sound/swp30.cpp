@@ -4027,46 +4027,43 @@ void swp30_device::meg_state::step()
 	// writes and reads as zero, absolute reads excepted since they do not
 	// go through the map
 	switch(BIT(opcode, 0x24, 2)) {
-	case 1: {
-		if(BIT(m_swp->m_revram_enable, map_bank(m_pc)))
-			break;
-		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
-		if(address != 0xffffffff)
-			m_swp->m_reverb_cache.write_word(address, revram_encode(m_ram_write));
+	case 1:
+		if(!BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
+			u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
+			if(address != 0xffffffff)
+				m_swp->m_reverb_cache.write_word(address, revram_encode(m_ram_write));
+		}
 		break;
-	}
-	case 2: {
+	case 2:
 		if(!BIT(opcode, 0x23) && BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
 			m_memr_value[m_delay_2] = 0;
 			m_memr_active[m_delay_2] = true;
-			break;
-		}
-		u32 address = BIT(opcode, 0x23) ?
-			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
-			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
-		if(address != 0xffffffff) {
-			u16 val = m_swp->m_reverb_cache.read_word(address);
-			m_memr_value[m_delay_2] = revram_decode(val);
-			m_memr_active[m_delay_2] = true;
+		} else {
+			u32 address = BIT(opcode, 0x23) ?
+				(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
+				resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
+			if(address != 0xffffffff) {
+				u16 val = m_swp->m_reverb_cache.read_word(address);
+				m_memr_value[m_delay_2] = revram_decode(val);
+				m_memr_active[m_delay_2] = true;
+			}
 		}
 		break;
-	}
-	case 3: {
+	case 3:
 		if(!BIT(opcode, 0x23) && BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
 			m_memr_value[m_delay_2] = 0;
 			m_memr_active[m_delay_2] = true;
-			break;
-		}
-		u32 address = BIT(opcode, 0x23) ?
-			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
-			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
-		if(address != 0xffffffff) {
-			u16 val = m_swp->m_reverb_cache.read_word(address);
-			m_memr_value[m_delay_2] = revram_decode(val);
-			m_memr_active[m_delay_2] = true;
+		} else {
+			u32 address = BIT(opcode, 0x23) ?
+				(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
+				resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
+			if(address != 0xffffffff) {
+				u16 val = m_swp->m_reverb_cache.read_word(address);
+				m_memr_value[m_delay_2] = revram_decode(val);
+				m_memr_active[m_delay_2] = true;
+			}
 		}
 		break;
-	}
 	}
 
 	m_delay_3 ++;

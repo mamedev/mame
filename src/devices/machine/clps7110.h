@@ -20,6 +20,8 @@ class clps711x_device : public device_t,
 public:
 	void set_screen_origin(uint16_t x_offset, uint16_t y_offset) { m_lcd_x_offset = x_offset; m_lcd_y_offset = y_offset; }
 
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+
 	// callbacks
 	auto lcd_dma_cb() { return m_lcd_dma_cb.bind(); }
 	auto buz_cb() { return m_buz_cb.bind(); }
@@ -49,8 +51,6 @@ public:
 	void periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 protected:
 	clps711x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id);
