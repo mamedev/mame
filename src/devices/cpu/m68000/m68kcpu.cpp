@@ -1109,6 +1109,8 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_fpsr));
 	save_item(NAME(m_fpiar));
 	save_item(NAME(m_fpu_just_reset));
+	save_item(NAME(m_fpu_pending_exception));
+	save_item(NAME(m_fpu_frame));
 
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));

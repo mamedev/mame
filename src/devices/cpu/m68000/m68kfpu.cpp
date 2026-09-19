@@ -33,8 +33,8 @@ static constexpr int FPCC_NAN        = 0x01000000;
 static constexpr u32 FPES_INEXDEC       = 0x00000100;
 static constexpr u32 FPES_INEXACT       = 0x00000200;
 static constexpr u32 FPES_DIVZERO       = 0x00000400;
-static constexpr u32 FPES_OVERFLOW      = 0x00000800;
-static constexpr u32 FPES_UNDERFLOW     = 0x00001000;
+static constexpr u32 FPES_OVERFLOW      = 0x00001000;
+static constexpr u32 FPES_UNDERFLOW     = 0x00000800;
 static constexpr u32 FPES_OPERR         = 0x00002000;
 static constexpr u32 FPES_SNAN          = 0x00004000;
 static constexpr u32 FPES_BSUN          = 0x00008000;
@@ -418,7 +418,7 @@ void m68000_musashi_device::set_condition_codes(extFloat80_t reg)
 	}
 
 	// zero flag
-	if (((reg.signExp & 0x7fff) == 0) && ((reg.signif<<1) == 0))
+	if (((reg.signExp & 0x7fff) == 0) && (reg.signif == 0))
 	{
 		m_fpsr |= FPCC_Z;
 	}
@@ -500,6 +500,199 @@ void m68000_musashi_device::sync_exception_flags(extFloat80_t op1, extFloat80_t 
 	}
 
 	update_accrued_exceptions();
+}
+
+// MC68040 User's Manual, sections 9.7 and 9.8.  Exceptions are posted by
+// arithmetic, not by writes to FPCR/FPSR, and reported before the next F-line
+// instruction (except FSAVE/FRESTORE).  Currently posted by FDIV/FSDIV/FDDIV;
+// other operations and the 68881/68882 exception frames remain to be implemented.
+u8 m68000_musashi_device::fpu_exception_vector(u32 exceptions) const
+{
+	static constexpr u8 vectors[8] =
+	{
+		48, 54, 52, 53, 51, 50, 49, 49
+	};
+	for (unsigned bit = 0; bit < 8; ++bit)
+	{
+		if (exceptions & (0x8000 >> bit))
+		{
+			return vectors[bit];
+		}
+	}
+	return 0;
+}
+
+bool m68000_musashi_device::fpu_check_pending_exception()
+{
+	if (!m_fpu_pending_exception)
+	{
+		return false;
+	}
+
+	const u32 vector = m_fpu_pending_exception;
+	const u32 sr = m68ki_init_exception(vector);
+	m68ki_stack_frame_0000(m_ppc, sr, vector);
+	m68ki_jump_vector(vector);
+	m_icount -= m_cyc_exception[vector];
+	// Only FSAVE suspends the exceptional state.  An F-line instruction in
+	// the handler before FSAVE must report the exception again.
+	return true;
+}
+
+void m68000_musashi_device::fpu_exception_frame(u16 command, extFloat80_t source, extFloat80_t destination, bool writeback)
+{
+	auto tag = [](extFloat80_t value) -> u32
+	{
+		if ((value.signExp & 0x7fff) == 0x7fff)
+		{
+			return (value.signif << 1) ? 3 : 2;
+		}
+		if (!value.signif)
+		{
+			return 1;
+		}
+		return (value.signif >> 63) ? 0 : 4;
+	};
+	auto operand = [this](unsigned offset, extFloat80_t value)
+	{
+		m_fpu_frame[offset / 4] = u32(value.signExp) << 16;
+		m_fpu_frame[offset / 4 + 1] = value.signif >> 32;
+		m_fpu_frame[offset / 4 + 2] = u32(value.signif);
+	};
+
+	m_fpu_frame.fill(0);
+	m_fpu_frame[0] = 0x41600000; // revision $41, 96 bytes after the header
+	m_fpu_frame[0x28 / 4] = m_fpiar;
+	// CMDREG3B permutes command bits 5:2; see figure 9-11.
+	const u16 command3 = (command & 0x03c3) | ((command & 0x0038) >> 1) | ((command & 4) << 3);
+	m_fpu_frame[0x34 / 4] = u32(command3) << 16;
+	m_fpu_frame[0x3c / 4] = tag(source) << 29;
+	m_fpu_frame[0x40 / 4] = u32(command) << 16;
+	m_fpu_frame[0x44 / 4] = tag(destination) << 29;
+	m_fpu_frame[0x48 / 4] = writeback ? 0x02000000 : 0x04000000; // E3/E1
+	operand(0x4c, destination);
+	operand(0x58, source);
+}
+
+void m68000_musashi_device::fpu_div(u16 command, extFloat80_t source, int precision)
+{
+	const unsigned dst = (command >> 7) & 7;
+	const extFloat80_t destination = m_fpr[dst];
+	const int saved_precision = extF80_roundingPrecision;
+	extF80_roundingPrecision = precision;
+	extFloat80_t result, condition_result;
+	int exponent = 0, rounded_exponent = 0;
+	u64 numerator = destination.signif;
+	u64 denominator = source.signif;
+	const bool finite = numerator && denominator &&
+		(destination.signExp & 0x7fff) != 0x7fff && (source.signExp & 0x7fff) != 0x7fff;
+	if ((m_cpu_type & CPU_TYPE_040) && finite)
+	{
+		// Divide normalized, scaled operands so SoftFloat doesn't discard the
+		// intermediate exponent on overflow/underflow.  Motorola also permits
+		// a normalized extended operand with exponent zero, unlike x87.
+		const int ashift = std::countl_zero(numerator);
+		const int bshift = std::countl_zero(denominator);
+		numerator <<= ashift;
+		denominator <<= bshift;
+		exponent = int(destination.signExp & 0x7fff) - ashift
+			- int(source.signExp & 0x7fff) + bshift + 0x3fff;
+		extFloat80_t a = destination, b = source;
+		a.signExp = (a.signExp & 0x8000) | 0x3fff;
+		b.signExp = (b.signExp & 0x8000) | 0x3fff;
+		a.signif = numerator;
+		b.signif = denominator;
+		result = extF80_div(a, b);
+		rounded_exponent = exponent + (result.signExp & 0x7fff) - 0x3fff;
+		if (numerator < denominator)
+		{
+			--exponent;
+		}
+
+		// Unlike SoftFloat's precision control, the 040 also checks the
+		// selected exponent range, and reports underflow even for exact results.
+		const int minimum = precision == 32 ? 0x3f81 : precision == 64 ? 0x3c01 : 0;
+		const int maximum = precision == 32 ? 0x407e : precision == 64 ? 0x43fe : 0x7ffe;
+		if (exponent < minimum)
+		{
+			m_fpsr |= FPES_UNDERFLOW;
+		}
+		else if (rounded_exponent > maximum)
+		{
+			m_fpsr |= FPES_OVERFLOW;
+		}
+		condition_result = result; // the intermediate is finite even outside the exponent range
+		result.signExp = (result.signExp & 0x8000) | (rounded_exponent & 0x7fff);
+	}
+	else
+	{
+		condition_result = result = extF80_div(destination, source);
+	}
+	extF80_roundingPrecision = saved_precision;
+
+	if (softfloat_exceptionFlags & softfloat_flag_infinite)
+	{
+		m_fpsr |= FPES_DIVZERO;
+	}
+	sync_exception_flags(source, destination, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+	set_condition_codes(condition_result);
+
+	// Overflow/underflow require FPSP intervention even when masked on 040.
+	const u32 exceptions = m_fpsr & (m_fpcr | FPES_OVERFLOW | FPES_UNDERFLOW) & 0xff00;
+	m_fpu_pending_exception = (m_cpu_type & CPU_TYPE_040) ? fpu_exception_vector(exceptions) : 0;
+	if (!m_fpu_pending_exception || m_fpu_pending_exception == 49)
+	{
+		m_fpr[dst] = result; // INEX commits the rounded result before trapping
+	}
+	if (!m_fpu_pending_exception)
+	{
+		return;
+	}
+
+	const bool writeback = m_fpu_pending_exception == 49 || m_fpu_pending_exception == 51 || m_fpu_pending_exception == 53;
+	fpu_exception_frame(command, source, destination, writeback);
+	if (writeback && finite)
+	{
+		// Recover the 67-bit intermediate significand for WBTEMP.  This is
+		// only needed on the exceptional path, before FPSP rounds/denormalizes.
+		u64 remainder = numerator < denominator ? (numerator << 1) - denominator : numerator - denominator;
+		u64 significand = u64(1) << 63;
+		auto quotient_bit = [&remainder, denominator]() -> bool
+		{
+			const bool carry = BIT(remainder, 63);
+			remainder <<= 1;
+			if (carry || remainder >= denominator)
+			{
+				remainder -= denominator;
+				return true;
+			}
+			return false;
+		};
+		for (int bit = 62; bit >= 0; --bit)
+		{
+			if (quotient_bit())
+			{
+				significand |= u64(1) << bit;
+			}
+		}
+		const bool guard = quotient_bit();
+		const bool round = quotient_bit();
+		const bool sticky = remainder != 0;
+		if (m_fpu_pending_exception == 53)
+		{
+			// Overflow supplies an already rounded mantissa.
+			exponent = rounded_exponent;
+			significand = result.signif;
+		}
+		else
+		{
+			m_fpu_frame[0x3c / 4] |= (u32(guard) << 25) | (u32(round) << 24) | (u32(sticky) << 23);
+		}
+		m_fpu_frame[0x18 / 4] = (u32((destination.signExp ^ source.signExp) & 0x8000) << 16) | (u32(exponent & 0x7fff) << 16);
+		m_fpu_frame[0x1c / 4] = significand >> 32;
+		m_fpu_frame[0x20 / 4] = u32(significand);
+		m_fpu_frame[0x44 / 4] |= BIT(exponent, 15) << 20;
+	}
 }
 
 int m68000_musashi_device::test_condition(int condition)
@@ -1879,17 +2072,9 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			break;
 		}
 		case 0x20:      // FDIV
-		{
-			if (extF80_eq(source, i32_to_extF80(0)))
-			{
-				m_fpsr |= FPES_DIVZERO | FPAE_DIVZERO;
-			}
-			m_fpr[dst] = extF80_div(m_fpr[dst], source);
-			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT|EXC_ENB_OVRFLOW|EXC_ENB_UNDFLOW);
+			fpu_div(w2, source, extF80_roundingPrecision);
 			m_icount -= 128;
 			break;
-		}
 		case 0x21:      // FMOD
 		{
 			s8 const mode = softfloat_roundingMode;
@@ -2216,20 +2401,9 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x60:      // FSDIV
 		case 0x64:      // FDDIV
-		{
-			if (extF80_eq(source, i32_to_extF80(0)))
-			{
-				m_fpsr |= FPES_DIVZERO | FPAE_DIVZERO;
-			}
-			{
-				const forced_precision fp(opmode);
-				m_fpr[dst] = extF80_div(m_fpr[dst], source);
-			}
-			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(source, dstCopy, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
+			fpu_div(w2, source, (opmode & 4) ? 64 : 32);
 			m_icount -= 124;
 			break;
-		}
 		case 0x62:      // FSADD
 		case 0x66:      // FDADD
 		{
@@ -2710,6 +2884,17 @@ int m68000_musashi_device::perform_fsave(u32 addr, int inc)
 {
 	if(m_cpu_type & CPU_TYPE_040)
 	{
+		if (m_fpu_pending_exception)
+		{
+			const u32 start = inc ? addr : addr - 100;
+			for (unsigned i = 0; i < m_fpu_frame.size(); ++i)
+			{
+				m68ki_write_32(start + 4 * i, m_fpu_frame[i]);
+			}
+			m_fpu_pending_exception = 0;
+			m_fpu_frame.fill(0);
+			return inc ? 100 : -100;
+		}
 		if(inc)
 		{
 			m68ki_write_32(addr, 0x41000000);
@@ -2752,6 +2937,8 @@ void m68000_musashi_device::do_frestore_null()
 {
 	int i;
 
+	m_fpu_pending_exception = 0;
+	m_fpu_frame.fill(0);
 	m_fpcr = 0;
 	m_fpsr = 0;
 	m_fpiar = 0;
@@ -2806,8 +2993,23 @@ void m68000_musashi_device::m68040_do_frestore(u32 addr, int reg)
 	// check for nullptr frame
 	if (temp & 0xff000000)
 	{
-		// we don't handle non-nullptr frames
 		m_fpu_just_reset = 0;
+		m_fpu_pending_exception = 0;
+		m_fpu_frame.fill(0);
+		if (m40 && temp == 0x41600000)
+		{
+			m_fpu_frame[0] = temp;
+			for (unsigned i = 1; i < m_fpu_frame.size(); ++i)
+			{
+				m_fpu_frame[i] = m68ki_read_32(addr + 4 * i);
+			}
+			// FPSR/FPCR are restored separately.  E1/E3 distinguish a pending
+			// exception from an old status bit or a serviced frame.
+			if (m_fpu_frame[0x48 / 4] & 0x06000000)
+			{
+				m_fpu_pending_exception = fpu_exception_vector(m_fpsr & (m_fpcr | FPES_OVERFLOW | FPES_UNDERFLOW) & 0xff00);
+			}
+		}
 
 		if (reg != -1)
 		{
@@ -2820,6 +3022,14 @@ void m68000_musashi_device::m68040_do_frestore(u32 addr, int reg)
 			else if (m40 && ((temp & 0xffff0000) == 0x41000000))
 			{
 				// the format longword is the whole frame
+			}
+			else if (m40 && temp == 0x41600000)
+			{
+				REG_A()[reg] += 96;
+			}
+			else if (m40 && temp == 0x41300000)
+			{
+				REG_A()[reg] += 48;
 			} // check UNIMP
 			else if ((temp & 0x00ff0000) == 0x00380000)
 			{

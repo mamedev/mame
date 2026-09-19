@@ -60,7 +60,12 @@ f000 f000 1111     . .          071234fc:4
 
 
 f200 ffc0 fpgen    l .          234f:0
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u16 w2 = OPER_I_16();
 		switch((w2 >> 13) & 0x7)
@@ -84,75 +89,133 @@ f200 ffc0 fpgen    l .          234f:0
 				m68ki_exception_1111();
 				break;
 		}
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f240 fff8 fscc_d   b .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u32 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		DY() = (DY() & 0xffffff00) | v;
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f240 ffc0 fscc     b A+-DXWL    234f:6
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(M68KMAKE_GET_EA_AY_8, v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f248 fff8 fdbcc    l .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		fdbcc();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f27a ffff ftrap_w  l .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m68881_ftrap();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f27b ffff ftrap_l  l .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m68881_ftrap();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f27c ffff ftrap    l .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m68881_ftrap();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f280 ffc0 fbcc_w   w .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		fbcc16();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
 
 f2c0 ffc0 fbcc_l   l .          234f:4
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		fbcc32();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 

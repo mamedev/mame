@@ -17,7 +17,12 @@ void m68000_musashi_device::xf000_1111_071234fc()
 }
 void m68000_musashi_device::xf200_fpgen_l_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u16 w2 = OPER_I_16();
 		switch((w2 >> 13) & 0x7)
@@ -41,7 +46,9 @@ void m68000_musashi_device::xf200_fpgen_l_234f()
 				m68ki_exception_1111();
 				break;
 		}
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -49,11 +56,18 @@ void m68000_musashi_device::xf200_fpgen_l_234f()
 }
 void m68000_musashi_device::xf240_fscc_d_b_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u32 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		DY() = (DY() & 0xffffff00) | v;
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -61,11 +75,18 @@ void m68000_musashi_device::xf240_fscc_d_b_234f()
 }
 void m68000_musashi_device::xf250_fscc_b_ai_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_AI_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -73,11 +94,18 @@ void m68000_musashi_device::xf250_fscc_b_ai_234f()
 }
 void m68000_musashi_device::xf258_fscc_b_pi_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_PI_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -85,11 +113,18 @@ void m68000_musashi_device::xf258_fscc_b_pi_234f()
 }
 void m68000_musashi_device::xf25f_fscc_b_pi7_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_A7_PI_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -97,11 +132,18 @@ void m68000_musashi_device::xf25f_fscc_b_pi7_234f()
 }
 void m68000_musashi_device::xf260_fscc_b_pd_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_PD_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -109,11 +151,18 @@ void m68000_musashi_device::xf260_fscc_b_pd_234f()
 }
 void m68000_musashi_device::xf267_fscc_b_pd7_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_A7_PD_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -121,11 +170,18 @@ void m68000_musashi_device::xf267_fscc_b_pd7_234f()
 }
 void m68000_musashi_device::xf268_fscc_b_di_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_DI_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -133,11 +189,18 @@ void m68000_musashi_device::xf268_fscc_b_di_234f()
 }
 void m68000_musashi_device::xf270_fscc_b_ix_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_IX_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -145,11 +208,18 @@ void m68000_musashi_device::xf270_fscc_b_ix_234f()
 }
 void m68000_musashi_device::xf278_fscc_b_aw_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AW_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -157,11 +227,18 @@ void m68000_musashi_device::xf278_fscc_b_aw_234f()
 }
 void m68000_musashi_device::xf279_fscc_b_al_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AL_8(), v);
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -169,9 +246,16 @@ void m68000_musashi_device::xf279_fscc_b_al_234f()
 }
 void m68000_musashi_device::xf248_fdbcc_l_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		fdbcc();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -179,9 +263,16 @@ void m68000_musashi_device::xf248_fdbcc_l_234f()
 }
 void m68000_musashi_device::xf27a_ftrap_w_l_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m68881_ftrap();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -189,9 +280,16 @@ void m68000_musashi_device::xf27a_ftrap_w_l_234f()
 }
 void m68000_musashi_device::xf27b_ftrap_l_l_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m68881_ftrap();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -199,9 +297,16 @@ void m68000_musashi_device::xf27b_ftrap_l_l_234f()
 }
 void m68000_musashi_device::xf27c_ftrap_l_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		m68881_ftrap();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -209,9 +314,16 @@ void m68000_musashi_device::xf27c_ftrap_l_234f()
 }
 void m68000_musashi_device::xf280_fbcc_w_w_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		fbcc16();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
@@ -219,9 +331,16 @@ void m68000_musashi_device::xf280_fbcc_w_w_234f()
 }
 void m68000_musashi_device::xf2c0_fbcc_l_l_234f()
 {
-	if(m_has_fpu) {
+	if (m_has_fpu)
+	{
+		if (fpu_check_pending_exception())
+		{
+			return;
+		}
 		fbcc32();
-	} else {
+	}
+	else
+	{
 		m68ki_exception_1111();
 	}
 
