@@ -27,6 +27,10 @@
 
    There don't appear to be any ROM / SPI / NAND devices onboard, so must either
    boot directly from the SD, or have some boot program internal to the SoC
+   
+Known Undumped international versions
+	InnoTab Max (US English, with Toca Boca bonus app, Color and Pop 2, Ice Escape and Peek a Martian, What's That Noise isnt included this time)
+	Storio Max (NL Dutch, without the Toca Boca bonus app but everythign is identical from US English except the language)
 
    The following pinout was used for the InnoTV / InnoTab MAX cartridges
 
@@ -157,7 +161,7 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_innotv_cart");
 }
 
-ROM_START( innotv )
+ROM_START( innotvuk )
 	DISK_REGION( "internalsd" )
 	DISK_IMAGE( "8gb_sdhc_internal", 0, SHA1(443a0a9cc830387317d3218955b72295ee5a88eb) )
 ROM_END
@@ -165,4 +169,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, innotvuk,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
