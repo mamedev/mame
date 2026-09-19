@@ -6,17 +6,19 @@
 
 #define LOG_IRQ   (1U << 1) // enable bits (verbose)
 #define LOG_TIMER (1U << 2)
-#define LOG_XBUS  (1U << 3)
-#define LOG_XBUSV (1U << 4) // verbose XBus stuff
-#define LOG_DSPP  (1U << 5)
+#define LOG_DMA   (1U << 3) // DMA channel requests (verbose)
+#define LOG_XBUS  (1U << 4)
+#define LOG_XBUSV (1U << 5) // verbose XBus stuff
+#define LOG_DSPP  (1U << 6)
 
-#define VERBOSE (LOG_GENERAL | LOG_XBUS | LOG_DSPP)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
 #define LOGIRQ(...)   LOGMASKED(LOG_IRQ,     __VA_ARGS__)
 #define LOGTIMER(...) LOGMASKED(LOG_TIMER,   __VA_ARGS__)
+#define LOGDMA(...)   LOGMASKED(LOG_DMA,     __VA_ARGS__)
 #define LOGXBUS(...)  LOGMASKED(LOG_XBUS,    __VA_ARGS__)
 #define LOGXBUSV(...) LOGMASKED(LOG_XBUSV,   __VA_ARGS__)
 #define LOGDSPP(...)  LOGMASKED(LOG_DSPP,    __VA_ARGS__)
@@ -266,7 +268,9 @@ void clio_device::map(address_map &map)
 	);
 	map(0x000c, 0x000f).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("vint1: %08x & %08x\n", data, mem_mask);
+			// suppress regular use cases (normal line and disable)
+			if (data != 5 && data != 0xffff'ffff)
+				LOG("vint1: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_vint1);
 		})
 	);
@@ -545,7 +549,7 @@ void clio_device::map(address_map &map)
 				m_dma_enable &= ~data;
 			else
 				m_dma_enable |= data;
-			LOG("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
+			LOGDMA("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
 			m_exp_dma_enable_cb(BIT(m_dma_enable, 20) && BIT(m_expctl, 11));
 			// DSPP channels 0-12 (RAM -> DSPP) and 16-19 (DSPP -> RAM)
 			if (data & 0x000f1fff)

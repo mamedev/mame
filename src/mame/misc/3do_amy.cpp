@@ -108,7 +108,7 @@ void amy_device::clut_write(u32 data)
 			case 0xc0:
 			case 0xc2:
 			{
-				LOG("0xc0: display-control word %06x\n", data & 0xff'ffff);
+				LOG("0xc0: display-control word %07x\n", data & 0x03ff'ffff);
 
 				const bool fixed_clut_enable = !!BIT(data, 25);
 				m_clut_mask = fixed_clut_enable << 15;

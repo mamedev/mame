@@ -1007,6 +1007,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			}
 			tick_time ++;
 
+			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x ", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
+
 			// plut fetch is optional
 			// TODO: find use cases when not
 			if (ldplut)
@@ -1016,12 +1018,14 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 					m_cel.plut_ptr = plut_addr;
 				else
 				{
-					LOGCEL("    RELPLUT %08x\n", plut_addr);
+					LOGCEL("RELPLUT %08x -> ", plut_addr);
 					m_cel.plut_ptr = m_cel.address + (s32)plut_addr + 0x10;
 				}
+				// PLUTPTR tends to hold garbage when unused, avoid printing to make it less confusing.
+				LOGCEL("PLUTPTR %08x", m_cel.plut_ptr);
 				tick_time ++;
 			}
-			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
+			LOGCEL("\n");
 
 			// TODO: verify what "current" means in context of X/Y base positions
 			// is it the previously CEL loaded address or the actual pointer at the end of a CEL drawing?
@@ -1115,7 +1119,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 					// 16 / 0: 2D secondary divider value (value + 1)
 					m_cel.pixc_2d[i] = BIT(m_cel.pixc, 0 + nibble);
-					LOGCEL("    P[%d]: 1S %d MS %d MF %d DF %d | 2S %d AV %02x 2D %d\n"
+					LOGCEL("    P[%d] 1S: %d MS %d MF %d DF %d | 2S: %d AV %02x 2D %d\n"
 						, i
 						, m_cel.pixc_1s[i], m_cel.pixc_ms[i], m_cel.pixc_mf[i], m_cel.pixc_df[i]
 						, m_cel.pixc_2s[i], m_cel.pixc_av[i], m_cel.pixc_2d[i]
@@ -1204,13 +1208,12 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, bpp
 				, BPP_VALUES[bpp]
 			);
-			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0xff) + 2;
-			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
-			// TODO: should be bits 31-24 -> 7-0
+			// woffset8 should be bits 31-24 -> 7-0
 			// (doc claims integer, signed?)
 			// - demoman triggers this on flame transitions with 0xff, no noticeable difference (?)
-			//if (bpp < 5 && BIT(m_cel.pre1, 31))
-			//	popmessage("3do_madam.cpp: CEL check woffset8 (bpp=%d pre1=%08x)", bpp, m_cel.pre1);
+			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0xff) + 2;
+			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
+			// NOTE: matters only for unpacked CELs
 			const u16 woffset = bpp >= 5 ? woffset10 : woffset8;
 			const bool lrform = !!BIT(m_cel.pre1, 11);
 			const u16 tlhpcnt = ((m_cel.pre1 >> 0) & 0x7ff) + 1;
