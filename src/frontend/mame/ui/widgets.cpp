@@ -12,6 +12,7 @@
 
 #include "widgets.h"
 
+#include "ui/ui.h"
 
 namespace ui {
 
@@ -23,14 +24,16 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-widgets_manager::widgets_manager(running_machine &machine)
-	: m_hilight_bitmap(std::make_unique<bitmap_argb32>(512, 1))
-	, m_hilight_texture(nullptr, machine.render())
+widgets_manager::widgets_manager(render_manager &render, ui_colors const &colors)
+	: m_colors(colors)
+	, m_hilight_bitmap(std::make_unique<bitmap_argb32>(512, 1))
+	, m_hilight_texture(nullptr, render)
 	, m_hilight_main_bitmap(std::make_unique<bitmap_argb32>(1, 128))
-	, m_hilight_main_texture(nullptr, machine.render())
-	, m_arrow_texture(nullptr, machine.render())
+	, m_hilight_main_texture(nullptr, render)
+	, m_arrow_texture(nullptr, render)
+	, m_hilight_main_top(rgb_t::transparent())
+	, m_hilight_main_bottom(rgb_t::transparent())
 {
-	render_manager &render(machine.render());
 
 	// create a texture for hilighting items
 	for (unsigned x = 0; x < 512; ++x)
@@ -42,20 +45,48 @@ widgets_manager::widgets_manager(running_machine &machine)
 	m_hilight_texture->set_bitmap(*m_hilight_bitmap, m_hilight_bitmap->cliprect(), TEXFORMAT_ARGB32);
 
 	// create a texture for hilighting items in main menu
-	for (unsigned y = 0; y < 128; ++y)
-	{
-		constexpr unsigned r1(0), g1(169), b1 = (255); // any start color
-		constexpr unsigned r2(0), g2(39), b2 = (130); // any stop color
-		unsigned const r = r1 + (y * (r2 - r1) / 128);
-		unsigned const g = g1 + (y * (g2 - g1) / 128);
-		unsigned const b = b1 + (y * (b2 - b1) / 128);
-		m_hilight_main_bitmap->pix(y, 0) = rgb_t(r, g, b);
-	}
 	m_hilight_main_texture.reset(render.texture_alloc());
-	m_hilight_main_texture->set_bitmap(*m_hilight_main_bitmap, m_hilight_main_bitmap->cliprect(), TEXFORMAT_ARGB32);
+	generate_hilight_main(m_colors.focus_gradient_top(), m_colors.focus_gradient_bottom());
 
 	// create a texture for arrow icons
 	m_arrow_texture.reset(render.texture_alloc(render_triangle));
+}
+
+
+//-------------------------------------------------
+//  hilight_main_texture - get the main menu
+//  hilight texture, regenerating it if the
+//  effective theme's gradient stops changed
+//-------------------------------------------------
+
+render_texture *widgets_manager::hilight_main_texture()
+{
+	ui_colors const &colors(m_colors);
+	if ((uint32_t(colors.focus_gradient_top()) != uint32_t(m_hilight_main_top)) || (uint32_t(colors.focus_gradient_bottom()) != uint32_t(m_hilight_main_bottom)))
+		generate_hilight_main(colors.focus_gradient_top(), colors.focus_gradient_bottom());
+	return m_hilight_main_texture.get();
+}
+
+
+//-------------------------------------------------
+//  generate_hilight_main - fill the main menu
+//  hilight texture with a vertical gradient from
+//  the focus gradient stops
+//-------------------------------------------------
+
+void widgets_manager::generate_hilight_main(rgb_t top, rgb_t bottom)
+{
+	for (unsigned y = 0; y < 128; ++y)
+	{
+		int const alpha(int(top.a()) + ((int(bottom.a()) - int(top.a())) * int(y) / 127));
+		int const r(int(top.r()) + ((int(bottom.r()) - int(top.r())) * int(y) / 127));
+		int const g(int(top.g()) + ((int(bottom.g()) - int(top.g())) * int(y) / 127));
+		int const b(int(top.b()) + ((int(bottom.b()) - int(top.b())) * int(y) / 127));
+		m_hilight_main_bitmap->pix(y, 0) = rgb_t(alpha, r, g, b);
+	}
+	m_hilight_main_texture->set_bitmap(*m_hilight_main_bitmap, m_hilight_main_bitmap->cliprect(), TEXFORMAT_ARGB32);
+	m_hilight_main_top = top;
+	m_hilight_main_bottom = bottom;
 }
 
 
