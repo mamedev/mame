@@ -1283,7 +1283,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						// The ACW/ACCW part ...
 
 						u16 res_data = (this->*pixc_mix_table[pixc_mode])(xpos, ypos, src_data, p_mode, op_mode);
-						res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos, ypos, res_data);
+						// NOTE: x/y may be the CEL origin not the fb destination ...
+						res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos, ypos, src_data, res_data);
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * dst_pitch) << 2;
@@ -1682,16 +1683,16 @@ const madam_device::vh_interpolate_func madam_device::vh_interpolate_table[2] =
 };
 
 // TODO: stub
-u16 madam_device::vh_interpolate_subposition(int xpos, int ypos, u16 pix_data)
+u16 madam_device::vh_interpolate_subposition(int xpos, int ypos, u16 cel_data, u16 pix_data)
 {
 	return pix_data;
 }
 
 // TODO: enough for virtuoso and not much else
-// wants bit 0 as CLUT separator for the player avatar, which goes in AMY fixed at 0 due of swaphv
-u16 madam_device::vh_interpolate_plut(int xpos, int ypos, u16 pix_data)
+// wants bit 15 as CLUT separator for the player avatar, which goes in AMY fixed at 0 due of swaphv
+u16 madam_device::vh_interpolate_plut(int xpos, int ypos, u16 cel_data, u16 pix_data)
 {
-	bool v_bit = BIT(pix_data, m_cel_master_sw.v_output_bit);
+	bool v_bit = BIT(cel_data, m_cel_master_sw.v_output_bit);
 	v_bit |= m_cel_master_sw.v_output_force_high;
 	v_bit &= m_cel_master_sw.v_output_mask;
 
