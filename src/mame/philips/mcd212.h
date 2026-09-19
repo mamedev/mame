@@ -74,6 +74,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
 	TIMER_CALLBACK_MEMBER(ica_tick);
 	TIMER_CALLBACK_MEMBER(dca_tick);
@@ -252,6 +253,8 @@ protected:
 	required_shared_ptr<uint16_t> m_planeb;
 
 	uint32_t m_interlace_field[312][768];
+
+	void update_frame_geometry(bool force);
 
 	// internal state
 	bool m_matte_flag[2][768]{};

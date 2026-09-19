@@ -41,6 +41,7 @@ public:
 	auto read_mousebtn() { return m_read_mousebtn.bind(); }
 	auto atten_callback() { return m_atten_w.bind(); }
 	auto testplug_callback() { return m_testplug_cb.bind(); }
+	auto ntsc_callback() { return m_ntsc_cb.bind(); }
 
 	uint8_t* get_lcd_state() { return m_lcd_state; }
 
@@ -70,6 +71,7 @@ private:
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	devcb_write32 m_atten_w;
 	devcb_read_line m_testplug_cb;
+	devcb_read_line m_ntsc_cb;
 	required_device<cdrom_image_device> m_cdrom;
 
 	struct channel_state

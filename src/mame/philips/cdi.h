@@ -39,6 +39,7 @@ public:
 
 	void cdimono1_base(machine_config &config);
 	void cdimono1(machine_config &config);
+	void cdimono1n(machine_config &config);
 	void cdimono2(machine_config &config);
 	void cdi910(machine_config &config);
 

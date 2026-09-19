@@ -813,6 +813,28 @@ void mcd212_device::dcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_MAIN_REG_WRITES, "%s: Display Command Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_dcr[0]);
+	update_frame_geometry(false);
+}
+
+// The frame follows DCR1's frame duration bit, per the vertical timing of
+// table 5-6 of the MCD212 documentation: a 50 Hz frame has 312
+// lines of which 280 are displayed, a 60 Hz frame 262 of which 240.  Always
+// drawing the 50 Hz frame left 40 lines of whatever followed the image in
+// memory below NTSC pictures (The Adventure of the Space Ship Beagle).
+void mcd212_device::update_frame_geometry(bool force)
+{
+	const bool ntsc = BIT(m_dcr[0], DCR_FD_BIT);
+	const int total = ntsc ? 262 : 312;
+	if (!force && total == m_total_height)
+		return;
+
+	m_total_height = total;
+	m_ica_height = ntsc ? 22 : 32;
+
+	// the screen runs at twice the line count, for interlace
+	const rectangle visarea(0, 767, m_ica_height * 2, total * 2 - 1);
+	screen().configure(screen().width(), total * 2, visarea,
+			screen().pixel_period() * screen().width() * total * 2);
 }
 
 uint16_t mcd212_device::vsr1_r(offs_t offset, uint16_t mem_mask)
@@ -1145,6 +1167,7 @@ void mcd212_device::device_reset()
 
 	m_ica_height = 32;
 	m_total_height = 312;
+	update_frame_geometry(true);
 	m_blink_time = 0;
 	for (int i = 0; i < m_total_height; i++)
 	{
@@ -1173,6 +1196,11 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
+
+void mcd212_device::device_post_load()
+{
+	update_frame_geometry(true);
+}
 
 void mcd212_device::device_start()
 {
