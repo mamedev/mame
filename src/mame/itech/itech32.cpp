@@ -502,6 +502,9 @@ void drivedge_state::machine_start()
 	itech32_state::machine_start();
 
 	save_item(NAME(m_tms_spinning));
+	save_item(NAME(m_wheel_motor_control));
+	save_item(NAME(m_wheel_motor_data_a));
+	save_item(NAME(m_wheel_motor_data_b));
 #if LOG_DRIVEDGE_UNINIT_RAM
 	save_item(NAME(m_written));
 #endif
@@ -510,6 +513,11 @@ void drivedge_state::machine_start()
 void drivedge_state::machine_reset()
 {
 	itech32_state::machine_reset();
+
+	m_wheel_motor_control = 2;
+	m_wheel_motor_data_a = 0;
+	m_wheel_motor_data_b = 0;
+	m_wheel_motor = 0;
 
 	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -621,6 +629,48 @@ u16 drivedge_state::gas_r()
 	return m_gas->read();
 }
 
+void drivedge_state::wheel_motor_control_w(u16 data)
+{
+	m_wheel_motor_control = data;
+	update_wheel_motor();
+}
+
+
+void drivedge_state::wheel_motor_data_a_w(u16 data)
+{
+	m_wheel_motor_data_a = data;
+}
+
+
+void drivedge_state::wheel_motor_data_b_w(u16 data)
+{
+	m_wheel_motor_data_b = data;
+	update_wheel_motor();
+}
+
+
+void drivedge_state::update_wheel_motor()
+{
+	s32 motor = 0;
+
+	if ((m_wheel_motor_control == 0 || m_wheel_motor_control == 1) &&
+		(m_wheel_motor_data_a || m_wheel_motor_data_b))
+	{
+		const u32 total = u32(m_wheel_motor_data_a) + u32(m_wheel_motor_data_b);
+
+		if (total != 0)
+		{
+			s32 magnitude = (u32(m_wheel_motor_data_a) * 31 + total / 2) / total;
+
+			if (magnitude > 31)
+				magnitude = 31;
+
+			motor = (m_wheel_motor_control == 0) ? magnitude : -magnitude;
+		}
+	}
+
+	m_wheel_motor = motor;
+}
 
 /*************************************
  *
@@ -967,10 +1017,11 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(drivedge_state::test2_r), FUNC(d
 	map(0x084001, 0x084001).rw(FUNC(drivedge_state::sound_return_r), FUNC(drivedge_state::sound_data_w));
 //  map(0x086000, 0x08623f).ram(); -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
 	map(0x088000, 0x088001).r(FUNC(drivedge_state::steering_r));
-	map(0x08a000, 0x08a001).r(FUNC(drivedge_state::gas_r));
-	map(0x08a000, 0x08a003).nopw();
+	map(0x08a000, 0x08a001).rw(FUNC(drivedge_state::gas_r), FUNC(drivedge_state::wheel_motor_control_w));
 	map(0x08c000, 0x08c003).portr("8c000");
-	map(0x08e000, 0x08e003).portr("8e000").nopw();
+	map(0x08c000, 0x08c001).w(FUNC(drivedge_state::wheel_motor_data_a_w));
+	map(0x08e000, 0x08e003).portr("8e000");
+	map(0x08e000, 0x08e001).w(FUNC(drivedge_state::wheel_motor_data_b_w));
 	map(0x100000, 0x10000f).w(FUNC(drivedge_state::zbuf_control_w)).share(m_zbuf_control);
 	map(0x180001, 0x180001).w(FUNC(drivedge_state::color_w<0>));
 	map(0x1a0000, 0x1bffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
