@@ -38,7 +38,8 @@
 
 DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
 
-// Valkyrie aligns its (often byte-wide) registers to the left-hand side of 32-bit addresses
+// Valkyrie aligns its (often byte-wide) registers to the left-hand side of 32-bit addresses.
+// Valkyrie-AR is aligned to 64-bit addresses and not 32-bit ones.
 enum
 {
 	VALKYRIEREG_VIDEO_TIMING        = 0x00,
@@ -58,34 +59,7 @@ enum
 	VALKYRIEREG_VIDEO_FIELD_Y_PIXEL = 0x84, // 16-bit
 };
 
-// Valkyrie-AR is aligned to 64-bit addresses and not 32-bit ones,
-// so this lookup table translates 64-bit addressing to 32-bit addressing
-// without creating unwanted mirroring
-#define OFF64(x) (x<<1)
-std::map<offs_t,int> valkyrie_ar_to_std_mappings
-{
-	{ OFF64(VALKYRIEREG_VIDEO_TIMING), 	 VALKYRIEREG_VIDEO_TIMING },
-	{ OFF64(VALKYRIEREG_VIDEO_MODE),	 VALKYRIEREG_VIDEO_MODE },
-	{ OFF64(VALKYRIEREG_VIDEO_DEPTH), 	 VALKYRIEREG_VIDEO_DEPTH },
-	{ OFF64(VALKYRIEREG_CONFIG), 		 VALKYRIEREG_CONFIG },
-	{ OFF64(VALKYRIEREG_VBLANK), 		 VALKYRIEREG_VBLANK },
-	{ OFF64(VALKYRIEREG_SCREEN_ENABLE),	 VALKYRIEREG_SCREEN_ENABLE },
-	{ OFF64(VALKYRIEREG_MONITOR_SENSE),  VALKYRIEREG_MONITOR_SENSE },
 
-	{ OFF64(VALKYRIEREG_VIDEO_IN_CONTROL),      VALKYRIEREG_VIDEO_IN_CONTROL      },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_XPOS),     VALKYRIEREG_VIDEO_WINDOW_XPOS     },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_XPOS)+1,   VALKYRIEREG_VIDEO_WINDOW_XPOS+1   },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_YPOS),     VALKYRIEREG_VIDEO_WINDOW_YPOS     },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_YPOS)+1,   VALKYRIEREG_VIDEO_WINDOW_YPOS+1   },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_WIDTH),    VALKYRIEREG_VIDEO_WINDOW_WIDTH    },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_WIDTH)+1,  VALKYRIEREG_VIDEO_WINDOW_WIDTH+1  },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_HEIGHT),   VALKYRIEREG_VIDEO_WINDOW_HEIGHT   },
-	{ OFF64(VALKYRIEREG_VIDEO_WINDOW_HEIGHT)+1, VALKYRIEREG_VIDEO_WINDOW_HEIGHT+1 },
-	{ OFF64(VALKYRIEREG_VIDEO_FIELD_X_PIXEL),   VALKYRIEREG_VIDEO_FIELD_X_PIXEL   },
-	{ OFF64(VALKYRIEREG_VIDEO_FIELD_X_PIXEL)+1, VALKYRIEREG_VIDEO_FIELD_X_PIXEL+1 },
-	{ OFF64(VALKYRIEREG_VIDEO_FIELD_Y_PIXEL),   VALKYRIEREG_VIDEO_FIELD_Y_PIXEL   },
-	{ OFF64(VALKYRIEREG_VIDEO_FIELD_Y_PIXEL)+1, VALKYRIEREG_VIDEO_FIELD_Y_PIXEL+1 },
-};
 
 //-------------------------------------------------
 //  ADDRESS_MAP
@@ -434,28 +408,30 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 
 void valkyrie_device::regs64_w(offs_t offset, u8 data)
 {
-	auto legacy_reg_id = valkyrie_ar_to_std_mappings.find(offset);
-	if (legacy_reg_id == valkyrie_ar_to_std_mappings.end())
+	// TODO: check that this 64-bit alignment really exists on real hardware.
+	// Valkyrie-AR registers are 64-bit aligned, so it makes sense that they don't
+	// get mirrored in 32-bit halves...
+	if (offset & 4)
 	{
-		logerror("%s regs64_w(): untranslatable write to reg 0x%02x\n", tag(), offset);
+		logerror("%s regs64_w(): unaligned write to 0x%02x\n", tag(), offset);
 		return;
 	}
 
-	regs_w(legacy_reg_id->second, data);
+	regs_w((offset >> 1) + (offset & 3), data);
 }
 
 u8 valkyrie_device::regs64_r(offs_t offset)
 {
-	auto legacy_reg_id = valkyrie_ar_to_std_mappings.find(offset);
-	if (legacy_reg_id == valkyrie_ar_to_std_mappings.end())
+	// TODO: check that this 64-bit alignment really exists on real hardware
+	if (offset & 4)
 	{
-		logerror("%s regs64_r(): untranslatable read from reg at 8-bit address 0x%02x\n",
+		logerror("%s regs64_r(): unaligned read from reg at 8-bit address 0x%02x\n",
 				 tag(),
 				 offset);
 		return 0;
 	}
 
-	return regs_r(legacy_reg_id->second);
+	return regs_r((offset >> 1) + (offset & 3));
 }
 
 u32 valkyrie_device::ramdac_r(offs_t offset)

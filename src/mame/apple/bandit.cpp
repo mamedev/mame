@@ -53,7 +53,7 @@ enum
 
 DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "banditpci", "Apple Bandit PowerPC-to-PCI bridge")
 DEFINE_DEVICE_TYPE(ASPEN, aspen_host_device, "aspenpci", "Apple Aspen PowerPC-to-PCI bridge and memory controller")
-DEFINE_DEVICE_TYPE(APPLPSX, applpsx_host_device, "aspenpci", "Apple PSX PowerPC-to-PCI bridge and memory controller")
+DEFINE_DEVICE_TYPE(APPLPSX, applpsx_host_device, "applepsxpci", "Apple PSX PowerPC-to-PCI bridge and memory controller")
 
 
 void bandit_host_device::config_map(address_map &map)
