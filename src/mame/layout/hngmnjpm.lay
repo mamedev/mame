@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license: CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="button_1">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.00" /></rect>
+		<rect state="0"><color red="0.33" green="0.31" blue="0.00" /></rect>
+	</element>
+	<element name="button_2">
+		<rect state="1"><color red="0.91" green="0.00" blue="0.03" /></rect>
+		<rect state="0"><color red="0.30" green="0.00" blue="0.01" /></rect>
+	</element>
+	<element name="button_3">
+		<rect state="1"><color red="0.16" green="0.65" blue="0.93" /></rect>
+		<rect state="0"><color red="0.05" green="0.21" blue="0.31" /></rect>
+	</element>
+
+	<element name="button_1_text">
+		<text state="1" string="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+		<text state="0" string="1">
+			<color red="0.30" green="0.30" blue="0.30" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="button_2_text">
+		<text state="1" string="2">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+		<text state="0" string="2">
+			<color red="0.30" green="0.30" blue="0.30" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+	<element name="button_3_text">
+		<text state="1" string="3">
+			<color red="1.00" green="1.00" blue="1.00" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+		<text state="0" string="3">
+			<color red="0.30" green="0.30" blue="0.30" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<element name="collect_button">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.00" green="0.50" blue="0.00" /></rect>
+		<text string="Collect">
+			<color red="0.10" green="0.10" blue="0.00" />
+			<bounds x="0.10" y="0.20" width="0.8" height="0.6" />
+		</text>
+	</element>
+	<view name="Control Panel">
+
+		<screen index="0">
+			<bounds x="0" y="0" width="800" height="600" />
+		</screen>
+
+		<element name="lamp48" ref="collect_button" state="0" inputtag="J10_0" inputmask="0x01">
+			<bounds x="825" y="625" width="100" height="100" />
+		</element>
+
+		<element name="lamp51" ref="button_1" state="0" inputtag="J10_0" inputmask="0x08">
+			<bounds x="100" y="625" width="100" height="100" />
+		</element>
+
+		<element name="lamp50" ref="button_2" state="0" inputtag="J10_0" inputmask="0x04">
+			<bounds x="350" y="625" width="100" height="100" />
+		</element>
+
+		<element name="lamp49" ref="button_3" state="0" inputtag="J10_0" inputmask="0x02">
+			<bounds x="600" y="625" width="100" height="100" />
+		</element>
+
+
+		<!-- Unemulated lamps that are part of the lamp-test include: 14, 12, 15 -->
+
+		<element name="lamp44" ref="button_1_text" state="0" inputtag="J10_0" inputmask="0x08">
+			<bounds x="100" y="625" width="100" height="100" />
+		</element>
+
+		<element name="lamp43" ref="button_2_text" state="0" inputtag="J10_0" inputmask="0x04">
+			<bounds x="350" y="625" width="100" height="100" />
+		</element>
+
+		<element name="lamp42" ref="button_3_text" state="0" inputtag="J10_0" inputmask="0x02">
+			<bounds x="600" y="625" width="100" height="100" />
+		</element>
+
+		<!-- Unemulated lamps that are part of the lamp-test:
+		    23, 24, 25, 26, 27, 28, 29, 30, 31: these lamps remain on during the game and flash during the demo.  They are likely the marquee
+		    38, 39, 40, 41: these lamps blink when hitting the jackpot.  Otherwise, they tend to remain on
+		    22: this remains on at all times
+		-->
+	</view>
+</mamelayout>
