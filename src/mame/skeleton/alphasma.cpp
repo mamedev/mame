@@ -15,6 +15,8 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "fileio.h"
+#include "emuopts.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "machine/nvram.h"
 #include "video/hd44780.h"
@@ -81,6 +83,7 @@ public:
 		: alphasmart_state(mconfig, type, tag)
 		, m_io_view(*this, "io")
 		, m_dictbank(*this, "dictbank")
+		, m_pc_connected(*this, "PC_CONNECTED")
 	{
 	}
 
@@ -91,14 +94,24 @@ protected:
 
 private:
 	void lcd_ctrl_w(uint8_t data);
+	uint8_t asma2k_port_a_r();
 	virtual void port_a_w(uint8_t data) override;
+	void send_pc_w(uint16_t pc);
+	void send_sink_begin();
+	void send_sink_byte(uint8_t data);
+	void send_sink_end();
 
 	void asma2k_mem(address_map &map) ATTR_COLD;
 
 	memory_view m_io_view;
 	required_memory_bank m_dictbank;
+	required_ioport m_pc_connected;
 
 	uint8_t m_lcd_ctrl;
+	bool m_send_sink_active = false;
+	bool m_send_sink_break = false;
+	bool m_send_sink_shift = false;
+	std::unique_ptr<emu_file> m_send_sink;
 };
 
 INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
@@ -195,6 +208,168 @@ void asma2k_state::lcd_ctrl_w(uint8_t data)
 	update_lcdc(changed & 0x01, changed & 0x02);
 	m_dictbank->set_entry((m_port_a & 0x30) >> 3 | (data & 0x80) >> 7);
 	m_lcd_ctrl = data;
+}
+
+uint8_t asma2k_state::asma2k_port_a_r()
+{
+	uint8_t data = (m_port_a & 0xfd) | (m_battery_status->read() << 1);
+	if (BIT(m_pc_connected->read(), 0))
+		data |= 0x05; // PC attached: PA2 asserted, PA0 idle high
+	return data;
+}
+
+void asma2k_state::send_sink_begin()
+{
+	if (m_send_sink)
+	{
+		m_send_sink->close();
+		m_send_sink.reset();
+	}
+
+	std::string rom_directory;
+	path_iterator rom_paths(machine().options().media_path());
+	if (!rom_paths.next(rom_directory) || rom_directory.empty())
+	{
+		logerror("AS2K_TX TEXT_SINK_OPEN_FAILED reason=no_rom_directory\n");
+		m_send_sink_active = false;
+		return;
+	}
+
+	m_send_sink = std::make_unique<emu_file>(
+		rom_directory,
+		OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+
+	std::error_condition const err = m_send_sink->open("send.txt");
+	if (err)
+	{
+		logerror("AS2K_TX TEXT_SINK_OPEN_FAILED path=%s%s%s error=%s\n",
+			rom_directory,
+			PATH_SEPARATOR,
+			"send.txt",
+			err.message());
+		m_send_sink.reset();
+		m_send_sink_active = false;
+	}
+	else
+	{
+		logerror("AS2K_TX TEXT_SINK_OPEN path=%s\n", m_send_sink->fullpath());
+		m_send_sink_active = true;
+	}
+
+	m_send_sink_break = false;
+	m_send_sink_shift = false;
+}
+
+void asma2k_state::send_sink_byte(uint8_t data)
+{
+	if (!m_send_sink_active)
+		return;
+
+	if (data == 0xf0)
+	{
+		m_send_sink_break = true;
+		return;
+	}
+
+	if (m_send_sink_break)
+	{
+		if (data == 0x12)
+			m_send_sink_shift = false;
+		m_send_sink_break = false;
+		return;
+	}
+
+	if (data == 0x12)
+	{
+		m_send_sink_shift = true;
+		return;
+	}
+
+	char out = 0;
+	switch (data)
+	{
+	case 0x1c: out = m_send_sink_shift ? 'A' : 'a'; break;
+	case 0x32: out = m_send_sink_shift ? 'B' : 'b'; break;
+	case 0x21: out = m_send_sink_shift ? 'C' : 'c'; break;
+	case 0x23: out = m_send_sink_shift ? 'D' : 'd'; break;
+	case 0x24: out = m_send_sink_shift ? 'E' : 'e'; break;
+	case 0x2b: out = m_send_sink_shift ? 'F' : 'f'; break;
+	case 0x34: out = m_send_sink_shift ? 'G' : 'g'; break;
+	case 0x33: out = m_send_sink_shift ? 'H' : 'h'; break;
+	case 0x43: out = m_send_sink_shift ? 'I' : 'i'; break;
+	case 0x3b: out = m_send_sink_shift ? 'J' : 'j'; break;
+	case 0x42: out = m_send_sink_shift ? 'K' : 'k'; break;
+	case 0x4b: out = m_send_sink_shift ? 'L' : 'l'; break;
+	case 0x3a: out = m_send_sink_shift ? 'M' : 'm'; break;
+	case 0x31: out = m_send_sink_shift ? 'N' : 'n'; break;
+	case 0x44: out = m_send_sink_shift ? 'O' : 'o'; break;
+	case 0x4d: out = m_send_sink_shift ? 'P' : 'p'; break;
+	case 0x15: out = m_send_sink_shift ? 'Q' : 'q'; break;
+	case 0x2d: out = m_send_sink_shift ? 'R' : 'r'; break;
+	case 0x1b: out = m_send_sink_shift ? 'S' : 's'; break;
+	case 0x2c: out = m_send_sink_shift ? 'T' : 't'; break;
+	case 0x3c: out = m_send_sink_shift ? 'U' : 'u'; break;
+	case 0x2a: out = m_send_sink_shift ? 'V' : 'v'; break;
+	case 0x1d: out = m_send_sink_shift ? 'W' : 'w'; break;
+	case 0x22: out = m_send_sink_shift ? 'X' : 'x'; break;
+	case 0x35: out = m_send_sink_shift ? 'Y' : 'y'; break;
+	case 0x1a: out = m_send_sink_shift ? 'Z' : 'z'; break;
+
+	case 0x16: out = m_send_sink_shift ? '!' : '1'; break;
+	case 0x1e: out = m_send_sink_shift ? '@' : '2'; break;
+	case 0x26: out = m_send_sink_shift ? '#' : '3'; break;
+	case 0x25: out = m_send_sink_shift ? '$' : '4'; break;
+	case 0x2e: out = m_send_sink_shift ? '%' : '5'; break;
+	case 0x36: out = m_send_sink_shift ? '^' : '6'; break;
+	case 0x3d: out = m_send_sink_shift ? '&' : '7'; break;
+	case 0x3e: out = m_send_sink_shift ? '*' : '8'; break;
+	case 0x46: out = m_send_sink_shift ? '(' : '9'; break;
+	case 0x45: out = m_send_sink_shift ? ')' : '0'; break;
+
+	case 0x54: out = m_send_sink_shift ? '{' : '['; break;
+	case 0x5b: out = m_send_sink_shift ? '}' : ']'; break;
+	case 0x4c: out = m_send_sink_shift ? ':' : ';'; break;
+	case 0x52: out = m_send_sink_shift ? '"' : '\''; break;
+	case 0x41: out = m_send_sink_shift ? '<' : ','; break;
+	case 0x49: out = m_send_sink_shift ? '>' : '.'; break;
+	case 0x4a: out = m_send_sink_shift ? '?' : '/'; break;
+	case 0x4e: out = m_send_sink_shift ? '_' : '-'; break;
+	case 0x55: out = m_send_sink_shift ? '+' : '='; break;
+	case 0x5d: out = m_send_sink_shift ? '|' : '\\'; break;
+	case 0x0e: out = m_send_sink_shift ? '~' : '`'; break;
+
+	case 0x29: out = ' '; break;
+	case 0x5a: out = '\n'; break;
+	case 0x0d: out = '\t'; break;
+	default: break;
+	}
+
+	if (out)
+		m_send_sink->write(&out, 1);
+}
+
+void asma2k_state::send_sink_end()
+{
+	if (m_send_sink)
+	{
+		m_send_sink->flush();
+		m_send_sink->close();
+		m_send_sink.reset();
+	}
+	m_send_sink_active = false;
+	m_send_sink_break = false;
+	m_send_sink_shift = false;
+}
+
+void asma2k_state::send_pc_w(uint16_t pc)
+{
+	switch (pc)
+	{
+	case 0x8606: send_sink_begin(); break;
+	case 0xaa54: send_sink_byte(m_maincpu->space(AS_PROGRAM).read_byte(0x0046)); break;
+	case 0x80f5: send_sink_end(); break;
+	default: break;
+	}
 }
 
 void asma2k_state::port_a_w(uint8_t data)
@@ -518,6 +693,11 @@ static INPUT_PORTS_START( asma2k )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)    PORT_CHAR('m')  PORT_CHAR('M')  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(alphasmart_state::kb_irq), 0)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)    PORT_CHAR('n')  PORT_CHAR('N')  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(alphasmart_state::kb_irq), 0)
 
+	// Emulator-only host attachment control.  Pause/Break is not part of the
+	// AlphaSmart 2000 keyboard matrix, so it cannot be mistaken for an AS2K key.
+	PORT_START("PC_CONNECTED")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PC Connected (Pause/Break)") PORT_CODE(KEYCODE_PAUSE) PORT_TOGGLE
+
 	PORT_START("BATTERY")
 	PORT_CONFNAME(0x01, 0x01, "Battery status")
 	PORT_CONFSETTING (0x00, DEF_STR(Low))
@@ -596,7 +776,9 @@ void alphasmart_state::alphasmart(machine_config &config)
 void asma2k_state::asma2k(machine_config &config)
 {
 	alphasmart(config);
+	m_maincpu->in_pa_callback().set(FUNC(asma2k_state::asma2k_port_a_r));
 	m_maincpu->set_addrmap(AS_PROGRAM, &asma2k_state::asma2k_mem);
+	m_maincpu->instruction_callback().set(FUNC(asma2k_state::send_pc_w));
 }
 
 // MCU: MC68HC11D0P

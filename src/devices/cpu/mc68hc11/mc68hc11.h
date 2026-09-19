@@ -49,6 +49,7 @@ public:
 	auto in_an7_callback() { return m_analog_cb[7].bind(); }
 	auto in_spi2_data_callback() { return m_spi2_data_input_cb.bind(); }
 	auto out_spi2_data_callback() { return m_spi2_data_output_cb.bind(); }
+	auto instruction_callback() { return m_instruction_cb.bind(); }
 
 	void set_default_config(uint8_t data) { assert(!configured()); m_config = data & m_config_mask; }
 
@@ -175,6 +176,7 @@ private:
 	devcb_read8::array<8> m_analog_cb;
 	devcb_read8 m_spi2_data_input_cb;
 	devcb_write8 m_spi2_data_output_cb;
+	devcb_write16 m_instruction_cb;
 	int m_icount;
 
 	memory_view m_ram_view;
