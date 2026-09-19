@@ -36,7 +36,8 @@ TODO:
   MCD-212 documentation states in both tables and timing diagrams that vertical retrace
   has an additional half-line even in non-interlaced mode, which cannot be represented
   in the current screen-timing framework. The input clock has been adjusted downward
-  to factor out this half-line, resulting in the expected 50Hz exactly in PAL mode.
+  to factor out this half-line, resulting in the expected 50Hz exactly in PAL mode,
+  and 59.94Hz in NTSC mode.
 
 - Proper abstraction of the 68070's internal devices (UART, DMA, Timers, etc.)
 
@@ -66,8 +67,9 @@ TODO:
 
 #include "cdi.lh"
 
-// TODO: NTSC system clock is 30.2098 MHz; additional 4.9152 MHz XTAL provided for UART
-#define CLOCK_A 30_MHz_XTAL
+// TODO: additional 4.9152 MHz XTAL provided for UART
+#define CLOCK_A 30_MHz_XTAL         // PAL system clock
+#define CLOCK_A_NTSC 30.2098_MHz_XTAL  // NTSC system clock, 1920x the NTSC line rate
 
 #define LOG_DVC             (1U << 1)
 #define LOG_QUIZARD_READS   (1U << 2)
@@ -614,6 +616,26 @@ void cdi_state::cdimono1(machine_config &config)
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
+// The same player reporting NTSC.  The OS asks the slave for the video
+// standard at boot and sets itself up from the answer: with NTSC it programs
+// the MCD212 for 60 Hz, and NTSC-only discs run.
+void cdi_state::cdimono1n(machine_config &config)
+{
+	cdimono1(config);
+
+	// NTSC players run from a 30.2098 MHz system clock rather than 30 MHz
+	m_maincpu->set_clock(CLOCK_A_NTSC);
+	m_mcd212->set_clock(CLOCK_A_NTSC);
+
+	// as for PAL, the pixel clock is lowered to factor out the MCD212's half
+	// line, here 262 of 262.5 lines, which gives 59.94 Hz
+	screen_device &screen = *subdevice<screen_device>("screen");
+	screen.set_raw(u32(CLOCK_A_NTSC.dvalue() * 262 / 262.5), 960, 0, 768, 262*2, 22*2, 262*2); // x2 for interlace
+
+	m_slave_hle->ntsc_callback().set_constant(1);
+	m_dvc_slot->set_pal(false);
+}
+
 void quizard_state::quizard(machine_config &config)
 {
 	cdimono1_base(config);
@@ -656,6 +678,9 @@ ROM_START( cdimono1 )
 	ROM_REGION(0x2000, "slave", 0)
 	ROM_LOAD( "zx405042p__cdi_slave_2.0__b43t__zzmk9213.mc68hc705c8a_withtestrom.7206", 0x0000, 0x2000, CRC(688cda63) SHA1(56d0acd7caad51c7de703247cd6d842b36173079) BAD_DUMP )
 ROM_END
+
+// same board and ROMs, see cdi_state::cdimono1n
+#define rom_cdimono1n rom_cdimono1
 
 ROM_START( cdi910 )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -1051,6 +1076,7 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS      INIT        COMPANY       FULLNAME */
 // BIOS / System
 CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (PAL)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, cdimono1n, cdimono1, 0,   cdimono1n, cdi,     cdi_state, empty_init, "Philips",    "CD-i (Mono-I) (NTSC)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
