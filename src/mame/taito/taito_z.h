@@ -217,7 +217,8 @@ class sci_state : public taitoz_z80_sound_state
 {
 public:
 	sci_state(const machine_config &mconfig, device_type type, const char *tag) :
-		taitoz_z80_sound_state(mconfig, type, tag)
+		taitoz_z80_sound_state(mconfig, type, tag),
+		m_sprphase(1)
 	{
 	}
 
@@ -250,6 +251,10 @@ private:
 	int        m_sci_spriteframe = 0;
 	s32        m_sci_int6 = 0;
 	emu_timer *m_int6_timer = nullptr;
+
+	/* displayed copy of the sprite list, latched on spriteframe edges */
+	std::unique_ptr<u16[]> m_spritebuf_display;
+	int m_sprphase;
 };
 
 
