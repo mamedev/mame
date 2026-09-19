@@ -40049,6 +40049,10 @@ mcword_de
 @source:psion/mc600.cpp
 mc600
 
+@source:psion/osaris.cpp
+osaris
+osaris_fr
+
 @source:psion/psion.cpp
 psion1
 psioncm
