@@ -111,6 +111,18 @@ static const int m_p_n_prevpointlist4b[] = { 0, 2, 3, 1 };
 static const int m_p_n_nextpointlist3[] = { 1, 2, 0 };
 static const int m_p_n_prevpointlist3[] = { 2, 0, 1 };
 
+/*
+ * Offsets applied to the 8 bit colour components before they are reduced to
+ * 5 bits, indexed by the low two bits of the y and x vram coordinates.
+ */
+static const int m_p_n_ditheroffset[ 4 ][ 4 ] =
+{
+	{ -4,  0, -3,  1 },
+	{  2, -2,  3, -1 },
+	{ -3,  1, -4,  0 },
+	{  3, -1,  2, -2 }
+};
+
 #define COORD_X( a ) ( a.sw.l )
 #define COORD_Y( a ) ( a.sw.h )
 #define S11_COORD_X( a ) util::sext( a.sw.l, 11 )
@@ -480,45 +492,65 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 		p_p_vram[ n_line ] = &p_vram[ ( n_line % height ) * width ];
 	}
 
-	for( int n_level = 0; n_level < MAX_LEVEL; n_level++ )
+	for( int n_y = 0; n_y < 4; n_y++ )
 	{
-		for( int n_shade = 0; n_shade < MAX_SHADE; n_shade++ )
+		for( int n_x = 0; n_x < 4; n_x++ )
 		{
-			/* shaded */
-			int n_shaded = ( n_level * n_shade ) / MID_SHADE;
-			if( n_shaded > MAX_LEVEL - 1 )
-			{
-				n_shaded = MAX_LEVEL - 1;
-			}
-			p_n_redshade[ ( n_level * MAX_SHADE ) | n_shade ] = n_shaded;
-			p_n_greenshade[ ( n_level * MAX_SHADE ) | n_shade ] = n_shaded << 5;
-			p_n_blueshade[ ( n_level * MAX_SHADE ) | n_shade ] = n_shaded << 10;
+			/* dithering disabled is the slice with an offset of zero */
+			p_n_dither[ 0 ][ n_y ][ n_x ] = 0;
+			p_n_dither[ 1 ][ n_y ][ n_x ] = ( m_p_n_ditheroffset[ n_y ][ n_x ] & ( MAX_DITHER - 1 ) ) * MAX_LEVEL * MAX_SHADE;
+		}
+	}
 
-			/* 1/4 x transparency */
-			n_shaded = ( n_level * n_shade ) / MID_SHADE;
-			n_shaded >>= 2;
-			if( n_shaded > MAX_LEVEL - 1 )
-			{
-				n_shaded = MAX_LEVEL - 1;
-			}
-			p_n_f025[ ( n_level * MAX_SHADE ) | n_shade ] = n_shaded;
+	for( int n_dither = 0; n_dither < MAX_DITHER; n_dither++ )
+	{
+		int n_offset = util::sext( n_dither, 3 );
 
-			/* 1/2 x transparency */
-			n_shaded = ( n_level * n_shade ) / MID_SHADE;
-			n_shaded >>= 1;
-			if( n_shaded > MAX_LEVEL - 1 )
+		for( int n_level = 0; n_level < MAX_LEVEL; n_level++ )
+		{
+			for( int n_shade = 0; n_shade < MAX_SHADE; n_shade++ )
 			{
-				n_shaded = MAX_LEVEL - 1;
-			}
-			p_n_f05[ ( n_level * MAX_SHADE ) | n_shade ] = n_shaded;
+				int n_index = ( n_dither * MAX_LEVEL * MAX_SHADE ) | ( n_level * MAX_SHADE ) | n_shade;
 
-			/* 1 x transparency */
-			n_shaded = ( n_level * n_shade ) / MID_SHADE;
-			if( n_shaded > MAX_LEVEL - 1 )
-			{
-				n_shaded = MAX_LEVEL - 1;
+				/* the gpu scales the 5 bit level up to 8 bits and multiplies it by the
+				   8 bit shade, then adds the dither offset before truncating to 5 bits */
+				int n_colour = ( n_level * int( MAX_SHADE / MAX_LEVEL ) * n_shade ) / int( MID_SHADE );
+				int n_dithered = std::max( n_colour + n_offset, 0 ) / int( MAX_SHADE / MAX_LEVEL );
+
+				/* shaded */
+				int n_shaded = n_dithered;
+				if( n_shaded > MAX_LEVEL - 1 )
+				{
+					n_shaded = MAX_LEVEL - 1;
+				}
+				p_n_redshade[ n_index ] = n_shaded;
+				p_n_greenshade[ n_index ] = n_shaded << 5;
+				p_n_blueshade[ n_index ] = n_shaded << 10;
+
+				/* 1/4 x transparency */
+				n_shaded = n_dithered >> 2;
+				if( n_shaded > MAX_LEVEL - 1 )
+				{
+					n_shaded = MAX_LEVEL - 1;
+				}
+				p_n_f025[ n_index ] = n_shaded;
+
+				/* 1/2 x transparency */
+				n_shaded = n_dithered >> 1;
+				if( n_shaded > MAX_LEVEL - 1 )
+				{
+					n_shaded = MAX_LEVEL - 1;
+				}
+				p_n_f05[ n_index ] = n_shaded;
+
+				/* 1 x transparency */
+				n_shaded = n_dithered;
+				if( n_shaded > MAX_LEVEL - 1 )
+				{
+					n_shaded = MAX_LEVEL - 1;
+				}
+				p_n_f1[ n_index ] = n_shaded;
 			}
-			p_n_f1[ ( n_level * MAX_SHADE ) | n_shade ] = n_shaded;
 		}
 	}
 
@@ -602,6 +634,7 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	save_item(NAME(n_ix));
 	save_item(NAME(n_iy));
 	save_item(NAME(n_ti));
+	save_item(NAME(n_dtd));
 	save_item(NAME(m_draw_stp));
 	save_item(NAME(m_check_stp));
 }
@@ -790,11 +823,25 @@ f  e| d  c| b| a  9| 8  7| 6  5| 4| 3  2  1  0
     |iy|ix|ty|     |   tp|  abr|ty|         tx
 */
 
-void psxgpu_device::decode_tpage( uint32_t tpage )
+/*
+ * Bits 9 & 10 of the draw mode, dithering and drawing to the display area, only
+ * exist in the GP0(E1h) draw mode setting. They are unused in the texpage
+ * attribute that is embedded in the textured polygon commands, which leaves the
+ * values set by GP0(E1h) alone.
+ */
+void psxgpu_device::decode_tpage( uint32_t tpage, bool drawmode )
 {
 	if( m_n_gputype == 2 )
 	{
-		n_gpustatus = ( n_gpustatus & 0xffff7800 ) | ( tpage & 0x7ff ) | ( ( tpage & 0x800 ) << 4 );
+		if( drawmode )
+		{
+			n_gpustatus = ( n_gpustatus & 0xffff7800 ) | ( tpage & 0x7ff ) | ( ( tpage & 0x800 ) << 4 );
+			n_dtd = ( tpage & 0x200 ) >> 9;
+		}
+		else
+		{
+			n_gpustatus = ( n_gpustatus & 0xffff7e00 ) | ( tpage & 0x1ff ) | ( ( tpage & 0x800 ) << 4 );
+		}
 
 		m_n_tx = ( tpage & 0x0f ) << 6;
 		m_n_ty = ( ( tpage & 0x10 ) << 4 ) | ( ( tpage & 0x800 ) >> 2 );
@@ -824,6 +871,8 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 		n_ti = ( tpage & 0x2000 ) >> 13;
 		n_ix = 0;
 		n_iy = 0;
+		// TODO: find the dither bit on a real type 1 gpu
+		n_dtd = 0;
 		if( ( tpage & ~0x27ef ) != 0 )
 		{
 			LOG("not handled: draw mode %08x\n", tpage & ~0x27ef);
@@ -917,6 +966,14 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 		break; \
 	}
 
+/*
+ * Dithering is enabled by bit 9 of the draw mode, but the gpu only applies it to
+ * gouraud shaded or texture blended polygons and to lines. Monochrome polygons,
+ * raw textured polygons and all rectangles are never dithered.
+ */
+#define DITHERSETUP( ENABLE ) \
+	const int n_dither = ( ENABLE ) ? 1 : 0;
+
 #define SOLIDSETUP \
 	TRANSPARENCYSETUP
 
@@ -954,6 +1011,8 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 		n_distance = ( n_drawarea_x2 - drawx ) + 1; \
 	} \
 	uint16_t *p_vram = p_p_vram[ drawy ] + drawx; \
+	const uint32_t *p_n_ditherrow = p_n_dither[ n_dither ][ drawy & 3 ]; \
+	uint32_t n_ditherx = drawx & 3; \
 	\
 	switch( n_cmd & 0x02 ) \
 	{ \
@@ -961,11 +1020,13 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 		/* transparency off */ \
 		while( n_distance > 0 ) \
 		{ \
+			uint32_t n_ditheroffset = p_n_ditherrow[ n_ditherx ]; \
 			WRITE_PIXEL( \
-				p_n_redshade[ MID_LEVEL | n_r.w.h ] | \
-				p_n_greenshade[ MID_LEVEL | n_g.w.h ] | \
-				p_n_blueshade[ MID_LEVEL | n_b.w.h ] ) \
+				p_n_redshade[ n_ditheroffset | MID_LEVEL | n_r.w.h ] | \
+				p_n_greenshade[ n_ditheroffset | MID_LEVEL | n_g.w.h ] | \
+				p_n_blueshade[ n_ditheroffset | MID_LEVEL | n_b.w.h ] ) \
 			p_vram++; \
+			n_ditherx = ( n_ditherx + 1 ) & 3; \
 			PIXELUPDATE \
 			n_distance--; \
 		} \
@@ -974,11 +1035,13 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 		/* transparency on */ \
 		while( n_distance > 0 ) \
 		{ \
+			uint32_t n_ditheroffset = p_n_ditherrow[ n_ditherx ]; \
 			WRITE_PIXEL( \
-				p_n_redtrans[ p_n_f[ MID_LEVEL | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] | \
-				p_n_greentrans[ p_n_f[ MID_LEVEL | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] | \
-				p_n_bluetrans[ p_n_f[ MID_LEVEL | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] ) \
+				p_n_redtrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] | \
+				p_n_greentrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] | \
+				p_n_bluetrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] ) \
 			p_vram++; \
+			n_ditherx = ( n_ditherx + 1 ) & 3; \
 			PIXELUPDATE \
 			n_distance--; \
 		} \
@@ -1046,13 +1109,15 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 #define SHADEDPIXEL( PIXELUPDATE ) \
 		if( n_bgr != 0 ) \
 		{ \
+			uint32_t n_ditheroffset = p_n_ditherrow[ n_ditherx ]; \
 			WRITE_PIXEL( \
-				p_n_redshade[ p_n_redlevel[ n_bgr ] | n_r.w.h ] | \
-				p_n_greenshade[ p_n_greenlevel[ n_bgr ] | n_g.w.h ] | \
-				p_n_blueshade[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] | \
+				p_n_redshade[ n_ditheroffset | p_n_redlevel[ n_bgr ] | n_r.w.h ] | \
+				p_n_greenshade[ n_ditheroffset | p_n_greenlevel[ n_bgr ] | n_g.w.h ] | \
+				p_n_blueshade[ n_ditheroffset | p_n_bluelevel[ n_bgr ] | n_b.w.h ] | \
 				( n_bgr & 0x8000 ) ) \
 		} \
 		p_vram++; \
+		n_ditherx = ( n_ditherx + 1 ) & 3; \
 		PIXELUPDATE \
 		n_distance--; \
 	TEXTURE_ENDLOOP
@@ -1060,23 +1125,25 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 #define TRANSPARENTPIXEL( PIXELUPDATE ) \
 		if( n_bgr != 0 ) \
 		{ \
+			uint32_t n_ditheroffset = p_n_ditherrow[ n_ditherx ]; \
 			if( ( n_bgr & 0x8000 ) != 0 ) \
 			{ \
 				WRITE_PIXEL( \
-					p_n_redtrans[ p_n_f[ p_n_redlevel[ n_bgr ] | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] | \
-					p_n_greentrans[ p_n_f[ p_n_greenlevel[ n_bgr ] | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] | \
-					p_n_bluetrans[ p_n_f[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] | \
+					p_n_redtrans[ p_n_f[ n_ditheroffset | p_n_redlevel[ n_bgr ] | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] | \
+					p_n_greentrans[ p_n_f[ n_ditheroffset | p_n_greenlevel[ n_bgr ] | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] | \
+					p_n_bluetrans[ p_n_f[ n_ditheroffset | p_n_bluelevel[ n_bgr ] | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] | \
 					0x8000 ) \
 			} \
 			else \
 			{ \
 				WRITE_PIXEL( \
-					p_n_redshade[ p_n_redlevel[ n_bgr ] | n_r.w.h ] | \
-					p_n_greenshade[ p_n_greenlevel[ n_bgr ] | n_g.w.h ] | \
-					p_n_blueshade[ p_n_bluelevel[ n_bgr ] | n_b.w.h ] ) \
+					p_n_redshade[ n_ditheroffset | p_n_redlevel[ n_bgr ] | n_r.w.h ] | \
+					p_n_greenshade[ n_ditheroffset | p_n_greenlevel[ n_bgr ] | n_g.w.h ] | \
+					p_n_blueshade[ n_ditheroffset | p_n_bluelevel[ n_bgr ] | n_b.w.h ] ) \
 			} \
 		} \
 		p_vram++; \
+		n_ditherx = ( n_ditherx + 1 ) & 3; \
 		PIXELUPDATE \
 		n_distance--; \
 	TEXTURE_ENDLOOP
@@ -1087,6 +1154,8 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 		n_distance = ( n_drawarea_x2 - drawx ) + 1; \
 	} \
 	uint16_t *p_vram = p_p_vram[ drawy ] + drawx; \
+	const uint32_t *p_n_ditherrow = p_n_dither[ n_dither ][ drawy & 3 ]; \
+	uint32_t n_ditherx = drawx & 3; \
 	\
 	if( n_ti != 0 ) \
 	{ \
@@ -1399,6 +1468,7 @@ void psxgpu_device::FlatPolygon( int n_points )
 	PAIR n_cx2; n_cx2.d = 0;
 
 	SOLIDSETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = BGR_R( m_packet.FlatPolygon.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = BGR_G( m_packet.FlatPolygon.n_bgr ); n_g.w.l = 0;
@@ -1520,8 +1590,9 @@ void psxgpu_device::FlatTexturedPolygon( int n_points )
 	PAIR n_cu2; n_cu2.d = 0;
 	PAIR n_cv2; n_cv2.d = 0;
 
-	decode_tpage( m_packet.FlatTexturedPolygon.vertex[ 1 ].n_texture.w.h );
+	decode_tpage( m_packet.FlatTexturedPolygon.vertex[ 1 ].n_texture.w.h, false );
 	TEXTURESETUP
+	DITHERSETUP( n_dtd && !( n_cmd & 0x01 ) )
 
 	PAIR n_r; n_r.w.h = n_cmd & 0x01 ? 0x80 : BGR_R( m_packet.FlatTexturedPolygon.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = n_cmd & 0x01 ? 0x80 : BGR_G( m_packet.FlatTexturedPolygon.n_bgr ); n_g.w.l = 0;
@@ -1675,6 +1746,7 @@ void psxgpu_device::GouraudPolygon( int n_points )
 	PAIR n_cb2; n_cb2.d = 0;
 
 	SOLIDSETUP
+	DITHERSETUP( n_dtd )
 
 	FINDTOPLEFT( GouraudPolygon )
 
@@ -1845,8 +1917,9 @@ void psxgpu_device::GouraudTexturedPolygon( int n_points )
 	PAIR n_cu2; n_cu2.d = 0;
 	PAIR n_cv2; n_cv2.d = 0;
 
-	decode_tpage( m_packet.GouraudTexturedPolygon.vertex[ 1 ].n_texture.w.h );
+	decode_tpage( m_packet.GouraudTexturedPolygon.vertex[ 1 ].n_texture.w.h, false );
 	TEXTURESETUP
+	DITHERSETUP( n_dtd )
 
 	FINDTOPLEFT( GouraudTexturedPolygon )
 
@@ -2038,6 +2111,7 @@ void psxgpu_device::MonochromeLine()
 	uint8_t n_b = BGR_B( m_packet.MonochromeLine.n_bgr );
 
 	TRANSPARENCYSETUP
+	DITHERSETUP( n_dtd )
 
 	int32_t n_xlen;
 	if( n_xend > n_xstart )
@@ -2089,22 +2163,23 @@ void psxgpu_device::MonochromeLine()
 			drawx <= (int32_t)n_drawarea_x2 && drawy <= (int32_t)n_drawarea_y2 )
 		{
 			uint16_t *p_vram = p_p_vram[ drawy ] + drawx;
+			uint32_t n_ditheroffset = p_n_dither[ n_dither ][ drawy & 3 ][ drawx & 3 ];
 
 			switch( n_cmd & 0x02 )
 			{
 			case 0x00:
 				/* transparency off */
 				WRITE_PIXEL(
-					p_n_redshade[ MID_LEVEL | n_r ] |
-					p_n_greenshade[ MID_LEVEL | n_g ] |
-					p_n_blueshade[ MID_LEVEL | n_b ] )
+					p_n_redshade[ n_ditheroffset | MID_LEVEL | n_r ] |
+					p_n_greenshade[ n_ditheroffset | MID_LEVEL | n_g ] |
+					p_n_blueshade[ n_ditheroffset | MID_LEVEL | n_b ] )
 				break;
 			case 0x02:
 				/* transparency on */
 				WRITE_PIXEL(
-					p_n_redtrans[ p_n_f[ MID_LEVEL | n_r ] | p_n_redb[ *( p_vram ) ] ] |
-					p_n_greentrans[ p_n_f[ MID_LEVEL | n_g ] | p_n_greenb[ *( p_vram ) ] ] |
-					p_n_bluetrans[ p_n_f[ MID_LEVEL | n_b ] | p_n_blueb[ *( p_vram ) ] ] )
+					p_n_redtrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_r ] | p_n_redb[ *( p_vram ) ] ] |
+					p_n_greentrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_g ] | p_n_greenb[ *( p_vram ) ] ] |
+					p_n_bluetrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_b ] | p_n_blueb[ *( p_vram ) ] ] )
 				break;
 			}
 		}
@@ -2130,6 +2205,7 @@ void psxgpu_device::GouraudLine()
 	uint8_t n_cmd = BGR_C( m_packet.GouraudLine.vertex[ 0 ].n_bgr );
 
 	TRANSPARENCYSETUP
+	DITHERSETUP( n_dtd )
 
 	int32_t n_xstart = S11_COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord );
 	int32_t n_ystart = S11_COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord );
@@ -2200,22 +2276,23 @@ void psxgpu_device::GouraudLine()
 			drawx <= (int32_t)n_drawarea_x2 && drawy <= (int32_t)n_drawarea_y2 )
 		{
 			uint16_t *p_vram = p_p_vram[ drawy ] + drawx;
+			uint32_t n_ditheroffset = p_n_dither[ n_dither ][ drawy & 3 ][ drawx & 3 ];
 
 			switch( n_cmd & 0x02 )
 			{
 			case 0x00:
 				/* transparency off */
 				WRITE_PIXEL(
-					p_n_redshade[ MID_LEVEL | n_r.w.h ] |
-					p_n_greenshade[ MID_LEVEL | n_g.w.h ] |
-					p_n_blueshade[ MID_LEVEL | n_b.w.h ] )
+					p_n_redshade[ n_ditheroffset | MID_LEVEL | n_r.w.h ] |
+					p_n_greenshade[ n_ditheroffset | MID_LEVEL | n_g.w.h ] |
+					p_n_blueshade[ n_ditheroffset | MID_LEVEL | n_b.w.h ] )
 				break;
 			case 0x02:
 				/* transparency on */
 				WRITE_PIXEL(
-					p_n_redtrans[ p_n_f[ MID_LEVEL | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] |
-					p_n_greentrans[ p_n_f[ MID_LEVEL | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] |
-					p_n_bluetrans[ p_n_f[ MID_LEVEL | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] )
+					p_n_redtrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_r.w.h ] | p_n_redb[ *( p_vram ) ] ] |
+					p_n_greentrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_g.w.h ] | p_n_greenb[ *( p_vram ) ] ] |
+					p_n_bluetrans[ p_n_f[ n_ditheroffset | MID_LEVEL | n_b.w.h ] | p_n_blueb[ *( p_vram ) ] ] )
 				break;
 			}
 		}
@@ -2287,6 +2364,7 @@ void psxgpu_device::FlatRectangle()
 	uint8_t n_cmd = BGR_C( m_packet.FlatRectangle.n_bgr );
 
 	SOLIDSETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = BGR_R( m_packet.FlatRectangle.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = BGR_G( m_packet.FlatRectangle.n_bgr ); n_g.w.l = 0;
@@ -2336,6 +2414,7 @@ void psxgpu_device::FlatRectangle8x8()
 	uint8_t n_cmd = BGR_C( m_packet.FlatRectangle8x8.n_bgr );
 
 	SOLIDSETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = BGR_R( m_packet.FlatRectangle8x8.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = BGR_G( m_packet.FlatRectangle8x8.n_bgr ); n_g.w.l = 0;
@@ -2385,6 +2464,7 @@ void psxgpu_device::FlatRectangle16x16()
 	uint8_t n_cmd = BGR_C( m_packet.FlatRectangle16x16.n_bgr );
 
 	SOLIDSETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = BGR_R( m_packet.FlatRectangle16x16.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = BGR_G( m_packet.FlatRectangle16x16.n_bgr ); n_g.w.l = 0;
@@ -2438,6 +2518,7 @@ void psxgpu_device::FlatTexturedRectangle()
 
 	TEXTURESETUP
 	SPRITESETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = n_cmd & 0x01 ? 0x80 : BGR_R( m_packet.FlatTexturedRectangle.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = n_cmd & 0x01 ? 0x80 : BGR_G( m_packet.FlatTexturedRectangle.n_bgr ); n_g.w.l = 0;
@@ -2495,6 +2576,7 @@ void psxgpu_device::Sprite8x8()
 
 	TEXTURESETUP
 	SPRITESETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = n_cmd & 0x01 ? 0x80 : BGR_R( m_packet.Sprite8x8.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = n_cmd & 0x01 ? 0x80 : BGR_G( m_packet.Sprite8x8.n_bgr ); n_g.w.l = 0;
@@ -2553,6 +2635,7 @@ void psxgpu_device::Sprite16x16()
 
 	TEXTURESETUP
 	SPRITESETUP
+	DITHERSETUP( 0 )
 
 	PAIR n_r; n_r.w.h = n_cmd & 0x01 ? 0x80 : BGR_R( m_packet.Sprite16x16.n_bgr ); n_r.w.l = 0;
 	PAIR n_g; n_g.w.h = n_cmd & 0x01 ? 0x80 : BGR_G( m_packet.Sprite16x16.n_bgr ); n_g.w.l = 0;
@@ -2663,6 +2746,7 @@ void psxgpu_device::TexturedDot()
 	uint32_t n_cluty = ( m_packet.TexturedDot.vertex.n_texture.w.h >> 6 ) & 0x3ff;
 
 	TEXTURESETUP
+	DITHERSETUP( 0 )
 
 	int32_t n_distance = 1;
 
@@ -3153,7 +3237,7 @@ void psxgpu_device::gpu_write( uint32_t *p_ram, int32_t n_size )
 		case 0xe1:
 			LOGMASKED(LOG_WRITE, "%s: %02x: draw mode %06x\n", machine().describe_context(), m_packet.n_entry[ 0 ] >> 24,
 				m_packet.n_entry[ 0 ] & 0xffffff );
-			decode_tpage( m_packet.n_entry[ 0 ] & 0xffffff );
+			decode_tpage( m_packet.n_entry[ 0 ] & 0xffffff, true );
 			break;
 		case 0xe2:
 			n_twy = ( ( ( m_packet.n_entry[ 0 ] >> 15 ) & 0x1f ) << 3 );
@@ -3486,6 +3570,7 @@ void psxgpu_device::gpu_reset()
 	n_twy = 0;
 	n_twh = 255;
 	n_tww = 255;
+	n_dtd = 0;
 	m_draw_stp = false;
 	m_check_stp = false;
 	updatevisiblearea();
