@@ -569,11 +569,12 @@ void zbi_s8k_cpu10_card_device::addrmap_sio(address_map &map)
 
 bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t &offset)
 {
-	bool stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const side_effects = !machine().side_effects_disabled();
 
 	offset <<= 1;
 
-	if (stack_access)
+	if (side_effects && stack_access)
 	{
 		m_ctc[0]->trg3(1);
 		m_ctc[0]->trg3(0);
@@ -588,9 +589,10 @@ bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t 
 					z8002_device::ST_REQ_STACK :
 					z8002_device::ST_REQ_DATA);
 
-	observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
+	if (side_effects)
+		observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
 	// SUP is shared by all three MMUs, not just the selected address driver.
-	if (!machine().side_effects_disabled() && !m_dma_on &&
+	if (side_effects && !m_dma_on &&
 		(m_mmu_code->cpu_suppressed() || m_mmu_data->cpu_suppressed() || m_mmu_stck->cpu_suppressed()))
 		return false;
 
@@ -1039,7 +1041,8 @@ zbi_s8k_hpcpu_card_device::zbi_s8k_hpcpu_card_device(const machine_config &mconf
 
 bool zbi_s8k_hpcpu_card_device::translate_addr(int spacenum, bool write, offs_t &offset)
 {
-	bool stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const side_effects = !machine().side_effects_disabled();
 
 	offset <<= 1;
 
@@ -1054,9 +1057,10 @@ bool zbi_s8k_hpcpu_card_device::translate_addr(int spacenum, bool write, offs_t 
 
 	// Board latches and MMU bus snoop see the cycle before any
 	// violation can be raised for it.
-	observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
+	if (side_effects)
+		observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
 	// SUP is shared by all three MMUs, not just the selected address driver.
-	if (!machine().side_effects_disabled() && !m_dma_on &&
+	if (side_effects && !m_dma_on &&
 		(m_mmu_code->cpu_suppressed() || m_mmu_data->cpu_suppressed() || m_mmu_stck->cpu_suppressed()))
 		return false;
 

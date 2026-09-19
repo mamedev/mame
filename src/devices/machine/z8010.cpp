@@ -152,8 +152,6 @@ void z8010_device::device_reset()
 // freezes a copy into the instruction seg/offset status registers.
 void z8010_device::ifetch1_observed(offs_t offset)
 {
-	if (machine().side_effects_disabled())
-		return;
 	instruction_end();
 	m_if1_seg = (uint8_t)(offset >> 16) & 0x7f;
 	m_if1_hoffs = (uint8_t)(offset >> 8);
