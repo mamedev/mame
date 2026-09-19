@@ -83,7 +83,7 @@ void clps6700_device::set_input_level(int bit, int state)
 
 uint32_t clps6700_device::register_r(offs_t offset)
 {
-	uint16_t data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 
 	offset <<= 2;
 
