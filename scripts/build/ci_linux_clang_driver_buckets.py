@@ -12,6 +12,12 @@ import sys
 
 PROJECTS_PREFIX = 'PROJECTS := '
 EXECUTABLE_PROJECT = 'mame'
+THIRDPARTY_PROJECTS = (
+        '7z', 'asmjit', 'bgfx', 'bimg', 'bx', 'expat', 'flac', 'jpeg', 'linenoise', 'lua', 'lualibs',
+        'portaudio', 'portmidi', 'softfloat3', 'sqlite3', 'utf8proc', 'wdlfft', 'ymfm', 'zlib', 'zstd')
+TOOL_PROJECTS = (
+        'castool', 'chdman', 'floptool', 'imgtool', 'jedutil', 'ldresample', 'ldverify', 'nltool', 'nlwav',
+        'pngcmp', 'regrep', 'romcmp', 'split', 'srcclean', 'testkeys', 'unidasm')
 
 BUCKETS = {
         'driver-1': (
@@ -78,7 +84,9 @@ def parse_args():
 
     list_parser = subparsers.add_parser('list')
     add_common_arguments(list_parser)
-    list_parser.add_argument('--group', required=True, choices=('base', 'all') + tuple(BUCKETS))
+    list_parser.add_argument(
+            '--group', required=True,
+            choices=('base', 'thirdparty', 'tools', 'all') + tuple(BUCKETS))
 
     archives_parser = subparsers.add_parser('verify-archives')
     add_common_arguments(archives_parser)
@@ -123,14 +131,30 @@ def validate_buckets(projects, source_root):
         raise ValueError('; '.join(details))
     if EXECUTABLE_PROJECT not in projects:
         raise ValueError('generated solution does not contain the %s executable project' % EXECUTABLE_PROJECT)
+
+    generated_projects = set(projects)
+    missing_thirdparty = sorted(set(THIRDPARTY_PROJECTS) - generated_projects)
+    missing_tools = sorted(set(TOOL_PROJECTS) - generated_projects)
+    if missing_thirdparty or missing_tools:
+        details = []
+        if missing_thirdparty:
+            details.append('third-party projects absent from generated solution: %s' % ' '.join(missing_thirdparty))
+        if missing_tools:
+            details.append('tool projects absent from generated solution: %s' % ' '.join(missing_tools))
+        raise ValueError('; '.join(details))
     return generated_drivers
 
 
 def select_projects(group, projects, generated_drivers):
     if group == 'base':
+        excluded = generated_drivers | set(THIRDPARTY_PROJECTS) | set(TOOL_PROJECTS) | {EXECUTABLE_PROJECT}
         return [
                 project for project in projects
-                if (project not in generated_drivers) and (project != EXECUTABLE_PROJECT)]
+                if project not in excluded]
+    elif group == 'thirdparty':
+        return [project for project in projects if project in THIRDPARTY_PROJECTS]
+    elif group == 'tools':
+        return [project for project in projects if project in TOOL_PROJECTS]
     elif group == 'all':
         return [project for bucket in BUCKETS.values() for project in bucket]
     else:

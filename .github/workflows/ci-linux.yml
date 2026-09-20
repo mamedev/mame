@@ -72,8 +72,14 @@ jobs:
           unidasm
         if-no-files-found: error
 
-  build-linux-clang-base:
-    name: build-linux (clang base)
+  build-linux-clang-libraries:
+    name: build-linux (clang ${{ matrix.group }})
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+        - base
+        - thirdparty
     runs-on: ubuntu-latest
     env:
       OVERRIDE_CC: clang
@@ -88,7 +94,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
-    - name: Build base projects
+    - name: Build library shard
       run: |
         set -euo pipefail
         make -j3 generate
@@ -100,24 +106,32 @@ jobs:
         python scripts/build/instrument_solution_makefile.py \
           "$CLANG_SOLUTION_DIR/Makefile"
         projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
-          list "$CLANG_SOLUTION_DIR/Makefile" --group base)"
+          list "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}")"
         make -j3 -C "$CLANG_SOLUTION_DIR" config=release64 $projects
-    - name: Stage base artifacts
+    - name: Stage library artifacts
       run: |
         set -euo pipefail
-        artifact_root=build/ci-linux-clang-base-artifact
+        artifact_root=build/ci-linux-clang-${{ matrix.group }}-artifact
         mkdir -p "$artifact_root"
-        find build/linux_clang/bin/x64/Release -type f -name '*.a' \
-          -exec cp --parents '{}' "$artifact_root" \;
-        test -x chdman
-        test -x unidasm
-        cp --parents chdman unidasm "$artifact_root"
+        projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
+          list "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}")"
+        for project in $projects; do
+          mapfile -t archives < <(find build/linux_clang/bin/x64/Release \
+            -type f -name "lib${project}.a")
+          if (( ${#archives[@]} != 1 )); then
+            echo "Expected one archive for ${project}, found ${#archives[@]}" >&2
+            exit 1
+          fi
+          cp --parents "${archives[0]}" "$artifact_root"
+        done
         cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
-    - name: Upload base artifacts
+    - name: Upload library artifacts
       uses: actions/upload-artifact@main
       with:
-        name: mame-linux-clang-shard-base-${{ github.sha }}
-        path: build/ci-linux-clang-base-artifact/
+        name: mame-linux-clang-shard-${{ matrix.group }}-${{ github.sha }}
+        path: build/ci-linux-clang-${{ matrix.group }}-artifact/
         if-no-files-found: error
 
   build-linux-clang-drivers:
@@ -188,7 +202,7 @@ jobs:
   build-linux-clang:
     name: build-linux (clang)
     needs:
-    - build-linux-clang-base
+    - build-linux-clang-libraries
     - build-linux-clang-drivers
     runs-on: ubuntu-latest
     env:
@@ -217,13 +231,23 @@ jobs:
         pattern: mame-linux-clang-shard-*-${{ github.sha }}
         path: .
         merge-multiple: true
+    - name: Build tools
+      run: |
+        set -euo pipefail
+        export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
+        mkdir -p "$MAME_PROJECT_TIMING_DIR"
+        for project in chdman unidasm; do
+          /usr/bin/time -a -f '%e %U %S %M %x' \
+            -o "$MAME_PROJECT_TIMING_DIR/${project}.timing" \
+            make -j3 -C "$CLANG_SOLUTION_DIR" -f "${project}.make" \
+              config=release64
+        done
     - name: Link MAME
       run: |
         set -euo pipefail
         python scripts/build/ci_linux_clang_driver_buckets.py \
           verify-archives "$CLANG_SOLUTION_DIR/Makefile" --group all \
           --archive-dir "$CLANG_DRIVER_ARCHIVE_DIR"
-        chmod +x chdman unidasm
         test -x chdman
         test -x unidasm
         export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
