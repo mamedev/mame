@@ -1856,10 +1856,26 @@ void sci_state::racingb_map(address_map &map)
 	map(0x520001, 0x520001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x520003, 0x520003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0x700000, 0x701fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x900000, 0x90ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));      /* tilemaps */
+	map(0x900000, 0x90ffff).r(m_tc0480scp, FUNC(tc0480scp_device::ram_r)).w(FUNC(sci_state::racingb_scp_w));    /* tilemaps */
 	map(0x930000, 0x93002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0xb00000, 0xb03fff).ram().share("spriteram"); /* mostly unused ? */
 	map(0xb08000, 0xb08001).rw(FUNC(sci_state::sci_spriteframe_r), FUNC(sci_state::sci_spriteframe_w)); /* alternates 0/0x100 */
+}
+
+void sci_state::racingb_scp_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	/* Stopgap approximation of TC0480SCP VRAM access contention, which is
+	   not otherwise emulated (the real chip owns this RAM and the CPU waits
+	   for an access slot). Racing Beat's scene teardown bulk-clears the SCP
+	   row tables while its road pipeline is still draining beam-raced writes
+	   into them; with zero-wait VRAM the clear completes 1-2 frames early
+	   and the final drain rewrites cleared tables, leaving a stale road
+	   band over the post-coin car screen (verified against original
+	   hardware footage, where the screen is clean). 10 cycles per write is
+	   the smallest penalty that reorders the race as on hardware; the true
+	   per-access delay is unmeasured. */
+	m_maincpu->eat_cycles(10);
+	m_tc0480scp->ram_w(offset, data, mem_mask);
 }
 
 void sci_state::racingb_cpub_map(address_map &map)

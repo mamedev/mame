@@ -238,6 +238,7 @@ private:
 	void sci_spriteframe_w(u16 data);
 
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
+	void racingb_scp_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	u32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
