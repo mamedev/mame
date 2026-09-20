@@ -46,6 +46,15 @@ public:
 	auto portb_write() { return m_port_write[PORT_B].bind(); }
 	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
+	// Byte-granularity serial hooks.  All additive and default-inert: an
+	// unbound devcb write is a no-op and the rx bytes start and stay 0, so a
+	// machine that wires nothing behaves exactly as before.
+	auto sc0_txd() { return m_sc0_txd_cb.bind(); }   // byte written to SC0BUF
+	auto sc1_txd() { return m_sc1_txd_cb.bind(); }   // byte written to SC1BUF
+	auto sc1_mod() { return m_sc1_mod_cb.bind(); }   // every SC1MOD write, so a peer sees RXE
+	void sc0_rxd(uint8_t data);                      // hand the CPU a byte, raise INTRX0
+	void sc1_rxd(uint8_t data);                      // hand the CPU a byte, raise INTRX1
+
 protected:
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
@@ -173,6 +182,11 @@ private:
 	// Serial Channel
 	uint8_t   m_serial_control[2];
 	uint8_t   m_serial_mode[2];
+	devcb_write8 m_sc0_txd_cb;
+	devcb_write8 m_sc1_txd_cb;
+	devcb_write8 m_sc1_mod_cb;
+	uint8_t   m_sc0_rx_data;
+	uint8_t   m_sc1_rx_data;
 	uint8_t   m_baud_rate[2];
 	uint8_t   m_od_enable;
 

@@ -38,6 +38,11 @@ tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *ta
 	m_watchdog_mode(0),
 	m_serial_control{ 0, 0 },
 	m_serial_mode{ 0, 0 },
+	m_sc0_txd_cb(*this),
+	m_sc1_txd_cb(*this),
+	m_sc1_mod_cb(*this),
+	m_sc0_rx_data(0),
+	m_sc1_rx_data(0),
 	m_baud_rate{ 0, 0 },
 	m_od_enable(0),
 	m_ad_result{ 0, 0, 0, 0 },
@@ -226,6 +231,8 @@ void tmp95c061_device::device_start()
 	save_item(NAME(m_watchdog_mode));
 	save_item(NAME(m_serial_control));
 	save_item(NAME(m_serial_mode));
+	save_item(NAME(m_sc0_rx_data));
+	save_item(NAME(m_sc1_rx_data));
 	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_od_enable));
 	save_item(NAME(m_ad_result));
@@ -1146,13 +1153,22 @@ void tmp95c061_device::wdcr_w(uint8_t data)
 
 uint8_t tmp95c061_device::sc0buf_r()
 {
-	return 0;
+	return m_sc0_rx_data;
 }
 
 void tmp95c061_device::sc0buf_w(uint8_t data)
 {
+	m_sc0_txd_cb(data);
+
 	// Fake finish sending data
 	m_int_reg[INTES0] |= 0x80;
+	m_check_irqs = 1;
+}
+
+void tmp95c061_device::sc0_rxd(uint8_t data)
+{
+	m_sc0_rx_data = data;
+	m_int_reg[INTES0] |= 0x08;
 	m_check_irqs = 1;
 }
 
@@ -1191,13 +1207,25 @@ void tmp95c061_device::br0cr_w(uint8_t data)
 
 uint8_t tmp95c061_device::sc1buf_r()
 {
-	return 0;
+	return m_sc1_rx_data;
 }
 
 void tmp95c061_device::sc1buf_w(uint8_t data)
 {
 	// Fake finish sending data
 	m_int_reg[INTES1] |= 0x80;
+	m_check_irqs = 1;
+
+	// In I/O-interface mode (SM = 0) the peer clocks the byte out, so only hand
+	// it on when the channel is in a mode that actually transmits.
+	if (((m_serial_mode[1] & 0x0c) != 0) || (m_port_function[PORT_8] & 0x20))
+		m_sc1_txd_cb(data);
+}
+
+void tmp95c061_device::sc1_rxd(uint8_t data)
+{
+	m_sc1_rx_data = data;
+	m_int_reg[INTES1] |= 0x08;
 	m_check_irqs = 1;
 }
 
@@ -1222,6 +1250,8 @@ uint8_t tmp95c061_device::sc1mod_r()
 void tmp95c061_device::sc1mod_w(uint8_t data)
 {
 	m_serial_mode[1] = data;
+
+	m_sc1_mod_cb(data);
 }
 
 uint8_t tmp95c061_device::br1cr_r()
