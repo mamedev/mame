@@ -100,7 +100,7 @@ protected:
 
 private:
 	// registers on PSX appear to be aligned to 64 bit boundaries
-	
+
 	u64 regs_r(offs_t offset, u64 mem_mask = ~0);
 	void regs_w(offs_t offset, u64 data, u64 mem_mask = ~0);
 

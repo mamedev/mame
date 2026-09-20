@@ -44,6 +44,7 @@ public:
 	auto iobus_d_w_callback() { return write_iobus_d.bind(); }
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
+	void set_system_id(u32 id) { m_system_id = id; }
 
 	void cb1_w(int state);
 	void cb2_w(int state);
@@ -112,6 +113,7 @@ protected:
 private:
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel;
+	u32 m_system_id;
 	u8 m_lt_timer_count;
 	attotime m_lt_timer_start;
 	u8 m_scc_rec_count;
@@ -148,7 +150,7 @@ public:
 	auto enet_r_callback() { return read_enet.bind(); }
 	auto enet_w_callback() { return write_enet.bind(); }
 	auto enet_prom_r_callback() { return read_enet_prom.bind(); }
-	//template <typename T> void set_mace_tag(T &&tag) { m_mace.set_tag(std::forward<T>(tag)); }
+//  template <typename T> void set_mace_tag(T &&tag) { m_mace.set_tag(std::forward<T>(tag)); }
 	void enet_irq(int state) { set_irq_line<14>(state); }
 	void enet_tx_drq(int state) { m_dma_enet_tx->drq_w(state); }
 	void enet_rx_drq(int state) { m_dma_enet_rx->drq_w(state); }
@@ -210,7 +212,7 @@ private:
 
 	required_device<dbdma_device> m_dma_scsi1;
 	required_device<dbdma_device> m_dma_enet_tx, m_dma_enet_rx;
-	//optional_device<am79c940_device> m_mace;
+//  optional_device<am79c940_device> m_mace;
 	devcb_read8 read_enet, read_enet_prom;
 	devcb_write8 write_enet;
 	bool m_enet_tx_eof;

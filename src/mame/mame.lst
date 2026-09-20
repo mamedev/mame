@@ -1335,6 +1335,16 @@ pmac7200_120
 pmac6200
 pmac5200
 
+@source:apple/macgazelle.cpp
+pmac5500
+pmac5500_250
+pmac5500_275
+pmac6500
+pmac6500_250
+pmac6500_275
+pmac6500_300
+pmac20th
+
 @source:apple/macii.cpp
 mac2fdhd
 macii

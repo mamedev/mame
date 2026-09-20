@@ -320,6 +320,7 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	m_dma_audio_out(*this, "dma_audout"),
 	m_cur_floppy(nullptr),
 	m_hdsel(0),
+	m_system_id(0),
 	m_lt_timer_count(0),
 	m_lt_timer_start(attotime::zero),
 	m_scc_rec_count(8),
@@ -333,7 +334,7 @@ grandcentral_device::grandcentral_device(const machine_config &mconfig, const ch
 	m_dma_scsi1(*this, "dma_scsi1"),
 	m_dma_enet_tx(*this, "dma_enet_tx"),
 	m_dma_enet_rx(*this, "dma_enet_rx"),
-	//m_mace(*this, finder_base::DUMMY_TAG),
+//  m_mace(*this, finder_base::DUMMY_TAG),
 	read_enet(*this, 0xff),
 	read_enet_prom(*this, 0xff),
 	write_enet(*this),
@@ -631,6 +632,8 @@ u32 macio_device::macio_r(offs_t offset)
 			return m_InterruptMask;
 		case 0x2c:
 			return m_InterruptLevels;
+		case 0x34:  // ID: front panel, monitor, media bay, CPU/box ID
+			return m_system_id;
 	}
 	return 0;
 }
@@ -1146,7 +1149,7 @@ u8 grandcentral_device::enet_prom_r(offs_t offset)
 // so the residual count tells the driver where they are.
 u32 grandcentral_device::enet_dma_r()
 {
-#if 0
+	#if 0
 	if (!m_mace)
 	{
 		return 0;
@@ -1164,9 +1167,9 @@ u32 grandcentral_device::enet_dma_r()
 		m_dma_enet_rx->eof_w(1);
 	}
 	return result.data & 0xff;
-#else
+	#else
 	return 0;
-#endif
+	#endif
 }
 
 void grandcentral_device::enet_dma_eof_w(int state)
