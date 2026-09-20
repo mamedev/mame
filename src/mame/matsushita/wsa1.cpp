@@ -52,6 +52,10 @@
 #include "emu.h"
 
 #include "cpu/tlcs900/tmp95c061.h"
+#include "video/sed1330.h"
+
+#include "emupal.h"
+#include "screen.h"
 
 
 
@@ -64,6 +68,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu1(*this, "cpu1")
 		, m_cpu2(*this, "cpu2")
+		, m_lcdc(*this, "lcdc")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -71,10 +76,32 @@ public:
 private:
 	required_device<tmp95c061_device> m_cpu1;
 	required_device<tmp95c061_device> m_cpu2;
+	required_device<sed1330_device> m_lcdc;
+
+	void palette_init(palette_device &palette) ATTR_COLD;
 
 	void cpu1_map(address_map &map) ATTR_COLD;
 	void cpu2_map(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 };
+
+
+void wsa1_state::palette_init(palette_device &palette)
+{
+	// A driver choice, not a measurement: the pen pair ympsr2000.cpp uses for
+	// its own SED1330 panel of the same geometry.  The real module's appearance
+	// is not established.
+	palette.set_pen_color(0, rgb_t(0x36, 0x41, 0xcf));
+	palette.set_pen_color(1, rgb_t(0xdb, 0xe9, 0xff));
+}
+
+
+void wsa1_state::lcdc_map(address_map &map)
+{
+	// 32 KiB of display RAM: the power-on clear at LcdRamPowerOnClear writes 0x800 x 16
+	// bytes, and the highest address any layer reaches is SAD3 + 240 * AP.
+	map(0x0000, 0x7fff).ram();
+}
 
 
 // CPU 1 fetches prom_a and prom_b; CPU 2 fetches prom_c.  Which of them is IC1
@@ -89,6 +116,9 @@ void wsa1_state::cpu1_map(address_map &map)
 	// work DRAM on CS3 (MSAR3 = 0x60 at InitMSAR3_CS3; P6FC = 0x1F at InitP6FC_LCAS makes
 	// the CS3 pin LCAS).  First stack is 0x60EB80.
 	map(0x600000, 0x67ffff).ram();
+
+	map(0x790000, 0x790000).rw(m_lcdc, FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
+	map(0x790001, 0x790001).rw(m_lcdc, FUNC(sed1330_device::data_r),   FUNC(sed1330_device::command_w));
 
 	map(0xf00000, 0xf7ffff).rom().region("prom_ab", 0x000000);   // IC13
 	map(0xf80000, 0xffffff).rom().region("prom_ab", 0x080000);   // IC12
@@ -115,6 +145,19 @@ void wsa1_state::wsa1r(machine_config &config)
 
 	TMP95C061(config, m_cpu2, 28_MHz_XTAL);
 	m_cpu2->set_addrmap(AS_PROGRAM, &wsa1_state::cpu2_map);
+
+	auto &palette = PALETTE(config, "palette", FUNC(wsa1_state::palette_init), 2);
+
+	screen_device &screen = SCREEN(config, "screen").set_lcd();
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(m_lcdc, FUNC(sed1330_device::screen_update));
+	screen.set_size(320, 240);
+	screen.set_visarea_full();
+	screen.set_palette(palette);
+
+	SED1330(config, m_lcdc, 8'000'000);   // IC7's X2
+	m_lcdc->set_screen("screen");
+	m_lcdc->set_addrmap(0, &wsa1_state::lcdc_map);
 }
 
 
