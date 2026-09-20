@@ -222,6 +222,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_eeprom(*this, "eeprom")
 		, m_cpanel(*this, "cpanel")
+		, m_checkdev(*this, "CHECKDEV")
 		, m_midi_uart(*this, "midi_uart")
 		, m_tonegen(*this, "tonegen")
 		, m_modeling(*this, "modeling")
@@ -239,6 +240,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<wsa1r_cpanel_device> m_cpanel;
+	required_ioport m_checkdev;
 	required_device<wsa1_midi_uart_device> m_midi_uart;
 	required_device<wsa1_tonegen_device> m_tonegen;
 	required_device<l7a1429_device> m_modeling;
@@ -470,11 +472,16 @@ uint16_t wsa1_state::tg_status_r()
 }
 
 
-// P5 bit 4 is the service CHECKING DEVICE input on CN4, high when nothing is
-// attached.
+// P5 bit 4 is the service CHECKING DEVICE input on CN4.  It reads high when
+// nothing is attached; the firmware takes its service path if it reads low.
 uint8_t wsa1_state::cpu1_p5_r()
 {
-	return (m_cpu1_p5 & 0x2c) | 0xd3;           // bits 0, 1, 6, 7 do not exist
+	uint8_t data = (m_cpu1_p5 & 0x2c) | 0xc3;   // bits 0, 1, 6, 7 do not exist
+
+	if (!BIT(m_checkdev->read(), 0))
+		data |= 0x10;
+
+	return data;
 }
 
 
@@ -669,6 +676,11 @@ static void wsa1_floppies(device_slot_interface &device)
 
 
 static INPUT_PORTS_START(wsa1r)
+	PORT_START("CHECKDEV")
+	PORT_CONFNAME(0x01, 0x00, "Service CHECKING DEVICE on CN4")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+
 INPUT_PORTS_END
 
 
