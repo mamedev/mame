@@ -1,6 +1,9 @@
 // license::BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
+ unkrgm
+ No info.
+
  mscbar
   Product name: 小方玛丽板
   Product Code: square-mario-baord
@@ -76,6 +79,8 @@ public:
 	{ }
 
 	void mscbar(machine_config &config);
+		void unkrgm(machine_config &config);
+
 	void mscbar_adpcm_bank(uint8_t data) ATTR_COLD;
 
 protected:
@@ -95,6 +100,8 @@ private:
 	uint8_t keyboard_r();
 	void mscbar_data_map(address_map &map) ATTR_COLD;
 	void mscbar_program_map(address_map &map) ATTR_COLD;
+	void unkrgm_data_map(address_map &map) ATTR_COLD;
+	void unkrgm_program_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_selected_7seg_module = 0;
     uint8_t m_p1_out = 0xff;
@@ -110,25 +117,25 @@ private:
 
 static INPUT_PORTS_START( mscbar )
 	PORT_START("KEYS1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 4")PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 3")PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 2")PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 1")PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 6")PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 7")PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 8")PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 9") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 9") PORT_CODE( KEYCODE_9_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 8") PORT_CODE( KEYCODE_8_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 7") PORT_CODE( KEYCODE_7_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 6")PORT_CODE( KEYCODE_6_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 1") PORT_CODE( KEYCODE_1_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 2") PORT_CODE( KEYCODE_2_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 3") PORT_CODE( KEYCODE_3_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 4") PORT_CODE( KEYCODE_4_PAD)
 
 
 	PORT_START("KEYS2")
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_GAMBLE_TAKE)  PORT_NAME("Credits") PORT_CODE(KEYCODE_Q) 
-	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bonus") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_T) // ???
-	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bet 5") PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout") 
-	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH)  PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW)   PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_START1) PORT_NAME("Start / Take Score")
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW) 
+	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout") 
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bet 5") PORT_CODE( KEYCODE_5_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_BUTTON5 ) PORT_NAME( "Unknown" )
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_BUTTON6)  PORT_NAME("Bonus") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON7)  PORT_NAME("Credits") PORT_CODE(KEYCODE_Q) 
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
@@ -148,12 +155,40 @@ static INPUT_PORTS_START( mscbar )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT) PORT_NAME("Clear Credits?") PORT_CODE(KEYCODE_C)  //  will cause error 76.
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_MEMORY_RESET) //  will cause error 76.
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // For Hopper.
 
 	PORT_START("P3")
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)  // Coin
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3)  // Coin
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( unkrgm )
+	PORT_INCLUDE( mscbar )
+
+	PORT_MODIFY("P1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6" )	
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // For Hopper.
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_MEMORY_RESET) PORT_CODE(KEYCODE_7) 
+
+	PORT_MODIFY("P3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1" )
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3)  // Coin
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
+	
+	
+INPUT_PORTS_END
+
+
 
 void mscbar_state::ay1_port_a_w(uint8_t data)
 {  
@@ -244,10 +279,21 @@ void mscbar_state::mscbar_adpcm_bank(uint8_t data)
 
 void mscbar_state::mscbar_program_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom().region("maincpu", 0);
-	map(0x1000, 0xffff).rom().region("eeprom",  0x1000);
+	map(0x0000, 0x0fff).rom().region("maincpu", 0); // mcu
+	map(0x1000, 0xffff).rom().region("eeprom",  0x1000); // eeprom
 
 }
+
+void mscbar_state::unkrgm_data_map(address_map &map)
+{
+    map(0xf800, 0xf801).w("ay1", FUNC(ay8910_device::address_data_w));
+    map(0xf802, 0xf803).w("ay2", FUNC(ay8910_device::address_data_w)); 
+	map(0xfc00, 0xfc01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xf000, 0xf7ff).ram().share("nvram"); /* HM6116LP-3: 2kb of Static RAM */
+
+}
+
+
 
 void mscbar_state::mscbar_data_map(address_map &map)
 {
@@ -260,11 +306,11 @@ void mscbar_state::mscbar_data_map(address_map &map)
 
 }
 
-void mscbar_state::mscbar(machine_config &config)
+void mscbar_state::unkrgm(machine_config &config)
 {
-	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'000))); // actual cpu is at89c51
+	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'000))); // actual cpu is at89s51
 	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
-	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
+	maincpu.set_addrmap(AS_DATA, &mscbar_state::unkrgm_data_map);
 
 	
 	maincpu.port_in_cb<1>().set_ioport("P1");
@@ -298,17 +344,45 @@ void mscbar_state::mscbar(machine_config &config)
 	ay2.port_a_write_callback().set(FUNC(mscbar_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(mscbar_state::ay2_port_b_w));
    
+}
+void mscbar_state::mscbar(machine_config &config)
+{
+	unkrgm(config);
+	i80c51_device &maincpu(I80C51(config.replace(), "maincpu", XTAL(10'738'000)));   // Actual cpu is at89c51-24pc
+	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
+	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
+	maincpu.port_in_cb<1>().set_ioport("P1");
+	maincpu.port_in_cb<1>().set(FUNC(mscbar_state::p1_port_r));
+    maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
+	maincpu.port_in_cb<3>().set_ioport("P3");
+	maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
     OKIM6295(config, m_oki,  XTAL(10'738'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
+
 }
 
 void mscbar_state::machine_start()
 {
-	m_digits.resolve();
-	m_leds.resolve();
 	save_item(NAME(m_selected_7seg_module));
 	save_item(NAME(m_p1_out));
 
 }
+
+ROM_START( unkrgm )
+
+
+
+	ROM_REGION( 0x01000, "maincpu", 0 ) // actual CPU is a at89s51.
+	ROM_LOAD( "at89s51.bin", 0x00000, 0x01000, CRC(6B35111C) SHA1(81dbf4a53b05c2aa1013796c727149f6dfb2fb97) ) 
+
+	ROM_REGION( 0x10000, "eeprom", 0 )
+	ROM_LOAD( "w27c512_autoresets_2credits.bin", 0x00000, 0x10000, CRC(C5BA2975) SHA1(f61feeebcc10d7513df5f24a5e9a02c6415b465a) )
+	
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(C69A5ADD) SHA1(484e356da2651f5bcb31d6fb99fa6cd8eed471bf) ) // pre-initialized
+	
+	ROM_REGION( 0x023D, "gals", 0 )
+	ROM_LOAD( "gal16v8b.jed", 0x0000, 0x023D, CRC(4E8A3074) SHA1(42519321f2b29c843ced6fc9a105a031cd1d3272) )
+ROM_END
 
 ROM_START( mscbar )
 
@@ -318,6 +392,9 @@ ROM_START( mscbar )
 	ROM_REGION( 0x10000, "eeprom", 0 )
 	ROM_LOAD( "w27c512.u12", 0x0000, 0x10000, CRC(735147D8) SHA1(df2431f85224443eda4346a10183021f60d858a0) )
 
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(1A099702) SHA1(68399f7dcba0400207289b9717c8e8b9f7bb3038) ) // pre-initialized
+
 	ROM_REGION( 0x200000, "oki", 0 ) // adpcm rom - 8 bank
 	ROM_LOAD( "mx29f1615pc-10.u11", 0x000000, 0x200000, CRC(D8B7E688) SHA1(5e220f1cb963e0bc2ce37b297359f937fb097bf0) )
 
@@ -325,8 +402,14 @@ ROM_START( mscbar )
 	ROM_LOAD( "epm7032slc44-10n.u8", 0x0000, 0x0800, NO_DUMP  )
 ROM_END
 
+
+
+
 } // anonymous namespace
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                  FLAGS
-GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                      MACHINE_NOT_WORKING  ) // Error 02
+GAME( 20??, unkrgm, 0,       unkrgm,   unkrgm,  mscbar_state,  empty_init, ROT0,  "Unknown", "unknown Roulette Gambling Machine'",                                MACHINE_NOT_WORKING  ) 
+GAME( 20??, mscbar, unkrgm,  mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                      MACHINE_NOT_WORKING  ) 
+
+
