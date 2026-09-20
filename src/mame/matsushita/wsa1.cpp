@@ -64,6 +64,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "wsa1r.lh"
+
 
 // A byte/bit shim between the TMP95C061's serial channel 0 and MAME's
 // bit-serial MIDI ports: 31250 baud, 8N1, with a small transmit ring so a
@@ -784,6 +786,8 @@ void wsa1_state::wsa1r(machine_config &config)
 	m_midi_uart->tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
 
 	SPEAKER(config, "speaker", 2).front();
+	config.set_default_layout(layout_wsa1r);
+
 	WSA1_TONEGEN(config, m_tonegen, 0);
 	m_tonegen->add_route(0, "speaker", 1.0, 0);
 	m_tonegen->add_route(1, "speaker", 1.0, 1);
