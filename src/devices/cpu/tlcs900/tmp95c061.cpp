@@ -671,6 +671,15 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 }
 
 
+// TLCS-900/H databook table 3.8 (1): the 8-bit timer prescaler taps are
+// phiT1 = fc/8, phiT4 = fc/32, phiT16 = fc/128 and phiT256 = fc/2048.  The
+// shifts here were four bits too many for each tap, so every 8-bit timer
+// counted sixteen times too slowly.
+static constexpr int PRESCALE_T1   = 3;
+static constexpr int PRESCALE_T4   = 5;
+static constexpr int PRESCALE_T16  = 7;
+static constexpr int PRESCALE_T256 = 11;
+
 void tmp95c061_device::tlcs900_handle_timers()
 {
 	uint32_t  old_pre = m_timer_pre;
@@ -687,13 +696,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		case 0x00:  /* TIO */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[0] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T4 */
-			m_timer_change[0] += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T4 ) - ( old_pre >> PRESCALE_T4 );
 			break;
 		case 0x03:  /* T16 */
-			m_timer_change[0] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		}
 
@@ -725,13 +734,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		case 0x00:  /* TO0TRG */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[1] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T16 */
-			m_timer_change[1] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		case 0x03:  /* T256 */
-			m_timer_change[1] += ( m_timer_pre >> 15 ) - ( old_pre >> 15 );
+			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T256 ) - ( old_pre >> PRESCALE_T256 );
 			break;
 		}
 
@@ -764,13 +773,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		{
 		case 0x00:  /* invalid */
 		case 0x01:  /* T1 */
-			m_timer_change[2] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T4 */
-			m_timer_change[2] += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T4 ) - ( old_pre >> PRESCALE_T4 );
 			break;
 		case 0x03:  /* T16 */
-			m_timer_change[2] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		}
 
@@ -802,13 +811,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		case 0x00:  /* TO2TRG */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[3] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T16 */
-			m_timer_change[3] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		case 0x03:  /* T256 */
-			m_timer_change[3] += ( m_timer_pre >> 15 ) - ( old_pre >> 15 );
+			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T256 ) - ( old_pre >> PRESCALE_T256 );
 			break;
 		}
 
