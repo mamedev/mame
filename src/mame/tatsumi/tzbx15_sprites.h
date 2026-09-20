@@ -19,6 +19,7 @@ public:
 	void draw_sprites(bitmap_ind8 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
 
 	void update_cluts();
+	void set_rotation_enabled(bool enabled) { m_rotation_enabled = enabled; }
 
 protected:
 	tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -31,12 +32,9 @@ private:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
-			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-			const rectangle &clip, int transparent_color);
-	void mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
-			int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-			const rectangle &clip, int transparent_color);
+	template<class BitmapClass> void draw_rotated_sprite(BitmapClass &bitmap, const rectangle &cliprect,
+			int index, int color, int x, int y, int scale, int rotation, bool flipx, bool flipy,
+			int write_priority_only);
 
 	template<class BitmapClass> void draw_sprites_main(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
 	template<class BitmapClass> void roundupt_drawgfxzoomrotate(
@@ -55,9 +53,9 @@ private:
 	required_region_ptr<uint8_t> m_sprites_h_rom;
 
 	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
-	bitmap_rgb32 m_temp_bitmap;
 
 	// config
+	bool m_rotation_enabled = false;
 	int m_rom_clut_size;
 	int m_rom_clut_offset;
 	int m_sprite_palette_base;

@@ -5,8 +5,6 @@
 #include "tzbx15_sprites.h"
 #include "screen.h"
 
-#include <numbers>
-
 // TZB215 on Apache 3
 // TZB315 on Round Up 5, Big Fight, Cycle Warriors
 // differences, if any, unknown
@@ -77,7 +75,6 @@ void tzbx15_device::device_start()
 	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
 
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(m_rom_clut_size * 2);
-	m_temp_bitmap.allocate(512, 512);
 
 	decode_gfx(gfxinfo);
 	gfx(0)->set_colors(m_rom_clut_size / 8);
@@ -94,62 +91,92 @@ void tzbx15_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette_clut).set_format(palette_device::xRGB_555, m_rom_clut_size * 2);
 }
 
-void tzbx15_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
-		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-		const rectangle &clip, int transparent_color)
-{ }
-
-void tzbx15_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
-	int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-	const rectangle &clip, int transparent_color)
+// The low nine bits are a signed 8-fractional-bit shear (tan(theta)),
+// not a binary angle. The game compensates the scale by cos(theta) and
+// uses alternate ROM descriptors and flips for the other octants.
+// Sample the complete ROM-defined object about its RAM X/Y anchor. This
+// avoids both the old 512-pixel temporary-bitmap limit and tile-edge cracks.
+template<class BitmapClass>
+void tzbx15_device::draw_rotated_sprite(BitmapClass &bitmap, const rectangle &cliprect,
+		int index, int color, int x, int y, int scale, int rotation, bool flipx, bool flipy,
+		int write_priority_only)
 {
-	//  const int xmask = srcbitmap.width()-1;
-	//  const int ymask = srcbitmap.height()-1;
-	const int widthshifted = srcwidth << 16;
-	const int heightshifted = srcheight << 16;
+	const uint8_t *const header = m_sprites_l_rom + index * 4;
+	const int top = header[0] & 0xf8;
+	const int rows = (int(header[2]) - top + 7) / 8;
+	if (!scale || rows <= 0)
+		return;
 
-	uint32_t startx = 0;
-	uint32_t starty = 0;
-
-	int sx = dstx;
-	int sy = dsty;
-	int ex = dstx + srcwidth;
-	int ey = dsty + srcheight;
-
-	if (sx < clip.min_x) sx = clip.min_x;
-	if (ex > clip.max_x) ex = clip.max_x;
-	if (sy < clip.min_y) sy = clip.min_y;
-	if (ey > clip.max_y) ey = clip.max_y;
-
-	if (sx <= ex)
+	struct strip { int left, right, base; } strips[32];
+	int left = 2048, right = 0;
+	for (int row = 0; row < rows; ++row)
 	{
-		while (sy <= ey)
-		{
-			int x = sx;
-			uint32_t cx = startx;
-			uint32_t cy = starty;
-			uint32_t *dest = &bitmap.pix(sy, sx);
-
-			while (x <= ex)
-			{
-				if (cx < widthshifted && cy < heightshifted)
-				{
-					int c = srcbitmap.pix(cy >> 16, cx >> 16);
-
-					if (c != transparent_color)
-						*dest = c;
-				}
-
-				cx += incxx;
-				cy += incxy;
-				x++;
-				dest++;
-			}
-			startx += incyx;
-			starty += incyy;
-			sy++;
-		}
+		const uint8_t *const descriptor = (row & 1)
+				? &m_sprites_l_rom[index * 4 + 4 + (row / 2) * 4]
+				: &m_sprites_h_rom[index * 4 + (row / 2) * 4];
+		strips[row] = { descriptor[1] * 8, (descriptor[1] + descriptor[0] + 1) * 8,
+				(descriptor[2] | (descriptor[3] << 8)) * 2 };
+		left = std::min(left, strips[row].left);
+		right = std::max(right, strips[row].right);
 	}
+
+	const double zoom = double(scale) / 128.0;
+	const double shear = double(util::sext(rotation, 9)) / 256.0;
+	const double a = flipx ? -zoom : zoom;
+	const double d = flipy ? -zoom : zoom;
+	const double b = -a * shear;
+	const double c = d * shear;
+	const double determinant = a * d - b * c;
+	const int bottom = top + rows * 8;
+	const bool fill = BIT(header[3], 7);
+	if (fill)
+	{
+		// End-of-line fill extends the last source pixel, including through
+		// rotation and flips. Bound it by the inverse image of the viewport.
+		for (int px : { cliprect.min_x, cliprect.max_x + 1 })
+			for (int py : { cliprect.min_y, cliprect.max_y + 1 })
+				right = std::max(right, int(std::ceil((d * (px - x) - b * (py - y)) / determinant)) + 1);
+	}
+	double minx = bitmap.width(), maxx = -1, miny = bitmap.height(), maxy = -1;
+	for (int u : { left, right })
+		for (int v : { top, bottom })
+		{
+			const double px = x + a * u + b * v;
+			const double py = y + c * u + d * v;
+			minx = std::min(minx, px); maxx = std::max(maxx, px);
+			miny = std::min(miny, py); maxy = std::max(maxy, py);
+		}
+	rectangle bounds(int(std::floor(minx)), int(std::ceil(maxx)) - 1,
+			int(std::floor(miny)), int(std::ceil(maxy)) - 1);
+	bounds &= cliprect;
+	bounds &= bitmap.cliprect();
+	const unsigned palette = 16 * (color % gfx(0)->colors());
+	const pen_t *const pens = &m_palette_clut->pen(palette);
+	const uint8_t *const shadows = m_shadow_pen_array.get() + palette;
+	for (int dy = bounds.min_y; dy <= bounds.max_y; ++dy)
+		for (int dx = bounds.min_x; dx <= bounds.max_x; ++dx)
+		{
+			const double px = dx + 0.5 - x, py = dy + 0.5 - y;
+			const int u = int(std::floor((d * px - b * py) / determinant));
+			const int v = int(std::floor((a * py - c * px) / determinant));
+			if (v < top || v >= bottom)
+				continue;
+			const strip &line = strips[(v - top) / 8];
+			if (u < line.left || (!fill && u >= line.right))
+				continue;
+			const int source_x = std::min(u, line.right - 1);
+			const int tile = line.base + (source_x - line.left) / 8;
+			gfx_element *const source = gfx(tile & 1);
+			const uint8_t pixel = source->get_data((tile >> 1) % source->elements())[
+					(v & 7) * source->rowbytes() + (source_x & 7)];
+			if (pixel)
+			{
+				if (write_priority_only)
+					bitmap.pix(dy, dx) = shadows[pixel];
+				else if (!shadows[pixel])
+					bitmap.pix(dy, dx) = pens[pixel];
+			}
+		}
 }
 
 template<class BitmapClass>
@@ -195,10 +222,6 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 //          int ex = sx+sprite_screen_width;
 //          int ey = sy+sprite_screen_height;
 
-			int incxx=0x10000;//(int)((float)dx * cos(theta));
-//          int incxy=0x0;//(int)((float)dy * -sin(theta));
-			int incyx=0x0;//(int)((float)dx * sin(theta));
-//          int incyy=0x10000;//(int)((float)dy * cos(theta));
 
 			if (ssx&0x80000000) sx=0-(0x10000 - (ssx>>16)); else sx=ssx>>16;
 			if (ssy&0x80000000) sy=0-(0x10000 - (ssy>>16)); else sy=ssy>>16;
@@ -209,8 +232,6 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 			{
 				x_index_base = (sprite_screen_width-1)*dx;
 				dx = -dx;
-				incxx=-incxx;
-				incyx=-incyx;
 			}
 			else
 			{
@@ -258,53 +279,7 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 			// skip if inner loop doesn't draw anything
 			if( ex > sx )
 			{
-#if 0
-				int startx=0;
-				int starty=0;
 
-				//int incxx=0x10000;
-				//int incxy=0;
-				//int incyx=0;
-				//int incyy=0x10000;
-				double theta=rotate * ((2.0 * std::numbers::pi)/512.0);
-				double c=cos(theta);
-				double s=sin(theta);
-
-				//if (ey-sy > 0) dy=dy / (ey-sy);
-				{
-					float angleAsRadians=(float)rotate * (7.28f / 512.0f);
-					//float ccx = cosf(angleAsRadians);
-					//float ccy = sinf(angleAsRadians);
-					float a=0;
-
-				}
-
-				for( int y=sy; y<ey; y++ )
-				{
-					uint32_t *const dest = &dest_bmp.pix(y);
-					int cx = startx;
-					int cy = starty;
-
-					int x_index = x_index_base;
-					for( int x=sx; x<ex; x++ )
-					{
-						const uint8_t *source = code_base + (cy>>16) * gfx->rowbytes();
-						int c = source[(cx >> 16)];
-						if( c != transparent_color )
-						{
-							if (write_priority_only)
-								dest[x]=shadow_pens[c];
-							else
-								dest[x]=pal[c];
-						}
-						cx += incxx;
-						cy += incxy;
-					}
-					startx += incyx;
-					starty += incyy;
-				}
-#endif
-#if 1 // old
 				for( int y=sy; y<ey; y++ )
 				{
 					uint8_t const *const source = code_base + (y_index>>16) * gfx->rowbytes();
@@ -327,7 +302,6 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 
 					y_index += dy;
 				}
-#endif
 			}
 		}
 	}
@@ -348,16 +322,16 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
     Word 2: 0xffff - X position
     Word 3: 0xffff - Y position
     Word 4: 0x01ff - Scale
-    Word 5: 0x01ff - Rotation
+    Word 5: 0x01ff - Signed shear (8 fractional bits)
 
     Sprite ROM table format, alternate lines come from each bank, with the
     very first line indicating control information:
 
     First bank:
-    Byte 0: Y destination offset (in scanlines, unaffected by scale).
+    Byte 0: Y source offset (in pixels, before scaling/rotation).
     Byte 1: Always 0?
     Byte 2: Number of source scanlines to render from (so unaffected by destination scale).
-    Byte 3: Usually 0, sometimes 0x80??
+    Byte 3: Bit 7 extends the final pixel of each source line.
 
     Other banks:
     Byte 0: Width of line in tiles (-1)
@@ -377,7 +351,7 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		int color =     m_spriteram[offs+1] >> 3 & 0x1ff;
 		int flip_x =    m_spriteram[offs+1] & 0x8000;
 		int flip_y =    m_spriteram[offs+1] & 0x4000;
-		int rotate =    0;//m_spriteram[offs+5]&0x1ff; // Todo:  Turned off for now
+		int rotate =    m_rotation_enabled ? (m_spriteram[offs+5] & 0x1ff) : 0;
 
 		int index = m_spriteram[offs];
 
@@ -390,6 +364,13 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 
 		if (index >= 0x4000)
 			continue;
+
+		if (m_rotation_enabled && (rotate || BIT(m_sprites_l_rom[index * 4 + 3], 7)))
+		{
+			draw_rotated_sprite(bitmap, cliprect, index, color, int16_t(x), int16_t(y),
+					scale, rotate, flip_x, flip_y, write_priority_only);
+			continue;
+		}
 
 		uint8_t const *src1 = m_sprites_l_rom + (index * 4);
 		uint8_t const *src2 = m_sprites_h_rom + (index * 4);
@@ -408,110 +389,22 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		else
 			render_y += y_offset * scale;
 
-		if (rotate)
-		{
-			render_y = 0;
-			m_temp_bitmap.fill(0);
-		}
-
-		int extent_x = 0, extent_y = 0;
-
 		src1 += 4;
-		int h = 0;
-
-		while (lines > 0)
+		for (int row = 0; lines > 0; ++row, lines -= 8)
 		{
-			int base, x_offs, x_width, x_pos, draw_this_line = 1;
-			int this_extent = 0;
-
-			/* Odd and even lines come from different banks */
-			if (h & 1)
+			const uint8_t *const descriptor = (row & 1) ? src1 : src2;
+			const int width = descriptor[0] + 1;
+			const int offset = descriptor[1] * scale * 8;
+			int base = (descriptor[2] | (descriptor[3] << 8)) * 2;
+			int xpos = flip_x ? render_x - offset - scale * 8 : render_x + offset;
+			for (int w = 0; w < width; ++w, ++base)
 			{
-				x_width = src1[0] + 1;
-				x_offs = src1[1] * scale * 8;
-				base = src1[2] | (src1[3] << 8);
+				roundupt_drawgfxzoomrotate(bitmap, cliprect, gfx(base & 1), base >> 1,
+						color, flip_x, flip_y, xpos, render_y, scale, scale, 0, write_priority_only);
+				xpos += flip_x ? -scale * 8 : scale * 8;
 			}
-			else
-			{
-				x_width = src2[0] + 1;
-				x_offs = src2[1] * scale * 8;
-				base = src2[2] | (src2[3] << 8);
-			}
-
-			if (draw_this_line)
-			{
-				base *= 2;
-
-				if (!rotate)
-				{
-					if (flip_x)
-						x_pos = render_x - x_offs - scale * 8;
-					else
-						x_pos = render_x + x_offs;
-				}
-				else
-					x_pos = x_offs;
-
-				for (int w = 0; w < x_width; w++)
-				{
-					if (rotate)
-						roundupt_drawgfxzoomrotate(
-								m_temp_bitmap,cliprect,gfx(0 + (base & 1)),
-								base >> 1,
-								color,flip_x,flip_y,x_pos,render_y,
-								scale,scale,0,write_priority_only);
-					else
-						roundupt_drawgfxzoomrotate(
-								bitmap,cliprect,gfx(0 + (base & 1)),
-								base >> 1,
-								color,flip_x,flip_y,x_pos,render_y,
-								scale,scale,0,write_priority_only);
-					base++;
-
-					if (flip_x)
-						x_pos -= scale * 8;
-					else
-						x_pos += scale * 8;
-
-					this_extent += scale * 8;
-				}
-				if (h & 1)
-					src1 += 4;
-				else
-					src2 += 4;
-
-				if (this_extent > extent_x)
-					extent_x = this_extent;
-				this_extent = 0;
-
-				if (flip_y)
-					render_y -= 8 * scale;
-				else
-					render_y += 8 * scale;
-				extent_y += 8 * scale;
-
-				h++;
-				lines -= 8;
-			}
-			else
-			{
-				h = 32; // hack
-			}
-		}
-
-		if (rotate)
-		{
-			double theta = rotate * ((2.0 * std::numbers::pi) / 512.0);
-
-			int incxx = (int)(65536.0 * cos(theta));
-			int incxy = (int)(65536.0 * -sin(theta));
-			int incyx = (int)(65536.0 * sin(theta));
-			int incyy = (int)(65536.0 * cos(theta));
-
-			extent_x = extent_x >> 16;
-			extent_y = extent_y >> 16;
-			if (extent_x > 2 && extent_y > 2)
-				mycopyrozbitmap_core(bitmap, m_temp_bitmap, x/* + (extent_x/2)*/, y /*+ (extent_y/2)*/, extent_x, extent_y, incxx, incxy, incyx, incyy, cliprect, 0);
+			if (row & 1) src1 += 4; else src2 += 4;
+			render_y += flip_y ? -8 * scale : 8 * scale;
 		}
 	}
 }
