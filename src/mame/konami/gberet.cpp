@@ -18,6 +18,8 @@
     gberetb is a bootleg hacked to run on different hardware.
 
     TODO
+    - Sprite RAM bank offset (005849 reg 3, bit 3) is the wrong way around,
+      but flipping it causes sprite/bg sync lag that doesn't happen on PCB.
     - Correct PROMs decoding for the bootleg
 
 ****************************************************************************
