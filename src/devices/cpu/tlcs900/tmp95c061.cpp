@@ -895,6 +895,22 @@ void tmp95c061_device::execute_set_input(int input, int level)
 		m_level[TLCS900_INT5] = level;
 		break;
 
+	// INT6 and INT7 are rising-edge inputs whose enable bits and vectors are
+	// already in the table above; only the pin side was missing, so
+	// set_input_line() on either was a no-op.  Ungated: which port B pin
+	// carries them is not settled here, and no driver gated them before.
+	case TLCS900_INT6:
+		if ( m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE )
+			m_int_reg[INTE67] |= 0x08;
+		m_level[TLCS900_INT6] = level;
+		break;
+
+	case TLCS900_INT7:
+		if ( m_level[TLCS900_INT7] == CLEAR_LINE && level == ASSERT_LINE )
+			m_int_reg[INTE67] |= 0x80;
+		m_level[TLCS900_INT7] = level;
+		break;
+
 	case TLCS900_TIO:   /* External timer input for timer 0 */
 		if ( ( m_trun & 0x01 ) && ( m_t8_mode[0] & 0x03 ) == 0x00 )
 		{
