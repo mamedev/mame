@@ -38,8 +38,7 @@
       - dump the six 16 Mbit wave mask ROMs, the AM29F400T flash, and the
         internal ROM of the control panel microcontroller
       - devices with no MAME implementation yet: the L7A1429 modeling LSI, the
-        uPD6383GF-3BA DSP, the M37471M2196S panel MCU and the uPD72070 floppy
-        disk controller
+        uPD6383GF-3BA DSP and the M37471M2196S panel MCU
       - map the flash at 0xE80000 on CPU 2.  The firmware probes it with the
         AMD autoselect sequence (0xAAAA/0x5554 unlock, 0x90, then reads
         0xE80000 and 0xE80002) at prom_c 0xFC85BD, so the part is almost
@@ -52,6 +51,8 @@
 #include "emu.h"
 
 #include "cpu/tlcs900/tmp95c061.h"
+#include "imagedev/floppy.h"
+#include "machine/upd765.h"
 #include "video/sed1330.h"
 
 #include "emupal.h"
@@ -69,6 +70,7 @@ public:
 		, m_cpu1(*this, "cpu1")
 		, m_cpu2(*this, "cpu2")
 		, m_lcdc(*this, "lcdc")
+		, m_fdc(*this, "fdc")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -77,6 +79,7 @@ private:
 	required_device<tmp95c061_device> m_cpu1;
 	required_device<tmp95c061_device> m_cpu2;
 	required_device<sed1330_device> m_lcdc;
+	required_device<upd765a_device> m_fdc;
 
 	void palette_init(palette_device &palette) ATTR_COLD;
 
@@ -120,6 +123,18 @@ void wsa1_state::cpu1_map(address_map &map)
 	map(0x790000, 0x790000).rw(m_lcdc, FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
 	map(0x790001, 0x790001).rw(m_lcdc, FUNC(sed1330_device::data_r),   FUNC(sed1330_device::command_w));
 
+	// FDC data port, reached by programmed I/O and by micro-DMA channel 0.
+	map(0x7a0000, 0x7a0000).rw(m_fdc, FUNC(upd765a_device::dma_r),
+	                                  FUNC(upd765a_device::dma_w));
+
+	// Main status / data rate select at +4, data at +5.  Read off the callers:
+	// 0x7B0004 is only ever tested for RQM and DIO, never stored, while every
+	// read of 0x7B0005 goes straight into the result buffer.
+	map(0x7b0004, 0x7b0004).r(m_fdc, FUNC(upd765a_device::msr_r))
+	                       .w(m_fdc, FUNC(upd765a_device::dsr_w));
+	map(0x7b0005, 0x7b0005).rw(m_fdc, FUNC(upd765a_device::fifo_r),
+	                                  FUNC(upd765a_device::fifo_w));
+
 	map(0xf00000, 0xf7ffff).rom().region("prom_ab", 0x000000);   // IC13
 	map(0xf80000, 0xffffff).rom().region("prom_ab", 0x080000);   // IC12
 }
@@ -129,6 +144,12 @@ void wsa1_state::cpu2_map(address_map &map)
 	map(0x000080, 0x01ffff).ram();
 	map(0xf00000, 0xf7ffff).rom().region("prom_d", 0);           // IC21, tone database
 	map(0xf80000, 0xffffff).rom().region("prom_c", 0);           // IC28
+}
+
+
+static void wsa1_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
 }
 
 
@@ -158,6 +179,17 @@ void wsa1_state::wsa1r(machine_config &config)
 	SED1330(config, m_lcdc, 8'000'000);   // IC7's X2
 	m_lcdc->set_screen("screen");
 	m_lcdc->set_addrmap(0, &wsa1_state::lcdc_map);
+
+	// The parts list names a uPD72070; upd765a stands in for it.  Interrupt
+	// lines are the schematic's: IC1 pin 37 INT5 = FDINT, pin 41 INT7 = FDDRQ.
+	UPD765A(config, m_fdc, 24'000'000, true, true);   // IC8's X5
+	m_fdc->intrq_wr_callback().set_inputline(m_cpu1, TLCS900_INT5);
+	m_fdc->drq_wr_callback().set_inputline(m_cpu1, TLCS900_INT7);
+
+	// PC formats: the geometries the firmware programmes are the IBM ones down
+	// to the gap lengths.  Untested against real media -- no disk is dumped.
+	FLOPPY_CONNECTOR(config, "fdc:0", wsa1_floppies, "35hd",
+		floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 }
 
 
