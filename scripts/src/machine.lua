@@ -2922,6 +2922,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mk3835.h,MACHINES["MK3835"] = true
+---------------------------------------------------
+
+if MACHINES["MK3835"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mk3835.cpp",
+		MAME_DIR .. "src/devices/machine/mk3835.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pcf8584.h,MACHINES["PCF8584"] = true
 ---------------------------------------------------
 

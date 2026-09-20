@@ -6,6 +6,16 @@
 #pragma once
 
 #include "bus/centronics/ctronics.h"
+#include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
+#include "bus/rs232/rs232.h"
+#include "machine/74259.h"
+#include "machine/mk3835.h"
+#include "machine/pcf8583.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "screen.h"
+#include "softlist_dev.h"
 
 #define HD64180_TAG             "hd64180"
 #define FDC9268_TAG             "fdc9268"
@@ -20,16 +30,22 @@ public:
 	prof180x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_centronics(*this, CENTRONICS_TAG)
+		, m_mk3835(*this, MK3835_TAG)
+		, m_pcf8583(*this, "pcf8583")
+		, m_ram(*this, RAM_TAG)
 	{
 	}
 
 	void prof180x(machine_config &config);
+	void prof181x(machine_config &config);
 
 private:
 	required_device<centronics_device> m_centronics;
+	optional_device<mk3835_device> m_mk3835;
+	optional_device<pcf8583_device> m_pcf8583;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -43,17 +59,17 @@ private:
 	void c2_flag_w(int state);
 	void mini_flag_w(int state);
 	void mm0_flag_w(int state);
-	void rtc_ce_w(int state);
 	void peps_flag_w(int state);
 	void mm1_flag_w(int state);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void prof180x_base(machine_config &config);
 
 	int m_c0 = 0;
 	int m_c1 = 0;
 	int m_c2 = 0;
 	int m_mm0 = 0;
 	int m_mm1 = 0;
+
 	void prof180x_io(address_map &map) ATTR_COLD;
 	void prof180x_mem(address_map &map) ATTR_COLD;
 };
