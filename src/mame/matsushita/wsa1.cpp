@@ -50,6 +50,7 @@
 
 #include "emu.h"
 
+#include "wsa1_tonegen.h"
 #include "wsa1r_cpanel.h"
 
 #include "bus/midi/midi.h"
@@ -62,6 +63,7 @@
 #include "diserial.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 // A byte/bit shim between the TMP95C061's serial channel 0 and MAME's
@@ -157,7 +159,6 @@ void wsa1_midi_uart_device::start_next_tx()
 	transmit_register_setup(b);
 }
 
-
 namespace {
 class wsa1_state : public driver_device
 {
@@ -171,6 +172,7 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_cpanel(*this, "cpanel")
 		, m_midi_uart(*this, "midi_uart")
+		, m_tonegen(*this, "tonegen")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -183,6 +185,21 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<wsa1r_cpanel_device> m_cpanel;
 	required_device<wsa1_midi_uart_device> m_midi_uart;
+	required_device<wsa1_tonegen_device> m_tonegen;
+
+	static constexpr unsigned TG_VOICES       = 64;
+	static constexpr unsigned TG_REG_COUNT    = 0x1000;
+	static constexpr unsigned TG_CHAN_REG_TOP = 0x0a7f;
+
+	uint16_t m_tg_latch = 0;
+	uint16_t m_tg_regs[TG_REG_COUNT]{};
+	uint16_t m_tg_busy[4]{};
+	uint64_t m_tg_noteon_burst = 0;
+	uint64_t m_tg_released = 0;
+
+	void tg_addr_w(uint16_t data);
+	void tg_data_w(uint16_t data);
+	uint16_t tg_status_r();
 
 	void midi1_rx(uint8_t data) { m_cpu1->sc0_rxd(data); }
 
@@ -206,6 +223,99 @@ private:
 	void cpu2_map(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
 };
+
+
+// IC4, the tone generator: a 16-bit register file addressed through a latch.
+// The low six bits of the register select the channel; a handful of blocks are
+// global and carry no channel.
+void wsa1_state::tg_addr_w(uint16_t data)
+{
+	m_tg_latch = data;
+}
+
+void wsa1_state::tg_data_w(uint16_t data)
+{
+	if (m_tg_latch < TG_REG_COUNT)
+		m_tg_regs[m_tg_latch] = data;
+
+	const bool is_global = ((m_tg_latch >= 0x0200) && (m_tg_latch <= 0x0205))
+		|| ((m_tg_latch >= 0x0c00) && (m_tg_latch <= 0x0c05))
+		|| (m_tg_latch == 0x0e00);
+
+	if (is_global || (m_tg_latch > TG_CHAN_REG_TOP))
+		return;
+
+	const unsigned chan = m_tg_latch & 0x3f;
+	const uint64_t cbit = uint64_t(1) << chan;
+
+	switch (m_tg_latch & 0xffc0)
+	{
+	case 0x0400: m_tonegen->set_pitch(chan, data); break;
+	case 0x0080: m_tonegen->set_level(chan, data); break;
+	case 0x0800: m_tonegen->set_env0(chan, data);  break;
+	case 0x0840: m_tonegen->set_env1(chan, data);  break;
+	}
+
+	// The gate word, 0x8100 on and 0x7E00 off, is only carried by the first 64
+	// registers; higher blocks reuse the same encoding as data.
+	if (m_tg_latch < TG_VOICES)
+	{
+		const uint16_t bit = uint16_t(1u << (chan & 15));
+		if (data == 0x8100)
+		{
+			m_tg_busy[chan >> 4] |= bit;
+			m_tg_noteon_burst |= cbit;
+			m_tg_released &= ~cbit;
+		}
+		else if (data == 0x7e00)
+		{
+			m_tg_busy[chan >> 4] &= uint16_t(~bit);
+			m_tg_noteon_burst &= ~cbit;
+			m_tg_released &= ~cbit;
+		}
+
+		m_tonegen->set_gate(chan, (m_tg_busy[chan >> 4] & bit) != 0);
+	}
+
+	switch (m_tg_latch & 0xffc0)
+	{
+	case 0x0a40:                          // last register of the note-on burst
+		m_tg_noteon_burst &= ~cbit;
+		break;
+	case 0x0a00:                          // inside the note-off release burst
+		if ((m_tg_busy[chan >> 4] & (1u << (chan & 15)))
+			&& !(m_tg_noteon_burst & cbit) && !(m_tg_released & cbit))
+			m_tg_released |= cbit;
+		break;
+	}
+}
+
+uint16_t wsa1_state::tg_status_r()
+{
+	const uint16_t latch = m_tg_latch;
+
+	// latch 0..3 selects one of four 16-channel busy words; a released channel
+	// clears once its envelope has decayed away.
+	if (latch < 4)
+	{
+		for (unsigned i = 0; i < 16; i++)
+		{
+			const unsigned chan = latch * 16 + i;
+			const uint64_t cbit = uint64_t(1) << chan;
+			if ((m_tg_released & cbit) && m_tonegen->amplitude(chan) <= 0.0009f)
+				m_tg_busy[latch] &= uint16_t(~(1u << i));
+		}
+		return m_tg_busy[latch];
+	}
+
+	if ((latch >= 0x0180) && (latch < 0x0180 + TG_VOICES))
+	{
+		const unsigned chan = latch - 0x0180;
+		return BIT(m_tg_busy[chan >> 4], chan & 15) ? 0x1000 : 0x0000;
+	}
+
+	return 0;
+}
 
 
 // CPU 1's P8 and PB carry the panel's serial clock and busy lines alongside
@@ -313,6 +423,10 @@ void wsa1_state::cpu1_map(address_map &map)
 void wsa1_state::cpu2_map(address_map &map)
 {
 	map(0x000080, 0x01ffff).ram();
+	map(0x10c000, 0x10c001).w(FUNC(wsa1_state::tg_addr_w));
+	map(0x10c002, 0x10c003).w(FUNC(wsa1_state::tg_data_w));
+	map(0x10c004, 0x10c005).r(FUNC(wsa1_state::tg_status_r));
+
 	map(0xf00000, 0xf7ffff).rom().region("prom_d", 0);           // IC21, tone database
 	map(0xf80000, 0xffffff).rom().region("prom_c", 0);           // IC28
 }
@@ -390,6 +504,11 @@ void wsa1_state::wsa1r(machine_config &config)
 	auto &mdout(MIDI_PORT(config, "mdout"));
 	midiout_slot(mdout);
 	m_midi_uart->tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
+
+	SPEAKER(config, "speaker", 2).front();
+	WSA1_TONEGEN(config, m_tonegen, 0);
+	m_tonegen->add_route(0, "speaker", 1.0, 0);
+	m_tonegen->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -523,4 +642,4 @@ ROM_END
 
 
 //   YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY     FULLNAME    FLAGS
-SYST(1995, wsa1r, 0,      0,      wsa1r,   wsa1r, wsa1_state, empty_init, "Technics", "SX-WSA1R", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+SYST(1995, wsa1r, 0,      0,      wsa1r,   wsa1r, wsa1_state, empty_init, "Technics", "SX-WSA1R", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
