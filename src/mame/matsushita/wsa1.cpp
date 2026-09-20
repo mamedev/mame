@@ -212,7 +212,6 @@ upd6383_device::upd6383_device(const machine_config &mconfig, const char *tag, d
 
 
 namespace {
-
 class wsa1_state : public driver_device
 {
 public:
@@ -230,6 +229,9 @@ public:
 	{ }
 
 	void wsa1r(machine_config &config);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tmp95c061_device> m_cpu1;
@@ -252,17 +254,34 @@ private:
 	uint64_t m_tg_noteon_burst = 0;
 	uint64_t m_tg_released = 0;
 
+	uint8_t m_link_to_cpu1 = 0, m_link_to_cpu2 = 0;
+	bool m_link_to_cpu1_full = false, m_link_to_cpu2_full = false;
+
+	uint8_t cpu1_link_r();
+	void cpu1_link_w(uint8_t data);
+	uint8_t cpu2_link_r();
+	void cpu2_link_w(uint8_t data);
+
 	void tg_addr_w(uint16_t data);
 	void tg_data_w(uint16_t data);
 	uint16_t tg_status_r();
 
 	void midi1_rx(uint8_t data) { m_cpu1->sc0_rxd(data); }
 
+	uint8_t m_cpu1_p5 = 0;
+	uint8_t m_cpu1_p7 = 0;
 	uint8_t m_cpu1_p8 = 0;
 	uint8_t m_cpu1_pb = 0;
+	uint8_t m_cpu2_pa = 0;
 	int m_panel_sclk = 1;   // P8.5, idle high
 	int m_panel_busy = 0;   // PB.4, idle low
 
+	uint8_t cpu1_p5_r();
+	void cpu1_p5_w(uint8_t data) { m_cpu1_p5 = data; }
+	uint8_t cpu1_p7_r();
+	void cpu1_p7_w(uint8_t data) { m_cpu1_p7 = data; }
+	uint8_t cpu2_pa_r();
+	void cpu2_pa_w(uint8_t data) { m_cpu2_pa = data; }
 	uint8_t cpu1_p8_r();
 	void cpu1_p8_w(uint8_t data);
 	uint8_t cpu1_pb_r();
@@ -280,6 +299,56 @@ private:
 	void cpu2_map(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
 };
+
+
+// The byte link between the two processors.  Writing hands one byte to the
+// peer and raises its INT0; reading takes the byte and releases this
+// processor's INT0.
+//
+// Both sides spin on the handshake with a 0x4E20 iteration limit, so the two
+// scheduling numbers below are what make a transfer complete.  They are not
+// the same number and neither is from a datasheet: 50 us is the machine-wide
+// slice, and 200 us is how long the processor doing a transfer is allowed to
+// keep the CPU once it has started one.  Measured: these are the values that
+// reach the SOUND MODE screen.
+static constexpr int BASE_QUANTUM_US  = 50;
+static constexpr int BURST_QUANTUM_US = 200;
+
+uint8_t wsa1_state::cpu1_link_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_link_to_cpu1_full = false;
+		m_cpu1->set_input_line(TLCS900_INT0, CLEAR_LINE);
+	}
+	return m_link_to_cpu1;
+}
+
+void wsa1_state::cpu1_link_w(uint8_t data)
+{
+	m_link_to_cpu2 = data;
+	m_link_to_cpu2_full = true;
+	m_cpu2->set_input_line(TLCS900_INT0, ASSERT_LINE);
+	machine().scheduler().perfect_quantum(attotime::from_usec(BURST_QUANTUM_US));
+}
+
+uint8_t wsa1_state::cpu2_link_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_link_to_cpu2_full = false;
+		m_cpu2->set_input_line(TLCS900_INT0, CLEAR_LINE);
+	}
+	return m_link_to_cpu2;
+}
+
+void wsa1_state::cpu2_link_w(uint8_t data)
+{
+	m_link_to_cpu1 = data;
+	m_link_to_cpu1_full = true;
+	m_cpu1->set_input_line(TLCS900_INT0, ASSERT_LINE);
+	machine().scheduler().perfect_quantum(attotime::from_usec(BURST_QUANTUM_US));
+}
 
 
 // IC4, the tone generator: a 16-bit register file addressed through a latch.
@@ -375,6 +444,34 @@ uint16_t wsa1_state::tg_status_r()
 }
 
 
+// P5 bit 4 is the service CHECKING DEVICE input on CN4, high when nothing is
+// attached.
+uint8_t wsa1_state::cpu1_p5_r()
+{
+	return (m_cpu1_p5 & 0x2c) | 0xd3;           // bits 0, 1, 6, 7 do not exist
+}
+
+
+// The link's handshake lines.  CPU 1 drives its strobe and receiver-busy on
+// P7.0/P7.1 and reads CPU 2's on P7.2/P7.3; CPU 2 does the mirror on port A.
+// Without these the data port at 0x7C0000 is never clocked.
+uint8_t wsa1_state::cpu1_p7_r()
+{
+	uint8_t data = (m_cpu1_p7 & 0x33) | 0xc0;
+	data |= BIT(m_cpu2_pa, 0) << 2;             // SSTAT0, CPU 2's strobe
+	data |= BIT(m_cpu2_pa, 1) << 3;             // SSTAT1, CPU 2's receiver-busy
+	return data;
+}
+
+uint8_t wsa1_state::cpu2_pa_r()
+{
+	uint8_t data = (m_cpu2_pa & 0x03) | 0xf0;
+	data |= BIT(m_cpu1_p7, 0) << 2;             // MSTAT0, CPU 1's strobe
+	data |= BIT(m_cpu1_p7, 1) << 3;             // MSTAT1, CPU 1's receiver-busy
+	return data;
+}
+
+
 // CPU 1's P8 and PB carry the panel's serial clock and busy lines alongside
 // the floppy's terminal count.  PB.0 low identifies the rack model.
 uint8_t wsa1_state::cpu1_p8_r()
@@ -427,6 +524,30 @@ void wsa1_state::cpu2_p8_w(uint8_t data)
 }
 
 
+// The port shadows have to start at the levels the pins idle at, not at zero:
+// the link's handshake lines are active low, so a zeroed shadow reads as both
+// processors asserting at reset and the transfer never starts.
+void wsa1_state::machine_reset()
+{
+	m_cpu1_p5 = 0xff;
+	m_cpu1_p7 = 0xff;
+	m_cpu1_p8 = 0xff;
+	m_cpu1_pb = 0xf3;
+	m_cpu2_pa = 0x03;
+
+	m_link_to_cpu1_full = false;
+	m_link_to_cpu2_full = false;
+
+
+	std::fill(std::begin(m_tg_busy), std::end(m_tg_busy), 0);
+	m_tg_noteon_burst = 0;
+	m_tg_released = 0;
+
+	m_panel_sclk = 1;
+	m_panel_busy = 0;
+
+}
+
 void wsa1_state::palette_init(palette_device &palette)
 {
 	// A driver choice, not a measurement: the pen pair ympsr2000.cpp uses for
@@ -473,6 +594,9 @@ void wsa1_state::cpu1_map(address_map &map)
 	map(0x7b0005, 0x7b0005).rw(m_fdc, FUNC(upd765a_device::fifo_r),
 	                                  FUNC(upd765a_device::fifo_w));
 
+	map(0x7c0000, 0x7c0001).rw(FUNC(wsa1_state::cpu1_link_r),
+	                           FUNC(wsa1_state::cpu1_link_w)).umask16(0x00ff);
+
 	map(0xf00000, 0xf7ffff).rom().region("prom_ab", 0x000000);   // IC13
 	map(0xf80000, 0xffffff).rom().region("prom_ab", 0x080000);   // IC12
 }
@@ -480,6 +604,9 @@ void wsa1_state::cpu1_map(address_map &map)
 void wsa1_state::cpu2_map(address_map &map)
 {
 	map(0x000080, 0x01ffff).ram();
+	map(0x100000, 0x100001).rw(FUNC(wsa1_state::cpu2_link_r),
+	                           FUNC(wsa1_state::cpu2_link_w)).umask16(0x00ff);
+
 	map(0x104000, 0x104001).w(m_modeling, FUNC(l7a1429_device::addr_w));
 	map(0x104002, 0x104003).rw(m_modeling, FUNC(l7a1429_device::data_r),
 	                                       FUNC(l7a1429_device::data_w));
@@ -505,10 +632,18 @@ INPUT_PORTS_END
 
 void wsa1_state::wsa1r(machine_config &config)
 {
+	// At the default quantum one processor runs its whole spin loop to timeout
+	// before the other ever updates the line it is waiting on.
+	config.set_maximum_quantum(attotime::from_usec(BASE_QUANTUM_US));
+
 	// fc = 28 MHz: the firmware stores it as a byte, prom_c[FcClockByte] = 0x1C
 	// read at SerialDivisorFromFc, and computes its own serial divisor from it.
 	TMP95C061(config, m_cpu1, 28_MHz_XTAL);
 	m_cpu1->set_addrmap(AS_PROGRAM, &wsa1_state::cpu1_map);
+	m_cpu1->port5_read().set(FUNC(wsa1_state::cpu1_p5_r));
+	m_cpu1->port5_write().set(FUNC(wsa1_state::cpu1_p5_w));
+	m_cpu1->port7_read().set(FUNC(wsa1_state::cpu1_p7_r));
+	m_cpu1->port7_write().set(FUNC(wsa1_state::cpu1_p7_w));
 	m_cpu1->port8_read().set(FUNC(wsa1_state::cpu1_p8_r));
 	m_cpu1->port8_write().set(FUNC(wsa1_state::cpu1_p8_w));
 	m_cpu1->portb_read().set(FUNC(wsa1_state::cpu1_pb_r));
@@ -518,6 +653,8 @@ void wsa1_state::wsa1r(machine_config &config)
 
 	TMP95C061(config, m_cpu2, 28_MHz_XTAL);
 	m_cpu2->set_addrmap(AS_PROGRAM, &wsa1_state::cpu2_map);
+	m_cpu2->porta_read().set(FUNC(wsa1_state::cpu2_pa_r));
+	m_cpu2->porta_write().set(FUNC(wsa1_state::cpu2_pa_w));
 	m_cpu2->port6_write().set(FUNC(wsa1_state::cpu2_p6_w));
 	m_cpu2->port8_read().set(FUNC(wsa1_state::cpu2_p8_r));
 	m_cpu2->port8_write().set(FUNC(wsa1_state::cpu2_p8_w));
