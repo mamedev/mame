@@ -48,7 +48,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools
+        sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
     - name: Install clang
       if: matrix.compiler == 'clang'
       run: sudo apt-get install -y clang
@@ -59,7 +59,30 @@ jobs:
         ARCHOPTS: ${{ matrix.archopts }}
         SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
-      run: make -j3
+      run: |
+        if [ "${{ matrix.compiler }}" = "clang" ]; then
+          export MAME_PROJECT_TIMING_DIR="$PWD/build/ci-project-timings"
+          mkdir -p "$MAME_PROJECT_TIMING_DIR"
+        fi
+        make -j3
+    - name: Summarize project timings
+      if: matrix.compiler == 'clang'
+      run: |
+        python scripts/build/summarize_project_timings.py \
+          --input-dir build/ci-project-timings \
+          --csv build/ci-project-timings.csv \
+          --markdown build/ci-project-timings.md
+        cat build/ci-project-timings.md >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload project timings
+      if: matrix.compiler == 'clang'
+      uses: actions/upload-artifact@main
+      with:
+        name: mame-linux-clang-project-timings-${{ github.sha }}
+        path: |
+          build/ci-project-timings.csv
+          build/ci-project-timings.md
+          build/ci-project-timings/*.timing
+        if-no-files-found: error
     - name: Validate
       run: ./${{ matrix.executable }} -validate
     - name: Reconcile driver list

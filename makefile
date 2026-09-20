@@ -1277,6 +1277,9 @@ $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: linux_x64_clang
 linux_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
+ifdef MAME_PROJECT_TIMING_DIR
+	$(SILENT)$(PYTHON) scripts/build/instrument_solution_makefile.py $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
+endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)64
 
