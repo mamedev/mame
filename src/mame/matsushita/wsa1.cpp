@@ -37,8 +37,7 @@
     TODO:
       - dump the six 16 Mbit wave mask ROMs, the AM29F400T flash, and the
         internal ROM of the control panel microcontroller
-      - devices with no MAME implementation yet: the L7A1429 modeling LSI, the
-        uPD6383GF-3BA DSP
+      - replace the L7A1429 and uPD6383GF-3BA skeletons with real models
       - map the flash at 0xE80000 on CPU 2.  The firmware probes it with the
         AMD autoselect sequence (0xAAAA/0x5554 unlock, 0x90, then reads
         0xE80000 and 0xE80002) at prom_c 0xFC85BD, so the part is almost
@@ -159,7 +158,61 @@ void wsa1_midi_uart_device::start_next_tx()
 	transmit_register_setup(b);
 }
 
+// IC3, the L7A1429 modeling LSI, as a skeleton: it holds the register file the
+// firmware writes and makes no sound.  What the part computes is still being
+// decoded.  Its chip select is IC27, a D74HC139GS, output 1Y1 = WFICS.
+class l7a1429_device : public device_t
+{
+public:
+	l7a1429_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	void addr_w(uint16_t data) { m_latch = data; }
+	uint16_t data_r() { return (m_latch < std::size(m_regs)) ? m_regs[m_latch] : 0; }
+	void data_w(uint16_t data) { if (m_latch < std::size(m_regs)) m_regs[m_latch] = data; }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	uint16_t m_latch = 0;
+	uint16_t m_regs[0x400]{};
+};
+
+DEFINE_DEVICE_TYPE(L7A1429, l7a1429_device, "l7a1429", "Technics L7A1429 modeling LSI (skeleton)")
+
+l7a1429_device::l7a1429_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, L7A1429, tag, owner, clock)
+{
+}
+
+void l7a1429_device::device_start()
+{
+	save_item(NAME(m_latch));
+	save_item(NAME(m_regs));
+}
+
+// IC5, IC6 and IC30, the NEC uPD6383GF-3BA effects DSPs, as skeletons.  The
+// host reaches them by bit-banging CPU 2's ports rather than through the
+// address map, and the instruction set is still being decoded.
+class upd6383_device : public device_t
+{
+public:
+	upd6383_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void device_start() override ATTR_COLD {}
+};
+
+DEFINE_DEVICE_TYPE(UPD6383, upd6383_device, "upd6383", "NEC uPD6383GF DSP (skeleton)")
+
+upd6383_device::upd6383_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, UPD6383, tag, owner, clock)
+{
+}
+
+
 namespace {
+
 class wsa1_state : public driver_device
 {
 public:
@@ -173,6 +226,7 @@ public:
 		, m_cpanel(*this, "cpanel")
 		, m_midi_uart(*this, "midi_uart")
 		, m_tonegen(*this, "tonegen")
+		, m_modeling(*this, "modeling")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -186,6 +240,7 @@ private:
 	required_device<wsa1r_cpanel_device> m_cpanel;
 	required_device<wsa1_midi_uart_device> m_midi_uart;
 	required_device<wsa1_tonegen_device> m_tonegen;
+	required_device<l7a1429_device> m_modeling;
 
 	static constexpr unsigned TG_VOICES       = 64;
 	static constexpr unsigned TG_REG_COUNT    = 0x1000;
@@ -216,6 +271,8 @@ private:
 	void cpu2_p6_w(uint8_t data);
 	uint8_t cpu2_p8_r();
 	void cpu2_p8_w(uint8_t data);
+	// AN0 strapped high; DSPRDY, the uPD6383 ready line, pulled up by R79
+	uint8_t cpu2_p9_r() { return 0x09; }
 
 	void palette_init(palette_device &palette) ATTR_COLD;
 
@@ -423,6 +480,10 @@ void wsa1_state::cpu1_map(address_map &map)
 void wsa1_state::cpu2_map(address_map &map)
 {
 	map(0x000080, 0x01ffff).ram();
+	map(0x104000, 0x104001).w(m_modeling, FUNC(l7a1429_device::addr_w));
+	map(0x104002, 0x104003).rw(m_modeling, FUNC(l7a1429_device::data_r),
+	                                       FUNC(l7a1429_device::data_w));
+
 	map(0x10c000, 0x10c001).w(FUNC(wsa1_state::tg_addr_w));
 	map(0x10c002, 0x10c003).w(FUNC(wsa1_state::tg_data_w));
 	map(0x10c004, 0x10c005).r(FUNC(wsa1_state::tg_status_r));
@@ -460,6 +521,7 @@ void wsa1_state::wsa1r(machine_config &config)
 	m_cpu2->port6_write().set(FUNC(wsa1_state::cpu2_p6_w));
 	m_cpu2->port8_read().set(FUNC(wsa1_state::cpu2_p8_r));
 	m_cpu2->port8_write().set(FUNC(wsa1_state::cpu2_p8_w));
+	m_cpu2->port9_read().set(FUNC(wsa1_state::cpu2_p9_r));
 
 	auto &palette = PALETTE(config, "palette", FUNC(wsa1_state::palette_init), 2);
 
@@ -509,6 +571,12 @@ void wsa1_state::wsa1r(machine_config &config)
 	WSA1_TONEGEN(config, m_tonegen, 0);
 	m_tonegen->add_route(0, "speaker", 1.0, 0);
 	m_tonegen->add_route(1, "speaker", 1.0, 1);
+
+	L7A1429(config, m_modeling);
+
+	UPD6383(config, "dsp1", 33.8688_MHz_XTAL);   // IC5
+	UPD6383(config, "dsp2", 33.8688_MHz_XTAL);   // IC6
+	UPD6383(config, "dsp3", 33.8688_MHz_XTAL);   // IC30
 }
 
 
