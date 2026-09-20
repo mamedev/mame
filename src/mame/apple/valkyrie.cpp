@@ -94,7 +94,7 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_irq(*this),
 	m_vram_offset(0), m_monitor_id(0),
 	m_base(0), m_stride(1024), m_video_timing(0x80), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
-	m_config(0),
+	m_config(0), m_vbl_enabled(false),
 	m_M(1), m_N(1), m_P(1)
 {
 }
@@ -120,6 +120,7 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_vtotal));
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_config));
+	save_item(NAME(m_vbl_enabled));
 	save_item(NAME(m_int_status));
 	save_item(NAME(m_M));
 	save_item(NAME(m_N));
@@ -352,13 +353,15 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			m_int_status &= ~1;
 			recalc_ints();
 
-			m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
+			if (m_vbl_enabled)
+				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			break;
 
 		case VALKYRIEREG_SCREEN_ENABLE: // screen enable
 			// at startup, the screen isn't wanted on until 0x81 is written.
 			// if the Video Startup extension is installed, it later sets this to 0x02.
-			if ((data & 0x80) || (data == 0x02))
+			m_vbl_enabled = ((data & 0x80) || (data == 0x02));
+			if (m_vbl_enabled)
 			{
 				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			}
