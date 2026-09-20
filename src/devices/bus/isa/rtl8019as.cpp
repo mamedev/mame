@@ -5,9 +5,10 @@
  * Realtek RTL8019AS Ethernet adapter.
  *
  * The RTL8019AS is an NE2000-compatible controller with an integrated
- * 10BASE-T/10BASE2 transceiver and 16 KiB of on-chip packet buffer.  This
- * emulates a jumper configured card strapped for the 8-bit ISA bus, as used by
- * the Sprinter, so the remote DMA data port is a single byte wide.
+ * 10BASE-T transceiver, an AUI port for an external 10BASE2 or 10BASE5
+ * transceiver, and 16 KiB of on-chip packet buffer.  This emulates a jumper
+ * configured card strapped for the 8-bit ISA bus, as used by the Sprinter, so
+ * the remote DMA data port is a single byte wide.
  *
  * The card occupies a 32 byte I/O window:
  *
@@ -27,6 +28,7 @@
  *
  * TODO:
  *  - 93C46 EEPROM, jumperless and Plug and Play configuration modes
+ *  - CONFIG0 and CONFIG1 do not reflect the jumper configuration
  *  - boot ROM window and the BPAGE page register
  *  - full duplex mode
  *  - ignore DCR WTS, which the 8-bit strapping overrides on real hardware;
@@ -82,7 +84,6 @@ private:
 	u8 m_prom[32];
 	u8 m_ram[16 * 1024];
 	u8 m_irq;
-	u8 m_page;
 	bool m_installed;
 	bool m_wts_warned;
 };
@@ -95,7 +96,6 @@ isa8_rtl8019as_device::isa8_rtl8019as_device(machine_config const &mconfig, char
 	, m_prom{}
 	, m_ram{}
 	, m_irq(0)
-	, m_page(0)
 	, m_installed(false)
 	, m_wts_warned(false)
 {
@@ -136,13 +136,10 @@ void isa8_rtl8019as_device::device_start()
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_irq));
-	save_item(NAME(m_page));
 }
 
 void isa8_rtl8019as_device::device_reset()
 {
-	m_page = 0;
-
 	// the jumpers are only sampled at power-on
 	if (!m_installed)
 	{
@@ -195,7 +192,6 @@ u8 isa8_rtl8019as_device::port_r(offs_t offset)
 			LOG("reset cleared\n");
 
 			m_dp8390->dp8390_reset(CLEAR_LINE);
-			m_page = 0;
 		}
 
 		return 0;
@@ -208,12 +204,11 @@ void isa8_rtl8019as_device::port_w(offs_t offset, u8 data)
 	{
 		LOGIO("register write 0x%02x data 0x%02x\n", offset, data);
 
-		// The page select lives in the command register, and the register at
-		// offset 0x0e is DCR only while page 0 is selected, so the page has to
-		// be followed to tell a DCR write from a multicast filter write.
-		if (!offset)
-			m_page = BIT(data, 6, 2);
-		else if ((offset == 0x0e) && !m_page && BIT(data, 0) && !m_wts_warned)
+		// The register at offset 0x0e is DCR only while page 0 is selected; on
+		// page 1 it is a multicast filter byte.  The command register reads
+		// back the same on every page and reading it has no side effects, so
+		// the controller can be asked which page is current.
+		if ((offset == 0x0e) && BIT(data, 0) && !m_wts_warned && !BIT(m_dp8390->cs_read(0), 6, 2))
 		{
 			// The controller honours DCR WTS, but the 8-bit strapping overrides
 			// it on real hardware and the data port here is a byte wide, so a
