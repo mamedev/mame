@@ -38,7 +38,7 @@
       - dump the six 16 Mbit wave mask ROMs, the AM29F400T flash, and the
         internal ROM of the control panel microcontroller
       - devices with no MAME implementation yet: the L7A1429 modeling LSI, the
-        uPD6383GF-3BA DSP and the M37471M2196S panel MCU
+        uPD6383GF-3BA DSP
       - map the flash at 0xE80000 on CPU 2.  The firmware probes it with the
         AMD autoselect sequence (0xAAAA/0x5554 unlock, 0x90, then reads
         0xE80000 and 0xE80002) at prom_c 0xFC85BD, so the part is almost
@@ -49,6 +49,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "wsa1r_cpanel.h"
 
 #include "cpu/tlcs900/tmp95c061.h"
 #include "imagedev/floppy.h"
@@ -73,6 +75,7 @@ public:
 		, m_lcdc(*this, "lcdc")
 		, m_fdc(*this, "fdc")
 		, m_eeprom(*this, "eeprom")
+		, m_cpanel(*this, "cpanel")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -83,6 +86,17 @@ private:
 	required_device<sed1330_device> m_lcdc;
 	required_device<upd765a_device> m_fdc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<wsa1r_cpanel_device> m_cpanel;
+
+	uint8_t m_cpu1_p8 = 0;
+	uint8_t m_cpu1_pb = 0;
+	int m_panel_sclk = 1;   // P8.5, idle high
+	int m_panel_busy = 0;   // PB.4, idle low
+
+	uint8_t cpu1_p8_r();
+	void cpu1_p8_w(uint8_t data);
+	uint8_t cpu1_pb_r();
+	void cpu1_pb_w(uint8_t data);
 
 	void cpu2_p6_w(uint8_t data);
 	uint8_t cpu2_p8_r();
@@ -94,6 +108,37 @@ private:
 	void cpu2_map(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
 };
+
+
+// CPU 1's P8 and PB carry the panel's serial clock and busy lines alongside
+// the floppy's terminal count.  PB.0 low identifies the rack model.
+uint8_t wsa1_state::cpu1_p8_r()
+{
+	uint8_t data = (m_cpu1_p8 & 0x09) | 0xd6;
+	if (m_panel_sclk)
+		data |= 0x20;
+	return data;
+}
+
+void wsa1_state::cpu1_p8_w(uint8_t data)
+{
+	m_cpu1_p8 = data;
+}
+
+uint8_t wsa1_state::cpu1_pb_r()
+{
+	uint8_t data = (m_cpu1_pb & 0x0c) | 0xe3;
+	data &= ~0x01;                  // PB.0 low: the rack
+	if (m_panel_busy)
+		data |= 0x10;
+	return data;
+}
+
+void wsa1_state::cpu1_pb_w(uint8_t data)
+{
+	m_cpu1_pb = data;
+	m_fdc->tc_w(BIT(data, 3));
+}
 
 
 // The calibration EEPROM is bit-banged from CPU 2: P6.5 is chip select, P8.4
@@ -191,6 +236,12 @@ void wsa1_state::wsa1r(machine_config &config)
 	// read at SerialDivisorFromFc, and computes its own serial divisor from it.
 	TMP95C061(config, m_cpu1, 28_MHz_XTAL);
 	m_cpu1->set_addrmap(AS_PROGRAM, &wsa1_state::cpu1_map);
+	m_cpu1->port8_read().set(FUNC(wsa1_state::cpu1_p8_r));
+	m_cpu1->port8_write().set(FUNC(wsa1_state::cpu1_p8_w));
+	m_cpu1->portb_read().set(FUNC(wsa1_state::cpu1_pb_r));
+	m_cpu1->portb_write().set(FUNC(wsa1_state::cpu1_pb_w));
+	m_cpu1->sc1_txd().set(m_cpanel, FUNC(wsa1r_cpanel_device::tx_byte));
+	m_cpu1->sc1_mod().set([this] (uint8_t data) { m_cpanel->rx_enable(BIT(data, 5)); });
 
 	TMP95C061(config, m_cpu2, 28_MHz_XTAL);
 	m_cpu2->set_addrmap(AS_PROGRAM, &wsa1_state::cpu2_map);
@@ -223,6 +274,13 @@ void wsa1_state::wsa1r(machine_config &config)
 		floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	WSA1R_CPANEL(config, m_cpanel);
+	m_cpanel->atn().set([this] (int state) {
+			m_cpu1->set_input_line(TLCS900_INT6, state ? ASSERT_LINE : CLEAR_LINE); });
+	m_cpanel->busy().set([this] (int state) { m_panel_busy = state; });
+	m_cpanel->sclk().set([this] (int state) { m_panel_sclk = state; });
+	m_cpanel->rxd().set([this] (uint8_t data) { m_cpu1->sc1_rxd(data); });
 }
 
 
