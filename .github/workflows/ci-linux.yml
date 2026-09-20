@@ -95,13 +95,51 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
-    - name: Build library shard
+    - name: Generate library shard
       run: |
         set -euo pipefail
         make -j3 generate
         make "$CLANG_SOLUTION_DIR/Makefile"
         python scripts/build/ci_linux_clang_driver_buckets.py \
           validate "$CLANG_SOLUTION_DIR/Makefile"
+    - name: Prepare library shard cache
+      id: library-cache-key
+      run: |
+        set -euo pipefail
+        toolchain_file=build/ci-linux-clang-toolchain.txt
+        current_manifest=build/ci-linux-clang-${{ matrix.group }}-manifest.json
+        {
+          printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
+          printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
+          clang --version
+          clang++ --version
+          ar --version
+          make --version
+          python --version
+          dpkg-query --show --showformat='${binary:Package}=${Version}\n' \
+            clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev \
+            libasound2-dev libxinerama-dev libxi-dev qt6-base-dev \
+            qt6-base-dev-tools
+        } > "$toolchain_file"
+        cache_key="$(python scripts/build/ci_linux_clang_shard_cache.py \
+          prepare "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file "$toolchain_file" \
+          --manifest "$current_manifest" \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "key=$cache_key" >> "$GITHUB_OUTPUT"
+    - name: Restore library shard cache
+      id: library-cache
+      uses: actions/cache@main
+      with:
+        path: build/ci-linux-clang-${{ matrix.group }}-artifact
+        key: ${{ steps.library-cache-key.outputs.key }}
+    - name: Build library shard
+      if: steps.library-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
         export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
         mkdir -p "$MAME_PROJECT_TIMING_DIR"
         python scripts/build/instrument_solution_makefile.py \
@@ -111,9 +149,12 @@ jobs:
           --group "${{ matrix.group }}")"
         make -j3 -C "$CLANG_SOLUTION_DIR" config=release64 $projects
     - name: Stage library artifacts
+      if: steps.library-cache.outputs.cache-hit != 'true'
       run: |
         set -euo pipefail
         artifact_root=build/ci-linux-clang-${{ matrix.group }}-artifact
+        current_manifest=build/ci-linux-clang-${{ matrix.group }}-manifest.json
+        rm -rf "$artifact_root"
         mkdir -p "$artifact_root"
         projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
           list "$CLANG_SOLUTION_DIR/Makefile" \
@@ -128,6 +169,17 @@ jobs:
           cp --parents "${archives[0]}" "$artifact_root"
         done
         cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
+        cp "$current_manifest" \
+          "$artifact_root/shard-manifest-${{ matrix.group }}.json"
+    - name: Verify library shard artifacts
+      run: |
+        python scripts/build/ci_linux_clang_shard_cache.py \
+          verify "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}" \
+          --expected-manifest \
+            build/ci-linux-clang-${{ matrix.group }}-manifest.json \
+          --cache-root \
+            build/ci-linux-clang-${{ matrix.group }}-artifact
     - name: Upload library artifacts
       uses: actions/upload-artifact@main
       with:
@@ -163,13 +215,51 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
-    - name: Build driver bucket
+    - name: Generate driver bucket
       run: |
         set -euo pipefail
         make -j3 generate
         make "$CLANG_SOLUTION_DIR/Makefile"
         python scripts/build/ci_linux_clang_driver_buckets.py \
           validate "$CLANG_SOLUTION_DIR/Makefile"
+    - name: Prepare driver bucket cache
+      id: driver-cache-key
+      run: |
+        set -euo pipefail
+        toolchain_file=build/ci-linux-clang-toolchain.txt
+        current_manifest=build/ci-linux-clang-${{ matrix.bucket }}-manifest.json
+        {
+          printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
+          printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
+          clang --version
+          clang++ --version
+          ar --version
+          make --version
+          python --version
+          dpkg-query --show --showformat='${binary:Package}=${Version}\n' \
+            clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev \
+            libasound2-dev libxinerama-dev libxi-dev qt6-base-dev \
+            qt6-base-dev-tools
+        } > "$toolchain_file"
+        cache_key="$(python scripts/build/ci_linux_clang_shard_cache.py \
+          prepare "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --toolchain-file "$toolchain_file" \
+          --manifest "$current_manifest" \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "key=$cache_key" >> "$GITHUB_OUTPUT"
+    - name: Restore driver bucket cache
+      id: driver-cache
+      uses: actions/cache@main
+      with:
+        path: build/ci-linux-clang-${{ matrix.bucket }}-artifact
+        key: ${{ steps.driver-cache-key.outputs.key }}
+    - name: Build driver bucket
+      if: steps.driver-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
         export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
         mkdir -p "$MAME_PROJECT_TIMING_DIR"
         python scripts/build/instrument_solution_makefile.py \
@@ -182,9 +272,12 @@ jobs:
           --group "${{ matrix.bucket }}" \
           --archive-dir "$CLANG_DRIVER_ARCHIVE_DIR"
     - name: Stage driver artifacts
+      if: steps.driver-cache.outputs.cache-hit != 'true'
       run: |
         set -euo pipefail
         artifact_root=build/ci-linux-clang-${{ matrix.bucket }}-artifact
+        current_manifest=build/ci-linux-clang-${{ matrix.bucket }}-manifest.json
+        rm -rf "$artifact_root"
         mkdir -p "$artifact_root"
         projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
           list "$CLANG_SOLUTION_DIR/Makefile" --group "${{ matrix.bucket }}")"
@@ -193,6 +286,17 @@ jobs:
             "$artifact_root"
         done
         cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
+        cp "$current_manifest" \
+          "$artifact_root/shard-manifest-${{ matrix.bucket }}.json"
+    - name: Verify driver shard artifacts
+      run: |
+        python scripts/build/ci_linux_clang_shard_cache.py \
+          verify "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --expected-manifest \
+            build/ci-linux-clang-${{ matrix.bucket }}-manifest.json \
+          --cache-root \
+            build/ci-linux-clang-${{ matrix.bucket }}-artifact
     - name: Upload driver artifacts
       uses: actions/upload-artifact@main
       with:
