@@ -420,6 +420,8 @@ void tmp95c063_device::tlcs900_check_irqs()
 	/* Check for NMI */
 	if ( m_nmi_state == ASSERT_LINE )
 	{
+		tlcs900_intnest_accept();
+
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );
 		m_xssp.d -= 2;
@@ -469,6 +471,8 @@ void tmp95c063_device::tlcs900_check_irqs()
 	if ( irq >= 0 )
 	{
 		uint8_t vector = tmp95c063_irq_vector_map[irq].vector;
+
+		tlcs900_intnest_accept();
 
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );

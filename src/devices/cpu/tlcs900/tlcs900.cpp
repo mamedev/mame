@@ -120,6 +120,7 @@ void tlcs900_device::device_start()
 	memset(m_dmad, 0x00, sizeof(m_dmad));
 	memset(m_dmac, 0x00, sizeof(m_dmac));
 	memset(m_dmam, 0x00, sizeof(m_dmam));
+	m_intnest = 0;
 
 	save_item( NAME(m_xwa) );
 	save_item( NAME(m_xbc) );
@@ -137,6 +138,7 @@ void tlcs900_device::device_start()
 	save_item( NAME(m_dmad) );
 	save_item( NAME(m_dmac) );
 	save_item( NAME(m_dmam) );
+	save_item( NAME(m_intnest) );
 	save_item( NAME(m_timer_pre) );
 	save_item( NAME(m_timer_8) );
 	save_item( NAME(m_timer_change) );
@@ -204,6 +206,7 @@ void tlcs900_device::device_reset()
 	m_sr.d = 0xf000;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
+	m_intnest = 0;   /* no interrupt is in progress out of reset */
 	m_halted = 0;
 	m_check_irqs = 0;
 	m_prefetch_clear = true;
@@ -220,6 +223,7 @@ void tlcs900h_device::device_reset()
 	m_sr.d = 0xf800;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
+	m_intnest = 0;   /* no interrupt is in progress out of reset */
 	m_halted = 0;
 	m_check_irqs = 0;
 	m_prefetch_clear = true;
