@@ -972,8 +972,10 @@ void bally_say_it_again_device::sound_stream_update(sound_stream &stream)
 	// ahead of the line, R23 with C7 and R27 with C9 after it. They are inside the
 	// regeneration loop, so a repeat passes through them once per lap and comes back
 	// duller than the one before.
+	// one pole per RC, as filter_rc_device works it out: the coefficient is the time
+	// constant against the rate the filter is stepped at, with no pi in sight
 	auto pole = [this] (double r, double c) {
-		return 1.0f - std::exp(-2.0f * float(M_PI) * float(1.0 / (2.0 * M_PI * r * c)) / m_bbd_clock);
+		return 1.0f - float(std::exp(-1.0 / (r * c) / m_bbd_clock));
 	};
 	float const a_pre = pole(RES_K(330), CAP_P(470));
 	float const a_post1 = pole(RES_K(330), CAP_P(680));
