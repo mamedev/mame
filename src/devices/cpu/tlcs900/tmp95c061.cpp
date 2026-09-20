@@ -501,6 +501,21 @@ void tmp95c061_device::tlcs900_check_hdma()
 }
 
 
+/* Databook 3.4: a micro-DMA start consumes the interrupt request, so the CPU
+   does not dispatch that vector and the HALT state is not released by it.
+   Vectors below 0x28 are not micro-DMA capable, and 0x3c (INTRTC) is not. */
+bool tmp95c061_device::hdma_owns_vector( uint8_t vector ) const
+{
+	if ( ! ( vector >= 0x28 && vector != 0x3c && vector < 0x74 ) )
+		return false;
+
+	for ( int ch = 0; ch < 4; ch++ )
+		if ( ( ( m_dma_vector[ch] & 0x1f ) << 2 ) == vector )
+			return true;
+
+	return false;
+}
+
 void tmp95c061_device::tlcs900_check_irqs()
 {
 	/* Check for NMI */
@@ -529,6 +544,9 @@ void tmp95c061_device::tlcs900_check_irqs()
 	{
 		if ( m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
 		{
+			if ( hdma_owns_vector( tmp95c061_irq_vector_map[i].vector ) )
+				continue;
+
 			switch( tmp95c061_irq_vector_map[i].iff )
 			{
 			case 0x80:
@@ -877,7 +895,8 @@ void tmp95c061_device::execute_set_input(int input, int level)
 				if ( m_level[TLCS900_INT0] == CLEAR_LINE && level == ASSERT_LINE )
 				{
 					/* Leave HALT state */
-					m_halted = 0;
+					if ( ! hdma_owns_vector( 0x28 ) )
+						m_halted = 0;
 					m_int_reg[INTE0AD] |= 0x08;
 				}
 			}

@@ -69,6 +69,9 @@ protected:
 
 	void tlcs900_change_tff( int which, int change );
 	int tlcs900_process_hdma( int channel );
+	// A micro-DMA channel that owns a vector consumes the request itself, so
+	// the CPU must neither dispatch it nor leave HALT for it.
+	bool hdma_owns_vector( uint8_t vector ) const;
 	void update_porta();
 
 	// device_disasm_interface overrides
