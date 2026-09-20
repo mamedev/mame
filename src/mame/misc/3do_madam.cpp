@@ -845,8 +845,6 @@ void madam_device::ccobctl0_w(offs_t offset, u32 data, u32 mem_mask)
 		LOGREGIS("    b15pos=%d b0pos=%d swaphv=%d\n", b15pos, b0pos, swaphv);
 
 		m_cel_master_sw.ascall = BIT(data, 26);
-		if (m_cel_master_sw.ascall)
-			popmessage("3do_madam.cpp: enable ASCALL master switch");
 	}
 	COMBINE_DATA(&m_ccobctl0);
 }
@@ -886,9 +884,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			else
 			{
 				// - crshburn uses this as soon as it starts using the engine
+				// - madden wants this at +8 for helmets in main menu
+				// NOTE: this, spabs and ppabs are offset against the address where they fetch
+				// i.e. address would be internally incrementing at every single enabled iteraction
 				LOGCEL("    RELNEXT %08x\n", next_addr);
-				// TODO: is offset dependant on preamble words?
-				// also three relative pointers all with their own offset, wtf
 				m_cel.next_ptr = m_cel.address + (s32)next_addr + 8;
 			}
 
@@ -940,7 +939,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const bool ldplut = !!BIT(m_cel.current_ccb, 23);
 			m_cel.ccbpre = !!BIT(m_cel.current_ccb, 22);
 			const bool yoxy = !!BIT(m_cel.current_ccb, 21);
-			LOGCEL("        ldplut=%d ccbpre=%d yoxy=%d acsc=%d alsc=%d acw=%d accw=%d twd=%d\n"
+			LOGCEL("        ldplut=%d ccbpre=%d yoxy=%d |acsc=%d alsc=%d & ascall=%d| acw=%d accw=%d twd=%d\n"
 				, ldplut
 				, m_cel.ccbpre
 				, yoxy
@@ -948,6 +947,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				// (both needs ASCALL to be enabled first)
 				, BIT(m_cel.current_ccb, 20)
 				, BIT(m_cel.current_ccb, 19)
+				, m_cel_master_sw.ascall
 				// ACW/ACCW: enable clockwise/counterclockwise rendering
 				, BIT(m_cel.current_ccb, 18)
 				, BIT(m_cel.current_ccb, 17)
@@ -997,14 +997,14 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				popmessage("3do_madam.cpp: unsupported PLUTA CEL %d", m_cel.pluta);
 
 			// relative spabs/ppabs offsets are trusted against orbatak
-			// TODO: negative values, used by bam PLUT entries (can't decode it properly yet)
+			// - bam uses negative PLUT addresses
 			const u32 source_addr = m_dma32_read_cb(m_cel.address + 0x08);
 			if (spabs)
 				m_cel.source_ptr = source_addr;
 			else
 			{
 				LOGCEL("    RELSOURCE %08x\n", source_addr);
-				m_cel.source_ptr = m_cel.address + (s32)source_addr - 4;
+				m_cel.source_ptr = m_cel.address + (s32)source_addr + 0xc;
 			}
 			tick_time ++;
 
@@ -1712,6 +1712,7 @@ const madam_device::get_woffset_func madam_device::get_woffset_table[2] =
 	&madam_device::get_woffset10
 };
 
+// TODO: verify rollover i.e. if a max woffset10 goes at 0x401 or goes back at +1
 u16 madam_device::get_woffset8(u32 ptr)
 {
 	return m_dma8_read_cb(ptr) + 2;
@@ -1720,16 +1721,7 @@ u16 madam_device::get_woffset8(u32 ptr)
 u16 madam_device::get_woffset10(u32 ptr)
 {
 	const u8 vh = m_dma8_read_cb(ptr);
-	// TODO: bam CEL setups are suspect
-	// All its source pointers in intro/title/main menu going *inside* "PDAT" file headers,
-	// including the unpacked versions. Doc claims to not set the other woffset bits,
-	// i.e. don't set woffset8 bits 31-24 when using woffset10 25-16 and viceversa ...
-	//if (vh & 0xfc)
-	//  return 2;
-
 	const u8 vl = m_dma8_read_cb(ptr + 1);
-	// TODO: verify rollover
-	// (bam also needs this)
 	return ((vh << 8 | vl) & 0x3ff) + 2;
 }
 
@@ -1905,6 +1897,9 @@ u32 madam_device::cel_decompress()
 {
 	u32 tick_time = 1;
 	u32 source_ptr = m_cel.source_ptr;
+
+	// NOTE: Must start at "PDAT" $+8 ($+4 being the calculated size including header)
+	LOGCEL("    packed source_ptr: [%08x]\n", source_ptr);
 
 	const u16 vcnt = ((m_cel.pre0 >> 6) & 0x3ff) + 1;
 	const bool uncoded = !!BIT(m_cel.pre0, 4);
@@ -2306,7 +2301,7 @@ void madam_device::mult_start_process_w(offs_t offset, u32 data, u32 mem_mask)
 		// 2: 3x3 MAC
 		// - slayer, docthauz, retfire
 		// 3: 3x3 MAC w/divide and multiply
-		// - poed, vgoalsc96, goalfh
+		// - poed, aitd, vgoalsc96 gameplay, goalfh
 		case 1:
 		case 2:
 		case 3:
