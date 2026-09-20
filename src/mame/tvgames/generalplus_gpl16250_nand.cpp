@@ -120,6 +120,12 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	common_config(config);
 }
 
+void generalplus_gpac800_game_state::generalplus_gpl16238b(machine_config &config)
+{
+	GPL16238B(config, m_maincpu, 96000000/2, m_screen);
+	common_config(config);
+}
+
 void generalplus_gpac800_game_state::generalplus_gpl16258vb(machine_config &config)
 {
 	GPL16258VB(config, m_maincpu, 96000000/2, m_screen);
@@ -131,6 +137,12 @@ void generalplus_gpac800_game_state::generalplus_gpac800_nand64mbyte(machine_con
 {
 	generalplus_gpac800(config);
 	GENERALPLUS_GPR27P512A(config, m_nand); // 64Mbyte part, with 0x200+0x10 sized pages (accepts many compatible devices)
+}
+
+void generalplus_gpac800_game_state::generalplus_gpl16238b_nand64mbyte(machine_config &config)
+{
+	generalplus_gpl16238b(config);
+	GENERALPLUS_GPR27P512A(config, m_nand);
 }
 
 void generalplus_gpac800_game_state::generalplus_gpl16258vb_nand64mbyte(machine_config &config)
@@ -687,6 +699,14 @@ ROM_START( beambox )
 	ROM_LOAD( "beambox.bin", 0x0000, 0x4200000, CRC(a486f04e) SHA1(73c7d99d8922eba58d94e955e254b9c3baa4443e) )
 ROM_END
 
+ROM_START( behero )
+	ROM_REGION( 0x4200000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr27p512a.u4", 0x0000000, 0x4200000, CRC(e9471102) SHA1(f536289f968474032f910c4e42598f2cfff2070d) )
+
+	ROM_REGION( 0x400, "seeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "ft24c08a.u6", 0x000, 0x400, CRC(c9a45887) SHA1(e84a469e8b039564d6d044e2a3977e276186dcd4) )
+ROM_END
+
 
 void generalplus_gpac800_game_state::machine_start()
 {
@@ -943,3 +963,16 @@ CONS(200?, vbaby,   0, 0, generalplus_gpl16258vb_nand128mbyte_2048_vbaby, jak_ca
 CONS(200?, tiviboo, 0, 0, generalplus_gpl16258vb_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,    "VTech", "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS(200?, kiugames, 0, 0, generalplus_gpl16258vb_nand512mbyte_2048, jak_car2, generalplus_gpac800_game_state, nand_kiugames, "VideoJet", "Kiu Games", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // probably has other names in English too? menus don't appear to be in German
+
+// Main board marked "NEEPCB#2789A"
+// - U1: ST Microelectronics N009013
+// - U2: Unknown IC (connected to U3 and U4, ROM build path strings suggest GPL16238B unSP2.0 CPU)
+// - U3: ASL(?) AVS641604L-6TE (8 MB DRAM)
+// - U4: Generalplus GPR27P512A-006A (64 MB NAND Flash)
+// - U6: FT24C08A (1 KB SEEPROM)
+// - Y1: Crystal marked "32768"
+// - Y2: Crystal marked "HDF6.000"
+// - Infrared sensor
+// Button board marked "NEEPCB#2789BR1 / 2010-5-31"
+// Barcode reader board marked "NEEPCB#2789C / 20100506"
+CONS(2010?, behero, 0, 0, generalplus_gpl16238b_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init, "Giochi Preziosi", "Be Hero - Be your legend (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
