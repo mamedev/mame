@@ -31,6 +31,20 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// The CD-i base machine can take its backdrop from an external video source
+// instead of the backdrop colour register.  On a machine with a Digital Video
+// Cartridge fitted, that source is the cartridge's MPEG decoder.
+
+class mcd212_ext_video_source
+{
+public:
+	virtual ~mcd212_ext_video_source() = default;
+
+	// returns true and fills argb when the source drives this pixel
+	virtual bool ext_video_pixel(int x, int y, uint32_t &argb) const = 0;
+};
+
+
 class mcd212_device : public device_t,
 					  public device_video_interface
 {
@@ -46,6 +60,8 @@ public:
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
+
+	void set_ext_video_source(mcd212_ext_video_source *source) { m_ext_video = source; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -202,6 +218,9 @@ protected:
 	uint32_t m_cursor_pattern[16]{};
 	uint32_t m_matte_control[8]{};
 	uint32_t m_backdrop_color = 0;
+
+	mcd212_ext_video_source *m_ext_video = nullptr;
+	int m_display_line = 0;
 	uint32_t m_mosaic_hold[2]{};
 	uint8_t m_weight_factor[2][768]{};
 
@@ -253,7 +272,7 @@ protected:
 
 	int get_screen_width();
 	int get_border_width();
-	uint32_t get_backdrop_plane();
+	uint32_t get_backdrop_plane(int x, int y);
 
 	template <int Path> void set_vsr(uint32_t value);
 	template <int Path> uint32_t get_vsr();
