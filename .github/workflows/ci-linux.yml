@@ -102,12 +102,11 @@ jobs:
         make "$CLANG_SOLUTION_DIR/Makefile"
         python scripts/build/ci_linux_clang_driver_buckets.py \
           validate "$CLANG_SOLUTION_DIR/Makefile"
-    - name: Prepare library shard cache
-      id: library-cache-key
+    - name: Prepare library cache context
+      id: library-cache-context
       run: |
         set -euo pipefail
         toolchain_file=build/ci-linux-clang-toolchain.txt
-        current_manifest=build/ci-linux-clang-${{ matrix.group }}-manifest.json
         {
           printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
           printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
@@ -121,18 +120,44 @@ jobs:
             libasound2-dev libxinerama-dev libxi-dev qt6-base-dev \
             qt6-base-dev-tools
         } > "$toolchain_file"
+        dependency_prefix="$(python \
+          scripts/build/ci_linux_clang_shard_cache.py \
+          context "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file "$toolchain_file" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "dependency-prefix=$dependency_prefix" >> "$GITHUB_OUTPUT"
+        echo "dependency-key=${dependency_prefix}${GITHUB_SHA}" \
+          >> "$GITHUB_OUTPUT"
+    - name: Restore library dependency manifest
+      id: library-dependencies
+      uses: actions/cache@main
+      with:
+        path: build/ci-linux-clang-${{ matrix.group }}-dependency-state
+        key: ${{ steps.library-cache-context.outputs.dependency-key }}
+        restore-keys: |
+          ${{ steps.library-cache-context.outputs.dependency-prefix }}
+    - name: Prepare library shard cache
+      id: library-cache-key
+      run: |
+        set -euo pipefail
+        toolchain_file=build/ci-linux-clang-toolchain.txt
+        current_manifest=build/ci-linux-clang-${{ matrix.group }}-manifest.json
+        dependency_manifest=build/ci-linux-clang-${{ matrix.group }}-dependency-state/dependency-manifest-${{ matrix.group }}.json
         cache_key="$(python scripts/build/ci_linux_clang_shard_cache.py \
           prepare "$CLANG_SOLUTION_DIR/Makefile" \
           --group "${{ matrix.group }}" \
           --toolchain-file "$toolchain_file" \
           --manifest "$current_manifest" \
+          --dependency-manifest "$dependency_manifest" \
           --source-commit "$GITHUB_SHA" \
           --runner-os "${{ runner.os }}" \
           --runner-arch "${{ runner.arch }}")"
         echo "key=$cache_key" >> "$GITHUB_OUTPUT"
     - name: Restore library shard cache
       id: library-cache
-      uses: actions/cache@main
+      uses: actions/cache/restore@main
       with:
         path: build/ci-linux-clang-${{ matrix.group }}-artifact
         key: ${{ steps.library-cache-key.outputs.key }}
@@ -148,12 +173,45 @@ jobs:
           list "$CLANG_SOLUTION_DIR/Makefile" \
           --group "${{ matrix.group }}")"
         make -j3 -C "$CLANG_SOLUTION_DIR" config=release64 $projects
+    - name: Capture library dependencies
+      if: steps.library-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        dependency_manifest=build/ci-linux-clang-${{ matrix.group }}-dependency-state/dependency-manifest-${{ matrix.group }}.json
+        python scripts/build/ci_linux_clang_shard_cache.py \
+          capture "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file build/ci-linux-clang-toolchain.txt \
+          --dependency-root build/linux_clang \
+          --manifest "$dependency_manifest" \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}"
+    - name: Finalize library shard cache
+      id: library-final-cache-key
+      if: steps.library-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        current_manifest=build/ci-linux-clang-${{ matrix.group }}-manifest.json
+        dependency_manifest=build/ci-linux-clang-${{ matrix.group }}-dependency-state/dependency-manifest-${{ matrix.group }}.json
+        cache_key="$(python scripts/build/ci_linux_clang_shard_cache.py \
+          prepare "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file build/ci-linux-clang-toolchain.txt \
+          --manifest "$current_manifest" \
+          --dependency-manifest "$dependency_manifest" \
+          --require-dependency-manifest \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "key=$cache_key" >> "$GITHUB_OUTPUT"
     - name: Stage library artifacts
       if: steps.library-cache.outputs.cache-hit != 'true'
       run: |
         set -euo pipefail
         artifact_root=build/ci-linux-clang-${{ matrix.group }}-artifact
         current_manifest=build/ci-linux-clang-${{ matrix.group }}-manifest.json
+        dependency_manifest=build/ci-linux-clang-${{ matrix.group }}-dependency-state/dependency-manifest-${{ matrix.group }}.json
         rm -rf "$artifact_root"
         mkdir -p "$artifact_root"
         projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
@@ -169,8 +227,13 @@ jobs:
           cp --parents "${archives[0]}" "$artifact_root"
         done
         cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
+        while IFS= read -r -d '' dependency_file; do
+          cp --parents "$dependency_file" "$artifact_root"
+        done < <(find build/linux_clang -type f -name '*.d' -print0)
         cp "$current_manifest" \
           "$artifact_root/shard-manifest-${{ matrix.group }}.json"
+        cp "$dependency_manifest" \
+          "$artifact_root/dependency-manifest-${{ matrix.group }}.json"
     - name: Verify library shard artifacts
       run: |
         python scripts/build/ci_linux_clang_shard_cache.py \
@@ -180,12 +243,26 @@ jobs:
             build/ci-linux-clang-${{ matrix.group }}-manifest.json \
           --cache-root \
             build/ci-linux-clang-${{ matrix.group }}-artifact
+    - name: Refresh library dependency manifest
+      run: |
+        set -euo pipefail
+        artifact_root=build/ci-linux-clang-${{ matrix.group }}-artifact
+        dependency_state=build/ci-linux-clang-${{ matrix.group }}-dependency-state
+        mkdir -p "$dependency_state"
+        cp "$artifact_root/dependency-manifest-${{ matrix.group }}.json" \
+          "$dependency_state/dependency-manifest-${{ matrix.group }}.json"
     - name: Upload library artifacts
       uses: actions/upload-artifact@main
       with:
         name: mame-linux-clang-shard-${{ matrix.group }}-${{ github.sha }}
         path: build/ci-linux-clang-${{ matrix.group }}-artifact/
         if-no-files-found: error
+    - name: Save library shard cache
+      if: steps.library-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@main
+      with:
+        path: build/ci-linux-clang-${{ matrix.group }}-artifact
+        key: ${{ steps.library-final-cache-key.outputs.key }}
 
   build-linux-clang-drivers:
     name: build-linux (clang ${{ matrix.bucket }})
@@ -222,12 +299,11 @@ jobs:
         make "$CLANG_SOLUTION_DIR/Makefile"
         python scripts/build/ci_linux_clang_driver_buckets.py \
           validate "$CLANG_SOLUTION_DIR/Makefile"
-    - name: Prepare driver bucket cache
-      id: driver-cache-key
+    - name: Prepare driver cache context
+      id: driver-cache-context
       run: |
         set -euo pipefail
         toolchain_file=build/ci-linux-clang-toolchain.txt
-        current_manifest=build/ci-linux-clang-${{ matrix.bucket }}-manifest.json
         {
           printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
           printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
@@ -241,18 +317,44 @@ jobs:
             libasound2-dev libxinerama-dev libxi-dev qt6-base-dev \
             qt6-base-dev-tools
         } > "$toolchain_file"
+        dependency_prefix="$(python \
+          scripts/build/ci_linux_clang_shard_cache.py \
+          context "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --toolchain-file "$toolchain_file" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "dependency-prefix=$dependency_prefix" >> "$GITHUB_OUTPUT"
+        echo "dependency-key=${dependency_prefix}${GITHUB_SHA}" \
+          >> "$GITHUB_OUTPUT"
+    - name: Restore driver dependency manifest
+      id: driver-dependencies
+      uses: actions/cache@main
+      with:
+        path: build/ci-linux-clang-${{ matrix.bucket }}-dependency-state
+        key: ${{ steps.driver-cache-context.outputs.dependency-key }}
+        restore-keys: |
+          ${{ steps.driver-cache-context.outputs.dependency-prefix }}
+    - name: Prepare driver bucket cache
+      id: driver-cache-key
+      run: |
+        set -euo pipefail
+        toolchain_file=build/ci-linux-clang-toolchain.txt
+        current_manifest=build/ci-linux-clang-${{ matrix.bucket }}-manifest.json
+        dependency_manifest=build/ci-linux-clang-${{ matrix.bucket }}-dependency-state/dependency-manifest-${{ matrix.bucket }}.json
         cache_key="$(python scripts/build/ci_linux_clang_shard_cache.py \
           prepare "$CLANG_SOLUTION_DIR/Makefile" \
           --group "${{ matrix.bucket }}" \
           --toolchain-file "$toolchain_file" \
           --manifest "$current_manifest" \
+          --dependency-manifest "$dependency_manifest" \
           --source-commit "$GITHUB_SHA" \
           --runner-os "${{ runner.os }}" \
           --runner-arch "${{ runner.arch }}")"
         echo "key=$cache_key" >> "$GITHUB_OUTPUT"
     - name: Restore driver bucket cache
       id: driver-cache
-      uses: actions/cache@main
+      uses: actions/cache/restore@main
       with:
         path: build/ci-linux-clang-${{ matrix.bucket }}-artifact
         key: ${{ steps.driver-cache-key.outputs.key }}
@@ -271,12 +373,45 @@ jobs:
           verify-archives "$CLANG_SOLUTION_DIR/Makefile" \
           --group "${{ matrix.bucket }}" \
           --archive-dir "$CLANG_DRIVER_ARCHIVE_DIR"
+    - name: Capture driver dependencies
+      if: steps.driver-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        dependency_manifest=build/ci-linux-clang-${{ matrix.bucket }}-dependency-state/dependency-manifest-${{ matrix.bucket }}.json
+        python scripts/build/ci_linux_clang_shard_cache.py \
+          capture "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --toolchain-file build/ci-linux-clang-toolchain.txt \
+          --dependency-root build/linux_clang \
+          --manifest "$dependency_manifest" \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}"
+    - name: Finalize driver shard cache
+      id: driver-final-cache-key
+      if: steps.driver-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        current_manifest=build/ci-linux-clang-${{ matrix.bucket }}-manifest.json
+        dependency_manifest=build/ci-linux-clang-${{ matrix.bucket }}-dependency-state/dependency-manifest-${{ matrix.bucket }}.json
+        cache_key="$(python scripts/build/ci_linux_clang_shard_cache.py \
+          prepare "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --toolchain-file build/ci-linux-clang-toolchain.txt \
+          --manifest "$current_manifest" \
+          --dependency-manifest "$dependency_manifest" \
+          --require-dependency-manifest \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "key=$cache_key" >> "$GITHUB_OUTPUT"
     - name: Stage driver artifacts
       if: steps.driver-cache.outputs.cache-hit != 'true'
       run: |
         set -euo pipefail
         artifact_root=build/ci-linux-clang-${{ matrix.bucket }}-artifact
         current_manifest=build/ci-linux-clang-${{ matrix.bucket }}-manifest.json
+        dependency_manifest=build/ci-linux-clang-${{ matrix.bucket }}-dependency-state/dependency-manifest-${{ matrix.bucket }}.json
         rm -rf "$artifact_root"
         mkdir -p "$artifact_root"
         projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
@@ -286,8 +421,13 @@ jobs:
             "$artifact_root"
         done
         cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
+        while IFS= read -r -d '' dependency_file; do
+          cp --parents "$dependency_file" "$artifact_root"
+        done < <(find build/linux_clang -type f -name '*.d' -print0)
         cp "$current_manifest" \
           "$artifact_root/shard-manifest-${{ matrix.bucket }}.json"
+        cp "$dependency_manifest" \
+          "$artifact_root/dependency-manifest-${{ matrix.bucket }}.json"
     - name: Verify driver shard artifacts
       run: |
         python scripts/build/ci_linux_clang_shard_cache.py \
@@ -297,12 +437,26 @@ jobs:
             build/ci-linux-clang-${{ matrix.bucket }}-manifest.json \
           --cache-root \
             build/ci-linux-clang-${{ matrix.bucket }}-artifact
+    - name: Refresh driver dependency manifest
+      run: |
+        set -euo pipefail
+        artifact_root=build/ci-linux-clang-${{ matrix.bucket }}-artifact
+        dependency_state=build/ci-linux-clang-${{ matrix.bucket }}-dependency-state
+        mkdir -p "$dependency_state"
+        cp "$artifact_root/dependency-manifest-${{ matrix.bucket }}.json" \
+          "$dependency_state/dependency-manifest-${{ matrix.bucket }}.json"
     - name: Upload driver artifacts
       uses: actions/upload-artifact@main
       with:
         name: mame-linux-clang-shard-${{ matrix.bucket }}-${{ github.sha }}
         path: build/ci-linux-clang-${{ matrix.bucket }}-artifact/
         if-no-files-found: error
+    - name: Save driver shard cache
+      if: steps.driver-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@main
+      with:
+        path: build/ci-linux-clang-${{ matrix.bucket }}-artifact
+        key: ${{ steps.driver-final-cache-key.outputs.key }}
 
   build-linux-clang:
     name: build-linux (clang)
