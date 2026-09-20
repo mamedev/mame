@@ -70,7 +70,6 @@ void jaleco_fpu_device::data_map(address_map &map)
 	map(0x000, 0x8ff).ram().share("data");
 }
 
-// host bus window, 32-bit: data RAM, registers, program RAM (opcode and argument in separate longs)
 void jaleco_fpu_device::host_map(address_map &map)
 {
 	map(0x0000, 0x23ff).rw(FUNC(jaleco_fpu_device::host_data_r), FUNC(jaleco_fpu_device::host_data_w)).umask32(0x0000ffff);
@@ -261,9 +260,6 @@ bool jaleco_fpu_device::condition(u8 code)
 	case 0x5: return m_c7-- != 0;
 	case 0x8: return m_flags & F_Z;
 	case 0x9: return n != v; // signed <
-	// signed >: greater-or-equal here makes the road line loop (program 270-306)
-	// emit one line past the y target when the road reaches the screen bottom,
-	// overflowing the host's line buffer (game hangs jumping a crest at full speed)
 	case 0xa: return (n == v) && !(m_flags & F_Z);
 	case 0xd: return m_flags & F_C;
 	case 0xe: return n;
@@ -389,7 +385,6 @@ void jaleco_fpu_device::execute_one(u32 op)
 			// on overflow and divide by zero the quotient saturates: the program
 			// consumes results with no V check and clamps only one side (22c-231),
 			// and the perspective divide at 2df overflows routinely in-game.
-			// Inferred, not verified against hardware.
 			u32 const dividend = (u32(m_s[b]) << 16) | m_s[0xd];
 			u16 const divisor = m_s[a];
 			if (!divisor || (dividend / divisor) > 0xffff)

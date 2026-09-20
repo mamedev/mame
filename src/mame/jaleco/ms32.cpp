@@ -138,7 +138,7 @@ missing clipping window effect in gametngk intro
 f1superb - network link not emulated (MCU on the F1-93159 I/O board is not dumped)
          - steering shock and seat motor outputs not hooked up
          - priority RAM output bits 1-0 ignored, "effect" outputs drawn at half brightness
-         - math coprocessor clock unknown
+         - math coprocessor unidentified and clock unknown
 
 Jaleco Megasystem 32 Game List - thanks to Yasuhiro
 ---------------------------------------------------
