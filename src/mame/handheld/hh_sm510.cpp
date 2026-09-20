@@ -27,13 +27,13 @@ TODO:
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
 - naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
-- Currently there is no accurate way to dump the SM511/SM512 melody ROM
-  electronically. For the ones that weren't decapped, they were read by
+- An accurate way to dump the SM511/SM512 melody ROM electronically now exists.
+  For the ones that weren't decapped or re-dumped with it, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
-  verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
-  gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
-  gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
+  verification, or a re-dump with the new method, is wanted for: bassmate,
+  gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp,
+  gnw_dkong3, gnw_gcliff, gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway,
+  gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, trtreisl,
   trspacadv, vesarif, uchitari
 
 ================================================================================
@@ -2935,7 +2935,7 @@ ROM_START( gnw_zelda )
 	ROM_LOAD( "zl-65.program", 0x0000, 0x1000, CRC(b96aa64e) SHA1(d1f0c64104eb3ecbf370674d5078a3a85b2b7227) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "zl-65.melody", 0x000, 0x100, BAD_DUMP CRC(3a281b0f) SHA1(7a236775557939050bbcd6f9d0a598d219a032f2) ) // decap needed for verification
+	ROM_LOAD( "zl-65.melody", 0x000, 0x100, CRC(5e8abd36) SHA1(44899ff1c31cf69b105ed83a8bb6576551649379) )
 
 	ROM_REGION( 283029, "screen_top", 0)
 	ROM_LOAD( "gnw_zelda_top.svg", 0, 283029, CRC(aaab1d7e) SHA1(fe01e8a92e6dcf457da87afe6bf39fcf511da9db) )
@@ -3919,7 +3919,7 @@ ROM_START( gnw_climber )
 	ROM_LOAD( "dr-802.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // dumped from NWS version
+	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(cb6a873c) SHA1(62c05338f42e283030c2d847384037817398890b) ) // dumped from NWS version
 
 	ROM_REGION( 564868, "screen", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 564868, CRC(a50ebd1c) SHA1(51047db960c8f110c1b681347cf8efd1d6263b85) )
@@ -3930,7 +3930,7 @@ ROM_START( gnw_climbern )
 	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // decap needed for verification
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, CRC(cb6a873c) SHA1(62c05338f42e283030c2d847384037817398890b) )
 
 	ROM_REGION( 542453, "screen", 0)
 	ROM_LOAD( "gnw_climbern.svg", 0, 542453, CRC(2ded966e) SHA1(7e9c99d372b6e547b9b3e789dca9dee60455a427) )

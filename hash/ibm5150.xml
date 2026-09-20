@@ -18623,6 +18623,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Code To Go" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Turbo Out Run [Sega] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="5c2ed4fe" sha1="6f5ca56e4e40b81cbf7a9e07f55e9cb18f31e0da"/>
@@ -18646,6 +18647,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Code To Go" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Turbo Out Run [Sega] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="67d93e45" sha1="9b6a1ee5abfa46f879c1bfdc661bfc95b2539853"/>
@@ -19338,6 +19340,18 @@ Hangs at credits screen
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="8088mph.360" size="368640" crc="4f5f4871" sha1="b7f61ad133edf7e80d2ccd0bc7767baf0b13f34d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=e8ziXxs027g -->
+	<software name="3sg">
+		<description>Three Shades of Gray</description>
+		<year>2016</year>
+		<publisher>Alumni</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="3shades.dsk" size="368640" crc="b0c7a559" sha1="70ecd4d9e1335bc985369cc77a52e7bbbb4e72f8"/>
 			</dataarea>
 		</part>
 	</software>

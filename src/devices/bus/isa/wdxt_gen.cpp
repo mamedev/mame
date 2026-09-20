@@ -61,7 +61,7 @@ DEFINE_DEVICE_TYPE(ISA8_WDXT_GEN, wdxt_gen_device, "wdxt_gen", "Western Digital 
 
 ROM_START( wdxt_gen )
 	ROM_REGION( 0x2000, "bios", 0 )
-	ROM_LOAD( "3.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) )
+	ROM_LOAD( "62-000100-003.u13", 0x0000, 0x2000, CRC(fbcb5f91) SHA1(8c22bd664177eb6126f3011eda8c5655fffe0ef2) )
 ROM_END
 
 

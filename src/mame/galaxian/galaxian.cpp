@@ -13776,7 +13776,7 @@ ROM_START( porterb )
 	ROM_LOAD( "pm-6_2532.bin",       0x4000, 0x1000, CRC(1d6e6442) SHA1(6fce4fd548d54ecc477992ea0deaf4505b036a73) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "2716.1h_bottom.bin ", 0x0000, 0x0800, BAD_DUMP CRC(147dc4b6) SHA1(8a3ffefec829cb2120c1a863937836c191fb12b0) ) // bitrotten
+	ROM_LOAD( "2716.1h_bottom.bin",  0x0000, 0x0800, BAD_DUMP CRC(147dc4b6) SHA1(8a3ffefec829cb2120c1a863937836c191fb12b0) ) // bitrotten
 	ROM_LOAD( "2716.1h_upper.bin",   0x0800, 0x0800, CRC(a85b080b) SHA1(bf208607613c5f6b039950df11d19e1149671ccc) )
 	ROM_LOAD( "2716.1k_bottom.bin",  0x1000, 0x0800, BAD_DUMP CRC(cd4fcabc) SHA1(d0d51d701a12231c3dafcb91b3df21e05915138e) ) // bitrotten
 	ROM_LOAD( "2716.1k_upper.bin",   0x1800, 0x0800, CRC(44e5cc3c) SHA1(e372f49e1785914512c58df216723c4782eb8918) )

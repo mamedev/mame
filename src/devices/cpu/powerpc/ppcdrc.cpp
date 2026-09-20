@@ -901,6 +901,28 @@ void ppc_device::static_generate_out_of_cycles()
 
 
 /*-------------------------------------------------
+    static_generate_bus_retry - abandon the stalled
+    load/store and exit so the instruction re-runs
+-------------------------------------------------*/
+
+void ppc_device::static_generate_bus_retry()
+{
+	drcuml_block &block(m_drcuml->begin_invariant_block(16));
+	alloc_handle(m_drcuml.get(), &m_bus_retry, "bus_retry");
+	UML_HANDLE(block, *m_bus_retry);
+	UML_RECOVER(block, I0, MAPVAR_PC);
+	UML_RECOVER(block, I1, MAPVAR_CYCLES);
+	UML_MOV(block, mem(&m_core->pc), I0);
+	UML_STORE(block, access_to_be_redone_ptr(), 0, 0, SIZE_BYTE, SCALE_x1);
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);
+	save_fast_iregs(block);
+	save_fast_fregs(block);
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+	block.end();
+}
+
+
+/*-------------------------------------------------
     static_generate_tlb_mismatch - generate a
     TLB mismatch handler
 -------------------------------------------------*/
@@ -1355,6 +1377,10 @@ void ppc_device::static_generate_memory_accessor(
 				UML_LABEL(block, skip);                                                     // skip:
 			}
 
+	// clear first, so a request this instruction never made can't discard an unrelated transfer
+	if (m_drcoptions & PPCDRC_BUS_RETRY)
+		UML_STORE(block, access_to_be_redone_ptr(), 0, 0, SIZE_BYTE, SCALE_x1);
+
 	switch (size)
 	{
 		case 1:
@@ -1414,6 +1440,14 @@ void ppc_device::static_generate_memory_accessor(
 					UML_DREADM(block, I0, I0, I2, SIZE_QWORD, SPACE_PROGRAM);           // dreadm  i0,i0,i2,program_qword
 			}
 			break;
+	}
+
+	// unwind before the destination and update-address registers are written
+	if (m_drcoptions & PPCDRC_BUS_RETRY)
+	{
+		UML_LOAD(block, I3, access_to_be_redone_ptr(), 0, SIZE_BYTE, SCALE_x1);
+		UML_TEST(block, I3, 1);
+		UML_EXHc(block, COND_NZ, *m_bus_retry, 0);
 	}
 
 	// 601 codewatch continued: if the store is to a page with compiled code,

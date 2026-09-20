@@ -5945,7 +5945,7 @@ Eventually hangs requiring a transfer ready irq [SCSI] (untested)
 	</software>
 
 	<software name="srmp5">
-		<description>Super Real Mahjong P V Custom (ACD, SCD)(Japan)</description>
+		<description>Super Real Mahjong P.V Custom (ACD, SCD)(Japan)</description>
 		<year>1995</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="serial" value="NXCD5032"/>

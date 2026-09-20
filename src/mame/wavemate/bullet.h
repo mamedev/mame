@@ -39,14 +39,7 @@ public:
 		m_dmac(*this, Z80DMA_TAG),
 		m_fdc(*this, MB8877_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, MB8877_TAG":0"),
-		m_floppy1(*this, MB8877_TAG":1"),
-		m_floppy2(*this, MB8877_TAG":2"),
-		m_floppy3(*this, MB8877_TAG":3"),
-		m_floppy4(*this, MB8877_TAG":4"),
-		m_floppy5(*this, MB8877_TAG":5"),
-		m_floppy6(*this, MB8877_TAG":6"),
-		m_floppy7(*this, MB8877_TAG":7"),
+		m_floppies(*this, MB8877_TAG":%u", 0U),
 		m_floppy(nullptr),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_rom(*this, Z80_TAG),
@@ -99,14 +92,8 @@ protected:
 	required_device<z80dma_device> m_dmac;
 	required_device<mb8877_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<floppy_connector> m_floppy4;
-	required_device<floppy_connector> m_floppy5;
-	required_device<floppy_connector> m_floppy6;
-	required_device<floppy_connector> m_floppy7;
+	// the revision F board adds two 3.5" units, so the last two are absent on the earlier boards
+	optional_device_array<floppy_connector, 10> m_floppies;
 	floppy_image_device *m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_memory_region m_rom;
@@ -139,8 +126,6 @@ class bulletf_state : public bullet_state
 public:
 	bulletf_state(const machine_config &mconfig, device_type type, const char *tag) :
 		bullet_state(mconfig, type, tag),
-		m_floppy8(*this, MB8877_TAG":8"),
-		m_floppy9(*this, MB8877_TAG":9"),
 		m_scsibus(*this, SCSIBUS_TAG),
 		m_scsi_data_in(*this, "scsi_data_in"),
 		m_scsi_data_out(*this, "scsi_data_out"),
@@ -174,8 +159,6 @@ protected:
 
 	void update_dma_rdy();
 
-	required_device<floppy_connector> m_floppy8;
-	required_device<floppy_connector> m_floppy9;
 	required_device<scsi_port_device> m_scsibus;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_data_out;

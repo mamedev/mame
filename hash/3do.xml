@@ -564,7 +564,7 @@ Not extensively tested
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
 [Madam] corrupted CEL for Krisalis logo at startup
-Title screen, options and pause menu have PIXC bugs
+Title screen options (B button) and pause menu requires Projector for cursor
 ]]></notes>
 		<!-- 7 90561 02500 9 for other pressings (same content?) -->
 		<info name="barcode" value="7 90561 00942 9"/>
@@ -715,7 +715,7 @@ Eventually has optional [Player] lightgun and maybe mouse support
 		<publisher>Interplay</publisher>
 		<notes><![CDATA[
 [Madam] check PIXC outputs in main menu
-Never color fills floor and roof in gameplay
+[Sport] Never color fills floor and roof in gameplay
 Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 40421 29247 9"/>

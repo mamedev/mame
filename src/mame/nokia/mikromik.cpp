@@ -177,7 +177,6 @@ Notes:
 
 	- upd765 FIFO underrun on floppy write due to CRTC hogging DMA
 	- "movcpm * *" syncronization error on mm1m6
-	- MPSC test fails
 
 */
 
