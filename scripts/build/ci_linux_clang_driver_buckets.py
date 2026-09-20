@@ -15,9 +15,18 @@ EXECUTABLE_PROJECT = 'mame'
 THIRDPARTY_PROJECTS = (
         '7z', 'asmjit', 'bgfx', 'bimg', 'bx', 'expat', 'flac', 'jpeg', 'linenoise', 'lua', 'lualibs',
         'portaudio', 'portmidi', 'softfloat3', 'sqlite3', 'utf8proc', 'wdlfft', 'ymfm', 'zlib', 'zstd')
+CORE_PROJECTS = (
+        'dasm', 'emu', 'formats', 'frontend', 'netlist', 'ocore_sdl', 'osd_sdl', 'precompile', 'qtdbg_sdl',
+        'utils')
+OPTIONAL_PROJECTS = ('optional',)
 TOOL_PROJECTS = (
         'castool', 'chdman', 'floptool', 'imgtool', 'jedutil', 'ldresample', 'ldverify', 'nltool', 'nlwav',
         'pngcmp', 'regrep', 'romcmp', 'split', 'srcclean', 'testkeys', 'unidasm')
+
+LIBRARY_GROUPS = {
+        'core': CORE_PROJECTS,
+        'optional': OPTIONAL_PROJECTS,
+        'thirdparty': THIRDPARTY_PROJECTS}
 
 BUCKETS = {
         'driver-1': (
@@ -86,7 +95,7 @@ def parse_args():
     add_common_arguments(list_parser)
     list_parser.add_argument(
             '--group', required=True,
-            choices=('base', 'thirdparty', 'tools', 'all') + tuple(BUCKETS))
+            choices=tuple(LIBRARY_GROUPS) + ('tools', 'all') + tuple(BUCKETS))
 
     archives_parser = subparsers.add_parser('verify-archives')
     add_common_arguments(archives_parser)
@@ -116,6 +125,12 @@ def validate_buckets(projects, source_root):
     if duplicates:
         raise ValueError('projects assigned to multiple buckets: %s' % ' '.join(duplicates))
 
+    library_assignments = [project for group in LIBRARY_GROUPS.values() for project in group]
+    duplicates = sorted(
+            project for project, count in collections.Counter(library_assignments).items() if count != 1)
+    if duplicates:
+        raise ValueError('projects assigned to multiple library groups: %s' % ' '.join(duplicates))
+
     generated_drivers = {
             project for project in projects
             if (source_root / 'src' / 'mame' / project).is_dir()}
@@ -133,26 +148,26 @@ def validate_buckets(projects, source_root):
         raise ValueError('generated solution does not contain the %s executable project' % EXECUTABLE_PROJECT)
 
     generated_projects = set(projects)
-    missing_thirdparty = sorted(set(THIRDPARTY_PROJECTS) - generated_projects)
+    missing_libraries = sorted(set(library_assignments) - generated_projects)
     missing_tools = sorted(set(TOOL_PROJECTS) - generated_projects)
-    if missing_thirdparty or missing_tools:
+    classified_projects = generated_drivers | set(library_assignments) | set(TOOL_PROJECTS) | {EXECUTABLE_PROJECT}
+    unassigned_projects = sorted(generated_projects - classified_projects)
+    if missing_libraries or missing_tools or unassigned_projects:
         details = []
-        if missing_thirdparty:
-            details.append('third-party projects absent from generated solution: %s' % ' '.join(missing_thirdparty))
+        if missing_libraries:
+            details.append('library projects absent from generated solution: %s' % ' '.join(missing_libraries))
         if missing_tools:
             details.append('tool projects absent from generated solution: %s' % ' '.join(missing_tools))
+        if unassigned_projects:
+            details.append('unassigned generated projects: %s' % ' '.join(unassigned_projects))
         raise ValueError('; '.join(details))
     return generated_drivers
 
 
 def select_projects(group, projects, generated_drivers):
-    if group == 'base':
-        excluded = generated_drivers | set(THIRDPARTY_PROJECTS) | set(TOOL_PROJECTS) | {EXECUTABLE_PROJECT}
-        return [
-                project for project in projects
-                if project not in excluded]
-    elif group == 'thirdparty':
-        return [project for project in projects if project in THIRDPARTY_PROJECTS]
+    if group in LIBRARY_GROUPS:
+        selected_projects = set(LIBRARY_GROUPS[group])
+        return [project for project in projects if project in selected_projects]
     elif group == 'tools':
         return [project for project in projects if project in TOOL_PROJECTS]
     elif group == 'all':
@@ -188,8 +203,10 @@ def main():
         projects = read_solution_projects(options.solution_makefile)
         generated_drivers = validate_buckets(projects, options.source_root)
         if options.command == 'validate':
-            sys.stdout.write('Validated %d driver projects in %d buckets.\n' % (
-                    len(generated_drivers), len(BUCKETS)))
+            sys.stdout.write(
+                    'Validated %d driver projects in %d buckets and %d library projects in %d groups.\n' % (
+                            len(generated_drivers), len(BUCKETS),
+                            sum(len(group) for group in LIBRARY_GROUPS.values()), len(LIBRARY_GROUPS)))
         else:
             selected_projects = select_projects(options.group, projects, generated_drivers)
             if options.command == 'list':

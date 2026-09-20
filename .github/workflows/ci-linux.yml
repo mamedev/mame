@@ -78,7 +78,8 @@ jobs:
       fail-fast: false
       matrix:
         group:
-        - base
+        - core
+        - optional
         - thirdparty
     runs-on: ubuntu-latest
     env:
