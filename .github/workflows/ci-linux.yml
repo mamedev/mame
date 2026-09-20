@@ -80,7 +80,6 @@ jobs:
       OVERRIDE_CXX: clang++
       SUBTARGET: mame
       TOOLS: 1
-      PRECOMPILE: 0
     steps:
     - uses: actions/checkout@main
       with:
@@ -141,7 +140,6 @@ jobs:
       OVERRIDE_CXX: clang++
       SUBTARGET: mame
       TOOLS: 1
-      PRECOMPILE: 0
     steps:
     - uses: actions/checkout@main
       with:
@@ -198,7 +196,6 @@ jobs:
       OVERRIDE_CXX: clang++
       SUBTARGET: mame
       TOOLS: 1
-      PRECOMPILE: 0
     steps:
     - uses: actions/checkout@main
       with:
