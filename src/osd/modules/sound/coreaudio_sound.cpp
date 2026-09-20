@@ -75,7 +75,7 @@ static const char *sMacChannelLabels[sMacChannelCount] =
 	"Center Surround Direct",
 	"Haptic",
 	"", "", "",
-	"Left Top Middle"
+	"Left Top Middle",
 	"",                             // 50
 	"Right Top Middle",
 	"Left Top Rear",
@@ -1062,7 +1062,7 @@ void sound_coreaudio::build_device_list()
 
 						if ((chDesc.mChannelLabel == 0xffffffff) || (chDesc.mChannelLabel >= sMacChannelCount))
 						{
-							if (chanLayout->mNumberChannelDescriptions > 1)
+							if ((chanLayout->mNumberChannelDescriptions > 1) && ((desc + 1) < sMacChannelCount))
 							{
 								node.m_port_names.push_back(sMacChannelLabels[desc + 1]);
 								node.m_port_positions.emplace_back(sChannelPositions[desc + 1]);
