@@ -22,7 +22,7 @@
 
 #include "emu.h"
 #include "jalfpu.h"
-#include "jalfpud.h"
+#include "jalfpu_dasm.h"
 
 #define LOG_UNIMPL (1U << 1)
 #define LOG_HOST   (1U << 2)
@@ -33,8 +33,6 @@
 #define LOGUNIMPL(...) LOGMASKED(LOG_UNIMPL, __VA_ARGS__)
 #define LOGHOST(...)   LOGMASKED(LOG_HOST, __VA_ARGS__)
 
-
-DEFINE_DEVICE_TYPE(JALECO_FPU, jaleco_fpu_device, "jalfpu", "Jaleco FPU math coprocessor")
 
 namespace {
 
@@ -50,6 +48,9 @@ constexpr u16 CTL_ENTRY_B = 0x4100; // routine entry marker (14c 167 1b6), no ef
 } // anonymous namespace
 
 
+DEFINE_DEVICE_TYPE(JALECO_FPU, jaleco_fpu_device, "jalfpu", "Jaleco FPU math coprocessor")
+
+
 jaleco_fpu_device::jaleco_fpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, JALECO_FPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(jaleco_fpu_device::program_map), this))
@@ -62,19 +63,19 @@ jaleco_fpu_device::jaleco_fpu_device(const machine_config &mconfig, const char *
 
 void jaleco_fpu_device::program_map(address_map &map)
 {
-	map(0x000, 0x3ff).ram().share("prg");
+	map(0x000, 0x3ff).ram().share(m_prg_ram);
 }
 
 void jaleco_fpu_device::data_map(address_map &map)
 {
-	map(0x000, 0x8ff).ram().share("data");
+	map(0x000, 0x8ff).ram().share(m_data_ram);
 }
 
 void jaleco_fpu_device::host_map(address_map &map)
 {
-	map(0x0000, 0x23ff).rw(FUNC(jaleco_fpu_device::host_data_r), FUNC(jaleco_fpu_device::host_data_w)).umask32(0x0000ffff);
-	map(0x2400, 0x24ff).rw(FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w)).umask32(0x0000ffff);
-	map(0x4000, 0x5fff).rw(FUNC(jaleco_fpu_device::host_prg_r), FUNC(jaleco_fpu_device::host_prg_w));
+	map(0x0000, 0x23ff).umask32(0x0000ffff).rw(FUNC(jaleco_fpu_device::host_data_r), FUNC(jaleco_fpu_device::host_data_w));
+	map(0x2400, 0x24ff).umask32(0x0000ffff).rw(FUNC(jaleco_fpu_device::host_r), FUNC(jaleco_fpu_device::host_w));
+	map(0x4000, 0x5fff).umask32(0x0000ffff).rw(FUNC(jaleco_fpu_device::host_prg_r), FUNC(jaleco_fpu_device::host_prg_w));
 }
 
 device_memory_interface::space_config_vector jaleco_fpu_device::memory_space_config() const
@@ -175,19 +176,19 @@ void jaleco_fpu_device::host_data_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_data_ram[offset]);
 }
 
-u32 jaleco_fpu_device::host_prg_r(offs_t offset)
+u16 jaleco_fpu_device::host_prg_r(offs_t offset)
 {
 	u32 const word = m_prg_ram[offset >> 1];
 	return BIT(offset, 0) ? (word & 0xffff) : (word >> 16);
 }
 
-void jaleco_fpu_device::host_prg_w(offs_t offset, u32 data, u32 mem_mask)
+void jaleco_fpu_device::host_prg_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u32 &word = m_prg_ram[offset >> 1];
 	if (BIT(offset, 0))
-		word = (word & 0xf0000) | (data & mem_mask & 0xffff) | (word & ~mem_mask & 0xffff);
+		word = (word & 0xf0000) | (data & mem_mask) | (word & ~mem_mask & 0xffff);
 	else
-		word = (word & 0x0ffff) | ((((word >> 16) & ~mem_mask) | (data & mem_mask)) & 0xf) << 16;
+		word = (word & 0x0ffff) | u32((((word >> 16) & ~mem_mask) | (data & mem_mask)) & 0xf) << 16;
 }
 
 u16 jaleco_fpu_device::host_r(offs_t offset)
@@ -286,6 +287,292 @@ void jaleco_fpu_device::unimplemented(u32 op)
 	LOGUNIMPL("%03x: unimplemented %x %04x\n", m_ppc, op >> 16, op & 0xffff);
 }
 
+void jaleco_fpu_device::op_alu(u32 op)
+{
+	unsigned const fn = (op >> 10) & 0x3f;
+	unsigned const a = (op >> 6) & 0xf;
+	unsigned const b = op & 0xf;
+
+	u32 const d = m_s[b];
+	u32 const s = m_s[a];
+	u32 const cin = (m_flags & F_C) ? 1 : 0;
+	u32 r;
+	bool store = true;
+	switch (fn)
+	{
+	case 0x07: case 0x0f:
+		r = d + s + (fn == 0x0f ? cin : 0);
+		m_flags &= ~(F_C | F_V);
+		if (r & 0x10000)
+			m_flags |= F_C;
+		if ((d ^ r) & (s ^ r) & 0x8000)
+			m_flags |= F_V;
+		break;
+	case 0x17: case 0x1f: case 0x27:
+		r = d - s - (fn == 0x1f ? cin : 0);
+		m_flags &= ~(F_C | F_V);
+		if (r & 0x10000)
+			m_flags |= F_C;
+		if ((d ^ s) & (d ^ r) & 0x8000)
+			m_flags |= F_V;
+		store = fn != 0x27;
+		break;
+	case 0x2f:
+		r = d & s;
+		m_flags &= ~(F_C | F_V);
+		break;
+	case 0x37:
+		r = d | s;
+		m_flags &= ~(F_C | F_V);
+		break;
+	case 0x3f:
+		r = d ^ s;
+		m_flags &= ~(F_C | F_V);
+		break;
+	default:
+		unimplemented(op);
+		return;
+	}
+	set_nz(r);
+	if (store)
+		m_s[b] = r;
+}
+
+void jaleco_fpu_device::op_muldiv(u32 op)
+{
+	unsigned const fn = (op >> 10) & 0x3f;
+	unsigned const a = (op >> 6) & 0xf;
+	unsigned const b = op & 0xf;
+
+	switch (fn)
+	{
+	case 0x1c: case 0x1d: case 0x1e:
+	{
+		s64 r = s64(s16(m_s[b])) * s64(m_s[a]);
+		if (!BIT(m_sign, a))
+			r = -r;
+		m_s[b] = u64(r) >> 16;
+		m_s[0xd] = r;
+		set_nz(m_s[b]);
+		break;
+	}
+	case 0x17:
+	{
+		s32 const r = s32(s16(m_s[b])) * s32(s16(m_s[a]));
+		m_s[b] = u32(r) >> 16;
+		m_s[0xd] = r;
+		set_nz(m_s[b]);
+		break;
+	}
+	case 0x07:
+		set_nz(m_s[b]);
+		break;
+	case 0x27:
+	{
+		// on overflow and divide by zero the quotient saturates: the program
+		// consumes results with no V check and clamps only one side (22c-231),
+		// and the perspective divide at 2df overflows routinely in-game.
+		u32 const dividend = (u32(m_s[b]) << 16) | m_s[0xd];
+		u16 const divisor = m_s[a];
+		if (!divisor || (dividend / divisor) > 0xffff)
+		{
+			LOGUNIMPL("%03x: unsigned divide %s\n", m_ppc, divisor ? "overflow" : "by zero");
+			m_flags |= F_V;
+			m_s[0xd] = 0xffff;
+			set_nz(m_s[0xd]);
+			break;
+		}
+		m_s[0xd] = dividend / divisor;
+		m_s[b] = dividend % divisor;
+		set_nz(m_s[0xd]);
+		break;
+	}
+	case 0x2f:
+	{
+		s64 const dividend = s32((u32(m_s[b]) << 16) | m_s[0xd]);
+		s16 const divisor = s16(m_s[a]);
+		s64 const quotient = divisor ? dividend / divisor : (dividend < 0 ? -0x8000 : 0x7fff);
+		if (!divisor || (quotient < -0x8000) || (quotient > 0x7fff))
+		{
+			LOGUNIMPL("%03x: signed divide %s\n", m_ppc, divisor ? "overflow" : "by zero");
+			m_flags |= F_V;
+			m_s[0xd] = (quotient < 0) ? 0x8000 : 0x7fff;
+			set_nz(m_s[0xd]);
+			break;
+		}
+		m_s[0xd] = quotient;
+		m_s[b] = dividend % divisor;
+		set_nz(m_s[0xd]);
+		break;
+	}
+	default:
+		unimplemented(op);
+		break;
+	}
+}
+
+void jaleco_fpu_device::op_move(u32 op)
+{
+	unsigned const fn = (op >> 10) & 0x3f;
+	unsigned const a = (op >> 6) & 0xf;
+	unsigned const b = op & 0xf;
+
+	switch (fn)
+	{
+	case 0x3f: case 0x3c: case 0x3d: case 0x3e:
+		m_s[b] = m_s[a];
+		set_nz(m_s[b]);
+		break;
+	case 0x07:
+	{
+		u16 const v = m_s[a];
+		m_s[b] = v + 1;
+		set_nz(m_s[b]);
+		m_flags &= ~(F_C | F_V);
+		if (v == 0xffff)
+			m_flags |= F_C;
+		if (v == 0x7fff)
+			m_flags |= F_V;
+		break;
+	}
+	case 0x0f:
+	{
+		u16 const v = m_s[a];
+		m_s[b] = v - 1;
+		set_nz(m_s[b]);
+		m_flags &= ~(F_C | F_V);
+		if (v == 0)
+			m_flags |= F_C;
+		if (v == 0x8000)
+			m_flags |= F_V;
+		break;
+	}
+	case 0x17:
+		m_s[b] = -m_s[a];
+		set_nz(m_s[b]);
+		break;
+	case 0x1f:
+	{
+		u16 const v = m_s[a];
+		m_s[b] = BIT(v, 15) ? -v : v;
+		set_nz(m_s[b]);
+		// N reflects the input being positive; matches the host ROM's projected Y table
+		m_flags = (m_flags & ~F_N) | ((s16(v) > 0) ? F_N : 0);
+		break;
+	}
+	case 0x27:
+		m_s[b] = ~m_s[a];
+		set_nz(m_s[b]);
+		break;
+	default:
+		unimplemented(op);
+		break;
+	}
+}
+
+void jaleco_fpu_device::op_shift(u32 op)
+{
+	unsigned const fn = (op >> 10) & 0x3f;
+	unsigned const a = (op >> 6) & 0xf;
+	unsigned const b = op & 0xf;
+
+	u16 const v = m_s[a];
+	bool const cin = m_flags & F_C;
+	bool cout;
+	u16 r;
+	switch (fn)
+	{
+	case 0x07: cout = BIT(v, 15); r = v << 1; break;
+	case 0x0f: cout = BIT(v, 0); r = v >> 1; break;
+	case 0x1f: cout = BIT(v, 0); r = u16(s16(v) >> 1); break;
+	case 0x37: cout = BIT(v, 15); r = (v << 1) | (cin ? 1 : 0); break;
+	case 0x3f: cout = BIT(v, 0); r = (v >> 1) | (cin ? 0x8000 : 0); break;
+	default:
+		unimplemented(op);
+		return;
+	}
+	m_s[b] = r;
+	m_flags &= ~F_C;
+	if (cout)
+		m_flags |= F_C;
+	set_nz(r);
+}
+
+void jaleco_fpu_device::op_group(u32 op)
+{
+	unsigned const fn = (op >> 10) & 0x3f;
+	u8 const mask = (op >> 4) & 0x3f;
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (!BIT(mask, i))
+			continue;
+		u8 const r = GROUP_REG[i];
+		switch (fn)
+		{
+		case 0x1e: case 0x1f:
+			m_sign &= ~(1 << r);
+			break;
+		case 0x2d:
+			m_sign = (m_sign & ~(1 << r)) | ((m_flags & F_N) ? (1 << r) : 0);
+			break;
+		case 0x3a:
+			if (m_flags & F_C)
+				m_s[r] = 0xffff;
+			break;
+		default:
+			unimplemented(op);
+			return;
+		}
+	}
+}
+
+void jaleco_fpu_device::op_branch(u32 op)
+{
+	unsigned const fn = (op >> 10) & 0x3f;
+	unsigned const code = fn & 0xf;
+	bool const sense = BIT(fn, 4);
+	bool const delay = BIT(fn, 5);
+	u16 target = op & 0x3ff;
+	bool taken;
+
+	if (code == 0x7)
+	{
+		if (sense)
+		{
+			if (m_sp >= std::size(m_stack))
+				LOGUNIMPL("%03x: stack overflow\n", m_ppc);
+			else
+				m_stack[m_sp++] = (m_ppc + (delay ? 2 : 1)) & 0x3ff;
+		}
+		else
+		{
+			if (!m_sp)
+				LOGUNIMPL("%03x: stack underflow\n", m_ppc);
+			else
+				target = m_stack[--m_sp];
+		}
+		taken = true;
+	}
+	else
+	{
+		taken = condition(code) == sense;
+	}
+
+	if (taken)
+	{
+		if (delay)
+		{
+			m_delay = true;
+			m_delay_target = target;
+		}
+		else
+		{
+			m_pc = target;
+		}
+	}
+}
+
 void jaleco_fpu_device::execute_one(u32 op)
 {
 	unsigned const opc = op >> 16;
@@ -309,199 +596,20 @@ void jaleco_fpu_device::execute_one(u32 op)
 		break;
 
 	case 0x8:
-	{
-		u32 const d = m_s[b];
-		u32 const s = m_s[a];
-		u32 const cin = (m_flags & F_C) ? 1 : 0;
-		u32 r;
-		bool store = true;
-		switch (fn)
-		{
-		case 0x07: case 0x0f:
-			r = d + s + (fn == 0x0f ? cin : 0);
-			m_flags &= ~(F_C | F_V);
-			if (r & 0x10000)
-				m_flags |= F_C;
-			if ((d ^ r) & (s ^ r) & 0x8000)
-				m_flags |= F_V;
-			break;
-		case 0x17: case 0x1f: case 0x27:
-			r = d - s - (fn == 0x1f ? cin : 0);
-			m_flags &= ~(F_C | F_V);
-			if (r & 0x10000)
-				m_flags |= F_C;
-			if ((d ^ s) & (d ^ r) & 0x8000)
-				m_flags |= F_V;
-			store = fn != 0x27;
-			break;
-		case 0x2f:
-			r = d & s;
-			m_flags &= ~(F_C | F_V);
-			break;
-		case 0x37:
-			r = d | s;
-			m_flags &= ~(F_C | F_V);
-			break;
-		case 0x3f:
-			r = d ^ s;
-			m_flags &= ~(F_C | F_V);
-			break;
-		default:
-			unimplemented(op);
-			return;
-		}
-		set_nz(r);
-		if (store)
-			m_s[b] = r;
+		op_alu(op);
 		break;
-	}
 
 	case 0x9:
-		switch (fn)
-		{
-		case 0x1c: case 0x1d: case 0x1e:
-		{
-			s64 r = s64(s16(m_s[b])) * s64(m_s[a]);
-			if (!BIT(m_sign, a))
-				r = -r;
-			m_s[b] = u64(r) >> 16;
-			m_s[0xd] = r;
-			set_nz(m_s[b]);
-			break;
-		}
-		case 0x17:
-		{
-			s32 const r = s32(s16(m_s[b])) * s32(s16(m_s[a]));
-			m_s[b] = u32(r) >> 16;
-			m_s[0xd] = r;
-			set_nz(m_s[b]);
-			break;
-		}
-		case 0x07:
-			set_nz(m_s[b]);
-			break;
-		case 0x27:
-		{
-			// on overflow and divide by zero the quotient saturates: the program
-			// consumes results with no V check and clamps only one side (22c-231),
-			// and the perspective divide at 2df overflows routinely in-game.
-			u32 const dividend = (u32(m_s[b]) << 16) | m_s[0xd];
-			u16 const divisor = m_s[a];
-			if (!divisor || (dividend / divisor) > 0xffff)
-			{
-				LOGUNIMPL("%03x: unsigned divide %s\n", m_ppc, divisor ? "overflow" : "by zero");
-				m_flags |= F_V;
-				m_s[0xd] = 0xffff;
-				set_nz(m_s[0xd]);
-				break;
-			}
-			m_s[0xd] = dividend / divisor;
-			m_s[b] = dividend % divisor;
-			set_nz(m_s[0xd]);
-			break;
-		}
-		case 0x2f:
-		{
-			s64 const dividend = s32((u32(m_s[b]) << 16) | m_s[0xd]);
-			s16 const divisor = s16(m_s[a]);
-			s64 const quotient = divisor ? dividend / divisor : (dividend < 0 ? -0x8000 : 0x7fff);
-			if (!divisor || (quotient < -0x8000) || (quotient > 0x7fff))
-			{
-				LOGUNIMPL("%03x: signed divide %s\n", m_ppc, divisor ? "overflow" : "by zero");
-				m_flags |= F_V;
-				m_s[0xd] = (quotient < 0) ? 0x8000 : 0x7fff;
-				set_nz(m_s[0xd]);
-				break;
-			}
-			m_s[0xd] = quotient;
-			m_s[b] = dividend % divisor;
-			set_nz(m_s[0xd]);
-			break;
-		}
-		default:
-			unimplemented(op);
-			break;
-		}
+		op_muldiv(op);
 		break;
 
 	case 0xa:
-		switch (fn)
-		{
-		case 0x3f: case 0x3c: case 0x3d: case 0x3e:
-			m_s[b] = m_s[a];
-			set_nz(m_s[b]);
-			break;
-		case 0x07:
-		{
-			u16 const v = m_s[a];
-			m_s[b] = v + 1;
-			set_nz(m_s[b]);
-			m_flags &= ~(F_C | F_V);
-			if (v == 0xffff)
-				m_flags |= F_C;
-			if (v == 0x7fff)
-				m_flags |= F_V;
-			break;
-		}
-		case 0x0f:
-		{
-			u16 const v = m_s[a];
-			m_s[b] = v - 1;
-			set_nz(m_s[b]);
-			m_flags &= ~(F_C | F_V);
-			if (v == 0)
-				m_flags |= F_C;
-			if (v == 0x8000)
-				m_flags |= F_V;
-			break;
-		}
-		case 0x17:
-			m_s[b] = -m_s[a];
-			set_nz(m_s[b]);
-			break;
-		case 0x1f:
-		{
-			u16 const v = m_s[a];
-			m_s[b] = BIT(v, 15) ? -v : v;
-			set_nz(m_s[b]);
-			// N reflects the input being positive; matches the host ROM's projected Y table
-			m_flags = (m_flags & ~F_N) | ((s16(v) > 0) ? F_N : 0);
-			break;
-		}
-		case 0x27:
-			m_s[b] = ~m_s[a];
-			set_nz(m_s[b]);
-			break;
-		default:
-			unimplemented(op);
-			break;
-		}
+		op_move(op);
 		break;
 
 	case 0xb:
-	{
-		u16 const v = m_s[a];
-		bool const cin = m_flags & F_C;
-		bool cout;
-		u16 r;
-		switch (fn)
-		{
-		case 0x07: cout = BIT(v, 15); r = v << 1; break;
-		case 0x0f: cout = BIT(v, 0); r = v >> 1; break;
-		case 0x1f: cout = BIT(v, 0); r = u16(s16(v) >> 1); break;
-		case 0x37: cout = BIT(v, 15); r = (v << 1) | (cin ? 1 : 0); break;
-		case 0x3f: cout = BIT(v, 0); r = (v >> 1) | (cin ? 0x8000 : 0); break;
-		default:
-			unimplemented(op);
-			return;
-		}
-		m_s[b] = r;
-		m_flags &= ~F_C;
-		if (cout)
-			m_flags |= F_C;
-		set_nz(r);
+		op_shift(op);
 		break;
-	}
 
 	case 0xc:
 	{
@@ -514,32 +622,8 @@ void jaleco_fpu_device::execute_one(u32 op)
 	}
 
 	case 0xd:
-	{
-		u8 const mask = (arg >> 4) & 0x3f;
-		for (int i = 0; i < 6; i++)
-		{
-			if (!BIT(mask, i))
-				continue;
-			u8 const r = GROUP_REG[i];
-			switch (fn)
-			{
-			case 0x1e: case 0x1f:
-				m_sign &= ~(1 << r);
-				break;
-			case 0x2d:
-				m_sign = (m_sign & ~(1 << r)) | ((m_flags & F_N) ? (1 << r) : 0);
-				break;
-			case 0x3a:
-				if (m_flags & F_C)
-					m_s[r] = 0xffff;
-				break;
-			default:
-				unimplemented(op);
-				return;
-			}
-		}
+		op_group(op);
 		break;
-	}
 
 	case 0xe:
 		if (arg == CTL_HALT)
@@ -552,50 +636,8 @@ void jaleco_fpu_device::execute_one(u32 op)
 		break;
 
 	case 0xf:
-	{
-		unsigned const code = fn & 0xf;
-		bool const sense = BIT(fn, 4);
-		bool const delay = BIT(fn, 5);
-		u16 target = arg & 0x3ff;
-		bool taken;
-
-		if (code == 0x7)
-		{
-			if (sense)
-			{
-				if (m_sp >= std::size(m_stack))
-					LOGUNIMPL("%03x: stack overflow\n", m_ppc);
-				else
-					m_stack[m_sp++] = (m_ppc + (delay ? 2 : 1)) & 0x3ff;
-			}
-			else
-			{
-				if (!m_sp)
-					LOGUNIMPL("%03x: stack underflow\n", m_ppc);
-				else
-					target = m_stack[--m_sp];
-			}
-			taken = true;
-		}
-		else
-		{
-			taken = condition(code) == sense;
-		}
-
-		if (taken)
-		{
-			if (delay)
-			{
-				m_delay = true;
-				m_delay_target = target;
-			}
-			else
-			{
-				m_pc = target;
-			}
-		}
+		op_branch(op);
 		break;
-	}
 	}
 }
 

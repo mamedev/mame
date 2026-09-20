@@ -4,7 +4,7 @@
 // Jaleco "FPU" math coprocessor disassembler
 
 #include "emu.h"
-#include "jalfpud.h"
+#include "jalfpu_dasm.h"
 
 namespace {
 

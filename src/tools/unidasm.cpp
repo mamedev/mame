@@ -85,7 +85,7 @@ using util::BIT;
 #include "cpu/ie15/ie15dasm.h"
 #include "cpu/interdata16/dasm16.h"
 #include "cpu/jaguar/jagdasm.h"
-#include "cpu/jalfpu/jalfpud.h"
+#include "cpu/jalfpu/jalfpu_dasm.h"
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"

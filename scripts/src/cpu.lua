@@ -396,8 +396,8 @@ if CPUS["JALFPU"] then
 end
 
 if opt_tool(CPUS, "JALFPU") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpud.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpud.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu_dasm.h")
 end
 
 --------------------------------------------------

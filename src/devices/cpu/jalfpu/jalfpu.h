@@ -73,13 +73,19 @@ private:
 	void host_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 host_data_r(offs_t offset);
 	void host_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u32 host_prg_r(offs_t offset);
-	void host_prg_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 host_prg_r(offs_t offset);
+	void host_prg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_nz(u16 v);
 	bool condition(u8 code);
 	u16 mem_addr(u8 mode, u8 base);
 	void unimplemented(u32 op);
+	void op_alu(u32 op);
+	void op_muldiv(u32 op);
+	void op_move(u32 op);
+	void op_shift(u32 op);
+	void op_group(u32 op);
+	void op_branch(u32 op);
 	void execute_one(u32 op);
 };
 
