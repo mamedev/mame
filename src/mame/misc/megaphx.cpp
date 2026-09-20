@@ -18,7 +18,7 @@ suggesting they share a common codebase.
 
 PIC16C54 info:
 - The PIC has 5 functions:
-  * Read dip switches (serially connected) [cmd 0x82 0x86]
+  * Read DIP switches (serially connected) [cmd 0x82 0x86]
   * Read the two start buttons [returned with all commands]
   * Provide 4 security codes. For the dumped PIC those are:
     0x4a 0x6f 0x61 0x6e (Joan). Not used by Mega Phoenix. [cmd 0x8a 0x8e 0x92 0x96]
@@ -38,7 +38,7 @@ TODO:
   to access this because it's a daisy chain setup with the CTC?
 - even if I hack that the title screen speech doesn't work properly - is there a timing register like Little Robin?
 - Verify when m_ppi_to_pic_command is set and cleared. It's currently guessed but seems to work fine this way.
-- After The War dip switches are wrong.
+- After The War DIP switches are wrong.
 
 ----------------------------------------
 
@@ -54,7 +54,7 @@ Main board:
 
   Actel A1010A-PL68C  (custom blitter maybe?)
 
-  2x 8 DSW, bottom corner, away from everything..
+  2x 8 DIP switches, bottom corner, away from everything..
 
 Sub / Sound board:
 
@@ -166,13 +166,13 @@ Sub / Sound board:
 
 #include "emu.h"
 
+#include "inder_sb.h"
+#include "inder_vid.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/74166.h"
 #include "machine/i8255.h"
-
-#include "inder_sb.h"
-#include "inder_vid.h"
 
 namespace {
 
@@ -191,8 +191,8 @@ public:
 		m_start(*this, "START")
 	{ }
 
-	void megaphx(machine_config &config);
-	void hamboy(machine_config &config);
+	void megaphx(machine_config &config) ATTR_COLD;
+	void hamboy(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -220,6 +220,7 @@ private:
 
 	void install_bootrom(bool enable);
 	TIMER_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+
 	emu_timer *m_disable_bootrom = nullptr;
 
 	int m_dsw_data = 0;
@@ -437,10 +438,10 @@ void megaphx_state::pic_porta_w(uint8_t data)
 // -6------   w  watchdog (not enabled by megaphx)
 // --5-----  r   start2
 // ---4----  r   start1
-// ----3---   w  dsw clock
-// -----2--   w  dsw shift/load
-// ------1-  r   dip switch data
-// -------0  r   ppi to PIC command incoming
+// ----3---   w  DIP switch clock
+// -----2--   w  DIP switch shift/load
+// ------1-  r   DIP switch data
+// -------0  r   PPI to PIC command incoming
 
 uint8_t megaphx_state::pic_portb_r()
 {
@@ -463,13 +464,13 @@ void megaphx_state::pic_portb_w(uint8_t data)
 
 // ppi port c
 //
-// 7-------   w  ppi to PIC clock
-// -6------   w  ppi to PIC data
+// 7-------   w  PPI to PIC clock
+// -6------   w  PPI to PIC data
 // --5-----   w  unknown
-// ---4----   w  ppi to PIC command
-// ----3---  r   PIC to ppi clock
+// ---4----   w  PPI to PIC command
+// ----3---  r   PIC to PPI clock
 // -----2--  r   unknown
-// ------1-  r   PIC to ppi data
+// ------1-  r   PIC to PPI data
 // -------0  r   unknown
 
 uint8_t megaphx_state::ppi_portc_r()
@@ -535,7 +536,7 @@ void megaphx_state::hamboy(machine_config &config)
 }
 
 
-ROM_START( aftertwar )
+ROM_START( afterwar )
 	ROM_REGION16_BE( 0x40000, "boot", 0 )
 	ROM_LOAD16_BYTE( "aw.u32", 0x00001, 0x20000, CRC(b99703d4) SHA1(393b6869e71d4c61060e66e0e9e36a1e6ca345d1) )
 	ROM_LOAD16_BYTE( "aw.u21", 0x00000, 0x20000, CRC(f11e7449) SHA1(1017142d10011d68e49d3ccdb1ac4e815c03b17a) )
@@ -672,9 +673,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, aftertwar, 0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After The War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, megaphx,   0, megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hamboy,    0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, afterwar, 0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After the War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, megaphx,  0, megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hamboy,   0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // This game would later become Little Robin, although this early version has significant design differences. The game has no music, verified to be the same as the real hardware.
 GAME( 1992, yoyospel, littlerb, megaphx, yoyospel, megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
