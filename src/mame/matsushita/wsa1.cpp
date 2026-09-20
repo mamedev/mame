@@ -52,19 +52,113 @@
 
 #include "wsa1r_cpanel.h"
 
+#include "bus/midi/midi.h"
 #include "cpu/tlcs900/tmp95c061.h"
 #include "imagedev/floppy.h"
 #include "machine/eepromser.h"
 #include "machine/upd765.h"
 #include "video/sed1330.h"
 
+#include "diserial.h"
 #include "emupal.h"
 #include "screen.h"
 
 
+// A byte/bit shim between the TMP95C061's serial channel 0 and MAME's
+// bit-serial MIDI ports: 31250 baud, 8N1, with a small transmit ring so a
+// burst from the firmware is not lost between stop bits.
+class wsa1_midi_uart_device : public device_t, public device_serial_interface
+{
+public:
+	wsa1_midi_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto rx_cb() { return m_rx_cb.bind(); }   // each received MIDI byte
+	auto tx_cb() { return m_tx_cb.bind(); }   // each transmitted bit
+
+	void tx_byte(uint8_t data);
+	void rx_line_w(int state) { rx_w(state); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void rcv_complete() override
+	{
+		receive_register_extract();
+		m_rx_cb(get_received_char());
+	}
+	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
+	virtual void tra_complete() override { start_next_tx(); }
+
+private:
+	void start_next_tx();
+
+	static constexpr unsigned TX_FIFO = 256;   // power of two
+
+	devcb_write8      m_rx_cb;
+	devcb_write_line  m_tx_cb;
+	uint8_t           m_tx_ring[TX_FIFO];
+	unsigned          m_tx_head = 0;
+	unsigned          m_tx_tail = 0;
+	bool              m_tx_busy = false;
+};
+
+DEFINE_DEVICE_TYPE(WSA1_MIDI_UART, wsa1_midi_uart_device, "wsa1_midi_uart", "SX-WSA1R MIDI UART")
+
+wsa1_midi_uart_device::wsa1_midi_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, WSA1_MIDI_UART, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	m_rx_cb(*this),
+	m_tx_cb(*this)
+{
+}
+
+void wsa1_midi_uart_device::device_start()
+{
+	save_item(NAME(m_tx_ring));
+	save_item(NAME(m_tx_head));
+	save_item(NAME(m_tx_tail));
+	save_item(NAME(m_tx_busy));
+}
+
+void wsa1_midi_uart_device::device_reset()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
+	transmit_register_reset();
+	receive_register_reset();
+	m_tx_head = m_tx_tail = 0;
+	m_tx_busy = false;
+	m_tx_cb(1);                                // TXD idles high
+}
+
+void wsa1_midi_uart_device::tx_byte(uint8_t data)
+{
+	unsigned const next = (m_tx_head + 1) & (TX_FIFO - 1);
+	if (next != m_tx_tail)                     // drop on overflow rather than corrupt
+	{
+		m_tx_ring[m_tx_head] = data;
+		m_tx_head = next;
+	}
+	if (!m_tx_busy)
+		start_next_tx();
+}
+
+void wsa1_midi_uart_device::start_next_tx()
+{
+	if (m_tx_head == m_tx_tail)
+	{
+		m_tx_busy = false;
+		return;
+	}
+	m_tx_busy = true;
+	uint8_t const b = m_tx_ring[m_tx_tail];
+	m_tx_tail = (m_tx_tail + 1) & (TX_FIFO - 1);
+	transmit_register_setup(b);
+}
+
 
 namespace {
-
 class wsa1_state : public driver_device
 {
 public:
@@ -76,6 +170,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_eeprom(*this, "eeprom")
 		, m_cpanel(*this, "cpanel")
+		, m_midi_uart(*this, "midi_uart")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -87,6 +182,9 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<wsa1r_cpanel_device> m_cpanel;
+	required_device<wsa1_midi_uart_device> m_midi_uart;
+
+	void midi1_rx(uint8_t data) { m_cpu1->sc0_rxd(data); }
 
 	uint8_t m_cpu1_p8 = 0;
 	uint8_t m_cpu1_pb = 0;
@@ -281,6 +379,17 @@ void wsa1_state::wsa1r(machine_config &config)
 	m_cpanel->busy().set([this] (int state) { m_panel_busy = state; });
 	m_cpanel->sclk().set([this] (int state) { m_panel_sclk = state; });
 	m_cpanel->rxd().set([this] (uint8_t data) { m_cpu1->sc1_rxd(data); });
+
+	// The rear MIDI1 jack, on CPU 1's serial channel 0.
+	WSA1_MIDI_UART(config, m_midi_uart, 0);
+	m_midi_uart->rx_cb().set(FUNC(wsa1_state::midi1_rx));
+	m_cpu1->sc0_txd().set(m_midi_uart, FUNC(wsa1_midi_uart_device::tx_byte));
+
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(
+			m_midi_uart, FUNC(wsa1_midi_uart_device::rx_line_w));
+	auto &mdout(MIDI_PORT(config, "mdout"));
+	midiout_slot(mdout);
+	m_midi_uart->tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
 }
 
 
