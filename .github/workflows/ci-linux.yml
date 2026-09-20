@@ -23,11 +23,16 @@ on:
 permissions:
   contents: read
 
+env:
+  CLANG_SOLUTION_DIR: build/projects/sdl/mame/gmake-linux-clang
+  CLANG_DRIVER_ARCHIVE_DIR: build/linux_clang/bin/x64/Release/mame_mame
+  CLANG_TIMING_DIR: build/ci-project-timings
+
 jobs:
   build-linux:
     strategy:
       matrix:
-        compiler: [gcc, clang]
+        compiler: [gcc]
         include:
           - compiler: gcc
             cc: gcc
@@ -35,11 +40,6 @@ jobs:
             archopts: -U_FORTIFY_SOURCE
             subtarget: tiny
             executable: mametiny
-          - compiler: clang
-            cc: clang
-            cxx: clang++
-            subtarget: mame
-            executable: mame
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
@@ -48,10 +48,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
-    - name: Install clang
-      if: matrix.compiler == 'clang'
-      run: sudo apt-get install -y clang
+        sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools
     - name: Build
       env:
         OVERRIDE_CC: ${{ matrix.cc }}
@@ -59,30 +56,7 @@ jobs:
         ARCHOPTS: ${{ matrix.archopts }}
         SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
-      run: |
-        if [ "${{ matrix.compiler }}" = "clang" ]; then
-          export MAME_PROJECT_TIMING_DIR="$PWD/build/ci-project-timings"
-          mkdir -p "$MAME_PROJECT_TIMING_DIR"
-        fi
-        make -j3
-    - name: Summarize project timings
-      if: matrix.compiler == 'clang'
-      run: |
-        python scripts/build/summarize_project_timings.py \
-          --input-dir build/ci-project-timings \
-          --csv build/ci-project-timings.csv \
-          --markdown build/ci-project-timings.md
-        cat build/ci-project-timings.md >> "$GITHUB_STEP_SUMMARY"
-    - name: Upload project timings
-      if: matrix.compiler == 'clang'
-      uses: actions/upload-artifact@main
-      with:
-        name: mame-linux-clang-project-timings-${{ github.sha }}
-        path: |
-          build/ci-project-timings.csv
-          build/ci-project-timings.md
-          build/ci-project-timings/*.timing
-        if-no-files-found: error
+      run: make -j3
     - name: Validate
       run: ./${{ matrix.executable }} -validate
     - name: Reconcile driver list
@@ -94,6 +68,199 @@ jobs:
         name: ${{ matrix.executable }}-linux-${{ matrix.compiler }}-${{ github.sha }}
         path: |
           ${{ matrix.executable }}
+          chdman
+          unidasm
+        if-no-files-found: error
+
+  build-linux-clang-base:
+    name: build-linux (clang base)
+    runs-on: ubuntu-latest
+    env:
+      OVERRIDE_CC: clang
+      OVERRIDE_CXX: clang++
+      SUBTARGET: mame
+      TOOLS: 1
+      PRECOMPILE: 0
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
+    - name: Build base projects
+      run: |
+        set -euo pipefail
+        make -j3 generate
+        make "$CLANG_SOLUTION_DIR/Makefile"
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          validate "$CLANG_SOLUTION_DIR/Makefile"
+        export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
+        mkdir -p "$MAME_PROJECT_TIMING_DIR"
+        python scripts/build/instrument_solution_makefile.py \
+          "$CLANG_SOLUTION_DIR/Makefile"
+        projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
+          list "$CLANG_SOLUTION_DIR/Makefile" --group base)"
+        make -j3 -C "$CLANG_SOLUTION_DIR" config=release64 $projects
+    - name: Stage base artifacts
+      run: |
+        set -euo pipefail
+        artifact_root=build/ci-linux-clang-base-artifact
+        mkdir -p "$artifact_root"
+        find build/linux_clang/bin/x64/Release -type f -name '*.a' \
+          -exec cp --parents '{}' "$artifact_root" \;
+        test -x chdman
+        test -x unidasm
+        cp --parents chdman unidasm "$artifact_root"
+        cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
+    - name: Upload base artifacts
+      uses: actions/upload-artifact@main
+      with:
+        name: mame-linux-clang-shard-base-${{ github.sha }}
+        path: build/ci-linux-clang-base-artifact/
+        if-no-files-found: error
+
+  build-linux-clang-drivers:
+    name: build-linux (clang ${{ matrix.bucket }})
+    strategy:
+      fail-fast: false
+      matrix:
+        bucket:
+        - driver-1
+        - driver-2
+        - driver-3
+        - driver-4
+        - driver-5
+        - driver-6
+        - driver-7
+        - driver-8
+    runs-on: ubuntu-latest
+    env:
+      OVERRIDE_CC: clang
+      OVERRIDE_CXX: clang++
+      SUBTARGET: mame
+      TOOLS: 1
+      PRECOMPILE: 0
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
+    - name: Build driver bucket
+      run: |
+        set -euo pipefail
+        make -j3 generate
+        make "$CLANG_SOLUTION_DIR/Makefile"
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          validate "$CLANG_SOLUTION_DIR/Makefile"
+        export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
+        mkdir -p "$MAME_PROJECT_TIMING_DIR"
+        python scripts/build/instrument_solution_makefile.py \
+          "$CLANG_SOLUTION_DIR/Makefile"
+        projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
+          list "$CLANG_SOLUTION_DIR/Makefile" --group "${{ matrix.bucket }}")"
+        make -j3 -C "$CLANG_SOLUTION_DIR" config=release64 $projects
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          verify-archives "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --archive-dir "$CLANG_DRIVER_ARCHIVE_DIR"
+    - name: Stage driver artifacts
+      run: |
+        set -euo pipefail
+        artifact_root=build/ci-linux-clang-${{ matrix.bucket }}-artifact
+        mkdir -p "$artifact_root"
+        projects="$(python scripts/build/ci_linux_clang_driver_buckets.py \
+          list "$CLANG_SOLUTION_DIR/Makefile" --group "${{ matrix.bucket }}")"
+        for project in $projects; do
+          cp --parents "$CLANG_DRIVER_ARCHIVE_DIR/lib${project}.a" \
+            "$artifact_root"
+        done
+        cp --parents "$CLANG_TIMING_DIR"/*.timing "$artifact_root"
+    - name: Upload driver artifacts
+      uses: actions/upload-artifact@main
+      with:
+        name: mame-linux-clang-shard-${{ matrix.bucket }}-${{ github.sha }}
+        path: build/ci-linux-clang-${{ matrix.bucket }}-artifact/
+        if-no-files-found: error
+
+  build-linux-clang:
+    name: build-linux (clang)
+    needs:
+    - build-linux-clang-base
+    - build-linux-clang-drivers
+    runs-on: ubuntu-latest
+    env:
+      OVERRIDE_CC: clang
+      OVERRIDE_CXX: clang++
+      SUBTARGET: mame
+      TOOLS: 1
+      PRECOMPILE: 0
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
+    - name: Generate build files
+      run: |
+        set -euo pipefail
+        make -j3 generate
+        make "$CLANG_SOLUTION_DIR/Makefile"
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          validate "$CLANG_SOLUTION_DIR/Makefile"
+    - name: Download shard artifacts
+      uses: actions/download-artifact@main
+      with:
+        pattern: mame-linux-clang-shard-*-${{ github.sha }}
+        path: .
+        merge-multiple: true
+    - name: Link MAME
+      run: |
+        set -euo pipefail
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          verify-archives "$CLANG_SOLUTION_DIR/Makefile" --group all \
+          --archive-dir "$CLANG_DRIVER_ARCHIVE_DIR"
+        chmod +x chdman unidasm
+        test -x chdman
+        test -x unidasm
+        export MAME_PROJECT_TIMING_DIR="$PWD/$CLANG_TIMING_DIR"
+        mkdir -p "$MAME_PROJECT_TIMING_DIR"
+        /usr/bin/time -a -f '%e %U %S %M %x' \
+          -o "$MAME_PROJECT_TIMING_DIR/mame.timing" \
+          make -j3 -C "$CLANG_SOLUTION_DIR" -f mame.make config=release64
+    - name: Summarize project timings
+      run: |
+        python scripts/build/summarize_project_timings.py \
+          --input-dir "$CLANG_TIMING_DIR" \
+          --csv build/ci-project-timings.csv \
+          --markdown build/ci-project-timings.md
+        cat build/ci-project-timings.md >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload project timings
+      uses: actions/upload-artifact@main
+      with:
+        name: mame-linux-clang-project-timings-${{ github.sha }}
+        path: |
+          build/ci-project-timings.csv
+          build/ci-project-timings.md
+          build/ci-project-timings/*.timing
+        if-no-files-found: error
+    - name: Validate
+      run: ./mame -validate
+    - name: Reconcile driver list
+      run: ./mame -listxml | python scripts/build/makedep.py reconcilelist -l src/mame/mame.lst -
+    - name: ORM check
+      run: python scripts/minimaws/minimaws.py load --executable ./mame --softwarepath hash
+    - uses: actions/upload-artifact@main
+      with:
+        name: mame-linux-clang-${{ github.sha }}
+        path: |
+          mame
           chdman
           unidasm
         if-no-files-found: error
