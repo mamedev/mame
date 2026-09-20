@@ -52,6 +52,7 @@
 
 #include "cpu/tlcs900/tmp95c061.h"
 #include "imagedev/floppy.h"
+#include "machine/eepromser.h"
 #include "machine/upd765.h"
 #include "video/sed1330.h"
 
@@ -71,6 +72,7 @@ public:
 		, m_cpu2(*this, "cpu2")
 		, m_lcdc(*this, "lcdc")
 		, m_fdc(*this, "fdc")
+		, m_eeprom(*this, "eeprom")
 	{ }
 
 	void wsa1r(machine_config &config);
@@ -80,6 +82,11 @@ private:
 	required_device<tmp95c061_device> m_cpu2;
 	required_device<sed1330_device> m_lcdc;
 	required_device<upd765a_device> m_fdc;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+
+	void cpu2_p6_w(uint8_t data);
+	uint8_t cpu2_p8_r();
+	void cpu2_p8_w(uint8_t data);
 
 	void palette_init(palette_device &palette) ATTR_COLD;
 
@@ -87,6 +94,27 @@ private:
 	void cpu2_map(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
 };
+
+
+// The calibration EEPROM is bit-banged from CPU 2: P6.5 is chip select, P8.4
+// data in, P8.3 clock, P8.5 data out.  64 x 16 with a 6-bit address, so a
+// 93C46 class part; the identification is from the protocol at prom_c
+// EepromBitbangProtocol, not from a part number, and the device itself is not dumped.
+void wsa1_state::cpu2_p6_w(uint8_t data)
+{
+	m_eeprom->cs_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+uint8_t wsa1_state::cpu2_p8_r()
+{
+	return m_eeprom->do_read() << 5;
+}
+
+void wsa1_state::cpu2_p8_w(uint8_t data)
+{
+	m_eeprom->di_write(BIT(data, 4));
+	m_eeprom->clk_write(BIT(data, 3));
+}
 
 
 void wsa1_state::palette_init(palette_device &palette)
@@ -166,6 +194,9 @@ void wsa1_state::wsa1r(machine_config &config)
 
 	TMP95C061(config, m_cpu2, 28_MHz_XTAL);
 	m_cpu2->set_addrmap(AS_PROGRAM, &wsa1_state::cpu2_map);
+	m_cpu2->port6_write().set(FUNC(wsa1_state::cpu2_p6_w));
+	m_cpu2->port8_read().set(FUNC(wsa1_state::cpu2_p8_r));
+	m_cpu2->port8_write().set(FUNC(wsa1_state::cpu2_p8_w));
 
 	auto &palette = PALETTE(config, "palette", FUNC(wsa1_state::palette_init), 2);
 
@@ -190,6 +221,8 @@ void wsa1_state::wsa1r(machine_config &config)
 	// to the gap lengths.  Untested against real media -- no disk is dumped.
 	FLOPPY_CONNECTOR(config, "fdc:0", wsa1_floppies, "35hd",
 		floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
 }
 
 
