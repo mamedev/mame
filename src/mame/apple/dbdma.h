@@ -24,6 +24,15 @@ public:
 	auto dma_r() { return m_read_dma.bind(); }
 	auto dma_w() { return m_write_dma.bind(); }
 
+	// Record boundaries for devices that move packets.  dma_w's mem_mask has the
+	// byte lanes that carry data: it's only short when the channel program runs
+	// out in the middle of a word.  EOF is asserted around the final transfer of
+	// an OUTPUT_LAST.  For input the device calls eof_w, from inside its dma_r
+	// handler or afterwards, to end the record with the transfer in progress: the
+	// INPUT command completes early and what's left of reqCount becomes resCount.
+	auto eof_callback() { return m_write_eof.bind(); }
+	void eof_w(int state);
+
 	u32 dma_read(offs_t offset);
 	void dma_write(offs_t offset, u32 data);
 	void drq_w(int state);
@@ -67,14 +76,17 @@ private:
 	int m_width;
 	int m_drq_state;
 	bool m_in_pump;
+	bool m_input_end;
 	int m_drq_status_bit;
 	u8 m_hw_status_mask;
 	u8 m_hw_status;
 	bool m_waiting;
+	bool m_stopped;
 	emu_timer *m_wake_timer;
 
 	devcb_read32 m_read_dma;
 	devcb_write32 m_write_dma;
+	devcb_write_line m_write_eof;
 
 	void control_w(u32 data);
 	u32 status_r();
@@ -87,7 +99,7 @@ private:
 	u32 waitselect_r();
 	void waitselect_w(u32 data);
 
-	void step_program();
+	u32 step_program(bool *held = nullptr);
 	void new_command();
 	void fetch_command();
 	void process_commands();
