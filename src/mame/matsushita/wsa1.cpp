@@ -9,6 +9,9 @@
     128 preset combinations, a 320 x 240 dot LCD, two sets of MIDI IN/OUT/THRU
     and a built-in 3.5 inch floppy drive.
 
+    Two TLCS-900/H processors share the work.  CPU 1 drives the panel, the
+    floppy and MIDI; CPU 2 drives the tone generator and the modeling LSI.
+
     Hardware inventory below is taken from the SX-WSA1R service manual,
     ORDER NO. EMiD951604, (c) 1995 Matsushita Electric Industrial, which covers
     the rack module only.  The scan available here is photocopy grade: where
@@ -31,19 +34,7 @@
     VERSION screen has exactly three slots, WSA-A/WSA-C/WSA-D, with no WSA-B
     line for the fourth image.
 
-    Firmware symbols used in the comments below.  Addresses are in the OS v2.0 images;
-    a v1 OS shipped and is not dumped.
-
-        PromA_Reset     prom_a  0xF826A9
-        PromB_JumpTable prom_b  0xF00000
-        PromC_Base      prom_c  0xF80000
-        PromC_Reset     prom_c  0xFFF000
-        PromC_Vectors   prom_c  0xFFFF00
-
     TODO:
-      - decode the chip-select ranges and give both processors a memory map
-      - tie the oscillators in the parts list to the devices they clock, so
-        that the two TMP95C061AF can be instantiated
       - dump the six 16 Mbit wave mask ROMs, the AM29F400T flash, and the
         internal ROM of the control panel microcontroller
       - devices with no MAME implementation yet: the L7A1429 modeling LSI, the
@@ -60,6 +51,8 @@
 
 #include "emu.h"
 
+#include "cpu/tlcs900/tmp95c061.h"
+
 
 
 namespace {
@@ -69,10 +62,44 @@ class wsa1_state : public driver_device
 public:
 	wsa1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cpu1(*this, "cpu1")
+		, m_cpu2(*this, "cpu2")
 	{ }
 
 	void wsa1r(machine_config &config);
+
+private:
+	required_device<tmp95c061_device> m_cpu1;
+	required_device<tmp95c061_device> m_cpu2;
+
+	void cpu1_map(address_map &map) ATTR_COLD;
+	void cpu2_map(address_map &map) ATTR_COLD;
 };
+
+
+// CPU 1 fetches prom_a and prom_b; CPU 2 fetches prom_c.  Which of them is IC1
+// "MICROCOMPUTER (MAIN)" and which is IC2 "(SUB)" is not established, so the
+// tags are neutral.
+void wsa1_state::cpu1_map(address_map &map)
+{
+	// static RAM on CS1 (MSAR1 = 0x00 at InitMSAR1_CS1).  Boot clears from 0x000080
+	// and the checksum furniture at 0x007FCA-0x007FD4 sizes the chip at 32 KiB.
+	map(0x000080, 0x007fff).ram();
+
+	// work DRAM on CS3 (MSAR3 = 0x60 at InitMSAR3_CS3; P6FC = 0x1F at InitP6FC_LCAS makes
+	// the CS3 pin LCAS).  First stack is 0x60EB80.
+	map(0x600000, 0x67ffff).ram();
+
+	map(0xf00000, 0xf7ffff).rom().region("prom_ab", 0x000000);   // IC13
+	map(0xf80000, 0xffffff).rom().region("prom_ab", 0x080000);   // IC12
+}
+
+void wsa1_state::cpu2_map(address_map &map)
+{
+	map(0x000080, 0x01ffff).ram();
+	map(0xf00000, 0xf7ffff).rom().region("prom_d", 0);           // IC21, tone database
+	map(0xf80000, 0xffffff).rom().region("prom_c", 0);           // IC28
+}
 
 
 static INPUT_PORTS_START(wsa1r)
@@ -81,6 +108,13 @@ INPUT_PORTS_END
 
 void wsa1_state::wsa1r(machine_config &config)
 {
+	// fc = 28 MHz: the firmware stores it as a byte, prom_c[FcClockByte] = 0x1C
+	// read at SerialDivisorFromFc, and computes its own serial divisor from it.
+	TMP95C061(config, m_cpu1, 28_MHz_XTAL);
+	m_cpu1->set_addrmap(AS_PROGRAM, &wsa1_state::cpu1_map);
+
+	TMP95C061(config, m_cpu2, 28_MHz_XTAL);
+	m_cpu2->set_addrmap(AS_PROGRAM, &wsa1_state::cpu2_map);
 }
 
 
