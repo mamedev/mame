@@ -210,7 +210,6 @@ upd6383_device::upd6383_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-
 namespace {
 class wsa1_state : public driver_device
 {
@@ -262,6 +261,20 @@ private:
 	uint8_t cpu2_link_r();
 	void cpu2_link_w(uint8_t data);
 
+
+	uint8_t m_cpu1_chanreg[0x100]{}, m_cpu2_chanreg[0x100]{};
+	uint8_t m_cpu1_chanreg_addr = 0, m_cpu2_chanreg_addr = 0;
+
+	uint16_t keybed_data_r();
+	uint16_t keybed_status_r();
+	void keybed_w(uint16_t data) { }   // the firmware arms the queue; nothing to arm
+	void cpu1_chanreg_addr_w(uint16_t data) { m_cpu1_chanreg_addr = data & 0xff; }
+	uint16_t cpu1_chanreg_data_r() { return m_cpu1_chanreg[m_cpu1_chanreg_addr]; }
+	void cpu1_chanreg_data_w(uint16_t data) { m_cpu1_chanreg[m_cpu1_chanreg_addr] = data & 0xff; }
+	void cpu2_chanreg_addr_w(uint16_t data) { m_cpu2_chanreg_addr = data & 0xff; }
+	uint16_t cpu2_chanreg_data_r() { return m_cpu2_chanreg[m_cpu2_chanreg_addr]; }
+	void cpu2_chanreg_data_w(uint16_t data) { m_cpu2_chanreg[m_cpu2_chanreg_addr] = data & 0xff; }
+
 	void tg_addr_w(uint16_t data);
 	void tg_data_w(uint16_t data);
 	uint16_t tg_status_r();
@@ -299,6 +312,19 @@ private:
 	void cpu2_map(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
 };
+
+
+// The keybed queue on CPU 2.  This is the rack module, so no keybed is
+// connected: the queue is always empty and status reports nothing pending.
+uint16_t wsa1_state::keybed_data_r()
+{
+	return 0;
+}
+
+uint16_t wsa1_state::keybed_status_r()
+{
+	return 0;
+}
 
 
 // The byte link between the two processors.  Writing hands one byte to the
@@ -597,6 +623,13 @@ void wsa1_state::cpu1_map(address_map &map)
 	map(0x7c0000, 0x7c0001).rw(FUNC(wsa1_state::cpu1_link_r),
 	                           FUNC(wsa1_state::cpu1_link_w)).umask16(0x00ff);
 
+	// Two 4-channel x 32-register files with a byte-identical driver shape,
+	// one per processor.  What the device behind them is is not established,
+	// so the writes are stored and nothing is synthesised from them.
+	map(0x7f0000, 0x7f0001).w(FUNC(wsa1_state::cpu1_chanreg_addr_w));
+	map(0x7f0002, 0x7f0003).rw(FUNC(wsa1_state::cpu1_chanreg_data_r),
+	                           FUNC(wsa1_state::cpu1_chanreg_data_w));
+
 	map(0xf00000, 0xf7ffff).rom().region("prom_ab", 0x000000);   // IC13
 	map(0xf80000, 0xffffff).rom().region("prom_ab", 0x080000);   // IC12
 }
@@ -607,6 +640,11 @@ void wsa1_state::cpu2_map(address_map &map)
 	map(0x100000, 0x100001).rw(FUNC(wsa1_state::cpu2_link_r),
 	                           FUNC(wsa1_state::cpu2_link_w)).umask16(0x00ff);
 
+	map(0x108000, 0x108001).rw(FUNC(wsa1_state::keybed_data_r),
+	                           FUNC(wsa1_state::keybed_w));
+	map(0x108002, 0x108003).rw(FUNC(wsa1_state::keybed_status_r),
+	                           FUNC(wsa1_state::keybed_w));
+
 	map(0x104000, 0x104001).w(m_modeling, FUNC(l7a1429_device::addr_w));
 	map(0x104002, 0x104003).rw(m_modeling, FUNC(l7a1429_device::data_r),
 	                                       FUNC(l7a1429_device::data_w));
@@ -614,6 +652,10 @@ void wsa1_state::cpu2_map(address_map &map)
 	map(0x10c000, 0x10c001).w(FUNC(wsa1_state::tg_addr_w));
 	map(0x10c002, 0x10c003).w(FUNC(wsa1_state::tg_data_w));
 	map(0x10c004, 0x10c005).r(FUNC(wsa1_state::tg_status_r));
+
+	map(0xe00000, 0xe00001).w(FUNC(wsa1_state::cpu2_chanreg_addr_w));
+	map(0xe00002, 0xe00003).rw(FUNC(wsa1_state::cpu2_chanreg_data_r),
+	                           FUNC(wsa1_state::cpu2_chanreg_data_w));
 
 	map(0xf00000, 0xf7ffff).rom().region("prom_d", 0);           // IC21, tone database
 	map(0xf80000, 0xffffff).rom().region("prom_c", 0);           // IC28
