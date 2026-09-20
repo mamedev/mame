@@ -231,6 +231,7 @@ public:
 	void wsa1r(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -579,6 +580,30 @@ void wsa1_state::machine_reset()
 	m_panel_sclk = 1;
 	m_panel_busy = 0;
 
+}
+
+void wsa1_state::machine_start()
+{
+	save_item(NAME(m_cpu1_p5));
+	save_item(NAME(m_cpu1_p7));
+	save_item(NAME(m_cpu1_p8));
+	save_item(NAME(m_cpu1_pb));
+	save_item(NAME(m_cpu2_pa));
+	save_item(NAME(m_link_to_cpu1));
+	save_item(NAME(m_link_to_cpu2));
+	save_item(NAME(m_link_to_cpu1_full));
+	save_item(NAME(m_link_to_cpu2_full));
+	save_item(NAME(m_tg_latch));
+	save_item(NAME(m_tg_regs));
+	save_item(NAME(m_tg_busy));
+	save_item(NAME(m_tg_noteon_burst));
+	save_item(NAME(m_tg_released));
+	save_item(NAME(m_cpu1_chanreg));
+	save_item(NAME(m_cpu2_chanreg));
+	save_item(NAME(m_cpu1_chanreg_addr));
+	save_item(NAME(m_cpu2_chanreg_addr));
+	save_item(NAME(m_panel_sclk));
+	save_item(NAME(m_panel_busy));
 }
 
 void wsa1_state::palette_init(palette_device &palette)
