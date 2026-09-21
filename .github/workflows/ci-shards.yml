@@ -98,7 +98,9 @@ jobs:
           printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
           "$OVERRIDE_CC" --version
           "$OVERRIDE_CXX" --version
-          "$ar_tool" --version 2>&1 || "$ar_tool" -V 2>&1
+          "$ar_tool" --version 2>&1 ||
+            "$ar_tool" -V 2>&1 ||
+            command -v "$ar_tool"
           make --version
           "$CI_PYTHON" --version
           case "${{ matrix.install_kind }}" in
@@ -107,7 +109,7 @@ jobs:
                 $CI_PACKAGES
               ;;
             brew)
-              brew list --versions $CI_PACKAGES
+              brew list --versions
               ;;
             msys2)
               pacman -Q $CI_PACKAGES
@@ -174,6 +176,10 @@ jobs:
       run: |
         set -euo pipefail
         timing_dir="$PWD/build/ci-shards/${{ matrix.profile_id }}/project-timings"
+        if [[ "$PRECOMPILE" != "0" && "${{ matrix.group }}" != "thirdparty" ]]; then
+          make -j${{ matrix.make_jobs }} -C "${{ matrix.solution_dir }}" \
+            config=${{ matrix.configuration }} precompile
+        fi
         if [[ "$COLLECT_TIMINGS" == "true" ]]; then
           mkdir -p "$timing_dir"
           export MAME_PROJECT_TIMING_DIR="$timing_dir"
