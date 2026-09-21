@@ -194,6 +194,11 @@ void ecbbus_cards(device_slot_interface &device)
 /*  device.option_add("grip25", ECB_GRIP25);
     device.option_add("grip26", ECB_GRIP26);
     device.option_add("grip31", ECB_GRIP31);
-    device.option_add("grip562", ECB_GRIP562);
+    device.option_add("grip562", ECB_GRIP562); (HD6345, 256KB RAM)
     device.option_add("grips115", ECB_GRIPS115);*/
+	// GRIP-COLOR (192kB color RAM)
+	// XR color card
+	// PEPS Programmable EPROM Simulator
+	// UNIO (Z80-STI, Z80-SIO, 2x centronics)
+	// DISI
 }

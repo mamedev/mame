@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="prof180" description="Conitec PROF-180 floppy disks">
+<softwarelist name="prof180x_flop" description="Conitec PROF-180X floppy disks">
 
 	<software name="cpm22">
 		<description>CP/M 2.2</description>

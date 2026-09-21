@@ -17508,6 +17508,9 @@ prof80
 
 @source:conitec/prof180x.cpp
 prof180x
+prof180xp
+
+@source:conitec/prof181x.cpp
 prof181x
 
 @source:cosmo/cosmo_ls9310.cpp
