@@ -93,29 +93,33 @@ jobs:
         toolchain_file="$state_root/toolchain.txt"
         mkdir -p "$state_root"
         ar_tool="${OVERRIDE_AR:-ar}"
-        {
-          printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
-          printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
-          "$OVERRIDE_CC" --version
-          "$OVERRIDE_CXX" --version
-          "$ar_tool" --version 2>&1 ||
-            "$ar_tool" -V 2>&1 ||
-            command -v "$ar_tool"
-          make --version
-          "$CI_PYTHON" --version
-          case "${{ matrix.install_kind }}" in
-            apt)
-              dpkg-query --show --showformat='${binary:Package}=${Version}\n' \
-                $CI_PACKAGES
-              ;;
-            brew)
-              brew list --versions
-              ;;
-            msys2)
-              pacman -Q $CI_PACKAGES
-              ;;
-          esac
-        } > "$toolchain_file"
+        : > "$toolchain_file"
+        record_toolchain() {
+          "$@" 2>&1 | tee -a "$toolchain_file"
+        }
+        record_toolchain printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
+        record_toolchain printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
+        record_toolchain "$OVERRIDE_CC" --version
+        record_toolchain "$OVERRIDE_CXX" --version
+        if ! record_toolchain "$ar_tool" --version; then
+          if ! record_toolchain "$ar_tool" -V; then
+            record_toolchain command -v "$ar_tool"
+          fi
+        fi
+        record_toolchain make --version
+        record_toolchain "$CI_PYTHON" --version
+        case "${{ matrix.install_kind }}" in
+          apt)
+            record_toolchain dpkg-query --show \
+              --showformat='${binary:Package}=${Version}\n' $CI_PACKAGES
+            ;;
+          brew)
+            record_toolchain brew list --versions
+            ;;
+          msys2)
+            record_toolchain pacman -Q $CI_PACKAGES
+            ;;
+        esac
         dependency_prefix="$("$CI_PYTHON" scripts/build/ci_shards.py \
           context "${{ matrix.solution_dir }}/Makefile" \
           --profile "${{ matrix.profile_path }}" \
