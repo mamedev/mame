@@ -1155,15 +1155,16 @@ def materialize_dependencies(options):
         makefile, target = targets[relative_path]
         by_makefile[makefile].append((relative_path, target))
 
+    build = context['profile_map']['profile']['build']
     solution_dir = context['solution_makefile'].parent
     for makefile in sorted(by_makefile, key=lambda path: path.as_posix()):
         selected = sorted(by_makefile[makefile])
         command = [
                 options.make_program,
-                '-j%d' % context['build']['make_jobs'],
+                '-j%d' % build['make_jobs'],
                 '-C', str(solution_dir),
                 '-f', makefile.name,
-                'config=%s' % context['build']['configuration']]
+                'config=%s' % build['configuration']]
         command.extend(target for relative_path, target in selected)
         try:
             subprocess.check_call(command)
