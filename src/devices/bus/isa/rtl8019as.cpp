@@ -78,7 +78,7 @@ private:
 
 	void irq_w(int state);
 
-	required_device<rtl8019a_device> m_dp8390;
+	required_device<rtl8019a_device> m_nic;
 	required_ioport m_config;
 
 	u8 m_prom[32];
@@ -91,7 +91,7 @@ private:
 isa8_rtl8019as_device::isa8_rtl8019as_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ISA8_RTL8019AS, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
-	, m_dp8390(*this, "rtl8019a")
+	, m_nic(*this, "rtl8019a")
 	, m_config(*this, "CONFIG")
 	, m_prom{}
 	, m_ram{}
@@ -103,27 +103,23 @@ isa8_rtl8019as_device::isa8_rtl8019as_device(machine_config const &mconfig, char
 
 void isa8_rtl8019as_device::device_add_mconfig(machine_config &config)
 {
-	RTL8019A(config, m_dp8390, 0);
-	m_dp8390->irq_callback().set(FUNC(isa8_rtl8019as_device::irq_w));
-	m_dp8390->mem_read_callback().set(FUNC(isa8_rtl8019as_device::mem_r));
-	m_dp8390->mem_write_callback().set(FUNC(isa8_rtl8019as_device::mem_w));
+	RTL8019A(config, m_nic, 0);
+	m_nic->irq_callback().set(FUNC(isa8_rtl8019as_device::irq_w));
+	m_nic->mem_read_callback().set(FUNC(isa8_rtl8019as_device::mem_r));
+	m_nic->mem_write_callback().set(FUNC(isa8_rtl8019as_device::mem_w));
 }
 
 void isa8_rtl8019as_device::device_start()
 {
 	set_isa_device();
 
-	// The 93C46 EEPROM that supplies the station address is not emulated, so
-	// derive a locally administered address from the device tag.  This keeps
-	// the address stable from run to run and distinct between cards in one
-	// machine, but two instances of the same machine bridged onto a single
-	// network will need one of them reprogrammed through PAR0-PAR5.
+	// create a MAC address by hashing the device tag
 	u8 mac[6] = { 0x02, 0xe0, 0x4c, 0x00, 0x00, 0x00 };
 	u32 hash = 0;
 	for (char const *p = tag(); *p; p++)
 		hash = (hash * 33) ^ u8(*p);
 	put_u24be(&mac[3], hash);
-	m_dp8390->set_mac(mac);
+	m_nic->set_mac(mac);
 
 	// Strapped for the 8-bit bus, the station address PROM is fetched a byte
 	// at a time and the bytes are not duplicated as they are on a 16-bit NE2000
@@ -161,22 +157,19 @@ u8 isa8_rtl8019as_device::port_r(offs_t offset)
 {
 	if (offset < 0x10)
 	{
-		u8 const data = m_dp8390->cs_read(offset);
+		u8 const data = m_nic->cs_read(offset);
 
-		LOGIO("register read 0x%02x data 0x%02x\n", offset, data);
+		if (!machine().side_effects_disabled())
+			LOGIO("register read 0x%02x data 0x%02x\n", offset, data);
 
 		return data;
 	}
 	else if (offset < 0x18)
 	{
-		// The remote DMA data port is mirrored across eight locations and is a
-		// single byte wide on an 8-bit card.  Reading it advances the remote
-		// DMA address, so give the debugger nothing rather than let it disturb
-		// a transfer in progress.
 		if (machine().side_effects_disabled())
 			return 0xff;
 
-		u8 const data = u8(m_dp8390->remote_read());
+		u8 const data = u8(m_nic->remote_read());
 
 		LOGDMA("remote read data 0x%02x\n", data);
 
@@ -184,14 +177,13 @@ u8 isa8_rtl8019as_device::port_r(offs_t offset)
 	}
 	else
 	{
-		// The reset port is mirrored across eight locations.  Drivers read it
-		// and write the value back; the dp8390 device models only the release,
-		// so the read is what actually resets the controller.
+		// the dp8390 device models only the release, so the read is what
+		// actually resets the controller
 		if (!machine().side_effects_disabled())
 		{
 			LOG("reset cleared\n");
 
-			m_dp8390->dp8390_reset(CLEAR_LINE);
+			m_nic->dp8390_reset(CLEAR_LINE);
 		}
 
 		return 0;
@@ -204,32 +196,25 @@ void isa8_rtl8019as_device::port_w(offs_t offset, u8 data)
 	{
 		LOGIO("register write 0x%02x data 0x%02x\n", offset, data);
 
-		// The register at offset 0x0e is DCR only while page 0 is selected; on
-		// page 1 it is a multicast filter byte.  The command register reads
-		// back the same on every page and reading it has no side effects, so
-		// the controller can be asked which page is current.
-		if ((offset == 0x0e) && BIT(data, 0) && !m_wts_warned && !BIT(m_dp8390->cs_read(0), 6, 2))
+		if ((offset == 0x0e) && BIT(data, 0) && !m_wts_warned && !BIT(m_nic->cs_read(0), 6, 2))
 		{
-			// The controller honours DCR WTS, but the 8-bit strapping overrides
-			// it on real hardware and the data port here is a byte wide, so a
-			// word wide transfer would quietly drop every second byte.
 			m_wts_warned = true;
 			logerror("word wide remote DMA selected on an 8-bit card, transfers will lose data\n");
 		}
 
-		m_dp8390->cs_write(offset, data);
+		m_nic->cs_write(offset, data);
 	}
 	else if (offset < 0x18)
 	{
 		LOGDMA("remote write data 0x%02x\n", data);
 
-		m_dp8390->remote_write(data);
+		m_nic->remote_write(data);
 	}
 	else
 	{
 		LOG("reset asserted\n");
 
-		m_dp8390->dp8390_reset(ASSERT_LINE);
+		m_nic->dp8390_reset(ASSERT_LINE);
 	}
 }
 
