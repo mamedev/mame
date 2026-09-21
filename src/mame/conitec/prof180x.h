@@ -33,6 +33,7 @@ public:
 		, m_mk3835(*this, MK3835_TAG)
 		, m_pcf8583(*this, "pcf8583")
 		, m_ram(*this, RAM_TAG)
+		, m_config(*this, "CONFIG")
 	{
 	}
 
@@ -44,6 +45,7 @@ private:
 	optional_device<mk3835_device> m_mk3835;
 	optional_device<pcf8583_device> m_pcf8583;
 	required_device<ram_device> m_ram;
+	required_ioport m_config;
 
 	virtual void machine_start() override ATTR_COLD;
 

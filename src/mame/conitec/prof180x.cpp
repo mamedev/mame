@@ -4,7 +4,6 @@
 
     TODO:
 
-	- boot is waiting for $c0 input
     - keyboard
     - floppy
 
@@ -150,7 +149,23 @@ uint8_t prof180x_state::status1_r()
 
 	*/
 
-	return !(m_mk3835 ? m_mk3835->io_r() : m_pcf8583->sda_r()) << 7;
+	u8 data = 0;
+
+	const u8 scan = (m_c0 ? 0x01 : 0x00)
+		| (m_c1 ? 0x02 : 0x00)
+		| (m_c2 ? 0x04 : 0x00);
+	const u8 config = m_config->read();
+
+	if ((config & 0x07) & scan)
+		data |= 0x10;
+
+	if (((config >> 3) & 0x07) & scan)
+		data |= 0x20;
+
+	if (!(m_mk3835 ? m_mk3835->io_r() : m_pcf8583->sda_r()))
+		data |= 0x80;
+
+	return data;
 }
 
 uint8_t prof180x_state::status_r(offs_t offset)
@@ -174,6 +189,19 @@ void prof180x_state::prof180x_io(address_map &map)
 }
 
 static INPUT_PORTS_START( prof180x )
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x07, 0x07, "J18 I/O Configuration")
+	PORT_CONFSETTING(0x00, "No jumper (GRIP)")
+	PORT_CONFSETTING(0x07, "1-3 (Terminal)")
+	PORT_CONFSETTING(0x06, "2-4 (GRADE-X)")
+	PORT_CONFSETTING(0x05, "3-5 (USER)")
+	PORT_CONFSETTING(0x03, "4-6 (Auto-Boot)")
+	PORT_CONFNAME(0x38, 0x38, "J19 Baud Rate")
+	PORT_CONFSETTING(0x00, "No jumper (19200 baud)")
+	PORT_CONFSETTING(0x38, "1-3 (9600 baud)")
+	PORT_CONFSETTING(0x30, "2-4 (2400 baud)")
+	PORT_CONFSETTING(0x28, "3-5 (1200 baud)")
+	PORT_CONFSETTING(0x18, "4-6 (300 baud)")
 INPUT_PORTS_END
 
 static void prof180x_floppies(device_slot_interface &device)
@@ -278,6 +306,9 @@ ROM_START( prof180x )
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "pal14l8.z10", 0x000, 0x157, NO_DUMP )
+
+	ROM_REGION( 0x20, MK3835_TAG, 0 )
+	ROM_LOAD( "mk3835.u40", 0x00, 0x20, CRC(65202043) SHA1(5f1e688efd9056d5b73d434a3610e9e6e95fc3b0) )
 ROM_END
 
 ROM_START( prof181x )

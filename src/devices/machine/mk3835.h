@@ -41,8 +41,9 @@ private:
 	u8 read_byte() const;
 	void restore_clock();
 
+	optional_memory_region m_region;
 	emu_timer *m_clock_timer;
-	std::array<u8, 8> m_clock;
+	std::array<u8, 8> m_rtc;
 	std::array<u8, 24> m_ram;
 	u8 m_ce;
 	u8 m_sclk;
