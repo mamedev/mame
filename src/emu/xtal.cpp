@@ -253,6 +253,7 @@ const double XTAL::known_xtals[] = {
 	 14'250'000, // 14.250_MHz_XTAL        Hector HRX
 	 14'250'450, // 14.25045_MHz_XTAL      Apple II Europlus
 	 14'300'000, // 14.3_MHz_XTAL          Agat-7
+	 14'302'446, // 14.302446_MHz_XTAL     TK2000 (4x PAL-M subcarrier)
 	 14'314'000, // 14.314_MHz_XTAL        Taito TTL Board
 	 14'318'181, // 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier)
 	 14'349'600, // 14.3496_MHz_XTAL       Roland S-50 VDP
