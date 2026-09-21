@@ -675,13 +675,37 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/coupedsk.h,FORMATS["COUPEDSK"] = true
+--@src/lib/formats/coupe_mgt.h,FORMATS["COUPE_MGT"] = true
 --------------------------------------------------
 
-if opt_tool(FORMATS, "COUPEDSK") then
+if opt_tool(FORMATS, "COUPE_MGT") then
 	files {
-		MAME_DIR.. "src/lib/formats/coupedsk.cpp",
-		MAME_DIR.. "src/lib/formats/coupedsk.h",
+		MAME_DIR.. "src/lib/formats/coupe_mgt.cpp",
+		MAME_DIR.. "src/lib/formats/coupe_mgt.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/coupe_sad.h,FORMATS["COUPE_SAD"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COUPE_SAD") then
+	files {
+		MAME_DIR.. "src/lib/formats/coupe_sad.cpp",
+		MAME_DIR.. "src/lib/formats/coupe_sad.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/coupe_sdf.h,FORMATS["COUPE_SDF"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COUPE_SDF") then
+	files {
+		MAME_DIR.. "src/lib/formats/coupe_sdf.cpp",
+		MAME_DIR.. "src/lib/formats/coupe_sdf.h",
 	}
 end
 
