@@ -3793,7 +3793,9 @@ void namcos22_state::namcos22(machine_config &config)
 	m_iomcu->p4_in_cb().set(FUNC(namcos22_state::iomcu_port4_s22_r));
 	m_iomcu->set_disable(); // not emulated yet
 
-	config.set_maximum_quantum(attotime::from_hz(40000)); // needed for main CPU => master DSP comms (acedrive, victlap video test)
+	// high quantum is needed for main CPU => master DSP comms (acedrive, victlap video test)
+	// and erratic inputs otherwise in ss22 games, probably mcu vs maincpu shareram
+	config.set_maximum_quantum(attotime::from_hz(40000));
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
@@ -3847,7 +3849,6 @@ void namcos22s_state::namcos22s(machine_config &config)
 	m_mcu->an2_cb().set(FUNC(namcos22s_state::mcu_adc_r<2>));
 	m_mcu->an3_cb().set(FUNC(namcos22s_state::mcu_adc_r<3>));
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22s_state::mcu_irq), "screen", 0, 240);
-	config.set_maximum_quantum(attotime::from_hz(9000)); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	config.device_remove("iomcu");
 
