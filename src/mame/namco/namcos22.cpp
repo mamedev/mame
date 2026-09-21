@@ -27,7 +27,6 @@ TODO:
 - ridgera2 title screen scrolls horizontally on some video footage, C139 related?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
 - global offset is wrong in non-super22 testmode video test
-- acedrive/victlap testmode video test flickers
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
@@ -3793,6 +3792,8 @@ void namcos22_state::namcos22(machine_config &config)
 	m_iomcu->set_addrmap(AS_PROGRAM, &namcos22_state::iomcu_s22_program);
 	m_iomcu->p4_in_cb().set(FUNC(namcos22_state::iomcu_port4_s22_r));
 	m_iomcu->set_disable(); // not emulated yet
+
+	config.set_maximum_quantum(attotime::from_hz(40000)); // needed for main CPU => master DSP comms (acedrive, victlap video test)
 
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
