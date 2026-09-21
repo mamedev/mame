@@ -666,11 +666,7 @@ void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangl
 			case MX_XOR:         bitmap.pix(y, px) ^= bit; break;
 			case MX_AND:         bitmap.pix(y, px) &= bit; break;
 
-			// Priority-OR is the same operation as OR here, not an omission.
-			// Every layer in all-graphics mode is one bit per pixel, so "a set
-			// pixel wins" and "OR" agree on all four inputs.  The two modes can
-			// only differ where a text layer takes part, and screen_update()
-			// sends that case to update_text() instead.
+			// 1bpp layers: priority-OR and OR agree on every input
 			case MX_OR:
 			case MX_PRIORITY_OR: bitmap.pix(y, px) |= bit; break;
 			}
@@ -685,10 +681,6 @@ void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangl
 
 void sed1330_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// pages 1, 2 and optionally 3 are all bitmaps.  The first layer drawn
-	// replaces the scanline; later ones combine with it using the method the
-	// host selected in OVLAY.  Only MX_OR is exercised by a driver in tree;
-	// XOR and AND come from the datasheet's capability list.
 	const uint8_t attr1 = m_fp & 0x03;
 	const uint8_t attr2 = (m_fp >> 2) & 0x03;
 	const uint8_t attr3 = (m_fp >> 4) & 0x03;
