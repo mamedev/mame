@@ -64,4 +64,4 @@ ROM_END
 } // anonymous namespace
 
 /*    YEAR  NAME      PARENT COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME     FLAGS */
-COMP( 1992, prof181x, 0, 	 0,      prof181x, prof181x, prof181x_state, empty_init, "Conitec Datensysteme", "PROF-181X", MACHINE_NOT_WORKING )
+COMP( 1992, prof181x, 0, 	 0,      prof181x, prof181x, prof181x_state, empty_init, "Conitec Datensysteme", "PROF-181X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
