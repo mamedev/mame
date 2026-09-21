@@ -19,7 +19,6 @@ public:
 	void draw_sprites(bitmap_ind8 &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
 
 	void update_cluts();
-	void set_rotation_enabled(bool enabled) { m_rotation_enabled = enabled; }
 
 protected:
 	tzbx15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -55,7 +54,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_shadow_pen_array;
 
 	// config
-	bool m_rotation_enabled = false;
 	int m_rom_clut_size;
 	int m_rom_clut_offset;
 	int m_sprite_palette_base;

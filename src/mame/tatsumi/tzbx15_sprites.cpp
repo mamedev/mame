@@ -120,13 +120,29 @@ void tzbx15_device::draw_rotated_sprite(BitmapClass &bitmap, const rectangle &cl
 		right = std::max(right, strips[row].right);
 	}
 
-	const double zoom = double(scale) / 128.0;
-	const double shear = double(util::sext(rotation, 9)) / 256.0;
-	const double a = flipx ? -zoom : zoom;
-	const double d = flipy ? -zoom : zoom;
-	const double b = -a * shear;
-	const double c = d * shear;
-	const double determinant = a * d - b * c;
+	// Q15 coefficients preserve scale/128 and the signed Q8 tangent exactly.
+	// Use 64-bit products and explicit floor division for negative coordinates;
+	// C++ integer division alone would round towards zero at sprite edges.
+	constexpr int64_t unit = 1 << 15;
+	const int64_t tangent = util::sext(rotation, 9);
+	const int64_t a = (flipx ? -scale : scale) * 256;
+	const int64_t d = (flipy ? -scale : scale) * 256;
+	const int64_t b = -(a / 256) * tangent;
+	const int64_t c = (d / 256) * tangent;
+	const int64_t determinant = a * d - b * c;
+	const auto floor_div = [] (int64_t numerator, int64_t denominator) -> int64_t
+	{
+		if (denominator < 0)
+		{
+			numerator = -numerator;
+			denominator = -denominator;
+		}
+		return numerator / denominator - (numerator % denominator < 0);
+	};
+	const auto ceil_div = [&floor_div] (int64_t numerator, int64_t denominator) -> int64_t
+	{
+		return -floor_div(-numerator, denominator);
+	};
 	const int bottom = top + rows * 8;
 	const bool fill = BIT(header[3], 7);
 	if (fill)
@@ -135,19 +151,20 @@ void tzbx15_device::draw_rotated_sprite(BitmapClass &bitmap, const rectangle &cl
 		// rotation and flips. Bound it by the inverse image of the viewport.
 		for (int px : { cliprect.min_x, cliprect.max_x + 1 })
 			for (int py : { cliprect.min_y, cliprect.max_y + 1 })
-				right = std::max(right, int(std::ceil((d * (px - x) - b * (py - y)) / determinant)) + 1);
+				right = std::max(right, int(ceil_div((d * (px - x) - b * (py - y)) * unit, determinant)) + 1);
 	}
-	double minx = bitmap.width(), maxx = -1, miny = bitmap.height(), maxy = -1;
+	int64_t minx = bitmap.width() * unit, maxx = -unit;
+	int64_t miny = bitmap.height() * unit, maxy = -unit;
 	for (int u : { left, right })
 		for (int v : { top, bottom })
 		{
-			const double px = x + a * u + b * v;
-			const double py = y + c * u + d * v;
+			const int64_t px = x * unit + a * u + b * v;
+			const int64_t py = y * unit + c * u + d * v;
 			minx = std::min(minx, px); maxx = std::max(maxx, px);
 			miny = std::min(miny, py); maxy = std::max(maxy, py);
 		}
-	rectangle bounds(int(std::floor(minx)), int(std::ceil(maxx)) - 1,
-			int(std::floor(miny)), int(std::ceil(maxy)) - 1);
+	rectangle bounds(int(floor_div(minx, unit)), int(ceil_div(maxx, unit)) - 1,
+			int(floor_div(miny, unit)), int(ceil_div(maxy, unit)) - 1);
 	bounds &= cliprect;
 	bounds &= bitmap.cliprect();
 	const unsigned palette = 16 * (color % gfx(0)->colors());
@@ -156,9 +173,10 @@ void tzbx15_device::draw_rotated_sprite(BitmapClass &bitmap, const rectangle &cl
 	for (int dy = bounds.min_y; dy <= bounds.max_y; ++dy)
 		for (int dx = bounds.min_x; dx <= bounds.max_x; ++dx)
 		{
-			const double px = dx + 0.5 - x, py = dy + 0.5 - y;
-			const int u = int(std::floor((d * px - b * py) / determinant));
-			const int v = int(std::floor((a * py - c * px) / determinant));
+			// Doubled coordinates represent pixel centres without a fractional type.
+			const int64_t px = 2 * (dx - x) + 1, py = 2 * (dy - y) + 1;
+			const int u = int(floor_div((d * px - b * py) * (unit / 2), determinant));
+			const int v = int(floor_div((a * py - c * px) * (unit / 2), determinant));
 			if (v < top || v >= bottom)
 				continue;
 			const strip &line = strips[(v - top) / 8];
@@ -351,7 +369,7 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		int color =     m_spriteram[offs+1] >> 3 & 0x1ff;
 		int flip_x =    m_spriteram[offs+1] & 0x8000;
 		int flip_y =    m_spriteram[offs+1] & 0x4000;
-		int rotate =    m_rotation_enabled ? (m_spriteram[offs+5] & 0x1ff) : 0;
+		int rotate =    m_spriteram[offs+5] & 0x1ff;
 
 		int index = m_spriteram[offs];
 
@@ -365,7 +383,7 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		if (index >= 0x4000)
 			continue;
 
-		if (m_rotation_enabled && (rotate || BIT(m_sprites_l_rom[index * 4 + 3], 7)))
+		if (rotate || BIT(m_sprites_l_rom[index * 4 + 3], 7))
 		{
 			draw_rotated_sprite(bitmap, cliprect, index, color, int16_t(x), int16_t(y),
 					scale, rotate, flip_x, flip_y, write_priority_only);
