@@ -36,14 +36,8 @@ tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *ta
 	m_pgreg{ 0, 0 },
 	m_pg01cr(0),
 	m_watchdog_mode(0),
-	m_serial_control{ 0, 0 },
-	m_serial_mode{ 0, 0 },
-	m_sc0_txd_cb(*this),
-	m_sc1_txd_cb(*this),
+	m_serial(*this, "serial%u", 0U),
 	m_sc1_mod_cb(*this),
-	m_sc0_rx_data(0),
-	m_sc1_rx_data(0),
-	m_baud_rate{ 0, 0 },
 	m_od_enable(0),
 	m_ad_result{ 0, 0, 0, 0 },
 	m_ad_mode(0),
@@ -229,11 +223,6 @@ void tmp95c061_device::device_start()
 	save_item(NAME(m_pgreg));
 	save_item(NAME(m_pg01cr));
 	save_item(NAME(m_watchdog_mode));
-	save_item(NAME(m_serial_control));
-	save_item(NAME(m_serial_mode));
-	save_item(NAME(m_sc0_rx_data));
-	save_item(NAME(m_sc1_rx_data));
-	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_od_enable));
 	save_item(NAME(m_ad_result));
 	save_item(NAME(m_ad_mode));
@@ -287,9 +276,6 @@ void tmp95c061_device::device_reset()
 	m_watchdog_mode = 0x80;
 	for (int i = 0; i < 2; i++)
 	{
-		m_serial_control[i] &= 0x80;
-		m_serial_mode[i] &= 0x80;
-		m_baud_rate[i] = 0x00;
 	}
 	m_od_enable = 0x00;
 	m_ad_mode = 0x00;
@@ -1183,117 +1169,49 @@ void tmp95c061_device::wdcr_w(uint8_t data)
 }
 
 
-uint8_t tmp95c061_device::sc0buf_r()
-{
-	return m_sc0_rx_data;
-}
+uint8_t tmp95c061_device::sc0buf_r()  { return m_serial[0]->scbuf_r(); }
+void tmp95c061_device::sc0buf_w(uint8_t data) { m_serial[0]->scbuf_w(data); }
+uint8_t tmp95c061_device::sc0cr_r()   { return m_serial[0]->sccr_r(); }
+void tmp95c061_device::sc0cr_w(uint8_t data)  { m_serial[0]->sccr_w(data); }
+uint8_t tmp95c061_device::sc0mod_r()  { return m_serial[0]->scmod_r(); }
+void tmp95c061_device::sc0mod_w(uint8_t data) { m_serial[0]->scmod_w(data); }
+uint8_t tmp95c061_device::br0cr_r()   { return m_serial[0]->brcr_r(); }
+void tmp95c061_device::br0cr_w(uint8_t data)  { m_serial[0]->brcr_w(data); }
 
-void tmp95c061_device::sc0buf_w(uint8_t data)
-{
-	m_sc0_txd_cb(data);
-
-	// Fake finish sending data
-	m_int_reg[INTES0] |= 0x80;
-	m_check_irqs = 1;
-}
-
-void tmp95c061_device::sc0_rxd(uint8_t data)
-{
-	m_sc0_rx_data = data;
-	m_int_reg[INTES0] |= 0x08;
-	m_check_irqs = 1;
-}
-
-uint8_t tmp95c061_device::sc0cr_r()
-{
-	uint8_t reg = m_serial_control[0];
-	if (!machine().side_effects_disabled())
-		m_serial_control[0] &= 0xe3;
-	return reg;
-}
-
-void tmp95c061_device::sc0cr_w(uint8_t data)
-{
-	m_serial_control[0] = data;
-}
-
-uint8_t tmp95c061_device::sc0mod_r()
-{
-	return m_serial_mode[0];
-}
-
-void tmp95c061_device::sc0mod_w(uint8_t data)
-{
-	m_serial_mode[0] = data;
-}
-
-uint8_t tmp95c061_device::br0cr_r()
-{
-	return m_baud_rate[0];
-}
-
-void tmp95c061_device::br0cr_w(uint8_t data)
-{
-	m_baud_rate[0] = data;
-}
-
-uint8_t tmp95c061_device::sc1buf_r()
-{
-	return m_sc1_rx_data;
-}
-
+uint8_t tmp95c061_device::sc1buf_r()  { return m_serial[1]->scbuf_r(); }
 void tmp95c061_device::sc1buf_w(uint8_t data)
 {
-	// Fake finish sending data
-	m_int_reg[INTES1] |= 0x80;
-	m_check_irqs = 1;
-
-	// In I/O-interface mode (SM = 0) the peer clocks the byte out, so only hand
-	// it on when the channel is in a mode that actually transmits.
-	if (((m_serial_mode[1] & 0x0c) != 0) || (m_port_function[PORT_8] & 0x20))
-		m_sc1_txd_cb(data);
+	m_serial[1]->set_pin_enabled(BIT(m_port_function[PORT_8], 5));
+	m_serial[1]->scbuf_w(data);
 }
-
-void tmp95c061_device::sc1_rxd(uint8_t data)
-{
-	m_sc1_rx_data = data;
-	m_int_reg[INTES1] |= 0x08;
-	m_check_irqs = 1;
-}
-
-uint8_t tmp95c061_device::sc1cr_r()
-{
-	uint8_t reg = m_serial_control[1];
-	if (!machine().side_effects_disabled())
-		m_serial_control[1] &= 0xe3;
-	return reg;
-}
-
-void tmp95c061_device::sc1cr_w(uint8_t data)
-{
-	m_serial_control[1] = data;
-}
-
-uint8_t tmp95c061_device::sc1mod_r()
-{
-	return m_serial_mode[1];
-}
+uint8_t tmp95c061_device::sc1cr_r()   { return m_serial[1]->sccr_r(); }
+void tmp95c061_device::sc1cr_w(uint8_t data)  { m_serial[1]->sccr_w(data); }
+uint8_t tmp95c061_device::sc1mod_r()  { return m_serial[1]->scmod_r(); }
 
 void tmp95c061_device::sc1mod_w(uint8_t data)
 {
-	m_serial_mode[1] = data;
-
+	m_serial[1]->scmod_w(data);
 	m_sc1_mod_cb(data);
 }
 
-uint8_t tmp95c061_device::br1cr_r()
+uint8_t tmp95c061_device::br1cr_r()   { return m_serial[1]->brcr_r(); }
+void tmp95c061_device::br1cr_w(uint8_t data)  { m_serial[1]->brcr_w(data); }
+
+// A channel raises INTTX as 0x80 and INTRX as 0x08, which are the bits its
+// INTES register uses, so the channel needs to know nothing about the CPU.
+template <int N>
+void tmp95c061_device::serial_int_w(uint8_t bits)
 {
-	return m_baud_rate[1];
+	m_int_reg[N ? INTES1 : INTES0] |= bits;
+	m_check_irqs = 1;
 }
 
-void tmp95c061_device::br1cr_w(uint8_t data)
+void tmp95c061_device::device_add_mconfig(machine_config &config)
 {
-	m_baud_rate[1] = data;
+	TMP95C061_SERIAL(config, m_serial[0], DERIVED_CLOCK(1, 1));
+	m_serial[0]->setint().set(FUNC(tmp95c061_device::serial_int_w<0>));
+	TMP95C061_SERIAL(config, m_serial[1], DERIVED_CLOCK(1, 1));
+	m_serial[1]->setint().set(FUNC(tmp95c061_device::serial_int_w<1>));
 }
 
 uint8_t tmp95c061_device::ode_r()
