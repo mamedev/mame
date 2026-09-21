@@ -5,11 +5,7 @@
     Technics SX-WSA1R control panel HLE
 
     The SX-WSA1 keyboard's panel is a different board and is not modelled here.
-    The evidence that this is the panel at all, and the wire format, are in
-    wsa1r_cpanel.h.
-
-    Every constant below is quoted with the prom_a / prom_b address that
-    establishes it.
+    The wire format is described in wsa1r_cpanel.h.
 
 ***************************************************************************/
 
@@ -29,29 +25,18 @@ DEFINE_DEVICE_TYPE(WSA1R_CPANEL, wsa1r_cpanel_device, "wsa1r_cpanel", "SX-WSA1R 
 //-------------------------------------------------
 //  the scan matrix
 //
-//  Eleven ports because the CP1 microcomputer drives SEG0..SEG10 and reads
-//  SW0..SW7 (block diagram, manual page II-1).  The (0xC4) == 2 variant, the
-//  rack, leaves SEG6 and SEG10 unwired -- PanelWireGroupMap_Variant2 has no entry for
-//  wire 0xC6 or 0xCA -- so segment_is_wired() refuses them and a key bound
-//  there is inert rather than injecting a packet the firmware files under
-//  group id 0x20, "no such control".
+//  The CP1 microcomputer drives SEG0..SEG10 and reads SW0..SW7 (block diagram,
+//  manual page II-1).  The rack leaves SEG6 and SEG10 unwired, so a key bound
+//  there is inert.
 //
-//  Port names carry the wire position first and the legend in parentheses.
-//  Legends printed beside the switch on the CP1/CP2 P.C. Diagram (PDF p.32)
-//  cover SEG0..SEG2 and CP2's SEG7/SEG8; the rest are read off the P.C. board
-//  page (PDF p.31).  The SX-WSA1 keyboard has two more scan columns and three
-//  more pots and will need its own port map.
+//  Port names carry the wire position first and the legend in parentheses,
+//  read off the CP1/CP2 P.C. diagram and board pages of the service manual.
+//  The SX-WSA1 keyboard has two more scan columns and three more pots and
+//  needs its own port map.
 //
-//  A handful of bits have a FUNCTION named by the ROM, marked below: three
-//  power-on chords tested by the boot block (Panel_Chord_FactoryClear, Panel_Chord_RomVersion,
-//  Panel_Chord_ThirdEntry) and the four service-screen keys in SEG1 (Panel_ServiceScreenSelect).
-//
-//  All of them read the panel's per-wire shadow at
-//  RAM 0x2B20 + ((wire & 0x0F) | ((wire & 0x40) >> 2)), which holds the LAST
-//  VALUE, not a change mask: SC1_RxOp0_ThreeByte does
-//  `ex (XHL),A` then `xor A,(XHL)`, so the shadow takes the new value and the
-//  mask is what gets queued.  Every chord test compares that byte for
-//  EQUALITY, so an extra button held in the same segment kills the chord.
+//  Keys held at power-on select service screens or a factory operation, named
+//  in the PORT_NAMEs below; one at a time, as the firmware compares the whole
+//  segment for equality.
 //-------------------------------------------------
 
 static INPUT_PORTS_START(wsa1r_cpanel)
@@ -60,30 +45,14 @@ static INPUT_PORTS_START(wsa1r_cpanel)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW1 (PLAY MODE COMBI)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW2 (EDIT MODE SOUND)")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW3 (EDIT MODE COMBI)")
-	// power-on chord: 0/4, 0/5 and 0/6 held = ROM-version LED display (Panel_Chord_RomVer_Seg0)
+	// power-on: 0/4, 0/5 and 0/6 held together show the ROM version on the LEDs
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW4 (BANK USER 1)")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW5 (BANK USER 2)")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW6 (BANK ROM/EXT)")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG0 SW7 (BANK RE-MAP)")
 
-	// SEG1 is the service-screen keypad.  sub_F953CD, reached from RESET
-	// at Boot_ChordCall_ServiceScreen when the model strap says (0xC4) == 2, compares (0x2B31) --
-	// wire 0xC1, this segment -- for equality:
-	//
-	//     0x02 -> recognised, no screen           SvcScreen_None
-	//     0x04 -> screen 0xD9  PANEL CPU CHECK    SvcScreen_PanelCpuCheck
-	//     0x08 -> screen 0xDA  SINE WAVE CHECK    SvcScreen_SineWaveCheck
-	//     0x10 -> screen 0xDB  PANEL SW&LED CHECK SvcScreen_PanelSwLedCheck
-	//     0x20 -> screen 0xDC  the screen cycler  SvcScreen_Cycler
-	//
-	// then stores the id at (0x2070) and sets (0x2071) = 0x80.  Equality, so one
-	// key at a time.  Variant 2 only: on the SX-WSA1 the same call reads the
-	// keybed instead (sub_F9530B).
-	//
-	// The boot block tests four chords in address order -- FACTORY CLEAR
-	// Boot_ChordCall_FactoryClear, this one Boot_ChordCall_ServiceScreen, ROM VERSION Boot_ChordCall_RomVersion, then Boot_ChordCall_Fourth -- and
-	// Panel_Chord_RomVersion's matched arm never returns, so a held ROM-version chord pre-empts
-	// a service screen this test already latched.
+	// SEG1 is the service-screen keypad.  Rack only: on the SX-WSA1 the same
+	// power-on test reads the keybed instead.
 	PORT_START("CP_SEG1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG1 SW0 (number 0)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG1 SW1 (number 1; power-on: recognised, no screen)")
@@ -110,7 +79,7 @@ static INPUT_PORTS_START(wsa1r_cpanel)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG3 SW2 (LCD soft key, RIGHT column, 3rd)")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG3 SW3 (LCD soft key, RIGHT column, 4th)")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG3 SW4 (LCD soft key, RIGHT column, 5th)")
-	// power-on chord: 3/5, 3/6 and 3/7 held = the third service entry (Panel_Chord_Third_Seg3)
+	// power-on: 3/5, 3/6 and 3/7 held together reach a third service entry
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG3 SW5 (-1)")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG3 SW6 (+1)")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG3 SW7 (EXIT)")
@@ -146,7 +115,7 @@ static INPUT_PORTS_START(wsa1r_cpanel)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG7 SW7 (not fitted)")
 
 	PORT_START("CP_SEG8")
-	// power-on chord: FACTORY CLEAR, 8/0 and 8/1 held (Panel_Chord_FactoryClear)
+	// power-on: 8/0 and 8/1 held together perform FACTORY CLEAR
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG8 SW0 (REALTIME CREATOR 1~6)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG8 SW1 (REALTIME CREATOR RESET)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG8 SW2 (not fitted)")
@@ -166,31 +135,18 @@ static INPUT_PORTS_START(wsa1r_cpanel)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG9 SW6 (not fitted)")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Panel SEG9 SW7 (not fitted)")
 
-	// Wire 0xD3.  The handler at Ctrl_G3Ch3_Normalise maps the byte through the plain,
-	// strictly monotone 0..127 ramp at Ctrl_Curve_Identity128 (no plateau anywhere in it).  The
-	// rack's mechanical parts list has exactly one VOLUME KNOB.
+	// Wire 0xD3, a linear 0..127 pot.  The rack has one volume knob.
 	PORT_START("CP_VOLUME")
 	PORT_ADJUSTER(80, "VOLUME")
 
-	// Wire 0xD7.  Its dispatch slot (Ctrl_HandlerTable entry 31 -> Ctrl_ReportChanged) is a bare
-	// `scf` -- no curve, no previous-value compare -- so every packet is accepted.  A
-	// control that must never be de-duplicated is a RELATIVE encoder, and the KN5000's
-	// twin protocol uses the same wire address 0xD7 for its endless wheel as
-	// [0xD7, signed detent count] (kn5000_cpanel.cpp:269-271).  The rack's parts list
-	// has exactly one DIAL WHEEL.  The signed-step encoding is inferred from those
-	// two facts; prom_a's group-0x0F consumer has not been read.
+	// Wire 0xD7, a relative encoder: the packet is [0xD7, signed detent count]
+	// and is never de-duplicated.  The rack has one data dial.
 	PORT_START("CP_DIAL")
 	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_NAME("DATA ENTRY DIAL")
 
-	// The SAME wheel, dragged in a circle by src/mame/layout/wsa1r.lay's widget
-	// script, which writes it through user_value.  It cannot be the field above:
-	// an analog field's only Lua write path, set_value(), latches
-	// m_use_adjoverride permanently and detaches the field from the input system,
-	// so one drag would kill the keys and the mouse axis for the rest of the
-	// session.  An adjuster's user_value has no such side effect, so the two
-	// controls coexist and scan_tick() sums their wrap-aware deltas.  Same split,
-	// and for the same reason, as the KN5000's ENCODER / ENCODER_DRAG pair
-	// (kn5000_cpanel.cpp).  It carries no key binding and needs none.
+	// The same wheel, dragged by the layout widget.  It is a separate adjuster
+	// because writing an analog field from Lua detaches it from the input system
+	// for the rest of the session; scan_tick() sums both controls' deltas.
 	PORT_START("CP_DIAL_DRAG")
 	PORT_ADJUSTER(50, "DATA ENTRY DIAL (mouse drag)")
 INPUT_PORTS_END
@@ -267,16 +223,14 @@ void wsa1r_cpanel_device::device_reset()
 	m_dial_synced = false;
 	m_dial_drag_synced = false;
 
-	// The two lines SC1_WaitTxDrain and SC1_TxFlush_Body test before they will touch the
-	// link (SC1_WaitTxDrain / SC1_LineFree_PBBit4): "free" is P8 bit 5 HIGH and PB bit 4 LOW.  Get
-	// this wrong and nothing is ever transmitted -- the four-way test bails to
-	// SC1_TxFlush_Exit and no LED frame and no command leaves the CPU.
+	// The CPU will only drive the link when it reads it as free: P8 bit 5 high
+	// and PB bit 4 low.
 	m_sclk_cb(1);
 	m_busy_cb(0);
 	m_atn_cb(0);
 
-	// 250 Hz, the same rate kn_cpanel_base_device uses.  Nothing in the WSA1 ROMs measures
-	// the real MCU's scan period; this is a driver choice and is marked as one.
+	// 250 Hz, as kn_cpanel_base_device uses.  The real MCU's scan period is
+	// unknown, so this is a driver choice.
 	m_scan_timer->adjust(attotime::from_hz(250), 0, attotime::from_hz(250));
 }
 
@@ -296,17 +250,10 @@ bool wsa1r_cpanel_device::segment_is_wired(int seg) const
 //-------------------------------------------------
 //  CPU 1 -> panel
 //
-//  The frame length rule is the firmware's own, from the two places it sets
-//  the "bytes still expected" counter (0x2A81) after a first byte:
-//  SC1_State08_TxFromRing (transmit, SC1_State08_TxFromRing) and SC1_State20_RxFirstByte
-//  (receive, SC1_State20_RxFirstByte).  Both are
-//      (0x2A81) = 2 ; if ((b & 0x3F) >= 0x30) (0x2A81) = (b & 0x0F) + 3
-//  which is exactly what SC1_TxOp3_Run emits (header + (n & 0x0F) + 2 more)
-//  and what SC1_RxOp6_Run consumes (header + address + (n & 0x0F) + 1 data).
-//
-//  So the two run encoders agree, at n+3 bytes per message, and the length
-//  counter is a third independent witness to it.
+//  A message is two bytes, or, when (header & 0x3F) >= 0x30, header + (n & 0x0F)
+//  + 2 more.
 //-------------------------------------------------
+
 
 void wsa1r_cpanel_device::tx_byte(u8 data)
 {
@@ -335,9 +282,9 @@ void wsa1r_cpanel_device::frame_complete()
 
 	if ((hdr & 0x30) == 0x30)
 	{
-		// Run frame: [HDR][FIRST_ADDR][DATA] x ((HDR & 0x0F) + 1), addresses stepping by 1.
-		// SC1_TxOp3_Run builds it; nothing in this firmware has been seen
-		// to produce one, but the codec accepts it, so decode it.
+		// Run frame: [HDR][FIRST_ADDR][DATA] x ((HDR & 0x0F) + 1), addresses
+		// stepping by 1.  This firmware has not been seen to send one, but the
+		// format allows it.
 		const int n = (hdr & 0x0f) + 1;
 		u8 addr = (hdr & 0xc0) | (m_frame[1] & 0x1f);
 		for (int i = 0; i < n && (2 + i) < m_len; i++, addr++)
@@ -347,10 +294,8 @@ void wsa1r_cpanel_device::frame_complete()
 
 	const u8 addr = hdr, data = m_frame[1];
 
-	// The LED wire table is the authority, not the shape of the address: register 7
-	// maps to wire address 0x00, and Panel_RefreshLeds walks all eight registers
-	// (`ld B,0x08` at Panel_RefreshLeds), so that frame really is emitted and does not
-	// look like an LED address at all.
+	// The wire table decides, not the shape of the address: LED register 7 maps
+	// to wire address 0x00, which does not look like an LED address.
 	if (led_frame(addr, data))
 		return;
 
@@ -361,23 +306,13 @@ void wsa1r_cpanel_device::frame_complete()
 		return;
 	}
 
-	// Everything else is a command.  The seven the firmware ever sends first are, in ROM
-	// order: 0xDF 0xD2 / 0xDF 0x1A / 0xDD 0x03 / 0xDE 0x80 (SC1_ConfigurePort, prom_b
-	// SC1_ConfigurePort_Cmds..SC1_ConfigurePort_LastCmd), 0xE0 0x00 (SC1_Cmd_E0_ReadStatus), 0xE3 0x00 / 0xE2 0x08 /
-	// 0xE3 0x10 (SC1_Cmd_E3_E2_E3) and 0xEF 0x00 (SC1_Cmd_EF).
-	//
-	// What they ask for is not established.  What is, is what the firmware does with
-	// the answer: SC1_Cmd_E0_ReadStatus zeroes both rx ring indices,
-	// sends (0xE0,0x00), waits six ticks and sets bit 3 of (0x2A85) if the WRITE index
-	// moved.  So the only thing it measures is "did the panel answer at all".  Answering
-	// with a two-byte packet whose type field is 3, 4 or 5 satisfies that and is then
-	// DISCARDED by SC1_RxOp3_Discard without entering the message queue --
-	// exactly the KN5000's TYPE 3 sync packet (kn5000_cpanel.cpp, send_sync_packet).
-	//
-	// The header byte itself is a CHOICE: 0xD8 is type 3 (bits 5:3) with bits 7:6 = 11,
-	// which is what every live address on THIS link carries.  The KN5000 sends 0x18, the
-	// same type with bits 7:6 = 00.  Only the TYPE field is decoded by the receiver, so
-	// both work; the exact byte a real M37471M2196S sends here is unknown.
+	// Everything else is a command.  The firmware sends 0xDF 0xD2, 0xDF 0x1A,
+	// 0xDD 0x03, 0xDE 0x80, 0xE0 0x00, 0xE3 0x00, 0xE2 0x08, 0xE3 0x10 and
+	// 0xEF 0x00.  What they ask for is not established; 0xE0 only tests whether
+	// the panel answers at all, so any two-byte reply of type 3, 4 or 5 will do
+	// and is then discarded.  0xD8 is type 3 with the upper bits every live
+	// address on this link carries; the byte a real M37471M2196S sends is
+	// unknown.
 	static const u8 sync[2] = { 0xd8, 0x00 };
 	switch (addr)
 	{
@@ -395,15 +330,9 @@ void wsa1r_cpanel_device::frame_complete()
 //-------------------------------------------------
 //  LED registers
 //
-//  Panel_RefreshLeds walks EIGHT registers, comparing the
-//  want-buffer at RAM 0x20D0..0x20D7 with the sent-shadow at 0x20F0..0x20F7
-//  and calling Panel_SetLedRegister for each one that differs.
-//  That routine maps the register INDEX through one of two tables --
-//  Panel_LedWireTable on this machine -- to the wire address, then pushes [ADDR][DATA]
-//  into the outbound queue at 0x2BA0.
-//
-//  Eight, not seven: the table ends C1 C2 C9 CA CB CC C3 00 and the loop emits
-//  that trailing 0x00 as a wire address like any other.
+//  Eight registers, each mapped through a table to a wire address.  The table
+//  ends C1 C2 C9 CA CB CC C3 00, and that trailing 0x00 is emitted as a wire
+//  address like any other.
 //-------------------------------------------------
 
 bool wsa1r_cpanel_device::led_frame(u8 addr, u8 data)
@@ -430,22 +359,14 @@ bool wsa1r_cpanel_device::led_frame(u8 addr, u8 data)
 //-------------------------------------------------
 //  panel -> CPU 1
 //
-//  One INT6 per MESSAGE, not per byte: INT6_SC1_PeerRequest
-//  turns RXE on, sets SC1CR bit 0 (the panel now clocks), selects INTES1=0x05
-//  (receive only) and sets state 0x20.  SC1_State20_RxFirstByte then takes the
-//  length from the first byte and SC1_State24_RxNextByte counts the rest down,
-//  re-arming INT6 when it is done.  So: raise ATN, wait for the firmware to
-//  enable RX, then push the message's bytes one at a time.
+//  One interrupt per message, not per byte: raise ATN, wait for the firmware
+//  to enable RX, then push the message's bytes one at a time.
 //-------------------------------------------------
 
-//  Every message this device sends is exactly two bytes, and the queue is a FIFO
-//  of two-byte messages rather than a byte stream, because the CPU's receive
-//  state machine is per message: INT6_SC1_PeerRequest accepts one request,
-//  SC1_State20_RxFirstByte takes the length from the first byte -- 2 for every
-//  address this device uses, since (addr & 0x3F) < 0x30 for 0xC0..0xD7 -- and
-//  SC1_State24_RxNextByte re-arms INT6 when the count runs out.  Concatenating
-//  two messages into one delivery would hand the second one to a state machine
-//  that has stopped expecting bytes.
+//  Every message this device sends is two bytes, and the queue holds messages
+//  rather than a byte stream: the CPU's receive state machine takes a length
+//  from the first byte and stops expecting bytes when the count runs out, so
+//  two messages cannot be concatenated into one delivery.
 void wsa1r_cpanel_device::queue_frame(const u8 *bytes, int n)
 {
 	if (m_resp_pos >= m_resp_len)
@@ -458,6 +379,7 @@ void wsa1r_cpanel_device::queue_frame(const u8 *bytes, int n)
 	if (was_idle && !m_requesting)
 		start_request();
 }
+
 
 
 void wsa1r_cpanel_device::start_request()

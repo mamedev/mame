@@ -5,25 +5,19 @@
     Technics SX-WSA1R control panel HLE
 
     One Mitsubishi M37471M2196S on the CONTROL PANEL 1 board -- the same part
-    as the two panel MCUs in kn5000_cpanel.cpp -- scanning the button matrix
-    and talking to CPU 1 over the TMP95C061's serial channel 1 in
-    I/O-interface (synchronous) mode.
-
-    That SC1 is the panel is measured rather than argued: of every common
-    substring of 16 bytes or more between CPU 1's SC1 module (prom_b
-    0xF5A800-0xF5B44D) and the KN5000's main program ROM, all eight land inside
-    the KN5000's own control-panel driver.  The same scan over the whole of
-    prom_b finds 4,399 runs, and only those eight touch the panel driver.
+    as the two panel MCUs in kn5000_cpanel.cpp -- scans the button matrix and
+    talks to CPU 1 over the TMP95C061's serial channel 1 in I/O-interface
+    (synchronous) mode.
 
     Signals: P8.3 = TXD1 to panel SIN, P8.4 = RXD1 from panel SOUT, P8.5 =
     SCLK1 driven by whoever transmits, PB.4 = the panel's busy line, INT6 =
-    its attention request.  Idle is P8.5 high and PB.4 low (0xF5AB7B).  The pin
-    NAMES are the databook's and no databook is in these trees; what is
-    established is which bits the SC1 module drives and reads.
+    its attention request.  Idle is P8.5 high and PB.4 low.  The pin names are
+    the databook's; what is established here is which bits the CPU drives and
+    reads.
 
-    A frame is a length byte, an address byte and a body, per the rule at
-    prom_b 0xF5ADD7.  The address byte is read through four different masks
-    rather than one field layout, so no single bit decode is asserted here.
+    A frame is a length byte, an address byte and a body.  The address byte is
+    read through four different masks rather than one field layout, so no
+    single bit decode is asserted here.
 
 ***************************************************************************/
 
