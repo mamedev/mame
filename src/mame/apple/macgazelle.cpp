@@ -349,11 +349,11 @@ ROM_END
 // TAM: 250
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    CLASS           INIT            COMPANY           FULLNAME                   FLAGS
-COMP( 1997, pmac6500, 0,        0,      gazelle,  gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Performa 6500/225", MACHINE_SUPPORTS_SAVE)
-COMP( 1997, pmac6500_250, pmac6500, 0,  gaz250,   gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Performa 6500/250", MACHINE_SUPPORTS_SAVE)
-COMP( 1997, pmac6500_275, pmac6500, 0,  gaz275,   gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Performa 6500/275", MACHINE_SUPPORTS_SAVE)
-COMP( 1997, pmac6500_300, pmac6500, 0,  gaz300,   gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Performa 6500/300", MACHINE_SUPPORTS_SAVE)
-COMP( 1997, pmac5500, pmac6500, 0,      gazelle,  gazelle, gazelle_state, init_pmac5500,  "Apple Computer", "Performa 5500/225", MACHINE_SUPPORTS_SAVE)
-COMP( 1997, pmac5500_250, pmac6500, 0,  gaz250,   gazelle, gazelle_state, init_pmac5500,  "Apple Computer", "Performa 5500/250", MACHINE_SUPPORTS_SAVE)
-COMP( 1997, pmac5500_275, pmac6500, 0,  gaz275,   gazelle, gazelle_state, init_pmac5500,  "Apple Computer", "Performa 5500/275", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac6500, 0,        0,      gazelle,  gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Power Macintosh 6500/225", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac6500_250, pmac6500, 0,  gaz250,   gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Power Macintosh 6500/250", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac6500_275, pmac6500, 0,  gaz275,   gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Power Macintosh 6500/275", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac6500_300, pmac6500, 0,  gaz300,   gazelle, gazelle_state, init_pmac6500,  "Apple Computer", "Power Macintosh 6500/300", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac5500, pmac6500, 0,      gazelle,  gazelle, gazelle_state, init_pmac5500,  "Apple Computer", "Power Macintosh 5500/225", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac5500_250, pmac6500, 0,  gaz250,   gazelle, gazelle_state, init_pmac5500,  "Apple Computer", "Power Macintosh 5500/250", MACHINE_SUPPORTS_SAVE)
+COMP( 1997, pmac5500_275, pmac6500, 0,  gaz275,   gazelle, gazelle_state, init_pmac5500,  "Apple Computer", "Power Macintosh 5500/275", MACHINE_SUPPORTS_SAVE)
 COMP( 1997, pmac20th, pmac6500, 0,      gaz250,   gazelle, gazelle_state, init_tam,       "Apple Computer", "Twentieth Anniversary Macintosh", MACHINE_SUPPORTS_SAVE)
