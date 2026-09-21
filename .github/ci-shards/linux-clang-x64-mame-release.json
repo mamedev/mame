@@ -1,0 +1,2436 @@
+{
+  "$schema": "../ci-shard-map.schema.json",
+  "complete_map_hash": "a6bc9cbf09c374602fb14ef8b99a7b5a31cd803b43b0915f011e986d12b71993",
+  "driver_map": {
+    "complete_map_hash": "7da9c976b02b9eef00a0fe5b25d0c60e64a73b65d623a8fb7ff1eda2cee544c1",
+    "partition_algorithm": "lpt-v1",
+    "pool": "driver-libs",
+    "predicted_maximum_cpu_seconds": 1368.43,
+    "previous_maximum_cpu_seconds": 1724.94,
+    "proposed_maximum_cpu_seconds": 1368.43,
+    "requested_shards": 8,
+    "schema_version": 1,
+    "shards": [
+      {
+        "definition_hash": "29ff0f8fd10d0020638370ae2fa03cf174e41f6298aae2294e180bdac9b23906",
+        "name": "driver-1",
+        "outputs": [
+          "libadp.a",
+          "libamirix.a",
+          "libampro.a",
+          "libappliedconcepts.a",
+          "libbally.a",
+          "libbarcrest.a",
+          "libbeehive.a",
+          "libbrainchild.a",
+          "libcave.a",
+          "libcoleco.a",
+          "libcompugraphic.a",
+          "libcybiko.a",
+          "libemusys.a",
+          "libesprit.a",
+          "libexcalibur.a",
+          "libgamepark.a",
+          "libgottlieb.a",
+          "libhp.a",
+          "libitech.a",
+          "libleapfrog.a",
+          "libluxor.a",
+          "libmattel.a",
+          "libmisc.a",
+          "libnec.a",
+          "libolympiaint.a",
+          "libomron.a",
+          "libpitronics.a",
+          "libramtek.a",
+          "librare.a",
+          "libsanritsu.a",
+          "libsanyo.a",
+          "libsony.a",
+          "libsunwise.a",
+          "libtandberg.a",
+          "libteamconcepts.a",
+          "libtecfri.a",
+          "libtechnos.a",
+          "libtelercas.a",
+          "libtorch.a",
+          "libultimachine.a",
+          "libverifone.a",
+          "libvidbrain.a",
+          "libvirtual.a",
+          "libzvt.a"
+        ],
+        "predicted_cpu_seconds": 1361.72,
+        "target_count": 44,
+        "targets": [
+          "adp",
+          "amirix",
+          "ampro",
+          "appliedconcepts",
+          "bally",
+          "barcrest",
+          "beehive",
+          "brainchild",
+          "cave",
+          "coleco",
+          "compugraphic",
+          "cybiko",
+          "emusys",
+          "esprit",
+          "excalibur",
+          "gamepark",
+          "gottlieb",
+          "hp",
+          "itech",
+          "leapfrog",
+          "luxor",
+          "mattel",
+          "misc",
+          "nec",
+          "olympiaint",
+          "omron",
+          "pitronics",
+          "ramtek",
+          "rare",
+          "sanritsu",
+          "sanyo",
+          "sony",
+          "sunwise",
+          "tandberg",
+          "teamconcepts",
+          "tecfri",
+          "technos",
+          "telercas",
+          "torch",
+          "ultimachine",
+          "verifone",
+          "vidbrain",
+          "virtual",
+          "zvt"
+        ]
+      },
+      {
+        "definition_hash": "955531bbc206995172be8763e73638fac118e781aa1652d933f30a3262a718e2",
+        "name": "driver-2",
+        "outputs": [
+          "libadc.a",
+          "libamstrad.a",
+          "libatari.a",
+          "libbandai.a",
+          "libbenesse.a",
+          "libcamputers.a",
+          "libcomad.a",
+          "libcomx.a",
+          "libddr.a",
+          "libdgrm.a",
+          "libdyna.a",
+          "libefo.a",
+          "libepoch.a",
+          "libfairlight.a",
+          "libfalco.a",
+          "libfuuki.a",
+          "libhegenerglaser.a",
+          "libinformer.a",
+          "libirem.a",
+          "libkorg.a",
+          "libmchester.a",
+          "libmg1.a",
+          "libmicrocraft.a",
+          "libmidw8080.a",
+          "libnokia.a",
+          "libnovation.a",
+          "libolympia.a",
+          "libosi.a",
+          "libplexus.a",
+          "libpsion.a",
+          "libquantel.a",
+          "librolm.a",
+          "libsaturn.a",
+          "libsfrj.a",
+          "libsiemens.a",
+          "libsigma.a",
+          "libsord.a",
+          "libsubsino.a",
+          "libtatung.a",
+          "libtelenova.a",
+          "libtigertel.a",
+          "libwilliams.a"
+        ],
+        "predicted_cpu_seconds": 1361.73,
+        "target_count": 42,
+        "targets": [
+          "adc",
+          "amstrad",
+          "atari",
+          "bandai",
+          "benesse",
+          "camputers",
+          "comad",
+          "comx",
+          "ddr",
+          "dgrm",
+          "dyna",
+          "efo",
+          "epoch",
+          "fairlight",
+          "falco",
+          "fuuki",
+          "hegenerglaser",
+          "informer",
+          "irem",
+          "korg",
+          "mchester",
+          "mg1",
+          "microcraft",
+          "midw8080",
+          "nokia",
+          "novation",
+          "olympia",
+          "osi",
+          "plexus",
+          "psion",
+          "quantel",
+          "rolm",
+          "saturn",
+          "sfrj",
+          "siemens",
+          "sigma",
+          "sord",
+          "subsino",
+          "tatung",
+          "telenova",
+          "tigertel",
+          "williams"
+        ]
+      },
+      {
+        "definition_hash": "fcc0d335711fdd4f845d601160af90e4c4163d3df88a4765e191b76429cb95b2",
+        "name": "driver-3",
+        "outputs": [
+          "libadds.a",
+          "libalpha.a",
+          "libapollo.a",
+          "libaristocrat.a",
+          "libbfm.a",
+          "libbitcorp.a",
+          "libbordun.a",
+          "libcanon.a",
+          "libcapcom.a",
+          "libccs.a",
+          "libces.a",
+          "libchess.a",
+          "libedevices.a",
+          "libfujitsu.a",
+          "libhds.a",
+          "libhitachi.a",
+          "libigt.a",
+          "libkaneko.a",
+          "liblsi.a",
+          "libmakerbot.a",
+          "libmidcoin.a",
+          "libmit.a",
+          "libmitsubishi.a",
+          "libnewcrest.a",
+          "libnext.a",
+          "libnorthstar.a",
+          "libolivetti.a",
+          "libomnibyte.a",
+          "libphoenix.a",
+          "libpoly88.a",
+          "libsega.a",
+          "libseta.a",
+          "libsgi.a",
+          "libstm.a",
+          "libsynertek.a",
+          "libtab.a",
+          "libtabaustria.a",
+          "libtatsumi.a",
+          "libtecmo.a",
+          "libvideoton.a",
+          "libvotrax.a",
+          "libyachiyo.a",
+          "libyamaha.a",
+          "libyeno.a",
+          "libzpa.a"
+        ],
+        "predicted_cpu_seconds": 1368.43,
+        "target_count": 45,
+        "targets": [
+          "adds",
+          "alpha",
+          "apollo",
+          "aristocrat",
+          "bfm",
+          "bitcorp",
+          "bordun",
+          "canon",
+          "capcom",
+          "ccs",
+          "ces",
+          "chess",
+          "edevices",
+          "fujitsu",
+          "hds",
+          "hitachi",
+          "igt",
+          "kaneko",
+          "lsi",
+          "makerbot",
+          "midcoin",
+          "mit",
+          "mitsubishi",
+          "newcrest",
+          "next",
+          "northstar",
+          "olivetti",
+          "omnibyte",
+          "phoenix",
+          "poly88",
+          "sega",
+          "seta",
+          "sgi",
+          "stm",
+          "synertek",
+          "tab",
+          "tabaustria",
+          "tatsumi",
+          "tecmo",
+          "videoton",
+          "votrax",
+          "yachiyo",
+          "yamaha",
+          "yeno",
+          "zpa"
+        ]
+      },
+      {
+        "definition_hash": "11f41ef8901124828bee53c82c75284b72787df023da4ff31f05b5e532b5f7df",
+        "name": "driver-4",
+        "outputs": [
+          "libakai.a",
+          "libaltos.a",
+          "libatlus.a",
+          "libausnz.a",
+          "libbe.a",
+          "libbondwell.a",
+          "libbooth.a",
+          "libburroughs.a",
+          "libcantab.a",
+          "libcce.a",
+          "libcromemco.a",
+          "libdooyong.a",
+          "libdrc.a",
+          "libenterprise.a",
+          "libepson.a",
+          "libgametron.a",
+          "libhandheld.a",
+          "libhomebrew.a",
+          "libhuangyeh.a",
+          "libhusky.a",
+          "libjpm.a",
+          "libkaypro.a",
+          "libkoei.a",
+          "libkontron.a",
+          "libmera.a",
+          "libmicroterm.a",
+          "libnix.a",
+          "liboberheim.a",
+          "libqume.a",
+          "librm.a",
+          "libsaitek.a",
+          "libsamsung.a",
+          "libseibu.a",
+          "libsequential.a",
+          "libsharp.a",
+          "libskeleton.a",
+          "libtch.a",
+          "libtms.a",
+          "libtoshiba.a",
+          "libtrainer.a",
+          "libvectorgraphic.a",
+          "libvideogames.a",
+          "libvisual.a",
+          "libwang.a",
+          "libwicat.a"
+        ],
+        "predicted_cpu_seconds": 1361.67,
+        "target_count": 45,
+        "targets": [
+          "akai",
+          "altos",
+          "atlus",
+          "ausnz",
+          "be",
+          "bondwell",
+          "booth",
+          "burroughs",
+          "cantab",
+          "cce",
+          "cromemco",
+          "dooyong",
+          "drc",
+          "enterprise",
+          "epson",
+          "gametron",
+          "handheld",
+          "homebrew",
+          "huangyeh",
+          "husky",
+          "jpm",
+          "kaypro",
+          "koei",
+          "kontron",
+          "mera",
+          "microterm",
+          "nix",
+          "oberheim",
+          "qume",
+          "rm",
+          "saitek",
+          "samsung",
+          "seibu",
+          "sequential",
+          "sharp",
+          "skeleton",
+          "tch",
+          "tms",
+          "toshiba",
+          "trainer",
+          "vectorgraphic",
+          "videogames",
+          "visual",
+          "wang",
+          "wicat"
+        ]
+      },
+      {
+        "definition_hash": "c67703fac36b17c22943139d6d5a7f5c3b8ec7806d6ad05694a7168f4602fc48",
+        "name": "driver-5",
+        "outputs": [
+          "libalesis.a",
+          "libarcadia.a",
+          "libastrocorp.a",
+          "libbmc.a",
+          "libcolonial.a",
+          "libcommodore.a",
+          "libcosmo.a",
+          "libdataeast.a",
+          "libdec.a",
+          "libdms.a",
+          "libeolith.a",
+          "libexcellent.a",
+          "libfairchild.a",
+          "libgrundy.a",
+          "libjaleco.a",
+          "libmatic.a",
+          "libmatsushita.a",
+          "libmeadows.a",
+          "libmerit.a",
+          "libmetro.a",
+          "libncr.a",
+          "libnetronics.a",
+          "libnmk.a",
+          "libnovadesitec.a",
+          "libopenuni.a",
+          "libpacific.a",
+          "libpalm.a",
+          "libpce.a",
+          "libpsikyo.a",
+          "libsage.a",
+          "libsealy.a",
+          "libshared.a",
+          "libsun.a",
+          "libtaito.a",
+          "libtangerine.a",
+          "libtoaplan.a",
+          "libtomy.a",
+          "libultratec.a",
+          "libumc.a",
+          "libupl.a",
+          "libusp.a",
+          "libvaladon.a",
+          "libvsystem.a",
+          "libwing.a",
+          "libzaccaria.a"
+        ],
+        "predicted_cpu_seconds": 1361.47,
+        "target_count": 45,
+        "targets": [
+          "alesis",
+          "arcadia",
+          "astrocorp",
+          "bmc",
+          "colonial",
+          "commodore",
+          "cosmo",
+          "dataeast",
+          "dec",
+          "dms",
+          "eolith",
+          "excellent",
+          "fairchild",
+          "grundy",
+          "jaleco",
+          "matic",
+          "matsushita",
+          "meadows",
+          "merit",
+          "metro",
+          "ncr",
+          "netronics",
+          "nmk",
+          "novadesitec",
+          "openuni",
+          "pacific",
+          "palm",
+          "pce",
+          "psikyo",
+          "sage",
+          "sealy",
+          "shared",
+          "sun",
+          "taito",
+          "tangerine",
+          "toaplan",
+          "tomy",
+          "ultratec",
+          "umc",
+          "upl",
+          "usp",
+          "valadon",
+          "vsystem",
+          "wing",
+          "zaccaria"
+        ]
+      },
+      {
+        "definition_hash": "d47fd78c3f23a3569417d1e63c68edb56dd4f93661e56ad2adf59f0a46a4c5a1",
+        "name": "driver-6",
+        "outputs": [
+          "libaccess.a",
+          "libampex.a",
+          "libapf.a",
+          "libconitec.a",
+          "libdg.a",
+          "libdynax.a",
+          "libeaca.a",
+          "libericsson.a",
+          "libexidy.a",
+          "libf32.a",
+          "libfidelity.a",
+          "libigs.a",
+          "libintel.a",
+          "libintergraph.a",
+          "libinterton.a",
+          "libkyocera.a",
+          "liblinn.a",
+          "libmicrosoft.a",
+          "libmiltonbradley.a",
+          "libmsx.a",
+          "libmultitech.a",
+          "libnamco.a",
+          "libnascom.a",
+          "libncd.a",
+          "libnovag.a",
+          "liborca.a",
+          "libosborne.a",
+          "libpacman.a",
+          "libpc.a",
+          "libpinball.a",
+          "libplaymark.a",
+          "librecfranco.a",
+          "librobotron.a",
+          "librockwell.a",
+          "libslicer.a",
+          "libsnk.a",
+          "libta.a",
+          "libtektronix.a",
+          "libthomson.a",
+          "libti.a",
+          "libtiki.a",
+          "libtryom.a",
+          "libunicard.a",
+          "libunisys.a",
+          "libyunsung.a",
+          "libzilog.a"
+        ],
+        "predicted_cpu_seconds": 1361.72,
+        "target_count": 46,
+        "targets": [
+          "access",
+          "ampex",
+          "apf",
+          "conitec",
+          "dg",
+          "dynax",
+          "eaca",
+          "ericsson",
+          "exidy",
+          "f32",
+          "fidelity",
+          "igs",
+          "intel",
+          "intergraph",
+          "interton",
+          "kyocera",
+          "linn",
+          "microsoft",
+          "miltonbradley",
+          "msx",
+          "multitech",
+          "namco",
+          "nascom",
+          "ncd",
+          "novag",
+          "orca",
+          "osborne",
+          "pacman",
+          "pc",
+          "pinball",
+          "playmark",
+          "recfranco",
+          "robotron",
+          "rockwell",
+          "slicer",
+          "snk",
+          "ta",
+          "tektronix",
+          "thomson",
+          "ti",
+          "tiki",
+          "tryom",
+          "unicard",
+          "unisys",
+          "yunsung",
+          "zilog"
+        ]
+      },
+      {
+        "definition_hash": "664ccbdfdf8be7876da3e261c8560545d378abdf4d2192b3441997184c3b1776",
+        "name": "driver-7",
+        "outputs": [
+          "libact.a",
+          "liballiedleisure.a",
+          "libamcoe.a",
+          "libapple.a",
+          "libcasio.a",
+          "libcitoh.a",
+          "libconcept.a",
+          "libdai.a",
+          "libensoniq.a",
+          "libentex.a",
+          "libfacit.a",
+          "libforce.a",
+          "libfuntech.a",
+          "libgalaxian.a",
+          "libhec2hrp.a",
+          "libibm.a",
+          "libice.a",
+          "libkonami.a",
+          "libkyber.a",
+          "liblearsiegler.a",
+          "libmaygay.a",
+          "libmc.a",
+          "libmicrokey.a",
+          "libmips.a",
+          "libmits.a",
+          "libmodelracing.a",
+          "libmoog.a",
+          "libmupid.a",
+          "libnakajima.a",
+          "libnichibutsu.a",
+          "liborla.a",
+          "libpaia.a",
+          "libphilips.a",
+          "librca.a",
+          "libsamcoupe.a",
+          "libsuccess.a",
+          "libsvi.a",
+          "libswtpc.a",
+          "libtelevideo.a",
+          "libtesla.a",
+          "libtiger.a",
+          "libtrs.a",
+          "libunisonic.a",
+          "libussr.a",
+          "libwestinghouse.a",
+          "libwyse.a"
+        ],
+        "predicted_cpu_seconds": 1361.45,
+        "target_count": 46,
+        "targets": [
+          "act",
+          "alliedleisure",
+          "amcoe",
+          "apple",
+          "casio",
+          "citoh",
+          "concept",
+          "dai",
+          "ensoniq",
+          "entex",
+          "facit",
+          "force",
+          "funtech",
+          "galaxian",
+          "hec2hrp",
+          "ibm",
+          "ice",
+          "konami",
+          "kyber",
+          "learsiegler",
+          "maygay",
+          "mc",
+          "microkey",
+          "mips",
+          "mits",
+          "modelracing",
+          "moog",
+          "mupid",
+          "nakajima",
+          "nichibutsu",
+          "orla",
+          "paia",
+          "philips",
+          "rca",
+          "samcoupe",
+          "success",
+          "svi",
+          "swtpc",
+          "televideo",
+          "tesla",
+          "tiger",
+          "trs",
+          "unisonic",
+          "ussr",
+          "westinghouse",
+          "wyse"
+        ]
+      },
+      {
+        "definition_hash": "fe1beef738996fca46b5344f3770014c5096668192affe4242c98b8dcfe034da",
+        "name": "driver-8",
+        "outputs": [
+          "libacorn.a",
+          "libagat.a",
+          "libamiga.a",
+          "libatt.a",
+          "libbanctec.a",
+          "libbrother.a",
+          "libceres.a",
+          "libchessking.a",
+          "libchromatics.a",
+          "libcinematronics.a",
+          "libcirsa.a",
+          "libelektor.a",
+          "libelektron.a",
+          "libfunworld.a",
+          "libgaelco.a",
+          "libgridcomp.a",
+          "libheathzenith.a",
+          "libhomelab.a",
+          "libhominn.a",
+          "libisc.a",
+          "libkawai.a",
+          "libkurzweil.a",
+          "libliberty.a",
+          "libmemotech.a",
+          "libmorrow.a",
+          "libmotorola.a",
+          "libnasco.a",
+          "libnatsemi.a",
+          "libnintendo.a",
+          "libomori.a",
+          "libpositron.a",
+          "libpromat.a",
+          "libregnecentralen.a",
+          "libroland.a",
+          "libseequa.a",
+          "libsinclair.a",
+          "libstern.a",
+          "libsuna.a",
+          "libsunelectronics.a",
+          "libsvision.a",
+          "libtvgames.a",
+          "libunico.a",
+          "libuniversal.a",
+          "libvtech.a",
+          "libwavemate.a",
+          "libxerox.a"
+        ],
+        "predicted_cpu_seconds": 1361.66,
+        "target_count": 46,
+        "targets": [
+          "acorn",
+          "agat",
+          "amiga",
+          "att",
+          "banctec",
+          "brother",
+          "ceres",
+          "chessking",
+          "chromatics",
+          "cinematronics",
+          "cirsa",
+          "elektor",
+          "elektron",
+          "funworld",
+          "gaelco",
+          "gridcomp",
+          "heathzenith",
+          "homelab",
+          "hominn",
+          "isc",
+          "kawai",
+          "kurzweil",
+          "liberty",
+          "memotech",
+          "morrow",
+          "motorola",
+          "nasco",
+          "natsemi",
+          "nintendo",
+          "omori",
+          "positron",
+          "promat",
+          "regnecentralen",
+          "roland",
+          "seequa",
+          "sinclair",
+          "stern",
+          "suna",
+          "sunelectronics",
+          "svision",
+          "tvgames",
+          "unico",
+          "universal",
+          "vtech",
+          "wavemate",
+          "xerox"
+        ]
+      }
+    ],
+    "timing": {
+      "identity": {
+        "architecture": "x64",
+        "compiler": "clang",
+        "compiler_version": "clang-18",
+        "configuration": "release64",
+        "make_jobs": "3",
+        "osd": "sdl",
+        "pch": "enabled",
+        "runner_arch": "X64",
+        "runner_image": "ubuntu-latest",
+        "source_commit": "d5378ba4c9740c5e431f74d281f4020c9cc5655a",
+        "subtarget": "mame",
+        "target_os": "linux",
+        "timing_schema": "1"
+      },
+      "metric": "cpu_seconds",
+      "sources": [
+        {
+          "file": "ci-project-timings.csv",
+          "run_id": "35541046991",
+          "sha256": "cc5e65749564e4e2e8f41e8258df20092a64daa021cf6577195d64d3f08a19f0"
+        }
+      ],
+      "targets": {
+        "access": {
+          "sample_count": 1,
+          "weight": 2.84
+        },
+        "acorn": {
+          "sample_count": 1,
+          "weight": 60.06
+        },
+        "act": {
+          "sample_count": 1,
+          "weight": 26.83
+        },
+        "adc": {
+          "sample_count": 1,
+          "weight": 3.4
+        },
+        "adds": {
+          "sample_count": 1,
+          "weight": 8.77
+        },
+        "adp": {
+          "sample_count": 1,
+          "weight": 14.11
+        },
+        "agat": {
+          "sample_count": 1,
+          "weight": 8.66
+        },
+        "akai": {
+          "sample_count": 1,
+          "weight": 26.99
+        },
+        "alesis": {
+          "sample_count": 1,
+          "weight": 8.67
+        },
+        "alliedleisure": {
+          "sample_count": 1,
+          "weight": 16.97
+        },
+        "alpha": {
+          "sample_count": 1,
+          "weight": 23.32
+        },
+        "altos": {
+          "sample_count": 1,
+          "weight": 25.1
+        },
+        "amcoe": {
+          "sample_count": 1,
+          "weight": 5.44
+        },
+        "amiga": {
+          "sample_count": 1,
+          "weight": 34.4
+        },
+        "amirix": {
+          "sample_count": 1,
+          "weight": 1.94
+        },
+        "ampex": {
+          "sample_count": 1,
+          "weight": 7.8
+        },
+        "ampro": {
+          "sample_count": 1,
+          "weight": 7.89
+        },
+        "amstrad": {
+          "sample_count": 1,
+          "weight": 25.51
+        },
+        "apf": {
+          "sample_count": 1,
+          "weight": 2.58
+        },
+        "apollo": {
+          "sample_count": 1,
+          "weight": 11.18
+        },
+        "apple": {
+          "sample_count": 1,
+          "weight": 172.9
+        },
+        "appliedconcepts": {
+          "sample_count": 1,
+          "weight": 8.9
+        },
+        "arcadia": {
+          "sample_count": 1,
+          "weight": 5.12
+        },
+        "aristocrat": {
+          "sample_count": 1,
+          "weight": 9.99
+        },
+        "astrocorp": {
+          "sample_count": 1,
+          "weight": 7.87
+        },
+        "atari": {
+          "sample_count": 1,
+          "weight": 773.4
+        },
+        "atlus": {
+          "sample_count": 1,
+          "weight": 13.1
+        },
+        "att": {
+          "sample_count": 1,
+          "weight": 9.19
+        },
+        "ausnz": {
+          "sample_count": 1,
+          "weight": 45.9
+        },
+        "bally": {
+          "sample_count": 1,
+          "weight": 61.18
+        },
+        "banctec": {
+          "sample_count": 1,
+          "weight": 1.37
+        },
+        "bandai": {
+          "sample_count": 1,
+          "weight": 8.08
+        },
+        "barcrest": {
+          "sample_count": 1,
+          "weight": 100.31
+        },
+        "be": {
+          "sample_count": 1,
+          "weight": 7.59
+        },
+        "beehive": {
+          "sample_count": 1,
+          "weight": 2.66
+        },
+        "benesse": {
+          "sample_count": 1,
+          "weight": 2.93
+        },
+        "bfm": {
+          "sample_count": 1,
+          "weight": 98.72
+        },
+        "bitcorp": {
+          "sample_count": 1,
+          "weight": 2.01
+        },
+        "bmc": {
+          "sample_count": 1,
+          "weight": 16.02
+        },
+        "bondwell": {
+          "sample_count": 1,
+          "weight": 4.65
+        },
+        "booth": {
+          "sample_count": 1,
+          "weight": 3.53
+        },
+        "bordun": {
+          "sample_count": 1,
+          "weight": 6.46
+        },
+        "brainchild": {
+          "sample_count": 1,
+          "weight": 2.24
+        },
+        "brother": {
+          "sample_count": 1,
+          "weight": 10.07
+        },
+        "burroughs": {
+          "sample_count": 1,
+          "weight": 2.89
+        },
+        "camputers": {
+          "sample_count": 1,
+          "weight": 3.5
+        },
+        "canon": {
+          "sample_count": 1,
+          "weight": 4.46
+        },
+        "cantab": {
+          "sample_count": 1,
+          "weight": 2.48
+        },
+        "capcom": {
+          "sample_count": 1,
+          "weight": 150.38
+        },
+        "casio": {
+          "sample_count": 1,
+          "weight": 62.65
+        },
+        "cave": {
+          "sample_count": 1,
+          "weight": 28.63
+        },
+        "cce": {
+          "sample_count": 1,
+          "weight": 1.84
+        },
+        "ccs": {
+          "sample_count": 1,
+          "weight": 2.16
+        },
+        "ceres": {
+          "sample_count": 1,
+          "weight": 2.3
+        },
+        "ces": {
+          "sample_count": 1,
+          "weight": 5.9
+        },
+        "chess": {
+          "sample_count": 1,
+          "weight": 13.39
+        },
+        "chessking": {
+          "sample_count": 1,
+          "weight": 7.4
+        },
+        "chromatics": {
+          "sample_count": 1,
+          "weight": 5.77
+        },
+        "cinematronics": {
+          "sample_count": 1,
+          "weight": 236.07
+        },
+        "cirsa": {
+          "sample_count": 1,
+          "weight": 7.72
+        },
+        "citoh": {
+          "sample_count": 1,
+          "weight": 13.31
+        },
+        "coleco": {
+          "sample_count": 1,
+          "weight": 7.39
+        },
+        "colonial": {
+          "sample_count": 1,
+          "weight": 1.56
+        },
+        "comad": {
+          "sample_count": 1,
+          "weight": 5.91
+        },
+        "commodore": {
+          "sample_count": 1,
+          "weight": 50.17
+        },
+        "compugraphic": {
+          "sample_count": 1,
+          "weight": 3.01
+        },
+        "comx": {
+          "sample_count": 1,
+          "weight": 4.12
+        },
+        "concept": {
+          "sample_count": 1,
+          "weight": 5.74
+        },
+        "conitec": {
+          "sample_count": 1,
+          "weight": 6.87
+        },
+        "cosmo": {
+          "sample_count": 1,
+          "weight": 3.66
+        },
+        "cromemco": {
+          "sample_count": 1,
+          "weight": 2.39
+        },
+        "cybiko": {
+          "sample_count": 1,
+          "weight": 5.19
+        },
+        "dai": {
+          "sample_count": 1,
+          "weight": 4.22
+        },
+        "dataeast": {
+          "sample_count": 1,
+          "weight": 163.41
+        },
+        "ddr": {
+          "sample_count": 1,
+          "weight": 44.76
+        },
+        "dec": {
+          "sample_count": 1,
+          "weight": 60.71
+        },
+        "dg": {
+          "sample_count": 1,
+          "weight": 3.46
+        },
+        "dgrm": {
+          "sample_count": 1,
+          "weight": 9.31
+        },
+        "dms": {
+          "sample_count": 1,
+          "weight": 2.41
+        },
+        "dooyong": {
+          "sample_count": 1,
+          "weight": 9.26
+        },
+        "drc": {
+          "sample_count": 1,
+          "weight": 1.52
+        },
+        "dyna": {
+          "sample_count": 1,
+          "weight": 6.03
+        },
+        "dynax": {
+          "sample_count": 1,
+          "weight": 28.97
+        },
+        "eaca": {
+          "sample_count": 1,
+          "weight": 5.63
+        },
+        "edevices": {
+          "sample_count": 1,
+          "weight": 14.84
+        },
+        "efo": {
+          "sample_count": 1,
+          "weight": 10.46
+        },
+        "elektor": {
+          "sample_count": 1,
+          "weight": 7.12
+        },
+        "elektron": {
+          "sample_count": 1,
+          "weight": 1.26
+        },
+        "emusys": {
+          "sample_count": 1,
+          "weight": 6.89
+        },
+        "ensoniq": {
+          "sample_count": 1,
+          "weight": 18.11
+        },
+        "enterprise": {
+          "sample_count": 1,
+          "weight": 3.39
+        },
+        "entex": {
+          "sample_count": 1,
+          "weight": 5.36
+        },
+        "eolith": {
+          "sample_count": 1,
+          "weight": 14.63
+        },
+        "epoch": {
+          "sample_count": 1,
+          "weight": 4.97
+        },
+        "epson": {
+          "sample_count": 1,
+          "weight": 17.98
+        },
+        "ericsson": {
+          "sample_count": 1,
+          "weight": 15.3
+        },
+        "esprit": {
+          "sample_count": 1,
+          "weight": 4.03
+        },
+        "excalibur": {
+          "sample_count": 1,
+          "weight": 10.65
+        },
+        "excellent": {
+          "sample_count": 1,
+          "weight": 19.45
+        },
+        "exidy": {
+          "sample_count": 1,
+          "weight": 82.55
+        },
+        "f32": {
+          "sample_count": 1,
+          "weight": 6.24
+        },
+        "facit": {
+          "sample_count": 1,
+          "weight": 6.8
+        },
+        "fairchild": {
+          "sample_count": 1,
+          "weight": 5.7
+        },
+        "fairlight": {
+          "sample_count": 1,
+          "weight": 8.12
+        },
+        "falco": {
+          "sample_count": 1,
+          "weight": 7.44
+        },
+        "fidelity": {
+          "sample_count": 1,
+          "weight": 54.45
+        },
+        "force": {
+          "sample_count": 1,
+          "weight": 1.04
+        },
+        "fujitsu": {
+          "sample_count": 1,
+          "weight": 20.57
+        },
+        "funtech": {
+          "sample_count": 1,
+          "weight": 4.81
+        },
+        "funworld": {
+          "sample_count": 1,
+          "weight": 15.75
+        },
+        "fuuki": {
+          "sample_count": 1,
+          "weight": 10.93
+        },
+        "gaelco": {
+          "sample_count": 1,
+          "weight": 86.57
+        },
+        "galaxian": {
+          "sample_count": 1,
+          "weight": 52.36
+        },
+        "gamepark": {
+          "sample_count": 1,
+          "weight": 4.48
+        },
+        "gametron": {
+          "sample_count": 1,
+          "weight": 4.5
+        },
+        "gottlieb": {
+          "sample_count": 1,
+          "weight": 6.25
+        },
+        "gridcomp": {
+          "sample_count": 1,
+          "weight": 3.89
+        },
+        "grundy": {
+          "sample_count": 1,
+          "weight": 2.95
+        },
+        "handheld": {
+          "sample_count": 1,
+          "weight": 93.8
+        },
+        "hds": {
+          "sample_count": 1,
+          "weight": 2.96
+        },
+        "heathzenith": {
+          "sample_count": 1,
+          "weight": 20.69
+        },
+        "hec2hrp": {
+          "sample_count": 1,
+          "weight": 7.14
+        },
+        "hegenerglaser": {
+          "sample_count": 1,
+          "weight": 52.02
+        },
+        "hitachi": {
+          "sample_count": 1,
+          "weight": 11.25
+        },
+        "homebrew": {
+          "sample_count": 1,
+          "weight": 52.68
+        },
+        "homelab": {
+          "sample_count": 1,
+          "weight": 3.67
+        },
+        "hominn": {
+          "sample_count": 1,
+          "weight": 4.53
+        },
+        "hp": {
+          "sample_count": 1,
+          "weight": 89.51
+        },
+        "huangyeh": {
+          "sample_count": 1,
+          "weight": 4.04
+        },
+        "husky": {
+          "sample_count": 1,
+          "weight": 8.04
+        },
+        "ibm": {
+          "sample_count": 1,
+          "weight": 44.84
+        },
+        "ice": {
+          "sample_count": 1,
+          "weight": 22.88
+        },
+        "igs": {
+          "sample_count": 1,
+          "weight": 147.96
+        },
+        "igt": {
+          "sample_count": 1,
+          "weight": 17.99
+        },
+        "informer": {
+          "sample_count": 1,
+          "weight": 13.59
+        },
+        "intel": {
+          "sample_count": 1,
+          "weight": 33.83
+        },
+        "intergraph": {
+          "sample_count": 1,
+          "weight": 8.63
+        },
+        "interton": {
+          "sample_count": 1,
+          "weight": 4.09
+        },
+        "irem": {
+          "sample_count": 1,
+          "weight": 79.09
+        },
+        "isc": {
+          "sample_count": 1,
+          "weight": 2.07
+        },
+        "itech": {
+          "sample_count": 1,
+          "weight": 24.2
+        },
+        "jaleco": {
+          "sample_count": 1,
+          "weight": 110.41
+        },
+        "jpm": {
+          "sample_count": 1,
+          "weight": 38.8
+        },
+        "kaneko": {
+          "sample_count": 1,
+          "weight": 66.13
+        },
+        "kawai": {
+          "sample_count": 1,
+          "weight": 9.58
+        },
+        "kaypro": {
+          "sample_count": 1,
+          "weight": 5.49
+        },
+        "koei": {
+          "sample_count": 1,
+          "weight": 2.04
+        },
+        "konami": {
+          "sample_count": 1,
+          "weight": 356.0
+        },
+        "kontron": {
+          "sample_count": 1,
+          "weight": 5.17
+        },
+        "korg": {
+          "sample_count": 1,
+          "weight": 22.32
+        },
+        "kurzweil": {
+          "sample_count": 1,
+          "weight": 2.01
+        },
+        "kyber": {
+          "sample_count": 1,
+          "weight": 3.82
+        },
+        "kyocera": {
+          "sample_count": 1,
+          "weight": 4.74
+        },
+        "leapfrog": {
+          "sample_count": 1,
+          "weight": 5.52
+        },
+        "learsiegler": {
+          "sample_count": 1,
+          "weight": 8.95
+        },
+        "liberty": {
+          "sample_count": 1,
+          "weight": 6.43
+        },
+        "linn": {
+          "sample_count": 1,
+          "weight": 4.96
+        },
+        "lsi": {
+          "sample_count": 1,
+          "weight": 7.14
+        },
+        "luxor": {
+          "sample_count": 1,
+          "weight": 16.71
+        },
+        "makerbot": {
+          "sample_count": 1,
+          "weight": 1.93
+        },
+        "matic": {
+          "sample_count": 1,
+          "weight": 2.49
+        },
+        "matsushita": {
+          "sample_count": 1,
+          "weight": 15.48
+        },
+        "mattel": {
+          "sample_count": 1,
+          "weight": 12.64
+        },
+        "maygay": {
+          "sample_count": 1,
+          "weight": 37.8
+        },
+        "mc": {
+          "sample_count": 1,
+          "weight": 4.83
+        },
+        "mchester": {
+          "sample_count": 1,
+          "weight": 1.48
+        },
+        "meadows": {
+          "sample_count": 1,
+          "weight": 5.38
+        },
+        "memotech": {
+          "sample_count": 1,
+          "weight": 5.19
+        },
+        "mera": {
+          "sample_count": 1,
+          "weight": 8.12
+        },
+        "merit": {
+          "sample_count": 1,
+          "weight": 20.88
+        },
+        "metro": {
+          "sample_count": 1,
+          "weight": 10.75
+        },
+        "mg1": {
+          "sample_count": 1,
+          "weight": 5.18
+        },
+        "microcraft": {
+          "sample_count": 1,
+          "weight": 4.48
+        },
+        "microkey": {
+          "sample_count": 1,
+          "weight": 2.77
+        },
+        "microsoft": {
+          "sample_count": 1,
+          "weight": 5.18
+        },
+        "microterm": {
+          "sample_count": 1,
+          "weight": 11.65
+        },
+        "midcoin": {
+          "sample_count": 1,
+          "weight": 4.67
+        },
+        "midw8080": {
+          "sample_count": 1,
+          "weight": 31.46
+        },
+        "miltonbradley": {
+          "sample_count": 1,
+          "weight": 9.55
+        },
+        "mips": {
+          "sample_count": 1,
+          "weight": 7.32
+        },
+        "misc": {
+          "sample_count": 1,
+          "weight": 605.57
+        },
+        "mit": {
+          "sample_count": 1,
+          "weight": 8.8
+        },
+        "mits": {
+          "sample_count": 1,
+          "weight": 6.32
+        },
+        "mitsubishi": {
+          "sample_count": 1,
+          "weight": 6.49
+        },
+        "modelracing": {
+          "sample_count": 1,
+          "weight": 8.69
+        },
+        "moog": {
+          "sample_count": 1,
+          "weight": 4.55
+        },
+        "morrow": {
+          "sample_count": 1,
+          "weight": 4.97
+        },
+        "motorola": {
+          "sample_count": 1,
+          "weight": 39.93
+        },
+        "msx": {
+          "sample_count": 1,
+          "weight": 23.61
+        },
+        "multitech": {
+          "sample_count": 1,
+          "weight": 7.15
+        },
+        "mupid": {
+          "sample_count": 1,
+          "weight": 3.77
+        },
+        "nakajima": {
+          "sample_count": 1,
+          "weight": 2.18
+        },
+        "namco": {
+          "sample_count": 1,
+          "weight": 305.87
+        },
+        "nasco": {
+          "sample_count": 1,
+          "weight": 4.73
+        },
+        "nascom": {
+          "sample_count": 1,
+          "weight": 2.25
+        },
+        "natsemi": {
+          "sample_count": 1,
+          "weight": 6.55
+        },
+        "ncd": {
+          "sample_count": 1,
+          "weight": 5.75
+        },
+        "ncr": {
+          "sample_count": 1,
+          "weight": 5.28
+        },
+        "nec": {
+          "sample_count": 1,
+          "weight": 70.25
+        },
+        "netronics": {
+          "sample_count": 1,
+          "weight": 3.78
+        },
+        "newcrest": {
+          "sample_count": 1,
+          "weight": 32.14
+        },
+        "next": {
+          "sample_count": 1,
+          "weight": 7.99
+        },
+        "nichibutsu": {
+          "sample_count": 1,
+          "weight": 79.49
+        },
+        "nintendo": {
+          "sample_count": 1,
+          "weight": 187.85
+        },
+        "nix": {
+          "sample_count": 1,
+          "weight": 6.88
+        },
+        "nmk": {
+          "sample_count": 1,
+          "weight": 34.72
+        },
+        "nokia": {
+          "sample_count": 1,
+          "weight": 9.29
+        },
+        "northstar": {
+          "sample_count": 1,
+          "weight": 1.47
+        },
+        "novadesitec": {
+          "sample_count": 1,
+          "weight": 4.72
+        },
+        "novag": {
+          "sample_count": 1,
+          "weight": 41.66
+        },
+        "novation": {
+          "sample_count": 1,
+          "weight": 2.27
+        },
+        "oberheim": {
+          "sample_count": 1,
+          "weight": 10.27
+        },
+        "olivetti": {
+          "sample_count": 1,
+          "weight": 17.86
+        },
+        "olympia": {
+          "sample_count": 1,
+          "weight": 13.37
+        },
+        "olympiaint": {
+          "sample_count": 1,
+          "weight": 9.7
+        },
+        "omnibyte": {
+          "sample_count": 1,
+          "weight": 3.72
+        },
+        "omori": {
+          "sample_count": 1,
+          "weight": 12.02
+        },
+        "omron": {
+          "sample_count": 1,
+          "weight": 15.41
+        },
+        "openuni": {
+          "sample_count": 1,
+          "weight": 3.27
+        },
+        "orca": {
+          "sample_count": 1,
+          "weight": 16.96
+        },
+        "orla": {
+          "sample_count": 1,
+          "weight": 2.05
+        },
+        "osborne": {
+          "sample_count": 1,
+          "weight": 7.28
+        },
+        "osi": {
+          "sample_count": 1,
+          "weight": 4.07
+        },
+        "pacific": {
+          "sample_count": 1,
+          "weight": 4.34
+        },
+        "pacman": {
+          "sample_count": 1,
+          "weight": 17.97
+        },
+        "paia": {
+          "sample_count": 1,
+          "weight": 7.94
+        },
+        "palm": {
+          "sample_count": 1,
+          "weight": 4.4
+        },
+        "pc": {
+          "sample_count": 1,
+          "weight": 97.7
+        },
+        "pce": {
+          "sample_count": 1,
+          "weight": 9.08
+        },
+        "philips": {
+          "sample_count": 1,
+          "weight": 20.87
+        },
+        "phoenix": {
+          "sample_count": 1,
+          "weight": 13.69
+        },
+        "pinball": {
+          "sample_count": 1,
+          "weight": 174.52
+        },
+        "pitronics": {
+          "sample_count": 1,
+          "weight": 2.07
+        },
+        "playmark": {
+          "sample_count": 1,
+          "weight": 12.13
+        },
+        "plexus": {
+          "sample_count": 1,
+          "weight": 1.86
+        },
+        "poly88": {
+          "sample_count": 1,
+          "weight": 5.11
+        },
+        "positron": {
+          "sample_count": 1,
+          "weight": 2.95
+        },
+        "promat": {
+          "sample_count": 1,
+          "weight": 4.17
+        },
+        "psikyo": {
+          "sample_count": 1,
+          "weight": 12.28
+        },
+        "psion": {
+          "sample_count": 1,
+          "weight": 37.29
+        },
+        "quantel": {
+          "sample_count": 1,
+          "weight": 5.65
+        },
+        "qume": {
+          "sample_count": 1,
+          "weight": 10.79
+        },
+        "ramtek": {
+          "sample_count": 1,
+          "weight": 21.1
+        },
+        "rare": {
+          "sample_count": 1,
+          "weight": 5.18
+        },
+        "rca": {
+          "sample_count": 1,
+          "weight": 11.27
+        },
+        "recfranco": {
+          "sample_count": 1,
+          "weight": 10.66
+        },
+        "regnecentralen": {
+          "sample_count": 1,
+          "weight": 10.67
+        },
+        "rm": {
+          "sample_count": 1,
+          "weight": 15.05
+        },
+        "robotron": {
+          "sample_count": 1,
+          "weight": 12.88
+        },
+        "rockwell": {
+          "sample_count": 1,
+          "weight": 3.43
+        },
+        "roland": {
+          "sample_count": 1,
+          "weight": 76.66
+        },
+        "rolm": {
+          "sample_count": 1,
+          "weight": 2.11
+        },
+        "sage": {
+          "sample_count": 1,
+          "weight": 2.06
+        },
+        "saitek": {
+          "sample_count": 1,
+          "weight": 63.17
+        },
+        "samcoupe": {
+          "sample_count": 1,
+          "weight": 1.81
+        },
+        "samsung": {
+          "sample_count": 1,
+          "weight": 6.32
+        },
+        "sanritsu": {
+          "sample_count": 1,
+          "weight": 33.47
+        },
+        "sanyo": {
+          "sample_count": 1,
+          "weight": 12.24
+        },
+        "saturn": {
+          "sample_count": 1,
+          "weight": 1.35
+        },
+        "sealy": {
+          "sample_count": 1,
+          "weight": 10.19
+        },
+        "seequa": {
+          "sample_count": 1,
+          "weight": 2.47
+        },
+        "sega": {
+          "sample_count": 1,
+          "weight": 471.79
+        },
+        "seibu": {
+          "sample_count": 1,
+          "weight": 145.11
+        },
+        "sequential": {
+          "sample_count": 1,
+          "weight": 13.68
+        },
+        "seta": {
+          "sample_count": 1,
+          "weight": 60.38
+        },
+        "sfrj": {
+          "sample_count": 1,
+          "weight": 15.23
+        },
+        "sgi": {
+          "sample_count": 1,
+          "weight": 46.1
+        },
+        "shared": {
+          "sample_count": 1,
+          "weight": 86.3
+        },
+        "sharp": {
+          "sample_count": 1,
+          "weight": 82.11
+        },
+        "siemens": {
+          "sample_count": 1,
+          "weight": 11.3
+        },
+        "sigma": {
+          "sample_count": 1,
+          "weight": 20.52
+        },
+        "sinclair": {
+          "sample_count": 1,
+          "weight": 115.92
+        },
+        "skeleton": {
+          "sample_count": 1,
+          "weight": 501.39
+        },
+        "slicer": {
+          "sample_count": 1,
+          "weight": 1.84
+        },
+        "snk": {
+          "sample_count": 1,
+          "weight": 51.5
+        },
+        "sony": {
+          "sample_count": 1,
+          "weight": 51.6
+        },
+        "sord": {
+          "sample_count": 1,
+          "weight": 6.87
+        },
+        "stern": {
+          "sample_count": 1,
+          "weight": 12.56
+        },
+        "stm": {
+          "sample_count": 1,
+          "weight": 5.44
+        },
+        "subsino": {
+          "sample_count": 1,
+          "weight": 15.76
+        },
+        "success": {
+          "sample_count": 1,
+          "weight": 11.16
+        },
+        "sun": {
+          "sample_count": 1,
+          "weight": 22.34
+        },
+        "suna": {
+          "sample_count": 1,
+          "weight": 14.64
+        },
+        "sunelectronics": {
+          "sample_count": 1,
+          "weight": 22.86
+        },
+        "sunwise": {
+          "sample_count": 1,
+          "weight": 8.76
+        },
+        "svi": {
+          "sample_count": 1,
+          "weight": 3.0
+        },
+        "svision": {
+          "sample_count": 1,
+          "weight": 3.36
+        },
+        "swtpc": {
+          "sample_count": 1,
+          "weight": 10.07
+        },
+        "synertek": {
+          "sample_count": 1,
+          "weight": 5.32
+        },
+        "ta": {
+          "sample_count": 1,
+          "weight": 10.12
+        },
+        "tab": {
+          "sample_count": 1,
+          "weight": 3.84
+        },
+        "tabaustria": {
+          "sample_count": 0,
+          "weight": 8.0
+        },
+        "taito": {
+          "sample_count": 1,
+          "weight": 441.15
+        },
+        "tandberg": {
+          "sample_count": 1,
+          "weight": 9.93
+        },
+        "tangerine": {
+          "sample_count": 1,
+          "weight": 11.79
+        },
+        "tatsumi": {
+          "sample_count": 1,
+          "weight": 31.32
+        },
+        "tatung": {
+          "sample_count": 1,
+          "weight": 4.8
+        },
+        "tch": {
+          "sample_count": 1,
+          "weight": 9.51
+        },
+        "teamconcepts": {
+          "sample_count": 1,
+          "weight": 1.33
+        },
+        "tecfri": {
+          "sample_count": 1,
+          "weight": 7.02
+        },
+        "technos": {
+          "sample_count": 1,
+          "weight": 42.33
+        },
+        "tecmo": {
+          "sample_count": 1,
+          "weight": 44.2
+        },
+        "tektronix": {
+          "sample_count": 1,
+          "weight": 22.13
+        },
+        "telenova": {
+          "sample_count": 1,
+          "weight": 7.19
+        },
+        "telercas": {
+          "sample_count": 1,
+          "weight": 5.77
+        },
+        "televideo": {
+          "sample_count": 1,
+          "weight": 31.67
+        },
+        "tesla": {
+          "sample_count": 1,
+          "weight": 9.58
+        },
+        "thomson": {
+          "sample_count": 1,
+          "weight": 13.79
+        },
+        "ti": {
+          "sample_count": 1,
+          "weight": 64.1
+        },
+        "tiger": {
+          "sample_count": 1,
+          "weight": 15.58
+        },
+        "tigertel": {
+          "sample_count": 1,
+          "weight": 2.48
+        },
+        "tiki": {
+          "sample_count": 1,
+          "weight": 4.13
+        },
+        "tms": {
+          "sample_count": 1,
+          "weight": 1.26
+        },
+        "toaplan": {
+          "sample_count": 1,
+          "weight": 68.03
+        },
+        "tomy": {
+          "sample_count": 1,
+          "weight": 7.22
+        },
+        "torch": {
+          "sample_count": 1,
+          "weight": 4.68
+        },
+        "toshiba": {
+          "sample_count": 1,
+          "weight": 17.74
+        },
+        "trainer": {
+          "sample_count": 1,
+          "weight": 31.9
+        },
+        "trs": {
+          "sample_count": 1,
+          "weight": 90.61
+        },
+        "tryom": {
+          "sample_count": 1,
+          "weight": 4.52
+        },
+        "tvgames": {
+          "sample_count": 1,
+          "weight": 167.58
+        },
+        "ultimachine": {
+          "sample_count": 1,
+          "weight": 1.42
+        },
+        "ultratec": {
+          "sample_count": 1,
+          "weight": 1.79
+        },
+        "umc": {
+          "sample_count": 1,
+          "weight": 6.8
+        },
+        "unicard": {
+          "sample_count": 1,
+          "weight": 1.32
+        },
+        "unico": {
+          "sample_count": 1,
+          "weight": 16.05
+        },
+        "unisonic": {
+          "sample_count": 1,
+          "weight": 3.12
+        },
+        "unisys": {
+          "sample_count": 1,
+          "weight": 2.13
+        },
+        "universal": {
+          "sample_count": 1,
+          "weight": 30.89
+        },
+        "upl": {
+          "sample_count": 1,
+          "weight": 7.2
+        },
+        "usp": {
+          "sample_count": 1,
+          "weight": 1.06
+        },
+        "ussr": {
+          "sample_count": 1,
+          "weight": 129.42
+        },
+        "valadon": {
+          "sample_count": 1,
+          "weight": 6.43
+        },
+        "vectorgraphic": {
+          "sample_count": 1,
+          "weight": 7.01
+        },
+        "verifone": {
+          "sample_count": 1,
+          "weight": 3.13
+        },
+        "vidbrain": {
+          "sample_count": 1,
+          "weight": 3.6
+        },
+        "videogames": {
+          "sample_count": 1,
+          "weight": 5.24
+        },
+        "videoton": {
+          "sample_count": 1,
+          "weight": 4.19
+        },
+        "virtual": {
+          "sample_count": 1,
+          "weight": 18.7
+        },
+        "visual": {
+          "sample_count": 1,
+          "weight": 21.46
+        },
+        "votrax": {
+          "sample_count": 1,
+          "weight": 3.18
+        },
+        "vsystem": {
+          "sample_count": 1,
+          "weight": 39.08
+        },
+        "vtech": {
+          "sample_count": 1,
+          "weight": 48.76
+        },
+        "wang": {
+          "sample_count": 1,
+          "weight": 5.72
+        },
+        "wavemate": {
+          "sample_count": 1,
+          "weight": 5.69
+        },
+        "westinghouse": {
+          "sample_count": 1,
+          "weight": 1.55
+        },
+        "wicat": {
+          "sample_count": 1,
+          "weight": 4.12
+        },
+        "williams": {
+          "sample_count": 1,
+          "weight": 61.83
+        },
+        "wing": {
+          "sample_count": 1,
+          "weight": 9.62
+        },
+        "wyse": {
+          "sample_count": 1,
+          "weight": 13.86
+        },
+        "xerox": {
+          "sample_count": 1,
+          "weight": 18.61
+        },
+        "yachiyo": {
+          "sample_count": 1,
+          "weight": 9.66
+        },
+        "yamaha": {
+          "sample_count": 1,
+          "weight": 83.34
+        },
+        "yeno": {
+          "sample_count": 1,
+          "weight": 7.35
+        },
+        "yunsung": {
+          "sample_count": 1,
+          "weight": 9.18
+        },
+        "zaccaria": {
+          "sample_count": 1,
+          "weight": 30.82
+        },
+        "zilog": {
+          "sample_count": 1,
+          "weight": 1.51
+        },
+        "zpa": {
+          "sample_count": 1,
+          "weight": 2.83
+        },
+        "zvt": {
+          "sample_count": 1,
+          "weight": 4.13
+        }
+      }
+    }
+  },
+  "library_shards": [
+    {
+      "definition_hash": "b327fb1c0b861a3318828ea74b97f6611ce2dc737e5a30a9506c7c4b805dad3c",
+      "name": "core",
+      "outputs": [
+        "libdasm.a",
+        "libemu.a",
+        "libformats.a",
+        "libfrontend.a",
+        "libnetlist.a",
+        "libocore_sdl.a",
+        "libosd_sdl.a",
+        "libprecompile.a",
+        "libqtdbg_sdl.a",
+        "libutils.a"
+      ],
+      "targets": [
+        "dasm",
+        "emu",
+        "formats",
+        "frontend",
+        "netlist",
+        "ocore_sdl",
+        "osd_sdl",
+        "precompile",
+        "qtdbg_sdl",
+        "utils"
+      ]
+    },
+    {
+      "definition_hash": "fc83b632295b0e6a131cb9695afc028ffee13f3dbc94bcca6b8922dc06134181",
+      "name": "optional",
+      "outputs": [
+        "liboptional.a"
+      ],
+      "targets": [
+        "optional"
+      ]
+    },
+    {
+      "definition_hash": "461e8092ce02d8a4df940cea940c6d6fd3405814ea6666ba1c5b9dba101f65fa",
+      "name": "thirdparty",
+      "outputs": [
+        "lib7z.a",
+        "libasmjit.a",
+        "libbgfx.a",
+        "libbimg.a",
+        "libbx.a",
+        "libexpat.a",
+        "libflac.a",
+        "libjpeg.a",
+        "liblinenoise.a",
+        "liblua.a",
+        "liblualibs.a",
+        "libportaudio.a",
+        "libportmidi.a",
+        "libsoftfloat3.a",
+        "libsqlite3.a",
+        "libutf8proc.a",
+        "libwdlfft.a",
+        "libymfm.a",
+        "libzlib.a",
+        "libzstd.a"
+      ],
+      "targets": [
+        "7z",
+        "asmjit",
+        "bgfx",
+        "bimg",
+        "bx",
+        "expat",
+        "flac",
+        "jpeg",
+        "linenoise",
+        "lua",
+        "lualibs",
+        "portaudio",
+        "portmidi",
+        "softfloat3",
+        "sqlite3",
+        "utf8proc",
+        "wdlfft",
+        "ymfm",
+        "zlib",
+        "zstd"
+      ]
+    }
+  ],
+  "profile": {
+    "archive": {
+      "prefix": "lib",
+      "suffix": ".a"
+    },
+    "executable_suffix": "",
+    "final_projects": [
+      "chdman",
+      "unidasm"
+    ],
+    "run_orm": true,
+    "artifact_name": "mame-linux-clang",
+    "build": {
+      "architecture": "x64",
+      "compiler": "clang",
+      "configuration": "release64",
+      "dependency_format": "make",
+      "dependency_glob": "*.d",
+      "make_jobs": 3,
+      "options": {
+        "ARCHOPTS": "",
+        "OSD": "sdl",
+        "OVERRIDE_AR": "",
+        "OVERRIDE_CC": "clang",
+        "OVERRIDE_CXX": "clang++",
+        "PRECOMPILE": "1",
+        "SUBTARGET": "mame",
+        "TARGET": "mame",
+        "TOOLS": "1",
+        "USE_LIBSDL": "",
+        "USE_SDL3": ""
+      },
+      "target_os": "linux"
+    },
+    "build_root": "build/linux_clang",
+    "ci": {
+      "install_kind": "apt",
+      "msystem": "",
+      "packages": "clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time",
+      "python": "python",
+      "runner": "ubuntu-latest",
+      "shell": "bash"
+    },
+    "collect_timings": true,
+    "executable": "mame",
+    "executable_project": "mame",
+    "id": "linux-clang-x64-mame-release",
+    "reconcile_list": "src/mame/mame.lst",
+    "solution_dir": "build/projects/sdl/mame/gmake-linux-clang",
+    "workflow": ".github/workflows/ci-shards.yml",
+    "deferred_projects": [
+      "castool",
+      "chdman",
+      "floptool",
+      "imgtool",
+      "jedutil",
+      "ldresample",
+      "ldverify",
+      "mame",
+      "nltool",
+      "nlwav",
+      "pngcmp",
+      "regrep",
+      "romcmp",
+      "split",
+      "srcclean",
+      "testkeys",
+      "unidasm"
+    ]
+  },
+  "schema_version": 2
+}

@@ -1,0 +1,215 @@
+{
+  "$schema": "../ci-shard-map.schema.json",
+  "complete_map_hash": "3e465acf52209b955c9fe940bbf89221b5a1c459b38b4c7ff389794073452db4",
+  "driver_map": {
+    "complete_map_hash": "b0535473edea5a214eb6dfd82daf180f11adc6f9a6279664e4593abc5ffa79b4",
+    "partition_algorithm": "lpt-v1",
+    "pool": "driver-libs",
+    "predicted_maximum_cpu_seconds": 1361.73,
+    "previous_maximum_cpu_seconds": null,
+    "proposed_maximum_cpu_seconds": 1361.73,
+    "requested_shards": 1,
+    "schema_version": 1,
+    "shards": [
+      {
+        "definition_hash": "2c3aa29688bccf8d83ff018afe6370b54ec46c7c28eda0fc959f7ef97e135ed1",
+        "name": "driver-1",
+        "outputs": [
+          "libmame_tiny.a"
+        ],
+        "predicted_cpu_seconds": 1361.73,
+        "target_count": 1,
+        "targets": [
+          "mame_tiny"
+        ]
+      }
+    ],
+    "timing": {
+      "identity": {
+        "architecture": "x64",
+        "compiler": "gcc",
+        "configuration": "release64",
+        "make_jobs": "3",
+        "osd": "sdl",
+        "precompile": "1",
+        "profile": "linux-gcc-x64-tiny-release",
+        "seed_profile": "linux-clang-x64-mame-release",
+        "subtarget": "tiny",
+        "target_os": "linux"
+      },
+      "metric": "cpu_seconds",
+      "sources": [
+        {
+          "file": "ci-project-timings.csv",
+          "run_id": "35541046991",
+          "sha256": "cc5e65749564e4e2e8f41e8258df20092a64daa021cf6577195d64d3f08a19f0"
+        }
+      ],
+      "targets": {
+        "mame_tiny": {
+          "sample_count": 0,
+          "weight": 1361.73
+        }
+      }
+    }
+  },
+  "library_shards": [
+    {
+      "definition_hash": "b327fb1c0b861a3318828ea74b97f6611ce2dc737e5a30a9506c7c4b805dad3c",
+      "name": "core",
+      "outputs": [
+        "libdasm.a",
+        "libemu.a",
+        "libformats.a",
+        "libfrontend.a",
+        "libnetlist.a",
+        "libocore_sdl.a",
+        "libosd_sdl.a",
+        "libprecompile.a",
+        "libqtdbg_sdl.a",
+        "libutils.a"
+      ],
+      "targets": [
+        "dasm",
+        "emu",
+        "formats",
+        "frontend",
+        "netlist",
+        "ocore_sdl",
+        "osd_sdl",
+        "precompile",
+        "qtdbg_sdl",
+        "utils"
+      ]
+    },
+    {
+      "definition_hash": "fc83b632295b0e6a131cb9695afc028ffee13f3dbc94bcca6b8922dc06134181",
+      "name": "optional",
+      "outputs": [
+        "liboptional.a"
+      ],
+      "targets": [
+        "optional"
+      ]
+    },
+    {
+      "definition_hash": "461e8092ce02d8a4df940cea940c6d6fd3405814ea6666ba1c5b9dba101f65fa",
+      "name": "thirdparty",
+      "outputs": [
+        "lib7z.a",
+        "libasmjit.a",
+        "libbgfx.a",
+        "libbimg.a",
+        "libbx.a",
+        "libexpat.a",
+        "libflac.a",
+        "libjpeg.a",
+        "liblinenoise.a",
+        "liblua.a",
+        "liblualibs.a",
+        "libportaudio.a",
+        "libportmidi.a",
+        "libsoftfloat3.a",
+        "libsqlite3.a",
+        "libutf8proc.a",
+        "libwdlfft.a",
+        "libymfm.a",
+        "libzlib.a",
+        "libzstd.a"
+      ],
+      "targets": [
+        "7z",
+        "asmjit",
+        "bgfx",
+        "bimg",
+        "bx",
+        "expat",
+        "flac",
+        "jpeg",
+        "linenoise",
+        "lua",
+        "lualibs",
+        "portaudio",
+        "portmidi",
+        "softfloat3",
+        "sqlite3",
+        "utf8proc",
+        "wdlfft",
+        "ymfm",
+        "zlib",
+        "zstd"
+      ]
+    }
+  ],
+  "profile": {
+    "archive": {
+      "prefix": "lib",
+      "suffix": ".a"
+    },
+    "executable_suffix": "",
+    "final_projects": [
+      "chdman",
+      "unidasm"
+    ],
+    "run_orm": true,
+    "artifact_name": "mametiny-linux-gcc",
+    "build": {
+      "architecture": "x64",
+      "compiler": "gcc",
+      "configuration": "release64",
+      "dependency_format": "make",
+      "dependency_glob": "*.d",
+      "make_jobs": 3,
+      "options": {
+        "ARCHOPTS": "-U_FORTIFY_SOURCE",
+        "OSD": "sdl",
+        "OVERRIDE_AR": "",
+        "OVERRIDE_CC": "gcc",
+        "OVERRIDE_CXX": "g++",
+        "PRECOMPILE": "1",
+        "SUBTARGET": "tiny",
+        "TARGET": "mame",
+        "TOOLS": "1",
+        "USE_LIBSDL": "",
+        "USE_SDL3": ""
+      },
+      "target_os": "linux"
+    },
+    "build_root": "build/linux_gcc",
+    "ci": {
+      "install_kind": "apt",
+      "msystem": "",
+      "packages": "libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools",
+      "python": "python",
+      "runner": "ubuntu-latest",
+      "shell": "bash"
+    },
+    "collect_timings": false,
+    "executable": "mametiny",
+    "executable_project": "mametiny",
+    "id": "linux-gcc-x64-tiny-release",
+    "reconcile_list": "src/mame/tiny.lst",
+    "solution_dir": "build/projects/sdl/mametiny/gmake-linux",
+    "workflow": ".github/workflows/ci-shards.yml",
+    "deferred_projects": [
+      "castool",
+      "chdman",
+      "floptool",
+      "imgtool",
+      "jedutil",
+      "ldresample",
+      "ldverify",
+      "mametiny",
+      "nltool",
+      "nlwav",
+      "pngcmp",
+      "regrep",
+      "romcmp",
+      "split",
+      "srcclean",
+      "testkeys",
+      "unidasm"
+    ]
+  },
+  "schema_version": 2
+}

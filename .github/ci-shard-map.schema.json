@@ -1,0 +1,506 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mamedev.org/schemas/ci-shard-map-v2.json",
+  "title": "MAME CI shard profile map",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "complete_map_hash",
+    "driver_map",
+    "library_shards",
+    "profile",
+    "schema_version"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../ci-shard-map.schema.json"
+    },
+    "complete_map_hash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "driver_map": {
+      "$ref": "#/$defs/driverMap"
+    },
+    "library_shards": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/libraryShard"
+      }
+    },
+    "profile": {
+      "$ref": "#/$defs/profile"
+    },
+    "schema_version": {
+      "const": 2
+    }
+  },
+  "$defs": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_.+-]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\\\]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stringArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/name"
+      }
+    },
+    "outputArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "libraryShard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "definition_hash",
+        "name",
+        "outputs",
+        "targets"
+      ],
+      "properties": {
+        "definition_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "name": {
+          "$ref": "#/$defs/name"
+        },
+        "outputs": {
+          "$ref": "#/$defs/outputArray"
+        },
+        "targets": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "driverShard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "definition_hash",
+        "name",
+        "outputs",
+        "predicted_cpu_seconds",
+        "target_count",
+        "targets"
+      ],
+      "properties": {
+        "definition_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^driver-[1-9][0-9]*$"
+        },
+        "outputs": {
+          "$ref": "#/$defs/outputArray"
+        },
+        "predicted_cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "target_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "targets": {
+          "$ref": "#/$defs/stringArray"
+        }
+      }
+    },
+    "timingSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "run_id",
+        "sha256"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "timingTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_count",
+        "weight"
+      ],
+      "properties": {
+        "sample_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "metric",
+        "sources",
+        "targets"
+      ],
+      "properties": {
+        "identity": {
+          "type": "object",
+          "minProperties": 1
+        },
+        "metric": {
+          "const": "cpu_seconds"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/timingSource"
+          }
+        },
+        "targets": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/timingTarget"
+          }
+        }
+      }
+    },
+    "driverMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete_map_hash",
+        "partition_algorithm",
+        "pool",
+        "predicted_maximum_cpu_seconds",
+        "previous_maximum_cpu_seconds",
+        "proposed_maximum_cpu_seconds",
+        "requested_shards",
+        "schema_version",
+        "shards",
+        "timing"
+      ],
+      "properties": {
+        "complete_map_hash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "partition_algorithm": {
+          "const": "lpt-v1"
+        },
+        "pool": {
+          "const": "driver-libs"
+        },
+        "predicted_maximum_cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "previous_maximum_cpu_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "proposed_maximum_cpu_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requested_shards": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "shards": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/driverShard"
+          }
+        },
+        "timing": {
+          "$ref": "#/$defs/timing"
+        }
+      }
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prefix",
+        "suffix"
+      ],
+      "properties": {
+        "prefix": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "buildOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ARCHOPTS",
+        "OSD",
+        "OVERRIDE_AR",
+        "OVERRIDE_CC",
+        "OVERRIDE_CXX",
+        "PRECOMPILE",
+        "SUBTARGET",
+        "TARGET",
+        "TOOLS",
+        "USE_LIBSDL",
+        "USE_SDL3"
+      ],
+      "properties": {
+        "ARCHOPTS": {
+          "type": "string"
+        },
+        "OSD": {
+          "$ref": "#/$defs/name"
+        },
+        "OVERRIDE_AR": {
+          "type": "string"
+        },
+        "OVERRIDE_CC": {
+          "$ref": "#/$defs/name"
+        },
+        "OVERRIDE_CXX": {
+          "$ref": "#/$defs/name"
+        },
+        "PRECOMPILE": {
+          "enum": [
+            "0",
+            "1"
+          ]
+        },
+        "SUBTARGET": {
+          "$ref": "#/$defs/name"
+        },
+        "TARGET": {
+          "$ref": "#/$defs/name"
+        },
+        "TOOLS": {
+          "enum": [
+            "0",
+            "1"
+          ]
+        },
+        "USE_LIBSDL": {
+          "enum": [
+            "",
+            "0",
+            "1"
+          ]
+        },
+        "USE_SDL3": {
+          "enum": [
+            "",
+            "0",
+            "1"
+          ]
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "architecture",
+        "compiler",
+        "configuration",
+        "dependency_format",
+        "dependency_glob",
+        "make_jobs",
+        "options",
+        "target_os"
+      ],
+      "properties": {
+        "architecture": {
+          "$ref": "#/$defs/name"
+        },
+        "compiler": {
+          "$ref": "#/$defs/name"
+        },
+        "configuration": {
+          "$ref": "#/$defs/name"
+        },
+        "dependency_format": {
+          "enum": [
+            "make",
+            "msvc-json"
+          ]
+        },
+        "dependency_glob": {
+          "type": "string",
+          "minLength": 1
+        },
+        "make_jobs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "options": {
+          "$ref": "#/$defs/buildOptions"
+        },
+        "target_os": {
+          "$ref": "#/$defs/name"
+        }
+      }
+    },
+    "ci": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "install_kind",
+        "msystem",
+        "packages",
+        "python",
+        "runner",
+        "shell"
+      ],
+      "properties": {
+        "install_kind": {
+          "enum": [
+            "apt",
+            "brew",
+            "msys2"
+          ]
+        },
+        "msystem": {
+          "type": "string"
+        },
+        "packages": {
+          "type": "string",
+          "minLength": 1
+        },
+        "python": {
+          "$ref": "#/$defs/name"
+        },
+        "runner": {
+          "$ref": "#/$defs/name"
+        },
+        "shell": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archive",
+        "artifact_name",
+        "build",
+        "build_root",
+        "ci",
+        "collect_timings",
+        "deferred_projects",
+        "executable",
+        "executable_project",
+        "executable_suffix",
+        "final_projects",
+        "id",
+        "reconcile_list",
+        "run_orm",
+        "solution_dir",
+        "workflow"
+      ],
+      "properties": {
+        "archive": {
+          "$ref": "#/$defs/archive"
+        },
+        "artifact_name": {
+          "$ref": "#/$defs/name"
+        },
+        "build": {
+          "$ref": "#/$defs/build"
+        },
+        "build_root": {
+          "$ref": "#/$defs/path"
+        },
+        "ci": {
+          "$ref": "#/$defs/ci"
+        },
+        "collect_timings": {
+          "type": "boolean"
+        },
+        "deferred_projects": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "executable": {
+          "$ref": "#/$defs/name"
+        },
+        "executable_project": {
+          "$ref": "#/$defs/name"
+        },
+        "executable_suffix": {
+          "type": "string"
+        },
+        "final_projects": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "id": {
+          "$ref": "#/$defs/name"
+        },
+        "reconcile_list": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "run_orm": {
+          "type": "boolean"
+        },
+        "solution_dir": {
+          "$ref": "#/$defs/path"
+        },
+        "workflow": {
+          "$ref": "#/$defs/path"
+        }
+      }
+    }
+  }
+}

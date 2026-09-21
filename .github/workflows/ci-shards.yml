@@ -1,0 +1,430 @@
+name: Sharded build
+
+on:
+  workflow_call:
+    inputs:
+      profiles:
+        description: JSON array of CI shard profile map paths
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      profiles: ${{ steps.matrix.outputs.profiles }}
+      shards: ${{ steps.matrix.outputs.shards }}
+    steps:
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Create build matrices
+      id: matrix
+      env:
+        CI_SHARD_PROFILES: ${{ inputs.profiles }}
+      run: |
+        set -euo pipefail
+        profiles="$(python scripts/build/ci_shards.py matrix \
+          --profiles-json "$CI_SHARD_PROFILES" --kind profiles)"
+        shards="$(python scripts/build/ci_shards.py matrix \
+          --profiles-json "$CI_SHARD_PROFILES" --kind shards)"
+        echo "profiles=$profiles" >> "$GITHUB_OUTPUT"
+        echo "shards=$shards" >> "$GITHUB_OUTPUT"
+
+  build-shards:
+    name: build (${{ matrix.profile_id }} ${{ matrix.group }})
+    needs: plan
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.shards) }}
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    env:
+      ARCHOPTS: ${{ matrix.archopts }}
+      CI_PACKAGES: ${{ matrix.packages }}
+      CI_PYTHON: ${{ matrix.python }}
+      OSD: ${{ matrix.osd }}
+      OVERRIDE_AR: ${{ matrix.ar }}
+      OVERRIDE_CC: ${{ matrix.cc }}
+      OVERRIDE_CXX: ${{ matrix.cxx }}
+      PRECOMPILE: ${{ matrix.precompile }}
+      SUBTARGET: ${{ matrix.subtarget }}
+      TARGET: ${{ matrix.target }}
+      TOOLS: ${{ matrix.tools }}
+      USE_LIBSDL: ${{ matrix.use_libsdl }}
+      USE_SDL3: ${{ matrix.use_sdl3 }}
+    steps:
+    - name: Set up MSYS2
+      if: matrix.install_kind == 'msys2'
+      uses: msys2/setup-msys2@e9898307ac31d1a803454791be09ab9973336e1c # v2.31.1
+      with:
+        msystem: ${{ matrix.msystem }}
+        install: ${{ matrix.packages }}
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Install apt dependencies
+      if: matrix.install_kind == 'apt'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y $CI_PACKAGES
+    - name: Install Homebrew dependencies
+      if: matrix.install_kind == 'brew'
+      run: brew install $CI_PACKAGES
+    - name: Generate shard build files
+      run: |
+        set -euo pipefail
+        make -j${{ matrix.make_jobs }} generate
+        make "${{ matrix.solution_dir }}/Makefile"
+        "$CI_PYTHON" scripts/build/ci_shards.py validate \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}"
+    - name: Capture toolchain identity
+      id: cache-context
+      run: |
+        set -euo pipefail
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        toolchain_file="$state_root/toolchain.txt"
+        mkdir -p "$state_root"
+        ar_tool="${OVERRIDE_AR:-ar}"
+        {
+          printf 'ImageOS=%s\n' "${ImageOS:-unknown}"
+          printf 'ImageVersion=%s\n' "${ImageVersion:-unknown}"
+          "$OVERRIDE_CC" --version
+          "$OVERRIDE_CXX" --version
+          "$ar_tool" --version 2>&1 || "$ar_tool" -V 2>&1
+          make --version
+          "$CI_PYTHON" --version
+          case "${{ matrix.install_kind }}" in
+            apt)
+              dpkg-query --show --showformat='${binary:Package}=${Version}\n' \
+                $CI_PACKAGES
+              ;;
+            brew)
+              brew list --versions $CI_PACKAGES
+              ;;
+            msys2)
+              pacman -Q $CI_PACKAGES
+              ;;
+          esac
+        } > "$toolchain_file"
+        dependency_prefix="$("$CI_PYTHON" scripts/build/ci_shards.py \
+          context "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file "$toolchain_file" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "dependency-prefix=$dependency_prefix" >> "$GITHUB_OUTPUT"
+        echo "dependency-key=${dependency_prefix}${GITHUB_SHA}" \
+          >> "$GITHUB_OUTPUT"
+    - name: Restore dependency manifest
+      id: dependencies
+      uses: actions/cache@main
+      with:
+        path: build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}/dependency-state
+        key: ${{ steps.cache-context.outputs.dependency-key }}
+        restore-keys: |
+          ${{ steps.cache-context.outputs.dependency-prefix }}
+    - name: Materialize generated dependencies
+      run: |
+        "$CI_PYTHON" scripts/build/ci_shards.py materialize \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file \
+            "build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}/toolchain.txt" \
+          --dependency-manifest \
+            "build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}"
+    - name: Prepare shard cache key
+      id: cache-key
+      run: |
+        set -euo pipefail
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        key="$("$CI_PYTHON" scripts/build/ci_shards.py prepare \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file "$state_root/toolchain.txt" \
+          --manifest "$state_root/cache-manifest.json" \
+          --dependency-manifest \
+            "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "key=$key" >> "$GITHUB_OUTPUT"
+    - name: Restore shard cache
+      id: shard-cache
+      uses: actions/cache/restore@main
+      with:
+        path: build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}/artifact
+        key: ${{ steps.cache-key.outputs.key }}
+    - name: Build shard
+      if: steps.shard-cache.outputs.cache-hit != 'true'
+      env:
+        COLLECT_TIMINGS: ${{ matrix.collect_timings }}
+      run: |
+        set -euo pipefail
+        timing_dir="$PWD/build/ci-shards/${{ matrix.profile_id }}/project-timings"
+        if [[ "$COLLECT_TIMINGS" == "true" ]]; then
+          mkdir -p "$timing_dir"
+          export MAME_PROJECT_TIMING_DIR="$timing_dir"
+          "$CI_PYTHON" scripts/build/instrument_solution_makefile.py \
+            "${{ matrix.solution_dir }}/Makefile"
+        fi
+        projects="$("$CI_PYTHON" scripts/build/ci_shards.py list \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}")"
+        make -j${{ matrix.make_jobs }} -C "${{ matrix.solution_dir }}" \
+          config=${{ matrix.configuration }} $projects
+    - name: Capture compiler dependencies
+      if: steps.shard-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        "$CI_PYTHON" scripts/build/ci_shards.py capture \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file "$state_root/toolchain.txt" \
+          --dependency-root "${{ matrix.build_root }}" \
+          --manifest \
+            "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}"
+    - name: Finalize shard cache key
+      id: final-cache-key
+      if: steps.shard-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euo pipefail
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        key="$("$CI_PYTHON" scripts/build/ci_shards.py prepare \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file "$state_root/toolchain.txt" \
+          --manifest "$state_root/cache-manifest.json" \
+          --dependency-manifest \
+            "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
+          --require-dependency-manifest \
+          --source-commit "$GITHUB_SHA" \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}")"
+        echo "key=$key" >> "$GITHUB_OUTPUT"
+    - name: Stage shard artifact
+      if: steps.shard-cache.outputs.cache-hit != 'true'
+      env:
+        COLLECT_TIMINGS: ${{ matrix.collect_timings }}
+      run: |
+        set -euo pipefail
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        timing_args=()
+        if [[ "$COLLECT_TIMINGS" == "true" ]]; then
+          timing_args=(--timing-dir \
+            "build/ci-shards/${{ matrix.profile_id }}/project-timings")
+        fi
+        "$CI_PYTHON" scripts/build/ci_shards.py stage \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --build-root "${{ matrix.build_root }}" \
+          --cache-root "$state_root/artifact" \
+          --cache-manifest "$state_root/cache-manifest.json" \
+          --dependency-manifest \
+            "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
+          "${timing_args[@]}"
+    - name: Verify shard artifact
+      run: |
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        "$CI_PYTHON" scripts/build/ci_shards.py verify \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --expected-manifest "$state_root/cache-manifest.json" \
+          --cache-root "$state_root/artifact"
+    - name: Stamp current shard definition
+      run: |
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        "$CI_PYTHON" scripts/build/ci_shards.py write-definition \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" \
+          --group "${{ matrix.group }}" \
+          --output \
+            "$state_root/artifact/shard-definition-${{ matrix.group }}.json"
+    - name: Refresh dependency manifest
+      run: |
+        set -euo pipefail
+        state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
+        mkdir -p "$state_root/dependency-state"
+        cp "$state_root/artifact/dependency-manifest-${{ matrix.group }}.json" \
+          "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json"
+    - name: Upload shard artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: mame-ci-${{ matrix.profile_id }}-shard-${{ matrix.group }}-${{ github.sha }}
+        path: build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}/artifact/
+        if-no-files-found: error
+    - name: Save shard cache
+      if: steps.shard-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@main
+      with:
+        path: build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}/artifact
+        key: ${{ steps.final-cache-key.outputs.key }}
+
+  link-and-validate:
+    name: link (${{ matrix.profile_id }})
+    needs:
+    - plan
+    - build-shards
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.profiles) }}
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    env:
+      ARCHOPTS: ${{ matrix.archopts }}
+      CI_PACKAGES: ${{ matrix.packages }}
+      CI_PYTHON: ${{ matrix.python }}
+      OSD: ${{ matrix.osd }}
+      OVERRIDE_AR: ${{ matrix.ar }}
+      OVERRIDE_CC: ${{ matrix.cc }}
+      OVERRIDE_CXX: ${{ matrix.cxx }}
+      PRECOMPILE: ${{ matrix.precompile }}
+      SUBTARGET: ${{ matrix.subtarget }}
+      TARGET: ${{ matrix.target }}
+      TOOLS: ${{ matrix.tools }}
+      USE_LIBSDL: ${{ matrix.use_libsdl }}
+      USE_SDL3: ${{ matrix.use_sdl3 }}
+    steps:
+    - name: Set up MSYS2
+      if: matrix.install_kind == 'msys2'
+      uses: msys2/setup-msys2@e9898307ac31d1a803454791be09ab9973336e1c # v2.31.1
+      with:
+        msystem: ${{ matrix.msystem }}
+        install: ${{ matrix.packages }}
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Install apt dependencies
+      if: matrix.install_kind == 'apt'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y $CI_PACKAGES
+    - name: Install Homebrew dependencies
+      if: matrix.install_kind == 'brew'
+      run: brew install $CI_PACKAGES
+    - name: Generate final build files
+      run: |
+        set -euo pipefail
+        make -j${{ matrix.make_jobs }} generate
+        make "${{ matrix.solution_dir }}/Makefile"
+        "$CI_PYTHON" scripts/build/ci_shards.py validate \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" --group all
+    - name: Download shard artifacts
+      uses: actions/download-artifact@main
+      with:
+        pattern: mame-ci-${{ matrix.profile_id }}-shard-*-${{ github.sha }}
+        path: .
+        merge-multiple: true
+    - name: Verify shard definitions and archives
+      run: |
+        set -euo pipefail
+        "$CI_PYTHON" scripts/build/ci_shards.py verify-definitions \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" --manifest-dir .
+        "$CI_PYTHON" scripts/build/ci_shards.py verify-archives \
+          "${{ matrix.solution_dir }}/Makefile" \
+          --profile "${{ matrix.profile_path }}" --group all \
+          --archive-dir "${{ matrix.build_root }}"
+    - name: Build final tools
+      env:
+        COLLECT_TIMINGS: ${{ matrix.collect_timings }}
+      run: |
+        set -euo pipefail
+        timing_dir="$PWD/build/ci-shards/${{ matrix.profile_id }}/project-timings"
+        mkdir -p "$timing_dir"
+        for project in ${{ matrix.final_projects }}; do
+          if [[ "$COLLECT_TIMINGS" == "true" ]]; then
+            /usr/bin/time -a -f '%e %U %S %M %x' \
+              -o "$timing_dir/${project}.timing" \
+              make -j${{ matrix.make_jobs }} -C "${{ matrix.solution_dir }}" \
+                -f "${project}.make" config=${{ matrix.configuration }}
+          else
+            make -j${{ matrix.make_jobs }} -C "${{ matrix.solution_dir }}" \
+              -f "${project}.make" config=${{ matrix.configuration }}
+          fi
+          test -x "./${project}${{ matrix.executable_suffix }}"
+        done
+    - name: Link executable
+      env:
+        COLLECT_TIMINGS: ${{ matrix.collect_timings }}
+      run: |
+        set -euo pipefail
+        timing_dir="$PWD/build/ci-shards/${{ matrix.profile_id }}/project-timings"
+        if [[ "$COLLECT_TIMINGS" == "true" ]]; then
+          /usr/bin/time -a -f '%e %U %S %M %x' \
+            -o "$timing_dir/${{ matrix.executable_project }}.timing" \
+            make -j${{ matrix.make_jobs }} -C "${{ matrix.solution_dir }}" \
+              -f "${{ matrix.executable_project }}.make" \
+              config=${{ matrix.configuration }}
+        else
+          make -j${{ matrix.make_jobs }} -C "${{ matrix.solution_dir }}" \
+            -f "${{ matrix.executable_project }}.make" \
+            config=${{ matrix.configuration }}
+        fi
+        test -x "${{ matrix.executable }}"
+    - name: Summarize project timings
+      if: matrix.collect_timings
+      run: |
+        timing_root="build/ci-shards/${{ matrix.profile_id }}"
+        "$CI_PYTHON" scripts/build/summarize_project_timings.py \
+          --input-dir "$timing_root/project-timings" \
+          --csv "$timing_root/project-timings.csv" \
+          --markdown "$timing_root/project-timings.md"
+        cat "$timing_root/project-timings.md" >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload project timings
+      if: matrix.collect_timings
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ matrix.artifact_name }}-project-timings-${{ github.sha }}
+        path: |
+          build/ci-shards/${{ matrix.profile_id }}/project-timings.csv
+          build/ci-shards/${{ matrix.profile_id }}/project-timings.md
+          build/ci-shards/${{ matrix.profile_id }}/project-timings/*.timing
+        if-no-files-found: error
+    - name: Validate
+      run: ${{ matrix.executable }} -validate
+    - name: Reconcile driver list
+      if: matrix.reconcile_list != ''
+      run: |
+        set -euo pipefail
+        ${{ matrix.executable }} -listxml | "$CI_PYTHON" \
+          scripts/build/makedep.py reconcilelist \
+          -l "${{ matrix.reconcile_list }}" -
+    - name: ORM check
+      if: matrix.run_orm
+      run: |
+        "$CI_PYTHON" scripts/minimaws/minimaws.py load \
+          --executable "${{ matrix.executable }}" --softwarepath hash
+    - name: Upload executables
+      uses: actions/upload-artifact@main
+      with:
+        name: ${{ matrix.artifact_name }}-${{ github.sha }}
+        path: |
+          ${{ matrix.executable }}
+          ./chdman${{ matrix.executable_suffix }}
+          ./unidasm${{ matrix.executable_suffix }}
+        if-no-files-found: error
