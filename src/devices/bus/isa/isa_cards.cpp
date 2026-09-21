@@ -91,10 +91,10 @@
 #include "3xtwin.h"
 #include "eis_sad8852.h"
 #include "eis_twib.h"
+#include "kiselev_eth.h"
 #include "ne1000.h"
 #include "ne2000.h"
 #include "np600.h"
-#include "rtl8019as.h"
 #include "ubpnic.h"
 
 // communication ports
@@ -158,7 +158,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("mpu401", ISA8_MPU401);
 	device.option_add("pcmidi", ISA8_PCMIDI);
 	device.option_add("ne1000", NE1000);
-	device.option_add("rtl8019as", ISA8_RTL8019AS);
+	device.option_add("kiselev_eth", ISA8_KISELEV_ETH);
 	device.option_add("3c503", EL2_3C503);
 	device.option_add("lpt", ISA8_LPT);
 	device.option_add("ibm_mfc", ISA8_IBM_MFC);
