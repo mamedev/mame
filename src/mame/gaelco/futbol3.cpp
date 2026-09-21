@@ -685,6 +685,7 @@ ROM_START( donpepito )
 	ROM_LOAD( "don_pepito.u1", 0x00000, 0x40000, CRC(574fcd14) SHA1(a23f1eb6d2cef5aa07df3a553fe1d33803648f43) )
 ROM_END
 
+// Needs a different PIC program (M3), maybe the PCB is also different
 ROM_START( kwairi )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "m3_pic16c54c.u3", 0x0000, 0x2000, NO_DUMP ) // Protected
