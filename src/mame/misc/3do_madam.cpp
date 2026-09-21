@@ -11,7 +11,7 @@
 #define LOG_CEL     (1U << 5)
 #define LOG_REGIS   (1U << 6)
 #define LOG_MULT    (1U << 8) // MULT matrix ops
-#define LOG_MULTV   (1U << 9) // verbose, mult register access
+#define LOG_MULTV   (1U << 9) // MULT register access (verbose)
 
 //#include "input.h"
 
@@ -1340,10 +1340,14 @@ std::tuple<u8, u8, u8> madam_device::convert_cel_primary_source(u32 cel_data, bo
 
 	u8 pmv_r, pmv_g, pmv_b, pdv;
 	std::tie(pmv_r, pmv_g, pmv_b, pdv) = (this->*pixc_ms_table[ms_mode])(cel_data, p_mode);
+	const u8 sdv = m_cel.pixc_2d[p_mode];
 
-	r = std::min(std::max((r * pmv_r) >> pdv, 0), 0x1f);
-	g = std::min(std::max((g * pmv_g) >> pdv, 0), 0x1f);
-	b = std::min(std::max((b * pmv_b) >> pdv, 0), 0x1f);
+	// NOTE: the primary source also needs to be scaled down by the secondary divider
+	// - gex sets 2D 1 in one of the P ends (i.e. 0x1f001f01) for background shading
+	// - cpquazar needs it for status bar to not look too bright
+	r = std::min(std::max((r * pmv_r) >> (pdv + sdv), 0), 0x1f);
+	g = std::min(std::max((g * pmv_g) >> (pdv + sdv), 0), 0x1f);
+	b = std::min(std::max((b * pmv_b) >> (pdv + sdv), 0), 0x1f);
 
 	return std::make_tuple(r, g, b);
 }
@@ -1378,14 +1382,15 @@ std::tuple<u8, u8, u8> madam_device::convert_fb_primary_source(u16 fb_data, u32 
 
 	u8 pmv_r, pmv_g, pmv_b, pdv;
 	std::tie(pmv_r, pmv_g, pmv_b, pdv) = (this->*pixc_ms_table[ms_mode])(cel_data, p_mode);
+	const u8 sdv = m_cel.pixc_2d[p_mode];
 
 	s16 r = (fb_data & 0x7c00) >> 10;
 	s16 g = (fb_data & 0x03e0) >> 5;
 	s16 b = (fb_data & 0x001f) >> 0;
 
-	r = std::min(std::max((r * pmv_r) >> pdv, 0), 0x1f);
-	g = std::min(std::max((g * pmv_g) >> pdv, 0), 0x1f);
-	b = std::min(std::max((b * pmv_b) >> pdv, 0), 0x1f);
+	r = std::min(std::max((r * pmv_r) >> (pdv + sdv), 0), 0x1f);
+	g = std::min(std::max((g * pmv_g) >> (pdv + sdv), 0), 0x1f);
+	b = std::min(std::max((b * pmv_b) >> (pdv + sdv), 0), 0x1f);
 
 	return std::make_tuple(r, g, b);
 }
@@ -1483,6 +1488,7 @@ u16 madam_device::pixc_cel_0(int xpos, int ypos, u32 cel_data, bool p_mode, u8 o
 	return (this->*pixc_math_table[op_mode])(m_cel.pixc_av[p_mode], 0, r, g, b, 0, 0, 0);
 }
 
+// TODO: find use cases
 u16 madam_device::pixc_cel_ccb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode)
 {
 	u8 r, g, b;
@@ -1490,13 +1496,14 @@ u16 madam_device::pixc_cel_ccb(int xpos, int ypos, u32 cel_data, bool p_mode, u8
 	const u8 sdv = m_cel.pixc_2d[p_mode];
 	const u8 av = m_cel.pixc_av[p_mode] >> sdv;
 
-	return (this->*pixc_math_table[op_mode])(m_cel.pixc_av[p_mode], 1, r, g, b, av, av, av);
+	return (this->*pixc_math_table[op_mode])(m_cel.pixc_av[p_mode], 0, r, g, b, av, av, av);
 }
 
 // - retfire gameplay
 // - roadrash main menu blend
 // - waywarr character select
-// FIXME: ramping in cpquazar
+// - cpquazar gameplay status bar (denote slightly transparent)
+// - plumber choice screen
 u16 madam_device::pixc_cel_fb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode)
 {
 	u8 cel_r, cel_g, cel_b;
@@ -1547,6 +1554,7 @@ u16 madam_device::pixc_fb_ccb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 
 	return (this->*pixc_math_table[op_mode])(m_cel.pixc_av[p_mode], 1, r, g, b, av, av, av);
 }
 
+// TODO: find use cases
 u16 madam_device::pixc_fb_fb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode)
 {
 	const u16 fb_data = get_fb_pixel(xpos, ypos);
@@ -1559,6 +1567,7 @@ u16 madam_device::pixc_fb_fb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 o
 }
 
 // - sailormn title screen blink
+// TODO: megarace useav for blended score bar in gameplay
 u16 madam_device::pixc_fb_cel(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode)
 {
 	u8 fb_r, fb_g, fb_b;
@@ -2174,9 +2183,12 @@ u32 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 	cel_address += (x / 4) * 3;
 	u8 src_shift = (~x & 3) * 6;
 
-	u16 plut_data = ((m_dma8_read_cb(cel_address + 0) << 16) + (m_dma8_read_cb(cel_address + 1) << 8) + (m_dma8_read_cb(cel_address + 2))) >> (src_shift) & 0x3f;
+	u16 plut_data = ((
+		(m_dma8_read_cb(cel_address + 0) << 16) |
+		(m_dma8_read_cb(cel_address + 1) << 8) |
+		(m_dma8_read_cb(cel_address + 2))) >> src_shift) & 0x3f;
 
-	const u16 p_mode = BIT(plut_data, 5);
+	const u16 p_mode = BIT(plut_data, 5) << 15;
 
 	plut_data &= 0x1f;
 	plut_data <<= 1;
