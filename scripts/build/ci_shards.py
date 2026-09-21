@@ -74,6 +74,19 @@ def parse_args():
     matrix_parser.add_argument('--profiles-json')
     matrix_parser.add_argument('--kind', required=True, choices=('shards', 'profiles'))
 
+    github_env_parser = subparsers.add_parser('github-env')
+    github_env_parser.add_argument('--profile', required=True, type=pathlib.Path)
+    github_env_parser.add_argument('--group', required=True)
+    github_env_parser.add_argument('--expected-profile-id', required=True)
+    github_env_parser.add_argument('--expected-runner', required=True)
+    github_env_parser.add_argument('--expected-shell', required=True)
+    github_env_parser.add_argument('--expected-install-kind', required=True)
+    github_env_parser.add_argument('--expected-msystem', required=True)
+    github_env_parser.add_argument('--expected-packages', required=True)
+    github_env_parser.add_argument('--expected-python', required=True)
+    github_env_parser.add_argument('--github-output', type=pathlib.Path)
+    github_env_parser.add_argument('--github-env', type=pathlib.Path)
+
     validate_parser = subparsers.add_parser('validate')
     add_profile_arguments(validate_parser)
 
@@ -574,6 +587,98 @@ def matrix_output(options):
                 shard_entry['group'] = shard['name']
                 include.append(shard_entry)
     return {'include': include}
+
+
+def workflow_bool(value):
+    if isinstance(value, bool):
+        return 'true' if value else 'false'
+    return str(value)
+
+
+def write_github_values(path, values):
+    if path is None:
+        return
+    with io.open(path, 'a', encoding='utf-8', newline='\n') as output:
+        for name, value in values.items():
+            text = workflow_bool(value)
+            if '\n' in text or '\r' in text:
+                delimiter = 'MAME_CI_%s' % hashlib.sha256(
+                        ('%s\0%s' % (name, text)).encode('utf-8')).hexdigest()
+                output.write('%s<<%s\n%s\n%s\n' % (
+                        name, delimiter, text, delimiter))
+            else:
+                output.write('%s=%s\n' % (name, text))
+
+
+def profile_groups(profile_map):
+    return set(shard['name'] for shard in all_shards(profile_map))
+
+
+def write_github_profile_environment(options):
+    if options.github_output is None and options.github_env is None:
+        raise ValueError('provide --github-output or --github-env')
+
+    profile_map = load_profile_map(options.profile)
+    entry = matrix_profile_entry(options.profile, profile_map)
+    expected = {
+            'install_kind': options.expected_install_kind,
+            'msystem': options.expected_msystem,
+            'packages': options.expected_packages,
+            'profile_id': options.expected_profile_id,
+            'python': options.expected_python,
+            'runner': options.expected_runner,
+            'shell': options.expected_shell}
+    for field, expected_value in sorted(expected.items()):
+        actual_value = workflow_bool(entry[field])
+        if actual_value != expected_value:
+            raise ValueError(
+                    'workflow input %s does not match %s: expected %s, got %s' % (
+                            field, entry['profile_id'], expected_value, actual_value))
+
+    if options.group != 'all' and options.group not in profile_groups(profile_map):
+        raise ValueError(
+                'workflow input group does not match %s: %s' % (
+                        entry['profile_id'], options.group))
+
+    outputs = collections.OrderedDict(
+            (name, workflow_bool(value)) for name, value in sorted(entry.items()))
+    outputs['group'] = options.group
+    write_github_values(options.github_output, outputs)
+
+    env_values = collections.OrderedDict((
+            ('ARCHOPTS', entry['archopts']),
+            ('CI_ARTIFACT_NAME', entry['artifact_name']),
+            ('CI_BUILD_ROOT', entry['build_root']),
+            ('CI_COLLECT_TIMINGS', entry['collect_timings']),
+            ('CI_CONFIGURATION', entry['configuration']),
+            ('CI_EXECUTABLE', entry['executable']),
+            ('CI_EXECUTABLE_PROJECT', entry['executable_project']),
+            ('CI_EXECUTABLE_SUFFIX', entry['executable_suffix']),
+            ('CI_FINAL_PROJECTS', entry['final_projects']),
+            ('CI_INSTALL_KIND', entry['install_kind']),
+            ('CI_MAKE_JOBS', entry['make_jobs']),
+            ('CI_MSYSTEM', entry['msystem']),
+            ('CI_PACKAGES', entry['packages']),
+            ('CI_PROFILE_ID', entry['profile_id']),
+            ('CI_PROFILE_PATH', entry['profile_path']),
+            ('CI_PYTHON', entry['python']),
+            ('CI_RECONCILE_LIST', entry['reconcile_list']),
+            ('CI_RUN_ORM', entry['run_orm']),
+            ('CI_RUNNER', entry['runner']),
+            ('CI_SHELL', entry['shell']),
+            ('CI_SOLUTION_DIR', entry['solution_dir']),
+            ('OSD', entry['osd']),
+            ('OVERRIDE_AR', entry['ar']),
+            ('OVERRIDE_CC', entry['cc']),
+            ('OVERRIDE_CXX', entry['cxx']),
+            ('PRECOMPILE', entry['precompile']),
+            ('SUBTARGET', entry['subtarget']),
+            ('TARGET', entry['target']),
+            ('TOOLS', entry['tools']),
+            ('USE_LIBSDL', entry['use_libsdl']),
+            ('USE_SDL3', entry['use_sdl3'])))
+    write_github_values(options.github_env, env_values)
+    return entry['profile_id']
 
 
 def is_under(relative_path, root):
@@ -1840,6 +1945,9 @@ def main():
             sys.stdout.write(json.dumps(
                     matrix_output(options), ensure_ascii=True,
                     separators=(',', ':'), sort_keys=True) + '\n')
+        elif options.command == 'github-env':
+            profile_id = write_github_profile_environment(options)
+            sys.stdout.write('Validated fixed workflow inputs for %s.\n' % profile_id)
         elif options.command == 'validate':
             profile_map = load_profile_map(options.profile)
             projects = read_solution_projects(options.solution_makefile)

@@ -33,14 +33,49 @@ jobs:
   build-windows-gcc-x64:
     uses: ./.github/workflows/ci-shards.yml
     with:
-      profiles: '[".github/ci-shards/windows-gcc-x64-mame-release.json"]'
+      profile_path: .github/ci-shards/windows-gcc-x64-mame-release.json
+      profile_id: windows-gcc-x64-mame-release
+      groups: '["core","optional","thirdparty","driver-1","driver-2","driver-3","driver-4","driver-5","driver-6","driver-7","driver-8"]'
+      runner: windows-latest
+      shell: 'msys2 {0}'
+      install_kind: msys2
+      msystem: UCRT64
+      packages: >-
+        git make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-python
+        mingw-w64-ucrt-x86_64-lld mingw-w64-ucrt-x86_64-llvm
+        mingw-w64-ucrt-x86_64-libc++ mingw-w64-ucrt-x86_64-sdl3
+      python: python
 
   build-windows-clang-x64:
     uses: ./.github/workflows/ci-shards.yml
     with:
-      profiles: '[".github/ci-shards/windows-clang-x64-tiny-release.json"]'
+      profile_path: .github/ci-shards/windows-clang-x64-tiny-release.json
+      profile_id: windows-clang-x64-tiny-release
+      groups: '["core","optional","thirdparty","driver-1"]'
+      runner: windows-latest
+      shell: 'msys2 {0}'
+      install_kind: msys2
+      msystem: CLANG64
+      packages: >-
+        git make mingw-w64-clang-x86_64-clang mingw-w64-clang-x86_64-python
+        mingw-w64-clang-x86_64-lld mingw-w64-clang-x86_64-llvm
+        mingw-w64-clang-x86_64-libc++ mingw-w64-clang-x86_64-sdl3
+        mingw-w64-clang-x86_64-gcc-compat
+      python: python
 
   build-windows-clang-arm64:
     uses: ./.github/workflows/ci-shards.yml
     with:
-      profiles: '[".github/ci-shards/windows-clang-arm64-mame-release.json"]'
+      profile_path: .github/ci-shards/windows-clang-arm64-mame-release.json
+      profile_id: windows-clang-arm64-mame-release
+      groups: '["core","optional","thirdparty","driver-1","driver-2","driver-3","driver-4","driver-5","driver-6","driver-7","driver-8"]'
+      runner: windows-11-arm
+      shell: 'msys2 {0}'
+      install_kind: msys2
+      msystem: CLANGARM64
+      packages: >-
+        git make mingw-w64-clang-aarch64-clang
+        mingw-w64-clang-aarch64-python mingw-w64-clang-aarch64-lld
+        mingw-w64-clang-aarch64-llvm mingw-w64-clang-aarch64-libc++
+        mingw-w64-clang-aarch64-sdl3 mingw-w64-clang-aarch64-gcc-compat
+      python: python

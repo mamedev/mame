@@ -29,4 +29,12 @@ jobs:
   build-macos-clang-arm64:
     uses: ./.github/workflows/ci-shards.yml
     with:
-      profiles: '[".github/ci-shards/macos-clang-arm64-mame-release.json"]'
+      profile_path: .github/ci-shards/macos-clang-arm64-mame-release.json
+      profile_id: macos-clang-arm64-mame-release
+      groups: '["core","optional","thirdparty","driver-1","driver-2","driver-3","driver-4","driver-5","driver-6","driver-7","driver-8"]'
+      runner: macOS-latest
+      shell: bash
+      install_kind: brew
+      msystem: ''
+      packages: python3 sdl3
+      python: python3

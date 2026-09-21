@@ -33,9 +33,29 @@ jobs:
   build-linux-gcc:
     uses: ./.github/workflows/ci-shards.yml
     with:
-      profiles: '[".github/ci-shards/linux-gcc-x64-tiny-release.json"]'
+      profile_path: .github/ci-shards/linux-gcc-x64-tiny-release.json
+      profile_id: linux-gcc-x64-tiny-release
+      groups: '["core","optional","thirdparty","driver-1"]'
+      runner: ubuntu-latest
+      shell: bash
+      install_kind: apt
+      msystem: ''
+      packages: >-
+        libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev
+        libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools
+      python: python
 
   build-linux-clang:
     uses: ./.github/workflows/ci-shards.yml
     with:
-      profiles: '[".github/ci-shards/linux-clang-x64-mame-release.json"]'
+      profile_path: .github/ci-shards/linux-clang-x64-mame-release.json
+      profile_id: linux-clang-x64-mame-release
+      groups: '["core","optional","thirdparty","driver-1","driver-2","driver-3","driver-4","driver-5","driver-6","driver-7","driver-8"]'
+      runner: ubuntu-latest
+      shell: bash
+      install_kind: apt
+      msystem: ''
+      packages: >-
+        clang libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev
+        libxinerama-dev libxi-dev qt6-base-dev qt6-base-dev-tools time
+      python: python
