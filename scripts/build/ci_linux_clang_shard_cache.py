@@ -578,7 +578,9 @@ def capture_dependencies(options):
     if not dependency_root.is_dir():
         raise ValueError('%s: compiler dependency root does not exist' % dependency_root)
 
-    dependency_files = sorted(path for path in dependency_root.rglob('*.d') if path.is_file())
+    dependency_files = sorted(
+            (path for path in dependency_root.rglob('*.d') if path.is_file()),
+            key=lambda path: path.relative_to(context['source_root']).as_posix())
     if not dependency_files:
         raise ValueError('%s: no compiler dependency files found' % dependency_root)
     relative_files = [path.relative_to(context['source_root']).as_posix() for path in dependency_files]
