@@ -245,7 +245,6 @@ scc68070_device::scc68070_device(const machine_config &mconfig, const char *tag,
 	, m_iack4_callback(*this, autovector(4))
 	, m_iack5_callback(*this, autovector(5))
 	, m_iack7_callback(*this, autovector(7))
-	, m_uart_tx_callback(*this)
 	, m_txd_cb(*this)
 	, m_uart_rtsn_callback(*this)
 	, m_i2c_scl_callback(*this)
@@ -645,6 +644,17 @@ void scc68070_device::recalc_framing()
 	set_data_frame(1, data_bits, parity, stop_bits);
 }
 
+void scc68070_device::update_tx_int()
+{
+	const bool tx_enabled = ((m_uart.command_register >> 2) & 3) == 1;
+	const bool tx_ready = tx_enabled && (m_uart.status_register & USR_TXRDY) != 0;
+	if (tx_ready != m_uart_tx_int)
+	{
+		m_uart_tx_int = tx_ready;
+		update_ipl();
+	}
+}
+
 void scc68070_device::check_for_tx_start()
 {
 	if (((m_uart.command_register >> 2) & 3) != 1)
@@ -663,11 +673,9 @@ void scc68070_device::check_for_tx_start()
 
 	LOGMASKED(LOG_MORE_UART, "check_for_tx_start: Transmitting %02x\n", m_uart.transmit_holding_register);
 	transmit_register_setup(m_uart.transmit_holding_register);
-	m_uart_tx_callback(m_uart.transmit_holding_register); // Temporary due to tap
 	m_uart.status_register &= ~USR_TXEMT;
 	m_uart.status_register |= USR_TXRDY;
-	m_uart_tx_int = true;
-	update_ipl();
+	update_tx_int();
 }
 
 void scc68070_device::tra_callback()
@@ -703,21 +711,6 @@ void scc68070_device::rcv_complete()
 	m_uart.receive_holding_register = get_received_char();
 	LOGMASKED(LOG_UART, "rcv_complete: Received %02x\n", m_uart.receive_holding_register);
 
-	m_uart.status_register |= USR_RXRDY;
-	m_uart_rx_int = true;
-	update_ipl();
-}
-
-void scc68070_device::uart_rx(uint8_t data)
-{
-	if (m_uart.status_register & USR_RXRDY)
-	{
-		LOGMASKED(LOG_UART, "%s: uart_rx: receiver overrun, discarding %02x\n", machine().describe_context(), data);
-		m_uart.status_register |= USR_OE;
-		return;
-	}
-
-	m_uart.receive_holding_register = data;
 	m_uart.status_register |= USR_RXRDY;
 	m_uart_rx_int = true;
 	update_ipl();
@@ -819,6 +812,7 @@ void scc68070_device::picr2_w(uint8_t data)
 	switch (data & 0x88)
 	{
 	case 0x08:
+		// re-armed from TXRDY by update_tx_int()
 		if (m_uart_tx_int)
 		{
 			m_uart_tx_int = false;
@@ -1404,6 +1398,7 @@ void scc68070_device::ucr_w(uint8_t data)
 	}
 
 	check_for_tx_start();
+	update_tx_int();
 }
 
 uint8_t scc68070_device::uth_r()
@@ -1419,6 +1414,7 @@ void scc68070_device::uth_w(uint8_t data)
 	LOGMASKED(LOG_MORE_UART, "%s: UART Transmit Holding Register Write: %02x ('%c')\n", machine().describe_context(), data, (data >= 0x20 && data < 0x7f) ? data : ' ');
 	m_uart.transmit_holding_register = data;
 	m_uart.status_register &= ~(USR_TXRDY | USR_TXEMT);
+	update_tx_int();
 	check_for_tx_start();
 }
 

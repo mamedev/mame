@@ -195,9 +195,6 @@ void quizard_state::machine_start()
 	save_item(NAME(m_boot_press));
 
 	m_boot_timer = timer_alloc(FUNC(quizard_state::boot_press_tick), this);
-
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(9600);
 }
 
 void quizard_state::machine_reset()
@@ -206,7 +203,7 @@ void quizard_state::machine_reset()
 
 	m_boot_press = false;
 	m_boot_timer->adjust(attotime::from_seconds(22), 1);
-	m_mcu_p3 = 0x05; // RTS|RXD
+	m_mcu_rxd = 1;
 }
 
 
@@ -282,11 +279,9 @@ void quizard_state::mcu_rtsn_from_cpu(int state)
 	LOGMASKED(LOG_UART, "MCU receiving RTSN from CPU: %d\n", state);
 }
 
-void quizard_state::mcu_rx_from_cpu(uint8_t data)
+void quizard_state::mcu_rxd_from_cpu(int state)
 {
-	LOGMASKED(LOG_UART, "MCU receiving %02x from CPU\n", data);
-
-	transmit_register_setup(data);
+	m_mcu_rxd = state;
 }
 
 uint8_t quizard_state::mcu_p0_r()
@@ -314,8 +309,9 @@ uint8_t quizard_state::mcu_p2_r()
 
 uint8_t quizard_state::mcu_p3_r()
 {
-	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 3 Read (%02x)\n", machine().describe_context(), m_mcu_p3);
-	return m_mcu_p3;
+	const uint8_t data = m_mcu_rxd ? 0x7f : 0x7e;
+	LOGMASKED(LOG_QUIZARD_READS, "%s: MCU Port 3 Read (%02x)\n", machine().describe_context(), data);
+	return data;
 }
 
 void quizard_state::mcu_p0_w(uint8_t data)
@@ -336,7 +332,7 @@ void quizard_state::mcu_p2_w(uint8_t data)
 void quizard_state::mcu_p3_w(uint8_t data)
 {
 	LOGMASKED(LOG_QUIZARD_WRITES, "%s: MCU Port 3 Write (%02x)\n", machine().describe_context(), data);
-	rx_w(BIT(data, 1));
+	m_maincpu->rx_w(BIT(data, 1));
 	m_maincpu->uart_ctsn(BIT(data, 6));
 }
 
@@ -535,7 +531,7 @@ void quizard_state::quizard(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &quizard_state::cdimono1_mem);
 	m_maincpu->uart_rtsn_callback().set(FUNC(quizard_state::mcu_rtsn_from_cpu));
-	m_maincpu->uart_tx_callback().set(FUNC(quizard_state::mcu_rx_from_cpu));
+	m_maincpu->out_txd_cb().set(FUNC(quizard_state::mcu_rxd_from_cpu));
 
 	I8751(config, m_mcu, 11.0592_MHz_XTAL);
 	m_mcu->port_in_cb<0>().set(FUNC(quizard_state::mcu_p0_r));
@@ -548,23 +544,6 @@ void quizard_state::quizard(machine_config &config)
 	m_mcu->port_out_cb<3>().set(FUNC(quizard_state::mcu_p3_w));
 
 	m_slave_hle->read_mousebtn().set(FUNC(quizard_state::mcu_button_press));
-}
-
-void quizard_state::tra_callback()
-{
-	if (transmit_register_get_data_bit())
-		m_mcu_p3 |= 1;
-	else
-		m_mcu_p3 &= ~1;
-}
-
-void quizard_state::rcv_complete()
-{
-	receive_register_extract();
-
-	const uint8_t data = get_received_char();
-	LOGMASKED(LOG_QUIZARD_OTHER, "%s: MCU transmitting %02x\n", machine().describe_context(), data);
-	m_maincpu->uart_rx(data);
 }
 
 /*************************

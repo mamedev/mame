@@ -83,12 +83,11 @@ protected:
 	void bus_error_w(offs_t offset, uint16_t data);
 };
 
-class quizard_state : public cdi_state, public device_serial_interface
+class quizard_state : public cdi_state
 {
 public:
 	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cdi_state(mconfig, type, tag)
-		, device_serial_interface(mconfig, *this)
 		, m_mcu(*this, "mcu")
 		, m_inputs(*this, "P%u", 0U)
 	{ }
@@ -99,8 +98,6 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void tra_callback() override;
-	virtual void rcv_complete() override;
 
 	TIMER_CALLBACK_MEMBER(boot_press_tick);
 
@@ -113,7 +110,7 @@ private:
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
 
-	void mcu_rx_from_cpu(uint8_t data);
+	void mcu_rxd_from_cpu(int state);
 	void mcu_rtsn_from_cpu(int state);
 
 	uint8_t mcu_button_press();
@@ -123,7 +120,7 @@ private:
 
 	bool m_boot_press = false;
 	emu_timer *m_boot_timer = nullptr;
-	uint8_t m_mcu_p3;
+	int m_mcu_rxd;
 };
 
 // Quizard 2 language values:

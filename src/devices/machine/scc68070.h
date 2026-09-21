@@ -53,7 +53,6 @@ public:
 	auto iack4_callback() { return m_iack4_callback.bind(); }
 	auto iack5_callback() { return m_iack5_callback.bind(); }
 	auto iack7_callback() { return m_iack7_callback.bind(); }
-	auto uart_tx_callback() { return m_uart_tx_callback.bind(); }
 	auto out_txd_cb() { return m_txd_cb.bind(); }
 	auto uart_rtsn_callback() { return m_uart_rtsn_callback.bind(); }
 	auto i2c_scl_w() { return m_i2c_scl_callback.bind(); }
@@ -73,7 +72,6 @@ public:
 	TIMER_CALLBACK_MEMBER(i2c_callback);
 
 	// external callbacks
-	void uart_rx(uint8_t data);
 	void uart_ctsn(int state);
 
 	// register structures
@@ -259,6 +257,7 @@ private:
 	void recalc_framing();
 	void recalc_baud();
 	void check_for_tx_start();
+	void update_tx_int();
 	void set_timer_callback(int channel);
 
 	// callbacks
@@ -266,7 +265,6 @@ private:
 	devcb_read8 m_iack4_callback;
 	devcb_read8 m_iack5_callback;
 	devcb_read8 m_iack7_callback;
-	devcb_write8 m_uart_tx_callback;
 	devcb_write_line m_txd_cb;
 	devcb_write_line m_uart_rtsn_callback;
 	devcb_write_line m_i2c_scl_callback;
