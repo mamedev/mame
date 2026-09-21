@@ -161,6 +161,20 @@ NOKIA 9923204 C
 |-----------------------------------------------------------------------------------|
 |       PROM    LS14    SPKR                LS163   LS163           LS123   7438    |
 |                                           LS42    LS151           LS162           |
+|                                                                                   |
+|        F1  F2  F3  F4  F5  F6  F7  F8  F9 F10  DEL ESC UPLT DN  UP  LT  RT        |
+|                                                                                   |
+|          1!  2"  3#  4$  5%  6&  7/  8(  9)  0=  +?  ´`   <>    7   8   9         |
+|                                                                                   |
+|        TAB  Q   W   E   R   T   Y   U   I   O   P   Å   ~^  @*  4   5   6         |
+|                                                                                   |
+|        CAPS  A   S   D   F   G   H   J   K   L   Ö   Ä  RETURN  1   2   3         |
+|        LOCK                                                                       |
+|        SHIFT  Z   X   C   V   B   N   M   ,;  .:  -_  SHIFT LF  0       .         |         
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
 |-----------------------------------------------------------------------------------|
 
 Notes:
@@ -176,7 +190,6 @@ Notes:
     TODO
 
 	- upd765 FIFO underrun on floppy write due to CRTC hogging DMA
-	- "movcpm * *" syncronization error on mm1m6
 
 */
 
