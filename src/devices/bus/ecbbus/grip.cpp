@@ -397,11 +397,9 @@ void ecb_grip21_device::kb_w(uint8_t data)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-
 
 void ecb_grip21_device::device_add_mconfig(machine_config &config)
 {
@@ -429,13 +427,13 @@ void ecb_grip21_device::device_add_mconfig(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MC6845(config, m_crtc, XTAL(16'000'000)/4);
+	MC6845(config, m_crtc, XTAL(16'000'000)/8);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
 	m_crtc->set_update_row_callback(FUNC(ecb_grip21_device::crtc_update_row));
 	m_crtc->out_de_callback().set(m_sti, FUNC(z80sti_device::i1_w));
-	m_crtc->out_cur_callback().set(m_sti, FUNC(z80sti_device::i1_w));
+	m_crtc->out_cur_callback().set(m_sti, FUNC(z80sti_device::i2_w));
 
 //  HD6345(config, HD6345_TAG, XTAL(16'000'000)/4).set_screen(SCREEN_TAG);
 

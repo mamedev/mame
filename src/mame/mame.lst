@@ -1322,6 +1322,9 @@ macsefd
 unitron
 utrn1024
 
+@source:apple/macalchemy.cpp
+pmac6400
+
 @source:apple/maccatalyst.cpp
 pmac7200
 pmac7200_90
@@ -1331,6 +1334,16 @@ pmac7200_120
 @source:apple/maccordyceps.cpp
 pmac6200
 pmac5200
+
+@source:apple/macgazelle.cpp
+pmac5500
+pmac5500_250
+pmac5500_275
+pmac6500
+pmac6500_250
+pmac6500_275
+pmac6500_300
+pmac20th
 
 @source:apple/macii.cpp
 mac2fdhd
@@ -1421,6 +1434,10 @@ macqd800
 @source:apple/macquadraav.cpp
 macqd660av
 macqd840av
+
+@source:apple/mactanzania.cpp
+pmac4400
+pmac4400_200
 
 @source:apple/newton.cpp
 emate
@@ -17491,6 +17508,9 @@ prof80
 
 @source:conitec/prof180x.cpp
 prof180x
+prof180xp
+
+@source:conitec/prof181x.cpp
 prof181x
 
 @source:cosmo/cosmo_ls9310.cpp
@@ -20872,7 +20892,9 @@ monty
 @source:handheld/mylife.cpp
 mylife
 mylifei
+mylifei4
 mylifes
+myrelife
 
 @source:handheld/pensebem.cpp
 pbem2017
@@ -26999,6 +27021,9 @@ jb3000
 myb3k
 stepone
 
+@source:matsushita/wsa1.cpp
+wsa1r
+
 @source:mattel/aquarius.cpp
 aquarius
 aquariusp
@@ -32483,6 +32508,7 @@ nostk
 mcm70
 
 @source:misc/megaphx.cpp
+afterwar
 hamboy
 megaphx
 yoyospel
@@ -40049,6 +40075,10 @@ mcword_de
 @source:psion/mc600.cpp
 mc600
 
+@source:psion/osaris.cpp
+osaris
+osaris_fr
+
 @source:psion/psion.cpp
 psion1
 psioncm
@@ -40085,6 +40115,7 @@ psion3mx_fr
 psion3mx_nl
 
 @source:psion/psion5mx.cpp
+conan
 mako
 mc218
 mc218_de
@@ -40097,6 +40128,7 @@ psion618c
 revo
 revo_de
 revo_fr
+revo_nl
 
 @source:psion/psion7.cpp
 netbook
@@ -42360,7 +42392,7 @@ prc2ksu
 prikura
 puyosun
 rsgun
-sandor
+sandr
 sanjeon
 sackids
 sasissu
@@ -47917,6 +47949,7 @@ mobigo2g
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
 beambox
+behero
 jak_camp
 jak_car2
 jak_duck
@@ -48118,6 +48151,7 @@ zone3d
 @source:tvgames/spg2xx.cpp
 ablkickb
 abltenni
+anpannou
 anpantv
 backybbs
 ban_krkk

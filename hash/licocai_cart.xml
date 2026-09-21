@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="licocai_cart" description="Cai System / C&amp;E LICO cartridges">
+<softwarelist name="licocai_cart" description="Socrates Co. / C&amp;E Inc. LICO cartridges">
 
 	<!-- data seems to end abruptly in all of these, are they complete? -->
 	
@@ -11,7 +11,7 @@ license:CC0-1.0
 	<software name="znfsg" supported="no">
 		<description>Zhuōná Fēnshù Guài</description>
 		<year>1992</year>
-		<publisher>Cai System / C&amp;E</publisher>
+		<publisher>Socrates Co. / C&amp;E Inc.</publisher>
 		<info name="alt_title" value="捉拿分數怪"/>
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="green" />
@@ -25,7 +25,7 @@ license:CC0-1.0
 	<software name="zyfhk" supported="no">
 		<description>Zhùyīn Fúhào Kǎ</description>
 		<year>1994</year>
-		<publisher>Cai System / C&amp;E</publisher>
+		<publisher>Socrates Co. / C&amp;E Inc.</publisher>
 		<info name="alt_title" value="注音符號卡"/>	
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="pink/red" />
@@ -37,9 +37,9 @@ license:CC0-1.0
 
 	<!-- no size listed in header, data ends abruptly, was dumped at double this size but with identical halves, likely bad -->
 	<software name="kshs" supported="no">
-		<description>Kuài suàn hǎoshǒu / Smart Kids</description>
+		<description>Kuài Suàn Hǎoshǒu / Smart Kids</description>
 		<year>1994</year>
-		<publisher>Cai System / C&amp;E</publisher>
+		<publisher>Socrates Co. / C&amp;E Inc.</publisher>
 		<info name="alt_title" value="快算好手"/>	
 		<part name="cart" interface="licocai_cart">
 			<feature name="label_color" value="orange/yellow" />

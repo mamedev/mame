@@ -2285,7 +2285,12 @@ u16 swp30_device::revram_enable_r()
 void swp30_device::revram_enable_w(u16 data)
 {
 	logerror("revram enable = %04x\n", data);
+	if(data == m_revram_enable)
+		return;
 	m_revram_enable = data;
+	// The drc generates the memory accesses for the banks that are on at the
+	// time, so the cache has to go when that changes
+	m_meg_program_changed = true;
 }
 
 void swp30_device::revram_clear_w(u16 data)
@@ -3202,6 +3207,18 @@ u32 swp30_device::meg_state::resolve_address(u16 pc, s32 offset)
 	return 0xffffffff;
 }
 
+// Which bank of the map an instruction lands in, same selection as
+// resolve_address.  The bit of that number in the tlb enable register says
+// whether the bank is turned off
+int swp30_device::meg_state::map_bank(u16 pc) const
+{
+	u16 key = (pc / 12) << 11;
+	for(int i=0; i != 7; i++)
+		if(m_map[i+1] <= m_map[i] || ((m_map[i+1] & 0xf800) > key))
+			return i;
+	return 7;
+}
+
 u32 swp30_device::meg_state::get_lfo(int lfo)
 {
 	constexpr u32 offsets[16] = {
@@ -3802,6 +3819,16 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 		u16 mapr = m_map[bank];
 		u32 mask = (1 << (10+BIT(mapr, 8, 3))) - 1;
 		u32 base = BIT(mapr, 0, 8) << 10;
+		// A bank turned off in the tlb enable register drops writes and reads
+		// as zero.  Absolute reads do not go through the map, so they are not
+		// affected.  Which banks are on is part of the state the block is
+		// generated for: a write to the register marks the program changed,
+		// which throws the cache away and generates it again
+		if((amem == 1 || !BIT(opcode, 0x23)) && BIT(m_swp->m_revram_enable, bank)) {
+			if(amem != 1)
+				UML_MOV(block, mem(&m_memr_value[index2]), 0);
+			return;
+		}
 		UML_LOAD(block, I0, m_offset.data(), pc/3, SIZE_WORD, SCALE_x2);
 		if(amem == 3)
 			UML_ADD(block, I0, I0, 1);
@@ -3996,36 +4023,47 @@ void swp30_device::meg_state::step()
 	}
 	m_t_value[m_delay_2] = s16(BIT(opcode, 0x3e) ? (m_p >> 8) & 0x7fff : std::clamp<s64>(m_p >> (15+8), -0x8000, 0x7fff));
 
-	// Memory access
+	// Memory access.  A bank turned off in the tlb enable register drops
+	// writes and reads as zero, absolute reads excepted since they do not
+	// go through the map
 	switch(BIT(opcode, 0x24, 2)) {
-	case 1: {
-		u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
-		if(address != 0xffffffff)
-			m_swp->m_reverb_cache.write_word(address, revram_encode(m_ram_write));
-		break;
-	}
-	case 2: {
-		u32 address = BIT(opcode, 0x23) ?
-			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
-			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
-		if(address != 0xffffffff) {
-			u16 val = m_swp->m_reverb_cache.read_word(address);
-			m_memr_value[m_delay_2] = revram_decode(val);
-			m_memr_active[m_delay_2] = true;
+	case 1:
+		if(!BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
+			u32 address = resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
+			if(address != 0xffffffff)
+				m_swp->m_reverb_cache.write_word(address, revram_encode(m_ram_write));
 		}
 		break;
-	}
-	case 3: {
-		u32 address = BIT(opcode, 0x23) ?
-			(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
-			resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
-		if(address != 0xffffffff) {
-			u16 val = m_swp->m_reverb_cache.read_word(address);
-			m_memr_value[m_delay_2] = revram_decode(val);
+	case 2:
+		if(!BIT(opcode, 0x23) && BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
+			m_memr_value[m_delay_2] = 0;
 			m_memr_active[m_delay_2] = true;
+		} else {
+			u32 address = BIT(opcode, 0x23) ?
+				(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0)) & 0x3ffff :
+				resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter);
+			if(address != 0xffffffff) {
+				u16 val = m_swp->m_reverb_cache.read_word(address);
+				m_memr_value[m_delay_2] = revram_decode(val);
+				m_memr_active[m_delay_2] = true;
+			}
 		}
 		break;
-	}
+	case 3:
+		if(!BIT(opcode, 0x23) && BIT(m_swp->m_revram_enable, map_bank(m_pc))) {
+			m_memr_value[m_delay_2] = 0;
+			m_memr_active[m_delay_2] = true;
+		} else {
+			u32 address = BIT(opcode, 0x23) ?
+				(m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) + 1) & 0x3ffff :
+				resolve_address(m_pc, m_offset[m_pc/3] + (BIT(opcode, 0x21) ? m_ram_index : 0) - m_sample_counter + 1);
+			if(address != 0xffffffff) {
+				u16 val = m_swp->m_reverb_cache.read_word(address);
+				m_memr_value[m_delay_2] = revram_decode(val);
+				m_memr_active[m_delay_2] = true;
+			}
+		}
+		break;
 	}
 
 	m_delay_3 ++;

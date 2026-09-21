@@ -1007,6 +1007,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			}
 			tick_time ++;
 
+			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x ", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
+
 			// plut fetch is optional
 			// TODO: find use cases when not
 			if (ldplut)
@@ -1016,12 +1018,14 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 					m_cel.plut_ptr = plut_addr;
 				else
 				{
-					LOGCEL("    RELPLUT %08x\n", plut_addr);
+					LOGCEL("RELPLUT %08x -> ", plut_addr);
 					m_cel.plut_ptr = m_cel.address + (s32)plut_addr + 0x10;
 				}
+				// PLUTPTR tends to hold garbage when unused, avoid printing to make it less confusing.
+				LOGCEL("PLUTPTR %08x", m_cel.plut_ptr);
 				tick_time ++;
 			}
-			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
+			LOGCEL("\n");
 
 			// TODO: verify what "current" means in context of X/Y base positions
 			// is it the previously CEL loaded address or the actual pointer at the end of a CEL drawing?
@@ -1115,7 +1119,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 					// 16 / 0: 2D secondary divider value (value + 1)
 					m_cel.pixc_2d[i] = BIT(m_cel.pixc, 0 + nibble);
-					LOGCEL("    P[%d]: 1S %d MS %d MF %d DF %d | 2S %d AV %02x 2D %d\n"
+					LOGCEL("    P[%d] 1S: %d MS %d MF %d DF %d | 2S: %d AV %02x 2D %d\n"
 						, i
 						, m_cel.pixc_1s[i], m_cel.pixc_ms[i], m_cel.pixc_mf[i], m_cel.pixc_df[i]
 						, m_cel.pixc_2s[i], m_cel.pixc_av[i], m_cel.pixc_2d[i]
@@ -1204,13 +1208,12 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, bpp
 				, BPP_VALUES[bpp]
 			);
-			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0xff) + 2;
-			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
-			// TODO: should be bits 31-24 -> 7-0
+			// woffset8 should be bits 31-24 -> 7-0
 			// (doc claims integer, signed?)
 			// - demoman triggers this on flame transitions with 0xff, no noticeable difference (?)
-			//if (bpp < 5 && BIT(m_cel.pre1, 31))
-			//	popmessage("3do_madam.cpp: CEL check woffset8 (bpp=%d pre1=%08x)", bpp, m_cel.pre1);
+			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0xff) + 2;
+			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
+			// NOTE: matters only for unpacked CELs
 			const u16 woffset = bpp >= 5 ? woffset10 : woffset8;
 			const bool lrform = !!BIT(m_cel.pre1, 11);
 			const u16 tlhpcnt = ((m_cel.pre1 >> 0) & 0x7ff) + 1;
@@ -1280,7 +1283,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						// The ACW/ACCW part ...
 
 						u16 res_data = (this->*pixc_mix_table[pixc_mode])(xpos, ypos, src_data, p_mode, op_mode);
-						res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos, ypos, res_data);
+						// NOTE: x/y may be the CEL origin not the fb destination ...
+						res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos, ypos, src_data, res_data);
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * dst_pitch) << 2;
@@ -1679,16 +1683,16 @@ const madam_device::vh_interpolate_func madam_device::vh_interpolate_table[2] =
 };
 
 // TODO: stub
-u16 madam_device::vh_interpolate_subposition(int xpos, int ypos, u16 pix_data)
+u16 madam_device::vh_interpolate_subposition(int xpos, int ypos, u16 cel_data, u16 pix_data)
 {
 	return pix_data;
 }
 
 // TODO: enough for virtuoso and not much else
-// wants bit 0 as CLUT separator for the player avatar, which goes in AMY fixed at 0 due of swaphv
-u16 madam_device::vh_interpolate_plut(int xpos, int ypos, u16 pix_data)
+// wants bit 15 as CLUT separator for the player avatar, which goes in AMY fixed at 0 due of swaphv
+u16 madam_device::vh_interpolate_plut(int xpos, int ypos, u16 cel_data, u16 pix_data)
 {
-	bool v_bit = BIT(pix_data, m_cel_master_sw.v_output_bit);
+	bool v_bit = BIT(cel_data, m_cel_master_sw.v_output_bit);
 	v_bit |= m_cel_master_sw.v_output_force_high;
 	v_bit &= m_cel_master_sw.v_output_mask;
 

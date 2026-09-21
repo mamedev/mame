@@ -1111,6 +1111,29 @@ if MACHINES["CHESSMACHINE"] then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/clps6700.h,MACHINES["CLPS6700"] = true
+---------------------------------------------------
+
+if MACHINES["CLPS6700"] then
+	files {
+		MAME_DIR .. "src/devices/machine/clps6700.cpp",
+		MAME_DIR .. "src/devices/machine/clps6700.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/clps7110.h,MACHINES["CLPS7110"] = true
+---------------------------------------------------
+
+if MACHINES["CLPS7110"] then
+	files {
+		MAME_DIR .. "src/devices/machine/clps7110.cpp",
+		MAME_DIR .. "src/devices/machine/clps7110.h",
+	}
+end
 
 ---------------------------------------------------
 --
@@ -2894,6 +2917,18 @@ if MACHINES["PCF8583"] then
 	files {
 		MAME_DIR .. "src/devices/machine/pcf8583.cpp",
 		MAME_DIR .. "src/devices/machine/pcf8583.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mk3835.h,MACHINES["MK3835"] = true
+---------------------------------------------------
+
+if MACHINES["MK3835"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mk3835.cpp",
+		MAME_DIR .. "src/devices/machine/mk3835.h",
 	}
 end
 

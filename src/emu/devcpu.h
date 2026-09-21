@@ -58,6 +58,9 @@ protected:
 	// construction/destruction
 	cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
+	// for recompiling cores to test from generated code; they must clear it themselves
+	bool *access_to_be_redone_ptr() noexcept { return &m_access_to_be_redone; }
+
 private:
 	// configured state
 	bool m_force_no_drc;                   // whether or not to force DRC off

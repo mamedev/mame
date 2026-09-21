@@ -664,9 +664,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	bool show_warnings = true;
 	bool video_none = strcmp(downcast<osd_options &>(machine().options()).video(), OSDOPTVAL_NONE) == 0;
 
-	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
+	// disable everything if we are using -str for 300 (5 minutes) or fewer seconds, or if we're the empty driver,
 	// or if we are debugging, or if there's no mame window to send inputs to
-	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) || video_none)
+	if (!first_time || (str > 0 && str <= 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) || video_none)
 		show_gameinfo = show_warnings = false;
 
 #if defined(__EMSCRIPTEN__)

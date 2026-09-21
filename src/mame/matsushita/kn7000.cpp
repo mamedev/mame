@@ -58,6 +58,8 @@
 
 #include "emu.h"
 
+#include "machine/intelfsh.h"
+
 
 
 namespace {
@@ -88,7 +90,18 @@ void kn7000_state::kn7000(machine_config &config)
 	// (unlock at +0xAAAA / +0x5554, autoselect 0x90, program 0xA0, sector erase
 	// 0x80+0x30) and validates it against a table of accepted parts before it will
 	// program anything, so the device IDs here are functional, not decorative.
-	// KN7000 accepts MBM29LV160B, MX29LV160B or AT49BV16X4 (table at 0x485CF9E0).
+	//
+	// Accepted parts, from the table at 0x485CF9E0:
+	//
+	//   maker  device  sectors  name
+	//   0x04   0x2249  35       MBM29LV160B   Fujitsu
+	//   0xC2   0x2249  35       MX29LV160B    Macronix
+	//   0x1F   0x00C0  40       AT49BV16X4    Atmel
+	//
+	// Both geometries are bottom boot and 2 MiB: 16K + 2x8K + 32K + 31x64K for the
+	// 29LV160B pair, 8x8K + 2x32K + 30x64K for the Atmel.  Which one is fitted is
+	// not recorded -- IC21's marking is the house code C3FBMD000050.
+	FUJITSU_29LV160B(config, "custom_data");
 }
 
 void kn7000_state::kn6000(machine_config &config)
@@ -194,7 +207,9 @@ ROM_START(kn7000)
 	// because a real instrument holds exactly one of them at a time.  Sectors 19..29
 	// are byte-identical in all nine, so a little over a third of the region is an
 	// invariant template rather than per-set data.
-	ROM_REGION(0x200000, "custom_data", ROMREGION_ERASEFF)
+	// 16_BE: intelfsh preloads a 16-bit part with m_region->as_u16(), a host-native
+	// read, so a byte-wide region would reach the device halfword-swapped.
+	ROM_REGION16_BE(0x200000, "custom_data", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "ctmini",  "Initial Data Disk (factory default)")
 	ROMX_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "custm1",  "Custom Data: Blue Bayou")

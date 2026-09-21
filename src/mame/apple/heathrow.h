@@ -12,6 +12,7 @@
 #include "bus/ata/ataintf.h"
 #include "machine/pci.h"
 #include "machine/6522via.h"
+//#include "machine/am79c940.h"
 #include "machine/applefdintf.h"
 #include "machine/swim3.h"
 #include "machine/z80scc.h"
@@ -43,6 +44,7 @@ public:
 	auto iobus_d_w_callback() { return write_iobus_d.bind(); }
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
+	void set_system_id(u32 id) { m_system_id = id; }
 
 	void cb1_w(int state);
 	void cb2_w(int state);
@@ -79,6 +81,11 @@ protected:
 	void scc_w(offs_t offset, u16 data, u16 mem_mask);
 	u8 scc_macrisc_r(offs_t offset);
 	void scc_macrisc_w(offs_t offset, u8 data);
+	u8 lt_timer_r(offs_t offset);
+	void lt_timer_w(offs_t offset, u8 data);
+	u8 ltpc_r(offs_t offset);
+	void ltpc_w(offs_t offset, u8 data);
+	void scc_tx_dma_w(u32 data);
 
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
@@ -104,8 +111,13 @@ protected:
 	required_device<dbdma_device> m_dma_sccbtx, m_dma_sccbrx, m_dma_audio_in, m_dma_audio_out;
 
 private:
-	floppy_image_device *m_cur_floppy = nullptr;
+	floppy_image_device *m_cur_floppy;
 	int m_hdsel;
+	u32 m_system_id;
+	u8 m_lt_timer_count;
+	attotime m_lt_timer_start;
+	u8 m_scc_rec_count;
+	u8 m_ltpc_start[2];
 
 	u8 via_in_a();
 	u8 via_in_b();
@@ -133,6 +145,15 @@ public:
 	grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void map(address_map &map) ATTR_COLD;
+
+	// interface to external MACE (in the Curio chip)
+	auto enet_r_callback() { return read_enet.bind(); }
+	auto enet_w_callback() { return write_enet.bind(); }
+	auto enet_prom_r_callback() { return read_enet_prom.bind(); }
+//  template <typename T> void set_mace_tag(T &&tag) { m_mace.set_tag(std::forward<T>(tag)); }
+	void enet_irq(int state) { set_irq_line<14>(state); }
+	void enet_tx_drq(int state) { m_dma_enet_tx->drq_w(state); }
+	void enet_rx_drq(int state) { m_dma_enet_rx->drq_w(state); }
 
 	// Grand Central has no SCSI controller of its own: it interfaces to two external ones.
 	auto scsi0_r_callback() { return read_scsi0.bind(); }
@@ -169,6 +190,13 @@ protected:
 	virtual uint8_t cache_line_size_r() override { return 0x08; }
 
 private:
+	u8 enet_r(offs_t offset);
+	void enet_w(offs_t offset, u8 data);
+	u8 enet_prom_r(offs_t offset);
+	u32 enet_dma_r();
+	void enet_dma_w(offs_t offset, u32 data, u32 mem_mask);
+	void enet_dma_eof_w(int state);
+
 	u8 scsi0_r(offs_t offset);
 	void scsi0_w(offs_t offset, u8 data);
 	u32 scsi0_dma_r(offs_t offset);
@@ -183,6 +211,11 @@ private:
 	template <devcb_write32 grandcentral_device::*W> void iobus_w(offs_t offset, u32 data, u32 mem_mask);
 
 	required_device<dbdma_device> m_dma_scsi1;
+	required_device<dbdma_device> m_dma_enet_tx, m_dma_enet_rx;
+//  optional_device<am79c940_device> m_mace;
+	devcb_read8 read_enet, read_enet_prom;
+	devcb_write8 write_enet;
+	bool m_enet_tx_eof;
 
 	devcb_read8 read_scsi0;
 	devcb_write8 write_scsi0;

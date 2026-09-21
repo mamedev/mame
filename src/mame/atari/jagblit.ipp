@@ -539,7 +539,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 					WRITE_ZDATA(adestflags, srczdata);
 			}
 
-				/* update X/Y */
+			/* update X/Y */
 			asrc_x = (asrc_x + asrc_xadd) & asrc_xmask;
 			asrc_y = (asrc_y + asrc_yadd) & asrc_ymask;
 			adest_x = (adest_x + adest_xadd) & adest_xmask;

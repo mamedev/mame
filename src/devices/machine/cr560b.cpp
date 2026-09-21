@@ -24,13 +24,14 @@ TODO:
 #include "cr560b.h"
 
 #define LOG_CMD    (1 << 1)
-#define LOG_TOC    (1 << 2)
-#define LOG_PARAM  (1 << 3)
-#define LOG_DATA   (1 << 4)
-#define LOG_SUBQ   (1 << 5)
-#define LOG_SUBQ2  (1 << 6) // log subq data to popmessage
+#define LOG_CMDV   (1 << 2) // cmd 0x10 + cmd 0x83 + output returns (verbose)
+#define LOG_TOC    (1 << 3)
+#define LOG_PARAM  (1 << 4)
+#define LOG_DATA   (1 << 5)
+#define LOG_SUBQ   (1 << 6)
+#define LOG_SUBQ2  (1 << 7) // log subq data to popmessage
 
-#define VERBOSE (LOG_GENERAL | LOG_TOC | LOG_CMD | LOG_PARAM)
+#define VERBOSE (LOG_GENERAL | LOG_TOC | LOG_CMD)
 //#define VERBOSE (LOG_TOC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
@@ -290,7 +291,7 @@ void cr560b_device::status_enable(uint8_t output_length)
 	if (m_output_fifo_length > 0)
 	{
 		if (m_input_fifo[0] != 0x87 || (VERBOSE & LOG_SUBQ))
-			LOGMASKED(LOG_CMD, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
+			LOGMASKED(LOG_CMDV, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
 
 		m_sten_timer->adjust(attotime::from_usec(64 * 4)); // TODO
 	}
@@ -686,7 +687,7 @@ void cr560b_device::cmd_play_track()
 // TODO: unverified in this implementation (sure needs data ready in Clio)
 void cr560b_device::cmd_read()
 {
-	LOGMASKED(LOG_CMD, "Command: Read\n");
+	LOGMASKED(LOG_CMDV, "Command: Read\n");
 	LOGPARAM;
 
 	u8 read_mode = m_input_fifo[4];
@@ -699,7 +700,7 @@ void cr560b_device::cmd_read()
 
 	if (read_mode == 0)
 	{
-		LOGMASKED(LOG_CMD, "MSF mode %06x ", start_sector);
+		LOGMASKED(LOG_CMDV, "MSF mode %06x ", start_sector);
 		start_sector = msf_to_lba(start_sector);
 	}
 
@@ -707,7 +708,7 @@ void cr560b_device::cmd_read()
 	m_transfer_sectors = (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
 	m_transfer_length = m_transfer_sectors * m_sector_size;
 
-	LOGMASKED(LOG_CMD, "-> LBA %06x, sectors %d\n", m_transfer_lba, m_transfer_sectors);
+	LOGMASKED(LOG_CMDV, "-> LBA %06x, sectors %d\n", m_transfer_lba, m_transfer_sectors);
 
 	m_cdda->stop_audio();
 
@@ -762,7 +763,7 @@ void cr560b_device::cmd_read_error()
 
 void cr560b_device::cmd_version()
 {
-	LOGMASKED(LOG_CMD, "Command: Version\n");
+	LOGMASKED(LOG_CMDV, "Command: Version\n");
 	LOGPARAM;
 
 	m_output_fifo[0]  = 0x83;

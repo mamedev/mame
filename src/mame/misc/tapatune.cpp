@@ -71,8 +71,8 @@ public:
 	{
 	}
 
-	void tapatune(machine_config &config);
-	void tapatune_base(machine_config &config);
+	void tapatune(machine_config &config) ATTR_COLD;
+	void tapatune_base(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -190,11 +190,11 @@ MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 	uint32_t *const dest = &bitmap.pix(y);
 	offs_t offs = (ma*2 + ra*0x40)*4;
 
-	uint8_t const *const videoram = reinterpret_cast<uint8_t *>(m_videoram.target());
+	auto const videoram = util::big_endian_cast<uint8_t const>(m_videoram.target());
 
 	for (uint32_t x = 0; x < x_count*4; x++)
 	{
-		uint8_t pix = videoram[BYTE_XOR_BE(offs + x)];
+		uint8_t const pix = videoram[offs + x];
 		dest[2*x] = m_pens[((pix >> 4) & 0x0f)];
 		dest[2*x + 1] = m_pens[(pix & 0x0f)];
 	}
@@ -204,7 +204,7 @@ MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 void tapatune_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("Palette write: offset = %02x, data = %04x, mask = %04x\n", offset, data, mem_mask );
-	switch(offset)
+	switch (offset)
 	{
 		case 0: // address register
 			m_palette_write_addr = ((data >> 8) & 0xff) * 3;
