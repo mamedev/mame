@@ -73,6 +73,11 @@ def parse_args():
     prepare_parser.add_argument('--dependency-manifest', type=pathlib.Path)
     prepare_parser.add_argument('--require-dependency-manifest', action='store_true')
 
+    materialize_parser = subparsers.add_parser('materialize')
+    add_build_arguments(materialize_parser)
+    materialize_parser.add_argument('--dependency-manifest', required=True, type=pathlib.Path)
+    materialize_parser.add_argument('--make-program', default='make')
+
     capture_parser = subparsers.add_parser('capture')
     add_build_arguments(capture_parser)
     capture_parser.add_argument('--dependency-root', required=True, type=pathlib.Path)
@@ -341,7 +346,8 @@ def dependency_manifest_identity(manifest):
             'shard': manifest.get('shard')}
 
 
-def validate_dependency_manifest(manifest, context, expected_shape_hash=None):
+def validate_dependency_manifest(
+        manifest, context, expected_shape_hash=None, allow_missing_dependencies=False):
     if manifest.get('schema_version') != DEPENDENCY_SCHEMA_VERSION:
         raise ValueError('dependency manifest schema does not match')
     if manifest.get('shard') != context['group']:
@@ -366,7 +372,8 @@ def validate_dependency_manifest(manifest, context, expected_shape_hash=None):
         if is_under(relative_path, dependency_root):
             raise ValueError('dependency path refers to a compiled intermediate: %s' % relative_path)
         path = context['source_root'].joinpath(*relative_path.split('/'))
-        require_input_file(relative_path, path)
+        if not allow_missing_dependencies or path.exists() or path.is_symlink():
+            require_input_file(relative_path, path)
 
     dependency_files = manifest.get('dependency_files')
     if not isinstance(dependency_files, list) or not dependency_files:
@@ -387,14 +394,16 @@ def validate_dependency_manifest(manifest, context, expected_shape_hash=None):
     return dependencies
 
 
-def dependency_manifest_for_key(path, context, required):
+def dependency_manifest_for_key(path, context, required, allow_missing_dependencies=False):
     if path is None or not path.is_file():
         if required:
             raise ValueError('required dependency manifest is missing')
         return None, 'missing'
     try:
         manifest = read_manifest(path)
-        validate_dependency_manifest(manifest, context)
+        validate_dependency_manifest(
+                manifest, context,
+                allow_missing_dependencies=allow_missing_dependencies)
         return manifest, 'available'
     except (IOError, OSError, UnicodeError, ValueError) as error:
         if required:
@@ -525,6 +534,127 @@ def parse_make_words(value, path):
     if word:
         words.append(''.join(word))
     return words
+
+
+def read_make_logical_lines(path):
+    pending = ''
+    with io.open(path, 'r', encoding='utf-8') as makefile:
+        for physical_line in makefile:
+            line = physical_line.rstrip('\r\n')
+            if pending:
+                line = pending + line.lstrip()
+            if line.endswith('\\'):
+                pending = line[:-1] + ' '
+            else:
+                yield line
+                pending = ''
+    if pending:
+        yield pending.rstrip()
+
+
+def make_rule_separator(line):
+    escaped = False
+    for index, character in enumerate(line):
+        if escaped:
+            escaped = False
+        elif character == '\\':
+            escaped = True
+        elif character == ':':
+            if (index + 1) >= len(line) or line[index + 1] != '=':
+                return index
+    return None
+
+
+def normalize_make_target(token, makefile, source_root):
+    if not token or '$' in token or '%' in token:
+        return None
+    path = pathlib.Path(token)
+    if not path.is_absolute():
+        path = makefile.parent / path
+    try:
+        return path.resolve().relative_to(source_root).as_posix()
+    except ValueError:
+        return None
+
+
+def find_generated_dependency_targets(context, dependencies):
+    needed = set(dependencies)
+    matches = {}
+    for relative_makefile in context['project_makefiles']:
+        makefile = context['source_root'].joinpath(*relative_makefile.split('/'))
+        for line in read_make_logical_lines(makefile):
+            if not line or line[0].isspace() or line.lstrip().startswith('#'):
+                continue
+            separator = make_rule_separator(line)
+            if separator is None:
+                continue
+            for target in parse_make_words(line[:separator], makefile):
+                relative_target = normalize_make_target(
+                        target, makefile, context['source_root'])
+                if relative_target in needed and relative_target not in matches:
+                    matches[relative_target] = (makefile, target)
+    return matches, sorted(needed - set(matches))
+
+
+def materialize_dependencies(options):
+    context = build_context(options)
+    dependency_manifest, dependency_status = dependency_manifest_for_key(
+            options.dependency_manifest,
+            context,
+            required=False,
+            allow_missing_dependencies=True)
+    if dependency_manifest is None:
+        return 0, dependency_status
+
+    missing = []
+    for relative_path in dependency_manifest['dependencies']:
+        path = context['source_root'].joinpath(*relative_path.split('/'))
+        if not path.is_file() and not path.is_symlink():
+            missing.append(relative_path)
+    if not missing:
+        return 0, 'current'
+
+    targets, unresolved = find_generated_dependency_targets(context, missing)
+    if unresolved:
+        sys.stderr.write(
+                'Generated dependencies cannot be materialized; using conservative inputs: %s\n' %
+                ' '.join(unresolved))
+        return 0, 'unresolved'
+
+    by_makefile = collections.defaultdict(list)
+    for relative_path in missing:
+        makefile, target = targets[relative_path]
+        by_makefile[makefile].append((relative_path, target))
+
+    solution_dir = context['solution_makefile'].parent
+    for makefile in sorted(by_makefile, key=lambda path: path.as_posix()):
+        selected = sorted(by_makefile[makefile])
+        command = [
+                options.make_program,
+                '-j%d' % context['build']['make_jobs'],
+                '-C', str(solution_dir),
+                '-f', makefile.name,
+                'config=%s' % context['build']['configuration']]
+        command.extend(target for relative_path, target in selected)
+        try:
+            subprocess.check_call(command)
+        except (OSError, subprocess.CalledProcessError) as error:
+            sys.stderr.write(
+                    'Generated dependencies could not be rebuilt; using conservative inputs: %s\n' %
+                    error)
+            return 0, 'failed'
+
+    remaining = []
+    for relative_path in missing:
+        path = context['source_root'].joinpath(*relative_path.split('/'))
+        if not path.is_file() and not path.is_symlink():
+            remaining.append(relative_path)
+    if remaining:
+        sys.stderr.write(
+                'Generated dependency rules produced no output; using conservative inputs: %s\n' %
+                ' '.join(remaining))
+        return 0, 'failed'
+    return len(missing), 'materialized'
 
 
 def read_compiler_dependencies(path):
@@ -719,6 +849,17 @@ def main():
             sys.stdout.write('%s\n' % dependency_cache_prefix(options))
         elif options.command == 'prepare':
             sys.stdout.write('%s\n' % prepare_cache(options))
+        elif options.command == 'materialize':
+            dependency_count, status = materialize_dependencies(options)
+            if status == 'materialized':
+                sys.stdout.write('Materialized %d generated dependencies for %s.\n' % (
+                        dependency_count, options.group))
+            elif status == 'current':
+                sys.stdout.write('All dependencies for %s are already materialized.\n' % options.group)
+            else:
+                sys.stdout.write(
+                        'Generated dependency materialization skipped for %s (%s).\n' %
+                        (options.group, status))
         elif options.command == 'capture':
             file_count, dependency_count = capture_dependencies(options)
             sys.stdout.write('Captured %d compiler dependency files with %d inputs for %s.\n' % (

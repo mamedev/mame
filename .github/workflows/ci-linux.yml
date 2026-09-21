@@ -140,6 +140,16 @@ jobs:
         key: ${{ steps.library-cache-context.outputs.dependency-key }}
         restore-keys: |
           ${{ steps.library-cache-context.outputs.dependency-prefix }}
+    - name: Materialize library generated dependencies
+      run: |
+        python scripts/build/ci_linux_clang_shard_cache.py \
+          materialize "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.group }}" \
+          --toolchain-file build/ci-linux-clang-toolchain.txt \
+          --dependency-manifest \
+            build/ci-linux-clang-${{ matrix.group }}-dependency-state/dependency-manifest-${{ matrix.group }}.json \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}"
     - name: Prepare library shard cache
       id: library-cache-key
       run: |
@@ -337,6 +347,16 @@ jobs:
         key: ${{ steps.driver-cache-context.outputs.dependency-key }}
         restore-keys: |
           ${{ steps.driver-cache-context.outputs.dependency-prefix }}
+    - name: Materialize driver generated dependencies
+      run: |
+        python scripts/build/ci_linux_clang_shard_cache.py \
+          materialize "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --toolchain-file build/ci-linux-clang-toolchain.txt \
+          --dependency-manifest \
+            build/ci-linux-clang-${{ matrix.bucket }}-dependency-state/dependency-manifest-${{ matrix.bucket }}.json \
+          --runner-os "${{ runner.os }}" \
+          --runner-arch "${{ runner.arch }}"
     - name: Prepare driver bucket cache
       id: driver-cache-key
       run: |
