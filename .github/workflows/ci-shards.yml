@@ -96,6 +96,13 @@ jobs:
         set -euo pipefail
         make -j"$CI_MAKE_JOBS" generate
         make "$CI_SOLUTION_DIR/Makefile"
+        state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
+        mkdir -p "$state_root"
+        "$CI_PYTHON" scripts/build/ci_shards.py inventory \
+          "$CI_SOLUTION_DIR/Makefile" \
+          --profile "$CI_PROFILE_PATH" \
+          --inventory-output "$state_root/target-inventory.json" \
+          --drift-output "$state_root/target-drift.json"
         "$CI_PYTHON" scripts/build/ci_shards.py validate \
           "$CI_SOLUTION_DIR/Makefile" \
           --profile "$CI_PROFILE_PATH" \
@@ -311,6 +318,7 @@ jobs:
 
   link-and-validate:
     name: link (${{ inputs.profile_id }})
+    if: ${{ always() }}
     needs:
     - build-shards
     runs-on: ${{ inputs.runner }}
@@ -354,11 +362,42 @@ jobs:
     - name: Install Homebrew dependencies
       if: inputs.install_kind == 'brew'
       run: brew install $CI_PACKAGES
-    - name: Generate final build files
+    - name: Generate final build files and target inventory
+      id: target-inventory
       run: |
         set -euo pipefail
         make -j"$CI_MAKE_JOBS" generate
         make "$CI_SOLUTION_DIR/Makefile"
+        state_root="build/ci-shards/$CI_PROFILE_ID/final"
+        mkdir -p "$state_root"
+        "$CI_PYTHON" scripts/build/ci_shards.py inventory \
+          "$CI_SOLUTION_DIR/Makefile" \
+          --profile "$CI_PROFILE_PATH" \
+          --inventory-output "$state_root/target-inventory.json" \
+          --drift-output "$state_root/target-drift.json" \
+          --summary-output "$state_root/target-drift.html" \
+          --github-output "$GITHUB_OUTPUT"
+    - name: Report target manifest drift
+      if: always() && steps.target-inventory.outputs.drift == 'true'
+      run: |
+        cat "build/ci-shards/$CI_PROFILE_ID/final/target-drift.html" \
+          >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload target drift data
+      if: always() && steps.target-inventory.outputs.drift == 'true'
+      uses: actions/upload-artifact@main
+      with:
+        name: mame-ci-${{ steps.profile.outputs.profile_id }}-target-drift-${{ github.sha }}
+        path: |
+          build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/target-inventory.json
+          build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/target-drift.json
+        if-no-files-found: error
+    - name: Preserve shard build result
+      if: needs.build-shards.result != 'success'
+      run: |
+        echo "Shard build result: ${{ needs.build-shards.result }}" >&2
+        exit 1
+    - name: Validate checked target manifest
+      run: |
         "$CI_PYTHON" scripts/build/ci_shards.py validate \
           "$CI_SOLUTION_DIR/Makefile" \
           --profile "$CI_PROFILE_PATH" --group all

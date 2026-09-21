@@ -8,6 +8,7 @@ import collections
 import csv
 import decimal
 import hashlib
+import html
 import io
 import json
 import os
@@ -28,6 +29,8 @@ PROFILE_SCHEMA_VERSION = 2
 DRIVER_MAP_SCHEMA_VERSION = 1
 PARTITION_ALGORITHM = 'lpt-v1'
 DRIVER_POOL = 'driver-libs'
+INVENTORY_SCHEMA_VERSION = 1
+DRIFT_SCHEMA_VERSION = 1
 REBALANCE_THRESHOLD = decimal.Decimal('0.05')
 MILLISECOND = decimal.Decimal('0.001')
 CHUNK_SIZE = 1024 * 1024
@@ -49,6 +52,12 @@ BUILD_INPUT_PATHS = (
 
 TRANSLATION_UNIT_SUFFIXES = frozenset(('.c', '.cc', '.cpp', '.cxx', '.m', '.mm'))
 PROJECTS_PREFIX = 'PROJECTS := '
+MAKE_ASSIGNMENT_PATTERN = re.compile(
+        r'^\s*(?:override\s+)?(TARGETDIR|TARGET|LIBDEPS|LINKCMD)\s*'
+        r'(\+=|:=|\?=|=)\s*(.*)$')
+MAKE_CONDITIONAL_PATTERN = re.compile(
+        r'^(?:ifeq|ifneq|ifdef|ifndef)(?:\s|\()')
+MAKE_VARIABLE_PATTERN = re.compile(r'\$\(([^()]+)\)|\$\{([^{}]+)\}')
 
 
 def add_profile_arguments(parser):
@@ -89,6 +98,15 @@ def parse_args():
 
     validate_parser = subparsers.add_parser('validate')
     add_profile_arguments(validate_parser)
+
+    inventory_parser = subparsers.add_parser('inventory')
+    inventory_parser.add_argument('solution_makefile', type=pathlib.Path)
+    inventory_parser.add_argument('--profile', required=True, type=pathlib.Path)
+    inventory_parser.add_argument('--source-root', type=pathlib.Path, default=pathlib.Path('.'))
+    inventory_parser.add_argument('--inventory-output', required=True, type=pathlib.Path)
+    inventory_parser.add_argument('--drift-output', required=True, type=pathlib.Path)
+    inventory_parser.add_argument('--summary-output', type=pathlib.Path)
+    inventory_parser.add_argument('--github-output', type=pathlib.Path)
 
     list_parser = subparsers.add_parser('list')
     add_profile_arguments(list_parser)
@@ -853,6 +871,345 @@ def validate_solution_projects(projects, profile_map):
             details.append('unassigned generated projects: %s' % ' '.join(unexpected))
         raise ValueError('; '.join(details))
     return len(projects)
+
+
+def read_project_configuration(path, configuration, description=None):
+    description = description or path
+    marker = 'ifeq ($(config),%s)' % configuration
+    variables = {}
+    found = False
+    active = False
+    depth = 0
+
+    for line in read_make_logical_lines(path):
+        stripped = line.strip()
+        if not active:
+            if stripped == marker:
+                if found:
+                    raise ValueError(
+                            '%s: duplicate configuration block for %s' %
+                            (description, configuration))
+                found = True
+                active = True
+                depth = 1
+            continue
+
+        if MAKE_CONDITIONAL_PATTERN.match(stripped):
+            depth += 1
+            continue
+        if stripped == 'endif':
+            depth -= 1
+            if depth == 0:
+                active = False
+            continue
+        if depth != 1:
+            continue
+
+        match = MAKE_ASSIGNMENT_PATTERN.match(line)
+        if not match:
+            continue
+        name, operation, value = match.groups()
+        if operation == '+=':
+            previous = variables.get(name, '')
+            variables[name] = '%s%s%s' % (
+                    previous, ' ' if previous and value else '', value)
+        elif operation == '?=':
+            variables.setdefault(name, value)
+        else:
+            variables[name] = value
+
+    if active:
+        raise ValueError('%s: unterminated configuration block for %s' % (
+                description, configuration))
+    if not found:
+        raise ValueError('%s: configuration is absent: %s' % (
+                description, configuration))
+    return variables
+
+
+def expand_make_variables(value, variables):
+    expanded = value
+    for unused in range(20):
+        def replace(match):
+            name = match.group(1) or match.group(2)
+            return variables.get(name, match.group(0))
+
+        updated = MAKE_VARIABLE_PATTERN.sub(replace, expanded)
+        if updated == expanded:
+            break
+        expanded = updated
+    unresolved = sorted(set(
+            match.group(1) or match.group(2)
+            for match in MAKE_VARIABLE_PATTERN.finditer(expanded)))
+    return expanded, unresolved
+
+
+def normalize_project_path(token, project_makefile, source_root):
+    if not token or '$' in token or '%' in token:
+        return None
+    path = pathlib.Path(token)
+    if not path.is_absolute():
+        path = project_makefile.parent / path
+    try:
+        return path.resolve().relative_to(source_root).as_posix()
+    except ValueError:
+        return None
+
+
+def generated_project_kind(output, link_command, archive):
+    name = pathlib.PurePosixPath(output.replace('\\', '/')).name if output else ''
+    if re.search(r'(^|\s)\$\(AR\)(?:\s|$)', link_command):
+        return 'static-library'
+    if (
+            name.startswith(archive['prefix'])
+            and name.endswith(archive['suffix'])):
+        return 'static-library'
+    if name.endswith(('.dll', '.dylib', '.so')):
+        return 'shared-library'
+    if '-o $(TARGET)' in link_command or '-o "$(TARGET)"' in link_command:
+        return 'executable'
+    return 'unknown'
+
+
+def read_generated_project(project, solution_makefile, profile_map, source_root):
+    project_makefile = solution_makefile.parent / ('%s.make' % project)
+    relative_makefile = normalize_project_path(
+            str(project_makefile), project_makefile, source_root)
+    record = {
+            'dependencies': [],
+            'kind': 'unknown',
+            'makefile': relative_makefile or project_makefile.name,
+            'metadata_errors': [],
+            'name': project,
+            'outputs': [],
+            'unresolved_dependencies': []}
+    try:
+        variables = read_project_configuration(
+                project_makefile,
+                profile_map['profile']['build']['configuration'],
+                record['makefile'])
+    except (IOError, OSError, UnicodeError, ValueError) as error:
+        record['metadata_errors'].append(str(error))
+        return record, []
+
+    target, unresolved_target_variables = expand_make_variables(
+            variables.get('TARGET', ''), variables)
+    target_words = parse_make_words(target, project_makefile) if target else []
+    if unresolved_target_variables:
+        record['metadata_errors'].append(
+                'target contains unresolved make variables: %s' %
+                ' '.join(unresolved_target_variables))
+    if len(target_words) != 1:
+        record['metadata_errors'].append(
+                'expected one generated target path, found %d' % len(target_words))
+        output = None
+    else:
+        output = normalize_project_path(
+                target_words[0], project_makefile, source_root)
+        if output is None:
+            record['metadata_errors'].append(
+                    'generated target path is outside the source tree or unresolved: %s' %
+                    target_words[0])
+        else:
+            record['outputs'] = [output]
+
+    link_command = variables.get('LINKCMD', '')
+    record['kind'] = generated_project_kind(
+            output or (target_words[0] if len(target_words) == 1 else ''),
+            link_command,
+            profile_map['profile']['archive'])
+    if record['kind'] == 'unknown':
+        record['metadata_errors'].append('generated project kind is unknown')
+
+    libdeps, unresolved_dependency_variables = expand_make_variables(
+            variables.get('LIBDEPS', ''), variables)
+    if unresolved_dependency_variables:
+        record['metadata_errors'].append(
+                'library dependencies contain unresolved make variables: %s' %
+                ' '.join(unresolved_dependency_variables))
+    dependency_paths = []
+    for token in parse_make_words(libdeps, project_makefile):
+        dependency = normalize_project_path(token, project_makefile, source_root)
+        if dependency is None:
+            record['unresolved_dependencies'].append(token.replace('\\', '/'))
+        else:
+            dependency_paths.append(dependency)
+    record['metadata_errors'] = sorted(set(record['metadata_errors']))
+    record['unresolved_dependencies'] = sorted(set(record['unresolved_dependencies']))
+    return record, sorted(set(dependency_paths))
+
+
+def generated_project_inventory(solution_makefile, profile_map, source_root):
+    source_root = source_root.resolve()
+    solution_makefile = solution_makefile.resolve()
+    projects = read_solution_projects(solution_makefile)
+    executable = profile_map['profile']['executable_project']
+    if executable not in projects:
+        raise ValueError(
+                'primary executable project is absent from generated solution: %s' %
+                executable)
+
+    records = {}
+    dependency_paths = {}
+    output_owners = collections.defaultdict(list)
+    for project in sorted(projects):
+        record, dependencies = read_generated_project(
+                project, solution_makefile, profile_map, source_root)
+        records[project] = record
+        dependency_paths[project] = dependencies
+        for output in record['outputs']:
+            output_owners[output].append(project)
+
+    for output, owners in sorted(output_owners.items()):
+        if len(owners) > 1:
+            message = 'generated output is shared by projects %s: %s' % (
+                    ' '.join(sorted(owners)), output)
+            for project in owners:
+                records[project]['metadata_errors'].append(message)
+
+    for project, paths in sorted(dependency_paths.items()):
+        dependencies = []
+        unresolved = list(records[project]['unresolved_dependencies'])
+        for path in paths:
+            owners = output_owners.get(path, [])
+            if len(owners) == 1:
+                dependencies.append(owners[0])
+            else:
+                unresolved.append(path)
+        records[project]['dependencies'] = sorted(set(dependencies))
+        records[project]['unresolved_dependencies'] = sorted(set(unresolved))
+        records[project]['metadata_errors'] = sorted(
+                set(records[project]['metadata_errors']))
+
+    relative_solution = normalize_project_path(
+            str(solution_makefile), solution_makefile, source_root)
+    if relative_solution is None:
+        raise ValueError('solution makefile is outside the source tree: %s' % (
+                solution_makefile))
+    identity = {
+            'configuration': profile_map['profile']['build']['configuration'],
+            'profile': profile_map['profile']['id'],
+            'project_count': len(records),
+            'projects': [records[project] for project in sorted(records)],
+            'schema_version': INVENTORY_SCHEMA_VERSION,
+            'solution_makefile': relative_solution}
+    inventory = dict(identity)
+    inventory['inventory_hash'] = canonical_hash(identity)
+    return inventory
+
+
+def checked_project_details(profile_map):
+    archive = profile_map['profile']['archive']
+    details = {}
+    for shard in all_shards(profile_map):
+        for target in shard['targets']:
+            details[target] = {
+                    'checked_group': shard['name'],
+                    'kind': 'static-library',
+                    'name': target,
+                    'outputs': [
+                            '%s%s%s' % (
+                                    archive['prefix'], target, archive['suffix'])]}
+    executable_suffix = profile_map['profile']['executable_suffix']
+    for target in profile_map['profile']['deferred_projects']:
+        details[target] = {
+                'checked_group': 'deferred',
+                'kind': 'executable',
+                'name': target,
+                'outputs': ['%s%s' % (target, executable_suffix)]}
+    return details
+
+
+def generated_target_drift(inventory, profile_map):
+    actual = dict((project['name'], project) for project in inventory['projects'])
+    expected = checked_project_details(profile_map)
+    added_names = sorted(set(actual) - set(expected))
+    removed_names = sorted(set(expected) - set(actual))
+    added = []
+    for name in added_names:
+        record = dict(actual[name])
+        record['provisional_assignment'] = None
+        added.append(record)
+    removed = [expected[name] for name in removed_names]
+    has_drift = bool(added or removed)
+    identity = {
+            'added_projects': added,
+            'checked_manifest_hash': profile_map['complete_map_hash'],
+            'has_drift': has_drift,
+            'inventory_hash': inventory['inventory_hash'],
+            'profile': profile_map['profile']['id'],
+            'provisional_assignments': [],
+            'recovery_mode': 'pending-reconciliation' if has_drift else 'exact',
+            'removed_projects': removed,
+            'schema_version': DRIFT_SCHEMA_VERSION}
+    report = dict(identity)
+    report['drift_hash'] = canonical_hash(identity)
+    return report
+
+
+def render_target_drift_summary(report):
+    if not report['has_drift']:
+        return ''
+
+    rows = []
+    for project in report['added_projects']:
+        outputs = '<br>'.join(
+                '<code>%s</code>' % html.escape(output)
+                for output in project['outputs']) or '<em>unknown</em>'
+        rows.append(
+                '<tr><td>Added</td><td><code>%s</code></td><td>%s</td>'
+                '<td>%s</td><td>Pending reconciliation</td></tr>' % (
+                        html.escape(project['name']),
+                        html.escape(project['kind']), outputs))
+    for project in report['removed_projects']:
+        outputs = '<br>'.join(
+                '<code>%s</code>' % html.escape(output)
+                for output in project['outputs']) or '<em>unknown</em>'
+        rows.append(
+                '<tr><td>Removed</td><td><code>%s</code></td><td>%s</td>'
+                '<td>%s</td><td><code>%s</code></td></tr>' % (
+                        html.escape(project['name']),
+                        html.escape(project['kind']), outputs,
+                        html.escape(project['checked_group'])))
+
+    return '\n'.join((
+            '<h1>CI shard target manifest drift detected</h1>',
+            '<p><strong>Profile:</strong> <code>%s</code></p>' %
+            html.escape(report['profile']),
+            '<p><strong>Recovery mode:</strong> <code>%s</code></p>' %
+            html.escape(report['recovery_mode']),
+            '<table>',
+            '<thead><tr><th>Change</th><th>Project</th><th>Kind</th>'
+            '<th>Outputs</th><th>Assignment</th></tr></thead>',
+            '<tbody>%s</tbody>' % ''.join(rows),
+            '</table>',
+            '<p><strong>Maintainer action:</strong> use '
+            '<code>scripts/build/ci_shards.py rebalance</code> with compatible '
+            'timing data, review the result, and update the checked-in profile.'
+            '</p>',
+            ''))
+
+
+def write_text(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with io.open(path, 'w', encoding='utf-8', newline='\n') as output:
+        output.write(value)
+
+
+def write_generated_project_inventory(options):
+    profile_map = load_profile_map(options.profile)
+    inventory = generated_project_inventory(
+            options.solution_makefile, profile_map, options.source_root)
+    report = generated_target_drift(inventory, profile_map)
+    write_manifest(options.inventory_output, inventory)
+    write_manifest(options.drift_output, report)
+    if options.summary_output is not None:
+        write_text(options.summary_output, render_target_drift_summary(report))
+    write_github_values(options.github_output, {
+            'drift': report['has_drift'],
+            'drift_hash': report['drift_hash'],
+            'inventory_hash': inventory['inventory_hash']})
+    return inventory, report
 
 
 def select_projects(group, projects, profile_map):
@@ -1957,6 +2314,20 @@ def main():
                             count, len(all_shards(profile_map)),
                             profile_map['profile']['id'],
                             profile_map['complete_map_hash']))
+        elif options.command == 'inventory':
+            inventory, report = write_generated_project_inventory(options)
+            if report['has_drift']:
+                sys.stdout.write(
+                        'Recorded %d generated projects for %s; '
+                        'detected %d added and %d removed targets.\n' % (
+                                inventory['project_count'], inventory['profile'],
+                                len(report['added_projects']),
+                                len(report['removed_projects'])))
+            else:
+                sys.stdout.write(
+                        'Recorded %d generated projects for %s; '
+                        'the checked target manifest matches.\n' % (
+                                inventory['project_count'], inventory['profile']))
         elif options.command == 'list':
             profile_map = load_profile_map(options.profile)
             projects = read_solution_projects(options.solution_makefile)
