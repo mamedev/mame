@@ -102,7 +102,7 @@ public:
 		m_caps_lock(1)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<m8502_device> m_subcpu;
 	required_device<input_merger_device> m_nmi;
 	required_device<mos8722_device> m_mmu;
@@ -150,6 +150,7 @@ public:
 	uint8_t vic_colorram_r(offs_t offset);
 
 	void mmu_z80en_w(int state);
+	void mmu_busack_w(int state);
 	void mmu_fsdir_w(int state);
 	int mmu_game_r();
 	int mmu_exrom_r();
@@ -1066,8 +1067,21 @@ void c128_state::mmu_z80en_w(int state)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
+	}
+	else
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
+	}
+
+	m_z80en = state;
+}
+
+void c128_state::mmu_busack_w(int state)
+{
+	if (state == ASSERT_LINE) 
+	{
+		m_subcpu->set_input_line(M8502_RDY_LINE, ASSERT_LINE);
 
 		if (m_reset)
 		{
@@ -1078,11 +1092,8 @@ void c128_state::mmu_z80en_w(int state)
 	}
 	else
 	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_subcpu->set_input_line(M8502_RDY_LINE, CLEAR_LINE);
 	}
-
-	m_z80en = state;
 }
 
 void c128_state::mmu_fsdir_w(int state)
@@ -1658,18 +1669,7 @@ void c128_state::machine_start()
 
 void c128_state::machine_reset()
 {
-	m_maincpu->reset();
 	m_reset = 1;
-
-	m_mmu->reset();
-	m_vic->reset();
-	m_vdc->reset();
-	m_sid->reset();
-	m_cia1->reset();
-	m_cia2->reset();
-
-	m_iec->reset();
-	m_exp->reset();
 
 	m_user->write_3(0);
 	m_user->write_3(1);
@@ -1710,6 +1710,7 @@ void c128_state::ntsc(machine_config &config)
 	Z80(config, m_maincpu, XTAL(14'318'181)*2/3.5/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
+	m_maincpu->busack_cb().set(FUNC(c128_state::mmu_busack_w));
 
 	M8502(config, m_subcpu, XTAL(14'318'181)*2/3.5/8);
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
@@ -1889,6 +1890,7 @@ void c128_state::pal(machine_config &config)
 	Z80(config, m_maincpu, XTAL(17'734'472)*2/4.5/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
+	m_maincpu->busack_cb().set(FUNC(c128_state::mmu_busack_w));
 
 	M8502(config, m_subcpu, XTAL(17'734'472)*2/4.5/8);
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
