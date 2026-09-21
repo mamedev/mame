@@ -3,6 +3,7 @@ name: CI (Linux)
 on:
   push:
     paths:
+    - '.github/ci-linux-clang-driver-shards.json'
     - '.github/workflows/**'
     - '3rdparty/**'
     - 'hash/**'
@@ -12,6 +13,7 @@ on:
     - 'makefile'
   pull_request:
     paths:
+    - '.github/ci-linux-clang-driver-shards.json'
     - '.github/workflows/**'
     - '3rdparty/**'
     - 'hash/**'
@@ -428,6 +430,15 @@ jobs:
           "$artifact_root/shard-manifest-${{ matrix.bucket }}.json"
         cp "$dependency_manifest" \
           "$artifact_root/dependency-manifest-${{ matrix.bucket }}.json"
+    - name: Stamp driver shard definition
+      run: |
+        set -euo pipefail
+        artifact_root=build/ci-linux-clang-${{ matrix.bucket }}-artifact
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          write-definition "$CLANG_SOLUTION_DIR/Makefile" \
+          --group "${{ matrix.bucket }}" \
+          --output \
+            "$artifact_root/driver-shard-definition-${{ matrix.bucket }}.json"
     - name: Verify driver shard artifacts
       run: |
         python scripts/build/ci_linux_clang_shard_cache.py \
@@ -490,6 +501,11 @@ jobs:
         pattern: mame-linux-clang-shard-*-${{ github.sha }}
         path: .
         merge-multiple: true
+    - name: Verify driver shard map
+      run: |
+        python scripts/build/ci_linux_clang_driver_buckets.py \
+          verify-definitions "$CLANG_SOLUTION_DIR/Makefile" \
+          --manifest-dir .
     - name: Build tools
       run: |
         set -euo pipefail

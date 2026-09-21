@@ -48,7 +48,7 @@ def add_solution_arguments(parser):
     parser.add_argument('solution_makefile', type=pathlib.Path)
     parser.add_argument(
             '--group', required=True,
-            choices=tuple(shard_config.LIBRARY_GROUPS) + tuple(shard_config.BUCKETS))
+            choices=tuple(shard_config.LIBRARY_GROUPS) + shard_config.driver_groups())
     parser.add_argument('--source-root', type=pathlib.Path, default=pathlib.Path('.'))
 
 
@@ -144,7 +144,7 @@ def collect_tracked_roots(tracked, roots):
 def collect_broad_input_files(tracked, group, projects):
     files = collect_tracked_roots(tracked, BROAD_INPUT_PATHS)
     selectors = list(BROAD_INPUT_PATHS)
-    if group in shard_config.BUCKETS:
+    if group in shard_config.driver_groups():
         # Driver projects own translation units in their directory, but may
         # include headers from anywhere under src/mame.
         selectors.append('src/mame/** excluding translation units')
@@ -239,20 +239,30 @@ def build_identity(runner_os, runner_arch, toolchain):
 
 
 def load_projects(solution_makefile, source_root, group):
+    shard_map = shard_config.load_shard_map()
     projects = shard_config.read_solution_projects(solution_makefile)
-    generated_drivers = shard_config.validate_buckets(projects, source_root)
-    return sorted(shard_config.select_projects(group, projects, generated_drivers))
+    generated_drivers = shard_config.validate_buckets(projects, source_root, shard_map)
+    return sorted(shard_config.select_projects(group, projects, generated_drivers, shard_map))
 
 
 def shard_definition(group, projects):
-    pool = 'libraries' if group in shard_config.LIBRARY_GROUPS else 'drivers'
-    return {
-            'outputs': ['lib%s.a' % project for project in projects],
-            'partition': 'manual-v1',
-            'pool': pool,
-            'schema_version': DEFINITION_SCHEMA_VERSION,
-            'shard': group,
-            'targets': projects}
+    if group in shard_config.LIBRARY_GROUPS:
+        return {
+                'outputs': ['lib%s.a' % project for project in projects],
+                'partition': 'manual-v1',
+                'pool': 'libraries',
+                'schema_version': DEFINITION_SCHEMA_VERSION,
+                'shard': group,
+                'targets': projects}
+
+    shard_map = shard_config.load_shard_map()
+    checked = shard_config.find_driver_shard(shard_map, group)
+    definition = shard_config.driver_shard_definition(projects)
+    if definition['targets'] != checked['targets']:
+        raise ValueError('%s: cache definition does not match checked shard map' % group)
+    if canonical_hash(definition) != checked['definition_hash']:
+        raise ValueError('%s: cache definition hash does not match checked shard map' % group)
+    return definition
 
 
 def project_shape(solution_makefile, source_root, projects):
