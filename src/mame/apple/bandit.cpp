@@ -86,6 +86,7 @@ aspen_host_device::aspen_host_device(const machine_config &mconfig, const char *
 
 applpsx_host_device::applpsx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: bandit_host_device(mconfig, APPLPSX, tag, owner, clock)
+	, m_system_id(0x10000000)
 {
 }
 
@@ -112,7 +113,7 @@ u64 applpsx_host_device::regs_r(offs_t offset, u64 mem_mask)
 	switch(offset)
 	{
 		case PSX_SYSTEM_ID:
-			return 0x10000000'00000000;
+			return u64(m_system_id) << 32;
 
 		case PSX_REVISION:
 			return 0x10000000'00000000;
@@ -178,7 +179,8 @@ void bandit_host_device::device_start()
 	m_cpu_space->install_read_handler(0x80000000, 0xefffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_r<0x80000000>)));
 	m_cpu_space->install_write_handler(0x80000000, 0xefffffff, emu::rw_delegate(*this, FUNC(bandit_host_device::pci_memory_w<0x80000000>)));
 
-	// TODO: PCI I/O space is at Fn000000-Fn7FFFFF, but it's unclear where in the PCI space that maps to
+	// PCI I/O space is at Fn000000-Fn7FFFFF and maps 1:1 from I/O address 0 (see cpu_map).
+	// Open Firmware assigns I/O BARs from 0x400 up and its FCode drivers expect to find them there.
 
 	switch (m_dev_offset)
 	{
@@ -227,6 +229,7 @@ void bandit_host_device::device_reset()
 
 void bandit_host_device::cpu_map(address_map &map)
 {
+	map(0x00000000, 0x007fffff).rw(FUNC(bandit_host_device::pci_io_r<0>), FUNC(bandit_host_device::pci_io_w<0>));
 	map(0x00800000, 0x00bfffff).rw(FUNC(bandit_host_device::be_config_address_r), FUNC(bandit_host_device::be_config_address_w));
 	map(0x00c00000, 0x00ffffff).rw(FUNC(bandit_host_device::be_config_data_r), FUNC(bandit_host_device::be_config_data_w));
 }
@@ -253,12 +256,12 @@ void bandit_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_ma
 
 u32 bandit_host_device::be_config_data_r(offs_t offset, u32 mem_mask)
 {
-	return swapendian_int32(pci_host_device::config_data_ex_r(offset, mem_mask));
+	return swapendian_int32(pci_host_device::config_data_ex_r(offset, swapendian_int32(mem_mask)));
 }
 
 void bandit_host_device::be_config_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	pci_host_device::config_data_ex_w(offset, swapendian_int32(data), mem_mask);
+	pci_host_device::config_data_ex_w(offset, swapendian_int32(data), swapendian_int32(mem_mask));
 }
 
 template <u32 Base>
@@ -295,6 +298,9 @@ void bandit_host_device::pci_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	this->space(AS_PCI_IO).write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32((mem_mask)));
 }
+
+template u32 bandit_host_device::pci_io_r<0>(offs_t offset, u32 mem_mask);
+template void bandit_host_device::pci_io_w<0>(offs_t offset, u32 data, u32 mem_mask);
 
 template <u32 Base>
 u32 bandit_host_device::cpu_memory_r(offs_t offset, u32 mem_mask)

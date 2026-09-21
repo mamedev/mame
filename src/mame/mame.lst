@@ -1435,6 +1435,10 @@ macqd800
 macqd660av
 macqd840av
 
+@source:apple/mactanzania.cpp
+pmac4400
+pmac4400_200
+
 @source:apple/newton.cpp
 emate
 motmarco
