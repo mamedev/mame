@@ -30,7 +30,7 @@ DRIVER_MAP_SCHEMA_VERSION = 1
 PARTITION_ALGORITHM = 'lpt-v1'
 DRIVER_POOL = 'driver-libs'
 INVENTORY_SCHEMA_VERSION = 1
-DRIFT_SCHEMA_VERSION = 1
+DRIFT_SCHEMA_VERSION = 2
 REBALANCE_THRESHOLD = decimal.Decimal('0.05')
 MILLISECOND = decimal.Decimal('0.001')
 CHUNK_SIZE = 1024 * 1024
@@ -107,6 +107,14 @@ def parse_args():
     inventory_parser.add_argument('--drift-output', required=True, type=pathlib.Path)
     inventory_parser.add_argument('--summary-output', type=pathlib.Path)
     inventory_parser.add_argument('--github-output', type=pathlib.Path)
+
+    reconcile_parser = subparsers.add_parser('reconcile')
+    reconcile_parser.add_argument('--profile', required=True, type=pathlib.Path)
+    reconcile_parser.add_argument('--inventory', required=True, type=pathlib.Path)
+    reconcile_parser.add_argument('--output', required=True, type=pathlib.Path)
+    reconcile_parser.add_argument('--drift-output', required=True, type=pathlib.Path)
+    reconcile_parser.add_argument('--summary-output', type=pathlib.Path)
+    reconcile_parser.add_argument('--github-output', type=pathlib.Path)
 
     list_parser = subparsers.add_parser('list')
     add_profile_arguments(list_parser)
@@ -746,13 +754,18 @@ def collect_tracked_roots(tracked, roots):
 
 
 def add_profile_inputs(files, selectors, tracked, context):
-    profile_path = context['profile_path'].relative_to(context['source_root']).as_posix()
+    profile_relative = '.github/ci-shards/%s.json' % (
+            context['profile_map']['profile']['id'])
+    if profile_relative not in tracked:
+        raise ValueError('checked profile cache input is not tracked: %s' % profile_relative)
+    checked_profile_path = tracked[profile_relative]
+    checked_profile = load_profile_map(checked_profile_path)
+    if checked_profile['profile'] != context['profile_map']['profile']:
+        raise ValueError('runtime profile changes checked build configuration')
     schema_path = (
-            context['profile_path'].parent / context['profile_map']['$schema']).resolve()
+            checked_profile_path.parent / checked_profile['$schema']).resolve()
     schema_relative = schema_path.relative_to(context['source_root']).as_posix()
-    workflow = context['profile_map']['profile']['workflow']
-    if profile_path not in tracked:
-        raise ValueError('profile cache input is not tracked: %s' % profile_path)
+    workflow = checked_profile['profile']['workflow']
     for relative_path in (schema_relative, workflow):
         if relative_path not in tracked:
             raise ValueError('profile cache input is not tracked: %s' % relative_path)
@@ -1098,6 +1111,38 @@ def generated_project_inventory(solution_makefile, profile_map, source_root):
     return inventory
 
 
+def generated_project_inventory_identity(inventory):
+    return dict(
+            (key, value) for key, value in inventory.items()
+            if key != 'inventory_hash')
+
+
+def validate_generated_project_inventory(inventory, profile_map, path):
+    if inventory.get('schema_version') != INVENTORY_SCHEMA_VERSION:
+        raise ValueError('%s: generated-project inventory schema does not match' % path)
+    if inventory.get('profile') != profile_map['profile']['id']:
+        raise ValueError('%s: generated-project inventory profile does not match' % path)
+    projects = inventory.get('projects')
+    if not isinstance(projects, list):
+        raise ValueError('%s: generated-project inventory has no project list' % path)
+    names = []
+    for project in projects:
+        if not isinstance(project, dict):
+            raise ValueError('%s: generated-project inventory contains an invalid project' % path)
+        name = project.get('name')
+        if not isinstance(name, str) or not name:
+            raise ValueError('%s: generated-project inventory contains an unnamed project' % path)
+        names.append(name)
+    if names != sorted(set(names)):
+        raise ValueError('%s: generated-project inventory names are not sorted and unique' % path)
+    if inventory.get('project_count') != len(projects):
+        raise ValueError('%s: generated-project inventory count does not match' % path)
+    if inventory.get('inventory_hash') != canonical_hash(
+            generated_project_inventory_identity(inventory)):
+        raise ValueError('%s: generated-project inventory hash does not match' % path)
+    return inventory
+
+
 def checked_project_details(profile_map):
     archive = profile_map['profile']['archive']
     details = {}
@@ -1120,7 +1165,11 @@ def checked_project_details(profile_map):
     return details
 
 
-def generated_target_drift(inventory, profile_map):
+def generated_target_drift(
+        inventory, profile_map, recovery_mode=None, provisional_assignments=None,
+        reconciliation_errors=None, runtime_manifest_hash=None):
+    provisional_assignments = provisional_assignments or {}
+    reconciliation_errors = sorted(set(reconciliation_errors or []))
     actual = dict((project['name'], project) for project in inventory['projects'])
     expected = checked_project_details(profile_map)
     added_names = sorted(set(actual) - set(expected))
@@ -1128,23 +1177,176 @@ def generated_target_drift(inventory, profile_map):
     added = []
     for name in added_names:
         record = dict(actual[name])
-        record['provisional_assignment'] = None
+        record['provisional_assignment'] = provisional_assignments.get(name)
         added.append(record)
     removed = [expected[name] for name in removed_names]
     has_drift = bool(added or removed)
+    if recovery_mode is None:
+        recovery_mode = 'pending-reconciliation' if has_drift else 'exact'
+    assignments = [
+            {'group': provisional_assignments[name], 'project': name}
+            for name in sorted(set(added_names) & set(provisional_assignments))]
+    if runtime_manifest_hash is None and not has_drift:
+        runtime_manifest_hash = profile_map['complete_map_hash']
     identity = {
             'added_projects': added,
             'checked_manifest_hash': profile_map['complete_map_hash'],
             'has_drift': has_drift,
             'inventory_hash': inventory['inventory_hash'],
             'profile': profile_map['profile']['id'],
-            'provisional_assignments': [],
-            'recovery_mode': 'pending-reconciliation' if has_drift else 'exact',
+            'provisional_assignments': assignments,
+            'reconciliation_errors': reconciliation_errors,
+            'recovery_mode': recovery_mode,
             'removed_projects': removed,
+            'runtime_manifest_hash': runtime_manifest_hash,
             'schema_version': DRIFT_SCHEMA_VERSION}
     report = dict(identity)
     report['drift_hash'] = canonical_hash(identity)
     return report
+
+
+def reconcilable_archive_output(project, profile_map):
+    name = project.get('name', '<unnamed>')
+    errors = []
+    if not isinstance(name, str) or re.match(r'^[A-Za-z0-9_.+-]+$', name) is None:
+        errors.append('project name is invalid')
+    if project.get('kind') != 'static-library':
+        errors.append('project kind is not a static library')
+    for field in ('dependencies', 'metadata_errors', 'outputs', 'unresolved_dependencies'):
+        if not isinstance(project.get(field), list):
+            errors.append('%s metadata is invalid' % field.replace('_', ' '))
+    if isinstance(project.get('metadata_errors'), list) and project['metadata_errors']:
+        errors.append('generated metadata has errors: %s' % ' | '.join(project['metadata_errors']))
+    if isinstance(project.get('dependencies'), list) and project['dependencies']:
+        errors.append('project dependencies are not supported: %s' % ' '.join(project['dependencies']))
+    if (
+            isinstance(project.get('unresolved_dependencies'), list)
+            and project['unresolved_dependencies']):
+        errors.append('project has unresolved dependencies: %s' % ' '.join(
+                project['unresolved_dependencies']))
+
+    outputs = project.get('outputs')
+    output = None
+    if isinstance(outputs, list):
+        if len(outputs) != 1:
+            errors.append('expected exactly one generated output')
+        else:
+            output = outputs[0]
+            try:
+                validate_relative_path(output, 'generated archive output')
+            except ValueError as error:
+                errors.append(str(error))
+                output = None
+
+    archive = profile_map['profile']['archive']
+    expected_output = '%s%s%s' % (archive['prefix'], name, archive['suffix'])
+    if output is not None:
+        if not is_under(output, profile_map['profile']['build_root']):
+            errors.append('generated output is outside the profile build root: %s' % output)
+        if pathlib.PurePosixPath(output).name != expected_output:
+            errors.append('generated output does not match archive naming: %s' % output)
+    if errors:
+        raise ValueError('cannot reconcile generated target %s: %s' % (
+                name, '; '.join(errors)))
+    return expected_output
+
+
+def reconciled_library_shards(profile_map, actual_projects):
+    archive = profile_map['profile']['archive']
+    result = []
+    for checked in library_shards(profile_map):
+        targets = sorted(set(checked['targets']) & actual_projects)
+        if not targets:
+            raise ValueError(
+                    'cannot reconcile an empty fixed library shard: %s' % checked['name'])
+        outputs = [
+                '%s%s%s' % (archive['prefix'], target, archive['suffix'])
+                for target in targets]
+        definition = shard_definition('libraries', targets, outputs)
+        result.append({
+                'definition_hash': canonical_hash(definition),
+                'name': checked['name'],
+                'outputs': definition['outputs'],
+                'targets': definition['targets']})
+    return result
+
+
+def reconcile_profile_map(inventory, profile_map, profile_path):
+    validate_generated_project_inventory(inventory, profile_map, '<generated inventory>')
+    report = generated_target_drift(inventory, profile_map)
+    if not report['has_drift']:
+        return json.loads(json.dumps(profile_map)), {}
+
+    actual = dict((project['name'], project) for project in inventory['projects'])
+    actual_projects = set(actual)
+    checked = checked_project_details(profile_map)
+    added_projects = sorted(actual_projects - set(checked))
+    removed_projects = sorted(set(checked) - actual_projects)
+    removed_deferred = sorted(
+            set(removed_projects) & set(profile_map['profile']['deferred_projects']))
+    if removed_deferred:
+        raise ValueError('cannot reconcile removed deferred projects: %s' % (
+                ' '.join(removed_deferred)))
+
+    for name in added_projects:
+        reconcilable_archive_output(actual[name], profile_map)
+
+    previous_driver_map = profile_map['driver_map']
+    previous_driver_targets = set(previous_driver_map['timing']['targets'])
+    elastic_targets = sorted(
+            (previous_driver_targets & actual_projects) | set(added_projects))
+    requested_shards = previous_driver_map['requested_shards']
+    if len(elastic_targets) < requested_shards:
+        raise ValueError(
+                'cannot reconcile %d elastic targets into %d non-empty shards' % (
+                        len(elastic_targets), requested_shards))
+
+    updated = json.loads(json.dumps(profile_map))
+    updated['library_shards'] = reconciled_library_shards(
+            profile_map, actual_projects)
+    if set(elastic_targets) != previous_driver_targets:
+        previous_timing = previous_driver_map['timing']['targets']
+        previous_weights = dict(
+                (target, number_value(record['weight'], 'timing weight for %s' % target))
+                for target, record in previous_timing.items())
+        if not previous_weights:
+            raise ValueError('cannot reconcile without a compatible archive timing weight')
+        fallback_weight = max(previous_weights.values())
+        weights = {}
+        timing_records = {}
+        for target in elastic_targets:
+            if target in previous_timing:
+                weights[target] = previous_weights[target]
+                timing_records[target] = json.loads(json.dumps(previous_timing[target]))
+            else:
+                weights[target] = fallback_weight
+                timing_records[target] = {
+                        'sample_count': 0,
+                        'weight': json_seconds(fallback_weight)}
+
+        assignments, loads = partition_targets(
+                elastic_targets, weights, requested_shards,
+                previous_assignment(previous_driver_map))
+        proposed_maximum = max(loads.values())
+        previous_maximum = number_value(
+                previous_driver_map['predicted_maximum_cpu_seconds'],
+                'previous maximum archive weight')
+        updated['driver_map'] = build_driver_map(
+                assignments,
+                weights,
+                timing_records,
+                json.loads(json.dumps(previous_driver_map['timing']['identity'])),
+                json.loads(json.dumps(previous_driver_map['timing']['sources'])),
+                previous_maximum,
+                proposed_maximum,
+                profile_map['profile']['archive'])
+
+    updated['complete_map_hash'] = canonical_hash(profile_map_identity(updated))
+    validate_profile_map(updated, str(profile_path))
+    validate_solution_projects(sorted(actual_projects), updated)
+    assignments = previous_assignment(updated['driver_map'])
+    return updated, dict(
+            (name, assignments[name]) for name in added_projects)
 
 
 def render_target_drift_summary(report):
@@ -1156,11 +1358,15 @@ def render_target_drift_summary(report):
         outputs = '<br>'.join(
                 '<code>%s</code>' % html.escape(output)
                 for output in project['outputs']) or '<em>unknown</em>'
+        assignment = project.get('provisional_assignment')
+        assignment_html = (
+                '<code>%s</code>' % html.escape(assignment)
+                if assignment else '<em>Pending reconciliation</em>')
         rows.append(
                 '<tr><td>Added</td><td><code>%s</code></td><td>%s</td>'
-                '<td>%s</td><td>Pending reconciliation</td></tr>' % (
+                '<td>%s</td><td>%s</td></tr>' % (
                         html.escape(project['name']),
-                        html.escape(project['kind']), outputs))
+                        html.escape(project['kind']), outputs, assignment_html))
     for project in report['removed_projects']:
         outputs = '<br>'.join(
                 '<code>%s</code>' % html.escape(output)
@@ -1171,6 +1377,12 @@ def render_target_drift_summary(report):
                         html.escape(project['name']),
                         html.escape(project['kind']), outputs,
                         html.escape(project['checked_group'])))
+
+    errors = report.get('reconciliation_errors', [])
+    error_summary = ''
+    if errors:
+        error_summary = '<h2>Reconciliation errors</h2><ul>%s</ul>' % ''.join(
+                '<li>%s</li>' % html.escape(error) for error in errors)
 
     return '\n'.join((
             '<h1>CI shard target manifest drift detected</h1>',
@@ -1183,6 +1395,7 @@ def render_target_drift_summary(report):
             '<th>Outputs</th><th>Assignment</th></tr></thead>',
             '<tbody>%s</tbody>' % ''.join(rows),
             '</table>',
+            error_summary,
             '<p><strong>Maintainer action:</strong> use '
             '<code>scripts/build/ci_shards.py rebalance</code> with compatible '
             'timing data, review the result, and update the checked-in profile.'
@@ -1210,6 +1423,72 @@ def write_generated_project_inventory(options):
             'drift_hash': report['drift_hash'],
             'inventory_hash': inventory['inventory_hash']})
     return inventory, report
+
+
+def write_runtime_profile(checked_profile_path, output_path, runtime_profile):
+    if output_path.stem != runtime_profile['profile']['id']:
+        raise ValueError('%s: runtime profile id does not match file name' % output_path)
+    checked_profile = load_profile_map(checked_profile_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    if checked_profile == runtime_profile:
+        shutil.copy2(str(checked_profile_path), str(output_path))
+    else:
+        write_profile_map(output_path, runtime_profile)
+
+    schema_reference = runtime_profile['$schema']
+    schema_source = (checked_profile_path.parent / schema_reference).resolve()
+    schema_output = (output_path.parent / schema_reference).resolve()
+    schema_output.parent.mkdir(parents=True, exist_ok=True)
+    if schema_source != schema_output:
+        shutil.copy2(str(schema_source), str(schema_output))
+    written = load_profile_map(output_path)
+    if written != runtime_profile:
+        raise ValueError('%s: written runtime profile does not match' % output_path)
+    return schema_output
+
+
+def write_reconciliation_report(options, inventory, report, runtime_profile_path=None):
+    write_manifest(options.drift_output, report)
+    if options.summary_output is not None:
+        write_text(options.summary_output, render_target_drift_summary(report))
+    write_github_values(options.github_output, {
+            'drift': report['has_drift'],
+            'drift_hash': report['drift_hash'],
+            'inventory_hash': inventory['inventory_hash'],
+            'recovery_mode': report['recovery_mode'],
+            'runtime_profile': runtime_profile_path or ''})
+
+
+def write_reconciled_profile(options):
+    checked_profile = load_profile_map(options.profile)
+    inventory = read_manifest(options.inventory)
+    validate_generated_project_inventory(inventory, checked_profile, options.inventory)
+    try:
+        runtime_profile, assignments = reconcile_profile_map(
+                inventory, checked_profile, options.profile)
+    except ValueError as error:
+        report = generated_target_drift(
+                inventory,
+                checked_profile,
+                recovery_mode='reconciliation-failed',
+                reconciliation_errors=[str(error)])
+        write_reconciliation_report(options, inventory, report)
+        raise
+
+    recovery_mode = (
+            'runtime-reconciled'
+            if generated_target_drift(inventory, checked_profile)['has_drift']
+            else 'exact')
+    report = generated_target_drift(
+            inventory,
+            checked_profile,
+            recovery_mode=recovery_mode,
+            provisional_assignments=assignments,
+            runtime_manifest_hash=runtime_profile['complete_map_hash'])
+    write_runtime_profile(options.profile, options.output, runtime_profile)
+    write_reconciliation_report(
+            options, inventory, report, options.output.as_posix())
+    return runtime_profile, report
 
 
 def select_projects(group, projects, profile_map):
@@ -2328,6 +2607,17 @@ def main():
                         'Recorded %d generated projects for %s; '
                         'the checked target manifest matches.\n' % (
                                 inventory['project_count'], inventory['profile']))
+        elif options.command == 'reconcile':
+            profile_map, report = write_reconciled_profile(options)
+            if report['has_drift']:
+                sys.stdout.write(
+                        'Reconciled generated target drift into runtime map %s for %s.\n' % (
+                                profile_map['complete_map_hash'],
+                                profile_map['profile']['id']))
+            else:
+                sys.stdout.write(
+                        'Copied the exact checked profile for %s.\n' % (
+                                profile_map['profile']['id']))
         elif options.command == 'list':
             profile_map = load_profile_map(options.profile)
             projects = read_solution_projects(options.solution_makefile)

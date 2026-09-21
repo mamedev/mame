@@ -97,15 +97,23 @@ jobs:
         make -j"$CI_MAKE_JOBS" generate
         make "$CI_SOLUTION_DIR/Makefile"
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
+        checked_profile="$CI_PROFILE_PATH"
+        runtime_profile="$state_root/runtime/$CI_PROFILE_ID.json"
         mkdir -p "$state_root"
         "$CI_PYTHON" scripts/build/ci_shards.py inventory \
           "$CI_SOLUTION_DIR/Makefile" \
-          --profile "$CI_PROFILE_PATH" \
+          --profile "$checked_profile" \
           --inventory-output "$state_root/target-inventory.json" \
           --drift-output "$state_root/target-drift.json"
+        "$CI_PYTHON" scripts/build/ci_shards.py reconcile \
+          --profile "$checked_profile" \
+          --inventory "$state_root/target-inventory.json" \
+          --output "$runtime_profile" \
+          --drift-output "$state_root/target-drift.json"
+        echo "CI_PROFILE_PATH=$runtime_profile" >> "$GITHUB_ENV"
         "$CI_PYTHON" scripts/build/ci_shards.py validate \
           "$CI_SOLUTION_DIR/Makefile" \
-          --profile "$CI_PROFILE_PATH" \
+          --profile "$runtime_profile" \
           --group "${{ matrix.group }}"
     - name: Capture toolchain identity
       id: cache-context
@@ -369,14 +377,22 @@ jobs:
         make -j"$CI_MAKE_JOBS" generate
         make "$CI_SOLUTION_DIR/Makefile"
         state_root="build/ci-shards/$CI_PROFILE_ID/final"
+        checked_profile="$CI_PROFILE_PATH"
+        runtime_profile="$state_root/runtime/$CI_PROFILE_ID.json"
         mkdir -p "$state_root"
         "$CI_PYTHON" scripts/build/ci_shards.py inventory \
           "$CI_SOLUTION_DIR/Makefile" \
-          --profile "$CI_PROFILE_PATH" \
+          --profile "$checked_profile" \
           --inventory-output "$state_root/target-inventory.json" \
+          --drift-output "$state_root/target-drift.json"
+        "$CI_PYTHON" scripts/build/ci_shards.py reconcile \
+          --profile "$checked_profile" \
+          --inventory "$state_root/target-inventory.json" \
+          --output "$runtime_profile" \
           --drift-output "$state_root/target-drift.json" \
           --summary-output "$state_root/target-drift.html" \
           --github-output "$GITHUB_OUTPUT"
+        echo "CI_PROFILE_PATH=$runtime_profile" >> "$GITHUB_ENV"
     - name: Report target manifest drift
       if: always() && steps.target-inventory.outputs.drift == 'true'
       run: |
@@ -390,13 +406,15 @@ jobs:
         path: |
           build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/target-inventory.json
           build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/target-drift.json
+          build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/runtime/${{ steps.profile.outputs.profile_id }}.json
+          build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/ci-shard-map.schema.json
         if-no-files-found: error
     - name: Preserve shard build result
       if: needs.build-shards.result != 'success'
       run: |
         echo "Shard build result: ${{ needs.build-shards.result }}" >&2
         exit 1
-    - name: Validate checked target manifest
+    - name: Validate runtime target manifest
       run: |
         "$CI_PYTHON" scripts/build/ci_shards.py validate \
           "$CI_SOLUTION_DIR/Makefile" \

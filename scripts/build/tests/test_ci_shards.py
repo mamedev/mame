@@ -3,6 +3,7 @@
 ## license:BSD-3-Clause
 ## copyright-holders:MAMEdev Team
 
+import decimal
 import pathlib
 import sys
 import tempfile
@@ -61,6 +62,44 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
                         '')),
                 encoding='utf-8')
 
+    def reconciliation_profile(self):
+        archive = {'prefix': 'lib', 'suffix': '.a'}
+        library_definition = ci_shards.shard_definition(
+                'libraries', ['known', 'removed'],
+                ['libknown.a', 'libremoved.a'])
+        driver_map = ci_shards.build_driver_map(
+                {'driver-1': ['driver']},
+                {'driver': decimal.Decimal('2.000')},
+                {'driver': {'sample_count': 1, 'weight': 2.0}},
+                {'compiler': 'test'},
+                [{'file': 'timings.csv', 'run_id': '1', 'sha256': '0' * 64}],
+                decimal.Decimal('2.000'),
+                decimal.Decimal('2.000'),
+                archive)
+        profile = {
+                '$schema': '../ci-shard-map.schema.json',
+                'complete_map_hash': None,
+                'driver_map': driver_map,
+                'library_shards': [{
+                        'definition_hash': ci_shards.canonical_hash(
+                                library_definition),
+                        'name': 'core',
+                        'outputs': library_definition['outputs'],
+                        'targets': library_definition['targets']}],
+                'profile': {
+                        'archive': archive,
+                        'build': {'configuration': 'release64'},
+                        'build_root': 'out',
+                        'deferred_projects': ['app'],
+                        'executable_project': 'app',
+                        'executable_suffix': '',
+                        'final_projects': ['app'],
+                        'id': 'test-profile'},
+                'schema_version': ci_shards.PROFILE_SCHEMA_VERSION}
+        profile['complete_map_hash'] = ci_shards.canonical_hash(
+                ci_shards.profile_map_identity(profile))
+        return profile
+
     def test_inventory_records_outputs_kinds_and_project_dependencies(self):
         self.write_solution(['app', 'known', 'newlib'])
         self.write_project('known', 'libknown.a')
@@ -118,6 +157,24 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
         self.assertEqual('exact', report['recovery_mode'])
         self.assertEqual('', ci_shards.render_target_drift_summary(report))
 
+    def test_failed_reconciliation_is_visible_in_summary(self):
+        self.write_solution(['app', 'known', 'newlib'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('newlib', 'newlib.exe', archive=False)
+        self.write_project('app', 'app', archive=False)
+
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, self.profile, self.source_root)
+        report = ci_shards.generated_target_drift(
+                inventory,
+                self.profile,
+                recovery_mode='reconciliation-failed',
+                reconciliation_errors=['newlib is not an independent archive'])
+        summary = ci_shards.render_target_drift_summary(report)
+
+        self.assertIn('<code>reconciliation-failed</code>', summary)
+        self.assertIn('newlib is not an independent archive', summary)
+
     def test_missing_primary_executable_is_fatal(self):
         self.write_solution(['known'])
         self.write_project('known', 'libknown.a')
@@ -125,6 +182,94 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'primary executable project'):
             ci_shards.generated_project_inventory(
                     self.solution_makefile, self.profile, self.source_root)
+
+    def test_reconcile_assigns_new_archive_and_removes_missing_archive(self):
+        profile = self.reconciliation_profile()
+        self.write_solution(['app', 'driver', 'known', 'newlib'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('driver', 'libdriver.a')
+        self.write_project('newlib', 'libnewlib.a')
+        self.write_project('app', 'app', archive=False)
+
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, profile, self.source_root)
+        runtime, assignments = ci_shards.reconcile_profile_map(
+                inventory, profile, self.source_root / 'test-profile.json')
+        report = ci_shards.generated_target_drift(
+                inventory,
+                profile,
+                recovery_mode='runtime-reconciled',
+                provisional_assignments=assignments,
+                runtime_manifest_hash=runtime['complete_map_hash'])
+
+        self.assertEqual(['known'], runtime['library_shards'][0]['targets'])
+        self.assertEqual(
+                ['driver', 'newlib'],
+                runtime['driver_map']['shards'][0]['targets'])
+        self.assertEqual('driver-1', assignments['newlib'])
+        self.assertEqual(
+                {'sample_count': 0, 'weight': 2.0},
+                runtime['driver_map']['timing']['targets']['newlib'])
+        self.assertEqual('runtime-reconciled', report['recovery_mode'])
+        self.assertEqual(
+                [{'group': 'driver-1', 'project': 'newlib'}],
+                report['provisional_assignments'])
+        self.assertIn('<code>driver-1</code>',
+                      ci_shards.render_target_drift_summary(report))
+        self.assertEqual(
+                runtime,
+                ci_shards.reconcile_profile_map(
+                        inventory, profile,
+                        self.source_root / 'test-profile.json')[0])
+
+    def test_reconcile_preserves_exact_profile(self):
+        profile = self.reconciliation_profile()
+        self.write_solution(['app', 'driver', 'known', 'removed'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('removed', 'libremoved.a')
+        self.write_project('driver', 'libdriver.a')
+        self.write_project('app', 'app', archive=False)
+
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, profile, self.source_root)
+        runtime, assignments = ci_shards.reconcile_profile_map(
+                inventory, profile, self.source_root / 'test-profile.json')
+
+        self.assertEqual(profile, runtime)
+        self.assertEqual({}, assignments)
+
+    def test_reconcile_rejects_archive_with_project_dependencies(self):
+        profile = self.reconciliation_profile()
+        self.write_solution(['app', 'driver', 'known', 'newlib', 'removed'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('removed', 'libremoved.a')
+        self.write_project('driver', 'libdriver.a')
+        self.write_project('newlib', 'libnewlib.a', ('../../../out/libknown.a',))
+        self.write_project('app', 'app', archive=False)
+
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, profile, self.source_root)
+        with self.assertRaisesRegex(ValueError, 'project dependencies are not supported'):
+            ci_shards.reconcile_profile_map(
+                    inventory, profile, self.source_root / 'test-profile.json')
+
+    def test_reconcile_rejects_removed_deferred_project(self):
+        profile = self.reconciliation_profile()
+        profile['profile']['deferred_projects'].append('tool')
+        profile['profile']['deferred_projects'].sort()
+        profile['complete_map_hash'] = ci_shards.canonical_hash(
+                ci_shards.profile_map_identity(profile))
+        self.write_solution(['app', 'driver', 'known', 'removed'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('removed', 'libremoved.a')
+        self.write_project('driver', 'libdriver.a')
+        self.write_project('app', 'app', archive=False)
+
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, profile, self.source_root)
+        with self.assertRaisesRegex(ValueError, 'removed deferred projects: tool'):
+            ci_shards.reconcile_profile_map(
+                    inventory, profile, self.source_root / 'test-profile.json')
 
 
 if __name__ == '__main__':
