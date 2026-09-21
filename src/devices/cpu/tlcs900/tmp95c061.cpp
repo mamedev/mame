@@ -36,9 +36,8 @@ tmp95c061_device::tmp95c061_device(const machine_config &mconfig, const char *ta
 	m_pgreg{ 0, 0 },
 	m_pg01cr(0),
 	m_watchdog_mode(0),
-	m_serial_control{ 0, 0 },
-	m_serial_mode{ 0, 0 },
-	m_baud_rate{ 0, 0 },
+	m_serial(*this, "serial%u", 0U),
+	m_sc1_mod_cb(*this),
 	m_od_enable(0),
 	m_ad_result{ 0, 0, 0, 0 },
 	m_ad_mode(0),
@@ -116,7 +115,7 @@ void tmp95c061_device::internal_mem(address_map &map)
 	map(0x00000d, 0x00000d).rw(FUNC(tmp95c061_device::port_r<PORT_5>), FUNC(tmp95c061_device::port_w<PORT_5>));
 	map(0x000010, 0x000010).w(FUNC(tmp95c061_device::port_cr_w<PORT_5>));
 	map(0x000011, 0x000011).w(FUNC(tmp95c061_device::port_fc_w<PORT_5>));
-	map(0x000012, 0x000012).rw(FUNC(tmp95c061_device::port_r<PORT_6>), FUNC(tmp95c061_device::port_w<PORT_7>));
+	map(0x000012, 0x000012).rw(FUNC(tmp95c061_device::port_r<PORT_6>), FUNC(tmp95c061_device::port_w<PORT_6>));
 	map(0x000013, 0x000013).rw(FUNC(tmp95c061_device::port_r<PORT_7>), FUNC(tmp95c061_device::port_w<PORT_7>));
 	map(0x000015, 0x000015).w(FUNC(tmp95c061_device::port_fc_w<PORT_6>));
 	map(0x000016, 0x000016).w(FUNC(tmp95c061_device::port_cr_w<PORT_7>));
@@ -224,9 +223,6 @@ void tmp95c061_device::device_start()
 	save_item(NAME(m_pgreg));
 	save_item(NAME(m_pg01cr));
 	save_item(NAME(m_watchdog_mode));
-	save_item(NAME(m_serial_control));
-	save_item(NAME(m_serial_mode));
-	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_od_enable));
 	save_item(NAME(m_ad_result));
 	save_item(NAME(m_ad_mode));
@@ -280,9 +276,6 @@ void tmp95c061_device::device_reset()
 	m_watchdog_mode = 0x80;
 	for (int i = 0; i < 2; i++)
 	{
-		m_serial_control[i] &= 0x80;
-		m_serial_mode[i] &= 0x80;
-		m_baud_rate[i] = 0x00;
 	}
 	m_od_enable = 0x00;
 	m_ad_mode = 0x00;
@@ -494,11 +487,28 @@ void tmp95c061_device::tlcs900_check_hdma()
 }
 
 
+/* Databook 3.4: a micro-DMA start consumes the interrupt request, so the CPU
+   does not dispatch that vector and the HALT state is not released by it.
+   Vectors below 0x28 are not micro-DMA capable, and 0x3c (INTRTC) is not. */
+bool tmp95c061_device::hdma_owns_vector( uint8_t vector ) const
+{
+	if ( ! ( vector >= 0x28 && vector != 0x3c && vector < 0x74 ) )
+		return false;
+
+	for ( int ch = 0; ch < 4; ch++ )
+		if ( ( ( m_dma_vector[ch] & 0x1f ) << 2 ) == vector )
+			return true;
+
+	return false;
+}
+
 void tmp95c061_device::tlcs900_check_irqs()
 {
 	/* Check for NMI */
 	if ( m_nmi_state == ASSERT_LINE )
 	{
+		tlcs900_intnest_accept();
+
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );
 		m_xssp.d -= 2;
@@ -520,6 +530,9 @@ void tmp95c061_device::tlcs900_check_irqs()
 	{
 		if ( m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
 		{
+			if ( hdma_owns_vector( tmp95c061_irq_vector_map[i].vector ) )
+				continue;
+
 			switch( tmp95c061_irq_vector_map[i].iff )
 			{
 			case 0x80:
@@ -548,6 +561,8 @@ void tmp95c061_device::tlcs900_check_irqs()
 	if ( irq >= 0 )
 	{
 		uint8_t vector = tmp95c061_irq_vector_map[irq].vector;
+
+		tlcs900_intnest_accept();
 
 		m_xssp.d -= 4;
 		WRMEML( m_xssp.d, m_pc.d );
@@ -664,6 +679,15 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 }
 
 
+// TLCS-900/H databook table 3.8 (1): the 8-bit timer prescaler taps are
+// phiT1 = fc/8, phiT4 = fc/32, phiT16 = fc/128 and phiT256 = fc/2048.  The
+// shifts here were four bits too many for each tap, so every 8-bit timer
+// counted sixteen times too slowly.
+static constexpr int PRESCALE_T1   = 3;
+static constexpr int PRESCALE_T4   = 5;
+static constexpr int PRESCALE_T16  = 7;
+static constexpr int PRESCALE_T256 = 11;
+
 void tmp95c061_device::tlcs900_handle_timers()
 {
 	uint32_t  old_pre = m_timer_pre;
@@ -680,13 +704,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		case 0x00:  /* TIO */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[0] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T4 */
-			m_timer_change[0] += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T4 ) - ( old_pre >> PRESCALE_T4 );
 			break;
 		case 0x03:  /* T16 */
-			m_timer_change[0] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		}
 
@@ -718,13 +742,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		case 0x00:  /* TO0TRG */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[1] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T16 */
-			m_timer_change[1] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		case 0x03:  /* T256 */
-			m_timer_change[1] += ( m_timer_pre >> 15 ) - ( old_pre >> 15 );
+			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T256 ) - ( old_pre >> PRESCALE_T256 );
 			break;
 		}
 
@@ -757,13 +781,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		{
 		case 0x00:  /* invalid */
 		case 0x01:  /* T1 */
-			m_timer_change[2] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T4 */
-			m_timer_change[2] += ( m_timer_pre >> 9 ) - ( old_pre >> 9 );
+			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T4 ) - ( old_pre >> PRESCALE_T4 );
 			break;
 		case 0x03:  /* T16 */
-			m_timer_change[2] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		}
 
@@ -795,13 +819,13 @@ void tmp95c061_device::tlcs900_handle_timers()
 		case 0x00:  /* TO2TRG */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[3] += ( m_timer_pre >> 7 ) - ( old_pre >> 7 );
+			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
 			break;
 		case 0x02:  /* T16 */
-			m_timer_change[3] += ( m_timer_pre >> 11 ) - ( old_pre >> 11 );
+			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
 			break;
 		case 0x03:  /* T256 */
-			m_timer_change[3] += ( m_timer_pre >> 15 ) - ( old_pre >> 15 );
+			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T256 ) - ( old_pre >> PRESCALE_T256 );
 			break;
 		}
 
@@ -857,7 +881,8 @@ void tmp95c061_device::execute_set_input(int input, int level)
 				if ( m_level[TLCS900_INT0] == CLEAR_LINE && level == ASSERT_LINE )
 				{
 					/* Leave HALT state */
-					m_halted = 0;
+					if ( ! hdma_owns_vector( 0x28 ) )
+						m_halted = 0;
 					m_int_reg[INTE0AD] |= 0x08;
 				}
 			}
@@ -893,6 +918,22 @@ void tmp95c061_device::execute_set_input(int input, int level)
 			}
 		}
 		m_level[TLCS900_INT5] = level;
+		break;
+
+	// INT6 and INT7 are rising-edge inputs whose enable bits and vectors are
+	// already in the table above; only the pin side was missing, so
+	// set_input_line() on either was a no-op.  Ungated: which port B pin
+	// carries them is not settled here, and no driver gated them before.
+	case TLCS900_INT6:
+		if ( m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE )
+			m_int_reg[INTE67] |= 0x08;
+		m_level[TLCS900_INT6] = level;
+		break;
+
+	case TLCS900_INT7:
+		if ( m_level[TLCS900_INT7] == CLEAR_LINE && level == ASSERT_LINE )
+			m_int_reg[INTE67] |= 0x80;
+		m_level[TLCS900_INT7] = level;
 		break;
 
 	case TLCS900_TIO:   /* External timer input for timer 0 */
@@ -1128,94 +1169,49 @@ void tmp95c061_device::wdcr_w(uint8_t data)
 }
 
 
-uint8_t tmp95c061_device::sc0buf_r()
-{
-	return 0;
-}
+uint8_t tmp95c061_device::sc0buf_r()  { return m_serial[0]->scbuf_r(); }
+void tmp95c061_device::sc0buf_w(uint8_t data) { m_serial[0]->scbuf_w(data); }
+uint8_t tmp95c061_device::sc0cr_r()   { return m_serial[0]->sccr_r(); }
+void tmp95c061_device::sc0cr_w(uint8_t data)  { m_serial[0]->sccr_w(data); }
+uint8_t tmp95c061_device::sc0mod_r()  { return m_serial[0]->scmod_r(); }
+void tmp95c061_device::sc0mod_w(uint8_t data) { m_serial[0]->scmod_w(data); }
+uint8_t tmp95c061_device::br0cr_r()   { return m_serial[0]->brcr_r(); }
+void tmp95c061_device::br0cr_w(uint8_t data)  { m_serial[0]->brcr_w(data); }
 
-void tmp95c061_device::sc0buf_w(uint8_t data)
-{
-	// Fake finish sending data
-	m_int_reg[INTES0] |= 0x80;
-	m_check_irqs = 1;
-}
-
-uint8_t tmp95c061_device::sc0cr_r()
-{
-	uint8_t reg = m_serial_control[0];
-	if (!machine().side_effects_disabled())
-		m_serial_control[0] &= 0xe3;
-	return reg;
-}
-
-void tmp95c061_device::sc0cr_w(uint8_t data)
-{
-	m_serial_control[0] = data;
-}
-
-uint8_t tmp95c061_device::sc0mod_r()
-{
-	return m_serial_mode[0];
-}
-
-void tmp95c061_device::sc0mod_w(uint8_t data)
-{
-	m_serial_mode[0] = data;
-}
-
-uint8_t tmp95c061_device::br0cr_r()
-{
-	return m_baud_rate[0];
-}
-
-void tmp95c061_device::br0cr_w(uint8_t data)
-{
-	m_baud_rate[0] = data;
-}
-
-uint8_t tmp95c061_device::sc1buf_r()
-{
-	return 0;
-}
-
+uint8_t tmp95c061_device::sc1buf_r()  { return m_serial[1]->scbuf_r(); }
 void tmp95c061_device::sc1buf_w(uint8_t data)
 {
-	// Fake finish sending data
-	m_int_reg[INTES1] |= 0x80;
-	m_check_irqs = 1;
+	m_serial[1]->set_pin_enabled(BIT(m_port_function[PORT_8], 5));
+	m_serial[1]->scbuf_w(data);
 }
-
-uint8_t tmp95c061_device::sc1cr_r()
-{
-	uint8_t reg = m_serial_control[1];
-	if (!machine().side_effects_disabled())
-		m_serial_control[1] &= 0xe3;
-	return reg;
-}
-
-void tmp95c061_device::sc1cr_w(uint8_t data)
-{
-	m_serial_control[1] = data;
-}
-
-uint8_t tmp95c061_device::sc1mod_r()
-{
-	return m_serial_mode[1];
-}
+uint8_t tmp95c061_device::sc1cr_r()   { return m_serial[1]->sccr_r(); }
+void tmp95c061_device::sc1cr_w(uint8_t data)  { m_serial[1]->sccr_w(data); }
+uint8_t tmp95c061_device::sc1mod_r()  { return m_serial[1]->scmod_r(); }
 
 void tmp95c061_device::sc1mod_w(uint8_t data)
 {
-	m_serial_mode[1] = data;
+	m_serial[1]->scmod_w(data);
+	m_sc1_mod_cb(data);
 }
 
-uint8_t tmp95c061_device::br1cr_r()
+uint8_t tmp95c061_device::br1cr_r()   { return m_serial[1]->brcr_r(); }
+void tmp95c061_device::br1cr_w(uint8_t data)  { m_serial[1]->brcr_w(data); }
+
+// A channel raises INTTX as 0x80 and INTRX as 0x08, which are the bits its
+// INTES register uses, so the channel needs to know nothing about the CPU.
+template <int N>
+void tmp95c061_device::serial_int_w(uint8_t bits)
 {
-	return m_baud_rate[1];
+	m_int_reg[N ? INTES1 : INTES0] |= bits;
+	m_check_irqs = 1;
 }
 
-void tmp95c061_device::br1cr_w(uint8_t data)
+void tmp95c061_device::device_add_mconfig(machine_config &config)
 {
-	m_baud_rate[1] = data;
+	TMP95C061_SERIAL(config, m_serial[0], DERIVED_CLOCK(1, 1));
+	m_serial[0]->setint().set(FUNC(tmp95c061_device::serial_int_w<0>));
+	TMP95C061_SERIAL(config, m_serial[1], DERIVED_CLOCK(1, 1));
+	m_serial[1]->setint().set(FUNC(tmp95c061_device::serial_int_w<1>));
 }
 
 uint8_t tmp95c061_device::ode_r()

@@ -1252,6 +1252,8 @@ void tmp94c241_device::tlcs900_check_irqs()
 	// Check for NMI
 	if (m_nmi_state == ASSERT_LINE)
 	{
+		tlcs900_intnest_accept();
+
 		m_xssp.d -= 4;
 		WRMEML(m_xssp.d, m_pc.d);
 		m_xssp.d -= 2;
@@ -1320,6 +1322,8 @@ void tmp94c241_device::tlcs900_check_irqs()
 			LOGMASKED(LOG_IRQ, "IRQ: INTTC0 (DMA ch0 done) level=%d PC=%06X\n", level, m_pc.d);
 		else if (vector == 0x9c)
 			LOGMASKED(LOG_IRQ, "IRQ: INTTC2 (DMA ch2 done) level=%d PC=%06X\n", level, m_pc.d);
+
+		tlcs900_intnest_accept();
 
 		m_xssp.d -= 4;
 		WRMEML(m_xssp.d, m_pc.d);
