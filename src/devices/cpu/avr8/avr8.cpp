@@ -510,6 +510,7 @@ enum
 DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
 DEFINE_DEVICE_TYPE(ATMEGA168,  atmega168_device,  "atmega168",  "Atmel ATmega168")
 DEFINE_DEVICE_TYPE(ATMEGA328,  atmega328_device,  "atmega328",  "Atmel ATmega328")
+DEFINE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device, "atmega32u4", "Atmel ATmega32U4")
 DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
 DEFINE_DEVICE_TYPE(ATMEGA1284, atmega1284_device, "atmega1284", "Atmel ATmega1284")
 DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
@@ -652,6 +653,11 @@ void atmega168_device::atmega168_internal_map(address_map &map)
 }
 
 void atmega328_device::atmega328_internal_map(address_map &map)
+{
+	avr8_device::base_internal_map(map);
+}
+
+void atmega32u4_device::atmega32u4_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
 }
@@ -1399,6 +1405,33 @@ void atmega328_device::update_interrupt(int source)
 }
 
 bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
+{
+	switch (port)
+	{
+	case GPIOB: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOC: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOD: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
+	}
+}
+
+void atmega32u4_device::update_interrupt(int source)
+{
+	const interrupt_condition &condition = s_int_conditions[source];
+
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+
+	set_irq_line(condition.m_intindex << 1, intstate);
+
+	if (intstate)
+	{
+		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	}
+}
+
+bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
 	switch (port)
 	{

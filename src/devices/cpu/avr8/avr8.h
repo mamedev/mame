@@ -1145,6 +1145,7 @@ protected:
 DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
 DECLARE_DEVICE_TYPE(ATMEGA168,  atmega168_device)
 DECLARE_DEVICE_TYPE(ATMEGA328,  atmega328_device)
+DECLARE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device)
 DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
 DECLARE_DEVICE_TYPE(ATMEGA1284, atmega1284_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
@@ -1192,6 +1193,28 @@ public:
 
 protected:
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
+};
+
+// ======================> atmega32u4_device
+
+class atmega32u4_device : public avr8_device<3>
+{
+public:
+	// construction/destruction
+	atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void update_interrupt(int source) override;
+	void atmega32u4_internal_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
+	{
+		sck_mask  = 0x02; // PB1
+		mosi_mask = 0x04; // PB2
+		miso_mask = 0x08; // PB3
+	}
 	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
 };
 
