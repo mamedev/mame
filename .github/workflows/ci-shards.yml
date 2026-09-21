@@ -238,21 +238,24 @@ jobs:
       run: |
         set -euo pipefail
         state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
-        timing_args=()
+        stage_shard() {
+          "$CI_PYTHON" scripts/build/ci_shards.py stage \
+            "${{ matrix.solution_dir }}/Makefile" \
+            --profile "${{ matrix.profile_path }}" \
+            --group "${{ matrix.group }}" \
+            --build-root "${{ matrix.build_root }}" \
+            --cache-root "$state_root/artifact" \
+            --cache-manifest "$state_root/cache-manifest.json" \
+            --dependency-manifest \
+              "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
+            "$@"
+        }
         if [[ "$COLLECT_TIMINGS" == "true" ]]; then
-          timing_args=(--timing-dir \
-            "build/ci-shards/${{ matrix.profile_id }}/project-timings")
+          stage_shard --timing-dir \
+            "build/ci-shards/${{ matrix.profile_id }}/project-timings"
+        else
+          stage_shard
         fi
-        "$CI_PYTHON" scripts/build/ci_shards.py stage \
-          "${{ matrix.solution_dir }}/Makefile" \
-          --profile "${{ matrix.profile_path }}" \
-          --group "${{ matrix.group }}" \
-          --build-root "${{ matrix.build_root }}" \
-          --cache-root "$state_root/artifact" \
-          --cache-manifest "$state_root/cache-manifest.json" \
-          --dependency-manifest \
-            "$state_root/dependency-state/dependency-manifest-${{ matrix.group }}.json" \
-          "${timing_args[@]}"
     - name: Verify shard artifact
       run: |
         state_root="build/ci-shards/${{ matrix.profile_id }}/${{ matrix.group }}"
