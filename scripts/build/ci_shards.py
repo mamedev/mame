@@ -31,6 +31,7 @@ PARTITION_ALGORITHM = 'lpt-v1'
 DRIVER_POOL = 'driver-libs'
 INVENTORY_SCHEMA_VERSION = 1
 DRIFT_SCHEMA_VERSION = 2
+FALLBACK_SCHEMA_VERSION = 1
 REBALANCE_THRESHOLD = decimal.Decimal('0.05')
 MILLISECOND = decimal.Decimal('0.001')
 CHUNK_SIZE = 1024 * 1024
@@ -58,6 +59,10 @@ MAKE_ASSIGNMENT_PATTERN = re.compile(
 MAKE_CONDITIONAL_PATTERN = re.compile(
         r'^(?:ifeq|ifneq|ifdef|ifndef)(?:\s|\()')
 MAKE_VARIABLE_PATTERN = re.compile(r'\$\(([^()]+)\)|\$\{([^{}]+)\}')
+
+
+class MonolithicFallbackRequired(ValueError):
+    pass
 
 
 def add_profile_arguments(parser):
@@ -113,6 +118,7 @@ def parse_args():
     reconcile_parser.add_argument('--inventory', required=True, type=pathlib.Path)
     reconcile_parser.add_argument('--output', required=True, type=pathlib.Path)
     reconcile_parser.add_argument('--drift-output', required=True, type=pathlib.Path)
+    reconcile_parser.add_argument('--fallback-marker', required=True, type=pathlib.Path)
     reconcile_parser.add_argument('--summary-output', type=pathlib.Path)
     reconcile_parser.add_argument('--github-output', type=pathlib.Path)
 
@@ -132,6 +138,11 @@ def parse_args():
     definitions_parser.add_argument('--profile', required=True, type=pathlib.Path)
     definitions_parser.add_argument('--source-root', type=pathlib.Path, default=pathlib.Path('.'))
     definitions_parser.add_argument('--manifest-dir', required=True, type=pathlib.Path)
+
+    fallback_parser = subparsers.add_parser('verify-fallback')
+    fallback_parser.add_argument('--profile', required=True, type=pathlib.Path)
+    fallback_parser.add_argument('--manifest-dir', required=True, type=pathlib.Path)
+    fallback_parser.add_argument('--expected-marker', type=pathlib.Path)
 
     rebalance_parser = subparsers.add_parser('rebalance')
     rebalance_parser.add_argument('solution_makefile', type=pathlib.Path)
@@ -1205,6 +1216,62 @@ def generated_target_drift(
     return report
 
 
+def fallback_marker_identity(marker):
+    return dict(
+            (key, value) for key, value in marker.items()
+            if key != 'marker_hash')
+
+
+def monolithic_fallback_marker(report):
+    identity = {
+            'checked_manifest_hash': report['checked_manifest_hash'],
+            'drift_hash': report['drift_hash'],
+            'inventory_hash': report['inventory_hash'],
+            'profile': report['profile'],
+            'reasons': sorted(set(report['reconciliation_errors'])),
+            'recovery_mode': 'monolithic-fallback',
+            'schema_version': FALLBACK_SCHEMA_VERSION}
+    marker = dict(identity)
+    marker['marker_hash'] = canonical_hash(identity)
+    return marker
+
+
+def validate_monolithic_fallback_marker(marker, profile_map, path):
+    expected_fields = {
+            'checked_manifest_hash',
+            'drift_hash',
+            'inventory_hash',
+            'marker_hash',
+            'profile',
+            'reasons',
+            'recovery_mode',
+            'schema_version'}
+    if set(marker) != expected_fields:
+        raise ValueError('%s: fallback marker fields do not match' % path)
+    if marker.get('schema_version') != FALLBACK_SCHEMA_VERSION:
+        raise ValueError('%s: fallback marker schema does not match' % path)
+    if marker.get('profile') != profile_map['profile']['id']:
+        raise ValueError('%s: fallback marker profile does not match' % path)
+    if marker.get('checked_manifest_hash') != profile_map['complete_map_hash']:
+        raise ValueError('%s: fallback marker checked manifest does not match' % path)
+    if marker.get('recovery_mode') != 'monolithic-fallback':
+        raise ValueError('%s: fallback marker recovery mode does not match' % path)
+    reasons = marker.get('reasons')
+    if (
+            not isinstance(reasons, list)
+            or not reasons
+            or reasons != sorted(set(reasons))
+            or any(not isinstance(reason, str) or not reason for reason in reasons)):
+        raise ValueError('%s: fallback marker reasons are invalid' % path)
+    for field in ('drift_hash', 'inventory_hash', 'marker_hash'):
+        value = marker.get(field)
+        if not isinstance(value, str) or re.match(r'^[0-9a-f]{64}$', value) is None:
+            raise ValueError('%s: fallback marker %s is invalid' % (path, field))
+    if marker['marker_hash'] != canonical_hash(fallback_marker_identity(marker)):
+        raise ValueError('%s: fallback marker hash does not match' % path)
+    return marker
+
+
 def reconcilable_archive_output(project, profile_map):
     name = project.get('name', '<unnamed>')
     errors = []
@@ -1246,7 +1313,7 @@ def reconcilable_archive_output(project, profile_map):
         if pathlib.PurePosixPath(output).name != expected_output:
             errors.append('generated output does not match archive naming: %s' % output)
     if errors:
-        raise ValueError('cannot reconcile generated target %s: %s' % (
+        raise MonolithicFallbackRequired('cannot reconcile generated target %s: %s' % (
                 name, '; '.join(errors)))
     return expected_output
 
@@ -1257,7 +1324,7 @@ def reconciled_library_shards(profile_map, actual_projects):
     for checked in library_shards(profile_map):
         targets = sorted(set(checked['targets']) & actual_projects)
         if not targets:
-            raise ValueError(
+            raise MonolithicFallbackRequired(
                     'cannot reconcile an empty fixed library shard: %s' % checked['name'])
         outputs = [
                 '%s%s%s' % (archive['prefix'], target, archive['suffix'])
@@ -1285,7 +1352,7 @@ def reconcile_profile_map(inventory, profile_map, profile_path):
     removed_deferred = sorted(
             set(removed_projects) & set(profile_map['profile']['deferred_projects']))
     if removed_deferred:
-        raise ValueError('cannot reconcile removed deferred projects: %s' % (
+        raise MonolithicFallbackRequired('cannot reconcile removed deferred projects: %s' % (
                 ' '.join(removed_deferred)))
 
     for name in added_projects:
@@ -1297,7 +1364,7 @@ def reconcile_profile_map(inventory, profile_map, profile_path):
             (previous_driver_targets & actual_projects) | set(added_projects))
     requested_shards = previous_driver_map['requested_shards']
     if len(elastic_targets) < requested_shards:
-        raise ValueError(
+        raise MonolithicFallbackRequired(
                 'cannot reconcile %d elastic targets into %d non-empty shards' % (
                         len(elastic_targets), requested_shards))
 
@@ -1359,9 +1426,12 @@ def render_target_drift_summary(report):
                 '<code>%s</code>' % html.escape(output)
                 for output in project['outputs']) or '<em>unknown</em>'
         assignment = project.get('provisional_assignment')
-        assignment_html = (
-                '<code>%s</code>' % html.escape(assignment)
-                if assignment else '<em>Pending reconciliation</em>')
+        if assignment:
+            assignment_html = '<code>%s</code>' % html.escape(assignment)
+        elif report['recovery_mode'] == 'monolithic-fallback':
+            assignment_html = '<em>Monolithic build</em>'
+        else:
+            assignment_html = '<em>Pending reconciliation</em>'
         rows.append(
                 '<tr><td>Added</td><td><code>%s</code></td><td>%s</td>'
                 '<td>%s</td><td>%s</td></tr>' % (
@@ -1381,8 +1451,30 @@ def render_target_drift_summary(report):
     errors = report.get('reconciliation_errors', [])
     error_summary = ''
     if errors:
-        error_summary = '<h2>Reconciliation errors</h2><ul>%s</ul>' % ''.join(
-                '<li>%s</li>' % html.escape(error) for error in errors)
+        heading = (
+                'Monolithic fallback reasons'
+                if report['recovery_mode'] == 'monolithic-fallback'
+                else 'Reconciliation errors')
+        error_summary = '<h2>%s</h2><ul>%s</ul>' % (
+                heading,
+                ''.join('<li>%s</li>' % html.escape(error) for error in errors))
+
+    build_action = ''
+    if report['recovery_mode'] == 'monolithic-fallback':
+        build_action = (
+                '<p><strong>Build action:</strong> shard compilation was skipped; '
+                'the final job is running the original monolithic build and '
+                'validation path.</p>')
+        maintainer_action = (
+                '<p><strong>Maintainer action:</strong> review the generated '
+                'project metadata and update the checked profile or shard '
+                'classification before the next optimized build.</p>')
+    else:
+        maintainer_action = (
+                '<p><strong>Maintainer action:</strong> use '
+                '<code>scripts/build/ci_shards.py rebalance</code> with compatible '
+                'timing data, review the result, and update the checked-in profile.'
+                '</p>')
 
     return '\n'.join((
             '<h1>CI shard target manifest drift detected</h1>',
@@ -1396,10 +1488,8 @@ def render_target_drift_summary(report):
             '<tbody>%s</tbody>' % ''.join(rows),
             '</table>',
             error_summary,
-            '<p><strong>Maintainer action:</strong> use '
-            '<code>scripts/build/ci_shards.py rebalance</code> with compatible '
-            'timing data, review the result, and update the checked-in profile.'
-            '</p>',
+            build_action,
+            maintainer_action,
             ''))
 
 
@@ -1454,9 +1544,20 @@ def write_reconciliation_report(options, inventory, report, runtime_profile_path
     write_github_values(options.github_output, {
             'drift': report['has_drift'],
             'drift_hash': report['drift_hash'],
+            'fallback': report['recovery_mode'] == 'monolithic-fallback',
             'inventory_hash': inventory['inventory_hash'],
             'recovery_mode': report['recovery_mode'],
             'runtime_profile': runtime_profile_path or ''})
+
+
+def remove_runtime_profile(checked_profile_path, runtime_profile_path, profile_map):
+    if runtime_profile_path.is_file():
+        runtime_profile_path.unlink()
+    schema_reference = profile_map['$schema']
+    schema_source = (checked_profile_path.parent / schema_reference).resolve()
+    schema_output = (runtime_profile_path.parent / schema_reference).resolve()
+    if schema_output != schema_source and schema_output.is_file():
+        schema_output.unlink()
 
 
 def write_reconciled_profile(options):
@@ -1466,14 +1567,18 @@ def write_reconciled_profile(options):
     try:
         runtime_profile, assignments = reconcile_profile_map(
                 inventory, checked_profile, options.profile)
-    except ValueError as error:
+    except MonolithicFallbackRequired as error:
         report = generated_target_drift(
                 inventory,
                 checked_profile,
-                recovery_mode='reconciliation-failed',
+                recovery_mode='monolithic-fallback',
                 reconciliation_errors=[str(error)])
+        remove_runtime_profile(options.profile, options.output, checked_profile)
+        write_manifest(
+                options.fallback_marker,
+                monolithic_fallback_marker(report))
         write_reconciliation_report(options, inventory, report)
-        raise
+        return None, report
 
     recovery_mode = (
             'runtime-reconciled'
@@ -1485,6 +1590,8 @@ def write_reconciled_profile(options):
             recovery_mode=recovery_mode,
             provisional_assignments=assignments,
             runtime_manifest_hash=runtime_profile['complete_map_hash'])
+    if options.fallback_marker.is_file():
+        options.fallback_marker.unlink()
     write_runtime_profile(options.profile, options.output, runtime_profile)
     write_reconciliation_report(
             options, inventory, report, options.output.as_posix())
@@ -2332,6 +2439,40 @@ def verify_definitions(options):
     return target_count
 
 
+def verify_fallback_markers(profile_map, manifest_dir, expected_marker_path=None):
+    if not manifest_dir.is_dir():
+        raise ValueError('%s: fallback marker directory does not exist' % manifest_dir)
+    actual_paths = sorted(manifest_dir.glob('fallback-marker-*.json'))
+    if expected_marker_path is None:
+        if actual_paths:
+            raise ValueError('unexpected monolithic fallback markers: %s' % (
+                    ' '.join(path.name for path in actual_paths)))
+        return 0
+
+    expected_names = {
+            'fallback-marker-%s.json' % shard['name']
+            for shard in all_shards(profile_map)}
+    actual_names = {path.name for path in actual_paths}
+    missing = sorted(expected_names - actual_names)
+    unexpected = sorted(actual_names - expected_names)
+    if missing or unexpected:
+        details = []
+        if missing:
+            details.append('missing fallback markers: %s' % ' '.join(missing))
+        if unexpected:
+            details.append('unexpected fallback markers: %s' % ' '.join(unexpected))
+        raise ValueError('; '.join(details))
+
+    expected = read_json(expected_marker_path, 'expected monolithic fallback marker')
+    validate_monolithic_fallback_marker(expected, profile_map, expected_marker_path)
+    for path in actual_paths:
+        marker = read_json(path, 'monolithic fallback marker')
+        validate_monolithic_fallback_marker(marker, profile_map, path)
+        if marker != expected:
+            raise ValueError('%s: fallback marker disagrees with final job' % path)
+    return len(actual_paths)
+
+
 def rounded(value):
     return value.quantize(MILLISECOND, rounding=decimal.ROUND_HALF_UP)
 
@@ -2609,7 +2750,12 @@ def main():
                                 inventory['project_count'], inventory['profile']))
         elif options.command == 'reconcile':
             profile_map, report = write_reconciled_profile(options)
-            if report['has_drift']:
+            if report['recovery_mode'] == 'monolithic-fallback':
+                sys.stdout.write(
+                        'Selected monolithic fallback for %s: %s.\n' % (
+                                report['profile'],
+                                '; '.join(report['reconciliation_errors'])))
+            elif report['has_drift']:
                 sys.stdout.write(
                         'Reconciled generated target drift into runtime map %s for %s.\n' % (
                                 profile_map['complete_map_hash'],
@@ -2639,6 +2785,17 @@ def main():
             count = verify_definitions(options)
             sys.stdout.write('Validated %d downloaded targets for %s.\n' % (
                     count, load_profile_map(options.profile)['profile']['id']))
+        elif options.command == 'verify-fallback':
+            profile_map = load_profile_map(options.profile)
+            count = verify_fallback_markers(
+                    profile_map, options.manifest_dir, options.expected_marker)
+            if options.expected_marker is None:
+                sys.stdout.write('Validated sharded build mode for %s.\n' % (
+                        profile_map['profile']['id']))
+            else:
+                sys.stdout.write(
+                        'Validated %d identical monolithic fallback markers for %s.\n' % (
+                                count, profile_map['profile']['id']))
         elif options.command == 'rebalance':
             profile_map, retained = rebalance_profile(options)
             action = 'Retained' if retained else 'Selected'

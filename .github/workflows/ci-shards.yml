@@ -92,6 +92,7 @@ jobs:
       if: inputs.install_kind == 'brew'
       run: brew install $CI_PACKAGES
     - name: Generate shard build files
+      id: target-mode
       run: |
         set -euo pipefail
         make -j"$CI_MAKE_JOBS" generate
@@ -99,6 +100,7 @@ jobs:
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
         checked_profile="$CI_PROFILE_PATH"
         runtime_profile="$state_root/runtime/$CI_PROFILE_ID.json"
+        fallback_marker="$state_root/artifact/fallback-marker-${{ matrix.group }}.json"
         mkdir -p "$state_root"
         "$CI_PYTHON" scripts/build/ci_shards.py inventory \
           "$CI_SOLUTION_DIR/Makefile" \
@@ -109,7 +111,12 @@ jobs:
           --profile "$checked_profile" \
           --inventory "$state_root/target-inventory.json" \
           --output "$runtime_profile" \
-          --drift-output "$state_root/target-drift.json"
+          --drift-output "$state_root/target-drift.json" \
+          --fallback-marker "$fallback_marker" \
+          --github-output "$GITHUB_OUTPUT"
+        if [[ -f "$fallback_marker" ]]; then
+          exit 0
+        fi
         echo "CI_PROFILE_PATH=$runtime_profile" >> "$GITHUB_ENV"
         "$CI_PYTHON" scripts/build/ci_shards.py validate \
           "$CI_SOLUTION_DIR/Makefile" \
@@ -117,6 +124,7 @@ jobs:
           --group "${{ matrix.group }}"
     - name: Capture toolchain identity
       id: cache-context
+      if: steps.target-mode.outputs.fallback != 'true'
       run: |
         set -euo pipefail
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
@@ -162,6 +170,7 @@ jobs:
           >> "$GITHUB_OUTPUT"
     - name: Restore dependency manifest
       id: dependencies
+      if: steps.target-mode.outputs.fallback != 'true'
       uses: actions/cache@main
       with:
         path: build/ci-shards/${{ steps.profile.outputs.profile_id }}/${{ matrix.group }}/dependency-state
@@ -169,6 +178,7 @@ jobs:
         restore-keys: |
           ${{ steps.cache-context.outputs.dependency-prefix }}
     - name: Materialize generated dependencies
+      if: steps.target-mode.outputs.fallback != 'true'
       run: |
         "$CI_PYTHON" scripts/build/ci_shards.py materialize \
           "$CI_SOLUTION_DIR/Makefile" \
@@ -182,6 +192,7 @@ jobs:
           --runner-arch "${{ runner.arch }}"
     - name: Prepare shard cache key
       id: cache-key
+      if: steps.target-mode.outputs.fallback != 'true'
       run: |
         set -euo pipefail
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
@@ -199,12 +210,15 @@ jobs:
         echo "key=$key" >> "$GITHUB_OUTPUT"
     - name: Restore shard cache
       id: shard-cache
+      if: steps.target-mode.outputs.fallback != 'true'
       uses: actions/cache/restore@main
       with:
         path: build/ci-shards/${{ steps.profile.outputs.profile_id }}/${{ matrix.group }}/artifact
         key: ${{ steps.cache-key.outputs.key }}
     - name: Build shard
-      if: steps.shard-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.target-mode.outputs.fallback != 'true' &&
+        steps.shard-cache.outputs.cache-hit != 'true'
       env:
         COLLECT_TIMINGS: ${{ steps.profile.outputs.collect_timings }}
       run: |
@@ -227,7 +241,9 @@ jobs:
         make -j"$CI_MAKE_JOBS" -C "$CI_SOLUTION_DIR" \
           config="$CI_CONFIGURATION" $projects
     - name: Capture compiler dependencies
-      if: steps.shard-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.target-mode.outputs.fallback != 'true' &&
+        steps.shard-cache.outputs.cache-hit != 'true'
       run: |
         set -euo pipefail
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
@@ -244,7 +260,9 @@ jobs:
           --runner-arch "${{ runner.arch }}"
     - name: Finalize shard cache key
       id: final-cache-key
-      if: steps.shard-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.target-mode.outputs.fallback != 'true' &&
+        steps.shard-cache.outputs.cache-hit != 'true'
       run: |
         set -euo pipefail
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
@@ -262,7 +280,9 @@ jobs:
           --runner-arch "${{ runner.arch }}")"
         echo "key=$key" >> "$GITHUB_OUTPUT"
     - name: Stage shard artifact
-      if: steps.shard-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.target-mode.outputs.fallback != 'true' &&
+        steps.shard-cache.outputs.cache-hit != 'true'
       env:
         COLLECT_TIMINGS: ${{ steps.profile.outputs.collect_timings }}
       run: |
@@ -287,6 +307,7 @@ jobs:
           stage_shard
         fi
     - name: Verify shard artifact
+      if: steps.target-mode.outputs.fallback != 'true'
       run: |
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
         "$CI_PYTHON" scripts/build/ci_shards.py verify \
@@ -296,6 +317,7 @@ jobs:
           --expected-manifest "$state_root/cache-manifest.json" \
           --cache-root "$state_root/artifact"
     - name: Stamp current shard definition
+      if: steps.target-mode.outputs.fallback != 'true'
       run: |
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
         "$CI_PYTHON" scripts/build/ci_shards.py write-definition \
@@ -305,6 +327,7 @@ jobs:
           --output \
             "$state_root/artifact/shard-definition-${{ matrix.group }}.json"
     - name: Refresh dependency manifest
+      if: steps.target-mode.outputs.fallback != 'true'
       run: |
         set -euo pipefail
         state_root="build/ci-shards/$CI_PROFILE_ID/${{ matrix.group }}"
@@ -318,7 +341,9 @@ jobs:
         path: build/ci-shards/${{ steps.profile.outputs.profile_id }}/${{ matrix.group }}/artifact/
         if-no-files-found: error
     - name: Save shard cache
-      if: steps.shard-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.target-mode.outputs.fallback != 'true' &&
+        steps.shard-cache.outputs.cache-hit != 'true'
       uses: actions/cache/save@main
       with:
         path: build/ci-shards/${{ steps.profile.outputs.profile_id }}/${{ matrix.group }}/artifact
@@ -379,6 +404,7 @@ jobs:
         state_root="build/ci-shards/$CI_PROFILE_ID/final"
         checked_profile="$CI_PROFILE_PATH"
         runtime_profile="$state_root/runtime/$CI_PROFILE_ID.json"
+        fallback_marker="$state_root/fallback-marker.json"
         mkdir -p "$state_root"
         "$CI_PYTHON" scripts/build/ci_shards.py inventory \
           "$CI_SOLUTION_DIR/Makefile" \
@@ -390,8 +416,12 @@ jobs:
           --inventory "$state_root/target-inventory.json" \
           --output "$runtime_profile" \
           --drift-output "$state_root/target-drift.json" \
+          --fallback-marker "$fallback_marker" \
           --summary-output "$state_root/target-drift.html" \
           --github-output "$GITHUB_OUTPUT"
+        if [[ -f "$fallback_marker" ]]; then
+          exit 0
+        fi
         echo "CI_PROFILE_PATH=$runtime_profile" >> "$GITHUB_ENV"
     - name: Report target manifest drift
       if: always() && steps.target-inventory.outputs.drift == 'true'
@@ -408,6 +438,7 @@ jobs:
           build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/target-drift.json
           build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/runtime/${{ steps.profile.outputs.profile_id }}.json
           build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/ci-shard-map.schema.json
+          build/ci-shards/${{ steps.profile.outputs.profile_id }}/final/fallback-marker.json
         if-no-files-found: error
     - name: Preserve shard build result
       if: needs.build-shards.result != 'success'
@@ -415,6 +446,7 @@ jobs:
         echo "Shard build result: ${{ needs.build-shards.result }}" >&2
         exit 1
     - name: Validate runtime target manifest
+      if: steps.target-inventory.outputs.fallback != 'true'
       run: |
         "$CI_PYTHON" scripts/build/ci_shards.py validate \
           "$CI_SOLUTION_DIR/Makefile" \
@@ -425,7 +457,21 @@ jobs:
         pattern: mame-ci-${{ steps.profile.outputs.profile_id }}-shard-*-${{ github.sha }}
         path: .
         merge-multiple: true
+    - name: Verify shard build mode
+      run: |
+        set -euo pipefail
+        if [[ "${{ steps.target-inventory.outputs.fallback }}" == "true" ]]; then
+          "$CI_PYTHON" scripts/build/ci_shards.py verify-fallback \
+            --profile "$CI_PROFILE_PATH" \
+            --manifest-dir . \
+            --expected-marker \
+              "build/ci-shards/$CI_PROFILE_ID/final/fallback-marker.json"
+        else
+          "$CI_PYTHON" scripts/build/ci_shards.py verify-fallback \
+            --profile "$CI_PROFILE_PATH" --manifest-dir .
+        fi
     - name: Verify shard definitions and archives
+      if: steps.target-inventory.outputs.fallback != 'true'
       run: |
         set -euo pipefail
         "$CI_PYTHON" scripts/build/ci_shards.py verify-definitions \
@@ -435,7 +481,17 @@ jobs:
           "$CI_SOLUTION_DIR/Makefile" \
           --profile "$CI_PROFILE_PATH" --group all \
           --archive-dir "$CI_BUILD_ROOT"
+    - name: Build monolithic fallback
+      if: steps.target-inventory.outputs.fallback == 'true'
+      run: |
+        set -euo pipefail
+        make -j"$CI_MAKE_JOBS"
+        test -x "$CI_EXECUTABLE"
+        for project in $CI_FINAL_PROJECTS; do
+          test -x "./${project}${CI_EXECUTABLE_SUFFIX}"
+        done
     - name: Build final tools
+      if: steps.target-inventory.outputs.fallback != 'true'
       env:
         COLLECT_TIMINGS: ${{ steps.profile.outputs.collect_timings }}
       run: |
@@ -455,6 +511,7 @@ jobs:
           test -x "./${project}${CI_EXECUTABLE_SUFFIX}"
         done
     - name: Link executable
+      if: steps.target-inventory.outputs.fallback != 'true'
       env:
         COLLECT_TIMINGS: ${{ steps.profile.outputs.collect_timings }}
       run: |
@@ -473,7 +530,9 @@ jobs:
         fi
         test -x "$CI_EXECUTABLE"
     - name: Summarize project timings
-      if: steps.profile.outputs.collect_timings == 'true'
+      if: >-
+        steps.target-inventory.outputs.fallback != 'true' &&
+        steps.profile.outputs.collect_timings == 'true'
       run: |
         timing_root="build/ci-shards/$CI_PROFILE_ID"
         "$CI_PYTHON" scripts/build/summarize_project_timings.py \
@@ -482,7 +541,9 @@ jobs:
           --markdown "$timing_root/project-timings.md"
         cat "$timing_root/project-timings.md" >> "$GITHUB_STEP_SUMMARY"
     - name: Upload project timings
-      if: steps.profile.outputs.collect_timings == 'true'
+      if: >-
+        steps.target-inventory.outputs.fallback != 'true' &&
+        steps.profile.outputs.collect_timings == 'true'
       uses: actions/upload-artifact@main
       with:
         name: ${{ steps.profile.outputs.artifact_name }}-project-timings-${{ github.sha }}

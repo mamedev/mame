@@ -157,7 +157,7 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
         self.assertEqual('exact', report['recovery_mode'])
         self.assertEqual('', ci_shards.render_target_drift_summary(report))
 
-    def test_failed_reconciliation_is_visible_in_summary(self):
+    def test_monolithic_fallback_is_visible_in_summary(self):
         self.write_solution(['app', 'known', 'newlib'])
         self.write_project('known', 'libknown.a')
         self.write_project('newlib', 'newlib.exe', archive=False)
@@ -168,12 +168,13 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
         report = ci_shards.generated_target_drift(
                 inventory,
                 self.profile,
-                recovery_mode='reconciliation-failed',
+                recovery_mode='monolithic-fallback',
                 reconciliation_errors=['newlib is not an independent archive'])
         summary = ci_shards.render_target_drift_summary(report)
 
-        self.assertIn('<code>reconciliation-failed</code>', summary)
+        self.assertIn('<code>monolithic-fallback</code>', summary)
         self.assertIn('newlib is not an independent archive', summary)
+        self.assertIn('the original monolithic build', summary)
 
     def test_missing_primary_executable_is_fatal(self):
         self.write_solution(['known'])
@@ -249,7 +250,9 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
 
         inventory = ci_shards.generated_project_inventory(
                 self.solution_makefile, profile, self.source_root)
-        with self.assertRaisesRegex(ValueError, 'project dependencies are not supported'):
+        with self.assertRaisesRegex(
+                ci_shards.MonolithicFallbackRequired,
+                'project dependencies are not supported'):
             ci_shards.reconcile_profile_map(
                     inventory, profile, self.source_root / 'test-profile.json')
 
@@ -267,9 +270,92 @@ class GeneratedProjectInventoryTest(unittest.TestCase):
 
         inventory = ci_shards.generated_project_inventory(
                 self.solution_makefile, profile, self.source_root)
-        with self.assertRaisesRegex(ValueError, 'removed deferred projects: tool'):
+        with self.assertRaisesRegex(
+                ci_shards.MonolithicFallbackRequired,
+                'removed deferred projects: tool'):
             ci_shards.reconcile_profile_map(
                     inventory, profile, self.source_root / 'test-profile.json')
+
+    def test_unsafe_executable_produces_verified_fallback_markers(self):
+        profile = self.reconciliation_profile()
+        self.write_solution([
+                'app', 'driver', 'known', 'newtool', 'removed'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('removed', 'libremoved.a')
+        self.write_project('driver', 'libdriver.a')
+        self.write_project('newtool', 'newtool', archive=False)
+        self.write_project('app', 'app', archive=False)
+
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, profile, self.source_root)
+        with self.assertRaises(ci_shards.MonolithicFallbackRequired) as raised:
+            ci_shards.reconcile_profile_map(
+                    inventory, profile, self.source_root / 'test-profile.json')
+        report = ci_shards.generated_target_drift(
+                inventory,
+                profile,
+                recovery_mode='monolithic-fallback',
+                reconciliation_errors=[str(raised.exception)])
+        marker = ci_shards.monolithic_fallback_marker(report)
+        ci_shards.validate_monolithic_fallback_marker(
+                marker, profile, '<test marker>')
+
+        marker_dir = self.source_root / 'markers'
+        marker_dir.mkdir()
+        expected_marker = self.source_root / 'expected-marker.json'
+        ci_shards.write_manifest(expected_marker, marker)
+        for shard in ci_shards.all_shards(profile):
+            ci_shards.write_manifest(
+                    marker_dir / ('fallback-marker-%s.json' % shard['name']),
+                    marker)
+
+        self.assertEqual(
+                len(ci_shards.all_shards(profile)),
+                ci_shards.verify_fallback_markers(
+                        profile, marker_dir, expected_marker))
+        self.assertIn('project kind is not a static library', marker['reasons'][0])
+
+    def test_fallback_marker_disagreement_is_fatal(self):
+        profile = self.reconciliation_profile()
+        report = {
+                'checked_manifest_hash': profile['complete_map_hash'],
+                'drift_hash': '1' * 64,
+                'inventory_hash': '2' * 64,
+                'profile': profile['profile']['id'],
+                'reconciliation_errors': ['first reason']}
+        expected = ci_shards.monolithic_fallback_marker(report)
+        different_report = dict(report)
+        different_report['reconciliation_errors'] = ['different reason']
+        different = ci_shards.monolithic_fallback_marker(different_report)
+        marker_dir = self.source_root / 'markers'
+        marker_dir.mkdir()
+        expected_marker = self.source_root / 'expected-marker.json'
+        ci_shards.write_manifest(expected_marker, expected)
+        ci_shards.write_manifest(
+                marker_dir / 'fallback-marker-core.json', expected)
+        ci_shards.write_manifest(
+                marker_dir / 'fallback-marker-driver-1.json', different)
+
+        with self.assertRaisesRegex(ValueError, 'disagrees with final job'):
+            ci_shards.verify_fallback_markers(
+                    profile, marker_dir, expected_marker)
+
+    def test_malformed_inventory_does_not_select_fallback(self):
+        profile = self.reconciliation_profile()
+        self.write_solution(['app', 'driver', 'known', 'removed'])
+        self.write_project('known', 'libknown.a')
+        self.write_project('removed', 'libremoved.a')
+        self.write_project('driver', 'libdriver.a')
+        self.write_project('app', 'app', archive=False)
+        inventory = ci_shards.generated_project_inventory(
+                self.solution_makefile, profile, self.source_root)
+        inventory['inventory_hash'] = 'invalid'
+
+        with self.assertRaises(ValueError) as raised:
+            ci_shards.reconcile_profile_map(
+                    inventory, profile, self.source_root / 'test-profile.json')
+        self.assertNotIsInstance(
+                raised.exception, ci_shards.MonolithicFallbackRequired)
 
 
 if __name__ == '__main__':
