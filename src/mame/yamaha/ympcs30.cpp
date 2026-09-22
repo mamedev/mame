@@ -214,5 +214,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY   FULLNAME  FLAGS
-SYST( 1984, pcs30,   0,      0,      pcs30,   pcs30,  pcs30_state, empty_init,  "Yamaha", "PCS-30", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT         COMPANY   FULLNAME             FLAGS
+SYST( 1984, pcs30,   0,      0,      pcs30,   pcs30,  pcs30_state, empty_init,  "Yamaha", "PortaSound PCS-30", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -245,8 +245,8 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS
-SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sk5,  0,      0,      sk5,     sk1,   sk1_state, empty_init, "Casio", "SK-5",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sk10, 0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-10",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-SYST( 1988, sk2,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                    FLAGS
+SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1 Sampling Keyboard",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sk5,  0,      0,      sk5,     sk1,   sk1_state, empty_init, "Casio", "SK-5 Sampling Keyboard",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sk10, 0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-10 Sampling Keyboard",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sk2,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-2 Sampling Keyboard",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

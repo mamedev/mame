@@ -138,4 +138,4 @@ void psr400_state::driver_start()
 
 } // anonymous namespace
 
-SYST(1991, psr500, 0, 0, psr500, psr500, psr400_state, empty_init, "Yamaha", "PSR-500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1991, psr500, 0, 0, psr500, psr500, psr400_state, empty_init, "Yamaha", "PortaTone PSR-500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

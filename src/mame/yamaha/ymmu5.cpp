@@ -229,4 +229,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS(1994, mu5, 0, 0, mu5, mu5, mu5_state, empty_init, "Yamaha", "MU-5", MACHINE_NOT_WORKING )
+CONS(1994, mu5, 0, 0, mu5, mu5, mu5_state, empty_init, "Yamaha", "MU5 Tone Generator", MACHINE_NOT_WORKING )
