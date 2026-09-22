@@ -36,6 +36,8 @@ in the comments) means the signal is active-low.
 
 #include "emu.h"
 
+#include "matrixsynth_kbd.h"
+
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
@@ -71,9 +73,12 @@ protected:
 	void machine_reset() override ATTR_COLD;
 
 private:
-	u8 kbd0_r();
-	u8 kbd1_r();
 	int footsw_r() const;
+
+	virtual int dor_r() const;
+	virtual u8 kbd0_r(offs_t offset);
+	virtual u8 kbd1_r(offs_t offset);
+	virtual void kbdclr_w(int state);
 
 	void dac_w(offs_t offset, u8 data);
 	void sound_control_latch_w(offs_t offset, u8 data);
@@ -92,19 +97,27 @@ private:
 	bool m_footsw_en;
 };
 
+
 // Matrix-6
-// The Matrix-6R contains a subset of the Matrix6 hardware, so using the -6R as
-// the base class.
-// TODO: The extra Matrix-6 hardware is not emulated, so matrix6_state is just a
-// "thin" subclass.
+// The Matrix-6R contains a subset of the Matrix-6 hardware, so using the -6R as
+// the base class. The implementations of the two classes are interleaved, to
+// better demonstrate the differences.
 class matrix6_state :  public matrix6r_state
 {
 public:
-	matrix6_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
-		: matrix6r_state(mconfig, type, tag) { }
+	matrix6_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
-	void matrix6(machine_config &config) ATTR_COLD { matrix6r(config); }
+	void matrix6(machine_config &config) ATTR_COLD;
+
+private:
+	int dor_r() const override;
+	u8 kbd0_r(offs_t offset) override;
+	u8 kbd1_r(offs_t offset) override;
+	void kbdclr_w(int state) override;
+
+	required_device<matrix6_kbd_device> m_kbd;
 };
+
 
 matrix6r_state::matrix6r_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
@@ -118,16 +131,10 @@ matrix6r_state::matrix6r_state(const machine_config &mconfig, device_type type, 
 {
 }
 
-u8 matrix6r_state::kbd0_r()
+matrix6_state::matrix6_state(const machine_config &mconfig, device_type type, const char *tag)
+	: matrix6r_state(mconfig, type, tag)
+	, m_kbd(*this, "kbd")
 {
-	// The Matrix-6R doesn't have a keyboard, but the port is sometimes read.
-	return 0xff;
-}
-
-u8 matrix6r_state::kbd1_r()
-{
-	// The Matrix-6R doesn't have a keyboard, but the port is sometimes read.
-	return 0xff;
 }
 
 int matrix6r_state::footsw_r() const
@@ -135,6 +142,51 @@ int matrix6r_state::footsw_r() const
 	const bool footsw_in = m_footsw_en ? BIT(m_pedal2->read(), 0) : false;
 	return footsw_in ? 0 : 1;  // Inverted by Q6 (display board).
 }
+
+
+// Keyboard-related handlers. In contrast to the Matrix-6, the Matrix-6R does
+// not have a keyboard. But at least some firmware revisions seems to support
+// both synths, and will poll or write relevant ports in both.
+
+int matrix6r_state::dor_r() const
+{
+	return 0;
+}
+
+int matrix6_state::dor_r() const
+{
+	return m_kbd->dor_r();
+}
+
+u8 matrix6r_state::kbd0_r(offs_t offset)
+{
+	return 0xff;
+}
+
+u8 matrix6_state::kbd0_r(offs_t offset)
+{
+	return m_kbd->kbd0_r(offset);
+}
+
+u8 matrix6r_state::kbd1_r(offs_t offset)
+{
+	return 0xff;
+}
+
+u8 matrix6_state::kbd1_r(offs_t offset)
+{
+	return m_kbd->kbd1_r(offset);
+}
+
+void matrix6r_state::kbdclr_w(int state)
+{
+}
+
+void matrix6_state::kbdclr_w(int state)
+{
+	m_kbd->kbdclr_w(state);
+}
+
 
 void matrix6r_state::dac_w(offs_t offset, u8 data)
 {
@@ -156,7 +208,7 @@ void matrix6r_state::update_banking()
 	else
 		m_mem2_view.select(mem_protect ? 1 : 0);  // RAM2
 
-	LOGMASKED(LOG_BANKING, "Ram1: %d, Mem2: %d\n", *m_ram1_view.entry(), *m_mem2_view.entry());
+	LOGMASKED(LOG_BANKING, "RAM: %d, MEM2: %d\n", *m_ram1_view.entry(), *m_mem2_view.entry());
 }
 
 void matrix6r_state::machine_start()
@@ -202,8 +254,8 @@ void matrix6r_state::memory_map(address_map &map)
 	map(0x1e00, 0x1e00).mirror(0x00ff).unmaprw();  // U12A-O2 not connected.
 
 	// U12A-O3 -> U12B (74LS139)
-	map(0x1f00, 0x1f00).mirror(0x003f).r(FUNC(matrix6r_state::kbd0_r));  // U12B-O0: KBD0*
-	map(0x1f40, 0x1f40).mirror(0x003f).r(FUNC(matrix6r_state::kbd1_r));  // U12B-O1: KBD1*
+	map(0x1f00, 0x1f01).mirror(0x003e).r(FUNC(matrix6r_state::kbd0_r));  // U12B-O0: KBD0*
+	map(0x1f40, 0x1f41).mirror(0x003e).r(FUNC(matrix6r_state::kbd1_r));  // U12B-O1: KBD1*
 
 	// U12B-O2: SWITCH* -> U1 (74LS138, display board)
 	map(0x1f80, 0x1f80).mirror(0x0038).portr("switch0");  // U1-O0
@@ -231,8 +283,6 @@ void matrix6r_state::memory_map(address_map &map)
 	// for ROM1 (U4) and ROM2 (U5). Based on the schematic, the shipped jumper
 	// configuration leaves these outputs unconnected, and ROM1 (U4) is marked
 	// with an "X". Based on PCB photos, U4 is unpopulated and missing a socket.
-	// While the Matrix-6 includes a ROM0 (U47), the Matrix-6R does not, and it
-	// just has an empty socket (based on PCB photos).
 
 	// ROM2 gets enabled when A15=1 in the shipped jumper configuration.
 	map(0x8000, 0xffff).rom().region("maincpu", 0x2000);
@@ -263,7 +313,7 @@ void matrix6r_state::matrix6r(machine_config &config)
 	MOS6522(config, m_via, 8_MHz_XTAL / 4);  // U9
 
 	// PA, ordered from LSBit to MSBit.
-	// TODO: PA0 - DOR - input.
+	m_via->readpa_handler().append(FUNC(matrix6r_state::dor_r)).mask(1).lshift(0);  // DOR
 	m_via->readpa_handler().append_ioport("memory_protect").mask(1).lshift(1);  // PROTECT
 	m_via->readpa_handler().append(FUNC(matrix6r_state::footsw_r)).mask(1).lshift(2);  // FOOTSW
 	m_via->writepa_handler().append([this] (int state) { update_banking(); }).bit(3);  // BSEL
@@ -272,13 +322,15 @@ void matrix6r_state::matrix6r(machine_config &config)
 	m_via->readpa_handler().append_ioport("pedal1").rshift(1).mask(1).lshift(6);  // RING1
 	m_via->readpa_handler().append_ioport("pedal2").rshift(1).mask(1).lshift(7);  // RING2
 
-	// PB, ordered from LSBit to MSBit. TODO: emulate all these.
-	// PB0 - KBDCLR* - output.
+	// PB, ordered from LSBit to MSBit.
+	m_via->writepb_handler().append(FUNC(matrix6r_state::kbdclr_w)).bit(0);  // KBDCLR*
 	// PB1 - Not connected.
+	// TODO: emulate the rest:
 	// PB2 - FSL - output.
 	// PB3-PB5 - MUX select - output.
 	// PB6 - MUX - input.
 	// PB7 - LSET -> invert -> LSET* - output.
+	// CA2 - FOOTSW - input.
 
 	m_via->cb1_handler().set("vfd", FUNC(roc10937_device::sclk)).invert();  // Inverted by U11. DCLK*
 	m_via->cb2_handler().set("vfd", FUNC(roc10937_device::data));  // DDATA
@@ -307,6 +359,14 @@ void matrix6r_state::matrix6r(machine_config &config)
 	PIT8254(config, "timer2");  // U729
 	PIT8254(config, "timer3");  // U728
 	PIT8254(config, "timer4");  // U727
+}
+
+void matrix6_state::matrix6(machine_config &config)
+{
+	matrix6r(config);
+
+	MATRIX6_KBD(config, m_kbd, 8_MHz_XTAL / 4 / 2);  // 1 MHz
+	m_kbd->dor_cb().set("via", FUNC(via6522_device::write_ca1));
 }
 
 INPUT_PORTS_START(matrix6r)
