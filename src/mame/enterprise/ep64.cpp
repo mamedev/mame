@@ -139,7 +139,6 @@ Notes: (All IC's shown)
 
     TODO:
 
-    - POST RAM errors
     - rewrite DAVE to output to discrete DAC
     - rewrite NICK
     - cassette

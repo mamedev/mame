@@ -110,7 +110,7 @@ private:
 	int get_color_index(int pen_index);
 	void write_pixels2color(uint8_t pen0, uint8_t pen1, uint8_t data_byte);
 	void write_pixels2color_lpixel(uint8_t pen0, uint8_t pen1, uint8_t data_byte);
-	void write_pixels(uint8_t data_byte, uint8_t char_idx);
+	void write_pixels(uint8_t data_byte);
 	void write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx);
 
 	void do_pixel(int clocks_visible);

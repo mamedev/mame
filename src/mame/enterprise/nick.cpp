@@ -452,7 +452,7 @@ void nick_device::write_pixels2color_lpixel(uint8_t pen0, uint8_t pen1, uint8_t 
 }
 
 
-void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
+void nick_device::write_pixels(uint8_t data_byte)
 {
 	/* pen index colour 2-C (0,1), 4-C (0..3) 16-C (0..16) */
 	int pen_idx;
@@ -489,24 +489,6 @@ void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
 
 				data &=~0x01;
 			}
-
-			if (m_LPT.RM & NICK_RM_ALTIND1)
-			{
-				if (char_idx & 0x080)
-				{
-					pen_offs |= 0x02;
-				}
-			}
-
-#if 0
-			if (m_LPT.RM & NICK_RM_ALTIND0)
-			{
-				if (data & 0x040)
-				{
-					pen_offs |= 0x04;
-				}
-			}
-#endif
 
 			write_pixels2color(pen_offs, (pen_offs | 0x01), data);
 		}
@@ -640,23 +622,23 @@ void nick_device::write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx)
 				data &=~0x01;
 			}
 
-			if (m_LPT.RM & NICK_RM_ALTIND1)
+			/* character code attributes, character modes only */
+			switch (NICK_GET_DISPLAY_MODE(m_LPT.MB))
 			{
-				if (char_idx & 0x080)
+			case NICK_CH256_MODE:
+			case NICK_CH128_MODE:
+			case NICK_CH64_MODE:
+				if ((m_LPT.RM & NICK_RM_ALTIND0) && BIT(char_idx, 7))
 				{
 					pen_offs |= 0x02;
 				}
-			}
 
-#if 0
-			if (m_LPT.RM & NICK_RM_ALTIND0)
-			{
-				if (data & 0x040)
+				if ((m_LPT.RM & NICK_RM_ALTIND1) && BIT(char_idx, 6))
 				{
 					pen_offs |= 0x04;
 				}
+				break;
 			}
-#endif
 
 			write_pixels2color_lpixel(pen_offs, (pen_offs | 0x01), data);
 		}
@@ -779,8 +761,8 @@ void nick_device::do_pixel(int clocks_visible)
 		buf2 = space().read_byte(m_LD1);
 		m_LD1++;
 
-		write_pixels(buf1, buf1);
-		write_pixels(buf2, buf1);
+		write_pixels(buf1);
+		write_pixels(buf2);
 	}
 }
 
