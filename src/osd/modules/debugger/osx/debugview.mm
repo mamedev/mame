@@ -328,6 +328,9 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	totalWidth = newSize.x;
 	totalHeight = newSize.y;
 
+	totalWidth = newSize.x;
+	totalHeight = newSize.y;
+
 	// scroll the view if we're being told to
 	debug_view_xy const newOrigin = view->visible_position();
 	if (newOrigin.y != originTop)

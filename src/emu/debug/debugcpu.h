@@ -66,9 +66,9 @@ public:
 	bool suspended() const { return ((m_flags & DEBUG_FLAG_SUSPENDED) != 0); }
 
 	// single stepping
-	void single_step(int numsteps = 1);
-	void single_step_over(int numsteps = 1);
-	void single_step_out();
+	void single_step(int numsteps = 1, bool source_stepping = false);
+	void single_step_over(int numsteps = 1, bool source_stepping = false);
+	void single_step_out(bool source_stepping = false);
 
 	// execution
 	void go(offs_t targetpc = ~0);
@@ -165,11 +165,15 @@ public:
 	// debugger_cpu helpers
 	void compute_debug_flags();
 
+	// source-level debugging
+	void update_symbols_from_srcdbg(const srcdbg_info & srcdbg_info);
+
 private:
 	void halt_on_next_instruction_impl(util::format_argument_pack<char> &&args);
 
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
+	bool is_source_stepping_complete(offs_t pc);
 	void errorlog_write_line(const char *line);
 
 	// breakpoint and watchpoint helpers
@@ -188,13 +192,18 @@ private:
 	device_disasm_interface *  m_disasm;                // disasm interface, if present
 
 	// global state
-	u32                         m_flags;                // debugging flags for this CPU
-	std::unique_ptr<symbol_table> m_symtable;           // symbol table for expression evaluation
+	u32                           m_flags;                   // debugging flags for this CPU
+	std::unique_ptr<symbol_table> m_symtable_device;         // storage for device symbols for expression evaluation
+	std::unique_ptr<symbol_table> m_symtable_srcdbg_globals; // storage for source-debugging globals
+	std::unique_ptr<symbol_table> m_symtable_srcdbg_locals;  // storage for source-debugging locals
+	symbol_table *                m_symtable;                // Root of symbol table chain exposed by this class
 
 	// stepping information
-	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER or DEBUG_FLAG_STEPPING_BRANCH
-	int                     m_stepsleft;                // number of steps left until done
-	int                     m_delay_steps;              // number of steps until target address check
+	offs_t                     m_stepaddr;                   // step target address for DEBUG_FLAG_STEPPING_OVER or DEBUG_FLAG_STEPPING_BRANCH
+	int                        m_stepsleft;                  // number of steps left until done
+	int                        m_delay_steps;                // number of steps until target address check
+	std::unique_ptr<file_line> m_step_source_start;          // When source-level stepping, where did the step start?
+	bool                       m_outs_encountered_return;    // When source-level stepping-out, have we encountered our first return yet?
 
 	// execution information
 	offs_t                  m_stopaddr;                 // stop address for DEBUG_FLAG_STOP_PC
@@ -236,6 +245,8 @@ private:
 		bool logerror() const { return m_logerror; }
 
 	private:
+		void get_srcdbg_line(offs_t pc, std::string & srcdbg_line);
+
 		static const int TRACE_LOOPS = 64;
 
 		device_debug &      m_debug;                    // reference to our owner
@@ -250,6 +261,8 @@ private:
 		offs_t              m_trace_over_target;        // target for tracing over
 														//    (0 = not tracing over,
 														//    ~0 = not currently tracing over)
+		u16					m_opened_srcdbg_file_index; // Index of source file currently opened
+		std::unique_ptr<util::line_indexed_file> m_opened_srcdbg_file; // Source file currently opened
 	};
 	std::unique_ptr<tracer>                m_trace;     // tracer state
 
@@ -338,9 +351,10 @@ private:
 	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH_FALSE = 0x0080000;  // run until false branch
 	static constexpr u32 DEBUG_FLAG_CALL_IN_PROGRESS = 0x01000000;      // CPU is in the middle of a subroutine call
 	static constexpr u32 DEBUG_FLAG_TEST_IN_PROGRESS = 0x02000000;      // CPU is performing a conditional test and branch
+	static constexpr u32 DEBUG_FLAG_SOURCE_STEPPING  = 0x04000000;      // CPU is stepping in/over/out during source debugging (set in conjunction with other DEBUG_FLAG_STEPPING* flags)
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_BRANCH = DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE;
-	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH;
+	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH | DEBUG_FLAG_SOURCE_STEPPING;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |

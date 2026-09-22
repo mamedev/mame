@@ -36,6 +36,7 @@ public:
 	debugger_commands &commands() const { return *m_commands; }
 	debugger_cpu &cpu() const { return *m_cpu; }
 	debugger_console &console() const { return *m_console; }
+	srcdbg_info *get_srcdbg_info() const { return m_debug_info.get(); }     // Note: can be null!
 
 private:
 	running_machine &   m_machine;
@@ -43,6 +44,7 @@ private:
 	std::unique_ptr<debugger_commands> m_commands;
 	std::unique_ptr<debugger_cpu> m_cpu;
 	std::unique_ptr<debugger_console> m_console;
+	std::unique_ptr<srcdbg_info> m_debug_info;								// Note: wrapped ptr can be null!
 };
 
 
