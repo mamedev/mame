@@ -83,6 +83,7 @@ void ballyw_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x17ffff).ram().share("nvram");
+	map(0x800000, 0x8fffff).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
 }
 
 static INPUT_PORTS_START( ballyw )
@@ -97,7 +98,7 @@ void ballyw_state::b2(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery backed
 
-	RTC72421(config, "rtc", XTAL(32'768)); // internal oscillator
+	RTC72421(config, m_rtc, XTAL(32'768)); // internal oscillator
 
 	SPEAKER(config, "mono").front_center();
 }
