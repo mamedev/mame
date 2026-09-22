@@ -143,14 +143,6 @@ To load a floppy:
 ./mame ep64 -exp exdos -flop isdos
 */
 
-/*
-
-    TODO:
-
-    - external joysticks
-
-*/
-
 #include "emu.h"
 
 #include "bus/centronics/ctronics.h"
