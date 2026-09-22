@@ -696,67 +696,76 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 {
 	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
-	if (disp & (1 << layer))
+	if (!(disp & (1 << layer))) return;
+
+	set_brightness(layer);
+
+	const u8 layer2 = layer << 1;
+	const u8 j = mixerflags >> layer2 & 3;
+
+	u32 flags = 0;
+	if (mixerflags & 1 << (layer + 12)) flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+
+	// Category 0 is the tiles with no mix code of their own: they blend with
+	// the layer's internal code (V INMIX where V INMIX ON routes it).
+	// Categories 1-3 are the tiles whose colour bits 5:4 carry a mix code
+	// (the tile callback, K055555 p.62 7.2.6): each is drawn with that code's
+	// K054338 level. Every tile blends with its own code, rather than all of
+	// them with the code of whichever tile the callback saw last.
+	for (u8 cat = 0; cat < 4; cat++)
 	{
-		set_brightness(layer);
-
-		const u8 layer2 = layer << 1;
-		const u8 j = mixerflags >> layer2 & 3;
-
-		// keep internal and external mix codes separated, so the external mix code can be applied to category 1 tiles
-		u8 mix_mode_internal = 0;
-		u8 mix_mode_external = 0;
-
+		int mix;
 		if (j == GXMIX_BLEND_FORCE)
-			mix_mode_internal = mixerflags >> (layer2 + 16) & 3; // hack
+			mix = mixerflags >> (layer2 + 16) & 3;
+		else if (cat == 0)
+			mix = (m_vinmix >> layer2 & 3) & (m_vmixon >> layer2 & 3);
 		else
-		{
-			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 3;
-			const u8 v_inmix_layer = m_vinmix >> layer2 & 3;
-			const u8 tile_mix_code = u32(mixerflags) >> 30;
+			mix = cat;
+		gx_draw_tilemap_category(screen, bitmap, cliprect, layer, cat, flags, m_k054338->set_alpha_level(mix));
+	}
+}
 
-			mix_mode_internal = v_inmix_layer & v_inmix_on_layer;
-			mix_mode_external = tile_mix_code & ~v_inmix_on_layer;
-		}
+// One category of a layer at one K054338 level: set_alpha_level's 10 bits,
+// { MIXPRI, additive, alpha }. MIXPRI is still not implemented.
+void konamigx_state::gx_draw_tilemap_category(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 layer, u8 category, u32 flags, int level)
+{
+	flags |= TILEMAP_DRAW_CATEGORY(category);
+	const u8 alpha = level & 0xff;
 
-		int flags = TILEMAP_DRAW_CATEGORY(0);
-		int flags2 = TILEMAP_DRAW_CATEGORY(1);
-
-		if (mixerflags & 1 << (layer + 12))
-		{
-			flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
-			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
-		}
-
-		// FIXME: implement mixpri and additive
-		// hack: mask out mixpri bit. if additive bit set, mask it out and invert alpha.
-		// this makes additive alpha effects look OK until they are properly handled.
-		int alpha = m_k054338->set_alpha_level(mix_mode_internal) & 0x1ff;
-		if (alpha & 0x100)
-		{
-			alpha &= 0xff;
-			if (alpha) alpha = ~alpha & 0xff;
-		}
-
-		int alpha2 = m_k054338->set_alpha_level(mix_mode_external) & 0x1ff;
-		if (alpha2 & 0x100) alpha2 = ~alpha2 & 0xff;
-
+	if (!(level & 0x100))
+	{
+		if (alpha == 0) return;
 		if (alpha < 255) flags |= TILEMAP_DRAW_ALPHA(alpha);
-
-		if (alpha2 < 255)
-		{
-			// tiles with mix codes are put into category 1.
-			// draw them in a separate pass for per-tile blending if necessary.
-			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
-			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
-		}
-		else
-		{
-			// if no alpha is being applied to category 1 (tile mix code) tiles,
-			// draw all tiles with one tilemap_draw call
-			flags |= TILEMAP_DRAW_ALL_CATEGORIES;
-		}
 		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
+		return;
+	}
+
+	// Additive (mix set bit 5): the layer's colour at this level is added to
+	// what is under it, per channel and clamped, so black adds nothing and
+	// stays transparent. Drawn as an inverted alpha before ("hack: ... if
+	// additive bit set, mask it out and invert alpha"), an additive layer
+	// faded to nothing instead. tilemap.cpp has no additive draw, so the
+	// category goes through an indexed scratch bitmap first.
+	if (!m_gx_tile_scratch || m_gx_tile_scratch->width() < bitmap.width() || m_gx_tile_scratch->height() < bitmap.height())
+		m_gx_tile_scratch = std::make_unique<bitmap_ind16>(bitmap.width(), bitmap.height());
+	m_gx_tile_scratch->fill(0xffff, cliprect);
+	m_k056832->tilemap_draw(screen, *m_gx_tile_scratch, cliprect, layer, flags, 0);
+
+	pen_t const *const pens = m_palette->pens();
+	const u32 mul = u32(alpha) + 1;   // 255 is a full add
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		u16 const *const src = &m_gx_tile_scratch->pix(y);
+		u32 *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			if (src[x] == 0xffff) continue;
+			const u32 s = pens[src[x]];
+			const u32 scaled = ((((s >> 16) & 0xff) * mul >> 8) << 16)
+			                 | ((((s >> 8) & 0xff) * mul >> 8) << 8)
+			                 | ((s & 0xff) * mul >> 8);
+			dst[x] = add_blend_r32(dst[x], scaled);
+		}
 	}
 }
 
@@ -1038,36 +1047,27 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 	int d = code;
 
 	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
+
+	// The tile's own mix code (K055555 p.62 7.2.6): its colour bits 5:4 where
+	// V INMIX ON does not route them to the palette, V INMIX's where it does.
+	// It becomes the tile's category, and gx_draw_basic_tilemaps draws each
+	// category with that code's K054338 level. -1 (V INMIX ON = 3, no bits
+	// from the tile) is category 0, the layer's internal code.
+	const int emx = K055555GX_decode_vmixcolor(layer, color);
+	priority = emx > 0 ? emx : 0;
 }
 
+// The mix code was read from attr bits 5:4 (salmndr2) and 7:6 (alpha) here
+// before: those are colour bits 5:4 after get_tile_info's FBIT normalisation
+// (k056832_shiftmasks for fbits 0 and 1), so both are what the decode reads.
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
-	const u8 mix_code = attr >> 4 & 3;
-	if (mix_code)
-	{
-		priority = 1;
-		m_last_alpha_tile_mix_code = mix_code;
-	}
-
-	int d = code;
-
-	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
+	type2_tile_callback(layer, code, color, flags, priority, attr);
 }
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	const u8 mix_code = attr >> 6 & 3;
-	if (mix_code)
-	{
-		priority = 1;
-		m_last_alpha_tile_mix_code = mix_code;
-	}
-	int d = code;
-
-	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
+	type2_tile_callback(layer, code, color, flags, priority, attr);
 }
 
 /*
@@ -1125,7 +1125,6 @@ void konamigx_state::common_init()
 	save_item(NAME(m_osmixon));
 	save_item(NAME(m_current_brightness));
 	save_item(NAME(m_brightness));
-	save_item(NAME(m_last_alpha_tile_mix_code));
 
 	m_gx_tilemode = 0;
 
@@ -1446,8 +1445,7 @@ u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &
 	}
 	else
 	{
-		int mixerflags = m_last_alpha_tile_mix_code << 30;
-		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, m_gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, m_gx_rushingheroes_hack);
 	}
 
 	// HACK: draw type-1 roz layer here for testing purposes only

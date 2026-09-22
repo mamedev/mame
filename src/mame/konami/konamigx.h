@@ -143,6 +143,7 @@ public:
 
 
 	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer);
+	void gx_draw_tilemap_category(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 layer, u8 category, u32 flags, int level);
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
@@ -258,7 +259,7 @@ protected:
 
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
-	u8 m_last_alpha_tile_mix_code = 0;
+	std::unique_ptr<bitmap_ind16> m_gx_tile_scratch;   // additive tilemap categories, gx_draw_tilemap_category
 
 	// mirrored K054338 settings
 	s32 *m_K054338_shdRGB = nullptr;
