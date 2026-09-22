@@ -87,7 +87,7 @@ public:
 	struct {
 		uint8_t   index;
 		uint8_t   data[32];
-		uint8_t   index_write = 0;
+		uint8_t   index_write;
 	} m_attribute;
 
 	/* Sequencer registers SR00 - SR04
@@ -110,8 +110,9 @@ public:
 	uint8_t   m_vblank;
 	uint8_t   m_display_enable;
 	uint8_t   m_irq;
-	int     m_video_mode;
+	uint8_t   m_video_mode;
 	uint8_t   m_last_pixel_value;
+
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
