@@ -1346,8 +1346,8 @@ static INPUT_PORTS_START( racinfrc )
 	// Old note: needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Calibration skip?")
 	PORT_BIT( 0x03e00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Brake")
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC-WRPORT")
@@ -1359,10 +1359,10 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::do_read))
 
 	PORT_START("AN0")   /* mask default type                     sens delta min max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_CODE_INC(KEYCODE_LCONTROL) PORT_REVERSE
+	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
 
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01000000, 0x01000000, "SW1:1")
@@ -1883,6 +1883,7 @@ void konamigx_state::opengolf(machine_config &config)
 {
 	konamigx(config);
 	K053936(config, m_type1_roz).set_wrap(1);
+	m_screen->screen_vblank().set(FUNC(konamigx_state::type1_vblank_w));
 
 	m_k053252->set_offsets(24 - 8 + 16, 16);
 
@@ -1905,6 +1906,7 @@ void konamigx_state::racinfrc(machine_config &config)
 {
 	konamigx(config);
 	K053936(config, m_type1_roz).set_wrap(1);
+	m_screen->screen_vblank().set(FUNC(konamigx_state::type1_vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_racinfrc);
 

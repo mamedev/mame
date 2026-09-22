@@ -305,6 +305,7 @@ protected:
 	// color/height samples feed the 056540 (PSAC4), not the mixer directly.
 	// The PSAC4 software renderer approximates height projection and coverage;
 	// the DRAM pipeline and per-pixel mixer parameters remain to be emulated.
+	void type1_vblank_w(int state);
 	void type1_draw_terrain(screen_device &screen);
 	void type1_mix_terrain(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 priority);
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;

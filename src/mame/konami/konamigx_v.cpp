@@ -10,8 +10,6 @@
 
 #include "k053250.h"
 
-#include "input.h" // for video debug keys
-
 
 //#define GX_DEBUG
 #define VERBOSE 0
@@ -1365,17 +1363,25 @@ VIDEO_START_MEMBER(konamigx_state, racinfrc)
 	m_screen->priority().allocate(512, 512);
 }
 
+void konamigx_state::type1_vblank_w(int state)
+{
+	if (state)
+	{
+		return;
+	}
+
+	bool const golf = m_gfxdecode->gfx(0)->granularity() == 256;
+	int const phase = golf ? BIT(m_type1_roz->ctrl_r(0x0e), 7) : 0;
+	m_type1_yorigin[phase] = (m_type1_psac4_ctrl[0] >> 8) & 0xffff;
+	m_type1_yorigin_valid |= 1 << phase;
+}
+
 // Approximate PSAC4 height-field renderer. The two games upload matching
 // eight-byte PSAC2 and four-byte PSAC4 records, separated by 14 raster lines.
 // PSAC4 consumes color, ROM height and a tile-wide height byte.
 void konamigx_state::type1_draw_terrain(screen_device &screen)
 {
 	bool const golf = m_gfxdecode->gfx(0)->granularity() == 256;
-	// Open Golf alternates near/far table ranges, with a different vertical
-	// origin for each. Retain both origins while displaying the combined map.
-	int const phase = golf ? BIT(m_type1_roz->ctrl_r(0x0e), 7) : 0;
-	m_type1_yorigin[phase] = (m_type1_psac4_ctrl[0] >> 8) & 0xffff;
-	m_type1_yorigin_valid |= 1 << phase;
 
 	bitmap_ind16 &height = *m_gxtype1_roz_dstbitmap;
 	bitmap_ind16 &color = *m_gxtype1_roz_dstbitmap2;
@@ -1568,38 +1574,6 @@ u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &
 	{
 		int mixerflags = m_last_alpha_tile_mix_code << 30;
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, m_gx_rushingheroes_hack);
-	}
-
-	// Diagnostic 053936 outputs, before the approximate 056540 projection.
-	// W: CROM color (without the PSAC4 palette parameters), E: raw HROM height.
-	// The vertical reflection is only for viewing; it is not the PSAC4 transform.
-	if (m_gx_specialrozenable == 1)
-	{
-		bool const show_height = machine().input().code_pressed(KEYCODE_E);
-		if (show_height || machine().input().code_pressed(KEYCODE_W))
-		{
-			bitmap_ind16 &source = show_height ? *m_gxtype1_roz_dstbitmap : *m_gxtype1_roz_dstbitmap2;
-			tilemap_t *const tilemap = show_height ? m_gx_psac_tilemap : m_gx_psac_tilemap2;
-			source.fill(0);
-			m_type1_roz->zoom_draw(screen, source, m_gxtype1_roz_dstbitmapclip, tilemap, 0, 0, 0);
-
-			pen_t const *const paldata = m_palette->pens();
-			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-			{
-				int const source_y = (272 - y) & 0x1ff;
-				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				{
-					u16 const pen = source.pix(source_y, x & 0x1ff);
-					if (show_height)
-					{
-						u8 const level = (pen & 0x3f) * 255 / 63;
-						bitmap.pix(y, x) = rgb_t(level, level, level);
-					}
-					else
-						bitmap.pix(y, x) = paldata[pen];
-				}
-			}
-		}
 	}
 
 	return 0;
