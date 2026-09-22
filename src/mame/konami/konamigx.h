@@ -42,11 +42,14 @@ public:
 		, m_k054539_2(*this, "k054539_2")
 		, m_k053250_1(*this, "k053250_1")
 		, m_k053250_2(*this, "k053250_2")
+		, m_type1_roz(*this, "type1_roz")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_workram(*this, "workram")
 		, m_psacram(*this, "psacram")
+		, m_type1_psac4_ctrl(*this, "type1_psac4_ctrl")
+		, m_type1_psac4_lram(*this, "type1_psac4_lram")
 		, m_subpaletteram32(*this, "subpaletteram")
 		, m_k053936_0_ctrl(*this, "k053936_0_ctrl")
 		, m_k053936_0_linectrl(*this, "k053936_0_line")
@@ -69,8 +72,11 @@ public:
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 le2_gun_H_r();
 	u32 le2_gun_V_r();
-	u32 type1_roz_r1(offs_t offset);
-	u32 type1_roz_r2(offs_t offset);
+	u8 type1_roz_r1(offs_t offset);
+	u8 type1_roz_r2(offs_t offset);
+	void type1_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 type1_lookup_r(offs_t offset);
+	void type1_lookup_w(offs_t offset, u8 data);
 	u32 type3_sync_r();
 	void type4_prot_w(address_space &space, offs_t offset, u32 data);
 	void type1_cablamps_w(u32 data);
@@ -81,6 +87,8 @@ public:
 	void K053990_martchmp_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void fantjour_dma_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void type3_bank_w(offs_t offset, u8 data);
+	u32 konamigx_palette_r(offs_t offset);
+	void konamigx_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void konamigx_tilebank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -219,12 +227,15 @@ protected:
 	optional_device<k054539_device> m_k054539_2;
 	optional_device<k053250_device> m_k053250_1;
 	optional_device<k053250_device> m_k053250_2;
+	optional_device<k053936_device> m_type1_roz;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<u32> m_workram;
 	optional_shared_ptr<u32> m_psacram;
+	optional_shared_ptr<u32> m_type1_psac4_ctrl;
+	optional_shared_ptr<u32> m_type1_psac4_lram;
 	optional_shared_ptr<u32> m_subpaletteram32;
 	optional_shared_ptr<u32> m_k053936_0_ctrl;
 	optional_shared_ptr<u32> m_k053936_0_linectrl;
@@ -290,24 +301,21 @@ protected:
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
-	/* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
-	the 'voxel' effect to give the pixels height is a post-process operation on the
-	output of the K053936 (this can clearly be seen in videos as large chunks of
-	scenary flicker when in the distance due to single pixels in the K053936 output
-	becoming visible / invisible due to drawing precision.
-
-	-- however, progress on this has stalled as our K053936 doesn't seem to give
-	   the right output for post processing, I suspect the game is using some
-	   unsupported flipping modes (probably due to the way it's hooked up to the
-	   rest of the chips) which is causing entirely the wrong output.
-
-	-- furthermore video\k053936.cpp contains an implementation of
-	   the K053936_zoom_draw named K053936GP_zoom_draw that's only used in konamigx ...
-
-
-	*/
+	// Type-1: the 053936 supplies coordinates to both CROM and HROM. The resulting
+	// color/height samples feed the 056540 (PSAC4), not the mixer directly.
+	// The PSAC4 software renderer approximates height projection and coverage;
+	// the DRAM pipeline and per-pixel mixer parameters remain to be emulated.
+	void type1_draw_terrain(screen_device &screen);
+	void type1_mix_terrain(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 priority);
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
+	std::unique_ptr<bitmap_ind16> m_type1_terrain;
+	std::unique_ptr<bitmap_ind8> m_type1_terrain_priority;
+	std::array<bool, 256> m_type1_priority_used{};
+	u16 m_type1_bank = 0;
+	std::array<u8, 0x800> m_type1_lookup{};
+	u16 m_type1_yorigin[2]{};
+	u8 m_type1_yorigin_valid = 0;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
 	u8 m_type3_psac2_bank = 0;

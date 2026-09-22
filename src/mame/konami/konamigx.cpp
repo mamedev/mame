@@ -774,20 +774,49 @@ u32 konamigx_state::le2_gun_V_r()
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-u32 konamigx_state::type1_roz_r1(offs_t offset)
+u8 konamigx_state::type1_roz_r1(offs_t offset)
 {
-	u32 *ROM = (u32 *)memregion("gfx3")->base();
-
-	return ROM[offset];
+	// HBK0-2 supply ROM address bits 18-20; HBK3-4 select a byte
+	// lane (two height bitplanes). The fourth height ROM is unpopulated.
+	u32 const lane = (m_type1_bank >> 3) & 3;
+	if (lane == 3)
+	{
+		return 0xff;
+	}
+	memory_region &rom = *memregion("gfx4");
+	u32 const address = ((m_type1_bank & 7) * 0x40000 + offset) % (rom.bytes() / 3);
+	return rom.base()[address * 3 + lane];
 }
 
-u32 konamigx_state::type1_roz_r2(offs_t offset)
+u8 konamigx_state::type1_roz_r2(offs_t offset)
 {
-	u32 *ROM = (u32 *)memregion("gfx3")->base();
+	// CBK is the equivalent five-bit bank for the color ROMs. Golf
+	// populates all four lanes; Racin' Force has only three.
+	u32 const bank = (m_type1_bank >> 6) & 0x1f;
+	u32 const lane = bank >> 3;
+	u32 const lanes = m_gfxdecode->gfx(0)->granularity() == 256 ? 4 : 3;
+	if (lane >= lanes)
+	{
+		return 0xff;
+	}
+	memory_region &rom = *memregion("gfx3");
+	u32 const address = ((bank & 7) * 0x40000 + offset) % (rom.bytes() / lanes);
+	return rom.base()[address * lanes + lane];
+}
 
-	ROM += (0x600000/2);
+void konamigx_state::type1_bank_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_type1_bank);
+}
 
-	return ROM[offset];
+u8 konamigx_state::type1_lookup_r(offs_t offset)
+{
+	return m_type1_lookup[((m_type1_bank >> 12) << 7) | offset];
+}
+
+void konamigx_state::type1_lookup_w(offs_t offset, u8 data)
+{
+	m_type1_lookup[((m_type1_bank >> 12) << 7) | offset] = data;
 }
 
 u32 konamigx_state::type3_sync_r()
@@ -1067,19 +1096,19 @@ void konamigx_state::gx_base_memmap(address_map &map)
 void konamigx_state::gx_type1_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd90000, 0xd97fff).ram().rw(FUNC(konamigx_state::konamigx_palette_r), FUNC(konamigx_state::konamigx_palette_w)).share("palette");
 	map(0xdda000, 0xddafff).portw("ADC-WRPORT");
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
 	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
-	map(0xe20000, 0xe2000f).nopw();
-	map(0xe40000, 0xe40003).nopw();
-	map(0xe80000, 0xe81fff).ram().share("k053936_0_line");  // chips 21L+19L / S
+	map(0xe00000, 0xe0001f).rw(m_type1_roz, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
+	map(0xe20000, 0xe2000f).writeonly().share("type1_psac4_ctrl"); // 056540 registers (partially understood)
+	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type1_bank_w)); // ROM and palette lookup banks
+	map(0xe80000, 0xe81fff).rw(m_type1_roz, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // chips 21L+19L / S
 	map(0xec0000, 0xedffff).ram().w(FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
 	map(0xf00000, 0xf3ffff).r(FUNC(konamigx_state::type1_roz_r1));  // ROM readback
 	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
-	map(0xf80000, 0xf80fff).ram(); // chip 21Q / S
-	map(0xfc0000, 0xfc00ff).ram(); // chip 22N / S
+	map(0xf80000, 0xf80fff).ram().share("type1_psac4_lram"); // chip 21Q / S, 056540 line parameters
+	map(0xfc0000, 0xfc00ff).rw(FUNC(konamigx_state::type1_lookup_r), FUNC(konamigx_state::type1_lookup_w)).umask32(0xff00ff00); // chip 22N / S
 }
 
 void konamigx_state::racinfrc_map(address_map &map)
@@ -1093,7 +1122,7 @@ void konamigx_state::gx_type2_map(address_map &map)
 {
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0003).w(FUNC(konamigx_state::esc_w));
-	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd90000, 0xd97fff).ram().rw(FUNC(konamigx_state::konamigx_palette_r), FUNC(konamigx_state::konamigx_palette_w)).share("palette");
 }
 
 void konamigx_state::gx_type3_map(address_map &map)
@@ -1150,7 +1179,7 @@ void konamigx_state::sexyparoebl_map(address_map &map) // TODO: verify everythin
 	map(0xd5c000, 0xd5c003).portr("INPUTS");
 	map(0xd5e000, 0xd5e003).portr("SERVICE");
 	map(0xd80000, 0xd8001f).w(m_k054338, FUNC(k054338_device::word_w));
-	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd90000, 0xd97fff).ram().rw(FUNC(konamigx_state::konamigx_palette_r), FUNC(konamigx_state::konamigx_palette_w)).share("palette");
 	map(0xda0000, 0xda1fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0xda2000, 0xda3fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 }
@@ -1628,43 +1657,16 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
-// for scanrows on tilemap
-#if 0
-static const gfx_layout t1_charlayout6 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	6,
-	{ 20, 16, 12, 8, 4, 0 },
-	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
-	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
-	16*16*6
-};
-
-static const gfx_layout t1_charlayout8 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	8,
-	{ 28, 24, 20, 16, 12, 8, 4, 0 },
-	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
-	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
-	16*16*8
-};
-#endif
-
-// for scancols on tilemap
+// Type-1 VRAM addresses use X[10:4] for columns and Y[10:4] for rows.
+// Each ROM byte supplies two bitplanes for four adjacent horizontal pixels.
 static const gfx_layout t1_charlayout6 =
 {
 	16, 16,
 	RGN_FRAC(1,1),
 	6,
 	{ 16, 20, 8, 12, 0, 4 },
-	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
+	{ STEP16(0, 16*6) },
 	16*16*6
 };
 
@@ -1674,9 +1676,8 @@ static const gfx_layout t1_charlayout8 =
 	RGN_FRAC(1,1),
 	8,
 	{ 24, 28, 16, 20, 8, 12, 0, 4 },
-	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
+	{ STEP16(0, 16*8) },
 	16*16*8
 };
 
@@ -1684,12 +1685,12 @@ static const gfx_layout t1_charlayout8 =
 // TODO: pinpoint color size
 static GFXDECODE_START( gfx_opengolf )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 256 ) // also carries the VRAM height byte
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_racinfrc )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 128 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 256 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
@@ -1881,6 +1882,9 @@ void konamigx_state::salmndr2(machine_config &config)
 void konamigx_state::opengolf(machine_config &config)
 {
 	konamigx(config);
+	K053936(config, m_type1_roz).set_wrap(1);
+
+	m_k053252->set_offsets(24 - 8 + 16, 16);
 
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
@@ -1889,7 +1893,7 @@ void konamigx_state::opengolf(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
 
-	m_k055673->set_config(K055673_LAYOUT_GX6, -53, -23);
+	m_k055673->set_config(K055673_LAYOUT_GX6, -69, -23);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
 
@@ -1900,8 +1904,7 @@ void konamigx_state::opengolf(machine_config &config)
 void konamigx_state::racinfrc(machine_config &config)
 {
 	konamigx(config);
-	//m_screen->set_raw(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
-	//m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
+	K053936(config, m_type1_roz).set_wrap(1);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_racinfrc);
 
@@ -1911,7 +1914,7 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	m_k056832->set_config(K056832_BPP_6, 0, 0);
 
-	m_k055673->set_config(K055673_LAYOUT_GX, -53, -23);
+	m_k055673->set_config(K055673_LAYOUT_GX, -53, -34);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::racinfrc_map);
 
@@ -3974,6 +3977,9 @@ MACHINE_START_MEMBER(konamigx_state,konamigx)
 
 MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 {
+	m_type1_bank = 0;
+	m_type1_yorigin[0] = m_type1_yorigin[1] = 0;
+	m_type1_yorigin_valid = 0;
 	m_gx_wrport1_0 = m_gx_wrport1_1 = 0;
 	m_gx_wrport2 = 0;
 

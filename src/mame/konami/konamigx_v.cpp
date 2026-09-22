@@ -449,7 +449,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	}
 
 	// build object database and create indices
-	std::vector<GX_OBJ> objpool; // max size: 6 layers + 256 sprites + 256 shadows
+	std::vector<GX_OBJ> objpool; // layers (including PSAC4 priorities), sprites and shadows
 
 	for (int i = 5; i >= 0; i--)
 	{
@@ -467,6 +467,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			    -3 : K053936 ROZ+ layer 2
 			    -4 : K053250 LVC layer 1
 			    -5 : K053250 LVC layer 2
+			    -6 : PSAC4 pixels at one priority
 			*/
 			case 4:
 				offs = -128;
@@ -482,6 +483,25 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		if (offs != -128)
 		{
+			if (code == 5 && m_gx_specialrozenable == 1)
+			{
+				// PSAC4 supplies a different priority for each terrain sample.
+				// Insert its used priorities into the same list as objects and
+				// shadows, allowing both to pass behind nearer terrain.
+				u8 const mask = m_k055555->K055555_read_register(21); // S2 INPRI ON
+				for (int p = 0; p < 256; p++)
+				{
+					if (m_type1_priority_used[p])
+					{
+						u8 const pri = (p & ~mask) | (layerpri[i] & mask);
+						// OBJ wins a priority tie against SUB2. Draw this
+						// terrain before all objects at the same priority,
+						// irrespective of their sprite Z code or RAM offset.
+						objpool.emplace_back(GX_OBJ{ (u32(pri) << 24) | 0x00ffffff, -6, p, 0 });
+					}
+				}
+				continue;
+			}
 			const u32 order = layerpri[i] << 24;
 			const int color = 0;
 			objpool.emplace_back(GX_OBJ{ order, offs, code, color });
@@ -675,6 +695,12 @@ void konamigx_state::konamigx_mixer_draw(
 		{
 			switch (offs)
 			{
+				case -6:
+					if (disp & K55_INP_SUB2)
+					{
+						type1_mix_terrain(bitmap, cliprect, code);
+					}
+					continue;
 				case -1:
 					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code);
 					continue;
@@ -986,51 +1012,22 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
  * (c)KONAMI 1993
  *
  */
-/* these tilemaps are weird in both format and content, one of them
-   doesn't really look like it should be displayed? - it's height data */
+// The two VRAM entries select HROM and CROM independently. The second entry
+// supplies both pairs of tile flips and the two extra color bits (PL0/PL1).
+// HROM/CROM have 15 tile address bits; Racin' Force only populates half of each.
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 {
-	int tileno, colour, flipx, flipy;
-	int flip = 0;
-	colour = 0;
-
-	tileno = (m_psacram[tile_index*2] & 0x00003fff) >> 0;
-
-	// scanrows
-	//flipx  = (m_psacram[tile_index*2+1] & 0x00800000) >> 23;
-	//flipy  = (m_psacram[tile_index*2+1] & 0x00400000) >> 22;
-	// scancols
-	flipy  = (m_psacram[tile_index*2+1] & 0x00800000) >> 23;
-	flipx  = (m_psacram[tile_index*2+1] & 0x00400000) >> 22;
-
-	if (flipx) flip |= TILE_FLIPX;
-	if (flipy) flip |= TILE_FLIPY;
-
-	tileinfo.set(1, tileno, colour, flip);
+	u32 const attr = m_psacram[tile_index * 2 + 1];
+	int const flip = (BIT(attr, 23) ? TILE_FLIPX : 0) | (BIT(attr, 22) ? TILE_FLIPY : 0);
+	u32 const height = m_psacram[tile_index * 2];
+	tileinfo.set(1, height & 0x7fff, (height >> 16) & 0xff, flip);
 }
 
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
 {
-	int tileno, colour, flipx,flipy;
-	int flip = 0;
-
-	// FIXME: has at least 32 entries of valid colors
-	// (from z-value as color depth effect?)
-	colour = (m_psacram[tile_index*2 + 1] & 0x000c'0000) >> 18;
-	// TODO: 0x7fff mask for opengolf
-	tileno = (m_psacram[tile_index*2 + 1] & 0x0000'3fff) >> 0;
-
-	// scanrows
-	//flipx  = (m_psacram[tile_index*2 + 1] & 0x0080'0000) >> 23;
-	//flipy  = (m_psacram[tile_index*2 + 1] & 0x0040'0000) >> 22;
-	// scancols
-	flipy  = (m_psacram[tile_index*2 + 1] & 0x0020'0000) >> 21;
-	flipx  = (m_psacram[tile_index*2 + 1] & 0x0010'0000) >> 20;
-
-	if (flipx) flip |= TILE_FLIPX;
-	if (flipy) flip |= TILE_FLIPY;
-
-	tileinfo.set(0, tileno, colour, flip);
+	u32 const attr = m_psacram[tile_index * 2 + 1];
+	int const flip = (BIT(attr, 21) ? TILE_FLIPX : 0) | (BIT(attr, 20) ? TILE_FLIPY : 0);
+	tileinfo.set(0, attr & 0x7fff, (attr >> 18) & 3, flip);
 }
 
 K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
@@ -1302,6 +1299,12 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_sd2)
 
 VIDEO_START_MEMBER(konamigx_state, opengolf)
 {
+	m_type1_terrain = std::make_unique<bitmap_ind16>(512, 512);
+	m_type1_terrain_priority = std::make_unique<bitmap_ind8>(512, 512);
+	save_item(NAME(m_type1_bank));
+	save_item(NAME(m_type1_lookup));
+	save_item(NAME(m_type1_yorigin));
+	save_item(NAME(m_type1_yorigin_valid));
 	common_init();
 
 	m_k056832->set_layer_offs(0, -2+1, 0);
@@ -1309,8 +1312,8 @@ VIDEO_START_MEMBER(konamigx_state, opengolf)
 	m_k056832->set_layer_offs(2,  2+1, 0);
 	m_k056832->set_layer_offs(3,  3+1, 0);
 
-	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1a_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
-	m_gx_psac_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1b_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1a_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	m_gx_psac_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1b_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//m_gx_psac_tilemap->set_transparent_pen(0);
@@ -1324,17 +1327,18 @@ VIDEO_START_MEMBER(konamigx_state, opengolf)
 
 	m_gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
 
-	K053936_wraparound_enable(0, 1);
-	K053936GP_set_offset(0, 0, 0);
-
-	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
-	// until there is a better solution, or priority bitmap can be specified manually.
-	m_screen->priority().allocate(2048, 2048);
-
+	// draw_roz uses the screen priority bitmap even for these off-screen views.
+	m_screen->priority().allocate(512, 512);
 }
 
 VIDEO_START_MEMBER(konamigx_state, racinfrc)
 {
+	m_type1_terrain = std::make_unique<bitmap_ind16>(512, 512);
+	m_type1_terrain_priority = std::make_unique<bitmap_ind8>(512, 512);
+	save_item(NAME(m_type1_bank));
+	save_item(NAME(m_type1_lookup));
+	save_item(NAME(m_type1_yorigin));
+	save_item(NAME(m_type1_yorigin_valid));
 	common_init();
 
 	m_k056832->set_layer_offs(0, -2+1, -16);
@@ -1342,8 +1346,8 @@ VIDEO_START_MEMBER(konamigx_state, racinfrc)
 	m_k056832->set_layer_offs(2,  2+1, -16);
 	m_k056832->set_layer_offs(3,  3+1, -16);
 
-	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1a_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
-	m_gx_psac_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1b_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 128, 128);
+	m_gx_psac_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1a_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	m_gx_psac_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(konamigx_state::get_gx_psac1b_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 
 	// transparency will be handled manually in post-processing
 	//m_gx_psac_tilemap->set_transparent_pen(0);
@@ -1357,14 +1361,132 @@ VIDEO_START_MEMBER(konamigx_state, racinfrc)
 
 	m_gxtype1_roz_dstbitmapclip.set(0, 512-1, 0, 512-1);
 
-	K053936_wraparound_enable(0, 1);
-	K053936GP_set_offset(0, 0, 0);
+	// draw_roz uses the screen priority bitmap even for these off-screen views.
+	m_screen->priority().allocate(512, 512);
+}
 
-	// urgh.. the priority bitmap is global, and because our temp bitmaps are bigger than the screen, this causes issues.. so just allocate something huge
-	// until there is a better solution, or priority bitmap can be specified manually.
-	m_screen->priority().allocate(2048, 2048);
+// Approximate PSAC4 height-field renderer. The two games upload matching
+// eight-byte PSAC2 and four-byte PSAC4 records, separated by 14 raster lines.
+// PSAC4 consumes color, ROM height and a tile-wide height byte.
+void konamigx_state::type1_draw_terrain(screen_device &screen)
+{
+	bool const golf = m_gfxdecode->gfx(0)->granularity() == 256;
+	// Open Golf alternates near/far table ranges, with a different vertical
+	// origin for each. Retain both origins while displaying the combined map.
+	int const phase = golf ? BIT(m_type1_roz->ctrl_r(0x0e), 7) : 0;
+	m_type1_yorigin[phase] = (m_type1_psac4_ctrl[0] >> 8) & 0xffff;
+	m_type1_yorigin_valid |= 1 << phase;
 
+	bitmap_ind16 &height = *m_gxtype1_roz_dstbitmap;
+	bitmap_ind16 &color = *m_gxtype1_roz_dstbitmap2;
+	height.fill(0);
+	color.fill(0);
+	m_type1_terrain->fill(0xffff);
+	m_type1_priority_used.fill(false);
+	if (!(m_type1_roz->ctrl_r(7) & 0x20))
+		return;
 
+	m_type1_roz->zoom_draw(screen, height, m_gxtype1_roz_dstbitmapclip, m_gx_psac_tilemap, 0, 0, 0);
+	m_type1_roz->zoom_draw(screen, color, m_gxtype1_roz_dstbitmapclip, m_gx_psac_tilemap2, 0, 0, 0);
+
+	// Traverse near to far and fill newly exposed portions of each column.
+	// This approximates the vertical faces and occlusion without drawing behind
+	// nearer terrain. A transparent sample must not hide more distant scenery.
+	std::array<int, 512> limit;
+	limit.fill(screen.visible_area().max_y + 1);
+	for (int line = 1; line <= (golf ? 480 : 255); line++)
+	{
+		u32 const entry = m_type1_psac4_lram[line];
+		u8 const parameter = entry >> 8;
+		if (parameter == 0xff)
+		{
+			continue;
+		}
+
+		int const bank = golf && line > 224;
+		if (!BIT(m_type1_yorigin_valid, bank))
+			continue;
+		int const origin = 256 + m_type1_yorigin[bank];
+		// The displacement wraps past 0x7f during elevated camera views.
+		int const ground = origin - line - s8(entry);
+		int const scale = entry >> 16;
+		// SRAM 22N maps PR to COL8-10 and MIX. PR0 selects a nibble,
+		// PR1-7 address the byte, and BRK0-3 select one of sixteen banks.
+		u8 const lookup = type1_lookup_r(parameter >> 1) >> (BIT(parameter, 0) ? 0 : 4);
+		for (int x = 0; x < 512; x++)
+		{
+			u16 const c = color.pix(line + 14, x);
+			// Transparency comes from CROM. A combined height of 0xff is
+			// valid, including on the flat Racin' Force Konami logo.
+			if (!(c & (golf ? 0xff : 0x3f)))
+				continue;
+			u16 const h = height.pix(line + 14, x);
+			int const level = ((h & 0x3f) + (h >> 6)) & 0xff;
+
+			// Racin' Force's LRAM projection uses 6 fractional bits: the
+			// terrain height must use the same units as the camera height.
+			int const top = std::max(ground - level * scale / (golf ? 256 : 64), 0);
+			u16 const pen = (c & 0xff) | ((lookup & 0xf) << 8);
+			if (!scale)
+			{
+				// Flat ROZ artwork (e.g. the Racin' Force title) has no height
+				// extrusion; transparency must remain intact between its rows.
+				if (ground >= 0 && ground <= screen.visible_area().max_y)
+				{
+					m_type1_terrain->pix(ground, x) = pen;
+					m_type1_terrain_priority->pix(ground, x) = parameter;
+					m_type1_priority_used[parameter] = true;
+				}
+				continue;
+			}
+			for (int y = top; y < limit[x]; y++)
+			{
+				m_type1_terrain->pix(y, x) = pen;
+				m_type1_terrain_priority->pix(y, x) = parameter;
+				m_type1_priority_used[parameter] = true;
+			}
+			limit[x] = std::min(limit[x], top);
+		}
+	}
+}
+
+void konamigx_state::type1_mix_terrain(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 priority)
+{
+	// The Type-1 board provides one external mix bit and no brightness bits.
+	u8 const bri_mask = m_k055555->K055555_read_register(K55_OSBRI_ON) >> 4 & 3;
+	u8 const bri_mode = (m_k055555->K055555_read_register(K55_OSBRI) >> 4) & bri_mask;
+	u8 const brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
+	if (m_current_brightness != brightness)
+	{
+		m_current_brightness = brightness;
+		for (int p = 0; p < m_palette->entries(); p++)
+			m_palette->set_pen_contrast(p, brightness / 255.0);
+	}
+
+	u8 const mix_mask = m_osmixon >> 4 & 3;
+	u8 const mix_internal = (m_osinmix >> 4) & mix_mask;
+	int alpha[2];
+	for (int m = 0; m < 2; m++)
+	{
+		// Match the GX mixer's existing approximation for additive modes.
+		int const level = m_k054338->set_alpha_level((m & ~mix_mask) | mix_internal);
+		alpha[m] = (level & 0x100) ? (~level & 0xff) : (level & 0xff);
+	}
+	pen_t const *const paldata = m_palette->pens();
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			u16 const pen = m_type1_terrain->pix(y, x);
+			if (pen != 0xffff && m_type1_terrain_priority->pix(y, x) == priority)
+			{
+				int const a = alpha[BIT(pen, 11)];
+				u32 const rgb = paldata[pen & 0x7ff];
+				if (a == 255)
+					bitmap.pix(y, x) = rgb;
+				else if (a)
+					bitmap.pix(y, x) = alpha_blend_r32(bitmap.pix(y, x), rgb, a);
+			}
+		}
 }
 
 u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1419,14 +1541,12 @@ u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &
 
 	if (dirty) m_k056832->mark_all_tilemaps_dirty();
 
-	// Type-1
 	if (m_gx_specialrozenable == 1)
 	{
-		//K053936_0_zoom_draw(screen, *m_gxtype1_roz_dstbitmap, m_gxtype1_roz_dstbitmapclip,m_gx_psac_tilemap, 0, 0, 0); // height data
-		K053936_0_zoom_draw(screen, *m_gxtype1_roz_dstbitmap2,m_gxtype1_roz_dstbitmapclip,m_gx_psac_tilemap2, 0, 0, 0); // colour data (+ some voxel height data?)
+		type1_draw_terrain(screen);
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, m_type1_terrain.get(), m_gx_rushingheroes_hack);
 	}
-
-	if (m_gx_specialrozenable == 3)
+	else if (m_gx_specialrozenable == 3)
 	{
 		konamigx_mixer(screen, bitmap, cliprect, m_gx_psac_tilemap, GXSUB_8BPP,nullptr,0,  0, nullptr, m_gx_rushingheroes_hack);
 	}
@@ -1450,37 +1570,36 @@ u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, m_gx_rushingheroes_hack);
 	}
 
-	// HACK: draw type-1 roz layer here for testing purposes only
+	// Diagnostic 053936 outputs, before the approximate 056540 projection.
+	// W: CROM color (without the PSAC4 palette parameters), E: raw HROM height.
+	// The vertical reflection is only for viewing; it is not the PSAC4 transform.
 	if (m_gx_specialrozenable == 1)
 	{
-		pen_t const *const paldata = m_palette->pens();
-
-		// draw the roz tilemap if W is held
-		if ( machine().input().code_pressed(KEYCODE_W) )
+		bool const show_height = machine().input().code_pressed(KEYCODE_E);
+		if (show_height || machine().input().code_pressed(KEYCODE_W))
 		{
-			// make it flicker, to compare positioning
-			//if (screen.frame_number() & 1)
+			bitmap_ind16 &source = show_height ? *m_gxtype1_roz_dstbitmap : *m_gxtype1_roz_dstbitmap2;
+			tilemap_t *const tilemap = show_height ? m_gx_psac_tilemap : m_gx_psac_tilemap2;
+			source.fill(0);
+			m_type1_roz->zoom_draw(screen, source, m_gxtype1_roz_dstbitmapclip, tilemap, 0, 0, 0);
+
+			pen_t const *const paldata = m_palette->pens();
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+				int const source_y = (272 - y) & 0x1ff;
+				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				{
-					//u32 *const dst = &bitmap.pix(y);
-					// ths K053936 rendering should probably just be flipped
-					// this is just kludged to align the racing force 2d logo
-					u16 const *const src = &m_gxtype1_roz_dstbitmap2->pix(y);
-					//u16 const *const src = &m_gxtype1_roz_dstbitmap->pix(y);
-
-					u32 *const dst = &bitmap.pix((256 + 16) - y);
-
-					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+					u16 const pen = source.pix(source_y, x & 0x1ff);
+					if (show_height)
 					{
-						u16 const dat = src[x];
-						dst[x] = paldata[dat];
+						u8 const level = (pen & 0x3f) * 255 / 63;
+						bitmap.pix(y, x) = rgb_t(level, level, level);
 					}
+					else
+						bitmap.pix(y, x) = paldata[pen];
 				}
 			}
-
 		}
-
 	}
 
 	return 0;
@@ -1570,6 +1689,19 @@ u32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitmap_r
 static inline void set_color_555(palette_device &palette, pen_t color, int rshift, int gshift, int bshift, u16 data)
 {
 	palette.set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+}
+
+// The CLTC RAM stores only RGB. Its dummy byte ignores writes and always
+// reads zero (GX manual, section 8.4.1). Racin' Force relies on this when
+// reusing a register from palette fading to calculate the sky's Y scroll.
+u32 konamigx_state::konamigx_palette_r(offs_t offset)
+{
+	return m_palette->read32(offset) & 0x00ffffff;
+}
+
+void konamigx_state::konamigx_palette_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_palette->write32(offset, data, mem_mask & 0x00ffffff);
 }
 
 // main monitor for type 3
