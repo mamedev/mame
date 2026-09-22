@@ -171,7 +171,6 @@ private:
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM
-	uint8_t m_first_partition[4];     // first display partition latched at vertical sync
 	int m_ra_addr;                    // parameter RAM address
 
 	uint8_t m_sr;                     // status register

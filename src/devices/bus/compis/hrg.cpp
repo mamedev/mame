@@ -35,20 +35,13 @@ DEFINE_DEVICE_TYPE(COMPIS_UHRG, compis_uhrg_device, "compis_uhrg", "Compis UHRG"
 void compis_hrg_device::hrg_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x00000, 0x3fff).ram().w(FUNC(compis_hrg_device::vram_w)).share("video_ram");
+	map(0x00000, 0x3fff).ram().share("video_ram");
 }
 
 void compis_uhrg_device::uhrg_map(address_map &map)
 {
 	map.global_mask(0xffff);
-	map(0x00000, 0xffff).ram().w(FUNC(compis_uhrg_device::vram_w)).share("video_ram");
-}
-
-void compis_hrg_device::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// Scrolling reuses memory that may already have been scanned out this frame.
-	m_crtc->screen().update_partial(m_crtc->screen().vpos());
-	COMBINE_DATA(&m_video_ram[offset]);
+	map(0x00000, 0xffff).ram().share("video_ram");
 }
 
 

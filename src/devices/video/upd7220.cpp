@@ -606,11 +606,10 @@ inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 
 inline void upd7220_device::get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd)
 {
-	const uint8_t *const ra = index ? &m_ra[index * 4] : m_first_partition;
-	*sad = ((ra[1] & 0x1f) << 8) | ra[0];
-	*len = ((ra[3] & 0x3f) << 4) | (ra[2] >> 4);
-	*im = BIT(ra[3], 6);
-	*wd = BIT(ra[3], 7);
+	*sad = ((m_ra[(index * 4) + 1] & 0x1f) << 8) | m_ra[(index * 4) + 0];
+	*len = ((m_ra[(index * 4) + 3] & 0x3f) << 4) | (m_ra[(index * 4) + 2] >> 4);
+	*im = BIT(m_ra[(index * 4) + 3], 6);
+	*wd = BIT(m_ra[(index * 4) + 3], 7);
 }
 
 
@@ -620,11 +619,10 @@ inline void upd7220_device::get_text_partition(int index, uint32_t *sad, uint16_
 
 inline void upd7220_device::get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd)
 {
-	const uint8_t *const ra = index ? &m_ra[index * 4] : m_first_partition;
-	*sad = ((ra[2] & 0x03) << 16) | (ra[1] << 8) | ra[0];
-	*len = ((ra[3] & 0x3f) << 4) | (ra[2] >> 4);
-	*im = BIT(ra[3], 6);
-	*wd = BIT(ra[3], 7);
+	*sad = ((m_ra[(index * 4) + 2] & 0x03) << 16) | (m_ra[(index * 4) + 1] << 8) | m_ra[(index * 4) + 0];
+	*len = ((m_ra[(index * 4) + 3] & 0x3f) << 4) | (m_ra[(index * 4) + 2] >> 4);
+	*im = BIT(m_ra[(index * 4) + 3], 6);
+	*wd = BIT(m_ra[(index * 4) + 3], 7);
 }
 
 /*
@@ -706,7 +704,6 @@ upd7220_device::upd7220_device(const machine_config &mconfig, device_type type, 
 	{
 		elem = 0;
 	}
-	std::fill(std::begin(m_first_partition), std::end(m_first_partition), 0);
 
 	memset(&m_figs, 0x00, sizeof(m_figs));
 }
@@ -739,7 +736,6 @@ void upd7220_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_ra));
-	save_item(NAME(m_first_partition));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_de));
@@ -824,7 +820,6 @@ TIMER_CALLBACK_MEMBER(upd7220_device::vsync_update)
 	else
 	{
 		m_sr &= ~UPD7220_SR_VSYNC_ACTIVE;
-		std::copy_n(m_ra, std::size(m_first_partition), m_first_partition);
 	}
 
 	m_write_vsync(param);
@@ -1771,7 +1766,6 @@ void upd7220_device::ext_sync_w(int state)
 	else
 	{
 		m_sr &= ~UPD7220_SR_VSYNC_ACTIVE;
-		std::copy_n(m_ra, std::size(m_first_partition), m_first_partition);
 	}
 }
 
