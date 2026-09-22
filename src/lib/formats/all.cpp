@@ -262,6 +262,10 @@
 #include "ep64_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_EP64_TAP
+#include "ep64_tap.h"
+#endif
+
 #ifdef HAS_FORMATS_DMV_DSK
 #include "dmv_dsk.h"
 #endif
@@ -1105,6 +1109,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Enterprise");
 #ifdef HAS_FORMATS_EP64_DSK
 	en.add(FLOPPY_EP64_FORMAT); // ep64_dsk.h
+#endif
+#ifdef HAS_FORMATS_EP64_TAP
+	en.add(ep64_cassette_formats); // ep64_tap.h
 #endif
 
 	en.category("Ensoniq");

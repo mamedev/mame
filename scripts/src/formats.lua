@@ -891,6 +891,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/ep64_tap.h,FORMATS["EP64_TAP"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "EP64_TAP") then
+	files {
+		MAME_DIR.. "src/lib/formats/ep64_tap.cpp",
+		MAME_DIR.. "src/lib/formats/ep64_tap.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/dmv_dsk.h,FORMATS["DMV_DSK"] = true
 --------------------------------------------------
 
