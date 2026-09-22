@@ -753,19 +753,6 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(    0x00, "Diagnostic Mode" )
 
 	PORT_START("SW")
-	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
-	PORT_DIPSETTING(    0x0b, "Internal MD, External CGA80" )
-	PORT_DIPSETTING(    0x0a, "Internal MD, External CGA40" )
-	PORT_DIPSETTING(    0x09, "Internal ECD350, External MDA/HERC" )
-	PORT_DIPSETTING(    0x08, "Internal ECD200, External MDA/HERC" )
-	PORT_DIPSETTING(    0x07, "Internal CD80, External MDA/HERC" )
-	PORT_DIPSETTING(    0x06, "Internal CD40, External MDA/HERC" )
-	PORT_DIPSETTING(    0x05, "External CGA80, Internal MD" )
-	PORT_DIPSETTING(    0x04, "External CGA40, Internal MD" )
-	PORT_DIPSETTING(    0x03, "External MDA/HERC, Internal ECD350" )
-	PORT_DIPSETTING(    0x02, "External MDA/HERC, Internal ECD200" )
-	PORT_DIPSETTING(    0x01, "External MDA/HERC, Internal CD80" )
-	PORT_DIPSETTING(    0x00, "External MDA/HERC, Internal CD40" )
 	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
 	PORT_DIPSETTING(    0x10, "EGA" )
 	PORT_DIPSETTING(    0x00, "CGA/MDA/HERC" )
@@ -1331,7 +1318,7 @@ void pc1512_state::pc1512hd(machine_config &config)
 {
 	pc1512(config);
 
-	subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa3")->set_default_option("wdxt_gen");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
 }
@@ -1478,8 +1465,8 @@ void pc1640_state::pc1640dd(machine_config &config)
 void pc1640_state::pc1640hd(machine_config &config)
 {
 	pc1640(config);
-	
-	subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+
+	subdevice<isa8_slot_device>("isa4")->set_default_option("wdxt_gen");
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
 }
@@ -1551,7 +1538,7 @@ COMP( 1986, pc1512,     0,      0,      pc1512,   pc1512, pc1512_state, empty_in
 COMP( 1986, pc1512dd,   pc1512, 0,      pc1512dd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 DD",   MACHINE_SUPPORTS_SAVE )
 COMP( 1986, pc1512hd10, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD10", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, pc1512hd20, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD20", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,      0,      pc1640,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,      0,      pc1640,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_SUPPORTS_SAVE )

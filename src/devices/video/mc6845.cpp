@@ -380,7 +380,8 @@ void mc6845_device::recompute_parameters(bool postload)
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if (!m_reconfigure_cb.isnull())
-				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
+				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh,
+						hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos);
 
 			m_has_valid_parameters = true;
 		}
