@@ -3397,7 +3397,7 @@ CONS( 2008, ddr33v,     0,        0, spg2xx,     ddr33v,     spg2xx_game_ddr33v_
 // アンパンマン かいてあそんでトレーニング おえかき育脳教室
 // Board markings: TOHO V1.0 20100819
 // ROM header: chksum:2FCD5D12 ver:"u'nSP IDEVer 1.6.2" user:"sunplus" body:"SPG243"
-CONS( 2010, anpannou,   0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "Toho", "Anpanman Kaite Asonde Toreiningu Oekaki Iku Nou Kyoushitsu (Japan)", MACHINE_NOT_WORKING )
+CONS( 2010, anpannou,   0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "JoyPalette / Toho", "Anpanman Kaite Asonde Training Oekaki Iku Nou Kyoushitsu (Japan)", MACHINE_NOT_WORKING )
 
 // PCB has 'Anpanman TV 2006 Ver 1.4' printed on it, ROM has SPG260 header.  Uses custom built-in keyboard, no display built into the unit.
 CONS( 2006, anpantv,    0,        0, spg2xx,     spg2xx,     spg2xx_game_state,               empty_init,    "Bandai", "Anpanman TV (Japan)", MACHINE_NOT_WORKING )
