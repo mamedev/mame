@@ -1237,7 +1237,6 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 	m_gx_rushingheroes_hack = 1;
 	m_konamigx_has_dual_screen = 1;
 	m_konamigx_palformat = 0;
-
 }
 
 VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
@@ -1367,6 +1366,7 @@ void konamigx_state::type1_vblank_w(int state)
 {
 	if (state)
 	{
+		// VIDEO_UPDATE_AFTER_VBLANK
 		return;
 	}
 
@@ -1567,7 +1567,6 @@ u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &
 		if (m_type3_psac2_bank == 1) K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap_alt, 0, 0, 0); // soccerss playfield
 		else K053936_0_zoom_draw(screen, *m_type3_roz_temp_bitmap, temprect,m_gx_psac_tilemap, 0, 0, 0); // soccerss playfield
 
-
 		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, m_type3_roz_temp_bitmap.get(), m_gx_rushingheroes_hack);
 	}
 	else
@@ -1586,7 +1585,7 @@ u32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap_rg
 
 	if (m_konamigx_current_frame == 1)
 	{
-		int offset=0;
+		int offset = 0;
 
 		if (m_konamigx_palformat == 1)
 		{
@@ -1629,7 +1628,7 @@ u32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitmap_r
 	}
 	else
 	{
-		int offset=0;
+		int offset = 0;
 
 		if (m_konamigx_palformat == 1)
 		{
