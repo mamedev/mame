@@ -40171,6 +40171,9 @@ qvt190
 @source:qume/qvt201.cpp
 qvt201
 
+@source:radiobulletin/cosmicos.cpp
+cosmicos
+
 @source:ramtek/hitme.cpp
 barricad
 brickyrd
@@ -43836,9 +43839,6 @@ cidx628
 @source:skeleton/cortex.cpp
 cortex
 
-@source:skeleton/cosmicos.cpp
-cosmicos
-
 @source:skeleton/cp1.cpp
 cp1
 
@@ -44645,9 +44645,6 @@ xbase09
 
 @source:skeleton/xinyun.cpp
 hongmxy
-
-@source:skeleton/xor100.cpp
-xor100
 
 @source:skeleton/yeno_ks56c1660.cpp
 ckidpers
@@ -49870,6 +49867,9 @@ x820ii
 x820iilp
 x820ii5
 x820iis
+
+@source:xor/xor100.cpp
+xor100
 
 @source:yachiyo/atamanot.cpp
 atamanot
