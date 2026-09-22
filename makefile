@@ -1067,6 +1067,36 @@ regenie:
 FORCE:
 
 #-------------------------------------------------
+# JSON compilation database (without compiling)
+#-------------------------------------------------
+
+JCDB_GCC := $(TARGETOS)
+ifeq ($(TARGETOS),linux)
+JCDB_GCC := linux-gcc
+else ifeq ($(TARGETOS),macosx)
+JCDB_GCC := osx
+else ifeq ($(TARGETOS),windows)
+JCDB_GCC := mingw$(if $(filter _x64%,$(ARCHITECTURE)),64,32)-gcc
+endif
+
+JCDB_VERSION := $(GCC_VERSION)
+ifneq ($(CLANG_VERSION),)
+JCDB_VERSION := $(CLANG_VERSION)
+ifneq ($(filter linux windows,$(TARGETOS)),)
+JCDB_GCC := $(if $(filter windows,$(TARGETOS)),mingw,linux)-clang
+else ifneq ($(TARGETOS),asmjs)
+JCDB_GCC := $(JCDB_GCC)-clang
+endif
+endif
+
+JCDB_CONFIG := $(CONFIG)$(if $(filter _x64% _arm64%,$(ARCHITECTURE)),64,$(if $(filter _x86%,$(ARCHITECTURE)),32))
+
+.PHONY: jcdb
+jcdb: $(GENIE)
+	-$(call MKDIR,$(GENDIR)/$(TARGET))
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=$(JCDB_GCC) --gcc_version=$(JCDB_VERSION) --jcdb-config=$(JCDB_CONFIG) jcdb
+
+#-------------------------------------------------
 # gmake-mingw64-gcc
 #-------------------------------------------------
 
