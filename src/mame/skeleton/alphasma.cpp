@@ -76,6 +76,18 @@ protected:
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
 
+enum class as2k_pc_key : uint8_t
+{
+	none,
+	space, tab, enter, backspace, caps_lock,
+	left_shift, right_shift, left_ctrl, right_ctrl, left_alt, right_alt,
+	a, b, c, d, e, f, g, h, i, j, k, l, m,
+	n, o, p, q, r, s, t, u, v, w, x, y, z,
+	num_0, num_1, num_2, num_3, num_4, num_5, num_6, num_7, num_8, num_9,
+	grave, minus, equals, lbrace, rbrace, backslash, semicolon, quote, comma, period, slash,
+	kp_0, kp_1, kp_2, kp_3, kp_4, kp_5, kp_6, kp_7, kp_8, kp_9
+};
+
 class asma2k_state : public alphasmart_state
 {
 public:
@@ -88,6 +100,7 @@ public:
 	}
 
 	void asma2k(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(pc_connected_changed);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -95,10 +108,14 @@ protected:
 private:
 	void lcd_ctrl_w(uint8_t data);
 	uint8_t asma2k_port_a_r();
+	void asma2k_port_d_w(uint8_t data);
 	virtual void port_a_w(uint8_t data) override;
-	void send_pc_w(uint16_t pc);
+	void pc_clock_rising(bool data);
+	void pc_set2_byte(uint8_t data);
+	void pc_key_event(as2k_pc_key key, bool pressed);
+	void pc_keyboard_reset();
 	void send_sink_begin();
-	void send_sink_byte(uint8_t data);
+	void send_sink_codepoint(char32_t codepoint);
 	void send_sink_end();
 
 	void asma2k_mem(address_map &map) ATTR_COLD;
@@ -108,9 +125,24 @@ private:
 	required_ioport m_pc_connected;
 
 	uint8_t m_lcd_ctrl;
+	uint16_t m_pc_frame = 0;
+	uint8_t m_pc_frame_bits = 0;
+	bool m_pc_set2_break = false;
+	bool m_pc_set2_extended = false;
+	uint8_t m_pc_set2_e1_remaining = 0;
+	bool m_pc_lshift = false;
+	bool m_pc_rshift = false;
+	bool m_pc_lctrl = false;
+	bool m_pc_rctrl = false;
+	bool m_pc_lalt = false;
+	bool m_pc_ralt = false;
+	bool m_pc_caps_lock = false;
+	// A host-side Windows ANSI keyboard profile; firmware only emits Set-2.
+	// Numeric composition is tracked across make/break events, not ROM PCs.
+	bool m_pc_alt_numeric_valid = false;
+	uint8_t m_pc_alt_numeric_count = 0;
+	char m_pc_alt_numeric_digits[4]{};
 	bool m_send_sink_active = false;
-	bool m_send_sink_break = false;
-	bool m_send_sink_shift = false;
 	std::unique_ptr<emu_file> m_send_sink;
 };
 
@@ -218,6 +250,190 @@ uint8_t asma2k_state::asma2k_port_a_r()
 	return data;
 }
 
+struct as2k_set2_key_map
+{
+	uint8_t code;
+	bool extended;
+	as2k_pc_key key;
+};
+
+static constexpr as2k_set2_key_map s_set2_keys[] =
+{
+	{ 0x0d, false, as2k_pc_key::tab },        { 0x0e, false, as2k_pc_key::grave },
+	{ 0x11, false, as2k_pc_key::left_alt },   { 0x11, true,  as2k_pc_key::right_alt },
+	{ 0x12, false, as2k_pc_key::left_shift }, { 0x14, false, as2k_pc_key::left_ctrl },
+	{ 0x14, true,  as2k_pc_key::right_ctrl }, { 0x15, false, as2k_pc_key::q },
+	{ 0x16, false, as2k_pc_key::num_1 },      { 0x1a, false, as2k_pc_key::z },
+	{ 0x1b, false, as2k_pc_key::s },          { 0x1c, false, as2k_pc_key::a },
+	{ 0x1d, false, as2k_pc_key::w },          { 0x1e, false, as2k_pc_key::num_2 },
+	{ 0x21, false, as2k_pc_key::c },          { 0x22, false, as2k_pc_key::x },
+	{ 0x23, false, as2k_pc_key::d },          { 0x24, false, as2k_pc_key::e },
+	{ 0x25, false, as2k_pc_key::num_4 },      { 0x26, false, as2k_pc_key::num_3 },
+	{ 0x29, false, as2k_pc_key::space },      { 0x2a, false, as2k_pc_key::v },
+	{ 0x2b, false, as2k_pc_key::f },          { 0x2c, false, as2k_pc_key::t },
+	{ 0x2d, false, as2k_pc_key::r },          { 0x2e, false, as2k_pc_key::num_5 },
+	{ 0x31, false, as2k_pc_key::n },          { 0x32, false, as2k_pc_key::b },
+	{ 0x33, false, as2k_pc_key::h },          { 0x34, false, as2k_pc_key::g },
+	{ 0x35, false, as2k_pc_key::y },          { 0x36, false, as2k_pc_key::num_6 },
+	{ 0x3a, false, as2k_pc_key::m },          { 0x3b, false, as2k_pc_key::j },
+	{ 0x3c, false, as2k_pc_key::u },          { 0x3d, false, as2k_pc_key::num_7 },
+	{ 0x3e, false, as2k_pc_key::num_8 },      { 0x41, false, as2k_pc_key::comma },
+	{ 0x42, false, as2k_pc_key::k },          { 0x43, false, as2k_pc_key::i },
+	{ 0x44, false, as2k_pc_key::o },          { 0x45, false, as2k_pc_key::num_0 },
+	{ 0x46, false, as2k_pc_key::num_9 },      { 0x49, false, as2k_pc_key::period },
+	{ 0x4a, false, as2k_pc_key::slash },      { 0x4b, false, as2k_pc_key::l },
+	{ 0x4c, false, as2k_pc_key::semicolon },  { 0x4d, false, as2k_pc_key::p },
+	{ 0x4e, false, as2k_pc_key::minus },      { 0x52, false, as2k_pc_key::quote },
+	{ 0x54, false, as2k_pc_key::lbrace },     { 0x55, false, as2k_pc_key::equals },
+	{ 0x58, false, as2k_pc_key::caps_lock },  { 0x59, false, as2k_pc_key::right_shift },
+	{ 0x5a, false, as2k_pc_key::enter },      { 0x5b, false, as2k_pc_key::rbrace },
+	{ 0x5d, false, as2k_pc_key::backslash },  { 0x66, false, as2k_pc_key::backspace },
+	{ 0x69, false, as2k_pc_key::kp_1 },       { 0x6b, false, as2k_pc_key::kp_4 },
+	{ 0x6c, false, as2k_pc_key::kp_7 },       { 0x70, false, as2k_pc_key::kp_0 },
+	{ 0x72, false, as2k_pc_key::kp_2 },       { 0x73, false, as2k_pc_key::kp_5 },
+	{ 0x74, false, as2k_pc_key::kp_6 },       { 0x75, false, as2k_pc_key::kp_8 },
+	{ 0x7a, false, as2k_pc_key::kp_3 },       { 0x7d, false, as2k_pc_key::kp_9 }
+};
+
+// The host text layout is indexed by consecutive as2k_pc_key values from
+// a through slash.  Each row is [unshifted, shifted]; Caps Lock applies
+// only to the contiguous a..z range, not to punctuation or number keys.
+// Alt-numeric composition is handled separately from this ordinary layout.
+static constexpr char32_t s_pc_us_text[][2] =
+{
+	{ U'a', U'A' }, // a
+	{ U'b', U'B' }, // b
+	{ U'c', U'C' }, // c
+	{ U'd', U'D' }, // d
+	{ U'e', U'E' }, // e
+	{ U'f', U'F' }, // f
+	{ U'g', U'G' }, // g
+	{ U'h', U'H' }, // h
+	{ U'i', U'I' }, // i
+	{ U'j', U'J' }, // j
+	{ U'k', U'K' }, // k
+	{ U'l', U'L' }, // l
+	{ U'm', U'M' }, // m
+	{ U'n', U'N' }, // n
+	{ U'o', U'O' }, // o
+	{ U'p', U'P' }, // p
+	{ U'q', U'Q' }, // q
+	{ U'r', U'R' }, // r
+	{ U's', U'S' }, // s
+	{ U't', U'T' }, // t
+	{ U'u', U'U' }, // u
+	{ U'v', U'V' }, // v
+	{ U'w', U'W' }, // w
+	{ U'x', U'X' }, // x
+	{ U'y', U'Y' }, // y
+	{ U'z', U'Z' }, // z
+	{ U'0', U')' }, // num_0
+	{ U'1', U'!' }, // num_1
+	{ U'2', U'@' }, // num_2
+	{ U'3', U'#' }, // num_3
+	{ U'4', U'$' }, // num_4
+	{ U'5', U'%' }, // num_5
+	{ U'6', U'^' }, // num_6
+	{ U'7', U'&' }, // num_7
+	{ U'8', U'*' }, // num_8
+	{ U'9', U'(' }, // num_9
+	{ U'`', U'~' }, // grave
+	{ U'-', U'_' }, // minus
+	{ U'=', U'+' }, // equals
+	{ U'[', U'{' }, // lbrace
+	{ U']', U'}' }, // rbrace
+	{ U'\\', U'|' }, // backslash
+	{ U';', U':' }, // semicolon
+	{ U'\'', U'"' }, // quote
+	{ U',', U'<' }, // comma
+	{ U'.', U'>' }, // period
+	{ U'/', U'?' }, // slash
+};
+
+static_assert(std::size(s_pc_us_text) == unsigned(as2k_pc_key::slash) - unsigned(as2k_pc_key::a) + 1);
+
+INPUT_CHANGED_MEMBER(asma2k_state::pc_connected_changed)
+{
+	// PC Connected defines the host session.  Send is intentionally not part
+	// of the sink contract: a real PC only sees keyboard traffic on the wire.
+	m_pc_frame = 0;
+	m_pc_frame_bits = 0;
+	pc_keyboard_reset();
+	send_sink_end();
+}
+
+void asma2k_state::pc_keyboard_reset()
+{
+	m_pc_set2_break = false;
+	m_pc_set2_extended = false;
+	m_pc_set2_e1_remaining = 0;
+	m_pc_lshift = false;
+	m_pc_rshift = false;
+	m_pc_lctrl = false;
+	m_pc_rctrl = false;
+	m_pc_lalt = false;
+	m_pc_ralt = false;
+	m_pc_caps_lock = false;
+	m_pc_alt_numeric_valid = false;
+	m_pc_alt_numeric_count = 0;
+}
+
+void asma2k_state::pc_clock_rising(bool data)
+{
+	if (!m_pc_frame_bits)
+	{
+		if (data)
+			return;
+		m_pc_frame = 0;
+	}
+
+	if (data)
+		m_pc_frame |= uint16_t(1) << m_pc_frame_bits;
+	++m_pc_frame_bits;
+
+	if (m_pc_frame_bits != 11)
+		return;
+
+	uint8_t const value = (m_pc_frame >> 1) & 0xff;
+	bool odd_parity = BIT(m_pc_frame, 9);
+	for (unsigned bit = 0; bit < 8; ++bit)
+		odd_parity ^= BIT(value, bit);
+
+	bool const valid = !BIT(m_pc_frame, 0) && BIT(m_pc_frame, 10) && odd_parity;
+	bool const resync_start = !BIT(m_pc_frame, 10);
+	m_pc_frame = 0;
+	m_pc_frame_bits = 0;
+
+	if (valid)
+	{
+		if (!m_send_sink_active)
+		{
+			if (!BIT(m_pc_connected->read(), 0))
+				return;
+			send_sink_begin();
+			if (!m_send_sink_active)
+				return;
+		}
+
+		pc_set2_byte(value);
+	}
+	else
+	{
+		logerror("AS2K_PC_FRAME_ERROR value=%02X\n", value);
+		if (resync_start)
+			m_pc_frame_bits = 1;
+	}
+}
+
+void asma2k_state::asma2k_port_d_w(uint8_t data)
+{
+	// The wired PC keyboard interface uses PD0 as clock and inverted PD1 as data.
+	if (BIT(m_pc_connected->read(), 0) && !BIT(m_port_d, 0) && BIT(data, 0))
+		pc_clock_rising(!BIT(data, 1));
+
+	alphasmart_state::port_d_w(data);
+}
+
 void asma2k_state::send_sink_begin()
 {
 	if (m_send_sink)
@@ -256,96 +472,245 @@ void asma2k_state::send_sink_begin()
 		m_send_sink_active = true;
 	}
 
-	m_send_sink_break = false;
-	m_send_sink_shift = false;
 }
 
-void asma2k_state::send_sink_byte(uint8_t data)
+void asma2k_state::pc_set2_byte(uint8_t data)
+{
+	if (m_pc_set2_e1_remaining)
+	{
+		--m_pc_set2_e1_remaining;
+		return;
+	}
+
+	if (data == 0xe1)
+	{
+		// Pause/Break is the canonical eight-byte E1 sequence in Set 2.  It
+		// carries no text, so consume the sequence without fabricating a key.
+		m_pc_set2_e1_remaining = 7;
+		m_pc_set2_break = false;
+		m_pc_set2_extended = false;
+		return;
+	}
+
+	if (data == 0xe0)
+	{
+		m_pc_set2_extended = true;
+		return;
+	}
+
+	if (data == 0xf0)
+	{
+		m_pc_set2_break = true;
+		return;
+	}
+
+	as2k_pc_key key = as2k_pc_key::none;
+	for (auto const &entry : s_set2_keys)
+	{
+		if ((entry.code == data) && (entry.extended == m_pc_set2_extended))
+		{
+			key = entry.key;
+			break;
+		}
+	}
+
+	if (key != as2k_pc_key::none)
+		pc_key_event(key, !m_pc_set2_break);
+	else
+		logerror("AS2K_PC_UNKNOWN_SET2 extended=%u break=%u code=%02X\n",
+			m_pc_set2_extended ? 1U : 0U, m_pc_set2_break ? 1U : 0U, data);
+
+	m_pc_set2_break = false;
+	m_pc_set2_extended = false;
+}
+
+// Windows ANSI Alt+0xxx numeric codes use Windows-1252 for the
+// 0x80-0x9f range. Undefined CP1252 byte positions have value zero.
+// This is a selected host profile, NOT a claim about all receiving PCs.
+static constexpr char32_t s_pc_windows_1252_extended[32] =
+{
+	U'€', 0, U'‚', U'ƒ', U'„', U'…', U'†', U'‡',
+	U'ˆ', U'‰', U'Š', U'‹', U'Œ', 0, U'Ž', 0,
+	0, U'‘', U'’', U'“', U'”', U'•', U'–', U'—',
+	U'˜', U'™', U'š', U'›', U'œ', 0, U'ž', U'Ÿ'
+};
+
+void asma2k_state::pc_key_event(as2k_pc_key key, bool pressed)
+{
+	bool const was_alt = m_pc_lalt || m_pc_ralt;
+	if (key == as2k_pc_key::left_alt || key == as2k_pc_key::right_alt)
+	{
+		if (key == as2k_pc_key::left_alt)
+			m_pc_lalt = pressed;
+		else
+			m_pc_ralt = pressed;
+
+		bool const now_alt = m_pc_lalt || m_pc_ralt;
+		if (!was_alt && now_alt)
+		{
+			m_pc_alt_numeric_count = 0;
+			m_pc_alt_numeric_valid = !(m_pc_lctrl || m_pc_rctrl || m_pc_lshift || m_pc_rshift);
+		}
+		else if (was_alt && !now_alt)
+		{
+			// Host Windows ANSI profile: Alt+0ddd is one composition.
+			// Releasing Alt commits a complete, bounded keypad sequence only.
+			if (m_pc_alt_numeric_valid && m_pc_alt_numeric_count == 4 && m_pc_alt_numeric_digits[0] == '0')
+			{
+				unsigned code = 0;
+				for (char digit : m_pc_alt_numeric_digits)
+					code = code * 10 + unsigned(digit - '0');
+
+				char32_t character = 0;
+				if (code >= 0x20 && code < 0x7f)
+					character = char32_t(code);
+				else if (code >= 0x80 && code < 0xa0)
+					character = s_pc_windows_1252_extended[code - 0x80];
+				else if (code >= 0xa0 && code <= 0xff)
+					character = char32_t(code);
+
+				if (character)
+					send_sink_codepoint(character);
+				else
+					logerror("AS2K_PC_ALT_NUMERIC_UNMAPPED code=%u\n", code);
+			}
+			else if (m_pc_alt_numeric_count)
+				logerror("AS2K_PC_ALT_NUMERIC_CANCEL count=%u\n", m_pc_alt_numeric_count);
+
+			m_pc_alt_numeric_count = 0;
+			m_pc_alt_numeric_valid = false;
+		}
+		return;
+	}
+
+	switch (key)
+	{
+	case as2k_pc_key::left_shift:  m_pc_lshift = pressed; break;
+	case as2k_pc_key::right_shift: m_pc_rshift = pressed; break;
+	case as2k_pc_key::left_ctrl:   m_pc_lctrl = pressed; break;
+	case as2k_pc_key::right_ctrl:  m_pc_rctrl = pressed; break;
+	case as2k_pc_key::caps_lock:
+		if (pressed)
+			m_pc_caps_lock = !m_pc_caps_lock;
+		break;
+	default:
+		break;
+	}
+
+	// Any non-keypad press during Alt cancels the numeric transaction,
+	// even if the pressed key is not normally a text key.
+	if (pressed && was_alt)
+	{
+		char digit = 0;
+		switch (key)
+		{
+		case as2k_pc_key::kp_0: digit = '0'; break;
+		case as2k_pc_key::kp_1: digit = '1'; break;
+		case as2k_pc_key::kp_2: digit = '2'; break;
+		case as2k_pc_key::kp_3: digit = '3'; break;
+		case as2k_pc_key::kp_4: digit = '4'; break;
+		case as2k_pc_key::kp_5: digit = '5'; break;
+		case as2k_pc_key::kp_6: digit = '6'; break;
+		case as2k_pc_key::kp_7: digit = '7'; break;
+		case as2k_pc_key::kp_8: digit = '8'; break;
+		case as2k_pc_key::kp_9: digit = '9'; break;
+		default: break;
+		}
+		if (digit && m_pc_alt_numeric_valid && m_pc_alt_numeric_count < 4)
+			m_pc_alt_numeric_digits[m_pc_alt_numeric_count++] = digit;
+		else
+			m_pc_alt_numeric_valid = false;
+		return;
+	}
+
+	if (!pressed)
+		return;
+
+	// Unrecognized combinations must not leak an ordinary printable key.
+	if (m_pc_lctrl || m_pc_rctrl || was_alt)
+	{
+		logerror("AS2K_PC_COMPOSE_PENDING key=%u ctrl=%u alt=%u\n",
+			unsigned(key), (m_pc_lctrl || m_pc_rctrl) ? 1U : 0U, was_alt ? 1U : 0U);
+		return;
+	}
+
+	if (key == as2k_pc_key::left_shift || key == as2k_pc_key::right_shift ||
+		key == as2k_pc_key::left_ctrl || key == as2k_pc_key::right_ctrl ||
+		key == as2k_pc_key::caps_lock)
+		return;
+
+	if (key == as2k_pc_key::space)
+	{
+		send_sink_codepoint(U' ');
+		return;
+	}
+	if (key == as2k_pc_key::tab)
+	{
+		send_sink_codepoint(U'\t');
+		return;
+	}
+	if (key == as2k_pc_key::enter)
+	{
+		send_sink_codepoint(U'\n');
+		return;
+	}
+	if (key == as2k_pc_key::backspace)
+	{
+		logerror("AS2K_PC_NON_TEXT backspace\n");
+		return;
+	}
+
+	if (key >= as2k_pc_key::a && key <= as2k_pc_key::slash)
+	{
+		bool const shifted = m_pc_lshift || m_pc_rshift;
+		bool const letter = key <= as2k_pc_key::z;
+		bool const use_shifted = letter ? (shifted != m_pc_caps_lock) : shifted;
+		send_sink_codepoint(s_pc_us_text[unsigned(key) - unsigned(as2k_pc_key::a)][use_shifted ? 1 : 0]);
+		return;
+	}
+
+	logerror("AS2K_PC_NON_TEXT key=%u\n", unsigned(key));
+}
+
+void asma2k_state::send_sink_codepoint(char32_t codepoint)
 {
 	if (!m_send_sink_active)
 		return;
 
-	if (data == 0xf0)
+	char utf8[4];
+	size_t length = 0;
+	if (codepoint <= 0x7f)
 	{
-		m_send_sink_break = true;
-		return;
+		utf8[0] = char(codepoint);
+		length = 1;
+	}
+	else if (codepoint <= 0x7ff)
+	{
+		utf8[0] = char(0xc0 | (codepoint >> 6));
+		utf8[1] = char(0x80 | (codepoint & 0x3f));
+		length = 2;
+	}
+	else if (codepoint <= 0xffff)
+	{
+		utf8[0] = char(0xe0 | (codepoint >> 12));
+		utf8[1] = char(0x80 | ((codepoint >> 6) & 0x3f));
+		utf8[2] = char(0x80 | (codepoint & 0x3f));
+		length = 3;
+	}
+	else if (codepoint <= 0x10ffff)
+	{
+		utf8[0] = char(0xf0 | (codepoint >> 18));
+		utf8[1] = char(0x80 | ((codepoint >> 12) & 0x3f));
+		utf8[2] = char(0x80 | ((codepoint >> 6) & 0x3f));
+		utf8[3] = char(0x80 | (codepoint & 0x3f));
+		length = 4;
 	}
 
-	if (m_send_sink_break)
+	if (length)
 	{
-		if (data == 0x12)
-			m_send_sink_shift = false;
-		m_send_sink_break = false;
-		return;
+		m_send_sink->write(utf8, length);
+		m_send_sink->flush();
 	}
-
-	if (data == 0x12)
-	{
-		m_send_sink_shift = true;
-		return;
-	}
-
-	char out = 0;
-	switch (data)
-	{
-	case 0x1c: out = m_send_sink_shift ? 'A' : 'a'; break;
-	case 0x32: out = m_send_sink_shift ? 'B' : 'b'; break;
-	case 0x21: out = m_send_sink_shift ? 'C' : 'c'; break;
-	case 0x23: out = m_send_sink_shift ? 'D' : 'd'; break;
-	case 0x24: out = m_send_sink_shift ? 'E' : 'e'; break;
-	case 0x2b: out = m_send_sink_shift ? 'F' : 'f'; break;
-	case 0x34: out = m_send_sink_shift ? 'G' : 'g'; break;
-	case 0x33: out = m_send_sink_shift ? 'H' : 'h'; break;
-	case 0x43: out = m_send_sink_shift ? 'I' : 'i'; break;
-	case 0x3b: out = m_send_sink_shift ? 'J' : 'j'; break;
-	case 0x42: out = m_send_sink_shift ? 'K' : 'k'; break;
-	case 0x4b: out = m_send_sink_shift ? 'L' : 'l'; break;
-	case 0x3a: out = m_send_sink_shift ? 'M' : 'm'; break;
-	case 0x31: out = m_send_sink_shift ? 'N' : 'n'; break;
-	case 0x44: out = m_send_sink_shift ? 'O' : 'o'; break;
-	case 0x4d: out = m_send_sink_shift ? 'P' : 'p'; break;
-	case 0x15: out = m_send_sink_shift ? 'Q' : 'q'; break;
-	case 0x2d: out = m_send_sink_shift ? 'R' : 'r'; break;
-	case 0x1b: out = m_send_sink_shift ? 'S' : 's'; break;
-	case 0x2c: out = m_send_sink_shift ? 'T' : 't'; break;
-	case 0x3c: out = m_send_sink_shift ? 'U' : 'u'; break;
-	case 0x2a: out = m_send_sink_shift ? 'V' : 'v'; break;
-	case 0x1d: out = m_send_sink_shift ? 'W' : 'w'; break;
-	case 0x22: out = m_send_sink_shift ? 'X' : 'x'; break;
-	case 0x35: out = m_send_sink_shift ? 'Y' : 'y'; break;
-	case 0x1a: out = m_send_sink_shift ? 'Z' : 'z'; break;
-
-	case 0x16: out = m_send_sink_shift ? '!' : '1'; break;
-	case 0x1e: out = m_send_sink_shift ? '@' : '2'; break;
-	case 0x26: out = m_send_sink_shift ? '#' : '3'; break;
-	case 0x25: out = m_send_sink_shift ? '$' : '4'; break;
-	case 0x2e: out = m_send_sink_shift ? '%' : '5'; break;
-	case 0x36: out = m_send_sink_shift ? '^' : '6'; break;
-	case 0x3d: out = m_send_sink_shift ? '&' : '7'; break;
-	case 0x3e: out = m_send_sink_shift ? '*' : '8'; break;
-	case 0x46: out = m_send_sink_shift ? '(' : '9'; break;
-	case 0x45: out = m_send_sink_shift ? ')' : '0'; break;
-
-	case 0x54: out = m_send_sink_shift ? '{' : '['; break;
-	case 0x5b: out = m_send_sink_shift ? '}' : ']'; break;
-	case 0x4c: out = m_send_sink_shift ? ':' : ';'; break;
-	case 0x52: out = m_send_sink_shift ? '"' : '\''; break;
-	case 0x41: out = m_send_sink_shift ? '<' : ','; break;
-	case 0x49: out = m_send_sink_shift ? '>' : '.'; break;
-	case 0x4a: out = m_send_sink_shift ? '?' : '/'; break;
-	case 0x4e: out = m_send_sink_shift ? '_' : '-'; break;
-	case 0x55: out = m_send_sink_shift ? '+' : '='; break;
-	case 0x5d: out = m_send_sink_shift ? '|' : '\\'; break;
-	case 0x0e: out = m_send_sink_shift ? '~' : '`'; break;
-
-	case 0x29: out = ' '; break;
-	case 0x5a: out = '\n'; break;
-	case 0x0d: out = '\t'; break;
-	default: break;
-	}
-
-	if (out)
-		m_send_sink->write(&out, 1);
 }
 
 void asma2k_state::send_sink_end()
@@ -357,19 +722,6 @@ void asma2k_state::send_sink_end()
 		m_send_sink.reset();
 	}
 	m_send_sink_active = false;
-	m_send_sink_break = false;
-	m_send_sink_shift = false;
-}
-
-void asma2k_state::send_pc_w(uint16_t pc)
-{
-	switch (pc)
-	{
-	case 0x8606: send_sink_begin(); break;
-	case 0xaa54: send_sink_byte(m_maincpu->space(AS_PROGRAM).read_byte(0x0046)); break;
-	case 0x80f5: send_sink_end(); break;
-	default: break;
-	}
 }
 
 void asma2k_state::port_a_w(uint8_t data)
@@ -696,7 +1048,7 @@ static INPUT_PORTS_START( asma2k )
 	// Emulator-only host attachment control.  Pause/Break is not part of the
 	// AlphaSmart 2000 keyboard matrix, so it cannot be mistaken for an AS2K key.
 	PORT_START("PC_CONNECTED")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PC Connected (Pause/Break)") PORT_CODE(KEYCODE_PAUSE) PORT_TOGGLE
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PC Connected (Pause/Break)") PORT_CODE(KEYCODE_PAUSE) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(asma2k_state::pc_connected_changed), 0)
 
 	PORT_START("BATTERY")
 	PORT_CONFNAME(0x01, 0x01, "Battery status")
@@ -777,8 +1129,8 @@ void asma2k_state::asma2k(machine_config &config)
 {
 	alphasmart(config);
 	m_maincpu->in_pa_callback().set(FUNC(asma2k_state::asma2k_port_a_r));
+	m_maincpu->out_pd_callback().set(FUNC(asma2k_state::asma2k_port_d_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &asma2k_state::asma2k_mem);
-	m_maincpu->instruction_callback().set(FUNC(asma2k_state::send_pc_w));
 }
 
 // MCU: MC68HC11D0P

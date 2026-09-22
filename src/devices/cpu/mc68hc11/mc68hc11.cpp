@@ -70,7 +70,6 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, device_t
 	, m_analog_cb(*this, 0)
 	, m_spi2_data_input_cb(*this, 0xff)
 	, m_spi2_data_output_cb(*this)
-	, m_instruction_cb(*this)
 	, m_ram_view(*this, "ram")
 	, m_reg_view(*this, "regs")
 	, m_eeprom_view(*this, "eeprom")
@@ -1240,7 +1239,6 @@ void mc68hc11_cpu_device::execute_run()
 		else
 		{
 			m_ppc = m_pc;
-			m_instruction_cb(m_pc);
 			debugger_instruction_hook(m_pc);
 
 			op = FETCH();
