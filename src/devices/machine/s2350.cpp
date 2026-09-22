@@ -167,7 +167,9 @@ void s2350_device::device_start()
 	save_item(NAME(m_receiver_sync_reg));
 	save_item(NAME(m_receiver_shift_reg));
 	save_item(NAME(m_serial_rx_state));
+	save_item(NAME(m_serial_rx_line));
 
+	save_item(NAME(m_sync_search_active));
 	save_item(NAME(m_in_sync));
 }
 
@@ -193,6 +195,7 @@ void s2350_device::device_reset()
 	m_in_sync = false;
 
 	m_serial_rx_state = 0;
+	m_serial_rx_line = 0;
 
 	// receiver registers
 	m_receiver_output_reg = 0x00;
@@ -226,6 +229,9 @@ u8 s2350_device::receiver_sync_search()
 {
 	set_sync_character_received(false);
 	m_sync_search_active = true;
+	m_in_sync = false;
+	m_serial_rx_state = 0;
+	m_receiver_shift_reg = 0;
 
 	LOGREG("%s: 0x%02x\n", FUNCNAME, m_receiver_sync_reg);
 
@@ -280,8 +286,10 @@ void s2350_device::receiver_restart()
 	set_receiver_parity_error(false);
 
 	m_sync_search_active = true;
+	m_in_sync = false;
 	m_serial_rx_state = 0;
 	m_serial_tx_state = 0;
+	m_receiver_shift_reg = 0;
 }
 
 void s2350_device::receive_byte(u8 data)
@@ -351,7 +359,7 @@ void s2350_device::set_sync_character_received(bool val)
 
 void s2350_device::update_receiver_shift()
 {
-	m_receiver_sync_reg >>= 1;
+	m_receiver_shift_reg >>= 1;
 
 	m_receiver_shift_reg |= m_serial_rx_line ? 0x80 : 0x00;
 }
@@ -387,6 +395,7 @@ void s2350_device::rcp_w()
 
 			m_serial_rx_line = 0;
 			m_in_sync = true;
+			set_sync_character_received(true);
 		}
 	}
 	else
@@ -406,7 +415,7 @@ void s2350_device::tcp_w()
 		}
 		else
 		{
-			set_transmit_buffer_empty(false);
+			set_transmit_buffer_empty(true);
 			set_fill_char_transmitted(false);
 			m_transmitter_shift_reg = m_transmitter_holding_reg;
 		}
