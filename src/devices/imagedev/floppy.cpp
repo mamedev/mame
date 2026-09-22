@@ -421,10 +421,10 @@ void floppy_image_device::add_variant(uint32_t variant)
 	} else if (m_sectoring_type == floppy_image::H16) {
 		switch (variant) {
 		case floppy_image::SSSD:
-			actual_variant = floppy_image::SSDD16;
+			actual_variant = floppy_image::SSSD16;
 			break;
 		case floppy_image::SSDD:
-			actual_variant = floppy_image::SSSD16;
+			actual_variant = floppy_image::SSDD16;
 			break;
 		case floppy_image::SSQD:
 			actual_variant = floppy_image::SSQD16;
@@ -952,6 +952,7 @@ bool floppy_image_device::twosid_r()
 	case floppy_image::SSDD16:
 	case floppy_image::SSDD32:
 	case floppy_image::SSQD:
+	case floppy_image::SSQD10:
 	case floppy_image::SSQD16:
 		return true;
 	case 0:
