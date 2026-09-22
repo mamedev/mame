@@ -72,8 +72,8 @@ public:
 
 	/* Video memory and related variables */
 	std::unique_ptr<uint8_t[]> m_vram;
-	uint8_t   *m_plane[4] = { };
-	uint8_t   m_read_latch[4] = { };
+	uint8_t   *m_plane[4];
+	uint8_t   m_read_latch[4];
 	uint8_t   *m_videoram;
 	uint8_t   *m_charA;
 	uint8_t   *m_charB;
@@ -85,23 +85,23 @@ public:
 	/* Attribute registers AR00 - AR14
 	*/
 	struct {
-		uint8_t   index = 0;
-		uint8_t   data[32] = { };
+		uint8_t   index;
+		uint8_t   data[32];
 		uint8_t   index_write = 0;
 	} m_attribute;
 
 	/* Sequencer registers SR00 - SR04
 	*/
 	struct {
-		uint8_t   index = 0;
-		uint8_t   data[8] = { };
+		uint8_t   index;
+		uint8_t   data[8];
 	} m_sequencer;
 
 	/* Graphics controller registers GR00 - GR08
 	*/
 	struct {
-		uint8_t   index = 0;
-		uint8_t   data[16] = { };
+		uint8_t   index;
+		uint8_t   data[16];
 	} m_graphics_controller;
 
 	uint8_t   m_frame_cnt;
