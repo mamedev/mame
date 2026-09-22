@@ -84,6 +84,10 @@ void ballyw_state::mem_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x17ffff).ram().share("nvram");
 	map(0x800000, 0x8fffff).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
+	map(0x900000, 0x9000ff).noprw();
+	map(0x900100, 0x9001ff).noprw();
+	map(0x900200, 0x9002ff).noprw();
+	map(0x900300, 0x9003ff).noprw();
 }
 
 static INPUT_PORTS_START( ballyw )
