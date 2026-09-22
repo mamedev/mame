@@ -1256,6 +1256,20 @@ void midzeus_renderer::zeus_draw_solid_quad(const rectangle& rect, const vertex_
  *
  *************************************/
 
+// Key on the nearest of the four filter taps, and let keyed neighbours take its texel so the
+// transparent color cannot bleed into the edge.  Ties round down.
+static bool zeus_apply_color_key(uint8_t (&texels)[4], int32_t curu, int32_t curv, uint16_t transcolor)
+{
+	bool const ur = (curu & 0xff) > 0x80, vr = (curv & 0xff) > 0x80;
+	uint8_t const nearest = texels[(vr ? 2 : 0) + (ur ? 1 : 0)];
+	if (nearest == transcolor)
+		return false;
+	for (auto &texel : texels)
+		if (texel == transcolor)
+			texel = nearest;
+	return true;
+}
+
 void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid)
 {
 	int32_t curz = extent.param[0].start;
@@ -1314,7 +1328,7 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 				texels[2] = object.get_texel(texbase, v1, u0, texwidth);
 				texels[3] = object.get_texel(texbase, v1, u1, texwidth);
 
-				if (texels[0] != transcolor)
+				if (zeus_apply_color_key(texels, curu, curv, transcolor))
 				{
 					rgb_t color[4] = {0, 0, 0, 0};
 
