@@ -147,10 +147,7 @@ To load a floppy:
 
     TODO:
 
-    - rewrite NICK
     - external joysticks
-
-    http://ep.homeserver.hu/Dokumentacio/Konyvek/
 
 */
 
@@ -601,10 +598,9 @@ void ep64_state::ep64(machine_config &config)
 
 	// video hardware
 	screen_device& screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT);
-	screen.set_visarea(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1);
+	screen.set_raw(XTAL(8'000'000)*2,
+		ENTERPRISE_SCREEN_WIDTH, (ENTERPRISE_SCREEN_WIDTH - ENTERPRISE_VISIBLE_WIDTH) / 2, (ENTERPRISE_SCREEN_WIDTH + ENTERPRISE_VISIBLE_WIDTH) / 2,
+		ENTERPRISE_SCREEN_HEIGHT, ENTERPRISE_SCREEN_HEIGHT - ENTERPRISE_VISIBLE_HEIGHT, ENTERPRISE_SCREEN_HEIGHT);
 	screen.set_screen_update(NICK_TAG, FUNC(nick_device::screen_update));
 
 	NICK(config, m_nick, XTAL(8'000'000), SCREEN_TAG);
@@ -710,6 +706,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                                        FULLNAME                     FLAGS
-COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, empty_init, "Intelligent Software / Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, empty_init, "Intelligent Software / Hegener + Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, empty_init, "Intelligent Software / Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, empty_init, "Intelligent Software / Enterprise Computers", "Enterprise Sixty Four",     MACHINE_SUPPORTS_SAVE )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, empty_init, "Intelligent Software / Hegener + Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, empty_init, "Intelligent Software / Enterprise Computers", "Enterprise One Two Eight",  MACHINE_SUPPORTS_SAVE )
