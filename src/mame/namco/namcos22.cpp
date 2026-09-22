@@ -839,7 +839,7 @@ SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
   |               |-----| |-----| |-----| |-----|  |         |  |  |
   |   |---------|                                  |  C399   |  |--|
   |   |         |         |-----| |-----| |-----|  |         |   |
-  |   |  C387   |         |C400 | |C400 | |C400 |  |         |   |
+  |   |  C397   |         |C400 | |C400 | |C400 |  |         |   |
   |   |         |         |-----| |-----| |-----|  |---------|  |--|
 |--|  |         |                    |-----|            N341256 |  |
 |  |  |---------|                    |C406 |  |-----|   N341256 |  |
@@ -1842,7 +1842,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	/**
 	 * Tilemap Memory (64 x 64)
 	 * Mounted position: VIDEO  2K
-	 * Known chip type: HM511664 (64k x 16bit SRAM)
+	 * Known chip type: HM511664 (64k x 16bit DRAM)
 	 * Note: Self test: 90084000 - 9009ffff
 	 */
 	map(0x9009e000, 0x9009ffff).ram().w(FUNC(namcos22_state::namcos22_textram_w)).share(m_textram);
