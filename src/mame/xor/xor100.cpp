@@ -30,10 +30,6 @@ Note some of the commands are a bit buggy, eg F doesn't fill the last byte
 
 
 TODO:
-- Fix floppy. It needs to WAIT the cpu whenever port 0xFC is read, wait
-  for either DRQ or INTRQ to assert, then release the cpu and then do the
-  actual port read.
-- The only available disks crash MAME when loaded.
 - honor jumper settings
 - CTC signal header
 - serial printer
@@ -55,6 +51,10 @@ TODO:
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
+
+#include "softlist_dev.h"
+
+#include "formats/imd_dsk.h"
 
 namespace {
 
@@ -119,7 +119,7 @@ private:
 	void bankswitch();
 	void post_load();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_uart_a;
 	required_device<i8251_device> m_uart_b;
 	required_device<fd1795_device> m_fdc;
@@ -280,7 +280,8 @@ uint8_t xor100_state::fdc_wait_r()
 	{
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
-			//m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_maincpu->retry_access();
 		}
 	}
 
@@ -289,27 +290,7 @@ uint8_t xor100_state::fdc_wait_r()
 
 void xor100_state::fdc_dcont_w(uint8_t data)
 {
-	/*
-
-	    bit     description
-
-	    0       DS0
-	    1       DS1
-	    2       DS2
-	    3       DS3
-	    4
-	    5
-	    6
-	    7       _HLSTB
-
-	*/
-
-	// drive select
-	floppy_image_device *floppy = nullptr;
-
-	for (int n = 0; n < 4; n++)
-		if (BIT(data, n))
-			floppy = m_floppy[n]->get_device();
+	floppy_image_device *floppy = m_floppy[BIT(~data, 2, 2)]->get_device();
 
 	m_fdc->set_floppy(floppy);
 
@@ -341,7 +322,7 @@ void xor100_state::fdc_dsel_w(uint8_t data)
 	case 3: m_fdc_dden = !m_fdc_dden; break;
 	}
 
-	m_fdc->dden_w(m_fdc_dden);
+	m_fdc->dden_w(!m_fdc_dden);
 }
 
 /* Memory Maps */
@@ -513,6 +494,12 @@ static void xor100_floppies(device_slot_interface &device)
 	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-100
 }
 
+static void xor100_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
+
 void xor100_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
@@ -566,6 +553,8 @@ void xor100_state::machine_start()
 void xor100_state::machine_reset()
 {
 	m_mode = EPROM_0000;
+	fdc_dcont_w(0xff);
+	fdc_dsel_w(0x02);
 
 	bankswitch();
 }
@@ -625,10 +614,12 @@ void xor100_state::xor100(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(xor100_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(xor100_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[2], xor100_floppies, nullptr,    floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[3], xor100_floppies, nullptr,    floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], xor100_floppies, "8ssdd", xor100_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], xor100_floppies, "8ssdd", xor100_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], xor100_floppies, nullptr, xor100_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], xor100_floppies, nullptr, xor100_floppy_formats);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("xor100_flop");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(I8255A_TAG, FUNC(i8255_device::pc4_w));
