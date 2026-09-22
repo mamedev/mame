@@ -1335,6 +1335,16 @@ pmac7200_120
 pmac6200
 pmac5200
 
+@source:apple/macgazelle.cpp
+pmac5500
+pmac5500_250
+pmac5500_275
+pmac6500
+pmac6500_250
+pmac6500_275
+pmac6500_300
+pmac20th
+
 @source:apple/macii.cpp
 mac2fdhd
 macii
@@ -1424,6 +1434,10 @@ macqd800
 @source:apple/macquadraav.cpp
 macqd660av
 macqd840av
+
+@source:apple/mactanzania.cpp
+pmac4400
+pmac4400_200
 
 @source:apple/newton.cpp
 emate
@@ -17494,6 +17508,9 @@ prof80
 
 @source:conitec/prof180x.cpp
 prof180x
+prof180xp
+
+@source:conitec/prof181x.cpp
 prof181x
 
 @source:cosmo/cosmo_ls9310.cpp
@@ -27004,6 +27021,9 @@ jb3000
 myb3k
 stepone
 
+@source:matsushita/wsa1.cpp
+wsa1r
+
 @source:mattel/aquarius.cpp
 aquarius
 aquariusp
@@ -32488,6 +32508,7 @@ nostk
 mcm70
 
 @source:misc/megaphx.cpp
+afterwar
 hamboy
 megaphx
 yoyospel
@@ -40150,6 +40171,9 @@ qvt190
 @source:qume/qvt201.cpp
 qvt201
 
+@source:radiobulletin/cosmicos.cpp
+cosmicos
+
 @source:ramtek/hitme.cpp
 barricad
 brickyrd
@@ -43815,9 +43839,6 @@ cidx628
 @source:skeleton/cortex.cpp
 cortex
 
-@source:skeleton/cosmicos.cpp
-cosmicos
-
 @source:skeleton/cp1.cpp
 cp1
 
@@ -44624,9 +44645,6 @@ xbase09
 
 @source:skeleton/xinyun.cpp
 hongmxy
-
-@source:skeleton/xor100.cpp
-xor100
 
 @source:skeleton/yeno_ks56c1660.cpp
 ckidpers
@@ -47926,6 +47944,7 @@ mobigo2g
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
 beambox
+behero
 jak_camp
 jak_car2
 jak_duck
@@ -48127,6 +48146,7 @@ zone3d
 @source:tvgames/spg2xx.cpp
 ablkickb
 abltenni
+anpannou
 anpantv
 backybbs
 ban_krkk
@@ -49847,6 +49867,9 @@ x820ii
 x820iilp
 x820ii5
 x820iis
+
+@source:xor/xor100.cpp
+xor100
 
 @source:yachiyo/atamanot.cpp
 atamanot

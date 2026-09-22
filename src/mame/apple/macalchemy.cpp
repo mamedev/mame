@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:wurthless-elektroniks, R. Belmont
 /****************************************************************************
 
     Power Macintosh x360/x400 "Alchemy" hardware
@@ -19,8 +21,9 @@
 
     Scans PCI slots 0d:, 0e:, 0f:, 11: at boot.
 
-    Current status: Plays the boot chime and boots Mac OS 8.1 from the SCSI CD-ROM
-    to the Finder.  The default 8 MB isn't enough for that, use -ram 40m.
+    Current status: Boots to Finder. Setting certain video resolutions results
+    in a black screen, which persists through reboots (NVRAM/OS configuration switch).
+    Mac OS 8 and later run better than 7.6 and earlier, which have sound problems.
 
  ****************************************************************************/
 
@@ -172,9 +175,10 @@ void pmac6400_state::pmac6400(machine_config &config)
 
 	// 8 MB built-in, 2x DIMM slots; modules can be 8, 16, 32 or 64 MB.
 	// note however that the PSX can support 5 memory banks.
+	// the minimum these machines shipped with was 16mb, so use that.
 	RAM(config, m_ram);
-	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("16M,24M,40M,72M,104M,136M");
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("8M,24M,40M,72M,104M,136M");
 
 	OHARE(config, m_ohare);
 	m_ohare->set_maincpu_tag("maincpu");

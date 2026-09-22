@@ -13,6 +13,7 @@
 #include "cpu/mcs51/i8051.h"
 #include "cpu/m6805/m68hc05.h"
 #include "diserial.h"
+#include "bus/rs232/rs232.h"
 #include "screen.h"
 
 /*----------- driver state -----------*/
@@ -33,6 +34,7 @@ public:
 		, m_cdrom(*this, "cdrom")
 		, m_mcd212(*this, "mcd212")
 		, m_dmadac(*this, "dac%u", 1U)
+		, m_serial_port(*this, "serial")
 	{ }
 
 	void cdimono1_base(machine_config &config);
@@ -61,9 +63,12 @@ protected:
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 
+	optional_device<rs232_port_device> m_serial_port;
+
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override ATTR_COLD;
 
+	void cdi_common_mem(address_map &map) ATTR_COLD;
 	void cdimono1_mem(address_map &map) ATTR_COLD;
 
 	void cdi910_mem(address_map &map) ATTR_COLD;
@@ -82,12 +87,11 @@ protected:
 	void bus_error_w(offs_t offset, uint16_t data);
 };
 
-class quizard_state : public cdi_state, public device_serial_interface
+class quizard_state : public cdi_state
 {
 public:
 	quizard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cdi_state(mconfig, type, tag)
-		, device_serial_interface(mconfig, *this)
 		, m_mcu(*this, "mcu")
 		, m_inputs(*this, "P%u", 0U)
 	{ }
@@ -98,8 +102,6 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual void tra_callback() override;
-	virtual void rcv_complete() override;
 
 	TIMER_CALLBACK_MEMBER(boot_press_tick);
 
@@ -112,7 +114,7 @@ private:
 	void mcu_p2_w(uint8_t data);
 	void mcu_p3_w(uint8_t data);
 
-	void mcu_rx_from_cpu(uint8_t data);
+	void mcu_rxd_from_cpu(int state);
 	void mcu_rtsn_from_cpu(int state);
 
 	uint8_t mcu_button_press();
@@ -122,7 +124,7 @@ private:
 
 	bool m_boot_press = false;
 	emu_timer *m_boot_timer = nullptr;
-	uint8_t m_mcu_p3;
+	int m_mcu_rxd;
 };
 
 // Quizard 2 language values:

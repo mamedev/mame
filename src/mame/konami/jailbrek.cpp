@@ -112,6 +112,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
 		m_maincpu(*this, "maincpu"),
 		m_vlm(*this, "vlm"),
 		m_k005849(*this, "k005849"),
@@ -129,6 +130,7 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -214,15 +216,22 @@ void jailbrek_state::video_start()
 
 void jailbrek_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int i = 0; i < m_spriteram.bytes(); i += 4)
+	uint8_t *sr;
+
+	if (m_k005849->ctrl_r(3) & 0x08)
+		sr = m_spriteram2;
+	else
+		sr = m_spriteram;
+
+	for (int i = 0; i < 0xc0; i += 4)
 	{
-		int const attr = m_spriteram[i + 1]; // attributes = ?tyxcccc
-		int const code = m_spriteram[i] + ((attr & 0x40) << 2);
+		int const attr = sr[i + 1]; // attributes = ?tyxcccc
+		int const code = sr[i] + ((attr & 0x40) << 2);
 		int const color = attr & 0x0f;
 		int flipx = attr & 0x10;
 		int flipy = attr & 0x20;
-		int sx = m_spriteram[i + 2] - ((attr & 0x80) << 1);
-		int sy = m_spriteram[i + 3];
+		int sx = sr[i + 2] - ((attr & 0x80) << 1);
+		int sy = sr[i + 3];
 
 		if (flip_screen())
 		{
@@ -240,6 +249,17 @@ void jailbrek_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	rectangle clip = cliprect;
+	if (m_k005849->ctrl_r(3) & 0x80)
+	{
+		bitmap.fill(0, clip);
+
+		// clip screen edges
+		clip.min_x += 8;
+		clip.max_x -= 8;
+		clip &= cliprect;
+	}
+
 	// bit 2 appears to be horizontal/vertical scroll control
 	if (m_k005849->ctrl_r(2) & 0x04)
 	{
@@ -260,8 +280,9 @@ uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			m_bg_tilemap->set_scrollx(i, m_k005849->scroll_r(i) | ((m_k005849->scroll_r(i | 0x20) & 1) << 8));
 	}
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
+	draw_sprites(bitmap, clip);
+
 	return 0;
 }
 
@@ -288,9 +309,9 @@ void jailbrek_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(FUNC(jailbrek_state::colorram_w)).share(m_colorram);
 	map(0x0800, 0x0fff).ram().w(FUNC(jailbrek_state::videoram_w)).share(m_videoram);
-	map(0x1000, 0x10bf).ram().share(m_spriteram);
-	map(0x10c0, 0x14ff).ram(); // ???
-	map(0x1500, 0x1fff).ram(); // work RAM
+	map(0x1000, 0x10ff).ram().share(m_spriteram);
+	map(0x1100, 0x11ff).ram().share(m_spriteram2);
+	map(0x1200, 0x1fff).ram();
 	map(0x2000, 0x203f).rw(m_k005849, FUNC(k005849_device::scroll_r), FUNC(k005849_device::scroll_w));
 	map(0x2040, 0x2047).w(m_k005849, FUNC(k005849_device::ctrl_w));
 	map(0x3000, 0x3000).w(FUNC(jailbrek_state::coin_w));
@@ -387,7 +408,7 @@ void jailbrek_state::jailbrek(machine_config &config)
 	PALETTE(config, m_palette, FUNC(jailbrek_state::palette), 512, 32);
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(jailbrek_state::screen_update));
 	screen.set_palette(m_palette);
 

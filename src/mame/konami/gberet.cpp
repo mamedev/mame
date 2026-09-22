@@ -18,6 +18,8 @@
     gberetb is a bootleg hacked to run on different hardware.
 
     TODO
+    - Sprite RAM bank offset (005849 reg 3, bit 3) is the wrong way around,
+      but flipping it causes sprite/bg sync lag that doesn't happen on PCB.
     - Correct PROMs decoding for the bootleg
 
 ****************************************************************************
@@ -444,12 +446,23 @@ void gberet_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 uint32_t gberet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	rectangle clip = cliprect;
+	if (m_k005849->ctrl_r(3) & 0x80)
+	{
+		bitmap.fill(0, clip);
+
+		// clip screen edges
+		clip.min_x += 8;
+		clip.max_x -= 8;
+		clip &= cliprect;
+	}
+
 	for (int i = 0; i < 32; i++)
 		m_bg_tilemap->set_scrollx(i, m_k005849->scroll_r(i) | ((m_k005849->scroll_r(i | 0x20) & 1) << 8));
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
-	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, clip, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	draw_sprites(bitmap, clip);
+	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	return 0;
 }
@@ -497,9 +510,18 @@ void gberetb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t gberetb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
-	draw_sprites(bitmap, cliprect);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	rectangle clip = cliprect;
+	bitmap.fill(0, clip);
+
+	// clip screen edges
+	clip.min_x += 8;
+	clip.max_x -= 8;
+	clip &= cliprect;
+
+	m_bg_tilemap->draw(screen, bitmap, clip, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	draw_sprites(bitmap, clip);
+	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
+
 	return 0;
 }
 
@@ -748,7 +770,7 @@ void gberet_state::gberet(machine_config &config)
 	mainirq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(gberet_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -774,7 +796,7 @@ void gberetb_state::gberetb(machine_config &config)
 	screen.set_refresh_hz(58.7090);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(gberetb_state::screen_update));
 	screen.set_palette(m_palette);
 

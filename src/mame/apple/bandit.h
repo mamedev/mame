@@ -95,16 +95,21 @@ public:
 	}
 	applpsx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// System ID register: bits 17-16 are straps sampled at reset, which the ROM and Open Firmware
+	// use as the board type (0 = Alchemy/Gazelle, 1 = Hooper/Comet (3400/2400), 2 = Tanzania)
+	void set_system_id(u32 id) { m_system_id = id; }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
 	// registers on PSX appear to be aligned to 64 bit boundaries
-	
+
 	u64 regs_r(offs_t offset, u64 mem_mask = ~0);
 	void regs_w(offs_t offset, u64 data, u64 mem_mask = ~0);
 
 	u64 m_sys_config;
+	u32 m_system_id;
 };
 
 DECLARE_DEVICE_TYPE(BANDIT, bandit_host_device)

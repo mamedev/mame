@@ -8,8 +8,11 @@
 
 #include "emu.h"
 #include "lundy_speech.h"
+
 #include "sound/sp0256.h"
 
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -106,6 +109,8 @@ const tiny_rom_entry *lundy_speech_device::device_rom_region() const
 {
 	return ROM_NAME( sp0256 );
 }
+
+} // anonymous namespace
 
 
 //**************************************************************************
