@@ -198,7 +198,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 
 		const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
 												   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
-		const uint16_t src_phase = m_state.fb_read && m_state.fb_write ? m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15) : 0;
+		const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
 		const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
 
 		m_state.prime = src_phase > dest_phase;
