@@ -25,6 +25,7 @@
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
 #include "machine/intelfsh.h"
+#include "machine/spi_sdcard.h"
 #include "machine/upd765.h"
 
 #include "screen.h"
@@ -52,20 +53,27 @@ public:
 		, m_tonegen(*this, "tonegen")
 		, m_dial(*this, "DIAL")
 		, m_rearsw(*this, "REARSW")
+		, m_sdsw(*this, "CPSD_SDSW")
+		, m_sdcard(*this, "sdcard")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
+		, m_sdcover(*this, "SDCOVER")
 		, m_volmain(*this, "VOL_MAIN")
 		, m_volapcseq(*this, "VOL_APCSEQ")
 		, m_tempoknob(*this, "TEMPO_KNOB")
 		, m_cpanel(*this, "cpanel")
+		, m_sd_leds(*this, "sd_led%u", 0U)
 	{ }
 
 	void kn7000_base(machine_config &config) ATTR_COLD;
 	void kn7000(machine_config &config) ATTR_COLD;
 	void kn6000(machine_config &config) ATTR_COLD;
 	void kn6500(machine_config &config) ATTR_COLD;
+	void kn24_base(machine_config &config) ATTR_COLD;
 	void kn2400(machine_config &config) ATTR_COLD;
+	void kn2600(machine_config &config) ATTR_COLD;
 	DECLARE_INPUT_CHANGED_MEMBER(kbd_key);     // PC-key note -> voice-event FIFO (public: PORT_CHANGED_MEMBER)
+	DECLARE_INPUT_CHANGED_MEMBER(sd_cover_changed);   // SD slot cover toggle (public: PORT_CHANGED_MEMBER)
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -89,6 +97,8 @@ private:
 	// serial HLE device that reads these / drives the LEDs are still to come).
 	required_ioport m_dial;
 	required_ioport m_rearsw;           // rear-panel MIDI IN / BASS PEDAL selector SW701 (strap bit12 = data-bus D28)
+	required_ioport m_sdsw;               // SD front-panel switches (byte 0x9CC00008, active-low)
+	optional_device<spi_sdcard_device> m_sdcard;   // the SD card (SPI protocol via the 0x9805000C byte mailbox)
 	optional_device<n82077aa_device> m_fdc;        // IC103 floppy disk controller (C1DB00000607, N82077AA/PC-AT-compatible)
 	optional_device<floppy_connector> m_floppy;    // the 3.5" floppy drive
 	uint8_t fdc_r(offs_t off);                     // FDC (IC103) PC/AT registers at 0x98020000 (schematic-confirmed)
@@ -97,6 +107,7 @@ private:
 	void    fdc_dma_w(offs_t off, uint8_t data);
 	void    fdc_irq_w(int state);                  // FDC INTRQ -> INTC group 0x18
 	void    fdc_drq_w(int state);                  // FDC DRQ  -> INTC group 0x18 (per-byte software-DMA)
+	required_ioport m_sdcover;             // SD slot cover switch (open/closed)
 	required_ioport m_volmain;             // front-panel MAIN VOLUME slider (0-100 adjuster)
 	required_ioport m_volapcseq;           // front-panel APC/SEQ VOLUME slider (0-100 adjuster)
 	required_ioport m_tempoknob;           // front-panel TEMPO/PROGRAM knob (0-100 adjuster; a RELATIVE encoder)
@@ -139,6 +150,32 @@ private:
 
 	// --- On-chip 16-bit TEMPO timer (mode 0x34001082 / base 0x34001092 / count 0x340010A2)
 
+	emu_timer *m_sd_insert_timer = nullptr;
+	TIMER_CALLBACK_MEMBER(sd_insert);
+
+	output_finder<2> m_sd_leds;              // sd_led0 = SD in use, sd_led1 = SD play/pause
+	emu_timer *m_sd_inuse_off = nullptr;     // one-shot: clear SD-in-use after the last SPI byte
+	TIMER_CALLBACK_MEMBER(sd_inuse_off);
+
+	// The SD slot has a hinged COVER; the firmware reads the cover switch as the
+	// card-detect line: closed with a card in means accessible, open means absent.
+	void sd_update_carddetect()
+	{
+		if (m_lib_mirror) return;
+		const bool cover_open = (m_sdcover->read() & 1) != 0;
+		const bool card = m_sdcard && m_sdcard->get_card_present();
+		if (!cover_open && card)
+			m_maincpu->intc_icr_clear(0x1B, 0x001F);   // bit4=0: present (closed + card)
+		else
+			m_maincpu->intc_icr_set(0x1B, 0x0012);     // bit4=1: no card / lid open
+	}
+
+	uint16_t m_sdmbx_out = 0xFF;               // last MISO byte (mailbox read value)
+	uint16_t m_gpio8004 = 0xFFFF;              // GPIO latch 0x36008004 (bit1 = SD SPI CS, active-low)
+	uint8_t  m_sdmbx_miso = 0;                 // MISO bit collector (spi_miso callback)
+	void cpsd_mbx_write(uint16_t data);
+	void sd_miso_w(int state) { m_sdmbx_miso = uint8_t(m_sdmbx_miso << 1) | (state & 1); }
+
 	// --- SIO: three on-chip USART channels at 0x34000800 / 0x810 / 0x820 ----
 	// ch0 = control panel, ch1 = MIDI port 1, ch2 = MIDI port 2.
 	enum { SIO_PANEL = 0, SIO_MIDI1 = 1, SIO_MIDI2 = 2 };
@@ -179,6 +216,13 @@ void kn7000_state::maincpu_mem(address_map &map)
 	map(0x44000000, 0x44ffffff).ram().share("ram44");
 	map(0x84000000, 0x84ffffff).ram().share("ram44");
 	map(0x9c000000, 0x9cffffff).ram().share("lcdbuf");   // firmware's composited LCD image (RGB565) lives at 0x9CE00000
+	// SD front-panel switch register (byte 0x9CC00008, active-low: bits 0-5 are the
+	// six CPSD-side transport switches, 1 = released).
+	if (!m_lib_mirror)
+		map(0x9cc00008, 0x9cc0000b).lr32(NAME([this](offs_t) -> uint32_t
+		{
+			return (m_lcdbuf[0x00C00008 >> 2] & 0xFFFFFFC0) | (~m_sdsw->read() & 0x3F);
+		}));
 
 	// --- Stubs for regions whose behavior is still unknown --------------
 
@@ -202,6 +246,17 @@ void kn7000_state::maincpu_mem(address_map &map)
 	map(0x36008000, 0x360080ff).rw(FUNC(kn7000_state::io_r), FUNC(kn7000_state::io_w));
 	// GPIO input port 0x36008084: bit 0 = panel-link ready/presence, held asserted.
 	map(0x36008084, 0x36008085).lr16(NAME([]() -> uint16_t { return 0x0001; }));
+	// GPIO output latch 0x36008004: bit1 = the SD card's SPI chip select, active-low
+	// (bclr asserts, bset releases).
+	if (!m_lib_mirror)
+		map(0x36008004, 0x36008005).lrw16(
+			NAME([this](offs_t) -> uint16_t { return m_gpio8004; }),
+			NAME([this](offs_t, uint16_t data, uint16_t mem_mask)
+			{
+				COMBINE_DATA(&m_gpio8004);
+				if (m_sdcard)
+					m_sdcard->spi_ss_w((m_gpio8004 & 0x0002) ? 0 : 1);   // active-low CS
+			}));
 	map(0x98000000, 0x9807ffff).rw(FUNC(kn7000_state::snd_r), FUNC(kn7000_state::snd_w));
 	map(0x98020000, 0x9802000f).rw(FUNC(kn7000_state::fdc_r), FUNC(kn7000_state::fdc_w));
 	// FDC.DACK byte slot at 0x98010000 (decoder Y1). The software-DMA handler, invoked
@@ -252,6 +307,8 @@ uint16_t kn7000_state::snd_r(offs_t offset, uint16_t mem_mask)
 			return m_kbd_fifo[m_kbd_tail++ & 63];
 		return 0xFFFF;
 	}
+	if (offset == 0x28006)                            // 0x9805000C: SD mailbox data latch
+		return m_sdmbx_out;
 	if (offset == 0x28007)
 		return m_sdspi_rate;
 	// Wave-memory read port DATA (main 0x9804000A / sub 0x9805000A): return the
@@ -273,6 +330,9 @@ void kn7000_state::snd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 	switch (offset)
 	{
+	case 0x28006:                                                 // 0x9805000C: SD mailbox data latch
+		cpsd_mbx_write(data);
+		return;
 	case 0x20000: m_tg_addr[0] = data; return;                    // main TG: address latch (0x98040000)
 	case 0x20001:                                                 // main TG: data (0x98040002) -> reg[addr]
 		m_tonegen->tg_write(0, m_tg_addr[0], data);                // Stage 2: feed the real TG voice engine
@@ -303,6 +363,45 @@ TIMER_CALLBACK_MEMBER(kn7000_state::sys_tick)
 // (The on-chip TEMPO timer -- TM5, the clock behind all sequenced playback --
 // is modeled in the MN10300 core now: mn10300.cpp tm5_*.)
 
+void kn7000_state::cpsd_mbx_write(uint16_t data)
+{
+	// SD "in use" lamp: every mailbox byte is a live SPI transfer, so the card is being accessed. Light
+	// the LED and (re)arm the one-shot; a burst of bytes keeps it steady, and it drops ~250 ms after the last.
+	m_sd_leds[0] = 1;
+	m_sd_inuse_off->adjust(attotime::from_msec(250));
+
+	if (m_sdcard)
+	{
+		m_sdmbx_miso = 0;
+		for (uint8_t bit = 0x80; bit; bit >>= 1)
+		{
+			m_sdcard->spi_clock_w(CLEAR_LINE);
+			m_sdcard->spi_mosi_w((data & bit) ? 1 : 0);
+			m_sdcard->spi_clock_w(ASSERT_LINE);
+		}
+		m_sdmbx_out = m_sdmbx_miso;
+	}
+	intc_assert(0x1C);
+}
+
+TIMER_CALLBACK_MEMBER(kn7000_state::sd_insert)
+{
+	sd_update_carddetect();
+}
+
+// SD "in use" one-shot expiry: no SPI byte for ~250 ms -> the card is idle, clear the lamp.
+TIMER_CALLBACK_MEMBER(kn7000_state::sd_inuse_off)
+{
+	m_sd_leds[0] = 0;
+}
+
+INPUT_CHANGED_MEMBER(kn7000_state::sd_cover_changed)
+{
+	sd_update_carddetect();
+}
+
+// A PC-key note press or release: push a voice event into the key-bed FIFO the
+// firmware polls. param carries the key index; velocity is fixed for host keys.
 INPUT_CHANGED_MEMBER(kn7000_state::kbd_key)
 {
 	kbd_push(newval ? uint8_t(param) : uint8_t(param | 0x80), newval ? 0x64 : 0xff);
@@ -326,6 +425,7 @@ TIMER_CALLBACK_MEMBER(kn7000_state::volume_scan)
 	const float v = float(m_volmain->read()) / 100.0f;
 	m_tonegen->set_output_gain(ALL_OUTPUTS, v * v);
 
+	m_sd_leds[1] = (m_lcdbuf[0x00C00008 >> 2] & 0xC0) ? 1 : 0;
 }
 
 static INPUT_PORTS_START(kn7000)
@@ -358,6 +458,9 @@ static INPUT_PORTS_START(kn7000)
 	// SD slot cover switch. The slot has a hinged cover and the firmware only looks
 	// for a card while it is closed.
 	PORT_START("SDCOVER")
+	PORT_CONFNAME(0x01, 0x00, "SD slot cover") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn7000_state::sd_cover_changed), 0)
+	PORT_CONFSETTING(   0x00, "Closed")
+	PORT_CONFSETTING(   0x01, "Open")
 
 	// Key bed: the PORT_CHANGED_MEMBER parameter is the key index, which is the
 	// GM note minus 36.
@@ -521,6 +624,8 @@ void kn7000_state::machine_start()
 	if (m_lib_mirror)
 		memcpy(memshare("libram")->ptr(), memregion("program")->base(), memregion("program")->bytes());
 	m_sys_timer = timer_alloc(FUNC(kn7000_state::sys_tick), this);
+	m_sd_insert_timer = timer_alloc(FUNC(kn7000_state::sd_insert), this);
+	m_sd_inuse_off = timer_alloc(FUNC(kn7000_state::sd_inuse_off), this);
 
 	// (INTC + TM5 timer state is save_item'd by the MN10300 core now.)
 	save_item(NAME(m_c11_unserviced));
@@ -548,6 +653,17 @@ void kn7000_state::machine_reset()
 	// (TM5 mode/base/countdown are reset by the core's device_reset.)
 	if (!m_lib_mirror)
 	{
+		// SD card-detect: the polled group-0x1B ICR (0x3400016C) bit4 reads
+		// 1 = no card, 0 = card present.
+		m_maincpu->intc_icr_set(0x1B, 0x0012);
+		const bool cover_open = (m_sdcover->read() & 1) != 0;
+		if (!cover_open && m_sdcard && m_sdcard->get_card_present())
+			m_sd_insert_timer->adjust(attotime::from_seconds(6));
+		else
+			m_sd_insert_timer->adjust(attotime::never);
+		m_gpio8004 = 0xFFFF;                            // CS released (bit1=1) at reset
+		if (m_sdcard)
+			m_sdcard->spi_ss_w(0);                      // deselected until the firmware asserts CS (0x36008004 bit1)
 	}
 }
 
@@ -674,6 +790,11 @@ void kn7000_state::kn7000_base(machine_config &config)
 
 	// --- Sound. Shared by every model that reuses this config.
 	SPEAKER(config, "speaker", 2).front();
+	// Every model reusing this config has the floppy drive; the ones without an
+	// SD slot remove it below.
+	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sd();
+	m_sdcard->spi_miso_callback().set(FUNC(kn7000_state::sd_miso_w));
 
 	// IC103 floppy disk controller (custom C1DB00000607, N82077AA/PC-AT-compatible) + 3.5" drive.
 	N82077AA(config, m_fdc, 24'000'000);
@@ -707,6 +828,9 @@ void kn7000_state::kn6000(machine_config &config)
 	KN6000_TONEGEN(config, m_tonegen, 0);
 	m_tonegen->add_route(0, "lspeaker", 1.0);
 	m_tonegen->add_route(1, "rspeaker", 1.0);
+	// The KN6000 and KN6500 have the floppy drive but no SD slot.
+	config.device_remove("sdcard");
+
 	config.device_remove("cpanel");
 	KN6000_CPANEL(config, m_cpanel);
 	m_cpanel->atn().set([this](int state) { if (state) intc_assert(0x1a); });
@@ -724,13 +848,26 @@ void kn7000_state::kn6500(machine_config &config)
 	kn6000(config);
 }
 
-void kn7000_state::kn2400(machine_config &config)
+void kn7000_state::kn24_base(machine_config &config)
 {
 	kn7000_base(config);
 	m_lcd_kn24 = true;
 	// 320x240 4-level grayscale LCD (2bpp framebuffer at 0x9C800000).
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320 - 1, 0, 240 - 1);
+}
+
+// IC404, the SD sub-CPU program, is listed "KN2600 only": the KN2400 has the
+// floppy drive and no SD slot, the KN2600 has both.
+void kn7000_state::kn2400(machine_config &config)
+{
+	kn24_base(config);
+	config.device_remove("sdcard");
+}
+
+void kn7000_state::kn2600(machine_config &config)
+{
+	kn24_base(config);
 }
 
 ROM_START(kn7000)
@@ -877,4 +1014,4 @@ SYST(2001, kn6500, 0,      0,      kn6500,  kn7000, kn7000_state, empty_init, "T
 
 // KN2400 / KN2600 -- MN10300/MILK siblings sharing one firmware image (kn2600 = clone of kn2400).
 SYST(2000, kn2400, 0,      0,      kn2400,  kn7000, kn7000_state, empty_init, "Technics", "SX-KN2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(2000, kn2600, kn2400, 0,      kn2400,  kn7000, kn7000_state, empty_init, "Technics", "SX-KN2600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(2000, kn2600, kn2400, 0,      kn2600,  kn7000, kn7000_state, empty_init, "Technics", "SX-KN2600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
