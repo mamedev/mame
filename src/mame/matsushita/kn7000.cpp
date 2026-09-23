@@ -23,7 +23,9 @@
 #include "kn7000_tonegen.h"
 
 #include "cpu/mn10300/mn10300.h"
+#include "imagedev/floppy.h"
 #include "machine/intelfsh.h"
+#include "machine/upd765.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -50,6 +52,8 @@ public:
 		, m_tonegen(*this, "tonegen")
 		, m_dial(*this, "DIAL")
 		, m_rearsw(*this, "REARSW")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
 		, m_volmain(*this, "VOL_MAIN")
 		, m_volapcseq(*this, "VOL_APCSEQ")
 		, m_tempoknob(*this, "TEMPO_KNOB")
@@ -85,6 +89,14 @@ private:
 	// serial HLE device that reads these / drives the LEDs are still to come).
 	required_ioport m_dial;
 	required_ioport m_rearsw;           // rear-panel MIDI IN / BASS PEDAL selector SW701 (strap bit12 = data-bus D28)
+	optional_device<n82077aa_device> m_fdc;        // IC103 floppy disk controller (C1DB00000607, N82077AA/PC-AT-compatible)
+	optional_device<floppy_connector> m_floppy;    // the 3.5" floppy drive
+	uint8_t fdc_r(offs_t off);                     // FDC (IC103) PC/AT registers at 0x98020000 (schematic-confirmed)
+	void    fdc_w(offs_t off, uint8_t data);
+	uint8_t fdc_dma_r(offs_t off);                 // FDC.DACK byte slot at 0x98010000 (software-DMA transfer)
+	void    fdc_dma_w(offs_t off, uint8_t data);
+	void    fdc_irq_w(int state);                  // FDC INTRQ -> INTC group 0x18
+	void    fdc_drq_w(int state);                  // FDC DRQ  -> INTC group 0x18 (per-byte software-DMA)
 	required_ioport m_volmain;             // front-panel MAIN VOLUME slider (0-100 adjuster)
 	required_ioport m_volapcseq;           // front-panel APC/SEQ VOLUME slider (0-100 adjuster)
 	required_ioport m_tempoknob;           // front-panel TEMPO/PROGRAM knob (0-100 adjuster; a RELATIVE encoder)
@@ -191,6 +203,10 @@ void kn7000_state::maincpu_mem(address_map &map)
 	// GPIO input port 0x36008084: bit 0 = panel-link ready/presence, held asserted.
 	map(0x36008084, 0x36008085).lr16(NAME([]() -> uint16_t { return 0x0001; }));
 	map(0x98000000, 0x9807ffff).rw(FUNC(kn7000_state::snd_r), FUNC(kn7000_state::snd_w));
+	map(0x98020000, 0x9802000f).rw(FUNC(kn7000_state::fdc_r), FUNC(kn7000_state::fdc_w));
+	// FDC.DACK byte slot at 0x98010000 (decoder Y1). The software-DMA handler, invoked
+	// per FDC.DRQ on INTC group 0x18, moves one FIFO byte through here per request.
+	map(0x98010000, 0x98010003).rw(FUNC(kn7000_state::fdc_dma_r), FUNC(kn7000_state::fdc_dma_w));
 }
 
 // Read one sample word out of a wave ROM through the tone generator's own port.
@@ -242,8 +258,6 @@ uint16_t kn7000_state::snd_r(offs_t offset, uint16_t mem_mask)
 	// sample word for the latched (bank, address). See tg_wave_read().
 	if (offset == 0x20005) return tg_wave_read(0);
 	if (offset == 0x28005) return tg_wave_read(1);
-	// (The FDC is IC103 at 0x98020000 = decoder slot Y2; 0x98010000 = Y1 = FDC.DACK, the DMA-ack strobe,
-	// not the register base -- that is why the old 0x98010000 probe never saw register traffic. The FDC
 	if (!machine().side_effects_disabled())
 		logerror("%s: snd_r +%06X mask %04X\n", machine().describe_context(),
 			offset << 1, mem_mask);
@@ -276,6 +290,7 @@ void kn7000_state::snd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x28003: m_tg_wave_bank[1] = data; return;              // sub  TG wave bank    (0x98050006)
 	case 0x28004: m_tg_wave_addr[1] = data; return;              // sub  TG wave address (0x98050008)
 	}
+	// (The FDC registers at 0x98020000-0f are carved out of this window -> fdc_r/fdc_w; see io_r note.)
 	logerror("%s: snd_w +%06X = %04X mask %04X\n", machine().describe_context(),
 		offset << 1, data, mem_mask);
 }
@@ -536,6 +551,64 @@ void kn7000_state::machine_reset()
 	}
 }
 
+// ================= FDC (IC103, C1DB00000607, N82077AA-compatible) at 0x98020000 =================
+// Confirmed by the SX-KN7000 service-manual schematic (chip-select decoder IC1 TC74VHC138F, page 101:
+uint8_t kn7000_state::fdc_r(offs_t off)
+{
+	if (!m_fdc) return 0xff;
+	switch (off)
+	{
+	case 0x4: return m_fdc->dor_r();    // reg2 DOR
+	case 0x8: return m_fdc->msr_r();    // reg4 Main Status Register
+	case 0xa: return m_fdc->fifo_r();   // reg5 data FIFO
+	case 0xe: return m_fdc->dir_r();    // reg7 DIR (bit7 = disk-change)
+	default:  return 0xff;
+	}
+}
+
+void kn7000_state::fdc_w(offs_t off, uint8_t data)
+{
+	if (!m_fdc) return;
+	switch (off)
+	{
+	case 0x4: m_fdc->dor_w(data);  break;   // reg2 DOR (motor / drive-select / /RESET / DMA gate)
+	case 0x8: m_fdc->dsr_w(data);  break;   // reg4 Data-rate Select Register
+	case 0xa: m_fdc->fifo_w(data); break;   // reg5 data FIFO
+	case 0xe: m_fdc->ccr_w(data);  break;   // reg7 Configuration Control Register (data rate)
+	default: break;
+	}
+}
+
+// FDC interrupt and DMA-request lines -> on-chip INTC group 0x18. The sector-data
+// phase is software DMA: the FDC asserts DRQ and the handler moves one byte.
+void kn7000_state::fdc_irq_w(int state)
+{
+	if (state)
+		intc_assert(0x18);
+}
+void kn7000_state::fdc_drq_w(int state)
+{
+	if (state)
+		intc_assert(0x18);
+}
+// FDC.DACK byte slot at 0x98010000 (decoder Y1). A read/write here transfers one FIFO byte to/from the
+// FDC in the current DMA operation (asserts DACK); the software-DMA ISR uses it per FDC.DRQ.
+uint8_t kn7000_state::fdc_dma_r(offs_t)
+{
+	return m_fdc ? m_fdc->dma_r() : 0xff;
+}
+void kn7000_state::fdc_dma_w(offs_t, uint8_t data)
+{
+	if (m_fdc)
+		m_fdc->dma_w(data);
+}
+
+static void kn7000_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);   // 3.5" high-density (1.44 MB, the KN7000 default)
+	device.option_add("35dd", FLOPPY_35_DD);   // 3.5" double-density (720 KB, 2DD media)
+}
+
 void kn7000_state::kn7000_base(machine_config &config)
 {
 	// IC21, the custom-data flash. The firmware identifies the part with a JEDEC
@@ -601,6 +674,12 @@ void kn7000_state::kn7000_base(machine_config &config)
 
 	// --- Sound. Shared by every model that reuses this config.
 	SPEAKER(config, "speaker", 2).front();
+
+	// IC103 floppy disk controller (custom C1DB00000607, N82077AA/PC-AT-compatible) + 3.5" drive.
+	N82077AA(config, m_fdc, 24'000'000);
+	m_fdc->intrq_wr_callback().set(FUNC(kn7000_state::fdc_irq_w));   // FDC INTRQ (logging stub -- firmware polls MSR)
+	m_fdc->drq_wr_callback().set(FUNC(kn7000_state::fdc_drq_w));     // FDC DRQ  (logging stub -- DMA not yet modelled)
+	FLOPPY_CONNECTOR(config, "fdc:0", kn7000_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	KN7000_TONEGEN(config, m_tonegen, 0);
 	m_tonegen->add_route(0, "lspeaker", 1.0);
