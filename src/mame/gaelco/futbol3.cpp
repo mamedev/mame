@@ -141,8 +141,7 @@ protected:
 	required_ioport m_dsw;
 
 	u8 m_latch = 0x00;
-	u64 m_display_shift = 0;
-	u8 m_display_bits = 0;
+	u32 m_display_shift = 0;
 
 private:
 	output_finder<2> m_lamps;
@@ -158,7 +157,7 @@ private:
 	u8 portb_r();
 	void portb_w(offs_t offset, u8 data, u8 mem_mask);
 
-	u8 bus_r();
+	u8 bus_r(u8 porta);
 	void latch_w(u8 data);
 	void update_display();
 };
@@ -171,7 +170,6 @@ void gaelcof3_state::machine_start()
 	save_item(NAME(m_portb_driven));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_display_shift));
-	save_item(NAME(m_display_bits));
 }
 
 void gaelcof3_state::machine_reset()
@@ -179,8 +177,6 @@ void gaelcof3_state::machine_reset()
 	// the PIC pins are high impedance after reset (assumed to be pulled up)
 	m_porta = 0x0f;
 	m_portb_driven = 0x00;
-
-	m_display_bits = 0;
 
 	// assume the 74HCT273 is cleared by the reset circuit
 	m_latch = 0x00;
@@ -194,14 +190,15 @@ void gaelcof3_state::init_rc_wdt()
 }
 
 
-u8 gaelcof3_state::bus_r()
+u8 gaelcof3_state::bus_r(u8 porta)
 {
-	// 74LS365: both enables (active low) must be asserted
-	if (!BIT(m_porta, 1) && !BIT(m_porta, 3))
+	// 74LS365: both enables (active low) must be asserted. The programs only do it with the M6295 /CS low too once
+	// at power on, without reading the bus; the M6295 is then written on the /WR rising edge, see porta_w
+	if (!BIT(porta, 1) && !BIT(porta, 3))
 		return 0xc0 | (m_dsw->read() & 0x3f);
 
 	// M6295 status read
-	if (!BIT(m_porta, 0) && !BIT(m_porta, 3))
+	if (!BIT(porta, m_oki_cs) && !BIT(porta, 3))
 		return m_oki->read();
 
 	// nothing drives the bus: pull-ups and inputs
@@ -221,29 +218,26 @@ void gaelcof3_state::porta_w(offs_t offset, u8 data, u8 mem_mask)
 	u8 const old = m_porta;
 	m_porta = data;
 
+	// the bus as latched on a rising edge; the programs raise /WR once at power on, while port B is still an input,
+	// so the M6295 gets the 74LS365 and the pull-ups: bit 7 is set, it takes the next byte as a voice selection
+	// and tries to play phrase 64-127, which is empty in all the ROMs
+	u8 const bus = (m_portb & m_portb_driven) | (bus_r(old) & ~m_portb_driven);
+
 	// the M6295 latches a command on the /WR rising edge, with /CS asserted
 	if (!BIT(old, 1) && BIT(data, 1) && !BIT(old, 0))
 	{
-		if (m_portb_driven == 0xff)
-		{
-			LOGMASKED(LOG_OKI, "M6295 write %02x\n", m_portb);
-			m_oki->write(m_portb);
-		}
-		else
-		{
-			// happens once at power on, when the PIC port B is still an input
-			LOGMASKED(LOG_OKI, "M6295 write ignored, bus not driven by the PIC\n");
-		}
+		LOGMASKED(LOG_OKI, "M6295 write %02x\n", bus);
+		m_oki->write(bus);
 	}
 
 	// 74HCT273 clock
 	if (!BIT(old, 2) && BIT(data, 2))
-		latch_w((m_portb & m_portb_driven) | (bus_r() & ~m_portb_driven));
+		latch_w(bus);
 }
 
 u8 gaelcof3_state::portb_r()
 {
-	return bus_r();
+	return bus_r(m_porta);
 }
 
 void gaelcof3_state::portb_w(offs_t offset, u8 data, u8 mem_mask)
@@ -259,24 +253,22 @@ void gaelcof3_state::latch_w(u8 data)
 	m_latch = data;
 	update_outputs();
 
-	if (BIT(old, 1) && !BIT(data, 1))
-		display_shift(BIT(data, 0));
-
+	// on simultaneous edges the external board latches what was in its shift register before shifting
 	if (!BIT(old, 2) && BIT(data, 2))
 		display_strobe();
+
+	if (BIT(old, 1) && !BIT(data, 1))
+		display_shift(BIT(data, 0));
 }
 
 void gaelcof3_state::display_shift(int bit)
 {
 	m_display_shift = (m_display_shift << 1) | bit;
-	if (m_display_bits < 64)
-		m_display_bits++;
 }
 
 void gaelcof3_state::display_strobe()
 {
 	update_display();
-	m_display_bits = 0;
 }
 
 void gaelcof3_state::update_outputs()
@@ -290,13 +282,6 @@ void gaelcof3_state::update_outputs()
 
 void gaelcof3_state::update_display()
 {
-	// the display board keeps the last 16 bits clocked into its shift register
-	if (m_display_bits < 16)
-	{
-		LOGMASKED(LOG_DISPLAY, "short display frame, only %d bits\n", m_display_bits);
-		return;
-	}
-
 	// 16-bit frame, the first bit shifted in ends at bit 15 (1 = active):
 	// bit 15: credits display enable, bits 14-8: units digit segments (a, f, e, d, c, g, b)
 	// bit 7:  time display enable,    bits 6-0:  tens digit segments  (f, g, c, d, e, b, a)
@@ -402,55 +387,47 @@ void futbol_state::display_strobe()
 {
 	// three bytes: display select and indicators, then the segments of the units and the tens digit.
 	// the board keeps the last 24 bits, the program also clocks it while reading the inputs
-	if (m_display_bits >= 24)
+	// the bits are captured before the ULN2803A inverters, so the frame comes out complemented
+	auto const frame = ~m_display_shift;
+	u8 const select = BIT(frame, 16, 8);
+	u8 const units = BIT(frame, 8, 8);    // sent first
+	u8 const tens = BIT(frame, 0, 8);
+
+	LOGMASKED(LOG_DISPLAY, "display frame: select %02x digits %02x %02x\n", select, tens, units);
+
+	if (BIT(select, 0))
 	{
-		// the bits are captured before the ULN2803A inverters, so they come out complemented
-		u8 const select = ~BIT(m_display_shift, 16, 8) & 0xff;
-		u8 const units = ~BIT(m_display_shift, 8, 8) & 0xff;    // sent first
-		u8 const tens = ~BIT(m_display_shift, 0, 8) & 0xff;
-
-		LOGMASKED(LOG_DISPLAY, "display frame: select %02x digits %02x %02x\n", select, tens, units);
-
-		if (BIT(select, 0))
-		{
-			m_score_home[0] = tens & 0x7f;
-			m_score_home[1] = units & 0x7f;
-		}
-		if (BIT(select, 1))
-		{
-			m_score_away[0] = tens & 0x7f;
-			m_score_away[1] = units & 0x7f;
-		}
-		if (BIT(select, 2))
-		{
-			m_knock_home[0] = tens & 0x7f;
-			m_knock_home[1] = units & 0x7f;
-		}
-		if (BIT(select, 3))
-		{
-			m_knock_away[0] = tens & 0x7f;
-			m_knock_away[1] = units & 0x7f;
-		}
-		if (BIT(select, 4))
-		{
-			m_center[0] = tens & 0x7f;
-			m_center[1] = units & 0x7f;
-
-			// the decimal points of the central display tell what it shows: credits when idle, time in play
-			m_led_credit = BIT(units, 7);
-			m_led_time = BIT(tens, 7);
-		}
-
-		// the game lights one of these while a team plays
-		m_led_home = BIT(select, 5);
-		m_led_away = BIT(select, 6);
+		m_score_home[0] = tens & 0x7f;
+		m_score_home[1] = units & 0x7f;
 	}
-	else
+	if (BIT(select, 1))
 	{
-		LOGMASKED(LOG_DISPLAY, "short display frame, only %d bits\n", m_display_bits);
+		m_score_away[0] = tens & 0x7f;
+		m_score_away[1] = units & 0x7f;
+	}
+	if (BIT(select, 2))
+	{
+		m_knock_home[0] = tens & 0x7f;
+		m_knock_home[1] = units & 0x7f;
+	}
+	if (BIT(select, 3))
+	{
+		m_knock_away[0] = tens & 0x7f;
+		m_knock_away[1] = units & 0x7f;
+	}
+	if (BIT(select, 4))
+	{
+		m_center[0] = tens & 0x7f;
+		m_center[1] = units & 0x7f;
+
+		// the decimal points of the central display tell what it shows: credits when idle, time in play
+		m_led_credit = BIT(units, 7);
+		m_led_time = BIT(tens, 7);
 	}
 
-	m_display_bits = 0;
+	// the game lights one of these while a team plays
+	m_led_home = BIT(select, 5);
+	m_led_away = BIT(select, 6);
 
 	// the parallel-in shift register of the external board is loaded while Q2 is high
 	load_inputs();
