@@ -188,10 +188,11 @@ void gba_ppu_device::device_post_load()
 void gba_ppu_device::configure()
 {
 	m_width = 240;
-	m_vram_mask[VRAM_BG] = 0xffff;       // 64K, followed by
+	m_vram_mask[VRAM_BG] = 0x1ffff;      // 64K for tiles and maps, 80K for the bitmap modes, overlapping
 	m_vram_mask[VRAM_OBJ] = 0x7fff;      // 32K of OBJ tiles
 	m_vram_mask[VRAM_BG_EXTPAL] = 0x7fff;
 	m_vram_mask[VRAM_OBJ_EXTPAL] = 0x1fff;
+	m_text_tile_limit = 0x10000;
 }
 
 uint8_t gba_ppu_device::bg_kind_for(int mode, int bg) const
@@ -448,6 +449,11 @@ void gba_ppu_device::draw_text_bg(int bg, int line)
 			const int ty = BIT(entry, 11) ? (7 - (yy & 7)) : (yy & 7);
 			tileaddr = charbase + ((entry & 0x3ff) * (color256 ? 64 : 32)) + (ty * (color256 ? 8 : 4));
 			palbase = (entry >> 12) << 4;
+		}
+
+		if (tileaddr >= m_text_tile_limit)
+		{
+			continue;
 		}
 
 		const int tx = BIT(entry, 10) ? (7 - (xx & 7)) : (xx & 7);
@@ -1133,6 +1139,7 @@ void gba_ppu_nds_a_device::configure()
 	m_vram_mask[VRAM_OBJ] = 0x3ffff;     // 256K
 	m_vram_mask[VRAM_BG_EXTPAL] = 0x7fff;
 	m_vram_mask[VRAM_OBJ_EXTPAL] = 0x1fff;
+	m_text_tile_limit = ~uint32_t(0);
 }
 
 // each accessor reverts to the base (GBA) behaviour while in GBA mode
@@ -1224,6 +1231,7 @@ void gba_ppu_nds_b_device::configure()
 	m_vram_mask[VRAM_OBJ] = 0x1ffff;     // 128K
 	m_vram_mask[VRAM_BG_EXTPAL] = 0x7fff;
 	m_vram_mask[VRAM_OBJ_EXTPAL] = 0x1fff;
+	m_text_tile_limit = ~uint32_t(0);
 }
 
 uint8_t gba_ppu_nds_b_device::bg_kind_for(int mode, int bg) const
