@@ -1221,7 +1221,7 @@ public:
 
 protected:
 	// driver_device
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
 		m_mainbank->configure_entries(0, memregion("bankedroms")->bytes() / 0x200000, memregion("bankedroms")->base(), 0x200000);
 		m_mainbank->set_entry(0);
@@ -1241,7 +1241,7 @@ protected:
 		save_item(NAME(m_tektagdmaoffset));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
 		if (m_boot_hack)
 		{
@@ -1504,9 +1504,9 @@ public:
 	using namcos12_state::namcos12_state;
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_state::driver_start();
+		namcos12_state::machine_start();
 
 		m_alt_bank = true;
 	}
@@ -1631,9 +1631,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_state::driver_start();
+		namcos12_state::machine_start();
 
 		/* HACK: patch out wait for dma 5 to complete */
 		*((uint32_t *)(m_mainrom->base() + 0x331c4)) = 0;
@@ -1707,9 +1707,9 @@ public:
 	}
 
 protected:
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		namcos12_state::driver_reset();
+		namcos12_state::machine_reset();
 
 		m_link_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -1806,9 +1806,9 @@ public:
 	using namcos12_state::namcos12_state;
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_state::driver_start();
+		namcos12_state::machine_start();
 
 		m_ttt_cnt = 0;
 		std::fill_n(m_ttt_val, 0, std::size(m_ttt_val));
@@ -1817,9 +1817,9 @@ protected:
 		save_item(NAME(m_ttt_val));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		namcos12_state::driver_reset();
+		namcos12_state::machine_reset();
 
 		m_has_tektagt_dma = false;
 	}
@@ -1951,9 +1951,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_cdxa_state::driver_start();
+		namcos12_cdxa_state::machine_start();
 
 		/*
 		HACK: Change order of code so that the status flags are set before DMA 5 is started

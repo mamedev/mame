@@ -84,7 +84,7 @@ public:
 
 protected:
 	virtual void device_reset() override ATTR_COLD;
-	virtual void driver_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -422,7 +422,7 @@ void macpdm_state::device_reset()
 	}
 }
 
-void macpdm_state::driver_reset()
+void macpdm_state::machine_reset()
 {
 	m_hmc_reg = 0;
 	m_hmc_buffer = 0;

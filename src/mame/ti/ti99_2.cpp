@@ -202,15 +202,17 @@ public:
 		m_rom(*this, TI992_ROM),
 		m_ram_start(0xf000),
 		m_first_ram_page(0)
-		{ }
+	{ }
 
-	void ti99_2(machine_config &config);
-	void ti99_224(machine_config &config);
-	void ti99_232(machine_config &config);
+	void ti99_224(machine_config &config) ATTR_COLD;
+	void ti99_232(machine_config &config) ATTR_COLD;
 
+protected:
 	// Lifecycle
-	void driver_start() override;
-	void driver_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+
+	void ti99_2(machine_config &config) ATTR_COLD;
 
 private:
 	void intflag_write(offs_t offset, uint8_t data);
@@ -244,13 +246,13 @@ private:
 	int m_first_ram_page;
 };
 
-void ti99_2_state::driver_start()
+void ti99_2_state::machine_start()
 {
 	m_ram_start = 0xf000 - m_ram->size();
 	m_first_ram_page = m_ram_start >> 12;
 }
 
-void ti99_2_state::driver_reset()
+void ti99_2_state::machine_reset()
 {
 	m_otherbank = false;
 

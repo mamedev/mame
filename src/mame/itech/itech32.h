@@ -49,13 +49,11 @@ public:
 		m_trackball_y(*this, "TRACKY%u", 1U)
 	{ }
 
-	void base_devices(machine_config &config);
-	void via(machine_config &config);
-	void tourny(machine_config &config);
-	void sftm(machine_config &config);
-	void bloodstm(machine_config &config);
-	void timekill(machine_config &config);
-	void pubball(machine_config &config);
+	void tourny(machine_config &config) ATTR_COLD;
+	void sftm(machine_config &config) ATTR_COLD;
+	void bloodstm(machine_config &config) ATTR_COLD;
+	void timekill(machine_config &config) ATTR_COLD;
+	void pubball(machine_config &config) ATTR_COLD;
 
 	void init_gtclasscp();
 	void init_shufshot();
@@ -105,8 +103,6 @@ protected:
 	optional_ioport_array<2> m_trackball_x;
 	optional_ioport_array<2> m_trackball_y;
 
-	virtual void nvram_init(nvram_device &nvram, void *base, size_t length);
-
 	std::unique_ptr<u16[]> m_videoram;
 	u8 m_vint_state = 0;
 	u8 m_xint_state = 0;
@@ -140,6 +136,11 @@ protected:
 	u32 m_vram_ymask = 0;
 	u32 m_grom_bank_mask = 0;
 
+	void base_devices(machine_config &config) ATTR_COLD;
+	void via(machine_config &config) ATTR_COLD;
+
+	virtual void nvram_init(nvram_device &nvram, void *base, size_t length);
+
 	void int1_ack_w(u16 data);
 	template<unsigned Which> u8 trackball_r();
 	u16 trackball_8bit_r();
@@ -172,6 +173,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
 	void init_program_rom();
 	void init_sftm_common(int prot_addr);
 	void init_shuffle_bowl_common(int prot_addr);
@@ -220,10 +222,9 @@ public:
 		m_gas(*this, "GAS")
 	{ }
 
-	void drivedge(machine_config &config);
+	void drivedge(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -290,10 +291,10 @@ public:
 		m_gun_timer(nullptr)
 	{ }
 
-	void shoottv(machine_config &config);
+	void shoottv(machine_config &config) ATTR_COLD;
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void update_interrupts(int vint, int xint, int qint) override;

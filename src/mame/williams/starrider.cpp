@@ -299,7 +299,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sound_sw1_changed);
 
 protected:
-	void driver_start() override ATTR_COLD;
+	void machine_start() override ATTR_COLD;
 
 private:
 	u8 cpu_page_r(address_space &space);
@@ -490,7 +490,7 @@ INPUT_CHANGED_MEMBER(sr_state::sound_sw1_changed)
 }
 
 
-void sr_state::driver_start()
+void sr_state::machine_start()
 {
 	m_vgg_drams = std::make_unique<u8 []>(16'384 * 4 / 8 * 6);
 

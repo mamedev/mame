@@ -1728,10 +1728,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void s23(machine_config &config);
-	void timecrs2(machine_config &config);
-	void downhill(machine_config &config);
-	void panicprk(machine_config &config);
+	void s23(machine_config &config) ATTR_COLD;
+	void timecrs2(machine_config &config) ATTR_COLD;
+	void downhill(machine_config &config) ATTR_COLD;
+	void panicprk(machine_config &config) ATTR_COLD;
 
 	render_t m_render;
 	const u8 *m_sprrom;
@@ -2016,8 +2016,8 @@ public:
 	{
 	}
 
-	void gorgon(machine_config &config);
-	void finfurl(machine_config &config);
+	void gorgon(machine_config &config) ATTR_COLD;
+	void finfurl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2056,7 +2056,7 @@ class motoxgo_state : public namcos23_state
 public:
 	using namcos23_state::namcos23_state;
 
-	void motoxgo(machine_config &config)
+	void motoxgo(machine_config &config) ATTR_COLD
 	{
 		s23(config);
 		m_jvs->set_default_option("namco_asca3a");
@@ -2095,16 +2095,16 @@ public:
 	{
 	}
 
-	void rapidrvr(machine_config &config)
+	void rapidrvr(machine_config &config) ATTR_COLD
 	{
 		gorgon(config);
 		m_jvs->set_default_option("namco_asca1");
 	}
 
 protected:
-	virtual void driver_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
-		gorgon_state::driver_start();
+		gorgon_state::machine_start();
 
 		m_sensor_timer = timer_alloc(FUNC(rapidrvr_state::sensor_timer_callback), this);
 		m_sensor_timer->adjust(attotime::zero, 0, attotime::from_hz(200));
@@ -2165,10 +2165,10 @@ public:
 		namcos23_state(mconfig, type, tag)
 	{ }
 
-	void ss23(machine_config &config);
-	void timecrs2v4a(machine_config &config);
-	void _500gp(machine_config &config);
-	void aking(machine_config &config);
+	void ss23(machine_config &config) ATTR_COLD;
+	void timecrs2v4a(machine_config &config) ATTR_COLD;
+	void _500gp(machine_config &config) ATTR_COLD;
+	void aking(machine_config &config) ATTR_COLD;
 
 protected:
 	void mips_map(address_map &map) ATTR_COLD;
@@ -2191,9 +2191,9 @@ public:
 		m_dsw(*this, "GMENDSW")
 	{ }
 
-	void gmen(machine_config &config);
-	void gunwars(machine_config &config);
-	void raceon(machine_config &config);
+	void gmen(machine_config &config) ATTR_COLD;
+	void gunwars(machine_config &config) ATTR_COLD;
+	void raceon(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2237,7 +2237,7 @@ public:
 	{
 	}
 
-	void finfurl2(machine_config &config)
+	void finfurl2(machine_config &config) ATTR_COLD
 	{
 		gmen(config);
 		m_jvs->set_default_option("namco_asca3a");
@@ -2266,7 +2266,7 @@ public:
 		m_acia(*this, "acia")
 	{ }
 
-	void crszone(machine_config &config);
+	void crszone(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

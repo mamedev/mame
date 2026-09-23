@@ -42,6 +42,7 @@
 #include "sound/flt_rc.h"
 #include "video/hd44780.h"
 #include "video/pwm.h"
+
 #include "screen_svg.h"
 #include "speaker.h"
 
@@ -124,7 +125,7 @@ public:
 	void lcd_w(int state) { m_lcdc->db_w(state << 4); }
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 	void screen_svg_update(screen_svg_device &screen);
 
@@ -214,7 +215,7 @@ void psr150_state::screen_svg_update(screen_svg_device &screen)
 }
 
 
-void psr150_state::driver_start()
+void psr150_state::machine_start()
 {
 	m_switch = 0x2; // "Voice Play" mode
 

@@ -183,7 +183,7 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	void sfkick(machine_config &config);
+	void sfkick(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

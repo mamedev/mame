@@ -41,11 +41,12 @@ public:
 	{
 	}
 
-	void wy60(machine_config &config);
+	void wy60(machine_config &config) ATTR_COLD;
+
+	void init_wy60() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void driver_start() override;
 
 private:
 	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
@@ -328,7 +329,7 @@ ROM_START(wy60a)
 	ROM_LOAD("wy-60_4k.u9", 0x00000, 0x10000, CRC(6daf2824) SHA1(23cd039ec7ae71b0742e8eebf75be8cd5992e3fd))
 ROM_END
 
-void wy60_state::driver_start()
+void wy60_state::init_wy60()
 {
 	uint8_t *rom = memregion("coderom")->base();
 	for (offs_t base = 0x00000; base < 0x10000; base += 0x2000)
@@ -342,5 +343,5 @@ void wy60_state::driver_start()
 
 } // anonymous namespace
 
-COMP(1986, wy60,  0,    0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNG2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1986, wy60a, wy60, 0, wy60, wy60, wy60_state, empty_init, "Wyse Technology", "WY-60 (RBFNB0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1986, wy60,  0,    0, wy60, wy60, wy60_state, init_wy60, "Wyse Technology", "WY-60 (RBFNG2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1986, wy60a, wy60, 0, wy60, wy60, wy60_state, init_wy60, "Wyse Technology", "WY-60 (RBFNB0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

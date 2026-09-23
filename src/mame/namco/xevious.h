@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-
 #ifndef MAME_NAMCO_XEVIOUS_H
 #define MAME_NAMCO_XEVIOUS_H
 
 #pragma once
+
+#include "galaga.h"
 
 #include "machine/timer.h"
 #include "tilemap.h"
@@ -25,10 +26,10 @@ public:
 		m_subcpu3(*this, "sub3")
 	{ }
 
-	void xevious(machine_config &config);
+	void xevious(machine_config &config) ATTR_COLD;
 
-	void init_xevious();
-	void init_xevios();
+	void init_xevious() ATTR_COLD;
+	void init_xevios() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -70,16 +71,16 @@ public:
 	{
 	}
 
-	void battles(machine_config &config);
+	void battles(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void interrupt_4(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
 
+	void battles_map(address_map &map) ATTR_COLD;
 	void battles_mem4(address_map &map) ATTR_COLD;
 
 	// Custom I/O

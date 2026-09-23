@@ -24,10 +24,11 @@ public:
 	{
 	}
 
-	void psr500(machine_config &config);
+	void psr500(machine_config &config) ATTR_COLD;
+
+	void init_psr500() ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 
 private:
@@ -121,7 +122,7 @@ ROM_START(psr500)
 	ROM_LOAD("xj450a00.ic1", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
-void psr400_state::driver_start()
+void psr400_state::init_psr500()
 {
 	memory_region *region = memregion("program");
 	u8 *program = static_cast<u8 *>(region->base());
@@ -138,4 +139,4 @@ void psr400_state::driver_start()
 
 } // anonymous namespace
 
-SYST(1991, psr500, 0, 0, psr500, psr500, psr400_state, empty_init, "Yamaha", "PortaTone PSR-500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1991, psr500, 0, 0, psr500, psr500, psr400_state, init_psr500, "Yamaha", "PortaTone PSR-500", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
