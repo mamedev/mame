@@ -4,8 +4,6 @@
 
     Epson HX-20
 
-    http://fjkraan.home.xs4all.nl/comp/hx20/
-
     Epson CM6000 Series
 
     These are re-badged HX-20 with revision H motherboard and keyboard overlay.
@@ -26,7 +24,6 @@
 
     - m6800.cpp rewrite
     - keyboard interrupt
-    - LCD controller
     - serial
     - SW6 read
     - RS-232
@@ -70,8 +67,6 @@ void hx20_state::update_interrupt()
 
 void hx20_state::ksc_w(uint8_t data)
 {
-	logerror("KSC %02x\n", data);
-
 	m_ksc = data;
 }
 
@@ -142,8 +137,6 @@ void hx20_state::lcd_cs_w(uint8_t data)
 
 	*/
 
-	logerror("LCD CS %02x\n", data);
-
 	// LCD
 	for (auto &lcdc : m_lcdc)
 		lcdc->cs_w(1);
@@ -166,9 +159,19 @@ void hx20_state::lcd_cs_w(uint8_t data)
 
 void hx20_state::lcd_data_w(uint8_t data)
 {
-	logerror("LCD DATA %02x\n", data);
-
 	m_lcd_data = data;
+
+	for (int i = 0; 8 > i; ++i)
+	{
+		for (auto &lcdc : m_lcdc)
+			lcdc->si_w(BIT(data, i));
+
+		for (auto &lcdc : m_lcdc)
+			lcdc->sck_w(0);
+
+		for (auto &lcdc : m_lcdc)
+			lcdc->sck_w(1);
+	}
 }
 
 
