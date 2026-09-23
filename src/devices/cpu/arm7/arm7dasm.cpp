@@ -99,25 +99,38 @@ uint32_t arm7_disassembler::ExtractImmediateOperand( uint32_t opcode )
 	return std::rotr(imm, r);
 }
 
-void arm7_disassembler::WriteShiftCount( std::ostream &stream, uint32_t opcode )
+static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
+
+void arm7_disassembler::WriteShiftCount( std::ostream &stream, int type, int count, bool printType )
 {
-	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
+	if (count == 0)
 	{
-		util::stream_format( stream, "R%d", (opcode>>8)&0xf );
+		if (type == 0)
+		{
+			// ignore LSL #0 for register shift
+			if (printType)
+				return;
+		}
+		else if (type == 3)
+		{
+			// RRX does not take a count
+			if (printType)
+				stream << ", RRX";
+			return;
+		}
+		else
+			count = 32;
 	}
-	else /* Shift amount immediate 5 bit unsigned integer */
-	{
-		int c=(opcode>>7)&0x1f;
-		if( c==0 ) c = 32;
-		util::stream_format( stream, "#%d", c );
-	}
+
+	if (printType)
+		util::stream_format(stream, ", %s #%d", pRegOp[type], count);
+	else
+		util::stream_format(stream, ", #%d", count);
 }
 
 void arm7_disassembler::WriteDataProcessingOperand( std::ostream &stream, uint32_t opcode, bool printOp0, bool printOp1 )
 {
 	/* ccccctttmmmm */
-	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
-
 	if (printOp0)
 		util::stream_format(stream, "R%d, ", (opcode>>12)&0xf);
 	if (printOp1)
@@ -134,44 +147,62 @@ void arm7_disassembler::WriteDataProcessingOperand( std::ostream &stream, uint32
 	/* Register Op2 */
 	util::stream_format(stream, "R%d", (opcode>>0)&0xf);
 
-	//SJE: ignore if LSL#0 for register shift
-	if( ((opcode>>4) & 0xff)==0 )
-		return;
-	else if ( ((opcode>>4) & 0xff)==0x06 )
+	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		stream << ", RRX";
-		return;
+		util::stream_format( stream, ", %s R%d", pRegOp[(opcode>>5)&3], (opcode>>8)&0xf );
 	}
-
-	util::stream_format(stream, ", %s ", pRegOp[(opcode>>5)&3]);
-	WriteShiftCount(stream, opcode);
+	else /* Shift amount immediate 5 bit unsigned integer */
+	{
+		WriteShiftCount(stream, (opcode>>5)&3, (opcode>>7)&0x1f, true);
+	}
 }
 
 void arm7_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t opcode )
 {
 	/* ccccctttmmmm */
-	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
-
 	util::stream_format(
 		stream,
 		", %sR%d", /* Operand 1 register, (optional) sign, Operand 2 register, shift type */
 		(opcode&0x800000)?"":"-",
 		(opcode >> 0) & 0xf);
 
-	//check for LSL 0
-	if( ((opcode>>4) & 0xff)==0 )
-		return;
-	else if ( ((opcode>>4) & 0xff)==0x06 )
+	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 	{
-		stream << ", RRX";
-		return;
+		util::stream_format( stream, ", %s R%d", pRegOp[(opcode>>5)&3], (opcode>>8)&0xf );
+	}
+	else /* Shift amount immediate 5 bit unsigned integer */
+	{
+		WriteShiftCount(stream, (opcode>>5)&3, (opcode>>7)&0x1f, true);
+	}
+} /* WriteRegisterOperand */
+
+void arm7_disassembler::WriteRegisterList( std::ostream &stream, uint16_t operand )
+{
+	stream << '{';
+
+	int j=0,last=0,found=0;
+	for (j=0; j<16; j++) {
+		if (operand&(1<<j) && found==0) {
+			if (operand&((1<<j)-1))
+				stream << ", ";
+			found=1;
+			last=j;
+		}
+		else if ((operand&(1<<j))==0 && found) {
+			util::stream_format(stream, "R%d", last);
+			if (last!=j-1)
+				util::stream_format(stream, "-R%d", j-1);
+			found=0;
+		}
+	}
+	if (found) {
+		if (last != 15)
+			util::stream_format(stream, "R%d-", last);
+		stream << "R15";
 	}
 
-	//Add rotation type
-	util::stream_format(stream, ", %s ", pRegOp[(opcode >> 5) & 3]);
-
-	WriteShiftCount(stream, opcode);
-} /* WriteRegisterOperand */
+	stream << '}';
+}
 
 
 void arm7_disassembler::WriteBranchAddress( std::ostream &stream, uint32_t pc, uint32_t opcode, bool h_bit )
@@ -497,27 +528,11 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 				stream << "ADR";
 			else if( is_shift )
 			{
-				switch( (opcode>>5) & 3 )
-				{
-				case 0:
-					stream << "LSL";
-					break;
-
-				case 1:
-					stream << "LSR";
-					break;
-
-				case 2:
-					stream << "ASR";
-					break;
-
-				case 3:
-					if ( (opcode & 0x00000f90) == 0 )
-						stream << "RRX";
-					else
-						stream << "ROR";
-					break;
-				}
+				int type = (opcode>>5) & 3;
+				if ( type == 3 && (opcode & 0x00000f90) == 0 )
+					stream << "RRX";
+				else
+					stream << pRegOp[type];
 			}
 			else
 				stream << pOperation[op];
@@ -583,10 +598,13 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 					if ( rd != rs )
 						util::stream_format( stream, "R%d, ", rd );
 					util::stream_format( stream, "R%d", rs );
-					if ( (opcode & 0x00000ff0) != 0x00000060 )
+					if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
 					{
-						stream << ", ";
-						WriteShiftCount(stream, opcode);
+						util::stream_format( stream, ", R%d", (opcode>>8)&0xf );
+					}
+					else /* Shift amount immediate 5 bit unsigned integer */
+					{
+						WriteShiftCount( stream, (opcode>>5)&3, (opcode>>7)&0x1f, false );
 					}
 					break;
 				}
@@ -690,6 +708,12 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 				util::stream_format( stream, "%c%c", (opcode&0x01000000) ? 'E' : 'F', (opcode&0x00800000) ? 'D' : 'A');
 			else
 				util::stream_format( stream, "%c%c", (opcode&0x00800000) ? 'I' : 'D', (opcode&0x01000000) ? 'B' : 'A');
+			if (opcode & 0x00008000)
+			{
+				dasmflags = STEP_OUT;
+				if (opcode < 0xe0000000)
+					dasmflags |= STEP_COND;
+			}
 		}
 		else
 		{
@@ -704,35 +728,9 @@ u32 arm7_disassembler::arm7_disasm( std::ostream &stream, uint32_t pc, uint32_t 
 		util::stream_format( stream, "R%d", rn );
 		if( opcode&0x00200000 )
 			stream << '!';
-		stream << ", {";
+		stream << ", ";
 
-		{
-			int j=0,last=0,found=0;
-			for (j=0; j<16; j++) {
-				if (opcode&(1<<j) && found==0) {
-					if (opcode&((1<<j)-1))
-						stream << ", ";
-					found=1;
-					last=j;
-				}
-				else if ((opcode&(1<<j))==0 && found) {
-					util::stream_format(stream, "R%d", last);
-					if (last!=j-1)
-						util::stream_format(stream, "-R%d", j-1);
-					found=0;
-				}
-			}
-			if (found) {
-				if (last != 15)
-					util::stream_format(stream, "R%d-", last);
-				stream << "R15";
-				dasmflags = STEP_OUT;
-				if (opcode < 0xe0000000)
-					dasmflags |= STEP_COND;
-			}
-		}
-
-		stream << '}';
+		WriteRegisterList(stream, opcode & 0x0000ffff);
 
 		if( opcode&0x00400000 )
 		{
@@ -1275,42 +1273,15 @@ u32 arm7_disassembler::thumb_disasm(std::ostream &stream, uint32_t pc, uint16_t 
 		case 0x5: /* PUSH {Rlist}{LR} */
 			stream << "PUSH";
 			WritePadding(stream, start_position);
-			stream << '{';
-			if (opcode & 0x100)
-				stream << "LR, ";
-			for( offs = 7; offs >= 0; offs-- )
-			{
-				if( opcode & ( 1 << offs ) )
-				{
-					util::stream_format(stream, "R%d", offs);
-					if( opcode & ( (1 << offs) - 1 ) )
-						stream << ", ";
-				}
-			}
-			util::stream_format( stream, "}");
+			WriteRegisterList(stream, (opcode & 0x100) << 6 | (opcode & 0xff));
 			break;
 		case 0xc: /* POP {Rlist} */
 		case 0xd: /* POP {Rlist}{PC} */
 			stream << "POP";
 			WritePadding(stream, start_position);
-			stream << '{';
-			for( offs = 0; offs < 8; offs++ )
-			{
-				if( opcode & ( 1 << offs ) )
-				{
-					if( opcode & ( (1 << offs) - 1 ) )
-						stream << ", ";
-					util::stream_format(stream, "R%d", offs);
-				}
-			}
+			WriteRegisterList(stream, (opcode & 0x100) << 7 | (opcode & 0xff));
 			if (opcode & 0x100)
-			{
-				if ((opcode & 0xff) != 0)
-					stream << ", ";
-				stream << "PC";
 				dasmflags = STEP_OUT;
-			}
-			stream << '}';
 			break;
 		default:
 			util::stream_format(stream, "INVALID %04x", opcode);

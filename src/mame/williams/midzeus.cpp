@@ -99,6 +99,9 @@ protected:
 
 	virtual void video_start() override ATTR_COLD {}
 
+	// vsync comes from the Zeus 2 device, not the driver
+	virtual void rearm_vsync() override { }
+
 	uint32_t disk_asic_r(offs_t offset);
 	void disk_asic_w(offs_t offset, uint32_t data);
 
@@ -211,7 +214,7 @@ void midzeus_state::machine_start()
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
-	m_display_irq_off_timer = timer_alloc(FUNC(midzeus_state::display_irq_off), this);
+	m_vsync_start_timer = timer_alloc(FUNC(midzeus_state::vsync_start), this);
 
 	save_item(NAME(m_disk_asic_jr));
 	save_item(NAME(m_cmos_protected));
@@ -240,25 +243,47 @@ void midzeus_state::machine_reset()
 	m_cmos_protected = true;
 	memset(m_disk_asic_jr, 0x0, 0x10 * 4);
 	m_disk_asic_jr[6] = 0xa0; // Rev3 Athens
+
+	rearm_vsync();
 }
 
 
 
 /*************************************
  *
- *  Display interrupt generation
+ *  Vertical sync generation
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
+// Vertical sync is reg 0xC8's high half, not the end of active video.  mk4 and invasn test the line
+// counter for equality with 256, so raising the interrupt there loses the background.
+attotime midzeus_state::time_until_vsync() const
 {
-	m_maincpu->set_input_line(TMS320C3X_IRQ0, CLEAR_LINE);
+	uint32_t const line = m_zeusbase[0xc8] >> 16;
+	if (line > m_screen->visible_area().max_y && line < m_screen->height())
+		return m_screen->time_until_pos(line);
+	return m_screen->time_until_vblank_start();
 }
 
-INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
+// Vertical sync in, IRQ0 out, for both generations.  IRQ0 is level-sensitive with ST bit 14 clear,
+// so holding it re-enters the handler and a zero-width pulse is not allowed; two clocks is the
+// width the driver's own off-timer used.
+void midzeus_state::vsync_changed(int state)
 {
-	m_maincpu->set_input_line(TMS320C3X_IRQ0, ASSERT_LINE);
-	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
+	if (state)
+		m_maincpu->pulse_input_line(TMS320C3X_IRQ0, m_maincpu->clocks_to_attotime(2));
+}
+
+// Zeus 1's vsync generator; Zeus 2 has one in the device, so midzeus2_state overrides this away.
+void midzeus_state::rearm_vsync()
+{
+	m_vsync_start_timer->adjust(time_until_vsync());
+}
+
+TIMER_CALLBACK_MEMBER(midzeus_state::vsync_start)
+{
+	vsync_changed(ASSERT_LINE);
+	rearm_vsync();
 }
 
 void midzeus2_state::zeus_irq(int state)
@@ -1383,7 +1408,6 @@ void midzeus_state::midzeus(machine_config &config)
 	// basic machine hardware
 	TMS320C32(config, m_maincpu, 60_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
-	m_maincpu->set_vblank_int("screen", FUNC(midzeus_state::display_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1434,7 +1458,6 @@ void midzeus2_state::midzeus2(machine_config &config)
 	// basic machine hardware
 	TMS320C32(config, m_maincpu, 60_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(midzeus2_state::display_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1444,6 +1467,7 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_screen->set_screen_update(m_zeus, FUNC(zeus2_device::screen_update));
 
 	ZEUS2(config, m_zeus, ZEUS2_VIDEO_CLOCK);
+	m_zeus->vsync_callback().set(FUNC(midzeus2_state::vsync_changed));
 	m_zeus->irq_callback().set(FUNC(midzeus2_state::zeus_irq));
 
 	// sound hardware

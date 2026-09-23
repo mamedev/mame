@@ -96,6 +96,14 @@ void sd2iec_device::cbm_iec_data(int state)
 	m_maincpu->pc_w<1>(state);
 }
 
+void sd2iec_device::cbm_iec_reset(int state)
+{
+	if (!state)
+	{
+		reset();
+	}
+}
+
 void sd2iec_device::main_map(address_map &map)
 {
 	map(0x00000, 0x1efff).rom();

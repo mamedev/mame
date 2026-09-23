@@ -304,7 +304,7 @@ void popobear_state::video_start()
  */
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *vram = reinterpret_cast<u8 *>(m_spriteram.target());
+	auto const vram = util::big_endian_cast<u8 const>(m_spriteram.target());
 
 	for (int drawpri = 0xf; drawpri >= 0x0; drawpri--)
 	{
@@ -378,7 +378,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				for (int xi = 0; xi < width; xi++)
 				{
-					u8 const pix = vram[BYTE_XOR_BE(spr_num)] & palmask; // sometimes upper bits are set, but are either unused or have some non-colour purpose
+					u8 const pix = vram[spr_num] & palmask; // sometimes upper bits are set, but are either unused or have some non-colour purpose
 					int const x_draw = x + (x_dir ? (width - 1 - xi) : xi);
 
 					if (cliprect.contains(x_draw, y_draw))
@@ -492,11 +492,11 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// pixram
 	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(m_vregs[0x0e], 5))
 	{
-		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
+		auto const fb = util::big_endian_cast<u8 const>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				u8 const byte = fb[BYTE_XOR_BE(y * 0x100 + (x >> 1))];
+				u8 const byte = fb[(y * 0x100) + (x >> 1)];
 				bitmap.pix(y, x) = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
 			}
 		return 0;

@@ -73,6 +73,11 @@ void x68k_scsiext_device::device_start()
 
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 
+	// add a NOP handler here so unused registers don't trigger a bus error.  Human68k 3.02, for some 
+	// reason, constantly writes to SSTS during boot
+	m_slot->space().nop_read(0xea0000, 0xea001f);
+	m_slot->space().nop_write(0xea0000, 0xea001f);
+
 	m_slot->space().install_rom(0xea0020,0xea1fff, m_rom.target());
 	m_slot->space().unmap_write(0xea0020,0xea1fff);
 	m_slot->space().install_device(0xea0000, 0xea001f, *m_spc, &mb89352_device::map, 0x00ff00ff);

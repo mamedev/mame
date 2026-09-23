@@ -123,8 +123,8 @@ private:
 	// Find the interrupt with the lowest level (most important)
 	void prioritize_interrupts();
 
-	// Outgoing INTREQ* line
-	void signal_int();
+	// Propagate INT latch to INTREQ* line
+	void check_int();
 
 	// Sample the interrupt inputs.
 	void sample_interrupt_inputs();

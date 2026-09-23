@@ -149,6 +149,9 @@ license:CC0-1.0
 		<description>Big Blue Reader 128 v4.10</description>
 		<year>1993</year>
 		<publisher>SOGWAP</publisher>
+		<notes><![CDATA[
+Before loading FORMAT.128, disable automatic write verification with this command: OPEN9,9,15,"U0>V1":CLOSE9. Otherwise MS-DOS disk formatting fails.
+]]></notes>
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

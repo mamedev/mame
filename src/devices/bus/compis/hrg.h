@@ -69,6 +69,8 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual void pcs6_6_w(offs_t offset, uint8_t data) override;
+
 private:
 	UPD7220_DISPLAY_PIXELS_MEMBER( display_pixels );
 

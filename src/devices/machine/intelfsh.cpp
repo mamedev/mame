@@ -104,6 +104,7 @@ DEFINE_DEVICE_TYPE(FUJITSU_29F016A,          fujitsu_29f016a_device,          "m
 DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,        fujitsu_29dl164bd_device,        "mbm29dl164bd",             "Fujitsu MBM29DL164BD Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,        fujitsu_29lv002tc_device,        "mbm29lv002tc",             "Fujitsu MBM29LV002TC Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29LV800B,         fujitsu_29lv800b_device,         "mbm29lv800b",              "Fujitsu MBM29LV800B Flash")
+DEFINE_DEVICE_TYPE(FUJITSU_29LV160B,         fujitsu_29lv160b_device,         "mbm29lv160b",              "Fujitsu MBM29LV160B Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F400B,           intel_e28f400b_device,           "intel_e28f400b",           "Intel E28F400B Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29F008TC,        macronix_29f008tc_device,        "macronix_29f008tc",        "Macronix 29F008TC Flash")
 DEFINE_DEVICE_TYPE(MACRONIX_29F1610MC,       macronix_29f1610mc_device,       "macronix_29f1610mc",       "Macronix 29F1610MC Flash")
@@ -209,6 +210,9 @@ fujitsu_29lv002tc_device::fujitsu_29lv002tc_device(const machine_config &mconfig
 fujitsu_29lv800b_device::fujitsu_29lv800b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, FUJITSU_29LV800B, tag, owner, clock, 0x100000, MFG_FUJITSU, 0x225b) { m_bot_boot_sector = true; }
 
+fujitsu_29lv160b_device::fujitsu_29lv160b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, FUJITSU_29LV160B, tag, owner, clock, 0x200000, MFG_FUJITSU, 0x2249) { m_bot_boot_sector = true; }
+
 sharp_lh28f016s_device::sharp_lh28f016s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SHARP_LH28F016S, tag, owner, clock, 0x200000, MFG_INTEL, 0xaa) { }
 
@@ -225,7 +229,7 @@ atmel_49f4096_device::atmel_49f4096_device(const machine_config &mconfig, const 
 	: intelfsh16_device(mconfig, ATMEL_49F4096, tag, owner, clock, 0x80000, MFG_ATMEL, 0x92) { m_sector_is_16k = true; }
 
 amd_29f010_device::amd_29f010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, AMD_29F010, tag, owner, clock, 0x20000, MFG_AMD, 0x20) { }
+	: intelfsh8_device(mconfig, AMD_29F010, tag, owner, clock, 0x20000, MFG_AMD, 0x20) { m_sector_is_16k = true; }
 
 amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29F040, tag, owner, clock, 0x80000, MFG_AMD, 0xa4) { }

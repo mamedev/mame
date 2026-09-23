@@ -43,14 +43,18 @@ private:
 	required_ioport m_boss;
 
 	uint8_t via0_pa_r() { return c1571_device::via0_pa_r() | (m_boss->read() << 3); }
-	uint8_t cia_pa_r() { return m_isa_data; }
-	void cia_pa_w(uint8_t data) { m_isa_data = data; }
+	uint8_t cia_pa_r() { return m_isa_din; }
+	void cia_pa_w(uint8_t data) { m_isa_dout = data; }
 	void cia_pb_w(uint8_t data);
 
 	void mini_chief_mem(address_map &map) ATTR_COLD;
 
 	offs_t m_isa_offs;
-	uint8_t m_isa_data;
+	// the two directions need separate latches: the CIA only reports port A when
+	// its value changes, so a byte written twice in a row fires no callback and
+	// a shared latch would still hold whatever the last ISA read put there
+	uint8_t m_isa_din;
+	uint8_t m_isa_dout;
 };
 
 

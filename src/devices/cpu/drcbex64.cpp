@@ -1187,6 +1187,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	a.cmp(eax, gpd(REG_PARAM3));
 	a.mov(gpd(REG_PARAM3), 0xff);
 	a.cmovne(gpd(REG_PARAM1), gpd(REG_PARAM3));
+	a.mov(MABS(&m_state.fmod), gpb_lo(REG_PARAM1));
 	a.mov(MABS(&m_near.nominalfmod), gpb_lo(REG_PARAM1));
 
 	a.call(gpq(REG_PARAM2));

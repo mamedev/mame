@@ -4,13 +4,11 @@
 
 /*
  TODO:
-  - Fix sound emulation (speed needs verifying + sample playback)
+  - Fix timings and sound emulation (speed needs verifying + sample playback on real hardware)
   - Fix sprite communication / banking
     * bit "output bit 0x02 %d (IC21)" at 0x42 might be important
-    * mag_exzi currently requires a gross hack to stop the sprite CPU crashing on startup
     * mag_xain sometimes leaves old sprites on the screen, probably due to a lost clear
       command
-  - Fix flipscreen
   - Verify behavior of unknown / unused ports / interrupt sources etc.
   - Verify the disk images, convert to a better format that can natively store protection
     * RAW data also available if required
@@ -21,7 +19,6 @@
     * there are no per-game protection devices, so it's something to do with the base hardware
     * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
       a port read
-  - Add additional hardware notes from ArcadeHacker
   - Layer enables on War Mission? (transitions from title screen etc.)
 
  notes:
@@ -58,16 +55,16 @@
 
   Ports / Conversions
   - Booby Kids *
-  - Cocomania (Pacmania)
-  - Dodge Ball
-  - Double Dragon
-  - Dracula's Castle (Haunted House)
+  - Cocomania (Pacmania) *
+  - Dodge Ball *
+  - Double Dragon *
+  - Dracula's Castle (Haunted House) *
   - Exzisus *
-  - Flying Shark
-  - Super Contra
+  - Flying Shark *
+  - Super Contra *
   - Time Scanner *
   - Twin Eagle
-  - World Wars (Bermuda Triangle)
+  - World Wars (Bermuda Triangle) *
   - Xain d'Sleena *
 
   ** screenshots present on flyer
@@ -316,6 +313,7 @@ public:
 		, m_address1hack(-1)
 		, m_address2hack(-1)
 		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_cedsound(*this, "cedtop")
 		, m_cedplane0(*this, "cedplane0")
@@ -385,6 +383,7 @@ private:
 	void handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);
 	void kludge_protection();
+	void kludge_ddrg_idle_watchdog();
 	int m_address1hack;
 	int m_address2hack;
 
@@ -393,6 +392,7 @@ private:
 	virtual void video_start() override ATTR_COLD;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_maincpu;
 
 	required_device<cedar_magnet_sound_device> m_cedsound;
@@ -415,8 +415,8 @@ private:
 
 void cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map(address_map &map)
 {
-// these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
-// these are on the master board memory sub-board
+/* these are 3x MOTOROLA MM2114N SRAM 4096 bit RAM (twice the size because we map bytes, but only 4 bits are used)
+   these are on the master board memory sub-board */
 	map(0x2400, 0x27ff).ram().w(FUNC(cedar_magnet_state::palette_r_w)).share("pal_r");
 	map(0x2800, 0x2bff).ram().w(FUNC(cedar_magnet_state::palette_g_w)).share("pal_g");
 	map(0x3000, 0x33ff).ram().w(FUNC(cedar_magnet_state::palette_b_w)).share("pal_b");
@@ -424,8 +424,8 @@ void cedar_magnet_state::cedar_magnet_mainboard_sub_pal_map(address_map &map)
 
 void cedar_magnet_state::cedar_magnet_mainboard_sub_ram_map(address_map &map)
 {
-// these are 8x SIEMENS HYB 41256-15 AA - 262,144 bit DRAM (32kbytes)
-// these are on the master board memory sub-board
+/* these are 8x SIEMENS HYB 41256-15 AA - 262,144 bit DRAM (32kbytes)
+   these are on the master board memory sub-board */
 	map(0x00000, 0x3ffff).ram().share("ram0");
 }
 
@@ -749,13 +749,14 @@ void cedar_magnet_state::handle_sub_board_cpu_lines(cedar_magnet_board_interface
 
 u8 cedar_magnet_state::ic48_pio_pa_r() // 0x20
 {
-	u8 ret = m_ic48_pio_pa_val & ~0x08;
+	u8 ret = m_ic48_pio_pa_val & ~0x18;
 
 	ret |= m_io_coin[0]->read()<<3;
 	if (!m_cedplane0->is_running()) ret &= ~0x01;
 
-	// interrupt source stuff??
-	ret &= ~0x10;
+	/* Active-low frame signal on IC48 PA4.  Super Contra polls both edges
+	   to advance gameplay; keeping it low stalls its frame-processing loop. */
+	if (!m_screen->vblank()) ret |= 0x10;
 
 	LOGMASKED(LOG_IC48_PIO_PA, "%s: ic48_pio_pa_r (returning %02x)\n", machine().describe_context(), ret);
 	return ret;
@@ -774,7 +775,7 @@ void cedar_magnet_state::ic48_pio_pa_w(u8 data) // 0x20
 	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x80 %d (unused)\n", (data >> 7)&1); // A7 -> 12 J4 unpopulated
 	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x40 %d (bank)\n", (data >> 6)&1); // A6 -> 2 74HC10 3NAND IC19
 	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x20 %d (bank)\n", (data >> 5)&1); // A5 -> 4 74HC10 3NAND IC19
-	LOGMASKED(LOG_IC48_PIO_PA, "input  bit 0x10 %d (interrupt source related?)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
+	LOGMASKED(LOG_IC48_PIO_PA, "input  bit 0x10 %d (active-low frame signal)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
 	LOGMASKED(LOG_IC48_PIO_PA, "input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
 	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x04 %d (plane0 CPU/bus related?)\n", (data >> 2)&1); // A2 -> 45 J6
 	LOGMASKED(LOG_IC48_PIO_PA, "output bit 0x02 %d (plane0 CPU/bus related?)\n", (data >> 1)&1); // A1 -> 47 J6
@@ -825,6 +826,7 @@ void cedar_magnet_state::ic48_pio_pb_w(u8 data) // 0x22
 	int spriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
 
 	handle_sub_board_cpu_lines(*m_cedplane1, oldplane1select, plane1select);
+
 	handle_sub_board_cpu_lines(*m_cedsprite, oldspriteselect, spriteselect);
 }
 
@@ -927,11 +929,15 @@ INPUT_PORTS_END
 INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 {
 	kludge_protection();
+	kludge_ddrg_idle_watchdog();
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_cedplane0->irq_hold();
 	m_cedplane1->irq_hold();
-	m_cedsprite->irq_hold();
+	/* The sprite board clears its interrupt request with OUT (0x9c),A.
+	   Keep the request asserted until then: clearing it at Z80 acknowledge
+	   queues another interrupt during a long handler and starves its main loop. */
+	m_cedsprite->cpu().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 void cedar_magnet_state::cedar_magnet(machine_config &config)
@@ -963,7 +969,7 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	// Derive a non-zero blanking interval from the total and visible height.
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-8-1, 0, 192-1);
 	screen.set_screen_update(FUNC(cedar_magnet_state::screen_update));
@@ -992,7 +998,9 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 
     *0xea400 is/was track 4e, side 00, sector 01 for future reference if the floppy format changes
 
-    All games have the same code in them but at different addresses
+    The checks occur at different addresses in each game.  Double Dragon adds 11 bytes
+    around the disk read to suppress normal disk-error logging during the protection check;
+    its retry loop uses DJNZ -46 (0xd2) rather than DJNZ -35 (0xdd).
 */
 void cedar_magnet_state::kludge_protection()
 {
@@ -1019,7 +1027,7 @@ void cedar_magnet_state::kludge_protection()
 	{
 		for (int i = 0; i < max_addr - 4; i++)
 		{
-			if ((m_ram0[i + 0] == 0x10) && (m_ram0[i + 1] == 0xdd) && (m_ram0[i + 2] == 0x3e) && (m_ram0[i + 3] == 0xff))
+			if ((m_ram0[i + 0] == 0x10) && ((m_ram0[i + 1] == 0xdd) || (m_ram0[i + 1] == 0xd2)) && (m_ram0[i + 2] == 0x3e) && (m_ram0[i + 3] == 0xff))
 			{
 				m_address2hack = i + 2;
 				logerror("found patch at %06x\n", i + 2);
@@ -1030,6 +1038,33 @@ void cedar_magnet_state::kludge_protection()
 	else
 	{
 		if ((m_ram0[m_address2hack] == 0x3e) && (m_ram0[m_address2hack + 1] == 0xff)) m_ram0[m_address2hack] = 0xc9;
+	}
+}
+
+
+/* Compatibility workaround for DD TEST 15/6/88. Its credited-title polling
+   loop does not service the software watchdog and can expire after 512 frames.
+   Service it only in that verified wait, retaining timeout detection elsewhere.
+   This is separate from the sprite board's interrupt acknowledgement fix. */
+void cedar_magnet_state::kludge_ddrg_idle_watchdog()
+{
+	const offs_t pc = m_maincpu->pc();
+	if ((pc < 0x925e) || (pc >= 0x9273) || (m_palbank & 0x03) || ((m_ic48_pio_pa_val & 0x60) == 0x60))
+		return;
+
+	static constexpr u8 wait_code[] = {
+		0x21, 0x20, 0x7a, 0xcb, 0x7e, 0x20, 0x29, 0x23, 0xcb, 0x7e, 0x20,
+		0x4d, 0x21, 0x3c, 0x0b, 0x3a, 0xba, 0x77, 0xbe, 0x28, 0xeb
+	};
+	static constexpr u8 watchdog_code[] = {
+		0x2a, 0x91, 0x0a, 0x23, 0x22, 0x91, 0x0a, 0x7c,
+		0xe6, 0xfe, 0xc2, 0x55, 0x04, 0xc3, 0x4b, 0x00
+	};
+	if (std::equal(std::begin(wait_code), std::end(wait_code), &m_ram0[0x925e]) &&
+		std::equal(std::begin(watchdog_code), std::end(watchdog_code), &m_ram0[0x0aae]))
+	{
+		m_ram0[0x0a91] = 0;
+		m_ram0[0x0a92] = 0;
 	}
 }
 
@@ -1047,12 +1082,19 @@ ROM_START( cedmag )
 	// no disk inserted
 ROM_END
 
-// Marked as BAD_DUMP because of the missing tracks (hence the different size).
 ROM_START( mag_boob )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "boobykid.img", 0x00000, 0xde000, BAD_DUMP CRC(3196ffb4) SHA1(99732f74bb907ed6a93ed097c7b211c709d8bf85) ) // Floppy labeled "BOOBY KID CC / TUBO VERTICAL / 1 joystick, 2 pulsadores"
+	ROM_LOAD( "mag_boob41.dsk", 0x00000, 0xf0000, CRC(79ca3f0d) SHA1(7daff6445e23f150b908b9c622fb66d7d92bfd04) ) // Floppy labeled "BOOBY KID / VERTICAL / VER. 4.1"
+ROM_END
+
+// Marked as BAD_DUMP because of the missing tracks (hence the different size).
+ROM_START( mag_boobcc )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_boob.dsk", 0x00000, 0xde000, BAD_DUMP CRC(3196ffb4) SHA1(99732f74bb907ed6a93ed097c7b211c709d8bf85) ) // Floppy labeled "BOOBY KID CC / TUBO VERTICAL / 1 joystick, 2 pulsadores"
 ROM_END
 
 // Data read 100% consistently with multiple drives
@@ -1060,7 +1102,7 @@ ROM_START( mag_burn )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 ) //
-	ROM_LOAD( "theburningcavern 31_3_87.img", 0x00000, 0xf0000, CRC(c95911f8) SHA1(eda3bdbbcc3e00a7da83253209e832855c2968b1) )
+	ROM_LOAD( "mag_burn.dsk", 0x00000, 0xf0000, CRC(c95911f8) SHA1(eda3bdbbcc3e00a7da83253209e832855c2968b1) )
 ROM_END
 
 /*
@@ -1075,40 +1117,115 @@ ROM_START( mag_day )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "adayinspace 31_3_87.img", 0x00000, 0xf0000, CRC(bc65302d) SHA1(6ace68a0b5f7a07a8f5c318c5359011074e7f2ec) )
+	ROM_LOAD( "mag_day.dsk", 0x00000, 0xf0000, CRC(205dbff9) SHA1(c00154cede00e99a7f62034fa4ddf0f5ff27b7a2) )
 ROM_END
 
 /*
-The following tracks/sides failed to read (bad disk)
+    "VERSION CC": read 1 selected; the two captures disagree at 0xd9800.
+    Keep the extra track data and BAD_DUMP status; the disputed sector is unresolved.
+*/
+ROM_START( mag_coco )
+	BIOS_ROM
 
-track:68:0 (file offset:0x0cc000 - 0x0cd7ff)
-track:69:0 (file offset:0x0cf000 - 0x0d07ff)
-track:70:0 (file offset:0x0d2000 - 0x0d37ff)
-track:71:0 (file offset:0x0d5000 - 0x0d67ff)
-track:72:0 (file offset:0x0d8000 - 0x0d97ff)
-track:73:0 (file offset:0x0db000 - 0x0dc7ff)
-track:74:0 (file offset:0x0de000 - 0x0df7ff)
-track:75:0 (file offset:0x0e1000 - 0x0e27ff)
-track:76:0 (file offset:0x0e4000 - 0x0e57ff)
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_coco.dsk", 0x00000, 0xfa800, BAD_DUMP CRC(95380ddd) SHA1(49fdb8bc970a7b7b848149ee0eb1f45378e9489b) )
+ROM_END
 
-These areas aren't read by the code that currently loads, but other areas also didn't read consistently.
+/*
+    "DD TEST  15/6/88": read 1 has independently corroborated shared graphics.
+    The inconsistent late sector at 0xea000 remains unresolved: retain BAD_DUMP.
+*/
+ROM_START( mag_ddrg )
+	BIOS_ROM
 
-The 3 dumps in the set below contain different reads of tracks 0-67.
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_ddrg.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(58eb41fc) SHA1(6042074f161e35b3a26067cab9255b760b8e6962) )
+ROM_END
+
+/*
+    "DD EC": complete read 1 with graphics sector 0x5ec00 reconstructed.
+    Read 2 physical 0x5d400 restores the phase-damaged tail (read 3 corroborates).
+    The sole unresolved byte at logical 0x5ece4 uses DD TEST read 1: 0x05.
+    The cross-revision pixel inference requires BAD_DUMP; program bytes are unchanged.
+*/
+ROM_START( mag_ddrgec )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_ddrgec.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(89408920) SHA1(408a2f8d9f5c595f32416ab0c63f4ae9227fc198) )
+ROM_END
+
+// Owner-confirmed working capture; disk header: "db ce".
+ROM_START( mag_dodg )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_dodg.dsk", 0x00000, 0xf0000, CRC(d6231e1f) SHA1(30703e5daf234cc1bdb883820f508c2b48524fff) )
+ROM_END
+
+/*
+    "FS 4.0": owner-tested read 1. Read 2 differs at 0xe9800; no verified
+    replacement exists for this sector, so retain read 1 and mark BAD_DUMP.
+*/
+ROM_START( mag_fsha )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_fsha.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(a44a6f53) SHA1(4fd6312b4f69e541d5716318727416d171f9eb6f) )
+ROM_END
+
+// Owner-confirmed working capture; disk header: "WW  Version  ED".
+ROM_START( mag_wwar )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_wwar.dsk", 0x00000, 0xf0000, CRC(6e8bebd8) SHA1(109b8e8d995fdff3765fd2fa8aea14ddd224f149) )
+ROM_END
+
+/*
+    The following tracks/sides failed to read (bad disk)
+      track:68:0 (file offset:0x0cc000 - 0x0cd7ff)
+      track:69:0 (file offset:0x0cf000 - 0x0d07ff)
+      track:70:0 (file offset:0x0d2000 - 0x0d37ff)
+      track:71:0 (file offset:0x0d5000 - 0x0d67ff)
+      track:72:0 (file offset:0x0d8000 - 0x0d97ff)
+      track:73:0 (file offset:0x0db000 - 0x0dc7ff)
+      track:74:0 (file offset:0x0de000 - 0x0df7ff)
+      track:75:0 (file offset:0x0e1000 - 0x0e27ff)
+      track:76:0 (file offset:0x0e4000 - 0x0e57ff)
+
+    The three captures also differ in six sectors before these missing tracks.
+    The reconstruction uses drac2.dsk, replacing 0x400-0x7ff with drac.dsk
+    (identical in drac3.dsk). At 0x3c00 all reads differ, but realigning a
+    four-bit phase error in read 1 corroborates read 2's palette tables.
+    No external donor data or replacement game code is used.
+    The missing tracks remain E5 filler, so the reconstruction is still BAD_DUMP.
+    Only the reconstruction is loaded. The original captures are archived separately;
+    overlapping ROM_LOADs previously loaded only the damaged third read.
 */
 ROM_START( mag_drac )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "drac.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(2b5ca6f8) SHA1(063ea3b55bf95d05c866c0fcdb41c307c484a4f8) )
-	ROM_LOAD( "drac2.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(cf6c1dd2) SHA1(7adb5146b050172090556927bf6d30ba8265107a) )
-	ROM_LOAD( "drac3.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(7060e4a2) SHA1(b8e5437afff11d57a40c092d005d6b075819537a))
+	ROM_LOAD( "mag_drac.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(31f9a112) SHA1(a288ad04f58ffdabe000fa5aa3a7814feec1d58e) )
 ROM_END
 
 ROM_START( mag_exzi )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "exzisus.img", 0x00000, 0xf0000, CRC(3705e9dc) SHA1(78c8010d224f5deb202a29bd273ea7dc85ddcdb4) )
+	ROM_LOAD( "mag_exzi.dsk", 0x00000, 0xf0000, CRC(3705e9dc) SHA1(78c8010d224f5deb202a29bd273ea7dc85ddcdb4) )
+ROM_END
+
+/*
+    A later revision, identified by the disk header as "EX 2.0".
+    Inverted video, confirmed on original hardware.
+*/
+ROM_START( mag_exzi2 )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_exzi2.dsk", 0x00000, 0xf0000, CRC(695ff3db) SHA1(950db8084e0aa79d44dc550d3591f4117b5b2b5a) )
 ROM_END
 
 /*
@@ -1120,14 +1237,38 @@ ROM_START( mag_pdak )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "paris.dsk 31_3_87.img", 0x00000, 0xf0000, BAD_DUMP CRC(2c4ee9e1) SHA1(22c2b75c16aca95ecf2199451c1bd12dd3a3844c) )
+	ROM_LOAD( "mag_pdak.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(2c4ee9e1) SHA1(22c2b75c16aca95ecf2199451c1bd12dd3a3844c) )
+ROM_END
+
+// The two supplied "supercontralenta" reads are byte-identical (header "CO SB").
+ROM_START( mag_scon )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "mag_scon.dsk", 0x00000, 0xf0000, CRC(5c94539a) SHA1(1b1deaa05c0c57a07327f0705668e4fb56ba32b1) )
+ROM_END
+
+/*
+    Three inconsistent reads of a non-booting "SC  cc" disk.
+    The reconstruction repairs ten sectors: two from read 2 and eight from mag_scon.
+    The reconstruction is BAD_DUMP, not an independently verified original read.
+    A fourth, mislabeled SC cc capture corroborates 0x1800, 0x1c00, 0x2400 and
+    0x2800, but cannot recover the remaining six damaged boot sectors. Other
+    SC cc data is preserved; the damaged originals are archived separately.
+*/
+ROM_START( mag_sconcc )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+
+	ROM_LOAD( "mag_sconcc.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(bc61c042) SHA1(bcba915d13633fe50c5ac5b3486fd8cf08c395b4) )
 ROM_END
 
 ROM_START( mag_time )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", 0 )
-	ROM_LOAD( "timescanner.img", 0x00000, 0xf0000, CRC(214c558c) SHA1(9c71fce35acaf17ac685f77aebb1b0a930060f0b) )
+	ROM_LOAD( "mag_time.dsk", 0x00000, 0xf0000, CRC(214c558c) SHA1(9c71fce35acaf17ac685f77aebb1b0a930060f0b) )
 ROM_END
 
 /*
@@ -1141,7 +1282,7 @@ ROM_START( mag_war )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "war mission wm 4_6_87.img", 0x00000, 0xf0000, CRC(7c813520) SHA1(2ba5999709a52302aa367fb46199b331421a0d56) )
+	ROM_LOAD( "mag_war.dsk", 0x00000, 0xf0000, CRC(7c813520) SHA1(2ba5999709a52302aa367fb46199b331421a0d56) )
 ROM_END
 
 // Data read 100% consistently with multiple drives
@@ -1149,28 +1290,38 @@ ROM_START( mag_wara )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "war mission wm 9_4_87.img", 0x00000, 0xf0000, CRC(6296ea6f) SHA1(c0aaf51362bfa3362ef39c3fb1e1c848b73fd780) )
+	ROM_LOAD( "mag_wara.dsk", 0x00000, 0xf0000, CRC(1bdabae0) SHA1(0341c46c6832e8682c9a39058e970e5cb2546544) )
 ROM_END
 
 ROM_START( mag_xain )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "xain.img", 0x00000, 0xf0000, CRC(5647849f) SHA1(edd2f3f6359424583bf526bf4601476dc849e617) )
+	ROM_LOAD( "mag_xain.dsk", 0x00000, 0xf0000, CRC(5647849f) SHA1(edd2f3f6359424583bf526bf4601476dc849e617) )
 ROM_END
 
 
 } // anonymous namespace
 
 
-GAME( 1987, cedmag,   0,       cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
-GAME( 1987, mag_boob, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "Booby Kids (Magnet System)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
-GAME( 1987, mag_burn, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "The Burning Cavern (31/03/87)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
-GAME( 1987, mag_day,  cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "A Day In Space (31/03/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
-GAME( 1987, mag_drac, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Dracula's Castle (Magnet System)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, mag_exzi, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game was by Taito
-GAME( 1987, mag_pdak, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Paris Dakar (31/03/87, Spanish)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label, has unemulated 'handlebar' option that can be enabled in service mode
-GAME( 1987, mag_time, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game was by Sega
-GAME( 1987, mag_war,  cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 04/06/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date in program
-GAME( 1987, mag_wara, mag_war, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90, "EFO SA / Cedar", "War Mission (WM 09/04/87)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // The '9' was handwritten over a printed letter on disk label, date not in program
-GAME( 1987, mag_xain, cedmag,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game was by Technos
+GAME( 1987, cedmag,     0,        cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Magnet System",                                  MACHINE_IS_BIOS_ROOT )
+GAME( 1987, mag_boob,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (version 4.1, Magnet System)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
+GAME( 1987, mag_boobcc, mag_boob, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (version CC, Magnet System)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
+GAME( 1987, mag_burn,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "The Burning Cavern (31/03/87)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
+GAME( 198?, mag_coco,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Cocomania (version CC, Magnet System)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_day,    cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "A Day In Space (31/03/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
+GAME( 1988, mag_ddrg,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Double Dragon (DD TEST 15/6/88, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_ddrgec, mag_ddrg, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Double Dragon (EC, Magnet System)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_dodg,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Dodge Ball (CE, Magnet System)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_drac,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Dracula's Castle (Magnet System)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_exzi,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Taito
+GAME( 198?, mag_exzi2,  mag_exzi, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT180, "EFO SA / Cedar", "Exzisus (EX 2.0, Magnet System)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Taito
+GAME( 198?, mag_fsha,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Flying Shark (4.0, Magnet System)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_pdak,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Paris Dakar (31/03/87, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label, has unemulated 'handlebar' option that can be enabled in service mode
+GAME( 198?, mag_scon,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (Magnet System)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_sconcc, mag_scon, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (SC cc, Magnet System)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_time,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Sega
+GAME( 1987, mag_war,    cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "War Mission (WM 04/06/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date in program
+GAME( 1987, mag_wara,   mag_war,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "War Mission (WM 09/04/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // The '9' was handwritten over a printed letter on disk label, date not in program
+GAME( 198?, mag_wwar,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "World Wars (ED, Magnet System)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, mag_xain,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Technos

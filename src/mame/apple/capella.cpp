@@ -15,8 +15,8 @@
         Per the 6200 Developer Notes, the Capella only has D0-D4 connected, so only 5 bits
         can be read/written at a time.
 
-        - $53000007: ???
-        ROM clears it to 0
+        - $53000007: Reset?
+        ROM clears it to 0 at boot, then never touches it again. Likely a reset signal
 
         - $5300000F: RAM / control switch
             Bit 2 = Tag RAM map enable?
@@ -60,6 +60,7 @@ DEFINE_DEVICE_TYPE(CAPELLA, capella_device, "maccapella", "Apple Capella PowerPC
 
 void capella_device::map(address_map &map)
 {
+	map(0x53000000, 0x53000007).w(FUNC(capella_device::reset_w));
 	map(0x53000008, 0x5300000f).rw(FUNC(capella_device::ctrl_r), FUNC(capella_device::ctrl_w));
 	map(0x53000010, 0x53000017).rw(FUNC(capella_device::ctrl_b_r), FUNC(capella_device::ctrl_b_w));
 	map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
@@ -110,6 +111,12 @@ void capella_device::device_reset()
 }
 
 //-------------------------------------------------
+
+void capella_device::reset_w(offs_t offset, u64 data)
+{
+	// failing to do this means system bootloops if you try to restart from macos
+	device_reset();
+}
 
 u64 capella_device::ctrl_r(offs_t offset)
 {

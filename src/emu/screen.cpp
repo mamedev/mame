@@ -1018,6 +1018,13 @@ int screen_device::vpos() const
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
 
+	// A device that stopped one cycle short of the VBLANK start timer is still
+	// executing that cycle in the previous frame.  See the "skip if we already
+	// rendered this frame" comment in update_partial(), which addresses the same
+	// problem there.
+	if (delta < 0)
+		delta += m_frame_period;
+
 	// compute the v position relative to the start of VBLANK
 	vpos = delta / m_scantime;
 
@@ -1037,6 +1044,10 @@ int screen_device::hpos() const
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
+
+	// compensate if device is in the previous frame.  see vpos() for more details.
+	if (delta < 0)
+		delta += m_frame_period;
 
 	// compute the v position relative to the start of VBLANK
 	int vpos = delta / m_scantime;

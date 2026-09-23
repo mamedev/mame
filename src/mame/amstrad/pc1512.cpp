@@ -13,11 +13,6 @@
 
     TODO:
 
-    - adjust mouse speed
-    - pc1512 V3 VDU check fails
-    - Amstrad SM2400 internal modem
-    - Amstrad RP4 diagnostic ISA card (PC1512)
-    - Amstrad RP5-2 diagnostic ISA card (PC1640)
     - 40291/8908 B ROM on PC1640 HD30 controller card
 
 */
@@ -368,6 +363,30 @@ void pc1512_base_state::dma_page_w(offs_t offset, uint8_t data)
 void pc1512_base_state::nmi_mask_w(uint8_t data)
 {
 	m_nmi_enable = BIT(data, 7);
+
+	update_nmi();
+}
+
+
+//-------------------------------------------------
+//  ndp_int_w -
+//-------------------------------------------------
+
+void pc1512_base_state::ndp_int_w(int state)
+{
+	m_ndp_int = state;
+
+	update_nmi();
+}
+
+
+//-------------------------------------------------
+//  update_nmi -
+//-------------------------------------------------
+
+void pc1512_base_state::update_nmi()
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_nmi_enable && m_ndp_int) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -412,7 +431,7 @@ uint8_t pc1512_base_state::printer_r(offs_t offset)
 		data |= m_centronics_select << 4;
 		data |= m_centronics_perror << 5;
 		data |= m_centronics_ack << 6;
-		data |= m_centronics_busy << 7;
+		data |= !m_centronics_busy << 7;
 		break;
 
 	case 2:
@@ -534,9 +553,10 @@ void pc1512_base_state::printer_w(offs_t offset, uint8_t data)
 
 		m_printer_control = data & 0x1f;
 
-		m_centronics->write_strobe(BIT(data, 0));
-		m_centronics->write_autofd(BIT(data, 1));
+		m_centronics->write_strobe(!BIT(data, 0));
+		m_centronics->write_autofd(!BIT(data, 1));
 		m_centronics->write_init(BIT(data, 2));
+		m_centronics->write_select_in(!BIT(data, 3));
 
 		m_ack_int_enable = BIT(data, 4);
 		update_ack();
@@ -722,7 +742,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc1640 )
 	PORT_START("LK")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Language ) ) PORT_DIPLOCATION("LK:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( French ) )
@@ -733,19 +753,6 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(    0x00, "Diagnostic Mode" )
 
 	PORT_START("SW")
-	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
-	PORT_DIPSETTING(    0x0b, "Internal MD, External CGA80" )
-	PORT_DIPSETTING(    0x0a, "Internal MD, External CGA40" )
-	PORT_DIPSETTING(    0x09, "Internal ECD350, External MDA/HERC" )
-	PORT_DIPSETTING(    0x08, "Internal ECD200, External MDA/HERC" )
-	PORT_DIPSETTING(    0x07, "Internal CD80, External MDA/HERC" )
-	PORT_DIPSETTING(    0x06, "Internal CD40, External MDA/HERC" )
-	PORT_DIPSETTING(    0x05, "External CGA80, Internal MD" )
-	PORT_DIPSETTING(    0x04, "External CGA40, Internal MD" )
-	PORT_DIPSETTING(    0x03, "External MDA/HERC, Internal ECD350" )
-	PORT_DIPSETTING(    0x02, "External MDA/HERC, Internal ECD200" )
-	PORT_DIPSETTING(    0x01, "External MDA/HERC, Internal CD80" )
-	PORT_DIPSETTING(    0x00, "External MDA/HERC, Internal CD40" )
 	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
 	PORT_DIPSETTING(    0x10, "EGA" )
 	PORT_DIPSETTING(    0x00, "CGA/MDA/HERC" )
@@ -1010,7 +1017,7 @@ void pc1512_base_state::drive_select_w(uint8_t data)
 void pc1512_base_state::update_ack()
 {
 	if (m_ack_int_enable)
-		m_pic->ir7_w(m_centronics_ack);
+		m_pic->ir7_w(!m_centronics_ack);
 	else
 		m_pic->ir7_w(CLEAR_LINE);
 }
@@ -1046,7 +1053,22 @@ void pc1512_base_state::write_centronics_fault(int state)
 //  isa8bus_interface isabus_intf
 //-------------------------------------------------
 
-void pc1640_isa8_cards(device_slot_interface &device)
+static void pc1512_isa8_cards(device_slot_interface &device)
+{
+	pc_isa8_cards(device);
+	// Amstrad MC2400 modem card
+    // Amstrad RP4 diagnostic ISA card (PC1512)
+    // Amstrad RP5-2 diagnostic ISA card (PC1512/PC1640)
+}
+
+static void pc1640_isa8_cards(device_slot_interface &device)
+{
+	pc_isa8_cards(device);
+	// Amstrad MC2400 modem card
+    // Amstrad RP5-2 diagnostic ISA card (PC1512/PC1640)
+}
+
+static void pc1640_internal_isa8_cards(device_slot_interface &device)
 {
 	device.option_add_internal("iga", ISA8_PC1640_IGA);
 }
@@ -1070,6 +1092,7 @@ void pc1512_base_state::machine_start()
 	save_item(NAME(m_status2));
 	save_item(NAME(m_port61));
 	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_ndp_int));
 	save_item(NAME(m_kbd));
 	save_item(NAME(m_kb_bits));
 	save_item(NAME(m_kbclk));
@@ -1113,6 +1136,7 @@ void pc1512_state::machine_start()
 void pc1512_base_state::machine_reset()
 {
 	m_nmi_enable = 0;
+	m_ndp_int = 0;
 	drive_select_w(0);
 
 	m_kb_bits = 0;
@@ -1151,17 +1175,24 @@ void pc1640_state::machine_start()
 
 void pc1512_state::pc1512(machine_config &config)
 {
-	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	I8086(config, m_maincpu, XTAL(24'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1512_state::pc1512_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc1512_state::pc1512_io);
 	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set(m_ndp, FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set(m_ndp, FUNC(i8087_device::addr_w));
+
+	I8087(config, m_ndp, XTAL(24'000'000)/3);
+	m_ndp->set_space_86(m_maincpu, AS_PROGRAM);
+	m_ndp->irq().set(FUNC(pc1512_state::ndp_int_w));
+	m_ndp->busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	// video
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_raw(28.636363_MHz_XTAL, 912, 0, 910, 262, 0, 260);
+	screen.set_raw(XTAL(28'636'363), 912, 0, 910, 262, 0, 260);
 	screen.set_screen_update(m_vdu, FUNC(ams40041_device::screen_update));
 
-	AMS40041(config, m_vdu, 28.636363_MHz_XTAL);
+	AMS40041(config, m_vdu, XTAL(28'636'363));
 	m_vdu->set_screen(SCREEN_TAG);
 	m_vdu->set_show_border_area(true);
 
@@ -1180,7 +1211,7 @@ void pc1512_state::pc1512(machine_config &config)
 	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
 	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
-	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
+	AM9517A(config, m_dmac, XTAL(24'000'000)/6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1512_state::hrq_w));
 	m_dmac->out_eop_callback().set(FUNC(pc1512_state::eop_w));
 	m_dmac->in_memr_callback().set(FUNC(pc1512_state::memr_r));
@@ -1201,30 +1232,30 @@ void pc1512_state::pc1512(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
+	m_pit->set_clk<0>(XTAL(28'636'363)/24);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
+	m_pit->set_clk<1>(XTAL(28'636'363)/24);
 	m_pit->out_handler<1>().set(FUNC(pc1512_state::pit1_w));
-	m_pit->set_clk<2>(28.636363_MHz_XTAL / 24);
+	m_pit->set_clk<2>(XTAL(28'636'363)/24);
 	m_pit->out_handler<2>().set(FUNC(pc1512_state::pit2_w));
 
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	MC146818(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	UPD765A(config, m_fdc, 24_MHz_XTAL / 6, false, false);
+	UPD765A(config, m_fdc, XTAL(24'000'000)/6, false, false);
 	// SED9420CAC (dedicated 16 MHz XTAL) is used as read data separator only
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
 
-	INS8250(config, m_uart, 1.8432_MHz_XTAL);
+	INS8250(config, m_uart, XTAL(1'843'200));
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->ack_handler().set(FUNC(pc1512_state::write_centronics_ack));
 	m_centronics->busy_handler().set(FUNC(pc1512_state::write_centronics_busy));
 	m_centronics->perror_handler().set(FUNC(pc1512_state::write_centronics_perror));
@@ -1254,16 +1285,16 @@ void pc1512_state::pc1512(machine_config &config)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1512_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa2", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1512_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1512_isa8_cards, nullptr, false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
 
 	// software list
+	SOFTWARE_LIST(config, "pc_flop_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "flop_list").set_original("pc1512_flop");
-	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
 }
 
 
@@ -1274,6 +1305,7 @@ void pc1512_state::pc1512(machine_config &config)
 void pc1512_state::pc1512dd(machine_config &config)
 {
 	pc1512(config);
+
 	m_floppy[1]->set_default_option("525dd");
 }
 
@@ -1285,8 +1317,10 @@ void pc1512_state::pc1512dd(machine_config &config)
 void pc1512_state::pc1512hd(machine_config &config)
 {
 	pc1512(config);
-	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
-	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+
+	subdevice<isa8_slot_device>("isa3")->set_default_option("wdxt_gen");
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
 }
 
 
@@ -1296,10 +1330,17 @@ void pc1512_state::pc1512hd(machine_config &config)
 
 void pc1640_state::pc1640(machine_config &config)
 {
-	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	I8086(config, m_maincpu, XTAL(24'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc1640_state::pc1640_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc1640_state::pc1640_io);
 	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set(m_ndp, FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set(m_ndp, FUNC(i8087_device::addr_w));
+
+	I8087(config, m_ndp, XTAL(24'000'000)/3);
+	m_ndp->set_space_86(m_maincpu, AS_PROGRAM);
+	m_ndp->irq().set(FUNC(pc1640_state::ndp_int_w));
+	m_ndp->busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	// sound
 	SPEAKER(config, "mono").front_center();
@@ -1316,7 +1357,7 @@ void pc1640_state::pc1640(machine_config &config)
 	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
 	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
-	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
+	AM9517A(config, m_dmac, XTAL(24'000'000)/6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1640_state::hrq_w));
 	m_dmac->out_eop_callback().set(FUNC(pc1640_state::eop_w));
 	m_dmac->in_memr_callback().set(FUNC(pc1640_state::memr_r));
@@ -1337,30 +1378,30 @@ void pc1640_state::pc1640(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
+	m_pit->set_clk<0>(XTAL(28'636'363)/24);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
-	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
+	m_pit->set_clk<1>(XTAL(28'636'363)/24);
 	m_pit->out_handler<1>().set(FUNC(pc1512_base_state::pit1_w));
-	m_pit->set_clk<2>(28.636363_MHz_XTAL / 24);
+	m_pit->set_clk<2>(XTAL(28'636'363)/24);
 	m_pit->out_handler<2>().set(FUNC(pc1512_base_state::pit2_w));
 
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	MC146818(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	UPD765A(config, m_fdc, 24_MHz_XTAL / 6, false, false);
+	UPD765A(config, m_fdc, XTAL(24'000'000)/6, false, false);
 	// FDC91C36 (clocked by CK8K) is used as read data separator only
 	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, m_floppy[0], pc1512_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], pc1512_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
 
-	INS8250(config, m_uart, 1.8432_MHz_XTAL);
+	INS8250(config, m_uart, XTAL(1'843'200));
 	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
 	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->ack_handler().set(FUNC(pc1512_state::write_centronics_ack));
 	m_centronics->busy_handler().set(FUNC(pc1512_state::write_centronics_busy));
 	m_centronics->perror_handler().set(FUNC(pc1512_state::write_centronics_perror));
@@ -1390,18 +1431,18 @@ void pc1640_state::pc1640(machine_config &config)
 	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
 	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
 	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
-	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa4", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false);
+	ISA8_SLOT(config, "isa1", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1640_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa2", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1640_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1640_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1640_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "iga", XTAL(28'636'363)/2, ISA_BUS_TAG, pc1640_internal_isa8_cards, "iga", false).set_fixed(true);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("640K");
 
 	// software list
+	SOFTWARE_LIST(config, "pc_flop_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "flop_list").set_original("pc1640_flop");
-	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
 }
 
 
@@ -1412,6 +1453,7 @@ void pc1640_state::pc1640(machine_config &config)
 void pc1640_state::pc1640dd(machine_config &config)
 {
 	pc1640(config);
+
 	m_floppy[1]->set_default_option("525dd");
 }
 
@@ -1423,8 +1465,10 @@ void pc1640_state::pc1640dd(machine_config &config)
 void pc1640_state::pc1640hd(machine_config &config)
 {
 	pc1640(config);
-	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
-	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+
+	subdevice<isa8_slot_device>("isa4")->set_default_option("wdxt_gen");
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
 }
 
 
@@ -1439,6 +1483,7 @@ void pc1640_state::pc1640hd(machine_config &config)
 
 ROM_START( pc1512 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
+	ROM_DEFAULT_BIOS("v3")
 	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
 	ROMX_LOAD( "40044.ic132", 0x0000, 0x2000, CRC(f72f1582) SHA1(7781d4717917262805d514b331ba113b1e05a247), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROMX_LOAD( "40043.ic129", 0x0001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482), ROM_SKIP(1) | ROM_BIOS(0) )
@@ -1466,13 +1511,14 @@ ROM_END
 
 ROM_START( pc1640 )
 	ROM_REGION16_LE( 0x4000, I8086_TAG, 0)
-	ROM_SYSTEM_BIOS( 0, "8809", "Week 9/1988" )
-	ROMX_LOAD( "40044-1 8809.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952), ROM_SKIP(1) | ROM_BIOS(0) ) // 8809 B
-	ROMX_LOAD( "40043-1 8809.ic129", 0x0001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8), ROM_SKIP(1) | ROM_BIOS(0) ) // 8809 B
-	ROM_SYSTEM_BIOS( 1, "8738", "Week 38/1987" )
-	ROMX_LOAD( "40044 8738.ic132", 0x0000, 0x2000, CRC(43832ea7) SHA1(eea4a8836f966940a88c88de6c5cc14852545f7d), ROM_SKIP(1) | ROM_BIOS(1) ) // 8738 D F
-	ROMX_LOAD( "40043 8738.ic129", 0x0001, 0x2000, CRC(768498f9) SHA1(ac48cb892417d7998d604f3b79756140c554f476), ROM_SKIP(1) | ROM_BIOS(1) ) // 8738 D F
-	ROM_SYSTEM_BIOS( 2, "88xx", "Week ?/1988" )
+	ROM_DEFAULT_BIOS("88xx")
+	ROM_SYSTEM_BIOS( 0, "8738", "Week 38/1987" ) // ROS 3
+	ROMX_LOAD( "40044 8738.ic132", 0x0000, 0x2000, CRC(43832ea7) SHA1(eea4a8836f966940a88c88de6c5cc14852545f7d), ROM_SKIP(1) | ROM_BIOS(0) ) // 8738 D F
+	ROMX_LOAD( "40043 8738.ic129", 0x0001, 0x2000, CRC(768498f9) SHA1(ac48cb892417d7998d604f3b79756140c554f476), ROM_SKIP(1) | ROM_BIOS(0) ) // 8738 D F
+	ROM_SYSTEM_BIOS( 1, "8809", "Week 9/1988" ) // ROS 3
+	ROMX_LOAD( "40044-1 8809.ic132", 0x0000, 0x2000, CRC(f1c074f3) SHA1(a055ea7e933d137623c22fe24004e870653c7952), ROM_SKIP(1) | ROM_BIOS(1) ) // 8809 B
+	ROMX_LOAD( "40043-1 8809.ic129", 0x0001, 0x2000, CRC(e40a1513) SHA1(447eff2057e682e51b1c7593cb6fad0e53879fa8), ROM_SKIP(1) | ROM_BIOS(1) ) // 8809 B
+	ROM_SYSTEM_BIOS( 2, "88xx", "Week ?/1988" ) // ROS 3.1
 	ROMX_LOAD( "40044 88xx.ic132", 0x0000, 0x2000, CRC(6090f782) SHA1(e21ae524d5b4d00696d293dbd4fe4d7bca22e277), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD( "40043 88xx.ic129", 0x0001, 0x2000, CRC(9219d0aa) SHA1(dde1a46c8f83e413d7070f1356fc91b9f595a8b6), ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
@@ -1492,7 +1538,7 @@ COMP( 1986, pc1512,     0,      0,      pc1512,   pc1512, pc1512_state, empty_in
 COMP( 1986, pc1512dd,   pc1512, 0,      pc1512dd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 DD",   MACHINE_SUPPORTS_SAVE )
 COMP( 1986, pc1512hd10, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD10", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, pc1512hd20, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD20", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,      0,      pc1640,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,      0,      pc1640,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_SUPPORTS_SAVE )

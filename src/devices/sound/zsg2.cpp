@@ -474,10 +474,9 @@ uint16_t zsg2_device::chan_r(int ch, int reg)
 		case 0x9:
 			// pretty certain, though no games actually read from this.
 			return m_chan[ch].output_cutoff;
-		case 0xb: // Only later games (taitogn) read this register...
-			// GNet games use some of the flags to decide which channels to kill when
-			// all the channels are busy. (take raycris song #23 as an example)
-			return m_chan[ch].vol;
+		case 0xb:
+			// lower 13 bits contain the output volume (used by G-NET driver to allocate voices)
+			return m_chan[ch].vol >> 3;
 		default:
 			break;
 	}

@@ -4,8 +4,6 @@
 
     Epson HX-20
 
-    http://fjkraan.home.xs4all.nl/comp/hx20/
-
     Epson CM6000 Series
 
     These are re-badged HX-20 with revision H motherboard and keyboard overlay.
@@ -24,9 +22,6 @@
 
     TODO:
 
-    - m6800.cpp rewrite
-    - keyboard interrupt
-    - LCD controller
     - serial
     - SW6 read
     - RS-232
@@ -58,9 +53,42 @@
 
 void hx20_state::update_interrupt()
 {
-	int irq = m_rtc_irq || m_kbrequest;
+	int irq = m_rtc_irq || (!m_kbrequest && m_kbmask);
 
 	m_maincpu->set_input_line(HD6301_IRQ1_LINE, irq);
+}
+
+
+//-------------------------------------------------
+//  update_kbrequest -
+//-------------------------------------------------
+
+void hx20_state::update_kbrequest()
+{
+	uint16_t data = 0x03ff;
+	for (int b = 0; 8 > b; ++b)
+		if (!BIT(m_ksc, b))
+			data &= m_ksc_io[b]->read();
+
+	// KRTN9 carries SW6 as well as the modifier keys, so it does not drive the request
+	int const kbrequest = ((data & 0x01ff) == 0x01ff) ? 1 : 0;
+
+	if (m_kbrequest != kbrequest)
+	{
+		m_kbrequest = kbrequest;
+
+		update_interrupt();
+	}
+}
+
+
+//-------------------------------------------------
+//  kb_tick -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(hx20_state::kb_tick)
+{
+	update_kbrequest();
 }
 
 
@@ -70,9 +98,9 @@ void hx20_state::update_interrupt()
 
 void hx20_state::ksc_w(uint8_t data)
 {
-	logerror("KSC %02x\n", data);
-
 	m_ksc = data;
+
+	update_kbrequest();
 }
 
 
@@ -142,8 +170,6 @@ void hx20_state::lcd_cs_w(uint8_t data)
 
 	*/
 
-	logerror("LCD CS %02x\n", data);
-
 	// LCD
 	for (auto &lcdc : m_lcdc)
 		lcdc->cs_w(1);
@@ -154,6 +180,10 @@ void hx20_state::lcd_cs_w(uint8_t data)
 	int const cd = BIT(data, 3);
 	for (auto &lcdc : m_lcdc)
 		lcdc->cd_w(cd);
+
+	// keyboard
+	m_kbmask = BIT(data, 4);
+	update_interrupt();
 
 	// serial
 	m_sio->pout_w(BIT(data, 5));
@@ -166,9 +196,19 @@ void hx20_state::lcd_cs_w(uint8_t data)
 
 void hx20_state::lcd_data_w(uint8_t data)
 {
-	logerror("LCD DATA %02x\n", data);
-
 	m_lcd_data = data;
+
+	for (int i = 0; 8 > i; ++i)
+	{
+		for (auto &lcdc : m_lcdc)
+			lcdc->si_w(BIT(data, i));
+
+		for (auto &lcdc : m_lcdc)
+			lcdc->sck_w(0);
+
+		for (auto &lcdc : m_lcdc)
+			lcdc->sck_w(1);
+	}
 }
 
 
@@ -850,12 +890,16 @@ uint8_t hx20_state::optrom_r(offs_t offset)
 
 void hx20_state::machine_start()
 {
+	m_kb_timer = timer_alloc(FUNC(hx20_state::kb_tick), this);
+	m_kb_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+
 	// state saving
 	save_item(NAME(m_slave_rx));
 	save_item(NAME(m_slave_tx));
 	save_item(NAME(m_slave_flag));
 	save_item(NAME(m_ksc));
 	save_item(NAME(m_kbrequest));
+	save_item(NAME(m_kbmask));
 	save_item(NAME(m_lcd_data));
 }
 
@@ -1043,7 +1087,7 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY  FULLNAME                FLAGS
 // NOTE: HX-20 is also an unrelated Toshiba MSX1, deambiguate in fullname
-COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "HX-20 (Epson portable)",          MACHINE_NOT_WORKING )
-COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "HX-20 (Epson portable, Europe)", MACHINE_NOT_WORKING )
-COMP( 1989, ecm6032, ehx20,  0,      cm6032,  cm6032, hx20_state, empty_init, "Epson", "CM6032",         MACHINE_NOT_WORKING )
-COMP( 1993, ecm6127, ehx20,  0,      cm6127,  cm6127, hx20_state, empty_init, "Epson", "CM6127",         MACHINE_NOT_WORKING )
+COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "Epson HX-20",          MACHINE_NOT_WORKING )
+COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "Epson HX-20 (Europe)", MACHINE_NOT_WORKING )
+COMP( 1989, ecm6032, ehx20,  0,      cm6032,  cm6032, hx20_state, empty_init, "Epson", "CM6032",               MACHINE_NOT_WORKING )
+COMP( 1993, ecm6127, ehx20,  0,      cm6127,  cm6127, hx20_state, empty_init, "Epson", "CM6127",               MACHINE_NOT_WORKING )

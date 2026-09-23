@@ -12,7 +12,7 @@
 #pragma once
 
 #include "isa.h"
-#include "ega.h"
+#include "pega1a.h"
 
 
 
@@ -22,7 +22,7 @@
 
 // ======================> isa8_pc1640_iga_device
 
-class isa8_pc1640_iga_device : public isa8_ega_device
+class isa8_pc1640_iga_device : public pega1a_device
 {
 public:
 	// construction/destruction
@@ -30,10 +30,22 @@ public:
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
+
+private:
+	uint8_t pc1640_3c0_r(offs_t offset);
+
+	required_ioport m_sw;
+	optional_ioport m_sysw;
+
+	bool m_installed;
+	bool m_enabled;
 };
 
 

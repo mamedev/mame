@@ -2,7 +2,7 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Acorn Archimedes Expansion Bus emulation
+    Acorn Archimedes/Risc PC Expansion Bus emulation
 
 **********************************************************************/
 
@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ARCHIMEDES_PODULE_SLOT, archimedes_podule_slot_device, "archimedes_exp_slot", "Acorn Archimedes Podule slot")
+DEFINE_DEVICE_TYPE(ARCHIMEDES_PODULE_SLOT, archimedes_podule_slot_device, "archimedes_exp_slot", "Acorn Expansion Card slot")
 
 
 //**************************************************************************
@@ -52,7 +52,7 @@ void archimedes_podule_slot_device::device_start()
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device, "archimedes_exp", "Acorn Archimedes Expansion Bus")
+DEFINE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device, "archimedes_exp", "Acorn Expansion Bus")
 
 
 //**************************************************************************
@@ -66,8 +66,9 @@ DEFINE_DEVICE_TYPE(ARCHIMEDES_EXPANSION_BUS, archimedes_exp_device, "archimedes_
 archimedes_exp_device::archimedes_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ARCHIMEDES_EXPANSION_BUS, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_ioc_config("podule_ioc", ENDIANNESS_LITTLE, 32, 16, 0, address_map_constructor(FUNC(archimedes_exp_device::ioc_map), this))
-	, m_memc_config("podule_memc", ENDIANNESS_LITTLE, 32, 16, 0, address_map_constructor(FUNC(archimedes_exp_device::memc_map), this))
+	, m_ioc_config("podule_ioc", ENDIANNESS_LITTLE, 32, 17, 0, address_map_constructor(FUNC(archimedes_exp_device::ioc_map), this))
+	, m_memc_config("podule_memc", ENDIANNESS_LITTLE, 32, 17, 0, address_map_constructor(FUNC(archimedes_exp_device::memc_map), this))
+	, m_easi_config("podule_easi", ENDIANNESS_LITTLE, 32, 27, 0, address_map_constructor(FUNC(archimedes_exp_device::easi_map), this))
 	, m_out_pirq_cb(*this)
 	, m_out_pfiq_cb(*this)
 {
@@ -77,7 +78,8 @@ device_memory_interface::space_config_vector archimedes_exp_device::memory_space
 {
 	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_memc_config),
-		std::make_pair(AS_IO, &m_ioc_config)
+		std::make_pair(AS_IO, &m_ioc_config),
+		std::make_pair(AS_DATA, &m_easi_config)
 	};
 }
 
@@ -91,6 +93,11 @@ void archimedes_exp_device::memc_map(address_map &map)
 	map.unmap_value_high();
 }
 
+void archimedes_exp_device::easi_map(address_map &map)
+{
+	map.unmap_value_high();
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -100,6 +107,7 @@ void archimedes_exp_device::device_start()
 {
 	m_ioc = &space(AS_IO);
 	m_memc = &space(AS_PROGRAM);
+	m_easi = &space(AS_DATA);
 }
 
 //-------------------------------------------------
@@ -128,7 +136,7 @@ void archimedes_exp_device::pirq_w(int state, int slot)
 
 
 //-------------------------------------------------
-//  ps - simple podule select
+//  ps - podule select
 //-------------------------------------------------
 
 u16 archimedes_exp_device::ps4_r(offs_t offset, u16 mem_mask)
@@ -170,18 +178,56 @@ void archimedes_exp_device::ps6_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
+
+u16 archimedes_exp_device::ps7_r(offs_t offset, u16 mem_mask)
+{
+	return m_ioc->read_word(0x10000 + (offset << 2), mem_mask);
+}
+
+void archimedes_exp_device::ps7_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_ioc->write_word(0x10000 + (offset << 2), data, mem_mask);
+}
+
+
 //-------------------------------------------------
-//  ms - memc select
+//  ms - module select
 //-------------------------------------------------
 
-u16 archimedes_exp_device::ms_r(offs_t offset, u16 mem_mask)
+u16 archimedes_exp_device::ms0_r(offs_t offset, u16 mem_mask)
 {
 	return m_memc->read_word(offset << 2, mem_mask);
 }
 
-void archimedes_exp_device::ms_w(offs_t offset, u16 data, u16 mem_mask)
+void archimedes_exp_device::ms0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_memc->write_word(offset << 2, data, mem_mask);
+}
+
+
+u16 archimedes_exp_device::ms3_r(offs_t offset, u16 mem_mask)
+{
+	return m_memc->read_word(0x10000 + (offset << 2), mem_mask);
+}
+
+void archimedes_exp_device::ms3_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_memc->write_word(0x10000 + (offset << 2), data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  eas - EASI select
+//-------------------------------------------------
+
+u32 archimedes_exp_device::eas_r(offs_t offset, u32 mem_mask)
+{
+	return m_easi->read_dword(offset, mem_mask);
+}
+
+void archimedes_exp_device::eas_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_easi->write_dword(offset, data, mem_mask);
 }
 
 
@@ -220,14 +266,15 @@ void device_archimedes_podule_interface::interface_pre_start()
 	size_t const tlen = strlen(m_exp_slottag);
 
 	m_slot = (m_exp_slottag[tlen - 1] - '0');
-	if (m_slot < 0 || m_slot > 3)
-		fatalerror("Podule %d out of range for Archimedes expansion bus\n", m_slot);
+	if (m_slot < 0 || m_slot > 7)
+		fatalerror("Podule %d out of range for Acorn expansion bus\n", m_slot);
 }
 
 void device_archimedes_podule_interface::interface_post_start()
 {
 	m_exp->install_ioc_map(m_slot, *this, &device_archimedes_podule_interface::ioc_map);
 	m_exp->install_memc_map(m_slot, *this, &device_archimedes_podule_interface::memc_map);
+	m_exp->install_easi_map(m_slot, *this, &device_archimedes_podule_interface::easi_map);
 }
 
 
@@ -237,8 +284,8 @@ void device_archimedes_podule_interface::interface_post_start()
 //#include "archdigi.h"
 //#include "archscan.h"
 #include "armadeus.h"
-//#include "discbuffer.h"
 //#include "colourcard.h"
+//#include "discbuffer.h"
 #include "eaglem2.h"
 #include "ether1.h"
 #include "ether2.h"
@@ -385,4 +432,22 @@ void archimedes_mini_exp_devices(device_slot_interface &device)
 	device.option_add("uma_morley", ARC_UMA_MORLEY);      // Morley Electronics User/MIDI/Analogue Interface
 	device.option_add("upa_hccs", ARC_UPA_HCCS);          // HCCS User/Analogue Podule
 	device.option_add("upmidi_aka12", ARC_UPMIDI_AKA12);  // Acorn AKA12 User Port/MIDI Upgrade
+}
+
+//-------------------------------------------------
+//  riscpc_debi_exp_devices (Risc PC DEBI cards)
+//-------------------------------------------------
+
+void riscpc_debi_exp_devices(device_slot_interface &device)
+{
+	riscpc_easi_exp_devices(device);
+}
+
+//-------------------------------------------------
+//  riscpc_easi_exp_devices (Risc PC EASI cards)
+//-------------------------------------------------
+
+void riscpc_easi_exp_devices(device_slot_interface &device)
+{
+	archimedes_exp_devices(device);
 }

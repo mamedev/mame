@@ -318,10 +318,15 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
-uint32_t mcd212_device::get_backdrop_plane()
+uint32_t mcd212_device::get_backdrop_plane(int x, int y)
 {
 	if (BIT(m_image_coding_method, ICM_EV_BIT))
-		return 0; // External Video Background. Default to Black since there is no DVC.
+	{
+		uint32_t argb = 0;
+		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
+			return argb;
+		return 0;
+	}
 	else
 		return s_4bpp_color[m_backdrop_color];
 }
@@ -677,7 +682,7 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = get_backdrop_plane();
+			out[x] = get_backdrop_plane(x + border_width, m_display_line);
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -806,6 +811,27 @@ void mcd212_device::dcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_MAIN_REG_WRITES, "%s: Display Command Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_dcr[0]);
+	update_frame_geometry(false);
+}
+
+// The frame follows DCR1's frame duration bit, per table 5-6 of the MCD212
+// documentation: 312 lines with 280 displayed at 50 Hz, 262 with 240 at
+// 60 Hz.  Always drawing the 50 Hz frame left 40 lines of stale memory below
+// an NTSC picture.
+void mcd212_device::update_frame_geometry(bool force)
+{
+	const bool ntsc = BIT(m_dcr[0], DCR_FD_BIT);
+	const int total = ntsc ? 262 : 312;
+	if (!force && total == m_total_height)
+		return;
+
+	m_total_height = total;
+	m_ica_height = ntsc ? 22 : 32;
+
+	// the screen runs at twice the line count, for interlace
+	const rectangle visarea(0, 767, m_ica_height * 2, total * 2 - 1);
+	screen().configure(screen().width(), total * 2, visarea,
+			screen().pixel_period() * screen().width() * total * 2);
 }
 
 uint16_t mcd212_device::vsr1_r(offs_t offset, uint16_t mem_mask)
@@ -977,6 +1003,9 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	// FIXME this should use the clipping rectangle to determine which lines need drawing
 	int scanline = screen.vpos() / 2;
 
+	// line number within active video, for the external video source
+	m_display_line = scanline - m_ica_height;
+
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
 	{
@@ -1135,6 +1164,7 @@ void mcd212_device::device_reset()
 
 	m_ica_height = 32;
 	m_total_height = 312;
+	update_frame_geometry(true);
 	m_blink_time = 0;
 	for (int i = 0; i < m_total_height; i++)
 	{
@@ -1163,6 +1193,11 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
+
+void mcd212_device::device_post_load()
+{
+	update_frame_geometry(true);
+}
 
 void mcd212_device::device_start()
 {

@@ -202,7 +202,7 @@ void m740_device::execute_set_input(int inputnum, int state)
 
 void m740_device::set_irq_line(int line, int state)
 {
-	assert(line > 0);
+	assert(line >= 0);
 	assert(line <= M740_MAX_INT_LINE);
 
 	if (state == ASSERT_LINE)

@@ -29,7 +29,7 @@ public:
 
 	void update_access_cycles(uint32_t address, bool write);
 
-#if SH7709S_ICACHE_TRACKING_HEAVY == 1
+#if SH7709S_ICACHE_TRACKING_HEAVY
 	void drc_update_icache();
 	bool generate_opcode(drcuml_block& block, compiler_state& compiler, const opcode_desc* desc, uint32_t ovrpc) override;
 #endif
@@ -49,24 +49,26 @@ protected:
 	void cache_address_array_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 private:
-	static constexpr uint32_t SH7709S_CACHE_SIZE = 16384;
+	static constexpr uint32_t SH7709S_CACHE_SIZE = 0x4000;
 	static constexpr uint32_t SH7709S_CACHE_LINE_SIZE = 16;
 	static constexpr uint32_t SH7709S_CACHE_ENTRY_COUNT = (SH7709S_CACHE_SIZE / SH7709S_CACHE_LINE_SIZE);
 	static constexpr uint32_t SH7709S_CACHE_ASSOCIATIVITY = 4;
 	static constexpr uint32_t SH7709S_CACHE_BLOCKS = (SH7709S_CACHE_ENTRY_COUNT / SH7709S_CACHE_ASSOCIATIVITY);
+
 	// Cache state tracking
 	struct sh7709s_cache_entry m_cache[SH7709S_CACHE_BLOCKS][SH7709S_CACHE_ASSOCIATIVITY];
 	uint32_t m_wb_address; // writeback buffer address if there's a dirty cache line to evict
 	uint8_t m_last_area_accessed; // last memory area accessed for WCR1 timing purposes
 	bool m_last_area_accessed_was_write; // last memory area accessed operation also for WCR1 timing purposes
-	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
-	unsigned int m_last_sdram_bank; // Last accessed sdram bank, used to track when to have to pay tpc(precharge) cost
-	unsigned int m_precharge_remaining_cycles;
-	unsigned int m_burst_continuation_remaining_cycles; // Remaining burst words still occupying the bus after the critical word lands
+	uint32_t m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
+	uint32_t m_last_sdram_bank; // Last accessed sdram bank, used to track when to have to pay tpc(precharge) cost
+	uint32_t m_precharge_remaining_cycles;
+	uint32_t m_burst_continuation_remaining_cycles; // Remaining burst words still occupying the bus after the critical word lands
 	uint64_t m_last_op_cycle_count; // Track the last cycle we did a memory operation for background accounting
+	bool m_cache_port_free;
 
 	bool cache_access(uint32_t address, bool write);
-	unsigned int access_penalty(uint32_t address, bool write);
+	uint32_t access_penalty(uint32_t address, bool write);
 
 	// Timing calculation/decode related functions
 	uint32_t get_wcr1_timing(uint32_t area);

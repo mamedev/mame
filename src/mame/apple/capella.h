@@ -18,10 +18,14 @@ public:
 
 	template <typename... T> void set_maincpu_tag(T &&... args) { m_maincpu.set_tag(std::forward<T>(args)...); }
 
+
 	// 68040-style interrupt priority level from the I/O controller (1-7, anything else = no interrupt)
 	void translate_ipl_state_change(int ipl);
+
 	// NMI (programmer's switch / Cuda), presented as IPL 7
 	void nmi_w(int state);
+
+	void reset_w(offs_t offset, u64 data);
 
 	u64 ctrl_r(offs_t offset);
 	void ctrl_w(offs_t offset, u64 data);

@@ -27,8 +27,7 @@
     to fully support PowerPC accelerators. But we can hack around that for now.
 
     Driver status:
-    Boots to Finder from the ATA hard disk.  TurboSCSI was not intended for PowerPC use and
-    a CD-ROM boot unsurprisingly hangs.
+    Boots to Finder from the ATA hard disk and from the internal SCSI CD-ROM.
 
     Machine IDs:
     pmac5200: 0x3258, 0x3259, 0x325C, 0x325D, 0x325E
@@ -86,6 +85,8 @@ public:
 
 	void init_pmac6200();
 
+	void pmac5200(machine_config &config);
+
 private:
 	required_device<ppc603_device> m_maincpu;
 	required_device<capella_device> m_capella;
@@ -110,6 +111,11 @@ private:
 	{
 		m_capella->nmi_w(state);
 	}
+
+
+	u32 id_r(offs_t offset, u32 mem_mask);
+
+	u32 m_model_id;
 };
 
 void pmac6200_state::machine_start()
@@ -124,6 +130,18 @@ void pmac6200_state::machine_reset()
 
 void pmac6200_state::init_pmac6200()
 {
+}
+
+uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
+{
+	// same behavior as in macpdm.cpp
+	// FIXME: Apple System Profiler only reports half the desired CPU speed
+	if (mem_mask == 0xffff'ffff)
+	{
+		return m_model_id & 0xffff;
+	}
+
+	return m_model_id;
 }
 
 /***************************************************************************
@@ -143,6 +161,7 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0x00000000, 0xffffffff).m(m_f108, FUNC(f108_device::map));
 	map(0x00000000, 0xffffffff).m(m_video, FUNC(valkyrie_device::map));
 	map(0x50000000, 0x53ffffff).m(m_primetimeii, FUNC(primetime_device::map));
+	map(0x5ffffffc, 0x5fffffff).r(FUNC(pmac6200_state::id_r));
 
 	// SONIC ethernet is supposed to live here. for now, pretend it's not there
 	map(0x50f0a000, 0x50f0bfff).noprw();
@@ -154,8 +173,6 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0xffc00000, 0xffffffff).rom().region("bootrom64", 0);
 
 	map(0x00000000, 0xffffffff).m(m_capella, FUNC(capella_device::map));
-
-	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a3250; }));
 }
 
 static INPUT_PORTS_START( macadb )
@@ -163,8 +180,11 @@ INPUT_PORTS_END
 
 void pmac6200_state::pmac6200(machine_config &config)
 {
+	m_model_id = 0xa55a3250;
+
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY);
 	m_maincpu->set_bus_frequency(XTAL(75_MHz_XTAL)); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
 	config.set_perfect_quantum(m_maincpu); // chimes of death without it
@@ -181,12 +201,18 @@ void pmac6200_state::pmac6200(machine_config &config)
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "f108:scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
+		});
 	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:6", mac_scsi_devices, nullptr);
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("PPC603");
 
 	PRIMETIMEII(config, m_primetimeii, 75_MHz_XTAL / 2); // guessed
 	m_primetimeii->set_maincpu_tag("maincpu");
@@ -242,6 +268,14 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,64M"); // per service manual
 }
 
+
+void pmac6200_state::pmac5200(machine_config &config)
+{
+	pmac6200(config);
+
+	m_model_id = 0xa55a3258;
+}
+
 #define PPC_MAKE_BRANCH_ALWAYS(x) \
 	ROM_FILL(x,   1, 0x48) \
 	ROM_FILL(x+1, 1, 0x00) \
@@ -274,4 +308,9 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1995, pmac6200, 0, 0, pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)
+
+#define rom_pmac5200 rom_pmac6200
+
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS           INIT            COMPANY           FULLNAME                   FLAGS
+COMP( 1995, pmac6200, 0,        0,      pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)
+COMP( 1995, pmac5200, pmac6200, 0,      pmac5200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 5200/75", MACHINE_NOT_WORKING)

@@ -220,9 +220,9 @@ protected:
 	void tiles_sprites_w(offs_t offset, uint8_t data);
 	int32_t scroll_x(int32_t x, uint16_t i);
 	int32_t scroll_y(int32_t y, uint16_t i);
-	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint16_t *tilemap, const uint8_t scroll_idx, const bool is_active, const bool is_overlay_rendered);
-	void draw_layer_tiles(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint16_t *tilemap, const uint8_t scroll_idx, const bool is_overlay_rendered);
-	void draw_layer_scanlines(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint16_t *tilemap, const uint8_t scroll_idx, const bool is_overlay_rendered);
+	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *tilemap, const uint8_t scroll_idx, const bool is_active, const bool is_overlay_rendered);
+	void draw_layer_tiles(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *tilemap, const uint8_t scroll_idx, const bool is_overlay_rendered);
+	void draw_layer_scanlines(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *tilemap, const uint8_t scroll_idx, const bool is_overlay_rendered);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bool is_overlay_rendered);
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1068,15 +1068,14 @@ void sega_9h0_0008_state::rtc_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void sega_9h0_0008_state::pal_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	uint16_t *shared16 = reinterpret_cast<uint16_t *>(m_paletteram.target());
-	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
+	auto const shared16 = util::big_endian_cast<uint16_t>(m_paletteram.target());
+	COMBINE_DATA(&shared16[offset]);
 
-	uint16_t pal_entry = shared16[BYTE_XOR_BE(offset)];
-	uint8_t r, g, b;
-	r = (pal_entry & 0x001f) >> 0;
-	g = (pal_entry & 0x03e0) >> 5;
-	b = (pal_entry & 0x7c00) >> 10;
-	rgb_t color = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+	uint16_t const pal_entry = shared16[offset];
+	uint8_t const r = (pal_entry & 0x001f) >> 0;
+	uint8_t const g = (pal_entry & 0x03e0) >> 5;
+	uint8_t const b = (pal_entry & 0x7c00) >> 10;
+	rgb_t const color = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 	m_cache_palette[m_scanline * 0x100 + offset] = color;
 	m_palette->set_pen_color(offset, color);
 	LOG("m_cache_palette[%d / m_scale * 0x100 + %04x] = %04x (%04x)\n", m_scanline, offset, color, pal_entry);
@@ -1113,7 +1112,7 @@ void sega_9h0_0008_state::tiles_sprites_w(offs_t offset, uint8_t data)
 void sega_9h0_0008_state::draw_layer(
 		bitmap_rgb32 &bitmap,
 		const rectangle &cliprect,
-		const uint16_t *tilemap,
+		const uint32_t *tilemap,
 		const uint8_t scroll_idx,
 		const bool is_active,
 		const bool is_overlay_rendered)
@@ -1132,13 +1131,14 @@ void sega_9h0_0008_state::draw_layer(
 void sega_9h0_0008_state::draw_layer_tiles(
 		bitmap_rgb32 &bitmap,
 		const rectangle &cliprect,
-		const uint16_t *tilemap,
+		const uint32_t *tilemap,
 		const uint8_t scroll_idx,
 		const bool is_overlay_rendered)
 {
 	// Bitplane area =  1024x512 (64x32 tiles), matches tile data mapping entries (64 * 32 = 0x800).
 	//  Visible area =   704x480 (44x30 tiles), offset by +10 tiles in x-axis and +2 tiles in y-axis.
 	//  Tilemap area = 1024x1024 (64x64 tiles), all these off-screen tiles must be considered for scrolling.
+	auto const tilemap16 = util::big_endian_cast<uint16_t const>(tilemap);
 	for (size_t offset = 0; offset < 0x2000/2; offset++) {
 		int32_t y = ((offset / 64) - 2) * 16;
 		int32_t x = ((offset % 64) - 10) * 16;
@@ -1160,7 +1160,7 @@ void sega_9h0_0008_state::draw_layer_tiles(
 		x = scroll_x(x, scroll_x_idx);
 		y = scroll_y(y, scroll_y_idx);
 
-		uint16_t tile = tilemap[BYTE_XOR_BE(offset)];
+		uint16_t tile = tilemap16[offset];
 		uint16_t tile_transform = (tile & 0xf000) >> 12;
 		uint16_t flip_x = (tile_transform & 1) != 0;
 		uint16_t flip_y = (tile_transform & 2) != 0;
@@ -1358,7 +1358,7 @@ int32_t sega_9h0_0008_state::scroll_y(int32_t y, uint16_t i)
 void sega_9h0_0008_state::draw_layer_scanlines(
 		bitmap_rgb32 &bitmap,
 		const rectangle &cliprect,
-		const uint16_t *tilemap,
+		const uint32_t *tilemap,
 		const uint8_t scroll_idx,
 		const bool is_overlay_rendered)
 {
@@ -1366,12 +1366,13 @@ void sega_9h0_0008_state::draw_layer_scanlines(
 	m_cache_layer.fill(0, cache_bitmap_bounds);
 
 	// Apply y-scrolling + wrap-around on each tile row and draw to cached bitmap
+	auto const tilemap16 = util::big_endian_cast<uint16_t const>(tilemap);
 	const int8_t tile_factor = 16;
 	for (size_t offset = 0; offset < 0x2000/2; offset++) {
 		int32_t y = ((offset / 64) - 2) * tile_factor;
 		int32_t x = ((offset % 64) - 10) * tile_factor;
 
-		uint16_t tile = tilemap[BYTE_XOR_BE(offset)];
+		uint16_t tile = tilemap16[offset];
 		uint16_t tile_transform = (tile & 0xf000) >> 12;
 		uint16_t flip_x = (tile_transform & 1) != 0;
 		uint16_t flip_y = (tile_transform & 2) != 0;
@@ -1594,20 +1595,17 @@ uint32_t sega_9h0_0008_state::screen_update(screen_device &screen, bitmap_rgb32 
 		return 0; // Disabled
 	}
 
-	uint16_t *shared16_tilemap_bg = reinterpret_cast<uint16_t *>(m_tilemap_bg.target());
-	uint16_t *shared16_tilemap_fg = reinterpret_cast<uint16_t *>(m_tilemap_fg.target());
-
 	if (((m_video_regs[0x10/4] & 0x3000) == 0x3000)) {
 		draw_bitmap(bitmap, cliprect);
 	}
 
-	draw_layer(bitmap, cliprect, shared16_tilemap_bg, 1, (m_video_regs[0x10/4] & 4) != 0, false);
+	draw_layer(bitmap, cliprect, m_tilemap_bg, 1, (m_video_regs[0x10/4] & 4) != 0, false);
 
 	if (((m_video_regs[0x10/4] & 0x3000) == 0x2000)) {
 		draw_bitmap(bitmap, cliprect);
 	}
 
-	draw_layer(bitmap, cliprect, shared16_tilemap_fg, 0, (m_video_regs[0x10/4] & 2) != 0, false);
+	draw_layer(bitmap, cliprect, m_tilemap_fg, 0, (m_video_regs[0x10/4] & 2) != 0, false);
 
 	bool is_bitmap_after_sprites = (m_video_regs[0x20/4] & 0x10) != 0;
 	if (((m_video_regs[0x10/4] & 0x3000) == 0x1000) && !is_bitmap_after_sprites) {
@@ -1616,14 +1614,14 @@ uint32_t sega_9h0_0008_state::screen_update(screen_device &screen, bitmap_rgb32 
 
 	draw_sprites(bitmap, cliprect, false);
 
-	draw_layer(bitmap, cliprect, shared16_tilemap_bg, 1, (m_video_regs[0x10/4] & 4) != 0, true);
+	draw_layer(bitmap, cliprect, m_tilemap_bg, 1, (m_video_regs[0x10/4] & 4) != 0, true);
 
 	if (((m_video_regs[0x10/4] & 0x3000) == 0) && !is_bitmap_after_sprites) {
 		draw_bitmap(bitmap, cliprect);
 	}
 
 	// TV bottom frame in front of running dog in "Partner in TV"
-	draw_layer(bitmap, cliprect, shared16_tilemap_fg, 0, (m_video_regs[0x10/4] & 2) != 0, true);
+	draw_layer(bitmap, cliprect, m_tilemap_fg, 0, (m_video_regs[0x10/4] & 2) != 0, true);
 
 	if (((m_video_regs[0x10/4] & 0x3000) == 0x1000) && is_bitmap_after_sprites) {
 		// Minimap after lamp posts in "Cars 2" bridge section

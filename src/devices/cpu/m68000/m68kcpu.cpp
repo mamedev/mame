@@ -1109,6 +1109,8 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_fpsr));
 	save_item(NAME(m_fpiar));
 	save_item(NAME(m_fpu_just_reset));
+	save_item(NAME(m_fpu_pending_exception));
+	save_item(NAME(m_fpu_frame));
 
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));
@@ -2597,49 +2599,46 @@ m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, cons
 void m68000_musashi_device::clear_all()
 {
 	m_cpu_type= 0;
-//
-	for (auto & elem : m_dar)
-		elem= 0;
-	m_ppc= 0;
-	m_pc= 0;
-	for (auto & elem : m_sp)
-		elem= 0;
-	m_vbr= 0;
-	m_sfc= 0;
-	m_dfc= 0;
-	m_cacr= 0;
-	m_caar= 0;
-	m_ir= 0;
-//  for (int i=0;i<8;i++)
-//      m_fpr[i]= 0;
-	m_fpiar= 0;
-	m_fpsr= 0;
-	m_fpcr= 0;
-	m_t1_flag= 0;
-	m_t0_flag= 0;
-	m_s_flag= 0;
-	m_m_flag= 0;
-	m_x_flag= 0;
-	m_n_flag= 0;
-	m_not_z_flag= 0;
-	m_v_flag= 0;
-	m_c_flag= 0;
-	m_int_mask= 0;
-	m_int_level= 0;
-	m_stopped= 0;
-	m_pref_addr= 0;
-	m_pref_data= 0;
-	m_sr_mask= 0;
-	m_instr_mode= 0;
-	m_run_mode= 0;
-	m_has_pmmu= false;
-	m_has_hmmu= false;
-	m_pmmu_enabled= false;
-	m_hmmu_enabled= 0;
-	m_emmu_enabled= false;
-	m_can_instruction_restart= false;
-	m_has_fpu= 0;
-	m_fpu_just_reset= 0;
+	std::fill(std::begin(m_dar), std::end(m_dar), 0);
+	m_ppc = 0;
+	m_pc = 0;
+	std::fill(std::begin(m_sp), std::end(m_sp), 0);
+	m_vbr = 0;
+	m_sfc = 0;
+	m_dfc = 0;
+	m_cacr = 0;
+	m_caar = 0;
+	m_ir = 0;
+	m_fpiar = 0;
+	m_fpsr = 0;
+	m_fpcr = 0;
+	m_t1_flag = 0;
+	m_t0_flag = 0;
+	m_s_flag = 0;
+	m_m_flag = 0;
+	m_x_flag = 0;
+	m_n_flag = 0;
+	m_not_z_flag = 0;
+	m_v_flag = 0;
+	m_c_flag = 0;
+	m_int_mask = 0;
+	m_int_level = 0;
+	m_stopped = 0;
+	m_pref_addr = 0;
+	m_pref_data = 0;
+	m_sr_mask = 0;
+	m_instr_mode = 0;
+	m_run_mode = 0;
+	m_has_pmmu = false;
+	m_has_hmmu = false;
+	m_pmmu_enabled = false;
+	m_hmmu_enabled = 0;
+	m_emmu_enabled = false;
+	m_can_instruction_restart = false;
+	m_has_fpu = false;
+	m_fpu_just_reset = false;
+	m_fpu_pending_exception = 0;
+	m_fpu_frame.fill(0);
 
 	m_cyc_bcc_notake_b = 0;
 	m_cyc_bcc_notake_w = 0;

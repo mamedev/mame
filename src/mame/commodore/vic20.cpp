@@ -1,12 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-    TODO:
-
-    - mos6560_port_r/w should respond at 0x1000-0x100f
-    - VIC21 (built in 21K ram)
-
-*/
 
 #include "emu.h"
 
@@ -231,13 +224,21 @@ uint8_t vic20_state::read(offs_t offset)
 			break;
 
 		case IO0:
-			if (BIT(offset, 4))
+			if (BIT(offset, 4) || BIT(offset, 5))
 			{
-				data = m_via1->read(offset & 0x0f);
-			}
-			else if (BIT(offset, 5))
-			{
-				data = m_via2->read(offset & 0x0f);
+				uint8_t via_data = 0xff;
+
+				if (BIT(offset, 4))
+				{
+					via_data &= m_via1->read(offset & 0x0f);
+				}
+
+				if (BIT(offset, 5))
+				{
+					via_data &= m_via2->read(offset & 0x0f);
+				}
+
+				data = via_data;
 			}
 			else if (offset >= 0x9000 && offset < 0x9010)
 			{
@@ -310,11 +311,13 @@ void vic20_state::write(offs_t offset, uint8_t data)
 			{
 				m_via1->write(offset & 0x0f, data);
 			}
-			else if (BIT(offset, 5))
+
+			if (BIT(offset, 5))
 			{
 				m_via2->write(offset & 0x0f, data);
 			}
-			else if (offset >= 0x9000 && offset < 0x9010)
+
+			if (offset >= 0x9000 && offset < 0x9010)
 			{
 				m_vic->write(offset & 0x0f, data);
 			}

@@ -1521,6 +1521,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/bn1541.h",
 		MAME_DIR .. "src/devices/bus/c64/geocable.cpp",
 		MAME_DIR .. "src/devices/bus/c64/geocable.h",
+		MAME_DIR .. "src/devices/bus/c64/up9600.cpp",
+		MAME_DIR .. "src/devices/bus/c64/up9600.h",
 	}
 end
 
@@ -1876,6 +1878,8 @@ if BUSES["COLECO_EXPANSION"] then
 		MAME_DIR .. "src/devices/bus/coleco/expansion/expansion.h",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/cards.h",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/lundy_speech.cpp",
+		MAME_DIR .. "src/devices/bus/coleco/expansion/lundy_speech.h",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.cpp",
 		MAME_DIR .. "src/devices/bus/coleco/expansion/sgm.h",
 	}
@@ -3012,6 +3016,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_sound.cpp",
 		MAME_DIR .. "src/devices/bus/isa/p1_sound.h",
+		MAME_DIR .. "src/devices/bus/isa/pega1a.cpp",
+		MAME_DIR .. "src/devices/bus/isa/pega1a.h",
 		MAME_DIR .. "src/devices/bus/isa/pc1640_iga.cpp",
 		MAME_DIR .. "src/devices/bus/isa/pc1640_iga.h",
 		MAME_DIR .. "src/devices/bus/isa/pcat512me.cpp",
@@ -6290,6 +6296,8 @@ if BUSES["VIP"] then
 		MAME_DIR .. "src/devices/bus/vip/vp570.h",
 		MAME_DIR .. "src/devices/bus/vip/vp575.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp575.h",
+		MAME_DIR .. "src/devices/bus/vip/vp576.cpp",
+		MAME_DIR .. "src/devices/bus/vip/vp576.h",
 		MAME_DIR .. "src/devices/bus/vip/vp585.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp585.h",
 		MAME_DIR .. "src/devices/bus/vip/vp590.cpp",

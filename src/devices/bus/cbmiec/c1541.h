@@ -77,6 +77,9 @@ private:
 	bool m_iec_clk;
 	bool m_iec_data;
 
+	emu_timer *m_mtr_on_timer;
+	TIMER_CALLBACK_MEMBER(mtr_on_tick);
+	
 	emu_timer *m_iec_sync_timer;
 	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 };

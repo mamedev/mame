@@ -202,7 +202,7 @@ void iosb_base::device_start()
 		else
 		{
 			fatalerror("iosb.cpp: init without 68k CPU or PowerPC-to-68k bridge device\n");
-		}	
+		}
 	}
 
 	m_6015_timer = timer_alloc(FUNC(iosb_base::mac_6015_tick), this);
@@ -546,7 +546,7 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	{
 		// The real DAFB simply holds off /DTACK here, we simulate that
 		// by rewinding and repeating the instruction until DRQ is asserted.
-		RESTART_INSTRUCTION(m_maincpu);	
+		RESTART_INSTRUCTION(m_maincpu);
 		m_maincpu->spin_until_time(attotime::from_usec(50));
 		return 0xffff;
 	}

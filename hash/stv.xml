@@ -8,6 +8,9 @@ Note: This list is for multicart games "CART-AM" only, to be run with stvbios -c
 It has no right to *repeat* all the games present in sega/stv.cpp, we also don't have a
 slot system for anything diverging from the regular 2 sticks N buttons setup.
 
+Also note IC13 based games *needs* the memory to be 1-filled, this is particularly important
+in Multi Cart mode.
+
 -->
 
 <softwarelist name="stv" description="Sega Titan Video Multicart (CART-AM) cartridges">
@@ -19,7 +22,10 @@ slot system for anything diverging from the regular 2 sticks N buttons setup.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="fpr17969.13" size="0x100000" crc="bee327e5" sha1="1d226db72d6ef68fd294f60659df7f882b25def6" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr17970.2" size="0x400000" crc="bc4d6f91" sha1="dcc241dcabea59325decfba3fd5e113c07958422" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr17971.3" size="0x400000" crc="c780a3b3" sha1="99587eea528a6413cacc3e4d3d1dbfff57b03dca" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr17972.4" size="0x400000" crc="8f29815a" sha1="e86acd8096f2aee5f5e3ddfd3abb4f5c2b11df66" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -56,7 +62,10 @@ slot system for anything diverging from the regular 2 sticks N buttons setup.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="fpr19119.13" size="0x100000" crc="de5c4f7c" sha1="35f670a15e9c86edbe2fe718470f5a75b5b096ac" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr19115.2" size="0x400000" crc="6fe06a30" sha1="dedb90f800bae8fd9df1023eb5bec7fb6c9d0179" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr19116.3" size="0x400000" crc="af9e627b" sha1="a53921c3185a93ec95299bf1c29e744e2fa3b8c0" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr19117.4" size="0x400000" crc="74520ff1" sha1="16c1acf878664b3bd866c9b94f3695ae892ac12f" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -72,7 +81,10 @@ slot system for anything diverging from the regular 2 sticks N buttons setup.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="fpr19114.13" size="0x100000" crc="1fd22a5f" sha1="c3d9653b12354a73a3e15f23a2ab7992ffb83e46" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr19115.2" size="0x400000" crc="6fe06a30" sha1="dedb90f800bae8fd9df1023eb5bec7fb6c9d0179" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr19116.3" size="0x400000" crc="af9e627b" sha1="a53921c3185a93ec95299bf1c29e744e2fa3b8c0" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr19117.4" size="0x400000" crc="74520ff1" sha1="16c1acf878664b3bd866c9b94f3695ae892ac12f" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -88,8 +100,11 @@ slot system for anything diverging from the regular 2 sticks N buttons setup.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x400000" loadflag="fill" />
 				<rom name="epr18137.13" size="0x080000" crc="151aa9bc" sha1="0959c60f31634816825acb57413838dcddb17d31" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr18138.2" size="0x400000" crc="f5567049" sha1="6eb35e4b5fbda39cf7e8c42b6a568bd53a364d6d" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr18139.3" size="0x400000" crc="f36b4878" sha1="e3f63c0046bd37b7ab02fb3865b8ebcf4cf68e75" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr18140.4" size="0x400000" crc="228850a0" sha1="d83f7fa7df08407fa45a13661393679b88800805" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -106,6 +121,7 @@ slot system for anything diverging from the regular 2 sticks N buttons setup.
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="finlarch.13" size="0x100000" crc="4505fa9e" sha1="96c6399146cf9c8f1d27a8fb6a265f937258004a" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
 				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
@@ -131,8 +147,11 @@ Unstable in multicart, may hang after InVision logo
 ]]></notes>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="epr17766.13" size="0x080000" crc="a83fcd62" sha1="4ce77ebaa0e93c6553ad8f7fb87cbdc32433402b" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr17768.2" size="0x400000" crc="d6808a7d" sha1="83a97bbe1160cb45b3bdcbde8adc0d9bae5ded60" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr17769.3" size="0x400000" crc="3471dd35" sha1="24febddfe70984cebc0e6948ad718e0e6957fa82" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr17770.4" size="0x400000" crc="06978a00" sha1="a8d1333a9f4322e28b23724937f595805315b136" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -151,8 +170,11 @@ Unstable in multicart, may hang after InVision logo
 		<info name="usage" value="Supports CART-AM but needs system set to 1p, init to joystick in test mode"/>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="epr18737.13" size="0x080000" crc="cfad6c49" sha1="fc69980a351ed13307706db506c79c774eabeb66" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr18738.2" size="0x400000" crc="4b3c175a" sha1="b6d2438ae1d3d51950a7ed1eaadf2dae45c4e7b1" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr18739.3" size="0x400000" crc="eb41fa67" sha1="d12acebb1df9eafd17aff1841087f5017225e7e7" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr18740.4" size="0x200000" crc="9ca7962f" sha1="a09e0db2246b34ca7efa3165afbc5ba292a95398" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -170,6 +192,7 @@ Unstable, can crash when cycling thru select button
 ]]></notes>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="ic13.bin" size="0x100000" crc="b456f4cd" sha1="91cbe703ec7c1dd45eb3b05bdfeb06e3570599d1" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
 				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
@@ -191,8 +214,11 @@ Unstable, can crash when cycling thru select button
 		<publisher>T&amp;E Soft</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="epr18852.13" size="0x080000" crc="d12414ec" sha1="0f42ec9e41983781b6892622b00398a102072aa7" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr18853.2" size="0x400000" crc="b9268c97" sha1="8734e3f0e6b2849d173e3acc9d0308084a4e84fd" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr18854.3" size="0x400000" crc="3113c8bc" sha1="4e4600646ddd1978988d27430ffdf0d1d405b804" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr18855.4" size="0x400000" crc="daf6ad0c" sha1="2a14a6a42e4eb68abb7a427e43062dfde2d13c5c" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -220,14 +246,17 @@ Unstable in multicart, may hang after Atlus logo
 		</part>
 	</software>
 
-	<!-- Game: Puzzle &amp; Action: Sando-R -->
-	<software name="sandor">
-		<description>Puzzle &amp; Action: Sando-R (J 951114 V1.000)</description>
+	<!-- Game: Puzzle &amp; Action: Sand-R -->
+	<software name="sandr">
+		<description>Puzzle &amp; Action: Sand-R (J 951114 V1.000)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="sando-r.13"  size="0x100000" crc="fe63a239" sha1="01502d4494f968443581cd2c74f25967d41f775e" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr18635.8"  size="0x400000" crc="441e1368" sha1="acb2a7e8d44c2203b8d3c7a7b70e20ffb120bebf" offset="0x1c00000" loadflag="load16_word_swap"/>
 				<rom  size="0x400000" offset="0x400000" loadflag="reload"/>
 				<rom name="mpr18636.9"  size="0x400000" crc="fff1dd80" sha1="36b8e1526a4370ae33fd4671850faf51c448bca4" offset="0x2000000" loadflag="load16_word_swap"/>
@@ -260,8 +289,11 @@ Unstable in multicart, may hang after Atlus logo
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="epr18777.13" size="0x080000" crc="8d180866" sha1="d47ebabab6e06400312d39f68cd818852e496b96" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr18778.8"  size="0x400000" crc="25e1300e" sha1="64f3843f62cee34a47244ad5ee78fb2aa35289e3" offset="0x1c00000" loadflag="load16_word_swap"/>
 				<rom name="mpr18779.9"  size="0x400000" crc="51e2fabd" sha1="3aa361149af516f16d7d422596ee82014a183c2b" offset="0x2000000" loadflag="load16_word_swap"/>
 				<rom name="mpr18780.10" size="0x400000" crc="8cd4dd74" sha1="9ffec1280b3965d52f643894bdfecdd792028191" offset="0x2400000" loadflag="load16_word_swap"/>
@@ -282,7 +314,10 @@ Is this game really CART-AM as the header says?
 ]]></notes>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="epr-21300a.ic13" size="0x100000" crc="899d829e" sha1="b6c6da92dc108353998b29c0659d288645541519" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr-21290.ic2"  size="0x400000" crc="a49d29f3" sha1="8f6c26fd9e94a9e03dd0029026d205cf481fe151" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr-21291.ic3"  size="0x400000" crc="9452ba20" sha1="8a9ff546901715f99bb911616c74ae30ebd7c6d7" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr-21292.ic4"  size="0x400000" crc="f60268e2" sha1="5c2febb94553a941a68e9611617750a89c82e783" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -304,7 +339,10 @@ Is this game really CART-AM as the header says?
 		<publisher>Data East</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="fpr17834.13" size="0x100000" crc="746ef686" sha1="e31c317991a687662a8a2a45aed411001e5f1941" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr17836.2" size="0x400000" crc="55e9642d" sha1="5198291cd1dce0398eb47760db2c19eae99273b0" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr17837.3" size="0x400000" crc="13d1e667" sha1="cd513ceb33cc20032090113b61227638cf3b3998" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr17838.4" size="0x400000" crc="f9e70032" sha1="8efdbcce01bdf77acfdb293545c59bf224a9c7d2" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -318,12 +356,13 @@ Is this game really CART-AM as the header says?
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: Treasure Hunt -->
-	<software name="thunt" cloneof="sandor" supported="no">
+	<software name="thunt" cloneof="sandr" supported="no">
 		<description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="th-ic7_2.stv" size="0x080000" crc="c4e993de" sha1="7aa433bc2623cb19a09d4ef4c8233a2d29901020" offset="0x200000" loadflag="load16_byte"/>
 				<rom name="th-ic7_1.stv" size="0x080000" crc="1355cc18" sha1="a9b731228a807b2b01f933fe0f7dcdbadaf89b7e" offset="0x200001" loadflag="load16_byte"/>
 				<rom name="th-e-2.ic2" size="0x400000" crc="47315694" sha1="4a7cc195b98dbca146f5efe3b5b35be0f13b2f4a" offset="0x400000" loadflag="load16_word_swap"/>
@@ -335,12 +374,13 @@ Is this game really CART-AM as the header says?
 	</software>
 
 	<!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
-	<software name="thuntk" supported="no" cloneof="sandor">
+	<software name="thuntk" cloneof="sandr" supported="no">
 		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
 		<year>1997</year>
 		<publisher>Sega / Deniam</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="2.ic13_2"      size="0x080000" crc="6cae2926" sha1="e8d5745b4228de24672da5017cb3dab58344f59f" offset="0x200000" loadflag="load16_byte"/>
 				<rom name="1.ic13_1"      size="0x080000" crc="460727c8" sha1="da7171b65734264e10692e3408ac93beb374c65e" offset="0x200001" loadflag="load16_byte"/>
 				<rom name="bom210-10.ic2" size="0x400000" crc="f59d0827" sha1="2bed4b2c78e9b4e9332f576e1b264a6343f4cfff" offset="0x1c00000"/>
@@ -365,8 +405,11 @@ Unstable in multicart, black screen by cycling with select button
 ]]></notes>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
 				<rom name="epr17944.13" size="0x080000" crc="3304c175" sha1="6d847efad73d361cac4d7fcb452ccf89efa13e24" offset="0x000001" loadflag="load16_byte"/>
 				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
+				<rom size="0x100000" offset="0x200000" loadflag="reload_plain"/>
+				<rom size="0x100000" offset="0x300000" loadflag="reload_plain"/>
 				<rom name="mpr17946.2" size="0x400000" crc="4cb245f7" sha1="363d9936b27043b5858c956a45736ac05aefc54e" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr17947.3" size="0x400000" crc="fef4a9fb" sha1="1b4bd095962db769da17d3644df10f62d041e914" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr17948.4" size="0x400000" crc="3e2b251a" sha1="be6191c18727d7cbc6399fd4c1aaae59304af30c" offset="0xc00000" loadflag="load16_word_swap"/>
@@ -399,6 +442,5 @@ Requires the two analog inputs from base driver
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

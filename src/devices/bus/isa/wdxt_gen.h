@@ -20,9 +20,9 @@
 
 
 #include "isa.h"
-#include "cpu/mcs48/mcs48.h"
 #include "machine/wd11c00_17.h"
-#include "machine/wd2010.h"
+#include "machine/wd1010.h"
+#include "machine/wd1015.h"
 #include "imagedev/harddriv.h"
 
 
@@ -43,7 +43,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -57,25 +56,11 @@ protected:
 private:
 	void irq5_w(int state);
 	void drq3_w(int state);
-	void mr_w(int state);
 	uint8_t rd322_r();
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
-	int wd1015_t1_r();
-	uint8_t wd1015_p1_r();
-	void wd1015_p1_w(uint8_t data);
-	uint8_t wd1015_p2_r();
-	void wd1015_p2_w(uint8_t data);
 
-	void wd1015_io(address_map &map) ATTR_COLD;
-
-	required_device<cpu_device> m_maincpu;
 	required_device<wd11c00_17_device> m_host;
-	required_device<wd2010_device> m_hdc;
-
-	uint8_t m_ram[0x800];
-
-	//uint8_t m_hdc_addr;
+	required_device<wd1010_device> m_hdc;
+	required_device<wd1015_device> m_mcu;
 };
 
 

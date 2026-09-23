@@ -62,6 +62,9 @@ enum
 #define VFP_LORES           22
 #define HFP_LORES           16
 
+#define LINES_PER_FRAME     262
+#define CCLK_LORES          1824
+
 
 
 //**************************************************************************
@@ -252,12 +255,11 @@ uint8_t ams40041_device::vdu_r(offs_t offset)
 		// light pen switch
 		data |= 0x04;
 
-		// vertical sync
-		//data |= vsync_r();
+		int line = int((machine().time().as_ticks(clock()) / CCLK_LORES) % LINES_PER_FRAME);
 		int flyback = 0;
 
-		if (screen().vpos() < VFP_LORES - 16) flyback = 1;
-		if (screen().vpos() > VFP_LORES + 200) flyback = 1;
+		if (line < VFP_LORES - 16) flyback = 1;
+		if (line > VFP_LORES + 200) flyback = 1;
 
 		data |= flyback << 3;
 		break;

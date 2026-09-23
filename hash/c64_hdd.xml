@@ -13,7 +13,7 @@ license:CC0-1.0
 		<!-- Seagate ST225 -->
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="minichief" sha1="c5146009a240841f816e65c218e8d43b68931c28" writeable="yes" />
+				<disk name="minichief" sha1="3ed8b78f3dc4e52766ef4cbfa43925b926d37834" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>

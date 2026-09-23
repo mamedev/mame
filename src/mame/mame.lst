@@ -1322,6 +1322,9 @@ macsefd
 unitron
 utrn1024
 
+@source:apple/macalchemy.cpp
+pmac6400
+
 @source:apple/maccatalyst.cpp
 pmac7200
 pmac7200_90
@@ -1330,6 +1333,17 @@ pmac7200_120
 
 @source:apple/maccordyceps.cpp
 pmac6200
+pmac5200
+
+@source:apple/macgazelle.cpp
+pmac5500
+pmac5500_250
+pmac5500_275
+pmac6500
+pmac6500_250
+pmac6500_275
+pmac6500_300
+pmac20th
 
 @source:apple/macii.cpp
 mac2fdhd
@@ -1416,6 +1430,14 @@ macct650
 macqd610
 macqd650
 macqd800
+
+@source:apple/macquadraav.cpp
+macqd660av
+macqd840av
+
+@source:apple/mactanzania.cpp
+pmac4400
+pmac4400_200
 
 @source:apple/newton.cpp
 emate
@@ -17486,6 +17508,9 @@ prof80
 
 @source:conitec/prof180x.cpp
 prof180x
+prof180xp
+
+@source:conitec/prof181x.cpp
 prof181x
 
 @source:cosmo/cosmo_ls9310.cpp
@@ -18663,14 +18688,24 @@ twinsed2
 @source:efo/cedar_magnet.cpp
 cedmag
 mag_boob
+mag_boobcc
 mag_burn
+mag_coco
 mag_day
+mag_ddrg
+mag_ddrgec
+mag_dodg
 mag_drac
 mag_exzi
+mag_exzi2
+mag_fsha
 mag_pdak
+mag_scon
+mag_sconcc
 mag_time
 mag_war
 mag_wara
+mag_wwar
 mag_xain
 
 @source:efo/cidelsa.cpp
@@ -19948,6 +19983,7 @@ pisces
 piscesb
 porter
 portera
+porterb
 quaak
 redufo
 redufob
@@ -20856,7 +20892,9 @@ monty
 @source:handheld/mylife.cpp
 mylife
 mylifei
+mylifei4
 mylifes
+myrelife
 
 @source:handheld/pensebem.cpp
 pbem2017
@@ -26983,6 +27021,9 @@ jb3000
 myb3k
 stepone
 
+@source:matsushita/wsa1.cpp
+wsa1r
+
 @source:mattel/aquarius.cpp
 aquarius
 aquariusp
@@ -29169,6 +29210,11 @@ mtchxlti
 pubtimed
 pubtimeda
 
+@source:metro/blzntrnd.cpp
+blzntrnd
+gstrik2
+gstrik2j
+
 @source:metro/hyprduel.cpp
 hyprduel
 hyprduel2
@@ -29179,7 +29225,6 @@ magerror
 balcube
 bangball
 batlbubl
-blzntrnd
 daitorid
 daitorida
 dharma
@@ -29191,8 +29236,6 @@ dokyusp
 gakusai
 gakusai2
 gakusaia
-gstrik2
-gstrik2j
 gunmast
 karatour
 karatourj
@@ -32465,6 +32508,7 @@ nostk
 mcm70
 
 @source:misc/megaphx.cpp
+afterwar
 hamboy
 megaphx
 yoyospel
@@ -35008,6 +35052,9 @@ mini5sx
 
 @source:nec/ews4800.cpp
 ews4800_310
+
+@source:nec/mobilepro.cpp
+mbpro450
 
 @source:nec/pc_h98.cpp
 pc_h98s
@@ -37615,6 +37662,7 @@ cdi490a
 cdi910
 cdibios
 cdimono1
+cdimono1n
 cdimono2
 gpi1200
 quizard
@@ -37661,6 +37709,9 @@ pm5644p00
 
 @source:philips/philipsbo.cpp
 pbo
+
+@source:philips/velo.cpp
+pvelo1
 
 @source:philips/vg5k.cpp
 vg5k
@@ -40025,6 +40076,10 @@ mcword_de
 @source:psion/mc600.cpp
 mc600
 
+@source:psion/osaris.cpp
+osaris
+osaris_fr
+
 @source:psion/psion.cpp
 psion1
 psioncm
@@ -40061,6 +40116,7 @@ psion3mx_fr
 psion3mx_nl
 
 @source:psion/psion5mx.cpp
+conan
 mako
 mc218
 mc218_de
@@ -40073,6 +40129,7 @@ psion618c
 revo
 revo_de
 revo_fr
+revo_nl
 
 @source:psion/psion7.cpp
 netbook
@@ -40114,6 +40171,9 @@ qvt190
 
 @source:qume/qvt201.cpp
 qvt201
+
+@source:radiobulletin/cosmicos.cpp
+cosmicos
 
 @source:ramtek/hitme.cpp
 barricad
@@ -40343,6 +40403,9 @@ s330
 s50
 s550
 w30
+
+@source:roland/roland_sb55.cpp
+sb55
 
 @source:roland/roland_sc55.cpp
 sc55
@@ -40639,6 +40702,7 @@ xy168
 
 @source:seequa/chameleon.cpp
 chameleon
+champroto
 
 @source:sega/angelkds.cpp
 angelkds
@@ -40941,6 +41005,7 @@ puckpkmn
 puckpkmnb
 shuifeng
 songjang
+xmvsfmb
 
 @source:sega/megaplay.cpp
 megaplay
@@ -42298,8 +42363,11 @@ pclub26w
 pclub26wa
 pclub27s
 pclub2bb
+pclub2bu
+pclub2ev
 pclub2fc
 pclub2kc
+pclub2lc
 pclub2mb
 pclub2pe
 pclub2pf
@@ -42328,7 +42396,7 @@ prc2ksu
 prikura
 puyosun
 rsgun
-sandor
+sandr
 sanjeon
 sackids
 sasissu
@@ -42338,6 +42406,7 @@ sfish2j
 shanhigw
 shienryu
 skychal
+slotbatt
 smleague
 sokyugrt
 sss
@@ -43771,9 +43840,6 @@ cidx628
 @source:skeleton/cortex.cpp
 cortex
 
-@source:skeleton/cosmicos.cpp
-cosmicos
-
 @source:skeleton/cp1.cpp
 cp1
 
@@ -44107,6 +44173,9 @@ arthurkn100
 circus2
 fruitcat
 pharmyst
+
+@source:skeleton/licocai.cpp
+licocai
 
 @source:skeleton/lilith.cpp
 lilith
@@ -44577,9 +44646,6 @@ xbase09
 
 @source:skeleton/xinyun.cpp
 hongmxy
-
-@source:skeleton/xor100.cpp
-xor100
 
 @source:skeleton/yeno_ks56c1660.cpp
 ckidpers
@@ -47879,6 +47945,7 @@ mobigo2g
 
 @source:tvgames/generalplus_gpl16250_nand.cpp
 beambox
+behero
 jak_camp
 jak_car2
 jak_duck
@@ -48080,6 +48147,7 @@ zone3d
 @source:tvgames/spg2xx.cpp
 ablkickb
 abltenni
+anpannou
 anpantv
 backybbs
 ban_krkk
@@ -49800,6 +49868,9 @@ x820ii
 x820iilp
 x820ii5
 x820iis
+
+@source:xor/xor100.cpp
+xor100
 
 @source:yachiyo/atamanot.cpp
 atamanot

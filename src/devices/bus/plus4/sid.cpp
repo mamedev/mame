@@ -4,18 +4,9 @@
 
     Commodore Plus/4 SID cartridge emulation
 
-    http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card
+    https://plus4world.powweb.com/hardware/Solders_SID_Card
 
 **********************************************************************/
-
-/*
-
-    TODO:
-
-    - GAL16V8 dump
-    - get SID clock from expansion port
-
-*/
 
 #include "emu.h"
 #include "sid.h"
@@ -67,7 +58,7 @@ const tiny_rom_entry *plus4_sid_cartridge_device::device_rom_region() const
 void plus4_sid_cartridge_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
-	MOS8580(config, m_sid, XTAL(17'734'470)/20).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MOS8580(config, m_sid, clock()).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	VCS_CONTROL_PORT(config, m_joy, vcs_control_port_devices, nullptr);
 }

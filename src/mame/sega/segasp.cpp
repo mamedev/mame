@@ -486,7 +486,7 @@ ROM_START( arajewel )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0616-jpn.ic15", 0, 0x800, BAD_DUMP CRC(5b7ad9f3) SHA1(9f2406141c21f8e4b30d8835d3bfae7e597ce054) ) // bruteforced
+	ROM_LOAD( "317-0616-jpn.ic15", 0, 0x800, CRC(30f70a52) SHA1(2b790a39d9c95ef6700d34a6e1918e54caef82b9) )
 ROM_END
 
 ROM_START( arajewelm )
@@ -502,7 +502,7 @@ ROM_START( arajewelm )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0616-jpn.ic15", 0, 0x800, BAD_DUMP CRC(5b7ad9f3) SHA1(9f2406141c21f8e4b30d8835d3bfae7e597ce054) ) // bruteforced
+	ROM_LOAD( "317-0616-jpn.ic15", 0, 0x800, CRC(30f70a52) SHA1(2b790a39d9c95ef6700d34a6e1918e54caef82b9) )
 ROM_END
 
 ROM_START( arajewels )
@@ -1270,49 +1270,49 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND)
 
-GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
+GAME( 2004, segasp,     0,        segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
-GAME( 2010, aminosan,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Aminosan (satellite)", GAME_FLAGS )
-GAME( 2010, arajewelm,arajewel,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (main)", GAME_FLAGS )
-GAME( 2010, arajewels,arajewel,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (satellite)", GAME_FLAGS )
-GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
-GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
-GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
-GAME( 2009, btlracer,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Saikyou Saisoku Battle Racer", GAME_FLAGS )
-GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
-GAME( 2008, galilfac,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Galileo Factory (main)", GAME_FLAGS )
-GAME( 2008, isshoni,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Isshoni Wanwan Waiwai Puppy 2008", GAME_FLAGS ) // いっしょにワンワンわいわいパピー 2008
-GAME( 2010, kazaaan,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal Kazaaan!!", GAME_FLAGS )
-GAME( 2009, kingyo,segasp,       segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (1-player, Japan, Ver 1.005)", GAME_FLAGS ) // キッズ屋台村 金魚すくい
-GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
-GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
-GAME( 2009, magicpop,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Magical Poppins", GAME_FLAGS )
-GAME( 2013, manpuku,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Manpuku Suizokukan", GAME_FLAGS ) // まんぷくすいぞくかん
-GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Mirage World (satellite)", GAME_FLAGS )
-GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
-GAME( 2009, puyomedal,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Puyo Puyo! The Medal Edition", GAME_FLAGS )
-GAME( 2010, shateki,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Shateki (1-player, Japan, Ver 1.000)", GAME_FLAGS )
-GAME( 2005, spchecksrv,segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "SystemSP Factory Check Server", GAME_FLAGS )
-GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
-GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
-GAME( 2009, westdrmg,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )
+GAME( 2010, aminosan,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Aminosan (satellite)", GAME_FLAGS )
+GAME( 2010, arajewelm,  arajewel, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (main)", GAME_FLAGS )
+GAME( 2010, arajewels,  arajewel, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (satellite)", GAME_FLAGS )
+GAME( 2009, bingogal,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
+GAME( 2009, bingogals,  segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
+GAME( 2009, brickppl,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
+GAME( 2009, btlracer,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Saikyou Saisoku Battle Racer", GAME_FLAGS )
+GAME( 2005, dinoking,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
+GAME( 2008, galilfac,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Galileo Factory (main)", GAME_FLAGS )
+GAME( 2008, isshoni,    segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Isshoni Wanwan Waiwai Puppy 2008", GAME_FLAGS ) // いっしょにワンワンわいわいパピー 2008
+GAME( 2010, kazaaan,    segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal Kazaaan!!", GAME_FLAGS )
+GAME( 2009, kingyo,     segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (1-player, Japan, Ver 1.005)", GAME_FLAGS ) // キッズ屋台村 金魚すくい
+GAME( 2006, lovebery,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
+GAME( 2006, lovebero,   lovebery, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
+GAME( 2009, magicpop,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Magical Poppins", GAME_FLAGS )
+GAME( 2013, manpuku,    segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Manpuku Suizokukan", GAME_FLAGS ) // まんぷくすいぞくかん
+GAME( 2007, mirworld,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Mirage World (satellite)", GAME_FLAGS )
+GAME( 2007, ochaken,    segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
+GAME( 2009, puyomedal,  segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Puyo Puyo! The Medal Edition", GAME_FLAGS )
+GAME( 2010, shateki,    segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Shateki (1-player, Japan, Ver 1.000)", GAME_FLAGS )
+GAME( 2005, spchecksrv, segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "SystemSP Factory Check Server", GAME_FLAGS )
+GAME( 2009, tetgiant,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
+GAME( 2009, unomedal,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
+GAME( 2009, westdrmg,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )
 // These use a CF card
-GAME( 2010, arajewel,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (MDA-C0090)", GAME_FLAGS )
-GAME( 2007, bingogala,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039A)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
-GAME( 2008, bingogalb,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039B)", GAME_FLAGS ) // 11.03.2008(main)
-GAME( 2009, bingogalc,bingogal,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039C)", GAME_FLAGS ) // 28.05.2009(main)
-GAME( 2005, bingopar,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Parade (main) (MDA-C0008E)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
-GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
-GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
-GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
-GAME( 2008, dinoki4,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
-GAME( 2019, huhimage,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Heat Up Hockey Image (Ver.1.003R)", GAME_FLAGS )
-GAME( 2010, kazaaana,kazaaan,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal Kazaaan!! (MDA-C0091A)", GAME_FLAGS )
-GAME( 2016, kazaaan2,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098D)", GAME_FLAGS )
-GAME( 2016, kazaaan2c,kazaaan2,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098C)", GAME_FLAGS )
-GAME( 2012, kazaaan2o,kazaaan2,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098)", GAME_FLAGS )
-GAME( 2009, kingyoch,kingyo,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
-GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
-GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
-GAME( 2008, monomedal,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Monopoly the Medal 2nd Edition (MDA-C0056A)", GAME_FLAGS )
-GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )
+GAME( 2010, arajewel,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Arabian Jewel (MDA-C0090)", GAME_FLAGS )
+GAME( 2007, bingogala,  bingogal, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039A)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
+GAME( 2008, bingogalb,  bingogal, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039B)", GAME_FLAGS ) // 11.03.2008(main)
+GAME( 2009, bingogalc,  bingogal, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (MDA-C0039C)", GAME_FLAGS ) // 28.05.2009(main)
+GAME( 2005, bingopar,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Parade (main) (MDA-C0008E)", GAME_FLAGS ) // 31.10.2007(main)/15.11.2007(satellite)
+GAME( 2006, dinokior,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - Operation: Dinosaur Rescue (USA, Export) (MDA-C0021)", GAME_FLAGS )
+GAME( 2008, dinoki25,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
+GAME( 2010, dinokich,   dinoki25, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
+GAME( 2008, dinoki4,    segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
+GAME( 2019, huhimage,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Heat Up Hockey Image (Ver.1.003R)", GAME_FLAGS )
+GAME( 2010, kazaaana,   kazaaan,  segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal Kazaaan!! (MDA-C0091A)", GAME_FLAGS )
+GAME( 2016, kazaaan2,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098D)", GAME_FLAGS )
+GAME( 2016, kazaaan2c,  kazaaan2, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098C)", GAME_FLAGS )
+GAME( 2012, kazaaan2o,  kazaaan2, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "100&Medal GekiKazaaan!! (MDA-C0098)", GAME_FLAGS )
+GAME( 2009, kingyoch,   kingyo,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
+GAME( 2007, loveber3,   segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
+GAME( 2010, loveber3cn, loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
+GAME( 2008, monomedal,  segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Monopoly the Medal 2nd Edition (MDA-C0056A)", GAME_FLAGS )
+GAME( 2009, tetgiano,   tetgiant, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )

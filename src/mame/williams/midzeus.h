@@ -102,13 +102,15 @@ protected:
 	void zeus_w(offs_t offset, uint32_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(display_irq);
-	TIMER_CALLBACK_MEMBER(display_irq_off);
+	attotime time_until_vsync() const;
+	void vsync_changed(int state);
+	virtual void rearm_vsync();
+	TIMER_CALLBACK_MEMBER(vsync_start);
 
 	void zeus_map(address_map &map) ATTR_COLD;
 	void midzeus(machine_config &config);
 
-	emu_timer *     m_display_irq_off_timer = nullptr;
+	emu_timer *     m_vsync_start_timer = nullptr;
 	uint32_t        m_disk_asic_jr[0x10]{};
 
 	uint8_t         m_cmos_protected = 0;

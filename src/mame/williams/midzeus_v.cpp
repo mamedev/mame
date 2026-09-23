@@ -716,6 +716,8 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					m_zeus_cliprect.min_x = 0;
 				}
 			}
+			// re-time vertical sync against the mode just programmed
+			rearm_vsync();
 			break;
 
 		case 0xcc:

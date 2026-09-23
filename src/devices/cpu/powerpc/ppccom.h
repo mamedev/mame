@@ -374,6 +374,10 @@ enum
 #define DSISR_NO_SEGMENT    0x00200000      /* DSI: no segment match found (64-bit only) */
 #define DSISR_INVALID_ECWX  0x00100000      /* DSI: ECIWX or ECOWX used with EAR[E] = 0 */
 #define DSISR_INSTRUCTION   0x000fffff      /* align: instruction decoding bits FIXME: mask/shift depends on addressing mode */
+#define DSISR_NOEXEC        0x10000000      /* ISI only: fetch from a no-execute segment (SRR1[3]) */
+
+// extra VTLB entry bit used by the 603 software-loaded TLB (bits 8-11 of an entry are free)
+#define VTLB_603_CHANGED    0x00000100      /* The PTE's C bit was set when the entry was loaded */
 
 
 // PowerPC 4XX IRQ bits

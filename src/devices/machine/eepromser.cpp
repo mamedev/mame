@@ -160,6 +160,7 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 	m_output_on_falling_clock_enabled(false),
 	m_do_tristate(ASSERT_LINE),
 	m_do_cb(*this),
+	m_ready_timer(nullptr),
 	m_state(STATE_IN_RESET),
 	m_cs_state(CLEAR_LINE),
 	m_last_cs_rising_edge_time(attotime::zero),
@@ -188,6 +189,8 @@ void eeprom_serial_base_device::device_start()
 
 	// start the base class
 	eeprom_base_device::device_start();
+
+	m_ready_timer = timer_alloc(FUNC(eeprom_serial_base_device::ready_timer_expired), this);
 
 	// save the current state
 	save_item(NAME(m_state));
@@ -339,8 +342,37 @@ void eeprom_serial_base_device::set_state(eeprom_state newstate)
 	// switch to the new state
 	m_state = newstate;
 
-	// set DO high (actually high impedance; pullup assumed) except when entering STATE_READING_DATA
-	m_do_cb(m_state != STATE_READING_DATA);
+	// let the device decide what DO should read in the new state
+	m_do_cb(do_line_for_state());
+
+	// an internal write/erase cycle only ends with the passage of time, and nothing
+	// else will poke DO again, so schedule the update that releases the busy signal
+	if (m_state == STATE_WAIT_FOR_COMPLETION && !ready())
+		m_ready_timer->adjust(m_completion_time - machine().time());
+}
+
+
+//-------------------------------------------------
+//  do_line_for_state - value the DO line takes on
+//  entry to the current state
+//-------------------------------------------------
+
+int eeprom_serial_base_device::do_line_for_state() const
+{
+	// high (actually high impedance; pullup assumed) except when entering STATE_READING_DATA
+	return (m_state != STATE_READING_DATA) ? ASSERT_LINE : CLEAR_LINE;
+}
+
+
+//-------------------------------------------------
+//  ready_timer_expired - the internal write cycle
+//  has finished, so update DO for anything polling
+//  it
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(eeprom_serial_base_device::ready_timer_expired)
+{
+	m_do_cb(do_line_for_state());
 }
 
 
@@ -656,6 +688,15 @@ void eeprom_serial_93cxx_device::parse_command_and_address()
 //-------------------------------------------------
 
 int eeprom_serial_93cxx_device::do_read() { return (m_state == STATE_WAIT_FOR_START_BIT) ? base_ready_read() : base_do_read(); }
+
+// DO is also READY/BUSY on these parts, and software polls it by raising CS after a
+// write, so it must read low until the internal write cycle finishes!
+int eeprom_serial_93cxx_device::do_line_for_state() const
+{
+	if (m_state == STATE_WAIT_FOR_START_BIT)
+		return ready() ? ASSERT_LINE : CLEAR_LINE;
+	return eeprom_serial_base_device::do_line_for_state();
+}
 
 
 //-------------------------------------------------

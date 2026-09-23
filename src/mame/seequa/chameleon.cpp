@@ -18,6 +18,48 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "softlist_dev.h"
 
+DECLARE_DEVICE_TYPE(ISA8_FDC_CHAMELEON, isa8_fdc_chameleon_device)
+
+class isa8_fdc_chameleon_device : public isa8_fdc_xt_device
+{
+public:
+	isa8_fdc_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		isa8_fdc_xt_device(mconfig, ISA8_FDC_CHAMELEON, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual void device_reset() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+	void map(address_map &map) ATTR_COLD;
+};
+
+void isa8_fdc_chameleon_device::device_reset()
+{
+	isa8_upd765_fdc_device::device_reset();
+	dor_w(dor_r() | 8);
+}
+
+void isa8_fdc_chameleon_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x074, 0x075, *this, &isa8_fdc_chameleon_device::map);
+		m_isa->install_device(0x3de, 0x3de, read8smo_delegate(*this, NAME([](){ return 0xff; })),
+				write8smo_delegate(*this, NAME([this](uint8_t d){ dor_w((dor_r() & ~0x10) | ((d & 0x80) >> 3)); })));
+		m_isa->install_device(0x3df, 0x3df, read8smo_delegate(*this, NAME([](){ return 0xff; })),
+				write8smo_delegate(*this, NAME([this](uint8_t d){ dor_w((dor_r() & ~4) | (d & 4)); })));
+	}
+}
+
+void isa8_fdc_chameleon_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(m_fdc, FUNC(upd765a_device::msr_r));
+	map(0x1, 0x1).r(m_fdc, FUNC(upd765a_device::fifo_r)).w(m_fdc, FUNC(upd765a_device::fifo_w));
+}
+
+DEFINE_DEVICE_TYPE(ISA8_FDC_CHAMELEON, isa8_fdc_chameleon_device, "isa8_fdc_chameleon_device", "Chameleon Prototype FDC hookup")
+
 namespace {
 
 class chameleon_state : public driver_device
@@ -35,13 +77,14 @@ public:
 	}
 
 	void chameleon(machine_config &config);
-	MC6845_UPDATE_ROW( crtc_update_row );
+	void champroto(machine_config &config);
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void i8088_io(address_map &map) ATTR_COLD;
+	void i8088_proto_io(address_map &map) ATTR_COLD;
 	void i8088_map(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
 	void z80_map(address_map &map) ATTR_COLD;
@@ -99,6 +142,17 @@ void chameleon_state::i8088_io(address_map &map)
 	map(0x03de, 0x03de).w(FUNC(chameleon_state::proc_swap));
 }
 
+void chameleon_state::i8088_proto_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	//map(0x0030, 0x0031).rw(m_i8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w));
+	map(0x0030, 0x0031).rw("mb:pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write)); // What's this about?
+	map(0x0378, 0x037b).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
+	map(0x0379, 0x0379).lw8(NAME([this](uint8_t d) { m_z80_bank = (d << 16); }));
+	map(0x03dd, 0x03dd).lw8(NAME([this](uint8_t d) { if(d & 0x80) proc_swap(0); }));
+}
+
 void chameleon_state::i8088_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -128,6 +182,7 @@ void chameleon_devices(device_slot_interface &device)
 {
 	device.option_add_internal("cga", ISA8_CGA_CHAMELEON);
 	device.option_add_internal("fdc", ISA8_FDC_XT);
+	device.option_add_internal("cfdc", ISA8_FDC_CHAMELEON);
 }
 
 void chameleon_state::chameleon(machine_config &config)
@@ -166,6 +221,14 @@ void chameleon_state::chameleon(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 }
 
+void chameleon_state::champroto(machine_config &config)
+{
+	chameleon(config);
+	m_i8088->set_addrmap(AS_IO, &chameleon_state::i8088_proto_io);
+	config.device_remove("dev1");
+	ISA8_SLOT(config, "dev1", 0, "mb:isa", chameleon_devices, "cfdc", true);
+}
+
 ROM_START(chameleon)
 	ROM_DEFAULT_BIOS("220")
 	ROM_SYSTEM_BIOS(0, "216", "2.16")
@@ -186,6 +249,21 @@ ROM_START(chameleon)
 	ROM_REGION(0x40, "x2210a", 0)  // configured for 256k ram
 	ROM_LOAD("nvram", 0, 0x40, CRC(ed73313b) SHA1(fa643bf008b937ea9bc2c3e99523d9ed0f92acc4))
 ROM_END
+
+ROM_START(champroto)
+	ROM_DEFAULT_BIOS("0w")
+	ROM_SYSTEM_BIOS(0, "0w", "0.w")
+	ROM_REGION(0x2000, "slotf", 0)
+	ROMX_LOAD("rom-0.w-2.bin", 0x1000, 0x1000, CRC(19367509) SHA1(01c82a43feb43cb125afb3e462b7d8a05866092f), ROM_BIOS(0))
+	ROMX_LOAD("rom-0.w-1.bin", 0, 0x1000, CRC(a5ea12b4) SHA1(0e15fdb30dcff6f3041bc9963e7dd61ce434fa82), ROM_BIOS(0)) // this is in slote but there's a rom size jumper
+	ROM_REGION(0x2000, "slote", 0)
+	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(0))
+	ROM_REGION(0x2000, "slotd", 0)
+	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(0))
+	ROM_REGION(0x40, "x2210a", 0)  // configured for 256k ram
+	ROM_LOAD("nvram", 0, 0x40, CRC(ed73313b) SHA1(fa643bf008b937ea9bc2c3e99523d9ed0f92acc4))
+ROM_END
 }
 
 COMP(1983, chameleon, 0, 0, chameleon, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC)", MACHINE_NOT_WORKING)
+COMP(1983, champroto, chameleon, 0, champroto, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC, prototype)", MACHINE_NOT_WORKING)

@@ -3035,6 +3035,11 @@ void tlcs900_device::op_RETD()
 
 void tlcs900_device::op_RETI()
 {
+	/* INTNEST: pair the decrement with the increment at interrupt acceptance.
+	   Clamped, so an unmatched RETI reads as "not nested" rather than wrapping. */
+	if ( m_intnest )
+		m_intnest--;
+
 	m_sr.w.l = RDMEMW( m_xssp.d );
 	m_xssp.d += 2;
 	m_pc.d = RDMEML( m_xssp.d );
@@ -3989,6 +3994,10 @@ void tlcs900_device::prepare_operands(const tlcs900inst *inst)
 		case 0x4c:  // TMP94C241
 			m_p1_reg16 = &m_dmac[3].w.l;
 			break;
+		case 0x3c:  // TMP96C141/TMP95C061/TMP95C063 -- INTNEST
+		case 0x7c:  // TMP94C241 -- INTNEST
+			m_p1_reg16 = &m_intnest;
+			break;
 		default:
 			m_p1_reg16 = &m_dummy.w.l;
 			break;
@@ -4166,6 +4175,10 @@ void tlcs900_device::prepare_operands(const tlcs900inst *inst)
 			break;
 		case 0x4c:  // TMP94C241
 			m_p2_reg16 = &m_dmac[3].w.l;
+			break;
+		case 0x3c:  // TMP96C141/TMP95C061/TMP95C063 -- INTNEST
+		case 0x7c:  // TMP94C241 -- INTNEST
+			m_p2_reg16 = &m_intnest;
 			break;
 		default:
 			m_p2_reg16 = &m_dummy.w.l;

@@ -61,28 +61,30 @@ f000 f000 1111     . .          071234fc:4
 
 f200 ffc0 fpgen    l .          234f:0
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u16 w2 = OPER_I_16();
-		switch((w2 >> 13) & 0x7)
-		{
-			case 0x0:   // FPU ALU FP, FP
-			case 0x2:   // FPU ALU ea, FP
-				fpgen_rm_reg(w2);
-				break;
-			case 0x3:   // FMOVE FP, ea
-				fmove_reg_mem(w2);
-				break;
-			case 0x4:   // FMOVEM ea, FPCR
-			case 0x5:   // FMOVEM FPCR, ea
-				fmove_fpcr(w2);
-				break;
-			case 0x6:   // FMOVEM ea, list
-			case 0x7:   // FMOVEM list, ea
-				fmovem(w2);
-				break;
-			default:
-				m68ki_exception_1111();
-				break;
+		switch((w2 >> 13) & 0x7) {
+		case 0x0:   // FPU ALU FP, FP
+		case 0x2:   // FPU ALU ea, FP
+			fpgen_rm_reg(w2);
+			break;
+		case 0x3:   // FMOVE FP, ea
+			fmove_reg_mem(w2);
+			break;
+		case 0x4:   // FMOVEM ea, FPCR
+		case 0x5:   // FMOVEM FPCR, ea
+			fmove_fpcr(w2);
+			break;
+		case 0x6:   // FMOVEM ea, list
+		case 0x7:   // FMOVEM list, ea
+			fmovem(w2);
+			break;
+		default:
+			m68ki_exception_1111();
+			break;
 		}
 	} else {
 		m68ki_exception_1111();
@@ -91,6 +93,9 @@ f200 ffc0 fpgen    l .          234f:0
 
 f240 fff8 fscc_d   b .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u32 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		DY() = (DY() & 0xffffff00) | v;
@@ -101,6 +106,9 @@ f240 fff8 fscc_d   b .          234f:4
 
 f240 ffc0 fscc     b A+-DXWL    234f:6
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(M68KMAKE_GET_EA_AY_8, v);
@@ -111,6 +119,9 @@ f240 ffc0 fscc     b A+-DXWL    234f:6
 
 f248 fff8 fdbcc    l .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fdbcc();
 	} else {
 		m68ki_exception_1111();
@@ -119,6 +130,9 @@ f248 fff8 fdbcc    l .          234f:4
 
 f27a ffff ftrap_w  l .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -127,6 +141,9 @@ f27a ffff ftrap_w  l .          234f:4
 
 f27b ffff ftrap_l  l .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -135,6 +152,9 @@ f27b ffff ftrap_l  l .          234f:4
 
 f27c ffff ftrap    l .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -143,6 +163,9 @@ f27c ffff ftrap    l .          234f:4
 
 f280 ffc0 fbcc_w   w .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fbcc16();
 	} else {
 		m68ki_exception_1111();
@@ -151,6 +174,9 @@ f280 ffc0 fbcc_w   w .          234f:4
 
 f2c0 ffc0 fbcc_l   l .          234f:4
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fbcc32();
 	} else {
 		m68ki_exception_1111();
@@ -2392,7 +2418,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -2418,7 +2444,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -2444,7 +2470,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -2470,7 +2496,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -2496,7 +2522,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -2522,7 +2548,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -2545,7 +2571,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -2566,7 +2592,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -2587,7 +2613,7 @@ e8c0 ffc0 bftst    l ADXWLdx    234fc:13
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -4815,30 +4841,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			REG_DA()[(word2 >> 12) & 15] = m_vbr;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -4881,30 +4905,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -4972,30 +4994,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_srp_aptr;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -5050,30 +5070,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr3;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -5090,7 +5108,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -5104,30 +5122,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			m_vbr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -5144,7 +5160,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -5155,7 +5171,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			/* 68030 can write all bits except 5-7, 040 can write all */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -5186,30 +5202,29 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			}
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			if(m_cpu_type == CPU_TYPE_COLDFIRE)
 			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -5226,7 +5241,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -5238,7 +5253,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			   writable; bits 5-7 and 14-31 are reserved and must read back as 0. */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x3f1f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -5268,30 +5283,29 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			}
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			if(m_cpu_type == CPU_TYPE_COLDFIRE)
 			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -5308,7 +5322,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -5346,12 +5360,9 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 		case 0x003:         /* TC */
 			m_mmu_tc = REG_DA()[(word2 >> 12) & 15];
 
-			if (m_mmu_tc & 0x8000)
-			{
+			if(m_mmu_tc & 0x8000) {
 				m_pmmu_enabled = 1;
-			}
-			else
-			{
+			} else {
 				m_pmmu_enabled = 0;
 			}
 			m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
@@ -5378,30 +5389,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			m_mmu_srp_aptr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -5418,7 +5427,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -5429,7 +5438,7 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			/* 68030 can write all bits except 5-7, 040 can write all */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -5471,30 +5480,28 @@ e3c0 ffc0 lsl      w A+-DXWL    01:8 7:14 24fc:5 3:4
 			m_mmu_acr3 = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -6570,12 +6577,9 @@ f510 fff8 pflushan l .          4fc:4p
 
 f000 fe00 pmmu     l .          23fc:8p
 	// 68851/68030 MMU instructions; all of these are F-line exceptions on the 68040
-	if (m_has_pmmu)
-	{
+	if(m_has_pmmu) {
 		m68851_mmu_ops();
-	}
-	else
-	{
+	} else {
 		m68ki_exception_1111();
 	}
 
@@ -6583,17 +6587,12 @@ f000 fe00 pmmu     l .          23fc:8p
 f548 ffd8 ptest    l .          4:8p
 	if(m_has_pmmu)
 	{
-		if(m_s_flag)
-		{
+		if(m_s_flag) {
 			m68040_ptest();
-		}
-		else
-		{
+		} else {
 			m68ki_exception_privilege_violation();
 		}
-	}
-	else
-	{
+	} else {
 		m68ki_exception_1111();
 	}
 
@@ -7245,8 +7244,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 24fc:5 3:4
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
-			{
+			if(format_word == 0x8) { /* 68010 - type 1000 stack frame */
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
 				m68ki_fake_pull_16();  /* format word */
@@ -7267,9 +7265,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 24fc:5 3:4
 				m68ki_set_sr(new_sr);
 				m_instr_mode = INSTRUCTION_YES;
 				m_run_mode = RUN_MODE_NORMAL;
-			}
-			else
-			{
+			} else {
 				m_instr_mode = INSTRUCTION_YES;
 				m_run_mode = RUN_MODE_NORMAL;
 				/* Not handling bus fault (9) */
@@ -8443,7 +8439,7 @@ f400 ff20 cinv     l .          4:16
 	u8 cache = (ir >> 6) & 3;
 	//  u8 scope = (ir >> 3) & 3;
 	//  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
-	switch (cache) {
+	switch(cache) {
 	case 1:
 		// TODO: data cache
 		break;

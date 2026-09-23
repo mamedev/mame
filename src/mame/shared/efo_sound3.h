@@ -32,7 +32,7 @@ private:
 
 	required_device<cdp1852_device> m_inputlatch;
 	required_device<cdp1852_device> m_intflatch;
-	required_device<tms5220_device> m_tms;
+	required_device<tms5200_device> m_tms;
 
 	u8 m_input;
 };

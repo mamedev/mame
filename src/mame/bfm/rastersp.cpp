@@ -79,8 +79,8 @@ public:
 	{
 	}
 
-	void rastersp(machine_config &config);
-	void rs_config_base(machine_config &config);
+	void rastersp(machine_config &config) ATTR_COLD;
+	void rs_config_base(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -406,7 +406,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				uint32_t pixels = (word2 >> 16) & 0x1ff;
 
 				uint16_t* palptr = &m_paletteram[m_palette_number*256];
-				uint8_t* srcptr = reinterpret_cast<uint8_t*>(&m_dram[0]);
+				auto const srcptr = util::little_endian_cast<uint8_t const>(&m_dram[0]);
 
 				uint32_t acc = srcaddr << 8;
 
@@ -419,7 +419,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				{
 					while (x < 320 && pixels)
 					{
-						*bmpptr++ = palptr[srcptr[BYTE_XOR_LE(acc >> 8)]];
+						*bmpptr++ = palptr[srcptr[acc >> 8]];
 						acc = (acc + incr) & VIDEO_ADDR_MASK;
 
 						--pixels;
@@ -440,7 +440,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				uint32_t srcaddr = word1 >> 8;
 				uint32_t pixels = (word2 >> 16) & 0x1ff;
 
-				uint16_t* srcptr = reinterpret_cast<uint16_t*>(&m_dram[0]);
+				auto const srcptr = util::little_endian_cast<uint16_t const>(&m_dram[0]);
 
 				uint32_t acc = srcaddr << 8;
 
@@ -453,7 +453,7 @@ void rastersp_state::dpylist_w(uint32_t data)
 				{
 					while (x < 320 && pixels)
 					{
-						*bmpptr++ = srcptr[WORD_XOR_LE(acc >> 9)];
+						*bmpptr++ = srcptr[acc >> 9];
 						acc = (acc + incr) & VIDEO_ADDR_MASK;
 
 						--pixels;

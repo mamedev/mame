@@ -13,7 +13,6 @@
 #include "bus/centronics/ctronics.h"
 #include "imagedev/floppy.h"
 #include "machine/am9519.h"
-#include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "trs80m2kb.h"
 #include "machine/wd_fdc.h"
@@ -62,8 +61,6 @@ public:
 	{
 	}
 
-	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t read(offs_t offset);
@@ -82,7 +79,6 @@ public:
 	void pio_pa_w(uint8_t data);
 	void strobe_w(int state);
 	void kb_clock_w(int state);
-	void kbd_w(u8 data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -128,12 +124,11 @@ protected:
 	int m_msel;
 
 	// keyboard state
-	uint8_t m_key_latch;
-	uint8_t m_key_data;
-	int m_key_bit;
-	int m_kbclk;
-	int m_kbdata;
-	int m_kbirq;
+	uint8_t m_key_data = 0;
+	int m_key_bit = 0;
+	int m_kbclk = 1;
+	int m_kbdata = 0;
+	int m_kbirq = 1;
 
 	// video state
 	int m_blnkvid;

@@ -11,7 +11,7 @@ license:CC0-1.0
 		<publisher>Amstrad</publisher>
 
 		<!-- Amstrad 40095 (Alps DRMD20A12A), Tandon TM-262 -->
-		<part name="hdd" interface="scsi_hdd">
+		<part name="hdd" interface="st_hdd">
 			<diskarea name="harddriv">
 				<disk name="40095" sha1="d3c8b579e40063e98331e667caf7bd3667b18d1c" writeable="yes" />
 			</diskarea>

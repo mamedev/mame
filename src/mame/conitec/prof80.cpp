@@ -6,28 +6,101 @@
     GRIP-1/2/3/4/5 (Grafik-Interface-Prozessor)
     UNIO-1 (?)
 
-    http://www.prof80.de/
-    http://oldcomputers.dyndns.org/public/pub/rechner/conitec/info.html
-
-*/
-
-/*
-
-    TODO:
-
-    - floppy Err on A: Select
-    - NE555 timeout is 10x too high
-    - grip31 does not work
-    - UNIO card (Z80-STI, Z80-SIO, 2x centronics)
-    - GRIP-COLOR (192kB color RAM)
-    - GRIP-5 (HD6345, 256KB RAM)
-    - XR color card
+	https://www.wolfgangrobel.de/prof80/
 
 */
 
 #include "emu.h"
-#include "prof80.h"
+#include "bus/ecbbus/ecbbus.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
+#include "machine/74259.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "machine/upd1990a.h"
+#include "machine/upd765.h"
+#include "machine/z80daisy.h"
+#include "prof80mmu.h"
 #include "softlist_dev.h"
+
+#define Z80_TAG         "z1"
+#define UPD765_TAG      "z38"
+#define UPD1990A_TAG    "z43"
+
+namespace {
+
+class prof80_state : public driver_device
+{
+public:
+	prof80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_mmu(*this, "mmu"),
+		m_rtc(*this, UPD1990A_TAG),
+		m_fdc(*this, UPD765_TAG),
+		m_ram(*this, RAM_TAG),
+		m_floppy(*this, UPD765_TAG":%u", 0U),
+		m_ecb(*this, "ecbbus"),
+		m_rs232a(*this, "rs232a"),
+		m_rs232b(*this, "rs232b"),
+		m_flra(*this, "z44"),
+		m_flrb(*this, "z45"),
+		m_rom(*this, Z80_TAG),
+		m_j4(*this, "J4"),
+		m_j5(*this, "J5")
+	{ }
+
+	void prof80(machine_config &config);
+
+private:
+	virtual void machine_start() override ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<prof80_mmu_device> m_mmu;
+	required_device<upd1990a_device> m_rtc;
+	required_device<upd765a_device> m_fdc;
+	required_device<ram_device> m_ram;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_device<ecbbus_device> m_ecb;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
+	required_device<ls259_device> m_flra;
+	required_device<ls259_device> m_flrb;
+	required_memory_region m_rom;
+	required_ioport m_j4;
+	required_ioport m_j5;
+
+	void flr_w(uint8_t data);
+	uint8_t status_r();
+	uint8_t status2_r();
+
+	void motor(int state);
+	void restore_floppy_ready() { ready_w(m_flra->q3_r()); }
+	TIMER_CALLBACK_MEMBER(motor_off_tick) { motor(1); }
+	void index_w(int state) { m_index = !state; };
+
+	void ready_w(int state)
+	{
+		m_fdc->set_ready_line_connected(!state);
+		m_fdc->ready_w(!state);
+	}
+	void inuse_w(int state) { };
+	void motor_w(int state) { if (!state) motor(0); };
+	void mstop_w(int state) { if (!state) motor(1); };
+	void select_w(int state) { m_fdc->set_select_lines_connected(state); };
+	void mini_w(int state) { m_fdc->set_rate(state ? 250'000 : 500'000); };
+
+	int m_motor = 1;
+	int m_index = 1;
+
+	// timers
+	emu_timer *m_motor_off_timer = nullptr;
+
+	void prof80_io(address_map &map) ATTR_COLD;
+	void prof80_mem(address_map &map) ATTR_COLD;
+	void prof80_mmu(address_map &map) ATTR_COLD;
+};
 
 
 //**************************************************************************
@@ -38,78 +111,28 @@
 //  motor -
 //-------------------------------------------------
 
-void prof80_state::motor(int mon)
+void prof80_state::motor(int state)
 {
-	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(mon);
-	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(mon);
-
-	m_motor = mon;
-}
-
-
-void prof80_state::ready_w(int state)
-{
-	if (m_ready != state)
+	for (auto &connector : m_floppy)
 	{
-		m_fdc->set_ready_line_connected(!state);
-		m_fdc->ready_w(!state);
-		m_ready = state;
+		floppy_image_device *drive = connector->get_device();
+
+		if (drive)
+		{
+			drive->mon_w(state);
+			m_motor = state;
+		}
 	}
-}
 
-
-void prof80_state::inuse_w(int state)
-{
-	//m_floppy->inuse_w(state);
-}
-
-
-void prof80_state::motor_w(int state)
-{
-	if (state)
-	{
-		// trigger floppy motor off NE555 timer
-		int t = 110 * RES_M(10) * CAP_U(6.8); // t = 1.1 * R8 * C6
-
-		m_floppy_motor_off_timer->adjust(attotime::from_msec(t));
-	}
-	else
-	{
-		// turn on floppy motor
-		motor(0);
-
-		// reset floppy motor off NE555 timer
-		m_floppy_motor_off_timer->adjust(attotime::never);
-	}
-}
-
-
-void prof80_state::select_w(int state)
-{
-	if (m_select != state)
-	{
-		//m_fdc->set_select_lines_connected(state);
-		m_select = state;
-	}
-}
-
-
-void prof80_state::mini_w(int state)
-{
-	m_fdc->set_unscaled_clock(16_MHz_XTAL / (state ? 4 : 2));
-}
-
-
-void prof80_state::mstop_w(int state)
-{
 	if (!state)
 	{
-		// turn off floppy motor
-		motor(1);
-
-		// reset floppy motor off NE555 timer
-		m_floppy_motor_off_timer->adjust(attotime::never);
+		double const t = 1.1 * RES_M(10) * CAP_U(6.8); // NE555 monostable
+		m_motor_off_timer->adjust(attotime::from_double(t));
+	} else {
+		m_motor_off_timer->adjust(attotime::never);
 	}
+
+	m_motor = state;
 }
 
 
@@ -147,7 +170,7 @@ uint8_t prof80_state::status_r()
 {
 	/*
 
-	    bit     signal      description
+	    bit     signal
 
 	    0       _RX
 	    1
@@ -163,14 +186,14 @@ uint8_t prof80_state::status_r()
 	uint8_t data = 0;
 
 	// serial receive
-	data |= !m_rs232a->rxd_r();
+	data |= m_rs232a->rxd_r();
 
 	// clear to send
-	data |= m_rs232a->cts_r() << 4;
-	data |= m_rs232b->cts_r() << 7;
+	data |= !m_rs232a->cts_r() << 4;
+	data |= !m_rs232b->cts_r() << 7;
 
 	// floppy index
-	data |= (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->idx_r() : m_floppy[1]->get_device() ? m_floppy[1]->get_device()->idx_r() : 1) << 5;
+	data |= m_index << 5;
 
 	return data;
 }
@@ -184,9 +207,9 @@ uint8_t prof80_state::status2_r()
 {
 	/*
 
-	    bit     signal      description
+	    bit     signal
 
-	    0       _MOTOR      floppy motor (0=on, 1=off)
+	    0		MTR
 	    1
 	    2
 	    3
@@ -198,10 +221,10 @@ uint8_t prof80_state::status2_r()
 	*/
 
 	uint8_t data = 0;
-	int js4 = 0, js5 = 0;
 
-	// floppy motor
 	data |= m_motor;
+
+	int js4 = 0, js5 = 0;
 
 	// JS4
 	switch (m_j4->read())
@@ -225,35 +248,13 @@ uint8_t prof80_state::status2_r()
 	case 4: js5 = !m_flra->q2_r(); break;
 	}
 
-	data |= js5 << 4;
+	data |= js5 << 5;
 
 	// RTC data
 	data |= !m_rtc->data_out_r() << 7;
 
 	return data;
 }
-
-// UNIO
-/*
-void prof80_state::unio_ctrl_w(uint8_t data)
-{
-//  int flag = BIT(data, 0);
-    int flad = (data >> 1) & 0x07;
-
-    switch (flad)
-    {
-    case 0: // CG1
-    case 1: // CG2
-    case 2: // _STB1
-    case 3: // _STB2
-    case 4: // _INIT
-    case 5: // JSO0
-    case 6: // JSO1
-    case 7: // JSO2
-        break;
-    }
-}
-*/
 
 
 
@@ -290,14 +291,6 @@ void prof80_state::prof80_mmu(address_map &map)
 void prof80_state::prof80_io(address_map &map)
 {
 	map(0x00, 0xd7).mirror(0xff00).rw(m_ecb, FUNC(ecbbus_device::io_r), FUNC(ecbbus_device::io_w));
-//  map(0x80, 0x8f).mirror(0xff00).rw(UNIO_Z80STI_TAG, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
-//  map(0x94, 0x95).mirror(0xff00).rw(UNIO_Z80SIO_TAG, FUNC(z80sio_device::z80sio_d_r), FUNC(z80sio_device::z80sio_d_w)); // TODO: these methods don't exist anymore
-//  map(0x96, 0x97).mirror(0xff00).rw(UNIO_Z80SIO_TAG, FUNC(z80sio_device::z80sio_c_r), FUNC(z80sio_device::z80sio_c_w)); // TODO: these methods don't exist anymore
-//  map(0x9e, 0x9e).mirror(0xff00).w(FUNC(prof80_state::unio_ctrl_w));
-//  map(0x9c, 0x9c).mirror(0xff00).w(UNIO_CENTRONICS1_TAG, FUNC(centronics_device::write));
-//  map(0x9d, 0x9d).mirror(0xff00).w(UNIO_CENTRONICS1_TAG, FUNC(centronics_device::write));
-//  map(0xc0, 0xc0).mirror(0xff00).r(FUNC(prof80_state::gripc_r));
-//  map(0xc1, 0xc1).mirror(0xff00).rw(FUNC(prof80_state::gripd_r), FUNC(prof80_state::gripd_w));
 	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(prof80_state::flr_w));
 	map(0xda, 0xda).mirror(0xff00).r(FUNC(prof80_state::status_r));
 	map(0xdb, 0xdb).mirror(0xff00).r(FUNC(prof80_state::status2_r));
@@ -379,6 +372,15 @@ static INPUT_PORTS_START( prof80 )
 	PORT_CONFSETTING( 0x01, "Normal" )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
+
 
 
 //**************************************************************************
@@ -401,17 +403,6 @@ static void prof80_floppies(device_slot_interface &device)
 //**************************************************************************
 
 //-------------------------------------------------
-//  motor_off - disable the floppy motor after
-//  a delay
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(prof80_state::motor_off)
-{
-	motor(1);
-}
-
-
-//-------------------------------------------------
 //  machine_start
 //-------------------------------------------------
 
@@ -422,12 +413,12 @@ void prof80_state::machine_start()
 	m_rtc->oe_w(1);
 
 	// create timer
-	m_floppy_motor_off_timer = timer_alloc(FUNC(prof80_state::motor_off), this);
+	m_motor_off_timer = timer_alloc(FUNC(prof80_state::motor_off_tick), this);
 
-	// register for state saving
+	// state saving
 	save_item(NAME(m_motor));
-	save_item(NAME(m_ready));
-	save_item(NAME(m_select));
+	save_item(NAME(m_index));
+	machine().save().register_postload(save_prepost_delegate(FUNC(prof80_state::restore_floppy_ready), this));
 }
 
 
@@ -443,7 +434,7 @@ void prof80_state::machine_start()
 void prof80_state::prof80(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 6_MHz_XTAL);
+	Z80(config, m_maincpu, XTAL(6'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mem);
 	m_maincpu->set_addrmap(AS_IO, &prof80_state::prof80_io);
 
@@ -455,11 +446,13 @@ void prof80_state::prof80(machine_config &config)
 	UPD1990A(config, m_rtc);
 
 	// FDC
-	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true); // clocked through FDC9229B
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", prof80_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", prof80_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	UPD765A(config, m_fdc, XTAL(16'000'000)/2, true, true);
+	m_fdc->idx_wr_callback().set(FUNC(prof80_state::index_w));
+
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", prof80_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", prof80_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", prof80_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// DEMUX latches
 	LS259(config, m_flra);
@@ -472,6 +465,7 @@ void prof80_state::prof80(machine_config &config)
 	m_flra->q_out_cb<5>().set(FUNC(prof80_state::inuse_w)); // IN USE
 	m_flra->q_out_cb<6>().set(FUNC(prof80_state::motor_w)); // _MOTOR
 	m_flra->q_out_cb<7>().set(FUNC(prof80_state::select_w)); // SELECT
+	
 	LS259(config, m_flrb);
 	m_flrb->q_out_cb<0>().set(m_fdc, FUNC(upd765a_device::reset_w)); // RESF
 	m_flrb->q_out_cb<1>().set(FUNC(prof80_state::mini_w)); // MINI
@@ -484,21 +478,24 @@ void prof80_state::prof80(machine_config &config)
 
 	// ECB bus
 	ECBBUS(config, m_ecb);
-	ECBBUS_SLOT(config, "ecb_1", m_ecb, 1, ecbbus_cards, "grip21");
-	ECBBUS_SLOT(config, "ecb_2", m_ecb, 2, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_3", m_ecb, 3, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_4", m_ecb, 4, ecbbus_cards, nullptr);
-	ECBBUS_SLOT(config, "ecb_5", m_ecb, 5, ecbbus_cards, nullptr);
-
+	ECBBUS_SLOT(config, "bus1", m_ecb, 1, ecbbus_cards, "grip21");
+	ECBBUS_SLOT(config, "bus2", m_ecb, 2, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "bus3", m_ecb, 3, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "bus4", m_ecb, 4, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "bus5", m_ecb, 5, ecbbus_cards, nullptr);
+	
 	// V24
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->rxd_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0).invert();
+	m_rs232a->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software lists
-	SOFTWARE_LIST(config, "flop_list").set_original("prof80");
+	SOFTWARE_LIST(config, "flop_list").set_original("prof80_flop");
 }
 
 
@@ -522,11 +519,13 @@ ROM_START( prof80 )
 	ROMX_LOAD( "prof80v17.z7", 0x0000, 0x2000, CRC(53305ff4) SHA1(3ea209093ac5ac8a5db618a47d75b705965cdf44), ROM_BIOS(2) )
 ROM_END
 
+} // anonymous namespace
+
 
 
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY                 FULLNAME    FLAGS
-COMP( 1984, prof80,  0,      0,      prof80,  prof80, prof80_state, empty_init, "Conitec Datensysteme", "PROF-80",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY                 FULLNAME   FLAGS
+COMP( 1984, prof80,  0,      0,      prof80,  prof80, prof80_state, empty_init, "Conitec Datensysteme", "PROF-80", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

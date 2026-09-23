@@ -83,8 +83,8 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(advance_tod_clock);
 
-	// On the 6526 an ICR read swallows the readable Timer B flag bit of an
-	// underflow landing in the next cycle
+	// On the 6526 the ICR read's clear window is held a little longer for the
+	// Timer B flag bit, so a flag set right after a read is swallowed
 	virtual bool icr_read_loses_tb() const { return true; }
 
 	// On the later chips the read bits are only driven to zero a cycle after the
@@ -105,6 +105,7 @@ protected:
 	// register bits and powers up at zero rather than 01:00:00.0
 	virtual uint8_t tod_mask(int offset) const;
 	virtual uint32_t tod_reset_value() const { return 0x01000000UL; }
+	virtual uint8_t cra_mask() const { return 0xef; }
 
 	int m_icount;
 	int m_tod_clock;
@@ -116,6 +117,7 @@ protected:
 	void set_cra(uint8_t data);
 	void set_crb(uint8_t data);
 	void serial_input();
+	void serial_receive();
 	void serial_load();
 	void serial_output();
 	void clock_ta();
@@ -140,13 +142,15 @@ protected:
 
 	// interrupts
 	bool m_irq;
-	int m_ir0;
-	int m_ir1;
-	int m_irq_pending;
+	int m_ir_set_prev;
+	int m_ir_set_prev2;
+	int m_icr7;
+	int m_ir_latch;
 	uint8_t m_icr;
 	uint8_t m_imr;
 	bool m_icr_read;
-	bool m_icr_tb_lost;
+	bool m_icr_read_prev;
+	bool m_ir_clr_pending;
 	uint8_t m_icr_delay;
 	uint8_t m_icr_sticky;
 	uint8_t m_icr_sticky_next;
@@ -178,6 +182,8 @@ protected:
 	int m_sdr_load_delay;
 	uint8_t m_cnt_hist;
 	bool m_sdr_force_finish;
+	uint8_t m_sdr_recv;
+	int m_sdr_recv_delay;
 
 	// timers
 	int m_ta_out;
@@ -275,6 +281,7 @@ protected:
 	virtual bool irq_sources_delayed() const override { return true; }
 	virtual uint8_t tod_mask(int offset) const override { return 0xff; }
 	virtual uint32_t tod_reset_value() const override { return 0; }
+	virtual uint8_t cra_mask() const override { return 0x6f; }
 };
 
 

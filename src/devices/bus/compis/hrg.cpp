@@ -54,7 +54,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_hrg_device::display_pixels )
 	uint16_t const gfx = m_video_ram[(address & 0x3fff)];
 	pen_t const *const pen = m_palette->pens();
 
-	for(uint16_t i=0; i<16; i++)
+	for(uint16_t i = 0; i < 16; i++)
 		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
 }
 
@@ -68,7 +68,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 	uint16_t const gfx = m_video_ram[(address & 0xffff)];
 	pen_t const *const pen = m_palette->pens();
 
-	for(uint16_t i=0; i<16; i++)
+	for(uint16_t i = 0; i < 16; i++)
 		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
 }
 
@@ -80,11 +80,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( compis_uhrg_device::display_pixels )
 void compis_hrg_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(640, 400);
-	screen.set_visarea(0, 640-1, 0, 400-1);
+	// from upd7220 setup
+	screen.set_raw(2252500 * 8, 848, 0, 640, 425, 20, 420);
 	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));
 
 	UPD7220(config, m_crtc, 2252500); // unknown clock
@@ -99,14 +96,13 @@ void compis_hrg_device::device_add_mconfig(machine_config &config)
 void compis_uhrg_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
-	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(1280, 800);
-	screen.set_visarea(0, 1280-1, 0, 800-1);
+	// from upd7220 setup
+	// this is just for frontend, system actually goes low res first before determining
+	// that UHRG card is connected thru VRAM mirror
+	screen.set_raw(2252500 * 8 * 4, 1696, 0, 1280, 850, 20, 820);
 	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));
 
-	UPD7220(config, m_crtc, 2252500*2); // unknown clock
+	UPD7220(config, m_crtc, 2252500 * 4); // unknown clock
 	m_crtc->set_addrmap(0, &compis_uhrg_device::uhrg_map);
 	m_crtc->set_display_pixels(FUNC(compis_uhrg_device::display_pixels));
 	m_crtc->set_screen(SCREEN_TAG);
@@ -172,6 +168,7 @@ uint8_t compis_hrg_device::pcs6_6_r(offs_t offset)
 	if (offset < 2)
 		data = m_crtc->read(offset & 0x01);
 	else
+	{
 		// monochrome only, hblank? vblank?
 		if(offset == 2)
 		{
@@ -189,8 +186,9 @@ uint8_t compis_hrg_device::pcs6_6_r(offs_t offset)
 			}
 			data = m_unk_video;
 		}
-	else
-		data = 0;
+		else
+			data = 0;
+	}
 
 	//logerror("%s PCS 6:6 read %04x : %02x\n", machine().describe_context(), offset, data);
 
@@ -208,4 +206,17 @@ void compis_hrg_device::pcs6_6_w(offs_t offset, uint8_t data)
 
 	// 0x336 is likely the color plane register
 	if (offset < 2) m_crtc->write(offset & 0x01, data);
+}
+
+void compis_uhrg_device::pcs6_6_w(offs_t offset, uint8_t data)
+{
+	compis_hrg_device::pcs6_6_w(offset, data);
+	if (offset == 2)
+	{
+		// bit 7: 1 high res clock 0: HRG regular clock
+		m_crtc->set_unscaled_clock((2252500) << (BIT(data, 7) ? 2 : 0));
+
+		// TODO: bits 3-0, non-linear address scanout?
+		// 0xf normally (including regular HRG device), 0xe when it starts to printout stuff in UHRG mode
+	}
 }

@@ -277,6 +277,7 @@ public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
 		, m_scsictrl(*this, "spc")
+		, m_dreq(false)
 	{
 	}
 
@@ -284,12 +285,17 @@ public:
 	void x68kxvi(machine_config &config);
 	void x68ksupr(machine_config &config);
 
+	uint16_t scsi_data_r(offs_t offset);
+	void scsi_data_w(offs_t offset, uint16_t data);
+	void dreq(int state) { m_dreq = (bool)state; }
+
 	virtual void driver_start() override;
 
 protected:
 	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;
+	bool m_dreq;
 
 	void x68kxvi_map(address_map &map) ATTR_COLD;
 };

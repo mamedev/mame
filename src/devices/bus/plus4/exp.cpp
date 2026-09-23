@@ -96,24 +96,19 @@ std::pair<std::error_condition, std::string> plus4_expansion_slot_device::call_l
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
-		{
-			// TODO
 			return std::make_pair(image_error::UNSUPPORTED, "Plus/4 Expansion software must be loaded from the software list");
-		}
-		else
-		{
-			load_software_region("c1l", m_card->m_c1l);
-			load_software_region("c1h", m_card->m_c1h);
-			load_software_region("c2l", m_card->m_c2l);
-			load_software_region("c2h", m_card->m_c2h);
-			m_card->m_c1l_size = get_software_region_length("c1l");
-			m_card->m_c1h_size = get_software_region_length("c1h");
-			m_card->m_c2l_size = get_software_region_length("c2l");
-			m_card->m_c2h_size = get_software_region_length("c2h");
 
-			if ((m_card->m_c1l_size & (m_card->m_c1l_size - 1)) || (m_card->m_c1h_size & (m_card->m_c1h_size - 1)) || (m_card->m_c2l_size & (m_card->m_c2l_size - 1)) || (m_card->m_c2h_size & (m_card->m_c2h_size - 1)))
-				return std::make_pair(image_error::INVALIDLENGTH, "All ROM sizes must be powers of 2");
-		}
+		load_software_region("c1l", m_card->m_c1l);
+		load_software_region("c1h", m_card->m_c1h);
+		load_software_region("c2l", m_card->m_c2l);
+		load_software_region("c2h", m_card->m_c2h);
+		m_card->m_c1l_size = get_software_region_length("c1l");
+		m_card->m_c1h_size = get_software_region_length("c1h");
+		m_card->m_c2l_size = get_software_region_length("c2l");
+		m_card->m_c2h_size = get_software_region_length("c2h");
+
+		if ((m_card->m_c1l_size & (m_card->m_c1l_size - 1)) || (m_card->m_c1h_size & (m_card->m_c1h_size - 1)) || (m_card->m_c2l_size & (m_card->m_c2l_size - 1)) || (m_card->m_c2h_size & (m_card->m_c2h_size - 1)))
+			return std::make_pair(image_error::INVALIDLENGTH, "All ROM sizes must be powers of 2");
 	}
 
 	return std::make_pair(std::error_condition(), std::string());

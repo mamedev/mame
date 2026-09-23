@@ -61687,6 +61687,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<!-- NOTE: spelled as "PV" unlike other iterations, without the dot -->
 	<software name="srmp5">
 		<description>Super Real Mahjong PV Paradise - All-Star 4-nin Uchi (Japan)</description>
 		<year>1995</year>
