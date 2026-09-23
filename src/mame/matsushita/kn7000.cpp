@@ -22,6 +22,9 @@
 #include "kn7000_cpanel.h"
 #include "kn7000_tonegen.h"
 
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
 #include "machine/intelfsh.h"
@@ -34,6 +37,46 @@
 #include <atomic>
 
 #include "kn7000.lh"
+
+//  KN7000 SIO UART -- byte<->bit bridge between a byte-oriented SIO channel and
+//  MAME's bit-serial midi_port. One instance per MIDI channel (31250 baud, 8N1).
+class kn7000_sio_uart_device : public device_t, public device_serial_interface
+{
+public:
+	kn7000_sio_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto tx_cb() { return m_tx_cb.bind(); }      // each TX bit -> midi_port write_txd
+	auto rx_cb() { return m_rx_cb.bind(); }      // each fully-received byte -> driver
+
+	void write(uint8_t data) { transmit_register_setup(data); }
+	bool tx_empty() const { return is_transmit_register_empty(); }
+
+protected:
+	virtual void device_start() override {}
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
+	virtual void rcv_complete() override { receive_register_extract(); m_rx_cb(get_received_char()); }
+
+	devcb_write_line m_tx_cb;
+	devcb_write8 m_rx_cb;
+};
+
+DEFINE_DEVICE_TYPE(KN7000_SIO_UART, kn7000_sio_uart_device, "kn7000_sio_uart", "KN7000 SIO MIDI UART")
+
+kn7000_sio_uart_device::kn7000_sio_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, KN7000_SIO_UART, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	m_tx_cb(*this),
+	m_rx_cb(*this)
+{
+}
+
+void kn7000_sio_uart_device::device_reset()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);   // MIDI: 8N1
+	set_rate(31250);                                  // MIDI baud
+}
 
 namespace {
 
@@ -50,6 +93,8 @@ public:
 		, m_customflash(*this, "custom_data")
 		, m_lcdbuf(*this, "lcdbuf")
 		, m_progrom(*this, "program")
+		, m_midi_uart(*this, "midi_uart%u", 0U)
+		, m_kbd_midi_uart(*this, "kbdmidi_uart")
 		, m_tonegen(*this, "tonegen")
 		, m_dial(*this, "DIAL")
 		, m_rearsw(*this, "REARSW")
@@ -91,7 +136,11 @@ private:
 	bool m_lcd_kn6 = false;                      // KN6000/KN6500: LCD framebuffer is RGB555 and mounted rotated 180deg (vs the KN7000's upright RGB565)
 	bool m_lcd_kn24 = false;                     // KN2400/KN2600: 320x240 4-level grayscale panel, 2bpp framebuffer at 0x9C800000
 	required_region_ptr<uint32_t> m_progrom;     // program flash (holds the CLUT)
+	required_device_array<kn7000_sio_uart_device, 2> m_midi_uart;
+	required_device<kn7000_sio_uart_device> m_kbd_midi_uart;  // MIDI -> internal key bed (velocity)
 	required_device<kn_tonegen_base_device> m_tonegen;   // first-cut audio (Phase C Stage 0)
+
+	template <int Ch> void midi_rx(uint8_t data) { m_maincpu->sio_rx_push(Ch, data); }
 
 	// Control panel button ports and LEDs (CPL = 8 cols, CPC = 5 cols; CPR + the
 	// serial HLE device that reads these / drives the LEDs are still to come).
@@ -138,6 +187,28 @@ private:
 		else             m_tonegen->key_context(note);
 	}
 
+	uint8_t m_kbd_midi_status = 0;             // MIDI running-status byte
+	uint8_t m_kbd_midi_d1 = 0;                  // first data byte (note)
+	bool    m_kbd_midi_have_d1 = false;
+	void kbd_midi_rx(uint8_t b)
+	{
+		if (b & 0x80)                          // status byte
+		{
+			if (b >= 0xF8) return;             // real-time messages: ignore
+			m_kbd_midi_status = (b < 0xF0) ? b : 0;   // system-common clears running status
+			m_kbd_midi_have_d1 = false;
+			return;
+		}
+		const uint8_t cmd = m_kbd_midi_status & 0xF0;
+		if (cmd != 0x90 && cmd != 0x80) return;       // only note-on / note-off
+		if (!m_kbd_midi_have_d1) { m_kbd_midi_d1 = b; m_kbd_midi_have_d1 = true; return; }
+		const uint8_t note = m_kbd_midi_d1, vel = b;
+		m_kbd_midi_have_d1 = false;            // ready for the next note in running status
+		if (note < 36 || note > 96) return;    // outside the 61-key bed
+		const uint8_t idx = note - 36;
+		const bool on = (cmd == 0x90) && (vel != 0);
+		kbd_push(on ? idx : uint8_t(idx | 0x80), on ? vel : 0xff);
+	}
 	uint16_t m_tg_addr[2] = { 0, 0 };          // latched register address, [0]=main [1]=sub
 
 	uint16_t m_tg_wave_bank[2] = { 0, 0 };     // latched bank register  (base+6), [0]=main [1]=sub
@@ -773,6 +844,11 @@ void kn7000_state::kn7000_base(machine_config &config)
 	// Config bit14 written set (group-0x1A ISR pass 2): the panel may now send
 	// its queued reply.
 	m_maincpu->sio_rx_enable_cb<0>().set([this](int state) { m_cpanel->rx_enable(); });
+	m_maincpu->sio_tx_cb<1>().set(m_midi_uart[0], FUNC(kn7000_sio_uart_device::write));
+	m_maincpu->sio_rx_rdy_cb<1>().set([this](int state) { intc_assert(0x12); });
+	m_maincpu->sio_tx_cb<2>().set(m_midi_uart[1], FUNC(kn7000_sio_uart_device::write));
+	m_maincpu->sio_rx_rdy_cb<2>().set([this](int state) { intc_assert(0x14); });
+
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -780,6 +856,25 @@ void kn7000_state::kn7000_base(machine_config &config)
 	m_screen->set_size(640, 240);
 	m_screen->set_visarea(0, 640 - 1, 0, 240 - 1);
 	m_screen->set_screen_update(FUNC(kn7000_state::screen_update));
+
+	// --- MIDI ports (SIO channels 1 & 2 at 0x34000810 / 0x34000820) ---------
+	KN7000_SIO_UART(config, m_midi_uart[0], 0);
+	m_midi_uart[0]->tx_cb().set("mdout1", FUNC(midi_port_device::write_txd));
+	m_midi_uart[0]->rx_cb().set(FUNC(kn7000_state::midi_rx<SIO_MIDI1>));
+	MIDI_PORT(config, "mdin1", midiin_slot, "midiin").rxd_handler().set(m_midi_uart[0], FUNC(kn7000_sio_uart_device::rx_w));
+	MIDI_PORT(config, "mdout1", midiout_slot, "midiout");
+
+	// MIDI -> internal key bed (velocity). A dedicated IN port so a controller
+	// plays the key bed itself, distinct from the two rear MIDI IN jacks.
+	KN7000_SIO_UART(config, m_kbd_midi_uart, 0);
+	m_kbd_midi_uart->rx_cb().set(FUNC(kn7000_state::kbd_midi_rx));
+	MIDI_PORT(config, "kbdmidi", midiin_slot, "midiin").rxd_handler().set(m_kbd_midi_uart, FUNC(kn7000_sio_uart_device::rx_w));
+
+	KN7000_SIO_UART(config, m_midi_uart[1], 0);
+	m_midi_uart[1]->tx_cb().set("mdout2", FUNC(midi_port_device::write_txd));
+	m_midi_uart[1]->rx_cb().set(FUNC(kn7000_state::midi_rx<SIO_MIDI2>));
+	MIDI_PORT(config, "mdin2", midiin_slot, "midiin").rxd_handler().set(m_midi_uart[1], FUNC(kn7000_sio_uart_device::rx_w));
+	MIDI_PORT(config, "mdout2", midiout_slot, "midiout");
 
 	KN7000_CPANEL(config, m_cpanel);
 	m_cpanel->atn().set([this](int state) { if (state) intc_assert(0x1a); });
@@ -803,8 +898,10 @@ void kn7000_state::kn7000_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", kn7000_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	KN7000_TONEGEN(config, m_tonegen, 0);
-	m_tonegen->add_route(0, "lspeaker", 1.0);
-	m_tonegen->add_route(1, "rspeaker", 1.0);
+	// The effects DSP that processes this on the real instrument is not modelled
+	// yet, so the output reaches the speakers dry.
+	m_tonegen->add_route(0, "speaker", 1.0, 0);
+	m_tonegen->add_route(1, "speaker", 1.0, 1);
 
 	// TODO: real tone generators IC201/IC205; the effects DSP and its SDRAM IC307/8; USB.
 }
@@ -826,8 +923,8 @@ void kn7000_state::kn6000(machine_config &config)
 	// so only the matrix geometry and the LED decode differ.
 	config.device_remove("tonegen");
 	KN6000_TONEGEN(config, m_tonegen, 0);
-	m_tonegen->add_route(0, "lspeaker", 1.0);
-	m_tonegen->add_route(1, "rspeaker", 1.0);
+	m_tonegen->add_route(0, "speaker", 1.0, 0);
+	m_tonegen->add_route(1, "speaker", 1.0, 1);
 	// The KN6000 and KN6500 have the floppy drive but no SD slot.
 	config.device_remove("sdcard");
 
