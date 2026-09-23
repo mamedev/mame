@@ -34,6 +34,7 @@
 #include "formats/ap_dsk35.h"
 
 #define LOG_PSCREGS    (1U << 1)
+#define LOG_ENET       (1U << 2)
 
 #define VERBOSE (0)
 #define LOG_OUTPUT_FUNC osd_printf_info
@@ -102,6 +103,8 @@ void psc_device::map(address_map &map)
 
 	map(0x00f3'1c00, 0x00f3'1c6f).rw(FUNC(psc_device::dma_ctrl_r), FUNC(psc_device::dma_ctrl_w));
 
+	map(0x00f3'2000, 0x00f3'20df).rw(FUNC(psc_device::dma_set_r), FUNC(psc_device::dma_set_w));
+
 	// PSC always IDs as 2830, VIA bits differentiate 660AV and 840AV
 	map(0x0fff'0000, 0x0fff'ffff).lr32(NAME([](offs_t offset) { return 0xa55a2830; }));
 }
@@ -158,7 +161,14 @@ psc_device::psc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_l5if(0), m_l5ier(0),
 	m_l6if(0), m_l6ier(0),
 	m_dma_irqstat(0),
-	m_space(*this, finder_base::DUMMY_TAG, -1)
+	m_mace(*this, finder_base::DUMMY_TAG),
+	m_enet_timer(nullptr),
+	m_enet_tx_drq(false),
+	m_enet_rx_drq(false),
+	m_enet_rx_offset(0),
+	m_enet_rx_status(0),
+	m_space(*this, finder_base::DUMMY_TAG, -1),
+	m_ncr(nullptr)
 {
 	std::fill(std::begin(m_psc_regs), std::end(m_psc_regs), 0);
 	for (int dma = 0; dma < DMA_NUM_CHANNELS; dma++)
@@ -182,6 +192,7 @@ void psc_device::device_start()
 	m_6015_timer->adjust(attotime::never);
 
 	m_singer_timer = timer_alloc(FUNC(psc_device::singer_tick), this);
+	m_enet_timer = timer_alloc(FUNC(psc_device::enet_dma_tick), this);
 
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));
@@ -191,10 +202,50 @@ void psc_device::device_start()
 	save_item(NAME(m_ifr));
 	save_item(NAME(m_ier));
 	save_item(NAME(m_psc_regs));
+	save_item(NAME(m_l3if));
+	save_item(NAME(m_l3ier));
+	save_item(NAME(m_l4if));
+	save_item(NAME(m_l4ier));
+	save_item(NAME(m_l5if));
+	save_item(NAME(m_l5ier));
+	save_item(NAME(m_l6if));
+	save_item(NAME(m_l6ier));
+	save_item(NAME(m_dma_control));
+	save_item(NAME(m_dma_addr));
+	save_item(NAME(m_dma_cnt));
+	save_item(NAME(m_dma_cmdstat));
+	save_item(NAME(m_dma_irqstat));
+	save_item(NAME(m_enet_tx_drq));
+	save_item(NAME(m_enet_rx_drq));
+	save_item(NAME(m_enet_rx_offset));
+	save_item(NAME(m_enet_rx_status));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_scsi_irq));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_audio_out_ptr));
+	save_item(NAME(m_audio_out_offset));
+	save_item(NAME(m_audio_out_length));
+
 }
 
 void psc_device::device_reset()
 {
+	m_enet_timer->enable(false);
+	m_enet_tx_drq = m_enet_rx_drq = false;
+	m_enet_rx_offset = m_enet_rx_status = 0;
+	for (int channel = 0; channel < DMA_NUM_CHANNELS; ++channel)
+	{
+		m_dma_control[channel] = 0;
+		for (int set = 0; set < 2; ++set)
+		{
+			m_dma_addr[channel][set] = m_dma_cnt[channel][set] = 0;
+			m_dma_cmdstat[channel][set] = 0;
+		}
+	}
+	m_l3if = m_l3ier = m_l4if = m_l4ier = 0;
+	m_l5if = m_l5ier = m_l6if = m_l6ier = 0;
+	device_post_load();
+
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 }
@@ -213,70 +264,205 @@ u16 psc_device::dma_ctrl_r(offs_t offset)
 	return m_dma_control[offset >> 3] | 0x8000;
 }
 
+void psc_device::device_post_load()
+{
+	recalc_dma_irqs();
+	recalc_lv3();
+	recalc_lv5();
+	recalc_lv6();
+}
+
 void psc_device::dma_ctrl_w(offs_t offset, u16 data)
 {
-//  printf("%04x to DMA control at %x\n", data, offset >> 3);
+	const unsigned channel = offset >> 3;
+	const bool ethernet = channel == DMA_ETHERNET_RX || channel == DMA_ETHERNET_TX;
+	u16 &control = m_dma_control[channel];
 	if (BIT(data, 15))
 	{
-		m_dma_control[offset >> 3] |= data & 0x7fff;
-
-		// PSC will set FROZEN and PAUSE on a reset
+		control |= data & (CTRL_CIE | CTRL_PAUSE);
 		if (data & CTRL_SWRESET)
 		{
-			m_dma_control[offset >> 3] = CTRL_FROZEN | CTRL_PAUSE;
+			// Software reset preserves programmed sets and interrupt enables,
+			// disables both sets, and selects set zero with the channel paused.
+			control = (control & CTRL_CIE) | CTRL_FROZEN | CTRL_PAUSE;
+			for (auto &command : m_dma_cmdstat[channel])
+				command &= ~CMD_ENABLED;
+			if (channel == DMA_ETHERNET_RX)
+				m_enet_rx_offset = m_enet_rx_status = 0;
 		}
-
-		// PSC will set FROZEN to indicate a freeze has taken effect
 		if (data & CTRL_PAUSE)
+			control |= CTRL_FROZEN;
+		if ((data & CTRL_FLUSH) && ethernet)
 		{
-			m_dma_control[offset >> 3] |= CTRL_FROZEN;
-		}
-
-		// PSC will clear the FLUSH flag 1 cycle after its set
-		if (data & CTRL_FLUSH)
-		{
-			m_dma_control[offset >> 3] &= ~CTRL_FLUSH;
+			// Flush abandons the current chain and advances to the other set.
+			m_dma_cmdstat[channel][control & 1] &= ~CMD_ENABLED;
+			control = (control ^ 1) | CTRL_PAUSE | CTRL_FROZEN;
+			if (channel == DMA_ETHERNET_RX)
+				m_enet_rx_offset = m_enet_rx_status = 0;
 		}
 	}
 	else
 	{
-		m_dma_control[offset >> 3] &= ~(data & 0x7fff);
-
-		// Clearing PAUSE will cause PSC to clear FROZEN
+		control &= ~(data & (CTRL_CIE | CTRL_PAUSE | CTRL_BERR));
 		if (data & CTRL_PAUSE)
-		{
-			m_dma_control[offset >> 3] &= ~CTRL_FROZEN;
-		}
+			control &= ~CTRL_FROZEN;
+	}
+	recalc_dma_irqs();
+	if (ethernet)
+		enet_dma_kick();
+}
+
+u32 psc_device::dma_set_r(offs_t offset)
+{
+	const unsigned channel = offset >> 3;
+	const unsigned set = BIT(offset, 2);
+	switch (offset & 3)
+	{
+	case 0: return m_dma_addr[channel][set];
+	case 1: return m_dma_cnt[channel][set];
+	case 2:
+		return u32(m_dma_cmdstat[channel][set] | (m_dma_cnt[channel][set] ? 0 : CMD_TERMCNT)) << 16;
+	default: return 0;
 	}
 }
 
-template <int channel, int set> u16 psc_device::dma_addr_r()
+void psc_device::dma_set_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	return m_dma_addr[channel][set];
+	const unsigned channel = offset >> 3;
+	const unsigned set = BIT(offset, 2);
+	switch (offset & 3)
+	{
+	case 0:
+		COMBINE_DATA(&m_dma_addr[channel][set]);
+		break;
+	case 1:
+		COMBINE_DATA(&m_dma_cnt[channel][set]);
+		break;
+	case 2:
+		if (ACCESSING_BITS_16_31)
+		{
+			const u16 bits = (data & mem_mask) >> 16;
+			const u16 writable = bits & (CMD_IE | CMD_ENABLED | CMD_DIR | CMD_IF);
+			if (BIT(bits, 15))
+				m_dma_cmdstat[channel][set] |= writable;
+			else
+				m_dma_cmdstat[channel][set] &= ~writable;
+		}
+		break;
+	}
+	recalc_dma_irqs();
+	if (channel == DMA_SCSI && m_ncr)
+		scsi_drq_w(m_drq);
+	else if (channel == DMA_ETHERNET_RX || channel == DMA_ETHERNET_TX)
+		enet_dma_kick();
 }
 
-template <int channel, int set> void psc_device::dma_addr_w(offs_t offset, u32 data)
+void psc_device::enet_irq_w(int state)
 {
-	m_dma_addr[channel][set] = data;
+	m_l3if = (m_l3if & ~LV3_ENETIRQ) | (state ? LV3_ENETIRQ : 0);
+	recalc_lv3();
 }
 
-template <int channel, int set> u32 psc_device::dma_cnt_r(offs_t offset)
+void psc_device::enet_tx_drq_w(int state)
 {
-	return m_dma_cnt[channel][set];
+	m_enet_tx_drq = bool(state);
+	enet_dma_kick();
 }
 
-template <int channel, int set> void psc_device::dma_cnt_w(offs_t offset, u32 data)
+void psc_device::enet_rx_drq_w(int state)
 {
-	m_dma_cnt[channel][set] = data;
+	m_enet_rx_drq = bool(state);
+	enet_dma_kick();
 }
 
-template <int channel, int set> u16 psc_device::dma_cmdstat_r(offs_t offset)
+bool psc_device::enet_dma_ready(int channel) const
 {
-	return m_dma_cmdstat[channel][set];
+	const unsigned set = m_dma_control[channel] & 1;
+	return !(m_dma_control[channel] & (CTRL_PAUSE | CTRL_FROZEN | CTRL_BERR)) &&
+		(m_dma_cmdstat[channel][set] & CMD_ENABLED) && m_dma_cnt[channel][set];
 }
 
-template <int channel, int set> void psc_device::dma_cmdstat_w(offs_t offset, u16 data)
+void psc_device::enet_dma_kick()
 {
+	// Never call back into the MACE FIFO from a request callback.  Requests can
+	// change while the chip is still updating its data/status cursors.
+	if (m_enet_timer && !m_enet_timer->enabled() && m_mace &&
+		((m_enet_tx_drq && enet_dma_ready(DMA_ETHERNET_TX)) ||
+		 ((m_enet_rx_drq || m_enet_rx_offset || m_enet_rx_status) && enet_dma_ready(DMA_ETHERNET_RX))))
+		m_enet_timer->adjust(attotime::from_usec(1));
+}
+
+void psc_device::enet_dma_complete(int channel)
+{
+	const unsigned set = m_dma_control[channel] & 1;
+	m_dma_cmdstat[channel][set] |= CMD_IF;
+	if (!m_dma_cnt[channel][set])
+	{
+		m_dma_cmdstat[channel][set] &= ~CMD_ENABLED;
+		m_dma_control[channel] ^= 1;
+	}
+	LOGMASKED(LOG_ENET, "Ethernet %s set %u complete: address %08x count %u\n",
+		channel == DMA_ETHERNET_RX ? "RX" : "TX", set, m_dma_addr[channel][set], m_dma_cnt[channel][set]);
+	recalc_dma_irqs();
+}
+
+TIMER_CALLBACK_MEMBER(psc_device::enet_dma_tick)
+{
+	// A bounded burst models the FIFO service, not individual PSC bus cycles.
+	// MACE supplies wire timing and backpressure.  PSC wiring presents the
+	// first memory byte on D7:0 (the driver leaves MACE BSWP clear).
+	for (unsigned word = 0; word < 8 && m_enet_tx_drq && enet_dma_ready(DMA_ETHERNET_TX); ++word)
+	{
+		const unsigned set = m_dma_control[DMA_ETHERNET_TX] & 1;
+		u32 &address = m_dma_addr[DMA_ETHERNET_TX][set];
+		u32 &count = m_dma_cnt[DMA_ETHERNET_TX][set];
+		const unsigned bytes = std::min<u32>(2, count);
+		u16 data = m_space->read_byte(address);
+		if (bytes == 2)
+			data |= u16(m_space->read_byte(address + 1)) << 8;
+		if (!m_mace->tx_dma_w(data, bytes == 2 ? 0xffff : 0x00ff, count == bytes))
+			break;
+		address += bytes;
+		count -= bytes;
+		if (!count)
+			enet_dma_complete(DMA_ETHERNET_TX);
+	}
+
+	for (unsigned word = 0; word < 8 && enet_dma_ready(DMA_ETHERNET_RX) &&
+		(m_enet_rx_drq || m_enet_rx_offset || m_enet_rx_status); ++word)
+	{
+		const auto result = m_mace->rx_dma_r();
+		if (!result.valid)
+			break;
+		const unsigned set = m_dma_control[DMA_ETHERNET_RX] & 1;
+		u32 &address = m_dma_addr[DMA_ETHERNET_RX][set];
+		if (result.status)
+		{
+			m_space->write_word(address + 2 * m_enet_rx_status, result.data);
+			++m_enet_rx_status;
+		}
+		else
+		{
+			for (unsigned byte = 0; byte < result.bytes; ++byte)
+			{
+				// A malformed oversized frame must never overwrite the next slot.
+				if (m_enet_rx_offset < 2048 - 16)
+					m_space->write_byte(address + 16 + m_enet_rx_offset, result.data >> (8 * byte));
+				++m_enet_rx_offset;
+			}
+		}
+		if (result.frame_done)
+		{
+			// Publish the slot only after all four duplicated status bytes exist.
+			address += 2048;
+			--m_dma_cnt[DMA_ETHERNET_RX][set];
+			m_enet_rx_offset = m_enet_rx_status = 0;
+			enet_dma_complete(DMA_ETHERNET_RX);
+		}
+	}
+	// Poll partial packets through temporary FIFO boundaries, including the
+	// final status cycles after RREQ drops.  Pause/reset stops this timer.
+	enet_dma_kick();
 }
 
 uint32_t psc_device::scc_fake_r()
@@ -490,13 +676,6 @@ void psc_device::vbl_irq_w(int state)
 
 void psc_device::scsi_irq_w(int state)
 {
-	if (getenv("DMALOG"))
-	{
-		static int n = 0;
-		if (n++ < 100000)
-			printf("SCSI IRQ t=%s state=%d ifr=%02x ier=%02x\n",
-				machine().time().as_string(), state, m_ifr, m_ier);
-	}
 	m_scsi_irq = state;
 
 	//printf("SCSI IRQ: %d\n", state);
@@ -583,46 +762,43 @@ void psc_device::scsi_drq_w(int state)
 	recalc_via2_irqs();
 
 	const int active_set = m_dma_control[DMA_SCSI] & 1;
-	if (getenv("DMALOG"))
-	{
-		static int n = 0;
-		if ((state == ASSERT_LINE) && !(m_dma_cmdstat[DMA_SCSI][active_set] & CMD_ENABLED) && (n++ < 100000))
-			printf("DMA STALL t=%s: drq asserted but set %d not enabled. ctrl=%04x  set0 cmd=%04x cnt=%08x addr=%08x  set1 cmd=%04x cnt=%08x addr=%08x\n",
-				machine().time().as_string(), active_set, m_dma_control[DMA_SCSI],
-				m_dma_cmdstat[DMA_SCSI][0], m_dma_cnt[DMA_SCSI][0], m_dma_addr[DMA_SCSI][0],
-				m_dma_cmdstat[DMA_SCSI][1], m_dma_cnt[DMA_SCSI][1], m_dma_addr[DMA_SCSI][1]);
-	}
 	while ((m_drq == ASSERT_LINE) && (m_dma_cmdstat[DMA_SCSI][active_set] & CMD_ENABLED))
 	{
+		const u32 xfer_size = (m_dma_cnt[DMA_SCSI][active_set] == 1) ? 1 : 2;
 		if (m_dma_cmdstat[DMA_SCSI][active_set] & CMD_DIR)
 		{
-			m_space->write_word(m_dma_addr[DMA_SCSI][active_set], m_ncr->dma16_swap_r());
+			if (xfer_size == 1)
+			{
+				m_space->write_byte(m_dma_addr[DMA_SCSI][active_set], m_ncr->dma_r());
+			}
+			else
+			{
+				m_space->write_word(m_dma_addr[DMA_SCSI][active_set], m_ncr->dma16_swap_r());
+			}
 		}
 		else
 		{
-			const u16 word = m_space->read_word(m_dma_addr[DMA_SCSI][active_set]);
-			m_ncr->dma16_swap_w(word);
+			if (xfer_size == 1)
+			{
+				m_ncr->dma_w(m_space->read_byte(m_dma_addr[DMA_SCSI][active_set]));
+			}
+			else
+			{
+				const u16 word = m_space->read_word(m_dma_addr[DMA_SCSI][active_set]);
+				m_ncr->dma16_swap_w(word);
+			}
 		}
 
 //      printf("SCSI DMA to %08x, %08x left\n", m_dma_addr[DMA_SCSI][active_set], m_dma_cnt[DMA_SCSI][active_set]);
 
-		m_dma_cnt[DMA_SCSI][active_set] -= 2;
-		m_dma_addr[DMA_SCSI][active_set] += 2;
+		m_dma_cnt[DMA_SCSI][active_set] -= xfer_size;
+		m_dma_addr[DMA_SCSI][active_set] += xfer_size;
 
 		if (m_dma_cnt[DMA_SCSI][active_set] == 0)
 		{
 			m_dma_cmdstat[DMA_SCSI][active_set] &= ~CMD_ENABLED;
 			m_dma_cmdstat[DMA_SCSI][active_set] |= CMD_IF;
 
-			if (getenv("DMALOG"))
-			{
-				static int n = 0;
-				if (n++ < 100000)
-					printf("DMA set %d COMPLETE t=%s. drq=%d ctrl=%04x  other set cmd=%04x cnt=%08x addr=%08x\n",
-						active_set, machine().time().as_string(), m_drq, m_dma_control[DMA_SCSI],
-						m_dma_cmdstat[DMA_SCSI][active_set ^ 1], m_dma_cnt[DMA_SCSI][active_set ^ 1],
-						m_dma_addr[DMA_SCSI][active_set ^ 1]);
-			}
 			recalc_dma_irqs();
 		}
 	}
@@ -636,12 +812,14 @@ void psc_device::recalc_dma_irqs()
 	// walk each DMA channel and set to see if anyone's interrupting
 	for (int dma = 0; dma < DMA_NUM_CHANNELS; dma++)
 	{
+		m_dma_control[dma] &= ~CTRL_CIRQ;
 		for (int active_set = 0; active_set < 2; active_set++)
 		{
 			if ((m_dma_cmdstat[dma][active_set] & (CMD_IE | CMD_IF)) == (CMD_IE | CMD_IF))
 			{
-				m_dma_irqstat |= (1 << dma);
 				m_dma_control[dma] |= CTRL_CIRQ;
+				if (m_dma_control[dma] & CTRL_CIE)
+					m_dma_irqstat |= 0x80000000U >> dma;
 			}
 		}
 	}
@@ -722,65 +900,29 @@ u32 psc_device::psc_regs_r(offs_t offset)
 {
 	switch (offset << 2)
 	{
-		case 0x1000:
-			return m_dma_addr[DMA_SCSI][0];
-
-		case 0x1004:
-			return m_dma_cnt[DMA_SCSI][0];
-
-		case 0x1008:
-			return m_dma_cmdstat[DMA_SCSI][0] << 16;
-
-		case 0x1010:
-			return m_dma_addr[DMA_SCSI][1];
-
-		case 0x1014:
-			return m_dma_cnt[DMA_SCSI][1];
-
-		case 0x1018:
-			return m_dma_cmdstat[DMA_SCSI][1] << 16;
-
-		case 0x10a0:
-			return m_dma_addr[DMA_SCCB][0];
-
-		case 0x10a4:
-			return m_dma_cnt[DMA_SCCB][0];
-
-		case 0x10a8:
-			return m_dma_cmdstat[DMA_SCCB][0] << 16;
-
-		case 0x10b0:
-			return m_dma_addr[DMA_SCCB][1];
-
-		case 0x10b4:
-			return m_dma_cnt[DMA_SCCB][1];
-
-		case 0x10b8:
-			return m_dma_cmdstat[DMA_SCCB][1] << 16;
-
 		case 0x130:
-			return m_l3if;
+			return m_l3if << 24;
 
 		case 0x134:
-			return m_l3ier;
+			return m_l3ier << 24;
 
 		case 0x140:
-			return m_l4if;
+			return m_l4if << 24;
 
 		case 0x144:
-			return m_l4ier;
+			return m_l4ier << 24;
 
 		case 0x150:
-			return m_l5if;
+			return m_l5if << 24;
 
 		case 0x154:
-			return m_l5ier;
+			return m_l5ier << 24;
 
 		case 0x160:
-			return m_l6if;
+			return m_l6if << 24;
 
 		case 0x164:
-			return m_l6ier;
+			return m_l6ier << 24;
 
 		case 0x20c:
 			if (m_audio_out_offset >= m_audio_out_length)
@@ -802,95 +944,16 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 {
 //  LOGMASKED(LOG_PSCREGS, "psc_regs_w: %08x @ %x, mask %04x (%s)\n", data, offset << 2, mem_mask, machine().describe_context());
 
+	// PSC interrupt registers occupy the first (most significant) byte lane.
+	if ((offset << 2) >= 0x130 && (offset << 2) <= 0x164)
+	{
+		if (!ACCESSING_BITS_24_31)
+			return;
+		data >>= 24;
+	}
+
 	switch (offset << 2)
 	{
-		case 0x1000:
-			m_dma_addr[DMA_SCSI][0] = data;
-			break;
-
-		case 0x1004:
-			m_dma_cnt[DMA_SCSI][0] = data;
-			break;
-
-		case 0x1008:
-			data >>= 16;
-			if (BIT(data, 15))
-			{
-				m_dma_cmdstat[DMA_SCSI][0] |= (data & 0x7fff);
-			}
-			else
-			{
-				m_dma_cmdstat[DMA_SCSI][0] &= ~(data & 0x7fff);
-			}
-			//printf("cmdstat 0 now %08x\n", m_dma_cmdstat[DMA_SCSI][0]);
-			// kick the transfer if it can be
-			scsi_drq_w(m_drq);
-			break;
-
-		case 0x1010:
-			m_dma_addr[DMA_SCSI][1] = data;
-			break;
-
-		case 0x1014:
-			m_dma_cnt[DMA_SCSI][1] = data;
-			break;
-
-		case 0x1018:
-			data >>= 16;
-			if (BIT(data, 15))
-			{
-				m_dma_cmdstat[DMA_SCSI][1] |= (data & 0x7fff);
-			}
-			else
-			{
-				m_dma_cmdstat[DMA_SCSI][1] &= ~(data & 0x7fff);
-			}
-			// kick the transfer if it can be
-			scsi_drq_w(m_drq);
-			break;
-
-		case 0x10a0:
-			m_dma_addr[DMA_SCCB][0] = data;
-			break;
-
-		case 0x10a4:
-			m_dma_cnt[DMA_SCCB][0] = data;
-			break;
-
-		case 0x10a8:
-			data >>= 16;
-			if (BIT(data, 15))
-			{
-				m_dma_cmdstat[DMA_SCCB][0] |= (data & 0x7fff);
-			}
-			else
-			{
-				m_dma_cmdstat[DMA_SCCB][0] &= ~(data & 0x7fff);
-			}
-			//printf("(DMA 5) cmdstat 0 now %08x\n", m_dma_cmdstat[DMA_SCCB][0]);
-			break;
-
-		case 0x10b0:
-			m_dma_addr[DMA_SCCB][1] = data;
-			break;
-
-		case 0x10b4:
-			m_dma_cnt[DMA_SCCB][1] = data;
-			break;
-
-		case 0x10b8:
-			data >>= 16;
-			if (BIT(data, 15))
-			{
-				m_dma_cmdstat[DMA_SCCB][1] |= (data & 0x7fff);
-			}
-			else
-			{
-				m_dma_cmdstat[DMA_SCCB][1] &= ~(data & 0x7fff);
-			}
-			//printf("(DMA 5) cmdstat 1 now %08x\n", m_dma_cmdstat[DMA_SCCB][1]);
-			break;
-
 		// no bits are writable in this register
 		case 0x0130:
 			break;

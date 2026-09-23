@@ -861,6 +861,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am79c940.h,MACHINES["AM79C940"] = true
+---------------------------------------------------
+
+if MACHINES["AM79C940"] then
+	files {
+		MAME_DIR .. "src/devices/machine/am79c940.cpp",
+		MAME_DIR .. "src/devices/machine/am79c940.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/am9513.h,MACHINES["AM9513"] = true
 ---------------------------------------------------
 
