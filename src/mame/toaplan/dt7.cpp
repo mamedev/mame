@@ -135,7 +135,6 @@ public:
 		, m_sys2port(*this, "SYS2")
 		, m_p1port(*this, "IN1")
 		, m_p2port(*this, "IN2")
-		, m_miscport(*this, "MISC%u", 0U)
 		, m_anport(*this, "AN%u", 0U)
 	{ }
 
@@ -166,9 +165,6 @@ private:
 
 	void dt7_irq(int state);
 	void dt7_sndreset_coin_w(offs_t offset, u16 data, u16 mem_mask);
-
-	u8 unmapped_v25_io1_r();
-	u8 unmapped_v25_io2_r();
 
 	u8 read_port_t();
 	u8 read_port_2();
@@ -206,7 +202,6 @@ private:
 	required_ioport m_sys2port;
 	required_ioport m_p1port;
 	required_ioport m_p2port;
-	required_ioport_array<2> m_miscport;
 	required_ioport_array<4> m_anport;
 };
 
@@ -269,8 +264,7 @@ void dt7_state::write_port_2(u8 data)
 		m_shift_chain[1] = ~u32(p2 | (m_sys2port->read() << 8) | ((p1 & 0x80) << 16));
 	}
 
-	// rising edge on bit 3: shift both chains one bit
-	if (!(m_ioport_state & 0x08) && (data & 0x08))
+	else if (!(m_ioport_state & 0x08) && (data & 0x08))
 	{
 		m_shift_chain[0] = (m_shift_chain[0] >> 1) | 0x80000000;
 		m_shift_chain[1] = (m_shift_chain[1] >> 1) | 0x80000000;
@@ -331,16 +325,6 @@ void dt7_state::dt7_68k_1_mem(address_map &map)
 }
 
 
-u8 dt7_state::unmapped_v25_io1_r()
-{
-	return m_miscport[0]->read();
-}
-
-u8 dt7_state::unmapped_v25_io2_r()
-{
-	return m_miscport[1]->read();
-}
-
 void dt7_state::machine_start()
 {
 	save_item(NAME(m_ioport_state));
@@ -367,8 +351,8 @@ void dt7_state::dt7_v25_mem(address_map &map)
 	map(0x58002, 0x58002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x58004, 0x58005).rw("ymsnd2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x58006, 0x58006).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x58008, 0x58008).r(FUNC(dt7_state::unmapped_v25_io1_r));
-	map(0x5800a, 0x5800a).r(FUNC(dt7_state::unmapped_v25_io2_r));
+	map(0x58008, 0x58008).portr("MISC0");
+	map(0x5800a, 0x5800a).portr("MISC1");
 
 	map(0x70000, 0x77fff).ram().share(m_shared_ram);
 	map(0xf8000, 0xfffff).ram().share(m_shared_ram);
