@@ -424,7 +424,7 @@ uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int 
 	}
 	if (!BIT(plaout, PLA_OUT_COLORRAM) && aec)
 	{
-		data = m_color_ram[(m_clrbank << 10) | (ta & 0x300) | sa] & 0x0f;
+		data = (data & 0xf0) | (m_color_ram[(m_clrbank << 10) | (ta & 0x300) | sa] & 0x0f);
 	}
 	if (!BIT(plaout, PLA_OUT_VIC))
 	{
@@ -672,6 +672,15 @@ uint8_t c128_state::vic_videoram_r(offs_t offset)
 
 uint8_t c128_state::vic_colorram_r(offs_t offset)
 {
+	if (m_vic->aec_r() && m_z80en)
+	{
+		// the CPU is halted by RDY on its next read, so the bus carries the byte at the address it
+		// presents rather than a latched opcode; that address is the internal PC for opcode and operand
+		// fetches (pcbase() is still the previous instruction, as the VIC runs its cycle first)
+		auto dis = machine().disable_side_effects();
+		return read(m_subcpu->get_internal_pc()) & 0x0f;
+	}
+
 	return m_color_ram[(m_clrbank << 10) | offset];
 }
 

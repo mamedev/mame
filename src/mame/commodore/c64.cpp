@@ -502,12 +502,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 
 	int plaout = read_pla(offset, va, rw, !aec, ba);
 
-	uint8_t data = 0xff;
-
-	if (!aec)
-	{
-		data = m_vic->bus_r();
-	}
+	uint8_t data = m_vic->bus_r();
 
 	if (!BIT(plaout, PLA_OUT_CASRAM))
 	{
@@ -554,7 +549,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 		case 0x9:
 		case 0xa:
 		case 0xb: // COLOR
-			data = m_color_ram[offset & 0x3ff] & 0x0f;
+			data = (data & 0xf0) | (m_color_ram[offset & 0x3ff] & 0x0f);
 			break;
 
 		case 0xc: // CIA1
@@ -715,19 +710,16 @@ uint8_t c64_state::vic_videoram_r(offs_t offset)
 
 uint8_t c64_state::vic_colorram_r(offs_t offset)
 {
-	uint8_t data;
-
 	if (m_vic->aec_r())
 	{
-		// TODO low nibble of last opcode
-		data = 0x0f;
-	}
-	else
-	{
-		data = m_color_ram[offset] & 0x0f;
+		// the CPU is halted by RDY on its next read, so the bus carries the byte at the address it
+		// presents rather than a latched opcode; that address is the internal PC for opcode and operand
+		// fetches (pcbase() is still the previous instruction, as the VIC runs its cycle first)
+		auto dis = machine().disable_side_effects();
+		return read(m_maincpu->get_internal_pc()) & 0x0f;
 	}
 
-	return data;
+	return m_color_ram[offset] & 0x0f;
 }
 
 
