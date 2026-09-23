@@ -218,9 +218,9 @@ void gaelcof3_state::porta_w(offs_t offset, u8 data, u8 mem_mask)
 	u8 const old = m_porta;
 	m_porta = data;
 
-	// the bus as latched on a rising edge; the programs raise /WR once at power on, while port B is still an input,
-	// so the M6295 gets the 74LS365 and the pull-ups: bit 7 is set, it takes the next byte as a voice selection
-	// and tries to play phrase 64-127, which is empty in all the ROMs
+	// what the M6295 and the 74HCT273 see: the bits the PIC drives, the 74LS365 or the pull-ups for the rest.
+	// the programs raise /WR once at power on with port B still an input, so the M6295 takes 0xc0 | dips as the
+	// first byte of a command and plays phrase 64-127, which is empty in all the ROMs
 	u8 const bus = (m_portb & m_portb_driven) | (bus_r(old) & ~m_portb_driven);
 
 	// the M6295 latches a command on the /WR rising edge, with /CS asserted
@@ -288,7 +288,7 @@ void gaelcof3_state::update_display()
 	u8 const units = bitswap<7>(m_display_shift >> 8, 1, 5, 4, 3, 2, 0, 6);
 	u8 const tens = bitswap<7>(m_display_shift, 5, 6, 2, 3, 4, 1, 0);
 
-	LOGMASKED(LOG_DISPLAY, "display frame %04x\n", m_display_shift);
+	LOGMASKED(LOG_DISPLAY, "display frame %04x\n", BIT(m_display_shift, 0, 16));
 
 	if (BIT(m_display_shift, 15))
 	{
