@@ -118,7 +118,6 @@ private:
 	void via2_out_b(uint8_t data);
 	void via1_irq(int state);
 	void via2_irq(int state);
-	void asc_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 
 	void phases_w(uint8_t phases);
