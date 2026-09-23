@@ -262,13 +262,11 @@ void dt7_state::write_port_2(u8 data)
 		const u8 p1 = m_p1port->read();
 		const u8 p2 = m_p2port->read();
 
-		// chain 0: 1P controls, system byte, 2P start echo, gate
-		m_shift_chain[0] = ~(p1 | (m_sysport->read() << 8) | ((p2 & 0x80) << 16)) & 0x00ffffff;
-		m_shift_chain[0] |= 0xff000000;
+		// chain 0: 1P controls, system byte, 2P start echo, gate (idle high)
+		m_shift_chain[0] = ~u32(p1 | (m_sysport->read() << 8) | ((p2 & 0x80) << 16));
 
 		// chain 1: 2P side, mirroring chain 0 (controls, system byte, 1P start echo, gate)
-		m_shift_chain[1] = ~(p2 | (m_sys2port->read() << 8) | ((p1 & 0x80) << 16)) & 0x00ffffff;
-		m_shift_chain[1] |= 0xff000000;
+		m_shift_chain[1] = ~u32(p2 | (m_sys2port->read() << 8) | ((p1 & 0x80) << 16));
 	}
 
 	// rising edge on bit 3: shift both chains one bit
