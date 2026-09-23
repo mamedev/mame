@@ -21,9 +21,11 @@ public:
 
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
+	void set_floating_falloff(uint8_t mask, uint32_t cycles);
 
 	auto read_callback() { return m_read_port.bind(); }
 	auto write_callback() { return m_write_port.bind(); }
+	auto bus_callback() { return m_read_bus.bind(); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
@@ -46,8 +48,12 @@ protected:
 
 	devcb_read8  m_read_port;
 	devcb_write8 m_write_port;
+	devcb_read8  m_read_bus;
 
 	uint8_t m_pullup, m_floating, m_dir, m_port, m_drive;
+	uint8_t m_falloff_mask;
+	uint32_t m_falloff_cycles[8];
+	uint64_t m_falloff_deadline[8];
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

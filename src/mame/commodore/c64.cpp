@@ -4,7 +4,6 @@
 
     TODO:
 
-    - floating bus writes to peripheral registers in m6502.c
     - sort out kernals between PAL/NTSC
     - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
 
@@ -588,12 +587,6 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 	int sphi2 = m_vic->phi0_r();
 
 	int plaout = read_pla(offset, va, rw, !aec, ba);
-
-	if (offset < 0x0002)
-	{
-		// write to internal CPU register
-		data = m_vic->bus_r();
-	}
 
 	if (!BIT(plaout, PLA_OUT_CASRAM))
 	{
@@ -1564,6 +1557,8 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
+	m_maincpu->set_floating_falloff(0xc0, 350000);
+	m_maincpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1683,7 +1678,8 @@ void sx64_state::ntsc_sx(machine_config &config)
 	// basic hardware
 	m_maincpu->read_callback().set(FUNC(sx64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(sx64_state::cpu_w));
-	m_maincpu->set_pulls(0x07, 0xc0);
+	m_maincpu->set_pulls(0x07, 0xf8);
+	m_maincpu->set_floating_falloff(0x38, 1500000);
 
 	// devices
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
@@ -1710,6 +1706,7 @@ void sx64_state::ntsc_dx(machine_config &config)
 void c64c_state::ntsc_c(machine_config &config)
 {
 	ntsc(config);
+	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
 	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
 	cia_config(config, 60);
@@ -1732,6 +1729,8 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
+	m_maincpu->set_floating_falloff(0xc0, 350000);
+	m_maincpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1840,7 +1839,8 @@ void sx64_state::pal_sx(machine_config &config)
 	// basic hardware
 	m_maincpu->read_callback().set(FUNC(sx64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(sx64_state::cpu_w));
-	m_maincpu->set_pulls(0x07, 0xc0);
+	m_maincpu->set_pulls(0x07, 0xf8);
+	m_maincpu->set_floating_falloff(0x38, 1500000);
 
 	// devices
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
@@ -1854,6 +1854,7 @@ void sx64_state::pal_sx(machine_config &config)
 void c64c_state::pal_c(machine_config &config)
 {
 	pal(config);
+	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
 	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
 	cia_config(config, 50);
@@ -1876,6 +1877,8 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
+	m_maincpu->set_floating_falloff(0xc0, 1500000);
+	m_maincpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 

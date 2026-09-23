@@ -1772,7 +1772,9 @@ void c128_state::ntsc(machine_config &config)
 	M8502(config, m_subcpu, XTAL(14'318'181)*2/3.5/8);
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
-	m_subcpu->set_pulls(0x07, 0x20);
+	m_subcpu->set_pulls(0x07, 0x88);
+	m_subcpu->set_floating_falloff(0x80, 53000);
+	m_subcpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
 	config.set_perfect_quantum(m_subcpu);
 
@@ -1953,7 +1955,9 @@ void c128_state::pal(machine_config &config)
 	M8502(config, m_subcpu, XTAL(17'734'472)*2/4.5/8);
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
-	m_subcpu->set_pulls(0x07, 0x20);
+	m_subcpu->set_pulls(0x07, 0x88);
+	m_subcpu->set_floating_falloff(0x80, 53000);
+	m_subcpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
 	config.set_perfect_quantum(m_subcpu);
 
