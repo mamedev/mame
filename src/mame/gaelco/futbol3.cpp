@@ -198,7 +198,7 @@ u8 gaelcof3_state::bus_r(u8 porta)
 		return 0xc0 | (m_dsw->read() & 0x3f);
 
 	// M6295 status read
-	if (!BIT(porta, m_oki_cs) && !BIT(porta, 3))
+	if (!BIT(porta, 0) && !BIT(porta, 3))
 		return m_oki->read();
 
 	// nothing drives the bus: pull-ups and inputs
