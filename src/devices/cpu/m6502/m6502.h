@@ -51,6 +51,7 @@ public:
 	}
 
 	bool get_sync() const { return m_sync; }
+	uint16_t get_internal_pc() const { return m_PC; }
 
 	auto sync_cb() { return m_sync_w.bind(); }
 

@@ -190,8 +190,16 @@
 #include "concept_dsk.h"
 #endif
 
-#ifdef HAS_FORMATS_COUPEDSK
-#include "coupedsk.h"
+#ifdef HAS_FORMATS_COUPE_MGT
+#include "coupe_mgt.h"
+#endif
+
+#ifdef HAS_FORMATS_COUPE_SAD
+#include "coupe_sad.h"
+#endif
+
+#ifdef HAS_FORMATS_COUPE_SDF
+#include "coupe_sdf.h"
 #endif
 
 #ifdef HAS_FORMATS_CPIS_DSK
@@ -252,6 +260,10 @@
 
 #ifdef HAS_FORMATS_EP64_DSK
 #include "ep64_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_EP64_TAP
+#include "ep64_tap.h"
 #endif
 
 #ifdef HAS_FORMATS_DMV_DSK
@@ -1098,6 +1110,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_EP64_DSK
 	en.add(FLOPPY_EP64_FORMAT); // ep64_dsk.h
 #endif
+#ifdef HAS_FORMATS_EP64_TAP
+	en.add(ep64_cassette_formats); // ep64_tap.h
+#endif
 
 	en.category("Ensoniq");
 #ifdef HAS_FORMATS_ESQ16_DSK
@@ -1128,8 +1143,14 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_TRD_DSK
 	en.add(FLOPPY_TRD_FORMAT); // trd_dsk.h
 #endif
-#ifdef HAS_FORMATS_COUPEDSK
-	en.add(FLOPPY_MGT_FORMAT); // coupedsk.h
+#ifdef HAS_FORMATS_COUPE_MGT
+	en.add(FLOPPY_COUPE_MGT_FORMAT); // coupe_mgt.h
+#endif
+#ifdef HAS_FORMATS_COUPE_SAD
+	en.add(FLOPPY_COUPE_SAD_FORMAT); // coupe_sad.h
+#endif
+#ifdef HAS_FORMATS_COUPE_SDF
+	en.add(FLOPPY_COUPE_SDF_FORMAT); // coupe_sdf.h
 #endif
 #ifdef HAS_FORMATS_OPD_DSK
 	en.add(FLOPPY_OPD_FORMAT); // opd_dsk.h
@@ -1492,7 +1513,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
     en.category("NEC");
 #ifdef HAS_FORMATS_PC88_T88
   en.add(t88_cassette_formats); // pc88_t88.h
-#endif	
+#endif
 //#ifdef HAS_FORMATS_P6001_CAS
 //  en.add(pc6001_cassette_formats); // p6001_cas.h
 //#endif

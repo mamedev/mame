@@ -12,7 +12,6 @@
 #include "machine/bankdev.h"
 #include "machine/cr560b.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 
 #include "screen.h"
@@ -20,7 +19,6 @@
 #include "3do_amy.h"
 #include "3do_clio.h"
 #include "3do_madam.h"
-#include "3do_portfolio.h"
 
 class _3do_state : public driver_device
 {

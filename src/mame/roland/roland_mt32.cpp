@@ -483,6 +483,6 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1988, mt100, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM-32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-32 Multi Timbre Sound Module",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1988, mt100, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "MT-100 Digital Sequencer and Sound Module", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, empty_init, "Roland", "CM-32L LA Sound Module",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

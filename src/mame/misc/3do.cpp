@@ -136,8 +136,9 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "emu.h"
 #include "3do.h"
 
+#include "3do_portfolio.h"
+
 #include "cpu/arm7/arm7.h"
-#include "imagedev/cdromimg.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

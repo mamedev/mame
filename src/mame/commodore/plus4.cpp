@@ -6,7 +6,6 @@
 
     - c16 function ROM test fails
     - clean up TED
-    - verify PLA
     - T6721 speech chip
 
 */
@@ -206,69 +205,15 @@ private:
 void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal)
 {
 	uint16_t i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
-/*  uint8_t data = m_pla->read(i);
+	uint8_t data = m_pla->read(i);
 
-    *scs = BIT(data, 0);
-    *phi2 = BIT(data, 1);
-    *user = BIT(data, 2);
-    *_6551 = BIT(data, 3);
-    *addr_clk = BIT(data, 4);
-    *keyport = BIT(data, 5);
-    *kernal = BIT(data, 6);
-    *f7 = BIT(data, 7);*/
-
-	// the following code is on loan from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/plus4/pla.c until we get the PLA dumped
-
-	#define I(b) (!!((i) & (1 << b)))
-
-	#define I0_F7   I(0)
-	#define PHI0    I(1)
-	#define A15 I(2)
-	#define A4  I(3)
-	#define A5  I(4)
-	#define A6  I(5)
-	#define A7  I(6)
-	#define A12 I(7)
-	#define MUX I(8)
-	#define A14 I(9)
-	#define A8  I(10)
-	#define A9  I(11)
-	#define A13 I(12)
-	#define A11 I(13)
-	#define A10 I(14)
-	#define RAS_    I(15)
-
-	/* unused_  0 when 0111 011x 1001 011x */
-	#define F0  RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||    \
-			!A12 || A7 || A6 || !A5 || A4 || !A15 || !PHI0
-	/* PHI2     1 when 0xxx xxxx xxxx xx11 */
-	#define F1  !RAS_ && PHI0 && I0_F7
-	/* USER_    0 when 0111 011x 1000 1111 */
-	#define F2  RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||     \
-			!A12 || A7 || A6 || A5 || !A4 || !A15 || !PHI0 || !I0_F7
-	/* 6551_    0 when x111 011x 1000 011x */
-	#define F3  !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||    \
-			!A12 || A7 || A6 || A5 || A4 || !A15 || !PHI0
-	/* ADDR_CLK 0 when 1111 011x 1110 1111 */
-	#define F4  RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||    \
-			!A12 || !A7 || !A6 || A5 || !A4 || !A15 || !PHI0 || !I0_F7
-	/* KEYPORT_ 0 when 0111 011x 1001 1111 */
-	#define F5  RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||    \
-			!A12 || A7 || A6 || !A5 || !A4 || !A15 || !PHI0 || !I0_F7
-	/* KERNAL_  1 when x111 001x 1xxx x1xx */
-	#define F6  A10 && A11 && A13 && !A9 && !A8 && A14 &&   \
-			A12 && A15
-	/* I0_F7    1 when xxxx xxx1 xxxx xxxx or
-	          when 0xxx xxxx xxxx xx11 */
-	#define F7  MUX || (F1)
-
-	*scs = F0;
-	*phi2 = F1;
-	*user = F2;
-	*_6551 = F3;
-	*addr_clk = F4;
-	*keyport = F5;
-	*kernal = F6;
+	*scs = BIT(data, 0);
+	*phi2 = BIT(data, 1);
+	*user = BIT(data, 2);
+	*_6551 = BIT(data, 3);
+	*addr_clk = BIT(data, 4);
+	*keyport = BIT(data, 5);
+	*kernal = BIT(data, 6);
 }
 
 
@@ -1075,7 +1020,7 @@ ROM_START( c264 )
 	// TODO: add cart slots to mount EPROMs here
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1092,7 +1037,7 @@ ROM_START( c232 )
 	// TODO: add cart slots to mount EPROMs here
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u7", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u7", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1113,7 +1058,7 @@ ROM_START( v364 )
 	ROM_LOAD( "spk3cc4.bin", 0x0000, 0x4000, CRC(5227c2ee) SHA1(59af401cbb2194f689898271c6e8aafa28a7af11) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1140,7 +1085,7 @@ ROM_START( plus4 )
 	ROM_LOAD( "317054-01.u26", 0x4000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1167,7 +1112,7 @@ ROM_START( plus4p )
 	ROM_LOAD( "317054-01.u26", 0x4000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1188,7 +1133,7 @@ ROM_START( c16 )
 	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1209,7 +1154,7 @@ ROM_START( c16p )
 	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1228,7 +1173,7 @@ ROM_START( c16_hu )
 	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(1) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 
@@ -1249,7 +1194,7 @@ ROM_START( c116 )
 	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
-	ROM_LOAD( "251641-02.u101", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
+	ROM_LOAD( "251641-02.u101", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
 ROM_END
 
 } // anonymous namespace

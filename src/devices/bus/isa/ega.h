@@ -48,7 +48,11 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	uint8_t alu_op( uint8_t data, uint8_t latch_data );
+	uint8_t alu_op( uint8_t data, uint8_t latch_data, uint8_t mask );
+
+	void ega_save_state() ATTR_COLD;
+
+	virtual uint8_t *font_base() const { return m_plane[2]; }
 
 private:
 	void de_changed(int state);
@@ -61,7 +65,7 @@ private:
 public:
 	required_device<crtc_ega_device> m_crtc_ega;
 
-	void install_banks();
+	virtual void install_banks();
 	void change_mode();
 	void pc_ega8_3X0_w(offs_t offset, uint8_t data);
 	uint8_t pc_ega8_3X0_r(offs_t offset);
@@ -106,8 +110,9 @@ public:
 	uint8_t   m_vblank;
 	uint8_t   m_display_enable;
 	uint8_t   m_irq;
-	int     m_video_mode;
+	uint8_t   m_video_mode;
 	uint8_t   m_last_pixel_value;
+
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };

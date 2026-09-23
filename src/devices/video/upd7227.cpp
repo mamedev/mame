@@ -46,6 +46,11 @@ upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, d
 	, m_sck(1)
 	, m_si(1)
 	, m_so(1)
+	, m_data(0)
+	, m_bits(0)
+	, m_pa(0)
+	, m_mode(CMD_SWM)
+	, m_disp(0)
 {
 }
 
@@ -62,6 +67,11 @@ void upd7227_device::device_start()
 	save_item(NAME(m_sck));
 	save_item(NAME(m_si));
 	save_item(NAME(m_so));
+	save_item(NAME(m_data));
+	save_item(NAME(m_bits));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_disp));
 }
 
 
@@ -93,7 +103,85 @@ device_memory_interface::space_config_vector upd7227_device::memory_space_config
 
 uint32_t upd7227_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int bank = 0; 2 > bank; ++bank)
+	{
+		for (int column = 0; 40 > column; ++column)
+		{
+			uint8_t const data = m_disp ? space().read_byte((bank << 6) | column) : 0;
+
+			for (int y = 0; 8 > y; ++y)
+			{
+				int const sx = m_sx + column;
+				int const sy = m_sy + (bank << 3) + y;
+
+				if (cliprect.contains(sx, sy))
+					bitmap.pix(sy, sx) = BIT(data, y);
+			}
+		}
+	}
+
 	return 0;
+}
+
+
+//-------------------------------------------------
+//  write_byte - process a received byte
+//-------------------------------------------------
+
+void upd7227_device::write_byte(uint8_t data)
+{
+	if (m_cd)
+	{
+		if (data & CMD_LDPI)
+		{
+			m_pa = data & 0x7f;
+		}
+		else if ((data & 0xf8) == CMD_BSET)
+		{
+			space().write_byte(m_pa, space().read_byte(m_pa) | (1 << (data & 0x07)));
+		}
+		else if ((data & 0xf8) == CMD_BRESET)
+		{
+			space().write_byte(m_pa, space().read_byte(m_pa) & ~(1 << (data & 0x07)));
+		}
+		else
+		{
+			switch (data)
+			{
+			case CMD_DISP_ON:   m_disp = 1; break;
+			case CMD_DISP_OFF:  m_disp = 0; break;
+
+			case CMD_SRM:
+			case CMD_SWM:
+			case CMD_SORM:
+			case CMD_SANDM:
+			case CMD_SCM:
+				m_mode = data;
+				break;
+
+			default:
+				LOG("%s: unhandled command %02x\n", machine().describe_context(), data);
+				break;
+			}
+		}
+	}
+	else
+	{
+		uint8_t byte = space().read_byte(m_pa);
+
+		switch (m_mode)
+		{
+		case CMD_SWM:   byte = data; break;
+		case CMD_SORM:  byte |= data; break;
+		case CMD_SANDM: byte &= data; break;
+		case CMD_SCM:   byte ^= data; break;
+		default: break;
+		}
+
+		space().write_byte(m_pa, byte);
+
+		m_pa = (m_pa + 1) & 0x7f;
+	}
 }
 
 
@@ -103,6 +191,9 @@ uint32_t upd7227_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void upd7227_device::cs_w(int state)
 {
+	if (m_cs != state)
+		m_bits = 0;
+
 	m_cs = state;
 }
 
@@ -123,6 +214,17 @@ void upd7227_device::cd_w(int state)
 
 void upd7227_device::sck_w(int state)
 {
+	if (!m_cs && !m_sck && state)
+	{
+		m_data = (m_data >> 1) | (m_si << 7);
+
+		if (++m_bits == 8)
+		{
+			m_bits = 0;
+			write_byte(m_data);
+		}
+	}
+
 	m_sck = state;
 }
 

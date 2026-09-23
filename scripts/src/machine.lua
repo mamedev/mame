@@ -861,6 +861,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am79c940.h,MACHINES["AM79C940"] = true
+---------------------------------------------------
+
+if MACHINES["AM79C940"] then
+	files {
+		MAME_DIR .. "src/devices/machine/am79c940.cpp",
+		MAME_DIR .. "src/devices/machine/am79c940.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/am9513.h,MACHINES["AM9513"] = true
 ---------------------------------------------------
 
@@ -2639,6 +2651,18 @@ if MACHINES["MICROTOUCH"] then
 end
 
 ---------------------------------------------------
+--
+--@src/devices/machine/mpeg_demux.h,MACHINES["MPEG_DEMUX"] = true
+--------------------------------------------------
+
+if MACHINES["MPEG_DEMUX"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mpeg_demux.cpp",
+		MAME_DIR .. "src/devices/machine/mpeg_demux.h",
+	}
+end
+
+--------------------------------------------------
 --
 --@src/devices/machine/mm5307.h,MACHINES["MM5307"] = true
 ---------------------------------------------------

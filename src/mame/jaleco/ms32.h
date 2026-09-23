@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Paul Priest
+// copyright-holders:David Haywood,Paul Priest, Andrea Bogazzi
 #ifndef MAME_JALECO_MS32_H
 #define MAME_JALECO_MS32_H
 
 #pragma once
 
+#include "cpu/jalfpu/jalfpu.h"
 #include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -70,16 +71,16 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_ymf(*this, "ymf")
+		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_roz_ctrl(*this, "roz_ctrl")
+		, m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE)
+		, m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE)
+		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_tx_scroll(*this, "tx_scroll")
 		, m_bg_scroll(*this, "bg_scroll")
 		, m_mahjong_input_select(*this, "mahjong_select")
-		, m_priram(*this, "priram",  0x2000, ENDIANNESS_LITTLE)
 		, m_palram(*this, "palram", 0x20000, ENDIANNESS_LITTLE)
-		, m_rozram(*this, "rozram", 0x10000, ENDIANNESS_LITTLE)
-		, m_lineram(*this, "lineram", 0x1000, ENDIANNESS_LITTLE)
 		, m_sprram(*this, "sprram", 0x10000, ENDIANNESS_LITTLE)
-		, m_txram(*this, "txram", 0x4000, ENDIANNESS_LITTLE)
 		, m_bgram(*this, "bgram", 0x4000, ENDIANNESS_LITTLE)
 		, m_io_mj(*this, "KEY%u", 0U)
 	{ }
@@ -102,23 +103,34 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ymf271_device> m_ymf;
 
+	memory_share_creator<u8> m_priram;
+	required_shared_ptr<u32> m_roz_ctrl;
+	memory_share_creator<u16> m_rozram;
+	memory_share_creator<u16> m_lineram;
+	memory_share_creator<u16> m_txram;
+	bitmap_ind16 m_temp_bitmap_tilemaps;
+	bitmap_ind16 m_temp_bitmap_sprites;
+
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
+	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect);
+	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual tilemap_t &create_roz_tilemap() ATTR_COLD;
+	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
+	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
+	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
+	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
+	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
 
 private:
-	required_shared_ptr<u32> m_roz_ctrl;
 	required_shared_ptr<u32> m_tx_scroll;
 	required_shared_ptr<u32> m_bg_scroll;
 	required_shared_ptr<u32> m_mahjong_input_select;
-	memory_share_creator<u8> m_priram;
 	memory_share_creator<u16> m_palram;
-	memory_share_creator<u16> m_rozram;
-	memory_share_creator<u16> m_lineram;
 	memory_share_creator<u16> m_sprram;
-	memory_share_creator<u16> m_txram;
 	memory_share_creator<u16> m_bgram;
 	optional_ioport_array<5> m_io_mj;
 
@@ -132,13 +144,12 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol;
-	bitmap_ind16 m_temp_bitmap_tilemaps;
-	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind8 m_temp_bitmap_sprites_pri;
 	u32 m_brt[4];
 	int m_brt_r;
 	int m_brt_g;
 	int m_brt_b;
+
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
 	u8 ms32_priram_r8(offs_t offset);
@@ -162,7 +173,6 @@ private:
 	void init_ms32_common();
 
 	TILE_GET_INFO_MEMBER(get_ms32_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_bg_tile_info);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -179,7 +189,9 @@ public:
 		ms32_state(mconfig, type, tag)
 		, m_road_vram(*this, "road_vram", 0x10000, ENDIANNESS_LITTLE)
 		, m_io_analog(*this, "AN%u", 0U)
-		// TODO: COPROs
+		, m_fpu(*this, "fpu%u", 0U)
+		, m_road_ctrl(*this, "road_ctrl")
+		, m_road_lineram(*this, "road_lineram", 0x10000, ENDIANNESS_LITTLE)
 	{}
 
 	void f1superb(machine_config &config) ATTR_COLD;
@@ -187,22 +199,39 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual tilemap_t &create_tx_tilemap() override ATTR_COLD;
+	virtual tilemap_t &create_roz_tilemap() override ATTR_COLD;
+	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect) override { }
+
 private:
 	memory_share_creator<u16> m_road_vram;
 
 	required_ioport_array<3> m_io_analog;
+	required_device_array<jaleco_fpu_device, 2> m_fpu;
+	required_shared_ptr<u32> m_road_ctrl;
+	memory_share_creator<u16> m_road_lineram;
+	std::vector<u16> m_txram_latch;
+	bitmap_ind16 m_layer_tx;
+	bitmap_ind16 m_layer_bg;
+	bitmap_ind16 m_layer_road;
+	bitmap_ind16 m_layer_roz;
 
-	tilemap_t* m_extra_tilemap;
+	tilemap_t *m_extra_tilemap;
 
+	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);
+
+	TILE_GET_INFO_MEMBER(get_latched_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_ms32_extra_tile_info);
-
-	void ms32_irq2_guess_w(u32 data);
-	void ms32_irq5_guess_w(u32 data);
 
 	void f1superb_map(address_map &map) ATTR_COLD;
 
 	void road_vram_w16(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 road_vram_r16(offs_t offset);
+
+	void f1superb_field_irq_w(int state);
+	void fpu0_irq_w(int state);
+	void fpu1_irq_w(int state);
 
 	u32 analog_r();
 };

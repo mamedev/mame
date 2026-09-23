@@ -65,6 +65,8 @@ private:
 		CMD_DISP_OFF    = 0x08
 	};
 
+	void write_byte(uint8_t data);
+
 	int m_sx;
 	int m_sy;
 
@@ -73,6 +75,12 @@ private:
 	int m_sck;
 	int m_si;
 	int m_so;
+
+	uint8_t m_data;
+	uint8_t m_bits;
+	uint8_t m_pa;
+	uint8_t m_mode;
+	int m_disp;
 
 	void upd7227_map(address_map &map) ATTR_COLD;
 };

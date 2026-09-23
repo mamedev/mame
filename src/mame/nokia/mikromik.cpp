@@ -161,6 +161,20 @@ NOKIA 9923204 C
 |-----------------------------------------------------------------------------------|
 |       PROM    LS14    SPKR                LS163   LS163           LS123   7438    |
 |                                           LS42    LS151           LS162           |
+|                                                                                   |
+|        F1  F2  F3  F4  F5  F6  F7  F8  F9 F10  DEL ESC UPLT DN  UP  LT  RT        |
+|                                                                                   |
+|          1!  2"  3#  4$  5%  6&  7/  8(  9)  0=  +?  ´`   <>    7   8   9         |
+|                                                                                   |
+|        TAB  Q   W   E   R   T   Y   U   I   O   P   Å   ~^  @*  4   5   6         |
+|                                                                                   |
+|        CAPS  A   S   D   F   G   H   J   K   L   Ö   Ä  RETURN  1   2   3         |
+|        LOCK                                                                       |
+|        SHIFT  Z   X   C   V   B   N   M   ,;  .:  -_  SHIFT LF  0       .         |         
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
+|                                                                                   |
 |-----------------------------------------------------------------------------------|
 
 Notes:
@@ -168,15 +182,6 @@ Notes:
 
     PROM    - 6349-1J
     SPKR    - piezo speaker
-
-*/
-
-/*
-
-    TODO
-
-	- upd765 FIFO underrun on floppy write due to CRTC hogging DMA
-	- "movcpm * *" syncronization error on mm1m6
 
 */
 
@@ -498,6 +503,12 @@ void mm1_state::update_tc()
 
 void mm1_state::dma_hrq_w(int state)
 {
+	if (!state)
+	{
+		m_crtc_dma = false;
+		m_dmac->dreq0_w(m_crtc_drq);
+	}
+
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// Assert HLDA
@@ -511,6 +522,18 @@ void mm1_state::dma_eop_w(int state)
 
 	m_tc = state;
 	update_tc();
+}
+
+void mm1_state::crtc_drq_w(int state)
+{
+	m_crtc_drq = state;
+	m_dmac->dreq0_w(m_crtc_drq && !m_crtc_dma);
+}
+
+void mm1_state::crtc_dma_w(uint8_t data)
+{
+	m_crtc_dma = true;
+	m_crtc->dack_w(data);
 }
 
 
@@ -549,6 +572,8 @@ void mm1_state::machine_start()
 	// state saving
 	save_item(NAME(m_a8));
 	save_item(NAME(m_leen));
+	save_item(NAME(m_crtc_drq));
+	save_item(NAME(m_crtc_dma));
 	save_item(NAME(m_intc));
 	save_item(NAME(m_rx21));
 	save_item(NAME(m_tx21));
@@ -609,7 +634,7 @@ void mm1_state::common(machine_config &config)
 	m_dmac->out_memw_callback().set(FUNC(mm1_state::write));
 	m_dmac->in_ior_callback<2>().set(m_mpsc, FUNC(upd7201_device::da_r));
 	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_r));
-	m_dmac->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
+	m_dmac->out_iow_callback<0>().set(FUNC(mm1_state::crtc_dma_w));
 	m_dmac->out_iow_callback<1>().set(m_mpsc, FUNC(upd7201_device::da_w));
 	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_dmac->out_dack_callback<1>().set(FUNC(mm1_state::dack1_w));
