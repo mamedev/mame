@@ -129,6 +129,7 @@ static const rgb_t PALETTE_MOS[] =
 
 #define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 #define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
+#define FAST_MODE               (IS_VICIIE && BIT(m_reg[REGISTER_FAST], 0))
 
 #define ROW25_YSTART      0x33
 #define ROW25_YSTOP       0xfb
@@ -323,6 +324,9 @@ inline void mos6566_device::display_if_bad_line()
 
 inline void mos6566_device::set_ba(int state)
 {
+	if (FAST_MODE)
+		state = ASSERT_LINE;
+
 	if (m_ba != state)
 	{
 		m_ba = state;
@@ -658,6 +662,8 @@ void mos6566_device::device_start()
 			m_expandx_multi[i] |= 0xa000;
 	}
 
+	m_fast_timer = timer_alloc(FUNC(mos6566_device::fast_changed), this);
+
 	// state saving
 	save_item(NAME(m_reg));
 
@@ -730,6 +736,9 @@ void mos6566_device::device_start()
 
 void mos6566_device::device_reset()
 {
+	if (IS_VICIIE)
+		m_cpu->set_unscaled_clock(clock() / 8, true);
+
 	memset(m_reg, 0, sizeof(m_reg));
 
 	for (auto & elem : m_mc)
@@ -812,6 +821,42 @@ void mos6566_device::device_reset()
 
 	set_ba(ASSERT_LINE);
 	set_aec(ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  fast_changed -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(mos6566_device::fast_changed)
+{
+	m_cpu->set_unscaled_clock((clock() / 8) << param, !param);
+}
+
+
+//-------------------------------------------------
+//  cpu_access -
+//-------------------------------------------------
+
+void mos6566_device::cpu_access(int ioacc)
+{
+	if (!FAST_MODE)
+		return;
+
+	attoseconds_t const half = cycles_to_attotime(1).as_attoseconds() / 2;
+	attotime const now = machine().time();
+	attotime const vic = local_time();
+	attoseconds_t const delta = ((now >= vic) ? (now - vic).as_attoseconds() : -(vic - now).as_attoseconds()) + half / 2;
+	int64_t const halves = (delta >= 0) ? (delta / half) : -((half - 1 - delta) / half);
+
+	if (halves & 1)
+		return;
+
+	int const cycles_per_line = VIC2_CYCLESPERLINE;
+	int const cycle = int(((m_cycle - 1 + (halves >> 1)) % cycles_per_line + cycles_per_line) % cycles_per_line) + 1;
+
+	if (ioacc || (cycle >= 11 && cycle <= 15))
+		m_cpu->adjust_icount(-1);
 }
 
 
@@ -2323,7 +2368,7 @@ void mos6566_device::draw_sprites()
 
 uint32_t mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(PALETTE_MOS[0], cliprect);
+	bitmap.fill(PALETTE_MOS[m_on ? 0 : BACKGROUNDCOLOR], cliprect);
 
 	if (m_on)
 		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
@@ -2677,12 +2722,16 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 		{
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
-				m_cpu->set_unscaled_clock((clock() / 8) << BIT(data, 0));
+				m_cpu->abort_timeslice();
+				m_fast_timer->adjust(attotime::zero, BIT(data, 0));
 			}
 
 			m_reg[offset] = data | 0xfc;
 
 			m_on = !BIT(data, 0);
+
+			if (BIT(data, 0))
+				set_ba(ASSERT_LINE);
 		}
 		break;
 

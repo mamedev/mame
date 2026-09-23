@@ -83,6 +83,7 @@ public:
 		m_va14(1),
 		m_va15(1),
 		m_clrbank(0),
+		m_ioacc(0),
 		m_cnt1(1),
 		m_sp1(1),
 		m_iec_data_out(1),
@@ -214,6 +215,7 @@ public:
 	int m_va14;
 	int m_va15;
 	int m_clrbank;
+	int m_ioacc;
 
 	// fast serial state
 	int m_cnt1;
@@ -385,6 +387,7 @@ uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int 
 	int plaout = read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0);
 
 	m_clrbank = BIT(plaout, PLA_OUT_CLRBANK);
+	m_ioacc = !BIT(plaout, PLA_OUT_IOACC);
 
 	if (!BIT(plaout, PLA_OUT_CASENB))
 	{
@@ -495,6 +498,7 @@ void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, i
 	int plaout = read_pla(offset, ca, vma, ba, rw, aec, z80io, ms3, ms2, ms1, ms0);
 
 	m_clrbank = BIT(plaout, PLA_OUT_CLRBANK);
+	m_ioacc = !BIT(plaout, PLA_OUT_IOACC);
 
 	if (!BIT(plaout, PLA_OUT_CASENB) && !BIT(plaout, PLA_OUT_DWE))
 	{
@@ -622,7 +626,12 @@ uint8_t c128_state::read(offs_t offset)
 	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(offset, vma, ba, aec, z80io);
+	uint8_t data = read_memory(offset, vma, ba, aec, z80io);
+
+	if (!machine().side_effects_disabled())
+		m_vic->cpu_access(m_ioacc);
+
+	return data;
 }
 
 
@@ -639,6 +648,9 @@ void c128_state::write(offs_t offset, uint8_t data)
 	offs_t vma = 0;
 
 	write_memory(offset, vma, data, ba, aec, z80io);
+
+	if (!machine().side_effects_disabled())
+		m_vic->cpu_access(m_ioacc);
 }
 
 
@@ -1113,6 +1125,8 @@ void c128_state::mmu_busack_w(int state)
 void c128_state::vic_ba_w(int state)
 {
 	m_vic_ba = state;
+
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? CLEAR_LINE : ASSERT_LINE);
 
 	update_rdy();
 }
@@ -1741,7 +1755,7 @@ void c128_state::softlists(machine_config &config, const char *filter)
 void c128_state::ntsc(machine_config &config)
 {
 	// basic hardware
-	Z80(config, m_maincpu, XTAL(14'318'181)*2/3.5/2);
+	Z80(config, m_maincpu, XTAL(14'318'181)*2/3.5/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
 	m_maincpu->busack_cb().set(FUNC(c128_state::mmu_busack_w));
@@ -1922,7 +1936,7 @@ void c128_state::c128d81(machine_config &config)
 void c128_state::pal(machine_config &config)
 {
 	// basic hardware
-	Z80(config, m_maincpu, XTAL(17'734'472)*2/4.5/2);
+	Z80(config, m_maincpu, XTAL(17'734'472)*2/4.5/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c128_state::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
 	m_maincpu->busack_cb().set(FUNC(c128_state::mmu_busack_w));
