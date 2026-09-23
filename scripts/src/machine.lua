@@ -2652,6 +2652,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mpeg_demux.h,MACHINES["MPEG_DEMUX"] = true
+--------------------------------------------------
+
+if MACHINES["MPEG_DEMUX"] then
+	files {
+		MAME_DIR .. "src/devices/machine/mpeg_demux.cpp",
+		MAME_DIR .. "src/devices/machine/mpeg_demux.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/machine/mm5307.h,MACHINES["MM5307"] = true
 ---------------------------------------------------
 

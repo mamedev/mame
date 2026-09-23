@@ -373,7 +373,9 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						break;
 					case 0xf6: // Request NTSC/PAL Status
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request NTSC/PAL Status (0xf6)\n", offset);
-						prepare_readback(attotime::never, 2, 2, 0xf6, 2, 0, 0, 0xf6);
+						// the real slave answers 01 for NTSC, 02 for PAL;
+						// cdimono1n ties ntsc_callback to 1
+						prepare_readback(attotime::never, 2, 2, 0xf6, m_ntsc_cb() ? 1 : 2, 0, 0, 0xf6);
 						m_in_index = 0;
 						break;
 					case 0xf7: // TODO: Arm Developer Mode
@@ -420,6 +422,7 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_dmadac(*this, ":dac%u", 1U)
 	, m_atten_w(*this)
 	, m_testplug_cb(*this, 0)
+	, m_ntsc_cb(*this, 0)
 	, m_cdrom(*this, ":cdrom")
 {
 }
