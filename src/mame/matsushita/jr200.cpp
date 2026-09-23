@@ -318,18 +318,22 @@ uint8_t jr200_state::mcu_keyb_r()
 		if (m_autorepeat == 2) // initial keypress
 			ret = keydata;
 		else
-		if (m_autorepeat == 0x330) // pause
 		{
-			ret = keydata;
-			m_autorepeat = 0x2e0; // repeat speed (pause - this)
+			if (m_autorepeat == 0x330) // pause
+			{
+				ret = keydata;
+				m_autorepeat = 0x2e0; // repeat speed (pause - this)
+			}
 		}
 	}
 	else
-	if (m_old_keydata != keydata)
 	{
-		// new key or none
-		m_old_keydata = keydata;
-		m_autorepeat = 0;
+		if (m_old_keydata != keydata)
+		{
+			// new key or none
+			m_old_keydata = keydata;
+			m_autorepeat = 0;
+		}
 	}
 
 	return ret;

@@ -1199,6 +1199,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			static const char *const BPP_VALUES[8] = { "<0 reserved>", "1bpp", "2bpp", "4bpp", "6bpp", "8bpp", "16bpp", "<7 reserved>" };
 
 			// - ssf2xj "Select Game Speed" in Arcade mode
+			// - fifa text kerning
 			const u8 skipx = (m_cel.pre0 >> 24) & 0xf;
 
 			LOGCEL("    skipx=%d vcnt=%d uncoded=%d rep8=%d bpp=%d (%s)\n"
@@ -1252,7 +1253,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				// - retfire main menu
 				for (int y = 0; y < vcnt << lrform; y++)
 				{
-					for (int x = 0; x < tlhpcnt; x++)
+					for (int x = 0; x < tlhpcnt - skipx; x++)
 					{
 						// According to "The Projector" section this floors down,
 						// discarding the fractional part
