@@ -213,7 +213,7 @@ protected:
 	inline uint8_t read_videoram(offs_t offset);
 	inline uint8_t read_colorram(offs_t offset);
 	inline void idle_access();
-	inline void spr_ba(int num);
+	inline void spr_ba(int cycle, int first);
 	inline void spr_ptr_access( int num );
 	inline void spr_data_access( int num, int bytenum );
 	inline void display_if_bad_line();

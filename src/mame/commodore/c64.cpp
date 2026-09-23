@@ -110,6 +110,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
+	void cpu_mem_w(offs_t offset, uint8_t data);
 
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
@@ -131,6 +132,8 @@ public:
 	void write_restore(int state);
 	void exp_dma_w(int state);
 	void exp_reset_w(int state);
+	void vic_ba_w(int state);
+	void update_rdy();
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c64);
 
@@ -162,6 +165,7 @@ public:
 
 	// interrupt state
 	int m_exp_dma;
+	int m_vic_ba;
 	int m_cass_rd;
 	int m_iec_srq;
 
@@ -655,7 +659,7 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 
 uint8_t c64_state::read(offs_t offset)
 {
-	int aec = 1, ba = 1;
+	int aec = 1, ba = m_vic->ba_r();
 
 	// VIC address bus is floating
 	offs_t va = 0x3fff;
@@ -670,9 +674,22 @@ uint8_t c64_state::read(offs_t offset)
 
 void c64_state::write(offs_t offset, uint8_t data)
 {
-	int aec = 1, ba = 1;
+	int aec = 1, ba = m_vic->ba_r();
 
 	write_memory(offset, data, aec, ba);
+}
+
+
+//-------------------------------------------------
+//  cpu_mem_w -
+//-------------------------------------------------
+
+void c64_state::cpu_mem_w(offs_t offset, uint8_t data)
+{
+	if (m_exp_dma)
+		return;
+
+	write(offset, data);
 }
 
 
@@ -725,7 +742,7 @@ uint8_t c64_state::vic_colorram_r(offs_t offset)
 
 void c64_state::c64_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(c64_state::read), FUNC(c64_state::write));
+	map(0x0000, 0xffff).rw(FUNC(c64_state::read), FUNC(c64_state::cpu_mem_w));
 }
 
 
@@ -1406,12 +1423,21 @@ void c64gs_state::cpu_w(uint8_t data)
 
 void c64_state::exp_dma_w(int state)
 {
-	if (m_exp_dma != state)
-	{
-		m_exp_dma = state;
+	m_exp_dma = state;
 
-		m_maincpu->set_input_line(INPUT_LINE_HALT, m_exp_dma);
-	}
+	update_rdy();
+}
+
+void c64_state::vic_ba_w(int state)
+{
+	m_vic_ba = state;
+
+	update_rdy();
+}
+
+void c64_state::update_rdy()
+{
+	m_maincpu->set_input_line(m6510_device::RDY_LINE, (m_vic_ba && !m_exp_dma) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void c64_state::exp_reset_w(int state)
@@ -1445,6 +1471,9 @@ void sx1541_iec_devices(device_slot_interface &device)
 void c64_state::machine_start()
 {
 	m_iec_sync_timer = timer_alloc(FUNC(c64_state::iec_sync_tick), this);
+
+	m_exp_dma = CLEAR_LINE;
+	m_vic_ba = ASSERT_LINE;
 
 	// get pointers to ROMs
 	if (memregion("basic") != nullptr)
@@ -1481,6 +1510,7 @@ void c64_state::machine_start()
 	save_item(NAME(m_va14));
 	save_item(NAME(m_va15));
 	save_item(NAME(m_exp_dma));
+	save_item(NAME(m_vic_ba));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_user_pa2));
@@ -1555,7 +1585,7 @@ void c64_state::ntsc(machine_config &config)
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
 	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos6567.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
+	mos6567.ba_callback().set(FUNC(c64_state::vic_ba_w));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
@@ -1723,7 +1753,7 @@ void c64_state::pal(machine_config &config)
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos6569.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
+	mos6569.ba_callback().set(FUNC(c64_state::vic_ba_w));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
@@ -1867,7 +1897,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos8565.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
+	mos8565.ba_callback().set(FUNC(c64_state::vic_ba_w));
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);

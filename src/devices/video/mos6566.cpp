@@ -285,16 +285,20 @@ inline void mos6566_device::spr_ptr_access( int num )
 	m_spr_ptr[num] = read_videoram(SPRITE_ADDR(num)) << 6;
 }
 
-inline void mos6566_device::spr_ba(int num)
+inline void mos6566_device::spr_ba(int cycle, int first)
 {
-	if (BIT(m_spr_dma_on, num))
+	if (cycle > 11 && cycle < first)
+		return;
+
+	int state = ASSERT_LINE;
+
+	for (int i = 0; i < 8; i++)
 	{
-		set_ba(CLEAR_LINE);
+		if (BIT(m_spr_dma_on, i) && ((cycle - first - 2 * i + 2 * VIC2_CYCLESPERLINE) % VIC2_CYCLESPERLINE) < 5)
+			state = CLEAR_LINE;
 	}
-	else if (num > 1 && !BIT(m_spr_dma_on, num - 1))
-	{
-		set_ba(ASSERT_LINE);
-	}
+
+	set_ba(state);
 }
 
 // Fetch sprite data, increment data counter
@@ -826,6 +830,7 @@ void mos6566_device::execute_run()
 
 		set_aec(CLEAR_LINE);
 
+		int const cycle = m_cycle;
 		int i;
 		uint8_t mask;
 
@@ -889,8 +894,6 @@ void mos6566_device::execute_run()
 			spr_data_access(3, 2);
 			display_if_bad_line();
 
-			spr_ba(5);
-
 			m_cycle++;
 			break;
 
@@ -909,8 +912,6 @@ void mos6566_device::execute_run()
 			spr_data_access(4, 2);
 			display_if_bad_line();
 
-			spr_ba(6);
-
 			m_cycle++;
 			break;
 
@@ -928,8 +929,6 @@ void mos6566_device::execute_run()
 			spr_data_access(5, 1);
 			spr_data_access(5, 2);
 			display_if_bad_line();
-
-			spr_ba(7);
 
 			m_cycle++;
 			break;
@@ -966,8 +965,6 @@ void mos6566_device::execute_run()
 			spr_data_access(7, 1);
 			spr_data_access(7, 2);
 			display_if_bad_line();
-
-			set_ba(ASSERT_LINE);
 
 			m_cycle++;
 			break;
@@ -1162,6 +1159,8 @@ void mos6566_device::execute_run()
 		case 52:
 		case 53:
 		case 54:
+			bad_line_ba();
+
 			draw_graphics();
 			sample_border();
 			graphics_access();
@@ -1233,8 +1232,6 @@ void mos6566_device::execute_run()
 			idle_access();
 			display_if_bad_line();
 
-			spr_ba(0);
-
 			m_cycle++;
 			break;
 
@@ -1254,8 +1251,6 @@ void mos6566_device::execute_run()
 			sample_border();
 			idle_access();
 			display_if_bad_line();
-
-			spr_ba(1);
 
 			m_cycle++;
 			break;
@@ -1298,8 +1293,6 @@ void mos6566_device::execute_run()
 			spr_data_access(0, 1);
 			spr_data_access(0, 2);
 			display_if_bad_line();
-
-			spr_ba(2);
 
 			m_cycle++;
 			break;
@@ -1349,8 +1342,6 @@ void mos6566_device::execute_run()
 			spr_data_access(1, 2);
 			display_if_bad_line();
 
-			spr_ba(3);
-
 			m_cycle++;
 			break;
 
@@ -1375,11 +1366,11 @@ void mos6566_device::execute_run()
 				if (SCREENON && (m_rasterline == m_dy_start))
 					m_ud_border_on = 0;
 
-			spr_ba(4);
-
 			// Last cycle
 			m_cycle = 1;
 		}
+
+		spr_ba(cycle, 57);
 
 		m_phi0 = 1;
 		set_aec(BIT(m_aec_delay, 2));
@@ -1410,6 +1401,7 @@ void mos6569_device::execute_run()
 
 		set_aec(CLEAR_LINE);
 
+		int const cycle = m_cycle;
 		int i;
 		uint8_t mask;
 
@@ -1445,8 +1437,6 @@ void mos6569_device::execute_run()
 
 		// Sprite 3
 		case 2:
-			spr_ba(5);
-
 			if (m_vblanking)
 			{
 				// Vertical blank, reset counters
@@ -1489,8 +1479,6 @@ void mos6569_device::execute_run()
 
 		// Sprite 4
 		case 4:
-			spr_ba(6);
-
 			spr_data_access(4, 1);
 			spr_data_access(4, 2);
 			display_if_bad_line();
@@ -1509,8 +1497,6 @@ void mos6569_device::execute_run()
 
 		// Sprite 5
 		case 6:
-			spr_ba(7);
-
 			spr_data_access(5, 1);
 			spr_data_access(5, 2);
 			display_if_bad_line();
@@ -1550,8 +1536,6 @@ void mos6569_device::execute_run()
 			spr_data_access(7, 1);
 			spr_data_access(7, 2);
 			display_if_bad_line();
-
-			set_ba(ASSERT_LINE);
 
 			m_cycle++;
 			break;
@@ -1775,8 +1759,6 @@ void mos6569_device::execute_run()
 
 			check_sprite_dma();
 
-			spr_ba(0);
-
 			m_cycle++;
 			break;
 
@@ -1799,8 +1781,6 @@ void mos6569_device::execute_run()
 
 		// Check border, sprites
 		case 57:
-			spr_ba(1);
-
 			if (COLUMNS40)
 				m_border_on = 1;
 
@@ -1858,8 +1838,6 @@ void mos6569_device::execute_run()
 
 		// Sprite 0
 		case 59:
-			spr_ba(2);
-
 			draw_background();
 			sample_border();
 			spr_data_access(0, 1);
@@ -1910,8 +1888,6 @@ void mos6569_device::execute_run()
 
 		// Sprite 1
 		case 61:
-			spr_ba(3);
-
 			spr_data_access(1, 1);
 			spr_data_access(1, 2);
 			display_if_bad_line();
@@ -1930,8 +1906,6 @@ void mos6569_device::execute_run()
 
 		// Sprite 2
 		case 63:
-			spr_ba(4);
-
 			spr_data_access(2, 1);
 			spr_data_access(2, 2);
 			display_if_bad_line();
@@ -1945,6 +1919,8 @@ void mos6569_device::execute_run()
 			// Last cycle
 			m_cycle = 1;
 		}
+
+		spr_ba(cycle, 55);
 
 		m_phi0 = 1;
 		set_aec(BIT(m_aec_delay, 2));

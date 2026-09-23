@@ -151,6 +151,8 @@ public:
 
 	void mmu_z80en_w(int state);
 	void mmu_busack_w(int state);
+	void vic_ba_w(int state);
+	void update_rdy();
 	void mmu_fsdir_w(int state);
 	int mmu_game_r();
 	int mmu_exrom_r();
@@ -231,6 +233,8 @@ public:
 
 	// interrupt state
 	int m_exp_dma;
+	int m_vic_ba;
+	int m_busack;
 	int m_cass_rd;
 	int m_iec_srq;
 
@@ -618,7 +622,7 @@ void c128_state::z80_io_w(offs_t offset, uint8_t data)
 
 uint8_t c128_state::read(offs_t offset)
 {
-	int ba = 1, aec = 1, z80io = 1;
+	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
 	return read_memory(offset, vma, ba, aec, z80io);
@@ -631,7 +635,10 @@ uint8_t c128_state::read(offs_t offset)
 
 void c128_state::write(offs_t offset, uint8_t data)
 {
-	int ba = 1, aec = 1, z80io = 1;
+	if (m_exp_dma)
+		return;
+
+	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
 	write_memory(offset, vma, data, ba, aec, z80io);
@@ -644,7 +651,7 @@ void c128_state::write(offs_t offset, uint8_t data)
 
 uint8_t c128_state::vic_videoram_r(offs_t offset)
 {
-	int ba = 0, aec = 0, z80io = 1;
+	int ba = m_vic->ba_r(), aec = 0, z80io = 1;
 
 	return read_memory(0, offset, ba, aec, z80io);
 }
@@ -1079,21 +1086,28 @@ void c128_state::mmu_z80en_w(int state)
 
 void c128_state::mmu_busack_w(int state)
 {
-	if (state == ASSERT_LINE) 
-	{
-		m_subcpu->set_input_line(M8502_RDY_LINE, ASSERT_LINE);
+	m_busack = state;
 
-		if (m_reset)
-		{
-			m_subcpu->reset();
+	update_rdy();
 
-			m_reset = 0;
-		}
-	}
-	else
+	if (state == ASSERT_LINE && m_reset)
 	{
-		m_subcpu->set_input_line(M8502_RDY_LINE, CLEAR_LINE);
+		m_subcpu->reset();
+
+		m_reset = 0;
 	}
+}
+
+void c128_state::vic_ba_w(int state)
+{
+	m_vic_ba = state;
+
+	update_rdy();
+}
+
+void c128_state::update_rdy()
+{
+	m_subcpu->set_input_line(M8502_RDY_LINE, (m_busack && m_vic_ba && !m_exp_dma) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void c128_state::mmu_fsdir_w(int state)
@@ -1566,7 +1580,7 @@ void c128_state::iec_data_w(int state)
 
 uint8_t c128_state::exp_dma_cd_r(offs_t offset)
 {
-	int ba = 0, aec = 1, z80io = 1;
+	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
 	return read_memory(offset, vma, ba, aec, z80io);
@@ -1574,17 +1588,17 @@ uint8_t c128_state::exp_dma_cd_r(offs_t offset)
 
 void c128_state::exp_dma_cd_w(offs_t offset, uint8_t data)
 {
-	int ba = 0, aec = 1, z80io = 1;
+	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return write_memory(offset, data, vma, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io);
 }
 
 void c128_state::exp_dma_w(int state)
 {
 	m_exp_dma = state;
 
-	check_interrupts();
+	update_rdy();
 }
 
 void c128_state::exp_reset_w(int state)
@@ -1639,6 +1653,10 @@ void c128_state::machine_start()
 		if (!(offset % 64)) data ^= 0xff;
 	}
 
+	m_exp_dma = CLEAR_LINE;
+	m_vic_ba = ASSERT_LINE;
+	m_busack = CLEAR_LINE;
+
 	// state saving
 	save_item(NAME(m_z80en));
 	save_item(NAME(m_loram));
@@ -1658,6 +1676,8 @@ void c128_state::machine_start()
 	save_item(NAME(m_iec_data));
 	save_item(NAME(m_iec_srq_out));
 	save_item(NAME(m_exp_dma));
+	save_item(NAME(m_vic_ba));
+	save_item(NAME(m_busack));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_vic_k));
@@ -1742,6 +1762,7 @@ void c128_state::ntsc(machine_config &config)
 	MOS8564(config, m_vic, XTAL(14'318'181)*2/3.5);
 	m_vic->set_cpu(m_subcpu);
 	m_vic->irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	m_vic->ba_callback().set(FUNC(c128_state::vic_ba_w));
 	m_vic->k_callback().set(FUNC(c128_state::vic_k_w));
 	m_vic->set_screen(SCREEN_VIC_TAG);
 	m_vic->set_addrmap(0, &c128_state::vic_videoram_map);
@@ -1922,6 +1943,7 @@ void c128_state::pal(machine_config &config)
 	mos8566_device &mos8566(MOS8566(config, MOS8566_TAG, XTAL(17'734'472)*2/4.5));
 	mos8566.set_cpu(M8502_TAG);
 	mos8566.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos8566.ba_callback().set(FUNC(c128_state::vic_ba_w));
 	mos8566.k_callback().set(FUNC(c128_state::vic_k_w));
 	mos8566.set_screen(SCREEN_VIC_TAG);
 	mos8566.set_addrmap(0, &c128_state::vic_videoram_map);
