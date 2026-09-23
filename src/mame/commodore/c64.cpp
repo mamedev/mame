@@ -1,13 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - sort out kernals between PAL/NTSC
-    - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
-
-*/
 
 #include "emu.h"
 #include "screen.h"
@@ -235,6 +227,7 @@ public:
 };
 
 
+// C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 class clipper_state : public c64_state
 {
 public:
@@ -2013,7 +2006,7 @@ ROM_START( c64 )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r3")
-	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" )
+	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" ) // NTSC-only
 	ROMX_LOAD( "901227-01.u4", 0x0000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "r2", "Kernal rev. 2" )
 	ROMX_LOAD( "901227-02.u4", 0x0000, 0x2000, CRC(a5c687b3) SHA1(0e2e4ee3f2d41f00bed72f9ab588b83e306fdb13), ROM_BIOS(1) )
