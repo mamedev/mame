@@ -698,4 +698,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+SYST( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P PCM Sound Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
