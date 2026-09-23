@@ -40067,6 +40067,10 @@ soldividk
 tgm2
 tgm2p
 
+@source:psion/geofox.cpp
+geofox
+geofox_us
+
 @source:psion/mc400.cpp
 mc200
 mc400
