@@ -548,10 +548,10 @@ void edsp_device::execute_run()
 				m_pc++;
 				m_icount -= 2;
 			}
-			else if ((op & 0xf8ff) == 0x3817)
+			else if ((op & 0xff1f) == 0x3817)
 			{
 				// RPT Rn
-				m_rcr = m_r[BIT(op, 8, 3)];
+				m_rcr = m_r[BIT(op, 5, 3)];
 				m_icount -= 1;
 			}
 			else if ((op & 0xf87f) == 0x3818)
@@ -724,13 +724,13 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf8ff) == 0x585e)
 			{
-				// JMP Rn
+				// JMP Rd
 				m_pc = m_r[BIT(op, 8, 3)];
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x587e)
 			{
-				// CALL Rn
+				// CALL Rd
 				m_data.write_word(m_sp, m_pc);
 				m_sp--;
 				m_pc = m_r[BIT(op, 8, 3)];
@@ -783,15 +783,15 @@ void edsp_device::execute_run()
 				else
 					m_icount -= 1;
 			}
-			else if ((op & 0xff00) == 0xa000)
+			else if ((op & 0xfe00) == 0xa000)
 			{
-				const u16 data = m_data.read_word(m_r[3] - BIT(op, 0, 5));
+				const u16 data = m_data.read_word(m_r[3] - (BIT(op, 8) << 5 | BIT(op, 0, 5)));
 				m_r[BIT(op, 5, 3)] = data;
 				m_icount -= 1;
 			}
-			else if ((op & 0xff00) == 0xa400)
+			else if ((op & 0xfe00) == 0xa400)
 			{
-				m_data.write_word(m_r[3] - BIT(op, 0, 5), m_r[BIT(op, 5, 3)]);
+				m_data.write_word(m_r[3] - (BIT(op, 8) << 5 | BIT(op, 0, 5)), m_r[BIT(op, 5, 3)]);
 				m_icount -= 1;
 			}
 			else if ((op & 0xff80) == 0xa800)

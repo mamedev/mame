@@ -309,10 +309,10 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "r%d = r%d XOR 0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
-	else if ((op & 0xf8ff) == 0x3817)
+	else if ((op & 0xff1f) == 0x3817)
 	{
 		// Repeat next instruction
-		util::stream_format(stream, "rpt r%d", BIT(op, 8, 3));
+		util::stream_format(stream, "rpt r%d", BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf87f) == 0x3818)
@@ -348,6 +348,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		stream << "reti";
 		return 1 | STEP_OUT | SUPPORTED;
 	}
+//  else if (op == 0x387a) - used in myrelife (definitely not an ALU operation)
 	else if ((op & 0xf81f) == 0x381b)
 	{
 		util::stream_format(stream, "sp = sp + #%d", BIT(op, 5, 6));
@@ -569,16 +570,14 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "jmp 0x%04X", u16(pc + 1 + util::sext(op, 9)));
 		return 1 | (cond != 15 ? 0 : STEP_COND) | SUPPORTED;
 	}
-	else if ((op & 0xff00) == 0xa000)
+	else if ((op & 0xfa00) == 0xa000)
 	{
-		// MOV R3 indirect with displacement to register
-		util::stream_format(stream, "r%d = [r3 - %d]", BIT(op, 5, 3), BIT(op, 0, 5));
-		return 1 | SUPPORTED;
-	}
-	else if ((op & 0xff00) == 0xa400)
-	{
-		// MOV register to R3 indirect with displacement
-		util::stream_format(stream, "[r3 - %d] = r%d", BIT(op, 0, 5), BIT(op, 5, 3));
+		// MOV register to or from R3 indirect with displacement (myrelife uses 6-bit extension)
+		const u8 imm6 = BIT(op, 8) << 5 | BIT(op, 0, 5);
+		if (BIT(op, 10))
+			util::stream_format(stream, "[r3 - %s%X] = r%d", imm6 > 9 ? "0x" : "", imm6, BIT(op, 5, 3));
+		else
+			util::stream_format(stream, "r%d = [r3 - %s%X]", BIT(op, 5, 3), imm6 > 9 ? "0x" : "", imm6);
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf980) == 0xa800)
