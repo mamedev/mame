@@ -25,7 +25,6 @@ public:
 
 	auto read_callback() { return m_read_port.bind(); }
 	auto write_callback() { return m_write_port.bind(); }
-	auto bus_callback() { return m_read_bus.bind(); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
@@ -48,7 +47,6 @@ protected:
 
 	devcb_read8  m_read_port;
 	devcb_write8 m_write_port;
-	devcb_read8  m_read_bus;
 
 	uint8_t m_pullup, m_floating, m_dir, m_port, m_drive;
 	uint8_t m_falloff_mask;

@@ -581,6 +581,11 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 
 	int plaout = read_pla(offset, va, rw, !aec, ba);
 
+	if (offset < 0x0002)
+	{
+		data = m_vic->bus_r();
+	}
+
 	if (!BIT(plaout, PLA_OUT_CASRAM))
 	{
 		m_ram->pointer()[offset] = data;
@@ -1551,7 +1556,6 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
 	m_maincpu->set_floating_falloff(0xc0, 350000);
-	m_maincpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1723,7 +1727,6 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
 	m_maincpu->set_floating_falloff(0xc0, 350000);
-	m_maincpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1871,7 +1874,6 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
 	m_maincpu->set_floating_falloff(0xc0, 1500000);
-	m_maincpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 

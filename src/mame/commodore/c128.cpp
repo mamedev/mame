@@ -647,6 +647,11 @@ void c128_state::write(offs_t offset, uint8_t data)
 	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
+	if (offset < 0x0002)
+	{
+		data = m_vic->bus_r();
+	}
+
 	write_memory(offset, vma, data, ba, aec, z80io);
 
 	if (!machine().side_effects_disabled())
@@ -1774,7 +1779,6 @@ void c128_state::ntsc(machine_config &config)
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x88);
 	m_subcpu->set_floating_falloff(0x80, 53000);
-	m_subcpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
 	config.set_perfect_quantum(m_subcpu);
 
@@ -1957,7 +1961,6 @@ void c128_state::pal(machine_config &config)
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x88);
 	m_subcpu->set_floating_falloff(0x80, 53000);
-	m_subcpu->bus_callback().set(m_vic, FUNC(mos6566_device::bus_r));
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
 	config.set_perfect_quantum(m_subcpu);
 

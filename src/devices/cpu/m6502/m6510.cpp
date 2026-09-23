@@ -27,7 +27,6 @@ m6510_device::m6510_device(const machine_config &mconfig, device_type type, cons
 	m6502_device(mconfig, type, tag, owner, clock),
 	m_read_port(*this, 0),
 	m_write_port(*this),
-	m_read_bus(*this, 0),
 	m_dir(0), m_port(0), m_drive(0),
 	m_falloff_mask(0)
 {
@@ -174,10 +173,7 @@ uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 
 void m6510_device::mi_6510::write(uint16_t adr, uint8_t val)
 {
-	if(adr < 0x0002 && !m_base->m_read_bus.isunset())
-		m_program.write_interruptible(adr, m_base->m_read_bus());
-	else
-		m_program.write_interruptible(adr, val);
+	m_program.write_interruptible(adr, val);
 	if(adr == 0x0000)
 		m_base->dir_w(val);
 	else if(adr == 0x0001)
