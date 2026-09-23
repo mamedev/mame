@@ -452,6 +452,7 @@ uint32_t gberet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		bitmap.fill(0, clip);
 
 		// clip screen edges
+		clip = screen.visible_area();
 		clip.min_x += 8;
 		clip.max_x -= 8;
 		clip &= cliprect;
@@ -510,10 +511,10 @@ void gberetb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t gberetb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rectangle clip = cliprect;
-	bitmap.fill(0, clip);
+	bitmap.fill(0, cliprect);
 
 	// clip screen edges
+	rectangle clip = screen.visible_area();
 	clip.min_x += 8;
 	clip.max_x -= 8;
 	clip &= cliprect;
