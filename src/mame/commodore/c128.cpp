@@ -1,12 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - connect CAPS LOCK to charom A12 on international variants
-
-*/
 
 #include "emu.h"
 #include "screen.h"
@@ -80,6 +73,7 @@ public:
 		m_caps(*this, "CAPS"),
 		m_40_80(*this, "40_80"),
 		m_portswap(*this, "JOYSWAP"),
+		m_charom_jumper(*this, "CHAROM_A12"),
 		m_z80en(0),
 		m_loram(1),
 		m_hiram(1),
@@ -99,7 +93,8 @@ public:
 		m_cass_rd(1),
 		m_iec_srq(1),
 		m_vic_k(0x07),
-		m_caps_lock(1)
+		m_caps_lock(1),
+		m_charom_caps(0)
 	{ }
 
 	required_device<z80_device> m_maincpu;
@@ -129,6 +124,7 @@ public:
 	required_ioport m_caps;
 	required_ioport m_40_80;
 	optional_ioport m_portswap;
+	required_ioport m_charom_jumper;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -241,6 +237,7 @@ public:
 	// keyboard state
 	uint8_t m_vic_k;
 	int m_caps_lock;
+	int m_charom_caps;
 
 	int m_user_pa2;
 	int m_user_pb;
@@ -420,7 +417,7 @@ uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int 
 	}
 	if (!BIT(plaout, PLA_OUT_CHAROM))
 	{
-		data = m_charom->base()[(ms3 << 12) | (ta & 0xf00) | sa];
+		data = m_charom->base()[((m_charom_caps ? m_caps_lock : ms3) << 12) | (ta & 0xf00) | sa];
 	}
 	if (!BIT(plaout, PLA_OUT_COLORRAM) && aec)
 	{
@@ -879,6 +876,11 @@ static INPUT_PORTS_START( c128 )
 	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
 	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
 	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
+
+	PORT_START( "CHAROM_A12" )
+	PORT_CONFNAME( 0x01, 0x00, "Character ROM A12" )
+	PORT_CONFSETTING( 0x00, "128/64" )
+	PORT_CONFSETTING( 0x01, "CAPS LOCK" )
 INPUT_PORTS_END
 
 
@@ -921,6 +923,11 @@ static INPUT_PORTS_START( c128_de )
 
 	PORT_MODIFY( "CAPS" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ASCII/DIN") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c128_state::caps_lock), 0)
+
+	PORT_MODIFY( "CHAROM_A12" )
+	PORT_CONFNAME( 0x01, 0x01, "Character ROM A12" )
+	PORT_CONFSETTING( 0x00, "128/64" )
+	PORT_CONFSETTING( 0x01, "CAPS LOCK" )
 INPUT_PORTS_END
 
 
@@ -1058,6 +1065,11 @@ static INPUT_PORTS_START( c128_se )
 
 	PORT_MODIFY( "CAPS" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK ASCII/CC") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c128_state::caps_lock), 0)
+
+	PORT_MODIFY( "CHAROM_A12" )
+	PORT_CONFNAME( 0x01, 0x01, "Character ROM A12" )
+	PORT_CONFSETTING( 0x00, "128/64" )
+	PORT_CONFSETTING( 0x01, "CAPS LOCK" )
 INPUT_PORTS_END
 
 
@@ -1682,6 +1694,7 @@ void c128_state::machine_start()
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_vic_k));
 	save_item(NAME(m_caps_lock));
+	save_item(NAME(m_charom_caps));
 	save_item(NAME(m_user_pa2));
 	save_item(NAME(m_user_pb));
 }
@@ -1690,6 +1703,7 @@ void c128_state::machine_start()
 void c128_state::machine_reset()
 {
 	m_reset = 1;
+	m_charom_caps = m_charom_jumper->read();
 
 	m_user->write_3(0);
 	m_user->write_3(1);
