@@ -9,6 +9,15 @@
     Graphics RAM is split into 8 pixel high "Pages" with one byte representing
     one vertical stripe of 8 pixels.
 
+    Frame rate is determined by:
+
+                                 1
+        osc_value * ---------------------------
+                     div * display_clocks * 64
+
+    where display_clocks is:
+        phase_1_period + phase_2_period +_
+
  ****************************************************************************/
 
 #include "emu.h"
@@ -23,6 +32,9 @@
 #define SET_LOW_NIBBLE_FROM_LOW4(reg, val)  reg = KEEP_HIGH_NIBBLE(reg) | LOW4_AS_LOW_NIBBLE(val);
 #define SET_HIGH_NIBBLE_FROM_LOW4(reg, val) reg = KEEP_LOW_NIBBLE(reg) | LOW4_AS_HIGH_NIBBLE(val);
 
+#define COMPLAIN_INVALID_COMMAND logerror("%s: invalid/unimplemented command %02x\n", m_command_fifo[0]);
+
+
 void ssd1306_device::device_init()
 {
     // init all commandlengths to 0 (=256)
@@ -34,35 +46,36 @@ void ssd1306_device::device_init()
 
 void ssd1306_device::device_reset()
 {
+    // in the datasheet and on the arduboy, the interface mode pins
+    // are supposed to be always tied to VCC or ground.
+    // the datasheet doesn't mention how these pins are read,
+    // so if someone is insane enough to change interfacing modes,
+    // let's assume the interface mode is latched only at reset
+    m_current_interface_mode = m_pending_interface_mode;
 
-    // When RES# input is LOW, the chip is initialized with the following status:
-    // 1. Display is OFF
+
     m_display_awake = false;
-    
-    // 2. 128 x 64 Display Mode
-    
-    // 3. Normal segment and display data column address and row address mapping (SEG0 mapped to
-    // address 00h and COM0 mapped to address 00h)
 
-
-    // 4. Shift register data clear in serial interface
-
-    // 5. Display start line is set at display RAM address 0
-    // 6. Column address counter is set at 0
-    
-    // 7. Normal scan direction of the COM outputs
-    
-    // 8. Contrast control register is set at 7Fh
-    
-    // 9. Normal display mode (Equivalent to A4h command)
-
+    m_inverting_pixels = false;
 
     m_pagemode_column_start_address = 0;
     m_hvmode_page_start_end_address = 0x07;
 
+    m_hvmode_page_start_address = 0x0d;
+    m_hvmode_page_end_address   = 0x7d;
+
+    m_vscroll_fixed_rows  = 0;
+    m_vscroll_scroll_rows = 64;
+
+    m_clk_div   = 0b0000;
+    m_osc_freq  = 0b1000;
+
+    m_phase_1_period = 2;
+    m_phase_2_period = 2;
 
     m_addressing_mode = PAGE;
 }
+
 
 void ssd1306_device::exec_command_2x()
 {
@@ -74,6 +87,8 @@ void ssd1306_device::exec_command_2x()
 
         case 0x1:
             // h/v addressing mode: set column start/end address
+            m_hvmode_column_start_address;
+            m_hvmode_column_end_address;
             break;
 
         case 0x2:
@@ -98,7 +113,9 @@ void ssd1306_device::exec_command_2x()
             // scroll enable
             
             break;
-
+        default:
+            COMPLAIN_INVALID_COMMAND;
+            break;
     }
 }
 
@@ -148,6 +165,7 @@ void ssd1306_device::exec_command_ax()
             break;
 
         default:
+            COMPLAIN_INVALID_COMMAND;
             break;
     }
 }
@@ -156,6 +174,32 @@ void ssd1306_device::exec_command_dx()
 {
     switch(m_command_fifo[0] & 0x0F)
     {
+        case 0x3:
+            // TODO: set display offset
+            break;
+
+        case 0x5:
+            m_clk_div  = m_command_fifo[1] & 0xf;
+            m_osc_freq = m_command_fifo[1] >> 4;
+            break;
+
+
+        case 0x9:
+            m_phase_1_period = m_command_fifo[1] & 0xf;
+            m_phase_2_period = m_command_fifo[1] >> 4;
+            break;
+
+        case 0xA:
+            // TODO: Set COM pins hardware config
+            break;
+
+        case 0xB:
+            // "set Vcomh deselect level"
+            break;
+        
+        default:
+            COMPLAIN_INVALID_COMMAND;
+            break;
     }
 }
 
@@ -196,7 +240,9 @@ void ssd1306_device::exec_command()
             if (0xB0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xB7)
             {
                 m_pagemode_page_start_address = m_command_fifo[0] & 7;
+                return;
             }
+            COMPLAIN_INVALID_COMMAND;
             break;
         
         case 0xC:
@@ -214,7 +260,7 @@ void ssd1306_device::exec_command()
                 return;
             }
 
-            logerror("%s: invalid/unimplemented command %02x\n", m_command_fifo[0]);
+            COMPLAIN_INVALID_COMMAND;
             break;
     }
 }
@@ -303,3 +349,60 @@ void ssd1306_device::write(u8 data)
     }
 
 }
+
+
+void ssd1306_device::rst_w(int rst)
+{
+    bool rst_asserted = !rst;
+
+}
+
+void ssd1306_device::dc_w(int dc)
+{
+    m_dc_line = dc != 0;
+
+    if (m_current_interface_mode == SPI_3WIRE)
+    {
+        // must be connected to ground in this mode
+        logerror("%s: D/C pin changed in 3-wire mode\n", tag());
+        return;
+    }
+
+    if (m_current_interface_mode == I2C)
+    {
+        // changes I2C slave address
+        return;
+    }
+
+    m_dc_internal_state = m_dc_line;
+}
+
+void ssd1306_device::update_scan_rate()
+{
+    double framerate = clock() * (1 / (m_clk_div * (m_phase_1_period + m_phase_2_period + ??) * 64));
+
+
+
+
+                                    //  1
+        // osc_value * ---------------------------
+                    //  div * display_clocks * 64
+}
+
+
+void ssd1306_device::spi_cs_w(int state)
+{
+
+}
+
+void ssd1306_device::spi_si_w(int state)
+{
+
+}
+    
+void ssd1306_device::spi_sck_w(int state)
+{
+
+}
+
+

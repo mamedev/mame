@@ -6,9 +6,20 @@
     This is a homebrew ATMega handheld system, based around the ATMega32u4,
     which provides us with an excellent AVR emulation test case.
 
+    The vanilla Arduboy expects you to upload or flash software to it. Such software is
+    virtually always in Intel HEX format, so we have to support that.
+
     The Arduboy FX has a 16 mbyte flash chip on board that can store multiple games.
     However, since the ATMega can only execute from its own internal 32kbyte flash,
     the games must be copied there every time.
+
+    Some FX games support reading data from the 16 mbyte flash. Those games are
+    distributed as .arduboy files, which are standard ZIP files containing a
+    JSON manifest, the main game code as a .hex, and the game resources as
+    .bin files. These are currently not supported as that would be a gigantic
+    chore to support within the MAME framework. For those games, you should
+    create your own flashcart with the game installed, then feed that
+    into the ardbyfx driver.
 
     Basic hardware:
     - MCU: ATMega32U4
@@ -65,6 +76,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/nvram.h"
 #include "sound/spkrdev.h"
 
 namespace {
@@ -98,10 +110,10 @@ private:
 	required_device<atmega32u4_device> m_maincpu;
 	required_device<screen_device> m_screen;
     required_device<speaker_sound_device> m_speaker;
-    required_device<generic_spi_flash_device> m_spi_flash;
     required_device<ssd1306_device> m_ssd1306;
 
 
+    optional_device<generic_spi_flash_device> m_spi_flash;
 	optional_device<generic_slot_device> m_cart; // required for arduboy, not for ardbyfx
 
 	uint8_t port_b_r();
@@ -121,9 +133,14 @@ private:
 
     bool m_oled_cs_inactive;
     bool m_flash_cs_inactive;
+
+    uint8_t m_internal_flash[0x7800];
 };
 
-
+void arduboy_state::machine_start()
+{
+    subdevice<nvram_device>("intflash")->set_base(&m_internal_flash[0], 0x7800);
+}
 
 uint8_t arduboy_state::port_b_r()
 {
@@ -139,11 +156,10 @@ void arduboy_state::port_b_w(uint8_t data)
     int spi_sck  = data & (1 << 1);
     int spi_mosi = data & (1 << 2);
 
-
-    m_spi_flash->si_w(spi_mosi);
+    if (m_spi_flash) m_spi_flash->si_w(spi_mosi);
     m_ssd1306->spi_si_w(spi_mosi);
 
-    m_spi_flash->sck_w(spi_sck);
+    if (m_spi_flash) m_spi_flash->sck_w(spi_sck);
     m_ssd1306->spi_sck_w(spi_sck);
 }
 
@@ -170,11 +186,11 @@ uint8_t arduboy_state::port_d_r()
 void arduboy_state::port_d_w(uint8_t data)
 {
 
-    m_spi_flash->cs_w(data & (1 << 3));
-    m_ssd1306->set_dc_line(data & (1 << 4));
+    if (m_spi_flash) m_spi_flash->cs_w(data & (1 << 3));
+    m_ssd1306->dc_w(data & (1 << 4));
     // TX LED on D.5
     m_ssd1306->spi_cs_w(data & (1 << 6));
-    m_ssd1306->set_rst(data & (1 << 7));
+    m_ssd1306->rst_w(data & (1 << 7));
 }
 
 
@@ -202,6 +218,7 @@ void arduboy_state::port_f_w(uint8_t data)
 
 void arduboy_state::prg_map(address_map &map)
 {
+    map(0x0000, 0x77ff).rom().region("intflash");
     map(0x7800, 0x7fff).rom().region("loader");
 }
 
@@ -209,7 +226,7 @@ void arduboy_state::data_map(address_map &map)
 {
     // TODO: 32u4 flash registers. the FX needs it
 
-    map(0x0100, 0x0AFF).ram(); // on-chip 2.5kbytes RAM
+    map(0x0100, 0x0aff).ram(); // on-chip 2.5kbytes RAM
 }
 
 
@@ -250,6 +267,7 @@ void arduboy_state::arduboy_base(machine_config &config)
     m_maincpu->gpio_out<atmega328_device::GPIOE>().set(arduboy_state::port_e_w);
     m_maincpu->gpio_out<atmega328_device::GPIOF>().set(arduboy_state::port_f_w);
 
+    NVRAM(config, "intflash", nvram_device::DEFAULT_ALL_1);
 
     SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
@@ -272,21 +290,160 @@ void arduboy_state::ardbyfx(machine_config &config)
     GENERIC_SPI_FLASH(config, m_spi_flash);
 }
 
+#define PARSE_HEX(xin, xout) { \
+    if ('0' <= xin && xin <= '9') \
+    {   \
+        xout = xin - '0';   \
+    }   \
+    else if ('A' <= xin && xin <= 'F')  \
+    {   \
+        xout = (xin - 'A') + 0x0A;  \
+    }   \
+    else  \
+    {   \
+        return std::make_pair(image_error::BADSOFTWARE, "invalid hex byte");    \
+    }   \
+}
+
+#define FREAD_BOUNDSCHECK(img, bufptr, count) \
+    if (img.fread(bufptr,count) != count) \
+        return std::make_pair(image_error::BADSOFTWARE, "file read error or premature EOF");
+
 DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::cart_load)
 {
-	uint32_t size = std::min(m_cart->common_get_size("rom"), 0x7800);
+    // remember: loading a new game overwrites the previous one up until EOF,
+    // so we let the old one persist at least in part.
+    if (image.is_filetype("bin"))
+    {
+        image.fread(m_internal_flash, 0x7800);
+        return std::make_pair(std::error_condition(), std::string());
+    }
 
-	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+    if (!image.is_filetype("hex"))
+    {
+        return std::make_pair(image_error::BADSOFTWARE, "cart must be bin or hex");
+    }
 
-    memcpy(m_cart->get_rom_base(), image.get_software_region("intflash"), size);
+    // oh boy oh boy! someone gave us a .hex. and that's gonna be super painful.
+    image.fseek(0, SEEK_SET);
+    char buf[80];
+    while(image.ftell() < image.length())
+    {
+        uint8_t  num_bytes;
+        uint16_t address;
+        uint8_t  record_type;
 
-	return std::make_pair(std::error_condition(), std::string());
+        uint8_t hex[8 + 16];
+        uint8_t checksum = 0;
+
+        FREAD_BOUNDSCHECK(image, buf, 1);
+        if (buf[0] != ':')
+        {
+            return std::make_pair(image_error::BADSOFTWARE, "hexdump line did not start with ':'");
+        }
+
+        memset(buf, 0, sizeof(buf));
+        FREAD_BOUNDSCHECK(image, buf, 8);
+        
+        if (sscanf(buf, "%02X%04X%02X", &num_bytes, &address, &record_type) == EOF)
+        { 
+            return std::make_pair(image_error::BADSOFTWARE, "record parse error");
+        }
+
+        // while the intel hex standard can support data lines greater than 16 bytes,
+        // virtually all software for the Arduboy only uses 16,
+        // so complain if we see anything else
+        if (num_bytes > 16)
+        {
+            return std::make_pair(image_error::BADSOFTWARE, "record greater than 16 bytes");
+        }
+
+        if (num_bytes != 0)
+        {
+            FREAD_BOUNDSCHECK(image, buf + 8, num_bytes * 2);
+        }
+
+        for (int i = 0; i < 8 + num_bytes; i++)
+        {
+            uint8_t hibits_byte;
+            uint8_t lobits_byte;
+
+            char hibits = buf[i*2];
+            char lobits = buf[(i*2)+1];
+
+            PARSE_HEX(hibits, hibits_byte);
+            PARSE_HEX(lobits, lobits_byte);
+
+            uint8_t byte = (hibits << 4) | lobits; 
+            hex[i] = byte;
+
+            if (i == 0)
+            {
+                checksum = byte;
+            }
+            else
+            {
+                checksum += byte;
+            }
+        }
+
+        memset(buf, 0, sizeof(buf));
+        FREAD_BOUNDSCHECK(image, buf, 2);
+        uint8_t expected_checksum;
+        if (sscanf(buf, "%02X", &expected_checksum) == EOF)
+        {
+            return std::make_pair(image_error::BADSOFTWARE, "checksum parse error");
+        }
+
+        if ((~checksum + 1) != expected_checksum)
+        {
+            return std::make_pair(image_error::BADSOFTWARE, "checksum mismatch"); 
+        }
+
+        // we've finally parsed the entire line, that's cause for celebration.
+        // but we're still not done, unfortunately!
+        if (record_type == 1)
+        {
+            // if we hit the EOF record, then treat it as the success path.
+            // we're counting on the hexdump being valid to begin with
+            // or loaded from a softlist. no need to complain about
+            // data past EOF
+            return std::make_pair(std::error_condition(), std::string());
+        }
+        else if (record_type != 0)
+        {
+            return std::make_pair(image_error::BADSOFTWARE, "invalid/unimplemented hexdump record type");
+        }
+
+        if (!(
+                (0x0000 <= address && address <= 0x77ff) ||
+                (0x0000 <= (address + num_bytes) && (address + num_bytes) <= 0x77ff)
+             ))
+        {
+            return std::make_pair(image_error::BADSOFTWARE, "hex record writes out of bounds");
+        }
+        
+        // all that just to do this. whew
+        memcpy(m_internal_flash + address, hex + 4, num_bytes); // n.b.: 8 chars = 4 hex bytes
+
+        // skip garbage until next record begins
+        while(1)
+        {
+            FREAD_BOUNDSCHECK(image, buf, 1);
+            if (buf[0] == ':')
+            {
+                // remember that the top of loop expects to read ':'
+                image.fseek(-1, SEEK_CUR);
+                break;
+            }
+        }
+    }
+
+    // we shouldn't end up here as EOF checks in the while loop should catch this for us
+    return std::make_pair(image_error::BADSOFTWARE, "hexdump hit premature EOF");
 }
 
 ROM_START( arduboy )
-    // arduboy treats this as a cart, ardbyfx loads games from spiflash into this space
-    ROM_REGION( 0x7800, "intflash", ROMREGION_ERASEFF)
-
     // bootloader dumped from an Arduboy FX
 	ROM_REGION( 0x800, "loader", ROMREGION_ERASEFF)
     ROM_LOAD("arduboy_boot.bin", 0x000, 0x800, CRC(4c49b0f5) SHA1(66a7411c46c04a8089a7ddfb5ffd9809dd08a21f))
@@ -297,4 +454,4 @@ ROM_END
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY    FULLNAME
 CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy",    MACHINE_NOT_WORKING)
-CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)
+// CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)
