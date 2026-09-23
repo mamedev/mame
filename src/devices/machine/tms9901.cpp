@@ -229,7 +229,7 @@ void tms9901_device::prioritize_interrupts()
 	m_int_pending = found;
 
 	// Only for asynchronous emulation
-	if (clock()!=0) signal_int();
+	if (clock()!=0) check_int();
 }
 
 bool tms9901_device::is_output(int p)
@@ -255,7 +255,7 @@ void tms9901_device::set_bit(uint16_t& bitfield, int pos, bool val)
 	else bitfield &= ~(1<<pos);
 }
 
-void tms9901_device::signal_int()
+void tms9901_device::check_int()
 {
 	if (m_int_level == m_last_level)
 		return;
@@ -513,10 +513,6 @@ void tms9901_device::phi_line(int state)
 
 			if (!m_clock_mode)
 				m_clock_read_register = m_decrementer_value;
-
-			// For the next phi assert
-			// MZ: This costs a lot of performance for a minimum of benefit.
-			if (m_poll_lines) sample_interrupt_inputs();
 		}
 		else
 		{
@@ -524,10 +520,14 @@ void tms9901_device::phi_line(int state)
 				timer_clock_in(CLEAR_LINE);
 		}
 
-		// INTREQ follows the external clock, not the decrementer's /64 clock.
-		// Delaying deassertion can leave a stale interrupt request after the
-		// CPU acknowledges a peripheral and then enables interrupts.
-		signal_int();
+		// For the next phi assert
+		// MZ: This costs a lot of performance for a minimum of benefit.
+		if (m_poll_lines) sample_interrupt_inputs();
+	}
+	else
+	{
+		// Latches are propagated on raising /phi (i.e. cleared phi)
+		check_int();
 	}
 }
 
