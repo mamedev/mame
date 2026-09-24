@@ -950,6 +950,33 @@ void x68k_state::machine_reset()
 
 void x68k_state::machine_start()
 {
+	unsigned char* rom = memregion("maincpu")->base();
+	unsigned char* user2 = memregion("user2")->base();
+
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
+
+#ifdef USE_PREDEFINED_SRAM
+	{
+		unsigned char* ramptr = memregion("user3")->base();
+		memcpy(m_sram,ramptr,0x4000);
+	}
+#endif
+
+	// copy last half of BIOS to a user region, to use for initial startup
+	memcpy(user2,(rom+0xff0000),0x10000);
+
+	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
+	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
+	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
+	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
+
+	m_sysport.cputype = 0xff;  // 68000, 10MHz
+	m_is_32bit = false;
+
+	save_item(NAME(m_tvram));
+	save_item(NAME(m_gvram));
+	save_item(NAME(m_spritereg));
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
@@ -982,46 +1009,18 @@ void x68k_state::machine_start()
 	m_led_state = 0;
 }
 
-void x68k_state::driver_start()
+void x68ksupr_state::machine_start()
 {
-	unsigned char* rom = memregion("maincpu")->base();
-	unsigned char* user2 = memregion("user2")->base();
+	x68k_state::machine_start();
 
-	subdevice<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
-
-#ifdef USE_PREDEFINED_SRAM
-	{
-		unsigned char* ramptr = memregion("user3")->base();
-		memcpy(m_sram,ramptr,0x4000);
-	}
-#endif
-
-	// copy last half of BIOS to a user region, to use for initial startup
-	memcpy(user2,(rom+0xff0000),0x10000);
-
-	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
-	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
-	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
-	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
-
-	m_sysport.cputype = 0xff;  // 68000, 10MHz
-	m_is_32bit = false;
-
-	save_item(NAME(m_tvram));
-	save_item(NAME(m_gvram));
-	save_item(NAME(m_spritereg));
-}
-
-void x68ksupr_state::driver_start()
-{
-	x68k_state::driver_start();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-void x68030_state::driver_start()
+void x68030_state::machine_start()
 {
-	x68k_state::driver_start();
+	x68ksupr_state::machine_start();
+
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }

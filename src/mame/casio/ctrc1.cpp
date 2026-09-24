@@ -27,6 +27,7 @@
 #include "emu.h"
 
 #include "ct8000_midi.h"
+
 #include "cpu/upd7810/upd7810.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
@@ -68,7 +69,7 @@ public:
 protected:
 	void map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void keys_w(u8 data) { m_key_select = data; }
 	void pll_w(offs_t offset, u8 data);
@@ -160,7 +161,7 @@ void ctrc1_state::ctrc1(machine_config &config)
 }
 
 //**************************************************************************
-void ctrc1_state::driver_start()
+void ctrc1_state::machine_start()
 {
 	m_port_in_select = 0xf;
 	m_port_in_strobe = 0;

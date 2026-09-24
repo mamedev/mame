@@ -2596,6 +2596,7 @@ void legionna_state::init_cupsoc_debug()
 void legionna_state::init_olysoc92()
 {
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
+	// TODO: this looks pulled thru Seibu COP interactions
 	ROM[0xffffe/2] ^= 0x0003; // show Olympic Soccer '92 title
 
 	init_cupsoc_debug();
@@ -2604,7 +2605,8 @@ void legionna_state::init_olysoc92()
 void legionna_state::init_cupsocs()
 {
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	ROM[0xffffa/2] = 0x00ff; // disable debug text (this is already 0x00ff in the bootleg sets for the same reason)
+	// TODO: disable debug text (this is already 0x00ff in the bootleg sets for the same reason)
+	ROM[0xffffa/2] = 0x00ff;
 
 	init_cupsoc_debug();
 }
@@ -2624,7 +2626,7 @@ void legionna_state::init_legiongfx()
 void legionna_state::init_godzilla()
 {
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
-	// TODO: some game elements don't collide properly, @see seibucop.cpp
+	// HACK: some game elements don't collide properly, @see seibucop.cpp
 	ROM[(0xbe0e + 0x0a)/2] = 0xb000;
 	ROM[(0xbe0e + 0x1a)/2] = 0xb800;
 	ROM[(0xbb0a + 0x0a)/2] = 0xb000;

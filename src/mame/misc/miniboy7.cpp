@@ -1100,6 +1100,7 @@ ROM_END
 
 void miniboy7_state::init_smini()
 {
+	// HACK: what are these for?
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xa0f0] = 0x0e;

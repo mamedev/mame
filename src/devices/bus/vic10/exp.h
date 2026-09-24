@@ -43,6 +43,59 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> vic10_expansion_window
+
+class vic10_expansion_window
+{
+public:
+	class variant
+	{
+	public:
+		void install_rom(offs_t start, offs_t end, void *baseptr) { install(start, end, baseptr, false); }
+		void install_ram(offs_t start, offs_t end, void *baseptr) { install(start, end, baseptr, true); }
+
+		template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler)
+		{ m_window.m_view[m_slot].install_write_handler(m_window.m_start + start, m_window.m_start + end, std::forward<W>(whandler)); }
+
+	private:
+		friend class vic10_expansion_window;
+
+		variant(vic10_expansion_window &window, int slot) : m_window(window), m_slot(slot) { }
+
+		void install(offs_t start, offs_t end, void *baseptr, bool writable);
+
+		vic10_expansion_window &m_window;
+		int const m_slot;
+	};
+
+	vic10_expansion_window(device_t &device, const char *name, offs_t start, offs_t end);
+	vic10_expansion_window(device_t &device, const char *name, offs_t start, offs_t end, offs_t video_start, offs_t video_end);
+
+	variant operator[](int slot) { return variant(*this, slot); }
+
+	void select(int slot);
+	void unmap();
+
+	void install_rom(offs_t start, offs_t end, void *baseptr) { (*this)[0].install_rom(start, end, baseptr); select(0); }
+	void install_ram(offs_t start, offs_t end, void *baseptr) { (*this)[0].install_ram(start, end, baseptr); select(0); }
+	template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler) { (*this)[0].install_write_handler(start, end, std::forward<W>(whandler)); select(0); }
+
+private:
+	friend class vic10_expansion_slot_device;
+
+	void install_views(address_space &program, address_space *video);
+
+	memory_view m_view;
+	memory_view m_video_view;
+	offs_t const m_start;
+	offs_t const m_end;
+	offs_t const m_video_start;
+	offs_t const m_video_end;
+	bool const m_has_video;
+	bool m_video_installed;
+};
+
+
 // ======================> vic10_expansion_slot_device
 
 class device_vic10_expansion_card_interface;
@@ -61,18 +114,23 @@ public:
 	}
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_video_space(T &&tag, int spacenum) { m_video.set_tag(std::forward<T>(tag), spacenum); }
+
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto res_callback() { return m_write_res.bind(); }
 	auto cnt_callback() { return m_write_cnt.bind(); }
 	auto sp_callback() { return m_write_sp.bind(); }
 
 	// computer interface
-	uint8_t cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
-	void cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
 	int p0_r();
 	void p0_w(int state);
 
 	// cartridge interface
+	vic10_expansion_window &exram() { return m_exram; }
+	vic10_expansion_window &lorom() { return m_lorom; }
+	vic10_expansion_window &uprom() { return m_uprom; }
+
 	void irq_w(int state) { m_write_irq(state); }
 	void res_w(int state) { m_write_res(state); }
 	void cnt_w(int state) { m_write_cnt(state); }
@@ -92,12 +150,23 @@ protected:
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
+	uint8_t *alloc_region(const char *tag);
+	std::error_condition load_region(util::random_read &file, const char *tag, offs_t offset, size_t length);
+
+	optional_address_space m_program;
+	optional_address_space m_video;
+
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_res;
 	devcb_write_line   m_write_cnt;
 	devcb_write_line   m_write_sp;
 
 	device_vic10_expansion_card_interface *m_card;
+
+private:
+	vic10_expansion_window m_exram;
+	vic10_expansion_window m_lorom;
+	vic10_expansion_window m_uprom;
 };
 
 
@@ -112,8 +181,6 @@ public:
 	// construction/destruction
 	virtual ~device_vic10_expansion_card_interface();
 
-	virtual uint8_t vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; }
-	virtual void vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram) { }
 	virtual int vic10_p0_r() { return 0; }
 	virtual void vic10_p0_w(int state) { }
 	virtual void vic10_sp_w(int state) { }
@@ -121,10 +188,6 @@ public:
 
 protected:
 	device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device);
-
-	std::unique_ptr<uint8_t[]> m_lorom;
-	std::unique_ptr<uint8_t[]> m_exram;
-	std::unique_ptr<uint8_t[]> m_uprom;
 
 	vic10_expansion_slot_device *m_slot;
 };

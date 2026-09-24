@@ -719,6 +719,16 @@ void saturn_state::vdp1_set_framebuffer_config()
 
 void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// PTM = 01 starts drawing immediately, while 00/10 only change the plot trigger mode at the
+	// next frame buffer change, so a 01 write leaves the mode from the last 00/10 write in effect.
+	// - doom and exhumed set 10 then draw with 01, and hang unless the next change draws again (CEF)
+	if (offset == 0x04/2 && ACCESSING_BITS_0_7 && (data & 3) == 1)
+	{
+		if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
+		vdp1_process_list();
+		return;
+	}
+
 	COMBINE_DATA(&m_vdp1_regs[offset]);
 
 	switch(offset)
@@ -735,9 +745,6 @@ void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 		case 0x04/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
-			if ( VDP1_PTMR == 1 )
-				vdp1_process_list();
-
 			break;
 		case 0x06/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase data set %08X\n", data );
@@ -6650,11 +6657,11 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 				{
 					if ( current_tilemap.colour_depth == 4 )
 					{
-						/* normal */
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
+						/* normal, an 8x8 RGB888 cell takes 8 character number units (32 bytes each) */
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos, drawypos,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos+8,drawypos,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
 					}
 					else if ( current_tilemap.colour_depth == 3 )
 					{

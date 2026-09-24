@@ -103,17 +103,6 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ymf271_device> m_ymf;
 
-	void flipscreen_w(int state);
-	virtual void video_start() override ATTR_COLD;
-	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect);
-	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual tilemap_t &create_roz_tilemap() ATTR_COLD;
-	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
-	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
-	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
-	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
-	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
-
 	memory_share_creator<u8> m_priram;
 	required_shared_ptr<u32> m_roz_ctrl;
 	memory_share_creator<u16> m_rozram;
@@ -124,6 +113,17 @@ protected:
 	bitmap_ind16 m_layer_tx;
 	bitmap_ind16 m_layer_bg;
 	bitmap_ind16 m_layer_roz;
+
+	void flipscreen_w(int state);
+	virtual void video_start() override ATTR_COLD;
+	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect);
+	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual tilemap_t &create_roz_tilemap() ATTR_COLD;
+	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
+	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
+	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
+	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
+	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
@@ -155,6 +155,7 @@ private:
 	int m_brt1_r;
 	int m_brt1_g;
 	int m_brt1_b;
+
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
 	u8 ms32_priram_r8(offs_t offset);
@@ -220,7 +221,7 @@ private:
 	std::vector<u16> m_txram_latch;
 	bitmap_ind16 m_layer_road;
 
-	tilemap_t* m_extra_tilemap;
+	tilemap_t *m_extra_tilemap;
 
 	void draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour);
 

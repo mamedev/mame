@@ -245,5 +245,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME      FLAGS
-CONS( 1991, tg100, 0,      0,      tg100,   tg100, tg100_state, empty_init, "Yamaha", "TG100",      MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME                FLAGS
+CONS( 1991, tg100, 0,      0,      tg100,   tg100, tg100_state, empty_init, "Yamaha", "TG100 Tone Generator", MACHINE_IMPERFECT_SOUND )

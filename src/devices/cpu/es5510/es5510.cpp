@@ -6,7 +6,7 @@
  *   by Christian Brunschen
  *
  *   TODO:
- *      gunlock and clones: Glitch sound after game over once (MT #07861)
+ *      gunlock and clones: Glitch sound after game over once (MT07861)
  *      DRAM Size isn't verified, differs per machines?
  *
  ***************************************************************************************/

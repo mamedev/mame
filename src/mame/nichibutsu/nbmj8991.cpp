@@ -59,6 +59,7 @@ void nbmj8991_state::machine_reset()
 void nbmj8991_state::init_finalbny()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
+	// TODO: why it needs 0-fill the main program, and why ROM_FILL isn't enough?
 	for (int i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
@@ -67,7 +68,7 @@ void nbmj8991_state::init_galkaika()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Patch to IM2 -> IM1
+	// HACK: Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
 #endif
 }
@@ -77,7 +78,7 @@ void nbmj8991_state::init_tokyogal()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Patch to IM2 -> IM1
+	// HACK: Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
 #endif
 }
@@ -87,7 +88,7 @@ void nbmj8991_state::init_tokimbsj()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Patch to IM2 -> IM1
+	// HACK: Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
 #endif
 }

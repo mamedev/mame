@@ -840,7 +840,7 @@ void sigmab98_state::init_gegege()
 //  rom[0x0dec] = 0x00;
 //  rom[0x0ded] = 0x00;
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -870,7 +870,7 @@ void sigmab98_state::init_b3rinsya()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -908,7 +908,7 @@ void sigmab98_state::init_pepsiman()
 //  rom[0xa00e] = 0x00;
 //  rom[0xa00f] = 0x00;
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -940,7 +940,7 @@ void sigmab98_state::init_tbeastw2()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -980,7 +980,7 @@ void sigmab98_state::init_ucytokyu()
 //  rom[0xa43a] = 0x00;
 //  rom[0xa43b] = 0x00;
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -1011,7 +1011,7 @@ void sigmab98_state::init_dashhero()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 

@@ -280,7 +280,7 @@ TIMER_CALLBACK_MEMBER(heath_h17_fdc_device::rx_timer_cb)
 	attotime const win_open  = (half * 3) / 4;
 	attotime const win_close = (half * 5) / 4;
 
-	for (;;)
+	while (true)
 	{
 		attotime const cell_end = m_rx_cell_start + fm_bit_time();
 		attotime const edge     = m_floppy->get_next_transition(m_rx_scan);

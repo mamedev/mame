@@ -31194,7 +31194,7 @@ void cmaster_state::init_crazybonb()
 
 	init_palnibbles();
 
-	// Hack Protection
+	// HACK: protection is not understood
 	rom[0x0123]=0x20; // change call $b00c to call $5a20  / Protection #1
 	rom[0x0124]=0x5a;
 
@@ -31234,6 +31234,7 @@ void cmaster_state::init_crazybonb()
 
 void cd3poker_state::init_3cdp()  // v1.6 & v1.0
 {
+	// HACK: why it needs to initialize PPIs like this?
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x0209] = 0x9b; // ppi0 init
@@ -31966,9 +31967,10 @@ void cmaster_state::init_wcat3a()  // seems ok, but needs checking
 		rom[i] = x;
 	}
 
-	rom[0x00e3] = 0x38; // Enable PSG Sound ChA-ChB-ChC
-	rom[0x0785] = 0xdc; //
-	rom[0x0786] = 0x20; //
+	// HACK: enable PSG Sound ChA-ChB-ChC
+	rom[0x00e3] = 0x38;
+	rom[0x0785] = 0xdc;
+	rom[0x0786] = 0x20;
 }
 
 void cb3_state::init_chrygld()
@@ -31991,9 +31993,9 @@ void cmaster_state::init_cm()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+    // the mixed modes 2-0 are not working properly.
+
 	rom[0x0021] = 0x9b;
 	rom[0x0025] = 0x9b;
 }
@@ -32002,9 +32004,8 @@ void cmaster_state::init_cmv4()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+    // the mixed modes 2-0 are not working properly.
 	rom[0x0209] = 0x9b;
 	rom[0x020d] = 0x9b;
 }
@@ -32041,7 +32042,8 @@ void cmaster_state::init_cmv823()
 		}
 	}
 
-//  forcing PPI mode 0 for all, and A, B & C as input.
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+    // the mixed modes 2-0 are not working properly.
 	rom[0x001f] = 0x9b;
 	rom[0x0023] = 0x9b;
 }
@@ -32078,7 +32080,8 @@ void cmaster_state::init_cmpap()
 		}
 	}
 
-//  forcing PPI mode 0 for all, and A, B & C as input.
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+    // the mixed modes 2-0 are not working properly.
 	rom[0x007a] = 0x9b;
 	rom[0x007e] = 0x9b;
 }
@@ -32258,6 +32261,7 @@ void cmaster_state::init_ll3() // verified with ICE dump
 
 	decrypt_ll3();
 
+	// HACK: what is this patch for?
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
@@ -32269,6 +32273,7 @@ void cmaster_state::init_ll3b() // verified with ICE dump
 
 	decrypt_ll3();
 
+	// HACK: what are these patch for?
 	rom[0x7e] = 0xcd;
 	rom[0x7f] = 0x87;
 	rom[0x80] = 0x6a;
@@ -32302,9 +32307,8 @@ void cmaster_state::init_cmast91()
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+    // the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a92] = 0x9b;
 }
@@ -32313,9 +32317,8 @@ void cmaster_state::init_cll()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+    // the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a9c] = 0x9b;
 }
@@ -32324,11 +32327,13 @@ void wingco_state::init_lucky8a()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what is this patch for?
 	rom[0x0010] = 0x21;
 }
 
-void wingco_state::init_lucky8f()  // TODO: simplify
+void wingco_state::init_lucky8f()
 {
+	// TODO: simplify
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x8000; i++)
@@ -32598,7 +32603,7 @@ void wingco_state::init_lucky8r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// bypass protection
+	// HACK: bypass protection
 	rom[0x4340] = 0x20;
 	rom[0x4364] = 0x08;
 	rom[0x4385] = 0x02;
@@ -32612,7 +32617,7 @@ void wingco_state::init_lucky8s()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// bypass protection
+	// HACK: bypass protection
 	rom[0x4772] = 0x08;
 	rom[0x47a8] = 0x02;
 	rom[0x47db] = 0x20;
@@ -32695,6 +32700,7 @@ void wingco_state::init_mbs2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what is this for?
 	rom[0xd6b1] = 0x97;
 }
 
@@ -33196,14 +33202,14 @@ void cb3_state::init_cb3c()
 		rom[i] = bitswap<8>(rom[i], 1, 0, 6, 4, 7, 5, 3, 2);
 	}
 
-	// skip checksum
+	// HACK: skip checksum
 	rom[0x0004] = 0x00;
 	rom[0x0005] = 0x02;
 	rom[0x0269] = 0xbb;
 	rom[0x026a] = 0x10;
 	rom[0xff02] = 0xc9;
 
-	// skip the 240 games suicide limit
+	// HACK: skip the 240 games suicide limit
 	rom[0x1110] = 0x00;
 	rom[0x1111] = 0x00;
 }
@@ -33262,9 +33268,10 @@ void cb3_state::init_cb3g()
 		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 12, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
-// todo: remove these patches!
 void unkch_state::init_unkch1()
 {
+	// HACK: remove this patch
+
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
@@ -33275,6 +33282,8 @@ void unkch_state::init_unkch1()
 
 void unkch_state::init_unkch3()
 {
+	// HACK: remove this patch
+
 	// game stores $04 at ($D77F) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
@@ -33285,6 +33294,8 @@ void unkch_state::init_unkch3()
 
 void unkch_state::init_unkch4()
 {
+	// HACK: remove this patch
+
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
@@ -33295,7 +33306,7 @@ void unkch_state::init_unkch4()
 
 void cmaster_state::init_tonypok()
 {
-	// the ppi doesn't seem to work properly, so just install the inputs directly
+	// HACK: the ppi doesn't seem to work properly, so just install the inputs directly
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_port(0x04, 0x04, "IN0" );
 	io.install_read_port(0x05, 0x05, "IN1" );
@@ -33314,6 +33325,7 @@ void goldstar_state::init_super9()
 	for (int i = 0; i < 0x8000; i++)
 		src2[i] = bitswap<8>(src2[i], 3, 7, 2, 6, 1, 5, 0, 4);
 
+	// HACK: get rid of this
 /*  Routine to arrange palette is in second half
     Here we try to adapt one for this half of program.
 
@@ -33421,7 +33433,7 @@ void cmaster_state::init_chthree()
 			std::swap(rom[i], rom[addr]);
 	}
 
-	// Temporary hacks - PPI settings and checksum correction
+	// HACK: PPI settings and checksum correction
 	rom[0x1ff] = 0xbd;
 	rom[0x209] = 0x9b;
 	rom[0x20d] = 0x9b;
@@ -33572,7 +33584,7 @@ void wingco_state::init_special7()
 		}
 	}
 
-	// bypassing the serial protection
+	// HACK: bypass the serial protection
 	rom[0x60ac] = 0x00;
 	rom[0x60b7] = 0x00;
 }
@@ -33683,7 +33695,7 @@ void cmaster_state::init_alienatt()
 	for (int a = 0; a < 0xc000; a++)
 		rom[a] = bitswap<8>(rom[a] ^ 0x59, 3, 1, 5, 0, 6, 7, 4, 2);
 
-	// unknown protection - read back needed values
+	// HACK: unknown protection - read back needed values
 	rom[0x9001] = 0x33;
 	rom[0x9002] = 0x54;
 }
@@ -33695,8 +33707,9 @@ void cmaster_state::init_animalhs()
 	for (int a = 0; a < 0xc000; a++)
 		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 2, 3, 0, 1, 6, 7, 4, 5);
 
-	 // Fix Test Mode bad string pointer - (perhaps bad decryption)
-	 // animalhs & animalhsa
+	// HACK: get rid of these patches
+	// Fix Test Mode bad string pointer - (perhaps bad decryption)
+	// animalhs & animalhsa
 	rom[0x5d5d] = 0xeb;
 	rom[0x5d5e] = 0x82;
 
@@ -33769,23 +33782,26 @@ void wingco_state::init_l8tet()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: get rid of these copy protection patches
 	rom[0x120e] = 0x00;   // skip bet protection
-	rom[0x01c9] = 0x68;   // alt mcu protection
-	rom[0x788f] = 0x20;   // alt mcu protection
+	rom[0x01c9] = 0x68;   // alt MCU protection
+	rom[0x788f] = 0x20;   // alt MCU protection
 }
 
 void cmaster_state::init_reelmag()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	rom[0xc803] = 0xbf; // unknown protection device (not rom)
-	rom[0xc80a] = 0x7f; // unknown protection device (not rom)
+	// HACK: unknown protection device (not ROM)
+	rom[0xc803] = 0xbf;
+	rom[0xc80a] = 0x7f;
 }
 
 void cmaster_state::init_rm7b()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what is this for?
 	rom[0x0004] = 0xd3;
 	rom[0x00d3] = 0x21;
 	rom[0x00d4] = 0xe4;
@@ -33798,6 +33814,7 @@ void wingco_state::init_skch()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x3415] = 0xc9;
 	rom[0x45e4] = 0xc9;
 
@@ -33809,6 +33826,7 @@ void wingco_state::init_skcha()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x3434] = 0xc9;
 	rom[0x4608] = 0xc9;
 
@@ -33820,6 +33838,7 @@ void wingco_state::init_skchb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x3415] = 0xc9;
 	rom[0x45ee] = 0xc9;
 
@@ -33831,6 +33850,7 @@ void wingco_state::init_mgln()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x45ec] = 0xc9;
 	rom[0x4637] = 0xc9;
 }
@@ -33839,19 +33859,20 @@ void unkch_state::init_bonch()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x5a60] = 0x77;
 	rom[0x5a67] = 0x77;
 
 	rom[0x5a8c] = 0x77;
 	rom[0x5a93] = 0x77;
 
-	//release hopper pay protection
+	// HACK: release hopper pay protection
 	rom[0x5ab2] = 0x4f;
 	rom[0x5ab3] = 0xd8;
 	rom[0x5ab6] = 0x77;
 	rom[0x5aca] = 0x77;
 
-	// backup data control skip
+	// HACK: backup data control skip
 	rom[0x5e82] = 0xd8; // 1
 	rom[0x5e98] = 0xd8; // 2
 
@@ -33863,6 +33884,7 @@ void unkch_state::init_boncha()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x5a47] = 0x77;
 	rom[0x5a4e] = 0x77;
 	rom[0x5a73] = 0x77;
@@ -33894,7 +33916,7 @@ void unkch_state::init_boncha()
 
 void goldstar_state::init_moonlghtb()
 {
-	// masking the reels
+	// HACK: mask the reels
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0xc780] = 0x00;   // black
@@ -33948,13 +33970,15 @@ void wingco_state::init_cbaai()
 		rom[0xf430 + i] = data2[i];
 	}
 
-	rom[0xf420] = 0xc9;  // disabling the stops bomb
+	// HACK: disabling the stops bomb
+	rom[0xf420] = 0xc9;
 }
 
 void cmaster_state::init_noved()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x5551] = 0xaf;  // avoids link error
+	// HACK: avoids link error
+	rom[0x5551] = 0xaf;
 	rom[0x29ff] = 0x00;
 	rom[0x2b11] = 0x00;
 	rom[0xb98f] = 0x00;
@@ -33978,7 +34002,8 @@ void cmaster_state::init_noved()
 void cmast97_state::init_cm97()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x4d9a] = 0x08;  // fix video register
+	// HACK: fix video register
+	rom[0x4d9a] = 0x08;
 }
 
 

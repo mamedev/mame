@@ -1606,11 +1606,11 @@ ROM_START( tmnt2po )
 ROM_END
 
 
+// TODO: emulate this properly
 // MIA and TMNT have their graphics data (both tiles and sprites) stored in the ROMs in
 // the packed pixel format used by older Konami hardware such as Twin16. The data lines
 // from the ROMs to the custom chips are swapped so that the chips receive the data in
 // the planar format they expect.
-
 static void chunky_to_planar(memory_region *rgn)
 {
 	uint32_t *ROM = reinterpret_cast<uint32_t *>(rgn->base());

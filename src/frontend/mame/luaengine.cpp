@@ -474,7 +474,7 @@ public:
 		auto const found(std::find_if(
 					self.state.state_entries().begin(),
 					self.state.state_entries().end(),
-					[&symbol] (std::unique_ptr<device_state_entry> const &v) { return !std::strcmp(v->symbol(), symbol); }));
+					[&symbol] (std::unique_ptr<device_state_entry> const &v) { return v->symbol() == symbol; }));
 		if (self.state.state_entries().end() != found)
 			return stack::push_reference(L, std::cref(**found));
 		else

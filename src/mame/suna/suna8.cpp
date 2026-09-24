@@ -179,7 +179,7 @@ void suna8_state::init_brickzn()
 {
 	init_brickzn_common();
 
-	// !!!!!! PATCHES !!!!!!
+	// // HACK: patch protection checks
 	// To do: ROM banking should be disabled here
 	m_decrypt[0x11cc] = 0x00; // LD ($C040),A -> NOP
 	m_decrypt[0x11cd] = 0x00; // LD ($C040),A -> NOP
@@ -197,7 +197,7 @@ void suna8_state::init_brickznv5()
 {
 	init_brickzn_common();
 
-	// !!!!!! PATCHES !!!!!!
+	// // HACK: patch protection checks
 	// To do: ROM banking should be disabled here
 	m_decrypt[0x11bb] = 0x00; // LD ($C040),A -> NOP
 	m_decrypt[0x11bc] = 0x00; // LD ($C040),A -> NOP
@@ -215,7 +215,7 @@ void suna8_state::init_brickznv4()
 {
 	init_brickzn_common();
 
-	// !!!!!! PATCHES !!!!!!
+	// // HACK: patch protection checks
 	// To do: ROM banking should be disabled here
 	m_decrypt[0x1190] = 0x00; // LD ($C040),A -> NOP
 	m_decrypt[0x1191] = 0x00; // LD ($C040),A -> NOP
@@ -399,7 +399,7 @@ void suna8_state::init_starfigh()
 	}
 
 
-	// !!!!!! PATCHES !!!!!!
+	// // HACK: patch protection checks
 
 	m_decrypt[0x07c0] = 0xc9; // c080 bit 7 protection check
 
@@ -486,7 +486,7 @@ void suna8_state::init_sparkman()
 			rom[i] = bitswap<8>(rom[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
-	// !!!!!! PATCHES !!!!!!
+	// HACK: get rid of these copy protection patches
 
 	// c083 bit 7 protection
 	m_decrypt[0x0ee0] = 0x00;

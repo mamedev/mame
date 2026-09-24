@@ -35,7 +35,7 @@ sh7604_device::sh7604_device(const machine_config &mconfig, const char *tag, dev
 	: sh2_device(mconfig, SH7604, tag, owner, clock, CPU_TYPE_SH2, address_map_constructor(FUNC(sh7604_device::sh7604_map), this), 32, 0xc7ffffff)
 	, m_test_irq(0), m_internal_irq_vector(0)
 	, m_smr(0), m_brr(0), m_scr(0), m_tdr(0), m_ssr(0)
-	, m_tier(0), m_ftcsr(0), m_frc_tcr(0), m_tocr(0), m_frc(0), m_ocra(0), m_ocrb(0), m_frc_icr(0)
+	, m_tier(0), m_ftcsr(0), m_ftcsr_read_flags(0), m_frc_tcr(0), m_tocr(0), m_frc(0), m_ocra(0), m_ocrb(0), m_frc_icr(0)
 	, m_ipra(0), m_iprb(0), m_vcra(0), m_vcrb(0), m_vcrc(0), m_vcrd(0), m_vcrwdt(0), m_vcrdiv(0), m_intc_icr(0), m_vecmd(false), m_nmie(false)
 	, m_divu_ovf(false), m_divu_ovfie(false), m_dvsr(0), m_dvdntl(0), m_dvdnth(0)
 	, m_wtcnt(0), m_wtcsr(0), m_rstcsr(0)
@@ -101,6 +101,7 @@ void sh7604_device::device_start()
 	// FRT / FRC
 	save_item(NAME(m_tier));
 	save_item(NAME(m_ftcsr));
+	save_item(NAME(m_ftcsr_read_flags));
 	save_item(NAME(m_frc_tcr));
 	save_item(NAME(m_tocr));
 	save_item(NAME(m_frc));
@@ -208,6 +209,49 @@ void sh7604_device::device_reset()
 	m_baral = 0;
 	m_barbh = 0;
 	m_barbl = 0;
+}
+
+// on-chip modules initialized in standby mode (SH7604 hardware manual table 14.3), the
+// INTC, UBC and BSC retain their registers and the DIVU ones are undefined
+// - saturn:madden98u leaves a slave FRT input capture pending on the master when it changes
+//   the system clock (the BIOS enters standby while the SMPC switches the PLL), it would
+//   otherwise dispatch to the slave SH2 that the clock change turned off
+void sh7604_device::standby_init()
+{
+	// FRT
+	sh2_timer_resync();
+	m_tier = 0x01;
+	m_ftcsr = 0;
+	m_ftcsr_read_flags = 0;
+	m_frc = 0;
+	m_ocra = 0xffff;
+	m_ocrb = 0xffff;
+	m_frc_tcr = 0;
+	m_tocr = 0xe0;
+	m_frc_icr = 0;
+	sh2_timer_activate();
+
+	// SCI
+	m_smr = 0;
+	m_brr = 0xff;
+	m_scr = 0;
+	m_tdr = 0xff;
+	m_ssr = 0x84;
+
+	// DMAC channel control and operation registers
+	for (int i = 0; i < 2; i++)
+	{
+		m_dmac[i].chcr = 0;
+		sh2_dmac_check(i);
+	}
+	m_dmaor = 0;
+
+	// WDT overflow flag, timer mode and enable bits, reset control/status
+	m_wtcsr &= 0x1f;
+	m_wdtimer->adjust(attotime::never);
+	m_rstcsr = 0;
+
+	sh2_recalc_irq();
 }
 
 void sh7604_device::sh7604_map(address_map &map)
@@ -321,6 +365,10 @@ void sh7604_device::sh7604_map(address_map &map)
 void sh7604_device::sh2_exception(const char *message, int irqline)
 {
 	int vector;
+
+	// leaving standby mode (SLEEP with SBYCR.SBY set)
+	if (irqline == 16 && m_sh2_state->sleep_mode == 1 && BIT(m_sbycr, 7))
+		standby_init();
 
 	if (irqline != 16)
 	{
@@ -902,16 +950,22 @@ uint8_t sh7604_device::ftcsr_r()
 	if (!m_ftcsr_read_cb.isnull())
 		m_ftcsr_read_cb((((m_tier << 24) | (m_ftcsr << 16)) & 0xffff0000) | m_frc);
 
+	// a status flag can only be cleared after it has been read as 1
+	if (!machine().side_effects_disabled())
+		m_ftcsr_read_flags = m_ftcsr & (ICF | OCFA | OCFB | OVF);
+
 	return m_ftcsr;
 }
 
 void sh7604_device::ftcsr_w(uint8_t data)
 {
-	uint8_t old = m_ftcsr;
+	// writing 0 clears a status flag only if it was read as 1 beforehand
+	// (saturn:doom slave does a word write to TIER/FTCSR, then polls ICF)
+	const uint8_t clear = m_ftcsr_read_flags & ~data;
+	m_ftcsr_read_flags &= ~clear;
 
-	m_ftcsr = data;
 	sh2_timer_resync();
-	m_ftcsr = (m_ftcsr & ~(ICF | OCFA | OCFB | OVF)) | (old & m_ftcsr & (ICF | OCFA | OCFB | OVF));
+	m_ftcsr = (m_ftcsr & ~clear & (ICF | OCFA | OCFB | OVF)) | (data & ~(ICF | OCFA | OCFB | OVF));
 	sh2_timer_activate();
 	sh2_recalc_irq();
 }

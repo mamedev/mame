@@ -846,13 +846,13 @@ void ppc_device::device_start()
 	state_add(PPC_DEC,   "DEC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
 	for (int regnum = 0; regnum < 16; regnum++)
-		state_add(PPC_SR0 + regnum, string_format("SR%d", regnum).c_str(), m_core->sr[regnum]).formatstr("%08X");
+		state_add(PPC_SR0 + regnum, string_format("SR%d", regnum), m_core->sr[regnum]).formatstr("%08X");
 
 	for (int regnum = 0; regnum < 32; regnum++)
-		state_add(PPC_R0 + regnum, string_format("R%d", regnum).c_str(), m_core->r[regnum]).formatstr("%08X");
+		state_add(PPC_R0 + regnum, string_format("R%d", regnum), m_core->r[regnum]).formatstr("%08X");
 
 	for (int regnum = 0; regnum < 32; regnum++)
-		state_add(PPC_F0 + regnum, string_format("F%d", regnum).c_str(), m_core->f[regnum]).formatstr("%12s");
+		state_add(PPC_F0 + regnum, string_format("F%d", regnum), m_core->f[regnum]).formatstr("%12s");
 	state_add(PPC_FPSCR, "FPSCR", m_core->fpscr).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_core->pc).noshow();

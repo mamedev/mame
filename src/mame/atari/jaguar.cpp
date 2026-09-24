@@ -381,6 +381,9 @@ void cojag_devices(device_slot_interface &device)
 
 void jaguar_state::machine_start()
 {
+	save_item(NAME(m_risc_read_latch));
+	save_item(NAME(m_risc_write_latch));
+
 	/* configure banks for gfx/sound ROMs */
 	if (m_romboard_region != nullptr)
 	{
@@ -1008,14 +1011,43 @@ void jaguar_state::area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_
 // surely these should be 16-bit natively if the standard Jaguar is driven by a plain 68k?
 // all these trampolines are not good for performance ;-)
 
-uint16_t jaguar_state::gpuctrl_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return gpuctrl_r(offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(offset>>1, mem_mask); } }
-void jaguar_state::gpuctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpuctrl_w(offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(offset>>1, data, mem_mask); } }
+// External 16-bit accesses to GPU/DSP local space are paired by the bus
+// interface (Jaguar Software Reference Manual v2.4, "External View of GPU
+// Space"). The first read captures both halves; the second write commits both.
+// In particular, a RISC must never see half of a 68000 command pointer.
+template <unsigned Which>
+u16 jaguar_state::risc_host_r(offs_t offset)
+{
+	address_space &space = Which ? m_dsp->space(AS_PROGRAM) : m_gpu->space(AS_PROGRAM);
+	const offs_t address = (Which ? 0xf1a000 : 0xf02000) + ((offset & ~1) << 1);
+	if (machine().side_effects_disabled())
+		return space.read_dword(address) >> (BIT(offset, 0) ? 0 : 16);
+
+	if (!BIT(offset, 0))
+	{
+		m_risc_read_latch[Which] = space.read_dword(address);
+		return m_risc_read_latch[Which] >> 16;
+	}
+	return m_risc_read_latch[Which];
+}
+
+template <unsigned Which>
+void jaguar_state::risc_host_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (!BIT(offset, 0))
+	{
+		COMBINE_DATA(&m_risc_write_latch[Which]);
+	}
+	else
+	{
+		address_space &space = Which ? m_dsp->space(AS_PROGRAM) : m_gpu->space(AS_PROGRAM);
+		const offs_t address = (Which ? 0xf1a000 : 0xf02000) + ((offset & ~1) << 1);
+		space.write_dword(address, (u32(m_risc_write_latch[Which]) << 16) | data, 0xffff0000 | mem_mask);
+	}
+}
+
 uint16_t jaguar_state::blitter_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return blitter_r(offset>>1, mem_mask<<16) >> 16;  } else { return blitter_r(offset>>1, mem_mask); } }
 void jaguar_state::blitter_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { blitter_w(offset>>1, data << 16, mem_mask << 16); } else { blitter_w(offset>>1, data, mem_mask); } }
-uint16_t jaguar_state::serial_r16(offs_t offset){ if (!(offset&1)) { return serial_r(offset>>1) >> 16;  } else { return serial_r(offset>>1); } }
-void jaguar_state::serial_w16(offs_t offset, uint16_t data){ if (!(offset&1)) { serial_w(offset>>1, data << 16); } else { serial_w(offset>>1, data); } }
-uint16_t jaguar_state::dspctrl_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return dspctrl_r(offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(offset>>1, mem_mask); } }
-void jaguar_state::dspctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dspctrl_w(offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(offset>>1, data, mem_mask); } }
 uint16_t jaguar_state::joystick_r16(offs_t offset){ if (!(offset&1)) { return joystick_r() >> 16;  } else { return joystick_r(); } }
 void jaguar_state::joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { joystick_w(offset>>1, data << 16, mem_mask << 16); } else { joystick_w(offset>>1, data, mem_mask); } }
 
@@ -1024,10 +1056,8 @@ void jaguar_state::shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 // TODO: as below?
 uint32_t jaguar_state::rom_base_r(offs_t offset){ return m_rom_base[offset*2+1] << 16 | m_rom_base[offset*2]; }
 // NOTE: BIOS ATARI SFX notes at startup depends on the correct endianness of this
-// - also cfr. several games (rayman, superx3d, ironsold)
+// - also cfr. several games (rayman, superx3d, ironsold, speedst2 engine sound)
 uint32_t jaguar_state::wave_rom_r(offs_t offset){ return m_wave_rom[offset*2+1] | m_wave_rom[offset*2] << 16; }
-uint32_t jaguar_state::dsp_ram_r(offs_t offset){ return m_dsp_ram[offset]; }
-void jaguar_state::dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_dsp_ram[offset]); }
 uint32_t jaguar_state::gpu_clut_r(offs_t offset){ return m_gpu_clut[offset]; }
 void jaguar_state::gpu_clut_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_gpu_clut[offset]); }
 uint32_t jaguar_state::gpu_ram_r(offs_t offset){ return m_gpu_ram[offset]; }
@@ -1036,8 +1066,6 @@ void jaguar_state::gpu_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ C
 uint16_t jaguar_state::shared_ram_r16(offs_t offset){ if (!(offset&1)) { return shared_ram_r(offset>>1) >> 16;  } else { return shared_ram_r(offset>>1); } }
 void jaguar_state::shared_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { shared_ram_w(offset>>1, data << 16, mem_mask << 16); } else { shared_ram_w(offset>>1, data, mem_mask); } }
 uint16_t jaguar_state::cart_base_r16(offs_t offset){ if (!(offset&1)) { return m_cart_base[offset>>1] >> 16;  } else { return m_cart_base[offset>>1] & 0xffff; } }
-uint16_t jaguar_state::dsp_ram_r16(offs_t offset){ if (!(offset&1)) { return dsp_ram_r(offset>>1) >> 16;  } else { return dsp_ram_r(offset>>1); } }
-void jaguar_state::dsp_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dsp_ram_w(offset>>1, data << 16, mem_mask << 16); } else { dsp_ram_w(offset>>1, data, mem_mask); } }
 uint16_t jaguar_state::gpu_clut_r16(offs_t offset){ if (!(offset&1)) { return gpu_clut_r(offset>>1) >> 16;  } else { return gpu_clut_r(offset>>1); } }
 void jaguar_state::gpu_clut_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpu_clut_w(offset>>1, data << 16, mem_mask << 16); } else { gpu_clut_w(offset>>1, data, mem_mask); } }
 uint16_t jaguar_state::gpu_ram_r16(offs_t offset){ if (!(offset&1)) { return gpu_ram_r(offset>>1) >> 16;  } else { return gpu_ram_r(offset>>1); } }
@@ -1050,9 +1078,9 @@ void jaguar_state::console_base_map(address_map &map)
 	// Tom section
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
 	map(0xf00400, 0xf005ff).mirror(0x000200).rw(FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
-	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
-	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
-	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
+	map(0xf02000, 0xf07fff).rw(FUNC(jaguar_state::risc_host_r<0>), FUNC(jaguar_state::risc_host_w<0>));
+	map(0xf0a200, 0xf0a2ff).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
+	map(0xf0b000, 0xf0bfff).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
 	// Jerry section
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
 	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
@@ -1095,10 +1123,7 @@ void jaguar_state::console_base_map(address_map &map)
 	// map(0xf17800, 0xf17bff)
 	// GPI05 "Paddle Interface"
 	// map(0xf17c00, 0xf17fff)
-	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
-	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
-	map(0xf1b000, 0xf1cfff).rw(FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
-	map(0xf1d000, 0xf1dfff).rom().region("waverom", 0);
+	map(0xf1a000, 0xf1efff).rw(FUNC(jaguar_state::risc_host_r<1>), FUNC(jaguar_state::risc_host_w<1>));
 }
 
 void jaguar_state::jaguar_map(address_map &map)
@@ -1879,6 +1904,9 @@ void jaguar_state::jaguar(machine_config &config)
 	video_config(config, JAGUAR_CLOCK);
 	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_dsp_map);
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::jag_gpu_dsp_map);
+	// The 68000 polls GPU/DSP mailboxes in local RAM. Let the RISCs observe
+	// commands before the host can mistake an old completion flag for a reply.
+	config.set_perfect_quantum(m_maincpu);
 
 //  MCFG_NVRAM_HANDLER(jaguar)
 
@@ -2674,10 +2702,10 @@ void jaguar_state::init_vcircle()
  *************************************/
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME */
-CONS( 1993, jaguar,     0,        0,      jaguar,   jaguar,   jaguar_state,   init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 1995, jaguarcd,   jaguar,   0,      jaguarcd, jaguar,   jaguarcd_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1993, jaguar,     0,        0,      jaguar,   jaguar,   jaguar_state,   init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, jaguarcd,   jaguar,   0,      jaguarcd, jaguar,   jaguarcd_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // MUP: cfr. cd_bios_r, should be IMPERFECT_PROTECTION
 
-/*    YEAR  NAME        PARENT    MACHINE       INPUT     CLASS         INIT            ROT   COMPANY        FULLNAME */
+
 GAME( 1996, area51,     0,        cojagr3k,     area51,   jaguar_state, init_area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
 GAME( 1995, area51ta,   area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )

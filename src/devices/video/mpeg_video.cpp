@@ -430,7 +430,7 @@ mpeg_video::mpeg_video(int maximum_width, int maximum_height) :
 	clear();
 }
 
-void mpeg_video::clear()
+void mpeg_video::reset_input()
 {
 	std::fill(std::begin(m_input_buffer), std::end(m_input_buffer), 0);
 	m_input_bytes = 0;
@@ -443,6 +443,15 @@ void mpeg_video::clear()
 	m_address_increment = 0;
 	m_input = {};
 	m_consumed = 0;
+	m_picture_ends_sequence = false;
+	m_sequence_header_seen = false;
+	m_group_seen = false;
+	m_macroblock_address = -1;
+}
+
+void mpeg_video::clear()
+{
+	reset_input();
 	m_horizontal_size = 0;
 	m_vertical_size = 0;
 	m_mb_width = 0;
@@ -450,6 +459,8 @@ void mpeg_video::clear()
 	m_luma_pitch = 0;
 	m_chroma_pitch = 0;
 	m_frame_rate = 0.0;
+	m_picture_rate_code = 0;
+	m_time_code = 0;
 	std::copy(
 			std::begin(s_default_intra_quantizer_matrix),
 			std::end(s_default_intra_quantizer_matrix),
@@ -457,13 +468,13 @@ void mpeg_video::clear()
 	std::fill(std::begin(m_non_intra_quantizer_matrix), std::end(m_non_intra_quantizer_matrix), 16);
 	m_picture_coding_type = 0;
 	m_temporal_reference = 0;
-	m_picture_ends_sequence = false;
+	m_picture_follows_sequence_header = false;
+	m_picture_follows_group = false;
 	m_full_pel_forward_vector = false;
 	m_full_pel_backward_vector = false;
 	m_forward_f = 0;
 	m_backward_f = 0;
 	m_quantizer_scale = 0;
-	m_macroblock_address = -1;
 	reset_dc_predictors();
 	m_forward_horizontal_previous = 0;
 	m_forward_vertical_previous = 0;
@@ -497,11 +508,17 @@ void mpeg_video::register_save_state(device_t &device, int index)
 	device.save_item(m_luma_pitch, "mpeg_video_luma_pitch", index);
 	device.save_item(m_chroma_pitch, "mpeg_video_chroma_pitch", index);
 	device.save_item(m_frame_rate, "mpeg_video_frame_rate", index);
+	device.save_item(m_picture_rate_code, "mpeg_video_picture_rate_code", index);
+	device.save_item(m_time_code, "mpeg_video_time_code", index);
+	device.save_item(m_sequence_header_seen, "mpeg_video_sequence_header_seen", index);
+	device.save_item(m_group_seen, "mpeg_video_group_seen", index);
 	device.save_item(m_intra_quantizer_matrix, "mpeg_video_intra_quantizer_matrix", index);
 	device.save_item(m_non_intra_quantizer_matrix, "mpeg_video_non_intra_quantizer_matrix", index);
 	device.save_item(m_picture_coding_type, "mpeg_video_picture_coding_type", index);
 	device.save_item(m_temporal_reference, "mpeg_video_temporal_reference", index);
 	device.save_item(m_picture_ends_sequence, "mpeg_video_picture_ends_sequence", index);
+	device.save_item(m_picture_follows_sequence_header, "mpeg_video_picture_follows_sequence_header", index);
+	device.save_item(m_picture_follows_group, "mpeg_video_picture_follows_group", index);
 	device.save_item(m_full_pel_forward_vector, "mpeg_video_full_pel_forward_vector", index);
 	device.save_item(m_full_pel_backward_vector, "mpeg_video_full_pel_backward_vector", index);
 	device.save_item(m_forward_f, "mpeg_video_forward_f", index);
@@ -653,19 +670,30 @@ mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::siz
 
 			case MACROBLOCK_ADDRESS:
 				// Consume stuffing and escapes separately, so even long runs do not
-				// require unbounded input retention or replay.
-				if (peek(11) == 0x00f)
+				// require unbounded input retention or replay.  Both start with
+				// 0000 0001, and a set bit before that rules them out without
+				// waiting for all 11 bits: the last macroblock of a stream can be
+				// shorter.
 				{
-					gb(11);
-					break;
-				}
-				if (peek(11) == 0x008)
-				{
-					gb(11);
-					m_address_increment += 33;
-					if ((m_macroblock_address + m_address_increment) >= (m_mb_width * m_mb_height))
-						throw invalid_stream();
-					break;
+					const int bits = std::min(available_bits(), 8);
+					if ((bits < 8) && !(bits && peek(bits)))
+						throw limit_hit();
+					if ((bits == 8) && (peek(8) == 0x01))
+					{
+						if (peek(11) == 0x00f)
+						{
+							gb(11);
+							break;
+						}
+						if (peek(11) == 0x008)
+						{
+							gb(11);
+							m_address_increment += 33;
+							if ((m_macroblock_address + m_address_increment) >= (m_mb_width * m_mb_height))
+								throw invalid_stream();
+							break;
+						}
+					}
 				}
 				{
 					const int address = m_macroblock_address + m_address_increment + macroblock_address_increment();
@@ -689,7 +717,21 @@ mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::siz
 				break;
 
 			case MACROBLOCK_END:
-				m_phase = (peek(23) == 0) ? SCAN : MACROBLOCK_ADDRESS;
+				// Nothing follows the last macroblock of a picture.  Otherwise a
+				// start code prefix ends the slice, and any set bit rules one out
+				// before all of its 23 bits have arrived.
+				if (m_macroblock_address == (m_mb_width * m_mb_height - 1))
+					m_phase = SCAN;
+				else
+				{
+					const int bits = std::min(available_bits(), 23);
+					if (bits && peek(bits))
+						m_phase = MACROBLOCK_ADDRESS;
+					else if (bits < 23)
+						throw limit_hit();
+					else
+						m_phase = SCAN;
+				}
 				break;
 			}
 			discard_consumed_bytes();
@@ -711,6 +753,30 @@ mpeg_video::decode_result mpeg_video::decode(std::span<const u8> input, std::siz
 			return finish(decode_result::INVALID_DATA);
 		}
 	}
+}
+
+mpeg_video::decode_result mpeg_video::complete_picture(const picture_buffers &buffers, int &width, int &height, double &frame_rate)
+{
+	if (!m_in_picture || !m_have_slice || (m_phase != SCAN) || (m_macroblock_address != (m_mb_width * m_mb_height - 1)))
+		return decode_result::NEED_DATA;
+
+	try
+	{
+		write_frame(m_current_frame, buffers.reconstructed.data, buffers.reconstructed.bytes);
+	}
+	catch (invalid_stream const &)
+	{
+		m_in_picture = false;
+		m_have_slice = false;
+		m_phase = RECOVER;
+		return decode_result::INVALID_DATA;
+	}
+	m_in_picture = false;
+	m_picture_ends_sequence = false;
+	width = m_horizontal_size;
+	height = m_vertical_size;
+	frame_rate = m_frame_rate;
+	return decode_result::PICTURE;
 }
 
 void mpeg_video::sequence_header()
@@ -772,6 +838,8 @@ void mpeg_video::sequence_header()
 	m_horizontal_size = horizontal_size;
 	m_vertical_size = vertical_size;
 	m_frame_rate = s_picture_rates[picture_rate];
+	m_picture_rate_code = picture_rate;
+	m_sequence_header_seen = true;
 	m_mb_width = (m_horizontal_size + 15) / 16;
 	m_mb_height = (m_vertical_size + 15) / 16;
 	m_luma_pitch = m_mb_width * 16;
@@ -782,6 +850,7 @@ void mpeg_video::sequence_header()
 
 void mpeg_video::group_of_pictures()
 {
+	const u32 time_code = peek(25);
 	gb(1); // drop frame flag
 	const unsigned hours = gb(5);
 	const unsigned minutes = gb(6);
@@ -793,6 +862,9 @@ void mpeg_video::group_of_pictures()
 		throw invalid_stream();
 	gb(1); // closed GOP
 	gb(1); // broken link
+
+	m_time_code = time_code;
+	m_group_seen = true;
 }
 
 void mpeg_video::picture_header()
@@ -830,6 +902,10 @@ void mpeg_video::picture_header()
 	m_picture_coding_type = picture_coding_type;
 	m_temporal_reference = temporal_reference;
 	m_picture_ends_sequence = false;
+	m_picture_follows_sequence_header = m_sequence_header_seen;
+	m_picture_follows_group = m_group_seen;
+	m_sequence_header_seen = false;
+	m_group_seen = false;
 	m_full_pel_forward_vector = full_pel_forward_vector;
 	m_full_pel_backward_vector = full_pel_backward_vector;
 	m_forward_f = forward_f;

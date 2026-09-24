@@ -113,4 +113,4 @@ CONS( 2007, jsc_gdg,   0,        0, base_config_pal, jak_sharp, jakks_sharp_stat
 
 CONS( 2007, jsc_dora,  0,        0, base_config_pal, jak_sharp, jakks_sharp_state, empty_init, "JAKKS Pacific, Inc. / Child Guidance / Handheld Games", "Dora the Explorer: Dora Saves the Mermaids (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2007, jsc_sdoo,  0,        0, base_config_pal, jak_sharp, jakks_sharp_state, empty_init, "JAKKS Pacific, Inc. / Child Guidance / Handheld Games", "Scooby-Doo! and The Pirate's Puzzles (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, jsc_sdoo,  0,        0, base_config_pal, jak_sharp, jakks_sharp_state, empty_init, "JAKKS Pacific, Inc. / Child Guidance / Handheld Games", "Scooby-Doo! and the Pirate's Puzzles (Sharp Cookie) (PAL, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

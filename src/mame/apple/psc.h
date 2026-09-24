@@ -8,6 +8,7 @@
 
 #include "cpu/m68000/m68040.h"
 #include "machine/6522via.h"
+#include "machine/am79c940.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr53c90.h"
 #include "sound/dac.h"
@@ -22,6 +23,7 @@ public:
 
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 	void set_scsi_device(ncr53c94_device *device) { m_ncr = device; }
+	template <typename T> void set_mace_tag(T &&tag) { m_mace.set_tag(std::forward<T>(tag)); }
 
 	// interface routines
 	auto write_cb1() { return m_cb1.bind(); }   // ADB clock
@@ -52,11 +54,15 @@ public:
 	void via_sync();
 
 	void scsi_drq_w(int state);
+	void enet_irq_w(int state);
+	void enet_tx_drq_w(int state);
+	void enet_rx_drq_w(int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual uint8_t via_in_b();
@@ -83,12 +89,12 @@ private:
 
 	u16 dma_ctrl_r(offs_t offset);
 	void dma_ctrl_w(offs_t offset, u16 data);
-	template <int channel, int set> u16 dma_addr_r();
-	template <int channel, int set> void dma_addr_w(offs_t offset, u32 data);
-	template <int channel, int set> u32 dma_cnt_r(offs_t offset);
-	template <int channel, int set> void dma_cnt_w(offs_t offset, u32 data);
-	template <int channel, int set> u16 dma_cmdstat_r(offs_t offset);
-	template <int channel, int set> void dma_cmdstat_w(offs_t offset, u16 data);
+	u32 dma_set_r(offs_t offset);
+	void dma_set_w(offs_t offset, u32 data, u32 mem_mask);
+	void enet_dma_kick();
+	bool enet_dma_ready(int channel) const;
+	void enet_dma_complete(int channel);
+	TIMER_CALLBACK_MEMBER(enet_dma_tick);
 	void recalc_dma_irqs();
 	void recalc_lv3();
 	void recalc_lv4();
@@ -129,6 +135,11 @@ private:
 	u32 m_dma_cnt[7][2];
 	u16 m_dma_cmdstat[7][2];
 	u32 m_dma_irqstat;
+	optional_device<am79c940_device> m_mace;
+	emu_timer *m_enet_timer;
+	bool m_enet_tx_drq, m_enet_rx_drq;
+	u16 m_enet_rx_offset;
+	u8 m_enet_rx_status;
 
 	required_address_space m_space;
 	ncr53c94_device *m_ncr;

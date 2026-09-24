@@ -46,14 +46,16 @@ public:
 		, m_pb(*this, "pb%u", 0U)
 	{}
 
-	void mc10_base(machine_config &config);
-	void mc10_video(machine_config &config);
-	void mc10(machine_config &config);
-	void alice(machine_config &config);
+	void mc10(machine_config &config) ATTR_COLD;
+	void alice(machine_config &config) ATTR_COLD;
+
 	void mc10_bfff_w_dac(uint8_t data);
 	uint8_t mc10_bfff_r();
 
 protected:
+	void mc10_base(machine_config &config) ATTR_COLD;
+	void mc10_video(machine_config &config) ATTR_COLD;
+
 	void mc10_bfff_w(uint8_t data);
 
 	uint8_t mc10_port1_r();
@@ -63,9 +65,8 @@ protected:
 
 	uint8_t mc6847_videoram_r(offs_t offset);
 
-	// device-level overrides
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -102,8 +103,7 @@ public:
 	uint8_t alice90_bfff_r();
 
 protected:
-	// device-level overrides
-	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 	required_device<ef9345_device> m_ef9345;
@@ -236,12 +236,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(alice32_state::alice32_scanline)
     DRIVER INIT
 ***************************************************************************/
 
-void mc10_state::driver_reset()
+void mc10_state::machine_reset()
 {
 	m_keyboard_strobe = 0x00;
 }
 
-void mc10_state::driver_start()
+void mc10_state::machine_start()
 {
 	save_item(NAME(m_keyboard_strobe));
 
@@ -255,7 +255,7 @@ void mc10_state::driver_start()
 	space.install_ram(0x4000, 0x4000+ram_size-1, m_ram->pointer());
 }
 
-void alice32_state::driver_start()
+void alice32_state::machine_start()
 {
 	save_item(NAME(m_keyboard_strobe));
 
@@ -271,14 +271,14 @@ void alice32_state::driver_start()
 
 void mc10_state::mc10_mem(address_map &map)
 {
-	// mc10 / alice: RAM start at 0x4000, installed in driver_start
+	// mc10 / alice: RAM start at 0x4000, installed in machine_start
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 }
 
 void alice32_state::alice32_mem(address_map &map)
 {
-	// alice32: RAM start at 0x3000, installed in driver_start
+	// alice32: RAM start at 0x3000, installed in machine_start
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(alice32_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
@@ -286,7 +286,7 @@ void alice32_state::alice32_mem(address_map &map)
 
 void alice32_state::alice90_mem(address_map &map)
 {
-	// alice90: RAM start at 0x3000, installed in driver_start
+	// alice90: RAM start at 0x3000, installed in machine_start
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
 	map(0xbfff, 0xbfff).rw(FUNC(alice32_state::alice90_bfff_r), FUNC(alice32_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);

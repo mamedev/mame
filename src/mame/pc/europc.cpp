@@ -316,10 +316,9 @@ void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
 
-	/*
-	  fix century rom bios bug !
-	  if year <79 month (and not CENTURY) is loaded with 0x20
-	*/
+	// HACK: fix century rom bios bug
+    // if year <79 month (and not CENTURY) is loaded with 0x20
+	// (should probably be handled by RTC init in some way ...)
 	if (rom[0xf93e]==0xb6){ // mov dh,
 		rom[0xf93e]=0xb5; // mov ch,
 		uint8_t a = 0;

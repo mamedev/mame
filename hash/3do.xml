@@ -54,7 +54,7 @@ Picture cards looks an use case of backface culling (verify, they flip text rath
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
 [Madam] requires ACW/ACCW region fills in gameplay
-PIXC doesn't fill selected item in inventory screen, Projector doesn't fill HP/MP bars
+[Madam] Projector rectangle fill for inventory screen and HP/MP bars (fixed)
 Not extensively tested, particularly with alt seeds
 ]]></notes>
 		<info name="alt_title" value="Slayer"/>
@@ -106,8 +106,8 @@ May run too fast?
 		<year>1996</year>
 		<publisher>LG Electronics</publisher>
 		<notes><![CDATA[
-[Madam] no cursor on character select, no HP bars drawn
-Seems to run too fast
+[Madam] Projector rectangle fill cursor on character screen and HP bars (fixed, mostly)
+Seems to run too fast, Mission Failed screen gets dismissed in less than a second
 ]]></notes>
 		<info name="alt_title" value="배틀 블루스"/>
 		<!-- a.k.a. Shin's Deco -->
@@ -150,7 +150,8 @@ Not extensively tested
 		<year>1995</year>
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
-[Sport] doesn't color fill on Taito logo and intro
+[Madam] Projector rectangle fill for startup screens (white for Taito logo) (fixed)
+Taito text logo blinks rather than be fading-in/-out
 [Madam] Sensitive to CEL timings
 ]]></notes>
 		<info name="barcode" value="0 37988 83036 7"/>
@@ -229,6 +230,7 @@ IntelliPlay logo at startup seems to need a transparency pen (btanb)
 		<notes><![CDATA[
 [Madam] requires ACW/ACCW region fills in gameplay, ducks colors too much in tunnels
 Has PIXC uses here and there
+Doesn't clip objects in rear mirror
 [DSPP] noisy scratches during gameplay (retest me)
 Not extensively tested
 ]]></notes>
@@ -248,7 +250,7 @@ Not extensively tested
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-[Sport] doesn't clear FB layer on FMV playback after beating a stage (verify if ASCALL used)
+[Madam] Projector rectangle fill for FMV playback after beating a stage (fixed)
 [Madam] occasional use of stretchy ACW/ACCW CELs (enemy grenades)
 Eventually requires optional [Player] mouse and lightgun
 Not extensively tested
@@ -333,7 +335,6 @@ May run too fast
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
 [Madam] extensive PIXC output with useav
-Text doesn't cut off completely, 1bpp packed?
 Requires ACW/ACCW region fills in places
 ]]></notes>
 		<!-- Korean alt title: FIFA Chuggu / 피파　축구 -->
@@ -463,7 +464,7 @@ Optional [Player] mouse support
 		<year>1995</year>
 		<publisher>Panasonic</publisher>
 		<notes><![CDATA[
-[Madam] enables ASCALL at startup, verify initial Micro Cabin animation
+[Madam] enables ASCALL at startup mixed with Projector rectangle fills, should progressively line mask Micro Cabin logo at startup
 Dialog boxes draws with transparent backgrounds
 Not extensively tested
 ]]></notes>
@@ -487,7 +488,7 @@ Not extensively tested
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-[Madam] doesn't draw background box in Subtitles select screen, CEL stretch
+[Madam] doesn't draw background box in Subtitles select screen, Projector region fill (fixed)
 [Madam] requires blending for score display in gameplay (currently full white)
 Not extensively tested (check name entry in particular)
 ]]></notes>
@@ -630,8 +631,8 @@ Stage 2-1 needs better PIXC blending (uses CELs rather than FMV)
 		<year>1995</year>
 		<publisher>Prolific</publisher>
 		<notes><![CDATA[
-[Sport] doesn't clear main menu graphics when entering gameplay
-[Madam] dots in main menu, has PIXC samples in gameplay, doesn't entirely mask radar
+[Madam] doesn't clear main menu graphics when entering gameplay, doesn't entirely mask radar (fixed, mostly)
+[Madam] dots in main menu, has PIXC samples in gameplay
 Requires ACW/ACCW region fills particularly for zoomed in cameras
 Not extensively tested
 ]]></notes>
@@ -658,8 +659,7 @@ Not extensively tested
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-[Madam] CEL packed corruptions in Hall of Fame screens
-Assume needing ACW/ACCW region fills in gameplay
+[Madam] Needs ACW/ACCW region fills in gameplay
 ]]></notes>
 		<info name="barcode" value="0 14633 07355 3"/>
 		<info name="developer" value="Electronic Arts Canada"/>
@@ -722,7 +722,8 @@ Not extensively tested
 		<year>1994</year>
 		<publisher>MicroProse</publisher>
 		<notes><![CDATA[
-[Madam] musical analysis draws with wrong FB base
+[Madam] musical analysis requires Projector region fills at least (fixed, mostly)
+Still missing music note lines
 Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 19703 38116 3"/>
@@ -759,7 +760,8 @@ Enables ASCALL at startup
 		<year>1994</year>
 		<publisher>The 3DO Company</publisher>
 		<notes><![CDATA[
-[Madam] Title screen options (B button) and pause menu requires Projector for cursor
+[Madam] Title screen options (B button) and pause menu requires Projector region fills for cursor (fixed)
+Pause menu has ACW/ACCW bug with the background rotating ball, verify PIXC blending
 ]]></notes>
 		<!-- 7 90561 02500 9 for other pressings (same content?) -->
 		<info name="barcode" value="7 90561 00942 9"/>
@@ -804,7 +806,7 @@ Enables ASCALL at startup
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
 [Madam] Sensitive to CEL timings
-Should mask initial 3do logo by using an unpacked CEL in bpp=0 hdx=320 vdy=240
+[Madam] Projector rectangle fill for initial 3do logo (fixed)
 Eventually requires support for [Player] Capcom fighting pad
 ]]></notes>
 		<info name="alt_title" value="スーパーストリートファイターIIX"/>
@@ -899,7 +901,7 @@ Not extensively tested
 		<publisher>Data East</publisher>
 		<notes><![CDATA[
 [Madam] Requires ACW/ACCW region fills
-HP bar doesn't decrease when getting hit (should black fill, presumably CEL)
+Projector rectangle fills for HP bar when getting hit (subtractive single color) (fixed)
 Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 13252 01900 3"/>
@@ -957,7 +959,8 @@ Eventually has optional [Player] lightgun and maybe mouse support
 		<year>1995</year>
 		<publisher>Interplay</publisher>
 		<notes><![CDATA[
-[Madam] needs stretched CEL, never color fills floor and roof in gameplay
+[Madam] Projector rectangle fills for selections in main menu, floor and roof in gameplay (fixed)
+Near textures requires ACW/ACCW fills
 Not extensively tested
 ]]></notes>
 		<info name="barcode" value="0 40421 29247 9"/>

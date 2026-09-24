@@ -487,6 +487,6 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2000, mu500,  0,     0, mu500,  mu500, mu500_state,  empty_init, "Yamaha", "MU500",  MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
-CONS( 1999, mu1000, mu500, 0, mu1000, mu500, mu1000_state, empty_init, "Yamaha", "MU1000", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
-CONS( 1999, mu2000, mu500, 0, mu2000, mu500, mu2000_state, empty_init, "Yamaha", "MU2000", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+CONS( 2000, mu500,  0,     0, mu500,  mu500, mu500_state,  empty_init, "Yamaha", "MU500 Tone Generator",  MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+CONS( 1999, mu1000, mu500, 0, mu1000, mu500, mu1000_state, empty_init, "Yamaha", "MU1000 Tone Generator", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+CONS( 1999, mu2000, mu500, 0, mu2000, mu500, mu2000_state, empty_init, "Yamaha", "MU2000 Tone Generator", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

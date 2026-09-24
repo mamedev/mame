@@ -505,6 +505,13 @@ void drivedge_state::machine_start()
 #if LOG_DRIVEDGE_UNINIT_RAM
 	save_item(NAME(m_written));
 #endif
+
+	init_program_rom();
+	m_vram_height = 1024;
+	m_planes = 1;
+
+	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
+	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
 }
 
 void drivedge_state::machine_reset()
@@ -4925,17 +4932,6 @@ void itech32_state::init_bloodstm()
 }
 
 
-void drivedge_state::driver_start()
-{
-	init_program_rom();
-	m_vram_height = 1024;
-	m_planes = 1;
-
-	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
-	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
-}
-
-
 void itech32_state::init_wcbowl()
 {
 	/*
@@ -5071,8 +5067,10 @@ void itech32_state::init_gt3d()
 }
 
 
-void shoottv_state::driver_start()
+void shoottv_state::machine_start()
 {
+	itech32_state::machine_start();
+
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 2;

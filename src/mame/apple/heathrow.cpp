@@ -334,7 +334,7 @@ grandcentral_device::grandcentral_device(const machine_config &mconfig, const ch
 	m_dma_scsi1(*this, "dma_scsi1"),
 	m_dma_enet_tx(*this, "dma_enet_tx"),
 	m_dma_enet_rx(*this, "dma_enet_rx"),
-//  m_mace(*this, finder_base::DUMMY_TAG),
+	m_mace(*this, finder_base::DUMMY_TAG),
 	read_enet(*this, 0xff),
 	read_enet_prom(*this, 0xff),
 	write_enet(*this),
@@ -1149,7 +1149,6 @@ u8 grandcentral_device::enet_prom_r(offs_t offset)
 // so the residual count tells the driver where they are.
 u32 grandcentral_device::enet_dma_r()
 {
-	#if 0
 	if (!m_mace)
 	{
 		return 0;
@@ -1167,9 +1166,6 @@ u32 grandcentral_device::enet_dma_r()
 		m_dma_enet_rx->eof_w(1);
 	}
 	return result.data & 0xff;
-	#else
-	return 0;
-	#endif
 }
 
 void grandcentral_device::enet_dma_eof_w(int state)
@@ -1179,13 +1175,11 @@ void grandcentral_device::enet_dma_eof_w(int state)
 
 void grandcentral_device::enet_dma_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	#if 0
 	// the MACE drops its request before the FIFO can fill, so it never turns a transfer down
 	if (m_mace && !m_mace->tx_dma_w(data, mem_mask, m_enet_tx_eof))
 	{
 		logerror("%s: MACE refused a transmit DMA transfer\n", tag());
 	}
-	#endif
 }
 
 u8 grandcentral_device::scsi0_r(offs_t offset)

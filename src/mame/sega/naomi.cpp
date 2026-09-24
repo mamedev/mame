@@ -20,7 +20,7 @@ QA Notes (Update January 2022):
     - We currently don't promote anything out of this driver due of lacking important features
       in PowerVR and AICA devices. Performance is also a concern.
     - Manufacturers needs to be overhauled, also
-      cfr. MT#08143 about a necessity to at least log Sega divisions somehow.
+      cfr. MT08143 about a necessity to at least log Sega divisions somehow.
     - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
 
 ===================================================================================================
@@ -2476,7 +2476,8 @@ void naomi_state::naomi_base(machine_config &config)
 	// - GPIO toggle in a loop - 13.499Mhz,
 	// - using UART as timer - 13.260MHz,
 	// - unrolled NOPs then GPIO toggle - 12.76MHz (or 3.19M NOP instructions per second)
-	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot (see MT#06552).
+	// for now we use higher clock, otherwise earlier NAOMI BIOS revisions will not boot
+	// (cfr. MT06552).
 	mie_device &mie(MIE(config, "mie" "_maple", 16000000, m_maple, 0, "mie"));
 	mie.set_gpio_name<3>("MIE.3");
 	mie.set_gpio_name<5>("MIE.5");
