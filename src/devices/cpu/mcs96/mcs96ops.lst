@@ -1124,7 +1124,7 @@ fe7f  mulb  indexed_2b
 	OP1 = reg_r16(OP1);
 	if(OP1) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		uint32_t TMP2 = TMP / OP1;
 		if(TMP2 > 65535)
 			PSW |= F_V|F_VT;
@@ -1140,7 +1140,7 @@ fe7f  mulb  indexed_2b
 	PSW &= ~F_V;
 	if(OP1) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		uint32_t TMP2 = TMP / OP1;
 		if(TMP2 > 65535)
 			PSW |= F_V|F_VT;
@@ -1157,7 +1157,7 @@ fe7f  mulb  indexed_2b
 	uint32_t d = any_r16(OP1);
 	if(d) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		uint32_t TMP2 = TMP / d;
 		if(TMP2 > 65535)
 			PSW |= F_V|F_VT;
@@ -1174,7 +1174,7 @@ fe7f  mulb  indexed_2b
 	uint32_t d = any_r16(OP1);
 	if(d) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		uint32_t TMP2 = TMP / d;
 		if(TMP2 > 65535)
 			PSW |= F_V|F_VT;
@@ -1191,7 +1191,7 @@ fe8c  div   direct_2w
 	OP1 = reg_r16(OP1);
 	if(OP1) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		int32_t TMP2 = int32_t(TMP) / int16_t(OP1);
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
@@ -1207,7 +1207,7 @@ fe8d  div   immed_2w
 	PSW &= ~F_V;
 	if(OP1) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		int32_t TMP2 = int32_t(TMP) / int16_t(OP1);
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
@@ -1224,7 +1224,7 @@ fe8e  div   indirect_2w
 	int32_t d = int16_t(any_r16(OP1));
 	if(d) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		int32_t TMP2 = int32_t(TMP) / d;
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
@@ -1241,7 +1241,7 @@ fe8f  div   indexed_2w
 	int32_t d = int16_t(any_r16(OP1));
 	if(d) {
 		TMP = reg_r16(OP2);
-		TMP |= reg_r16(OP2+2);
+		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
 		int32_t TMP2 = int32_t(TMP) / d;
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
