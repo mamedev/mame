@@ -568,19 +568,7 @@ void tms3556_device::draw_line_mixed(uint16_t *ln)
 
 void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
-	int double_lines;
-	uint16_t *ln, *ln2;
-
-//  if (m_control_regs[4] & 0x??)
-//  {   // interlaced mode
-//      ln = &bmp->pix(line, m_field);
-//  }
-//  else
-	{   /* non-interlaced mode */
-		ln = &bmp.pix(line);
-		ln2 = &bmp.pix(line, 1);
-		double_lines = 1;
-	}
+	uint16_t *ln = &bmp.pix(line);
 
 	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + 250)))
 	{
@@ -606,13 +594,6 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 			draw_line_mixed(ln);
 			break;
 		}
-	}
-
-	if (double_lines)
-	{
-		// TODO: this overlaps in exeltel - use memmove for now
-		//memcpy(ln2, ln, TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
-		memmove(ln2, ln, TOTAL_WIDTH * (TMS3556_DOUBLE_WIDTH ? 2 : 1));
 	}
 }
 
