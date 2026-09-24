@@ -5,10 +5,8 @@
     aka Cobra 3
 
    Telly Addicts user notes:
-   - Blank NVRAM produces a RAM ERROR on every startup.  Setting the stored
-     volume does not clear this error, but it does not prevent the game from
-     running.  The volume initially starts at its minimum setting.  From
-     attract mode, toggle Refill/Volume Setup Mode (R), adjust it with Up/Down,
+   - To adjust the volume from attract mode, toggle Refill/Volume Setup Mode
+     (R), adjust it with Up/Down,
      press Start to exit, then toggle Refill/Volume Setup Mode off.
    - To use the test routines, open the Back and Front Doors (T), then press
      Test (F1).  Use Up/Down to choose a test and Start to enter or leave it.
@@ -997,6 +995,9 @@ ROM_START( c3_rtime )
 	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
 	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
 
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_rtime.nv", 0x0000, 0x4000, CRC(ac8f938c) SHA1(305c76851fa9e936b3c54a8ba215643cf90660ea) )
+
 	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
 ROM_END
@@ -1019,6 +1020,9 @@ ROM_START( c3_telly )
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
 
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_telly.nv", 0x0000, 0x4000, CRC(5bc2b815) SHA1(c298c9c8df1b13ea702803cd7bae57ce28009e6d) )
+
 	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100300", 0, SHA1(98905cbff24c576c58210d1d003f710fa7064762) )
 ROM_END
@@ -1035,6 +1039,9 @@ ROM_START( c3_tellyns )
 
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_tellyns.nv", 0x0000, 0x4000, CRC(96abd9a8) SHA1(6708c113d423809b2e5f6e94331c50605fd90b13) )
 
 	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100301", 0, SHA1(dbce040a6fb7916a240d24e2207cf6e1b3f572e7) )
@@ -1053,6 +1060,9 @@ ROM_START( c3_totp )
 	ROM_LOAD( "totpsnd.lhs", 0x000000, 0x080000, CRC(56a73136) SHA1(10656ede18de9432a8a728cc59d000b5b1bf0150) )
 	ROM_LOAD( "totpsnd.rhs", 0x080000, 0x080000, CRC(28d156ab) SHA1(ebf5c4e008015b9b56b3aa5228c05b8e298daa80) )
 
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_totp.nv", 0x0000, 0x4000, CRC(9fc151d8) SHA1(f089841fabc72f1170a04b379ae39bfecfb13396) )
+
 	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100307", 0, SHA1(27ad1565f9a153fe71b72d9c597a6e3c3f13ded0) )
 ROM_END
@@ -1064,6 +1074,9 @@ ROM_START( c3_ppays )
 
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "phrasesn.l", 0x0000, 0x080000, CRC(a436ccf8) SHA1(18c39aa2e68c32242e0de1347b25d4af44b84548) )
+
+	ROM_REGION16_BE( 0x4000, "nvram", 0 )
+	ROM_LOAD( "c3_ppays.nv", 0x0000, 0x4000, CRC(321bf7ef) SHA1(d4dc979ed146bfd149657ee7900dfb085ac96cc9) )
 
 	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100315", 0, SHA1(fc76d3ab5ff38c2dc4f06399f5399a1ae3c136e9) )
