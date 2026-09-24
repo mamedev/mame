@@ -121,6 +121,9 @@ protected:
 	memory_share_creator<u16> m_txram;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
+	bitmap_ind16 m_layer_tx;
+	bitmap_ind16 m_layer_bg;
+	bitmap_ind16 m_layer_roz;
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
@@ -149,6 +152,9 @@ private:
 	int m_brt_r;
 	int m_brt_g;
 	int m_brt_b;
+	int m_brt1_r;
+	int m_brt1_g;
+	int m_brt1_b;
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
 	u8 ms32_priram_r8(offs_t offset);
@@ -211,10 +217,7 @@ private:
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	std::vector<u16> m_txram_latch;
-	bitmap_ind16 m_layer_tx;
-	bitmap_ind16 m_layer_bg;
 	bitmap_ind16 m_layer_road;
-	bitmap_ind16 m_layer_roz;
 
 	tilemap_t* m_extra_tilemap;
 
