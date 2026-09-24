@@ -19,6 +19,10 @@ typedef struct {
 	unsigned int iv[4];
 } AES_CTX;
 
+// The key is 32 bytes; the IV and each data block are 16 bytes.
+// Encryption/decryption update the CBC IV and support in-place operation.
+void AES_EncryptInit(AES_CTX *ctx, const unsigned char *key, const unsigned char *iv);
+void AES_Encrypt(AES_CTX *ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
 void AES_DecryptInit(AES_CTX *ctx, const unsigned char *key, const unsigned char *iv);
 void AES_Decrypt(AES_CTX* ctx, const unsigned char in_data[AES_BLOCK_SIZE], unsigned char out_data[AES_BLOCK_SIZE]);
 void AES_CTX_Free(AES_CTX *ctx);
