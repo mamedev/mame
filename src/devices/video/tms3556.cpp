@@ -527,7 +527,9 @@ void tms3556_device::draw_line_text(uint16_t *ln)
 void tms3556_device::draw_line_bitmap(uint16_t *ln)
 {
 	draw_line_bitmap_common(ln);
-	m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
+	// the trailing byte of each bitmap line is loaded into CM4
+	VDP_CM4 = readbyte(m_address_regs[2] + m_name_offset);
+	m_bg_color = (VDP_CM4 >> 5) & 0x7;
 	m_name_offset += 2;
 }
 
@@ -541,8 +543,10 @@ void tms3556_device::draw_line_mixed(uint16_t *ln)
 	if (m_cg_flag)
 	{   /* bitmap line */
 		draw_line_bitmap_common(ln);
-		m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
-		m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
+		// the trailing byte of each bitmap line is loaded into CM4
+		VDP_CM4 = readbyte(m_address_regs[2] + m_name_offset);
+		m_bg_color = (VDP_CM4 >> 5) & 0x7;
+		m_cg_flag = (VDP_CM4 >> 4) & 0x1;
 		m_name_offset += 2;
 	}
 	else
@@ -553,8 +557,10 @@ void tms3556_device::draw_line_mixed(uint16_t *ln)
 		draw_line_text_common(ln);
 		if (m_char_line_counter == 0)
 		{
-			m_bg_color = (readbyte(m_address_regs[2] + m_name_offset) >> 5) & 0x7;
-			m_cg_flag = (readbyte(m_address_regs[2] + m_name_offset) >> 4) & 0x1;
+			// the trailing byte of each character row is loaded into CM4
+			VDP_CM4 = readbyte(m_address_regs[2] + m_name_offset);
+			m_bg_color = (VDP_CM4 >> 5) & 0x7;
+			m_cg_flag = (VDP_CM4 >> 4) & 0x1;
 			m_name_offset += 2;
 		}
 	}
