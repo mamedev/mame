@@ -435,11 +435,6 @@ void digdug_state::machine_start()
 {
 	galaga_state::machine_start();
 
-	save_item(NAME(m_bg_select));
-	save_item(NAME(m_tx_color_mode));
-	save_item(NAME(m_bg_disable));
-	save_item(NAME(m_bg_color_bank));
-
 	earom_control_w(0);
 }
 
