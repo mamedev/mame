@@ -3,6 +3,7 @@
 
 #include "emu.h"
 
+#include "amic_enet.h"
 #include "cuda.h"
 
 #include "bus/adb/adb.h"
@@ -82,7 +83,8 @@ public:
 	void driver_init() ATTR_COLD;
 
 protected:
-	virtual void driver_reset() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -99,43 +101,46 @@ private:
 	required_device<swim3_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mac_video_sonora_device> m_video;
+	required_device<am79c940_device> m_mace;
+	required_device<amic_enet_device> m_enet_dma;
+	std::array<u8, 8> m_enet_prom;
+	bool m_enet_prom_initialized;
 
-	floppy_image_device *m_cur_floppy = nullptr;
+	floppy_image_device *m_cur_floppy;
 
-	uint32_t m_model_id = 0;
-	uint8_t m_simm_sockets = 2;
-	uint64_t m_hmc_reg = 0, m_hmc_buffer = 0;
-	uint8_t m_hmc_bit = 0;
+	uint32_t m_model_id;
+	uint8_t m_simm_sockets;
+	uint64_t m_hmc_reg, m_hmc_buffer;
+	uint8_t m_hmc_bit;
 
-	uint8_t m_irq_control = 0;
+	uint8_t m_irq_control;
 
 	uint8_t m_dma_irq_1, m_dma_irq_2;
 
-	uint8_t m_via2_ier = 0, m_via2_ifr = 0, m_via2_sier = 0, m_via2_sifr = 0;
+	uint8_t m_via2_ier, m_via2_ifr, m_via2_sier, m_via2_sifr;
 
-	uint64_t m_dma_scsi_a_buffer = 0;
-	uint64_t m_dma_scsi_b_buffer = 0;
+	uint64_t m_dma_scsi_a_buffer;
+	uint64_t m_dma_scsi_b_buffer;
 
-	uint32_t m_dma_badr = 0, m_dma_floppy_adr = 0;
-	uint16_t m_dma_floppy_byte_count = 0, m_dma_floppy_offset = 0;
+	uint32_t m_dma_badr, m_dma_floppy_adr;
+	uint16_t m_dma_floppy_byte_count, m_dma_floppy_offset;
 
-	uint16_t m_dma_berr_en = 0, m_dma_berr_flag = 0;
+	uint16_t m_dma_berr_en, m_dma_berr_flag;
 
-	uint32_t m_dma_scsi_a_base_adr = 0, m_dma_scsi_b_base_adr = 0;
-	uint32_t m_dma_scsi_a_cur_offset = 0, m_dma_scsi_b_cur_offset = 0;
+	uint32_t m_dma_scsi_a_base_adr, m_dma_scsi_b_base_adr;
+	uint32_t m_dma_scsi_a_cur_offset, m_dma_scsi_b_cur_offset;
 
-	uint8_t m_dma_scsi_a_ctrl = 0, m_dma_scsi_b_ctrl = 0, m_dma_floppy_ctrl = 0;
-	uint8_t m_dma_scsi_a_buffer_word_count = 0;
-	uint8_t m_dma_scsi_b_buffer_word_count = 0;
+	uint8_t m_dma_scsi_a_ctrl, m_dma_scsi_b_ctrl, m_dma_floppy_ctrl;
+	uint8_t m_dma_scsi_a_buffer_word_count;
+	uint8_t m_dma_scsi_b_buffer_word_count;
 
-	uint8_t m_dma_scc_txa_ctrl = 0, m_dma_scc_rxa_ctrl = 0, m_dma_scc_txb_ctrl = 0, m_dma_scc_rxb_ctrl = 0;
-	uint8_t m_dma_enet_rx_ctrl = 0, m_dma_enet_tx_ctrl = 0;
+	uint8_t m_dma_scc_txa_ctrl, m_dma_scc_rxa_ctrl, m_dma_scc_txb_ctrl, m_dma_scc_rxb_ctrl;
 
-	bool m_dma_scsi_a_in_step = false, m_dma_scsi_b_in_step = false;
-	bool m_dma_floppy_in_step = false, m_floppy_drq = false;
+	bool m_dma_scsi_a_in_step, m_dma_scsi_b_in_step;
+	bool m_dma_floppy_in_step, m_floppy_drq;
 
-	emu_timer *m_scsi_a_drq_timeout_timer = nullptr;
-	emu_timer *m_scsi_b_drq_timeout_timer = nullptr;
+	emu_timer *m_scsi_a_drq_timeout_timer;
+	emu_timer *m_scsi_b_drq_timeout_timer;
 
 	void pdm_map(address_map &map) ATTR_COLD;
 	void pdm_8100map(address_map &map) ATTR_COLD;
@@ -280,10 +285,7 @@ private:
 	uint8_t dma_scc_rxb_ctrl_r();
 	void dma_scc_rxb_ctrl_w(uint8_t data);
 
-	uint8_t dma_enet_rx_ctrl_r();
-	void dma_enet_rx_ctrl_w(uint8_t data);
-	uint8_t dma_enet_tx_ctrl_r();
-	void dma_enet_tx_ctrl_w(uint8_t data);
+	u8 enet_prom_r(offs_t offset);
 
 	uint32_t sound_dma_output(offs_t offset);
 	void sound_dma_input(offs_t offset, uint32_t value);
@@ -307,15 +309,61 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
 	m_video(*this, "video"),
+	m_mace(*this, "mace"),
+	m_enet_dma(*this, "enet_dma"),
+	m_enet_prom{},
+	m_enet_prom_initialized(false),
+	m_cur_floppy(nullptr),
+	m_model_id(0),
+	m_simm_sockets(2),
+	m_hmc_reg(0),
+	m_hmc_buffer(0),
+	m_hmc_bit(0),
+	m_irq_control(0),
 	m_dma_irq_1(0),
-	m_dma_irq_2(0)
+	m_dma_irq_2(0),
+	m_via2_ier(0),
+	m_via2_ifr(0),
+	m_via2_sier(0),
+	m_via2_sifr(0),
+	m_dma_scsi_a_buffer(0),
+	m_dma_scsi_b_buffer(0),
+	m_dma_badr(0),
+	m_dma_floppy_adr(0),
+	m_dma_floppy_byte_count(0),
+	m_dma_floppy_offset(0),
+	m_dma_berr_en(0),
+	m_dma_berr_flag(0),
+	m_dma_scsi_a_base_adr(0),
+	m_dma_scsi_b_base_adr(0),
+	m_dma_scsi_a_cur_offset(0),
+	m_dma_scsi_b_cur_offset(0),
+	m_dma_scsi_a_ctrl(0),
+	m_dma_scsi_b_ctrl(0),
+	m_dma_floppy_ctrl(0),
+	m_dma_scsi_a_buffer_word_count(0),
+	m_dma_scsi_b_buffer_word_count(0),
+	m_dma_scc_txa_ctrl(0),
+	m_dma_scc_rxa_ctrl(0),
+	m_dma_scc_txb_ctrl(0),
+	m_dma_scc_rxb_ctrl(0),
+	m_dma_scsi_a_in_step(false),
+	m_dma_scsi_b_in_step(false),
+	m_dma_floppy_in_step(false),
+	m_floppy_drq(false),
+	m_scsi_a_drq_timeout_timer(nullptr),
+	m_scsi_b_drq_timeout_timer(nullptr)
 {
-	m_cur_floppy = nullptr;
 }
 
 void macpdm_state::driver_init()
 {
 	m_maincpu->space().install_ram(0, m_ram->mask(), 0, m_ram->pointer());
+	const u32 suffix = machine().rand();
+	const u8 mac[6] = { 0x00, 0x00, 0x1b, u8(suffix >> 16), u8(suffix >> 8), u8(suffix) };
+	m_mace->set_mac(mac);
+	save_item(NAME(m_enet_prom));
+	save_item(NAME(m_enet_prom_initialized));
 
 	m_scsi_a_drq_timeout_timer = timer_alloc(FUNC(macpdm_state::scsi_a_drq_timeout), this);
 	m_scsi_b_drq_timeout_timer = timer_alloc(FUNC(macpdm_state::scsi_b_drq_timeout), this);
@@ -330,6 +378,8 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_via2_sifr));
 
 	save_item(NAME(m_irq_control));
+	save_item(NAME(m_dma_irq_1));
+	save_item(NAME(m_dma_irq_2));
 
 	save_item(NAME(m_dma_badr));
 	save_item(NAME(m_dma_berr_en));
@@ -352,8 +402,6 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_dma_scc_rxa_ctrl));
 	save_item(NAME(m_dma_scc_txb_ctrl));
 	save_item(NAME(m_dma_scc_rxb_ctrl));
-	save_item(NAME(m_dma_enet_rx_ctrl));
-	save_item(NAME(m_dma_enet_tx_ctrl));
 
 	save_item(NAME(m_dma_floppy_adr));
 	save_item(NAME(m_dma_floppy_offset));
@@ -361,7 +409,20 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_floppy_drq));
 }
 
-void macpdm_state::driver_reset()
+void macpdm_state::device_reset()
+{
+	if (!m_enet_prom_initialized)
+	{
+		// Snapshot the configured MAC before MACE reset clears its writable PADR.
+		std::copy(m_mace->get_mac().begin(), m_mace->get_mac().end(), m_enet_prom.begin());
+		m_enet_prom[7] = 0xff;
+		for (unsigned i = 0; i < 6; ++i)
+			m_enet_prom[7] ^= m_enet_prom[i];
+		m_enet_prom_initialized = true;
+	}
+}
+
+void macpdm_state::machine_reset()
 {
 	m_hmc_reg = 0;
 	m_hmc_buffer = 0;
@@ -373,6 +434,7 @@ void macpdm_state::driver_reset()
 	m_via2_sifr = 0x7f;
 
 	m_irq_control = 0;
+	m_dma_irq_1 = m_dma_irq_2 = 0;
 
 	m_dma_badr = 0;
 	m_dma_berr_en = 0;
@@ -394,8 +456,6 @@ void macpdm_state::driver_reset()
 	m_dma_scc_rxa_ctrl = 0;
 	m_dma_scc_txb_ctrl = 0;
 	m_dma_scc_rxb_ctrl = 0;
-	m_dma_enet_rx_ctrl = 0;
-	m_dma_enet_tx_ctrl = 0;
 
 	m_dma_floppy_adr = 0x15000;
 	m_dma_floppy_offset = 0;
@@ -1006,6 +1066,23 @@ void macpdm_state::sndo_dma_irq(int state)
 	recalc_dma_irqs();
 }
 
+void macpdm_state::enet_irq(int state)
+{
+	irq_main_set(0x08, state);
+}
+
+void macpdm_state::erx_dma_irq(int state)
+{
+	m_dma_irq_1 = (m_dma_irq_1 & ~0x10) | (state ? 0x10 : 0);
+	recalc_dma_irqs();
+}
+
+void macpdm_state::etx_dma_irq(int state)
+{
+	m_dma_irq_1 = (m_dma_irq_1 & ~0x20) | (state ? 0x20 : 0);
+	recalc_dma_irqs();
+}
+
 void macpdm_state::sndi_dma_irq(int state)
 {
 	m_dma_irq_2 &= ~DMA2_IRQ_SND_IN;
@@ -1022,6 +1099,7 @@ void macpdm_state::dma_badr_w(offs_t, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dma_badr);
 	m_dma_badr &= 0xfffc0000;
+	m_enet_dma->set_dma_base(m_dma_badr);
 
 	LOGMASKED(LOG_DMA, "dma base address %08x\n", m_dma_badr);
 
@@ -1471,26 +1549,9 @@ void macpdm_state::dma_scc_rxb_ctrl_w(uint8_t data)
 	m_dma_scc_rxb_ctrl = (m_dma_scc_rxb_ctrl & ~SCCDMA_WRITE_MASK) | (data & SCCDMA_WRITE_MASK);
 }
 
-uint8_t macpdm_state::dma_enet_rx_ctrl_r()
+u8 macpdm_state::enet_prom_r(offs_t offset)
 {
-	return m_dma_enet_rx_ctrl;
-}
-
-void macpdm_state::dma_enet_rx_ctrl_w(uint8_t data)
-{
-	m_dma_enet_rx_ctrl = data;
-	LOGMASKED(LOG_DMA, "dma_enet_rx_ctrl_w %02x\n", m_dma_enet_rx_ctrl);
-}
-
-uint8_t macpdm_state::dma_enet_tx_ctrl_r()
-{
-	return m_dma_enet_tx_ctrl;
-}
-
-void macpdm_state::dma_enet_tx_ctrl_w(uint8_t data)
-{
-	m_dma_enet_tx_ctrl = data;
-	LOGMASKED(LOG_DMA, "dma_enet_tx_ctrl_w %02x\n", m_dma_enet_tx_ctrl);
+	return bitswap<8>(m_enet_prom[(offset >> 4) & 7], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 uint32_t macpdm_state::sound_dma_output(offs_t offset)
@@ -1512,8 +1573,10 @@ void macpdm_state::pdm_map(address_map &map)
 
 	map(0x50f00000, 0x50f00000).rw(FUNC(macpdm_state::via1_r), FUNC(macpdm_state::via1_w)).select(0x1e00);
 	map(0x50f04000, 0x50f04007).rw(m_scc, FUNC(z80scc_device::dc_ab_r), FUNC(z80scc_device::dc_ab_w)).umask64(0xff00ff00ff00ff00);
-	// 50f08000 = ethernet ID PROM
-	// 50f0a000 = MACE ethernet controller
+	map(0x50f08000, 0x50f0807f).r(FUNC(macpdm_state::enet_prom_r));
+	map(0x50f0a000, 0x50f0a1ff).lrw8(
+		NAME([this](offs_t offset) { return m_mace->read(offset >> 4); }),
+		NAME([this](offs_t offset, u8 data) { m_mace->write(offset >> 4, data); }));
 	map(0x50f10000, 0x50f100ff).rw(FUNC(macpdm_state::scsi_a_r), FUNC(macpdm_state::scsi_a_w));
 	map(0x50f10100, 0x50f10101).rw(FUNC(macpdm_state::scsi_a_pdma_r), FUNC(macpdm_state::scsi_a_pdma_w));
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
@@ -1533,7 +1596,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f2c000, 0x50f2dfff).r(FUNC(macpdm_state::diag_r));
 
 	map(0x50f31000, 0x50f31003).rw(FUNC(macpdm_state::dma_badr_r), FUNC(macpdm_state::dma_badr_w));
-	map(0x50f31c20, 0x50f31c20).rw(FUNC(macpdm_state::dma_enet_tx_ctrl_r), FUNC(macpdm_state::dma_enet_tx_ctrl_w));
+	map(0x50f31000, 0x50f32fff).m(m_enet_dma, FUNC(amic_enet_device::map));
 
 	map(0x50f32000, 0x50f32003).rw(FUNC(macpdm_state::dma_scsi_a_base_adr_r), FUNC(macpdm_state::dma_scsi_a_base_adr_w));
 	map(0x50f32004, 0x50f32007).rw(FUNC(macpdm_state::dma_scsi_b_base_adr_r), FUNC(macpdm_state::dma_scsi_b_base_adr_w));
@@ -1541,8 +1604,6 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f32009, 0x50f32009).rw(FUNC(macpdm_state::dma_scsi_b_ctrl_r), FUNC(macpdm_state::dma_scsi_b_ctrl_w));
 	map(0x50f32010, 0x50f32013).r(FUNC(macpdm_state::dma_scsi_a_cur_adr_r));
 	map(0x50f32014, 0x50f32017).r(FUNC(macpdm_state::dma_scsi_b_cur_adr_r));
-
-	map(0x50f32028, 0x50f32028).rw(FUNC(macpdm_state::dma_enet_rx_ctrl_r), FUNC(macpdm_state::dma_enet_rx_ctrl_w));
 
 	map(0x50f32060, 0x50f32063).rw(FUNC(macpdm_state::dma_floppy_adr_r), FUNC(macpdm_state::dma_floppy_adr_w));
 	map(0x50f32064, 0x50f32065).rw(FUNC(macpdm_state::dma_floppy_byte_count_r), FUNC(macpdm_state::dma_floppy_byte_count_w));
@@ -1575,6 +1636,16 @@ void macpdm_state::pdm_base(machine_config &config)
 	PPC601(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_STRICT_601_SELF_MODIFY);
+
+	AMIC_ENET(config, m_enet_dma);
+	m_enet_dma->set_space(m_maincpu, AS_PROGRAM);
+	m_enet_dma->set_mace_tag(m_mace);
+	m_enet_dma->rx_irq_out().set(FUNC(macpdm_state::erx_dma_irq));
+	m_enet_dma->tx_irq_out().set(FUNC(macpdm_state::etx_dma_irq));
+	AM79C940(config, m_mace, 0);
+	m_mace->irq_out().set(FUNC(macpdm_state::enet_irq));
+	m_mace->rx_drq_out().set(m_enet_dma, FUNC(amic_enet_device::rx_drq_w));
+	m_mace->tx_drq_out().set(m_enet_dma, FUNC(amic_enet_device::tx_drq_w));
 
 	MAC_VIDEO_SONORA(config, m_video);
 	m_video->set_PDM();

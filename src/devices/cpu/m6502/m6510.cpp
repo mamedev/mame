@@ -27,16 +27,27 @@ m6510_device::m6510_device(const machine_config &mconfig, device_type type, cons
 	m6502_device(mconfig, type, tag, owner, clock),
 	m_read_port(*this, 0),
 	m_write_port(*this),
-	m_dir(0), m_port(0), m_drive(0)
+	m_dir(0), m_port(0), m_drive(0),
+	m_falloff_mask(0)
 {
 	m_pullup = 0x00;
 	m_floating = 0x00;
+	std::fill(std::begin(m_falloff_cycles), std::end(m_falloff_cycles), 0);
 }
 
 void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 {
 	m_pullup = _pullup;
 	m_floating = _floating;
+}
+
+void m6510_device::set_floating_falloff(uint8_t mask, uint32_t cycles)
+{
+	m_falloff_mask |= mask;
+
+	for (int bit = 0; bit < 8; bit++)
+		if (BIT(mask, bit))
+			m_falloff_cycles[bit] = cycles;
 }
 
 std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
@@ -51,6 +62,9 @@ void m6510_device::init_port()
 	save_item(NAME(m_dir));
 	save_item(NAME(m_port));
 	save_item(NAME(m_drive));
+	save_item(NAME(m_falloff_deadline));
+
+	std::fill(std::begin(m_falloff_deadline), std::end(m_falloff_deadline), 0);
 }
 
 void m6510_device::device_start()
@@ -88,11 +102,29 @@ uint8_t m6510_device::dir_r()
 
 uint8_t m6510_device::port_r()
 {
-	return ((m_read_port() | (m_floating & m_drive)) & ~m_dir) | (m_port & m_dir);
+	uint8_t floating = m_floating & m_drive;
+	uint8_t decaying = floating & m_falloff_mask & ~m_dir;
+
+	if (decaying)
+	{
+		uint64_t now = total_cycles();
+
+		for (int bit = 0; bit < 8; bit++)
+			if (BIT(decaying, bit) && now >= m_falloff_deadline[bit])
+				floating &= ~(1 << bit);
+	}
+
+	return ((m_read_port() | floating) & ~m_dir) | (m_port & m_dir);
 }
 
 void m6510_device::dir_w(uint8_t data)
 {
+	uint8_t released = m_falloff_mask & m_dir & ~data;
+
+	for (int bit = 0; bit < 8; bit++)
+		if (BIT(released, bit))
+			m_falloff_deadline[bit] = total_cycles() + m_falloff_cycles[bit];
+
 	m_dir = data;
 	update_port();
 }

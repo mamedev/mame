@@ -1199,6 +1199,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			static const char *const BPP_VALUES[8] = { "<0 reserved>", "1bpp", "2bpp", "4bpp", "6bpp", "8bpp", "16bpp", "<7 reserved>" };
 
 			// - ssf2xj "Select Game Speed" in Arcade mode
+			// - fifa text kerning
 			const u8 skipx = (m_cel.pre0 >> 24) & 0xf;
 
 			LOGCEL("    skipx=%d vcnt=%d uncoded=%d rep8=%d bpp=%d (%s)\n"
@@ -1252,7 +1253,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				// - retfire main menu
 				for (int y = 0; y < vcnt << lrform; y++)
 				{
-					for (int x = 0; x < tlhpcnt; x++)
+					for (int x = 0; x < tlhpcnt - skipx; x++)
 					{
 						// According to "The Projector" section this floors down,
 						// discarding the fractional part
@@ -2110,6 +2111,18 @@ u32 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 	// arbitrary moire/mesh pattern so it will be obvious if triggered
 	// (outputs a yellow-blue checkered flag)
 	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
+	return src_data;
+}
+// bpp=0: undocumented/illegal
+// - ssf2xj uses this for the 3do logo layer clearance at startup (with Projector rectangle fill)
+u32 madam_device::get_pixel_0bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+//	u32 cel_address = m_cel.source_ptr;
+	// assume it would still require a PLUT trip (and probably PLUTA)
+	const u32 plut_address = m_cel.plut_ptr;
+
+	u16 src_data = (m_dma8_read_cb(plut_address) << 8) + (m_dma8_read_cb(plut_address + 1));
+
 	return src_data;
 }
 

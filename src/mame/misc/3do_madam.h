@@ -231,6 +231,7 @@ private:
 	static const get_pixel_func get_pixel_table[32 + 1];
 
 	u32 get_pixel_invalid(int x, int y, u16 woffset);
+	u32 get_pixel_0bpp_coded_lrform0(int x, int y, u16 woffset);
 	u32 get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset);
 	u32 get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset);
 	u32 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);

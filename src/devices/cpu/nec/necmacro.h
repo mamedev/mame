@@ -261,7 +261,7 @@
 	int i,v1,v2,result;                          \
 	unsigned di = Wreg(IY);                      \
 	unsigned si = Wreg(IX);                      \
-	static const uint8_t table[4]={18,19,19,27};    \
+	static const uint8_t table[4]={18,19,19,27}; \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                  \
 	for (i=0;i<count;i++) {                      \
@@ -291,7 +291,7 @@
 	int i,v1,v2,result;                          \
 	unsigned di = Wreg(IY);                      \
 	unsigned si = Wreg(IX);                      \
-	static const uint8_t table[4]={14,19,19,23};    \
+	static const uint8_t table[4]={14,19,19,23}; \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                  \
 	for (i=0;i<count;i++) {                      \

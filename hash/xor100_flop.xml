@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="xor100_flop" description="XOR S-100-12 disks">
+
+	<software name="cpm22">
+		<description>CP/M 2.2</description>
+		<year>1982</year>
+		<publisher>Delta Products</publisher>
+		<info name="serial" value="168-1171"/>
+
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="237487">
+				<rom name="dp-xor-a.imd" size="237487" crc="6488477c" sha1="eccdde67366870ef65820177787b5f781b35ffed"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="517505">
+				<rom name="dp-xor-b.imd" size="517505" crc="3dc4fabb" sha1="e38921a79b9c2c29727c1923df1363cbdabacf82"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

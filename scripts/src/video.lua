@@ -979,6 +979,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mcd251.h,VIDEOS["MCD251"] = true
+--------------------------------------------------
+
+if VIDEOS["MCD251"] then
+	files {
+		MAME_DIR .. "src/devices/video/mcd251.cpp",
+		MAME_DIR .. "src/devices/video/mcd251.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/mos6566.h,VIDEOS["MOS6566"] = true
 --------------------------------------------------
 

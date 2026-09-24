@@ -46,9 +46,11 @@ TODO:
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "video/v9938.h"
 #include "sound/ymopl.h"
+#include "video/v9938.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -82,9 +84,9 @@ class pzlestar_state : public sangho_state
 public:
 	using sangho_state::sangho_state;
 
-	void init_pzlestar();
+	void init_pzlestar() ATTR_COLD;
 
-	void pzlestar(machine_config &config);
+	void pzlestar(machine_config &config) ATTR_COLD;
 
 protected:
 	void pzlestar_bank_w(uint8_t data);
@@ -110,7 +112,7 @@ class sexyboom_state : public sangho_state
 public:
 	using sangho_state::sangho_state;
 
-	void sexyboom(machine_config &config);
+	void sexyboom(machine_config &config) ATTR_COLD;
 
 protected:
 	void sexyboom_bank_w(offs_t offset, uint8_t data);

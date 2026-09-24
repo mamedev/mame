@@ -112,7 +112,7 @@ void edsp_device::device_start()
 	state_add(EDSP_LEA, "LEA", m_lea);
 	state_add(EDSP_SR, "SR", m_sr);
 	for (int n = 0; n < 8; n++)
-		state_add(EDSP_R0 + n, util::string_format("R%d", n).c_str(), m_r[n]);
+		state_add(EDSP_R0 + n, util::string_format("R%d", n), m_r[n]);
 	state_add(EDSP_INTE, "INTE", m_inte);
 	state_add(EDSP_INTF, "INTF", m_intf);
 
@@ -379,6 +379,11 @@ u16 edsp_device::read_program_word(u16 addr)
 	return m_program.read_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr);
 }
 
+void edsp_device::write_program_word(u16 addr, u16 data)
+{
+	m_program.write_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr, data);
+}
+
 u16 edsp_device::fetch_program_word()
 {
 	return m_cache.read_word(m_pc >= 0x8000 ? m_pc + (u32(BIT(m_bank, 0, 9)) << 15) : m_pc);
@@ -548,10 +553,10 @@ void edsp_device::execute_run()
 				m_pc++;
 				m_icount -= 2;
 			}
-			else if ((op & 0xf8ff) == 0x3817)
+			else if ((op & 0xff1f) == 0x3817)
 			{
 				// RPT Rn
-				m_rcr = m_r[BIT(op, 8, 3)];
+				m_rcr = m_r[BIT(op, 5, 3)];
 				m_icount -= 1;
 			}
 			else if ((op & 0xf87f) == 0x3818)
@@ -599,6 +604,11 @@ void edsp_device::execute_run()
 				m_sp++;
 				m_pc = m_data.read_word(m_sp);
 				m_sr |= SR_GIE;
+				m_icount -= 2;
+			}
+			else if (op == 0x387a)
+			{
+				write_program_word(m_r[0], m_data.read_word(m_r[1]));
 				m_icount -= 2;
 			}
 			else if ((op & 0xf81f) == 0x381b)
@@ -724,13 +734,13 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf8ff) == 0x585e)
 			{
-				// JMP Rn
+				// JMP Rd
 				m_pc = m_r[BIT(op, 8, 3)];
 				m_icount -= 2;
 			}
 			else if ((op & 0xf8ff) == 0x587e)
 			{
-				// CALL Rn
+				// CALL Rd
 				m_data.write_word(m_sp, m_pc);
 				m_sp--;
 				m_pc = m_r[BIT(op, 8, 3)];
@@ -783,15 +793,15 @@ void edsp_device::execute_run()
 				else
 					m_icount -= 1;
 			}
-			else if ((op & 0xff00) == 0xa000)
+			else if ((op & 0xfe00) == 0xa000)
 			{
-				const u16 data = m_data.read_word(m_r[3] - BIT(op, 0, 5));
+				const u16 data = m_data.read_word(m_r[3] - (BIT(op, 8) << 5 | BIT(op, 0, 5)));
 				m_r[BIT(op, 5, 3)] = data;
 				m_icount -= 1;
 			}
-			else if ((op & 0xff00) == 0xa400)
+			else if ((op & 0xfe00) == 0xa400)
 			{
-				m_data.write_word(m_r[3] - BIT(op, 0, 5), m_r[BIT(op, 5, 3)]);
+				m_data.write_word(m_r[3] - (BIT(op, 8) << 5 | BIT(op, 0, 5)), m_r[BIT(op, 5, 3)]);
 				m_icount -= 1;
 			}
 			else if ((op & 0xff80) == 0xa800)

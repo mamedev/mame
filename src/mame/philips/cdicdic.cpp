@@ -831,10 +831,10 @@ void cdicdic_device::process_disc_sector()
 	uint8_t subcode_buffer[96];
 	memset(subcode_buffer, 0, sizeof(subcode_buffer));
 
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
 	if (m_disc_mode == DISC_TOC)
 	{
 		uint8_t *toc_buffer = buffer;
-		const cdrom_file::toc &toc = m_cdrom->get_toc();
 		uint32_t entry_count = 0;
 
 		// Determine total frame count for data, and total audio track count
@@ -937,24 +937,37 @@ void cdicdic_device::process_disc_sector()
 		subcode_buffer[SUBCODE_Q_MODE1_AMINS] = toc_data[2];
 		subcode_buffer[SUBCODE_Q_MODE1_ASECS] = toc_data[3];
 		subcode_buffer[SUBCODE_Q_MODE1_AFRAC] = toc_data[4];
-		subcode_buffer[SUBCODE_Q_CRC0] = 0xff;
-		subcode_buffer[SUBCODE_Q_CRC1] = 0xff;
 	}
 	else
 	{
+		uint8_t track = 1;
+		for (uint32_t i = 0; i < toc.numtrks; i++)
+		{
+			if (m_curr_lba >= toc.tracks[i].logframeofs)
+				track = i + 1;
+		}
+
+		const uint32_t track_start = toc.numtrks ? toc.tracks[track - 1].logframeofs : 0;
+		const uint32_t rel_lba = (m_curr_lba >= track_start) ? (m_curr_lba - track_start) : 0;
+
+		const uint8_t rel_mins = rel_lba / (60 * 75);
+		const uint8_t rel_secs = (rel_lba / 75) % 60;
+		const uint8_t rel_frac = rel_lba % 75;
+
 		subcode_buffer[SUBCODE_Q_CONTROL] = (m_disc_mode == DISC_CDDA ? 0x01 : 0x41);
-		subcode_buffer[SUBCODE_Q_TRACK] = 0x01;
+		subcode_buffer[SUBCODE_Q_TRACK] = ((track / 10) << 4) | (track % 10);
 		subcode_buffer[SUBCODE_Q_INDEX] = 0x01;
-		subcode_buffer[SUBCODE_Q_MODE1_MINS] = mins_bcd;
-		subcode_buffer[SUBCODE_Q_MODE1_SECS] = secs_bcd;
-		subcode_buffer[SUBCODE_Q_MODE1_FRAC] = frac_bcd;
+		subcode_buffer[SUBCODE_Q_MODE1_MINS] = ((rel_mins / 10) << 4) | (rel_mins % 10);
+		subcode_buffer[SUBCODE_Q_MODE1_SECS] = ((rel_secs / 10) << 4) | (rel_secs % 10);
+		subcode_buffer[SUBCODE_Q_MODE1_FRAC] = ((rel_frac / 10) << 4) | (rel_frac % 10);
 		subcode_buffer[SUBCODE_Q_MODE1_ZERO] = 0x00;
 		subcode_buffer[SUBCODE_Q_MODE1_AMINS] = mins_bcd;
 		subcode_buffer[SUBCODE_Q_MODE1_ASECS] = secs_bcd;
 		subcode_buffer[SUBCODE_Q_MODE1_AFRAC] = frac_bcd;
-		subcode_buffer[SUBCODE_Q_CRC0] = 0xff;
-		subcode_buffer[SUBCODE_Q_CRC1] = 0xff;
 	}
+	
+	subcode_buffer[SUBCODE_Q_CRC0] = 0xff;
+	subcode_buffer[SUBCODE_Q_CRC1] = 0xff;
 
 	uint16_t crc_accum = 0;
 	for (int i = 0; i < 12; i++)
