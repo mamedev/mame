@@ -207,10 +207,10 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/er2055.h"
 #include "machine/watchdog.h"
-#include "video/resnet.h"
 
 #include "tilemap.h"
 #include "speaker.h"
+#include "video/resnet.h"
 
 
 namespace {
