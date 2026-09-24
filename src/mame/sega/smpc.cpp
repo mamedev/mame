@@ -146,6 +146,7 @@ void smpc_hle_device::device_start()
 	save_item(NAME(m_prev_cdoff));
 
 	m_cmd_timer = timer_alloc(FUNC(smpc_hle_device::handle_command), this);
+	m_syshalt_timer = timer_alloc(FUNC(smpc_hle_device::system_halt), this);
 	m_rtc_timer = timer_alloc(FUNC(smpc_hle_device::handle_rtc_increment), this);
 	m_intback_timer = timer_alloc(FUNC(smpc_hle_device::intback_continue_request), this);
 	m_sndres_timer = timer_alloc(FUNC(smpc_hle_device::sound_reset), this);
@@ -170,6 +171,7 @@ void smpc_hle_device::device_reset()
 	memset(m_oreg, 0, 32);
 
 	m_cmd_timer->reset();
+	m_syshalt_timer->reset();
 	m_intback_timer->reset();
 	m_sndres_timer->reset();
 	m_comreg = 0xff;
@@ -399,7 +401,12 @@ void smpc_hle_device::command_register_w(uint8_t data)
 			// This takes the equivalent of 3~4 frame cycles.
 			// (cfr. diagram on page 3 of SMPC manual)
 			// - shanhigw/sokyugrt/prikura (would otherwise set 2 credits at startup)
-			m_syshalt(1);
+			// The halt is deferred so that the BIOS clock change routine gets to execute the SLEEP
+			// that follows the command write, putting the Master SH2 in standby mode (which
+			// initializes its FRT, cfr. SH7604 hardware manual table 14.3).
+			// - madden98u otherwise dispatches to the (switched off) Slave SH2 after the FMV
+			//   from a stale input capture flag and hangs.
+			m_syshalt_timer->adjust(attotime::from_usec(10));
 
 			m_ckchg_tick = 5;
 
@@ -437,6 +444,11 @@ void smpc_hle_device::command_register_w(uint8_t data)
 	}
 }
 
+
+TIMER_CALLBACK_MEMBER(smpc_hle_device::system_halt)
+{
+	m_syshalt(1);
+}
 
 TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 {
