@@ -6203,6 +6203,8 @@ end
 
 if BUSES["VIC10"] then
 	files {
+		MAME_DIR .. "src/devices/bus/vic10/basic.cpp",
+		MAME_DIR .. "src/devices/bus/vic10/basic.h",
 		MAME_DIR .. "src/devices/bus/vic10/exp.cpp",
 		MAME_DIR .. "src/devices/bus/vic10/exp.h",
 		MAME_DIR .. "src/devices/bus/vic10/multimax.cpp",
