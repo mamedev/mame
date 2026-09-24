@@ -4474,11 +4474,13 @@ void subsino_state::init_newhunterc()
 
 void subsino_state::init_stbsub()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
 	// HACK: patch protection checks
 	rom[0x1005] = 0x1d; // patch protection check
 	rom[0x07ab] = 0x18; // patch "winning protection" check
 	rom[0x0957] = 0x18; // patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4490,12 +4492,14 @@ void subsino_state::init_stbsub()
 
 void subsino_state::init_stisub()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
 	// HACK: patch protection checks
 	rom[0xfa0] = 0x28;
 	rom[0xfa1] = 0x1d; //patch protection check
 	rom[0x7ed] = 0x18; //patch "winning protection" check
 	rom[0x9bb] = 0x18; //patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4507,12 +4511,14 @@ void subsino_state::init_stisub()
 
 void subsino_state::init_tesorone()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
 	// HACK: patch protection checks
 	rom[0x10a4] = 0x18; // patch protection check ("ERROR 08073"):
 	rom[0x10a5] = 0x11;
 	rom[0x08b6] = 0x18; // patch "winning protection" check
 	rom[0x0a84] = 0x18; // patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4573,6 +4579,7 @@ void subsino_state::init_mtrainnv()
 template <offs_t Offset>
 void subsino_state::init_trsocean()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
 	// HACK: patch protection check ("ERROR 08073")
 	rom[Offset] = 0x00;
@@ -4580,6 +4587,7 @@ void subsino_state::init_trsocean()
 	//TODO:
 	//rom[0x7ab] = 0x18; //patch "winning protection" check
 	//rom[0x96f] = 0x18; //patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{

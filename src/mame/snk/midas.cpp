@@ -831,7 +831,7 @@ void midas_state::init_livequiz()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
-	// HACK: protection checks
+	// HACK: patch protection check
 	rom[0x13345a/2] = 0x4e75;
 }
 
