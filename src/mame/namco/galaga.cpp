@@ -2668,6 +2668,7 @@ ROM_END
 
 void galaga_state::init_galaga()
 {
+	// TODO: handle in drawing routines not here
 	/* swap bytes for flipped character so we can decode them together with normal characters */
 	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();

@@ -609,11 +609,12 @@ void hotchili_state::init_hc()
 	uint8_t *ROM = memregion("maincpu")->base();
 	m_bank->configure_entries(0, 4, &ROM[0x8000], 0x2000);
 
+	// HACK: get rid of these
 	ROM[0x05bc] = 0x00;  // Avoids ram error flag setup
-	ROM[0x06c1] = 0x20;  // Skip Rom Error
-	ROM[0x06c4] = 0xc6;  // Skip Ram Error
-	ROM[0x06d1] = 0xd3;  // Skip Ram Error
-	ROM[0x06d2] = 0x06;  // Skip Ram Error
+	ROM[0x06c1] = 0x20;  // Skip ROM Error
+	ROM[0x06c4] = 0xc6;  // Skip RAM Error
+	ROM[0x06d1] = 0xd3;  // Skip RAM Error
+	ROM[0x06d2] = 0x06;  // Skip RAM Error
 	ROM[0x1c54] = 0x84;  // Avoids meter error
 	ROM[0x1c5b] = 0x84;  // Avoids meter error
 }

@@ -65,6 +65,7 @@ void nbmj8688_state::init_kanatuen()
 	/* uses the same protection data as mjcamer, but a different check */
 	uint8_t *rom = memregion("voice")->base() + 0x30000;
 
+	// HACK: bypass protection
 	rom[0x0004] = 0x09;
 	rom[0x0103] = 0x0e;
 	rom[0x0202] = 0x08;
@@ -73,14 +74,13 @@ void nbmj8688_state::init_kanatuen()
 
 void nbmj8688_state::init_kyuhito()
 {
-#if 1
 	/* uses the same protection data as ????, but a different check */
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: bypass protection
 	rom[0x0149] = 0x00;
 	rom[0x014a] = 0x00;
 	rom[0x014b] = 0x00;
-#endif
 }
 
 void nbmj8688_state::init_idhimitu()

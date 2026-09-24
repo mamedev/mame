@@ -788,11 +788,10 @@ void lependu_state::init_lependu()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-/*  break the loop at $cc53 that prevents to start a game
-
-    $cc53 lda $01c4
-    $cc56 bne $cc53
-*/
+	// HACK: get rid of these patches
+	//  break the loop at $cc53 that prevents to start a game
+	//  $cc53 lda $01c4
+	//  $cc56 bne $cc53
 	ROM[0xcc56] = 0xea;
 	ROM[0xcc57] = 0xea;
 

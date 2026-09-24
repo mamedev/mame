@@ -475,10 +475,9 @@ void gsword_state::init_gsword()
 	ROM2[0x71e] = 0;    // patch for sound protection or time out function
 	ROM2[0x71f] = 0;
 #endif
-#if 1
-	// hack for sound protection or time out function
+
+	// HACK: sound protection or time out function
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
-#endif
 }
 
 void gsword_state::init_gsword2()
@@ -490,10 +489,9 @@ void gsword_state::init_gsword2()
 	ROM2[0x726] = 0;    // patch for sound protection or time out function
 	ROM2[0x727] = 0;
 #endif
-#if 1
-	// hack for sound protection or time out function
+
+	// HACK: for sound protection or time out function
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
-#endif
 }
 
 void gsword_state::machine_start()

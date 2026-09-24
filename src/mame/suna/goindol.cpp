@@ -577,8 +577,7 @@ void goindol_state::init_goindol()
 	uint8_t *rom = memregion("maincpu")->base();
 
 
-	// I hope that's all patches to avoid protection
-
+	// HACK: skip protection checks
 	rom[0x18e9] = 0x18; // ROM 1 check
 	rom[0x1964] = 0x00; // ROM 9 error (MCU?)
 	rom[0x1965] = 0x00; //

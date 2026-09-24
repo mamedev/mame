@@ -82,7 +82,8 @@ void dc_cons_state::init_dc()
 
 void dc_cons_state::init_tream()
 {
-	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below, which allow to boot any region games.
+	// Modchip connected to BIOS ROM chip changes 4 bytes (actually bits) as shown below,
+	// which allow to boot any region games.
 	u8 *rom = (u8 *)memregion("maincpu")->base();
 	rom[0x503] |= 0x40;
 	rom[0x50f] |= 0x40;

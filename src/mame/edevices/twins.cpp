@@ -715,6 +715,7 @@ ROM_END
 
 void twins_state::init_twins()
 {
+	// TODO: MT #07516 workaround
 	u8 *rom = (u8 *)memregion("ipl")->base();
 
 	rom[0x3497d] = 0x90;
@@ -726,6 +727,7 @@ void twins_state::init_twins()
 
 void twins_state::init_twinsed2()
 {
+	// TODO: MT #07516 workaround
 	u8 *rom = (u8 *)memregion("ipl")->base();
 
 	rom[0x349d3] = 0x90;

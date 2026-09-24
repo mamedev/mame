@@ -3960,7 +3960,8 @@ ROM_END
 void subsino_state::init_smoto16()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x12d0] = 0x20; // "ERROR 951010"
+	// HACK: "ERROR 951010"
+	rom[0x12d0] = 0x20;
 }
 
 /***************************************************************************
@@ -4436,13 +4437,15 @@ void subsino_state::init_sharkpye()
 void subsino_state::init_smoto20()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x12e1] = 0x20; // "ERROR 951010"
+	// HACK: "ERROR 951010"
+	rom[0x12e1] = 0x20;
 }
 
 void subsino_state::init_smoto13()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x1308] = 0x20; // "ERROR 951010"
+	// HACK: "ERROR 951010"
+	rom[0x1308] = 0x20;
 }
 
 void subsino_state::init_tisub()
@@ -4471,12 +4474,11 @@ void subsino_state::init_newhunterc()
 
 void subsino_state::init_stbsub()
 {
-#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x1005] = 0x1d; //patch protection check
-	rom[0x7ab] = 0x18; //patch "winning protection" check
-	rom[0x957] = 0x18; //patch "losing protection" check
-#endif
+	// HACK: patch protection checks
+	rom[0x1005] = 0x1d; // patch protection check
+	rom[0x07ab] = 0x18; // patch "winning protection" check
+	rom[0x0957] = 0x18; // patch "losing protection" check
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4489,6 +4491,7 @@ void subsino_state::init_stbsub()
 void subsino_state::init_stisub()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
+	// HACK: patch protection checks
 	rom[0xfa0] = 0x28;
 	rom[0xfa1] = 0x1d; //patch protection check
 	rom[0x7ed] = 0x18; //patch "winning protection" check
@@ -4504,13 +4507,12 @@ void subsino_state::init_stisub()
 
 void subsino_state::init_tesorone()
 {
-#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x10a4] = 0x18; //patch protection check ("ERROR 08073"):
+	// HACK: patch protection checks
+	rom[0x10a4] = 0x18; // patch protection check ("ERROR 08073"):
 	rom[0x10a5] = 0x11;
-	rom[0x8b6] = 0x18; //patch "winning protection" check
-	rom[0xa84] = 0x18; //patch "losing protection" check
-#endif
+	rom[0x08b6] = 0x18; // patch "winning protection" check
+	rom[0x0a84] = 0x18; // patch "losing protection" check
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4522,13 +4524,13 @@ void subsino_state::init_tesorone()
 
 void subsino_state::init_tesorone230()
 {
-#if 1
-	uint8_t *rom = memregion( "maincpu" )->base();            //check this patch!!!!
-	rom[0x10a8] = 0x18; //patch protection check ("ERROR 08073"):
+	uint8_t *rom = memregion( "maincpu" )->base();
+	// HACK: protection checks
+	rom[0x10a8] = 0x18; // patch protection check ("ERROR 08073"):
 	rom[0x10a9] = 0x11;
-	rom[0x8ba] = 0x18; //patch "winning protection" check
-	rom[0xa88] = 0x18; //patch "losing protection" check
-#endif
+	rom[0x08ba] = 0x18; // patch "winning protection" check
+	rom[0x0a88] = 0x18; // patch "losing protection" check
+
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4540,13 +4542,12 @@ void subsino_state::init_tesorone230()
 
 void subsino_state::init_grndprix()
 {
-#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[0x1464] = 0x18; //patch protection check
+	// HACK: protection checks
+	rom[0x1464] = 0x18; // patch protection check
 	rom[0x1465] = 0x11;
-	rom[0x7ab] = 0x18; //patch "winning protection" check
-	rom[0x96f] = 0x18; //patch "losing protection" check
-#endif
+	rom[0x07ab] = 0x18; // patch "winning protection" check
+	rom[0x096f] = 0x18; // patch "losing protection" check
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4569,9 +4570,9 @@ void subsino_state::init_mtrainnv()
 template <offs_t Offset>
 void subsino_state::init_trsocean()
 {
-
 	uint8_t *rom = memregion( "maincpu" )->base();
-	rom[Offset] = 0x00; //patch protection check ("ERROR 08073")
+	// HACK: patch protection check ("ERROR 08073")
+	rom[Offset] = 0x00;
 
 	//TODO:
 	//rom[0x7ab] = 0x18; //patch "winning protection" check

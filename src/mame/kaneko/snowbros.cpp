@@ -3262,7 +3262,7 @@ void semicom_state::init_cookbib3()
 void semicom_state::init_sutjarod()
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
-	// patch RAM decrypt key in ROM to be the same as cookbib3
+	// HACK: patch RAM decrypt key in ROM to be the same as cookbib3
 	rom[0xb994 / 2] = 0x434b;
 	rom[0xb996 / 2] = 0x3345;
 
@@ -3273,7 +3273,7 @@ void semicom_state::init_sutjarod()
 
 void semicom_state::init_gwasu()
 {
-	// same reason for patch as init_sutjarod
+	// HACK: same reason for patch as init_sutjarod
 	u16 *rom = (u16*)memregion("maincpu")->base();
 	rom[0xfda8 / 2] = 0x434b;
 	rom[0xfdaa / 2] = 0x3345;

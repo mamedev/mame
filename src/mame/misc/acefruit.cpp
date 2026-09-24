@@ -626,9 +626,10 @@ void acefruit_state::acefruit(machine_config &config)
 void acefruit_state::init_sidewndr()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	/* replace "ret nc" (0xd0) with "di" */
+
+	// HACK: replace "ret nc" (0xd0) with "di"
+	// this is either a bad dump or the cpu core should set the carry flag on reset
 	ROM[0] = 0xf3;
-	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
 
 /***************************************************************************

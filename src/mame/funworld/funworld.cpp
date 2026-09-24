@@ -8240,6 +8240,7 @@ void funworld_state::init_tabblue()
 
 void magicrd2_state::init_magicd2b()
 {
+	// HACK: smells like copy protection
 	/*****************************************************************
 
 	  For a serie of Mexican Rockwell's 65c02
@@ -8283,7 +8284,7 @@ void magicrd2_state::init_magicd2c()
 
 void funworld_state::init_mongolnw()
 {
-//  temporary patch to avoid hardware errors for debug purposes
+	// HACK: temporary patch to avoid hardware errors for debug purposes
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x9115] = 0xa5;
@@ -8295,7 +8296,7 @@ void funworld_state::init_mongolnw()
 
 void funworld_state::init_soccernw()
 {
-//  temporary patch to avoid hardware errors for debug purposes
+	// HACK: temporary patch to avoid hardware errors for debug purposes
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x80b2] = 0xa9;
@@ -8806,6 +8807,8 @@ void chinatow_state::init_rcdinch()
 
 void funworld_state::init_jolycdig()
 {
+	// HACK: smells like copy protection
+
 	// covering two values in ROM space checked for hardware errors.
 	// maybe some virtual or physically mapped there.
 
@@ -8817,6 +8820,7 @@ void funworld_state::init_jolycdig()
 
 void intergames_state::init_novop_a()
 {
+	// HACK: smells like copy protection
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
 	uint8_t *rom = memregion("maincpu")->base();
@@ -8827,6 +8831,7 @@ void intergames_state::init_novop_a()
 
 void intergames_state::init_novop_b()
 {
+	// HACK: smells like copy protection
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
 	uint8_t *rom = memregion("maincpu")->base();
@@ -8837,6 +8842,7 @@ void intergames_state::init_novop_b()
 
 void intergames_state::init_intgms()
 {
+	// HACK: smells like copy protection
 	// NOP'ing some values in ROM space to avoid the hardware error.
 
 	uint8_t *rom = memregion("maincpu")->base();

@@ -869,7 +869,7 @@ void atomiswave_state::init_atomiswave()
 {
 	uint64_t *ROM = (uint64_t *)memregion("awflash")->base();
 
-	// patch out long startup delay
+	// HACK: patch out long startup delay
 	// (Sammy logo on -bios 0 before "ALL BACKUP DATA WAS CLEARED" msg)
 	// Notice that you also need to zap NVRAM contents in order to boot without this patch.
 	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffffU) | (uint64_t)0x0009<<48;

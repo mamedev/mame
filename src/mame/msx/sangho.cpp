@@ -577,7 +577,7 @@ void pzlestar_state::init_pzlestar()
 {
 	uint8_t *ROM = m_region_user1->base();
 
-	/* patch nasty looping check, related to sound? */
+	// HACK: patch nasty looping check, related to sound?
 	ROM[0x12ca7] = 0x00;
 	ROM[0x12ca8] = 0x00;
 }
