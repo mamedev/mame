@@ -53,6 +53,7 @@ static constexpr u32 C15M = (C7M * 2);
 DEFINE_DEVICE_TYPE(IOSB, iosb_device, "iosb", "Apple IOSB I/O ASIC")
 DEFINE_DEVICE_TYPE(PRIMETIME, primetime_device, "primetime", "Apple PrimeTime I/O ASIC")
 DEFINE_DEVICE_TYPE(PRIMETIMEII, primetimeii_device, "primetime2", "Apple PrimeTime II I/O ASIC")
+DEFINE_DEVICE_TYPE(PRIMETIMEIII, primetimeiii_device, "primetime3", "Apple PrimeTime III I/O ASIC")
 
 //-------------------------------------------------
 //  ADDRESS_MAP
@@ -112,6 +113,16 @@ void iosb_device::device_add_mconfig(machine_config &config)
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
 	m_rtc->cko_cb().set(m_via1, FUNC(via6522_device::write_ca2));
+}
+
+void primetimeiii_device::device_add_mconfig(machine_config &config)
+{
+	primetimeii_device::device_add_mconfig(config);
+
+	ASC_PRIMETIME3(config.replace(), m_asc, 45.1584_MHz_XTAL);
+	m_asc->add_route(0, "speaker", 1.0, 0);
+	m_asc->add_route(1, "speaker", 1.0, 1);
+	m_asc->irqf_callback().set(FUNC(primetimeiii_device::asc_irq));
 }
 
 //-------------------------------------------------
@@ -179,11 +190,21 @@ primetime_device::primetime_device(const machine_config &mconfig, const char *ta
 }
 
 primetimeii_device::primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	primetime_device(mconfig, PRIMETIMEII, tag, owner, clock),
+	primetimeii_device(mconfig, PRIMETIMEII, tag, owner, clock)
+{
+}
+
+primetimeii_device::primetimeii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	primetime_device(mconfig, type, tag, owner, clock),
 	m_ata_irq(0),
 	m_ata_irq_enables(0)
 {
 	std::fill(std::begin(m_primetimeii_regs), std::end(m_primetimeii_regs), 0);
+}
+
+primetimeiii_device::primetimeiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	primetimeii_device(mconfig, PRIMETIMEIII, tag, owner, clock)
+{
 }
 
 //-------------------------------------------------
@@ -693,6 +714,12 @@ void primetimeii_device::map(address_map &map)
 {
 	iosb_base::map(map);
 	map(0x0001a100, 0x0001a103).rw(FUNC(primetimeii_device::ata_regs_r), FUNC(primetimeii_device::ata_regs_w)).mirror(0x00f00000);
+}
+
+void primetimeiii_device::map(address_map &map)
+{
+	primetimeii_device::map(map);
+	map(0x00015000, 0x00015fff).rw("asc", FUNC(asc_primetime3_device::read16), FUNC(asc_primetime3_device::write16)).mirror(0x00f00000);
 }
 
 // This may actually be in F108, the boundaries between the two chips aren't completely clear

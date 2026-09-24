@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Tim Douglas
 /***************************************************************************
 
     asc.h
@@ -10,6 +10,7 @@
     Audio portion of "Sonora" ASIC (343S1065)
     Audio portion of "IOSB" ASIC (343S1078), copy-pasted in
       "PrimeTime" (343S0135) and "PrimeTime II" (343S0138) ASICs.
+    Audio portion of "PrimeTime III" ASIC (343S1189)
 
 ***************************************************************************/
 
@@ -219,11 +220,62 @@ private:
 	s32 m_xa_subpos[2]; // sub-position within packed byte
 };
 
+class asc_primetime3_device : public asc_base_device
+{
+public:
+	asc_primetime3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
+
+	u16 read16(offs_t offset);
+	void write16(offs_t offset, u16 data, u16 mem_mask);
+
+protected:
+	virtual void sound_stream_update(sound_stream &stream) override;
+	virtual u8 get_version() override;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	enum { FIFO_A, FIFO_B, FIFO_REC };
+	static constexpr unsigned FIFO_SAMPLES = 1024;
+	static constexpr unsigned FIFO_BYTES = FIFO_SAMPLES * 2;
+	static constexpr unsigned FIFO_HALF_BYTES = FIFO_BYTES / 2;
+	static constexpr unsigned FIFO_PTR_MASK = FIFO_BYTES - 1;
+
+	enum
+	{
+		R_COUNTA = 0xf0e - 0x800,
+		R_COUNTB = 0xf2e - 0x800
+	};
+
+	void reset_fifos();
+	u16 fifo_cap(int f) const;
+	void push_sample(int f, s16 sample);
+	s16 pop_sample(int f);
+	void update_status16();
+	void update_fifo_timer();
+	u8 counter_value() const;
+	u16 pop_record();
+	bool recording() const { return BIT(m_regs[R_PLAYRECA], 0); }
+
+	s16 m_fifo16[3][FIFO_SAMPLES]{};
+	u16 m_rdptr16[3]{}, m_wrptr16[3]{};
+	bool m_full[3]{};
+	u8 m_laststat = 0;
+	u8 m_irq_pending = 0;
+	u8 m_countbase = 0;
+	u16 m_rec_last = 0x8000;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(ASC, asc_device)
 DECLARE_DEVICE_TYPE(ASC_V8, asc_v8_device)
 DECLARE_DEVICE_TYPE(ASC_SONORA, asc_sonora_device)
 DECLARE_DEVICE_TYPE(ASC_IOSB, asc_iosb_device)
+DECLARE_DEVICE_TYPE(ASC_PRIMETIME3, asc_primetime3_device)
 DECLARE_DEVICE_TYPE(ASC_MSC, asc_msc_device)
 DECLARE_DEVICE_TYPE(ASC_EASC, asc_easc_device)
 

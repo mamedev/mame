@@ -68,6 +68,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	void asc_irq(int state);
+
 	virtual uint8_t via_in_b();
 	virtual void via_out_b(uint8_t data);
 
@@ -179,6 +181,8 @@ public:
 	void ata_irq_w(int state);
 
 protected:
+	primetimeii_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -190,9 +194,21 @@ private:
 	u16 m_primetimeii_regs[0x20];
 };
 
+class primetimeiii_device : public primetimeii_device
+{
+public:
+	primetimeiii_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void map(address_map &map) override ATTR_COLD;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(IOSB, iosb_device)
 DECLARE_DEVICE_TYPE(PRIMETIME, primetime_device)
 DECLARE_DEVICE_TYPE(PRIMETIMEII, primetimeii_device)
+DECLARE_DEVICE_TYPE(PRIMETIMEIII, primetimeiii_device)
 
 #endif // MAME_APPLE_IOSB_H
