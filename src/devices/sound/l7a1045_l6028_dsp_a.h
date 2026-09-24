@@ -61,6 +61,8 @@ private:
 		uint32_t step = 0;
 		uint32_t pos = 0;
 		uint32_t frac = 0;
+		uint32_t sample_history[3] = {}; // preceding source addresses, newest first
+		uint8_t history_count = 0;
 		uint16_t l_volume = 0;
 		uint16_t r_volume = 0;
 		uint16_t env_volume = 0;
@@ -104,6 +106,9 @@ private:
 	void atomic_w(uint16_t data);
 
 	void recalc_loop_start(l7a1045_voice *vptr);
+	static void advance_history(l7a1045_voice &voice, uint32_t address, uint32_t count);
+	int32_t read_sample(uint8_t sample_type, uint32_t address);
+	int32_t interpolated_sample(const l7a1045_voice &voice, uint32_t address, uint32_t frac);
 
 	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 };
