@@ -31,7 +31,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -40,13 +39,22 @@ protected:
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
 
-	// device_vic20_expansion_card_interface implementation
-	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
-	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
-
 private:
+	TIMER_CALLBACK_MEMBER(reset_tick);
+
+	void io3_w(offs_t offset, uint8_t data);
+	void update_map();
+
+	memory_share_creator<uint8_t> m_ram;
 	memory_share_creator<uint8_t> m_nvram;
+	uint8_t *m_rom;
+	emu_timer *m_reset_timer;
+
 	int m_nvram_en;
+	int m_oe;
+	int m_software_reset;
+	uint8_t m_bank_lo;
+	uint8_t m_bank_hi;
 };
 
 

@@ -839,7 +839,7 @@ SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
   |               |-----| |-----| |-----| |-----|  |         |  |  |
   |   |---------|                                  |  C399   |  |--|
   |   |         |         |-----| |-----| |-----|  |         |   |
-  |   |  C387   |         |C400 | |C400 | |C400 |  |         |   |
+  |   |  C397   |         |C400 | |C400 | |C400 |  |         |   |
   |   |         |         |-----| |-----| |-----|  |---------|  |--|
 |--|  |         |                    |-----|            N341256 |  |
 |  |  |---------|                    |C406 |  |-----|   N341256 |  |
@@ -867,13 +867,11 @@ Notes:
       C361         : Namco custom C361 (QFP120)
       C374         : Namco custom C374 (QFP160)
       C381         : Namco custom C381 (x2, QFP144)
-      C387         : Namco custom C387 (QFP160)
       C395         : Namco custom C395 (QFP168)
+      C397         : Namco custom C397 (QFP160)
       C399         : Namco custom C399 (QFP160)
       C400         : Namco custom C400 (x4, QFP100)
-                     - x3 on 1st Revision
       C401         : Namco custom C401 (x4, QFP64)
-                     - x5 on 1st Revision
       C404         : Namco custom C404 (QFP208)
       C406         : Namco custom C406 (TQFP120)
       C407         : Namco custom C407 (QFP64) NOTE! On Revision A & B, this position is populated by an
@@ -6322,7 +6320,7 @@ void propcycl_state::init_propcycl()
 {
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
-	// patch out strange routine (uninitialized-eeprom related?)
+	// HACK: patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation
 	ROM[0x1992c/4] = 0x4e754e75;
 
@@ -6344,7 +6342,7 @@ void propcycl_state::init_propcycl()
 
 void propcycl_state::init_propcyclj()
 {
-	// see init_propcycl for notes
+	// HACK: see init_propcycl for notes
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	ROM[0x1990a/4] = 0x4e754e75;

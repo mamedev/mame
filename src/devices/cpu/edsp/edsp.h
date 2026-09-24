@@ -100,6 +100,9 @@ public:
 	auto in_pa_callback() { return m_in_pa_cb.bind(); }
 	auto out_pa_callback() { return m_out_pa_cb.bind(); }
 	auto in_pb_callback() { return m_in_pb_cb.bind(); }
+	auto out_pb_callback() { return m_out_pb_cb.bind(); }
+	auto in_pc_callback() { return m_in_pc_cb.bind(); }
+	auto out_pc_callback() { return m_out_pc_cb.bind(); }
 
 protected:
 	// device_t implementation
@@ -115,8 +118,15 @@ private:
 	u16 porta_r();
 	void porta_w(u16 data);
 	u16 portb_r();
+	void portb_w(u16 data);
+	u16 portc_r();
+	void portc_w(u16 data);
 	u16 pdira_r();
 	void pdira_w(u16 data);
+	u16 pdirb_r();
+	void pdirb_w(u16 data);
+	u16 pdirc_r();
+	void pdirc_w(u16 data);
 	u16 pcona_r();
 	void pcona_w(u16 data);
 
@@ -124,9 +134,16 @@ private:
 	devcb_read16 m_in_pa_cb;
 	devcb_write16 m_out_pa_cb;
 	devcb_read8 m_in_pb_cb;
+	devcb_write8 m_out_pb_cb;
+	devcb_read16 m_in_pc_cb;
+	devcb_write16 m_out_pc_cb;
 
 	u16 m_pdata;
+	u8 m_pdatb;
+	u16 m_pdatc;
 	u16 m_pdira;
+	u8 m_pdirb;
+	u16 m_pdirc;
 	u16 m_pcona;
 };
 

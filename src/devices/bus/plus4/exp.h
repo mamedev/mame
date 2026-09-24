@@ -46,6 +46,70 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> plus4_expansion_window
+
+class plus4_expansion_window
+{
+public:
+	class variant
+	{
+	public:
+		void install_rom(offs_t start, offs_t end, void *baseptr) { install_rom(start, end, 0, baseptr); }
+		void install_rom(offs_t start, offs_t end, offs_t mirror, void *baseptr);
+
+		template <typename R> void install_read_handler(offs_t start, offs_t end, R &&rhandler) { install_read_handler(start, end, 0, std::forward<R>(rhandler)); }
+		template <typename R> void install_read_handler(offs_t start, offs_t end, offs_t mirror, R &&rhandler)
+		{ m_window.m_view[m_slot].install_read_handler(m_window.m_start + start, m_window.m_start + end, 0, mirror, 0, rhandler); }
+
+		template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler) { install_write_handler(start, end, 0, std::forward<W>(whandler)); }
+		template <typename W> void install_write_handler(offs_t start, offs_t end, offs_t mirror, W &&whandler)
+		{ m_window.m_view[m_slot].install_write_handler(m_window.m_start + start, m_window.m_start + end, 0, mirror, 0, whandler); }
+
+		template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, R &&rhandler, W &&whandler) { install_readwrite_handler(start, end, 0, std::forward<R>(rhandler), std::forward<W>(whandler)); }
+		template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, offs_t mirror, R &&rhandler, W &&whandler)
+		{ m_window.m_view[m_slot].install_readwrite_handler(m_window.m_start + start, m_window.m_start + end, 0, mirror, 0, rhandler, whandler); }
+
+	private:
+		friend class plus4_expansion_window;
+
+		variant(plus4_expansion_window &window, int slot) : m_window(window), m_slot(slot) { }
+
+		void install_rom_segment(offs_t start, offs_t end, uint8_t *base);
+
+		plus4_expansion_window &m_window;
+		int const m_slot;
+	};
+
+	plus4_expansion_window(device_t &device, const char *name, offs_t start, offs_t end);
+	plus4_expansion_window(device_t &device, const char *name, offs_t start, offs_t end, offs_t video_start);
+	plus4_expansion_window(device_t &device, const char *name, offs_t start, offs_t end, offs_t video_start, offs_t hole_start, offs_t hole_end);
+
+	variant operator[](int slot) { return variant(*this, slot); }
+
+	void select(int slot);
+	void unmap();
+
+	template <typename... T> void install_rom(T &&... args) { (*this)[0].install_rom(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_read_handler(T &&... args) { (*this)[0].install_read_handler(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_write_handler(T &&... args) { (*this)[0].install_write_handler(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_readwrite_handler(T &&... args) { (*this)[0].install_readwrite_handler(std::forward<T>(args)...); select(0); }
+
+	void install_views(address_space_installer &program, address_space_installer *video = nullptr);
+
+private:
+	memory_view m_view;
+	memory_view m_video_view;
+	offs_t const m_start;
+	offs_t const m_end;
+	offs_t const m_video_start;
+	offs_t const m_hole_start;
+	offs_t const m_hole_end;
+	bool const m_has_video;
+	bool const m_has_hole;
+	bool m_video_installed;
+};
+
+
 // ======================> plus4_expansion_slot_device
 
 class device_plus4_expansion_card_interface;
@@ -64,21 +128,20 @@ public:
 	}
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static void add_passthrough(machine_config &config, const char *tag);
+
 	auto irq_wr_callback() { return m_write_irq.bind(); }
-	auto cd_rd_callback() { return m_read_dma_cd.bind(); }
-	auto cd_wr_callback() { return m_write_dma_cd.bind(); }
 	auto aec_wr_callback() { return m_write_aec.bind(); }
 
-	// computer interface
-	uint8_t cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-	void cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-
 	// cartridge interface
-	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
-	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
+	plus4_expansion_window &c1l() { return m_root->m_c1l; }
+	plus4_expansion_window &c1h() { return m_root->m_c1h; }
+	plus4_expansion_window &c2l() { return m_root->m_c2l; }
+	plus4_expansion_window &c2h() { return m_root->m_c2h; }
+	plus4_expansion_window &io() { return m_root->m_io; }
+
 	void irq_w(int state) { m_write_irq(state); }
 	void aec_w(int state) { m_write_aec(state); }
-	int phi2() { return clock(); }
 
 protected:
 	// device_t implementation
@@ -95,11 +158,20 @@ protected:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line   m_write_irq;
-	devcb_read8        m_read_dma_cd;
-	devcb_write8       m_write_dma_cd;
 	devcb_write_line   m_write_aec;
 
 	device_plus4_expansion_card_interface *m_card;
+
+private:
+	plus4_expansion_slot_device *find_root(device_t *owner);
+
+	plus4_expansion_slot_device *const m_root;
+
+	plus4_expansion_window m_c1l;
+	plus4_expansion_window m_c1h;
+	plus4_expansion_window m_c2l;
+	plus4_expansion_window m_c2h;
+	plus4_expansion_window m_io;
 };
 
 
@@ -113,24 +185,13 @@ public:
 	// construction/destruction
 	virtual ~device_plus4_expansion_card_interface();
 
-	// runtime
-	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; }
-	virtual void plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { }
-
 protected:
 	device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
-	std::unique_ptr<uint8_t[]> m_c1l;
-	std::unique_ptr<uint8_t[]> m_c1h;
-	std::unique_ptr<uint8_t[]> m_c2l;
-	std::unique_ptr<uint8_t[]> m_c2h;
-
-	size_t m_c1l_size;
-	size_t m_c1h_size;
-	size_t m_c2l_size;
-	size_t m_c2h_size;
-
 	plus4_expansion_slot_device *m_slot;
+
+private:
+	void set_slot(plus4_expansion_slot_device &slot) { m_slot = &slot; }
 };
 
 

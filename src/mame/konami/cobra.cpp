@@ -3071,7 +3071,7 @@ void cobra_state::init_bujutsu()
 {
 	init_cobra();
 
-	// rom hacks for sub board...
+	// HACK: ROM hacks for sub board...
 	{
 		uint32_t *rom = (uint32_t*)memregion("user2")->base();
 
@@ -3079,7 +3079,7 @@ void cobra_state::init_bujutsu()
 	}
 
 
-	// rom hacks for gfx board...
+	// HACK: ROM hacks for gfx board...
 	{
 		int i;
 		uint32_t sum = 0;
@@ -3103,7 +3103,7 @@ void cobra_state::init_bujutsu()
 
 
 
-	// fill in M48T58 data for now...
+	// HACK: fill in M48T58 data for now...
 	{
 		uint8_t *rom = (uint8_t*)memregion("m48t58")->base();
 		rom[0x00] = 0x47;       // G
@@ -3153,7 +3153,7 @@ void cobra_state::init_racjamdx()
 {
 	init_cobra();
 
-	// rom hacks for sub board...
+	// HACK: ROM hacks for sub board...
 	{
 		uint32_t *rom = (uint32_t*)memregion("user2")->base();
 
@@ -3176,7 +3176,7 @@ void cobra_state::init_racjamdx()
 	}
 
 
-	// rom hacks for gfx board...
+	// HACK: ROM hacks for gfx board...
 	{
 		uint32_t sum = 0;
 
@@ -3200,7 +3200,7 @@ void cobra_state::init_racjamdx()
 	}
 
 
-	// fill in M48T58 data for now...
+	// HACK: fill in M48T58 data for now...
 	{
 		uint8_t *rom = (uint8_t*)memregion("m48t58")->base();
 		rom[0x00] = 0x47;       // G

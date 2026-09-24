@@ -4131,6 +4131,7 @@ void konamigx_state::init_konamigx()
 				{
 					u32 *rom = (u32*)memregion("maincpu")->base();
 
+					// HACK: remove this ROM patch
 					// The display is initialized after POST but the copyright screen disabled
 					// planes B,C,D and didn't bother restoring them. I've spent a good
 					// amount of time chasing this bug but the cause remains inconclusive.

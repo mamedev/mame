@@ -1755,7 +1755,7 @@ void swp30_device::device_start()
 	state_add(1,               "P",         m_meg->m_p);
 
 	for(int i=1; i != 0x40; i++)
-		state_add(i+1, util::string_format("m%02x", i).c_str(), m_meg->m_m[i]);
+		state_add(i+1, util::string_format("m%02x", i), m_meg->m_m[i]);
 
 	// SWP30 compiles the entire MEG program as one block, so the max sequence length is
 	// passed as 0 bytes.  In the unlikely event that changes, this should be updated.

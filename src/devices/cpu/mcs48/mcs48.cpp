@@ -1205,7 +1205,7 @@ void mcs48_cpu_device::device_start()
 	state_add(MCS48_P2,        "P2",        m_p2);
 
 	for (int regnum = 0; regnum < 8; regnum++)
-		state_add(MCS48_R0 + regnum, string_format("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
+		state_add(MCS48_R0 + regnum, string_format("R%d", regnum), m_rtemp).callimport().callexport();
 
 	if (!(m_feature_mask & I802X_FEATURE))
 		state_add(MCS48_EA,    "EA",        m_ea).mask(0x1);

@@ -479,6 +479,7 @@ ROM_END
 
 void spool99_state::init_spool99()
 {
+	// TODO: move vector init in machine_reset
 	uint8_t *ROM = memregion("maincpu")->base();
 //  vram = std::make_unique<uint8_t[]>(0x2000);
 	memcpy(m_main, ROM, 0x100);

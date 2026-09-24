@@ -578,3 +578,21 @@ void device_state_interface::interface_post_start()
 	if (m_state_list.size() == 0)
 		throw emu_fatalerror("No state registered for device '%s' that supports it!", device().tag());
 }
+
+
+//**************************************************************************
+//  TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class device_state_register<u8>;
+template class device_state_register<u16>;
+template class device_state_register<u32>;
+template class device_state_register<u64>;
+template class device_latched_functional_state_register<u8>;
+template class device_latched_functional_state_register<u16>;
+template class device_latched_functional_state_register<u32>;
+template class device_latched_functional_state_register<u64>;
+template class device_functional_state_register<u8>;
+template class device_functional_state_register<u16>;
+template class device_functional_state_register<u32>;
+template class device_functional_state_register<u64>;

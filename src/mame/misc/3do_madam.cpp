@@ -949,9 +949,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, BIT(m_cel.current_ccb, 19)
 				, m_cel_master_sw.ascall
 				// ACW/ACCW: enable clockwise/counterclockwise rendering
+				// applies at CEL level
 				, BIT(m_cel.current_ccb, 18)
 				, BIT(m_cel.current_ccb, 17)
 				// TWD: terminate CEL if wrong direction is encountered
+				// i.e. backface culling, per-pixel
 				, BIT(m_cel.current_ccb, 16)
 			);
 			m_cel.pxor = !!BIT(m_cel.current_ccb, 11);
@@ -1228,10 +1230,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, tlhpcnt
 			);
 
-			const u16 xclip = m_regis.xclip;
-			const u16 yclip = m_regis.yclip;
+			//const u16 xclip = m_regis.xclip;
+			//const u16 yclip = m_regis.yclip;
 			//const u16 src_pitch = m_regis.fb_pitch[0];
-			const u16 dst_pitch = m_regis.fb_pitch[1];
+			//const u16 dst_pitch = m_regis.fb_pitch[1];
 
 			// encode source addressing in an easy to digest inner loop form
 			const u8 actual_src_mode = m_cel.packed ? 32 : (bpp << 2) | (uncoded << 1) | lrform;
@@ -1247,6 +1249,19 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 
 				const u8 op_mode = (m_cel.pxor << 1) | m_cel.useav;
 
+				// Determine Projector fill action outside the loop
+				// TODO: rectangle fills only for now, check if hits at > 1.5 actually
+				// (cpubach may care for musical score)
+				const s32 abs_hdx = std::abs(m_cel.hdx);
+				const s32 abs_vdy = std::abs(m_cel.vdy);
+				const bool projector_fill = (abs_hdx >= 2.0 || abs_vdy >= 2.0) && m_cel.hddx == 0.0 && m_cel.hddy == 0.0;
+
+				const double proj_x_max = projector_fill ? std::abs(abs_hdx) : 0.0;
+				const double proj_y_max = projector_fill ? std::abs(abs_vdy) : 0.0;
+
+				const double proj_x_dir = m_cel.hdx >= 0.0 ? 1 : -1;
+				const double proj_y_dir = m_cel.vdy >= 0.0 ? 1 : -1;
+
 				// lrform enabled doubles vcnt
 				// - plumber choice screen
 				// - conandl FMV playbacks
@@ -1257,14 +1272,12 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 					{
 						// According to "The Projector" section this floors down,
 						// discarding the fractional part
-						// TODO: convert to fn, need to recalc thru Projector
 						int ypos = (s32)(m_cel.ypos + y * m_cel.vdy + x * actual_hdy);
-
-						if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
+						if (!check_y_clip_normal(ypos))
 							continue;
 
 						int xpos = (s32)(m_cel.xpos + x * actual_hdx + y * m_cel.vdx);
-						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
+						if (!check_x_clip_normal(xpos))
 							continue;
 
 						u32 src_data = (this->*get_pixel_table[actual_src_mode])(x + skipx, y, woffset);
@@ -1281,22 +1294,35 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						const bool p_mode = BIT(src_data, 15);
 						const u8 pixc_mode = pixc_mode_setting[p_mode];
 
-						// TODO: Projector enlarging pixels should be done here
-						// The ACW/ACCW part ...
-
 						u16 res_data = (this->*pixc_mix_table[pixc_mode])(xpos, ypos, src_data, p_mode, op_mode);
 						// NOTE: x/y may be the CEL origin not the fb destination ...
 						res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos, ypos, src_data, res_data);
 
-						u32 dst_address = m_regctl3;
-						dst_address += ((ypos & ~1) * dst_pitch) << 2;
-						dst_address += (xpos << 2);
+						set_fb_pixel(xpos, ypos, res_data);
 
-						u32 dst_data = m_dma32_read_cb(dst_address);
-						u8 dst_shift = ((ypos ^ 1) & 1) * 16;
-						dst_data &= dst_shift ? 0xffff : 0xffff0000;
+						// Projector fill from here if we have a CEL
+						// Essentially similar as above minus that we already have a source pixel
+						// TODO: handle cases where CEL would cross over clipping range
+						// i.e. something around screen pixel X=-100.0 HDX=200.0
+						for (double yi = 0; yi < proj_y_max; yi+= 1.0)
+						{
+							for (double xi = 0; xi < proj_x_max; xi+= 1.0)
+							{
+								int ypos_i = (s32)(ypos + yi * proj_y_dir);
+								if (!check_y_clip_normal(ypos_i))
+									continue;
 
-						m_dma32_write_cb(dst_address, (res_data << dst_shift) | dst_data);
+								int xpos_i = (s32)(xpos + xi * proj_x_dir);
+								if (!check_x_clip_normal(xpos_i))
+									continue;
+
+								u16 res_data = (this->*pixc_mix_table[pixc_mode])(xpos_i, ypos_i, src_data, p_mode, op_mode);
+
+								res_data = (this->*vh_interpolate_table[m_cel.plutpos])(xpos_i, ypos_i, src_data, res_data);
+
+								set_fb_pixel(xpos_i, ypos_i, res_data);
+							}
+						}
 
 						// TODO: add extra timing depending on mixing mode use at least
 						tick_time += 3;
@@ -1324,6 +1350,46 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			break;
 		}
 	}
+}
+
+// TODO: these are fns because we eventually need to branch thru various clipping modes
+// Line Super Clipping, CEL Super Clipping and perhaps ACW/ACCW/TWD for Projector
+bool madam_device::check_y_clip_normal(int ypos)
+{
+	return ypos == std::clamp<unsigned>(ypos, 0, m_regis.yclip);
+}
+
+bool madam_device::check_x_clip_normal(int xpos)
+{
+	return xpos == std::clamp<unsigned>(xpos, 0, m_regis.xclip);
+}
+
+u16 madam_device::get_fb_pixel(int xpos, int ypos)
+{
+	const u16 fb_pitch = m_regis.fb_pitch[0];
+
+	u32 fb_address = m_regctl2;
+	fb_address += ((ypos & ~1) * fb_pitch) << 2;
+	fb_address += (xpos << 2);
+
+	u32 dst_data = m_dma32_read_cb(fb_address);
+	u8 dst_shift = ((ypos ^ 1) & 1) * 16;
+	return (dst_data >> dst_shift) & 0x7fff;
+}
+
+void madam_device::set_fb_pixel(int xpos, int ypos, u16 pix_data)
+{
+	const u16 fb_pitch = m_regis.fb_pitch[1];
+
+	u32 dst_address = m_regctl3;
+	dst_address += ((ypos & ~1) * fb_pitch) << 2;
+	dst_address += (xpos << 2);
+
+	u32 dst_data = m_dma32_read_cb(dst_address);
+	u8 dst_shift = ((ypos ^ 1) & 1) * 16;
+	dst_data &= dst_shift ? 0xffff : 0xffff0000;
+
+	m_dma32_write_cb(dst_address, (pix_data << dst_shift) | dst_data);
 }
 
 /******************
@@ -1362,19 +1428,6 @@ std::tuple<u8, u8, u8> madam_device::convert_secondary_source(u16 pix_data, bool
 	const u8 b = (pix_data & 0x001f) >> (0 + sdv);
 
 	return std::make_tuple(r, g, b);
-}
-
-u16 madam_device::get_fb_pixel(int xpos, int ypos)
-{
-	const u16 fb_pitch = m_regis.fb_pitch[0];
-
-	u32 fb_address = m_regctl2;
-	fb_address += ((ypos & ~1) * fb_pitch) << 2;
-	fb_address += (xpos << 2);
-
-	u32 dst_data = m_dma32_read_cb(fb_address);
-	u8 dst_shift = ((ypos ^ 1) & 1) * 16;
-	return (dst_data >> dst_shift) & 0x7fff;
 }
 
 std::tuple<u8, u8, u8> madam_device::convert_fb_primary_source(u16 fb_data, u32 cel_data, bool p_mode)
@@ -2063,7 +2116,7 @@ u32 madam_device::cel_decompress()
 const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 {
 	// 0 <invalid>
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_0bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
@@ -2113,6 +2166,7 @@ u32 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
 	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
 	return src_data;
 }
+
 // bpp=0: undocumented/illegal
 // - ssf2xj uses this for the 3do logo layer clearance at startup (with Projector rectangle fill)
 u32 madam_device::get_pixel_0bpp_coded_lrform0(int x, int y, u16 woffset)

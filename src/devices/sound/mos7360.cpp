@@ -38,11 +38,12 @@
 #define TIMER2 (TIMER2HELPER ? TIMER2HELPER : 0x10000)
 #define TIMER3 (TIMER3HELPER ? TIMER3HELPER : 0x10000)
 
-#define TED7360_YPOS            40
-#define RASTERLINE_2_C16(a)    ((a + m_lines - TED7360_YPOS - 5) % m_lines)
-#define C16_2_RASTERLINE(a)    ((a + TED7360_YPOS + 5) % m_lines)
-#define XPOS 8
-#define YPOS 8
+#define RASTER_OFFSET           44
+#define RASTERLINE_2_C16(a)    ((a + m_lines - RASTER_OFFSET) % m_lines)
+#define C16_2_RASTERLINE(a)    ((a + RASTER_OFFSET) % m_lines)
+#define TED7360_YPOS            m_top
+#define XPOS 32
+#define YPOS (48 - m_top)
 
 #define SCREENON               (m_reg[6] & 0x10)
 #define TEST                   (m_reg[6] & 0x80)
@@ -78,9 +79,10 @@
 #define MULTICOLOR2     (m_reg[0x18] & 0x7f)
 #define FRAMECOLOR      (m_reg[0x19] & 0x7f)
 
-#define TED7360_CLOCK        (m_clock / 4)
-#define TED7360_VRETRACERATE ((m_clock == TED7360PAL_CLOCK) ? PAL_VRETRACERATE : NTSC_VRETRACERATE)
-#define TED7360_LINES        ((m_clock == TED7360PAL_CLOCK) ? PAL_LINES : NTSC_LINES)
+static constexpr int LINE_PHASE_START[5] = { 0, 4, 90, 101, 114 };
+static constexpr int LINE_PHASE_CYCLES_FETCH[4] = { 4, 43, 5, 13 };
+static constexpr int LINE_PHASE_CYCLES_BORDER[4] = { 4, 86, 6, 13 };
+
 
 static const rgb_t PALETTE_MOS[] =
 {
@@ -132,24 +134,26 @@ static const rgb_t PALETTE_MOS[] =
 };
 
 
-#define NOISE_BUFFER_SIZE_SEC 5
-
-#define TONE_ON         (!(m_reg[0x11] & 0x80))     /* or tone update!? */
-#define TONE1_ON        ((m_reg[0x11] & 0x10))
 #define TONE1_VALUE     (m_reg[0x0e] | ((m_reg[0x12] & 3) << 8))
-#define TONE2_ON        ((m_reg[0x11] & 0x20))
 #define TONE2_VALUE     (m_reg[0x0f] | ((m_reg[0x10] & 3) << 8))
 #define VOLUME          (m_reg[0x11] & 0x0f)
-#define NOISE_ON        (m_reg[0x11] & 0x40)
+#define VOICE1_ON       (m_reg[0x11] & 0x10)
+#define VOICE2_ON       (m_reg[0x11] & 0x20)
+#define NOISE_ON        ((m_reg[0x11] & 0x60) == 0x40)
+#define DIGITAL_ON      (m_reg[0x11] & 0x80)
 
-/*
- * pal 111860.781
- * ntsc 111840.45
- */
-#define TONE_FREQUENCY(reg)         ((TED7360_CLOCK >> 3) / (1024 - reg))
-#define TONE_FREQUENCY_MIN          (TONE_FREQUENCY(0))
-#define NOISE_FREQUENCY             (TED7360_CLOCK / 8 / (1024 - TONE2_VALUE))
-#define NOISE_FREQUENCY_MAX         (TED7360_CLOCK / 8)
+// output level for volume (bits 0-3), voice 1 (bit 4) and voice 2 (bit 5)
+static const int16_t TED_SOUND_LEVEL[64] =
+{
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+	0x0000, 0x024a, 0x064a, 0x0a4a, 0x0e4a, 0x124a, 0x164a, 0x1a4a,
+	0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a,
+	0x0000, 0x024a, 0x064a, 0x0a4a, 0x0e4a, 0x124a, 0x164a, 0x1a4a,
+	0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a, 0x1e4a,
+	0x0000, 0x0494, 0x0cd4, 0x1596, 0x1f30, 0x29a2, 0x34ec, 0x410e,
+	0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08
+};
 
 
 //**************************************************************************
@@ -173,7 +177,7 @@ DEFINE_DEVICE_TYPE(MOS7360, mos7360_device, "mos7360", "MOS 7360 TED")
 void mos7360_device::mos7360_videoram_map(address_map &map)
 {
 	if (!has_configured_map(0))
-		map(0x0000, 0xffff).ram();
+		map(0x00000, 0x0ffff).mirror(0x10000).ram();
 }
 
 
@@ -224,29 +228,19 @@ inline void mos7360_device::clear_interrupt(int mask)
 
 inline int mos7360_device::rastercolumn()
 {
-	return (int) ((machine().time().as_double() - m_rastertime) * TED7360_VRETRACERATE * m_lines * 57 * 8 + 0.5);
+	return (int) ((machine().time().as_double() - m_rastertime) * clock() * 8 + 0.5);
 }
 
 inline uint8_t mos7360_device::read_ram(offs_t offset)
 {
-	int rom = m_rom;
-	m_rom = 0;
-
 	m_last_data = space(0).read_byte(offset);
-
-	m_rom = rom;
 
 	return m_last_data;
 }
 
 inline uint8_t mos7360_device::read_rom(offs_t offset)
 {
-	int rom = m_rom;
-	m_rom = 1;
-
-	m_last_data = space(0).read_byte(offset);
-
-	m_rom = rom;
+	m_last_data = space(0).read_byte(0x10000 | offset);
 
 	return m_last_data;
 }
@@ -266,7 +260,7 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
+	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
 	m_write_irq(*this),
 	m_read_k(*this, 0xff),
 	m_stream(nullptr),
@@ -286,7 +280,7 @@ void mos7360_device::device_start()
 	m_timer[TIMER_ID_2] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
 	m_timer[TIMER_ID_3] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
 	m_line_timer = timer_alloc(FUNC(mos7360_device::raster_interrupt_gen), this);
-	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
+	m_phase_timer = timer_alloc(FUNC(mos7360_device::line_phase_gen), this);
 	m_frame_timer = timer_alloc(FUNC(mos7360_device::frame_interrupt_gen), this);
 	m_frame_timer->adjust(screen().frame_period(), 0, screen().frame_period());
 
@@ -294,42 +288,7 @@ void mos7360_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	// create sound stream
-	m_stream = stream_alloc(0, 1, machine().sample_rate());
-
-	// buffer for fastest played sample for 5 second so we have enough data for min 5 second
-	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = std::make_unique<uint8_t[]>(m_noisesize);
-
-	{
-		int noiseshift = 0x7ffff8;
-		uint8_t data;
-
-		for (int i = 0; i < m_noisesize; i++)
-		{
-			data = 0;
-			if (noiseshift & 0x400000)
-				data |= 0x80;
-			if (noiseshift & 0x100000)
-				data |= 0x40;
-			if (noiseshift & 0x010000)
-				data |= 0x20;
-			if (noiseshift & 0x002000)
-				data |= 0x10;
-			if (noiseshift & 0x000800)
-				data |= 0x08;
-			if (noiseshift & 0x000080)
-				data |= 0x04;
-			if (noiseshift & 0x000010)
-				data |= 0x02;
-			if (noiseshift & 0x000004)
-				data |= 0x01;
-			m_noise[i] = data;
-			if (((noiseshift & 0x400000) == 0) != ((noiseshift & 0x002000) == 0))
-				noiseshift = (noiseshift << 1) | 1;
-			else
-				noiseshift <<= 1;
-		}
-	}
+	m_stream = stream_alloc(0, 1, clock() / 4);
 
 	// register for state saving
 	save_item(NAME(m_reg));
@@ -356,12 +315,14 @@ void mos7360_device::device_start()
 	save_item(NAME(m_rasterline));
 	save_item(NAME(m_lastline));
 	save_item(NAME(m_rastertime));
-	save_item(NAME(m_tone1pos));
-	save_item(NAME(m_tone2pos));
-	save_item(NAME(m_tone1samples));
-	save_item(NAME(m_tone2samples));
-	save_item(NAME(m_noisepos));
-	save_item(NAME(m_noisesamples));
+	save_item(NAME(m_line_phase));
+	save_item(NAME(m_badlines));
+	save_item(NAME(m_top));
+	save_item(NAME(m_osc_accu));
+	save_item(NAME(m_osc_reload));
+	save_item(NAME(m_osc_sign));
+	save_item(NAME(m_osc_out));
+	save_item(NAME(m_noise_sr));
 }
 
 
@@ -373,10 +334,12 @@ void mos7360_device::device_reset()
 {
 	memset(m_reg, 0, sizeof(m_reg));
 	m_last_data = 0;
+	m_bus_fetch = false;
 
 	m_rom = 1;  // FIXME: at start should be RAM or ROM? old c16 code set it to ROM at init: is it correct?
 
-	m_lines = TED7360_LINES;
+	m_lines = PAL_LINES;
+	m_top = 4;
 	m_chargenaddr = 0;
 	m_bitmapaddr = 0;
 	m_videoaddr = 0;
@@ -387,6 +350,7 @@ void mos7360_device::device_reset()
 	m_lastline = 0;
 
 	m_rastertime = 0.0;
+	m_line_phase = 0;
 
 	m_frame_count = 0;
 
@@ -403,12 +367,25 @@ void mos7360_device::device_reset()
 	memset(m_ecmcolor, 0, sizeof(m_ecmcolor));
 	memset(m_colors, 0, sizeof(m_colors));
 
-	m_tone1pos = 0;
-	m_tone2pos = 0;
-	m_tone1samples = 1;
-	m_tone2samples = 1;
-	m_noisepos = 0;
-	m_noisesamples = 1;
+	std::fill(std::begin(m_osc_accu), std::end(m_osc_accu), 0);
+	std::fill(std::begin(m_osc_reload), std::end(m_osc_reload), 1);
+	std::fill(std::begin(m_osc_sign), std::end(m_osc_sign), 0);
+	std::fill(std::begin(m_osc_out), std::end(m_osc_out), 0);
+	m_noise_sr = 0xff;
+
+	m_badlines = false;
+
+	set_clocks();
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+
+void mos7360_device::device_post_load()
+{
+	update_cpu_clock();
 }
 
 
@@ -442,52 +419,29 @@ TIMER_CALLBACK_MEMBER(mos7360_device::timer_expired)
 
 void mos7360_device::sound_stream_update(sound_stream &stream)
 {
-	int i, v, a;
-
-	for (i = 0; i < stream.samples(); i++)
+	if (DIGITAL_ON)
 	{
-		v = 0;
+		stream.fill(0, TED_SOUND_LEVEL[m_reg[0x11] & 0x3f] / 32768.0);
+		return;
+	}
 
-		if (TONE1_ON)
+	for (int i = 0; i < stream.samples(); i++)
+	{
+		for (int voice = 0; voice < 2; voice++)
 		{
-			if (m_tone1pos <= m_tone1samples / 2 || !TONE_ON)
-				v += 0x2ff; // depends on the volume between sound and noise
-
-			m_tone1pos++;
-
-			if (m_tone1pos > m_tone1samples)
-				m_tone1pos = 0;
-		}
-
-		if (TONE2_ON || NOISE_ON )
-		{
-			if (TONE2_ON)
-			{                          /*higher priority ?! */
-				if (m_tone2pos <= m_tone2samples / 2 || !TONE_ON)
-					v += 0x2ff;
-
-				m_tone2pos++;
-
-				if (m_tone2pos > m_tone2samples)
-					m_tone2pos = 0;
-			}
-			else
+			if ((m_osc_reload[voice] != 0x3ff) && (++m_osc_accu[voice] >= 0x400))
 			{
-				v += m_noise[(int) ((double) m_noisepos * m_noisesize / m_noisesamples)];
-				m_noisepos++;
+				m_osc_accu[voice] = m_osc_reload[voice];
+				m_osc_sign[voice] ^= 1;
 
-				if ((double) m_noisepos / m_noisesamples >= 1.0)
-					m_noisepos = 0;
+				if (voice)
+					m_noise_sr = (m_noise_sr << 1) | (BIT(m_noise_sr, 7) ^ BIT(m_noise_sr, 5) ^ BIT(m_noise_sr, 4) ^ BIT(m_noise_sr, 1));
+
+				update_sound_outputs();
 			}
 		}
 
-		a = VOLUME;
-		if (a > 8)
-			a = 8;
-
-		v = v * a;
-
-		stream.put_int(0, i, v, 32768);
+		stream.put_int(0, i, TED_SOUND_LEVEL[m_osc_out[0] | m_osc_out[1]], 32768);
 	}
 }
 
@@ -749,7 +703,6 @@ void mos7360_device::drawlines(int first, int last)
 
 void mos7360_device::soundport_w(int offset, int data)
 {
-	// int old = m_reg[offset & 0x1f];
 	m_stream->update();
 
 	switch (offset)
@@ -761,34 +714,95 @@ void mos7360_device::soundport_w(int offset, int data)
 		else
 			m_reg[offset & 0x1f] = data;
 
-		m_tone1samples = machine().sample_rate() / TONE_FREQUENCY (TONE1_VALUE);
-		DBG_LOG(1, "ted7360", ("tone1 %d %d sample:%d\n", TONE1_VALUE, TONE_FREQUENCY(TONE1_VALUE), m_tone1samples));
+		if (TONE1_VALUE == 0x3fe)
+			m_osc_sign[0] = 1;
+
+		m_osc_reload[0] = (TONE1_VALUE + 1) & 0x3ff;
 		break;
 
-	case 0xf:
+	case 0x0f:
 	case 0x10:
 		m_reg[offset & 0x1f] = data;
 
-		m_tone2samples = machine().sample_rate() / TONE_FREQUENCY (TONE2_VALUE);
-		DBG_LOG (1, "ted7360", ("tone2 %d %d sample:%d\n", TONE2_VALUE, TONE_FREQUENCY(TONE2_VALUE), m_tone2samples));
+		if (TONE2_VALUE == 0x3fe)
+			m_osc_sign[1] = 1;
 
-		m_noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine().sample_rate() * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
-		DBG_LOG (1, "ted7360", ("noise %d sample:%d\n", NOISE_FREQUENCY, m_noisesamples));
-
-		if (!NOISE_ON || ((double) m_noisepos / m_noisesamples >= 1.0))
-			m_noisepos = 0;
+		m_osc_reload[1] = (TONE2_VALUE + 1) & 0x3ff;
 		break;
 
 	case 0x11:
 		m_reg[offset & 0x1f] = data;
-		DBG_LOG(1, "ted7360", ("%s volume %d, %s %s %s\n", TONE_ON?"on":"off",
-						VOLUME, TONE1_ON?"tone1":"", TONE2_ON?"tone2":"", NOISE_ON?"noise":""));
 
-		if (!TONE_ON||!TONE1_ON) m_tone1pos = 0;
-		if (!TONE_ON||!TONE2_ON) m_tone2pos = 0;
-		if (!TONE_ON||!NOISE_ON) m_noisepos = 0;
+		if (DIGITAL_ON)
+		{
+			m_osc_sign[0] = m_osc_sign[1] = 1;
+			m_osc_accu[0] = m_osc_reload[0];
+			m_osc_accu[1] = m_osc_reload[1];
+			m_noise_sr = 0xff;
+		}
 		break;
 	}
+
+	update_sound_outputs();
+}
+
+
+//-------------------------------------------------
+//  update_sound_outputs - latch the voice outputs
+//-------------------------------------------------
+
+void mos7360_device::update_sound_outputs()
+{
+	m_osc_out[0] = VOLUME | ((m_osc_sign[0] && VOICE1_ON) ? 0x10 : 0);
+
+	if (NOISE_ON)
+		m_osc_out[1] = VOLUME | (BIT(m_noise_sr, 0) ? 0x20 : 0);
+	else
+		m_osc_out[1] = VOLUME | ((m_osc_sign[1] && VOICE2_ON) ? 0x20 : 0);
+}
+
+
+//-------------------------------------------------
+//  bus_r - floating data bus read
+//-------------------------------------------------
+
+uint8_t mos7360_device::bus_r()
+{
+	if (m_bus_fetch || !SCREENON)
+		return m_last_data;
+
+	int const line = m_rasterline - TED7360_YPOS;
+	int const x = rastercolumn() - 8 - m_x_begin;
+
+	if ((line < m_y_begin + YPOS) || (line >= m_y_end + YPOS) || (x < 0) || (x >= 320))
+		return m_last_data;
+
+	int const vline = LINES25 ? (line - m_y_begin - YPOS) : (line - m_y_begin - YPOS + 8 - VERTICALPOS);
+	int const offs = (vline >> 3) * 40 + (x >> 3);
+	uint8_t data;
+
+	m_bus_fetch = true;
+
+	if (HIRESON)
+	{
+		data = space(0).read_byte(m_bitmapaddr + offs * 8 + (vline & 7));
+	}
+	else
+	{
+		int ch = space(0).read_byte((m_videoaddr | 0x400) + offs);
+
+		if (ECMON)
+			ch &= ~0xc0;
+		else if (REVERSEON && !MULTICOLORON)
+			ch &= ~0x80;
+
+		offs_t const addr = m_chargenaddr + ch * 8 + (vline & 7);
+		data = space(0).read_byte(INROM ? (0x10000 | addr) : addr);
+	}
+
+	m_bus_fetch = false;
+
+	return data;
 }
 
 
@@ -796,78 +810,71 @@ void mos7360_device::soundport_w(int offset, int data)
 //  read - register read
 //-------------------------------------------------
 
-uint8_t mos7360_device::read(offs_t offset, int &cs0, int &cs1)
+uint8_t mos7360_device::read(offs_t offset)
 {
 	uint8_t val = m_last_data;
 
-	cs0 = cs0_r(offset);
-	cs1 = cs1_r(offset);
-
 	switch (offset)
 	{
-	case 0xff00:
+	case 0x00:
 		val = m_timer_active[0] ? (m_timer[0]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
 		break;
-	case 0xff01:
+	case 0x01:
 		val = m_timer_active[0] ? (m_timer[0]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
 		break;
-	case 0xff02:
+	case 0x02:
 		val = m_timer_active[1] ? (m_timer[1]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
 		break;
-	case 0xff03:
+	case 0x03:
 		val = m_timer_active[1] ? (m_timer[1]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
 		break;
-	case 0xff04:
+	case 0x04:
 		val = m_timer_active[2] ? (m_timer[2]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
 		break;
-	case 0xff05:
+	case 0x05:
 		val = m_timer_active[2] ? (m_timer[2]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
 		break;
-	case 0xff07:
-		val = (m_reg[offset & 0x1f] & ~0x40);
-		if (m_clock == TED7360NTSC_CLOCK)
-			val |= 0x40;
-		break;
-	case 0xff13:
+	case 0x13:
 		val = m_reg[offset & 0x1f] & ~1;
 		if (m_rom)
 			val |= 1;
 		break;
-	case 0xff1c:                         /*rasterline */
+	case 0x1c:                         /*rasterline */
 		drawlines(m_lastline, m_rasterline);
 		val = ((RASTERLINE_2_C16(m_rasterline) & 0x100) >> 8) | 0xfe;   /* expected by matrix */
 		break;
-	case 0xff1d:                         /*rasterline */
+	case 0x1d:                         /*rasterline */
 		drawlines(m_lastline, m_rasterline);
 		val = RASTERLINE_2_C16(m_rasterline) & 0xff;
 		break;
-	case 0xff1e:                         /*rastercolumn */
-		val = rastercolumn() / 2;   /* pengo >=0x99 */
+	case 0x1e:                         /*rastercolumn */
+		val = (((rastercolumn() + 456 - 64) % 456) / 2) & 0xfe;
 		break;
-	case 0xff1f:
+	case 0x1f:
 		val = ((m_rasterline & 7) << 4) | (m_reg[offset & 0x1f] & 0x0f);
 		DBG_LOG(1, "port_w", ("read from cursorblink %.2x\n", val));
 		break;
-	case 0xff06:
-	case 0xff08:
-	case 0xff09:
-	case 0xff0a:
-	case 0xff0b:
-	case 0xff0c:
-	case 0xff0d:
-	case 0xff0e:
-	case 0xff0f:
-	case 0xff10:
-	case 0xff11:
-	case 0xff12:
-	case 0xff14:
-	case 0xff15:
-	case 0xff16:
-	case 0xff17:
-	case 0xff18:
-	case 0xff19:
-	case 0xff1a:
-	case 0xff1b:
+	case 0x06:
+	case 0x07:
+	case 0x08:
+	case 0x09:
+	case 0x0a:
+	case 0x0b:
+	case 0x0c:
+	case 0x0d:
+	case 0x0e:
+	case 0x0f:
+	case 0x10:
+	case 0x11:
+	case 0x12:
+	case 0x14:
+	case 0x15:
+	case 0x16:
+	case 0x17:
+	case 0x18:
+	case 0x19:
+	case 0x1a:
+	case 0x1b:
 		val = m_reg[offset & 0x1f];
 		break;
 	}
@@ -880,27 +887,25 @@ uint8_t mos7360_device::read(offs_t offset, int &cs0, int &cs1)
 //  write - register write
 //-------------------------------------------------
 
-void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
+void mos7360_device::write(offs_t offset, uint8_t data)
 {
 	int old;
-
-	cs0 = cs0_r(offset);
-	cs1 = cs1_r(offset);
+	int const line = (rastercolumn() >= 416) ? (m_rasterline + 1) : m_rasterline;
 
 	switch (offset)
 	{
-	case 0xff0e:
-	case 0xff0f:
-	case 0xff10:
-	case 0xff11:
-	case 0xff12:
+	case 0x0e:
+	case 0x0f:
+	case 0x10:
+	case 0x11:
+	case 0x12:
 		soundport_w(offset & 0x1f, data);
 		break;
 	}
 
 	switch (offset)
 	{
-	case 0xff00:                        /* stop timer 1 */
+	case 0x00:                        /* stop timer 1 */
 		m_reg[offset & 0x1f] = data;
 
 		if (m_timer_active[0])
@@ -909,12 +914,12 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 			m_timer_active[0] = false;
 		}
 		break;
-	case 0xff01:                        /* start timer 1 */
+	case 0x01:                        /* start timer 1 */
 		m_reg[offset & 0x1f] = data;
 		m_timer[0]->adjust(attotime::from_ticks(TIMER1, clock()), TIMER_ID_1);
 		m_timer_active[0] = true;
 		break;
-	case 0xff02:                        /* stop timer 2 */
+	case 0x02:                        /* stop timer 2 */
 		m_reg[offset & 0x1f] = data;
 		if (m_timer_active[1])
 		{
@@ -922,12 +927,12 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 			m_timer_active[1] = false;
 		}
 		break;
-	case 0xff03:                        /* start timer 2 */
+	case 0x03:                        /* start timer 2 */
 		m_reg[offset & 0x1f] = data;
 		m_timer[1]->adjust(attotime::from_ticks(TIMER2, clock()), TIMER_ID_2);
 		m_timer_active[1] = true;
 		break;
-	case 0xff04:                        /* stop timer 3 */
+	case 0x04:                        /* stop timer 3 */
 		m_reg[offset & 0x1f] = data;
 		if (m_timer_active[2])
 		{
@@ -935,15 +940,15 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 			m_timer_active[2] = false;
 		}
 		break;
-	case 0xff05:                        /* start timer 3 */
+	case 0x05:                        /* start timer 3 */
 		m_reg[offset & 0x1f] = data;
 		m_timer[2]->adjust(attotime::from_ticks(TIMER3, clock()), TIMER_ID_3);
 		m_timer_active[2] = true;
 		break;
-	case 0xff06:
+	case 0x06:
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			if (LINES25)
 			{
@@ -956,13 +961,17 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 				m_y_end = m_y_begin + 192;
 			}
 			m_chargenaddr = CHARGENADDR;
+
+			if (SCREENON && (RASTERLINE_2_C16(m_rasterline) == 0))
+				m_badlines = true;
+
 			set_clocks();
 		}
 		break;
-	case 0xff07:
+	case 0x07:
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			if (COLUMNS40)
 			{
@@ -979,10 +988,10 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 			set_clocks();
 		}
 		break;
-	case 0xff08:
+	case 0x08:
 		m_reg[offset & 0x1f] = m_read_k(data);
 		break;
-	case 0xff09:
+	case 0x09:
 		if (data & 0x08)
 			clear_interrupt(8);
 		if (data & 0x10)
@@ -992,7 +1001,7 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 		if (data & 0x02)
 			clear_interrupt(2);
 		break;
-	case 0xff0a:
+	case 0x0a:
 		old = data;
 		m_reg[offset & 0x1f] = data | 0xa0;
 #if 0
@@ -1005,109 +1014,110 @@ void mos7360_device::write(offs_t offset, uint8_t data, int &cs0, int &cs1)
 			/* DBG_LOG(1,"set rasterline hi",("soll:%d\n",RASTERLINE)); */
 		}
 		break;
-	case 0xff0b:
+	case 0x0b:
 		if (data != m_reg[offset & 0x1f])
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			/*  DBG_LOG(1,"set rasterline lo",("soll:%d\n",RASTERLINE)); */
 		}
 		break;
-	case 0xff0c:
-	case 0xff0d:
+	case 0x0c:
+	case 0x0d:
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 		}
 		break;
-	case 0xff12:
+	case 0x12:
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_bitmapaddr = BITMAPADDR;
 			m_chargenaddr = CHARGENADDR;
 			DBG_LOG(3, "port_w", ("bitmap %.4x %s\n",  BITMAPADDR, INROM ? "rom" : "ram"));
 		}
 		break;
-	case 0xff13:
+	case 0x13:
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_chargenaddr = CHARGENADDR;
+			update_cpu_clock();
 			DBG_LOG(3, "port_w", ("chargen %.4x %s %d\n", CHARGENADDR, data & 2 ? "" : "doubleclock", data & 1));
 		}
 		break;
-	case 0xff14:
+	case 0x14:
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_videoaddr = VIDEOADDR;
 			DBG_LOG(3, "port_w", ("videoram %.4x\n", VIDEOADDR));
 		}
 		break;
-	case 0xff15:                         /* backgroundcolor */
+	case 0x15:                         /* backgroundcolor */
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_monoinversed[1] = m_mono[0] = m_bitmapmulti[0] = m_multi[0] = m_colors[0] = BACKGROUNDCOLOR;
 		}
 		break;
-	case 0xff16:                         /* foregroundcolor */
+	case 0x16:                         /* foregroundcolor */
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_bitmapmulti[3] = m_multi[1] = m_colors[1] = FOREGROUNDCOLOR;
 		}
 		break;
-	case 0xff17:                         /* multicolor 1 */
+	case 0x17:                         /* multicolor 1 */
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_multi[2] = m_colors[2] = MULTICOLOR1;
 		}
 		break;
-	case 0xff18:                         /* multicolor 2 */
+	case 0x18:                         /* multicolor 2 */
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_colors[3] = MULTICOLOR2;
 		}
 		break;
-	case 0xff19:                         /* framecolor */
+	case 0x19:                         /* framecolor */
 		if (m_reg[offset & 0x1f] != data)
 		{
-			drawlines(m_lastline, m_rasterline);
+			drawlines(m_lastline, line);
 			m_reg[offset & 0x1f] = data;
 			m_colors[4] = FRAMECOLOR;
 		}
 		break;
-	case 0xff1c:
+	case 0x1c:
 		m_reg[offset & 0x1f] = data;          /*? */
 		DBG_LOG(1, "port_w", ("write to rasterline high %.2x\n",
 										data));
 		break;
-	case 0xff1f:
+	case 0x1f:
 		m_reg[offset & 0x1f] = data;
 		DBG_LOG(1, "port_w", ("write to cursorblink %.2x\n", data));
 		break;
-	case 0xff3e:
+	case 0x3e:
 		m_rom = 1;
 		break;
-	case 0xff3f:
+	case 0x3f:
 		m_rom = 0;
 		break;
-	case 0xff1a:
-	case 0xff1b:
-	case 0xff1d:
-	case 0xff1e:
+	case 0x1a:
+	case 0x1b:
+	case 0x1d:
+	case 0x1e:
 		m_reg[offset & 0x1f] = data;
 		break;
 	}
@@ -1145,7 +1155,7 @@ TIMER_CALLBACK_MEMBER(mos7360_device::raster_interrupt_gen)
 	if (m_rasterline >= m_lines)
 	{
 		m_rasterline = 0;
-		drawlines(m_lastline, TED7360_LINES);
+		drawlines(m_lastline, m_lines);
 		m_lastline = 0;
 	}
 
@@ -1154,43 +1164,84 @@ TIMER_CALLBACK_MEMBER(mos7360_device::raster_interrupt_gen)
 		drawlines(m_lastline, m_rasterline);
 		set_interrupt(2);
 	}
+
+	if (RASTERLINE_2_C16(m_rasterline) == 0)
+		m_badlines = SCREENON;
+
+	m_line_phase = 0;
+	m_phase_timer->adjust(attotime::from_ticks(LINE_PHASE_START[1], clock() * 2));
+	update_cpu_clock();
 }
 
-
-//-------------------------------------------------
-//  cs0_r - chip select 0 read
-//-------------------------------------------------
-
-int mos7360_device::cs0_r(offs_t offset)
+TIMER_CALLBACK_MEMBER(mos7360_device::line_phase_gen)
 {
-	if (m_rom && offset >= 0x8000 && offset < 0xc000)
-	{
-		return 0;
-	}
+	m_line_phase++;
 
-	return 1;
+	if (m_line_phase < 3)
+		m_phase_timer->adjust(attotime::from_ticks(LINE_PHASE_START[m_line_phase + 1] - LINE_PHASE_START[m_line_phase], clock() * 2));
+
+	update_cpu_clock();
 }
 
-
-//-------------------------------------------------
-//  cs1_r - chip select 1 read
-//-------------------------------------------------
-
-int mos7360_device::cs1_r(offs_t offset)
-{
-	if (m_rom && ((offset >= 0xc000 && offset < 0xfd00) || (offset >= 0xff20)))
-	{
-		return 0;
-	}
-
-	return 1;
-}
 
 void mos7360_device::set_clocks()
 {
 	bool ntsc = BIT(m_reg[0x07], 6);
+	uint32_t const old_clock = clock();
 	set_clock_scale(1.0 / ((5 - ntsc) * 4));
+	m_lines = ntsc ? NTSC_LINES : PAL_LINES;
 
-	bool doubleclock = !BIT(m_reg[0x06], 4);
-	m_cpu->set_clock(clock() << doubleclock);
+	if (clock() != old_clock)
+		m_stream->set_sample_rate(clock() / 4);
+	m_top = ntsc ? 16 : 4;
+
+	if ((clock() != old_clock) || !m_line_timer->enabled())
+	{
+		attotime const period = attotime::from_ticks(57, clock());
+		m_line_timer->adjust(period, 0, period);
+	}
+
+	update_cpu_clock();
+}
+
+
+//-------------------------------------------------
+//  update_cpu_clock - set the CPU clock to give
+//  the number of cycles TED leaves the CPU on
+//  the current raster line
+//-------------------------------------------------
+
+void mos7360_device::update_cpu_clock()
+{
+	int const raster = RASTERLINE_2_C16(m_rasterline);
+	int const ysmooth = VERTICALPOS;
+
+	bool const badline = m_badlines &&
+			(((raster < 0xcb) && ((raster & 7) == ysmooth)) ||
+			((raster > 0) && (raster <= 0xcb) && ((raster & 7) == ((ysmooth + 1) & 7))));
+
+	int const units = LINE_PHASE_START[m_line_phase + 1] - LINE_PHASE_START[m_line_phase];
+	int half_cycles;
+
+	if (badline && (m_line_phase == 1))
+		half_cycles = 0;
+	else if (BIT(m_reg[0x13], 1))
+		half_cycles = units;
+	else if (SCREENON && (raster <= 0xcb))
+		half_cycles = 2 * LINE_PHASE_CYCLES_FETCH[m_line_phase];
+	else
+		half_cycles = 2 * LINE_PHASE_CYCLES_BORDER[m_line_phase];
+
+	if (!half_cycles)
+	{
+		m_cpu->suspend(SUSPEND_REASON_HALT, true);
+		return;
+	}
+
+	m_cpu->resume(SUSPEND_REASON_HALT);
+
+	uint32_t const cpu_clock = uint64_t(clock()) * half_cycles / units;
+
+	if (m_cpu->unscaled_clock() != cpu_clock)
+		m_cpu->set_clock(cpu_clock);
 }

@@ -338,11 +338,11 @@ void cpu16_device::device_start()
 	state_add(CPU16_EK, "EK", m_ek).mask(0xf);
 	for (int i = 0; i < 3; i++)
 	{
-		state_add(CPU16_X + i, util::string_format("%c", 'X' + i).c_str(), m_index_regs[i]).mask(0xfffff);
-		state_add<u16>(CPU16_IX + i, util::string_format("I%c", 'X' + i).c_str(),
+		state_add(CPU16_X + i, util::string_format("%c", 'X' + i), m_index_regs[i]).mask(0xfffff);
+		state_add<u16>(CPU16_IX + i, util::string_format("I%c", 'X' + i),
 			std::bind(&cpu16_device::get_ix, this, i),
 			std::bind(&cpu16_device::set_ix, this, i, _1)).noshow();
-		state_add<u8>(CPU16_XK + i, util::string_format("%cK", 'X' + i).c_str(),
+		state_add<u8>(CPU16_XK + i, util::string_format("%cK", 'X' + i),
 			std::bind(&cpu16_device::get_xk, this, i),
 			std::bind(&cpu16_device::set_xk, this, i, _1)).mask(0xf).noshow();
 	}

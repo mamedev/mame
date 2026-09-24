@@ -181,7 +181,7 @@ private:
 	uint8_t m_smr, m_brr, m_scr, m_tdr, m_ssr;
 
 	// FRT / FRC
-	uint8_t m_tier, m_ftcsr, m_frc_tcr, m_tocr;
+	uint8_t m_tier, m_ftcsr, m_ftcsr_read_flags, m_frc_tcr, m_tocr;
 	uint16_t m_frc;
 	uint16_t m_ocra, m_ocrb, m_frc_icr;
 
@@ -272,6 +272,7 @@ private:
 	void sh2_do_dma(int dmach);
 	void sh2_dmac_check(int dma);
 	void sh2_recalc_irq();
+	void standby_init();
 };
 
 DECLARE_DEVICE_TYPE(SH7604, sh7604_device)

@@ -71,7 +71,7 @@ public:
 
 	/* pal 50 Hz vertical screen refresh, screen consists of 312 lines
 	 * ntsc 60 Hz vertical screen refresh, screen consists of 262 lines */
-	static constexpr unsigned NTSC_LINES = 261;
+	static constexpr unsigned NTSC_LINES = 262;
 	static constexpr unsigned PAL_LINES = 312;
 
 	// construction/destruction
@@ -84,8 +84,11 @@ public:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	uint8_t read(offs_t offset, int &cs0, int &cs1);
-	void write(offs_t offset, uint8_t data, int &cs0, int &cs1);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
+	uint8_t bus_r();
+	bool rom() const { return m_rom; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -106,6 +109,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
 	// device_sound_interface callbacks
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -123,12 +127,13 @@ protected:
 	void draw_cursor(int ybegin, int yend, int yoff, int xoff, int color);
 	void drawlines(int first, int last);
 	void soundport_w(int offset, int data);
+	void update_sound_outputs();
 	TIMER_CALLBACK_MEMBER(timer_expired);
 	TIMER_CALLBACK_MEMBER(frame_interrupt_gen);
 	TIMER_CALLBACK_MEMBER(raster_interrupt_gen);
-	int cs0_r(offs_t offset);
-	int cs1_r(offs_t offset);
+	TIMER_CALLBACK_MEMBER(line_phase_gen);
 	void set_clocks();
+	void update_cpu_clock();
 
 	const address_space_config      m_videoram_space_config;
 
@@ -139,6 +144,8 @@ protected:
 
 	uint8_t m_reg[0x20];
 	uint8_t m_last_data;
+	bool m_bus_fetch;
+	bool m_badlines;
 
 	bitmap_rgb32 m_bitmap;
 
@@ -147,6 +154,7 @@ protected:
 	int m_frame_count;
 
 	int m_lines;
+	int m_top;
 	bool m_timer_active[3];
 	emu_timer *m_timer[3];
 	int m_cursor1;
@@ -168,16 +176,17 @@ protected:
 
 	int m_rasterline, m_lastline;
 	double m_rastertime;
+	int m_line_phase;
 
 	/* sound part */
-	std::unique_ptr<uint8_t[]> m_noise;
-	int m_tone1pos, m_tone2pos,
-	m_tone1samples, m_tone2samples,
-	m_noisesize,          /* number of samples */
-	m_noisepos,         /* pos of tone */
-	m_noisesamples;   /* count of samples to give out per tone */
+	uint16_t m_osc_accu[2];
+	uint16_t m_osc_reload[2];
+	uint8_t m_osc_sign[2];
+	uint8_t m_osc_out[2];
+	uint8_t m_noise_sr;
 
 	emu_timer *m_line_timer;
+	emu_timer *m_phase_timer;
 	emu_timer *m_frame_timer;
 
 	optional_device<cpu_device> m_cpu;

@@ -4144,11 +4144,11 @@ void segas1x_bootleg_state::init_bayrouteb1()
 
 	uint16_t *ROM = &memregion("maincpu")->as_u16();
 
-	// patch interrupt vector
+	// HACK: patch interrupt vector
 	ROM[0x0070/2] = 0x000b;
 	ROM[0x0072/2] = 0xf000;
 
-	// patch check for code in RAM
+	// HACK: patch check for code in RAM
 	m_decrypted_opcodes[0x107e/2] = 0x48e7;
 	m_decrypted_opcodes[0x1080/2] = 0x000b;
 	m_decrypted_opcodes[0x1082/2] = 0xf000;

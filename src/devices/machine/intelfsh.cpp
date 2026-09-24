@@ -93,6 +93,7 @@ DEFINE_DEVICE_TYPE(ATMEL_29C020,             atmel_29c020_device,             "a
 DEFINE_DEVICE_TYPE(AMD_29F010,               amd_29f010_device,               "amd_29f010",               "AMD 29F010 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F040,               amd_29f040_device,               "amd_29f040",               "AMD 29F040 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F080,               amd_29f080_device,               "amd_29f080",               "AMD 29F080 Flash")
+DEFINE_DEVICE_TYPE(AMD_29F032,               amd_29f032_device,               "amd_29f032",               "AMD 29F032 Flash")
 DEFINE_DEVICE_TYPE(AMD_29F400T,              amd_29f400t_device,              "amd_29f400t",              "AMD 29F400T Flash")
 DEFINE_DEVICE_TYPE(AMD_29F800T,              amd_29f800t_device,              "amd_29f800t",              "AMD 29F800T Flash")
 DEFINE_DEVICE_TYPE(AMD_29F800B_16BIT,        amd_29f800b_16bit_device,        "amd_29f800b_16bit",        "AMD 29F800B Flash (16-bit)")
@@ -236,6 +237,9 @@ amd_29f040_device::amd_29f040_device(const machine_config &mconfig, const char *
 
 amd_29f080_device::amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29F080, tag, owner, clock, 0x100000, MFG_AMD, 0xd5) { m_addrmask = 0x7ff; }
+
+amd_29f032_device::amd_29f032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, AMD_29F032, tag, owner, clock, 0x400000, MFG_AMD, 0x41) { m_addrmask = 0x7ff; }
 
 amd_29f400t_device::amd_29f400t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29F400T, tag, owner, clock, 0x80000, MFG_AMD, 0x23) { m_top_boot_sector = true; }

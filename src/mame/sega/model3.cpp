@@ -6631,7 +6631,9 @@ void model3_state::init_lostwsga()
 	init_model3_15();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64s_delegate(*this, FUNC(model3_state::scsi_r)), write64s_delegate(*this, FUNC(model3_state::scsi_w)));
 
-	rom[0x7374f0/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
+	// HACK: get rid of this
+	// This seems to be an actual bug in the original code (? -AS)
+	rom[0x7374f0/4] = 0x38840004;
 }
 
 void model3_state::init_scud()
@@ -6671,6 +6673,7 @@ void model3_state::init_vf3()
 
 	init_model3_10();
 
+	// TODO: what's this for?
 	/*
 	rom[(0x713c7c^4)/4] = 0x60000000;
 	rom[(0x713e54^4)/4] = 0x60000000;
@@ -6701,6 +6704,7 @@ void model3_state::init_vs29815()
 
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
+	// HACK: what's this for?
 	rom[(0x6028ec^4)/4] = 0x60000000;
 	rom[(0x60290c^4)/4] = 0x60000000;
 
@@ -6763,6 +6767,8 @@ void model3_state::init_srally2()
 	init_model3_20();
 
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+
+	// HACK: patch out JTAG test
 	rom[(0x7c0c4^4)/4] = 0x60000000;
 	rom[(0x7c0c8^4)/4] = 0x60000000;
 	rom[(0x7c0cc^4)/4] = 0x60000000;
@@ -6789,12 +6795,13 @@ void model3_state::init_swtrilgy()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-
-	rom[(0xf776c^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
+	// HACK: Unemulated JTAG stuff, see srally2
+	rom[(0xf776c^4)/4] = 0x60000000;
 	rom[(0xf7770^4)/4] = 0x60000000;
 	rom[(0xf7774^4)/4] = 0x60000000;
 
-	rom[(0x043dc^4)/4] = 0x48000090;  // skip force feedback setup
+	// HACK: skip force feedback setup
+	rom[(0x043dc^4)/4] = 0x48000090;
 	rom[(0xf6e44^4)/4] = 0x60000000;
 }
 
@@ -6803,7 +6810,8 @@ void model3_state::init_swtrilga()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	rom[(0xf76f8^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
+	// HACK: Unemulated JTAG stuff, see srally2
+	rom[(0xf76f8^4)/4] = 0x60000000;
 	rom[(0xf76fc^4)/4] = 0x60000000;
 	rom[(0xf7700^4)/4] = 0x60000000;
 
@@ -6815,11 +6823,13 @@ void model3_state::init_swtrilgyp()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	rom[(0x886e0^4)/4] = 0x60000000;  // Unemulated JTAG stuff, see srally2
+	// HACK: Unemulated JTAG stuff, see srally2
+	rom[(0x886e0^4)/4] = 0x60000000;
 	rom[(0x886e4^4)/4] = 0x60000000;
 	rom[(0x886e8^4)/4] = 0x60000000;
 
-	rom[(0x0292c^4)/4] = 0x60000000;  // skip force feedback setup
+	// HACK: skip force feedback setup
+	rom[(0x0292c^4)/4] = 0x60000000;
 	rom[(0x02998^4)/4] = 0x60000000;
 }
 
@@ -6845,6 +6855,7 @@ void model3_state::init_daytona2()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64s_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, m_bank2);
 
+	// TODO: what's this for?
 	//rom[(0x68468c^4)/4] = 0x60000000;
 	//rom[(0x6063c4^4)/4] = 0x60000000;
 	//rom[(0x616434^4)/4] = 0x60000000;
@@ -6859,6 +6870,7 @@ void model3_state::init_dayto2pe()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64s_delegate(*this, FUNC(model3_state::daytona2_rombank_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, m_bank2);
 
+	// TODO: what's this for?
 //  rom[(0x606784^4)/4] = 0x60000000;
 //  rom[(0x69a3fc^4)/4] = 0x60000000;       // jump to encrypted code
 //  rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
@@ -6866,12 +6878,12 @@ void model3_state::init_dayto2pe()
 //  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
 }
 
-// TODO: sound dies often without these patches, investigate
 void model3_state::init_spikeout()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
+	// HACK: sound dies often without these patches, investigate
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
 }
@@ -6881,6 +6893,7 @@ void model3_state::init_spikeofe()
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
+	// HACK: as above
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
 }
@@ -6892,9 +6905,10 @@ void model3_state::init_eca()
 	// base = 0xffc80000
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
-	// cabinet network error
+	// HACK: cabinet network error
 	rom[(0x4a45e4^4)/4] = 0x60000000;
 
+	// HACK: get rid of this
 	// this code sometimes gets stuck waiting for [0x1e0064], changed by the sound irq (sound FIFO overflow?)
 	rom[(0x5523b4^4)/4] = 0x60000000;
 	rom[(0x5523d4^4)/4] = 0x60000000;
@@ -6905,6 +6919,7 @@ void model3_state::init_skichamp()
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
+	// TODO: what's this for?
 	/*
 	rom[(0x5263c8^4)/4] = 0x60000000;
 	rom[(0x5263e8^4)/4] = 0x60000000;
@@ -6918,6 +6933,7 @@ void model3_state::init_oceanhun()
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
+	// TODO: what's this for?
 	//rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 

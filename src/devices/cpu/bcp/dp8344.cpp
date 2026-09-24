@@ -181,25 +181,25 @@ void dp8344_device::device_start()
 	state_add(BCP_ATR, "ATR", m_atr);
 	state_add(BCP_FBR, "FBR", m_fbr);
 	for (int i = 0; i < 8; i++)
-		state_add(BCP_GP0 + i, string_format("GP%d", i).c_str(), m_gp_main[i]);
+		state_add(BCP_GP0 + i, string_format("GP%d", i), m_gp_main[i]);
 	state_add(BCP_ECR, "ECR", m_ecr).mask(0x1f);
 	state_add(BCP_TSR, "TSR", m_tsr);
 	state_add(BCP_TCR, "TCR", m_tcr);
 	state_add(BCP_TMR, "TMR", m_tmr);
 	for (int i = 0; i < 4; i++)
-		state_add(BCP_GP4_ALT + i, string_format("GP%da", 4 + i).c_str(), m_gp_alt[i]);
+		state_add(BCP_GP4_ALT + i, string_format("GP%da", 4 + i), m_gp_alt[i]);
 	for (int i = 0; i < 4; i++)
 	{
-		state_add(BCP_IW + i, string_format("I%c", 'W' + i).c_str(), m_ir[i]);
-		state_add<u8>(BCP_IWLO + i, string_format("I%cLO", 'W' + i).c_str(),
+		state_add(BCP_IW + i, string_format("I%c", 'W' + i), m_ir[i]);
+		state_add<u8>(BCP_IWLO + i, string_format("I%cLO", 'W' + i),
 			[this, i]() -> u8 { return m_ir[i] & 0x00ff; },
 			[this, i](u8 data) { m_ir[i] = (m_ir[i] & 0xff00) | data; }).noshow();
-		state_add<u8>(BCP_IWHI + i, string_format("I%cHI", 'W' + i).c_str(),
+		state_add<u8>(BCP_IWHI + i, string_format("I%cHI", 'W' + i),
 			[this, i]() -> u8 { return (m_ir[i] & 0xff00) >> 8; },
 			[this, i](u8 data) { m_ir[i] = (m_ir[i] & 0x00ff) | u16(data) << 8; }).noshow();
 	}
 	for (int i = 8; i < 16; i++)
-		state_add(BCP_GP8 + i - 8, string_format("GP%d", i).c_str(), m_gp_main[i]);
+		state_add(BCP_GP8 + i - 8, string_format("GP%d", i), m_gp_main[i]);
 	state_add(BCP_TR, "TR", m_tr);
 	state_add(BCP_COUNT, "COUNT", m_tcount);
 	state_add(BCP_ASP, "ASP", m_asp).mask(0xf);

@@ -112,7 +112,7 @@ protected:
 	bitmap_ind16 m_special;
 
 	template <typename CpuType, typename AddrMap, typename Clock>
-	void add_cpu(machine_config &config, CpuType &&type, AddrMap &&map, Clock &&clock) ATTR_COLD
+	void add_cpu(machine_config &config, CpuType &&type, AddrMap &&map, Clock &&clock)
 	{
 		type(config, m_maincpu, std::forward<Clock>(clock));
 		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
