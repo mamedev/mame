@@ -76,6 +76,17 @@ static const int SCROLL_FRAME_FREQUENCY_COUNT[8] =
     2     // 0b111
 };
 
+
+DEFINE_DEVICE_TYPE(SSD1306, ssd1306_device, "ssd1306", "Solomon Systech SSD1306 OLED display driver")
+
+ssd1306_device::ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SSD1306, tag, owner, clock),
+    device_video_interface(mconfig, *this)
+{
+}
+
+
+
 void ssd1306_device::device_start()
 {
 
@@ -487,7 +498,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
     {
         case PAGE:
             m_page_address_pointer ++;
-            if (m_page_address_pointer > m_pagemode_column_end_address)
+            if (m_page_address_pointer >= 128)  // m_pagemode_column_end_address)
             {
                 m_page_address_pointer = m_pagemode_column_start_address;
             }
@@ -518,6 +529,9 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
                     m_column_address_pointer = m_hvmode_column_start_address;
                 }
             }
+            break;
+        
+        default:
             break;
     }
 
@@ -597,20 +611,6 @@ void ssd1306_device::dc_w(int dc)
     }
 }
 
-void ssd1306_device::update_scan_rate()
-{
-    if (!m_using_external_oscillator)
-    {
-        set_clock(INTERNAL_OSCILLATOR_FREQUENCIES[m_osc_freq]);
-    }
-
-    double display_clocks = (m_phase_1_period + m_phase_2_period + BANK0_PULSE_WIDTH);
-    double framerate = clock() * (1 / ((m_clk_div + 1) * display_clocks * 64));
-
-
-    // screen->set_refresh_hz(framerate);
-}
-
 
 void ssd1306_device::spi_cs_w(int state)
 {
@@ -678,4 +678,51 @@ void ssd1306_device::spi_sck_w(int state)
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// Screen interface code
+//
+///////////////////////////////////////////////////////////////////////////////////////////
 
+void ssd1306_device::update_scan_rate()
+{
+    if (!m_using_external_oscillator)
+    {
+        set_clock(INTERNAL_OSCILLATOR_FREQUENCIES[m_osc_freq]);
+    }
+
+    double display_clocks = (m_phase_1_period + m_phase_2_period + BANK0_PULSE_WIDTH);
+    double framerate = clock() * (1 / ((m_clk_div + 1) * display_clocks * 64));
+
+    screen().set_refresh_hz(framerate);
+    screen().set_vblank_time(0);
+}
+
+uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+    bitmap.fill(rgb_t::black());
+    if (!m_display_enabled)
+    {
+        return 0;
+    }
+
+    if (m_display_blanking)
+    {
+        bitmap.fill(rgb_t::white());
+        return 0;
+    }
+
+    rgb_t on_pixel  = !m_inverting_pixels ? rgb_t(0xFF, 0xFF, 0xFF) : rgb_t(0x00, 0x00, 0x00);
+    rgb_t off_pixel = !m_inverting_pixels ? rgb_t(0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF);
+ 
+    // very simple rendering code for the time being...
+    for (int y = 0; y < 64; y++)
+    {
+        for (int x = 0; x < 128; x++)
+        {
+            uint8_t stripe = m_gddram[(128 * (y / 8)) + x];
+            bitmap.pix(y, x) = (stripe & (0x80 >> (y % 8))) ? on_pixel : off_pixel;
+        }
+    }
+	return 0;
+}

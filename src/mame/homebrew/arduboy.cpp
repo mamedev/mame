@@ -72,15 +72,15 @@
 
 #include "emu.h"
 
-#include "avr8.h"
-#include "generic_spi_flash.h"
-#include "ssd1306.h"
 #include "speaker.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/avr8/avr8.h"
 #include "machine/nvram.h"
+#include "machine/generic_spi_flash.h"
 #include "sound/spkrdev.h"
+#include "video/ssd1306.h"
 
 namespace {
 
@@ -92,8 +92,10 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_screen(*this, "screen"),
 		  m_speaker(*this, "speaker"),
-          m_spi_flash(*this, "spi_flash"),
-          m_ssd1306(*this, "ssd1306")
+          m_ssd1306(*this, "ssd1306"),
+          m_cart(*this, "cart"),
+          m_spicart(*this, "spicart"),
+          m_spi_flash(*this, "spi_flash")
 	{ }
 
     void arduboy_base(machine_config &config);
@@ -136,19 +138,26 @@ private:
     DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameprg_load);
     DECLARE_DEVICE_IMAGE_LOAD_MEMBER(spiflash_load);
 
-    int m_spi_last_sck;
 
-    bool m_oled_cs_inactive;
-    bool m_flash_cs_inactive;
-
+    bool m_rx_led;
+    bool m_tx_led;
+    bool m_rgbled_r;
+    bool m_rgbled_g;
+    bool m_rgbled_b;
+    
     uint8_t m_internal_flash[0x7800];
 
-    uint8_t* m_spi_flash_data;
+    
 };
 
 void arduboy_state::machine_start()
 {
     subdevice<nvram_device>("intflash")->set_base(&m_internal_flash[0], 0x7800);
+}
+
+void arduboy_state::machine_reset()
+{
+    // ?
 }
 
 uint8_t arduboy_state::port_b_r()
@@ -161,9 +170,14 @@ uint8_t arduboy_state::port_b_r()
 
 void arduboy_state::port_b_w(uint8_t data)
 {
-    int rx_led   = data & (1 << 0);
+    m_rx_led     = data & (1 << 0);
     int spi_sck  = data & (1 << 1);
     int spi_mosi = data & (1 << 2);
+    // B.3 = MISO
+    // B.4 = button B
+    m_rgbled_r   = data & (1 << 5);
+    m_rgbled_g   = data & (1 << 6);
+    m_rgbled_b   = data & (1 << 7);
 
     if (m_spi_flash) m_spi_flash->si_w(spi_mosi);
     m_ssd1306->spi_si_w(spi_mosi);
@@ -197,7 +211,7 @@ void arduboy_state::port_d_w(uint8_t data)
 
     if (m_spi_flash) m_spi_flash->cs_w(data & (1 << 3));
     m_ssd1306->dc_w(data & (1 << 4));
-    // TX LED on D.5
+    m_tx_led = data & (1 << 5);
     m_ssd1306->spi_cs_w(data & (1 << 6));
     m_ssd1306->rst_w(data & (1 << 7));
 }
@@ -227,8 +241,8 @@ void arduboy_state::port_f_w(uint8_t data)
 
 void arduboy_state::prg_map(address_map &map)
 {
-    map(0x0000, 0x77ff).rom().region("intflash");
-    map(0x7800, 0x7fff).rom().region("loader");
+    map(0x0000, 0x77ff).rom().region("intflash", 0);
+    map(0x7800, 0x7fff).rom().region("loader", 0);
 }
 
 void arduboy_state::data_map(address_map &map)
@@ -264,22 +278,30 @@ void arduboy_state::arduboy_base(machine_config &config)
     m_maincpu->set_high_fuses(0xD2);
     m_maincpu->set_extended_fuses(0xC2);
 
-    m_maincpu->gpio_in<atmega328_device::GPIOB>().set(arduboy_state::port_b_r);
-    m_maincpu->gpio_in<atmega328_device::GPIOC>().set(arduboy_state::port_c_r);
-    m_maincpu->gpio_in<atmega328_device::GPIOD>().set(arduboy_state::port_d_r);
-    m_maincpu->gpio_in<atmega328_device::GPIOE>().set(arduboy_state::port_e_r);
-    m_maincpu->gpio_in<atmega328_device::GPIOF>().set(arduboy_state::port_f_r);
+    m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
+    m_maincpu->gpio_in<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_r));
+    m_maincpu->gpio_in<atmega328_device::GPIOD>().set(FUNC(arduboy_state::port_d_r));
+    m_maincpu->gpio_in<atmega328_device::GPIOE>().set(FUNC(arduboy_state::port_e_r));
+    m_maincpu->gpio_in<atmega328_device::GPIOF>().set(FUNC(arduboy_state::port_f_r));
 
-    m_maincpu->gpio_out<atmega328_device::GPIOB>().set(arduboy_state::port_b_w);
-    m_maincpu->gpio_out<atmega328_device::GPIOC>().set(arduboy_state::port_c_w);
-    m_maincpu->gpio_out<atmega328_device::GPIOD>().set(arduboy_state::port_d_w);
-    m_maincpu->gpio_out<atmega328_device::GPIOE>().set(arduboy_state::port_e_w);
-    m_maincpu->gpio_out<atmega328_device::GPIOF>().set(arduboy_state::port_f_w);
+    m_maincpu->gpio_out<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_w));
+    m_maincpu->gpio_out<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_w));
+    m_maincpu->gpio_out<atmega328_device::GPIOD>().set(FUNC(arduboy_state::port_d_w));
+    m_maincpu->gpio_out<atmega328_device::GPIOE>().set(FUNC(arduboy_state::port_e_w));
+    m_maincpu->gpio_out<atmega328_device::GPIOF>().set(FUNC(arduboy_state::port_f_w));
 
     NVRAM(config, "intflash", nvram_device::DEFAULT_ALL_1);
 
     SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
+
+    SSD1306(config, m_ssd1306, 0);
+    m_ssd1306->set_screen("screen");
+
+    SCREEN(config, m_screen);
+    m_screen->set_raw(370'000, 128, 0, 0, 64, 0, 0); 
+    m_screen->set_lcd();
+    m_screen->set_screen_update(m_ssd1306, FUNC(ssd1306_device::screen_update));
 }
 
 void arduboy_state::arduboy(machine_config &config)
@@ -374,9 +396,8 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
     char buf[80];
     while(image.ftell() < image.length())
     {
-        uint8_t  num_bytes;
-        uint16_t address;
-        uint8_t  record_type;
+        // unsigned int, because of sscanf() below
+        unsigned int num_bytes, address, record_type;
 
         uint8_t hex[4 + 16 + 4];
         uint8_t checksum = 0;
@@ -419,7 +440,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
             PARSE_HEX(hibits, hibits_byte);
             PARSE_HEX(lobits, lobits_byte);
 
-            uint8_t byte = (hibits << 4) | lobits; 
+            uint8_t byte = (hibits_byte << 4) | lobits_byte; 
             hex[i] = byte;
 
             if (i == 0)
@@ -434,7 +455,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 
         memset(buf, 0, sizeof(buf));
         FREAD_BOUNDSCHECK(image, buf, 2);
-        uint8_t expected_checksum;
+        unsigned int expected_checksum;
         if (sscanf(buf, "%02X", &expected_checksum) == EOF)
         {
             return std::make_pair(image_error::BADSOFTWARE, "checksum parse error");
@@ -501,24 +522,29 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 //////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( arduboy )
+    // Arduboy FX loader
+    ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
+    ROM_LOAD("arduboy_boot.bin", 0x000, 0x800, CRC(d5b6f377) SHA1(a9d2e41a31c50df65b8e728b340be69e48cd800b))
+
     // generic Cathy2k loader
     // from https://github.com/MrBlinky/Arduboy/blob/master/cathy/hexfiles/arduboy-bootloader.hex
     // keeping only the actual bootloader segment (0x7800-0x7FFF)
-	ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
-    ROM_LOAD("arduboy-bootloader.bin", 0x000, 0x800, CRC(12345678) SHA1(garbagegarbagegarbage))
+	// ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
+    // ROM_LOAD("arduboy-bootloader.bin", 0x000, 0x800, CRC(12345678) SHA1(garbagegarbagegarbage))
 ROM_END
 
-ROM_START( ardbyfx )
-    // bootloader dumped from an Arduboy FX
-	ROM_REGION( 0x800, "loader", ROMREGION_ERASEFF)
-    ROM_LOAD("ardbyfx_boot.bin", 0x000, 0x800, CRC(12345678) SHA1(garbagegarbagegarbage))
+// ROM_START( ardbyfx )
+//     // bootloader dumped from an Arduboy FX
+// 	ROM_REGION( 0x800, "loader", ROMREGION_ERASEFF)
+//     ROM_LOAD("ardbyfx_boot.bin", 0x000, 0x800, CRC(d5b6f377) SHA1(a9d2e41a31c50df65b8e728b340be69e48cd800b))
 
-    // Arduboy FX has a 16mbyte chip on board, so honor that.
-    // note though that various clones and mods can support larger flash sizes.
-    ROM_REGION(0x01000000, "spi", ROMREGION_ERASEFF)
+//     // Arduboy FX has a 16mbyte chip on board, so honor that.
+//     // note though that various clones and mods can support larger flash sizes.
+//     ROM_REGION(0x01000000, "spi", ROMREGION_ERASEFF)
+
 } // anonymous namespace
 
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY    FULLNAME
 CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy",    MACHINE_NOT_WORKING)
-CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)
+// CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)

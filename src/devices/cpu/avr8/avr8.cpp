@@ -754,6 +754,16 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
+//  atmega328_device - constructor
+//-------------------------------------------------
+
+atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA32U4, 0x7fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+{
+}
+
+
+//-------------------------------------------------
 //  atmega644_device - constructor
 //-------------------------------------------------
 

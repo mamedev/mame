@@ -25,11 +25,14 @@ typedef enum
 } ssd1306_addressing_mode_t;
 
 
+DECLARE_DEVICE_TYPE(SSD1306,  ssd1306_device)
+
 class ssd1306_device :  public device_t,
-						public device_video_interface,
-						public device_palette_interface
+						public device_video_interface
 {
 public:
+    ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 
     void set_external_oscillator(bool use_external_oscillator);
     void set_intf_mode(ssd1306_interface_mode_t mode);
@@ -71,6 +74,7 @@ public:
      */
     void rst_w(int rst);
 
+    uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -190,7 +194,6 @@ private:
     // 
     ////////////////////////////////////////////////
 
-    ssd1306_addressing_mode_t m_addressing_mode;
     uint8_t m_page_address_pointer;
     uint8_t m_column_address_pointer;
 
@@ -212,7 +215,7 @@ private:
     int m_spi_bits_left;
     
 
-    // display memory; 128x64 bits, divided into 8 pages
+    // display memory: one "page" is 8 pixels tall, one line is 128 pixels long
     uint8_t m_gddram[ 128 * 8 ];
 };
 
