@@ -32,6 +32,9 @@ emg2000a_device::emg2000a_device(const machine_config &mconfig, const char *tag,
 	, m_in_pa_cb(*this, 0xffff)
 	, m_out_pa_cb(*this)
 	, m_in_pb_cb(*this, 0xff)
+	, m_out_pb_cb(*this)
+	, m_in_pc_cb(*this, 0x3fff)
+	, m_out_pc_cb(*this)
 {
 }
 
@@ -59,12 +62,15 @@ void emg2000a_device::io_map(address_map &map)
 	map(0x02, 0x02).ram(); // TODO: saved and restored during interrupts
 	map(0x03, 0x03).rw(FUNC(emg2000a_device::bank_r), FUNC(emg2000a_device::bank_w));
 	map(0x09, 0x09).rw(FUNC(emg2000a_device::porta_r), FUNC(emg2000a_device::porta_w));
-	map(0x0a, 0x0a).r(FUNC(emg2000a_device::portb_r));
+	map(0x0a, 0x0a).rw(FUNC(emg2000a_device::portb_r), FUNC(emg2000a_device::portb_w));
+	map(0x0b, 0x0b).rw(FUNC(emg2000a_device::portc_r), FUNC(emg2000a_device::portc_w));
 	map(0x0c, 0x0d).rw(FUNC(emg2000a_device::inte_r), FUNC(emg2000a_device::inte_w));
 	map(0x0e, 0x0f).rw(FUNC(emg2000a_device::intf_r), FUNC(emg2000a_device::intf_w));
 	map(0x13, 0x13).rw(FUNC(emg2000a_device::spa_r), FUNC(emg2000a_device::spa_w));
 	map(0x14, 0x16).ram(); // TODO: saved and restored during interrupts
 	map(0x21, 0x21).rw(FUNC(emg2000a_device::pdira_r), FUNC(emg2000a_device::pdira_w));
+	map(0x22, 0x22).rw(FUNC(emg2000a_device::pdirb_r), FUNC(emg2000a_device::pdirb_w));
+	map(0x23, 0x23).rw(FUNC(emg2000a_device::pdirc_r), FUNC(emg2000a_device::pdirc_w));
 	map(0x24, 0x24).rw(FUNC(emg2000a_device::pcona_r), FUNC(emg2000a_device::pcona_w));
 	map(0x40, 0x43).rw(FUNC(emg2000a_device::timer01_r), FUNC(emg2000a_device::timer01_w));
 	// TODO: lots of other ports and registers
@@ -140,7 +146,11 @@ void emg2000a_device::device_start()
 	edsp_device::device_start();
 
 	save_item(NAME(m_pdata));
+	save_item(NAME(m_pdatb));
+	save_item(NAME(m_pdatc));
 	save_item(NAME(m_pdira));
+	save_item(NAME(m_pdirb));
+	save_item(NAME(m_pdirc));
 	save_item(NAME(m_pcona));
 }
 
@@ -169,7 +179,11 @@ void emg2000a_device::device_reset()
 	edsp_device::device_reset();
 
 	m_pdata = 0;
+	m_pdatb = 0;
+	m_pdatc = 0;
 	m_pdira = 0;
+	m_pdirb = 0;
+	m_pdirc = 0;
 	m_pcona = 0;
 }
 
@@ -243,8 +257,26 @@ void emg2000a_device::porta_w(u16 data)
 
 u16 emg2000a_device::portb_r()
 {
-	// TODO: data direction
-	return m_in_pb_cb();
+	return (m_in_pb_cb() & ~m_pdirb) | (m_pdatb & m_pdirb);
+}
+
+void emg2000a_device::portb_w(u16 data)
+{
+	m_pdatb = data & 0x00ff;
+	if (m_pdirb)
+		m_out_pb_cb(0, m_pdatb | ~m_pdirb, m_pdirb);
+}
+
+u16 emg2000a_device::portc_r()
+{
+	return (m_in_pc_cb() & ~m_pdirc & 0x3fff) | (m_pdatc & m_pdirc);
+}
+
+void emg2000a_device::portc_w(u16 data)
+{
+	m_pdatc = data & 0x3fff;
+	if (m_pdirc)
+		m_out_pc_cb(0, m_pdatc | ~m_pdirc, m_pdirc);
 }
 
 u16 emg2000a_device::pdira_r()
@@ -256,6 +288,28 @@ void emg2000a_device::pdira_w(u16 data)
 {
 	m_pdira = data;
 	m_out_pa_cb(0, m_pdata | ~m_pdira, m_pdira);
+}
+
+u16 emg2000a_device::pdirb_r()
+{
+	return m_pdirb;
+}
+
+void emg2000a_device::pdirb_w(u16 data)
+{
+	m_pdirb = data & 0x00ff;
+	m_out_pb_cb(0, m_pdatb | ~m_pdirb, m_pdirb);
+}
+
+u16 emg2000a_device::pdirc_r()
+{
+	return m_pdirc;
+}
+
+void emg2000a_device::pdirc_w(u16 data)
+{
+	m_pdirc = data & 0x3fff;
+	m_out_pc_cb(0, m_pdatc | ~m_pdirc, m_pdirc);
 }
 
 u16 emg2000a_device::pcona_r()
@@ -637,9 +691,23 @@ void edsp_device::execute_run()
 				(void)add(s, ~t, true);
 				m_icount -= 1;
 			}
+			else if ((op & 0xf81f) == 0x5800)
+			{
+				// COM
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = ~s;
+				m_sr = (m_sr & 0xfff0) | (s16(s) < 0 ? 0 : 0x0008) | (s == 0xffff ? 0x0004 : 0);
+				m_icount -= 1;
+			}
 			else if ((op & 0xf81f) == 0x5801)
 			{
 				m_r[BIT(op, 8, 3)] = m_r[BIT(op, 5, 3)];
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x5802)
+			{
+				// NEG
+				m_r[BIT(op, 8, 3)] = add(0, ~m_r[BIT(op, 5, 3)], true);
 				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x5803)
@@ -670,12 +738,10 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf81f) == 0x5808)
 			{
-				// ASR
+				// SHR
 				const u16 s = m_r[BIT(op, 5, 3)];
-				m_r[BIT(op, 8, 3)] = s16(s) >> 1;
-				m_sr = (m_sr & 0xfff0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
-				if (s16(s) < 0)
-					m_sr ^= 0x000a;
+				m_r[BIT(op, 8, 3)] = s >> 1;
+				m_sr = (m_sr & 0xfff0) | (s >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
 				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x5809)
@@ -686,10 +752,9 @@ void edsp_device::execute_run()
 			}
 			else if ((op & 0xf81f) == 0x580a)
 			{
-				// SHR
+				// ROL
 				const u16 s = m_r[BIT(op, 5, 3)];
-				m_r[BIT(op, 8, 3)] = s >> 1;
-				m_sr = (m_sr & 0xfff0) | (s >> 1 ? 0 : 0x0004) | (BIT(s, 0) ? 0x0003 : 0);
+				m_r[BIT(op, 8, 3)] = add(s, s, BIT(m_sr, 0));
 				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x580b)
@@ -698,6 +763,26 @@ void edsp_device::execute_run()
 				m_r[BIT(op, 5, 3)]++;
 				m_r[BIT(op, 8, 3)] = data;
 				m_icount -= 2; // TODO: repeat timing
+			}
+			else if ((op & 0xf81f) == 0x580c)
+			{
+				// ROR
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = (s >> 1) | (BIT(m_sr, 0) << 15);
+				m_sr = (m_sr & 0xfff0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(m_sr, 0) ? 0x000a : 0);
+				if (BIT(s, 0))
+					m_sr ^= 0x0003;
+				m_icount -= 1;
+			}
+			else if ((op & 0xf81f) == 0x580e)
+			{
+				// ASR
+				const u16 s = m_r[BIT(op, 5, 3)];
+				m_r[BIT(op, 8, 3)] = s16(s) >> 1;
+				m_sr = (m_sr & 0xfff0) | (s16(s) >> 1 ? 0 : 0x0004) | (s16(s) < 0 ? 0x000a : 0);
+				if (BIT(s, 0))
+					m_sr ^= 0x0003;
+				m_icount -= 1;
 			}
 			else if ((op & 0xf81f) == 0x580f)
 			{

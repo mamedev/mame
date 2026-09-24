@@ -1056,7 +1056,7 @@ void jaguar_state::shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 // TODO: as below?
 uint32_t jaguar_state::rom_base_r(offs_t offset){ return m_rom_base[offset*2+1] << 16 | m_rom_base[offset*2]; }
 // NOTE: BIOS ATARI SFX notes at startup depends on the correct endianness of this
-// - also cfr. several games (rayman, superx3d, ironsold)
+// - also cfr. several games (rayman, superx3d, ironsold, speedst2 engine sound)
 uint32_t jaguar_state::wave_rom_r(offs_t offset){ return m_wave_rom[offset*2+1] | m_wave_rom[offset*2] << 16; }
 uint32_t jaguar_state::gpu_clut_r(offs_t offset){ return m_gpu_clut[offset]; }
 void jaguar_state::gpu_clut_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_gpu_clut[offset]); }
@@ -2702,10 +2702,10 @@ void jaguar_state::init_vcircle()
  *************************************/
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY    FULLNAME */
-CONS( 1993, jaguar,     0,        0,      jaguar,   jaguar,   jaguar_state,   init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 1995, jaguarcd,   jaguar,   0,      jaguarcd, jaguar,   jaguarcd_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+CONS( 1993, jaguar,     0,        0,      jaguar,   jaguar,   jaguar_state,   init_jaguar,   "Atari",   "Jaguar (NTSC)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, jaguarcd,   jaguar,   0,      jaguarcd, jaguar,   jaguarcd_state, init_jaguarcd, "Atari",   "Jaguar CD (NTSC)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // MUP: cfr. cd_bios_r, should be IMPERFECT_PROTECTION
 
-/*    YEAR  NAME        PARENT    MACHINE       INPUT     CLASS         INIT            ROT   COMPANY        FULLNAME */
+
 GAME( 1996, area51,     0,        cojagr3k,     area51,   jaguar_state, init_area51,    ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
 GAME( 1995, area51ta,   area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )
