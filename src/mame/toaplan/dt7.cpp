@@ -514,21 +514,6 @@ static INPUT_PORTS_START( dt7 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 INPUT_PORTS_END
 
-// as the coin code is broken for most regions, just hook it up to the service coin
-static INPUT_PORTS_START( dt7_altcoin )
-	PORT_INCLUDE( dt7 )
-
-	PORT_MODIFY("SYS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN1, but doesn't work
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN2, but doesn't work
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_MODIFY("SYS2") // second seat's coin unit
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN3, but doesn't work
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // should be COIN4, but doesn't work
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
-INPUT_PORTS_END
-
 TILE_GET_INFO_MEMBER(dt7_state::get_tx_dt7_tile_info)
 {
 	const u16 attrib = m_tx_videoram[tile_index];
@@ -694,5 +679,5 @@ ROM_END
 // The Japanese region has Japanese language
 // The Korean region has a unique title screen
 GAME( 1993, dt7,    0,   dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "DT7 (USA) (prototype)",            MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dt7j,   dt7, dt7, dt7_altcoin, dt7_state, empty_init, ROT270, "Toaplan", "DT7 (Japan) (prototype)",          MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dt7k,   dt7, dt7, dt7_altcoin, dt7_state, empty_init, ROT270, "Toaplan", "Car Fighting (Korea) (prototype)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dt7j,   dt7, dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "DT7 (Japan) (prototype)",          MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dt7k,   dt7, dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "Car Fighting (Korea) (prototype)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
