@@ -367,6 +367,7 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 	// table entries, so the serial attribute state restarts on each one.
 	const uint16_t margin_color = (VDP_CM4 >> 5) & 0x7;
 	uint16_t zone_bg = margin_color;
+	bool zone_masked = BIT(VDP_CM4, 3);
 
 	nametbl_base = m_address_regs[2];
 	for (i = 0; i < 4; i++)
@@ -387,7 +388,10 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 		if ((name_lo & 0x7f) == 0x20)
 		{   /* delimiter: sets the background colour of the zone that follows */
 			fg = (name_hi >> 5) & 0x7;
+			if (zone_masked && BIT(VDP_CM2, 5))
+				fg = zone_bg;   /* a delimiter ending a masked zone takes that zone's background colour */
 			zone_bg = name_hi & 0x7;
+			zone_masked = BIT(name_hi, 3);
 			bg = zone_bg;
 			pattern = 0xff; /* the delimiter cell is shown in its foreground colour */
 			dbl_w = 0;
@@ -437,6 +441,8 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 				if (m_char_line_counter == 0)
 					m_dbl_h_phase[x] = !m_dbl_h_phase[x];
 			}
+			if (zone_masked && BIT(VDP_CM2, 5))
+				pattern = 0;    /* characters in a masked zone are displayed as spaces */
 		}
 		if (!dbl_w)
 		{   /* single width */
