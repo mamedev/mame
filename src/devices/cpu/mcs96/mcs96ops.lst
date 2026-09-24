@@ -1192,10 +1192,10 @@ fe8c  div   direct_2w
 	if(OP1) {
 		TMP = reg_r16(OP2);
 		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-		int32_t TMP2 = int32_t(TMP) / int16_t(OP1);
+		int64_t TMP2 = int64_t(int32_t(TMP)) / int16_t(OP1);
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
-		TMP = TMP % int16_t(OP1);
+		TMP = int64_t(int32_t(TMP)) % int16_t(OP1);
 		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
 		reg_w16(OP2, TMP);
 		reg_w16(OP2+2, TMP >> 16);
@@ -1208,10 +1208,10 @@ fe8d  div   immed_2w
 	if(OP1) {
 		TMP = reg_r16(OP2);
 		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-		int32_t TMP2 = int32_t(TMP) / int16_t(OP1);
+		int64_t TMP2 = int64_t(int32_t(TMP)) / int16_t(OP1);
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
-		TMP = TMP % int16_t(OP1);
+		TMP = int64_t(int32_t(TMP)) % int16_t(OP1);
 		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
 		reg_w16(OP2, TMP);
 		reg_w16(OP2+2, TMP >> 16);
@@ -1225,10 +1225,10 @@ fe8e  div   indirect_2w
 	if(d) {
 		TMP = reg_r16(OP2);
 		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-		int32_t TMP2 = int32_t(TMP) / d;
+		int64_t TMP2 = int64_t(int32_t(TMP)) / d;
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
-		TMP = TMP % d;
+		TMP = int64_t(int32_t(TMP)) % d;
 		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
 		reg_w16(OP2, TMP);
 		reg_w16(OP2+2, TMP >> 16);
@@ -1242,10 +1242,10 @@ fe8f  div   indexed_2w
 	if(d) {
 		TMP = reg_r16(OP2);
 		TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-		int32_t TMP2 = int32_t(TMP) / d;
+		int64_t TMP2 = int64_t(int32_t(TMP)) / d;
 		if(TMP2 > 32767 || TMP2 < -32768)
 			PSW |= F_V|F_VT;
-		TMP = TMP % d;
+		TMP = int64_t(int32_t(TMP)) % d;
 		TMP = (TMP2 & 0xffff) | ((TMP & 0xffff) << 16);
 		reg_w16(OP2, TMP);
 		reg_w16(OP2+2, TMP >> 16);
