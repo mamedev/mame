@@ -112,7 +112,7 @@ void edsp_device::device_start()
 	state_add(EDSP_LEA, "LEA", m_lea);
 	state_add(EDSP_SR, "SR", m_sr);
 	for (int n = 0; n < 8; n++)
-		state_add(EDSP_R0 + n, util::string_format("R%d", n).c_str(), m_r[n]);
+		state_add(EDSP_R0 + n, util::string_format("R%d", n), m_r[n]);
 	state_add(EDSP_INTE, "INTE", m_inte);
 	state_add(EDSP_INTF, "INTF", m_intf);
 
@@ -379,6 +379,11 @@ u16 edsp_device::read_program_word(u16 addr)
 	return m_program.read_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr);
 }
 
+void edsp_device::write_program_word(u16 addr, u16 data)
+{
+	m_program.write_word(addr >= 0x8000 ? addr + (u32(BIT(m_bank, 0, 9)) << 15) : addr, data);
+}
+
 u16 edsp_device::fetch_program_word()
 {
 	return m_cache.read_word(m_pc >= 0x8000 ? m_pc + (u32(BIT(m_bank, 0, 9)) << 15) : m_pc);
@@ -599,6 +604,11 @@ void edsp_device::execute_run()
 				m_sp++;
 				m_pc = m_data.read_word(m_sp);
 				m_sr |= SR_GIE;
+				m_icount -= 2;
+			}
+			else if (op == 0x387a)
+			{
+				write_program_word(m_r[0], m_data.read_word(m_r[1]));
 				m_icount -= 2;
 			}
 			else if ((op & 0xf81f) == 0x381b)

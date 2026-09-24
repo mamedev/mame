@@ -4,10 +4,6 @@
 
     Psion Siena
 
-    TODO:
-    - Siena (US) should report USA instead of English, the locale switch is
-      unknown.
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -42,7 +38,8 @@ public:
 		, m_honda(*this, "honda")
 	{ }
 
-	void siena(machine_config &config);
+	void siena(machine_config &config) ATTR_COLD;
+	void siena_us(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(wakeup);
 
@@ -51,6 +48,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void palette_init(palette_device &palette);
+
+	uint16_t kbd_r();
+
 	required_device<psion_asic9_device> m_asic9;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
@@ -60,10 +61,6 @@ private:
 	required_device<psion_condor_device> m_condor;
 	required_device<psion_honda_slot_device> m_honda;
 
-	void palette_init(palette_device &palette);
-
-	uint16_t kbd_r();
-
 	uint8_t m_key_col = 0;
 };
 
@@ -71,6 +68,8 @@ private:
 void siena_state::machine_start()
 {
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
+
+	save_item(NAME(m_key_col));
 }
 
 void siena_state::machine_reset()
@@ -282,6 +281,7 @@ void siena_state::siena(machine_config &config)
 	m_asic9->set_screen("screen");
 	m_asic9->set_ram_rom("ram", "rom");
 	m_asic9->port_ab_r().set(FUNC(siena_state::kbd_r));
+	m_asic9->port_cd_r().set([]() { return 0x00; });
 	m_asic9->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
 
@@ -319,6 +319,17 @@ void siena_state::siena(machine_config &config)
 	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("SIENA");
 }
 
+void siena_state::siena_us(machine_config &config)
+{
+	siena(config);
+	// locale on port C:
+	// 00 - English
+	// 01 - Swedish
+	// 02 - USA
+	// 03 - Spanish
+	m_asic9->port_cd_r().set([]() { return 0x02; });
+}
+
 
 ROM_START(siena)
 	ROM_REGION16_LE(0x100000, "rom", 0)
@@ -344,4 +355,4 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS          INIT         COMPANY   FULLNAME           FLAGS
 COMP( 1996, siena,    0,      0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena",           MACHINE_SUPPORTS_SAVE )
 COMP( 1996, siena_fr, siena,  0,      siena,    siena_fr,  siena_state,   empty_init,  "Psion",  "Siena (French)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1996, siena_us, siena,  0,      siena,    siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1996, siena_us, siena,  0,      siena_us, siena,     siena_state,   empty_init,  "Psion",  "Siena (US)",      MACHINE_SUPPORTS_SAVE )
