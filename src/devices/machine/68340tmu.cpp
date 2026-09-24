@@ -313,6 +313,19 @@ void mc68340_timer_module_device::device_start()
 	m_timer = timer_alloc(FUNC(mc68340_timer_module_device::timer_callback), this);
 
 	m_ir = 0x000f;
+
+	save_item(NAME(m_mcr));
+	save_item(NAME(m_ir));
+	save_item(NAME(m_cr));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_cntr));
+	save_item(NAME(m_cntr_reg));
+	save_item(NAME(m_prel1));
+	save_item(NAME(m_prel2));
+	save_item(NAME(m_com));
+	save_item(NAME(m_timer_counter));
+	save_item(NAME(m_tin));
+	save_item(NAME(m_tgate));
 }
 
 void mc68340_timer_module_device::device_reset()
@@ -320,6 +333,11 @@ void mc68340_timer_module_device::device_reset()
 	m_mcr = REG_MCR_SUPV;
 	m_ir = 0x000f;
 	module_reset();
+}
+
+void mc68340_timer_module_device::device_post_load()
+{
+	m_tout_out_cb((m_sr & REG_SR_OUT) ? 1 : 0);
 }
 
 void mc68340_timer_module_device::module_reset()
@@ -511,6 +529,10 @@ void mc68340_timer_module_device::tout_clear()
 
 mc68340_timer_module_device::mc68340_timer_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
   : device_t(mconfig, MC68340_TIMER_MODULE, tag, owner, clock)
+  , m_sr(0)
+  , m_timer_counter(0)
+  , m_tin(0)
+  , m_tgate(0)
   , m_tout_out_cb(*this)
   , m_tgate_in_cb(*this)
 {

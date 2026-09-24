@@ -1,0 +1,817 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:MagikalUnicorn
+-->
+<!--
+Physical control positioning is reconstructed from photographs of a Top of
+the Pops Cobra 3 cabinet, the only known source for this cabinet layout.  The
+Telly Addicts cabinet may differ, and the button shades are visual estimates.
+The ten Telly and Addicts outputs are assumed to represent five illuminated
+zones behind each half of the cabinet name panel.  The panel position, lamp
+arrangement and purple logo colour have not been confirmed.
+The coin-value text does not illuminate on the physical coin acceptor; its
+highlighting here indicates the coin-channel acceptance state for convenience.
+-->
+<mamelayout version="2">
+	<element name="panel">
+		<rect>
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+	<element name="coin_input">
+		<rect>
+			<color alpha="0.0" />
+		</rect>
+	</element>
+
+	<element name="lamp_violet" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.20" green="0.05" blue="0.24" />
+			<color state="255" red="0.75" green="0.25" blue="0.90" />
+		</rect>
+	</element>
+	<element name="lamp_teal" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.02" green="0.16" blue="0.16" />
+			<color state="255" red="0.08" green="0.72" blue="0.66" />
+		</rect>
+	</element>
+	<element name="lamp_pink" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.28" green="0.06" blue="0.14" />
+			<color state="255" red="1.00" green="0.35" blue="0.65" />
+		</rect>
+	</element>
+	<element name="lamp_orange" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.30" green="0.12" blue="0.02" />
+			<color state="255" red="1.00" green="0.45" blue="0.05" />
+		</rect>
+	</element>
+	<element name="lamp_green" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.03" green="0.20" blue="0.05" />
+			<color state="255" red="0.10" green="0.90" blue="0.20" />
+		</rect>
+	</element>
+	<element name="lamp_red" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.28" green="0.03" blue="0.03" />
+			<color state="255" red="1.00" green="0.12" blue="0.08" />
+		</rect>
+	</element>
+	<element name="lamp_yellow" defstate="0">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<rect>
+			<bounds x="0.10" y="0.10" width="0.80" height="0.80" />
+			<color state="0" red="0.30" green="0.20" blue="0.02" />
+			<color state="255" red="1.00" green="0.72" blue="0.10" />
+		</rect>
+	</element>
+	<element name="button_detail">
+		<!-- Raised retaining ridge around the illuminated insert. -->
+		<rect>
+			<bounds x="0.055" y="0.055" width="0.890" height="0.045" />
+			<color red="0.13" green="0.13" blue="0.13" />
+		</rect>
+		<rect>
+			<bounds x="0.055" y="0.100" width="0.045" height="0.800" />
+			<color red="0.10" green="0.10" blue="0.10" />
+		</rect>
+		<rect>
+			<bounds x="0.055" y="0.900" width="0.890" height="0.045" />
+			<color red="0.03" green="0.03" blue="0.03" />
+		</rect>
+		<rect>
+			<bounds x="0.900" y="0.100" width="0.045" height="0.800" />
+			<color red="0.04" green="0.04" blue="0.04" />
+		</rect>
+		<!-- Subtle clear-lens highlight and opposing shadow. -->
+		<rect>
+			<bounds x="0.100" y="0.100" width="0.800" height="0.025" />
+			<color red="1.00" green="1.00" blue="1.00" alpha="0.10" />
+		</rect>
+		<rect>
+			<bounds x="0.100" y="0.100" width="0.025" height="0.800" />
+			<color red="1.00" green="1.00" blue="1.00" alpha="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.100" y="0.875" width="0.800" height="0.025" />
+			<color red="0.00" green="0.00" blue="0.00" alpha="0.22" />
+		</rect>
+		<rect>
+			<bounds x="0.875" y="0.100" width="0.025" height="0.800" />
+			<color red="0.00" green="0.00" blue="0.00" alpha="0.18" />
+		</rect>
+	</element>
+	<element name="button_highlight" defstate="0">
+		<!-- Light from the illuminated insert diffuses into the surrounding grey bezel. -->
+		<rect>
+			<bounds x="0.0875" y="0.075" width="0.825" height="0.025" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.32" />
+		</rect>
+		<rect>
+			<bounds x="0.075" y="0.0875" width="0.025" height="0.825" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.32" />
+		</rect>
+		<rect>
+			<bounds x="0.0875" y="0.90" width="0.825" height="0.025" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.32" />
+		</rect>
+		<rect>
+			<bounds x="0.90" y="0.0875" width="0.025" height="0.825" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.32" />
+		</rect>
+		<rect>
+			<bounds x="0.075" y="0.0625" width="0.85" height="0.0125" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.12" />
+		</rect>
+		<rect>
+			<bounds x="0.0625" y="0.075" width="0.0125" height="0.85" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.12" />
+		</rect>
+		<rect>
+			<bounds x="0.075" y="0.925" width="0.85" height="0.0125" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.12" />
+		</rect>
+		<rect>
+			<bounds x="0.925" y="0.075" width="0.0125" height="0.85" />
+			<color state="0" red="1.00" green="1.00" blue="1.00" alpha="0.00" />
+			<color state="255" red="1.00" green="1.00" blue="1.00" alpha="0.12" />
+		</rect>
+	</element>
+	<element name="name_panel_frame">
+		<rect>
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+	</element>
+	<element name="name_panel" defstate="0">
+		<rect>
+			<color state="0" red="0.09" green="0.015" blue="0.13" />
+			<color state="255" red="0.58" green="0.08" blue="0.80" />
+		</rect>
+	</element>
+	<element name="name_label" defstate="0">
+		<text string="TELLY ADDICTS">
+			<color state="0" red="0.22" green="0.08" blue="0.28" />
+			<color state="255" red="0.96" green="0.90" blue="1.00" />
+		</text>
+	</element>
+	<element name="coin_acceptor_body">
+		<!-- Black moulded housing and the three recessed panel apertures. -->
+		<rect>
+			<color red="0.015" green="0.015" blue="0.015" />
+		</rect>
+		<rect>
+			<bounds x="0.025" y="0.025" width="0.950" height="0.055" />
+			<color red="0.12" green="0.12" blue="0.12" />
+		</rect>
+		<rect>
+			<bounds x="0.025" y="0.080" width="0.045" height="0.820" />
+			<color red="0.08" green="0.08" blue="0.08" />
+		</rect>
+		<rect>
+			<bounds x="0.930" y="0.080" width="0.045" height="0.820" />
+			<color red="0.025" green="0.025" blue="0.025" />
+		</rect>
+		<rect>
+			<bounds x="0.025" y="0.880" width="0.950" height="0.095" />
+			<color red="0.01" green="0.01" blue="0.01" />
+		</rect>
+		<!-- A continuous raised bezel surrounds and separates all three panels. -->
+		<rect>
+			<bounds x="0.055" y="0.095" width="0.890" height="0.800" />
+			<color red="0.10" green="0.10" blue="0.10" />
+		</rect>
+		<rect>
+			<bounds x="0.065" y="0.110" width="0.870" height="0.770" />
+			<color red="0.025" green="0.025" blue="0.025" />
+		</rect>
+		<rect>
+			<bounds x="0.075" y="0.125" width="0.850" height="0.740" />
+			<color red="0.005" green="0.005" blue="0.005" />
+		</rect>
+		<!-- The blue coin-return panel is not illuminated. -->
+		<rect>
+			<bounds x="0.385" y="0.160" width="0.230" height="0.660" />
+			<color red="0.035" green="0.035" blue="0.20" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.170" width="0.210" height="0.035" />
+			<color red="0.20" green="0.20" blue="0.48" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.245" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.320" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.395" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.470" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.545" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.620" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.395" y="0.695" width="0.210" height="0.018" />
+			<color red="0.01" green="0.01" blue="0.06" />
+		</rect>
+		<text string="PUSH">
+			<bounds x="0.415" y="0.300" width="0.170" height="0.075" />
+			<color red="0.24" green="0.24" blue="0.40" />
+		</text>
+		<text string="TO REJECT">
+			<bounds x="0.400" y="0.405" width="0.200" height="0.070" />
+			<color red="0.20" green="0.20" blue="0.36" />
+		</text>
+	</element>
+	<element name="coin_acceptor_lamps" defstate="0">
+		<!-- Preserve the housing coordinate space around the illuminated panels. -->
+		<rect>
+			<color alpha="0.0" />
+		</rect>
+		<!-- Both red panels are lit by the acceptor lamp. -->
+		<rect>
+			<bounds x="0.090" y="0.160" width="0.255" height="0.660" />
+			<color state="0" red="0.16" green="0.015" blue="0.02" />
+			<color state="255" red="0.95" green="0.08" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.655" y="0.160" width="0.255" height="0.660" />
+			<color state="0" red="0.16" green="0.015" blue="0.02" />
+			<color state="255" red="0.95" green="0.08" blue="0.06" />
+		</rect>
+		<rect>
+			<bounds x="0.105" y="0.175" width="0.225" height="0.630" />
+			<color state="0" red="0.075" green="0.006" blue="0.01" />
+			<color state="255" red="0.62" green="0.025" blue="0.025" />
+		</rect>
+		<rect>
+			<bounds x="0.670" y="0.175" width="0.225" height="0.630" />
+			<color state="0" red="0.075" green="0.006" blue="0.01" />
+			<color state="255" red="0.62" green="0.025" blue="0.025" />
+		</rect>
+		<text string="C">
+			<bounds x="0.105" y="0.180" width="0.175" height="0.300" />
+			<color state="0" red="0.28" green="0.025" blue="0.025" />
+			<color state="255" red="1.00" green="0.24" blue="0.18" />
+		</text>
+		<text string="COINS">
+			<bounds x="0.105" y="0.475" width="0.175" height="0.075" />
+			<color state="0" red="0.25" green="0.02" blue="0.02" />
+			<color state="255" red="1.00" green="0.20" blue="0.14" />
+		</text>
+		<disk>
+			<bounds x="0.680" y="0.195" width="0.098" height="0.170" />
+			<color state="0" red="0.27" green="0.02" blue="0.025" />
+			<color state="255" red="1.00" green="0.20" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds x="0.703" y="0.234" width="0.053" height="0.092" />
+			<color state="0" red="0.065" green="0.005" blue="0.008" />
+			<color state="255" red="0.55" green="0.02" blue="0.02" />
+		</disk>
+		<disk>
+			<bounds x="0.680" y="0.335" width="0.098" height="0.170" />
+			<color state="0" red="0.27" green="0.02" blue="0.025" />
+			<color state="255" red="1.00" green="0.20" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds x="0.703" y="0.374" width="0.053" height="0.092" />
+			<color state="0" red="0.065" green="0.005" blue="0.008" />
+			<color state="255" red="0.55" green="0.02" blue="0.02" />
+		</disk>
+		<disk>
+			<bounds x="0.680" y="0.475" width="0.098" height="0.170" />
+			<color state="0" red="0.27" green="0.02" blue="0.025" />
+			<color state="255" red="1.00" green="0.20" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds x="0.703" y="0.514" width="0.053" height="0.092" />
+			<color state="0" red="0.065" green="0.005" blue="0.008" />
+			<color state="255" red="0.55" green="0.02" blue="0.02" />
+		</disk>
+		<disk>
+			<bounds x="0.680" y="0.615" width="0.098" height="0.170" />
+			<color state="0" red="0.27" green="0.02" blue="0.025" />
+			<color state="255" red="1.00" green="0.20" blue="0.15" />
+		</disk>
+		<disk>
+			<bounds x="0.703" y="0.654" width="0.053" height="0.092" />
+			<color state="0" red="0.065" green="0.005" blue="0.008" />
+			<color state="255" red="0.55" green="0.02" blue="0.02" />
+		</disk>
+		<!-- The coin aperture is illuminated by the same lamp as the red panels. -->
+		<rect>
+			<bounds x="0.273" y="0.220" width="0.045" height="0.520" />
+			<color state="0" red="0.20" green="0.12" blue="0.055" />
+			<color state="255" red="1.00" green="0.48" blue="0.16" />
+		</rect>
+		<rect>
+			<bounds x="0.285" y="0.240" width="0.021" height="0.480" />
+			<color state="0" red="0.005" green="0.005" blue="0.005" />
+			<color state="255" red="0.42" green="0.015" blue="0.008" />
+		</rect>
+	</element>
+	<element name="coin_label_10p" defstate="0">
+		<rect>
+			<color alpha="0.0" />
+		</rect>
+		<text string="10p">
+			<bounds x="0.1175" y="0.560" width="0.080" height="0.065" />
+			<color state="0" red="0.22" green="0.02" blue="0.02" />
+			<color state="255" red="0.90" green="0.16" blue="0.12" />
+			<color state="256" red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="coin_label_20p" defstate="0">
+		<rect>
+			<color alpha="0.0" />
+		</rect>
+		<text string="20p">
+			<bounds x="0.1915" y="0.560" width="0.080" height="0.065" />
+			<color state="0" red="0.22" green="0.02" blue="0.02" />
+			<color state="255" red="0.90" green="0.16" blue="0.12" />
+			<color state="256" red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="coin_label_50p" defstate="0">
+		<rect>
+			<color alpha="0.0" />
+		</rect>
+		<text string="50p">
+			<bounds x="0.1175" y="0.640" width="0.080" height="0.065" />
+			<color state="0" red="0.22" green="0.02" blue="0.02" />
+			<color state="255" red="0.90" green="0.16" blue="0.12" />
+			<color state="256" red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="coin_label_pound" defstate="0">
+		<rect>
+			<color alpha="0.0" />
+		</rect>
+		<text string="&#xa3;1">
+			<bounds x="0.2015" y="0.640" width="0.055" height="0.065" />
+			<color state="0" red="0.22" green="0.02" blue="0.02" />
+			<color state="255" red="0.90" green="0.16" blue="0.12" />
+			<color state="256" red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+
+	<element name="answer_left_a_label">
+		<text string="A">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="answer_left_b_label">
+		<text string="B">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="answer_left_c_label">
+		<text string="C">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="collect_label">
+		<text string="COLLECT">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="start_label">
+		<text string="START">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="answer_right_c_label">
+		<text string="C">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="answer_right_b_label">
+		<text string="B">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="answer_right_a_label">
+		<text string="A">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+
+	<element name="select_label">
+		<text string="SELECT">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<element name="direction_label">
+		<text string="▲">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</text>
+	</element>
+	<view name="Screen and Lamps">
+		<bounds x="-144" y="-192" width="1056" height="960" />
+		<element ref="panel">
+			<bounds x="-144" y="-192" width="1056" height="960" />
+		</element>
+
+		<element ref="name_panel_frame">
+			<bounds x="72" y="-168" width="552" height="108" />
+		</element>
+		<repeat count="5">
+			<param name="n" start="14" increment="1" />
+			<param name="group" start="5" increment="-1" />
+			<param name="x" start="84" increment="52.8" />
+			<element id="name_panel_telly_~group~" name="lamp~n~" ref="name_panel">
+				<bounds x="~x~" y="-156" width="51.8" height="84" />
+			</element>
+		</repeat>
+		<repeat count="5">
+			<param name="n" start="19" increment="1" />
+			<param name="group" start="5" increment="-1" />
+			<param name="x" start="348" increment="52.8" />
+			<element id="name_panel_addicts_~group~" name="lamp~n~" ref="name_panel">
+				<bounds x="~x~" y="-156" width="51.8" height="84" />
+			</element>
+		</repeat>
+		<element id="name_panel_label" ref="name_label">
+			<bounds x="96" y="-137" width="504" height="46" />
+		</element>
+
+		<element ref="coin_acceptor_body">
+			<bounds x="648" y="-168" width="240" height="138" />
+		</element>
+		<element id="coin_acceptor_lamps" name="lamp13" ref="coin_acceptor_lamps">
+			<bounds x="648" y="-168" width="240" height="138" />
+		</element>
+		<element id="coin_d_label" ref="coin_label_10p">
+			<bounds x="648" y="-168" width="240" height="138" />
+		</element>
+		<element id="coin_c_label" ref="coin_label_20p">
+			<bounds x="648" y="-168" width="240" height="138" />
+		</element>
+		<element id="coin_b_label" ref="coin_label_50p">
+			<bounds x="648" y="-168" width="240" height="138" />
+		</element>
+		<element id="coin_a_label" ref="coin_label_pound">
+			<bounds x="648" y="-168" width="240" height="138" />
+		</element>
+		<!-- The left illuminated panel operates the £1 validator channel (Coin A). -->
+		<element ref="coin_input" inputtag="IOSTATUS" inputmask="0x08">
+			<bounds x="669.6" y="-145.92" width="61.2" height="91.08" />
+		</element>
+		<screen index="0">
+			<bounds x="0" y="0" width="768" height="576" />
+		</screen>
+
+		<element id="answer_left_a_face" name="lamp0" ref="lamp_violet" inputtag="STROBE0" inputmask="0x01">
+			<bounds x="-105" y="128" width="72" height="72" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="-105" y="128" width="72" height="72" />
+		</element>
+		<element id="answer_left_a_highlight" name="lamp0" ref="button_highlight">
+			<bounds x="-105" y="128" width="72" height="72" />
+			<color red="0.61" green="0.46" blue="0.66" />
+		</element>
+		<element ref="answer_left_a_label">
+			<bounds x="-105" y="126" width="72" height="72" />
+		</element>
+		<element id="answer_left_b_face" name="lamp1" ref="lamp_teal" inputtag="STROBE0" inputmask="0x02">
+			<bounds x="-105" y="236" width="72" height="72" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="-105" y="236" width="72" height="72" />
+		</element>
+		<element id="answer_left_b_highlight" name="lamp1" ref="button_highlight">
+			<bounds x="-105" y="236" width="72" height="72" />
+			<color red="0.42" green="0.63" blue="0.61" />
+		</element>
+		<element ref="answer_left_b_label">
+			<bounds x="-105" y="234" width="72" height="72" />
+		</element>
+		<element id="answer_left_c_face" name="lamp2" ref="lamp_pink" inputtag="STROBE0" inputmask="0x04">
+			<bounds x="-105" y="344" width="72" height="72" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="-105" y="344" width="72" height="72" />
+		</element>
+		<element id="answer_left_c_highlight" name="lamp2" ref="button_highlight">
+			<bounds x="-105" y="344" width="72" height="72" />
+			<color red="0.69" green="0.49" blue="0.58" />
+		</element>
+		<element ref="answer_left_c_label">
+			<bounds x="-105" y="342" width="72" height="72" />
+		</element>
+		<element id="answer_right_a_face" name="lamp7" ref="lamp_red" inputtag="STROBE0" inputmask="0x80">
+			<bounds x="801" y="128" width="72" height="72" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="801" y="128" width="72" height="72" />
+		</element>
+		<element id="answer_right_a_highlight" name="lamp7" ref="button_highlight">
+			<bounds x="801" y="128" width="72" height="72" />
+			<color red="0.69" green="0.42" blue="0.41" />
+		</element>
+		<element ref="answer_right_a_label">
+			<bounds x="801" y="126" width="72" height="72" />
+		</element>
+		<element id="answer_right_b_face" name="lamp6" ref="lamp_green" inputtag="STROBE0" inputmask="0x40">
+			<bounds x="801" y="236" width="72" height="72" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="801" y="236" width="72" height="72" />
+		</element>
+		<element id="answer_right_b_highlight" name="lamp6" ref="button_highlight">
+			<bounds x="801" y="236" width="72" height="72" />
+			<color red="0.42" green="0.66" blue="0.45" />
+		</element>
+		<element ref="answer_right_b_label">
+			<bounds x="801" y="234" width="72" height="72" />
+		</element>
+		<element id="answer_right_c_face" name="lamp5" ref="lamp_orange" inputtag="STROBE0" inputmask="0x20">
+			<bounds x="801" y="344" width="72" height="72" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="801" y="344" width="72" height="72" />
+		</element>
+		<element id="answer_right_c_highlight" name="lamp5" ref="button_highlight">
+			<bounds x="801" y="344" width="72" height="72" />
+			<color red="0.69" green="0.52" blue="0.40" />
+		</element>
+		<element ref="answer_right_c_label">
+			<bounds x="801" y="342" width="72" height="72" />
+		</element>
+
+		<element id="direction_up_face" name="lamp10" ref="lamp_yellow" inputtag="STROBE1" inputmask="0x04">
+			<bounds x="220" y="620" width="56" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="220" y="620" width="56" height="56" />
+		</element>
+		<element id="direction_up_highlight" name="lamp10" ref="button_highlight">
+			<bounds x="220" y="620" width="56" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="direction_label">
+			<bounds x="220" y="620" width="56" height="56" />
+		</element>
+		<element id="direction_left_face" name="lamp8" ref="lamp_yellow" inputtag="STROBE1" inputmask="0x01">
+			<bounds x="154" y="653" width="56" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="154" y="653" width="56" height="56" />
+		</element>
+		<element id="direction_left_highlight" name="lamp8" ref="button_highlight">
+			<bounds x="154" y="653" width="56" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="direction_label">
+			<bounds x="154" y="653" width="56" height="56" />
+			<orientation rotate="270" />
+		</element>
+		<element id="direction_right_face" name="lamp9" ref="lamp_yellow" inputtag="STROBE1" inputmask="0x02">
+			<bounds x="286" y="653" width="56" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="286" y="653" width="56" height="56" />
+		</element>
+		<element id="direction_right_highlight" name="lamp9" ref="button_highlight">
+			<bounds x="286" y="653" width="56" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="direction_label">
+			<bounds x="286" y="653" width="56" height="56" />
+			<orientation rotate="90" />
+		</element>
+		<element id="direction_down_face" name="lamp11" ref="lamp_yellow" inputtag="STROBE1" inputmask="0x08">
+			<bounds x="220" y="686" width="56" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="220" y="686" width="56" height="56" />
+		</element>
+		<element id="direction_down_highlight" name="lamp11" ref="button_highlight">
+			<bounds x="220" y="686" width="56" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="direction_label">
+			<bounds x="220" y="686" width="56" height="56" />
+			<orientation rotate="180" />
+		</element>
+
+		<element id="select_face" name="lamp12" ref="lamp_yellow" inputtag="STROBE1" inputmask="0x10">
+			<bounds x="408" y="653" width="76" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="408" y="653" width="76" height="56" />
+		</element>
+		<element id="select_highlight" name="lamp12" ref="button_highlight">
+			<bounds x="408" y="653" width="76" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="select_label">
+			<bounds x="408" y="674" width="76" height="14" />
+		</element>
+
+		<element id="start_face" name="lamp4" ref="lamp_yellow" inputtag="STROBE0" inputmask="0x10">
+			<bounds x="562" y="653" width="76" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="562" y="653" width="76" height="56" />
+		</element>
+		<element id="start_highlight" name="lamp4" ref="button_highlight">
+			<bounds x="562" y="653" width="76" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="start_label">
+			<bounds x="562" y="674" width="76" height="14" />
+		</element>
+
+		<element id="collect_face" name="lamp3" ref="lamp_yellow" inputtag="STROBE0" inputmask="0x08">
+			<bounds x="716" y="653" width="76" height="56" />
+		</element>
+		<element ref="button_detail">
+			<bounds x="716" y="653" width="76" height="56" />
+		</element>
+		<element id="collect_highlight" name="lamp3" ref="button_highlight">
+			<bounds x="716" y="653" width="76" height="56" />
+			<color red="0.69" green="0.60" blue="0.34" />
+		</element>
+		<element ref="collect_label">
+			<bounds x="716" y="674" width="76" height="14" />
+		</element>
+
+	</view>
+
+	<view name="Screen Only">
+		<bounds x="0" y="0" width="768" height="576" />
+		<screen index="0">
+			<bounds x="0" y="0" width="768" height="576" />
+		</screen>
+	</view>
+
+	<script><![CDATA[
+		local lamp_items = {
+			{ number = 0, face = "answer_left_a_face", highlight = "answer_left_a_highlight" },
+			{ number = 1, face = "answer_left_b_face", highlight = "answer_left_b_highlight" },
+			{ number = 2, face = "answer_left_c_face", highlight = "answer_left_c_highlight" },
+			{ number = 3, face = "collect_face", highlight = "collect_highlight" },
+			{ number = 4, face = "start_face", highlight = "start_highlight" },
+			{ number = 5, face = "answer_right_c_face", highlight = "answer_right_c_highlight" },
+			{ number = 6, face = "answer_right_b_face", highlight = "answer_right_b_highlight" },
+			{ number = 7, face = "answer_right_a_face", highlight = "answer_right_a_highlight" },
+			{ number = 8, face = "direction_left_face", highlight = "direction_left_highlight" },
+			{ number = 9, face = "direction_right_face", highlight = "direction_right_highlight" },
+			{ number = 10, face = "direction_up_face", highlight = "direction_up_highlight" },
+			{ number = 11, face = "direction_down_face", highlight = "direction_down_highlight" },
+			{ number = 12, face = "select_face", highlight = "select_highlight" },
+			{ number = 13, face = "coin_acceptor_lamps" },
+			{ number = 14, face = "name_panel_telly_5" },
+			{ number = 15, face = "name_panel_telly_4" },
+			{ number = 16, face = "name_panel_telly_3" },
+			{ number = 17, face = "name_panel_telly_2" },
+			{ number = 18, face = "name_panel_telly_1" },
+			{ number = 19, face = "name_panel_addicts_5" },
+			{ number = 20, face = "name_panel_addicts_4" },
+			{ number = 21, face = "name_panel_addicts_3" },
+			{ number = 22, face = "name_panel_addicts_2" },
+			{ number = 23, face = "name_panel_addicts_1" }
+		}
+		local maximum_level = 255
+		local locked_coin_state = 256
+		-- Filament response is nonlinear, but exponential relaxation is a useful compact model.
+		-- With the exact lamp unknown, use the fast end of published miniature-lamp ranges:
+		-- 100 ms to reach 90% brightness and 60 ms to decay to 10% brightness.
+		local rise_time_to_90_percent = 0.10
+		local fall_time_to_10_percent = 0.06
+		local response_scale = math.log(10.0)
+
+		local function state_callback(lamp)
+			return function ()
+				return math.floor(lamp.level + 0.5)
+			end
+		end
+
+		local function coin_label_state_callback(label, lamp)
+			return function ()
+				return label.lockout:get() ~= 0 and locked_coin_state or math.floor(lamp.level + 0.5)
+			end
+		end
+
+		file:set_resolve_tags_callback(
+				function ()
+					local view = file.views["Screen and Lamps"]
+					local lamps = { }
+					local coin_acceptor_lamp
+					local name_panel_label = { item = view.items["name_panel_label"], level = 0 }
+					local name_panel_lamp_count = 0
+
+					for _, item in ipairs(lamp_items) do
+						local lamp = {
+							output = file.device:output(string.format("lamp%u", item.number)),
+							face = view.items[item.face],
+							highlight = item.highlight and view.items[item.highlight] or nil,
+							name_panel = item.number >= 14 }
+						lamp.level = lamp.output:get() ~= 0 and maximum_level or 0
+						lamp.face:set_element_state_callback(state_callback(lamp))
+						if lamp.highlight then
+							lamp.highlight:set_element_state_callback(state_callback(lamp))
+						end
+						if item.number == 13 then
+							coin_acceptor_lamp = lamp
+						end
+						if lamp.name_panel then
+							name_panel_label.level = name_panel_label.level + lamp.level
+							name_panel_lamp_count = name_panel_lamp_count + 1
+						end
+						table.insert(lamps, lamp)
+					end
+					name_panel_label.level = name_panel_label.level / name_panel_lamp_count
+					name_panel_label.item:set_element_state_callback(state_callback(name_panel_label))
+
+					local coin_labels = {
+						{ item = view.items["coin_a_label"], lockout = file.device:output("coin_lockout0") },
+						{ item = view.items["coin_b_label"], lockout = file.device:output("coin_lockout1") },
+						{ item = view.items["coin_c_label"], lockout = file.device:output("coin_lockout2") },
+						{ item = view.items["coin_d_label"], lockout = file.device:output("coin_lockout3") }
+					}
+					for _, label in ipairs(coin_labels) do
+						label.item:set_element_state_callback(coin_label_state_callback(label, coin_acceptor_lamp))
+					end
+
+					local previous_time = emu.attotime(machine.time)
+					view:set_prepare_items_callback(
+							function ()
+								local current_time = machine.time
+								local elapsed = (current_time - previous_time):as_double()
+								previous_time = emu.attotime(current_time)
+							local time_discontinuity = elapsed < 0 or elapsed > 0.25
+							local name_panel_level = 0
+
+							for _, lamp in ipairs(lamps) do
+									local target = lamp.output:get() ~= 0 and maximum_level or 0
+									if time_discontinuity then
+										lamp.level = target
+									elseif target ~= lamp.level then
+										local response_time = target > lamp.level and rise_time_to_90_percent or fall_time_to_10_percent
+										local fraction = 1.0 - math.exp(-response_scale * elapsed / response_time)
+										lamp.level = lamp.level + (target - lamp.level) * fraction
+										if math.abs(target - lamp.level) < 0.5 then
+										lamp.level = target
+									end
+								end
+								if lamp.name_panel then
+									name_panel_level = name_panel_level + lamp.level
+								end
+							end
+							name_panel_label.level = name_panel_level / name_panel_lamp_count
+						end)
+				end)
+	]]></script>
+</mamelayout>
