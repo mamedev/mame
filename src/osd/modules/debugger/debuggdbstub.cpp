@@ -841,6 +841,9 @@ public:
 	readbuf_state m_readbuf_state;
 
 	void generate_target_xml();
+	void generate_threads_xml();
+
+	void send_xfer(std::string const &content, int offset, int length);
 
 	int readchar();
 
@@ -885,6 +888,7 @@ private:
 	debug_watchpoint *m_triggered_watchpoint;
 
 	std::string m_target_xml;
+	std::string m_threads_xml;
 
 	uint8_t  m_readbuf[512];
 	uint32_t m_readbuf_len;
@@ -1000,6 +1004,61 @@ void debug_gdbstub::generate_target_xml()
 		target_xml += "  </feature>\n";
 	target_xml += "</target>\n";
 	m_target_xml = escape_packet(target_xml);
+}
+
+//-------------------------------------------------------------------------
+static std::string xml_escape(std::string_view text)
+{
+	std::string result;
+	for ( char ch : text )
+	{
+		switch ( ch )
+		{
+		case '&': result += "&amp;"; break;
+		case '<': result += "&lt;"; break;
+		case '>': result += "&gt;"; break;
+		case '"': result += "&quot;"; break;
+		default: result += ch; break;
+		}
+	}
+	return result;
+}
+
+//-------------------------------------------------------------------------
+void debug_gdbstub::generate_threads_xml()
+{
+	const game_driver &driver = m_machine->system();
+	offs_t const pc = m_state ? m_state->pc() : 0;
+	std::string const name = string_format("%s: %s", driver.name, driver.type.fullname());
+	const char *source = strstr(driver.type.source(), "src/");
+	if ( source == nullptr )
+		source = driver.type.source();
+	std::string threads_xml;
+	threads_xml += "<?xml version=\"1.0\"?>\n";
+	threads_xml += "<threads>\n";
+	threads_xml += string_format("  <thread id=\"1\" core=\"0\" name=\"%s\">%s</thread>\n",
+			xml_escape(name), xml_escape(string_format("MAME driver %s (%s) pc=0x%X", driver.name, source, pc)));
+	threads_xml += "</threads>\n";
+	m_threads_xml = escape_packet(threads_xml);
+}
+
+//-------------------------------------------------------------------------
+void debug_gdbstub::send_xfer(std::string const &content, int offset, int length)
+{
+	if ( offset < 0 )
+		offset = 0;
+	length = std::min(length, (int) content.length()-offset);
+	if ( offset > (int) content.length() )
+		offset = content.length();
+	if ( length < 0 )
+		length = 0;
+	std::string reply;
+	if ( offset + length < content.length() )
+		reply += 'm';
+	else
+		reply += 'l';
+	reply += content.substr(offset, length);
+	send_reply(reply);
 }
 
 //-------------------------------------------------------------------------
@@ -1470,7 +1529,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 	if ( name == "Supported" )
 	{
 		std::string reply = string_format("PacketSize=%x", MAX_PACKET_SIZE);
-		reply += ";qXfer:features:read+;qOffsets+";
+		reply += ";qXfer:features:read+;qOffsets+;qXfer:threads:read+";
 		send_reply(reply);
 		return REPLY_NONE;
 	}
@@ -1490,21 +1549,21 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 			{
 				if ( m_target_xml.empty() )
 					generate_target_xml();
-				if ( offset < 0 )
-					offset = 0;
-				length = std::min(length, (int) m_target_xml.length()-offset);
-				if ( offset > (int) m_target_xml.length() )
-					offset = m_target_xml.length();
-				if ( length < 0 )
-					length = 0;
-				std::string reply;
-				if ( offset + length < m_target_xml.length() )
-					reply += 'm';
-				else
-					reply += 'l';
-				reply += m_target_xml.substr(offset, length);
-				send_reply(reply);
+				send_xfer(m_target_xml, offset, length);
 				m_target_xml_sent = true;
+				return REPLY_NONE;
+			}
+		}
+		else if ( params.compare(0, 13, "threads:read:") == 0 )
+		{
+			// "threads:read::0,1000" (the annex is empty)
+			int offset = 0;
+			int length = 0;
+			if ( sscanf(params.c_str() + 13, ":%x,%x", &offset, &length) == 2 )
+			{
+				if ( offset == 0 )  // regenerate: the PC in the thread info changes at every halt
+					generate_threads_xml();
+				send_xfer(m_threads_xml, offset, length);
 				return REPLY_NONE;
 			}
 		}
