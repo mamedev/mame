@@ -4524,13 +4524,14 @@ void subsino_state::init_tesorone()
 
 void subsino_state::init_tesorone230()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
 	// HACK: protection checks
 	rom[0x10a8] = 0x18; // patch protection check ("ERROR 08073"):
 	rom[0x10a9] = 0x11;
 	rom[0x08ba] = 0x18; // patch "winning protection" check
 	rom[0x0a88] = 0x18; // patch "losing protection" check
-
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
@@ -4542,12 +4543,14 @@ void subsino_state::init_tesorone230()
 
 void subsino_state::init_grndprix()
 {
+#if 1
 	uint8_t *rom = memregion( "maincpu" )->base();
 	// HACK: protection checks
 	rom[0x1464] = 0x18; // patch protection check
 	rom[0x1465] = 0x11;
 	rom[0x07ab] = 0x18; // patch "winning protection" check
 	rom[0x096f] = 0x18; // patch "losing protection" check
+#endif
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
