@@ -2298,7 +2298,7 @@ void atarigx2_state::init_spclords()
 	m_playfield_base = 0x000;
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc80f00, 0xc80fff, read32s_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_read)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc80f00, 0xc80fff, write32sm_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_write)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc80f00, 0xc80fff, write32s_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_write)));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32s_delegate(*m_xga, FUNC(atari_xga_device::read)), write32s_delegate(*m_xga, FUNC(atari_xga_device::write)));
 }
 
@@ -2333,10 +2333,12 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
 
 void atarigx2_state::init_rrreveng()
 {
-	m_playfield_base = 0x000;
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32s_delegate(*this, FUNC(atarigx2_state::atarigx2_protection_r)), write32s_delegate(*this, FUNC(atarigx2_state::atarigx2_protection_w)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32smo_delegate(*this, FUNC(atarigx2_state::rrreveng_prot_r)));
+	// ROM-derived candidate: 17 tracks have plaintext height differences
+	// and independently stored, smoothed curvature for validation.
+	// All observed key mappings match Space Lords; the upper taps differ.
+	// Keep the not-working/protection flags pending full runtime validation.
+	init_spclords();
+	downcast<atari_136095_0072_device &>(*m_xga).set_polynomial_high(0xf000);
 }
 
 
