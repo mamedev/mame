@@ -149,11 +149,11 @@ ROM_END
 
 void syvg_state::init_luckyvl()
 {
+	// TODO: decrypt me
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x20000; i++)
 	{
-		// TODO
 		rom[i] = rom[i];
 	}
 }

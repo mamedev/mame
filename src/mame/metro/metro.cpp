@@ -4823,6 +4823,7 @@ void metro_state::init_karatour()
 }
 
 
+// TODO: emulate this at device level
 // Unscramble the GFX ROMs
 void metro_state::init_balcube()
 {

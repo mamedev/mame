@@ -997,7 +997,7 @@ void igs009_state::init_jingbelli()
 {
 	decrypt_jingbell();
 
-	// protection patch
+	// HACK: protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f19] = 0x18;
 }
@@ -1006,7 +1006,7 @@ void igs009_state::init_animalhjb()
 {
 	decrypt_jingbell();
 
-	// protection patch
+	// HACK: protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f21] = 0x18;
 }
@@ -1015,7 +1015,7 @@ void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
 
-	// protection patch
+	// HACK: protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x0e753] = 0x18;
 }

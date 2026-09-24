@@ -5451,13 +5451,6 @@ void cave_state::init_esprade()
 	init_cave();
 
 	m_time_vblank_irq = 2000;
-
-#if 0       //ROM PATCH
-	{
-		u16 *rom = (u16 *)memregion("maincpu")->base();
-		rom[0x118A/2] = 0x4e71;         //palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
-	}
-#endif
 }
 
 void cave_state::init_guwange()

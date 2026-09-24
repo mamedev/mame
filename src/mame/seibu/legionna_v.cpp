@@ -73,7 +73,7 @@ void legionna_state::heatbrl_setgfxbank(u16 data)
 /*xxx- --- ---- ---- banking*/
 void legionna_state::denjinmk_setgfxbank(u16 data)
 {
-	// this is either 0x0000 or 0xe000, except in two endings (MT #07416)
+	// this is either 0x0000 or 0xe000, except in two endings (MT07416)
 	m_back_gfx_bank = (data & 0x2000) >> 1; // Makai/Tarukusu endings
 	m_mid_gfx_bank = (data & 0x4000) >> 2; //???
 	m_fore_gfx_bank  = (data & 0x8000) >> 3; //???

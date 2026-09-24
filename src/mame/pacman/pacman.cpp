@@ -8719,7 +8719,7 @@ void pacman_state::init_mspacman()
 		DROM[0xb000+i] = ROM[0x3000+i]; // mirror of pacman.6j
 	}
 
-	// install patches into decrypted bank
+	// HACK: install patches into decrypted bank
 	mspacman_install_patches(DROM);
 
 	// mirror Pac-Man ROMs into upper addresses of normal bank
@@ -8820,7 +8820,7 @@ void pacman_state::init_porky()
 
 void pacman_state::init_rocktrv2()
 {
-	// hack to pass the rom check for the bad rom
+	// HACK: patches to pass the rom check for the bad ROM
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;

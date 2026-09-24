@@ -1711,6 +1711,7 @@ void eolith_state::init_landbrk()
 	init_eolith();
 }
 
+// HACK: protection isn't emulated
 /*
 The protected sets (where we're having to use a substitute ROM from an unprotected versions instead of the
 AT89c52 internal ROM) all have an extra startup check (to prevent you swapping in an external ROM?)
@@ -1722,7 +1723,6 @@ Using landbrka as an example it fails compares with memories:
 $4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 related with bits 0x100 - 0x200 read at startup from input(0) ?
 */
-
 void eolith_state::patch_mcu_protection(uint32_t address)
 {
 	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();
