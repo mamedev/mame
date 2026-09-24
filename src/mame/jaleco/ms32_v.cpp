@@ -555,11 +555,12 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 					| (pri << 3)
 					| depth;
 			u8 const code = m_priram[idx];
+			u8 const layer = (code >> 3) & 7;
 
 			u16 pen = 0;
 			if (!BIT(code, 6))
 			{
-				switch ((code >> 3) & 7)
+				switch (layer)
 				{
 				case 0: pen = spr[x] & 0x0fff; break;
 				case 1: pen = bg[x]; break;
@@ -572,15 +573,14 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
-			// priram bits 1:0 select brightness bank:
-			//   11 -> bank 0    00 -> bank 1
+			// TX text is unaffected by the second brightness bank. In gametngk,
+			// the 30 Hz pulse belongs to sprite priority output 0x02 (cabinet glow).
 			if ((code & 3) == 3)
 				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			else if ((code & 3) == 0)
+			else if (((code & 3) == 0 && layer != 6) || ((code & 3) == 2 && layer == 0))
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 			if (!BIT(code, 2))
 			{
-				u8 const layer = (code >> 3) & 7;
 				if (layer == 0)  // sprite → glow
 					c = alpha_blend_r32(c, 0x00ffffff, 128);
 				else  // BG, ROZ, TX → shadow
@@ -642,7 +642,11 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 				u8 const layer = (code_with >> 3) & 7;
 				rgb_t c(dst[x]);
 				if (layer == 0)
+				{
+					if ((code_with & 3) == 2)
+						c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				}
 				else
 					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 				dst[x] = c;
