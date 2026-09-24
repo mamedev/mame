@@ -31,12 +31,13 @@ class ssd1306_device :  public device_t,
 {
 public:
 
-
+    void set_external_oscillator(bool use_external_oscillator);
     void set_intf_mode(ssd1306_interface_mode_t mode);
 
     /** 
     * SPI bus mode (use only with ssd1306_interface_mode_t SPI_4WIRE or SPI_3WIRE)
     */
+
     void spi_cs_w(int state);
     void spi_si_w(int state);
     void spi_sck_w(int state);
@@ -70,70 +71,149 @@ public:
      */
     void rst_w(int rst);
 
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
 private:
     void raw_write(int dc_line, uint8_t data);
     u8   raw_read(int dc_line);
 
-    void exec_command();
-    void exec_command_2x();
-    void exec_command_ax();
-    void exec_command_dx();
+    void exec_command(uint8_t data);
+    void exec_command_2x(uint8_t data);
+    void exec_command_ax(uint8_t data);
+    void exec_command_dx(uint8_t data);
 
     void update_scan_rate();
 
-    bool m_reset_asserted;
-
-    bool m_scroll_enable;
-    bool m_display_awake;
-    bool m_inverting_pixels;
-
+    // external signals
     bool m_dc_line;
-    bool m_dc_internal_state;
-
-
-    uint8_t m_spi_shift;
+    bool m_reset_asserted;
     bool m_spi_cs_asserted;
     bool m_spi_si;
-    
-    int m_spi_bits_left;
+
+
+    bool m_using_external_oscillator;
+
 
     ssd1306_interface_mode_t  m_pending_interface_mode;
-    ssd1306_interface_mode_t  m_current_interface_mode;
 
+    ////////////////////////////////////////////////
+    //
+    // Internal signals
+    // 
+    ////////////////////////////////////////////////
+
+    bool m_dc_internal_state; // last latched D/C# value
+
+    ////////////////////////////////////////////////
+    // 
+    // Registers that can be set by commands
+    // 
+    ////////////////////////////////////////////////    
+
+    // Commands 0x01-0x1F
+    uint8_t m_pagemode_column_start_address;
+
+    // Command 0x20
     ssd1306_addressing_mode_t m_addressing_mode;
 
-    // display memory; 128x64 bits, divided into 8 pages
-    uint8_t m_gddram[ 128 * 8 ];
-
-    uint8_t m_pagemode_current_column_address;
-
-    uint8_t m_pagemode_page_start_address;
-    uint8_t m_pagemode_column_start_address;
-    uint8_t m_pagemode_column_end_address;
-
-    uint8_t m_hvmode_page_start_address;
-    uint8_t m_hvmode_page_end_address;
+    // Command 0x21
     uint8_t m_hvmode_column_start_address;
     uint8_t m_hvmode_column_end_address;
+    
+    // Command 0x22
+    uint8_t m_hvmode_page_start_address;
+    uint8_t m_hvmode_page_end_address;
 
-    uint8_t m_page_address_pointer;
-    uint8_t m_column_address_pointer;
+    // Commands 0x26,0x27,0x29,0x2A
+    bool m_horizontal_scroll_pending;
+    bool m_vertical_scroll_pending;
+    bool m_horizontal_scrolling_left_pending;
+    uint8_t m_horizontal_scroll_page_start_address_pending;
+    uint8_t m_horizontal_scroll_interval_pending;
+    uint8_t m_horizontal_scroll_page_end_address_pending;
+    uint8_t m_vertical_scroll_offset_pending;
 
-    uint8_t m_vscroll_fixed_rows;
-    uint8_t m_vscroll_scroll_rows;
+    // Commands 0x40-0x7F
+    uint8_t m_display_start_line; 
 
-    uint8_t m_command_fifo[0x100];
-    uint8_t m_command_pointer;
-    uint8_t m_command_bytes_left;
+    // Command 0x81
+    uint8_t m_contrast;
 
-    uint8_t m_command_lengths[0x100];
+    // Command 0xA0/0xA1
+    bool m_seg0_column_remapped;
 
+    // Command 0xA3
+    uint8_t m_vertical_scroll_top_fixed_rows;
+    uint8_t m_vertical_scroll_bottom_scrolled_rows;
+    
+    // Commands 0xA4/0xA5
+    bool m_display_blanking; // false = draw framebuffer, true = set all pixels to 1
+
+    // Commands 0xA6/0xA7
+    bool m_inverting_pixels; // false = normal display, true = invert all pixels
+
+    // Command 0xA8
+    uint8_t m_mux_ratio; // valid values 16-63
+
+    // Command 0xAE/0xAF
+    bool m_display_enabled; // false = display not driven, true = display will be driven
+
+    // Command 0xB0-0xB7
+    uint8_t m_pagemode_page_start_address; // =0-7
+
+    // commands 0xC0, 0xC8
+    bool m_column_scan_direction_inverse; // false = scan top to bottom, true = scan bottom to top
+
+    // command 0xD3
+    uint8_t m_display_offset;
+
+    // command 0xD5
+    uint8_t m_clk_div;  // clock divider, minus 1 (=0-15)
+    uint8_t m_osc_freq; // internal oscillator frequency select
+
+    // command 0xD9
     uint8_t m_phase_1_period;
     uint8_t m_phase_2_period;
 
-    uint8_t m_clk_div;
-    uint8_t m_osc_freq;
+    // command 0xDA
+    bool m_row_scan_interleaved;  // false = scan 0, 1, 2, 3, ... n; true = scan 0, 32, 1, 33, ... n
+    bool m_row_scan_split_invert; // false = scan 0-31 then 32-63; true = scan 32-63 then 0-31
 
+    // command 0xDB
+    uint8_t m_vcomh_deselect_level;
+
+    ////////////////////////////////////////////////
+    // 
+    // Internal registers and the framebuffer
+    // 
+    ////////////////////////////////////////////////
+
+    ssd1306_addressing_mode_t m_addressing_mode;
+    uint8_t m_page_address_pointer;
+    uint8_t m_column_address_pointer;
+
+    uint8_t m_command_fifo[8];
+    uint8_t m_command_pointer;
+
+
+    bool m_horizontal_scroll_enabled;
+    bool m_vertical_scroll_enabled;
+    bool m_horizontal_scrolling_left;
+    uint8_t m_horizontal_scroll_page_start_address;
+    uint8_t m_horizontal_scroll_interval;
+    uint8_t m_horizontal_scroll_page_end_address;
+    uint8_t m_vertical_scroll_offset;
+
+    ssd1306_interface_mode_t  m_current_interface_mode;
+
+    uint8_t m_spi_shift;
+    int m_spi_bits_left;
+    
+
+    // display memory; 128x64 bits, divided into 8 pages
+    uint8_t m_gddram[ 128 * 8 ];
 };
 
 

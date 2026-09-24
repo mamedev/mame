@@ -6,8 +6,14 @@
     Datasheet:
     https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf
 
+    Also see the common Adafruit Arduino driver:
+    https://github.com/adafruit/Adafruit_SSD1306/blob/master/Adafruit_SSD1306.cpp
+    
     Graphics RAM is split into 8 pixel high "Pages" with one byte representing
     one vertical stripe of 8 pixels.
+
+    Though this display driver is intended for 128x64 displays,
+    it can be configured in software to draw to smaller OLED panels.
 
     Frame rate is determined by:
 
@@ -18,15 +24,13 @@
     where display_clocks is:
         phase_1_period + phase_2_period + BANK0_pulse_width
 
-    The way to set BANK0_pulse_width isn't really described in the datasheet.
-    For now, we treat it as a constant 50.
-
  ****************************************************************************/
 
 #include "emu.h"
 #include "ssd1306.h"
 
-
+// The way to set BANK0_pulse_width isn't really described in the datasheet.
+// For now, we treat it as a constant 50.
 #define BANK0_PULSE_WIDTH 50
 
 #define KEEP_LOW_NIBBLE(x)  x & 0x0F
@@ -38,274 +42,428 @@
 #define SET_LOW_NIBBLE_FROM_LOW4(reg, val)  reg = KEEP_HIGH_NIBBLE(reg) | LOW4_AS_LOW_NIBBLE(val);
 #define SET_HIGH_NIBBLE_FROM_LOW4(reg, val) reg = KEEP_LOW_NIBBLE(reg) | LOW4_AS_HIGH_NIBBLE(val);
 
-#define COMPLAIN_INVALID_COMMAND logerror("%s: invalid/unimplemented command %02x\n", m_command_fifo[0]);
-
-
-void ssd1306_device::device_init()
+// It isn't really possible to get the exact frequencies because the chip
+// is usually embedded into the display panel itself.
+static const int INTERNAL_OSCILLATOR_FREQUENCIES[] =
 {
-    // init all commandlengths to 0 (=256)
-    memset(m_command_lengths, 0, sizeof(m_command_lengths));
+    280'000,  // 0 (known absolute lowest)
+    291'250,  // 1 (guessed)
+    302'500,  // 2 (guessed)
+    313'750,  // 3 (guessed)
+    325'000,  // 4 (guessed)
+    336'250,  // 5 (guessed)
+    347'500,  // 6 (guessed)
+    358'750,  // 7 (guessed)
+    370'000,  // 8 (known reset value)
+    394'285,  // 9 (guessed)
+    418'570,  // 10 (guessed)
+    442'855,  // 11 (guessed)
+    467'140,  // 12 (guessed)
+    491'425,  // 13 (guessed)
+    515'710,  // 14 (guessed)
+    540'000,  // 15 (known absolute highest)
+};
 
-    // 
+static const int SCROLL_FRAME_FREQUENCY_COUNT[8] = 
+{
+    5,    // 0b000
+    64,   // 0b001
+    128,  // 0b010
+    256,  // 0b011
+    3,    // 0b100
+    4,    // 0b101
+    25,   // 0b110
+    2     // 0b111
+};
+
+void ssd1306_device::device_start()
+{
 
 }
 
-void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
-{
-    // in the datasheet and on the arduboy, the interface mode pins
-    // are supposed to be always tied to VCC or ground.
-    // the datasheet doesn't mention how these pins are read,
-    // so if someone is insane enough to change interfacing modes,
-    // let's assume the interface mode is latched only at reset
-    m_pending_interface_mode = mode;
-}
 
 void ssd1306_device::device_reset()
 {
     m_current_interface_mode = m_pending_interface_mode;
 
-
-    m_display_awake = false;
-
+    // this is done as listed in order of Chapter 9 in the datasheet
+    m_contrast = 0x7f;
+    m_display_blanking = false;
     m_inverting_pixels = false;
+    m_display_enabled = false;
 
-    m_spi_bits_left = 0;
-    m_spi_shift = 0;
+    m_horizontal_scroll_pending = false;
+    m_horizontal_scroll_enabled = false;
+    m_vertical_scroll_pending = false;
+    m_vertical_scroll_enabled = false;
+
+    m_vertical_scroll_top_fixed_rows = 0;
+    m_vertical_scroll_bottom_scrolled_rows = 64;
 
     m_pagemode_column_start_address = 0;
-    m_pagemode_column_end_address = 7;
-    
-    m_hvmode_page_start_address = 0x0d;
-    m_hvmode_page_end_address   = 0x7d;
+    m_addressing_mode = PAGE;
+    m_hvmode_page_start_address = 0;
+    m_hvmode_page_end_address = 7;
 
-    m_vscroll_fixed_rows  = 0;
-    m_vscroll_scroll_rows = 64;
-
-    m_clk_div   = 0b0000;
-    m_osc_freq  = 0b1000;
+    m_display_start_line = 0;
+    m_seg0_column_remapped = false;
+    m_mux_ratio = 63;
+    m_column_scan_direction_inverse = false;
+    m_display_offset = 0;
+    m_row_scan_interleaved = true;
+    m_row_scan_split_invert = false;
+    m_clk_div = 0;
+    m_osc_freq = 8;
 
     m_phase_1_period = 2;
     m_phase_2_period = 2;
+    m_vcomh_deselect_level = 0x20;
 
-    m_addressing_mode = PAGE;
+    update_scan_rate();
+}
+
+void ssd1306_device::set_external_oscillator(bool using_external_oscillator)
+{
+    m_using_external_oscillator = using_external_oscillator;
 }
 
 
-void ssd1306_device::exec_command_2x()
+void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
 {
-    switch(m_command_fifo[0] & 0x0F)
+    // should be tied to VCC or ground
+    // behavior when toggled between resets is undefined,
+    // so assume it latches at reset
+    m_pending_interface_mode = mode;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// Command processing
+// 
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Indicates a multi-byte command. Keep buffering the fifo until n bytes have been read,
+ * then reset the FIFO pointer and fall through to the actual command handler.
+ */
+#define COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, n) \
+    m_command_fifo[m_command_pointer++] = data; \
+    if (m_command_pointer < n) \
+    { \
+        return; \
+    } \
+    m_command_pointer = 0;
+
+/**
+ * Indicates a single-byte command. The FIFO pointer is reset,
+ * and execution falls through to the code below.
+ */
+#define COMMAND_IS_SINGLE_BYTE m_command_pointer = 0;
+
+/**
+ * Indicates this command is invalid. The FIFO pointer is reset and an error is logged.
+ */
+#define COMMAND_IS_INVALID \
+    COMMAND_IS_SINGLE_BYTE; \
+    logerror("%s: invalid/unimplemented command %02x\n", m_command_fifo[0]);
+
+#define DUMMY_BYTE_CHECK(fifopos, expected) \
+    if (m_command_fifo[fifopos] != expected) \
+    { \
+        logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", tag(), fifopos, m_command_fifo[fifopos]); \
+    };
+
+void ssd1306_device::exec_command_2x(uint8_t data)
+{
+    switch(m_command_fifo[0])
     {
-        case 0x0:
+        case 0x20:
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
             m_addressing_mode = static_cast<ssd1306_addressing_mode_t>(m_command_fifo[1] & 3);
             break;
 
-        case 0x1:
+        case 0x21:
             // h/v addressing mode: set column start/end address
-            m_hvmode_column_start_address;
-            m_hvmode_column_end_address;
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
+            m_hvmode_column_start_address = m_command_fifo[1] & 0x7f;
+            m_hvmode_column_end_address   = m_command_fifo[2] & 0x7f;
             break;
 
-        case 0x2:
+        case 0x22:
             // h/v addressing mode: set page start/end address
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
+            m_hvmode_page_start_address = m_command_fifo[1] & 7;
+            m_hvmode_page_end_address = m_command_fifo[2] & 7;
             break;
 
-        case 0x6:
-        case 0x7:
-            // init right scroll (6) or left scroll (7)
+        case 0x26:
+        case 0x27:
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 7);
+            m_horizontal_scroll_pending = m_command_fifo[0] & 1;
+            DUMMY_BYTE_CHECK(1, 0);
+            m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
+            m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
+            m_horizontal_scroll_page_end_address_pending = m_command_fifo[4] & 7;
+            DUMMY_BYTE_CHECK(5, 0);
+            DUMMY_BYTE_CHECK(6, 0xFF);
             break;
 
-        case 0x9:
-        case 0xA:
-            // init vertical + right scroll (9) or left scroll (A)
+        case 0x29:
+        case 0x2A:
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 6);
+            m_horizontal_scroll_pending = m_command_fifo[0] & 1;
+            DUMMY_BYTE_CHECK(1, 0);
+            m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
+            m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
+            m_horizontal_scroll_page_end_address_pending = m_command_fifo[4] & 7;
+            m_vertical_scroll_offset_pending = m_command_fifo[5] & 0x3f;
             break;
 
-        case 0xE:
+        case 0x2E:
+            COMMAND_IS_SINGLE_BYTE;
+
             // scroll disable
+            m_horizontal_scroll_enabled = false;
+            m_vertical_scroll_enabled   = false;
+            m_horizontal_scroll_pending = false;
+            m_vertical_scroll_pending   = false;
             break;
         
-        case 0xF:
+        case 0x2F:
+            COMMAND_IS_SINGLE_BYTE;
+
             // scroll enable
-            
-            break;
-        default:
-            COMPLAIN_INVALID_COMMAND;
-            break;
-    }
-}
-
-
-void ssd1306_device::exec_command_ax()
-{
-    switch(m_command_fifo[0] & 0x0F)
-    {
-        case 0x0:
-            // map column 0 to SEG0
-            break;
-
-        case 0x1:
-            // map column 127 to SEG0
-            break;
-
-        case 0x3:
-            // vertical scroll
-            break;
-
-        case 0x4:
-            // display RAM contents
-            break;
-
-        case 0x5:
-            // blank display (all pixels on???)
-            break;
-
-        case 0x6:
-            m_inverting_pixels = false;
-            break;
-
-        case 0x7:
-            m_inverting_pixels = true;
-            break;
-
-        case 0x8:
-            // mux ratio
-            break;
-
-        case 0xE:
-            m_display_awake = false;
-            break;
-
-        case 0xF:
-            m_display_awake = true;
+            m_horizontal_scroll_enabled = m_horizontal_scroll_pending;
+            m_vertical_scroll_enabled = m_vertical_scroll_pending;
+            m_horizontal_scrolling_left = m_horizontal_scrolling_left_pending;
+            m_horizontal_scroll_page_start_address = m_horizontal_scroll_page_start_address_pending;
+            m_horizontal_scroll_interval = m_horizontal_scroll_interval_pending;
+            m_horizontal_scroll_page_end_address = m_horizontal_scroll_page_end_address_pending;
+            m_vertical_scroll_offset = m_vertical_scroll_offset_pending;
             break;
 
         default:
-            COMPLAIN_INVALID_COMMAND;
-            break;
+            COMMAND_IS_INVALID;
+            return;
     }
 }
 
-void ssd1306_device::exec_command_dx()
+void ssd1306_device::exec_command_ax(uint8_t data)
 {
-    switch(m_command_fifo[0] & 0x0F)
+    switch(m_command_fifo[0])
     {
-        case 0x3:
-            // TODO: set display offset
+        case 0xA0:
+        case 0xA1:
+            // remap SEG0 column: false = SEG0 is 0, true = SEG0 is 127
+            COMMAND_IS_SINGLE_BYTE;
+            m_seg0_column_remapped = m_command_fifo[0] & 1;
             break;
 
-        case 0x5:
+        case 0xA3:
+            // vertical scroll parameters
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
+            m_vertical_scroll_top_fixed_rows        = m_command_fifo[1] & 0x3f;
+            m_vertical_scroll_bottom_scrolled_rows  = m_command_fifo[2] & 0x7f;
+            break;
+
+        case 0xA4:
+        case 0xA5:
+            COMMAND_IS_SINGLE_BYTE;
+            m_display_blanking = m_command_fifo[0] & 1;
+            break;
+
+        case 0xA6:
+        case 0xA7:
+            COMMAND_IS_SINGLE_BYTE;
+            m_inverting_pixels = m_command_fifo[0] & 1;
+            break;
+
+        case 0xA8:
+            // mux ratio, i.e., total number of lines in framebuffer.
+            // any line in the framebuffer past this point won't be drawn.
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+
+            m_command_fifo[1] &= 0x3f;
+
+            if (m_command_fifo[1] < 15)
+            {
+                logerror("%s: invalid mux ratio: %02x\n", m_command_fifo[1]);
+                return;
+            }
+
+            m_mux_ratio = m_command_fifo[1];
+            break;
+
+        case 0xAE:
+        case 0xAF:
+            COMMAND_IS_SINGLE_BYTE;
+            m_display_enabled = m_command_fifo[0] & 1;
+            break;
+
+        default:
+            COMMAND_IS_INVALID;
+            return;
+    }
+}
+
+void ssd1306_device::exec_command_dx(uint8_t data)
+{
+    switch(m_command_fifo[0])
+    {
+        case 0xD3:
+            // display offset (shifts image down by n lines vertically)
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+            m_display_offset = m_command_fifo[1] & 0x3f;
+            break;
+ 
+        case 0xD5:
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+
             m_clk_div  = m_command_fifo[1] & 0xf;
             m_osc_freq = m_command_fifo[1] >> 4;
             break;
 
 
-        case 0x9:
+        case 0xD9:
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+
             m_phase_1_period = m_command_fifo[1] & 0xf;
             m_phase_2_period = m_command_fifo[1] >> 4;
             break;
 
-        case 0xA:
-            // TODO: Set COM pins hardware config
+        case 0xDA:
+            // COM pin scan direction
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+
+            if (!(m_command_fifo[1] & 2))
+            {
+                // bit should be set
+            }
+
+            m_row_scan_interleaved  = (m_command_fifo[1] & 0x10);
+            m_row_scan_split_invert = (m_command_fifo[1] & 0x20);
             break;
 
-        case 0xB:
-            // "set Vcomh deselect level"
+        case 0xDB:
+            if (m_command_fifo[1] & ~0x70)
+            {
+                // other bits should be zero
+            }
+
+            m_vcomh_deselect_level = m_command_fifo[1] & 0x70;
             break;
         
         default:
-            COMPLAIN_INVALID_COMMAND;
-            break;
+            COMMAND_IS_INVALID;
+            return;
     }
 }
 
 
-void ssd1306_device::exec_command()
+void ssd1306_device::exec_command(uint8_t data)
 {
-    switch(m_command_fifo[0] >> 4)
+    if (m_command_pointer == 0)
     {
-        case 0x0:
+        m_command_fifo[0] = data;
+    }
+
+    switch(m_command_fifo[0] & 0xF0)
+    {
+        case 0x00:
+            COMMAND_IS_SINGLE_BYTE;
             SET_LOW_NIBBLE_FROM_LOW4(m_pagemode_column_start_address, m_command_fifo[0]);
             break;
 
-        case 0x1:
+        case 0x10:
+            COMMAND_IS_SINGLE_BYTE;
             SET_HIGH_NIBBLE_FROM_LOW4(m_pagemode_column_start_address, m_command_fifo[0]);
             break;
 
-        case 0x2:
-            exec_command_2x();
+        case 0x20:
+            exec_command_2x(data);
             break;
         
-        case 0x4:
-        case 0x5:
-        case 0x6:
-        case 0x7:
+        case 0x40:
+        case 0x50:
+        case 0x60:
+        case 0x70:
+            COMMAND_IS_SINGLE_BYTE;
             m_display_start_line = m_command_fifo[0] & 0x3f;
             break;
 
-        case 0x8:
-            // $81 = contrast control
-            break;
-        
-        case 0xA:
-            exec_command_ax();
-            break;
-
-        case 0xB:
-            // page addressing mode: set page start address
-            if (0xB0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xB7)
+        case 0x80:
+            if (m_command_fifo[0] != 0x81)
             {
-                m_pagemode_page_start_address = m_command_fifo[0] & 7;
+                COMMAND_IS_INVALID;
                 return;
             }
-            COMPLAIN_INVALID_COMMAND;
+
+            COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+            m_contrast = m_command_fifo[1];
             break;
         
-        case 0xC:
+        case 0xA0:
+            exec_command_ax(data);
+            break;
+
+        case 0xB0:
+            // page addressing mode: set page start address
+            if (!(0xB0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xB7))
+            {
+                COMMAND_IS_INVALID;
+                return;
+            }
+            
+            COMMAND_IS_SINGLE_BYTE;
+            m_pagemode_page_start_address = m_command_fifo[0] & 7;
+            break;
+        
+        case 0xC0:
             // column scan direction: $C0 normal, $C8 reverse
+            if (!(m_command_fifo[0] == 0xC0 || m_command_fifo[0] != 0xC8))
+            {
+                COMMAND_IS_INVALID;
+                return;
+            }
+
+            COMMAND_IS_SINGLE_BYTE;
+            m_column_scan_direction_inverse = (m_command_fifo[0] & 8);
             break;
         
-        case 0xD:
-            exec_command_dx();
+        case 0xD0:
+            exec_command_dx(data);
             break;
 
         default:
-            if (m_command_fifo[0] == 0xE3)
+            if (m_command_fifo[0] != 0xE3)
             {
-                // explicit NOP
+                COMMAND_IS_INVALID;
                 return;
             }
 
-            COMPLAIN_INVALID_COMMAND;
+            COMMAND_IS_SINGLE_BYTE;
             break;
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//
+// I/O handling
+//
+///////////////////////////////////////////////////////////////////////////////////////////
 
 void ssd1306_device::raw_write(int dc_line, uint8_t data)
 {
-    if (dc_line)
+    if (!dc_line)
     {
-        // incoming write is a command
-        if (m_command_pointer == 0)
-        {
-            m_command_bytes_left = m_command_lengths[data];
-        }
-
-        m_command_fifo[m_command_pointer++] = data;
-        m_command_bytes_left --;
-
-        if (m_command_bytes_left == 0)
-        {
-            exec_command();
-        }
-
+        exec_command(data);
         return;
     }
 
     // otherwise, display data is inbound. cancel any previous command
     m_command_pointer    = 0;
-    m_command_bytes_left = 0;
 
-    if (m_scroll_enable)
+    if (m_horizontal_scroll_enabled || m_vertical_scroll_enabled)
     {
         logerror("%s: attempt to write display data while scrolling enabled\n");
         return;
@@ -367,6 +525,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 
 u8 ssd1306_device::raw_read(int dc_line)
 {
+
     if (!dc_line)
     {
         // TODO: status register
@@ -416,7 +575,12 @@ void ssd1306_device::rst_w(int rst)
 
 void ssd1306_device::dc_w(int dc)
 {
-    // store the state, but don't sample it yet
+    if (m_reset_asserted)
+    {
+        return;
+    }
+
+    // store the state, but don't sample it yet.
     m_dc_line = dc != 0;
 
     if (m_current_interface_mode == SPI_3WIRE)
@@ -435,19 +599,27 @@ void ssd1306_device::dc_w(int dc)
 
 void ssd1306_device::update_scan_rate()
 {
-    double framerate = clock() * (1 / (m_clk_div * (m_phase_1_period + m_phase_2_period + ??) * 64));
+    if (!m_using_external_oscillator)
+    {
+        set_clock(INTERNAL_OSCILLATOR_FREQUENCIES[m_osc_freq]);
+    }
+
+    double display_clocks = (m_phase_1_period + m_phase_2_period + BANK0_PULSE_WIDTH);
+    double framerate = clock() * (1 / ((m_clk_div + 1) * display_clocks * 64));
 
 
-
-
-                                    //  1
-        // osc_value * ---------------------------
-                    //  div * display_clocks * 64
+    // screen->set_refresh_hz(framerate);
 }
 
 
 void ssd1306_device::spi_cs_w(int state)
 {
+    if (!(m_current_interface_mode == SPI_3WIRE ||
+          m_current_interface_mode == SPI_4WIRE))
+    {
+        logerror("%s: spi_cs_w called when not in SPI mode\n", tag());
+        return;
+    }
     m_spi_cs_asserted = !state;
 }
 
@@ -466,7 +638,7 @@ void ssd1306_device::spi_si_w(int state)
     
 void ssd1306_device::spi_sck_w(int state)
 {
-    if (!m_spi_cs_asserted)
+    if (m_reset_asserted || !m_spi_cs_asserted)
     {
         return;
     }
