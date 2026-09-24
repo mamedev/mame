@@ -756,7 +756,7 @@ fe4f  mul   indexed_3w
 
 5f    mulub indexed_3e
 	TMP = any_r8(OP1);
-	TMP = reg_r8(OP2);
+	TMP *= reg_r8(OP2);
 	reg_w16(OP3, TMP);
 	post_indexed 20 21 // +5 when external
 
