@@ -588,7 +588,7 @@ void huc6270_device::hsync_changed(int state)
 			// cause several side effects, namely:
 			// - draculax Stage 4' "all blue" Richter;
 			// - faussete Stage 2 excessive slowdown;
-			// - xwiber Stage 2 boss never spawning (MT#07384)
+			// - xwiber Stage 2 boss never spawning (MT07384)
 			if (m_vert_to_go == 2 && m_vert_state == v_state::VDS)
 			{
 				m_raster_count = 0x40;
