@@ -6,6 +6,7 @@
 
 #include "screen.h"
 
+// see datasheet, Table 7-1. bits are in order BS2..BS0
 typedef enum
 {
     SPI_4WIRE       = 0b000,
@@ -33,21 +34,20 @@ public:
 
     void set_intf_mode(ssd1306_interface_mode_t mode);
 
+    /** 
+    * SPI bus mode (use only with ssd1306_interface_mode_t SPI_4WIRE or SPI_3WIRE)
+    */
     void spi_cs_w(int state);
     void spi_si_w(int state);
     void spi_sck_w(int state);
 
-    /**
-     * Perform write to the chip.
-     */
-    void write(u8 data);
 
-    /**
-     * Read internal chip status or data from GDDRAM. Only possible in parallel mode.
-     */
-    u8   read();
+    /** 
+    * Standard MAME parallel read/write handlers
+    */
 
-
+    void write(offs_t offset, uint8_t data);
+    u8   read(offs_t offset);
 
 
     /**
@@ -55,10 +55,13 @@ public:
      * 
      * In four-wire SPI mode, if the D/C# pin is high,
      * then next write is data, otherwise, it's a command.
-     * 
+     * The same behavior applies for parallel bus modes.
+     * In three-wire SPI mode, D/C# is set within the command itself.
+     *  
      * In I2C mode, D/C# changes the I2C slave address.
      * If low, the address is 0x3C (0b0111100).
      * If high, it's 0x3D (0b0111101).
+     *
      */
     void dc_w(int dc);
 
@@ -68,6 +71,9 @@ public:
     void rst_w(int rst);
 
 private:
+    void raw_write(int dc_line, uint8_t data);
+    u8   raw_read(int dc_line);
+
     void exec_command();
     void exec_command_2x();
     void exec_command_ax();
@@ -75,6 +81,7 @@ private:
 
     void update_scan_rate();
 
+    bool m_reset_asserted;
 
     bool m_scroll_enable;
     bool m_display_awake;
@@ -82,6 +89,13 @@ private:
 
     bool m_dc_line;
     bool m_dc_internal_state;
+
+
+    uint8_t m_spi_shift;
+    bool m_spi_cs_asserted;
+    bool m_spi_si;
+    
+    int m_spi_bits_left;
 
     ssd1306_interface_mode_t  m_pending_interface_mode;
     ssd1306_interface_mode_t  m_current_interface_mode;

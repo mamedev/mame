@@ -1,7 +1,6 @@
 /****************************************************************************
 
-    Arduboy
-    Arduboy FX
+    Arduboy / Arduboy FX hardware
 
     This is a homebrew ATMega handheld system, based around the ATMega32u4,
     which provides us with an excellent AVR emulation test case.
@@ -25,13 +24,17 @@
     - MCU: ATMega32U4
         - Fuses: lfuse 0xFF, hfuse 0xD2, efuse 0xCB
         - External 16 MHz clock crystal
-    - Display: SSD1306 OLED display, 128x64 resolution
+    - Display: SSD1306 OLED display, 128x64 resolution, in 4-wire SPI mode
     - SPI flash (on Arduboy FX and compatibles): Winbond W25Q128, 16 mbytes
     - D-pad and two buttons
-    - RGB LED at top left
-    - Two LEDs for serial activity
+    - RGB LED at top left, software driven
+    - Two yellow LEDs for serial activity, software driven
+    - One red LED for charge indication
     - Super thin battery that will probably inflate and explode
-      (Note: system will NOT power on if the battery is dead)
+        - NOTE: The system will NOT power on if the battery is dead or missing.
+          If you want to remove the battery, then the easiest reversable hack
+          is to jump a 10uF capacitor across BATT+ and ground. This will keep
+          the cap charged at 4.2 volts, and the system will run without complaints.
 
     Port mappings:
     - Port B
@@ -113,8 +116,11 @@ private:
     required_device<ssd1306_device> m_ssd1306;
 
 
+    optional_device<generic_slot_device> m_cart;            // required for arduboy, not for ardbyfx
+    optional_device<generic_slot_device> m_spicart;         // required for ardbyfx, not present on arduboy
+
     optional_device<generic_spi_flash_device> m_spi_flash;
-	optional_device<generic_slot_device> m_cart; // required for arduboy, not for ardbyfx
+
 
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
@@ -127,7 +133,8 @@ private:
 	uint8_t port_f_r();
 	void port_f_w(uint8_t data);
 
-    DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+    DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameprg_load);
+    DECLARE_DEVICE_IMAGE_LOAD_MEMBER(spiflash_load);
 
     int m_spi_last_sck;
 
@@ -135,6 +142,8 @@ private:
     bool m_flash_cs_inactive;
 
     uint8_t m_internal_flash[0x7800];
+
+    uint8_t* m_spi_flash_data;
 };
 
 void arduboy_state::machine_start()
@@ -273,14 +282,13 @@ void arduboy_state::arduboy_base(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
 }
 
-
 void arduboy_state::arduboy(machine_config &config)
 {
     arduboy_base(config);
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "arduboy", "bin");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mainprg", "bin,hex");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(arduboy_state::cart_load));
+	m_cart->set_device_load(FUNC(arduboy_state::gameprg_load));
 }
 
 void arduboy_state::ardbyfx(machine_config &config)
@@ -288,7 +296,44 @@ void arduboy_state::ardbyfx(machine_config &config)
     arduboy_base(config);
 
     GENERIC_SPI_FLASH(config, m_spi_flash);
+	m_spi_flash->set_rom_ptr(memregion("spi")->base());
+	m_spi_flash->set_rom_size(memregion("spi")->bytes());
+
+    GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gameprg", "bin,hex");
+	m_cart->set_must_be_loaded(false);
+	m_cart->set_device_load(FUNC(arduboy_state::gameprg_load));
+
+    GENERIC_CARTSLOT(config, m_spicart, generic_plain_slot, "spiflash", "bin");
+	m_spicart->set_must_be_loaded(true);
+	m_spicart->set_device_load(FUNC(arduboy_state::spiflash_load));
 }
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::spiflash_load)
+{
+    if (!image.is_filetype("bin"))
+    {
+        return std::make_pair(image_error::BADSOFTWARE, "spiflash dump must be a .bin");
+    }
+
+    memory_region* spimem = memregion("spi");
+    if (image.length() > spimem->length())
+    {
+        return std::make_pair(image_error::BADSOFTWARE, "spiflash dump too large!");
+    }
+
+    image.fseek(0, SEEK_SET);
+    image.fread(spimem->base(), image.length());
+
+    return std::make_pair(std::error_condition(), std::string());
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+// 
+// Game (Intel binhex) loader code
+//
+//////////////////////////////////////////////////////////////////////////////////////
 
 #define PARSE_HEX(xin, xout) { \
     if ('0' <= xin && xin <= '9') \
@@ -309,7 +354,7 @@ void arduboy_state::ardbyfx(machine_config &config)
     if (img.fread(bufptr,count) != count) \
         return std::make_pair(image_error::BADSOFTWARE, "file read error or premature EOF");
 
-DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 {
     // remember: loading a new game overwrites the previous one up until EOF,
     // so we let the old one persist at least in part.
@@ -333,7 +378,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::cart_load)
         uint16_t address;
         uint8_t  record_type;
 
-        uint8_t hex[8 + 16];
+        uint8_t hex[4 + 16 + 4];
         uint8_t checksum = 0;
 
         FREAD_BOUNDSCHECK(image, buf, 1);
@@ -404,14 +449,18 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::cart_load)
         // but we're still not done, unfortunately!
         if (record_type == 1)
         {
+            // ***** SUCCESS PATH: *****
             // if we hit the EOF record, then treat it as the success path.
             // we're counting on the hexdump being valid to begin with
             // or loaded from a softlist. no need to complain about
             // data past EOF
             return std::make_pair(std::error_condition(), std::string());
         }
-        else if (record_type != 0)
+
+        if (record_type != 0)
         {
+            // lots of other record types in the hex format,
+            // but arduboy games never use them
             return std::make_pair(image_error::BADSOFTWARE, "invalid/unimplemented hexdump record type");
         }
 
@@ -437,21 +486,39 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::cart_load)
                 break;
             }
         }
+
+        // ... continue loop from top ...
     }
 
     // we shouldn't end up here as EOF checks in the while loop should catch this for us
     return std::make_pair(image_error::BADSOFTWARE, "hexdump hit premature EOF");
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+// 
+// ROM and machine declarations
+// 
+//////////////////////////////////////////////////////////////////////////////////////
+
 ROM_START( arduboy )
-    // bootloader dumped from an Arduboy FX
-	ROM_REGION( 0x800, "loader", ROMREGION_ERASEFF)
-    ROM_LOAD("arduboy_boot.bin", 0x000, 0x800, CRC(4c49b0f5) SHA1(66a7411c46c04a8089a7ddfb5ffd9809dd08a21f))
+    // generic Cathy2k loader
+    // from https://github.com/MrBlinky/Arduboy/blob/master/cathy/hexfiles/arduboy-bootloader.hex
+    // keeping only the actual bootloader segment (0x7800-0x7FFF)
+	ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
+    ROM_LOAD("arduboy-bootloader.bin", 0x000, 0x800, CRC(12345678) SHA1(garbagegarbagegarbage))
 ROM_END
 
+ROM_START( ardbyfx )
+    // bootloader dumped from an Arduboy FX
+	ROM_REGION( 0x800, "loader", ROMREGION_ERASEFF)
+    ROM_LOAD("ardbyfx_boot.bin", 0x000, 0x800, CRC(12345678) SHA1(garbagegarbagegarbage))
+
+    // Arduboy FX has a 16mbyte chip on board, so honor that.
+    // note though that various clones and mods can support larger flash sizes.
+    ROM_REGION(0x01000000, "spi", ROMREGION_ERASEFF)
 } // anonymous namespace
 
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY    FULLNAME
 CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy",    MACHINE_NOT_WORKING)
-// CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)
+CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)

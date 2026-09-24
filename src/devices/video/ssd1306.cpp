@@ -16,12 +16,18 @@
                      div * display_clocks * 64
 
     where display_clocks is:
-        phase_1_period + phase_2_period +_
+        phase_1_period + phase_2_period + BANK0_pulse_width
+
+    The way to set BANK0_pulse_width isn't really described in the datasheet.
+    For now, we treat it as a constant 50.
 
  ****************************************************************************/
 
 #include "emu.h"
 #include "ssd1306.h"
+
+
+#define BANK0_PULSE_WIDTH 50
 
 #define KEEP_LOW_NIBBLE(x)  x & 0x0F
 #define KEEP_HIGH_NIBBLE(x) x & 0xF0
@@ -44,13 +50,18 @@ void ssd1306_device::device_init()
 
 }
 
-void ssd1306_device::device_reset()
+void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
 {
     // in the datasheet and on the arduboy, the interface mode pins
     // are supposed to be always tied to VCC or ground.
     // the datasheet doesn't mention how these pins are read,
     // so if someone is insane enough to change interfacing modes,
     // let's assume the interface mode is latched only at reset
+    m_pending_interface_mode = mode;
+}
+
+void ssd1306_device::device_reset()
+{
     m_current_interface_mode = m_pending_interface_mode;
 
 
@@ -58,9 +69,12 @@ void ssd1306_device::device_reset()
 
     m_inverting_pixels = false;
 
-    m_pagemode_column_start_address = 0;
-    m_hvmode_page_start_end_address = 0x07;
+    m_spi_bits_left = 0;
+    m_spi_shift = 0;
 
+    m_pagemode_column_start_address = 0;
+    m_pagemode_column_end_address = 7;
+    
     m_hvmode_page_start_address = 0x0d;
     m_hvmode_page_end_address   = 0x7d;
 
@@ -266,9 +280,9 @@ void ssd1306_device::exec_command()
 }
 
 
-void ssd1306_device::write(u8 data)
+void ssd1306_device::raw_write(int dc_line, uint8_t data)
 {
-    if (!m_dc_line)
+    if (dc_line)
     {
         // incoming write is a command
         if (m_command_pointer == 0)
@@ -283,10 +297,11 @@ void ssd1306_device::write(u8 data)
         {
             exec_command();
         }
+
+        return;
     }
 
-    // otherwise, display data is inbound
-
+    // otherwise, display data is inbound. cancel any previous command
     m_command_pointer    = 0;
     m_command_bytes_left = 0;
 
@@ -350,15 +365,58 @@ void ssd1306_device::write(u8 data)
 
 }
 
+u8 ssd1306_device::raw_read(int dc_line)
+{
+    if (!dc_line)
+    {
+        // TODO: status register
+        return 0;
+    }
+
+    // TODO: display RAM read
+    return 0;
+}
+
+
+   
+void ssd1306_device::write(offs_t offset, uint8_t data)
+{
+    if (!(m_current_interface_mode == PARALLEL_6800 ||
+          m_current_interface_mode == PARALLEL_8080))
+    {
+        logerror("%s: write() called when not in parallel mode!\n", tag());
+        return;
+    }
+
+    raw_write(m_dc_internal_state, data);
+}
+
+uint8_t ssd1306_device::read(offs_t offset)
+{
+    if (!(m_current_interface_mode == PARALLEL_6800 ||
+          m_current_interface_mode == PARALLEL_8080))
+    {
+        logerror("%s: read() called when not in parallel mode!\n", tag());
+        return 0;
+    }
+
+    return raw_read(m_dc_internal_state);
+}
+
 
 void ssd1306_device::rst_w(int rst)
 {
-    bool rst_asserted = !rst;
+    if (!m_reset_asserted && !rst)
+    {
+        device_reset();
+    }
 
+    m_reset_asserted = !rst;
 }
 
 void ssd1306_device::dc_w(int dc)
 {
+    // store the state, but don't sample it yet
     m_dc_line = dc != 0;
 
     if (m_current_interface_mode == SPI_3WIRE)
@@ -373,8 +431,6 @@ void ssd1306_device::dc_w(int dc)
         // changes I2C slave address
         return;
     }
-
-    m_dc_internal_state = m_dc_line;
 }
 
 void ssd1306_device::update_scan_rate()
@@ -392,17 +448,62 @@ void ssd1306_device::update_scan_rate()
 
 void ssd1306_device::spi_cs_w(int state)
 {
-
+    m_spi_cs_asserted = !state;
 }
 
 void ssd1306_device::spi_si_w(int state)
 {
+    if (!(m_current_interface_mode == SPI_3WIRE ||
+          m_current_interface_mode == SPI_4WIRE))
+    {
+        logerror("%s: spi_si_w called when not in SPI mode\n", tag());
+        return;
+    }
 
+    if (!m_spi_cs_asserted) return;
+    m_spi_si = state ? 1 : 0;
 }
     
 void ssd1306_device::spi_sck_w(int state)
 {
+    if (!m_spi_cs_asserted)
+    {
+        return;
+    }
 
+    if (!(m_current_interface_mode == SPI_3WIRE ||
+          m_current_interface_mode == SPI_4WIRE))
+    {
+        logerror("%s: spi_clk_w called when not in SPI mode\n", tag());
+        return;
+    }
+
+    if (m_spi_bits_left == 0)
+    {
+        m_spi_shift = 0;
+        
+        // the D/C# line is sampled only at the start of a field
+        if (m_current_interface_mode == SPI_3WIRE)
+        {
+            m_dc_internal_state = m_spi_si ? 1 : 0;
+            m_spi_bits_left = 8;
+        }
+        else
+        {
+            m_dc_internal_state = m_dc_line;
+            m_spi_shift = m_spi_si != 0 ? 1 : 0;
+            m_spi_bits_left = 7;
+        }
+        return;
+    }
+
+    m_spi_shift = (m_spi_shift << 1) | (m_spi_si != 0 ? 1 : 0);
+    m_spi_bits_left --;
+
+    if (m_spi_bits_left == 0)
+    {
+        raw_write(m_dc_internal_state, m_spi_shift);
+    }
 }
 
 
