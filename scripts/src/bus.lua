@@ -6229,6 +6229,8 @@ if BUSES["VIC20"] then
 		MAME_DIR .. "src/devices/bus/vic20/megacart.h",
 		MAME_DIR .. "src/devices/bus/vic20/std.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/std.h",
+		MAME_DIR .. "src/devices/bus/vic20/vfp.cpp",
+		MAME_DIR .. "src/devices/bus/vic20/vfp.h",
 		MAME_DIR .. "src/devices/bus/vic20/vic1010.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/vic1010.h",
 		MAME_DIR .. "src/devices/bus/vic20/vic1110.cpp",

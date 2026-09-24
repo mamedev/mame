@@ -163,6 +163,12 @@ public:
 	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class amd_29f032_device : public intelfsh8_device
+{
+public:
+	amd_29f032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class amd_29f400t_device : public intelfsh8_device
 {
 public:
@@ -440,6 +446,7 @@ DECLARE_DEVICE_TYPE(ATMEL_29C020,            atmel_29c020_device)
 DECLARE_DEVICE_TYPE(AMD_29F010,              amd_29f010_device)
 DECLARE_DEVICE_TYPE(AMD_29F040,              amd_29f040_device)
 DECLARE_DEVICE_TYPE(AMD_29F080,              amd_29f080_device)
+DECLARE_DEVICE_TYPE(AMD_29F032,              amd_29f032_device)
 DECLARE_DEVICE_TYPE(AMD_29F400T,             amd_29f400t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800T,             amd_29f800t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,       amd_29f800b_16bit_device)

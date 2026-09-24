@@ -27,13 +27,6 @@
 DEFINE_DEVICE_TYPE(VIC1112, vic1112_device, "vic1112", "VIC-1112 IEEE-488 Interface")
 
 
-void vic1112_device::via0_irq_w(int state)
-{
-	m_via0_irq = state;
-
-	m_slot->irq_w(m_via0_irq | m_via1_irq);
-}
-
 uint8_t vic1112_device::via0_pb_r()
 {
 	/*
@@ -85,14 +78,6 @@ void vic1112_device::via0_pb_w(uint8_t data)
 }
 
 
-void vic1112_device::via1_irq_w(int state)
-{
-	m_via1_irq = state;
-
-	m_slot->irq_w(m_via0_irq | m_via1_irq);
-}
-
-
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -102,14 +87,16 @@ void vic1112_device::device_add_mconfig(machine_config &config)
 	MOS6522(config, m_via0, DERIVED_CLOCK(1, 1));
 	m_via0->readpb_handler().set(FUNC(vic1112_device::via0_pb_r));
 	m_via0->writepb_handler().set(FUNC(vic1112_device::via0_pb_w));
-	m_via0->irq_handler().set(FUNC(vic1112_device::via0_irq_w));
+	m_via0->irq_handler().set("irq", FUNC(input_merger_device::in_w<0>));
 
 	MOS6522(config, m_via1, DERIVED_CLOCK(1, 1));
 	m_via1->readpb_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_via1->writepa_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_via1->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_atn_w));
 	m_via1->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_eoi_w));
-	m_via1->irq_handler().set(FUNC(vic1112_device::via1_irq_w));
+	m_via1->irq_handler().set("irq", FUNC(input_merger_device::in_w<1>));
+
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::irq_w));
 
 	IEEE488(config, m_bus);
 	ieee488_slot_device::add_cbm_defaults(config, nullptr);
@@ -132,7 +119,6 @@ vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, d
 	, m_via0(*this, M6522_0_TAG)
 	, m_via1(*this, M6522_1_TAG)
 	, m_bus(*this, IEEE488_TAG)
-	, m_via0_irq(0), m_via1_irq(0)
 {
 }
 
@@ -143,9 +129,8 @@ vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, d
 
 void vic1112_device::device_start()
 {
-	// state saving
-	save_item(NAME(m_via0_irq));
-	save_item(NAME(m_via1_irq));
+	m_slot->io2().install_readwrite_handler(0x00, 0x0f, 0x3e0, read8sm_delegate(*m_via0, FUNC(via6522_device::read)), write8sm_delegate(*m_via0, FUNC(via6522_device::write)));
+	m_slot->io2().install_readwrite_handler(0x10, 0x1f, 0x3e0, read8sm_delegate(*m_via1, FUNC(via6522_device::read)), write8sm_delegate(*m_via1, FUNC(via6522_device::write)));
 }
 
 
@@ -155,39 +140,12 @@ void vic1112_device::device_start()
 
 void vic1112_device::device_reset()
 {
+	memory_region *const blk5 = m_slot->memregion("blk5");
+
+	if (blk5)
+		m_slot->blk5().install_rom(0x1000, 0x17ff, 0x800, blk5->base() + 0x1000);
+
 	m_bus->host_ifc_w(0);
 	m_bus->host_ifc_w(1);
 }
 
-
-//-------------------------------------------------
-//  vic20_cd_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t vic1112_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	if (!io2)
-	{
-		data = (BIT(offset, 4) ? m_via1 : m_via0)->read(offset & 0x0f);
-	}
-	else if (!blk5)
-	{
-		if (offset & 0x1000)
-			data = m_blk5[offset & 0x17ff];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_cd_w - cartridge data write
-//-------------------------------------------------
-
-void vic1112_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	if (!io2)
-	{
-		(BIT(offset, 4) ? m_via1 : m_via0)->write(offset & 0x0f, data);
-	}
-}

@@ -115,6 +115,11 @@ void vic20_final_expansion_3_device::device_start()
 	save_item(NAME(m_reg1));
 	save_item(NAME(m_reg2));
 	save_item(NAME(m_lockbit));
+
+	m_slot->blk5()[0].install_readwrite_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(vic20_final_expansion_3_device::blk5_r)), write8sm_delegate(*this, FUNC(vic20_final_expansion_3_device::blk5_w)));
+	m_slot->io3()[0].install_readwrite_handler(0x002, 0x003, 0x3fc, read8sm_delegate(*this, FUNC(vic20_final_expansion_3_device::read_register)), write8sm_delegate(*this, FUNC(vic20_final_expansion_3_device::write_register)));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(vic20_final_expansion_3_device::update_map), this));
 }
 
 
@@ -127,465 +132,8 @@ void vic20_final_expansion_3_device::device_reset()
 	m_reg1 = 0;
 	m_reg2 = 0;
 	m_lockbit = 1;
-}
 
-
-//-------------------------------------------------
-//  vic20_cd_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t vic20_final_expansion_3_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	// any read from BLK5 sets the lock bit, regardless of the selected mode
-	if (!blk5)
-	{
-		m_lockbit = 1;
-	}
-
-	switch (m_reg1 & REG1_MODE_MASK)
-	{
-	case REG1_START:
-		// read from ROM bank 0
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(0, 3, offset));
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-
-	case REG1_SUPER_ROM:
-		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			data = m_ram[get_address(0, 0, offset)];
-		}
-
-		// read from ROM
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 0, offset));
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 1, offset));
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 2, offset));
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 3, offset));
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-
-	case REG1_RAM_1:
-		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			data = m_ram[get_address(0, 0, offset)];
-		}
-
-		// read from RAM bank 1
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			data = m_ram[get_address(1, 0, offset)];
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			data = m_ram[get_address(1, 1, offset)];
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			data = m_ram[get_address(1, 2, offset)];
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = m_ram[get_address(1, 3, offset)];
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-
-	case REG1_RAM_2:
-		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			data = m_ram[get_address(0, 0, offset)];
-		}
-
-		// read from RAM bank 1 or 2
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			data = m_ram[get_address((m_reg1 & REG1_BLK1) ? 2 : 1, 0, offset)];
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			data = m_ram[get_address((m_reg1 & REG1_BLK2) ? 2 : 1, 1, offset)];
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			data = m_ram[get_address((m_reg1 & REG1_BLK3) ? 2 : 1, 2, offset)];
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = m_ram[get_address((m_reg1 & REG1_BLK5) ? 2 : 1, 3, offset)];
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-
-	case REG1_SUPER_RAM:
-		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			data = m_ram[get_address(0, 0, offset)];
-		}
-
-		// read from any RAM bank
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			data = m_ram[get_address(REG1_BANK, 0, offset)];
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			data = m_ram[get_address(REG1_BANK, 1, offset)];
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			data = m_ram[get_address(REG1_BANK, 2, offset)];
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = m_ram[get_address(REG1_BANK, 3, offset)];
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-
-	case REG1_RAM_ROM:
-		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			data = m_ram[get_address(0, 0, offset)];
-		}
-
-		// read from ROM bank 0 or RAM bank 1
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			data = (m_reg1 & REG1_BLK1) ? m_flash_rom->read(get_address(0, 0, offset)) : m_ram[get_address(1, 0, offset)];
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			data = (m_reg1 & REG1_BLK2) ? m_flash_rom->read(get_address(0, 1, offset)) : m_ram[get_address(1, 1, offset)];
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			data = (m_reg1 & REG1_BLK3) ? m_flash_rom->read(get_address(0, 2, offset)) : m_ram[get_address(1, 2, offset)];
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = (m_reg1 & REG1_BLK5) ? m_flash_rom->read(get_address(0, 3, offset)) : m_ram[get_address(1, 3, offset)];
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-
-	case REG1_FLASH:
-		// read from RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			data = m_ram[get_address(0, 0, offset)];
-		}
-
-		// read from ROM
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 0, offset));
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 1, offset));
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 2, offset));
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			data = m_flash_rom->read(get_address(REG1_BANK, 3, offset));
-		}
-
-		// read from registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			data = read_register(BIT(offset, 0));
-		}
-		break;
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_cd_w - cartridge data write
-//-------------------------------------------------
-
-void vic20_final_expansion_3_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	// any write to BLK5 clears the lock bit, regardless of the selected mode
-	if (!blk5)
-	{
-		m_lockbit = 0;
-	}
-
-	switch (m_reg1 & REG1_MODE_MASK)
-	{
-	case REG1_START:
-		// write to RAM bank 1
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_ram[get_address(1, 0, offset)] = data;
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_ram[get_address(1, 1, offset)] = data;
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_ram[get_address(1, 2, offset)] = data;
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_ram[get_address(1, 3, offset)] = data;
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-		break;
-
-	case REG1_SUPER_ROM:
-		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			m_ram[get_address(0, 0, offset)] = data;
-		}
-
-		// write to RAM bank 1
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_ram[get_address(1, 0, offset)] = data;
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_ram[get_address(1, 1, offset)] = data;
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_ram[get_address(1, 2, offset)] = data;
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_ram[get_address(1, 3, offset)] = data;
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-		break;
-
-	case REG1_RAM_1:
-		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && !(m_reg1 & REG1_BLK0))
-		{
-			m_ram[get_address(0, 0, offset)] = data;
-		}
-
-		// write to RAM bank 1 or 2
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK1) ? 2 : 1, 0, offset)] = data;
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK2) ? 2 : 1, 1, offset)] = data;
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK3) ? 2 : 1, 2, offset)] = data;
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK5) ? 2 : 1, 3, offset)] = data;
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-		break;
-
-	case REG1_RAM_2:
-		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && !(m_reg1 & REG1_BLK0))
-		{
-			m_ram[get_address(0, 0, offset)] = data;
-		}
-
-		// write to RAM bank 1
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_ram[get_address(1, 0, offset)] = data;
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_ram[get_address(1, 1, offset)] = data;
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_ram[get_address(1, 2, offset)] = data;
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_ram[get_address(1, 3, offset)] = data;
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-		break;
-
-	case REG1_SUPER_RAM:
-		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			m_ram[get_address(0, 0, offset)] = data;
-		}
-
-		// write whole RAM
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_ram[get_address(REG1_BANK, 0, offset)] = data;
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_ram[get_address(REG1_BANK, 1, offset)] = data;
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_ram[get_address(REG1_BANK, 2, offset)] = data;
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_ram[get_address(REG1_BANK, 3, offset)] = data;
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-		break;
-
-	case REG1_RAM_ROM:
-		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN && !(m_reg1 & REG1_BLK0))
-		{
-			m_ram[get_address(0, 0, offset)] = data;
-		}
-
-		// write to RAM bank 1 or 2
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK1) ? 2 : 1, 0, offset)] = data;
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK2) ? 2 : 1, 1, offset)] = data;
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK3) ? 2 : 1, 2, offset)] = data;
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_ram[get_address((m_reg1 & REG1_BLK5) ? 2 : 1, 3, offset)] = data;
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-		break;
-
-	case REG1_FLASH:
-		// write to RAM bank 0
-		if ((!ram1 || !ram2 || !ram3) && !LORAM_HIDDEN)
-		{
-			m_ram[get_address(0, 0, offset)] = data;
-		}
-
-		// write to ROM
-		if (!blk1 && !BLK1_HIDDEN)
-		{
-			m_flash_rom->write(get_address(REG1_BANK, 0, offset), data);
-		}
-		if (!blk2 && !BLK2_HIDDEN)
-		{
-			m_flash_rom->write(get_address(REG1_BANK, 1, offset), data);
-		}
-		if (!blk3 && !BLK3_HIDDEN)
-		{
-			m_flash_rom->write(get_address(REG1_BANK, 2, offset), data);
-		}
-		if (!blk5 && !BLK5_HIDDEN)
-		{
-			m_flash_rom->write(get_address(REG1_BANK, 3, offset), data);
-		}
-
-		// write to registers
-		if (!io3 && !REGISTERS_HIDDEN && BIT(offset, 1))
-		{
-			write_register(BIT(offset, 0), data);
-		}
-	}
+	update_map();
 }
 
 
@@ -640,4 +188,210 @@ void vic20_final_expansion_3_device::write_register(offs_t offset, uint8_t data)
 		m_reg2 = data;
 		break;
 	}
+
+	update_map();
+}
+
+
+//-------------------------------------------------
+//  read_target -
+//-------------------------------------------------
+
+std::pair<int, int> vic20_final_expansion_3_device::read_target(int block) const
+{
+	bool const alt = BIT(m_reg1, block + 1);
+
+	switch (m_reg1 & REG1_MODE_MASK)
+	{
+	case REG1_START:     return (block == 3) ? std::make_pair(TARGET_FLASH, 0) : std::make_pair(TARGET_NONE, 0);
+	case REG1_SUPER_ROM: return std::make_pair(TARGET_FLASH, REG1_BANK);
+	case REG1_RAM_1:     return std::make_pair(TARGET_RAM, 1);
+	case REG1_RAM_2:     return std::make_pair(TARGET_RAM, alt ? 2 : 1);
+	case REG1_SUPER_RAM: return std::make_pair(TARGET_RAM, REG1_BANK);
+	case REG1_RAM_ROM:   return alt ? std::make_pair(TARGET_FLASH, 0) : std::make_pair(TARGET_RAM, 1);
+	case REG1_FLASH:     return std::make_pair(TARGET_FLASH, REG1_BANK);
+	default:             return std::make_pair(TARGET_NONE, 0);
+	}
+}
+
+
+//-------------------------------------------------
+//  write_target -
+//-------------------------------------------------
+
+std::pair<int, int> vic20_final_expansion_3_device::write_target(int block) const
+{
+	bool const alt = BIT(m_reg1, block + 1);
+
+	switch (m_reg1 & REG1_MODE_MASK)
+	{
+	case REG1_START:     return std::make_pair(TARGET_RAM, 1);
+	case REG1_SUPER_ROM: return std::make_pair(TARGET_RAM, 1);
+	case REG1_RAM_1:     return std::make_pair(TARGET_RAM, alt ? 2 : 1);
+	case REG1_RAM_2:     return std::make_pair(TARGET_RAM, 1);
+	case REG1_SUPER_RAM: return std::make_pair(TARGET_RAM, REG1_BANK);
+	case REG1_RAM_ROM:   return std::make_pair(TARGET_RAM, alt ? 2 : 1);
+	case REG1_FLASH:     return std::make_pair(TARGET_FLASH, REG1_BANK);
+	default:             return std::make_pair(TARGET_NONE, 0);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_lockbit -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::set_lockbit(int state)
+{
+	if (m_lockbit != state)
+	{
+		m_lockbit = state;
+
+		update_io3();
+	}
+}
+
+
+//-------------------------------------------------
+//  update_map -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::update_map()
+{
+	update_loram(m_slot->ram1(), 0x400);
+	update_loram(m_slot->ram2(), 0x800);
+	update_loram(m_slot->ram3(), 0xc00);
+	update_block(m_slot->blk1(), 0);
+	update_block(m_slot->blk2(), 1);
+	update_block(m_slot->blk3(), 2);
+	update_blk5();
+	update_io3();
+}
+
+
+//-------------------------------------------------
+//  update_loram -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::update_loram(vic20_expansion_window &window, offs_t offset)
+{
+	uint8_t const mode = m_reg1 & REG1_MODE_MASK;
+
+	if (LORAM_HIDDEN || (read_target(0).first == TARGET_NONE))
+	{
+		window.unmap();
+	}
+	else if (((mode == REG1_RAM_1) || (mode == REG1_RAM_2) || (mode == REG1_RAM_ROM)) && (m_reg1 & REG1_BLK0))
+	{
+		window[1].install_rom(0x000, 0x3ff, &m_ram[get_address(0, 0, offset)]);
+		window.select(1);
+	}
+	else
+	{
+		window[0].install_ram(0x000, 0x3ff, &m_ram[get_address(0, 0, offset)]);
+		window.select(0);
+	}
+}
+
+
+//-------------------------------------------------
+//  update_block -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::update_block(vic20_expansion_window &window, int block)
+{
+	auto const [rtype, rbank] = read_target(block);
+	auto const [wtype, wbank] = write_target(block);
+	offs_t const rbase = get_address(rbank, block, 0);
+	offs_t const wbase = get_address(wbank, block, 0);
+	int const slot = (rtype == TARGET_NONE) ? 1 : 0;
+
+	if (BIT(m_reg2, block + 1) || (wtype == TARGET_NONE))
+	{
+		window.unmap();
+		return;
+	}
+
+	switch (rtype)
+	{
+	case TARGET_RAM:
+		window[slot].install_rom(0x0000, 0x1fff, &m_ram[rbase]);
+		break;
+
+	case TARGET_FLASH:
+		window[slot].install_read_handler(0x0000, 0x1fff, read8sm_delegate(*this, NAME(([this, rbase] (offs_t offset) { return m_flash_rom->read(rbase | offset); }))));
+		break;
+	}
+
+	switch (wtype)
+	{
+	case TARGET_RAM:
+		window[slot].install_writeonly(0x0000, 0x1fff, &m_ram[wbase]);
+		break;
+
+	case TARGET_FLASH:
+		window[slot].install_write_handler(0x0000, 0x1fff, write8sm_delegate(*this, NAME(([this, wbase] (offs_t offset, uint8_t data) { m_flash_rom->write(wbase | offset, data); }))));
+		break;
+	}
+
+	window.select(slot);
+}
+
+
+//-------------------------------------------------
+//  update_blk5 -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::update_blk5()
+{
+	if (BLK5_HIDDEN || (write_target(3).first == TARGET_NONE))
+		m_slot->blk5().unmap();
+	else
+		m_slot->blk5().select(0);
+}
+
+
+//-------------------------------------------------
+//  update_io3 -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::update_io3()
+{
+	if (REGISTERS_HIDDEN || (write_target(0).first == TARGET_NONE))
+		m_slot->io3().unmap();
+	else
+		m_slot->io3().select(0);
+}
+
+
+//-------------------------------------------------
+//  blk5_r -
+//-------------------------------------------------
+
+uint8_t vic20_final_expansion_3_device::blk5_r(offs_t offset)
+{
+	auto const [type, bank] = read_target(3);
+	uint8_t data = (type == TARGET_FLASH) ? m_flash_rom->read(get_address(bank, 3, offset)) : m_ram[get_address(bank, 3, offset)];
+
+	if (!machine().side_effects_disabled())
+		set_lockbit(1);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  blk5_w -
+//-------------------------------------------------
+
+void vic20_final_expansion_3_device::blk5_w(offs_t offset, uint8_t data)
+{
+	auto const [type, bank] = write_target(3);
+
+	if (type == TARGET_FLASH)
+		m_flash_rom->write(get_address(bank, 3, offset), data);
+	else
+		m_ram[get_address(bank, 3, offset)] = data;
+
+	set_lockbit(0);
 }
