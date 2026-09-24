@@ -2468,7 +2468,7 @@ void mpu4vid_state::init_cybcas()
 
 	hack_bwb_startup_protection();
 
-	// HACK: out half the startup checks for now until we work out what they're checking!
+	// HACK: patch out half the startup checks for now until we work out what they're checking!
 	// (copy protection?)
 	uint16_t *rom = &memregion("video")->as_u16();
 

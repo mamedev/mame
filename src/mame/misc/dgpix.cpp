@@ -870,7 +870,7 @@ void dgpix_typea_state::init_elfin()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3a9e94)] = 0;
 	rom[BYTE4_XOR_LE(0x3a9e95)] = 3;
 	rom[BYTE4_XOR_LE(0x3a9e96)] = 0;
@@ -883,7 +883,7 @@ void dgpix_typea_state::init_jumpjump()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3a829a)] = 0;
 	rom[BYTE4_XOR_LE(0x3a829b)] = 3;
 	rom[BYTE4_XOR_LE(0x3a829c)] = 0;
@@ -896,7 +896,7 @@ void dgpix_typea_state::init_xfiles()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3a9a2a)] = 0;
 	rom[BYTE4_XOR_LE(0x3a9a2b)] = 3;
 	rom[BYTE4_XOR_LE(0x3a9a2c)] = 0;
@@ -909,7 +909,7 @@ void dgpix_typea_state::init_xfilesk()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3aa92e)] = 0;
 	rom[BYTE4_XOR_LE(0x3aa92f)] = 3;
 	rom[BYTE4_XOR_LE(0x3aa930)] = 0;
@@ -925,7 +925,7 @@ void dgpix_typea_state::init_kdynastg()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3aaa10)] = 0; // 129f0 - nopped call
 	rom[BYTE4_XOR_LE(0x3aaa11)] = 3;
 	rom[BYTE4_XOR_LE(0x3aaa12)] = 0;
@@ -944,7 +944,7 @@ void dgpix_bmkey_state::init_letsdnce()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3a9eb2)] = 0;
 	rom[BYTE4_XOR_LE(0x3a9eb3)] = 3;
 	rom[BYTE4_XOR_LE(0x3a9eb4)] = 0;
@@ -957,7 +957,7 @@ void dgpix_bmkey_state::init_btplay2k()
 {
 	u8 *rom = memregion("flash7")->base();
 
-	// HACK: what is this for?
+	// HACK: patch around undumped/unemulated PIC controller
 	rom[BYTE4_XOR_LE(0x3a7914)] = 0;
 	rom[BYTE4_XOR_LE(0x3a7915)] = 3;
 	rom[BYTE4_XOR_LE(0x3a7916)] = 0;

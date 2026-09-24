@@ -8820,7 +8820,7 @@ void pacman_state::init_porky()
 
 void pacman_state::init_rocktrv2()
 {
-	// HACK: to pass the rom check for the bad rom
+	// HACK: patches to pass the rom check for the bad ROM
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;

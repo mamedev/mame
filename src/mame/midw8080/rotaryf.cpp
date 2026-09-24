@@ -4,14 +4,13 @@
  board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6 x ROM, 1 x RAM, DIP(8 switches), ..
  board KIV-101 CRT: 2*RAM, lots of 74xx TTL
 
-driver by Barry Rodewald
- based on Initial work by David Haywood
+ driver by Barry Rodewald
+ based on initial work by David Haywood
 
- todo:
-
- - sound
- - verify game speed if possible (related to # of interrupts)
- - document actual PCB layout
+ TODO:
+ - sound;
+ - verify game speed if possible (related to # of interrupts);
+ - document actual PCB layout;
 
 */
 

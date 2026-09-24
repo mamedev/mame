@@ -82,6 +82,7 @@ void nbmj8891_state::init_omotesnd()
 	}
 #endif
 
+#if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// HACK: Protection ROM check skip
@@ -95,6 +96,7 @@ void nbmj8891_state::init_omotesnd()
 	// Voice ROM check skip
 //  ROM[0x0269] = 0x00;
 //  ROM[0x026a] = 0x00;
+#endif
 }
 
 void nbmj8891_state::init_telmahjn()
@@ -148,12 +150,14 @@ void nbmj8891_state::init_mjfocus()
 
 void nbmj8891_state::init_mjfocusm()
 {
+#if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// HACK: Protection ROM check skip
 	ROM[0x014e] = 0x00;
 	ROM[0x014f] = 0x00;
 	ROM[0x0150] = 0x00;
+#endif
 }
 
 void nbmj8891_state::init_scandal()

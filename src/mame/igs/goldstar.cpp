@@ -31993,7 +31993,7 @@ void cmaster_state::init_cm()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// HACK: force PPI PPI mode 0 for all, and A, B & C as input
+	// HACK: force PPI mode 0 for all, and A, B & C as input
     // the mixed modes 2-0 are not working properly.
 
 	rom[0x0021] = 0x9b;
@@ -32004,7 +32004,7 @@ void cmaster_state::init_cmv4()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// HACK: force PPI PPI mode 0 for all, and A, B & C as input
+	// HACK: force PPI mode 0 for all, and A, B & C as input
     // the mixed modes 2-0 are not working properly.
 	rom[0x0209] = 0x9b;
 	rom[0x020d] = 0x9b;
@@ -32042,7 +32042,7 @@ void cmaster_state::init_cmv823()
 		}
 	}
 
-	// HACK: force PPI PPI mode 0 for all, and A, B & C as input
+	// HACK: force PPI mode 0 for all, and A, B & C as input
     // the mixed modes 2-0 are not working properly.
 	rom[0x001f] = 0x9b;
 	rom[0x0023] = 0x9b;
@@ -32080,7 +32080,7 @@ void cmaster_state::init_cmpap()
 		}
 	}
 
-	// HACK: force PPI PPI mode 0 for all, and A, B & C as input
+	// HACK: force PPI mode 0 for all, and A, B & C as input
     // the mixed modes 2-0 are not working properly.
 	rom[0x007a] = 0x9b;
 	rom[0x007e] = 0x9b;
@@ -32307,7 +32307,7 @@ void cmaster_state::init_cmast91()
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// HACK: force PPI PPI mode 0 for all, and A, B & C as input
+	// HACK: force PPI mode 0 for all, and A, B & C as input
     // the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a92] = 0x9b;
@@ -32317,7 +32317,7 @@ void cmaster_state::init_cll()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// HACK: force PPI PPI mode 0 for all, and A, B & C as input
+	// HACK: force PPI mode 0 for all, and A, B & C as input
     // the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a9c] = 0x9b;

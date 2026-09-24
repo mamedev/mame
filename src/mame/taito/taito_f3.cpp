@@ -4529,9 +4529,9 @@ void taito_f3_state::init_landmkrp()
 
 	// TODO: move to handler in address_map
 	/* For some reason the least significant byte in the last 2 long words of
-	ROM are swapped.  As the roms have been verified ok, I assume this is some
+	ROMs are swapped.  As the ROMs have been verified ok, I assume this is some
 	kind of basic security on the prototype development board to prevent 'release'
-	roms running on it.  Easiest thing to do is switch the data around here */
+	ROMs running on it.  Easiest thing to do is switch the data around here */
 	ROM[0x1ffff8/4]=0xffffffff; /* From 0xffffff03 */
 	ROM[0x1ffffc/4]=0xffff0003; /* From 0xffff00ff */
 

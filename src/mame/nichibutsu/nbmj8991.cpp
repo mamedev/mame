@@ -65,26 +65,32 @@ void nbmj8991_state::init_finalbny()
 
 void nbmj8991_state::init_galkaika()
 {
+#if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// HACK: Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
+#endif
 }
 
 void nbmj8991_state::init_tokyogal()
 {
+#if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// HACK: Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
+#endif
 }
 
 void nbmj8991_state::init_tokimbsj()
 {
+#if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	// HACK: Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
+#endif
 }
 
 
