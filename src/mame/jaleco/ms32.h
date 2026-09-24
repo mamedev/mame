@@ -147,7 +147,7 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol;
-	bitmap_ind8 m_temp_bitmap_sprites_pri;
+	bitmap_ind16 m_temp_bitmap_sprites_pri;
 	u32 m_brt[4];
 	int m_brt_r;
 	int m_brt_g;
@@ -184,6 +184,7 @@ private:
 	void screen_vblank(int state);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
+	void apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 };
 

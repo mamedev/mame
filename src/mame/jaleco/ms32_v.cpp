@@ -491,11 +491,13 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get());
+	draw_sprites(m_temp_bitmap_sprites, screen.priority(), cliprect, m_sprram_buffer.get());
 
 	draw_tile_layers(screen, cliprect);
 
 	mix_layers(screen, bitmap, cliprect);
+
+	apply_sprite_effects(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -577,8 +579,74 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 			else if ((code & 3) == 0)
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 			if (!BIT(code, 2))
-				c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+			{
+				u8 const layer = (code >> 3) & 7;
+				if (layer == 0)  // sprite → glow
+					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				else  // BG, ROZ, TX → shadow
+					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+			}
 			dst[x] = c;
+		}
+	}
+}
+
+void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_temp_bitmap_sprites_pri.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	const size_t sprite_tail = m_objectram_size - 8;
+	u16 *source = m_sprram_buffer.get();
+	u16 *finish = m_sprram_buffer.get() + sprite_tail;
+	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
+	if (reverseorder) { source = m_sprram_buffer.get() + sprite_tail; finish = m_sprram_buffer.get(); }
+	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
+	{
+		bool disable; u8 pri; bool flipx, flipy; u32 code, color;
+		u8 tx, ty; u16 xsize, ysize; s32 sx, sy; u16 xzoom, yzoom;
+		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
+		if (disable || !xzoom || !yzoom) continue;
+		m_sprite->prio_zoom_transpen_raw(m_temp_bitmap_sprites_pri,cliprect,
+				code, (1 + pri) << 8, flipx, flipy, sx, sy,
+				tx, ty, xsize, ysize, xzoom, yzoom,
+				screen.priority(), 0, 0xffff);
+	}
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
+		u16 const *const cov = &m_temp_bitmap_sprites_pri.pix(y);
+		u16 const *const tx_row = &m_layer_tx.pix(y);
+		u16 const *const bg_row = &m_layer_bg.pix(y);
+		u16 const *const roz_row = &m_layer_roz.pix(y);
+		u32 *const dst = &bitmap.pix(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (cov[x] == 0) continue;
+			if (spr[x] & 0xff) continue;
+
+			u16 const cov_pri = ((cov[x] >> 8) - 1) & 0xf;
+			u16 const idx_with = (0 << 12)
+					| ((tx_row[x] == 0xffff) << 11)
+					| (1 << 10)
+					| ((roz_row[x] == 0xffff) << 9)
+					| (1 << 8)
+					| ((bg_row[x] == 0xffff) << 7)
+					| (cov_pri << 3);
+			u8 const code_with = m_priram[idx_with];
+
+			if (!BIT(code_with, 2))
+			{
+				u8 const layer = (code_with >> 3) & 7;
+				rgb_t c(dst[x]);
+				if (layer == 0)
+					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				else
+					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+				dst[x] = c;
+			}
 		}
 	}
 }
