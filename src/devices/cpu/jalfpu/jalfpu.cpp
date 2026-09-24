@@ -114,14 +114,14 @@ void jaleco_fpu_device::device_start()
 	state_add(STATE_GENFLAGS,  "GENFLAGS", m_flags).formatstr("%4s").noshow();
 	state_add(JALFPU_PC,       "PC", m_pc).mask(0x3ff);
 	for (int i = 0; i < 16; i++)
-		state_add(JALFPU_S0 + i, util::string_format("S%X", i).c_str(), m_s[i]);
+		state_add(JALFPU_S0 + i, util::string_format("S%X", i), m_s[i]);
 	state_add(JALFPU_C6,       "C6", m_c6);
 	state_add(JALFPU_C7,       "C7", m_c7);
 	state_add(JALFPU_SP,       "SP", m_sp);
 	state_add(JALFPU_CTRL,     "CTRL", m_ctrl);
 	state_add(JALFPU_SIGN,     "SIGN", m_sign);
 	for (int i = 0; i < 4; i++)
-		state_add(JALFPU_STK0 + i, util::string_format("STK%d", i).c_str(), m_stack[i]).mask(0x3ff);
+		state_add(JALFPU_STK0 + i, util::string_format("STK%d", i), m_stack[i]).mask(0x3ff);
 	state_add(JALFPU_DELAY,    "DELAY", m_delay);
 	state_add(JALFPU_DTGT,     "DTGT", m_delay_target).mask(0x3ff);
 

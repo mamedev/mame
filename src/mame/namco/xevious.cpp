@@ -4,10 +4,159 @@
 
   xevious.cpp
 
-  Functions to emulate the video hardware of the machine.
+  Functions to emulate the general aspects and video hardware of the machine.
+
+
+Custom ICs:
+----------
+Xevious:
+-------
+CPU board:
+06XX     interface to custom 5xXX
+07XX     clock divider
+08XX(x3) bus controller
+50XX     player score control (only used for a protection check on startup)
+51XX     I/O
+54XX     explosion sound generator
+
+Video board:
+03XX(x2) ?
+04XX     sprite address generator
+07XX     clock divider
+11XX(x2) gfx data shifter and mixer (16-bit in, 4-bit out)
+12XX     sprite generator
+13XX     dual scrolling tilemap address generator
+
+
+Memory maps:
+-----------
+Xevious:
+-------
+MAIN CPU:
+
+Address          Dir Data     Name      Description
+---------------- --- -------- --------- -----------------------
+000xxxxxxxxxxxxx R   xxxxxxxx ROM 1     program ROM
+001xxxxxxxxxxxxx R   xxxxxxxx ROM 2     program ROM
+the rest of the memory map is common to the other CPUs
+
+MOTION CPU:
+
+Address          Dir Data     Name      Description
+---------------- --- -------- --------- -----------------------
+000xxxxxxxxxxxxx R   xxxxxxxx ROM 3     program ROM
+the rest of the memory map is common to the other CPUs
+
+SOUND CPU:
+
+Address          Dir Data     Name      Description
+---------------- --- -------- --------- -----------------------
+00-xxxxxxxxxxxxx R   xxxxxxxx ROM 4     program ROM
+the rest of the memory map is common to the other CPUs
+
+COMMON:
+a small part of the decoding for the video board is done by a PAL so it is inferred by program behaviour
+
+Address          Dir Data     Name      Description
+---------------- --- -------- --------- -----------------------
+01000-----------              n.c.
+01001-----------              n.c.
+01010-----------              n.c.
+01011-----------              n.c.
+01100-----------              n.c.
+01101-----00----   W ----xxxx SRAM 0    \ sound control registers
+01101-----01----   W ----xxxx SRAM 1    /
+01101-----10-000   W -------x IRQ1      main CPU irq enable/acknowledge
+01101-----10-001   W -------x IRQ2      motion CPU irq enable/acknowledge
+01101-----10-010   W -------x NMION     sound CPU nmi enable
+01101-----10-011   W -------x RESET     reset sub and sound CPU, and 5xXX chips on CPU board
+01101-----10-100   W -------x n.c.
+01101-----10-101   W -------x n.c.
+01101-----10-110   W -------x n.c.
+01101-----10-111   W -------x n.c.
+01101-----11----   W -------- WDR       watchdog reset
+01101-----00-xxx R   -------x DIP SW    dip switch B
+01101-----00-xxx R   ------x- DIP SW    dip switch A
+01101-----01---- R            n.c.
+01101-----10---- R            n.c.
+01101-----11---- R            n.c.
+01110--0-------- R/W xxxxxxxx I/O       custom 06XX data
+01110--1-------- R/W xxxxxxxx I/O       custom 06XX control
+01111xxxxxxxxxxx R/W xxxxxxxx           work RAM
+1000-xxxxxxxxxxx R/W xxxxxxxx           work RAM
+1000-1111xxxxxxx R/W xxxxxxxx           portion holding sprite registers (x, y)
+1001-xxxxxxxxxxx R/W xxxxxxxx           work RAM
+1001-1111xxxxxxx R/W xxxxxxxx           portion holding sprite registers (flip, size)
+1010-xxxxxxxxxxx R/W xxxxxxxx           work RAM
+1010-1111xxxxxxx R/W xxxxxxxx           portion holding sprite registers (sprite number & color)
+10110xxxxxxxxxxx R/W xxxxxxxx PF0       fg tilemap RAM (tile attributes)
+10111xxxxxxxxxxx R/W xxxxxxxx PF1       bg tilemap RAM (tile attributes)
+11000xxxxxxxxxxx R/W xxxxxxxx PF2       fg tilemap RAM (tile code)
+11001xxxxxxxxxxx R/W xxxxxxxx PF3       bg tilemap RAM (tile code)
+1101-----000---x   W xxxxxxxx           bg X scroll (9-bit data: A0 is the msb)
+1101-----001---x   W xxxxxxxx           fg X scroll (9-bit data: A0 is the msb)
+1101-----010---x   W xxxxxxxx           bg Y scroll (9-bit data: A0 is the msb)
+1101-----011---x   W xxxxxxxx           fg Y scroll (9-bit data: A0 is the msb)
+1101-----111----   W -------x FLIP      flip screen
+1110------------              n.c.
+1111-----------0   W xxxxxxxx BS0       \ address to read from background data ROMs
+1111-----------1   W xxxxxxxx BS1       / (see xevious_bb_r)
+1111-----------0 R   xxxxxxxx BB0       \ read from background data ROMs
+1111-----------1 R   xxxxxxxx BB1       /
+
+
+Namco vs Atari ROM names and locations
+--------------------------------------
+Location  ID          Location  ID
+--------  ----        --------  ----------
+CPU 3P    XVI-1       CPU 1M    136018-118
+CPU 3M    XVI-2        "   "      "     "
+CPU 2M    XVI-3       CPU 1L    136018-119
+CPU 2L    XVI-4        "   "      "     "
+CPU 3F    XVI-5       CPU 4C    136018-120
+CPU 3J    XVI-6        "   "      "     "
+CPU 2C    XVI-7       CPU 2C    136018-127
+CPU 5N    XVI-1[bpr]  CPU 6M    136018-028
+CPU 7N    XVI-2[bpr]  CPU 8M    136018-029
+
+VID 2A    XVI-9       VID 2A    136018-101
+VID 2B    XVI-10      VID 2B    136018-102
+VID 2C    XVI-11      VID 2C    136018-103
+VID 3B    XVI-12      VID 3B    136018-104
+VID 3C    XVI-13      VID 3C    136018-105
+VID 3D    XVI-14      VID 3D    136018-106
+VID 4M    XVI-15      VID 4M    136018-107
+VID 4N    XVI-16      VID 4N    136018-108
+VID 4P    XVI-17      VID 4P    136018-109
+VID 4R    XVI-18      VID 4R    136018-110
+VID 3L    XVI-4[bpr]  VID 3L    136018-011
+VID 3M    XVI-5[bpr]  VID 3M    136018-012
+VID 4F    XVI-6[bpr]  VID 4F    136018-013
+VID 4H    XVI-7[bpr]  VID 4H    136018-014
+VID 6A    XVI-8[bpr]  VID 6A    136018-015
+VID 6D    XVI-9[bpr]  VID 6D    136018-016
+VID 6E    XVI-10[bpr] VID 6E    136018-017
+
+
+Easter eggs:
+-----------
+- Xevious:
+  - start a game
+  - go to the bottom right of the screen and keep B2 pressed
+  NAMCO ORIGINAL
+  program by EVEZOO
+  will be written at the bottom of the screen
+  In Super Xevious this is changed to
+  special thanks for you
+  by game designer EVEZOO
+
 
 TODO:
 ----
+- The Cabinet Type "DIP switch" actually comes from the edge connector, but is mapped
+  in memory in place of dip switch #8. DIP switch #8 selects single/dual coin counters
+  and is entirely handled by hardware.
+
 - Xevios: emulate the 4th Z80 (ROM dump is complete)
 
 - xevious: I haven't found any Easter egg in service mode. The main loop is very
@@ -18,7 +167,7 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "xevious.h"
+#include "galaga.h"
 
 #include "namco06.h"
 #include "namco50.h"
@@ -26,15 +175,124 @@ TODO:
 #include "namco54.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/samples.h"
 
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
 
 #define MASTER_CLOCK (XTAL(18'432'000)) // same as galaga.cpp
 
 
-static const gfx_layout bgcharlayout = // same as galaga.cpp
+class xevious_state : public galaga_state
+{
+public:
+	xevious_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaga_state(mconfig, type, tag),
+		m_xevious_sr1(*this, "xevious_sr1"),
+		m_xevious_sr2(*this, "xevious_sr2"),
+		m_xevious_sr3(*this, "xevious_sr3"),
+		m_xevious_fg_colorram(*this, "fg_colorram"),
+		m_xevious_bg_colorram(*this, "bg_colorram"),
+		m_xevious_fg_videoram(*this, "fg_videoram"),
+		m_xevious_bg_videoram(*this, "bg_videoram"),
+		m_samples(*this, "samples")
+	{ }
+
+	void xevious(machine_config &config) ATTR_COLD;
+
+	void init_xevious() ATTR_COLD;
+	void init_xevios() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+	void xevious_common(machine_config &config) ATTR_COLD;
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void xevious_palette(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void xevious_fg_videoram_w(offs_t offset, uint8_t data);
+	void xevious_fg_colorram_w(offs_t offset, uint8_t data);
+	void xevious_bg_videoram_w(offs_t offset, uint8_t data);
+	void xevious_bg_colorram_w(offs_t offset, uint8_t data);
+	void xevious_vh_latch_w(offs_t offset, uint8_t data);
+	void xevious_bs_w(offs_t offset, uint8_t data);
+	uint8_t xevious_bb_r(offs_t offset);
+
+	void common_map(address_map &map) ATTR_COLD;
+	void xevious_map(address_map &map) ATTR_COLD;
+
+	required_shared_ptr<uint8_t> m_xevious_sr1;
+	required_shared_ptr<uint8_t> m_xevious_sr2;
+	required_shared_ptr<uint8_t> m_xevious_sr3;
+	required_shared_ptr<uint8_t> m_xevious_fg_colorram;
+	required_shared_ptr<uint8_t> m_xevious_bg_colorram;
+	required_shared_ptr<uint8_t> m_xevious_fg_videoram;
+	required_shared_ptr<uint8_t> m_xevious_bg_videoram;
+	optional_device<samples_device> m_samples;
+
+	int32_t m_xevious_bs[2];
+};
+
+class battles_state : public xevious_state
+{
+public:
+	battles_state(const machine_config &mconfig, device_type type, const char *tag) :
+		xevious_state(mconfig, type, tag),
+		m_subcpu3(*this, "sub3"),
+		m_nmi_timer(*this, "nmi"),
+		m_io_in(*this, "IN%u", 0U)
+	{
+	}
+
+	void battles(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void interrupt_4(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_generate);
+
+	void battles_map(address_map &map) ATTR_COLD;
+	void battles_mem4(address_map &map) ATTR_COLD;
+
+	// Custom I/O
+	uint8_t customio0_r();
+	uint8_t customio_data0_r(offs_t offset);
+	uint8_t customio3_r();
+	uint8_t customio_data3_r(offs_t offset);
+	uint8_t input_port_r(offs_t offset);
+
+	void customio0_w(uint8_t data);
+	void customio_data0_w(offs_t offset, uint8_t data);
+	void customio3_w(uint8_t data);
+	void customio_data3_w(offs_t offset, uint8_t data);
+	void cpu4_coin_w(uint8_t data);
+	void noise_sound_w(offs_t offset, uint8_t data);
+
+	required_device<cpu_device> m_subcpu3;
+	required_device<timer_device> m_nmi_timer;
+	required_ioport_array<2> m_io_in;
+
+	uint8_t m_customio[16]{};
+	char m_customio_command = 0;
+	char m_customio_prev_command = 0;
+	char m_customio_command_count = 0;
+	char m_customio_data = 0;
+	char m_sound_played = 0;
+};
+
+
+static const gfx_layout bgcharlayout =
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -76,30 +334,37 @@ static const char *const battles_sample_names[] =
 };
 
 
-void xevious_state::xevious_map(address_map &map)
+void xevious_state::common_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().nopw();         /* the only area different for each CPU */
 	map(0x6800, 0x6807).r(FUNC(xevious_state::bosco_dsw_r));
 	map(0x6800, 0x681f).w(m_namco_sound, FUNC(namco_wsg_device::pacman_sound_w));
 	map(0x6820, 0x6827).w("misclatch", FUNC(ls259_device::write_d0));
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
-	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+	// either the Namco custom or the bootleg's replacement go here
 	map(0x7800, 0x7fff).ram().share("share1");                          /* work RAM */
-	map(0x8000, 0x87ff).ram().share("xevious_sr1"); /* work RAM + sprite registers */
-	map(0x9000, 0x97ff).ram().share("xevious_sr2"); /* work RAM + sprite registers */
-	map(0xa000, 0xa7ff).ram().share("xevious_sr3"); /* work RAM + sprite registers */
-	map(0xb000, 0xb7ff).ram().w(FUNC(xevious_state::xevious_fg_colorram_w)).share("fg_colorram");
-	map(0xb800, 0xbfff).ram().w(FUNC(xevious_state::xevious_bg_colorram_w)).share("bg_colorram");
-	map(0xc000, 0xc7ff).ram().w(FUNC(xevious_state::xevious_fg_videoram_w)).share("fg_videoram");
-	map(0xc800, 0xcfff).ram().w(FUNC(xevious_state::xevious_bg_videoram_w)).share("bg_videoram");
+	map(0x8000, 0x87ff).ram().share(m_xevious_sr1); /* work RAM + sprite registers */
+	map(0x9000, 0x97ff).ram().share(m_xevious_sr2); /* work RAM + sprite registers */
+	map(0xa000, 0xa7ff).ram().share(m_xevious_sr3); /* work RAM + sprite registers */
+	map(0xb000, 0xb7ff).ram().w(FUNC(xevious_state::xevious_fg_colorram_w)).share(m_xevious_fg_colorram);
+	map(0xb800, 0xbfff).ram().w(FUNC(xevious_state::xevious_bg_colorram_w)).share(m_xevious_bg_colorram);
+	map(0xc000, 0xc7ff).ram().w(FUNC(xevious_state::xevious_fg_videoram_w)).share(m_xevious_fg_videoram);
+	map(0xc800, 0xcfff).ram().w(FUNC(xevious_state::xevious_bg_videoram_w)).share(m_xevious_bg_videoram);
 	map(0xd000, 0xd07f).w(FUNC(xevious_state::xevious_vh_latch_w));
 	map(0xf000, 0xffff).rw(FUNC(xevious_state::xevious_bb_r), FUNC(xevious_state::xevious_bs_w));
 }
 
+void xevious_state::xevious_map(address_map &map)
+{
+	common_map(map);
+
+	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
+	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
+}
+
 void battles_state::battles_map(address_map &map)
 {
-	xevious_map(map);
+	common_map(map);
 
 	// replace the Namco I/O handlers with interface to the 4th CPU
 	map(0x7000, 0x700f).rw(FUNC(battles_state::customio_data0_r), FUNC(battles_state::customio_data0_w));
@@ -109,6 +374,7 @@ void battles_state::battles_map(address_map &map)
 void battles_state::battles_mem4(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
+
 	map(0x4000, 0x4003).r(FUNC(battles_state::input_port_r));
 	map(0x4001, 0x4001).w(FUNC(battles_state::cpu4_coin_w));
 	map(0x5000, 0x5000).w(FUNC(battles_state::noise_sound_w));
@@ -118,7 +384,7 @@ void battles_state::battles_mem4(address_map &map)
 }
 
 
-void xevious_state::xevious(machine_config &config)
+void xevious_state::xevious_common(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK/6);  /* 3.072 MHz */
@@ -131,11 +397,39 @@ void xevious_state::xevious(machine_config &config)
 	m_subcpu2->set_addrmap(AS_PROGRAM, &xevious_state::xevious_map);
 
 	ls259_device &misclatch(LS259(config, "misclatch")); // 5K
-	misclatch.q_out_cb<0>().set(FUNC(galaga_state::irq1_clear_w));
-	misclatch.q_out_cb<1>().set(FUNC(galaga_state::irq2_clear_w));
-	misclatch.q_out_cb<2>().set(FUNC(galaga_state::nmion_w));
+	misclatch.q_out_cb<0>().set(FUNC(xevious_state::irq1_clear_w));
+	misclatch.q_out_cb<1>().set(FUNC(xevious_state::irq2_clear_w));
+	misclatch.q_out_cb<2>().set(FUNC(xevious_state::nmion_w));
 	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	/* video hardware */
+	SCREEN(config, m_screen);
+	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
+	m_screen->set_screen_update(FUNC(xevious_state::screen_update_xevious));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(xevious_state::vblank_irq));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xevious);
+	PALETTE(config, m_palette, FUNC(xevious_state::xevious_palette), 128*4 + 64*8 + 64*2, 128+1);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
+	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
+}
+
+void xevious_state::xevious(machine_config &config)
+{
+	xevious_common(config);
+
+	/* basic machine hardware */
+	auto &misclatch = downcast<ls259_device &>(*config.device("misclatch"));
 	misclatch.q_out_cb<3>().append("50xx", FUNC(namco_50xx_device::reset));
 	misclatch.q_out_cb<3>().append("51xx", FUNC(namco_51xx_device::reset));
 	misclatch.q_out_cb<3>().append("54xx", FUNC(namco_54xx_device::reset));
@@ -147,8 +441,8 @@ void xevious_state::xevious(machine_config &config)
 	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
 	n51xx.input_callback<2>().set_ioport("IN1").mask(0x0f);
 	n51xx.input_callback<3>().set_ioport("IN1").rshift(4);
-	n51xx.output_callback().set(FUNC(galaga_state::out));
-	n51xx.lockout_callback().set(FUNC(galaga_state::lockout));
+	n51xx.output_callback().set(FUNC(xevious_state::out));
+	n51xx.lockout_callback().set(FUNC(xevious_state::lockout));
 
 	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n54xx.set_discrete("discrete");
@@ -167,26 +461,7 @@ void xevious_state::xevious(machine_config &config)
 	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 	n06xx.chip_select_callback<3>().set("54xx", FUNC(namco_54xx_device::chip_select));
 
-	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
-
-	config.set_maximum_quantum(attotime::from_hz(6000));
-
-	/* video hardware */
-	SCREEN(config, m_screen);
-	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224);
-	m_screen->set_screen_update(FUNC(xevious_state::screen_update_xevious));
-	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(FUNC(galaga_state::vblank_irq));
 	m_screen->screen_vblank().append("51xx", FUNC(namco_51xx_device::vblank));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xevious);
-	PALETTE(config, m_palette, FUNC(xevious_state::xevious_palette), 128*4 + 64*8 + 64*2, 128+1);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	NAMCO_WSG(config, m_namco_sound, MASTER_CLOCK/6/32);
-	m_namco_sound->add_route(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0);
 
 	/* discrete circuit on the 54XX outputs */
 	DISCRETE(config, "discrete", galaga_discrete).add_route(ALL_OUTPUTS, "mono", 0.90);
@@ -194,24 +469,12 @@ void xevious_state::xevious(machine_config &config)
 
 void battles_state::battles(machine_config &config)
 {
-	xevious(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &battles_state::battles_map);
+	xevious_common(config);
 
 	/* basic machine hardware */
-	config.device_remove("50xx");
-	config.device_remove("54xx");
-	config.device_remove("06xx");
-	ls259_device* misclatch = reinterpret_cast<ls259_device*>(config.device("misclatch"));
-	// xevious has the custom chips on this line, so just set the resets this board has
-	misclatch->q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
-	misclatch->q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
-
-	/* FIXME: bootlegs should not have any Namco custom chip. However, this workaround is needed atm */
-	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/6/64));
-	n06xx.set_maincpu(m_maincpu);
-	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
-	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
+	m_maincpu->set_addrmap(AS_PROGRAM, &battles_state::battles_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &battles_state::common_map);
+	m_subcpu2->set_addrmap(AS_PROGRAM, &battles_state::common_map);
 
 	Z80(config, m_subcpu3, MASTER_CLOCK/6);   /* 3.072 MHz */
 	m_subcpu3->set_addrmap(AS_PROGRAM, &battles_state::battles_mem4);
@@ -221,12 +484,174 @@ void battles_state::battles(machine_config &config)
 	TIMER(config, "nmi").configure_generic(FUNC(battles_state::nmi_generate));
 
 	/* sound hardware */
-	config.device_remove("discrete");
-
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
 	m_samples->set_samples_names(battles_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
+
+
+/***************************************************************************
+
+ BATTLES CPU4 (custum I/O Emulation) I/O Handlers
+
+***************************************************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(battles_state::nmi_generate)
+{
+	m_customio_prev_command = m_customio_command;
+
+	if (m_customio_command & 0x10)
+	{
+		if (m_customio_command_count == 0)
+		{
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		}
+		else
+		{
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		}
+	}
+	else
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+	m_customio_command_count++;
+}
+
+
+uint8_t battles_state::customio0_r()
+{
+	if (!machine().side_effects_disabled())
+		logerror("%s: custom I/O Read = %02x\n", machine().describe_context(), m_customio_command);
+
+	return m_customio_command;
+}
+
+uint8_t battles_state::customio3_r()
+{
+	uint8_t return_data;
+
+	if (m_subcpu3->pc() == 0xae)
+	{
+		/* CPU4 0xAA - 0xB9 : waiting for MB8851 ? */
+		return_data =   ( (m_customio_command & 0x10) << 3)
+						| 0x00
+						| (m_customio_command & 0x0f);
+	}
+	else
+	{
+		return_data =   ( (m_customio_prev_command & 0x10) << 3)
+						| 0x60
+						| (m_customio_prev_command & 0x0f);
+	}
+	logerror("%s: custom I/O Read = %02x\n", machine().describe_context(), return_data);
+
+	return return_data;
+}
+
+
+void battles_state::customio0_w(uint8_t data)
+{
+	logerror("%s: custom I/O Write = %02x\n", machine().describe_context(), data);
+
+	m_customio_command = data;
+	m_customio_command_count = 0;
+
+	switch (data)
+	{
+		case 0x10:
+			m_nmi_timer->reset();
+			return; /* nop */
+	}
+	m_nmi_timer->adjust(attotime::from_usec(166), 0, attotime::from_usec(166));
+}
+
+void battles_state::customio3_w(uint8_t data)
+{
+	logerror("%s: custom I/O Write = %02x\n", machine().describe_context(), data);
+
+	m_customio_command = data;
+}
+
+
+
+uint8_t battles_state::customio_data0_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_customio_data);
+
+	return m_customio_data;
+}
+
+uint8_t battles_state::customio_data3_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_customio_data);
+
+	return m_customio_data;
+}
+
+
+void battles_state::customio_data0_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
+
+	m_customio_data = data;
+}
+
+void battles_state::customio_data3_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
+
+	m_customio_data = data;
+}
+
+
+void battles_state::cpu4_coin_w(uint8_t data)
+{
+	m_leds[0] = BIT(data, 1); // Start 1
+	m_leds[1] = BIT(data, 0); // Start 2
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
+	machine().bookkeeping().coin_lockout_global_w(BIT(~data, 2));
+}
+
+
+void battles_state::noise_sound_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: 50%02x Write = %02x\n", machine().describe_context(), offset, data);
+	if ((m_sound_played == 0) && (data == 0xff))
+	{
+		if (m_customio[0] == 0x40)
+			m_samples->start(0, 0);
+		else
+			m_samples->start(0, 1);
+	}
+	m_sound_played = data;
+}
+
+
+uint8_t battles_state::input_port_r(offs_t offset)
+{
+	switch (offset)
+	{
+		default:
+		case 0: return ~bitswap<4>(m_io_in[1]->read(), 6, 7, 5, 4);
+		case 1: return ~m_io_in[0]->read() & 0x0f;
+		case 2: return ~m_io_in[0]->read() >> 4;
+		case 3: return ~m_io_in[1]->read() & 0x0f;
+	}
+}
+
+
+void battles_state::interrupt_4(int state)
+{
+	if (state)
+		m_subcpu3->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -408,31 +833,30 @@ void xevious_state::xevious_bg_colorram_w(offs_t offset, uint8_t data)
 
 void xevious_state::xevious_vh_latch_w(offs_t offset, uint8_t data)
 {
-	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
 
-	reg = (offset&0xf0)>>4;
+	int reg = (offset >> 4) & 0x0f;
 
 	switch (reg)
 	{
 	case 0:
-		m_bg_tilemap->set_scrollx(0,scroll);
+		m_bg_tilemap->set_scrollx(0, scroll);
 		break;
 	case 1:
-		m_fg_tilemap->set_scrollx(0,scroll);
+		m_fg_tilemap->set_scrollx(0, scroll);
 		break;
 	case 2:
-		m_bg_tilemap->set_scrolly(0,scroll);
+		m_bg_tilemap->set_scrolly(0, scroll);
 		break;
 	case 3:
-		m_fg_tilemap->set_scrolly(0,scroll);
+		m_fg_tilemap->set_scrolly(0, scroll);
 		break;
 	case 7:
 		flip_screen_set(scroll & 1);
 		break;
 	default:
-			logerror("CRTC WRITE REG: %x  Data: %03x\n",reg, scroll);
-			break;
+		logerror("CRTC WRITE REG: %x  Data: %03x\n",reg, scroll);
+		break;
 	}
 }
 
@@ -543,18 +967,15 @@ ROM 3M,3L color replace table for sprite
 
 void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_xevious_sr3 + 0x780;
-	uint8_t *spriteram_2 = m_xevious_sr1 + 0x780;
-	uint8_t *spriteram_3 = m_xevious_sr2 + 0x780;
-	int offs,sx,sy;
+	uint8_t const *const spriteram = m_xevious_sr3 + 0x780;
+	uint8_t const *const spriteram_2 = m_xevious_sr1 + 0x780;
+	uint8_t const *const spriteram_3 = m_xevious_sr2 + 0x780;
 
-	for (offs = 0;offs < 0x80;offs += 2)
+	for (int offs = 0;offs < 0x80;offs += 2)
 	{
 		if ((spriteram[offs + 1] & 0x40) == 0)  /* I'm not sure about this one */
 		{
-			int bank,code,color,flipx,flipy;
-			uint32_t transmask;
-
+			int bank, code;
 			if (spriteram_3[offs] & 0x80)
 			{
 				bank = 2;
@@ -566,12 +987,12 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				code = spriteram[offs];
 			}
 
-			color = spriteram[offs + 1] & 0x7f;
-			flipx = spriteram_3[offs] & 4;
-			flipy = spriteram_3[offs] & 8;
+			int color = spriteram[offs + 1] & 0x7f;
+			int flipx = spriteram_3[offs] & 4;
+			int flipy = spriteram_3[offs] & 8;
 
-			sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 1);
-			sy = 28*8-spriteram_2[offs]-1;
+			int sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 1);
+			int sy = 28*8-spriteram_2[offs]-1;
 
 			if (flip_screen())
 			{
@@ -579,7 +1000,7 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 				flipy = !flipy;
 			}
 
-			transmask = m_palette->transpen_mask(*m_gfxdecode->gfx(bank), color, 0x80);
+			uint32_t transmask = m_palette->transpen_mask(*m_gfxdecode->gfx(bank), color, 0x80);
 
 			if (spriteram_3[offs] & 2)  /* double height (?) */
 			{
@@ -629,6 +1050,18 @@ uint32_t xevious_state::screen_update_xevious(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
+
+void battles_state::machine_start()
+{
+	xevious_state::machine_start();
+
+	save_item(NAME(m_customio));
+	save_item(NAME(m_customio_command));
+	save_item(NAME(m_customio_prev_command));
+	save_item(NAME(m_customio_command_count));
+	save_item(NAME(m_customio_data));
+	save_item(NAME(m_sound_played));
+}
 
 void battles_state::machine_reset()
 {
@@ -1319,6 +1752,8 @@ ROM_START( sxeviousj )
 	ROM_LOAD( "xvi-2.7n",     0x0000, 0x0100, CRC(550f06bc) SHA1(816a0fafa0b084ac11ae1af70a5186539376fc2a) )
 	ROM_LOAD( "xvi-1.5n",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
 ROM_END
+
+} // anonymous namespace
 
 
 /* Original Namco hardware, with Namco Customs */

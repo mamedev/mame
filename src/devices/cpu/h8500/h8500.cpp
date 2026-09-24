@@ -109,7 +109,7 @@ void h8500_device::device_start()
 
 	// General registers
 	for (int n = 0; n < 6; n++) {
-		state_add(H8500_R0 + n, string_format("R%d", n).c_str(), m_r[n]);
+		state_add(H8500_R0 + n, string_format("R%d", n), m_r[n]);
 	}
 	state_add(H8500_FP, "FP", m_r[6]);
 	state_add(H8500_SP, "SP", m_r[7]);

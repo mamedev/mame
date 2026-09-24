@@ -46,9 +46,9 @@ void we32100_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_r[15]).noshow();
 	state_add(STATE_GENFLAGS, "CURFLAGS", m_r[11]).noshow().formatstr("%23s");
 	for (int i = 0; i < 9; i++)
-		state_add(WE_R0 + i, string_format("r%d", i).c_str(), m_r[i]);
+		state_add(WE_R0 + i, string_format("r%d", i), m_r[i]);
 	for (int i = 9; i < 15; i++)
-		state_add(WE_R0 + i, string_format("r%d", i).c_str(), m_r[i]).noshow();
+		state_add(WE_R0 + i, string_format("r%d", i), m_r[i]).noshow();
 	state_add(WE_FP, "FP", m_r[9]);
 	state_add(WE_AP, "AP", m_r[10]);
 	state_add(WE_PSW, "PSW", m_r[11]);

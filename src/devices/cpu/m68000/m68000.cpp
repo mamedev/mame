@@ -346,9 +346,9 @@ void m68000_device::device_start()
 	state_add(STATE_GENFLAGS,  "GENFLAGS", m_sr).noshow().callexport().formatstr("%16s");
 	state_add(M68K_SR,         "SR",  m_sr).callimport();
 	for(int r = 0; r != 8; r++)
-		state_add(M68K_D0 + r, string_format("D%d", r).c_str(), m_da[r]);
+		state_add(M68K_D0 + r, string_format("D%d", r), m_da[r]);
 	for(int r = 0; r != 7; r++)
-		state_add(M68K_A0 + r, string_format("A%d", r).c_str(), m_da[r+8]);
+		state_add(M68K_A0 + r, string_format("A%d", r), m_da[r+8]);
 	state_add(M68K_USP, "USP", m_da[15]);
 	state_add(M68K_SP,  "SP", m_da[16]);
 

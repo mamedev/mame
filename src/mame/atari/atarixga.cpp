@@ -263,6 +263,7 @@ DEFINE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device, "136095_0072", "
 atari_136095_0072_device::atari_136095_0072_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: atari_xga_device(mconfig, ATARI_136095_0072, tag, owner, clock)
 	, m_mode(FPGA_SETKEY)
+	, m_poly_high(0xc100)
 	, m_poly_lsb(0)
 	, m_reply(0)
 {
@@ -477,6 +478,10 @@ static constexpr offs_t TM_RESULT   = 0x387c0;
 
 atari_tmek_xga_device::atari_tmek_xga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_gt_xga_device(mconfig, ATARI_TMEK_XGA, tag, owner, clock)
+	, m_mode(FPGA_IDLE)
+	, m_select_pending(false)
+	, m_taps(0xc100)
+	, m_reply(0xffff)
 {
 }
 

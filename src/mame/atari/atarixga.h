@@ -81,7 +81,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	static const size_t RAM_WORDS = 4096;
+	static constexpr size_t RAM_WORDS = 4096;
 
 	enum fpga_mode : uint8_t
 	{
@@ -103,7 +103,7 @@ private:
 	} m_update;
 
 	fpga_mode m_mode;
-	uint16_t m_poly_high = 0xc100;
+	uint16_t m_poly_high;
 	uint8_t m_poly_lsb;
 	uint16_t m_reply;
 };
@@ -150,10 +150,10 @@ private:
 		FPGA_DECIPHER
 	};
 
-	fpga_mode m_mode = FPGA_IDLE;
-	bool m_select_pending = false;
-	uint16_t m_taps = 0xc100;
-	uint16_t m_reply = 0xffff;
+	fpga_mode m_mode;
+	bool m_select_pending;
+	uint16_t m_taps;
+	uint16_t m_reply;
 };
 
 
@@ -172,7 +172,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	static const size_t RAM_WORDS = 2048;
+	static constexpr size_t RAM_WORDS = 2048;
 
 	enum fpga_mode : uint8_t
 	{

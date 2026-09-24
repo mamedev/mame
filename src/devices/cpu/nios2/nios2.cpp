@@ -60,7 +60,7 @@ void nios2_device::device_start()
 	state_add<u32>(NIOS2_ZERO, "zero", []() { return 0; }).noshow();
 	state_add(NIOS2_AT, "at", m_gpr[1]);
 	for (int i = 2; i < 24; i++)
-		state_add(NIOS2_R2 + i - 2, util::string_format("r%d", i).c_str(), m_gpr[i]);
+		state_add(NIOS2_R2 + i - 2, util::string_format("r%d", i), m_gpr[i]);
 	state_add(NIOS2_ET, "et", m_gpr[24]);
 	state_add(NIOS2_BT, "bt", m_gpr[25]);
 	state_add(NIOS2_GP, "gp", m_gpr[26]);

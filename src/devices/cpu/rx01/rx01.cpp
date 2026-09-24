@@ -93,7 +93,7 @@ void rx01_cpu_device::device_start()
 	state_add(RX01_SR, "SR", m_sr).formatstr("%03O");
 	state_add(RX01_SPAR, "SPAR", m_spar).mask(15).formatstr("%3s");
 	for (int r = 0; r < 16; r++)
-		state_add(RX01_R0 + r, string_format("R%d", r).c_str(), m_sp[r]).formatstr("%03O");
+		state_add(RX01_R0 + r, string_format("R%d", r), m_sp[r]).formatstr("%03O");
 	state_add(RX01_BAR, "BAR", m_bar).mask(07777).formatstr("%04O");
 	state_add(RX01_CRC, "CRC", m_crc).formatstr("%06O");
 	state_add(RX01_UNIT, "UNIT", m_unit);

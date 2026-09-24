@@ -40,6 +40,18 @@ public:
 		, m_sub2_nmi_mask(0)
 	{ }
 
+	void galaga(machine_config &config) ATTR_COLD;
+	void gatsbee(machine_config &config) ATTR_COLD;
+	void galagab(machine_config &config) ATTR_COLD;
+
+	void init_galaga() ATTR_COLD;
+	void init_gatsbee() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 	uint8_t bosco_dsw_r(offs_t offset);
 	void irq1_clear_w(int state);
 	void irq2_clear_w(int state);
@@ -50,8 +62,6 @@ public:
 	void lockout(int state);
 	uint8_t namco_52xx_rom_r(offs_t offset);
 	uint8_t namco_52xx_si_r();
-	void init_galaga();
-	void init_gatsbee();
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void galaga_palette(palette_device &palette) const;
@@ -62,18 +72,10 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	uint16_t get_next_lfsr_state(uint16_t lfsr);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void galaga(machine_config &config);
-	void gatsbee(machine_config &config);
-	void galagab(machine_config &config);
-	void dzigzag_mem4(address_map &map) ATTR_COLD;
+
 	void galaga_map(address_map &map) ATTR_COLD;
 	void galaga_mem4(address_map &map) ATTR_COLD;
 	void gatsbee_main_map(address_map &map) ATTR_COLD;
-
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	/* memory pointers, devices */
 	optional_shared_ptr<uint8_t> m_videoram;
@@ -102,6 +104,8 @@ protected:
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_nmi_mask;
 };
+
+extern const gfx_layout spritelayout_galaga;
 
 DISCRETE_SOUND_EXTERN( galaga_discrete );
 DISCRETE_SOUND_EXTERN( bosco_discrete );
