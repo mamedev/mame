@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -13,7 +13,20 @@ license:CC0-1.0
 		<!-- Seagate ST225 -->
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="minichief" sha1="c5146009a240841f816e65c218e8d43b68931c28" writeable="yes" />
+				<disk name="minichief" sha1="3ed8b78f3dc4e52766ef4cbfa43925b926d37834" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cmdhd20">
+		<description>CMD HD-20</description>
+		<year>1990</year>
+		<publisher>Creative Micro Designs</publisher>
+
+		<!-- Seagate ST-125N -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="cmdhd20" sha1="ab1e36af7640eb0fce5c85200a21ffee7e0f12aa" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>

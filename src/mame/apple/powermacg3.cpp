@@ -357,4 +357,4 @@ static INPUT_PORTS_START(pwrmacg3)
 	PORT_CONFSETTING(ext6(2, 0, 3), u8"Multiple Scan 21\"")
 INPUT_PORTS_END
 
-COMP(1997, pwrmacg3, 0, 0, pwrmacg3, pwrmacg3, pwrmacg3_state, empty_init, "Apple Computer", "Power Macintosh G3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1997, pwrmacg3, 0, 0, pwrmacg3, pwrmacg3, pwrmacg3_state, empty_init, "Apple Computer", "Power Macintosh G3", MACHINE_NOT_WORKING )

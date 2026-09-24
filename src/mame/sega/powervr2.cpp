@@ -2496,7 +2496,7 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	float dy;
 	int yy0, yy1;
 
-	// demofist, chocomk (hardlocks with -drc, MT#8088)
+	// demofist, chocomk (hardlocks with -drc, MT08088)
 	// TODO: should throw an error?
 	if (std::isnan(y0) || std::isnan(y1))
 		return;

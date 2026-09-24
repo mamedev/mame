@@ -63,6 +63,7 @@ kn5000_cpanel_device::kn5000_cpanel_device(const machine_config &mconfig, const 
 	m_inta_cb(*this),
 	m_cpl_ports(*this, finder_base::DUMMY_TAG, 0U),
 	m_cpr_ports(*this, finder_base::DUMMY_TAG, 0U),
+	m_encoder_accum(0),
 	m_cpl_leds(*this, "cpl_led_%u", 0U),
 	m_cpr_leds(*this, "cpr_led_%u", 0U)
 {
@@ -100,6 +101,7 @@ void kn5000_cpanel_device::device_start()
 	save_item(NAME(m_self_clock_bytes_sent));
 	save_item(NAME(m_last_button_state));
 	save_item(NAME(m_pending_button_state));
+	save_item(NAME(m_encoder_accum));
 
 	// Initial state - line idle high
 	m_txd_cb(1);
@@ -547,6 +549,25 @@ uint8_t kn5000_cpanel_device::read_button_segment(int segment, bool is_left_pane
 	return (is_left_panel ? m_cpl_ports : m_cpr_ports)[segment].read_safe(0) & 0xff;
 }
 
+void kn5000_cpanel_device::encoder_detent(int delta)
+{
+	// the panel MCU counts detents between reports, so the next scan reports the total
+	m_encoder_accum += delta;
+}
+
+void kn5000_cpanel_device::send_encoder_packet(int8_t detents)
+{
+	// SW101 (ENCODER SWITCH) is on the CPL board, wired to the left panel MCU's ROTA/ROTB pins.
+	// Header 0xD7 = 0xC0 (left panel) | 0x17 (encoder sub-address); the firmware maps it to
+	// record index ((header & 0xc0) >> 1) | (header & 0x1f) = 0x19.  Then a signed count of
+	// detents since the last report.  send_button_packet() cannot carry this: it masks the
+	// sub-address to four bits.
+	send_byte(0xd7);
+	send_byte(uint8_t(detents));
+
+	LOGMASKED(LOG_BUTTONS, "Encoder packet: %d detent(s)\n", detents);
+}
+
 void kn5000_cpanel_device::send_button_packet(int segment, bool is_left_panel)
 {
 	// Button packet header: bits 7:6 = panel (00=right, 11=left),
@@ -894,6 +915,21 @@ TIMER_CALLBACK_MEMBER(kn5000_cpanel_device::button_scan_callback)
 		{
 			m_pending_button_state[idx] = state;
 		}
+	}
+
+	// Report any data-wheel movement accumulated since the last scan.  The count is negated
+	// because the firmware's acceleration curve is monotonically decreasing, and clamped to
+	// -16..+15 because the curve index is sext8(count + 0x10) into a 32-entry table, unchecked.
+	if (m_encoder_accum != 0)
+	{
+		int32_t count = -m_encoder_accum;
+		if (count > 15)
+			count = 15;
+		else if (count < -16)
+			count = -16;
+		m_encoder_accum = 0;
+		send_encoder_packet(int8_t(count));
+		changed = true;
 	}
 
 	if (changed)

@@ -545,7 +545,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	{
 		m_t1_pb7 = 1;
 		m_t1_active = 0;
-		m_time1 = machine().time();
+		m_time1 = machine().time() - clocks_to_attotime(IFR_DELAY - 1);
 	}
 
 	if (T1_SET_PB7(m_acr))
@@ -560,7 +560,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 TIMER_CALLBACK_MEMBER(via6522_device::t2_tick)
 {
 	m_t2_active = 0;
-	m_time2 = machine().time();
+	m_time2 = machine().time() - clocks_to_attotime(IFR_DELAY - 1);
 
 	LOGINT("T2 INT request ");
 	set_int(INT_T2);
@@ -736,7 +736,10 @@ u8 via6522_device::read(offs_t offset)
 		}
 		if (m_t2_active && m_t2->enabled())
 		{
-			val = attotime_to_clocks(m_t2->remaining()) & 0xff;
+			// Do not wrap before t2_tick sets IFR.  Mac OS reads T2CH, then IFR,
+			// and skips T2CL if the high byte is zero.  An early wrap makes it
+			// read T2CL and clear a newly arrived interrupt without servicing it.
+			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) & 0xff;
 		}
 		else
 		{
@@ -754,7 +757,8 @@ u8 via6522_device::read(offs_t offset)
 	case VIA_T2CH:
 		if (m_t2_active && m_t2->enabled())
 		{
-			val = attotime_to_clocks(m_t2->remaining()) >> 8;
+			// Hold at zero through the delayed IFR window, as for T2CL.
+			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) >> 8;
 		}
 		else
 		{

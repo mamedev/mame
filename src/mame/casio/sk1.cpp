@@ -39,8 +39,8 @@ public:
 	{
 	}
 
-	void sk1(machine_config &config);
-	void sk5(machine_config &config);
+	void sk1(machine_config &config) ATTR_COLD;
+	void sk5(machine_config &config) ATTR_COLD;
 
 	// make slide switches usable on a keyboard
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_function);
@@ -52,7 +52,7 @@ public:
 private:
 	void sk1_memory(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 	ioport_value    m_sw_function = 0xfe;
 	ioport_value    m_sw_mode = 0xfe;
@@ -79,7 +79,7 @@ template <ioport_value V> INPUT_CHANGED_MEMBER(sk1_state::sw_mode)
 }
 
 
-void sk1_state::driver_start()
+void sk1_state::machine_start()
 {
 	save_item(NAME(m_sw_function));
 	save_item(NAME(m_sw_mode));
@@ -245,8 +245,8 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS
-SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sk5,  0,      0,      sk5,     sk1,   sk1_state, empty_init, "Casio", "SK-5",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-SYST( 1987, sk10, 0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-10",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-SYST( 1988, sk2,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-2",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                    FLAGS
+SYST( 1985, sk1,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-1 Sampling Keyboard",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sk5,  0,      0,      sk5,     sk1,   sk1_state, empty_init, "Casio", "SK-5 Sampling Keyboard",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1987, sk10, 0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-10 Sampling Keyboard",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sk2,  0,      0,      sk1,     sk1,   sk1_state, empty_init, "Casio", "SK-2 Sampling Keyboard",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

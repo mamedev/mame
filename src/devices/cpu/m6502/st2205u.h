@@ -16,6 +16,13 @@
 class st2205u_base_device : public st2xxx_device, public device_sound_interface
 {
 public:
+	enum : unsigned
+	{
+		PSG_OUTPUT_PWM,
+		PSG_OUTPUT_CURRENT_DAC,
+		PSG_OUTPUT_COUNT
+	};
+
 	enum {
 		ST_BTC = ST_BDIV + 1,
 		ST_T0C,
@@ -73,9 +80,6 @@ protected:
 	virtual bool st2xxx_has_dma() const override { return true; }
 
 	void base_init(std::unique_ptr<mi_st2xxx> &&intf);
-
-	void push_adpcm_value(int channel, u16 psg_data);
-	void reset_adpcm_value(int channel);
 
 	u8 btc_r();
 	void btc_w(u8 data);
@@ -169,7 +173,7 @@ protected:
 
 	s16 m_adpcm_level[4];
 	u8 m_psg_amplitude[4];
-	u32 m_psg_freqcntr[4];
+	s16 m_psg_output[4];
 };
 
 class st2205u_device : public st2205u_base_device

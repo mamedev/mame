@@ -3,14 +3,14 @@
 /*
 
 Dinamic / Inder arcade hardware
-- Mega Phoenix
+- After The War
 - Hammer Boy
+- Mega Phoenix
 - YoYo Spell
 
-also known to exist on this hardware:
+Also known to exist on this hardware:
 - Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete)
   (versions exist for Amstrad CPC, MSX and Spectrum)
-- After The War
 
 trivia: Test mode graphics are the same as Little Robin(?!), TMS is very similar too,
 suggesting they share a common codebase.
@@ -18,7 +18,7 @@ suggesting they share a common codebase.
 
 PIC16C54 info:
 - The PIC has 5 functions:
-  * Read dip switches (serially connected) [cmd 0x82 0x86]
+  * Read DIP switches (serially connected) [cmd 0x82 0x86]
   * Read the two start buttons [returned with all commands]
   * Provide 4 security codes. For the dumped PIC those are:
     0x4a 0x6f 0x61 0x6e (Joan). Not used by Mega Phoenix. [cmd 0x8a 0x8e 0x92 0x96]
@@ -34,10 +34,11 @@ PIC16C54 info:
 
 
 TODO:
-- how does sound banking work? when the irq callbacks happen for each irq level? currently no way
-  to access this because it's a daisy chain setup with the ctc?
-- even if i hack that the title screen speech doesn't work properly - is there a timing register like little robin?
+- how does sound banking work? when the IRQ callbacks happen for each IRQ level? currently no way
+  to access this because it's a daisy chain setup with the CTC?
+- even if I hack that the title screen speech doesn't work properly - is there a timing register like Little Robin?
 - Verify when m_ppi_to_pic_command is set and cleared. It's currently guessed but seems to work fine this way.
+- After The War DIP switches are wrong.
 
 ----------------------------------------
 
@@ -53,7 +54,7 @@ Main board:
 
   Actel A1010A-PL68C  (custom blitter maybe?)
 
-  2x 8 DSW, bottom corner, away from everything..
+  2x 8 DIP switches, bottom corner, away from everything..
 
 Sub / Sound board:
 
@@ -165,13 +166,13 @@ Sub / Sound board:
 
 #include "emu.h"
 
+#include "inder_sb.h"
+#include "inder_vid.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/74166.h"
 #include "machine/i8255.h"
-
-#include "inder_sb.h"
-#include "inder_vid.h"
 
 namespace {
 
@@ -190,8 +191,8 @@ public:
 		m_start(*this, "START")
 	{ }
 
-	void megaphx(machine_config &config);
-	void hamboy(machine_config &config);
+	void megaphx(machine_config &config) ATTR_COLD;
+	void hamboy(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -219,6 +220,7 @@ private:
 
 	void install_bootrom(bool enable);
 	TIMER_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+
 	emu_timer *m_disable_bootrom = nullptr;
 
 	int m_dsw_data = 0;
@@ -404,7 +406,7 @@ INPUT_PORTS_END
 
 
 
-// pic port a
+// PIC port a
 //
 // 3---  r   serial clock
 // -2--   w  serial clock
@@ -415,7 +417,7 @@ uint8_t megaphx_state::pic_porta_r()
 {
 	uint8_t data = 0;
 
-	// clear when the pic starts reading the command
+	// clear when the PIC starts reading the command
 	m_ppi_to_pic_command = 0;
 
 	data |= m_ppi_to_pic_data << 0;
@@ -430,16 +432,16 @@ void megaphx_state::pic_porta_w(uint8_t data)
 	m_pic_to_ppi_clock = BIT(data, 2);
 }
 
-// pic port b
+// PIC port b
 //
 // 7-------   w  not used
 // -6------   w  watchdog (not enabled by megaphx)
 // --5-----  r   start2
 // ---4----  r   start1
-// ----3---   w  dsw clock
-// -----2--   w  dsw shift/load
-// ------1-  r   dip switch data
-// -------0  r   ppi to pic command incoming
+// ----3---   w  DIP switch clock
+// -----2--   w  DIP switch shift/load
+// ------1-  r   DIP switch data
+// -------0  r   PPI to PIC command incoming
 
 uint8_t megaphx_state::pic_portb_r()
 {
@@ -462,13 +464,13 @@ void megaphx_state::pic_portb_w(uint8_t data)
 
 // ppi port c
 //
-// 7-------   w  ppi to pic clock
-// -6------   w  ppi to pic data
+// 7-------   w  PPI to PIC clock
+// -6------   w  PPI to PIC data
 // --5-----   w  unknown
-// ---4----   w  ppi to pic command
-// ----3---  r   pic to ppi clock
+// ---4----   w  PPI to PIC command
+// ----3---  r   PIC to PPI clock
 // -----2--  r   unknown
-// ------1-  r   pic to ppi data
+// ------1-  r   PIC to PPI data
 // -------0  r   unknown
 
 uint8_t megaphx_state::ppi_portc_r()
@@ -483,7 +485,7 @@ uint8_t megaphx_state::ppi_portc_r()
 
 void megaphx_state::ppi_portc_w(uint8_t data)
 {
-	// only set, don't clear here. otherwise the pic has no chance to pick it up
+	// only set, don't clear here. otherwise the PIC has no chance to pick it up
 	if (BIT(data, 4))
 		m_ppi_to_pic_command = BIT(data, 4);
 
@@ -534,6 +536,40 @@ void megaphx_state::hamboy(machine_config &config)
 }
 
 
+ROM_START( afterwar )
+	ROM_REGION16_BE( 0x40000, "boot", 0 )
+	ROM_LOAD16_BYTE( "aw.u32", 0x00001, 0x20000, CRC(b99703d4) SHA1(393b6869e71d4c61060e66e0e9e36a1e6ca345d1) )
+	ROM_LOAD16_BYTE( "aw.u21", 0x00000, 0x20000, CRC(f11e7449) SHA1(1017142d10011d68e49d3ccdb1ac4e815c03b17a) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "aw0.u38", 0x000001, 0x20000, CRC(91a80067) SHA1(3caa5a1bb4d2e2658d7372d34cd6ec60d6ef8487) )
+	ROM_LOAD16_BYTE( "aw1.u27", 0x000000, 0x20000, CRC(43812d35) SHA1(06bfa159635e29fa3e3382d6f26e90663f25cc7f) )
+	ROM_LOAD16_BYTE( "aw2.u37", 0x040001, 0x20000, CRC(bcb7be40) SHA1(02b3795af0e02d0a5f88e5d63199072909b0205a) )
+	ROM_LOAD16_BYTE( "aw3.u26", 0x040000, 0x20000, CRC(45963256) SHA1(a67e323857127ca31776a9ee6ad6b03f20d650c4) )
+	ROM_LOAD16_BYTE( "aw4.u36", 0x080001, 0x20000, CRC(93d091a7) SHA1(73c0dff80d4f8aab07f17327e82a58b87a3bdd50) )
+	ROM_LOAD16_BYTE( "aw5.u25", 0x080000, 0x20000, CRC(e6044d6e) SHA1(016110e10fa3b0b06df6c91a8afbd7c3c624cc88) )
+
+	ROM_REGION( 0x20000, "inder_sb:user2", 0 )
+	ROM_LOAD( "sonido_aw1.u39", 0x00000, 0x20000, CRC(14368d11) SHA1(76579fb1ab1d6263c0fe6bc8b159b1d3f900a265) )
+
+	ROM_REGION( 0x2000, "inder_sb:audiocpu", 0 )
+	ROM_LOAD( "sonido_aw0.u35", 0x0000, 0x2000, CRC(cd22f2a4) SHA1(c5cf5b1ce528412493e2b5f565ed38e3e9123d37) )
+
+	ROM_REGION( 0x400, "pic", 0 )
+	ROM_LOAD( "pic16c54.bin", 0x000, 0x400, CRC(89e74d49) SHA1(29b5a37000ddc59242c95cc4973371ba18233076) )
+
+	ROM_REGION( 0x300, "pals", 0 )
+	ROM_LOAD( "b3_palce20v8h.bin",   0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "b15_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "b5_palce20v8h.bin",   0x000, 0x157, NO_DUMP )
+	ROM_LOAD( "b26_tibpal22v10.bin", 0x000, 0x2dd, NO_DUMP )
+	ROM_LOAD( "p28_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p29_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p30_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s31_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s32_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s33_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+ROM_END
 
 ROM_START( megaphx )
 	ROM_REGION16_BE( 0x40000, "boot", 0 ) // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
@@ -557,7 +593,7 @@ ROM_START( megaphx )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?)
 
 	ROM_REGION( 0x1000, "pals", 0 ) // protected
 	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(05ef04b7) SHA1(330dd81a832b6675fb0473868c26fe9bec2da854) )
@@ -589,7 +625,7 @@ ROM_START( hamboy )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430, CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?)
 ROM_END
 
 
@@ -617,7 +653,7 @@ ROM_START( yoyospel )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) ) // Unprotected, verified to be the same as "Mega Phoenix"
-	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?)
 
 	ROM_REGION( 0x200, "pals", 0 ) // protected
 	// On main PCB
@@ -637,8 +673,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hamboy,   0,        hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, afterwar, 0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After the War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, megaphx,  0, megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hamboy,   0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // This game would later become Little Robin, although this early version has significant design differences. The game has no music, verified to be the same as the real hardware.
-GAME( 1992, yoyospel, littlerb, megaphx, yoyospel, megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, yoyospel, littlerb, megaphx, yoyospel, megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

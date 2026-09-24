@@ -69,8 +69,8 @@ DEFINE_DEVICE_TYPE(AGNUS_COPPER, agnus_copper_device, "agnus_copper", "Amiga Agn
 
 agnus_copper_device::agnus_copper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AGNUS_COPPER, tag, owner, clock)
-	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_chipmem_r(*this, 0)
+	, m_custom_w(*this)
 {
 }
 
@@ -82,8 +82,6 @@ agnus_copper_device::agnus_copper_device(const machine_config &mconfig, const ch
 
 void agnus_copper_device::device_start()
 {
-	m_host_space = &m_host_cpu->space(AS_PROGRAM);
-
 	save_item(NAME(m_cdang_setting));
 	save_item(NAME(m_cdang_min_reg));
 	save_item(NAME(m_dma_master_enable));
@@ -99,6 +97,7 @@ void agnus_copper_device::device_start()
 	save_item(NAME(m_pending_offset));
 	save_item(NAME(m_xpos_state));
 	save_item(NAME(m_resync_pending));
+	save_item(NAME(m_copper_list));
 }
 
 
@@ -113,6 +112,7 @@ void agnus_copper_device::device_reset()
 	m_dma_master_enable = false;
 	m_dma_copen = false;
 	m_resync_pending = false;
+	m_copper_list = 0;
 	// TODO: latches states on soft reset
 }
 
@@ -199,11 +199,12 @@ template <u8 ch> u16 agnus_copper_device::copjmpx_r()
 {
 	if (!machine().side_effects_disabled())
 		set_pc(ch, false);
-	return m_host_space->unmap();
+	return 0xffff;
 }
 
 inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
 {
+	m_copper_list = ch;
 	m_pc = m_lc[ch];
 	m_state_waiting = false;
 	m_state_skipping = false;
@@ -242,9 +243,15 @@ void agnus_copper_device::vblank_sync(bool state)
 		// If copper DMA is disabled at vblank time the restart is deferred
 		// - maglines intro would otherwise squash drawing to a very small portion at screen center
 		if (m_dma_master_enable && m_dma_copen)
+		{
+			m_resync_pending = false;
 			set_pc(0, true);
+		}
 		else
+		{
 			m_resync_pending = true;
+			m_copper_list = 0;
+		}
 		m_xpos_state = 0;
 	}
 	m_vertical_blank = state;
@@ -278,12 +285,12 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 	if (!m_dma_master_enable || !m_dma_copen)
 		return 511;
 
-	// deferred vblank restart: fires at the first DMA opportunity,
-	// after any COP1LC update done while the copper was disabled
+	// deferred vblank restart: fires at the first DMA opportunity after any
+	// location-register update or COPJMP strobe done while the copper was disabled
 	if (m_resync_pending)
 	{
 		m_resync_pending = false;
-		set_pc(0, true);
+		set_pc(m_copper_list, true);
 	}
 
 	/* flush any pending writes */
@@ -296,7 +303,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 			(m_pending_offset << 1),
 			m_pending_data
 		);
-		m_host_space->write_word(0xdff000 | (m_pending_offset << 1), m_pending_data);
+		m_custom_w(m_pending_offset, m_pending_data, 0xffff);
 		m_pending_offset = 0;
 	}
 
@@ -326,13 +333,13 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 	// TODO: swap between ir0 and ir1 is controlled thru a selins latch
 	// (which can't be this instant too)
 	word0 = m_chipmem_r(m_pc);
-	m_host_space->write_word(0xdff08c, word0);
+	m_custom_w(0x08c >> 1, word0, 0xffff);
 	m_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	/* fetch the second data word */
 	word1 = m_chipmem_r(m_pc);
-	m_host_space->write_word(0xdff08c, word1);
+	m_custom_w(0x08c >> 1, word1, 0xffff);
 	m_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 

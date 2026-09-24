@@ -32,6 +32,7 @@
 
 #include "osdepend.h"
 
+#include "ioprocsstream.h"
 #include "path.h"
 
 #include <algorithm>
@@ -718,18 +719,21 @@ bool menu_export::handle(event const *ev)
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				if (!file.open(filename + ".txt"))
 				{
-					// print the header
-					std::ostringstream buffer;
-					buffer << _("Name:             Description:\n");
-					driver_enumerator drvlist(machine().options());
-					drvlist.exclude_all();
-					for (auto & elem : m_list)
-						drvlist.include(driver_list::find(*elem));
+					{
+						// print the header
+						util::owritestream str(file);
+						str << _("Name:             Description:\n");
+						driver_enumerator drvlist(machine().options());
+						drvlist.exclude_all();
+						for (auto & elem : m_list)
+							drvlist.include(driver_list::find(*elem));
 
-					// iterate through drivers and output the info
-					while (drvlist.next())
-						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
-					file.puts(buffer.str());
+						// iterate through drivers and output the info
+						while (drvlist.next())
+							util::stream_format(str, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
+
+						str << std::flush;
+					}
 					file.close();
 					machine().popmessage(_("%s.txt saved in UI settings folder."), filename);
 				}
@@ -814,8 +818,10 @@ bool menu_machine_configure::handle(event const *ev)
 					std::error_condition const filerr = file.open(filename + ".ini");
 					if (!filerr)
 					{
-						std::string inistring = m_opts.output_ini();
-						file.puts(inistring);
+						util::owritestream str(file);
+						str.imbue(std::locale::classic());
+						m_opts.output_ini(str);
+						str << std::flush;
 						ui().popup_time(2, "%s", _("\n    Settings saved    \n\n"));
 					}
 				}
@@ -946,8 +952,12 @@ menu_plugins_configure::~menu_plugins_configure()
 		//
 		// throw emu_fatalerror("Unable to create file plugin.ini\n");
 		return;
+
 	// generate the updated INI
-	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini());
+	util::owritestream str(file_plugin);
+	str.imbue(std::locale::classic());
+	mame_machine_manager::instance()->plugins().output_ini(str);
+	str << std::flush;
 }
 
 //-------------------------------------------------

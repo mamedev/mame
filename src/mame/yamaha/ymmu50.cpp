@@ -326,4 +326,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1995, mu50, 0, 0, mu50,  mu50, mu50_state, empty_init, "Yamaha", "MU50", 0 )
+CONS( 1995, mu50, 0, 0, mu50,  mu50, mu50_state, empty_init, "Yamaha", "MU50 Tone Generator", 0 )

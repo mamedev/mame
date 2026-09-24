@@ -22,14 +22,6 @@
 #include "pc1640_iga.h"
 
 
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define PEGA1A_TAG      "ic910"
-
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -42,7 +34,7 @@ DEFINE_DEVICE_TYPE(ISA8_PC1640_IGA, isa8_pc1640_iga_device, "pc1640_iga", "Amstr
 //-------------------------------------------------
 
 ROM_START( pc1640_iga )
-	ROM_REGION16_LE( 0x8000, "iga", 0)
+	ROM_REGION( 0x8000, "iga", 0 )
 	ROM_LOAD( "40100.ic913", 0x0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) ) // 8736 E
 ROM_END
 
@@ -57,6 +49,37 @@ const tiny_rom_entry *isa8_pc1640_iga_device::device_rom_region() const
 }
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( pc1640_iga )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( pc1640_iga )
+	PORT_START("SW")
+	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4")
+	PORT_DIPSETTING(    0x0b, "Internal MD, External CGA80" )
+	PORT_DIPSETTING(    0x0a, "Internal MD, External CGA40" )
+	PORT_DIPSETTING(    0x09, "Internal ECD350, External MDA/HERC" )
+	PORT_DIPSETTING(    0x08, "Internal ECD200, External MDA/HERC" )
+	PORT_DIPSETTING(    0x07, "Internal CD80, External MDA/HERC" )
+	PORT_DIPSETTING(    0x06, "Internal CD40, External MDA/HERC" )
+	PORT_DIPSETTING(    0x05, "External CGA80, Internal MD" )
+	PORT_DIPSETTING(    0x04, "External CGA40, Internal MD" )
+	PORT_DIPSETTING(    0x03, "External MDA/HERC, Internal ECD350" )
+	PORT_DIPSETTING(    0x02, "External MDA/HERC, Internal ECD200" )
+	PORT_DIPSETTING(    0x01, "External MDA/HERC, Internal CD80" )
+	PORT_DIPSETTING(    0x00, "External MDA/HERC, Internal CD40" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor isa8_pc1640_iga_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pc1640_iga );
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -66,8 +89,12 @@ const tiny_rom_entry *isa8_pc1640_iga_device::device_rom_region() const
 //  isa8_pc1640_iga_device - constructor
 //-------------------------------------------------
 
-isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: isa8_ega_device(mconfig, ISA8_PC1640_IGA, tag, owner, clock)
+isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pega1a_device(mconfig, ISA8_PC1640_IGA, tag, owner, clock),
+	m_sw(*this, "SW"),
+	m_sysw(*this, ":SW"),
+	m_installed(false),
+	m_enabled(true)
 {
 }
 
@@ -78,31 +105,73 @@ isa8_pc1640_iga_device::isa8_pc1640_iga_device(const machine_config &mconfig, co
 
 void isa8_pc1640_iga_device::device_start()
 {
-	if (m_palette != nullptr && !m_palette->started())
-		throw device_missing_dependencies();
+	pega1a_device::device_start();
 
-	set_isa_device();
+	save_item(NAME(m_installed));
+	save_item(NAME(m_enabled));
+}
 
-	for (int i = 0; i < 64; i++ )
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void isa8_pc1640_iga_device::device_reset()
+{
+	if (!m_installed)
 	{
-		uint8_t r = ( ( i & 0x04 ) ? 0xAA : 0x00 ) + ( ( i & 0x20 ) ? 0x55 : 0x00 );
-		uint8_t g = ( ( i & 0x02 ) ? 0xAA : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
-		uint8_t b = ( ( i & 0x01 ) ? 0xAA : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
-
-		m_palette->set_pen_color( i, r, g, b );
+		m_enabled = !m_sysw.found() || BIT(m_sysw->read(), 9);
 	}
 
-	/* Install 256KB Video ram on our EGA card */
-	m_vram = make_unique_clear<uint8_t[]>(256 * 1024);
+	if (!m_enabled)
+		return;
 
-	m_videoram = m_vram.get();
-	m_plane[0] = m_videoram + 0x00000;
-	m_plane[1] = m_videoram + 0x10000;
-	m_plane[2] = m_videoram + 0x20000;
-	m_plane[3] = m_videoram + 0x30000;
+	pega1a_device::device_reset();
+
+	if (m_installed)
+		return;
+
+	m_installed = true;
+
+	const uint8_t mode = m_sw->read() & 0x0f;
+	set_monitor_palette(mode == 0x04 || mode == 0x05 || mode == 0x0a || mode == 0x0b);
 
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "iga");
-	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_pc1640_iga_device::pega_3b0_r)), write8sm_delegate(*this, FUNC(isa8_pc1640_iga_device::pega_3b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_pc1640_iga_device::pc1640_3c0_r)), write8sm_delegate(*this, FUNC(pega1a_device::pega_3c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_pc1640_iga_device::pega_3d0_r)), write8sm_delegate(*this, FUNC(isa8_pc1640_iga_device::pega_3d0_w)));
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void isa8_pc1640_iga_device::device_post_load()
+{
+	if (m_enabled)
+		pega1a_device::device_post_load();
+}
+
+
+//-------------------------------------------------
+//  pc1640_3c0_r - attribute/sequencer/graphics
+//  controller and Input Status Register 0 read
+//-------------------------------------------------
+
+uint8_t isa8_pc1640_iga_device::pc1640_3c0_r(offs_t offset)
+{
+	if (offset == 2)
+	{
+		uint8_t swsts = 0;
+
+		if (!BIT(m_misc_output, 4))
+		{
+			swsts = BIT(m_sw->read(), 3 - ((m_misc_output >> 2) & 0x03));
+		}
+
+		return 0x6f | (m_irq ? 0x80 : 0x00) | (swsts << 4);
+	}
+
+	return pc_ega8_3c0_r(offset);
 }

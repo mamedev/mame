@@ -447,12 +447,10 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		}
 
 		int16_t sampleL = 0, sampleR = 0, outL = 0, outR = 0;
-		// Attenuation is logarithmic (decibels).
-		// Floats are not chip accurate, but the formula is correct.
-		float scaleLL = powf(10.0f, -m_atten[0] / 20.0f);
-		float scaleLR = powf(10.0f, -m_atten[1] / 20.0f);
-		float scaleRR = powf(10.0f, -m_atten[2] / 20.0f);
-		float scaleRL = powf(10.0f, -m_atten[3] / 20.0f);
+		const float scaleLL = m_atten[0] / 255.0f;
+		const float scaleLR = m_atten[1] / 255.0f;
+		const float scaleRR = m_atten[2] / 255.0f;
+		const float scaleRL = m_atten[3] / 255.0f;
 		for (uint16_t i = 0; i < 18 * 28 * num_samples; i++)
 		{
 			sampleL = m_samples[0][i];
@@ -833,10 +831,10 @@ void cdicdic_device::process_disc_sector()
 	uint8_t subcode_buffer[96];
 	memset(subcode_buffer, 0, sizeof(subcode_buffer));
 
+	const cdrom_file::toc &toc = m_cdrom->get_toc();
 	if (m_disc_mode == DISC_TOC)
 	{
 		uint8_t *toc_buffer = buffer;
-		const cdrom_file::toc &toc = m_cdrom->get_toc();
 		uint32_t entry_count = 0;
 
 		// Determine total frame count for data, and total audio track count
@@ -846,9 +844,11 @@ void cdicdic_device::process_disc_sector()
 		uint32_t audio_starts[cdrom_file::MAX_TRACKS];
 		for (uint32_t i = 0; i < toc.numtrks; i++)
 		{
+			frames += toc.tracks[i].frames + toc.tracks[i].extraframes;
+
 			if (toc.tracks[i].trktype != cdrom_file::CD_TRACK_AUDIO)
 			{
-				frames += toc.tracks[i].frames + toc.tracks[i].extraframes;
+				other_tracks++;
 			}
 			else
 			{
@@ -902,7 +902,7 @@ void cdicdic_device::process_disc_sector()
 			*toc_buffer++ = 0xa1;
 			if (audio_tracks > 0)
 			{
-				uint8_t last_audio_track = (uint8_t)(audio_tracks - 1);
+				uint8_t last_audio_track = audio_tracks;
 				*toc_buffer++ = ((last_audio_track / 10) << 4) | (last_audio_track % 10);
 			}
 			else
@@ -937,24 +937,37 @@ void cdicdic_device::process_disc_sector()
 		subcode_buffer[SUBCODE_Q_MODE1_AMINS] = toc_data[2];
 		subcode_buffer[SUBCODE_Q_MODE1_ASECS] = toc_data[3];
 		subcode_buffer[SUBCODE_Q_MODE1_AFRAC] = toc_data[4];
-		subcode_buffer[SUBCODE_Q_CRC0] = 0xff;
-		subcode_buffer[SUBCODE_Q_CRC1] = 0xff;
 	}
 	else
 	{
+		uint8_t track = 1;
+		for (uint32_t i = 0; i < toc.numtrks; i++)
+		{
+			if (m_curr_lba >= toc.tracks[i].logframeofs)
+				track = i + 1;
+		}
+
+		const uint32_t track_start = toc.numtrks ? toc.tracks[track - 1].logframeofs : 0;
+		const uint32_t rel_lba = (m_curr_lba >= track_start) ? (m_curr_lba - track_start) : 0;
+
+		const uint8_t rel_mins = rel_lba / (60 * 75);
+		const uint8_t rel_secs = (rel_lba / 75) % 60;
+		const uint8_t rel_frac = rel_lba % 75;
+
 		subcode_buffer[SUBCODE_Q_CONTROL] = (m_disc_mode == DISC_CDDA ? 0x01 : 0x41);
-		subcode_buffer[SUBCODE_Q_TRACK] = 0x01;
+		subcode_buffer[SUBCODE_Q_TRACK] = ((track / 10) << 4) | (track % 10);
 		subcode_buffer[SUBCODE_Q_INDEX] = 0x01;
-		subcode_buffer[SUBCODE_Q_MODE1_MINS] = mins_bcd;
-		subcode_buffer[SUBCODE_Q_MODE1_SECS] = secs_bcd;
-		subcode_buffer[SUBCODE_Q_MODE1_FRAC] = frac_bcd;
+		subcode_buffer[SUBCODE_Q_MODE1_MINS] = ((rel_mins / 10) << 4) | (rel_mins % 10);
+		subcode_buffer[SUBCODE_Q_MODE1_SECS] = ((rel_secs / 10) << 4) | (rel_secs % 10);
+		subcode_buffer[SUBCODE_Q_MODE1_FRAC] = ((rel_frac / 10) << 4) | (rel_frac % 10);
 		subcode_buffer[SUBCODE_Q_MODE1_ZERO] = 0x00;
 		subcode_buffer[SUBCODE_Q_MODE1_AMINS] = mins_bcd;
 		subcode_buffer[SUBCODE_Q_MODE1_ASECS] = secs_bcd;
 		subcode_buffer[SUBCODE_Q_MODE1_AFRAC] = frac_bcd;
-		subcode_buffer[SUBCODE_Q_CRC0] = 0xff;
-		subcode_buffer[SUBCODE_Q_CRC1] = 0xff;
 	}
+	
+	subcode_buffer[SUBCODE_Q_CRC0] = 0xff;
+	subcode_buffer[SUBCODE_Q_CRC1] = 0xff;
 
 	uint16_t crc_accum = 0;
 	for (int i = 0; i < 12; i++)
@@ -1386,7 +1399,7 @@ void cdicdic_device::device_reset()
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
 
-	std::fill_n(m_atten, 4, 0);
+	std::fill_n(m_atten, 4, 0xff);
 	std::fill_n(m_xa_last, 4, 0);
 }
 

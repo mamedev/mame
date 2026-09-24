@@ -28,6 +28,9 @@ public:
 	template <typename T> void set_cpl_port(unsigned n, T &&tag) { m_cpl_ports[n].set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpr_port(unsigned n, T &&tag) { m_cpr_ports[n].set_tag(std::forward<T>(tag)); }
 
+	// one detent of the TEMPO/PROGRAM data wheel, +1 clockwise; reported on the next panel scan
+	void encoder_detent(int delta);
+
 	// Configuration
 	void set_baudrate(uint16_t br);
 
@@ -60,6 +63,7 @@ private:
 	// Response generation
 	void send_sync_packet();
 	void send_button_packet(int segment, bool is_left_panel);
+	void send_encoder_packet(int8_t detents);
 	void send_all_button_states(bool is_left_panel);
 
 	// LED control
@@ -112,6 +116,7 @@ private:
 	// Input port pointers (set by main driver)
 	optional_ioport_array<11> m_cpl_ports;  // Left panel segments 0-10
 	optional_ioport_array<11> m_cpr_ports;  // Right panel segments 0-10
+	int32_t m_encoder_accum;                // data-wheel detents not yet reported
 
 	// LED outputs
 	output_finder<50> m_cpl_leds;  // Left panel LEDs (CPL_0 through CPL_49)

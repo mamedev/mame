@@ -33,6 +33,12 @@ void mpeg_audio::clear()
 	m_audio_buffer_pos[1] = 16*32;
 }
 
+void mpeg_audio::register_save_state(device_t &device, int index)
+{
+	device.save_item(m_audio_buffer, "mpeg_audio_buffer", index);
+	device.save_item(m_audio_buffer_pos, "mpeg_audio_buffer_pos", index);
+}
+
 bool mpeg_audio::decode_buffer(int &pos, int limit, short *output,
 								int &output_samples, int &sample_rate, int &channels, int atbl)
 {
@@ -704,7 +710,7 @@ void mpeg_audio::build_next_segments(int step)
 		band++;
 	}
 
-	while(band < m_joint_bands) {
+	while(band < m_total_bands) {
 		read_band_value_triplet(0, band);
 		m_bdata[1][0][band] = m_bdata[0][0][band];
 		m_bdata[1][1][band] = m_bdata[0][1][band];

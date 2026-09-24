@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-	- MFM
-
-*/
-
 #include "emu.h"
 #include "c1571.h"
 
@@ -583,7 +575,7 @@ void c1571_device::cbm_iec_reset(int state)
 {
 	if (!state)
 	{
-		device_reset();
+		reset();
 	}
 }
 

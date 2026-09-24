@@ -979,6 +979,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mcd251.h,VIDEOS["MCD251"] = true
+--------------------------------------------------
+
+if VIDEOS["MCD251"] then
+	files {
+		MAME_DIR .. "src/devices/video/mcd251.cpp",
+		MAME_DIR .. "src/devices/video/mcd251.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/mos6566.h,VIDEOS["MOS6566"] = true
 --------------------------------------------------
 
@@ -998,6 +1010,18 @@ if VIDEOS["MOS8563"] then
 	files {
 		MAME_DIR .. "src/devices/video/mos8563.cpp",
 		MAME_DIR .. "src/devices/video/mos8563.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mpeg_video.h,VIDEOS["MPEG_VIDEO"] = true
+--------------------------------------------------
+
+if VIDEOS["MPEG_VIDEO"] then
+	files {
+		MAME_DIR .. "src/devices/video/mpeg_video.cpp",
+		MAME_DIR .. "src/devices/video/mpeg_video.h",
 	}
 end
 
@@ -1580,6 +1604,18 @@ if VIDEOS["ST7735"] then
 	files {
 		MAME_DIR .. "src/devices/video/st7735_lcdc.cpp",
 		MAME_DIR .. "src/devices/video/st7735_lcdc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/sti3400.h,VIDEOS["STI3400"] = true
+--------------------------------------------------
+
+if VIDEOS["STI3400"] then
+	files {
+		MAME_DIR .. "src/devices/video/sti3400.cpp",
+		MAME_DIR .. "src/devices/video/sti3400.h",
 	}
 end
 

@@ -1,0 +1,42 @@
+// license:MIT
+// copyright-holders:Felix Kreuzer
+//============================================================
+//
+//  cell_segments.json - per-cell spline segment lists
+//
+//  Part of the depixelize chain, see bgfx/chains/depixelize.json.
+//
+//============================================================
+
+{
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": {
+		"function": "always",
+		"writeenable": false
+	},
+	"cull": {
+		"mode": "none"
+	},
+	"write": {
+		"rgb": true,
+		"alpha": true
+	},
+
+	"vertex": "chains/misc/vs_blit",
+	"fragment": "chains/depixelize/fs_cell_segments",
+	"uniforms": [
+		{ "name": "s_positions",      "type": "int",  "values": [ 1.0 ] },
+		{ "name": "s_flags",          "type": "int",  "values": [ 1.0 ] },
+		{ "name": "s_cps",            "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_tex_size0",      "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims",  "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_source_dims",    "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_target_dims",    "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+	]
+}

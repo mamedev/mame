@@ -72,6 +72,10 @@ public:
 	template <typename... T> void set_display_pixels(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_draw_text(T &&... args) { m_draw_text_cb.set(std::forward<T>(args)...); }
 
+	// dots per character clock in character mode, for boards whose
+	// character cell is not 8 dots wide (e.g. the Wang PC TIG uses 10)
+	void set_char_dots(int dots) { m_char_dots = dots; }
+
 	auto drq_wr_callback() { return m_write_drq.bind(); }
 	auto hsync_wr_callback() { return m_write_hsync.bind(); }
 	auto vsync_wr_callback() { return m_write_vsync.bind(); }
@@ -167,6 +171,7 @@ private:
 	uint32_t m_lad;                   // light pen address
 
 	uint8_t m_ra[16];                 // parameter RAM
+	uint8_t m_ra_partition[16];       // copy of parameter RAM, for partitions
 	int m_ra_addr;                    // parameter RAM address
 
 	uint8_t m_sr;                     // status register
@@ -201,6 +206,8 @@ private:
 
 	int m_disp;                       // display zoom factor
 	int m_gchr;                       // zoom factor for graphics character writing and area filling
+
+	int m_char_dots;                  // dots per character clock in character mode
 
 	uint8_t m_bitmap_mod;
 

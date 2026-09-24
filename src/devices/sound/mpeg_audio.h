@@ -11,6 +11,8 @@
 
 #pragma once
 
+class device_t;
+
 class mpeg_audio {
 public:
 	// Accepted layers.  Beware that AMM is incompatible with L2 (and
@@ -55,6 +57,9 @@ public:
 
 	// Clear audio buffer
 	void clear();
+
+	// Register persistent synthesis history with an owning device.
+	void register_save_state(device_t &device, int index = 0);
 
 private:
 	struct limit_hit {};

@@ -34,6 +34,7 @@
 #include "ui/uimain.h"
 
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "unzip.h"
 
 #include "osdepend.h"
@@ -42,10 +43,32 @@
 #include <rapidjson/stringbuffer.h>
 
 #include <ctime>
+#include <locale>
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten.h>
 #endif
+
+
+
+class running_machine::log_file_helper
+{
+private:
+	util::core_file::ptr m_file;
+	util::owritestream m_stream;
+
+public:
+	log_file_helper(util::core_file::ptr &&file) : m_file(std::move(file)), m_stream(*m_file)
+	{
+		m_stream.imbue(std::locale::classic());
+	}
+
+	void puts(std::string_view s)
+	{
+		m_stream << s << std::flush;
+		m_file->flush();
+	}
+};
 
 
 
@@ -350,13 +373,13 @@ int running_machine::run(bool quiet)
 		// if we have a logfile, set up the callback
 		if (options().log() && !quiet)
 		{
-			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			std::error_condition const filerr = m_logfile->open("error.log");
+			util::core_file::ptr logfile;
+			std::error_condition const filerr = util::core_file::open("error.log", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, logfile);
 			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
-			using namespace std::placeholders;
-			add_logerror_callback(std::bind(&running_machine::logfile_callback, this, _1));
+			m_logfile = std::make_unique<log_file_helper>(std::move(logfile));
+			add_logerror_callback([this] (char const *buffer) { if (m_logfile) m_logfile->puts(buffer); });
 		}
 
 		if (options().debug() && options().debuglog())
@@ -1044,21 +1067,6 @@ void running_machine::soft_reset(s32 param)
 
 	// now we're running
 	m_current_phase = machine_phase::RUNNING;
-}
-
-
-//-------------------------------------------------
-//  logfile_callback - callback for logging to
-//  logfile
-//-------------------------------------------------
-
-void running_machine::logfile_callback(const char *buffer)
-{
-	if (m_logfile != nullptr)
-	{
-		m_logfile->puts(buffer);
-		m_logfile->flush();
-	}
 }
 
 

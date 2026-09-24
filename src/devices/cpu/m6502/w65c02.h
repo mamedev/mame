@@ -29,6 +29,8 @@ public:
 protected:
 	w65c02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void prefetch_end() override;
+
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// 65c02 opcodes

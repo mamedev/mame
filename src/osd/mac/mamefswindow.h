@@ -12,4 +12,6 @@
 
 @interface MAMEFSWindow : NSWindow
 
+-(instancetype)initWithScreen:(NSScreen *)screen;
+
 @end

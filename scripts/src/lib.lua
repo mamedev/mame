@@ -95,6 +95,8 @@ end
 		MAME_DIR .. "src/lib/util/ioprocsfill.h",
 		MAME_DIR .. "src/lib/util/ioprocsfilter.cpp",
 		MAME_DIR .. "src/lib/util/ioprocsfilter.h",
+		MAME_DIR .. "src/lib/util/ioprocsstream.cpp",
+		MAME_DIR .. "src/lib/util/ioprocsstream.h",
 		MAME_DIR .. "src/lib/util/ioprocsvec.h",
 		MAME_DIR .. "src/lib/util/jedparse.cpp",
 		MAME_DIR .. "src/lib/util/jedparse.h",

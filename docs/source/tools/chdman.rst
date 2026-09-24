@@ -218,7 +218,7 @@ Common options supported:
 
 If the ``--hunksize`` or ``-hs`` option is not supplied, the default will be
 the hunk size of the parent CHD if a parent CHD file for the output is supplied,
-or eight sectors per hunk (18,816 bytes) otherwise.
+or eight sectors per hunk (19,584 bytes) otherwise.
 
 If the ``--compression`` or ``-c`` option is not supplied, it defaults to
 ``cdlz,cdzl,cdfl``.

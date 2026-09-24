@@ -20,7 +20,7 @@ class hd63484_device :  public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data)> display_delegate;
+	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n)> display_delegate;
 
 	// construction/destruction
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);

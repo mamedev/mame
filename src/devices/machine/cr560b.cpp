@@ -14,7 +14,8 @@ NOTES:
   https://github.com/trapexit/portfolio_os/blob/bee7b0c8e4287083c73cb5497b658880c9e7af8e/utils/discdata.h#L52
 
 TODO:
-- Enough to load a few sectors and nothing else;
+- Port status handling from cr511b;
+- Implement flush command (starts triggering with above);
 - Find common points with other MKE drives, generate a streamlined interface;
 
 **************************************************************************************************/
@@ -23,13 +24,14 @@ TODO:
 #include "cr560b.h"
 
 #define LOG_CMD    (1 << 1)
-#define LOG_TOC    (1 << 2)
-#define LOG_PARAM  (1 << 3)
-#define LOG_DATA   (1 << 4)
-#define LOG_SUBQ   (1 << 5)
-#define LOG_SUBQ2  (1 << 6) // log subq data to popmessage
+#define LOG_CMDV   (1 << 2) // cmd 0x10 + cmd 0x83 + output returns (verbose)
+#define LOG_TOC    (1 << 3)
+#define LOG_PARAM  (1 << 4)
+#define LOG_DATA   (1 << 5)
+#define LOG_SUBQ   (1 << 6)
+#define LOG_SUBQ2  (1 << 7) // log subq data to popmessage
 
-#define VERBOSE (LOG_GENERAL | LOG_TOC | LOG_CMD | LOG_PARAM)
+#define VERBOSE (LOG_GENERAL | LOG_TOC | LOG_CMD)
 //#define VERBOSE (LOG_TOC)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
@@ -289,7 +291,7 @@ void cr560b_device::status_enable(uint8_t output_length)
 	if (m_output_fifo_length > 0)
 	{
 		if (m_input_fifo[0] != 0x87 || (VERBOSE & LOG_SUBQ))
-			LOGMASKED(LOG_CMD, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
+			LOGMASKED(LOG_CMDV, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
 
 		m_sten_timer->adjust(attotime::from_usec(64 * 4)); // TODO
 	}
@@ -366,6 +368,8 @@ uint8_t cr560b_device::read()
 				}
 			}
 		}
+		else
+			popmessage("cr560b.cpp: read data while not ready");
 	}
 
 	return data;
@@ -401,7 +405,7 @@ void cr560b_device::write(uint8_t data)
 		case 0x03: cmd_motor_off(); break;
 		//case 0x04: cmd_diag(); break;
 		case 0x05: cmd_read_status(); break;
-		// TODO: drawer_open is issued by fz10e just after purging the disc avatars
+		// TODO: eventually need this for multi-CDs swapping
 		//case 0x06: cmd_drawer_open(); break;
 		//case 0x07: cmd_drawer_close(); break;
 		case 0x09: cmd_set_mode(); break;
@@ -416,7 +420,7 @@ void cr560b_device::write(uint8_t data)
 		case 0x0e: cmd_play_msf(); break;
 		case 0x0f: cmd_play_track(); break;
 		case 0x10: cmd_read(); break;
-		//case 0x11: cmd_read_subq(); break;
+		//case 0x11: cmd_subchannel_info(); break;
 
 		case 0x80: cmd_data_path_check(); break;
 		//case 0x81: cmd_read_status(); break;
@@ -436,6 +440,9 @@ void cr560b_device::write(uint8_t data)
 
 		default:
 		{
+			// NOTE: on 3do if 06 is triggered at startup then the BIOS purged the CD.
+			// If the CD is a prototype or an homebrew SW then user needs a -norsa BIOS (btanb).
+			popmessage("cr560b.cpp: unknown command %02x", m_input_fifo[0]);
 			LOG("Unknown command: %02x\n", m_input_fifo[0]);
 			// answer with an error so that callers waiting for a status byte don't hang
 			m_output_fifo[0] = m_input_fifo[0];
@@ -680,7 +687,7 @@ void cr560b_device::cmd_play_track()
 // TODO: unverified in this implementation (sure needs data ready in Clio)
 void cr560b_device::cmd_read()
 {
-	LOGMASKED(LOG_CMD, "Command: Read\n");
+	LOGMASKED(LOG_CMDV, "Command: Read\n");
 	LOGPARAM;
 
 	u8 read_mode = m_input_fifo[4];
@@ -693,7 +700,7 @@ void cr560b_device::cmd_read()
 
 	if (read_mode == 0)
 	{
-		LOGMASKED(LOG_CMD, "MSF mode %06x ", start_sector);
+		LOGMASKED(LOG_CMDV, "MSF mode %06x ", start_sector);
 		start_sector = msf_to_lba(start_sector);
 	}
 
@@ -701,7 +708,7 @@ void cr560b_device::cmd_read()
 	m_transfer_sectors = (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
 	m_transfer_length = m_transfer_sectors * m_sector_size;
 
-	LOGMASKED(LOG_CMD, "-> LBA %06x, sectors %d\n", m_transfer_lba, m_transfer_sectors);
+	LOGMASKED(LOG_CMDV, "-> LBA %06x, sectors %d\n", m_transfer_lba, m_transfer_sectors);
 
 	m_cdda->stop_audio();
 
@@ -756,7 +763,7 @@ void cr560b_device::cmd_read_error()
 
 void cr560b_device::cmd_version()
 {
-	LOGMASKED(LOG_CMD, "Command: Version\n");
+	LOGMASKED(LOG_CMDV, "Command: Version\n");
 	LOGPARAM;
 
 	m_output_fifo[0]  = 0x83;

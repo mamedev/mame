@@ -577,6 +577,11 @@ int z80scc_device::z80daisy_irq_state()
 		state |= elem;
 	}
 
+	// The IP bits are set whatever the state of MIE (they can be polled in RR3), but with MIE clear they don't request
+	// an interrupt: "This bit, when reset, has the same effect as pulling the IEI pin Low"
+	if (!(m_wr9 & WR9_BIT_MIE))
+		state &= ~Z80_DAISY_INT;
+
 	// Last chance to keep the control of the interrupt line
 	state |= (m_wr9 & WR9_BIT_DLC) ? Z80_DAISY_IEO : 0;
 
@@ -597,8 +602,8 @@ int z80scc_device::z80daisy_irq_ack()
 	// loop over all interrupt sources
 	for (auto & elem : m_int_state)
 	{
-		// find the first channel with an interrupt requested
-		if (elem & Z80_DAISY_INT)
+		// find the first channel with an interrupt requested, "No IUS bit is set after the MIE bit is cleared to zero"
+		if ((elem & Z80_DAISY_INT) && (m_wr9 & WR9_BIT_MIE))
 		{
 			elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
 			check_interrupts();
@@ -663,14 +668,16 @@ void z80scc_device::check_interrupts()
 //-------------------------------------------------
 //  reset_interrupts -
 //-------------------------------------------------
-void z80scc_device::reset_interrupts()
+void z80scc_device::reset_interrupts(int index)
 {
 	LOGINT("%s\n", FUNCNAME);
-	// reset internal interrupt sources
-	for (auto & elem : m_int_state)
+	// a channel reset "resets all IPs and IUSs and disables all interrupts in that channel"
+	const int base = (index == CHANNEL_A) ? 0 : 3;
+	for (int i = 0; i < 3; i++)
 	{
-		elem = 0;
+		m_int_state[base + i] = 0;
 	}
+	m_chanA->m_rr3 &= ~(0x07 << ((index == CHANNEL_A) ? 3 : 0));
 
 	// check external interrupt sources
 	check_interrupts();
@@ -740,12 +747,11 @@ void z80scc_device::trigger_interrupt(int index, int type)
 
 	LOGINT("%s: %02x\n", FUNCNAME, type);
 
-	/* The Master Interrupt Enable (MIE) bit, WR9 D3, must be set to enable the SCC to generate interrupts.*/
+	/* The Master Interrupt Enable (MIE) bit, WR9 D3, must be set to enable the SCC to generate interrupts, but the IP bit
+	   is set regardless so the sources can be polled in RR3: "Another way of polling SCC is to enable one of the interrupt
+	   modes and then reset the MIE bit in WR9. The processor may then poll the IP bits in RR3A" */
 	if (!(m_wr9 & WR9_BIT_MIE))
-	{
-		LOGINT("Master Interrupt Enable is not set, blocking attempt to interrupt\n");
-		return;
-	}
+		LOGINT("Master Interrupt Enable is not set, interrupt is pending but not requested\n");
 
 	source = type;
 	prio_level = get_extint_priority(type);
@@ -799,7 +805,7 @@ int z80scc_device::update_extint(int index)
 
 	LOGINT("%s(%02x)\n", FUNCNAME, index);
 	// Check if any of the enabled external interrupt sources has changed and requiresd service TODO: figure out Zero Count
-	if ( ((lrr0 & wr15 & 0xf8) ^ (rr0 & wr15 & 0xf8)) == 0 ) // mask off disabled and non relevant bits
+	if ( ((lrr0 ^ rr0) & wr15 & 0xf8) == 0 ) // mask off disabled and non relevant bits
 	{
 		LOGINT(" - All interrupts serviced\n");
 
@@ -812,7 +818,12 @@ int z80scc_device::update_extint(int index)
 	}
 	else
 	{
-		LOGINT(" - More external/status interrupts to serve: %02x\n", ((lrr0 & wr15 & 0xf8) ^ (rr0 & wr15 & 0xf8)));
+		LOGINT(" - More external/status interrupts to serve: %02x\n", (lrr0 ^ rr0) & wr15 & 0xf8);
+		// Update latched value to match current status
+		if (index == CHANNEL_A)
+			m_chanA->m_extint_states = rr0;
+		else
+			m_chanB->m_extint_states = rr0;
 	}
 	return ret;
 }
@@ -1046,7 +1057,9 @@ void z80scc_channel::device_start()
 	m_uart->m_wr0_ptrbits = 0;
 	m_start_bit_hack_for_external_clocks = true;
 
-	m_rx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 8 : 3;
+	// the receive FIFO is 8 deep on the ESCC and 3 deep on the NMOS/CMOS parts; the ring needs one spare
+	// slot to tell full from empty
+	m_rx_fifo_sz = ((m_uart->m_variant & z80scc_device::SET_ESCC) ? 8 : 3) + 1;
 
 	m_tx_fifo_sz = (m_uart->m_variant & z80scc_device::SET_ESCC) ? 4 : 1;
 
@@ -1154,17 +1167,13 @@ void z80scc_channel::device_reset()
 	m_rr1  &= 0x07;
 	m_rr1  |= 0x06;         //  Required reset value
 	m_rr1  |= RR1_ALL_SENT; // It is a don't care in the SCC user manual but drivers hangs without it set
-	m_rr3   = 0x00;
 	m_rr10 &= 0x40;
 
 	// reset external lines
 	out_rts_cb(m_rts = m_wr5 & WR5_RTS ? 0 : 1);
 	out_dtr_cb(m_dtr = m_wr14 & WR14_DTR_REQ_FUNC ? 0 : (m_wr5 & WR5_DTR ? 0 : 1));
 	// reset interrupts
-	if (m_index == z80scc_device::CHANNEL_A)
-	{
-		m_uart->reset_interrupts();
-	}
+	m_uart->reset_interrupts(m_index);
 	m_extint_latch = 0;
 	m_extint_states = m_rr0;
 	m_baudtimer->adjust(attotime::never);
@@ -1174,7 +1183,8 @@ void z80scc_channel::device_reset()
 TIMER_CALLBACK_MEMBER(z80scc_channel::brg_tick)
 {
 	// wr15 & WR15_ZEROCOUNT is implied by this timer being running at all
-	m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+	if (m_wr1 & WR1_EXT_INT_ENABLE)
+		m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 }
 
 
@@ -1486,7 +1496,7 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 			{
 				LOGINT(" - Checking an INT source %d\n", i);
 				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, m_uart->m_int_source[i] & 3);
-				if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK))
+				if ((m_uart->m_variant & (z80scc_device::SET_ESCC | z80scc_device::SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK) && (m_uart->m_wr9 & WR9_BIT_MIE))
 				{
 					LOGINT(" - Found an INT request to ack while reading RR2\n");
 					elem = Z80_DAISY_IEO; // Set IUS bit (called IEO in z80 daisy lingo)
@@ -1900,6 +1910,26 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	}
 	if (data & WR1_PARITY_IS_SPEC_COND)
 		LOG("- Parity error is a Special Condition\n");
+
+	// A source only has its IP set while its IE is set: "If the corresponding IE bit is not set, the IP for that source
+	// of interrupt will never be set".  The latched external/status and receive conditions come back with the IE.
+	auto const reset_ip =
+			[this] (int prio)
+			{
+				m_uart->m_int_state[prio + (m_index == z80scc_device::CHANNEL_A ? 0 : 3)] &= ~Z80_DAISY_INT;
+				m_uart->m_chanA->m_rr3 &= ~(1 << (prio + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+			};
+	if (!(data & WR1_EXT_INT_ENABLE))
+		reset_ip(INT_EXTERNAL_PRIO);
+	else if (m_extint_latch)
+		m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+	if (!(data & WR1_TX_INT_ENABLE))
+		reset_ip(INT_TRANSMIT_PRIO);
+	if ((data & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_DISABLE)
+		reset_ip(INT_RECEIVE_PRIO);
+	else
+		check_receive_interrupt();
+
 	m_uart->check_interrupts();
 }
 
@@ -2054,6 +2084,9 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 		logerror("Code is broken in WR9, please report!\n");
 		break;
 	}
+
+	// MIE gates the pending interrupts onto /INT
+	m_uart->check_interrupts();
 }
 
 /* WR10 contains miscellaneous control bits for both the receiver and the transmitter.
@@ -2391,7 +2424,8 @@ uint8_t z80scc_channel::data_read()
 		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | ((m_wr1 & WR1_PARITY_IS_SPEC_COND) ? RR1_PARITY_ERROR : 0)))
 		{
 			logerror("Rx Error %02x\n", m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
-			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
+			if ((m_wr1 & WR1_RX_INT_MODE_MASK) != WR1_RX_INT_DISABLE)
+				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
 		}
 		else
 		{
@@ -2978,8 +3012,8 @@ void z80scc_channel::set_dtr(int state)
 //-------------------------------------------------
 void z80scc_channel::write_rx(int state)
 {
-	int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
-	bool edge_driven_rxc = ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC) && !source && !m_rxc;
+	// the receiver runs straight off the /RTxC pin, whether that's a configured crystal/oscillator or edges from rxc_w
+	const bool rtxc_driven_rxc = (m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC;
 
 #if START_BIT_HUNT
 	// Check for start bit if not receiving
@@ -2991,12 +3025,12 @@ void z80scc_channel::write_rx(int state)
 	}
 #endif
 
-	if (m_rxd && !state && ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC) && (get_clock_mode() > 1))
+	if (m_rxd && !state && rtxc_driven_rxc && (get_clock_mode() > 1))
 		m_rx_clock = 0;
 
 	LOGRCV("%s(%d)\n", FUNCNAME, state);
 	m_rxd = state;
-	if (edge_driven_rxc || m_rxc != 0 || m_brg_rate != 0)
+	if (rtxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0)
 		device_serial_interface::rx_w(state);
 }
 

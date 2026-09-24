@@ -82,8 +82,8 @@ private:
 	void port2_w(u8 data);
 	void port3_w(u8 data);
 
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 
@@ -241,7 +241,7 @@ ioport_value ld50_state::dial_r()
 }
 
 
-void ld50_state::driver_start()
+void ld50_state::machine_start()
 {
 	save_item(NAME(m_port));
 	save_item(NAME(m_rom_addr));
@@ -249,7 +249,7 @@ void ld50_state::driver_start()
 	save_item(NAME(m_volume_data));
 }
 
-void ld50_state::driver_reset()
+void ld50_state::machine_reset()
 {
 	memset(m_port, 0xff, sizeof m_port);
 

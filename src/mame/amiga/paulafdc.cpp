@@ -532,7 +532,10 @@ void paula_fdc_device::ciaaprb_w(uint8_t data)
 		m_fdc_led = BIT(data, 7); // LED directly connected to FDC motor
 	}
 
-	if(floppy) {
+	// the dma engine needs to keep running even with no drive attached
+	bool const drive_selected = (data & 0x78) != 0x78;
+
+	if(drive_selected) {
 		if(cur_live.state == IDLE)
 			live_start();
 	} else

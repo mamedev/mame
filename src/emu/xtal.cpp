@@ -253,6 +253,7 @@ const double XTAL::known_xtals[] = {
 	 14'250'000, // 14.250_MHz_XTAL        Hector HRX
 	 14'250'450, // 14.25045_MHz_XTAL      Apple II Europlus
 	 14'300'000, // 14.3_MHz_XTAL          Agat-7
+	 14'302'446, // 14.302446_MHz_XTAL     TK2000 (4x PAL-M subcarrier)
 	 14'314'000, // 14.314_MHz_XTAL        Taito TTL Board
 	 14'318'181, // 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier)
 	 14'349'600, // 14.3496_MHz_XTAL       Roland S-50 VDP
@@ -443,7 +444,7 @@ const double XTAL::known_xtals[] = {
 	 32'317'400, // 32.3174_MHz_XTAL       DEC VT330, VT340
 	 32'530'470, // 32.53047_MHz_XTAL      Seta 2
 	 32'640'000, // 32.64_MHz_XTAL         Vector 4
-	 32'768'000, // 32.768_MHz_XTAL        Roland D-50 audio clock
+	 32'768'000, // 32.768_MHz_XTAL        Roland D-50/U-220 audio clock
 	 33'000'000, // 33_MHz_XTAL            Sega Model 3 video board
 	 33'264'000, // 33.264_MHz_XTAL        Hazeltine 1500 terminal
 	 33'330'000, // 33.33_MHz_XTAL         Sharp X68000 XVI
@@ -453,6 +454,7 @@ const double XTAL::known_xtals[] = {
 	 33'868'800, // 33.8688_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips with /2 divider
 	 34'000'000, // 34_MHz_XTAL            Gaelco PCBs
 	 34'291'712, // 34.291712_MHz_XTAL     Fairlight CMI master card
+	 34'816'000, // 34.816_MHz_XTAL        Roland U-110 audio clock
 	 34'846'000, // 34.846_MHz_XTAL        Visual 550
 	 35'452'500, // 35.4525_MHz_XTAL       Nokia MikroMikko 2
 	 35'469'000, // 35.469_MHz_XTAL        ZX Spectrum +2/+3 (~8x PAL subcarrier)
@@ -507,6 +509,7 @@ const double XTAL::known_xtals[] = {
 	 53'203'424, // 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier)
 	 53'693'175, // 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier)
 	 54'000'000, // 54_MHz_XTAL            Taito JC
+	 54'285'700, // 54.2857_MHz_XTAL       Qume QVT-82
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
 	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)

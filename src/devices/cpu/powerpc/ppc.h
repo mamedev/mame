@@ -170,6 +170,7 @@ enum
 #define PPCDRC_FULL_CACHE_FLUSH       0x0008        // completely flush the DRC cache on ICBI.  Should never be necessary now.
 #define PPCDRC_STRICT_601_SELF_MODIFY 0x0010        // check for self-modifying code on 601 in the write handler (fairly large performance impact & does not work with RAM bypass)
 #define PPCDRC_MACOS_CACHE_HACK       0x0020        // HACK for Mac OS relying on data cache behavior; see ppccom_dcbz_check() for details
+#define PPCDRC_BUS_RETRY              0x0040        // honor cpu_device::retry_access() on aligned I/O instructions
 
 // common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
@@ -253,6 +254,7 @@ public:
 	void ppc_cfunc_unimplemented();
 	void ppc_cfunc_ppccom_mismatch();
 	void ppccom_tlb_fill();
+	int  ppccom_fetch_intention() const;
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();
 	void ppccom_dcbz_check();
@@ -358,6 +360,7 @@ protected:
 		// PowerPC 603-specific state
 		uint32_t mmu603_cmp;
 		uint32_t mmu603_hash[2];
+		uint32_t mmu603_key;                 // SRR1[KEY] for the pending TLB miss: SR[Ks] or SR[Kp]
 		uint32_t mmu603_r[4];
 
 		// parameters for subroutines
@@ -638,7 +641,7 @@ protected:
 		uint32_t checkcount; // number of entry checks the block was generated with
 	};
 	std::unordered_map<uint64_t, reuse_entry> m_reuse_cache; // key = (mode << 32) | pc
-	uint64_t m_last_reuse = ~uint64_t(0);					 // key handed back by the last compile, if it was a reuse
+	uint64_t m_last_reuse = ~uint64_t(0);                    // key handed back by the last compile, if it was a reuse
 
 	bool reuse_entry_checks(uint32_t first, uint32_t count);
 
@@ -664,6 +667,7 @@ protected:
 	uml::code_handle *   m_entry;                      // entry point
 	uml::code_handle *   m_nocode;                     // nocode exception handler
 	uml::code_handle *   m_out_of_cycles;              // out of cycles exception handler
+	uml::code_handle *   m_bus_retry;                  // unwind an I/O instruction the bus asked us to redo
 	uml::code_handle *   m_tlb_mismatch;               // tlb mismatch handler
 	uml::code_handle *   m_swap_tgpr;                  // swap TGPR handler
 	uml::code_handle *   m_lsw[8][32];                 // lsw entries
@@ -758,6 +762,7 @@ protected:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
+	void static_generate_bus_retry();
 	void static_generate_tlb_mismatch();
 	void static_generate_code_write_reset();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);

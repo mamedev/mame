@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -2558,6 +2558,19 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="cproducao">
+		<description>Controle de Produção</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="required_ram" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15209">
+				<rom name="Controlo de Producao.p" size="15209" crc="d54715fd" sha1="bc9ba8f402d864e4f4cf9f0e40ecf5a983feb883"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="convgerm">
 		<description>Conversational German</description>
 		<year>1983</year>
@@ -2971,6 +2984,20 @@ MUSIC
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12047">
 				<rom name="EE1FilterDesign.tzx" size="12047" crc="1159b6aa" sha1="d6714fe623f9e444c22cde90f56488a58fce0d33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmuro">
+		<description>El Muro</description>
+		<year>198?</year>
+		<publisher>Juan C. Bravo</publisher>
+		<info name="language" value="Spanish" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5763">
+				<rom name="El Muro.tzx" size="5763" crc="87162193" sha1="542fe695bf2c68785f11593051b430f3cfc25641"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7578,6 +7605,22 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="planetds_a" cloneof="planetds">
+		<description>Planetoids (two sides)</description>
+		<year>1981</year>
+		<publisher>Macronics</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5109">
+				<rom name="Planetoids (Macronics) - Side 1.tzx" size="5109" crc="66ee1a16" sha1="d5396ee3fdb1d88519efcbe46e114b719c77686e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="3056">
+				<rom name="Planetoids (Macronics) - Side 2.tzx" size="3056" crc="a39b61d8" sha1="ba4f496f3efc4dd4ccfb220ecf29ee2f6d404e99"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="plandefd">
 		<description>Planet Defender</description>
 		<year>1982</year>
@@ -10436,7 +10479,7 @@ Defender: not working
 	</software>
 
 	<software name="walkplank">
-		<description>Walk The Plank</description>
+		<description>Walk the Plank</description>
 		<year>198?</year>
 		<publisher>Novus Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -11466,7 +11509,7 @@ Defender: not working
 	</software>
 
 
-<!-- Type-ins -->
+<!-- !Type-ins -->
 
 	<software name="antiaereo">
 		<description>Antiaéreo (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
@@ -11490,6 +11533,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14526">
 				<rom name="aventura.p" size="14526" crc="4802cd38" sha1="78f6ca6bc1138edfc0f2e59546ead50b18912dd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="b52bombr">
+		<description>B-52 Bomb-Run (type-in, Your Computer Vol.2 No.9 - September 1982)</description>
+		<year>1982</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="1K" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="667">
+				<rom name="B52 Bomb-Run.tzx" size="667" crc="986ef2a0" sha1="33b86fd95d65342592b1ff72d136b4724058c0d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11559,6 +11616,73 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="deepspac">
+		<description>Deep Space (type-in, Your Computer Vol.3 No.2 - February 1983)</description>
+		<year>1983</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6532">
+				<rom name="Deep Space.tzx" size="6532" crc="f85d0113" sha1="c1d137f975d7d952e70a58ba1833f70f71c31819"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deepspac_a" cloneof="deepspac">
+		<description>Deep Space (type-in, Your Computer Vol.3 No.2 - February 1983) (mod)</description>
+		<year>1983</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6834">
+				<rom name="Deep Space 2.tzx" size="6834" crc="c61e9dce" sha1="a5b0f0757102dbc0077ab07abceb49a984416b26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forcefld">
+		<description>Force-Field (type-in, Sinclair Programs № 1 - May/June 1982)</description>
+		<year>1982</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7326">
+				<rom name="Force-Field.tzx" size="7326" crc="6ab5ccd1" sha1="d1c7cd91bee82159d15c648f934e683dc00fa65a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggie">
+		<description>Froggie (type-in, Your Computer Vol.4 No.2 - February 1984)</description>
+		<year>1984</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="developer" value="Richard Braunton" />
+		<info name="language" value="English" />
+		<info name="required_ram" value="1K" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7391">
+				<rom name="Froggie.tzx" size="7391" crc="3ba2aecf" sha1="d597f8ee4dc81c277f0691445162eb99096b5168"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froggie_a" cloneof="froggie">
+		<description>Froggie (type-in, Your Computer Vol.4 No.2 - February 1984) (alt)</description>
+		<year>1984</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="1K" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7391">
+				<rom name="Froggie 2.tzx" size="7391" crc="a174a456" sha1="a929952f2aa0d2a1b77d6f673afbd4379b7bc5e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fruitcol">
 		<description>Fruit Collector (type-in, Sinclair Programs № 7 - May 1983)</description>
 		<year>1983</year>
@@ -11579,6 +11703,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3363">
 				<rom name="Fruit Collector v2.tzx" size="3363" crc="32daadcf" sha1="d7f08f4b4c788ea9dee7e694affcf63b47240fc7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hangman2">
+		<description>Hangman II (type-in, Sinclair Programs № 4 - November/December 1982)</description>
+		<year>1982</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4351">
+				<rom name="Hangman II.tzx" size="4351" crc="aa6da1f9" sha1="38a5a0a594783cd2ab6f71648f00428231e553e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11634,7 +11771,7 @@ Defender: not working
 	</software>
 
 	<software name="kongjump">
-		<description>Kong Jump (type-in, Your Computer Vol. 3 № 6 - June 1983)</description>
+		<description>Kong Jump (type-in, Your Computer Vol.3 No.6 - June 1983)</description>
 		<year>1983</year>
 		<publisher>IPC Magazines</publisher>
 		<info name="language" value="English" />
@@ -11642,6 +11779,18 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3484">
 				<rom name="Kong Jump.tzx" size="3484" crc="e3d0b107" sha1="0bde870b7afb18b7257a3077bdddeb92ff8e7360"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kongjump_a" cloneof="kongjump">
+		<description>Kong Jump (type-in, Your Computer Vol.3 No.6 - June 1983) (alt)</description>
+		<year>1983</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3064">
+				<rom name="Kong Jump (alt).tzx" size="3064" crc="6815356f" sha1="7352b085b7a9145d567c0c0e3b8dd9f11e335395"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11695,6 +11844,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="mutantrv">
+		<description>Mutant's Revenge (type-in, Your Computer Vol.5 No.3 - March 1985)</description>
+		<year>1985</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6393">
+				<rom name="Mutants Revenge.tzx" size="6393" crc="623e29b8" sha1="a275bf94ba7ff5c6c121309e69b6aaef30d989e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="barqueiro">
 		<description>O Barqueiro (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
 		<year>1984</year>
@@ -11720,6 +11881,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="pegler">
+		<description>Pegler (type-in, Sinclair Programs № 20 - June 1984)</description>
+		<year>1984</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9285">
+				<rom name="Pegler.tzx" size="9285" crc="9b110017" sha1="a93762545388f6b9db07af392a8a0fb52e96f822"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pfplan">
 		<description>Personal Financial Planning (type-in, Sinclair Projects № 11 - August/September 1984)</description>
 		<year>1984</year>
@@ -11741,6 +11915,33 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6279">
 				<rom name="Pilot.tzx" size="6279" crc="39f98172" sha1="43a1f665ba1d65321b72f8683d55c97173879315"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qubert">
+		<description>Q*Bert! (type-in, Sinclair User № 36 - March 1985)</description>
+		<year>1985</year>
+		<publisher>ECC Publications</publisher>
+		<info name="developer" value="Simon Godfrey" />
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12480">
+				<rom name="Q-Bert.tzx" size="12480" crc="2807de8f" sha1="19a7f4c0e18bed218681d44fece3f052f29237e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruler">
+		<description>Ruler (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4342">
+				<rom name="Ruler.tzx" size="4342" crc="f9d6fdb4" sha1="c935de9370d918339eabeae16a298732f0529ddd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11781,6 +11982,18 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5328">
 				<rom name="Shortcircuit.p" size="5328" crc="e6d4caf6" sha1="d9424abf71e77b9481216a1c3d899b5a1d51649d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snakelad">
+		<description>Snakes and Ladders + Card Tricks + Spelling Big Words (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12560">
+				<rom name="Snakes and Ladders - Card Tricks - Spelling Big Words.tzx" size="12560" crc="ecb4adf9" sha1="bad936f1ec864c641de7145222df34c9a77b1218"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11924,6 +12137,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="turbo">
+		<description>Turbo (type-in, Your Computer Vol.3 No.3 - March 1983)</description>
+		<year>1983</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="1K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2347">
+				<rom name="Turbo.tzx" size="2347" crc="61c15b8b" sha1="32fc499bcf5bdbd8fcfab7da099ca0b1ca4e6afc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="unipattern">
 		<description>Universal Patterner (type-in, Sinclair Programs № 1 - May/June 1982)</description>
 		<year>1982</year>
@@ -11946,6 +12172,50 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1542">
 				<rom name="VAT.tzx" size="1542" crc="b58edb7a" sha1="92df41d24183833e8a88250564b30dee55d33f0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="theplank">
+		<description>Walking the Plank (type-in, Computer &amp; Video Games № 30 - April 1984)</description>
+		<year>1984</year>
+		<publisher>EMAP Business &amp; Computer Publications</publisher>
+		<info name="developer" value="Peter Beebe" />
+		<info name="language" value="English" />
+		<info name="required_ram" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3791">
+				<rom name="Walking the Plank.tzx" size="3791" crc="a778dea5" sha1="20934f413d5da698af79c1e8c5c034a0a80660e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordsqur">
+		<description>Word Square (type-in, ZX Computing № 2 - August/September 1982)</description>
+		<year>1982</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<info name="developer" value="J. Elliot" />
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<info name="required_ram" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3468">
+				<rom name="Wordsquare1.tzx" size="3468" crc="40468c83" sha1="97052d06a0aff471acb4e4696f86419c7479a670"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordsqur_a" cloneof="wordsqur">
+		<description>Word Square (type-in, ZX Computing № 2 - August/September 1982) (alt)</description>
+		<year>1982</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<info name="developer" value="J. Elliot" />
+		<info name="language" value="English" />
+		<info name="usage" value="Type RUN after loading the program" />
+		<info name="required_ram" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3468">
+				<rom name="Wordsquare2.tzx" size="3468" crc="b9404d7e" sha1="06d824da72bb1ed99bb911cd95a8b0b1faf5ec48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11975,7 +12245,7 @@ Defender: not working
 	</software>
 
 
-<!-- Homebrews -->
+<!-- !Homebrews -->
 
 
 	<software name="aerial">
@@ -11988,6 +12258,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="9543">
 				<rom name="aerial.p" size="9543" crc="b6b6d09f" sha1="68cbace1d64816f672be5beca57fda8b68cd09e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amidoh">
+		<description>Amidoh!</description>
+		<year>2023</year>
+		<publisher>Jonathan Cauldwell</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6181">
+				<rom name="Amidoh.tzx" size="6181" crc="4f020b9c" sha1="3d89aec564b171055d8f43615ebd9b50723f0587"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12033,6 +12316,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="astrobik">
+		<description>Astro Bikers</description>
+		<year>2023</year>
+		<publisher>Jonathan Cauldwell</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4815">
+				<rom name="AstroBikers.tzx" size="4815" crc="f265348c" sha1="3852b443d8d97443af334a4333e52676b6dcda49"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="avalanch">
 		<description>Avalanche</description>
 		<year>2011</year>
@@ -12043,6 +12339,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15433">
 				<rom name="Avalanche (2011) - Full Version.p" size="15433" crc="2702a73c" sha1="aed759d4dbcadf89bd24769a5e1c2e3d19074bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awass">
+		<description>Awass</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="Type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="8143">
+				<rom name="awass.p" size="8143" crc="cf6ccb63" sha1="c71402c6a3b69b9c1d84f67f8fce26ba28b6de03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12609,6 +12919,20 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="swordwrk">
+		<description>SwordWork</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="Type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7466">
+				<rom name="sword.p" size="7466" crc="86243952" sha1="d530fc7ec75fc26f557ecb68b7234194b4baa450"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tuttut">
 		<description>Tut-Tut</description>
 		<year>2019</year>
@@ -12632,6 +12956,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14905">
 				<rom name="UBend.p" size="14905" crc="c537e261" sha1="17c49e4ac9179ed0d08c18c671f3db5343bad3cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uchotos">
+		<description>Uchotos</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<info name="language" value="English" />
+		<info name="required_ram" value="16K" />
+		<info name="usage" value="Type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7224">
+				<rom name="uchotos.p" size="7224" crc="a9c953ef" sha1="d86635340525f9f847102c2f5ddb0bcf737008eb"/>
 			</dataarea>
 		</part>
 	</software>

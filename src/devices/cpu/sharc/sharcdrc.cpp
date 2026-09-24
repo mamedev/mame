@@ -1356,6 +1356,8 @@ void adsp21062_device::static_generate_entry_point()
 	alloc_handle(m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                                                            // handle  entry
 
+	UML_SETFMOD(block, uml::ROUND_ROUND);                                                   // setfmod round
+
 	load_fast_iregs(block);                                                                 // <load fastregs>
 
 	/* check for interrupts */

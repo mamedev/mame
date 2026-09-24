@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -2231,6 +2231,19 @@ almost nothing like the prototype.
 				<rom name="fractal.bin" size="0x8000" crc="9a74fbf2" sha1="6653022f38e553d475896a918850158eaf8f77ff"/>
 			</dataarea>
 			<dataarea name="ram" size="0x800">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readriot">
+		<description>Read RIOT</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="readriot.a7800.bin" size="0x8000" crc="7a4d622c" sha1="c57c8041d67d100aefe91286acbcdd8dafd48181"/>
 			</dataarea>
 		</part>
 	</software>

@@ -1368,7 +1368,11 @@ macro take_exception %vector
 			m_br = read_ea_16() & 0xff;
 			internal(4);
 		} else if (m_tmp1 == 4) {
-			m_ep = read_ea_16() & 0xff;
+			// Alesis QS IRQ handlers do STC.W EP,@-SP / LDC.W @SP+, EP and expect DP
+			// to also be restored.
+			m_tmp1 = read_ea_16();
+			m_ep = (m_tmp1 >> 8) & 0xff;
+			m_dp = m_tmp1 & 0xff;
 			internal(4);
 		} else if (m_tmp1 == 5) {
 			m_dp = read_ea_16() & 0xff;
@@ -1417,6 +1421,8 @@ macro take_exception %vector
 90    f8    movg_w        e:!regw  -      -
 	if (BIT(m_ir[0], OP_WIDTH)) {
 		m_tmp1 = r16_r(op_byte());
+		if ((m_ir[0] & 0xf0) == 0xb0 && !((m_ir[0] ^ op_byte()) & 7))
+			m_tmp1 = (m_tmp1 - 2) & 0xffff;
 		write_ea_16(m_tmp1);
 		set_flags_nzv16 m_tmp1
 		cycles 2
@@ -1450,7 +1456,8 @@ macro take_exception %vector
 			write_ea_16((u32(m_br) << 8) | m_br);
 			internal(2);
 		} else if (m_tmp1 == 4) {
-			write_ea_16((u32(m_ep) << 8) | m_ep);
+			// EP:DP pair, see LDC
+			write_ea_16((u32(m_ep) << 8) | m_dp);
 			internal(2);
 		} else if (m_tmp1 == 5) {
 			write_ea_16((u32(m_dp) << 8) | m_dp);

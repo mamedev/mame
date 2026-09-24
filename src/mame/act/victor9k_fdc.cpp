@@ -1247,7 +1247,7 @@ void victor_9000_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = 0;
-			if (!cur_live.drw) // TODO WPS
+			if (!cur_live.drw && !get_floppy()->wpt_r())
 			{
 				write_bit = BIT(cur_live.shift_reg_write, 9);
 				if (pll_write_next_bit(write_bit, cur_live.tm, get_floppy(), limit))

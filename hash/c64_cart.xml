@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -190,15 +190,13 @@ Random corruption on any disk loaded with FASTLOAD enabled
 		</part>
 	</software>
 
-	<software name="ps64" supported="no">
+	<software name="ps64">
 		<description>PS-64 puhemoduli v1.0 (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ps64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="ps-64.bin" size="0x2000" crc="0613bd98" sha1="a255e3a42d65ffffe835d9ac06034caf371d6994"/>
@@ -206,15 +204,13 @@ Random corruption on any disk loaded with FASTLOAD enabled
 		</part>
 	</software>
 
-	<software name="ps64v2" cloneof="ps64" supported="no">
+	<software name="ps64v2" cloneof="ps64">
 		<description>PS-64 puhemoduli v2.0 (Finland)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ps64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1"/>

@@ -1388,6 +1388,18 @@ end
 
 
 ---------------------------------------------------
+-- Yamaha YM3413 LDSP
+--@src/devices/sound/ym3413.h,SOUNDS["YM3413"] = true
+---------------------------------------------------
+
+if SOUNDS["YM3413"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ym3413.cpp",
+		MAME_DIR .. "src/devices/sound/ym3413.h",
+	}
+end
+
+---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2154.h,SOUNDS["YM2154"] = true
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true
@@ -1531,6 +1543,18 @@ if SOUNDS["MPEG_AUDIO"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mpeg_audio.cpp",
 		MAME_DIR .. "src/devices/sound/mpeg_audio.h",
+	}
+end
+
+---------------------------------------------------
+-- Texas Instruments TMS320AV110 MPEG audio decoder
+--@src/devices/sound/tms320av110.h,SOUNDS["TMS320AV110"] = true
+---------------------------------------------------
+
+if SOUNDS["TMS320AV110"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tms320av110.cpp",
+		MAME_DIR .. "src/devices/sound/tms320av110.h",
 	}
 end
 
@@ -1714,6 +1738,18 @@ if SOUNDS["UPD934G"] then
 end
 
 ---------------------------------------------------
+--
+--@src/devices/sound/gsc38gg307.h,SOUNDS["GSC38GG307"] = true
+--------------------------------------------------
+
+if SOUNDS["GSC38GG307"] then
+	files {
+		MAME_DIR .. "src/devices/sound/gsc38gg307.cpp",
+		MAME_DIR .. "src/devices/sound/gsc38gg307.h",
+	}
+end
+
+--------------------------------------------------
 --
 --@src/devices/sound/iopspu.h,SOUNDS["IOPSPU"] = true
 ---------------------------------------------------

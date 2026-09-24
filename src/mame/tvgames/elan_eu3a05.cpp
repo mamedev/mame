@@ -926,7 +926,8 @@ ROM_END
 
 void elan_eu3a13_state::init_sudelan3()
 {
-	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
+	// HACK: skip infinite loop
+	// why is this needed? does it think we've soft shutdown?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x0fcc] = 0xea;
 	ROM[0x0fcd] = 0xea;
@@ -935,7 +936,8 @@ void elan_eu3a13_state::init_sudelan3()
 
 void elan_eu3a13_state::init_sudelan()
 {
-	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown?)
+	// HACK: avoid jump to infinite loop
+	// why is this needed? does it think we've soft shutdown?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0xd0f] = 0xea;
 	ROM[0xd10] = 0xea;
@@ -944,7 +946,8 @@ void elan_eu3a13_state::init_sudelan()
 
 void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 {
-	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown? or I/O failure?)
+	// HACK: avoid jump to infinite loop
+	// why is this needed? does it think we've soft shutdown? or I/O failure?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x1f8d92] = 0xea;
 	ROM[0x1f8d93] = 0xea;
@@ -956,7 +959,7 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 
 CONS( 2004, rad_sinv, 0, 0, elan_rad_sinv, rad_sinv, elan_eu3a05_rad_sinv_state, empty_init, "Radica (licensed from Taito)", "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
-CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_init, "Radica / Medialink (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_init, "Radica / Medialink Technology (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
 // it isn't clear if the ELAN is generating the music on this, or if one of the other globs is an audio MCU
 // VJ Starz Dance Mat on box, VJ Starz Dancing Mat on screen
@@ -971,7 +974,8 @@ CONS( 2005, pvwwcas, 0, 0, pvwwcas, sudoku, elan_eu3a05_pvwwcas_state, init_pvww
 
 // unknown, might be EU3A05, but bad dump
 // CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
-CONS( 200?, bratzra, 0, 0, elan_eu3a05_1mb, rad_sinv, elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )
+// TODO: Could possibly be titled "Bratz: Rock Angelz Guitar Game". Change once it's able to boot up.
+CONS( 200?, bratzra, 0, 0, elan_eu3a05_1mb, rad_sinv, elan_eu3a05_state, empty_init, "MGA", "Bratz: Rock Angelz", MACHINE_NOT_WORKING )
 
 
 // Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
@@ -982,10 +986,10 @@ CONS( 2005, sudelan,  0, 0, elan_eu3a13_pal_1mb, sudoku, elan_eu3a13_state, init
 
 CONS( 2005, sudoku2p, 0, 0, elan_eu3a13_pal_1mb, sudoku2p, elan_eu3a13_state, empty_init, "<unknown>", "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
-CONS( 2006, rad_ftet,  0,        0, elan_eu3a13_1mb,     rad_ftet, elan_eu3a13_state, empty_init, "Radica", "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
-CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal_1mb, rad_ftet, elan_eu3a13_state, empty_init, "Radica", "Family Tetris (PAL)",  MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftet,  0,        0, elan_eu3a13_1mb,     rad_ftet, elan_eu3a13_state, empty_init, "Radica / Hi-Score Entertainment Software Engineering", "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal_1mb, rad_ftet, elan_eu3a13_state, empty_init, "Radica / Hi-Score Entertainment Software Engineering", "Family Tetris (PAL)",  MACHINE_NOT_WORKING )
 
-CONS( 200?, carlecfg, 0, 0, elan_eu3a13_1mb, carlecfg, elan_eu3a13_state, empty_init, "Excalibur Electronics", "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 200?, carlecfg, 0, 0, elan_eu3a13_1mb, carlecfg, elan_eu3a13_state, empty_init, "Excalibur Electronics", "Carl Edwards' Chase for Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit

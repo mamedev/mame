@@ -36,16 +36,84 @@ private:
 	void machine_reset() override ATTR_COLD;
 
 	// ARM7
-	uint32_t arm7_io_r(offs_t offset, uint32_t mem_mask = ~0);
-	void arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm7_sio_r(offs_t offset);
+	void arm7_sio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm7_rcnt_r(offs_t offset, uint32_t mem_mask = ~0);
+	void arm7_rcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t arm7_spi_cnt_r();
+	void arm7_spi_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t arm7_spi_data_r();
+	void arm7_spi_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint32_t arm7_wramstat_r();
+	uint8_t arm7_postflg_r();
+	void arm7_postflg_w(uint8_t data);
+	void arm7_haltcnt_w(uint8_t data);
+	uint16_t arm7_powcnt_r();
+	void arm7_powcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void arm7_biosprot_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// ARM9
-	uint32_t arm9_io_r(offs_t offset, uint32_t mem_mask = ~0);
-	void arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_vramcnt_abcd_r();
+	void arm9_vramcnt_a_w(uint8_t data);
+	void arm9_vramcnt_b_w(uint8_t data);
+	void arm9_vramcnt_c_w(uint8_t data);
+	void arm9_vramcnt_d_w(uint8_t data);
+	uint32_t arm9_vramcnt_efg_wramcnt_r();
+	void arm9_vramcnt_e_w(uint8_t data);
+	void arm9_vramcnt_f_w(uint8_t data);
+	void arm9_vramcnt_g_w(uint8_t data);
+	void arm9_wramcnt_w(uint8_t data);
+	uint32_t arm9_vramcnt_hi_r();
+	void arm9_vramcnt_h_w(uint8_t data);
+	void arm9_vramcnt_i_w(uint8_t data);
+	uint32_t arm9_divcnt_r();
+	void arm9_divcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_div_numer_lsw_r();
+	void arm9_div_numer_lsw_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_div_numer_msw_r();
+	void arm9_div_numer_msw_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_div_denom_lsw_r();
+	void arm9_div_denom_lsw_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_div_denom_msw_r();
+	void arm9_div_denom_msw_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_sqrtcnt_r();
+	void arm9_sqrtcnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_sqrt_param_lsw_r();
+	void arm9_sqrt_param_lsw_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t arm9_sqrt_param_msw_r();
+	void arm9_sqrt_param_msw_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t arm9_postflg_r();
+	void arm9_postflg_w(uint8_t data);
+	uint16_t arm9_powcnt_r();
+	void arm9_powcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// registers shared by both CPUs (timers, DMA, IRQ controller, IPC, keypad, LCD status)
-	uint32_t common_io_r(int cpu, offs_t offset, uint32_t mem_mask, bool &handled);
-	void common_io_w(int cpu, offs_t offset, uint32_t data, uint32_t mem_mask, bool &handled);
+	template <int Cpu> uint32_t dispstat_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void dispstat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> uint32_t dma_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> uint32_t timer_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void timer_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> uint32_t keyinput_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void keyinput_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> uint32_t ipcsync_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void ipcsync_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t auxspi_cnt_r(offs_t offset, uint16_t mem_mask = ~0);
+	void auxspi_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t auxspi_data_r();
+	void auxspi_data_w(uint16_t data);
+	uint32_t gamecard_rom_ctrl_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void gamecard_rom_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t gamecard_command_r(offs_t offset);
+	void gamecard_command_w(offs_t offset, uint8_t data);
+	uint16_t exmemcnt_r();
+	template <int Cpu> void exmemcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <int Cpu> uint32_t ime_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <int Cpu> void ime_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> uint32_t ie_r();
+	template <int Cpu> void ie_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> uint32_t if_r();
+	template <int Cpu> void if_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// VRAM regions, in the order the banks can be assigned to them
 	enum : int
@@ -122,51 +190,10 @@ private:
 	required_ioport m_touch_x, m_touch_y;
 
 	enum {
-		ENGINE_A_OFFSET = (0x000/4),
-		ENGINE_A_END_OFFSET = (0x070/4),
-		ENGINE_B_OFFSET = (0x1000/4),
-		ENGINE_B_END_OFFSET = (0x1070/4),
-		DISPSTAT_OFFSET = (0x004/4),
-		GBA_LCD_END_OFFSET = (0x060/4),
-		DMA_OFFSET = (0x0b0/4),
-		DMAFILL_OFFSET = (0x0e0/4),
-		TIMER_OFFSET = (0x100/4),
-		SIO_OFFSET = (0x120/4),
-		KEYINPUT_OFFSET = (0x130/4),
-		RCNT_OFFSET = (0x134/4),   // EXTKEYIN shares this word on the ARM7
-		RTC_OFFSET = (0x138/4),
-		IPCSYNC_OFFSET = (0x180/4),
-		IPCFIFOCNT_OFFSET = (0x184/4),
-		IPCFIFOSEND_OFFSET = (0x188/4),
-		AUX_SPI_CNT_OFFSET = (0x1a0/4),
-		GAMECARD_BUS_CTRL_OFFSET = (0x1a4/4),
-		GAMECARD_DATA_OFFSET = (0x1a8/4),
-		GAMECARD_DATA_2_OFFSET = (0x1ac/4),
-		SPI_CTRL_OFFSET = (0x1c0/4),
-		EXMEMCNT_OFFSET = (0x204/4),
-		IME_OFFSET = (0x208/4),
-		IE_OFFSET = (0x210/4),
-		IF_OFFSET = (0x214/4),
-		GAMECARD_SEED_OFFSET = (0x1b0/4),
 		VRAMCNT_A_OFFSET = (0x240/4),
-		WRAMSTAT_OFFSET = (0x241/4),
+		WRAMSTAT_OFFSET = (0x240/4),
 		WRAMCNT_OFFSET = (0x244/4),
 		VRAMCNT_H_OFFSET = (0x248/4),
-		DIVCNT_OFFSET = (0x280/4),
-		DIV_NUMER_OFFSET = (0x290/4),
-		DIV_DENOM_OFFSET = (0x298/4),
-		DIV_RESULT_OFFSET = (0x2a0/4),
-		DIVREM_RESULT_OFFSET = (0x2a8/4),
-		SQRTCNT_OFFSET = (0x2b0/4),
-		SQRT_RESULT_OFFSET = (0x2b4/4),
-		SQRT_PARAM_OFFSET = (0x2b8/4),
-		POSTFLG_OFFSET = (0x300/4),
-		POWCNT_OFFSET = (0x304/4),
-		BIOSPROT_OFFSET = (0x308/4),
-		SOUND_OFFSET = (0x400/4),
-		SOUND_END_OFFSET = (0x520/4),
-		IPCFIFORECV_OFFSET = (0x100000/4),
-		GAMECARD_DATA_IN_OFFSET = (0x100010/4),
 		POSTFLG_PBF_SHIFT = 0,
 		POSTFLG_RAM_SHIFT = 1,
 		POSTFLG_PBF_MASK = (1 << POSTFLG_PBF_SHIFT),
@@ -175,8 +202,8 @@ private:
 		GAMECARD_BLOCK_BUSY = (1 << 31)
 	};
 
-	uint32_t m_arm7_postflg;
-	uint32_t m_arm9_postflg;
+	uint8_t m_arm7_postflg;
+	uint8_t m_arm9_postflg;
 	uint32_t m_ime[2], m_ie[2], m_if[2];
 	uint16_t m_ipcsync[2];
 	uint32_t m_WRAM[0x8000/4];
@@ -214,10 +241,10 @@ private:
 	uint32_t m_ipcfifo[2][16];
 	uint32_t m_ipcfifo_last[2];
 	uint8_t m_ipcfifo_head[2], m_ipcfifo_count[2];
-	uint32_t ipcfifo_recv(int cpu);
-	void ipcfifo_send(int cpu, uint32_t data);
-	void ipcfifo_cnt_w(int cpu, uint16_t data);
-	uint16_t ipcfifo_cnt_r(int cpu);
+	template <int Cpu> uint32_t ipcfifo_recv();
+	template <int Cpu> void ipcfifo_send(uint32_t data);
+	template <int Cpu> uint16_t ipcfifo_cnt_r();
+	template <int Cpu> void ipcfifo_cnt_w(uint16_t data);
 
 	// SPI bus
 	uint16_t m_spi_cnt;
@@ -271,19 +298,27 @@ private:
 		uint32_t word[8];
 	};
 	gba_fifo_t m_gba_fifo[2];
-	void gba_audio_tick(int ref);
-	void gba_sound_dma(int ch);
-	void gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	uint32_t gba_sound_r(offs_t offset);
+
+	void set_lcd_timing();
 	void enter_gba_mode();
 	void install_ds_arm7_map();
 	void install_gba_map();
-	void set_lcd_timing();
-	uint32_t gba_io_r(offs_t offset, uint32_t mem_mask = ~0);
-	void gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gba_pak_r(offs_t offset);
 	uint32_t gba_bios_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t gba_open_bus_r(offs_t offset, uint32_t mem_mask = ~0);
+	uint32_t gba_sound_r(offs_t offset);
+	void gba_sound_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void gba_audio_tick(int ref);
+	uint16_t gba_ie_r();
+	void gba_ie_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gba_if_r();
+	void gba_if_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t gba_waitcnt_r();
+	void gba_waitcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t gba_postflg_r();
+	void gba_postflg_w(uint8_t data);
+	void gba_haltcnt_w(uint8_t data);
+	uint32_t gba_memctrl_r();
 
 	// gamecard
 	uint16_t m_auxspicnt;

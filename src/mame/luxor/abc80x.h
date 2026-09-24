@@ -338,6 +338,7 @@ public:
 	// memory state
 	int m_eme = 0;                  // extended memory enable
 	uint8_t m_map[16]{};            // memory page register
+	bool m_30k = false;             // 30K block trigger (M1 fetch from 7800-7fff)
 
 	// video state
 	int m_txoff = 0;                // text display enable

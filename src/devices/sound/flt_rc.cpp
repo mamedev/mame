@@ -3,6 +3,15 @@
 #include "emu.h"
 #include "flt_rc.h"
 
+#include <numbers>
+
+// enable this to display the filter cutoff upon being recalculated
+#define LOG_CALC        (1U << 1)
+
+#define LOG_ALL         (LOG_CALC)
+
+//#define VERBOSE         (LOG_GENERAL)
+#include "logmacro.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(FILTER_RC, filter_rc_device, "filter_rc", "RC Filter")
@@ -131,5 +140,6 @@ void filter_rc_device::recalc()
 
 	/* Cut Frequency = 1/(2*Pi*Req*C) */
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
+	LOGMASKED(LOG_CALC,"flt_rc: recalc(): cutoff frequency is now %f\n", 1.0 / (2.0 * std::numbers::pi * Req * m_C));
 	m_k = 1.0 - exp(-1 / (Req * m_C) / m_stream->sample_rate());
 }

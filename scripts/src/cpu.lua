@@ -384,6 +384,23 @@ if opt_tool(CPUS, "JAGUAR") then
 end
 
 --------------------------------------------------
+-- Jaleco FPU math coprocessor (F-1 Super Battle)
+--@src/devices/cpu/jalfpu/jalfpu.h,CPUS["JALFPU"] = true
+--------------------------------------------------
+
+if CPUS["JALFPU"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu.cpp",
+		MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu.h",
+	}
+end
+
+if opt_tool(CPUS, "JALFPU") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu_dasm.h")
+end
+
+--------------------------------------------------
 -- MIT CADR cpu
 --@src/devices/cpu/cadr/cadr.h,CPUS["CADR"] = true
 --------------------------------------------------
@@ -919,6 +936,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh7014_adc.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh7014_adc.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_bsc.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_bsc.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_dmac.cpp",
@@ -931,6 +950,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_port.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_sci.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014_sci.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh7014_wdt.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh7014_wdt.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7014.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7021.cpp",
@@ -2079,6 +2100,7 @@ end
 --------------------------------------------------
 
 if CPUS["M6805"] then
+	MACHINES["ADBHOST"] = true
 	files {
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
@@ -3068,6 +3090,8 @@ if CPUS["TLCS900"] then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241_serial.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061_serial.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061_serial.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.cpp",
@@ -3688,6 +3712,40 @@ if CPUS["SWP30"] then
 		MAME_DIR .. "src/devices/sound/swp30.cpp",
 		MAME_DIR .. "src/devices/sound/swp30.h",
 	}
+end
+
+--------------------------------------------------
+-- Roland XP PCM chip and effect DSP
+--@src/devices/sound/roland_xp.h,CPUS["ROLANDXP"] = true
+--------------------------------------------------
+
+if CPUS["ROLANDXP"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_xp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_xp.h",
+	}
+end
+
+if opt_tool(CPUS, "ROLANDXP") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_xpd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_xpd.h")
+end
+
+--------------------------------------------------
+-- Roland LSP (Fujitsu MB87837)
+--@src/devices/sound/roland_lsp.h,CPUS["ROLANDLSP"] = true
+--------------------------------------------------
+
+if CPUS["ROLANDLSP"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_lsp.cpp",
+		MAME_DIR .. "src/devices/sound/roland_lsp.h",
+	}
+end
+
+if opt_tool(CPUS, "ROLANDLSP") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_lspd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/roland_lspd.h")
 end
 
 --------------------------------------------------

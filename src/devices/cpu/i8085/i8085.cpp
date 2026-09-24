@@ -301,7 +301,7 @@ void i8085a_cpu_device::device_start()
 	m_HL.d = 0;
 	m_WZ.d = 0;
 	m_halt = 0;
-	m_im = 0;
+	m_im = IM_IE; // INTE will go low at reset
 	m_status = 0;
 	m_after_ei = 0;
 	m_nmi_state = 0;

@@ -41,7 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ioc(*this, "ioc")
 		, m_memc(*this, "memc")
-		, m_vidc10(*this, "vidc")
+		, m_vidc(*this, "vidc")
 	{ }
 
 	void ertictac(machine_config &config);
@@ -59,7 +59,7 @@ private:
 	required_device<arm2_cpu_device> m_maincpu;
 	required_device<acorn_ioc_device> m_ioc;
 	required_device<acorn_memc_device> m_memc;
-	required_device<acorn_vidc10_device> m_vidc10;
+	required_device<acorn_vidc10_device> m_vidc;
 };
 
 
@@ -92,7 +92,7 @@ void ertictac_state::ertictac_map(address_map &map)
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	map(0x03000000, 0x033fffff).m(m_ioc, FUNC(acorn_ioc_device::map));
-	map(0x03400000, 0x035fffff).w(m_vidc10, FUNC(acorn_vidc10_device::write));
+	map(0x03400000, 0x035fffff).w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).w(m_memc, FUNC(acorn_memc_device::registers_w));
 	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(m_memc, FUNC(acorn_memc_device::page_w));
 }
@@ -247,7 +247,7 @@ void ertictac_state::ertictac(machine_config &config)
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 	screen.screen_vblank().append(m_memc, FUNC(acorn_memc_device::vidrq_w));
 
-	ACORN_MEMC(config, m_memc, 24_MHz_XTAL/3, m_vidc10);
+	ACORN_MEMC(config, m_memc, 24_MHz_XTAL/3, m_vidc);
 	m_memc->set_addrmap(0, &ertictac_state::ertictac_map);
 	m_memc->sirq_w().set(m_ioc, FUNC(acorn_ioc_device::il1_w));
 
@@ -259,9 +259,13 @@ void ertictac_state::ertictac(machine_config &config)
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
 	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
 
-	ACORN_VIDC1A(config, m_vidc10, 24_MHz_XTAL);
-	m_vidc10->set_screen("screen");
-	m_vidc10->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	SPEAKER(config, "speaker", 2).front();
+
+	ACORN_VIDC1A(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 }
 
 ROM_START( ertictac )

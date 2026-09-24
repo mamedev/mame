@@ -2052,6 +2052,40 @@ void isa8_cga_chameleon_device::chr_write(offs_t offset, uint8_t data)
 	m_charram[offset] = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
+void isa8_cga_chameleon_device::set_palette_luts(void)
+{
+	/* Setup 2bpp palette lookup table */
+	if ( m_mode_control & 0x10 )
+	{
+		m_palette_lut_2bpp[0] = 0;
+	}
+	else
+	{
+		m_palette_lut_2bpp[0] = m_color_select & 0x0F;
+	}
+	if ( m_mode_control & 0x04 )
+	{
+		m_palette_lut_2bpp[1] = ( ( m_color_select & 0x10 ) >> 1 ) | 3;
+		m_palette_lut_2bpp[2] = ( ( m_color_select & 0x10 ) >> 1 ) | 4;
+		m_palette_lut_2bpp[3] = ( ( m_color_select & 0x10 ) >> 1 ) | 7;
+	}
+	else
+	{
+		if ( m_color_select & 0x20 )
+		{
+			m_palette_lut_2bpp[1] = ( ( m_color_select & 0x10 ) >> 1 ) | m_color_lut[1][1];
+			m_palette_lut_2bpp[2] = ( ( m_color_select & 0x10 ) >> 1 ) | m_color_lut[1][2];
+			m_palette_lut_2bpp[3] = ( ( m_color_select & 0x10 ) >> 1 ) | m_color_lut[1][3];
+		}
+		else
+		{
+			m_palette_lut_2bpp[1] = ( ( m_color_select & 0x10 ) >> 1 ) | m_color_lut[0][1];
+			m_palette_lut_2bpp[2] = ( ( m_color_select & 0x10 ) >> 1 ) | m_color_lut[0][2];
+			m_palette_lut_2bpp[3] = ( ( m_color_select & 0x10 ) >> 1 ) | m_color_lut[0][3];
+		}
+	}
+}
+
 void isa8_cga_chameleon_device::device_start()
 {
 	if (m_palette != nullptr && !m_palette->started())
@@ -2062,9 +2096,13 @@ void isa8_cga_chameleon_device::device_start()
 	m_isa->install_device(0x3d0, 0x3dc, read8sm_delegate(*this, FUNC(isa8_cga_device::io_read)), write8sm_delegate(*this, FUNC(isa8_cga_device::io_write)));
 	m_isa->install_bank(0xb0000, 0xb3fff, &m_vram[0]);
 	m_isa->install_bank(0xb4000, 0xb7fff, &m_vram[0]);
-	m_isa->install_bank(0xb8000, 0xb9fff, &m_vram[0]);
+	m_isa->install_bank(0xb8000, 0xbbfff, &m_vram[0]);
 	m_isa->install_bank(0xbc000, 0xbffff, &m_vram[0]);
 	m_isa->install_memory(0xaf000, 0xaffff, read8sm_delegate(*this, FUNC(isa8_cga_chameleon_device::chr_read)), write8sm_delegate(*this, FUNC(isa8_cga_chameleon_device::chr_write)));
+	m_isa->install_memory(0xf3400, 0xf35ff, read8sm_delegate(*this, NAME([this](offs_t o){ return m_color_lut[0][o & 3] & 0xf; })),
+			write8sm_delegate(*this, NAME([this](offs_t o, uint8_t d){ m_color_lut[0][o & 3] = d & 0xf; set_palette_luts(); })));
+	m_isa->install_memory(0xf3600, 0xf37ff, read8sm_delegate(*this, NAME([this](offs_t o){ return m_color_lut[1][o & 3] & 0xf; })),
+			write8sm_delegate(*this, NAME([this](offs_t o, uint8_t d){ m_color_lut[1][o & 3] = d & 0xf; set_palette_luts(); })));
 
 	m_chr_gen_base = &m_charram[0];
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;

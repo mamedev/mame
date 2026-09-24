@@ -73,20 +73,9 @@ public:
 		, m_spritereg(0x8000/sizeof(uint16_t), 0)
 	{ }
 
-	void x68000_base(machine_config &config);
-	void x68000(machine_config &config);
-
-	virtual void driver_start() override;
+	void x68000(machine_config &config) ATTR_COLD;
 
 protected:
-	template <typename CpuType, typename AddrMap, typename Clock>
-	void add_cpu(machine_config &config, CpuType &&type, AddrMap &&map, Clock &&clock)
-	{
-		type(config, m_maincpu, std::forward<Clock>(clock));
-		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
-		m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x68k_state::cpu_space_map);
-	}
-
 	required_device<m68000_base_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
 	required_device<hd63450_device> m_hd63450;
@@ -121,6 +110,16 @@ protected:
 	bitmap_ind16 m_pcgbitmap;
 	bitmap_ind16 m_gfxbitmap;
 	bitmap_ind16 m_special;
+
+	template <typename CpuType, typename AddrMap, typename Clock>
+	void add_cpu(machine_config &config, CpuType &&type, AddrMap &&map, Clock &&clock)
+	{
+		type(config, m_maincpu, std::forward<Clock>(clock));
+		m_maincpu->set_addrmap(AS_PROGRAM, std::forward<AddrMap>(map));
+		m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &x68k_state::cpu_space_map);
+	}
+
+	void x68000_base(machine_config &config) ATTR_COLD;
 
 	void floppy_load_unload(bool load, floppy_image_device *dev);
 	void floppy_load(floppy_image_device *dev);
@@ -189,7 +188,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg1_tile);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_16);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_16);
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(floppy_tc_tick);
 	TIMER_CALLBACK_MEMBER(adpcm_drq_tick);
@@ -267,6 +265,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error = false;
 };
@@ -277,19 +276,25 @@ public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
 		, m_scsictrl(*this, "spc")
+		, m_dreq(false)
 	{
 	}
 
-	void x68ksupr_base(machine_config &config);
-	void x68kxvi(machine_config &config);
-	void x68ksupr(machine_config &config);
+	void x68ksupr_base(machine_config &config) ATTR_COLD;
+	void x68kxvi(machine_config &config) ATTR_COLD;
+	void x68ksupr(machine_config &config) ATTR_COLD;
 
-	virtual void driver_start() override;
+	uint16_t scsi_data_r(offs_t offset);
+	void scsi_data_w(offs_t offset, uint16_t data);
+	void dreq(int state) { m_dreq = (bool)state; }
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+
 	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;
+	bool m_dreq;
 
 	void x68kxvi_map(address_map &map) ATTR_COLD;
 };
@@ -302,11 +307,11 @@ public:
 	{
 	}
 
-	void x68030(machine_config &config);
-
-	virtual void driver_start() override;
+	void x68030(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+
 	void x68030_map(address_map &map) ATTR_COLD;
 };
 

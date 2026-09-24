@@ -351,7 +351,7 @@ bool ppc_device::reuse_entry_checks(uint32_t first, uint32_t count)
 	{
 		ppc_entry_check *const chk = m_entry_checks[first + i];
 		offs_t addr = chk->pc;
-		if ((ppccom_translate_address_internal(TR_FETCH, false, addr) > 1) || (addr != chk->physpc))
+		if ((ppccom_translate_address_internal(ppccom_fetch_intention(), false, addr) > 1) || (addr != chk->physpc))
 			return false;
 
 		chk->generation = m_core->m_translation_generation;
@@ -901,13 +901,35 @@ void ppc_device::static_generate_out_of_cycles()
 
 
 /*-------------------------------------------------
+    static_generate_bus_retry - abandon the stalled
+    load/store and exit so the instruction re-runs
+-------------------------------------------------*/
+
+void ppc_device::static_generate_bus_retry()
+{
+	drcuml_block &block(m_drcuml->begin_invariant_block(16));
+	alloc_handle(m_drcuml.get(), &m_bus_retry, "bus_retry");
+	UML_HANDLE(block, *m_bus_retry);
+	UML_RECOVER(block, I0, MAPVAR_PC);
+	UML_RECOVER(block, I1, MAPVAR_CYCLES);
+	UML_MOV(block, mem(&m_core->pc), I0);
+	UML_STORE(block, access_to_be_redone_ptr(), 0, 0, SIZE_BYTE, SCALE_x1);
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);
+	save_fast_iregs(block);
+	save_fast_fregs(block);
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+	block.end();
+}
+
+
+/*-------------------------------------------------
     static_generate_tlb_mismatch - generate a
     TLB mismatch handler
 -------------------------------------------------*/
 
 void ppc_device::static_generate_tlb_mismatch()
 {
-	int isi, exit;
+	int isi, exit, itlbmiss;
 	uml::code_label label = 1;
 
 	// forward references
@@ -925,11 +947,17 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
 	UML_LOAD(block, I2, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i2,[vtlb],i1,dword
 	UML_MOV(block, mem(&m_core->param0), I0);                               // mov     [param0],i0
-	UML_MOV(block, mem(&m_core->param1), TR_FETCH);                         // mov     [param1],TR_FETCH
+
+	// the fetch is checked with the permissions of the current privilege level (MSR[PR] is bit 2 of the mode)
+	UML_MOV(block, I3, TR_FETCH);                                           // mov     i3,TR_FETCH
+	UML_TEST(block, mem(&m_core->mode), MODE_USER);                         // test    [mode],MODE_USER
+	UML_MOVc(block, COND_NZ, I3, TR_UFETCH);                                // mov     i3,TR_UFETCH,nz
+	UML_MOV(block, mem(&m_core->param1), I3);                               // mov     [param1],i3
 	UML_CALLC(block, cfunc_ppccom_mismatch, this);
 	UML_CALLC(block, cfunc_ppccom_tlb_fill, this);                          // callc   tlbfill,ppc
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);    // load    i1,[vtlb],i1,dword
-	UML_TEST(block, I1, FETCH_ALLOWED);                                     // test    i1,FETCH_ALLOWED
+	UML_SHL(block, I3, 1, I3);                                              // shl     i3,1,i3
+	UML_TEST(block, I1, I3);                                                // test    i1,i3   ; (USER_)FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                 // jmp     isi,z
 	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
 	UML_JMPc(block, COND_NZ, exit = label++);                               // jmp     exit,nz
@@ -940,22 +968,31 @@ void ppc_device::static_generate_tlb_mismatch()
 	save_fast_fregs(block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                  // exit    EXECUTE_MISSING_CODE
 	UML_LABEL(block, isi);                                                  // isi:
+
+	// an ISI reports its fault reason in SRR1 (passed as the exception parameter)
+	UML_MOV(block, mem(&m_core->param1), TR_FETCH);                         // this was an instruction fetch (get_dsisr adds the privilege level)
+	UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                         // get reason to param1
+	UML_MOV(block, I1, mem(&m_core->param1));                               // mov     i1,[param1]
+	UML_AND(block, I1, I1, DSISR_NOT_FOUND | DSISR_PROTECTED | DSISR_NOEXEC);   // keep the SRR1 ISI reason bits
 	if (!(m_cap & PPCCAP_603_MMU))
 	{
-		// an ISI reports its fault reason in SRR1 (passed as the exception parameter)
-		UML_MOV(block, mem(&m_core->param1), TR_FETCH);                     // this was an instruction fetch
-		UML_CALLC(block, cfunc_ppccom_get_dsisr, this);                     // get reason to param1
-		UML_MOV(block, I0, mem(&m_core->param1));                           // mov i0, [param1]
-		UML_AND(block, I0, I0, DSISR_NOT_FOUND | DSISR_PROTECTED);          // keep the SRR1 ISI reason bits
-		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh isi,i0
+		UML_MOV(block, I0, I1);                                             // mov     i0,i1
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh     isi,i0
 	}
 	else
 	{
-		UML_MOV(block, SPR32(SPR603_IMISS), I0);                                        // mov     [imiss],i0
-		UML_MOV(block, SPR32(SPR603_ICMP), mem(&m_core->mmu603_cmp));                          // mov     [icmp],[mmu603_cmp]
-		UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));                     // mov     [hash1],[mmu603_hash][0]
-		UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));                     // mov     [hash2],[mmu603_hash][1]
-		UML_EXH(block, *m_exception[EXCEPTION_ITLBMISS], I0);              // exh     itlbmiss,i0
+		// The 603 takes the ISI itself when a BAT, the segment or a loaded TLB entry refuses the fetch.
+		// Only a page with no TLB entry is left to the software table search (Table 5-3 of the MPC603e User's Manual).
+		UML_TEST(block, I1, DSISR_PROTECTED | DSISR_NOEXEC);                // test    i1,protected|noexec
+		UML_JMPc(block, COND_Z, itlbmiss = label++);                        // jmp     itlbmiss,z
+		UML_MOV(block, I0, I1);                                             // mov     i0,i1
+		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                    // exh     isi,i0
+		UML_LABEL(block, itlbmiss);                                         // itlbmiss:
+		UML_MOV(block, SPR32(SPR603_IMISS), I0);                            // mov     [imiss],i0
+		UML_MOV(block, SPR32(SPR603_ICMP), mem(&m_core->mmu603_cmp));       // mov     [icmp],[mmu603_cmp]
+		UML_MOV(block, SPR32(SPR603_HASH1), mem(&m_core->mmu603_hash[0]));  // mov     [hash1],[mmu603_hash][0]
+		UML_MOV(block, SPR32(SPR603_HASH2), mem(&m_core->mmu603_hash[1]));  // mov     [hash2],[mmu603_hash][1]
+		UML_EXH(block, *m_exception[EXCEPTION_ITLBMISS], I0);               // exh     itlbmiss,i0
 	}
 
 	block.end();
@@ -1029,10 +1066,13 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		{
 			if (exception == EXCEPTION_ITLBMISS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);      // or      [srr1],0x00040000
-			else if (exception == EXCEPTION_DTLBMISSL)
+			else if (exception == EXCEPTION_DTLBMISSS)
 				UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00010000);      // or      [srr1],0x00010000
 			if (exception == EXCEPTION_ITLBMISS || exception == EXCEPTION_DTLBMISSL || exception == EXCEPTION_DTLBMISSS)
-				UML_ROLINS(block, SPR32(SPROEA_SRR1), CR32(0), 28, CRMASK(0));  // rolins  [srr1],[cr0],28,crmask(0)
+			{
+				UML_ROLINS(block, SPR32(SPROEA_SRR1), mem(&m_core->mmu603_key), 19, 0x00080000);    // rolins  [srr1],[mmu603_key],19,0x00080000 ; SRR1[KEY]
+				UML_ROLINS(block, SPR32(SPROEA_SRR1), CR32(0), 28, CRMASK(0));                      // rolins  [srr1],[cr0],28,crmask(0)
+			}
 		}
 
 		// update MSR
@@ -1337,6 +1377,10 @@ void ppc_device::static_generate_memory_accessor(
 				UML_LABEL(block, skip);                                                     // skip:
 			}
 
+	// clear first, so a request this instruction never made can't discard an unrelated transfer
+	if (m_drcoptions & PPCDRC_BUS_RETRY)
+		UML_STORE(block, access_to_be_redone_ptr(), 0, 0, SIZE_BYTE, SCALE_x1);
+
 	switch (size)
 	{
 		case 1:
@@ -1396,6 +1440,14 @@ void ppc_device::static_generate_memory_accessor(
 					UML_DREADM(block, I0, I0, I2, SIZE_QWORD, SPACE_PROGRAM);           // dreadm  i0,i0,i2,program_qword
 			}
 			break;
+	}
+
+	// unwind before the destination and update-address registers are written
+	if (m_drcoptions & PPCDRC_BUS_RETRY)
+	{
+		UML_LOAD(block, I3, access_to_be_redone_ptr(), 0, SIZE_BYTE, SCALE_x1);
+		UML_TEST(block, I3, 1);
+		UML_EXHc(block, COND_NZ, *m_bus_retry, 0);
 	}
 
 	// 601 codewatch continued: if the store is to a page with compiled code,
@@ -2030,7 +2082,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 				UML_CALLC(block, cfunc_printf_debug, this);                                 // callc   printf_debug
 			}
 			// Use a mask to only compare the parts of the TLB that actually matter for possibly recompiling a block
-			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);		// load    i0,tlbtable[desc->pc >> 12],dword
+			UML_LOAD(block, I0, &tlbtable[desc->pc >> 12], 0, SIZE_DWORD, SCALE_x4);        // load    i0,tlbtable[desc->pc >> 12],dword
 			UML_AND(block, I0, I0, VTLB_MAPPING_MASK);                                      // and     i0,i0,VTLB_MAPPING_MASK
 			UML_CMP(block, I0, tlbtable[desc->pc >> 12] & VTLB_MAPPING_MASK);               // cmp     i0,*tlbentry & VTLB_MAPPING_MASK
 			UML_EXHc(block, COND_NE, *m_tlb_mismatch, 0);                                   // exh     tlb_mismatch,0,NE
@@ -2577,6 +2629,16 @@ void ppc_device::generate_branch(drcuml_block &block, compiler_state *compiler, 
 			srcptr = &m_core->tempaddr;
 		}
 		UML_MOV(block, SPR32(SPR_LR), desc->pc + 4);                                    // mov     [lr],desc->pc + 4
+	}
+
+	// Mac OS X kernel panics go to a weird loop where multiple BRAs chain to
+	// form an infinite loop rather than the typical BRA self.  This causes
+	// our branch folding to make an entire compilation block have zero cycles,
+	// which locks up the MAME process.  Detect that and mitigate it.
+	if (compiler_temp.cycles == 0)
+	{
+		compiler_temp.cycles = 1;
+		UML_MAPVAR(block, MAPVAR_CYCLES, compiler_temp.cycles);
 	}
 
 	// update the cycles and jump through the hash table to the target

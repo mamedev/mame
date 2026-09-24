@@ -25,7 +25,8 @@ Grand Striker has an IRQ2 which is probably network related.
 
 TODO:
 - Finish hooking up the inputs
-- Tilemap scrolling/rotation/zooming or whatever effect it needs
+- MB60553 words 1, 2, 5 and 6 of the line table and registers 2/3 are
+  never used by these games, so their function is unknown
 - Priorities are wrong. I suspect they need sprite orthogonality
 - Missing mixer registers (mainly layer enable/disable)
 - Tecmo World Cup '94 has missing protection emulation for draw buy-in
@@ -878,8 +879,10 @@ ROM_START( vgoalsoc )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
-	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
+	ROM_REGION( 0x400000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
+	// game often sets $2x'xxxx source addresses for ADPCMB
+	ROM_COPY( "ymsnd:adpcmb", 0, 0x200000, 0x040000 )
 
 	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
@@ -909,8 +912,9 @@ ROM_START( vgoalsoca )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
-	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
+	ROM_REGION( 0x400000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
+	ROM_COPY( "ymsnd:adpcmb", 0, 0x200000, 0x040000 )
 
 	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )

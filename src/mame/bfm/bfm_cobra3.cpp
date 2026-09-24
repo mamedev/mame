@@ -3,8 +3,6 @@
 
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
-
-   TODO: MPEG decoding currently not implemented
 */
 
 
@@ -17,11 +15,14 @@
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
-#include "video/ramdac.h"
 #include "machine/rescap.h"
 #include "machine/scc66470.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/tms320av110.h"
 #include "sound/ymz280b.h"
+#include "video/ramdac.h"
+#include "video/sti3400.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -37,10 +38,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cpuregion(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
+		m_av110(*this, "av110"),
 		m_ymz(*this, "ymz280b"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ramdac(*this, "ramdac"),
 		m_scc66470(*this, "scc66470"),
+		m_sti3400(*this, "sti3400"),
 		m_strobein(*this, "STROBE%u", 0),
 		m_meters(*this, "meters"),
 		m_lamps(*this, "lamp%u", 0U),
@@ -56,10 +60,13 @@ protected:
 	required_device<m68340_cpu_device> m_maincpu;
 	required_region_ptr<uint16_t> m_cpuregion;
 	required_device<nvram_device> m_nvram;
+	required_device<tms320av110_device> m_av110;
 	required_device<ymz280b_device> m_ymz;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<ramdac_device> m_ramdac;
 	required_device<scc66470_device> m_scc66470;
+	required_device<sti3400_device> m_sti3400;
 	required_ioport_array<5> m_strobein;
 	optional_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
@@ -68,6 +75,8 @@ protected:
 	required_device<watchdog_timer_device> m_watchdog;
 
 	std::unique_ptr<uint16_t[]> m_mainram;
+	std::unique_ptr<u8[]> m_scc_line_buffer;
+	bitmap_rgb32 m_scc_bitmap;
 
 	uint8_t m_active_strobe;
 	uint8_t m_triac_latch;
@@ -75,12 +84,16 @@ protected:
 	uint8_t m_volume;
 
 	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 
 	void volume_control(uint8_t direction, uint8_t clock);
+	void av110_reset_strobe_w(u8 data);
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(scc_scanline);
 
 	void scc66470_irq(int state);
 
@@ -91,7 +104,7 @@ protected:
 
 void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 {
-	int clock_changed = m_vol_clock ^ clock;
+	uint8_t const clock_changed = m_vol_clock ^ clock;
 
 	m_vol_clock = clock;
 	if (clock_changed)
@@ -109,12 +122,21 @@ void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 					m_volume--;
 			}
 
-			float fraction = (64 - m_volume) / 64.0f;
+			float const fraction = (32 - m_volume) / 32.0f;
 
 			m_ymz->set_output_gain(0, fraction);
 			m_ymz->set_output_gain(1, fraction);
+			m_av110->set_output_gain(0, fraction);
+			m_av110->set_output_gain(1, fraction);
 		}
 	}
+}
+
+void bfm_cobra3_state::av110_reset_strobe_w(u8)
+{
+	// This decoded write pulses the AV110's active-low RESET input.
+	m_av110->reset_w(0);
+	m_av110->reset_w(1);
 }
 
 uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
@@ -305,6 +327,9 @@ void bfm_cobra3_state::bfm_cobra3_map(address_map &map)
 {
 	map(0x00000000, 0xffffffff).rw(FUNC(bfm_cobra3_state::mem_r), FUNC(bfm_cobra3_state::mem_w));
 	map(0x00800000, 0x009fffff).m(m_scc66470, FUNC(scc66470_device::map)).cswidth(16);
+	map(0x00a40000, 0x00a4007f).m(m_sti3400, FUNC(sti3400_device::map));
+	map(0x00a80000, 0x00a80001).w(FUNC(bfm_cobra3_state::av110_reset_strobe_w)).umask16(0x00ff);
+	map(0x00a81000, 0x00a810ff).m(m_av110, FUNC(tms320av110_device::map)).umask16(0x00ff);
 }
 
 void bfm_cobra3_state::ramdac_map(address_map &map)
@@ -375,8 +400,30 @@ INPUT_PORTS_END
 void bfm_cobra3_state::machine_start()
 {
 	m_active_strobe = 0;
+	m_vol_clock = 0;
+	m_volume = 0;
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
+
+	save_pointer(NAME(m_mainram), (1024 * 16) / 2);
+	save_item(NAME(m_active_strobe));
+	save_item(NAME(m_vol_clock));
+	save_item(NAME(m_volume));
+}
+
+void bfm_cobra3_state::video_start()
+{
+	m_scc_bitmap.allocate(m_screen->width(), m_screen->height());
+	m_scc_line_buffer = std::make_unique<u8[]>(m_screen->visible_area().width());
+	m_scc_bitmap.fill(rgb_t::transparent());
+
+	// Earlier scanlines cannot be reconstructed from the restored SCC state.
+	save_item(NAME(m_scc_bitmap));
+}
+
+void bfm_cobra3_state::video_reset()
+{
+	m_scc_bitmap.fill(rgb_t::transparent());
 }
 
 
@@ -385,64 +432,55 @@ void bfm_cobra3_state::scc66470_irq(int state)
 	m_maincpu->set_input_line(5, state);
 }
 
-uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+TIMER_DEVICE_CALLBACK_MEMBER(bfm_cobra3_state::scc_scanline)
 {
+	rectangle const &visible = m_screen->visible_area();
+	if ((param < visible.top()) || (param > visible.bottom()))
+		return;
+
+	u32 *const destination = &m_scc_bitmap.pix(param, visible.left());
+
 	if (m_scc66470->display_enabled())
 	{
-		if (cliprect.min_y == cliprect.max_y)
+		m_scc66470->line(param, m_scc_line_buffer.get(), visible.width());
+		pen_t const *const pens = m_palette->pens();
+		for (int x = 0; x != visible.width(); x++)
 		{
-			uint32_t *dest = &bitmap.pix(cliprect.min_y);
-			uint8_t buffer[768];
-			uint8_t *src = buffer;
-			m_scc66470->line(cliprect.min_y, buffer, sizeof(buffer));
-
-			src = buffer;
-
-			if (*src == 254)
-			{
-				// Other implementations suggest leaving transparency / MPEG border colour here to ease blending
-				src += 32;
-			}
+			u8 const pen = m_scc_line_buffer[x];
+			// The Cobra mixer selects external MPEG video for palette index 0xfe.
+			if (pen == 0xfe)
+				destination[x] = rgb_t::transparent();
 			else
-			{
-				dest = std::fill_n(dest, 32, m_palette->pen(*src));
-				src += 32;
-			}
-
-			/* mpeg video has significant overscan, 4 lines either side.
-
-			Just crop it out to fit, presume the chip does this IRL */
-
-			for (int x = 0 ; x < 352 ; x++)
-			{
-				if (*src == 254)
-				{
-					*dest++ = 0; // Will allow MPEG to be drawn i.e. transparent
-					src++;
-				}
-				else
-				{
-					*dest++ = m_palette->pen(*src++);
-				}
-
-				if (*src == 254)
-				{
-					*dest++ = 0; // This should be mpeg video pixel i.e. transparent
-					src++;
-				}
-				else
-				{
-					*dest++ = m_palette->pen(*src++);
-				}
-			}
-			// TODO: MPEG image will write a border of 32 pixels of mpeg border colour here when it's mixed in, see above.
-
-			if (*src != 254)
-			{
-				std::fill_n(dest, 32, m_palette->pen(*src));
-			}
+				destination[x] = pens[pen];
 		}
 	}
+	else
+	{
+		std::fill_n(destination, visible.width(), rgb_t::transparent());
+	}
+}
+
+uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+
+	rectangle const &visible = screen.visible_area();
+
+	if (m_sti3400->video_valid())
+	{
+		bitmap_rgb32 const &source = m_sti3400->bitmap();
+		rectangle video(visible);
+		video.set_size(std::min(source.width() * 2, visible.width()), std::min(source.height(), visible.height()));
+		video.set_origin(visible.left() + (visible.width() - video.width()) / 2, visible.top() + (visible.height() - video.height()) / 2);
+
+		// SCC66470 8-bit output repeats each stored pixel twice horizontally.
+		s32 const startx = (((source.width() * 2 - video.width()) / 2) - video.left()) * 0x8000;
+		s32 const starty = (((source.height() - video.height()) / 2) - video.top()) * 0x10000;
+		copyrozbitmap(bitmap, video & cliprect, source, startx, starty, 0x8000, 0, 0, 0x10000, false);
+	}
+
+	copybitmap_transalpha(bitmap, m_scc_bitmap, 0, 0, 0, 0, visible & cliprect);
+
 	return 0;
 }
 
@@ -455,9 +493,11 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(15000000, 960, 0, 768, 312, 32, 312);
-	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	// The SCC66470 produces a pixel clock at half its oscillator frequency.
+	// Cobra uses its 768-pixel, 280-visible-line mode in a 312-line field.
+	screen.set_raw(30_MHz_XTAL / 2, 960, 0, 768, 312, 32, 312);
 	screen.set_screen_update(FUNC(bfm_cobra3_state::screen_update));
+	screen.screen_vblank().set(m_sti3400, FUNC(sti3400_device::vblank_w));
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -472,10 +512,23 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	m_ymz->add_route(0, "lspeaker", 1.0);
 	m_ymz->add_route(1, "rspeaker", 1.0);
 
-	SCC66470(config,m_scc66470,30000000);
+	TMS320AV110(config, m_av110, 24_MHz_XTAL);
+	// Cobra enables decoder modes that require the optional external DRAM.
+	m_av110->set_external_dram(true);
+	// AV110 REQ and MC68340 DREQ2 are both active low.
+	m_av110->req().set(m_maincpu, FUNC(m68340_cpu_device::dma_dreq2_w));
+	m_av110->add_route(0, "lspeaker", 1.0);
+	m_av110->add_route(1, "rspeaker", 1.0);
+
+	SCC66470(config,m_scc66470,30_MHz_XTAL);
 	m_scc66470->set_addrmap(0, &bfm_cobra3_state::scc66470_map);
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(bfm_cobra3_state::scc66470_irq));
+	TIMER(config, "scc_scanline").configure_scanline(FUNC(bfm_cobra3_state::scc_scanline), m_screen, 0, 1);
+
+	STI3400(config, m_sti3400, 0); // decoder clock and external-memory cycle timing are not modelled
+	m_sti3400->set_dram_size(1024 * 1024); // Cobra's buffer pointers cover a 1 MiB address space
+	m_sti3400->irq().set_inputline(m_maincpu, 6);
 
 	auto &scsi(NSCSI_BUS(config, m_scsibus));
 	auto &cdrom(NSCSI_CDROM(config, "cdrom"));

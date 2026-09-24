@@ -2183,11 +2183,11 @@ ROM_START( outfxies )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
-	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x080000, CRC(e75e8cec) SHA1(49f6cffd8aabe6c39ee89fac97e63fc2dc267a31) )
 
-	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_REGION( 0x100000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x100000, CRC(40148bbb) SHA1(bbaa2e7e3f8b43ce0d0d8cb2d2a730f76a76cee1) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -2225,11 +2225,11 @@ ROM_START( outfxiesj )
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
-	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x080000, CRC(e75e8cec) SHA1(49f6cffd8aabe6c39ee89fac97e63fc2dc267a31) )
 
-	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_REGION( 0x100000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x100000, CRC(40148bbb) SHA1(bbaa2e7e3f8b43ce0d0d8cb2d2a730f76a76cee1) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -2267,11 +2267,11 @@ ROM_START( outfxiesja ) // this set uses different "c355spr", "c169roz" and "c12
 	ROM_REGION( 0x1000000, "c352", 0 ) // samples
 	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
-	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x080000, CRC(e75e8cec) SHA1(49f6cffd8aabe6c39ee89fac97e63fc2dc267a31) )
 
-	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_REGION( 0x100000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x100000, CRC(40148bbb) SHA1(bbaa2e7e3f8b43ce0d0d8cb2d2a730f76a76cee1) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 ) // all sldh
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(ecf135e4) SHA1(f88924bf4528845c6d178abf0c0d71e3030d6823) )
@@ -2309,11 +2309,11 @@ ROM_START( outfxiesa ) // briefly shows "For use in Japan" notice, but Japanese 
 	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
 	ROM_LOAD( "ou1voi0.6n", 0x000000, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
-	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
-	ROM_LOAD( "ou1shas.12s", 0x000000, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0x000000, 0x080000, CRC(e75e8cec) SHA1(49f6cffd8aabe6c39ee89fac97e63fc2dc267a31) )
 
-	ROM_REGION( 0x200000, "c169roz:mask", 0 )
-	ROM_LOAD( "ou1shar.18s", 0x000000, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_REGION( 0x100000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0x000000, 0x100000, CRC(40148bbb) SHA1(bbaa2e7e3f8b43ce0d0d8cb2d2a730f76a76cee1) )
 
 	ROM_REGION( 0x2000000, "c355spr", 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )

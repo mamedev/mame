@@ -72,7 +72,7 @@ void palm_device::device_start()
 
 	state_add(0, "IL", m_il);
 	for (unsigned i = 0; i < std::size(m_r[m_il]); i++)
-		state_add<u16>(i + 1, util::string_format("R%d", i).c_str(), [this, i]() { return m_r[m_il][i]; }, [this, i](u16 data) { m_r[m_il][i] = data; });
+		state_add<u16>(i + 1, util::string_format("R%d", i), [this, i]() { return m_r[m_il][i]; }, [this, i](u16 data) { m_r[m_il][i] = data; });
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_r));

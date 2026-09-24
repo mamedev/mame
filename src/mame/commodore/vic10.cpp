@@ -1,13 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - memory mapping with PLA
-    - PLA dump
-
-*/
 
 #include "emu.h"
 #include "screen.h"
@@ -19,7 +11,6 @@
 #include "cpu/m6502/m6510.h"
 #include "machine/input_merger.h"
 #include "machine/mos6526.h"
-#include "machine/ram.h"
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
@@ -46,9 +37,9 @@ public:
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
 		m_exp(*this, "exp"),
-		m_ram(*this, RAM_TAG),
+		m_ram(*this, "ram"),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
+		m_color_ram(*this, "color_ram"),
 		m_row(*this, "ROW%u", 0),
 		m_restore(*this, "RESTORE"),
 		m_lock(*this, "LOCK")
@@ -64,9 +55,9 @@ private:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<vic10_expansion_slot_device> m_exp;
-	required_device<ram_device> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	memory_share_creator<uint8_t> m_color_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
 	required_ioport_array<8> m_row;
 	required_ioport m_restore;
 	required_ioport m_lock;
@@ -74,11 +65,9 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
-
-	uint8_t vic_videoram_r(offs_t offset);
-	uint8_t vic_colorram_r(offs_t offset);
+	void cia_w(offs_t offset, uint8_t data);
+	uint8_t cia_pa_out() const { return m_cia_port[0] | ~m_cia_port[2]; }
+	uint8_t cia_pb_out() const { return m_cia_port[1] | ~m_cia_port[3]; }
 
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
@@ -92,127 +81,12 @@ private:
 
 	void exp_reset_w(int state);
 
+	uint8_t m_cia_port[4];
+
 	void vic10_mem(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
 	void vic_videoram_map(address_map &map) ATTR_COLD;
 };
-
-
-//**************************************************************************
-//  MEMORY MANAGEMENT
-//**************************************************************************
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t vic10_state::read(offs_t offset)
-{
-	// TODO this is really handled by the PLA
-
-	uint8_t data = m_vic->bus_r();
-	int lorom = 1, uprom = 1, exram = 1;
-
-	if (offset < 0x800)
-	{
-		data = m_ram->pointer()[offset];
-	}
-	else if (offset < 0x1000)
-	{
-		exram = 0;
-	}
-	else if (offset >= 0x8000 && offset < 0xa000)
-	{
-		lorom = 0;
-	}
-	else if (offset >= 0xd000 && offset < 0xd400)
-	{
-		data = m_vic->read(offset & 0x3f);
-	}
-	else if (offset >= 0xd400 && offset < 0xd800)
-	{
-		data = m_sid->read(offset & 0x1f);
-	}
-	else if (offset >= 0xd800 && offset < 0xdc00)
-	{
-		data = m_color_ram[offset & 0x3ff];
-	}
-	else if (offset >= 0xdc00 && offset < 0xe000)
-	{
-		data = m_cia->read(offset & 0x0f);
-	}
-	else if (offset >= 0xe000)
-	{
-		uprom = 0;
-	}
-
-	return m_exp->cd_r(offset, data, lorom, uprom, exram);
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void vic10_state::write(offs_t offset, uint8_t data)
-{
-	// TODO this is really handled by the PLA
-
-	int lorom = 1, uprom = 1, exram = 1;
-
-	if (offset < 0x800)
-	{
-		m_ram->pointer()[offset] = data;
-	}
-	else if (offset < 0x1000)
-	{
-		exram = 0;
-	}
-	else if (offset >= 0xd000 && offset < 0xd400)
-	{
-		m_vic->write(offset & 0x3f, data);
-	}
-	else if (offset >= 0xd400 && offset < 0xd800)
-	{
-		m_sid->write(offset & 0x1f, data);
-	}
-	else if (offset >= 0xd800 && offset < 0xdc00)
-	{
-		m_color_ram[offset & 0x3ff] = data & 0x0f;
-	}
-	else if (offset >= 0xdc00 && offset < 0xe000)
-	{
-		m_cia->write(offset & 0x0f, data);
-	}
-
-	m_exp->cd_w(offset, data, lorom, uprom, exram);
-}
-
-
-//-------------------------------------------------
-//  vic_videoram_r -
-//-------------------------------------------------
-
-uint8_t vic10_state::vic_videoram_r(offs_t offset)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (offset < 0x3000)
-		return program.read_byte(offset);
-
-	return program.read_byte(0xe000 + (offset & 0x1fff));
-}
-
-
-//-------------------------------------------------
-//  vic_colorram_r -
-//-------------------------------------------------
-
-uint8_t vic10_state::vic_colorram_r(offs_t offset)
-{
-	return m_color_ram[offset];
-}
-
 
 
 //**************************************************************************
@@ -225,7 +99,12 @@ uint8_t vic10_state::vic_colorram_r(offs_t offset)
 
 void vic10_state::vic10_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(vic10_state::read), FUNC(vic10_state::write));
+	map(0x0000, 0xffff).r(m_vic, FUNC(mos6566_device::bus_r)).nopw();
+	map(0x0000, 0x07ff).ram().share("ram");
+	map(0xd000, 0xd03f).mirror(0x3c0).rw(m_vic, FUNC(mos6566_device::read), FUNC(mos6566_device::write));
+	map(0xd400, 0xd41f).mirror(0x3e0).rw(m_sid, FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	map(0xd800, 0xdbff).readonly().share("color_ram").lw8(NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
+	map(0xdc00, 0xdc0f).mirror(0x3f0).r(m_cia, FUNC(mos6526_device::read)).w(FUNC(vic10_state::cia_w));
 }
 
 
@@ -235,7 +114,8 @@ void vic10_state::vic10_mem(address_map &map)
 
 void vic10_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(vic10_state::vic_videoram_r));
+	map(0x0000, 0x3fff).r(m_vic, FUNC(mos6566_device::bus_r));
+	map(0x0000, 0x07ff).readonly().share("ram");
 }
 
 
@@ -245,7 +125,7 @@ void vic10_state::vic_videoram_map(address_map &map)
 
 void vic10_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(FUNC(vic10_state::vic_colorram_r));
+	map(0x000, 0x3ff).readonly().share("color_ram");
 }
 
 
@@ -261,10 +141,10 @@ void vic10_state::vic_colorram_map(address_map &map)
 static INPUT_PORTS_START( vic10 )
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_RALT)        PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3)                                    PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2)                                    PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1)                                    PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4)                                    PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER)             PORT_CHAR(13)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INST DEL") PORT_CODE(KEYCODE_BACKSPACE)       PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
@@ -361,7 +241,7 @@ uint8_t vic10_state::sid_potx_r()
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->pa_r() >> 6)
+	switch (cia_pa_out() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_x(); break;
 	case 2: data = m_joy2->read_pot_x(); break;
@@ -388,7 +268,7 @@ uint8_t vic10_state::sid_poty_r()
 {
 	uint8_t data = 0xff;
 
-	switch (m_cia->pa_r() >> 6)
+	switch (cia_pa_out() >> 6)
 	{
 	case 1: data = m_joy1->read_pot_y(); break;
 	case 2: data = m_joy2->read_pot_y(); break;
@@ -442,7 +322,7 @@ uint8_t vic10_state::cia_pa_r()
 	data &= ~(!BIT(joy_b, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pb = m_cia->pb_r();
+	uint8_t cia_pb = cia_pb_out();
 	uint32_t row[8] = { m_row[0]->read(), m_row[1]->read() & m_lock->read(), m_row[2]->read(), m_row[3]->read(),
 						m_row[4]->read(), m_row[5]->read(), m_row[6]->read(), m_row[7]->read() };
 
@@ -490,7 +370,7 @@ uint8_t vic10_state::cia_pb_r()
 	data &= ~(!BIT(joy_a, 5) << 4);
 
 	// keyboard
-	uint8_t cia_pa = m_cia->pa_r();
+	uint8_t cia_pa = cia_pa_out();
 
 	if (!BIT(cia_pa, 7)) data &= m_row[7]->read();
 	if (!BIT(cia_pa, 6)) data &= m_row[6]->read();
@@ -522,6 +402,15 @@ void vic10_state::cia_pb_w(uint8_t data)
 	*/
 
 	m_vic->lp_w(BIT(data, 4));
+}
+
+
+void vic10_state::cia_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 0x0f) < 4)
+		m_cia_port[offset & 0x03] = data;
+
+	m_cia->write(offset, data);
 }
 
 
@@ -591,7 +480,7 @@ void vic10_state::exp_reset_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
-		machine_reset();
+		machine().schedule_soft_reset();
 	}
 }
 
@@ -610,23 +499,19 @@ void vic10_state::machine_start()
 	// initialize memory
 	uint8_t data = 0xff;
 
-	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	for (offs_t offset = 0; offset < m_ram.bytes(); offset++)
 	{
-		m_ram->pointer()[offset] = data;
+		m_ram[offset] = data;
 		if (!(offset % 64)) data ^= 0xff;
 	}
+
+	save_item(NAME(m_cia_port));
 }
 
 
 void vic10_state::machine_reset()
 {
-	m_maincpu->reset();
-
-	m_vic->reset();
-	m_sid->reset();
-	m_cia->reset();
-
-	m_exp->reset();
+	std::fill(std::begin(m_cia_port), std::end(m_cia_port), 0);
 }
 
 
@@ -647,21 +532,22 @@ void vic10_state::vic10(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(vic10_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(vic10_state::cpu_w));
 	m_maincpu->set_pulls(0x10, 0x20);
+	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
 
 	// video hardware
-	mos8566_device &mos8566(MOS8566(config, MOS6566_TAG, XTAL(8'000'000)/8));
-	mos8566.set_cpu(m_maincpu);
-	mos8566.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	mos8566.set_screen(SCREEN_TAG);
-	mos8566.set_addrmap(0, &vic10_state::vic_videoram_map);
-	mos8566.set_addrmap(1, &vic10_state::vic_colorram_map);
+	mos6566_device &mos6566(MOS6566(config, MOS6566_TAG, XTAL(8'000'000)/8));
+	mos6566.set_cpu(m_maincpu);
+	mos6566.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	mos6566.set_screen(SCREEN_TAG);
+	mos6566.set_addrmap(0, &vic10_state::vic_videoram_map);
+	mos6566.set_addrmap(1, &vic10_state::vic_colorram_map);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(VIC6566_VRETRACERATE);
-	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
+	screen.set_size(VIC6567_COLUMNS, VIC6566_LINES);
 	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
 	screen.set_screen_update(MOS6566_TAG, FUNC(mos6566_device::screen_update));
 
@@ -691,6 +577,8 @@ void vic10_state::vic10(machine_config &config)
 
 	VIC10_EXPANSION_SLOT(config, m_exp, XTAL(8'000'000)/8, vic10_expansion_cards, nullptr);
 	m_exp->set_must_be_loaded(true);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->set_video_space(m_vic, 0);
 	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->res_callback().set(FUNC(vic10_state::exp_reset_w));
 	m_exp->cnt_callback().set(m_cia, FUNC(mos6526_device::cnt_w));
@@ -698,9 +586,6 @@ void vic10_state::vic10(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("vic10");
-
-	// internal ram
-	RAM(config, RAM_TAG).set_default_size("4K");
 }
 
 

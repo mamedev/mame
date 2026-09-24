@@ -825,6 +825,7 @@ void gi6809_state::init_cast()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: work around some hangs
 	ROM[0x9676] = 0x12;  // fix hangs on Bonus Game - NOP 19Ch flag check 1/2
 	ROM[0x9677] = 0x12;  // fix hangs on Bonus Game - NOP 19Ch flag check 2/2
 	ROM[0x837f] = 0x00;  // fix checksum

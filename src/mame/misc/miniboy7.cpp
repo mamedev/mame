@@ -1074,7 +1074,7 @@ ROM_END
   The card backs have the Bonanza Enterprises logo
   Bets of 3 to 5 coins adds 1 Joker to the deck.
   Bets of 6 to 10 coins adds 1 more Joker to the deck.
-  Max bet limitted to 10 coins
+  Max bet limited to 10 coins
   There is some type of Bonus for 3's or 7's
 
 */
@@ -1100,6 +1100,7 @@ ROM_END
 
 void miniboy7_state::init_smini()
 {
+	// HACK: what are these for?
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0xa0f0] = 0x0e;

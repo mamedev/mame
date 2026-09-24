@@ -80,11 +80,11 @@ void alpha_device::device_start()
 
 	// integer registers
 	for (unsigned i = 0; i < 32; i++)
-		state_add(i, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(i, util::string_format("R%d", i), m_r[i]);
 
 	// floating point registers
 	for (unsigned i = 0; i < 32; i++)
-		state_add(i + 32, util::string_format("F%d", i).c_str(), m_f[i]);
+		state_add(i + 32, util::string_format("F%d", i), m_f[i]);
 }
 
 void alpha_device::device_reset()

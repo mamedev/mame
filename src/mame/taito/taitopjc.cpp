@@ -1081,7 +1081,7 @@ void taitopjc_state::init_optiger()
 {
 	uint8_t *rom = (uint8_t*)memregion("iocpu")->base();
 
-	// skip sound check
+	// HACK: skip sound check
 	rom[BYTE_XOR_LE(0x217)] = 0x00;
 	rom[BYTE_XOR_LE(0x218)] = 0x00;
 

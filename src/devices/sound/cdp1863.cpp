@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - what happens if you connect both clocks?
-
-*/
-
 #include "emu.h"
 #include "cdp1863.h"
 

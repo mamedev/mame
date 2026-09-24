@@ -38,7 +38,7 @@ license:CC0-1.0
 
 	<element name="start" defstate="0">
 		<disk state="0">
-			<color red="0.0" green="0.1" blue="0.02" />
+			<color red="0.0" green="0.15" blue="0.03" />
 		</disk>
 		<disk state="1">
 			<color red="0.0" green="0.8" blue="0.2" />
@@ -49,9 +49,19 @@ license:CC0-1.0
 		</text>
 	</element>
 
+	<element name="radio">
+		<disk>
+			<color red="0.27" green="0.12" blue="0.0" />
+		</disk>
+		<text string="radio">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.02" y="0.16" width="0.96" height="0.60" />
+		</text>
+	</element>
+
 	<element name="view1" defstate="0">
 		<disk state="0">
-			<color red="0.1" green="0.0" blue="0.0" />
+			<color red="0.15" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -64,7 +74,7 @@ license:CC0-1.0
 
 	<element name="view2" defstate="0">
 		<disk state="0">
-			<color red="0.1" green="0.1" blue="0.1" />
+			<color red="0.15" green="0.15" blue="0.15" />
 		</disk>
 		<disk state="1">
 			<color red="0.8" green="0.8" blue="0.8" />
@@ -77,7 +87,7 @@ license:CC0-1.0
 
 	<element name="view3" defstate="0">
 		<disk state="0">
-			<color red="0.0" green="0.06" blue="0.1" />
+			<color red="0.0" green="0.09" blue="0.15" />
 		</disk>
 		<disk state="1">
 			<color red="0.0" green="0.6" blue="0.9" />
@@ -106,81 +116,84 @@ license:CC0-1.0
 			<bounds x="2.095" y="3.060" width="0.11" height="0.17" />
 		</element>
 
-		<!-- Left arc: dots at equal arc-length along the ellipse; inner LED centered on digits -->
 		<element name="led0" ref="led_green">
-			<bounds x="0.929" y="3.370" width="0.035" height="0.035" />
+			<bounds x="0.991" y="3.370" width="0.035" height="0.035" />
 		</element>
 		<element name="led1" ref="led_green">
-			<bounds x="0.923" y="3.294" width="0.035" height="0.035" />
+			<bounds x="0.985" y="3.294" width="0.035" height="0.035" />
 		</element>
 		<element name="led2" ref="led_green">
-			<bounds x="0.944" y="3.220" width="0.035" height="0.035" />
+			<bounds x="1.006" y="3.220" width="0.035" height="0.035" />
 		</element>
 		<element name="led3" ref="led_orange">
-			<bounds x="0.988" y="3.157" width="0.035" height="0.035" />
+			<bounds x="1.050" y="3.157" width="0.035" height="0.035" />
 		</element>
 		<element name="led4" ref="led_orange">
-			<bounds x="1.049" y="3.108" width="0.035" height="0.035" />
+			<bounds x="1.111" y="3.108" width="0.035" height="0.035" />
 		</element>
 		<element name="led5" ref="led_red">
-			<bounds x="1.121" y="3.076" width="0.035" height="0.035" />
+			<bounds x="1.183" y="3.076" width="0.035" height="0.035" />
 		</element>
 		<element name="led6" ref="led_red">
-			<bounds x="1.200" y="3.062" width="0.035" height="0.035" />
+			<bounds x="1.262" y="3.062" width="0.035" height="0.035" />
 		</element>
 		<element name="led7" ref="led_red">
-			<bounds x="1.279" y="3.067" width="0.035" height="0.035" />
+			<bounds x="1.341" y="3.067" width="0.035" height="0.035" />
 		</element>
 		<element name="led16" ref="led_red">
-			<bounds x="1.355" y="3.088" width="0.035" height="0.035" />
+			<bounds x="1.417" y="3.088" width="0.035" height="0.035" />
 		</element>
 		<element name="led17" ref="led_red">
-			<bounds x="1.423" y="3.127" width="0.035" height="0.035" />
+			<bounds x="1.485" y="3.127" width="0.035" height="0.035" />
 		</element>
 
-		<!-- Right arc: mirror of left; inner LED centered on digits -->
 		<element name="led8" ref="led_green">
-			<bounds x="2.542" y="3.127" width="0.035" height="0.035" />
+			<bounds x="2.480" y="3.127" width="0.035" height="0.035" />
 		</element>
 		<element name="led9" ref="led_green">
-			<bounds x="2.610" y="3.088" width="0.035" height="0.035" />
+			<bounds x="2.548" y="3.088" width="0.035" height="0.035" />
 		</element>
 		<element name="led10" ref="led_green">
-			<bounds x="2.686" y="3.067" width="0.035" height="0.035" />
+			<bounds x="2.624" y="3.067" width="0.035" height="0.035" />
 		</element>
 		<element name="led11" ref="led_orange">
-			<bounds x="2.765" y="3.062" width="0.035" height="0.035" />
+			<bounds x="2.703" y="3.062" width="0.035" height="0.035" />
 		</element>
 		<element name="led12" ref="led_orange">
-			<bounds x="2.844" y="3.076" width="0.035" height="0.035" />
+			<bounds x="2.782" y="3.076" width="0.035" height="0.035" />
 		</element>
 		<element name="led13" ref="led_red">
-			<bounds x="2.916" y="3.108" width="0.035" height="0.035" />
+			<bounds x="2.854" y="3.108" width="0.035" height="0.035" />
 		</element>
 		<element name="led14" ref="led_red">
-			<bounds x="2.977" y="3.157" width="0.035" height="0.035" />
+			<bounds x="2.915" y="3.157" width="0.035" height="0.035" />
 		</element>
 		<element name="led15" ref="led_red">
-			<bounds x="3.021" y="3.220" width="0.035" height="0.035" />
+			<bounds x="2.959" y="3.220" width="0.035" height="0.035" />
 		</element>
 		<element name="led22" ref="led_red">
-			<bounds x="3.042" y="3.294" width="0.035" height="0.035" />
+			<bounds x="2.980" y="3.294" width="0.035" height="0.035" />
 		</element>
 		<element name="led23" ref="led_red">
-			<bounds x="3.036" y="3.370" width="0.035" height="0.035" />
+			<bounds x="2.974" y="3.370" width="0.035" height="0.035" />
+		</element>
+
+		<element name="lamp1" ref="view1" inputtag="IN1" inputmask="0x10">
+			<bounds x="0.115" y="3.020" width="0.305" height="0.135" />
+		</element>
+		<element name="lamp2" ref="view2" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.115" y="3.170" width="0.305" height="0.135" />
+		</element>
+		<element name="lamp3" ref="view3" inputtag="IN1" inputmask="0x40">
+			<bounds x="0.115" y="3.320" width="0.305" height="0.135" />
+		</element>
+
+		<element ref="radio" inputtag="IN1" inputmask="0x02">
+			<bounds x="0.535" y="3.145" width="0.335" height="0.18" />
 		</element>
 
 		<element name="lamp0" ref="start" inputtag="SYSTEM" inputmask="0x04">
-			<bounds x="3.43" y="3.145" width="0.335" height="0.18" />
-		</element>
-		<element name="lamp1" ref="view1" inputtag="IN1" inputmask="0x10">
-			<bounds x="0.245" y="3.020" width="0.305" height="0.135" />
-		</element>
-		<element name="lamp2" ref="view2" inputtag="IN1" inputmask="0x20">
-			<bounds x="0.245" y="3.170" width="0.305" height="0.135" />
-		</element>
-		<element name="lamp3" ref="view3" inputtag="IN1" inputmask="0x40">
-			<bounds x="0.245" y="3.320" width="0.305" height="0.135" />
+			<bounds x="3.130" y="3.145" width="0.335" height="0.18" />
 		</element>
 	</view>
 </mamelayout>

@@ -135,13 +135,13 @@ public:
 	{
 	}
 
-	void atetris_base(machine_config &config);
-	void atetris_pokey(machine_config &config);
-	void atetris(machine_config &config);
-	void atetrisb2(machine_config &config);
-	void atetrisb5(machine_config &config);
+	void atetris_base(machine_config &config) ATTR_COLD;
+	void atetris_pokey(machine_config &config) ATTR_COLD;
+	void atetris(machine_config &config) ATTR_COLD;
+	void atetrisb2(machine_config &config) ATTR_COLD;
+	void atetrisb5(machine_config &config) ATTR_COLD;
 
-	void init_atetris();
+	void init_atetris() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -166,7 +166,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
-	void reset_bank();
 
 	void atetrisb2_map(address_map &map) ATTR_COLD;
 	void atetrisb5_map(address_map &map) ATTR_COLD;
@@ -181,7 +180,7 @@ public:
 	{
 	}
 
-	void atetrisbp(machine_config &config);
+	void atetrisbp(machine_config &config) ATTR_COLD;
 
 private:
 	void output_w(uint8_t data);
@@ -200,8 +199,8 @@ public:
 	{
 	}
 
-	void atetrisb3(machine_config &config);
-	void atetrisb3_11mhz(machine_config &config);
+	void atetrisb3(machine_config &config) ATTR_COLD;
+	void atetrisb3_11mhz(machine_config &config) ATTR_COLD;
 
 
 protected:
@@ -225,7 +224,7 @@ public:
 	{
 	}
 
-	void atetb5205(machine_config &config);
+	void atetb5205(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<msm5205_device> m_msm;
@@ -241,8 +240,8 @@ private:
 
 TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
 {
-	int code = m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1] & 7) << 8);
-	int color = (m_videoram[tile_index * 2 + 1] & 0xf0) >> 4;
+	int const code = m_videoram[tile_index * 2] | ((m_videoram[tile_index * 2 + 1] & 7) << 8);
+	int const color = (m_videoram[tile_index * 2 + 1] & 0xf0) >> 4;
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -753,7 +752,7 @@ ROM_START( atetrisb2 )
 	ROM_LOAD( "c-gal16v8-b.bin", 0x22e, 0x117, CRC(e1a9db0b) SHA1(5bbac24e37a4d9b8a1387054722fa35478ca7941) ) // sub PCB
 	ROM_LOAD( "1-pal16l8-a.3g" , 0x345, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) ) // main PCB - Found also as GAL16v8 on some PCBs
 	ROM_LOAD( "2-pal16r4-a.3r" , 0x449, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) ) // main PCB
-	ROM_LOAD( "3-pal16r4-a.8p" , 0x54D, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) ) // main PCB - Found also as GAL16v8 on some PCBs
+	ROM_LOAD( "3-pal16r4-a.8p" , 0x54d, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) ) // main PCB - Found also as GAL16v8 on some PCBs
 	ROM_LOAD( "4-pal16l8-a.9n" , 0x651, 0x104, CRC(3630e734) SHA1(a29dc202ffc75ac48815115b85e984fc0c9d5b59) ) // main PCB - Found also as GAL16v8 on some PCBs
 	ROM_LOAD( "5-pal16l8-a.9m" , 0x755, 0x104, CRC(53b64be1) SHA1(2bf712b766541c90c38c0810ee16848e448c5205) ) // main PCB - Found also as GAL16v8 on some PCBs
 ROM_END
@@ -896,42 +895,48 @@ N |PAL16R4 74LS74 14017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
 */
 ROM_START( atetb3482 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "i4-d1.bin", 0x0000, 0x10000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
+	ROM_LOAD( "tet-d1-1100.4i", 0x0000, 0x10000, CRC(2acbdb09) SHA1(5e1189227f26563fd3e5372121ea5c915620f892) )
 
 	ROM_REGION( 0x10000, "tiles", 0 )
-	ROM_LOAD( "f8-d2.bin", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
+	ROM_LOAD( "tet-d2.8e", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
 
 	ROM_REGION( 0x8000, "soundcpu", 0 ) // Not hooked up
-	ROM_LOAD( "k1-d3.bin", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
+	ROM_LOAD( "tet-d3-z80.1k", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
 
 	// See http://www.seanriddle.com/um348x/ and http://arcadehacker.blogspot.com/2020/07/um3481a-series-multi-instrument-melody.html for notes about the UM3482
 	ROM_REGION( 0x01f0, "um3482", 0 ) // Not hooked up
 
 	/* Notes (3584 bits, which matches the datasheet's 512 7-bit notes).
 	   Raw dump from visual decap, needs further analysis. */
-	ROM_LOAD( "um3482araw.bin", 0x0000, 0x01c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) )
+	ROM_LOAD( "um3482araw.1f", 0x0000, 0x01c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) )
 
 	/* 16 entry by 9-bit ROM
 	   Song starting locations?  Chip has 16 songs max, 512 total notes.
 	   All 16 entries have data, but only 12 songs on chip.
 	   Dump from visual decap with values padded to 16 bits, needs further analysis. */
-	ROM_LOAD( "offsets.bin",    0x0000, 0x0020, BAD_DUMP CRC(f39aff3c) SHA1(255dcea154ed04c6d1968b09e188ca5fc8821721) )
+	ROM_LOAD( "offsets.bin", 0x0000, 0x0020, BAD_DUMP CRC(f39aff3c) SHA1(255dcea154ed04c6d1968b09e188ca5fc8821721) )
 
 	/* 16 entry by 7-bit ROM.
 	   Tempo for each song?
 	   All 16 entries have data, but only 12 songs on chip.
 	   Dump from visual decap with values padded to 8 bits, needs further analysis. */
-	ROM_LOAD( "tempos.bin",     0x0000, 0x0010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
+	ROM_LOAD( "tempos.bin", 0x0000, 0x0010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
+
+	ROM_REGION( 0x20, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "n82s123an.8n", 0x00, 0x20, NO_DUMP ) 
+
+	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "x2804ap.4j", 0x000, 0x200, NO_DUMP )
 
 	// Not dumped, unused
 	ROM_REGION( 0x71c, "plds", 0 )
-	ROM_LOAD( "pal16r4.1n" , 0x000, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16r4.7n" , 0x104, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8.9j" , 0x208, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8.9i" , 0x30c, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16r8.2h" , 0x410, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16r4.2g" , 0x514, 0x104, NO_DUMP )
-	ROM_LOAD( "pal16l8.4f" , 0x618, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r4acn.7.1n" , 0x000, 0x104, CRC(d71bdf27) SHA1(cc3503cb037de344fc353886f3492601638c9d45) )
+	ROM_LOAD( "pal16r4acn.3.7n" , 0x104, 0x104, CRC(e007edf2) SHA1(4f1bc31abd64e402edb4c900ddb21f258d6782c8) )
+	ROM_LOAD( "pal16l8acn.2.9j" , 0x208, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.1.9i" , 0x30c, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r8acn.6.2i" , 0x410, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r8acn.5.2h" , 0x514, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.4.4g" , 0x618, 0x104, CRC(dcf0d2fe) SHA1(0496acaa605ec5008b110c387136bbc714441384) )
 ROM_END
 
 

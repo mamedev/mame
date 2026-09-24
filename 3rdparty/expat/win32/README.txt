@@ -5,13 +5,13 @@ Expat can be built on Windows in two ways:
 * Cygwin:
   This follows the Unix build procedures.
 
-* MS Visual Studio 2019 and 2022:
+* MS Visual Studio 2022:
   Use CMake to generate a solution file for Visual Studio, then use msbuild
   to compile.  For example:
 
   md build
   cd build
-  cmake -G"Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+  cmake -G"Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
   msbuild /m expat.sln
 
 * All MS C/C++ compilers:

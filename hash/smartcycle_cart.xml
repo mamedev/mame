@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -29,7 +29,6 @@ NOTE: There is also a newer version of the Smart Cycle with 3D games, this howev
       dedicated hardware and cartridges.
 
 -->
-
 
 <softwarelist name="smartcycle_cart" description="Fisher-Price Smart Cycle cartridges">
 

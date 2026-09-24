@@ -1,12 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-    TODO:
-
-    - mos6560_port_r/w should respond at 0x1000-0x100f
-    - VIC21 (built in 21K ram)
-
-*/
 
 #include "emu.h"
 
@@ -20,7 +13,6 @@
 #include "cpu/m6502/m6510.h"
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
-#include "machine/ram.h"
 #include "sound/mos6560.h"
 
 #include "screen.h"
@@ -53,11 +45,9 @@ public:
 		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-		m_ram(*this, RAM_TAG),
+		m_ram0(*this, "ram0"),
+		m_ram(*this, "ram"),
 		m_screen(*this, SCREEN_TAG),
-		m_basic(*this, "basic"),
-		m_kernal(*this, "kernal"),
-		m_charom(*this, "charom"),
 		m_color_ram(*this, "color_ram"),
 		m_col(*this, "COL%u", 0),
 		m_restore(*this, "RESTORE"),
@@ -81,11 +71,9 @@ private:
 	required_device<vic20_expansion_slot_device> m_exp;
 	required_device<pet_user_port_device> m_user;
 	required_device<pet_datassette_port_device> m_cassette;
-	required_device<ram_device> m_ram;
+	required_shared_ptr<uint8_t> m_ram0;
+	required_shared_ptr<uint8_t> m_ram;
 	required_device<screen_device> m_screen;
-	required_region_ptr<uint8_t> m_basic;
-	required_region_ptr<uint8_t> m_kernal;
-	required_region_ptr<uint8_t> m_charom;
 	required_shared_ptr<uint8_t> m_color_ram;
 	required_ioport_array<8> m_col;
 	required_ioport m_restore;
@@ -93,11 +81,6 @@ private:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
-
-	uint8_t vic_videoram_r(offs_t offset);
 
 	void write_light_pen(int state);
 	void write_user_joy0(int state);
@@ -139,40 +122,6 @@ private:
 	int m_iec_clk = 0;
 	int m_iec_data = 0;
 
-	enum
-	{
-		BLK0 = 0,
-		BLK1,
-		BLK2,
-		BLK3,
-		BLK4,
-		BLK5,
-		BLK6,
-		BLK7
-	};
-
-
-	enum
-	{
-		RAM0 = 0,
-		RAM1,
-		RAM2,
-		RAM3,
-		RAM4,
-		RAM5,
-		RAM6,
-		RAM7
-	};
-
-
-	enum
-	{
-		IO0 = 4,
-		COLOR = 5,
-		IO2 = 6,
-		IO3 = 7
-	};
-
 	void vic20_mem(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
 	void vic_videoram_map(address_map &map) ATTR_COLD;
@@ -185,197 +134,6 @@ QUICKLOAD_LOAD_MEMBER(vic20_state::quickload_vc20)
 }
 
 //**************************************************************************
-//  MEMORY MANAGEMENT
-//**************************************************************************
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t vic20_state::read(offs_t offset)
-{
-	uint8_t data = m_vic->bus_r();
-
-	int ram1 = 1, ram2 = 1, ram3 = 1;
-	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
-	int io2 = 1, io3 = 1;
-
-	switch ((offset >> 13) & 0x07)
-	{
-	case BLK0:
-		switch ((offset >> 10) & 0x07)
-		{
-		case RAM0:
-			data = m_ram->pointer()[offset & 0x3ff];
-			break;
-
-		case RAM1: ram1 = 0; break;
-		case RAM2: ram2 = 0; break;
-		case RAM3: ram3 = 0; break;
-
-		default:
-			data = m_ram->pointer()[0x400 + (offset & 0xfff)];
-			break;
-		}
-		break;
-
-	case BLK1: blk1 = 0; break;
-	case BLK2: blk2 = 0; break;
-	case BLK3: blk3 = 0; break;
-
-	case BLK4:
-		switch ((offset >> 10) & 0x07)
-		{
-		default:
-			data = m_charom[offset & 0xfff];
-			break;
-
-		case IO0:
-			if (BIT(offset, 4))
-			{
-				data = m_via1->read(offset & 0x0f);
-			}
-			else if (BIT(offset, 5))
-			{
-				data = m_via2->read(offset & 0x0f);
-			}
-			else if (offset >= 0x9000 && offset < 0x9010)
-			{
-				data = m_vic->read(offset & 0x0f);
-			}
-			break;
-
-		case COLOR:
-			data = m_color_ram[offset & 0x3ff];
-			break;
-
-		case IO2: io2 = 0; break;
-		case IO3: io3 = 0; break;
-		}
-		break;
-
-	case BLK5: blk5 = 0; break;
-
-	case BLK6:
-		data = m_basic[offset & 0x1fff];
-		break;
-
-	case BLK7:
-		data = m_kernal[offset & 0x1fff];
-		break;
-	}
-
-	return m_exp->cd_r(offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void vic20_state::write(offs_t offset, uint8_t data)
-{
-	int ram1 = 1, ram2 = 1, ram3 = 1;
-	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
-	int io2 = 1, io3 = 1;
-
-	switch ((offset >> 13) & 0x07)
-	{
-	case BLK0:
-		switch ((offset >> 10) & 0x07)
-		{
-		case RAM0:
-			m_ram->pointer()[offset] = data;
-			break;
-
-		case RAM1: ram1 = 0; break;
-		case RAM2: ram2 = 0; break;
-		case RAM3: ram3 = 0; break;
-
-		default:
-			m_ram->pointer()[0x400 + (offset & 0xfff)] = data;
-			break;
-		}
-		break;
-
-	case BLK1: blk1 = 0; break;
-	case BLK2: blk2 = 0; break;
-	case BLK3: blk3 = 0; break;
-
-	case BLK4:
-		switch ((offset >> 10) & 0x07)
-		{
-		case IO0:
-			if (BIT(offset, 4))
-			{
-				m_via1->write(offset & 0x0f, data);
-			}
-			else if (BIT(offset, 5))
-			{
-				m_via2->write(offset & 0x0f, data);
-			}
-			else if (offset >= 0x9000 && offset < 0x9010)
-			{
-				m_vic->write(offset & 0x0f, data);
-			}
-			break;
-
-		case COLOR:
-			m_color_ram[offset & 0x3ff] = data & 0x0f;
-			break;
-
-		case IO2: io2 = 0; break;
-		case IO3: io3 = 0; break;
-		}
-		break;
-
-	case BLK5: blk5 = 0; break;
-	}
-
-	m_exp->cd_w(offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
-}
-
-
-//-------------------------------------------------
-//  vic_videoram_r -
-//-------------------------------------------------
-
-uint8_t vic20_state::vic_videoram_r(offs_t offset)
-{
-	int ram1 = 1, ram2 = 1, ram3 = 1;
-	int blk1 = 1, blk2 = 1, blk3 = 1, blk5 = 1;
-	int io2 = 1, io3 = 1;
-
-	uint8_t data = 0;
-
-	if (BIT(offset, 13))
-	{
-		switch ((offset >> 10) & 0x07)
-		{
-		case RAM0:
-			data = m_ram->pointer()[offset & 0x3ff];
-			break;
-
-		case RAM1: ram1 = 0; break;
-		case RAM2: ram2 = 0; break;
-		case RAM3: ram3 = 0; break;
-
-		default:
-			data = m_ram->pointer()[0x400 + (offset & 0xfff)];
-			break;
-		}
-	}
-	else
-	{
-		data = m_charom[offset & 0xfff];
-	}
-
-	return m_exp->cd_r(offset & 0x1fff, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -385,7 +143,19 @@ uint8_t vic20_state::vic_videoram_r(offs_t offset)
 
 void vic20_state::vic20_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(vic20_state::read), FUNC(vic20_state::write));
+	map(0x0000, 0xffff).r(m_vic, FUNC(mos6560_device::bus_r)).nopw();
+	map(0x0000, 0x03ff).ram().share("ram0");
+	map(0x1000, 0x1fff).ram().share("ram");
+	map(0x8000, 0x8fff).rom().region("charom", 0);
+	map(0x9000, 0x900f).rw(m_vic, FUNC(mos6560_device::read), FUNC(mos6560_device::write));
+	map(0x9010, 0x901f).mirror(0x3c0).m(m_via1, FUNC(via6522_device::map));
+	map(0x9020, 0x902f).mirror(0x3c0).m(m_via2, FUNC(via6522_device::map));
+	map(0x9030, 0x903f).mirror(0x3c0).lrw8(
+			NAME([this] (offs_t offset) { return m_via1->read(offset) & m_via2->read(offset); }),
+			NAME([this] (offs_t offset, uint8_t data) { m_via1->write(offset, data); m_via2->write(offset, data); }));
+	map(0x9400, 0x97ff).readonly().share("color_ram").lw8(NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
+	map(0xc000, 0xdfff).rom().region("basic", 0);
+	map(0xe000, 0xffff).rom().region("kernal", 0);
 }
 
 
@@ -395,7 +165,10 @@ void vic20_state::vic20_mem(address_map &map)
 
 void vic20_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(vic20_state::vic_videoram_r));
+	map(0x0000, 0x0fff).mirror(0x1000).rom().region("charom", 0);
+	map(0x2000, 0x23ff).readonly().share("ram0");
+	map(0x2400, 0x2fff).nopr();
+	map(0x3000, 0x3fff).readonly().share("ram");
 }
 
 
@@ -769,7 +542,7 @@ void vic20_state::exp_reset_w(int state)
 {
 	if (!state)
 	{
-		machine_reset();
+		machine().schedule_soft_reset();
 	}
 }
 
@@ -787,9 +560,12 @@ void vic20_state::machine_start()
 	// initialize memory
 	uint8_t data = 0xff;
 
-	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	for (offs_t offset = 0; offset < 0x1400; offset++)
 	{
-		m_ram->pointer()[offset] = data;
+		if (offset < 0x400)
+			m_ram0[offset] = data;
+		else
+			m_ram[offset - 0x400] = data;
 		if (!(offset % 64)) data ^= 0xff;
 	}
 
@@ -815,15 +591,6 @@ void vic20_state::machine_start()
 
 void vic20_state::machine_reset()
 {
-	m_maincpu->reset();
-
-	m_vic->reset();
-	m_via1->reset();
-	m_via2->reset();
-
-	m_iec->reset();
-	m_exp->reset();
-
 	m_user->write_3(0);
 	m_user->write_3(1);
 }
@@ -914,9 +681,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	SOFTWARE_LIST(config, "cart_list").set_original("vic1001_cart").set_filter(softlist_filter);
 	SOFTWARE_LIST(config, "cass_list").set_original("vic1001_cass").set_filter(softlist_filter);
 	SOFTWARE_LIST(config, "flop_list").set_original("vic1001_flop").set_filter(softlist_filter);
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("5K");
+	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter(softlist_filter);
 }
 
 
@@ -949,6 +714,8 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 
 	// devices
 	VIC20_EXPANSION_SLOT(config, m_exp, clock, vic20_expansion_cards, nullptr);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->set_video_space(m_vic, 0);
 	m_exp->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 	m_exp->nmi_wr_callback().set_inputline(m_maincpu, M6502_NMI_LINE);
 	m_exp->res_wr_callback().set(FUNC(vic20_state::exp_reset_w));

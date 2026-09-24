@@ -31,7 +31,7 @@ public:
 		: fdc37c665gt_device(mconfig, tag, owner, clock, upd765_family_device::mode_t::AT)
 	{ }
 
-	template<unsigned N, typename T> void set_ide(T&& tag) { m_ide[N].set_tag(std::forward<T>(tag)); }
+	template<typename T> void set_ide(T&& tag) { m_ide.set_tag(std::forward<T>(tag)); }
 
 	fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, upd765_family_device::mode_t floppy_mode);
 
@@ -39,8 +39,12 @@ public:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// to access io ports
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset) { return read16(offset) & 0xff; }
+	void write(offs_t offset, uint8_t data) { write16(offset, data); }
+
+	// alternate access for IDE Low/High byte enable
+	uint16_t read16(offs_t offset);
+	void write16(offs_t offset, uint16_t data);
 
 	auto fintr() { return m_fintr_callback.bind(); }
 	auto pintr1() { return m_pintr1_callback.bind(); }
@@ -137,7 +141,7 @@ private:
 	required_device<n82077aa_device> m_fdc;
 	required_device_array<ns16550_device, 2> m_serial;
 	required_device<pc_lpt_device> m_lpt;
-	optional_device_array<ata_interface_device, 2> m_ide;
+	optional_device<ata_interface_device> m_ide;
 
 	void write_configuration_register(int index, int data);
 };

@@ -386,16 +386,16 @@ void sparc_base_device::device_start()
 	state_add(SPARC_CWP,        "CWP",      m_cwp).formatstr("%2d");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_G0 + i, util::string_format("g%d", i).c_str(), m_r[i]).formatstr("%08X");
+		state_add(SPARC_G0 + i, util::string_format("g%d", i), m_r[i]).formatstr("%08X");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_O0 + i, util::string_format("o%d", i).c_str(), m_dbgregs[i]).formatstr("%08X");
+		state_add(SPARC_O0 + i, util::string_format("o%d", i), m_dbgregs[i]).formatstr("%08X");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_L0 + i, util::string_format("l%d", i).c_str(), m_dbgregs[8+i]).formatstr("%08X");
+		state_add(SPARC_L0 + i, util::string_format("l%d", i), m_dbgregs[8+i]).formatstr("%08X");
 
 	for (int i = 0; i < 8; i++)
-		state_add(SPARC_I0 + i, util::string_format("i%d", i).c_str(), m_dbgregs[16+i]).formatstr("%08X");
+		state_add(SPARC_I0 + i, util::string_format("i%d", i), m_dbgregs[16+i]).formatstr("%08X");
 
 	state_add(SPARC_EC,     "EC",       m_ec).formatstr("%1u");
 	state_add(SPARC_EF,     "EF",       m_ef).formatstr("%1u");
@@ -406,10 +406,10 @@ void sparc_base_device::device_start()
 	state_add(SPARC_FSR,    "FSR",      m_fsr).formatstr("%08X");
 
 	for (int i = 0; i < 32; i++)
-		state_add(SPARC_F0 + i, util::string_format("f%d", i).c_str(), m_fpr[i]);
+		state_add(SPARC_F0 + i, util::string_format("f%d", i), m_fpr[i]);
 
 	for (int i = 0; i < 136; i++)
-		state_add(SPARC_R0 + i, util::string_format("r%d", i).c_str(), m_r[i]).formatstr("%08X");
+		state_add(SPARC_R0 + i, util::string_format("r%d", i), m_r[i]).formatstr("%08X");
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_fpr));

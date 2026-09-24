@@ -155,7 +155,7 @@
 #include "mgt.h"
 #include "softlist_dev.h"
 
-#include "formats/coupedsk.h"
+#include "formats/coupe_mgt.h"
 
 
 //**************************************************************************
@@ -234,7 +234,7 @@ static void plusd_floppies(device_slot_interface &device)
 void spectrum_plusd_device::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	fr.add(FLOPPY_MGT_FORMAT);
+	fr.add(FLOPPY_COUPE_MGT_FORMAT);
 }
 
 //-------------------------------------------------

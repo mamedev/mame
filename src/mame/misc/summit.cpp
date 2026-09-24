@@ -9,15 +9,13 @@
     Video Fruit Machine
 
     TODO:
-    - Scrolling is wrong
-    - Missing graphics at top and right (pound values)
+    - Needs a proper layout. Various sections of the screen should be
+      hidden behind an opaque screen overlay.
     - Palette (currently handmade)
     - Sound (discrete?)
-    - Better artwork
 
     Notes:
-    - https://www.youtube.com/watch?v=2vtAwkP7JyM
-    - https://www.youtube.com/watch?v=xx7b5Zd1Qvc
+    - https://www.youtube.com/watch?v=rf1VuWgFDJ4
     - https://patents.google.com/patent/GB2106293A/en
 
 ***************************************************************************/
@@ -57,13 +55,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_attr;
-	required_shared_ptr<uint8_t> m_vram;
-
-	output_finder<16> m_lamps;
+	static constexpr unsigned REEL_LEFT_COLUMN = 6;
+	static constexpr unsigned REEL_COLUMNS = 20;
 
 	void mainmap(address_map &map) ATTR_COLD;
 
@@ -73,13 +66,24 @@ private:
 	void lamps1_w(uint8_t data);
 	void lamps2_w(uint8_t data);
 
+	void attr_w(offs_t offset, uint8_t data);
 	void vram_w(offs_t offset, uint8_t data);
 
 	void summit_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(tile_info);
+	TILEMAP_MAPPER_MEMBER(reel_scan);
 	uint32_t screen_update_summit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_attr;
+	required_shared_ptr<uint8_t> m_vram;
+
+	output_finder<16> m_lamps;
+
 	tilemap_t *m_tilemap = nullptr;
+	tilemap_t *m_reel_tilemap = nullptr;
 };
 
 
@@ -91,7 +95,7 @@ void summit_state::mainmap(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x17ff).rom();
-	map(0x2000, 0x23ff).ram().share("attr");
+	map(0x2000, 0x23ff).ram().w(FUNC(summit_state::attr_w)).share("attr");
 	map(0x2800, 0x2bff).ram().w(FUNC(summit_state::vram_w)).share("vram");
 	map(0x3000, 0x31ff).ram();
 	map(0x3800, 0x3800).portr("IN0");
@@ -195,18 +199,33 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
+void summit_state::attr_w(offs_t offset, uint8_t data)
+{
+	m_attr[offset] = data;
+
+	m_tilemap->mark_tile_dirty(offset);
+	m_reel_tilemap->mark_tile_dirty(offset);
+}
+
 void summit_state::vram_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x20)
-		m_tilemap->set_scrollx(offset, data);
+		m_reel_tilemap->set_scrollx(offset, data);
 
 	m_vram[offset] = data;
+
+	m_tilemap->mark_tile_dirty(offset);
+	m_reel_tilemap->mark_tile_dirty(offset);
 }
 
 uint32_t summit_state::screen_update_summit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap->mark_all_dirty();
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// draw the scrollable reels
+	rectangle reel_clip(REEL_LEFT_COLUMN * 8, (REEL_LEFT_COLUMN + REEL_COLUMNS) * 8 - 1, cliprect.top(), cliprect.bottom());
+	reel_clip &= cliprect;
+	m_reel_tilemap->draw(screen, bitmap, reel_clip, 0, 0);
 
 	return 0;
 }
@@ -219,6 +238,12 @@ TILE_GET_INFO_MEMBER(summit_state::tile_info)
 	uint16_t tile = (BIT(attr, 0) << 8) | m_vram[tile_index];
 
 	tileinfo.set(0, tile, attr & 0x0f, 0);
+}
+
+TILEMAP_MAPPER_MEMBER(summit_state::reel_scan)
+{
+	// adjust for the first scrollable column
+	return row * 32 + REEL_LEFT_COLUMN + col;
 }
 
 static const gfx_layout tiles8x8_layout =
@@ -379,8 +404,13 @@ void summit_state::lamps2_w(uint8_t data)
 
 void summit_state::machine_start()
 {
+	// tilemap covers whole screen
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(summit_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap->set_scroll_rows(32);
+
+	// a scrollable tilemap containing only the reels
+	m_reel_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(summit_state::tile_info)), tilemap_mapper_delegate(*this, FUNC(summit_state::reel_scan)), 8, 8, REEL_COLUMNS, 32);
+	m_reel_tilemap->set_scroll_rows(32);
+	m_reel_tilemap->set_scrolldx(REEL_LEFT_COLUMN * 8, REEL_LEFT_COLUMN * 8);
 }
 
 

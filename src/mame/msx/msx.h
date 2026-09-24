@@ -155,7 +155,6 @@ protected:
 	{
 		return add_cartridge_slot<N>(config, prim, false, 0, xtal);
 	}
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 

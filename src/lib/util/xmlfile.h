@@ -12,9 +12,12 @@
 
 #pragma once
 
-#include "corefile.h"
+#include "utilfwd.h"
 
+#include <cstdint>
+#include <iosfwd>
 #include <list>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -59,7 +62,7 @@ struct parse_options
 
 	parse_error *       error = nullptr;
 	void                (*init_parser)(XML_ParserStruct *parser) = nullptr;
-	uint32_t            flags = 0;
+	std::uint32_t       flags = 0;
 };
 
 
@@ -170,7 +173,7 @@ protected:
 	data_node();
 	~data_node();
 
-	void write_recursive(int indent, util::core_file &file) const;
+	void write_recursive(int indent, std::ostream &file) const;
 
 
 private:
@@ -230,7 +233,7 @@ public:
 	static ptr string_read(const char *string, parse_options const *opts);
 
 	// write an XML tree to a file
-	void write(util::core_file &file) const;
+	bool write(write_stream &file) const;
 
 
 private:

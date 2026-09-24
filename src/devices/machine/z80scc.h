@@ -257,13 +257,13 @@ protected:
 	unsigned int m_delayed_tx_brg_change;
 
 	// receiver state
-	uint8_t m_rx_data_fifo[8];    // receive data FIFO
-	uint8_t m_rx_error_fifo[8];   // receive error FIFO
+	uint8_t m_rx_data_fifo[8 + 1];    // receive data FIFO (ring buffer, one slot is always left unused)
+	uint8_t m_rx_error_fifo[8 + 1];   // receive error FIFO
 	uint8_t m_rx_error;       // current receive error
 	//int m_rx_fifo         // receive FIFO pointer
 	int m_rx_fifo_rp;       // receive FIFO read pointer
 	int m_rx_fifo_wp;       // receive FIFO write pointer
-	int m_rx_fifo_sz;       // receive FIFO size
+	int m_rx_fifo_sz;       // receive FIFO ring size (FIFO depth + 1)
 
 	int m_rx_clock;         // receive clock pulse count
 	int m_rx_first;         // first character received
@@ -398,7 +398,7 @@ protected:
 
 	// internal interrupt management
 	void check_interrupts();
-	void reset_interrupts();
+	void reset_interrupts(int index);
 	uint8_t modify_vector(uint8_t vect, int i, uint8_t src);
 	void trigger_interrupt(int index, int state);
 

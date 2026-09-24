@@ -31,12 +31,12 @@ project "expat"
 		"PACKAGE=\"expat\"",
 		"PACKAGE_BUGREPORT=\"https://github.com/libexpat/libexpat/issues\"",
 		"PACKAGE_NAME=\"expat\"",
-		"PACKAGE_STRING=\"expat-2.7.1\"",
+		"PACKAGE_STRING=\"expat-2.8.3\"",
 		"PACKAGE_TARNAME=\"expat\"",
 		"PACKAGE_URL=\"\"",
-		"PACKAGE_VERSION=\"2.7.1\"",
+		"PACKAGE_VERSION=\"2.8.3\"",
 		"STDC_HEADERS",
-		"VERSION=\"2.7.1\"",
+		"VERSION=\"2.8.3\"",
 		"XML_CONTEXT_BYTES=1024",
 		"XML_DTD",
 		"XML_GE=1",
@@ -57,9 +57,15 @@ if _OPTIONS["targetos"]=="windows" then
 		"__USE_MINGW_ANSI_STDIO=0",
 	}
 end
-if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" then
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
 	defines {
 		"HAVE_ARC4RANDOM",
+		"HAVE_ARC4RANDOM_BUF",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	defines {
+		"HAVE_GETENTROPY",
 	}
 end
 if BASE_TARGETOS=="unix" then
@@ -84,7 +90,7 @@ if _OPTIONS["vs"]==nil then
 		}
 end
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 
@@ -113,6 +119,27 @@ end
 		MAME_DIR .. "3rdparty/expat/lib/xmlrole.c",
 		MAME_DIR .. "3rdparty/expat/lib/xmltok.c",
 	}
+if _OPTIONS["targetos"]=="windows" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_rand_s.c",
+	}
+end
+if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random.c",
+		MAME_DIR .. "3rdparty/expat/lib/random_arc4random_buf.c",
+	}
+end
+if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="freebsd" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_getentropy.c",
+	}
+end
+if BASE_TARGETOS=="unix" then
+	files {
+		MAME_DIR .. "3rdparty/expat/lib/random_dev_urandom.c",
+	}
+end
 else
 links {
 	ext_lib("expat"),
@@ -131,7 +158,7 @@ project "zlib"
 
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android")) then
-		configuration { "gmake or ninja" }
+		configuration { "gmake or ninja or jcdb" }
 		if (version >= 30700) then
 			buildoptions {
 				"-Wno-shift-negative-value",
@@ -262,7 +289,7 @@ project "softfloat3"
 		MAME_DIR .. "3rdparty/softfloat3/bochs_ext"
 	}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -759,7 +786,7 @@ end
 		end
 
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-error=bad-function-cast",
 			"-Wno-error=unused-function",
@@ -831,7 +858,7 @@ project "7z"
 	uuid "ad573d62-e76a-4b11-ae34-5110a6789a42"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-error=undef",
 		}
@@ -926,7 +953,7 @@ project "lua"
 		"ForceCPP",
 	}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1007,7 +1034,7 @@ project "lualibs"
 		"ForceCPP",
 	}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_cpp {
 			"-x c++",
 		}
@@ -1053,7 +1080,7 @@ project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-error=bad-function-cast",
 			"-Wno-discarded-qualifiers",
@@ -1133,7 +1160,7 @@ end
 		}
 	configuration { }
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-unknown-pragmas",
 			"-Wno-unused-but-set-variable",
@@ -1304,7 +1331,7 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions {
 			"-Wno-unused-but-set-variable",
 			"-Wno-undef",
@@ -1467,7 +1494,7 @@ end
 			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions {
 			"-Wno-uninitialized",
 			"-Wno-unused-but-set-variable",
@@ -1619,7 +1646,7 @@ elseif _OPTIONS["vs"]=="clangcl" then
 		}
 end
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-bad-function-cast",
 			"-Wno-missing-braces",
@@ -1822,7 +1849,7 @@ project "wdlfft"
 	uuid "74ca017e-fa0d-48b8-81d6-8081a37be14c"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		buildoptions_c {
 			"-Wno-strict-prototypes",
 		}
@@ -1843,7 +1870,7 @@ project "ymfm"
 	uuid "2403a536-cb0a-4b50-b41f-10c17917689b"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 		if _OPTIONS["targetos"]=="asmjs" then
 			buildoptions_cpp {
 				"-Wno-array-bounds", -- ymfm_fm.ipp accesses operator array index past 12 in template code clang can't fully analyse
@@ -1889,7 +1916,7 @@ project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
 
-	configuration { "gmake or ninja" }
+	configuration { "gmake or ninja or jcdb" }
 	if (_OPTIONS["gcc"] ~= nil) and (not string.find(_OPTIONS["gcc"], "clang")) and (str_to_version(_OPTIONS["gcc_version"]) < 80000) then
 		buildoptions {
 			"-Wno-maybe-uninitialized",

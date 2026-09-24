@@ -625,6 +625,10 @@ ROM_START( dressmtv )
 	ROM_CONTINUE(0x600000,0x200000)
 ROM_END
 
+ROM_START( tfmat )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "trackfield.u9", 0x000000, 0x2000000, CRC(d2f3e7f9) SHA1(41fd22e4353fcec471e2a4b43d076e32c6ab26d8) )
+ROM_END
 
 void tkmag220_game_state::tkmag220(machine_config &config)
 {
@@ -858,7 +862,9 @@ void gameu_handheld_game_state::init_gameu50()
 {
 	init_gameu();
 
-	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+	// HACK: why do we need these?
+	// it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise,
+	// which can't be correct
 	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int base = 0x19c9a;
 	ROM[(base + 0x00) / 2] = 0xf165;
@@ -880,7 +886,9 @@ void gameu_handheld_game_state::init_gameu108()
 
 	u16 *ROM = (u16*)memregion("maincpu")->base();
 
-	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+	// HACK: why do we need these?
+	// it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise,
+	// which can't be correct
 	ROM[(0x1aa48) / 2] = 0xf165;
 	ROM[(0x1aa4a) / 2] = 0xf165;
 	ROM[(0x1aa4c) / 2] = 0xf165;
@@ -935,6 +943,10 @@ CONS( 2013, gormiti, 0, 0, base, gormiti, gpl162xx_rom_base_state, empty_init, "
 CONS( 201?, gameu50,  0, 0, gameu, gameu, gameu_handheld_game_state, init_gameu50,  "YSN", "Play Portable Color GameU+ (50-in-1) (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu90,  0, 0, gameu, gameu, gameu_handheld_game_state, init_gameu,    "YSN", "Play Portable Color GameU+ (90-in-1) (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 201?, gameu108, 0, 0, gameu, gameu, gameu_handheld_game_state, init_gameu108, "YSN", "Play Portable Color GameU+ (108-in-1) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// despite using the Track & Field name this isn't a licensed Konami product
+// TODO: inputs, banking (sets 8Mbyte CS space, ROM is 32Mbyte)
+CONS( 202?, tfmat,    0, 0, base,  base,  gpl162xx_rom_base_state,   empty_init,    "The Source Wholesale", "Track & Field Game Mat - 25 Games Included", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ----------------------------------------------------
 // these set SP to 3fff / only use RAM below that, so must be 'GPL162xx A' type

@@ -24,6 +24,9 @@
 #define FLOPSND_TAG "floppysound"
 #define FLOPSPK "output"
 
+// Delay time for spinning sound; see spin_start_delay
+const int SPIN_SOUND_DELAY_MS = 10;
+
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, FLOPSND_TAG, "Floppy sound")
 
 /* ===================================================================
@@ -278,6 +281,8 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 		m_samplelist(nullptr),
 		m_last_track(0),
 		m_last_subtrack(0),
+		m_spin_start_timer(nullptr),
+		m_spin_start_withdisk(false),
 		m_motor_on(false),
 		m_with_disk(false),
 		m_spin_kind(floppy_sound_samples::QUIET),
@@ -331,6 +336,7 @@ void floppy_sound_device::register_for_save_states()
 {
 	save_item(NAME(m_last_track));
 	save_item(NAME(m_last_subtrack));
+	save_item(NAME(m_spin_start_withdisk));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_with_disk));
 	save_item(NAME(m_spin_kind));
@@ -383,8 +389,11 @@ void floppy_sound_device::device_start()
 	if (m_samples_available)
 		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 
+	m_spin_start_timer = timer_alloc(FUNC(floppy_sound_device::spin_start_delay), this);
+
 	register_for_save_states();
 
+	m_spin_start_timer->reset();
 	m_motor_on = false;
 	m_spin_kind = floppy_sound_samples::QUIET;
 	m_spin_sample = floppy_sound_samples::QUIET;
@@ -418,7 +427,10 @@ void floppy_sound_device::set_samples(floppy_sound_samples *samples, int form_fa
 /*
     Motor sound. Select appropriate sound sample, depending on whether the
     motor is started or keeps running. Motor samples are always fully
-    played.
+    played once started.
+    Since some drives are rapidly polled via the motor line, we allow for a
+    short delay before starting the motor sound. If the motor is turned off
+    during that time, no motor sound is played.
 */
 void floppy_sound_device::motor(bool running, bool withdisk)
 {
@@ -426,15 +438,15 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	{
 		m_sound->update(); // required
 
+		LOGMASKED(LOG_SND_DETAIL, "Motor = %s [%s]\n", running? "on " : "off", machine().time().to_string());
+
 		if ((m_spin_kind==floppy_sound_samples::QUIET
 			|| m_spin_kind==floppy_sound_samples::END_EMPTY
 			|| m_spin_kind==floppy_sound_samples::END_LOADED ) && running) // motor was either off or already spinning down
 		{
-			m_spin_samplepos = 0;
-			// 3.5" floppy disks have a special first turn sound when the
-			// spindle motor latch meets the central metal hub hole.
-			m_spin_kind = withdisk? (m_firstturn? floppy_sound_samples::START_LOADED_INITIAL : floppy_sound_samples::START_LOADED) : floppy_sound_samples::START_EMPTY;
-			m_firstturn = false;
+			// See spin_start_delay
+			m_spin_start_withdisk = withdisk;
+			m_spin_start_timer->adjust(attotime::from_msec(SPIN_SOUND_DELAY_MS));
 		}
 		else
 		{
@@ -445,6 +457,9 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 				m_spin_kind = withdisk? floppy_sound_samples::END_LOADED : floppy_sound_samples::END_EMPTY; // go to spin down sound when loop is finished
 			}
 		}
+
+		if (!running)
+			m_spin_start_timer->reset(); // motor switched off again before the spindle sound could start: no sound at all
 
 		int old_sample = m_spin_sample;
 		m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samplelist->find_spin(m_spin_kind);
@@ -457,6 +472,38 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	}
 	m_motor_on = running;
 	m_with_disk = withdisk;
+}
+
+/*
+    Some drives like the FD-2000 are polled via the MON line to check for
+    an inserted disk; the on-off time is only about 16us. We have to avoid
+    starting the spinning sound in that case. For that reason, the start is
+    delayed by a certain time (see SPIN_SOUND_DELAY_MS).
+
+    The value may be adapted to cover other cases, but it should not be so
+    high that the delay is noticeable: This delay only affects the output
+    of the spinning sound, but neither step/seek sounds nor the operation of
+    the drive. Realistic spin-up times should be a concern of the floppy drive
+    emulation.
+*/
+TIMER_CALLBACK_MEMBER(floppy_sound_device::spin_start_delay)
+{
+	m_sound->update(); // required
+
+	m_spin_samplepos = 0;
+	// 3.5" floppy disks have a special first turn sound when the
+	// spindle motor latch meets the central metal hub hole.
+	m_spin_kind = m_spin_start_withdisk? (m_firstturn? floppy_sound_samples::START_LOADED_INITIAL : floppy_sound_samples::START_LOADED) : floppy_sound_samples::START_EMPTY;
+	m_firstturn = false;
+
+	int old_sample = m_spin_sample;
+	m_spin_sample = m_samplelist->find_spin(m_spin_kind);
+
+	if (m_spin_sample == floppy_sound_samples::QUIET)
+		LOGMASKED(LOG_SND, "Spin off\n");
+	else
+		if (m_spin_sample != old_sample)
+			LOGMASKED(LOG_SND, "Spin sample = %d\n", m_spin_sample);
 }
 
 /*

@@ -7,6 +7,7 @@
 #pragma once
 
 #include "tlcs900.h"
+#include "tmp95c061_serial.h"
 
 DECLARE_DEVICE_TYPE(TMP95C061, tmp95c061_device)
 
@@ -46,7 +47,20 @@ public:
 	auto portb_write() { return m_port_write[PORT_B].bind(); }
 	template <size_t Bit> auto an_read() { return m_an_read[Bit].bind(); }
 
+	// Serial channels.  Binding txd0()/txd1() puts that channel on the pins and
+	// it shifts bits at the rate BRxCR asks for; leaving it unbound keeps the
+	// byte-granularity behaviour this core has always had, so a machine that
+	// wires nothing is unaffected.
+	template <unsigned N> auto txd()      { return m_serial[N].lookup()->txd(); }
+	template <unsigned N> auto tx_byte()  { return m_serial[N].lookup()->tx_byte(); }
+	template <unsigned N> void rxd(int state)      { m_serial[N]->rxd_w(state); }
+	template <unsigned N> void rx_byte(uint8_t data) { m_serial[N]->rx_byte(data); }
+	auto sc1_mod() { return m_sc1_mod_cb.bind(); }   // every SC1MOD write, so a peer sees RXE
+
 protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	template <int N> void serial_int_w(uint8_t bits);
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -60,6 +74,9 @@ protected:
 
 	void tlcs900_change_tff( int which, int change );
 	int tlcs900_process_hdma( int channel );
+	// A micro-DMA channel that owns a vector consumes the request itself, so
+	// the CPU must neither dispatch it nor leave HALT for it.
+	bool hdma_owns_vector( uint8_t vector ) const;
 	void update_porta();
 
 	// device_disasm_interface overrides
@@ -171,9 +188,8 @@ private:
 	uint8_t   m_watchdog_mode;
 
 	// Serial Channel
-	uint8_t   m_serial_control[2];
-	uint8_t   m_serial_mode[2];
-	uint8_t   m_baud_rate[2];
+	required_device_array<tmp95c061_serial_device, 2> m_serial;
+	devcb_write8 m_sc1_mod_cb;
 	uint8_t   m_od_enable;
 
 	// A/D Converter Control

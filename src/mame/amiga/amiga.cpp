@@ -2252,6 +2252,10 @@ static void pcmcia_devices(device_slot_interface &device)
 // basic elements common to all amigas
 void amiga_state::amiga_base(machine_config &config)
 {
+	// NTSC E is the faster of the two, so its period is a fine enough quantum
+	// for both - configs switch between PAL and NTSC in either direction later
+	config.set_maximum_quantum(attotime::from_hz(amiga_state::CLK_E_NTSC));
+
 	// video
 	pal_video(config);
 
@@ -2300,8 +2304,8 @@ void amiga_state::amiga_base(machine_config &config)
 	// TODO: shouldn't have a clock
 	// (finite state machine, controlled by Agnus beams)
 	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
-	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->custom_write_cb().set(m_chipset, FUNC(address_map_bank_device::write16));
 	m_copper->set_ecs_mode(false);
 
 	// rs232
@@ -2313,7 +2317,7 @@ void amiga_state::amiga_base(machine_config &config)
 	rs232.cts_handler().set(FUNC(amiga_state::rs232_cts_w));
 
 	// centronics
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->set_data_input_buffer("cent_data_in");
 	m_centronics->ack_handler().set(FUNC(amiga_state::centronics_ack_w));
 	m_centronics->busy_handler().set(FUNC(amiga_state::centronics_busy_w));
@@ -2410,6 +2414,7 @@ void a2000_state::a2000(machine_config &config)
 	m_cpuslot->int2_cb().set(FUNC(a2000_state::cpuslot_int2_w));
 	m_cpuslot->int6_cb().set(FUNC(a2000_state::cpuslot_int6_w));
 	m_cpuslot->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
+	m_cpuslot->fc_cb().set([this]() { return m_maincpu->get_fc(); });
 
 	// zorro2 slots
 	ZORRO2_BUS(config, m_zorro, amiga_state::CLK_7M_PAL);
@@ -2465,6 +2470,7 @@ void a500_state::a500(machine_config &config)
 	m_side->int2_cb().set(FUNC(a500_state::side_int2_w));
 	m_side->int6_cb().set(FUNC(a500_state::side_int6_w));
 	m_side->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
+	m_side->fc_cb().set([this]() { return m_maincpu->get_fc(); });
 }
 
 void a500_state::a500n(machine_config &config)
@@ -2492,11 +2498,8 @@ void cdtv_state::cdtv(machine_config &config)
 
 	amiga_base(config);
 
-	// disable floppy as default
-	// TODO: breaks software loading
-#if 0
+	// no floppy drive by default
 	subdevice<floppy_connector>("fdc:0")->set_default_option(nullptr);
-#endif
 
 	// keyboard
 	INPUT_MERGER_ALL_HIGH(config, m_kbclock);
@@ -2694,6 +2697,7 @@ void a500p_state::a500p(machine_config &config)
 	m_side->int2_cb().set(FUNC(a500p_state::side_int2_w));
 	m_side->int6_cb().set(FUNC(a500p_state::side_int6_w));
 	m_side->ipl7_cb().set([this](int state) { m_maincpu->set_input_line(7, state); });
+	m_side->fc_cb().set([this]() { return m_maincpu->get_fc(); });
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");

@@ -91,7 +91,7 @@ private:
 
 void a2bus_iwm_device::device_add_mconfig(machine_config &config)
 {
-	IWM(config, m_iwm, clock(), 1021800*2);
+	IWM(config, m_iwm, clock(), A2BUS_1M_CLOCK*2);
 	m_iwm->phases_cb().set(FUNC(a2bus_iwm_device::phases_w));
 	m_iwm->devsel_cb().set(FUNC(a2bus_iwm_device::devsel_w));
 	applefdintf_device::add_525(config, m_floppy[0]);

@@ -1,18 +1,34 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
 -->
 
-<!-- multiple cartridge types exist, some with ROM, some with only SEEPROM (for settings?)
+<!--
 
-    NO ROM:
-    Revista - SEEPROM only (was blank)
+Multiple cartridge types exist:
+- Expansion carts with ROM
+- "My Magic Cards" / "My Stuff Keys" / "My Real Magic Keys" with only SEEPROM (for unlocking in-game content, stored in settings?)
+- "My Magic Keys" (for unlocking in-game content and additional mini-games, inserts into expansion cart slot)
+- "My World Keys" (Playmates expansion carts without "My Magic Keys" slot?)
 
-    the ROM cartridges appear to be data only
+Known "My Magic Cards":
+- 14(?) Accessori
+- 14(?) Fashion
+
+Known "My Magic Keys":
+- 6 Special Summer Gold
+- 12 Special Summer Fashion
+
+Known "My Real Magic Keys":
+- 20 Accessori
+- 20 Fashion
+
 -->
 
 <!--
+
+Cartridge slot pinout (74ac00 on expansion carts has 2 output pins used as additional ROM address lines):
 
  NC|01|VCC
 CEi|02|WE (Internal ROM)
@@ -52,13 +68,97 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 
 <softwarelist name="mylife_cart" description="Giochi Preziosi / Playmates My Life cartridges">
 
+	<software name="mmcacc4" supported="no">
+		<description>My Magic Cards Accessori - Key 4 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="l24c02-si.bin" size="0x100" crc="d906ab75" sha1="b7c816ae8c08063778879db2ddd0a0010e28ded8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcacc5" supported="no">
+		<description>My Magic Cards Accessori - Key 5 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="l24c02-si.bin" size="0x100" crc="5db13252" sha1="2e2a09ce67bc0ca8284e9f428fd9aef9198e00ca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcacc11" supported="no">
+		<description>My Magic Cards Accessori - Key 11 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="accessori_11.BIN" size="0x100" crc="4ea4b0f4" sha1="c64e1e62d1ecce7ebc4d03870819bb722da1cb61" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcacc12" supported="no">
+		<description>My Magic Cards Accessori - Key 12 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="accessori_12.BIN" size="0x100" crc="1b3c3d7a" sha1="14f18896ce7c88d63a6d3db2b48579175a20fe90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcfon11" supported="no">
+		<description>My Magic Cards Fashion - Key 11 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="fashion_11.BIN" size="0x100" crc="894c76be" sha1="480c52626b5e4389dc2ae378bad2cfd7529a0771" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmcfon12" supported="no">
+		<description>My Magic Cards Fashion - Key 12 (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="CGA-R03041-R3" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="fashion_12.BIN" size="0x100" crc="8b4879e8" sha1="b078ac16a7d3366940f897d0730cc1c569653d6e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rivista" supported="no">
+		<description>My Magic Cards - Rivista (Italy)</description>
+		<year>200?</year>
+		<publisher>Giochi Preziosi</publisher>
+		<part name="cart" interface="mylife_cart">
+			<feature name="pcb" value="FOR UNLOCK CART / Ver:2007 / 09.12 / TD-12955" />
+			<dataarea name="seeprom" size="0x100">
+				<rom name="rivista.BIN" size="0x100" crc="113a8c4d" sha1="9722bc0ba1a34cbaeec6a77a96cfa767750ae0c1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hannah" supported="no">
 		<description>Hannah Montana (Italy)</description>
 		<year>200?</year>
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="hannah.bin" size="0x800000" crc="f695fe8e" sha1="b5db32e659a35b6ce6d7f633cecf073e028dd45b"/>
+			<dataarea name="rom" size="0x2000000">
+				<rom name="hannah.bin" size="0x2000000" crc="874723c0" sha1="bdbb14e6a628809d16184bcaff0281b69c31522c" />
 			</dataarea>
 			<!-- blank -->
 			<!--
@@ -74,8 +174,10 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<year>200?</year>
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="summerparty.bin" size="0x800000" crc="24ee4969" sha1="9252f77fd8ff60d1e0cd68cfe363b0ee846343f2"/>
+			<feature name="pcb" value="MWA-R07301A-R12A+0.1" />
+			<dataarea name="rom" size="0x2000000">
+				<!-- One cart yielded at offset 0x013d75a8 value 0x4c instead of 0x0c, maybe bad dump? -->
+				<rom name="summerparty.bin" size="0x2000000" crc="66489756" sha1="a0b17ba6224a36050d5a56f25500044d8fdc7a66" />
 			</dataarea>
 			<!-- blank -->
 			<!--
@@ -91,13 +193,14 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<year>200?</year>
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="clubdisco.bin" size="0x800000" crc="d18006e7" sha1="ad2282766899610dc7fb32118b2eb7b434d01d01"/>
+			<feature name="pcb" value="MWA-R07801A-R10A" />
+			<dataarea name="rom" size="0x2000000">
+				<rom name="clubdisco.bin" size="0x2000000" crc="42ee2f10" sha1="0442fe6d2b4ea4d02f51264a46a9f898023dd351" />
 			</dataarea>
 			<!-- blank -->
 			<!--
 			<dataarea name="seeprom" size="0x100">
-			    <rom name="af24bc02.bin" size="0x100" crc="fea8a821" sha1="c744cac6af7621524fc3a2b0a9a135a32b33c81b"/>
+			    <rom name="l24c02.bin" size="0x100" crc="0d968558" sha1="b376885ac8452b6cbf9ced81b1080bfd570d9b91" />
 			</dataarea>
 			-->
 		</part>
@@ -108,8 +211,8 @@ CEi = CE Internal ROM! (set to VCC in Cartridge-PCB)
 		<year>200?</year>
 		<publisher>Giochi Preziosi</publisher>
 		<part name="cart" interface="mylife_cart">
-			<dataarea name="rom" size="0x800000">
-				<rom name="clubdisco_spain.bin" size="0x800000" crc="8f200051" sha1="253a7bf48908eee8084c01fcc22b07db729d4714"/>
+			<dataarea name="rom" size="0x2000000">
+				<rom name="clubdisco_spain.bin" size="0x2000000" crc="acfd3369" sha1="b9547d581d7504faec2cc73d6f0cae0f38a94fac" />
 			</dataarea>
 		</part>
 	</software>

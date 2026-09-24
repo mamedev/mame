@@ -234,9 +234,9 @@ void minitel_state::sound_stream_update(sound_stream &stream)
 		for (s32 i = 0; i < stream.samples(); i++)
 		{
 			double val = 0;
-			if (modem_rptf_reg != 0x8) // unless high-only filtered
+			if (modem_rptf_reg != 0x4) // unless high-only filtered
 				val += sin(modem_dtmf_phase1);
-			if (modem_rptf_reg != 0x4) // unless low-only filtered
+			if (modem_rptf_reg != 0x8) // unless low-only filtered
 				val += sin(modem_dtmf_phase2);
 			stream.put(0, i, 0.5 * val); // mixed sine waves
 			modem_dtmf_phase1 = fmod(modem_dtmf_phase1 + rate1, 2.0 * pi);

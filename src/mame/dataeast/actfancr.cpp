@@ -35,6 +35,7 @@
 
 #include "multibyte.h"
 
+
 namespace {
 
 class actfancr_state : public driver_device

@@ -27,6 +27,13 @@
 
 INPUT_PORTS_EXTERN(mc6847_artifacting);
 
+// device type declarations
+DECLARE_DEVICE_TYPE(MC6847,    mc6847_device)
+DECLARE_DEVICE_TYPE(MC6847Y,   mc6847y_device)
+DECLARE_DEVICE_TYPE(MC6847T1,  mc6847t1_device)
+DECLARE_DEVICE_TYPE(S68047,    s68047_device)
+DECLARE_DEVICE_TYPE(M5C6847P1, m5c6847p1_device)
+
 
 //**************************************************************************
 //  MC6847 CORE
@@ -167,30 +174,30 @@ protected:
 		// artifacting config
 		void setup_config(device_t *device);
 		bool poll_config();
-		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+		void set_pal_artifacting(bool palartifacting) { m_palartifacting = palartifacting; }
 		bool get_pal_artifacting() { return m_palartifacting; }
-		void create_color_blend_table( const pixel_t *palette );
+		void create_color_blend_table(const pixel_t *palette);
 
 		// artifacting application
 		template<int xscale>
 		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
 		{
-			if( !m_artifacting || !m_palartifacting )
+			if (!m_artifacting || !m_palartifacting)
 				return;
 
-			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
+			if ((mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG))
 			{
 				pixel_t *line1 = &bitmap.pix(y + base_y, base_x);
 				pixel_t *line2 = &bitmap.pix(y + base_y + 1, base_x);
 				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
 
-				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
+				for (int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel)
 				{
-					if( line1[pixel] == line2[pixel] )
+					if (line1[pixel] == line2[pixel])
 						continue;
 
 					newColor = m_palcolorblendmap.find(std::pair<pixel_t,pixel_t>(line1[pixel],line2[pixel]));
-					if( newColor != m_palcolorblendmap.end() )
+					if (newColor != m_palcolorblendmap.end())
 					{
 						line1[pixel] = newColor->second;
 						line2[pixel] = newColor->second;
@@ -370,7 +377,7 @@ protected:
 		if (mode & MODE_AG)
 		{
 			/* graphics */
-			switch(mode & (MODE_GM2|MODE_GM1|MODE_GM0))
+			switch (mode & (MODE_GM2|MODE_GM1|MODE_GM0))
 			{
 			case 0:
 				emit_graphics<2, xscale * 4>(data, length, pixels, (mode & MODE_CSS) ? 4 : 0, palette);
@@ -613,6 +620,8 @@ class mc6847y_device : public mc6847_base_device
 {
 public:
 	mc6847y_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
+
+	static auto parent_rom_device_type() { return &MC6847; }
 };
 
 class mc6847t1_device : public mc6847_base_device
@@ -648,13 +657,8 @@ class m5c6847p1_device : public mc6847_base_device
 {
 public:
 	m5c6847p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, bool pal = false);
+
+	static auto parent_rom_device_type() { return &MC6847; }
 };
-
-
-DECLARE_DEVICE_TYPE(MC6847,    mc6847_device)
-DECLARE_DEVICE_TYPE(MC6847Y,   mc6847y_device)
-DECLARE_DEVICE_TYPE(MC6847T1,  mc6847t1_device)
-DECLARE_DEVICE_TYPE(S68047,    s68047_device)
-DECLARE_DEVICE_TYPE(M5C6847P1, m5c6847p1_device)
 
 #endif // MAME_VIDEO_MC6847_H
