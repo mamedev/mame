@@ -243,6 +243,10 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
+			if ((code & 3) == 3)
+				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
+			else if ((code & 3) == 0)
+				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 			if (!BIT(code, 2))
 				c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 			dst[x] = c;

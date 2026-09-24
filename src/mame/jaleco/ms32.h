@@ -125,6 +125,14 @@ protected:
 	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
 
+	u32 m_brt[4];
+	int m_brt_r;
+	int m_brt_g;
+	int m_brt_b;
+	int m_brt1_r;
+	int m_brt1_g;
+	int m_brt1_b;
+
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
 
@@ -148,13 +156,6 @@ private:
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol;
 	bitmap_ind16 m_temp_bitmap_sprites_pri;
-	u32 m_brt[4];
-	int m_brt_r;
-	int m_brt_g;
-	int m_brt_b;
-	int m_brt1_r;
-	int m_brt1_g;
-	int m_brt1_b;
 
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
