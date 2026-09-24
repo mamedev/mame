@@ -379,7 +379,7 @@ void tms3556_device::draw_line_text_common(uint16_t *ln)
 		name_hi = readbyte(nametbl_base + name_offset);
 		name_lo = readbyte(nametbl_base + name_offset + 1);
 		pattern_ix = ((name_hi >> 2) & 2) | ((name_hi >> 4) & 1);
-		alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(m_control_regs[7] & 0x08));
+		alphanumeric_mode = (pattern_ix < 2) || ((pattern_ix == 3) && !(m_control_regs[5] & 0x08));
 		fg = (name_hi >> 5) & 0x7;
 		if (alphanumeric_mode)
 		{
