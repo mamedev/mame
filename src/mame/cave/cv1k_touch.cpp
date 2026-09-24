@@ -35,7 +35,7 @@
 #define LOG_COMMAND (1U << 1)
 #define LOG_REPORT  (1U << 2)
 
-// #define VERBOSE (LOG_COMMAND)
+// #define VERBOSE (LOG_GENERAL | LOG_COMMAND)
 
 #include "logmacro.h"
 
