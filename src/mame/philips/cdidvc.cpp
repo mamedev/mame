@@ -102,6 +102,9 @@ void cdi_dvc_vmpeg_device::device_start()
 			write16s_delegate(*this, FUNC(cdi_dvc_vmpeg_device::regs_w)));
 	m_memory_space->install_read_handler(0xe40000, 0xe7ffff,
 			read16sm_delegate(*this, FUNC(cdi_dvc_vmpeg_device::rom_r)));
+	m_memory_space->install_readwrite_handler(0xe80000, 0xefffff,
+			read16s_delegate(*this, FUNC(cdi_dvc_vmpeg_device::ram_r)),
+			write16s_delegate(*this, FUNC(cdi_dvc_vmpeg_device::ram_w)));
 
 	m_fmv->set_pal(m_slot->pal());
 
@@ -234,12 +237,33 @@ uint16_t cdi_dvc_vmpeg_device::rom_r(offs_t offset)
 // the host reach.
 uint16_t cdi_dvc_vmpeg_device::ram_r(offs_t offset, uint16_t mem_mask)
 {
+	if (!m_mpeg_ram_enabled)
+	{
+		ram_bus_error(offset, true);
+		return 0xff;
+	}
 	return m_fmv->dram_r(offset, mem_mask);
 }
 
 void cdi_dvc_vmpeg_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	if (!m_mpeg_ram_enabled)
+	{
+		ram_bus_error(offset, false);
+		return;
+	}
 	m_fmv->dram_w(offset, data, mem_mask);
+}
+
+void cdi_dvc_vmpeg_device::ram_bus_error(offs_t offset, bool read)
+{
+	if (machine().side_effects_disabled())
+		return;
+
+	scc68070_device *const cpu = m_slot->scc();
+	cpu->set_buserror_details(0xe80000 + offset * 2, read, cpu->get_fc());
+	cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 //**************************************************************************
@@ -271,17 +295,14 @@ void cdi_dvc_vmpeg_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mas
 			0xe00000 + (offset << 1), data, mem_mask);
 
 	// The video decoder's DRAM only answers the bus once the register file
-	// has been written 64 times; until then the machine's catch-all bus
-	// errors, so the OS RAM crawler never finds it and mis-sizes system
-	// memory.  How the real cartridge keeps the crawler out is not known.
+	// has been written 64 times; until then it bus errors, so the OS RAM
+	// crawler never finds it and mis-sizes system memory.  How the real
+	// cartridge keeps the crawler out is not known.
 	if (!m_mpeg_ram_enabled)
 	{
 		if (++m_mpeg_ram_enable_cnt >= 64)
 		{
 			m_mpeg_ram_enabled = true;
-			m_memory_space->install_readwrite_handler(0xe80000, 0xefffff,
-					read16s_delegate(*this, FUNC(cdi_dvc_vmpeg_device::ram_r)),
-					write16s_delegate(*this, FUNC(cdi_dvc_vmpeg_device::ram_w)));
 			LOGMASKED(LOG_REGS_W, "DVC: decoder DRAM mapped\n");
 		}
 	}
