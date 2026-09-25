@@ -325,7 +325,7 @@ uint32_t mcd212_device::get_backdrop_plane(int x, int y)
 		uint32_t argb = 0;
 		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
 			return argb;
-		return 0;
+		return s_4bpp_color[0];
 	}
 	else
 		return s_4bpp_color[m_backdrop_color];
@@ -946,10 +946,10 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 	m_csrr[0] &= ~CSR1R_DA;
 
 	// Process ICA
-	if (BIT(m_dcr[0], DCR_ICA_BIT))
-		process_ica<0>();
 	if (BIT(m_dcr[1], DCR_ICA_BIT))
 		process_ica<1>();
+	if (BIT(m_dcr[0], DCR_ICA_BIT))
+		process_ica<0>();
 
 	if (BIT(m_dcr[0], DCR_DCA_BIT))
 		m_dca[0] = get_dcp<0>();
@@ -977,10 +977,10 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 {
 	// Process DCA
-	if (BIT(m_dcr[0], DCR_DCA_BIT))
-		process_dca<0>();
 	if (BIT(m_dcr[1], DCR_DCA_BIT))
 		process_dca<1>();
+	if (BIT(m_dcr[0], DCR_DCA_BIT))
+		process_dca<0>();
 
 	int scanline = screen().vpos() / 2;
 	if (scanline == m_total_height - 1)
