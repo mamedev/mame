@@ -289,10 +289,10 @@ void evolution_handheldgame_state::init_yuleyuan()
 
 CONS( 2006, evolhh,   0, 0, evolhh,   evolhh, evolution_handheldgame_state, empty_init,    "Kidz Delight", "Evolution Max", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
 
-CONS( 2018, smkatsum, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "San-X / Takara Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2018, smkatsum, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // おしりたんてい ププッとかいけつゲーム
-CONS( 2020, buttdtct, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, buttdtct, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", "Oshiri Tantei: Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 2015, pokexyqz, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", u8"Pokémon Encyclopedia Z Pokémon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
