@@ -718,7 +718,7 @@ CONS(2020, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, 
 
 // unclear if colour matches, but there are multiple generations of these at least
 // uses PUNIRUNZU_MAIN_V3 pcb
-// TODO: Determine if punirune and punirunea use the Tomy name, the Takara Tomy name, or another company's name during bootup
+// TODO: Determine if punirune and punirunea use the Tomy name, the Takara Tomy name, or another company's name once they are able to boot up
 CONS(2021, punirune,  0,        0, puni, puni,     generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // looks similar to above, but has HXR-1 instead of the usual markings on the PCB
