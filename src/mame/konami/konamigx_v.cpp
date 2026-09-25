@@ -234,7 +234,7 @@ void konamigx_state::wipezbuf(int noshadow)
 	int w = visarea.width();
 	int h = visarea.height();
 
-	u8 *zptr = m_gx_objzbuf;
+	u8 *zptr = m_gx_objzbuf.get();
 	int ecx = h;
 
 	do { memset(zptr, -1, w); zptr += GX_ZBUFW; } while (--ecx);
@@ -300,7 +300,8 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 	m_gx_objdma = 0;
 	m_gx_primode = 0;
 
-	m_gx_objzbuf = &screen.priority().pix(0);
+	// the screen priority bitmap is free for gx_draw_deferred_shadows
+	m_gx_objzbuf = std::make_unique<u8[]>(GX_ZPAGESIZE);
 	m_gx_shdzbuf = std::make_unique<u8[]>(GX_ZBUFSIZE);
 
 	m_k054338->export_config(&m_K054338_shdRGB);
@@ -336,9 +337,6 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 					tilemap_t *sub2, int sub2flags,
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack)
 {
-	// buffer can move when it's resized, so refresh the pointer
-	m_gx_objzbuf = &screen.priority().pix(0);
-
 	// clear screen with backcolor and update flicker pulse
 	if (m_gx_wrport1_0 & 0x20)
 		m_k054338->fill_backcolor(bitmap,
@@ -398,7 +396,8 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		shdprisel = m_k055555->K055555_read_register(K55_SHD_PRI_SEL);
 	}
 
-	// SHDPRISEL filters shadows by different priority comparison methods (UNIMPLEMENTED, see detail on p.66)
+	// SHDPRISEL filters shadows by different priority comparison methods (see detail on p.66)
+	// conditions 1 and 2 are handled by gx_draw_deferred_shadows, 0 is UNIMPLEMENTED
 	bool shadowon[3];
 	if (!(shdprisel & 0x03)) shadowon[0] = 0;
 	if (!(shdprisel & 0x0c)) shadowon[1] = 0;
@@ -416,6 +415,9 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	int k = 0;
 	if (!(mixerflags & GXMIX_NOSHADOW))
 	{
+		// update shadows status now so it's valid for drawing the current frame
+		m_k054338->update_all_shadows(rushingheroes_hack, *m_palette);
+
 		// only enable shadows beyond a +/-7 RGB threshold
 		for (int j = 0, i = 0; i < 3; j += 3, i++)
 		{
@@ -427,9 +429,6 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		// SHDON specifies layers on which shadows can be projected (see detail on p.65 7.2.8)
 		int temp = m_k055555->K055555_read_register(K55_SHD_ON);
 		for (int i = 0; i < 4; i++) if (!BIT(temp, i) && spri_min < layerpri[i]) spri_min = layerpri[i]; // HACK
-
-		// update shadows status
-		m_k054338->update_all_shadows(rushingheroes_hack, *m_palette);
 	}
 
 	// pre-sort layers
@@ -448,6 +447,7 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// build object database and create indices
 	std::vector<GX_OBJ> objpool; // layers (including PSAC4 priorities), sprites and shadows
+	std::vector<GX_OBJ> deferred_shadows; // shadows that test the topmost screen, see gx_draw_deferred_shadows
 
 	for (int i = 5; i >= 0; i--)
 	{
@@ -623,7 +623,15 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		{
 			// add objects with shadows if enabled
 			u32 order = spri << 24 | zcode << 16 | offs << (8 - 3) | shadow_draw_mode << 4 | shadow;
-			objpool.emplace_back(GX_OBJ{ order, offs, code, color });
+			const u8 condition = (color & K055555_FULLSHADOW) ? 3 : (shdprisel >> (shadow * 2) & 3);
+			if (condition == 1 || condition == 2)
+			{
+				deferred_shadows.emplace_back(GX_OBJ{ order, offs, code, color });
+			}
+			else
+			{
+				objpool.emplace_back(GX_OBJ{ order, offs, code, color });
+			}
 		}
 	}
 
@@ -635,7 +643,29 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 			objpool.end(),
 			[] (const GX_OBJ &a, const GX_OBJ &b) { return a.order > b.order; });
 
+	m_gx_topmost_on = !deferred_shadows.empty();
+	if (m_gx_topmost_on)
+	{
+		// everything drawn from here on records its priority code; the back color is lowest
+		screen.priority().fill(0xff, cliprect);
+		m_k055673->k053247_set_gx_topmost(&screen.priority(), nullptr);
+	}
+
 	konamigx_mixer_draw(screen, bitmap, cliprect, sub1, sub1flags, sub2, sub2flags, mixerflags, extra_bitmap, rushingheroes_hack, objpool);
+
+	if (m_gx_topmost_on)
+	{
+		std::reverse(deferred_shadows.begin(), deferred_shadows.end());
+		std::stable_sort(
+				deferred_shadows.begin(),
+				deferred_shadows.end(),
+				[] (const GX_OBJ &a, const GX_OBJ &b) { return a.order > b.order; });
+
+		gx_draw_deferred_shadows(screen, bitmap, cliprect, deferred_shadows, shdprisel);
+
+		m_k055673->k053247_set_gx_topmost(nullptr, nullptr);
+		m_gx_topmost_on = false;
+	}
 }
 
 void konamigx_state::konamigx_mixer_draw(
@@ -683,7 +713,7 @@ void konamigx_state::konamigx_mixer_draw(
 			}
 
 			m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
-					m_gx_objzbuf, m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
+					m_gx_objzbuf.get(), m_gx_shdzbuf.get(), code, m_gx_spriteram, offs,
 					color, alpha, drawmode, zcode, pri,
 					/* non-gx only */
 					0, 0, nullptr, nullptr, 0);
@@ -700,7 +730,7 @@ void konamigx_state::konamigx_mixer_draw(
 					}
 					continue;
 				case -1:
-					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code);
+					gx_draw_basic_tilemaps(screen, bitmap, cliprect, mixerflags, code, order >> 24);
 					continue;
 				case -2:
 				case -4:
@@ -716,71 +746,119 @@ void konamigx_state::konamigx_mixer_draw(
 	}
 }
 
-void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer)
+// SHD PRI SEL (p.66 7.2.8) enables each shadow code by comparing its priority
+// with the priority code of the topmost screen at the pixel:
+// 1 = if the shadow's priority is greater
+// 2 = if the shadow's priority is equal
+// 3 = if the shadow's priority is less
+// 1 and 2 depend on the topmost screen, so those shadows are drawn last,
+// gated by the priority codes that everything else recorded in screen.priority()
+// as it was drawn.
+void konamigx_state::gx_draw_deferred_shadows(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const std::vector<GX_OBJ> &shadows, u8 shdprisel)
+{
+	bool enable[256];
+
+	for (const GX_OBJ &obj : shadows)
+	{
+		const u8 spri = obj.order >> 24;
+		const u8 shadow = obj.order & 3;
+		const u8 condition = shdprisel >> (shadow * 2) & 3;
+
+		for (int pri = 0; pri < 256; pri++)
+		{
+			enable[pri] = (condition == 2) ? (spri == pri) : (spri > pri);
+		}
+		enable[0xff] = false; // the back color, or a layer SHD ON keeps shadows off
+		m_k055673->k053247_set_gx_topmost(&screen.priority(), enable);
+
+		m_palette->set_shadow_mode(shadow);
+		m_k055673->k053247_draw_single_sprite_gxcore(bitmap, cliprect,
+				m_gx_objzbuf.get(), m_gx_shdzbuf.get(), obj.code, m_gx_spriteram, obj.offs,
+				obj.color & K055555_COLORMASK, 255, obj.order >> 4 & 0xf, obj.order >> 16 & 0xff, spri,
+				0, 0, nullptr, nullptr, 0);
+	}
+}
+
+void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri)
 {
 	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
-	if (disp & (1 << layer))
+	if (!(disp & (1 << layer))) return;
+
+	set_brightness(layer);
+
+	const u8 layer2 = layer << 1;
+	const u8 j = mixerflags >> layer2 & 3;
+
+	u32 flags = 0;
+	if (mixerflags & 1 << (layer + 12)) flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+
+	// what the layer records as the topmost screen for gx_draw_deferred_shadows:
+	// its priority code, or 0xff like the back color when SHD ON keeps shadows off it
+	const u8 topmost = BIT(m_k055555->K055555_read_register(K55_SHD_ON), layer) ? pri : 0xff;
+
+	// Category 0 is the tiles with no mix code of their own: they blend with
+	// the layer's internal code (V INMIX where V INMIX ON routes it).
+	// Categories 1-3 are the tiles whose colour bits 5:4 carry a mix code
+	// (the tile callback, K055555 p.62 7.2.6): each is drawn with that code's
+	// K054338 level. Every tile blends with its own code, rather than all of
+	// them with the code of whichever tile the callback saw last.
+	for (u8 cat = 0; cat < 4; cat++)
 	{
-		set_brightness(layer);
-
-		const u8 layer2 = layer << 1;
-		const u8 j = mixerflags >> layer2 & 3;
-
-		// keep internal and external mix codes separated, so the external mix code can be applied to category 1 tiles
-		u8 mix_mode_internal = 0;
-		u8 mix_mode_external = 0;
-
+		int mix;
 		if (j == GXMIX_BLEND_FORCE)
-			mix_mode_internal = mixerflags >> (layer2 + 16) & 3; // hack
+			mix = mixerflags >> (layer2 + 16) & 3;
+		else if (cat == 0)
+			mix = (m_vinmix >> layer2 & 3) & (m_vmixon >> layer2 & 3);
 		else
-		{
-			const u8 v_inmix_on_layer = m_vmixon >> layer2 & 3;
-			const u8 v_inmix_layer = m_vinmix >> layer2 & 3;
-			const u8 tile_mix_code = u32(mixerflags) >> 30;
+			mix = cat;
+		gx_draw_tilemap_category(screen, bitmap, cliprect, layer, cat, flags, m_k054338->set_alpha_level(mix), topmost);
+	}
+}
 
-			mix_mode_internal = v_inmix_layer & v_inmix_on_layer;
-			mix_mode_external = tile_mix_code & ~v_inmix_on_layer;
-		}
+// One category of a layer at one K054338 level: set_alpha_level's 10 bits,
+// { MIXPRI, additive, alpha }. MIXPRI is still not implemented.
+void konamigx_state::gx_draw_tilemap_category(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 layer, u8 category, u32 flags, int level, u8 topmost)
+{
+	flags |= TILEMAP_DRAW_CATEGORY(category);
+	const u8 alpha = level & 0xff;
 
-		int flags = TILEMAP_DRAW_CATEGORY(0);
-		int flags2 = TILEMAP_DRAW_CATEGORY(1);
+	// record the layer as the topmost screen, see gx_draw_deferred_shadows
+	const u8 top_pri = m_gx_topmost_on ? topmost : 0;
+	const u8 top_mask = m_gx_topmost_on ? 0 : 0xff;
 
-		if (mixerflags & 1 << (layer + 12))
-		{
-			flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
-			flags2 |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
-		}
-
-		// FIXME: implement mixpri and additive
-		// hack: mask out mixpri bit. if additive bit set, mask it out and invert alpha.
-		// this makes additive alpha effects look OK until they are properly handled.
-		int alpha = m_k054338->set_alpha_level(mix_mode_internal) & 0x1ff;
-		if (alpha & 0x100)
-		{
-			alpha &= 0xff;
-			if (alpha) alpha = ~alpha & 0xff;
-		}
-
-		int alpha2 = m_k054338->set_alpha_level(mix_mode_external) & 0x1ff;
-		if (alpha2 & 0x100) alpha2 = ~alpha2 & 0xff;
-
+	if (!(level & 0x100))
+	{
+		if (alpha == 0) return;
 		if (alpha < 255) flags |= TILEMAP_DRAW_ALPHA(alpha);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags, top_pri, top_mask);
+		return;
+	}
 
-		if (alpha2 < 255)
+	// Additive (mix set bit 5): the layer's colour at this level is added to
+	// what is under it, per channel and clamped, so black adds nothing and
+	// stays transparent. tilemap.cpp has no additive draw, so the
+	// category goes through an indexed scratch bitmap first.
+	if (!m_gx_tile_scratch || m_gx_tile_scratch->width() < bitmap.width() || m_gx_tile_scratch->height() < bitmap.height())
+		m_gx_tile_scratch = std::make_unique<bitmap_ind16>(bitmap.width(), bitmap.height());
+	m_gx_tile_scratch->fill(0xffff, cliprect);
+	m_k056832->tilemap_draw(screen, *m_gx_tile_scratch, cliprect, layer, flags, top_pri, top_mask);
+
+	pen_t const *const pens = m_palette->pens();
+	const u32 mul = u32(alpha) + 1;   // 255 is a full add
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		u16 const *const src = &m_gx_tile_scratch->pix(y);
+		u32 *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			// tiles with mix codes are put into category 1.
-			// draw them in a separate pass for per-tile blending if necessary.
-			flags2 |= TILEMAP_DRAW_ALPHA(alpha2);
-			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags2, 0);
+			if (src[x] == 0xffff) continue;
+			const u32 s = pens[src[x]];
+			const u32 scaled = ((((s >> 16) & 0xff) * mul >> 8) << 16)
+			                 | ((((s >> 8) & 0xff) * mul >> 8) << 8)
+			                 | ((s & 0xff) * mul >> 8);
+			dst[x] = add_blend_r32(dst[x], scaled);
 		}
-		else
-		{
-			// if no alpha is being applied to category 1 (tile mix code) tiles,
-			// draw all tiles with one tilemap_draw call
-			flags |= TILEMAP_DRAW_ALL_CATEGORIES;
-		}
-		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer, flags, 0);
 	}
 }
 
@@ -1033,36 +1111,27 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 	int d = code;
 
 	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
+
+	// The tile's own mix code (K055555 p.62 7.2.6): its colour bits 5:4 where
+	// V INMIX ON does not route them to the palette, V INMIX's where it does.
+	// It becomes the tile's category, and gx_draw_basic_tilemaps draws each
+	// category with that code's K054338 level. -1 (V INMIX ON = 3, no bits
+	// from the tile) is category 0, the layer's internal code.
+	const int emx = K055555GX_decode_vmixcolor(layer, color);
+	priority = emx > 0 ? emx : 0;
 }
 
+// The mix code was read from attr bits 5:4 (salmndr2) and 7:6 (alpha) here
+// before: those are colour bits 5:4 after get_tile_info's FBIT normalisation
+// (k056832_shiftmasks for fbits 0 and 1), so both are what the decode reads.
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
-	const u8 mix_code = attr >> 4 & 3;
-	if (mix_code)
-	{
-		priority = 1;
-		m_last_alpha_tile_mix_code = mix_code;
-	}
-
-	int d = code;
-
-	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
+	type2_tile_callback(layer, code, color, flags, priority, attr);
 }
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	const u8 mix_code = attr >> 6 & 3;
-	if (mix_code)
-	{
-		priority = 1;
-		m_last_alpha_tile_mix_code = mix_code;
-	}
-	int d = code;
-
-	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
-	K055555GX_decode_vmixcolor(layer, color);
+	type2_tile_callback(layer, code, color, flags, priority, attr);
 }
 
 /*
@@ -1120,7 +1189,6 @@ void konamigx_state::common_init()
 	save_item(NAME(m_osmixon));
 	save_item(NAME(m_current_brightness));
 	save_item(NAME(m_brightness));
-	save_item(NAME(m_last_alpha_tile_mix_code));
 
 	m_gx_tilemode = 0;
 
@@ -1571,8 +1639,7 @@ u32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb32 &
 	}
 	else
 	{
-		int mixerflags = m_last_alpha_tile_mix_code << 30;
-		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, m_gx_rushingheroes_hack);
+		konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, m_gx_rushingheroes_hack);
 	}
 
 	return 0;

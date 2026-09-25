@@ -63,6 +63,7 @@ public:
 		, m_light1_x(*this, "LIGHT1_X")
 		, m_light1_y(*this, "LIGHT1_Y")
 		, m_eepromout(*this, "EEPROMOUT")
+		, m_gx_topmost_on(false)
 		, m_use_68020_post_clock_hack(0)
 		, m_lamp(*this, "lamp0")
 	{ }
@@ -150,7 +151,9 @@ public:
 						);
 
 
-	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer);
+	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri);
+	void gx_draw_tilemap_category(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 layer, u8 category, u32 flags, int level, u8 topmost);
+	void gx_draw_deferred_shadows(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const std::vector<GX_OBJ> &shadows, u8 shdprisel);
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
@@ -269,7 +272,7 @@ protected:
 
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
-	u8 m_last_alpha_tile_mix_code = 0;
+	std::unique_ptr<bitmap_ind16> m_gx_tile_scratch;   // additive tilemap categories, gx_draw_tilemap_category
 
 	// mirrored K054338 settings
 	s32 *m_K054338_shdRGB = nullptr;
@@ -285,8 +288,9 @@ protected:
 	u16 m_gx_wrport2 = 0;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	u8 *m_gx_objzbuf = nullptr;
+	std::unique_ptr<u8[]> m_gx_objzbuf;
 	std::unique_ptr<u8[]> m_gx_shdzbuf;
+	bool m_gx_topmost_on; // screen.priority() tracks the topmost screen's priority code, see gx_draw_deferred_shadows
 	s32 m_layer_colorbase[4]{};
 	s32 m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};
 	s32 m_gx_tilemode = 0, m_gx_rozenable = 0, m_psac_colorbase = 0, m_last_psac_colorbase = 0;

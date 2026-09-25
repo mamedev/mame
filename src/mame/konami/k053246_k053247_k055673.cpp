@@ -487,6 +487,10 @@ void k053247_device::zdrawgfxzoom32GP(
 	const int z_buffer_offset = (dst_rect.top() - cliprect.top()) * GX_ZBUFW + (dst_rect.left() - cliprect.left());
 	u8 *ozbuf_ptr = gx_objzbuf + z_buffer_offset;
 
+	// see k053247_set_gx_topmost
+	u8 *const top_ptr = m_gx_topmost ? &m_gx_topmost->pix(dst_rect.top(), dst_rect.left()) : nullptr;
+	const int top_pitch = m_gx_topmost ? m_gx_topmost->rowpixels() : 0;
+
 	const u8 z8 = (u8)zcode;
 
 	if (zcode < 0)
@@ -503,6 +507,10 @@ void k053247_device::zdrawgfxzoom32GP(
 				if (!pal_idx || pal_idx >= shdpen) continue;
 				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
 				dst_ptr[x + y * dst_pitch] = pal_base[pal_idx];
+				if (top_ptr)
+				{
+					top_ptr[x + y * top_pitch] = pri;
+				}
 			}
 		}
 	}
@@ -522,6 +530,10 @@ void k053247_device::zdrawgfxzoom32GP(
 				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
 				if (!pal_idx || (drawmode & 3 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
 				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
+				if (top_ptr)
+				{
+					top_ptr[x + y * top_pitch] = pri;
+				}
 
 				if (!BIT(drawmode, 1)) // solid sprite
 				{
@@ -568,6 +580,10 @@ void k053247_device::zdrawgfxzoom32GP(
 				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
 				const int szbuf_offset = x * 2 + y * GX_ZBUFW * 2;
 				if (pal_idx < shdpen || szbuf_ptr[szbuf_offset] < z8 || szbuf_ptr[szbuf_offset + 1] <= pri) continue;
+				if (top_ptr && m_gx_topmost_shadow && !m_gx_topmost_shadow[top_ptr[x + y * top_pitch]])
+				{
+					continue;
+				}
 				szbuf_ptr[szbuf_offset] = z8;
 				szbuf_ptr[szbuf_offset + 1] = pri;
 
@@ -768,6 +784,8 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 	, m_dy(0)
 	, m_objcha_line(0)
 	, m_z_rejection(0)
+	, m_gx_topmost(nullptr)
+	, m_gx_topmost_shadow(nullptr)
 	, m_k053247_cb(*this)
 	, m_gfxrom(*this, DEVICE_SELF)
 	, m_gfx_num(0)
@@ -874,4 +892,19 @@ void k053247_device::device_reset()
 void k053247_device::k053247_set_z_rejection(s32 zcode)
 {
 	m_z_rejection = zcode;
+}
+
+/*
+    The 55555 decides whether a shadow applies by comparing the
+    shadow's priority with the priority of the topmost screen at each pixel.
+    While topmost is set, zdrawgfxzoom32GP writes the priority of every solid
+    pen it draws into it, and when shadow_enable is also set, shadow pens only
+    shade pixels whose topmost priority p has shadow_enable[p] true.
+    Pass nullptr for both to go back to the default behavior.
+*/
+
+void k053247_device::k053247_set_gx_topmost(bitmap_ind8 *topmost, const bool *shadow_enable)
+{
+	m_gx_topmost = topmost;
+	m_gx_topmost_shadow = shadow_enable;
 }
