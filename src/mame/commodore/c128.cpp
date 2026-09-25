@@ -1207,7 +1207,9 @@ uint8_t c128_state::sid_potx_r()
 	case 3:
 		if (cur1->has_pot_x() && cur2->has_pot_x())
 		{
-			data = 1 / (1 / cur1->read_pot_x() + 1 / cur2->read_pot_x());
+			const unsigned pot1 = cur1->read_pot_x();
+			const unsigned pot2 = cur2->read_pot_x();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (cur1->has_pot_x())
 		{
@@ -1236,7 +1238,9 @@ uint8_t c128_state::sid_poty_r()
 	case 3:
 		if (cur1->has_pot_y() && cur2->has_pot_y())
 		{
-			data = 1 / (1 / cur1->read_pot_y() + 1 / cur2->read_pot_y());
+			const unsigned pot1 = cur1->read_pot_y();
+			const unsigned pot2 = cur2->read_pot_y();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (cur1->has_pot_y())
 		{
