@@ -188,11 +188,11 @@ namespace {
 #define MASTER_CLOCK (XTAL(18'432'000)) // same as galaga.cpp
 
 
-class xevious_state : public galaga_state
+class xevious_state : public galaga_state_base
 {
 public:
 	xevious_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galaga_state(mconfig, type, tag),
+		galaga_state_base(mconfig, type, tag),
 		m_xevious_sr1(*this, "xevious_sr1"),
 		m_xevious_sr2(*this, "xevious_sr2"),
 		m_xevious_sr3(*this, "xevious_sr3"),
@@ -237,6 +237,9 @@ protected:
 	required_shared_ptr<uint8_t> m_xevious_fg_videoram;
 	required_shared_ptr<uint8_t> m_xevious_bg_videoram;
 	optional_device<samples_device> m_samples;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	int32_t m_xevious_bs[2];
 };
@@ -400,8 +403,8 @@ void xevious_state::xevious_common(machine_config &config)
 	misclatch.q_out_cb<0>().set(FUNC(xevious_state::irq1_clear_w));
 	misclatch.q_out_cb<1>().set(FUNC(xevious_state::irq2_clear_w));
 	misclatch.q_out_cb<2>().set(FUNC(xevious_state::nmion_w));
-	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
-	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
@@ -1084,19 +1087,17 @@ void xevious_state::init_xevious()
 
 void xevious_state::init_xevios()
 {
-	/* convert one of the sprite ROMs to the format used by Xevious */
-	uint8_t *rom = memregion("gfx3")->base();
-	for (int A = 0x5000; A < 0x7000; A++)
-	{
-		rom[A] = bitswap<8>(rom[A],1,3,5,7,0,2,4,6);
-	}
+	uint8_t *rom;
 
-	/* convert one of tile map ROMs to the format used by Xevious */
+	// convert one of the sprite ROMs to the format used by Xevious
+	rom = memregion("gfx3")->base();
+	for (int A = 0x5000; A < 0x7000; A++)
+		rom[A] = bitswap<8>(rom[A],1,3,5,7,0,2,4,6);
+
+	// convert one of tile map ROMs to the format used by Xevious
 	rom = memregion("gfx4")->base();
 	for (int A = 0x0000; A < 0x1000; A++)
-	{
 		rom[A] = bitswap<8>(rom[A],3,7,5,1,2,6,4,0);
-	}
 
 	init_xevious();
 }

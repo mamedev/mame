@@ -218,11 +218,13 @@ namespace {
 #define MASTER_CLOCK (XTAL(18'432'000)) // same as galaga.cpp
 
 
-class digdug_state : public galaga_state
+class digdug_state : public galaga_state_base
 {
 public:
 	digdug_state(const machine_config &mconfig, device_type type, const char *tag) :
-		galaga_state(mconfig, type, tag),
+		galaga_state_base(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_videolatch(*this, "videolatch"),
 		m_earom(*this, "earom"),
 		m_digdug_objram(*this, "digdug_objram"),
 		m_digdug_posram(*this, "digdug_posram"),
@@ -255,10 +257,15 @@ private:
 	void digdug_map(address_map &map) ATTR_COLD;
 	void dzigzag_mem4(address_map &map) ATTR_COLD;
 
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<ls259_device> m_videolatch;
 	required_device<er2055_device> m_earom;
 	required_shared_ptr<uint8_t> m_digdug_objram;
 	required_shared_ptr<uint8_t> m_digdug_posram;
 	required_shared_ptr<uint8_t> m_digdug_flpram;
+
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
 	uint8_t m_bg_select = 0U;
 	uint8_t m_tx_color_mode = 0U;
@@ -304,7 +311,7 @@ void digdug_state::digdug_map(address_map &map)
 	map(0x6830, 0x6830).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7000, 0x70ff).rw("06xx", FUNC(namco_06xx_device::data_r), FUNC(namco_06xx_device::data_w));
 	map(0x7100, 0x7100).rw("06xx", FUNC(namco_06xx_device::ctrl_r), FUNC(namco_06xx_device::ctrl_w));
-	map(0x8000, 0x83ff).ram().w(FUNC(digdug_state::digdug_videoram_w)).share("videoram"); /* tilemap RAM (bottom half of RAM 0 */
+	map(0x8000, 0x83ff).ram().w(FUNC(digdug_state::digdug_videoram_w)).share(m_videoram); /* tilemap RAM (bottom half of RAM 0 */
 	map(0x8400, 0x87ff).ram().share("share1");                          /* work RAM (top half for RAM 0 */
 	map(0x8800, 0x8bff).ram().share(m_digdug_objram);   /* work RAM + sprite registers */
 	map(0x9000, 0x93ff).ram().share(m_digdug_posram);   /* work RAM + sprite registers */
@@ -339,8 +346,8 @@ void digdug_state::digdug(machine_config &config)
 	misclatch.q_out_cb<0>().set(FUNC(digdug_state::irq1_clear_w));
 	misclatch.q_out_cb<1>().set(FUNC(digdug_state::irq2_clear_w));
 	misclatch.q_out_cb<2>().set(FUNC(digdug_state::nmion_w));
-	misclatch.q_out_cb<3>().set_inputline("sub", INPUT_LINE_RESET).invert();
-	misclatch.q_out_cb<3>().append_inputline("sub2", INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
+	misclatch.q_out_cb<3>().append_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
 	misclatch.q_out_cb<3>().append("51xx", FUNC(namco_51xx_device::reset));
 	misclatch.q_out_cb<3>().append("53xx", FUNC(namco_53xx_device::reset));
 	// Q5-Q7 also used (see below)
@@ -433,7 +440,7 @@ void digdug_state::earom_control_w(uint8_t data)
 
 void digdug_state::machine_start()
 {
-	galaga_state::machine_start();
+	galaga_state_base::machine_start();
 
 	earom_control_w(0);
 }
