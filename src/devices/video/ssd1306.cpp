@@ -86,13 +86,10 @@ ssd1306_device::ssd1306_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-
-
 void ssd1306_device::device_start()
 {
-
+    memset(m_gddram, 0, sizeof(m_gddram));
 }
-
 
 void ssd1306_device::device_reset()
 {
@@ -164,7 +161,8 @@ void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
     { \
         return; \
     } \
-    m_command_pointer = 0;
+    m_command_pointer = 0; \
+    logerror("%s: command %02x (multi-byte)\n", tag(), m_command_fifo[0]);
 
 /**
  * Indicates a single-byte command. The FIFO pointer is reset,
@@ -423,6 +421,14 @@ void ssd1306_device::exec_command(uint8_t data)
             break;
 
         case 0x80:
+            if (m_command_fifo[0] == 0x8D)
+            {
+                COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+                // charge pump setting, which amazingly isn't grouped
+                // in with the rest of the commands...
+                return;
+            }
+
             if (m_command_fifo[0] != 0x81)
             {
                 COMMAND_IS_INVALID;

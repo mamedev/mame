@@ -659,9 +659,9 @@ void atmega328_device::atmega328_internal_map(address_map &map)
 
 void atmega32u4_device::atmega32u4_internal_map(address_map &map)
 {
-	avr8_device::base_internal_map(map);
 
-	map(0x0049, 0x0049).lr8(NAME([] { return 0x13; }));
+	avr8_device::base_internal_map(map);
+	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
 
 }
 
@@ -761,7 +761,7 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
 {
 }
 
@@ -1435,9 +1435,28 @@ bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) 
 	}
 }
 
+
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_conditions[avr8_base_device::INTIDX_COUNT] =
+{
+	{ ATMEGA32U4_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
+	{ ATMEGA32U4_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
+	{ ATMEGA32U4_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
+	{ ATMEGA32U4_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
+	{ ATMEGA32U4_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
+	{ ATMEGA32U4_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
+	{ ATMEGA32U4_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
+	{ ATMEGA32U4_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
+	// { ATMEGA32U4_INT_T2COMPB, TIMSK2, TIMSK2_OCIE2B_MASK, TIFR2,   TIFR2_OCF2B_MASK },
+	// { ATMEGA32U4_INT_T2COMPA, TIMSK2, TIMSK2_OCIE2A_MASK, TIFR2,   TIFR2_OCF2A_MASK },
+	// { ATMEGA32U4_INT_T2OVF,   TIMSK2, TIMSK2_TOIE2_MASK,  TIFR2,   TIFR2_TOV2_MASK },
+	{ ATMEGA32U4_INT_PCINT0,  PCICR,  PCICR_PCIE0_MASK,   PCIFR,   PCIFR_PCIF0_MASK },
+	{ ATMEGA32U4_INT_INT0,    EIMSK,  EIMSK_INT0_MASK,    EIFR,    EIFR_INTF0_MASK },
+	{ ATMEGA32U4_INT_INT1,    EIMSK,  EIMSK_INT1_MASK,    EIFR,    EIFR_INTF1_MASK }
+};
+
 void atmega32u4_device::update_interrupt(int source)
 {
-	const interrupt_condition &condition = s_int_conditions[source];
+	const interrupt_condition &condition = s_mega32u4_int_conditions[source];
 
 	int intstate = 0;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
