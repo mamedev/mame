@@ -2102,3 +2102,27 @@ project "asmjit"
 		MAME_DIR .. "3rdparty/asmjit/asmjit/x86/x86rapass_p.h",
 	}
 end
+
+--------------------------------------------------
+-- OpenH264 portable decoder (Hantro G1)
+--------------------------------------------------
+if VIDEOS["HANTRO_G1"] then
+	project "openh264dec"
+	uuid "8812e9bd-a62e-49ce-a7f3-734080a2e19c"
+	kind "StaticLib"
+	defines { "MAME_H264_DECODE_ORDER" }
+	includedirs {
+		MAME_DIR .. "3rdparty/openh264/codec/api/wels",
+		MAME_DIR .. "3rdparty/openh264/codec/common/inc",
+		MAME_DIR .. "3rdparty/openh264/codec/decoder/core/inc",
+		MAME_DIR .. "3rdparty/openh264/codec/decoder/plus/inc",
+	}
+	configuration { "gmake or ninja or jcdb" }
+	buildoptions { "-Wno-error=implicit-fallthrough" }
+	configuration { }
+	files {
+		MAME_DIR .. "3rdparty/openh264/codec/common/src/*.cpp",
+		MAME_DIR .. "3rdparty/openh264/codec/decoder/core/src/*.cpp",
+		MAME_DIR .. "3rdparty/openh264/codec/decoder/plus/src/*.cpp",
+	}
+end

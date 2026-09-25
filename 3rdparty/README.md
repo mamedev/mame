@@ -1,6 +1,6 @@
 # **3rdparty** #
 
-aescbc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+aes128cbc, aes128ecb, aes192cbc, aes192ecb, aes256cbc, aes256ecb - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 asio - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
 
@@ -49,6 +49,8 @@ lzma - Custom public domain license
 minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
 
 nanosvg - [zlib license](http://opensource.org/licenses/Zlib)
+
+openh264 - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
 portaudio - [The MIT License (MIT)](http://opensource.org/licenses/MIT) explanation at [their site](http://www.portaudio.com/license.html)
 
