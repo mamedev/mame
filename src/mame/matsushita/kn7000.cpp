@@ -4,14 +4,53 @@
 
     Technics SX-KN7000 and related MN10300-based keyboards
 
-    Panasonic MN103002A (MN10300 family, AM33 core) running the "MILK"
-    object framework. LCD, control panel, floppy, SD, MIDI and an
-    ADSP-21065L effects DSP.
-
-    The wave ROMs are undumped, so the tone generator is driven correctly
-    but its timbre is a placeholder.
+    All five machines are built around a Panasonic MN103002A (MN10300 family,
+    AM33 core), running Panasonic's "MILK" object framework. LCD, control
+    panel, floppy, SD, MIDI and an ADSP-21065L effects DSP are emulated; the
+    wave ROMs are undumped, so the tone generator is driven correctly but its
+    timbre is a placeholder.
 
     Design notes: https://arqueologiadigital.github.io/technics-docs/kn7000-driver-internals/
+
+    Hardware inventory below is taken from the manufacturer's service manuals:
+
+        SX-KN7000  EMID0207013C0 (2002)
+        SX-KN6000  EMID9908016C0 (1999)
+        SX-KN6500  EMID0101001C0 (2001)
+        SX-KN2400, SX-KN2600
+
+    Each manual covers only its own model, except that the SX-KN2400 book's
+    parts list reproduces the SX-KN2600's list of main-board integrated
+    circuits verbatim - it names devices that appear on no SX-KN2400 schematic
+    sheet or board silkscreen, and omits the floppy controller that all three
+    SX-KN2400 sources show. The SX-KN2400 devices below are therefore taken
+    from its schematics, block diagram and board assembly drawings only.
+
+    Capacities were read from the schematics and parts lists, and confirmed by
+    counting address pins. The manuals write ROM sizes in megabits: the KN6000
+    manual prints "(64M BIT MASK ROM)" next to parts numbered QSIGX3C64004 and
+    up, which fixes both the unit and the meaning of the digits in the part
+    number.
+
+    Clocking: the KN6000 and KN6500 manuals print a 32 MHz oscillator at X1,
+    feeding a spread-spectrum clock generator at IC6 whose output drives the
+    CPU. The KN7000, KN2400 and KN2600 use the same topology, but their
+    manuals do not give the frequency of X1, so their core clocks are inferred
+    from the KN6000 and KN6500 rather than documented.
+
+    The KN7000's program and table ROMs are not chip reads. They are payloads
+    from Panasonic's own firmware update disks, and they validate against the
+    checksums that Panasonic ships alongside them: the update descriptor files
+    carry a 32-bit sum over the whole payload plus 16-bit sums of each 256 KiB
+    block, and every block matches.
+
+    A note on the KN7000's IC16/IC17: these are one pair of 4 MiB flash devices
+    on CPU address lines A2-A22, so together they span 8 MiB. Address line A22
+    selects between the two regions declared below - the table data occupies
+    the half where A22 is low, and the program the half where it is high.
+
+    TODO:
+      - dump the wave, rhythm and picture ROMs listed as NO_DUMP below
 
 ***************************************************************************/
 
@@ -798,8 +837,22 @@ static void kn7000_floppies(device_slot_interface &device)
 
 void kn7000_state::kn7000_base(machine_config &config)
 {
-	// IC21, the custom-data flash. The firmware identifies the part with a JEDEC
-	// autoselect before writing to it.
+	// The custom-data flash.  The firmware talks to it with the AMD command set
+	// (unlock at +0xAAAA / +0x5554, autoselect 0x90, program 0xA0, sector erase
+	// 0x80+0x30) and validates it against a table of accepted parts before it will
+	// program anything, so the device IDs here are functional, not decorative.
+	//
+	// Accepted parts, from the table at 0x485CF9E0:
+	//
+	//   maker  device  sectors  name
+	//   0x04   0x2249  35       MBM29LV160B   Fujitsu
+	//   0xC2   0x2249  35       MX29LV160B    Macronix
+	//   0x1F   0x00C0  40       AT49BV16X4    Atmel
+	//
+	// Both geometries are bottom boot and 2 MiB: 16K + 2x8K + 32K + 31x64K for the
+	// 29LV160B pair, 8x8K + 2x32K + 30x64K for the Atmel.  Which one is fitted is
+	// not recorded -- IC21's marking is the house code C3FBMD000050.  The KN6000
+	// and KN6500 accept MBM29LV160B or AT49BV16X4.
 	FUJITSU_29LV160B(config, m_customflash);
 
 	MN103002A(config, m_maincpu, 16_MHz_XTAL * 2);
@@ -967,6 +1020,40 @@ void kn7000_state::kn2600(machine_config &config)
 	kn24_base(config);
 }
 
+/***************************************************************************
+
+    SX-KN7000
+
+    IC16, IC17   C3FBNG000016   32 Mbit flash, program + table (see note above)
+    IC18         C3CBND000046   64 Mbit mask ROM, rhythm  (later production)
+    IC20         C3FBMD000050   32 Mbit flash, rhythm      (earlier production,
+                                same site, and half the capacity; the manual
+                                states IC20 is not supplied as a spare part)
+    IC19         C3CBMD000098   64 Mbit picture ROM
+    IC21         C3FBMD000050   16 Mbit custom flash (user data).  The service
+                                manual captions this "32M FLASH", but that is
+                                copied from IC20: the firmware's flash device
+                                table (0x485CF9E0) accepts only 16 Mbit parts,
+                                so a 32 Mbit device would fail its autoselect
+                                check.  It also builds a 0x200000 sector map,
+                                and the board decodes a 2 MB window at
+                                0x96800000.  Three independent reasons for
+                                16 Mbit.
+    IC203        C3CBQD000002  128 Mbit mask ROM, wave, main TG bank Y (AWAY)
+    IC204        C3CBQD000001  128 Mbit mask ROM, wave, main TG bank X (AWAX)
+    IC207        C3CBQD000004  128 Mbit mask ROM, wave, sub TG bank Y (BWAY)
+    IC208        C3CBQD000003  128 Mbit mask ROM, wave, sub TG bank X (BWAX)
+
+    The wave devices sit on two independent buses per tone generator, so they
+    are declared as one region per bank rather than concatenated. The block
+    diagram shows IC207 and IC208 the other way round, but the schematic gives
+    BWAY on IC207 and BWAX on IC208 at pin level, the chip-enable groups agree
+    with it, and the part numbers pair as Y = 000002/000004 against
+    X = 000001/000003.
+    IC414        C3FBKD000162    4 Mbit flash, SD card sub-CPU program
+
+***************************************************************************/
+
 ROM_START(kn7000)
 	ROM_REGION32_LE(0x400000, "program", 0)
 	ROM_LOAD32_WORD("kn7000_program_even.ic17", 0x000000, 0x200000, CRC(529b87ce) SHA1(f198fd9a9ea31a454acfe7be0eb935beca6771b1))
@@ -994,6 +1081,20 @@ ROM_START(kn7000)
 	ROM_REGION(0x800000, "picture", 0)
 	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x800000, NO_DUMP)
 
+	// The custom flash holds user data, and is populated from a floppy rather than
+	// programmed at the factory: the firmware inflates the CTMINI payload from an
+	// "Initial Data Disk" and writes it verbatim to offset 0x20000, which is the top
+	// 30 of the 64 KiB sectors.  Nothing is written below that, so the boot sectors
+	// are left erased here.
+	//
+	// The images below are therefore not chip dumps.  Each is the exact content the
+	// firmware places in the device for one published data set, so a part programmed
+	// from that floppy reads back as declared.  They are offered as a BIOS choice
+	// because a real instrument holds exactly one of them at a time.  Sectors 19..29
+	// are byte-identical in all nine, so a little over a third of the region is an
+	// invariant template rather than per-set data.
+	// 16_BE: intelfsh preloads a 16-bit part with m_region->as_u16(), a host-native
+	// read, so a byte-wide region would reach the device halfword-swapped.
 	ROM_REGION16_BE(0x200000, "custom_data", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "ctmini",  "Initial Data Disk (factory default)")
 	ROMX_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced), ROM_BIOS(0))
@@ -1017,6 +1118,22 @@ ROM_START(kn7000)
 	ROM_REGION(0x80000, "sdcard_cpu", 0)
 	ROM_LOAD("c3fbkd000162.ic414", 0x000000, 0x80000, NO_DUMP)
 ROM_END
+
+/***************************************************************************
+
+    SX-KN6000
+
+    IC11, IC12   M29LV160B8TN   16 Mbit flash, program
+    IC13         QSIGX3C16008   16 Mbit mask ROM, table data
+    IC14         QSIGX3C16007   16 Mbit mask ROM, table data
+    IC15         QSIGX3C32021   32 Mbit mask ROM, rhythm data
+    IC18         A49BV161490T   16 Mbit flash, custom rhythm (user data)
+    IC205        QSIGX3C64004   64 Mbit mask ROM, wave, bank Y (WAY)
+    IC206        QSIGX3C64005   64 Mbit mask ROM, wave, bank X (WAX)
+    IC207        QSIGX3C64006   64 Mbit mask ROM, wave, bank Y (WAY)
+    IC208        QSIGX3C64007   64 Mbit mask ROM, wave, bank X (WAX)
+
+***************************************************************************/
 
 ROM_START(kn6000)
 	ROM_REGION32_LE(0x400000, "program", 0)
@@ -1044,6 +1161,38 @@ ROM_START(kn6000)
 	ROM_LOAD("01ctmini.ic18", 0x020000, 0x1e0000, BAD_DUMP CRC(f108e4c7) SHA1(8c6d62a8afab717a2b59e9242bbf897b01369416))
 ROM_END
 
+/***************************************************************************
+
+    SX-KN6500
+
+    IC11, IC12   M29LV160B8TN   16 Mbit flash, program
+    IC13         C3FBMD000069   16 Mbit table data, supplied pre-programmed
+    IC14         C3FBMD000068   16 Mbit table data, supplied pre-programmed
+                                (the schematic legend reads "PROGRAMMED MASK
+                                ROM", copied from the KN6000, but the pinout
+                                drawn beside it - RESET, RY/BY, VPP, WE - is a
+                                NOR flash, so no device type is asserted here)
+    IC15         QSIGX3C32021   32 Mbit mask ROM, rhythm data
+    IC18         M29LV160B8TN   16 Mbit flash, custom rhythm (user data).  The
+                                schematic labels IC11, IC12 and IC18 with this
+                                same part but three different descriptors, so
+                                it is fitted at all three flash sites rather
+                                than being a repeated parts-list row.  The
+                                firmware will only program a device whose
+                                autoselect response is in its table, and that
+                                table holds MBM29LV160B and AT49BV16X4 - both
+                                16 Mbit bottom boot, which is what fixes the
+                                geometry here.  Which vendor's 29LV160B this
+                                designation refers to is not established.
+    IC205        QSIGX3C64004   64 Mbit mask ROM, wave, bank Y (WAY)
+    IC206        QSIGX3C64005   64 Mbit mask ROM, wave, bank X (WAX)
+    IC207        QSIGX3C64006   64 Mbit mask ROM, wave, bank Y (WAY)
+    IC208        QSIGX3C64007   64 Mbit mask ROM, wave, bank X (WAX)
+    IC209        QSIGX3C64020   64 Mbit mask ROM, wave, bank Y (WAY)
+    IC210        QSIGX3C64019   64 Mbit mask ROM, wave, bank X (WAX)
+
+***************************************************************************/
+
 ROM_START(kn6500)
 	ROM_REGION32_LE(0x400000, "program", 0)
 	ROM_LOAD32_WORD("kn6500_program_even.ic12", 0x000000, 0x200000, CRC(f42a2fcf) SHA1(7cebf73bf623fd714ca455ed50b80da1d2186414))
@@ -1070,6 +1219,43 @@ ROM_START(kn6500)
 	ROM_REGION16_BE(0x200000, "custom_data", ROMREGION_ERASEFF)
 	ROM_LOAD("01ctmini.ic18", 0x020000, 0x1e0000, BAD_DUMP CRC(f108e4c7) SHA1(8c6d62a8afab717a2b59e9242bbf897b01369416))
 ROM_END
+
+/***************************************************************************
+
+    SX-KN2400 and SX-KN2600
+
+    One firmware image serves both models, selecting between them at run time,
+    and the two boards carry an identical set of memory devices: the schematic
+    sheet holding the tone generator and both wave ROMs is the same drawing in
+    both manuals, and the board assembly drawings list the same designators.
+    The models differ in storage and I/O only - the SX-KN2400 has a floppy
+    drive and controller, the SX-KN2600 an SD card interface. They therefore
+    share every ROM listed below except the SD sub-processor's program flash,
+    which is fitted only on the SX-KN2600.
+
+    IC12, IC13   C3FBNG000007   32 Mbit flash, program (see note below)
+    IC14         C3ZBNG000023   64 Mbit flash, rhythm and other data
+    IC302        C3ZBP0000003   64 Mbit flash, wave bank Y (AWAY bus)
+    IC303        C3ZBP0000004   64 Mbit flash, wave bank X (AWAX bus)
+    IC404        C3ZBK0000020    4 Mbit flash, SD sub-CPU program (KN2600 only)
+
+    Neither board carries a table or font ROM: the schematics, the board
+    assembly drawings and the block diagrams agree that the devices listed
+    above are the only memories present, and the LCD controller at IC104 has
+    no external memory attached.
+
+    The block diagrams describe IC302 and IC303 as 128 Mbit parts addressed by
+    WAY0-WAY22, but the schematics show only 22 address inputs, and the tone
+    generator's WAY22 and WAY23 pins terminate unconnected. The 64 Mbit figure
+    from the schematics is used here.
+
+    A note on IC12/IC13: the schematics show 21 address inputs driven from CPU
+    address lines A2-A22, making these 32 Mbit devices that together span
+    8 MiB. The dumps below cover 4 MiB of that pair. The remainder has not been
+    read, so it is not described here; on the KN7000 the equivalent pair holds
+    the table data in the half that these dumps do not cover.
+
+***************************************************************************/
 
 #define KN2400_ROM_COMMON \
 	ROM_REGION32_LE(0x400000, "table_data", ROMREGION_ERASEFF) \
