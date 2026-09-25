@@ -202,6 +202,7 @@ void gaelco3d_state::machine_start()
 	save_item(NAME(m_fp_state));
 	save_item(NAME(m_fp_analog_ports));
 	save_item(NAME(m_fp_length));
+	save_item(NAME(m_wheel_motor_data));
 }
 
 
@@ -672,7 +673,7 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x51003c, 0x51003d).portr("IN3");
 	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
-	map(0x510044, 0x510045).nopw(); // unknown (cabinet control?)
+	map(0x510044, 0x510045).w(FUNC(gaelco3d_state::wheel_motor_w)); // Speed Up FFB
 	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
 	map(0x510103, 0x510103).select(0x000038).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); }));
@@ -725,7 +726,10 @@ void gaelco3d_state::adsp_data_map(address_map &map)
 	map(0x3fe0, 0x3fff).w(FUNC(gaelco3d_state::adsp_control_w)).share(m_adsp_control_regs);
 }
 
-
+void gaelco3d_state::wheel_motor_w(uint16_t data)
+{
+	m_wheel_motor = data & 0xff;
+}
 
 /*************************************
  *
