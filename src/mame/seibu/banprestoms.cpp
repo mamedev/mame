@@ -29,7 +29,7 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 TODO:
 - the GFX emulation was adapted from other drivers using the Seibu customs, it might need more adjustments
-- verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
+- verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called) -> verified streaming natural Japanese dialogs 
 - lamps
 - controls / dips need to be completed and better arranged
 - identify and hookup RTC
@@ -484,6 +484,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 
 	SEI0211(config, m_spritegen, XTAL(14'318'181), m_palette, gfx_banprestoms_spr);
 	m_spritegen->set_pri_callback(FUNC(banprestoms_state::pri_cb));
+    m_spritegen->set_offset(0, +16); // adjust Mario's nose position
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
