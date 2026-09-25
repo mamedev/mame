@@ -29,6 +29,47 @@ const char *c1571_format::extensions() const noexcept
 	return "dsk,img";
 }
 
+bool c1571_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
+{
+	if (!wd177x_format::load(io, form_factor, variants, image))
+		return false;
+
+	int tracks, heads;
+	image.get_maximal_geometry(tracks, heads);
+
+	for (int track = (tracks - 1) / 2; track > 0; track--)
+	{
+		for (int head = 0; head < heads; head++)
+		{
+			image.get_buffer(track * 2, head) = std::move(image.get_buffer(track, head));
+			image.get_buffer(track, head).clear();
+			image.set_write_splice_position(track * 2, head, image.get_write_splice_position(track, head));
+		}
+	}
+
+	return true;
+}
+
+bool c1571_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
+{
+	int tracks, heads;
+	image.get_maximal_geometry(tracks, heads);
+
+	floppy_image single(tracks, heads, image.get_form_factor());
+	single.set_variant(image.get_variant());
+
+	for (int track = 0; track * 2 < tracks; track++)
+	{
+		for (int head = 0; head < heads; head++)
+		{
+			single.get_buffer(track, head) = image.get_buffer(track * 2, head);
+			single.set_write_splice_position(track, head, image.get_write_splice_position(track * 2, head));
+		}
+	}
+
+	return wd177x_format::save(io, variants, single);
+}
+
 const c1571_format::format c1571_format::formats[] = {
 	// MS-DOS 360KB
 	// 80x4e 12x00 3xf6 fc 

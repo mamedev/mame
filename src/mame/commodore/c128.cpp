@@ -1654,9 +1654,8 @@ void c128_state::exp_reset_w(int state)
 //  SLOT_INTERFACE( c128dcr_iec_devices )
 //-------------------------------------------------
 
-[[maybe_unused]] void c128dcr_iec_devices(device_slot_interface &device)
+void c128dcr_iec_devices(device_slot_interface &device)
 {
-	device.option_add("c1571", C1571);
 	device.option_add("c1571cr", C1571CR);
 }
 
@@ -1923,9 +1922,11 @@ void c128_state::c128(machine_config &config)
 void c128_state::c128dcr(machine_config &config)
 {
 	ntsc(config);
-	cbm_iec_slot_device::add(config, m_iec, "c1571"); // TODO c1571cr
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128dcr_iec_devices, "c1571cr").set_fixed(true);
 }
 
 
@@ -1940,7 +1941,7 @@ void c128_state::c128d81(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
-	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563").set_fixed(true);
 }
 
 
@@ -2105,9 +2106,11 @@ void c128_state::c128pal(machine_config &config)
 void c128_state::c128dcrp(machine_config &config)
 {
 	pal(config);
-	cbm_iec_slot_device::add(config, m_iec, "c1571"); // TODO c1571cr
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128dcr_iec_devices, "c1571cr").set_fixed(true);
 }
 
 

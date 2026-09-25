@@ -524,8 +524,11 @@ void c1571_device::device_start()
 
 void c1571_device::device_reset()
 {
-	m_fdc->set_floppy(m_floppy);
-	m_fdc->dden_w(0);
+	if (m_fdc)
+	{
+		m_fdc->set_floppy(m_floppy);
+		m_fdc->dden_w(0);
+	}
 
 	m_sp_out = 1;
 	m_data_out = 1;
@@ -585,6 +588,11 @@ void c1571_device::cbm_iec_reset(int state)
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(c1571_device::iec_sync_tick)
+{
+	update_iec();
+}
+
+void c1571_device::update_iec()
 {
 	m_cia->cnt_w(m_ser_dir || m_bus->srq_r());
 	m_cia->sp_w(m_ser_dir || m_bus->data_r());
