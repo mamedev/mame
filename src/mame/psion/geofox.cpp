@@ -131,7 +131,7 @@ void geofox_state::init_geofox()
 
 	// calculate the checksum
 	uint8_t chksum = 0;
-	for (int i = 0; i < 0x1f; i++)
+	for (int i = 1; i < 0x20; i++)
 		chksum ^= eeprom[i];
 
 	// EPOC is expecting 0x42
@@ -191,9 +191,6 @@ uint16_t geofox_state::adc_r(offs_t offset)
 		{
 			// generate mouse packet data
 			mousepad_packet();
-
-			// clear the interrupt
-			m_soc->eint2_w(CLEAR_LINE); // TODO: how/when is this really cleared?
 		}
 		data = (m_mouse_data >> (16 * m_mouse_pkt)) & 0xffff;
 		m_mouse_pkt ^= 1;
@@ -269,7 +266,7 @@ void geofox_state::palette_init(palette_device &palette) const
 
 INPUT_CHANGED_MEMBER(geofox_state::mousepad_changed)
 {
-	m_soc->eint2_w(ASSERT_LINE);
+	m_soc->eint2_w(newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_PORTS_START( geofox )
@@ -436,6 +433,7 @@ void geofox_state::geofox(machine_config &config)
 	m_soc->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_soc->col_cb().set([this](uint8_t data) { m_kbd_scan = data; });
 	m_soc->adc_r().set(FUNC(geofox_state::adc_r));
+	m_soc->set_screen("screen");
 
 	//ADC12138(config, "adc"); // TODO: verify device
 
@@ -456,7 +454,7 @@ void geofox_state::geofox(machine_config &config)
 	m_screen->set_refresh_hz(58);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(m_soc, FUNC(clps7110_device::screen_update));
-	m_screen->set_size(640, 320); // PEN 440x200 LCD 320x200
+	m_screen->set_size(640, 320); // PEN 640x320 LCD 640x320
 	m_screen->set_visarea_full();
 	m_screen->set_palette(m_palette);
 
