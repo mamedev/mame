@@ -486,6 +486,7 @@ void batman_state::batman(machine_config &config)
 	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
+	m_jsa->set_oki1_tag("jsa:oki");
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -532,7 +533,7 @@ ROM_START( batman )
 	ROM_LOAD( "136085-1021.15c",  0x0c0000, 0x20000, CRC(9c8ef9ba) SHA1(c2540adfc227a654a3f91e2cfdcd98b3a04ae4fb) )
 	ROM_LOAD( "136085-1025.16c",  0x0e0000, 0x20000, CRC(5d30bcd1) SHA1(817e225511ab98e7575ee512d659c51fcb7716dc) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )   // ADPCM
+	ROM_REGION( 0x80000, "jsa:oki", 0 )   // ADPCM
 	ROM_LOAD( "136085-1041.19e",  0x00000, 0x20000, CRC(d97d5dbb) SHA1(7609841c773e3d1ae5a21da81e3387260fd8da41) )
 	ROM_LOAD( "136085-1042.17e",  0x20000, 0x20000, CRC(8c496986) SHA1(07c84c68885e2ab3e81ee92942d6a0f29e4dffa8) )
 	ROM_LOAD( "136085-1043.15e",  0x40000, 0x20000, CRC(51812d3b) SHA1(6748fecef753179a9257c0da5a7b7c9648437208) )

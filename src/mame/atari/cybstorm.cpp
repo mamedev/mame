@@ -524,6 +524,8 @@ void cybstorm_state::cybstorm(machine_config &config)
 	ATARI_JSA_IIIS(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("9F0010").bit(22);
+	m_jsa->set_oki1_tag("jsa:oki");
+	m_jsa->set_oki2_tag("jsa:oki");
 	m_jsa->add_route(0, "speaker", 0.9, 0);
 	m_jsa->add_route(1, "speaker", 0.9, 1);
 }
@@ -586,10 +588,7 @@ ROM_START( cybstorm )
 	ROM_LOAD( "st_11.22.mo34", 0x980000, 0x080000, CRC(b8b0c8b6) SHA1(f47218a4d94aa151964687a6e4c02f2b3065fdd3) )
 	ROM_LOAD( "st_11.22.mo35", 0xb80000, 0x080000, CRC(f0b9cf9d) SHA1(7ce30b05c1ee02346e8f568f36274b46d1ed99c4) )
 
-	ROM_REGION( 0x100000, "jsa:oki1", 0 ) // ADPCM
-	ROM_LOAD( "st_11.22.5a", 0x000000, 0x080000, CRC(d469692c) SHA1(b7d94c042cf9f28ea65d44f5305d56459562d209) )
-
-	ROM_REGION( 0x100000, "jsa:oki2", 0 ) // ADPCM
+	ROM_REGION( 0x100000, "jsa:oki", 0 ) // ADPCM
 	ROM_LOAD( "st_11.22.5a", 0x000000, 0x080000, CRC(d469692c) SHA1(b7d94c042cf9f28ea65d44f5305d56459562d209) )
 ROM_END
 
