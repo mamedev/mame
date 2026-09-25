@@ -757,11 +757,11 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  atmega328_device - constructor
+//  atmega32u4_device - constructor
 //-------------------------------------------------
 
 atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA32U4, 0x7fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
 {
 }
 
@@ -1164,7 +1164,7 @@ void avr8_device<NumTimers>::device_start()
 //  device_reset - reset the device
 //-------------------------------------------------
 
-void avr8_base_device::device_reset()
+void avr8_base_device::common_reset()
 {
 	logerror("AVR low fuse bits: 0x%02X\n", m_lfuses);
 	logerror("AVR high fuse bits: 0x%02X\n", m_hfuses);
@@ -1215,9 +1215,16 @@ void avr8_base_device::device_reset()
 	m_sleeping = false;
 }
 
+void avr8_base_device::device_reset()
+{
+	common_reset();
+}
+
 template <int NumTimers>
 void avr8_device<NumTimers>::device_reset()
 {
+	common_reset();
+
 	m_adc_sample = 0;
 	m_adc_result = 0;
 	m_adc_data = 0;

@@ -624,6 +624,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_shift_flag_cache;
 
 	// device-level overrides
+	void common_reset();
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -826,6 +827,7 @@ protected:
 	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map);
 
 	typedef delegate<void (void)> timer_func;
+
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
