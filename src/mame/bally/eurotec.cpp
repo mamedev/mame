@@ -434,6 +434,16 @@ ROM_START( machmehr )
 	ROM_LOAD16_BYTE("1602-s1.3_odd_mach_mehr.ic15", 0x00000, 0x80000, CRC(b36fa7f1) SHA1(7eed1fe4ec103fa7b14f84b2d90dc931dd562dc7))
 ROM_END
 
+ROM_START( mnrchp1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_LOAD16_WORD_SWAP("073-p1.0_monarch.ic10", 0x00000, 0x80000, CRC(272319ab) SHA1(767a2b76726221e9e5d11b82c98d13af84e4df87))
+ROM_END
+
+ROM_START( mnrchp5 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_LOAD16_WORD_SWAP("073-p5.0_monarch.ic10", 0x00000, 0x80000, CRC(0e5a1c92) SHA1(c6280cf60c1ccfde95485054cb8750832848af3f))
+ROM_END
+
 ROM_START( mnrchs6 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
     ROM_LOAD16_WORD_SWAP("073-s6.0_monarch.ic10", 0x00000, 0x80000, CRC(80d926bd) SHA1(875fb82657fa7417059ad3143fab34bac3e2b1ad))
@@ -491,6 +501,11 @@ ROM_START( rexe )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("136-even_rex.ic10", 0x00001, 0x80000, CRC(6c4f0770) SHA1(367784c724c12dd5a673cf8f44b9b44b0c5e2871))
 	ROM_LOAD16_BYTE("136-odd_rex.ic15", 0x00000, 0x80000, CRC(4afca1e3) SHA1(97a7dc44702589cfd03978f318399b7e97af6831))
+ROM_END
+
+ROM_START( rexsp5 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_LOAD16_WORD_SWAP("012-p5.0_rex_super.ic10", 0x00000, 0x80000, CRC(be851587) SHA1(e3c319addb774a3d647cb95e51fd13236bf592e6))
 ROM_END
 
 ROM_START( roys4 )
@@ -610,6 +625,7 @@ ROM_END
 GAME(1997, sjumpe6, 		0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Super Jump (E6)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(1998, kingpp5, 		0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "King Play (P5)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(1998, kingrp1, 		0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "King Royal (P1)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(1998, rexsp5, 		    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Rex Super (P5)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(1999, rrunp1, 		    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Round Runner (P1)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2000, heroldp5, 	    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Herold (P5)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2000, jetsets5,	    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Jet Set (S5)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
@@ -621,6 +637,8 @@ GAME(2001, lanzes5,		    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally W
 GAME(2001, limbos3,         0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Limbo (S3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, lords2,     lords5, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Lord CD (S2)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, lords5,          0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Lord CD (S5)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(2001, mnrchp1,   mnrchs6, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Monarch (P1)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(2001, mnrchp5,   mnrchs6, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Monarch (P5)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, mnrchs6,         0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Monarch (S6)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, scoots2,         0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Scooter (S2)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, smacs5,		    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Super Mac (S5)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
