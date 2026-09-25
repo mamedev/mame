@@ -7,32 +7,24 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Incomplete XBus/CD drive semantics;
-\- Audio CD has plenty of Cel, VDLP and sport issues. Also needs support between CD drive and DSPP
-   (reads random port, asks for audio tracks *with* subcode);
-\- Photo CD (winsenna): ugly DSPP scratching;
-- Incomplete DSPP mapping (semaphores, audio input, output FIFO flush, FIFO status flags,
-  RAM to DSPP N stack DMA);
-- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, possible mirroring?)
+- Incomplete XBus/CD drive semantics:
+\- Audio CD hangs between CD drive and DSPP (reads random port, asks for audio tracks *with*
+   subcode);
+\- Photo CD (winsenna): ugly DSPP scratching when pressing play *headphone user alert*;
+- Incomplete DSPP mapping (audio input, output FIFO flush, RAM to DSPP N stack DMA);
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
-- Fence/MMU?  Games seem to run fine with stock ARM60 semantics.
+- Fence/MMU? Games seem to run fine with stock ARM60 semantics.
 - Video CD module under Uncle/Woody (allegedly uses a C-Cube CL-450, also seen in Amiga,
   x86 ReelMagic card and possibly more);
 
 TODO (BIOS programs):
-- 3do_fz1: DSPP is silent on planet splash screen
-- 3do_fz1j: DSPP has repeating noise on planet splash screen
-- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs on initial logo screen;
-- 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
-- 3do_try, 3do_hc21 (bios 1), 3do_fc2: throws "QueueSport error on cmd 4: xfer across 1M boundary"
-  in Logic Analyser (resulting in issues with layer clearances), never really pings Sport DMA,
-  needs smaller VRAM?
+- 3do_fz1: DSPP is silent on planet splash screen (verify, is it supposed to make any sound?)
+- 3do_gdo101: star outward explosion should draw in b&w shades not colorized (Amy cornerweight?)
+- 3do_fc2: detects as PAL system during POST (?);
 - 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
   skipped.
 
 TODO (Arcade variants):
-- crime3do/md23do/sht3do: lightgun hookup;
-- orbatak: ugly colors in service mode, not extensively tested;
 - The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
   for enumerating p2 then p1);
 
@@ -40,6 +32,12 @@ References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
 - https://github.com/trapexit/portfolio_os
 - 3dodev wiki;
+
+Notes:
+- To calibrate in ALG lightgun games: go in service mode -> gun aiming and hit the center of the
+  target *twice*.
+
+===================================================================================================
 
 Hardware descriptions:
 
@@ -103,7 +101,7 @@ Models:
 - Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer (Japan, Asia, North America, Europe)
 - Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer (Japan, North America, Europe)
 - Goldstar 3DO Interactive Multiplayer (South Korea, North America, Europe)
-- Goldstar 3DO ALIVE II (South Korea)
+- Goldstar 3DO GDO-203 ALIVE II (South Korea)
 - Samsung DMB-800 (South Korea)
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
 - Creative 3DO Blaster, (ISA16 card, PCB marked CTM6110) with a MCT MVM121A VGA passthrough,
@@ -134,8 +132,8 @@ Part list of Goldstar 3DO Interactive Multiplayer
 **************************************************************************************************/
 
 #include "emu.h"
-#include "3do.h"
 
+#include "3do.h"
 #include "3do_portfolio.h"
 
 #include "cpu/arm7/arm7.h"
@@ -272,6 +270,34 @@ static INPUT_PORTS_START( orbatak )
 	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+// adapt our lightgun coordinate system to what the game expects.
+// Device return two values:
+// 1. a counter that translates video beams into a single 20-bit value;
+// 2. a 5-bit line_counter that indicates the number of consecutive scanlines where the hit
+//    occurred, as a "signal quality" check. It's unknown if ALG guns can do it and probably
+//    irrelevant for emulation beyond actually handling the out of screen check;
+std::pair<u32, u8> alg_gun_state::gun_counter_r(u8 which)
+{
+	const u8 p_side = which << 1;
+	// base with some (rather arbitrary) vblank offset
+	u32 counter = 4947;
+	u8 line_trigger = 1;
+
+	const u32 in_x = m_gun_r[p_side | 0]->read() / 2;
+	// 1271 would be NTSC_DEFAULT_YSCANTIME divided by 10 (12707)
+	const u32 in_y = (m_gun_r[p_side | 1]->read() * 240 / 2048) * 1271;
+
+	counter += in_x;
+	counter += in_y;
+
+	// out of screen check (top and bottom edges)
+	if (counter <= 5970 || counter >= 308716)
+		line_trigger = 0;
+
+	return std::make_pair(counter, line_trigger);
+}
+
+
 // both games maps player 2 first then player 1 next
 static INPUT_PORTS_START( alg_gun )
 	PORT_START("P1.0")
@@ -293,6 +319,18 @@ static INPUT_PORTS_START( alg_gun )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // highest bit for counter?
+
+	PORT_START("P1_GUNX")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1_GUNY")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P2_GUNX")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("P2_GUNY")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -610,17 +648,23 @@ void alg_gun_state::alg_gun(machine_config &config)
 {
 	arcade_ntsc(config);
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		u32 p1_counter, p2_counter;
+		u8 p1_line_trigger, p2_line_trigger;
+
+		std::tie(p1_counter, p1_line_trigger) = gun_counter_r(0);
+		std::tie(p2_counter, p2_line_trigger) = gun_counter_r(1);
+
 		switch(offset)
 		{
 			case 0:
-				return (0x4d << 24) | (m_p1_r[1]->read() << 16);
+				return (0x4d << 24) | ((m_p1_r[1]->read() & 0xfe) << 16) | ((p2_counter >> 3) & 0x1ffff);
 			case 1:
-				// should be 8 bit of ID and 24 of actual inputs but both games expects an extra byte
-				// to make this other side to work (padding or actual meaning?)
-				return (0x4d << 16) | (m_p1_r[0]->read() << 8);
+				return ((p2_counter & 7) << 29) | (p2_line_trigger << 24) | (0x4d << 16) | ((m_p1_r[0]->read() & 0xfe) << 8) | ((p1_counter >> 11) & 0x1ff);
+			case 2:
+				return ((p1_counter & 0x7ff) << 21) | (p1_line_trigger << 16);
 		}
 
-		return 0;
+		return 0xffff'ffff;
 	});
 }
 

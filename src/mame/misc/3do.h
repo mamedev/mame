@@ -165,9 +165,14 @@ class alg_gun_state : public _3do_state
 public:
 	alg_gun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: _3do_state(mconfig, type, tag)
+		, m_gun_r(*this, {"P1_GUNX", "P1_GUNY", "P2_GUNX", "P2_GUNY"})
 	{ }
 
 	void alg_gun(machine_config &config) ATTR_COLD;
+private:
+	required_ioport_array<4> m_gun_r;
+
+	std::pair<u32, u8> gun_counter_r(u8 which);
 };
 
 #endif // MAME_MISC_3DO_H
