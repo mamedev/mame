@@ -463,7 +463,42 @@ private:
 		u32 reset;
 		u32 writable;
 	};
-	static const scu_register SCU_REGISTERS[];
+
+	// SCU reset values and writable bit masks.
+	// Timer and I2C PCLK are derived below; other clocks and power domains
+	// are still configuration latches rather than a complete clock/power model.
+	static constexpr scu_register SCU_REGISTERS[] = {
+		{ 0x49475338, 0x00000000 }, // 00 CID
+		{ 0x01000031, 0x173f07ff }, // 04 MPLLCON
+		{ 0x0100013a, 0x173f07ff }, // 08 UPLLCON
+		{ 0x01010162, 0x173f07ff }, // 0c VPLLCON
+		{ 0x0101002c, 0x173f07ff }, // 10 ENCPLLCON
+		{ 0x0101002c, 0x173f07ff }, // 14 DECPLLCON
+		{ 0x06400000, 0xffff7f55 }, // 18 CLKCFG1
+		{ 0x00000000, 0xffffff5f }, // 1c CLKGATE1
+		{ 0x00000000, 0x0bffffff }, // 20 CLKGATE2
+		{ 0x00000000, 0x00770000 }, // 24 CLKDIV
+		{ 0x00000000, 0x00000000 }, // 28 REMAP (command)
+		{ 0x00000000, 0xffffffff }, // 2c PWRCON
+		{ 0x00000000, 0x00000000 }, // 30 SWRESET (command)
+		{ 0x00000000, 0x803ffbff }, // 34 CHIPCFG
+		{ 0x00000000, 0x00007777 }, // 38 PWRDOMAIN
+		{ 0x00000000, 0x00030301 }, // 3c IPCFG
+		{ 0x00000000, 0xffffffff }, // 40 INFORMATIONA
+		{ 0x00000000, 0xffffffff }, // 44 INFORMATIONB
+		{ 0x00000000, 0xffffffff }, // 48 INFORMATIONC
+		{ 0x00080808, 0xffffffff }, // 4c OTGCFG012
+		{ 0x00000000, 0xffffffff }, // 50 INFORMATION1
+		{ 0x00000000, 0xffffffff }, // 54 INFORMATION2
+		{ 0x00000000, 0x00000000 }, // 58 STATUS
+		{ 0x5555a6aa, 0xff3ff3ff }, // 5c PADDRV1 (reserved fields retain reset values)
+		{ 0x00005555, 0x0000ffff }, // 60 PADDRV2
+		{ 0x0101002c, 0x173f07ff }, // 64 CPUPLLCON
+		{ 0x00000000, 0xffffffff }, // 68 INFORMATIOND
+		{ 0x00000000, 0x0000001f }, // 6c CHIPCFG2
+		{ 0x00000000, 0x000000ff }, // 70 CLKGATE3
+		{ 0x00000000, 0xffffffff }, // 74 AUDIOCON (configuration latch)
+	};
 
 	u32 screen_update_pgm3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	u32 lcd_r(offs_t offset);
@@ -515,41 +550,6 @@ private:
 	u32 m_lcd[0x100 / 4]{};
 };
 
-// SCU reset values and writable bit masks.
-// Timer and I2C PCLK are derived below; other clocks and power domains
-// are still configuration latches rather than a complete clock/power model.
-constexpr pgm3_state::scu_register pgm3_state::SCU_REGISTERS[] = {
-	{ 0x49475338, 0x00000000 }, // 00 CID
-	{ 0x01000031, 0x173f07ff }, // 04 MPLLCON
-	{ 0x0100013a, 0x173f07ff }, // 08 UPLLCON
-	{ 0x01010162, 0x173f07ff }, // 0c VPLLCON
-	{ 0x0101002c, 0x173f07ff }, // 10 ENCPLLCON
-	{ 0x0101002c, 0x173f07ff }, // 14 DECPLLCON
-	{ 0x06400000, 0xffff7f55 }, // 18 CLKCFG1
-	{ 0x00000000, 0xffffff5f }, // 1c CLKGATE1
-	{ 0x00000000, 0x0bffffff }, // 20 CLKGATE2
-	{ 0x00000000, 0x00770000 }, // 24 CLKDIV
-	{ 0x00000000, 0x00000000 }, // 28 REMAP (command)
-	{ 0x00000000, 0xffffffff }, // 2c PWRCON
-	{ 0x00000000, 0x00000000 }, // 30 SWRESET (command)
-	{ 0x00000000, 0x803ffbff }, // 34 CHIPCFG
-	{ 0x00000000, 0x00007777 }, // 38 PWRDOMAIN
-	{ 0x00000000, 0x00030301 }, // 3c IPCFG
-	{ 0x00000000, 0xffffffff }, // 40 INFORMATIONA
-	{ 0x00000000, 0xffffffff }, // 44 INFORMATIONB
-	{ 0x00000000, 0xffffffff }, // 48 INFORMATIONC
-	{ 0x00080808, 0xffffffff }, // 4c OTGCFG012
-	{ 0x00000000, 0xffffffff }, // 50 INFORMATION1
-	{ 0x00000000, 0xffffffff }, // 54 INFORMATION2
-	{ 0x00000000, 0x00000000 }, // 58 STATUS
-	{ 0x5555a6aa, 0xff3ff3ff }, // 5c PADDRV1 (reserved fields retain reset values)
-	{ 0x00005555, 0x0000ffff }, // 60 PADDRV2
-	{ 0x0101002c, 0x173f07ff }, // 64 CPUPLLCON
-	{ 0x00000000, 0xffffffff }, // 68 INFORMATIOND
-	{ 0x00000000, 0x0000001f }, // 6c CHIPCFG2
-	{ 0x00000000, 0x000000ff }, // 70 CLKGATE3
-	{ 0x00000000, 0xffffffff }, // 74 AUDIOCON (configuration latch)
-};
 
 u32 pgm3_state::scu_r(offs_t offset)
 {
