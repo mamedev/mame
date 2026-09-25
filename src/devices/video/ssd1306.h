@@ -28,11 +28,13 @@ typedef enum
 DECLARE_DEVICE_TYPE(SSD1306,  ssd1306_device)
 
 class ssd1306_device :  public device_t,
-						public device_video_interface
+						public device_video_interface,
+                        public device_palette_interface
 {
 public:
     ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual u32 palette_entries() const noexcept override;
 
     void set_external_oscillator(bool use_external_oscillator);
     void set_intf_mode(ssd1306_interface_mode_t mode);
@@ -95,6 +97,7 @@ private:
     bool m_reset_asserted;
     bool m_spi_cs_asserted;
     bool m_spi_si;
+    bool m_spi_sck_asserted;
 
 
     bool m_using_external_oscillator;

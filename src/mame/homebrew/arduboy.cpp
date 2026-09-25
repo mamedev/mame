@@ -135,6 +135,8 @@ private:
 	uint8_t port_f_r();
 	void port_f_w(uint8_t data);
 
+    uint8_t intflash_r(offs_t offset);
+
     DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameprg_load);
     DECLARE_DEVICE_IMAGE_LOAD_MEMBER(spiflash_load);
 
@@ -153,16 +155,21 @@ private:
 void arduboy_state::machine_start()
 {
     subdevice<nvram_device>("intflash")->set_base(&m_internal_flash[0], 0x7800);
+
+
 }
 
 void arduboy_state::machine_reset()
 {
-    // ?
+    if (m_cart)
+    {
+        memcpy(m_internal_flash, m_cart->get_rom_base(), m_cart->get_rom_size());
+    }
 }
 
 uint8_t arduboy_state::port_b_r()
 {
-    int spi_miso = m_spi_flash->so_r() ? (1 << 3) : 0;
+    int spi_miso = m_spi_flash ? (m_spi_flash->so_r() ? (1 << 3) : 0) : 0;
     int button_a = ioport("PORTB")->read() & (1 << 4);
 
     return spi_miso | button_a;
@@ -239,15 +246,23 @@ void arduboy_state::port_f_w(uint8_t data)
 }
 
 
+uint8_t arduboy_state::intflash_r(offs_t offset)
+{
+    return m_internal_flash[offset];
+}
+
 void arduboy_state::prg_map(address_map &map)
 {
-    map(0x0000, 0x77ff).rom().region("intflash", 0);
+    map(0x0000, 0x77ff).r(FUNC(arduboy_state::intflash_r));
     map(0x7800, 0x7fff).rom().region("loader", 0);
 }
 
 void arduboy_state::data_map(address_map &map)
 {
     // TODO: 32u4 flash registers. the FX needs it
+
+    // PLLCSR: pretend that USB PLL is locked so games boot
+    map(0x0049, 0x0049).lr8(NAME([] { return 0x13; }));
 
     map(0x0100, 0x0aff).ram(); // on-chip 2.5kbytes RAM
 }
@@ -275,7 +290,7 @@ void arduboy_state::arduboy_base(machine_config &config)
 
 	m_maincpu->set_eeprom_tag("eeprom");
     m_maincpu->set_low_fuses(0xFF);
-    m_maincpu->set_high_fuses(0xD2);
+    m_maincpu->set_high_fuses(0xD3);
     m_maincpu->set_extended_fuses(0xC2);
 
     m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
@@ -297,18 +312,21 @@ void arduboy_state::arduboy_base(machine_config &config)
 
     SSD1306(config, m_ssd1306, 0);
     m_ssd1306->set_screen("screen");
+    m_ssd1306->set_intf_mode(SPI_4WIRE);
 
-    SCREEN(config, m_screen);
-    m_screen->set_raw(370'000, 128, 0, 0, 64, 0, 0); 
-    m_screen->set_lcd();
-    m_screen->set_screen_update(m_ssd1306, FUNC(ssd1306_device::screen_update));
+	screen_device &screen(SCREEN(config, m_screen));
+    screen.set_size(128, 64);
+    screen.set_visarea(0, 127, 0, 63);
+    screen.set_lcd();
+    screen.set_screen_update(m_ssd1306, FUNC(ssd1306_device::screen_update));
+    screen.set_palette(m_ssd1306);
 }
 
 void arduboy_state::arduboy(machine_config &config)
 {
     arduboy_base(config);
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mainprg", "bin,hex");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gameprg", "bin,hex");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(arduboy_state::gameprg_load));
 }
@@ -368,6 +386,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::spiflash_load)
     }   \
     else  \
     {   \
+        printf("%s: invalid hexbyte on load: %02x (@ %08x)\n", tag(), xin, (uint32_t)image.ftell()); \
         return std::make_pair(image_error::BADSOFTWARE, "invalid hex byte");    \
     }   \
 }
@@ -378,11 +397,14 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::spiflash_load)
 
 DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 {
-    // remember: loading a new game overwrites the previous one up until EOF,
-    // so we let the old one persist at least in part.
+    m_cart->rom_alloc(0x7800, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+
+    uint8_t* rom = m_cart->get_rom_base();
+    memset(rom, 0xff, 0x7800);
+
     if (image.is_filetype("bin"))
     {
-        image.fread(m_internal_flash, 0x7800);
+        image.fread(rom, 0x7800);
         return std::make_pair(std::error_condition(), std::string());
     }
 
@@ -429,7 +451,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
             FREAD_BOUNDSCHECK(image, buf + 8, num_bytes * 2);
         }
 
-        for (int i = 0; i < 8 + num_bytes; i++)
+        for (int i = 0; i < 4 + num_bytes; i++)
         {
             uint8_t hibits_byte;
             uint8_t lobits_byte;
@@ -461,7 +483,9 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
             return std::make_pair(image_error::BADSOFTWARE, "checksum parse error");
         }
 
-        if ((~checksum + 1) != expected_checksum)
+        uint8_t actual_checksum = (~checksum + 1) & 0xff;
+
+        if (actual_checksum != expected_checksum)
         {
             return std::make_pair(image_error::BADSOFTWARE, "checksum mismatch"); 
         }
@@ -494,7 +518,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
         }
         
         // all that just to do this. whew
-        memcpy(m_internal_flash + address, hex + 4, num_bytes); // n.b.: 8 chars = 4 hex bytes
+        memcpy(rom + address, hex + 4, num_bytes); // n.b.: 8 chars = 4 hex bytes
 
         // skip garbage until next record begins
         while(1)
@@ -526,6 +550,9 @@ ROM_START( arduboy )
     ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
     ROM_LOAD("arduboy_boot.bin", 0x000, 0x800, CRC(d5b6f377) SHA1(a9d2e41a31c50df65b8e728b340be69e48cd800b))
 
+
+    ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )
+    
     // generic Cathy2k loader
     // from https://github.com/MrBlinky/Arduboy/blob/master/cathy/hexfiles/arduboy-bootloader.hex
     // keeping only the actual bootloader segment (0x7800-0x7FFF)

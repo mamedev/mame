@@ -81,7 +81,8 @@ DEFINE_DEVICE_TYPE(SSD1306, ssd1306_device, "ssd1306", "Solomon Systech SSD1306 
 
 ssd1306_device::ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SSD1306, tag, owner, clock),
-    device_video_interface(mconfig, *this)
+    device_video_interface(mconfig, *this),
+	device_palette_interface(mconfig, *this)
 {
 }
 
@@ -169,20 +170,23 @@ void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
  * Indicates a single-byte command. The FIFO pointer is reset,
  * and execution falls through to the code below.
  */
-#define COMMAND_IS_SINGLE_BYTE m_command_pointer = 0;
+#define COMMAND_IS_SINGLE_BYTE \
+    m_command_pointer = 0; \
+    logerror("%s: command %02x\n", tag(), m_command_fifo[0]);
 
 /**
  * Indicates this command is invalid. The FIFO pointer is reset and an error is logged.
  */
 #define COMMAND_IS_INVALID \
     COMMAND_IS_SINGLE_BYTE; \
-    logerror("%s: invalid/unimplemented command %02x\n", m_command_fifo[0]);
+    logerror("%s: invalid/unimplemented command %02x\n", tag(), m_command_fifo[0]);
 
 #define DUMMY_BYTE_CHECK(fifopos, expected) \
     if (m_command_fifo[fifopos] != expected) \
     { \
         logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", tag(), fifopos, m_command_fifo[fifopos]); \
-    };
+    }; \
+    logerror("%s: command %02x (multi-byte)\n", tag(), m_command_fifo[0]);
 
 void ssd1306_device::exec_command_2x(uint8_t data)
 {
@@ -191,6 +195,22 @@ void ssd1306_device::exec_command_2x(uint8_t data)
         case 0x20:
             COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
             m_addressing_mode = static_cast<ssd1306_addressing_mode_t>(m_command_fifo[1] & 3);
+
+            switch(m_addressing_mode)
+            {
+                case PAGE:
+                    m_page_address_pointer = m_pagemode_page_start_address;
+                    m_column_address_pointer = m_pagemode_column_start_address;
+                    break;
+                case HORIZONTAL:
+                case VERTICAL:
+                    m_page_address_pointer = m_hvmode_page_start_address;
+                    m_column_address_pointer = m_hvmode_column_start_address;
+                    break;
+                default:
+                    break;
+            }
+            
             break;
 
         case 0x21:
@@ -431,7 +451,7 @@ void ssd1306_device::exec_command(uint8_t data)
         
         case 0xC0:
             // column scan direction: $C0 normal, $C8 reverse
-            if (!(m_command_fifo[0] == 0xC0 || m_command_fifo[0] != 0xC8))
+            if (!(m_command_fifo[0] == 0xC0 || m_command_fifo[0] == 0xC8))
             {
                 COMMAND_IS_INVALID;
                 return;
@@ -650,6 +670,14 @@ void ssd1306_device::spi_sck_w(int state)
         return;
     }
 
+    if (m_spi_sck_asserted || !state)
+    {
+        m_spi_sck_asserted = state != 0;
+        return;
+    }
+
+    m_spi_sck_asserted = true;
+
     if (m_spi_bits_left == 0)
     {
         m_spi_shift = 0;
@@ -663,7 +691,7 @@ void ssd1306_device::spi_sck_w(int state)
         else
         {
             m_dc_internal_state = m_dc_line;
-            m_spi_shift = m_spi_si != 0 ? 1 : 0;
+            m_spi_shift = m_spi_si ? 1 : 0;
             m_spi_bits_left = 7;
         }
         return;
@@ -684,6 +712,11 @@ void ssd1306_device::spi_sck_w(int state)
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+u32 ssd1306_device::palette_entries() const noexcept
+{
+	return 2; // monochrome
+}
+
 void ssd1306_device::update_scan_rate()
 {
     if (!m_using_external_oscillator)
@@ -700,7 +733,7 @@ void ssd1306_device::update_scan_rate()
 
 uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-    bitmap.fill(rgb_t::black());
+    bitmap.fill(rgb_t::black(), cliprect);
     if (!m_display_enabled)
     {
         return 0;
@@ -708,12 +741,12 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
     if (m_display_blanking)
     {
-        bitmap.fill(rgb_t::white());
+        bitmap.fill(rgb_t::white(), cliprect);
         return 0;
     }
 
-    rgb_t on_pixel  = !m_inverting_pixels ? rgb_t(0xFF, 0xFF, 0xFF) : rgb_t(0x00, 0x00, 0x00);
-    rgb_t off_pixel = !m_inverting_pixels ? rgb_t(0x00, 0x00, 0x00) : rgb_t(0xFF, 0xFF, 0xFF);
+    rgb_t on_pixel  = !m_inverting_pixels ? pen(1) : pen(0);
+    rgb_t off_pixel = !m_inverting_pixels ? pen(0) : pen(1);
  
     // very simple rendering code for the time being...
     for (int y = 0; y < 64; y++)
@@ -721,6 +754,7 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
         for (int x = 0; x < 128; x++)
         {
             uint8_t stripe = m_gddram[(128 * (y / 8)) + x];
+
             bitmap.pix(y, x) = (stripe & (0x80 >> (y % 8))) ? on_pixel : off_pixel;
         }
     }
