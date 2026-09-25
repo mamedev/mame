@@ -144,6 +144,7 @@ private:
 	uint16_t rom_r(offs_t offset);
 	uint16_t ram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void ram_bus_error(offs_t offset, bool read);
 
 	// a decoder asking for the next part of the system stream
 	void fma_drq_w(int state);
