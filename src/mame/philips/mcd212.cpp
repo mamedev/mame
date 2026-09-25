@@ -354,7 +354,8 @@ bool mcd212_device::process_ica_command(uint32_t &addr)
 	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
 	static const char *const s_ica_names[7] = { "STOP", "NOP", "DCP", "DCP and STOP", "VSR", "VSR and STOP", "INTERRUPT" };
 
-	uint32_t cmd = (ica[addr++] << 16) | ica[addr++];
+	uint32_t cmd = ica[addr++] << 16;
+	cmd |= ica[addr++];
 	
 	const uint8_t op = cmd >> 24;
 	if ((op >> 4) < 7)
