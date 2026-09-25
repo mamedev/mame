@@ -276,7 +276,9 @@ bool sh7014_dmac_channel_device::is_dma_activated(int vector)
 	if (!m_dma_timer_active)
 		return false;
 
-	m_dma_current_active_timer->adjust(attotime::from_ticks(2, clock()));
+	// The manual says "at least 2 clocks"; truckk's music streamer loses the race and
+	// plays byte-offset garbage if this isn't 4 clocks.
+	m_dma_current_active_timer->adjust(attotime::from_ticks(4, clock()));
 
 	return true;
 }
