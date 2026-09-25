@@ -38,6 +38,7 @@ public:
 
     void set_external_oscillator(bool use_external_oscillator);
     void set_intf_mode(ssd1306_interface_mode_t mode);
+    void set_base_rowscan_invert(bool base_rowscan_invert);
 
     /** 
     * SPI bus mode (use only with ssd1306_interface_mode_t SPI_4WIRE or SPI_3WIRE)
@@ -217,6 +218,7 @@ private:
     uint8_t m_spi_shift;
     int m_spi_bits_left;
     
+    bool m_base_rowscan_invert;
 
     // display memory: one "page" is 8 pixels tall, one line is 128 pixels long
     uint8_t m_gddram[ 128 * 8 ];

@@ -313,6 +313,7 @@ void arduboy_state::arduboy_base(machine_config &config)
     SSD1306(config, m_ssd1306, 0);
     m_ssd1306->set_screen("screen");
     m_ssd1306->set_intf_mode(SPI_4WIRE);
+    m_ssd1306->set_base_rowscan_invert(true);
 
 	screen_device &screen(SCREEN(config, m_screen));
     screen.set_size(128, 64);

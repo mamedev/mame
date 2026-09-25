@@ -150,6 +150,16 @@ void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
     m_pending_interface_mode = mode;
 }
 
+void ssd1306_device::set_base_rowscan_invert(bool base_rowscan_invert)
+{
+    // the OLED on the Adafruit display, as well as the one in the Arduboy,
+    // is internally wired so that COM0 is wired to the bottom-most row.
+    // this forces programmers to manually set the row scan invert flag at boot time.
+    // this setting is here so that, if there's ever a display that isn't built like this,
+    // then inverting the row scan actually flips the display vertically.
+    m_base_rowscan_invert = base_rowscan_invert;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
 // Command processing
@@ -766,7 +776,6 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
         return 0;
     }
 
-
     rgb_t on_pixel  = !m_inverting_pixels ? white_pen() : black_pen();
     rgb_t off_pixel = !m_inverting_pixels ? black_pen() : white_pen();
  
@@ -775,11 +784,11 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
     {
         for (int x = 0; x < 128; x++)
         {
-            int real_y = (m_row_scan_direction_inverse ? 63-y : y);
+            int real_y = ((m_base_rowscan_invert ^ m_row_scan_direction_inverse) ? 63-y : y);
 
-            uint8_t stripe = m_gddram[(128 * (real_y / 8)) + x];
+            uint8_t stripe = m_gddram[(128 * (real_y >> 3)) + x];
 
-            bitmap.pix(y, x) = (stripe & (0x80 >> (real_y % 8))) ? on_pixel : off_pixel;
+            bitmap.pix(y, x) = (stripe & (1 << (real_y & 7))) ? on_pixel : off_pixel;
         }
     }
 	return 0;
