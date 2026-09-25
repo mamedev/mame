@@ -40,7 +40,10 @@ pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconf
 	device_single_card_slot_interface<device_pet_expansion_card_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_read_dma(*this, 0),
-	m_write_dma(*this)
+	m_write_dma(*this),
+	m_write_halt(*this),
+	m_write_reset(*this),
+	m_write_irq(*this)
 {
 }
 

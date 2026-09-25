@@ -97,7 +97,7 @@ void superpet_device::device_add_mconfig(machine_config &config)
 
 static INPUT_PORTS_START( superpet )
 	PORT_START("SW1")
-	PORT_DIPNAME( 0x03, 0x02, "RAM" )
+	PORT_DIPNAME( 0x03, 0x01, "RAM" )
 	PORT_DIPSETTING(    0x00, "Read Only" )
 	PORT_DIPSETTING(    0x01, "Read/Write" )
 	PORT_DIPSETTING(    0x02, "System Port" )
@@ -131,20 +131,35 @@ ioport_constructor superpet_device::device_input_ports() const
 
 inline void superpet_device::update_cpu()
 {
-	int cpu = (m_sw2 == 2) ? BIT(m_system, 0) : m_sw2;
+	bool active = is_6809_active();
 
-	if (cpu)
+	m_slot->halt_w(active ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, active ? CLEAR_LINE : ASSERT_LINE);
+
+	if (active != m_6809_active)
 	{
-		// 6502 active
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_6809_active = active;
+
+		if (active)
+		{
+			m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		}
+		else
+		{
+			m_slot->reset_w(ASSERT_LINE);
+			m_slot->reset_w(CLEAR_LINE);
+		}
 	}
-	else
-	{
-		// 6809 active
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	}
+}
+
+
+//-------------------------------------------------
+//  is_6809_active -
+//-------------------------------------------------
+
+inline bool superpet_device::is_6809_active()
+{
+	return !((m_sw2 == 2) ? BIT(m_system, 0) : m_sw2);
 }
 
 
@@ -180,8 +195,7 @@ superpet_device::superpet_device(const machine_config &mconfig, const char *tag,
 	m_system(0),
 	m_bank(0), m_sw1(0), m_sw2(0),
 	m_sel9_rom(0),
-	m_pet_irq(CLEAR_LINE),
-	m_acia_irq(CLEAR_LINE)
+	m_6809_active(false)
 {
 }
 
@@ -195,7 +209,10 @@ void superpet_device::device_start()
 	// state saving
 	save_item(NAME(m_system));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_sw1));
+	save_item(NAME(m_sw2));
 	save_item(NAME(m_sel9_rom));
+	save_item(NAME(m_6809_active));
 }
 
 
@@ -215,6 +232,7 @@ void superpet_device::device_reset()
 	m_sw1 = m_io_sw1->read();
 	m_sw2 = m_io_sw2->read();
 
+	m_6809_active = is_6809_active();
 	update_cpu();
 }
 
@@ -225,7 +243,7 @@ void superpet_device::device_reset()
 
 int superpet_device::pet_norom_r(offs_t offset, int sel)
 {
-	return BIT(m_system, 0);
+	return !is_6809_active();
 }
 
 
@@ -286,6 +304,11 @@ uint8_t superpet_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
 		break;
 	}
 
+	if ((offset & 0xff00) == 0xef00)
+	{
+		sel = pet_expansion_slot_device::SEL_NONE;
+	}
+
 	return data;
 }
 
@@ -325,6 +348,8 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 
 	case 0xeff8:
 	case 0xeff9:
+	case 0xeffa:
+	case 0xeffb:
 		if (BIT(m_bank, 7))
 		{
 			/*
@@ -350,6 +375,8 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 
 	case 0xeffc:
 	case 0xeffd:
+	case 0xeffe:
+	case 0xefff:
 		/*
 
 		    bit     description
@@ -369,6 +396,11 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 		logerror("BANK %02x\n", data);
 		break;
 	}
+
+	if ((offset & 0xff00) == 0xef00)
+	{
+		sel = pet_expansion_slot_device::SEL_NONE;
+	}
 }
 
 
@@ -378,7 +410,7 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 
 int superpet_device::pet_diag_r()
 {
-	return BIT(m_system, 3);
+	return !BIT(m_system, 3);
 }
 
 
@@ -388,9 +420,7 @@ int superpet_device::pet_diag_r()
 
 void superpet_device::pet_irq_w(int state)
 {
-	m_pet_irq = state;
-
-	//m_maincpu->set_input_line(M6809_IRQ_LINE, m_pet_irq || m_acia_irq);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 
@@ -420,7 +450,5 @@ void superpet_device::write(offs_t offset, uint8_t data)
 
 void superpet_device::acia_irq_w(int state)
 {
-	m_acia_irq = state;
-
-	//m_maincpu->set_input_line(M6809_IRQ_LINE, m_pet_irq || m_acia_irq);
+	m_slot->card_irq_w(state);
 }
