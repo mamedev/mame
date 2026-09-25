@@ -697,20 +697,20 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 
 		if (transparent_a[x])
 		{
-			plane_a_cur = 0;
+			plane_a_cur = s_4bpp_color[0];
 		}
 		else if (OrderAB && (m_transparency_control & TCR_DISABLE_MX))
 		{
-			plane_b_cur = 0;
+			plane_b_cur = s_4bpp_color[0];
 		}
 
 		if (transparent_b[x])
 		{
-			plane_b_cur = 0;
+			plane_b_cur = s_4bpp_color[0];
 		}
 		else if (!OrderAB && (m_transparency_control & TCR_DISABLE_MX))
 		{
-			plane_a_cur = 0;
+			plane_a_cur = s_4bpp_color[0];
 		}
 
 		const int32_t plane_a_r = 0xff & (plane_a_cur >> 16);
@@ -720,13 +720,13 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 		const int32_t plane_b_g = 0xff & (plane_b_cur >> 8);
 		const int32_t plane_b_b = 0xff & plane_b_cur;
 
-		const int32_t weighted_a_r = std::clamp((std::clamp(plane_a_r - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
-		const int32_t weighted_a_g = std::clamp((std::clamp(plane_a_g - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
-		const int32_t weighted_a_b = std::clamp((std::clamp(plane_a_b - 16, 0, 255) * weight_a[x]) >> 6, 0, 255);
+		const int32_t weighted_a_r = ((plane_a_r - 16) * weight_a[x]) >> 6;
+		const int32_t weighted_a_g = ((plane_a_g - 16) * weight_a[x]) >> 6;
+		const int32_t weighted_a_b = ((plane_a_b - 16) * weight_a[x]) >> 6;
 
-		const int32_t weighted_b_r = std::clamp((std::clamp(plane_b_r - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
-		const int32_t weighted_b_g = std::clamp((std::clamp(plane_b_g - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
-		const int32_t weighted_b_b = std::clamp((std::clamp(plane_b_b - 16, 0, 255) * weight_b[x]) >> 6, 0, 255);
+		const int32_t weighted_b_r = ((plane_b_r - 16) * weight_b[x]) >> 6;
+		const int32_t weighted_b_g = ((plane_b_g - 16) * weight_b[x]) >> 6;
+		const int32_t weighted_b_b = ((plane_b_b - 16) * weight_b[x]) >> 6;
 
 		const uint8_t out_r = std::clamp(weighted_a_r + weighted_b_r + 16, 0, 255);
 		const uint8_t out_g = std::clamp(weighted_a_g + weighted_b_g + 16, 0, 255);
