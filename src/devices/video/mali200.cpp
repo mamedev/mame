@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <numbers>
 
 #define LOG_REGS (1U << 1)
 #define LOG_JOBS (1U << 2)
