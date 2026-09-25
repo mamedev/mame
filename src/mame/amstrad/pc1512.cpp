@@ -91,6 +91,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 #include "pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
+#include "bus/isa/hdc.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -255,7 +256,7 @@ void pc1512_base_state::system_w(offs_t offset, uint8_t data)
 		break;
 
 	case 6:
-		machine_reset();
+		machine().schedule_soft_reset();
 		break;
 	}
 }
@@ -1064,6 +1065,7 @@ static void pc1512_isa8_cards(device_slot_interface &device)
 static void pc1640_isa8_cards(device_slot_interface &device)
 {
 	pc_isa8_cards(device);
+	device.option_add("mc0109a", ISA8_MC0109A);
 	// Amstrad MC2400 modem card
     // Amstrad RP5-2 diagnostic ISA card (PC1512/PC1640)
 }
@@ -1472,6 +1474,20 @@ void pc1640_state::pc1640hd(machine_config &config)
 }
 
 
+//-------------------------------------------------
+//  machine_config( pc1640hd30 )
+//-------------------------------------------------
+
+void pc1640_state::pc1640hd30(machine_config &config)
+{
+	pc1640(config);
+
+	subdevice<isa8_slot_device>("isa4")->set_default_option("mc0109a");
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
+}
+
+
 
 //**************************************************************************
 //  ROMS
@@ -1533,12 +1549,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY        FULLNAME       FLAGS
-COMP( 1986, pc1512,     0,      0,      pc1512,   pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 SD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512dd,   pc1512, 0,      pc1512dd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 DD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd10, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD10", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd20, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD20", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,      0,      pc1640,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY        FULLNAME       FLAGS
+COMP( 1986, pc1512,     0,      0,      pc1512,     pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 SD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512dd,   pc1512, 0,      pc1512dd,   pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 DD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd10, pc1512, 0,      pc1512hd,   pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD10", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd20, pc1512, 0,      pc1512hd,   pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD20", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,      0,      pc1640,     pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd30, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_SUPPORTS_SAVE )
