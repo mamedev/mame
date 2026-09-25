@@ -403,6 +403,11 @@ ROM_START( limbos3 )
 	ROM_LOAD16_BYTE("092-s3.0_limbo.ic15", 0x00000, 0x80000, CRC(2b05541a) SHA1(f0dee5cc36a05d0876a1c9885b340b7d27c1a26b))
 ROM_END
 
+ROM_START( lordp5 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_LOAD16_WORD_SWAP("072-p5.0_lord_cd.ic10", 0x00000, 0x80000, CRC(eedcadc2) SHA1(014658ba26768848f20f9a043b6bf01aabd8d6c9))
+ROM_END
+
 ROM_START( lords2 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
     ROM_LOAD16_WORD_SWAP("072-s2.0_lord_cd.ic10", 0x00000, 0x80000, CRC(c0f7088d) SHA1(ba60abae37319d814e73ba088f55f3a3e6e7fb46))
@@ -635,6 +640,7 @@ GAME(2001, diakp2,	   diaks5, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally
 GAME(2001, diaks5,		    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Diamant Krone (S5)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, lanzes5,		    0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Lanzelot (S5)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, limbos3,         0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Limbo (S3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME(2001, lordp5,     lords5, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Lord CD (P5)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, lords2,     lords5, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Lord CD (S2)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, lords5,          0, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Lord CD (S5)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME(2001, mnrchp1,   mnrchs6, b2, ballyw, ballyw_state, empty_init, ROT0, "Bally Wulff", "Monarch (P1)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
