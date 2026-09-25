@@ -817,6 +817,7 @@ uint16_t mcd212_device::dcr1_r(offs_t offset, uint16_t mem_mask)
 void mcd212_device::dcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_MAIN_REG_WRITES, "%s: Display Command Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
+	mem_mask &= 0xffc0;
 	COMBINE_DATA(&m_dcr[0]);
 	update_frame_geometry(false);
 }
@@ -909,6 +910,7 @@ uint16_t mcd212_device::dcr2_r(offs_t offset, uint16_t mem_mask)
 void mcd212_device::dcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_MAIN_REG_WRITES, "%s: Display Command Register 2 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
+	mem_mask &= 0xffc0;
 	COMBINE_DATA(&m_dcr[1]);
 }
 
