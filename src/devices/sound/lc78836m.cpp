@@ -110,7 +110,12 @@ void lc78836m_device::mute_w(int state)
 
 void lc78836m_device::lrck_w(int state)
 {
-	// CH1 when high, CH2 when low
+	// CH1 when high, CH2 when low; each edge starts a new word
+	if (state != m_lrck) {
+		m_sample = 0;
+		m_sample_bit = 0;
+	}
+
 	m_lrck = state;
 }
 

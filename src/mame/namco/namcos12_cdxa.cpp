@@ -158,7 +158,7 @@ void namcos12_cdxa_device::device_reset()
 	m_ide_sh2_enabled = m_ide_ps1_enabled = false;
 	m_sram_enabled = false;
 	m_psx_int10_busy = false;
-	m_audio_cur_bit = 0;
+	m_audio_cur_bit = 8; // the SCI starts with the second half of a left word
 	m_volume_write_counter = 0;
 	m_audio_lrck = 1; // start with left channel first
 
