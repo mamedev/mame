@@ -24,15 +24,23 @@ in the video).
 Grand Striker has an IRQ2 which is probably network related.
 
 TODO:
-- Finish hooking up the inputs
+- Finish hooking up the inputs;
 - MB60553 words 1, 2, 5 and 6 of the line table and registers 2/3 are
-  never used by these games, so their function is unknown
-- Priorities are wrong. I suspect they need sprite orthogonality
-- Missing mixer registers (mainly layer enable/disable)
-- Tecmo World Cup '94 has missing protection emulation for draw buy-in
+  never used by these games, so their function is unknown;
+- fix MB60553 priority not actually being set internally
+  (required by gstriker coin-up menu, where the title should stay above
+  the playfield but behind the ball cursor and "human cup" lettering);
+- gstriker: needs MB60553 wraparound disable in attract mode
+  (title screen logo should be concealed until it actually start the zoom
+  transition);
+- vgoalsoc: unhandled R/Ws at $15'0000-2, related to the hack in init fn?
+- vgoalsoc: intermediate MB60553 strip of garbage after player wins
+  first round, in team select (verify);
+- vgoalsoc: non-functional name entry, related to protection?
+- twcup94: has missing protection emulation for draw buy-in
   (as seen by code snippet 0x42ee, referenced in other places as well)
-  It's unknown how the game logic should be at current stage.
-- Tecmo World Cup '94 also has no name entry whatsoever.
+  It's unknown how the game logic should be at current stage;
+- twcup94: has no name entry whatsoever;
 
 ******************************************************************************/
 
@@ -177,8 +185,8 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 #include "emu.h"
 
-#include "vs9209.h"
 #include "mb60553.h"
+#include "vs9209.h"
 #include "vs920a.h"
 #include "vsystem_spr.h"
 
@@ -198,14 +206,12 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 
 // configurable logging
-#define LOG_MIXER      (1U << 1)
 #define LOG_PROTECTION (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_MIXER | LOG_PROTECTION)
+//#define VERBOSE (LOG_GENERAL | LOG_PROTECTION)
 
 #include "logmacro.h"
 
-#define LOGMIXER(...)      LOGMASKED(LOG_MIXER,      __VA_ARGS__)
 #define LOGPROTECTION(...) LOGMASKED(LOG_PROTECTION, __VA_ARGS__)
 
 
@@ -313,7 +319,26 @@ void gstriker_state::video_start()
 
 uint32_t gstriker_state::pri_callback(uint32_t color)
 {
-	return BIT(color, 5) ? 0 : GFX_PMASK_2;
+	// B would be bit 4 in the color index (0x0100 translated to palette offset)
+	// - vgoalsoc team select: ec00 3000 e000
+	// (wants cup to be behind sprites, cursor in front of text layer)
+	// - gstriker gameplay: 2400 1000 3000
+	// (wants ball to go above the "GOAL!" text layer)
+	const u8 pri = BIT(color, 4);
+
+	const u8 sprite_pri = m_mixerregs[4] >> (12 - (pri * 4)) & 0xf;
+	const u8 layer_a_pri = (m_mixerregs[5] >> 12) & 0xf;
+	const u8 layer_b_pri = (m_mixerregs[6] >> 12) & 0xf;
+
+	u16 res = 0;
+
+	if (sprite_pri < layer_a_pri)
+		res |= GFX_PMASK_1;
+
+	if (sprite_pri < layer_b_pri)
+		res |= GFX_PMASK_2;
+
+	return res;
 }
 
 void gstriker_state::screen_vblank(int state)
@@ -327,24 +352,31 @@ void gstriker_state::screen_vblank(int state)
 	}
 }
 
-
+/*
+Mixer registers:
+[0] xxxx ---- ---- ---- sprite palette base
+[0] ---- --xx ---- ---- <unknown purpose>
+    ---- --00 ---- ---- (twcup94)
+    ---- --01 ---- ---- (vgoalsoc)
+	---- --10 ---- ---- (gstriker)
+[1] xxxx ---- ---- ---- MB60553 palette base
+[2] xxxx ---- ---- ---- VS920A palette base
+[4] AAAA BBBB ---- ---- sprite priority number A/B
+[5] xxxx ---- ---- ---- MB60553 priority number
+[6] xxxx ---- ---- ---- VS920A layer priority number
+[8] ---- -xxx xxxx xxxx back layer color index
+[9] xxxx xxxx ---- ---- <unknown>, always 0x9400? May be video sync related.
+*/
 uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_mixerregs[8] & 0x07ff, cliprect); // complete guess, causes green behind test grid in twc94 and blue behind title screen on gstriker
+	// guess: gives green behind test grid in twc94 and blue behind title screen on gstriker
+	bitmap.fill(m_mixerregs[8] & 0x07ff, cliprect);
 	screen.priority().fill(0, cliprect);
-
-	/*
-	[4] AAAA BBBB ---- ---- sprite priority number A/B?
-	[5] xxxx ---- ---- ---- background layer priority number?
-	[6] xxxx ---- ---- ---- foreground layer priority number?
-	*/
-	LOGMIXER("%04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x", m_mixerregs[0], m_mixerregs[1], m_mixerregs[2], m_mixerregs[3], m_mixerregs[4], m_mixerregs[5], m_mixerregs[6], m_mixerregs[7], m_mixerregs[8], m_mixerregs[9], m_mixerregs[10], m_mixerregs[11], m_mixerregs[12], m_mixerregs[13], m_mixerregs[14], m_mixerregs[15]);
 
 	m_spr->set_pal_base((m_mixerregs[0] & 0xf000) >> 8);
 	m_bg->set_pal_base((m_mixerregs[1] & 0xf000) >> 8);
 	m_tx->set_pal_base((m_mixerregs[2] & 0xf000) >> 8);
 
-	// Sandwiched screen/sprite0/score/sprite1. Surely wrong, probably needs sprite orthogonality
 	m_bg->draw(screen, bitmap, cliprect, 1);
 	m_tx->draw(screen, bitmap, cliprect, 2);
 
