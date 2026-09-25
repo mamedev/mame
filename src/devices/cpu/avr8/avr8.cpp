@@ -3787,19 +3787,19 @@ void avr8_device<NumTimers>::execute_run()
 {
 	while (m_icount > 0)
 	{
-		if (m_sleeping)
+		m_pc &= m_addr_mask;
+		debugger_instruction_hook(m_pc);
+	
+		if (!m_sleeping)
 		{
-			m_opcycles = 1;
-		}
-		else
-		{
-			m_pc &= m_addr_mask;
-			debugger_instruction_hook(m_pc);
-
 			const uint16_t op = (uint32_t)m_program->read_word(m_pc);
 			m_opcycles = m_op_cycles[op];
 			((this)->*(m_op_funcs[op]))(op);
 			m_pc += 2;
+		}
+		else
+		{
+			m_opcycles = 1;
 		}
 
 		// pin_w() may have latched a PCIFR/EIFR flag from an arbitrary (possibly mid-instruction)

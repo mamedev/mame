@@ -18,10 +18,10 @@ typedef enum
 
 typedef enum
 {
-    HORIZONTAL = 0,
-    VERTICAL,
-    PAGE,
-    INVALID
+    HORIZONTAL = 0b00,
+    VERTICAL   = 0b01,
+    PAGE       = 0b10,
+    INVALID    = 0b11
 } ssd1306_addressing_mode_t;
 
 
@@ -171,7 +171,7 @@ private:
     uint8_t m_pagemode_page_start_address; // =0-7
 
     // commands 0xC0, 0xC8
-    bool m_column_scan_direction_inverse; // false = scan top to bottom, true = scan bottom to top
+    bool m_row_scan_direction_inverse; // false = scan top to bottom, true = scan bottom to top
 
     // command 0xD3
     uint8_t m_display_offset;

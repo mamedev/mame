@@ -109,15 +109,17 @@ void ssd1306_device::device_reset()
     m_vertical_scroll_top_fixed_rows = 0;
     m_vertical_scroll_bottom_scrolled_rows = 64;
 
-    m_pagemode_column_start_address = 0;
     m_addressing_mode = PAGE;
+    m_pagemode_column_start_address = 0;
+    m_hvmode_column_start_address = 0;
+    m_hvmode_column_end_address = 127;
     m_hvmode_page_start_address = 0;
     m_hvmode_page_end_address = 7;
 
     m_display_start_line = 0;
     m_seg0_column_remapped = false;
     m_mux_ratio = 63;
-    m_column_scan_direction_inverse = false;
+    m_row_scan_direction_inverse = false;
     m_display_offset = 0;
     m_row_scan_interleaved = true;
     m_row_scan_split_invert = false;
@@ -127,6 +129,9 @@ void ssd1306_device::device_reset()
     m_phase_1_period = 2;
     m_phase_2_period = 2;
     m_vcomh_deselect_level = 0x20;
+
+    m_spi_bits_left = 0;
+    m_spi_shift = 0;
 
     update_scan_rate();
 }
@@ -193,7 +198,6 @@ void ssd1306_device::exec_command_2x(uint8_t data)
         case 0x20:
             COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
             m_addressing_mode = static_cast<ssd1306_addressing_mode_t>(m_command_fifo[1] & 3);
-
             switch(m_addressing_mode)
             {
                 case PAGE:
@@ -216,6 +220,11 @@ void ssd1306_device::exec_command_2x(uint8_t data)
             COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
             m_hvmode_column_start_address = m_command_fifo[1] & 0x7f;
             m_hvmode_column_end_address   = m_command_fifo[2] & 0x7f;
+
+            if (m_addressing_mode == HORIZONTAL || m_addressing_mode == VERTICAL)
+            {
+                m_column_address_pointer = m_hvmode_column_start_address;
+            }
             break;
 
         case 0x22:
@@ -223,6 +232,11 @@ void ssd1306_device::exec_command_2x(uint8_t data)
             COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
             m_hvmode_page_start_address = m_command_fifo[1] & 7;
             m_hvmode_page_end_address = m_command_fifo[2] & 7;
+
+            if (m_addressing_mode == HORIZONTAL || m_addressing_mode == VERTICAL)
+            {
+                m_page_address_pointer = m_hvmode_page_start_address;
+            }
             break;
 
         case 0x26:
@@ -456,7 +470,7 @@ void ssd1306_device::exec_command(uint8_t data)
             break;
         
         case 0xC0:
-            // column scan direction: $C0 normal, $C8 reverse
+            // COM (row) scan direction: $C0 normal, $C8 reverse
             if (!(m_command_fifo[0] == 0xC0 || m_command_fifo[0] == 0xC8))
             {
                 COMMAND_IS_INVALID;
@@ -464,7 +478,7 @@ void ssd1306_device::exec_command(uint8_t data)
             }
 
             COMMAND_IS_SINGLE_BYTE;
-            m_column_scan_direction_inverse = (m_command_fifo[0] & 8);
+            m_row_scan_direction_inverse = (m_command_fifo[0] & 8);
             break;
         
         case 0xD0:
@@ -515,29 +529,35 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
     // top to bottom
     // 
     // "Vertical addressing" mode = write pixels top to bottom,
-    // left to right
-  
+    // left to right 
 
-    m_gddram[ (m_page_address_pointer * 128) + m_column_address_pointer ] = data;
+    int address = (m_page_address_pointer * 128) + m_column_address_pointer;
+    // logerror("%s: write data %02x -> %04x (in addressing mode %d)\n",
+    //          tag(),
+    //          data,
+    //          address,
+    //          m_addressing_mode);
+
+    m_gddram[address] = data;
 
     switch(m_addressing_mode)
     {
         case PAGE:
-            m_page_address_pointer ++;
-            if (m_page_address_pointer >= 128)  // m_pagemode_column_end_address)
+            m_column_address_pointer ++;
+            if (m_column_address_pointer >= 128)  // m_pagemode_column_end_address)
             {
-                m_page_address_pointer = m_pagemode_column_start_address;
+                m_column_address_pointer = m_pagemode_column_start_address;
             }
             break;
         
         case HORIZONTAL:
             m_column_address_pointer ++;
-            if (m_column_address_pointer > m_hvmode_column_end_address)
+            if (m_column_address_pointer > std::min((int)m_hvmode_column_end_address, 127))
             {
                 m_column_address_pointer = m_hvmode_column_start_address;
 
                 m_page_address_pointer ++;
-                if (m_page_address_pointer > m_hvmode_page_end_address)
+                if (m_page_address_pointer > std::min((int)m_hvmode_page_end_address, 7))
                 {
                     m_page_address_pointer = m_hvmode_page_start_address;
                 }
@@ -546,11 +566,11 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
         
         case VERTICAL:
             m_page_address_pointer ++;
-            if (m_page_address_pointer > m_hvmode_page_end_address)
+            if (m_page_address_pointer > std::min((int)m_hvmode_page_end_address, 7))
             {
                 m_page_address_pointer = m_hvmode_page_start_address;
                 m_column_address_pointer ++;
-                if (m_column_address_pointer > m_hvmode_column_end_address)
+                if (m_column_address_pointer > std::min((int)m_hvmode_column_end_address, 127))
                 {
                     m_column_address_pointer = m_hvmode_column_start_address;
                 }
@@ -615,11 +635,6 @@ void ssd1306_device::rst_w(int rst)
 
 void ssd1306_device::dc_w(int dc)
 {
-    if (m_reset_asserted)
-    {
-        return;
-    }
-
     // store the state, but don't sample it yet.
     m_dc_line = dc != 0;
 
@@ -751,17 +766,20 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
         return 0;
     }
 
-    rgb_t on_pixel  = !m_inverting_pixels ? pen(1) : pen(0);
-    rgb_t off_pixel = !m_inverting_pixels ? pen(0) : pen(1);
+
+    rgb_t on_pixel  = !m_inverting_pixels ? white_pen() : black_pen();
+    rgb_t off_pixel = !m_inverting_pixels ? black_pen() : white_pen();
  
     // very simple rendering code for the time being...
     for (int y = 0; y < 64; y++)
     {
         for (int x = 0; x < 128; x++)
         {
-            uint8_t stripe = m_gddram[(128 * (y / 8)) + x];
+            int real_y = (m_row_scan_direction_inverse ? 63-y : y);
 
-            bitmap.pix(y, x) = (stripe & (0x80 >> (y % 8))) ? on_pixel : off_pixel;
+            uint8_t stripe = m_gddram[(128 * (real_y / 8)) + x];
+
+            bitmap.pix(y, x) = (stripe & (0x80 >> (real_y % 8))) ? on_pixel : off_pixel;
         }
     }
 	return 0;

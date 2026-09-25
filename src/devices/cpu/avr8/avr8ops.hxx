@@ -1179,9 +1179,12 @@ void avr8_base_device::op_reti(uint16_t op)
 
 void avr8_base_device::op_sleep(uint16_t op)
 {
-	// PC is left pointing at the instruction after SLEEP (the normal post-instruction
-	// increment in execute_run() still applies), so a later interrupt correctly resumes there
-	m_sleeping = true;
+	if (m_r[SMCR] & 1)
+	{
+		// PC is left pointing at the instruction after SLEEP (the normal post-instruction
+		// increment in execute_run() still applies), so a later interrupt correctly resumes there
+		m_sleeping = true;
+	}
 }
 
 void avr8_base_device::op_break(uint16_t op)
