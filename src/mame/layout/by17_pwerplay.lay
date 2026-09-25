@@ -537,9 +537,9 @@ Any state="9" items are not displayed and are only used for object alignment
 
 		<collection name="Playfield">
 
-			<element ref="Draw_White"><bounds x="0" y="0" width="320" height="1" /></element>
+			<element ref="Draw_White" id="pinviz:pfx"><bounds x="0" y="0" width="320" height="1" /></element>
 			<element ref="Draw_White"><bounds x="0" y="480" width="320" height="1" /></element>
-			<element ref="Draw_White"><bounds x="0" y="0" width="1" height="480" /></element>
+			<element ref="Draw_White" id="pinviz:pfy"><bounds x="0" y="0" width="1" height="480" /></element>
 			<element ref="Draw_White"><bounds x="320" y="0" width="1" height="480" /></element>
 
 
@@ -581,113 +581,113 @@ Any state="9" items are not displayed and are only used for object alignment
 
 			<!-- Outhole -->
 			<element name="solenoid6"  ref="Solenoid_Outhole">                        <bounds x="150" y="455" width="58" height="22" /></element>
-			<element ref="Switch_RollOn_WireForm_Left" inputtag="X0" inputmask="0x80"><bounds x="163" y="453" width="20" height="16" /></element>
+			<element ref="Switch_RollOn_WireForm_Left" inputtag="X0" inputmask="0x80" id="pinviz:X0:0x80"><bounds x="163" y="453" width="20" height="16" /></element>
 			<element ref="Key_BSpace">                                                <bounds x="185" y="455" width="15" height="14" /></element>
 
 
 			<!-- Pop Bumper Left -->
-			<element name="solenoid8"  ref="Solenoid_Bumper_Red_Star">           <bounds x="064" y="090" width="80" height="80" /></element>
-			<element ref="Switch_Bumper_Red_Star" inputtag="X4" inputmask="0x80"><bounds x="064" y="090" width="80" height="80" /></element>
-			<element name="lamp39" ref="Lamp_Bumper_Red_1000">                   <bounds x="064" y="090" width="80" height="80" /></element>
+			<element name="solenoid8"  ref="Solenoid_Bumper_Red_Star">           <bounds x="85.1" y="111.1" width="37.7" height="37.7" /></element>
+			<element ref="Switch_Bumper_Red_Star" inputtag="X4" inputmask="0x80" id="pinviz:X4:0x80"><bounds x="85.1" y="111.1" width="37.7" height="37.7" /></element>
+			<element name="lamp39" ref="Lamp_Bumper_Red_1000">                   <bounds x="85.1" y="111.1" width="37.7" height="37.7" /></element>
 			<element ref="Key_Z">                                                <bounds x="121" y="116" width="09" height="09" /></element>
 
 			<!-- Pop Bumper Right -->
-			<element name="solenoid9"  ref="Solenoid_Bumper_Red_Star">           <bounds x="177" y="090" width="80" height="80" /></element>
-			<element ref="Switch_Bumper_Red_Star" inputtag="X4" inputmask="0x40"><bounds x="177" y="090" width="80" height="80" /></element>
-			<element name="lamp39" ref="Lamp_Bumper_Red_1000">                   <bounds x="177" y="090" width="80" height="80" /></element>
+			<element name="solenoid9"  ref="Solenoid_Bumper_Red_Star">           <bounds x="198.1" y="111.1" width="37.7" height="37.7" /></element>
+			<element ref="Switch_Bumper_Red_Star" inputtag="X4" inputmask="0x40" id="pinviz:X4:0x40"><bounds x="198.1" y="111.1" width="37.7" height="37.7" /></element>
+			<element name="lamp39" ref="Lamp_Bumper_Red_1000">                   <bounds x="198.1" y="111.1" width="37.7" height="37.7" /></element>
 			<element ref="Key_X">                                                <bounds x="188" y="116" width="09" height="09" /></element>
 
 			<!-- Pop Bumper Middle -->
-			<element name="solenoid10" ref="Solenoid_Bumper_Red_Star">           <bounds x="121" y="123" width="80" height="80" /></element>
-			<element ref="Switch_Bumper_Red_Star" inputtag="X4" inputmask="0x20"><bounds x="121" y="123" width="80" height="80" /></element>
-			<element name="lamp54" ref="Lamp_Bumper_Red_1000">                   <bounds x="121" y="123" width="80" height="80" /></element>
+			<element name="solenoid10" ref="Solenoid_Bumper_Red_Star">           <bounds x="142.1" y="144.1" width="37.7" height="37.7" /></element>
+			<element ref="Switch_Bumper_Red_Star" inputtag="X4" inputmask="0x20" id="pinviz:X4:0x20"><bounds x="142.1" y="144.1" width="37.7" height="37.7" /></element>
+			<element name="lamp54" ref="Lamp_Bumper_Red_1000">                   <bounds x="142.1" y="144.1" width="37.7" height="37.7" /></element>
 			<element ref="Key_C">                                                <bounds x="156" y="128" width="09" height="09" /></element>
 
 
 			<!-- Slingshot Left -->
-			<element name="solenoid11" ref="Solenoid_SlingShot_Left">          <bounds x="035" y="320" width="69" height="80" /></element>
+			<element name="solenoid11" ref="Solenoid_SlingShot_Left" id="pinviz:X4:0x10">          <bounds x="035" y="320" width="69" height="80" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x10"><bounds x="060" y="384" width="08" height="09" /></element>
 			<element ref="Key_V">                                              <bounds x="060" y="375" width="09" height="09" /></element>
 
 			<!-- Slingshot Right -->
-			<element name="solenoid13" ref="Solenoid_SlingShot_Right">         <bounds x="221" y="320" width="69" height="80" /></element>
+			<element name="solenoid13" ref="Solenoid_SlingShot_Right" id="pinviz:X4:0x08">         <bounds x="221" y="320" width="69" height="80" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x08"><bounds x="257" y="384" width="08" height="09" /></element>
 			<element ref="Key_B">                                              <bounds x="257" y="375" width="09" height="09" /></element>
 
 
 			<!-- Saucer -->
 			<element name="solenoid7"  ref="Solenoid_Saucer">           <bounds x="149" y="67" width="23" height="23" /></element>
-			<element ref="Switch_Saucer" inputtag="X3" inputmask="0x80"><bounds x="149" y="67" width="23" height="23" /></element>
+			<element ref="Switch_Saucer" inputtag="X3" inputmask="0x80" id="pinviz:X3:0x80"><bounds x="149" y="67" width="23" height="23" /></element>
 			<element ref="Key_Q">                                       <bounds x="156" y="91" width="09" height="09" /></element>
 
 
 			<!-- Drop Targets Leftside -->
 			<element name="solenoid12" ref="Solenoid_DropTarget_Tall">    <bounds x="090" y="166" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x80"><bounds x="090" y="166" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x80" id="pinviz:X2:0x80"><bounds x="090" y="166" width="07" height="15" /></element>
 			<element ref="Key_A">                                         <bounds x="098" y="169" width="09" height="09" /></element>
 			<element name="solenoid12" ref="Solenoid_DropTarget_Tall">    <bounds x="084" y="181" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x40"><bounds x="084" y="181" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x40" id="pinviz:X2:0x40"><bounds x="084" y="181" width="07" height="15" /></element>
 			<element ref="Key_S">                                         <bounds x="092" y="184" width="09" height="09" /></element>
 			<element name="solenoid12" ref="Solenoid_DropTarget_Tall">    <bounds x="078" y="196" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x20"><bounds x="078" y="196" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x20" id="pinviz:X2:0x20"><bounds x="078" y="196" width="07" height="15" /></element>
 			<element ref="Key_D">                                         <bounds x="086" y="199" width="09" height="09" /></element>
 			<element name="solenoid12" ref="Solenoid_DropTarget_Tall">    <bounds x="072" y="211" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x10"><bounds x="072" y="211" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x10" id="pinviz:X2:0x10"><bounds x="072" y="211" width="07" height="15" /></element>
 			<element ref="Key_F">                                         <bounds x="080" y="214" width="09" height="09" /></element>
 
 			<!-- Drop Targets Rightside -->
 			<element name="solenoid14" ref="Solenoid_DropTarget_Tall">    <bounds x="222" y="166" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x08"><bounds x="222" y="166" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x08" id="pinviz:X2:0x08"><bounds x="222" y="166" width="07" height="15" /></element>
 			<element ref="Key_G">                                         <bounds x="214" y="169" width="09" height="09" /></element>
 			<element name="solenoid14" ref="Solenoid_DropTarget_Tall">    <bounds x="228" y="181" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x04"><bounds x="228" y="181" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x04" id="pinviz:X2:0x04"><bounds x="228" y="181" width="07" height="15" /></element>
 			<element ref="Key_H">                                         <bounds x="220" y="184" width="09" height="09" /></element>
 			<element name="solenoid14" ref="Solenoid_DropTarget_Tall">    <bounds x="234" y="196" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x02"><bounds x="234" y="196" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x02" id="pinviz:X2:0x02"><bounds x="234" y="196" width="07" height="15" /></element>
 			<element ref="Key_J">                                         <bounds x="226" y="199" width="09" height="09" /></element>
 			<element name="solenoid14" ref="Solenoid_DropTarget_Tall">    <bounds x="240" y="211" width="07" height="15" /></element>
-			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x01"><bounds x="240" y="211" width="07" height="15" /></element>
+			<element ref="DropTarget_Tall" inputtag="X2" inputmask="0x01" id="pinviz:X2:0x01"><bounds x="240" y="211" width="07" height="15" /></element>
 			<element ref="Key_K">                                         <bounds x="232" y="214" width="09" height="09" /></element>
 
 			<!-- Drop Target Area Rebound switches -->
-			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x04"><bounds x="249" y="188" width="08" height="09" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x04" id="pinviz:X0:0x04"><bounds x="249" y="188" width="08" height="09" /></element>
 			<element ref="Key_OBrkt">                                          <bounds x="247" y="174" width="10" height="10" /></element>
-			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x04"><bounds x="062" y="188" width="08" height="09" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x04" id="pinviz:X0:0x04:2"><bounds x="062" y="188" width="08" height="09" /></element>
 			<element ref="Key_OBrkt">                                          <bounds x="060" y="174" width="10" height="10" /></element>
 
 
 			<!-- Upper Rebound switch -->
-			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x02"><bounds x="259" y="42" width="08" height="09" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x02" id="pinviz:X0:0x02"><bounds x="259" y="42" width="08" height="09" /></element>
 			<element ref="Key_FSlash">                                         <bounds x="257" y="28" width="10" height="10" /></element>
 
 
 			<!-- Rollover Buttons Left Alley switches -->
 			<element name="lamp48" ref="Lamp_RollOver_Button">  <!-- Upper -->   <bounds x="17" y="105" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x10"><bounds x="07" y="099" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x10" id="pinviz:X3:0x10"><bounds x="07" y="099" width="35" height="35" /></element>
 			<element ref="Key_R">                                                <bounds x="33" y="109" width="09" height="09" /></element>
 			<element name="lamp48" ref="Lamp_RollOver_Button">  <!-- Middle -->  <bounds x="12" y="135" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X4" inputmask="0x02"><bounds x="02" y="129" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X4" inputmask="0x02" id="pinviz:X4:0x02"><bounds x="02" y="129" width="35" height="35" /></element>
 			<element ref="Key_M">                                                <bounds x="28" y="139" width="09" height="09" /></element>
 			<element name="lamp33" ref="Lamp_RollOver_Button">  <!-- Lower -->   <bounds x="12" y="165" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X0" inputmask="0x08"><bounds x="02" y="159" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X0" inputmask="0x08" id="pinviz:X0:0x08"><bounds x="02" y="159" width="35" height="35" /></element>
 			<element ref="Key_CBrkt">                                            <bounds x="28" y="168" width="10" height="10" /></element>
 
 
 			<!-- Rollover Buttons Right Alley -->
 			<element name="lamp18" ref="Lamp_RollOver_Button">  <!-- Upper -->   <bounds x="290" y="105" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x20"><bounds x="280" y="099" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x20" id="pinviz:X3:0x20"><bounds x="280" y="099" width="35" height="35" /></element>
 			<element ref="Key_E">                                                <bounds x="280" y="109" width="09" height="09" /></element>
 			<element name="lamp18" ref="Lamp_RollOver_Button">  <!-- Middle -->  <bounds x="295" y="135" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X4" inputmask="0x04"><bounds x="285" y="129" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X4" inputmask="0x04" id="pinviz:X4:0x04"><bounds x="285" y="129" width="35" height="35" /></element>
 			<element ref="Key_N">                                                <bounds x="285" y="139" width="09" height="09" /></element>
 			<element name="lamp3"  ref="Lamp_RollOver_Button">  <!-- Lower -->   <bounds x="295" y="165" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X0" inputmask="0x10"><bounds x="285" y="159" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X0" inputmask="0x10" id="pinviz:X0:0x10"><bounds x="285" y="159" width="35" height="35" /></element>
 			<element ref="Key_BSlash">                                           <bounds x="285" y="169" width="10" height="10" /></element>
 
 
 			<!-- Rollover Button Centre switch -->
 			<element ref="Lamp_RollOver_Button_On">                              <bounds x="153" y="228" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x02"><bounds x="143" y="222" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x02" id="pinviz:X3:0x02"><bounds x="143" y="222" width="35" height="35" /></element>
 			<element ref="Key_I">                                                <bounds x="156" y="245" width="09" height="09" /></element>
 
 
@@ -697,31 +697,31 @@ Any state="9" items are not displayed and are only used for object alignment
 			<!-- Post Up and Advance - Upper Rollover button and Middle Target switch -->
 			<element name="solenoid16" ref="Coil_Post_Up">                          <bounds x="148" y="420" width="22" height="22" /></element>
 			<element ref="Lamp_RollOver_Button_On">                                 <bounds x="153" y="28" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button"    inputtag="X4" inputmask="0x01"><bounds x="143" y="22" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button"    inputtag="X4" inputmask="0x01" id="pinviz:X4:0x01"><bounds x="143" y="22" width="35" height="35" /></element>
 			<element ref="Key_Comma">                                               <bounds x="153" y="12" width="14" height="14" /></element>
-			<element ref="Switch_Target_Red_Forward" inputtag="X4" inputmask="0x01"><bounds x="153.5" y="172" width="12" height="08" /></element>
+			<element ref="Switch_Target_Red_Forward" inputtag="X4" inputmask="0x01" id="pinviz:X4:0x01:2"><bounds x="153.5" y="172" width="12" height="08" /></element>
 			<element ref="Key_Comma">                                               <bounds x="153" y="176" width="14" height="14" /></element>
 
 			<!-- Post Down - Middle Left and Middle Right Rollover Button switches -->
 			<element name="solenoid0"  ref="Solenoid_Post_Down">                 <bounds x="148" y="420" width="22" height="22" /></element>
 			<element ref="Lamp_RollOver_Button_On">                              <bounds x="126" y="254" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x01"><bounds x="116" y="248" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x01" id="pinviz:X3:0x01"><bounds x="116" y="248" width="35" height="35" /></element>
 			<element ref="Key_O">                                                <bounds x="129" y="271" width="09" height="09" /></element>
 			<element ref="Lamp_RollOver_Button_On">                              <bounds x="180" y="254" width="15" height="15" /></element>
-			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x01"><bounds x="170" y="248" width="35" height="35" /></element>
+			<element ref="Switch_RollOver_Button" inputtag="X3" inputmask="0x01" id="pinviz:X3:0x01:2"><bounds x="170" y="248" width="35" height="35" /></element>
 			<element ref="Key_O">                                                <bounds x="183" y="271" width="09" height="09" /></element>
 
 
 			<!-- Outlane switches / lamps -->
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x08"><bounds x="009" y="346" width="09" height="27" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x08" id="pinviz:X3:0x08"><bounds x="009" y="346" width="09" height="27" /></element>
 			<element ref="Key_Y">                                                           <bounds x="009" y="376" width="09" height="09" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x04"><bounds x="301" y="346" width="09" height="27" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x04" id="pinviz:X3:0x04"><bounds x="301" y="346" width="09" height="27" /></element>
 			<element ref="Key_U">                                                           <bounds x="301" y="376" width="09" height="09" /></element>
 
 			<!-- Flipper Return Lane switches -->
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x01"><bounds x="030" y="348" width="09" height="27" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x01" id="pinviz:X0:0x01"><bounds x="030" y="348" width="09" height="27" /></element>
 			<element ref="Key_Dot">                                                         <bounds x="028" y="374" width="14" height="14" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x01"><bounds x="280" y="348" width="09" height="27" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x01" id="pinviz:X0:0x01:2"><bounds x="280" y="348" width="09" height="27" /></element>
 			<element ref="Key_Dot">                                                         <bounds x="278" y="374" width="14" height="14" /></element>
 
 		</collection>
