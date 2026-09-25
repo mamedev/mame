@@ -679,14 +679,15 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 }
 
 
-// TLCS-900/H databook table 3.8 (1): the 8-bit timer prescaler taps are
-// phiT1 = fc/8, phiT4 = fc/32, phiT16 = fc/128 and phiT256 = fc/2048.  The
-// shifts here were four bits too many for each tap, so every 8-bit timer
-// counted sixteen times too slowly.
-static constexpr int PRESCALE_T1   = 3;
-static constexpr int PRESCALE_T4   = 5;
-static constexpr int PRESCALE_T16  = 7;
-static constexpr int PRESCALE_T256 = 11;
+// 8-bit timer prescaler taps, as the original core has always had them, and
+// as tmp95c063 still has them.  Taking the databook's phiT1 = fc/8 literally
+// puts all four four bits lower, which runs every 8-bit timer sixteen times
+// faster and garbles ngp/ngpc music -- do not change these without testing
+// the machines that use this CPU.
+static constexpr int PRESCALE_T1   = 7;
+static constexpr int PRESCALE_T4   = 9;
+static constexpr int PRESCALE_T16  = 11;
+static constexpr int PRESCALE_T256 = 15;
 
 void tmp95c061_device::tlcs900_handle_timers()
 {

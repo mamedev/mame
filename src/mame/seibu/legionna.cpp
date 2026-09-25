@@ -1483,7 +1483,7 @@ void legionna_state::cupsoc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &legionna_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	RAIDEN2COP(config, m_raiden2cop);
+	SEIBUCOP_V1(config, m_raiden2cop);
 	m_raiden2cop->videoramout_cb().set(FUNC(legionna_state::videowrite_cb_w));
 	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
 	m_raiden2cop->set_host_cpu_tag(m_maincpu);

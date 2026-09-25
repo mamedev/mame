@@ -179,6 +179,8 @@ public:
 	void dump_table();
 
 protected:
+	raiden2cop_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool cupsoc);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
@@ -189,6 +191,7 @@ private:
 
 	required_device<cpu_device> m_host_cpu; /**< reference to the host cpu */
 	address_space *m_host_space; /**< reference to the host cpu space */
+	const bool m_cupsoc_mode;    /**< set by the Seibu Cup Soccer variant of the device */
 	bool m_host_endian;          /**< reference to the host cpu endianness, some commands cares! */
 	uint8_t m_byte_endian_val;     /**< 2 if m_host_endian is big (68k) else 0 */
 	uint8_t m_word_endian_val;     /**< 3 if m_host_endian is big (68k) else 0 */
@@ -220,6 +223,11 @@ private:
 	void execute_a900(int offset, uint16_t data);
 	void execute_b100(int offset, uint16_t data);
 	void execute_b900(int offset, uint16_t data);
+	void execute_3b30_latched(int offset, uint16_t data);
+	void LEGACY_execute_e30e_cupsoc(int offset, uint16_t data);
+	u32 cop_fixmul1616(u32 a) const;
+	void execute_5105(int offset, uint16_t data);
+	void execute_5905(int offset, uint16_t data);
 	void execute_f105(int offset, uint16_t data);
 
 	void execute_ede5(int offset, uint16_t data);
@@ -253,6 +261,14 @@ private:
 	void dma_zsorting(uint16_t data);
 };
 
+// Seibu Cup Soccer runs the earlier COP, which differs in several commands.
+class seibucop_v1_device : public raiden2cop_device
+{
+public:
+	seibucop_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 DECLARE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device)
+DECLARE_DEVICE_TYPE(SEIBUCOP_V1, seibucop_v1_device)
 
 #endif // MAME_SEIBU_SEIBUCOP_H

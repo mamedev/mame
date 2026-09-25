@@ -167,80 +167,31 @@ void cbm2_hrg_device::device_start()
 void cbm2_hrg_device::device_reset()
 {
 	m_gdc->reset();
+
+	m_slot->bank3().install_rom(0x0000, 0x1f7f, m_bank3->base());
+	m_slot->bank3().install_write_handler(0x1f80, 0x1f80, write8smo_delegate(*this, FUNC(cbm2_hrg_device::control_w)));
+	m_slot->bank3().install_readwrite_handler(0x1ff0, 0x1fff, read8sm_delegate(*m_gdc, FUNC(ef9365_device::data_r)), write8sm_delegate(*m_gdc, FUNC(ef9365_device::data_w)));
 }
 
 
 //-------------------------------------------------
-//  cbm2_bd_r - cartridge data read
+//  control_w -
 //-------------------------------------------------
 
-uint8_t cbm2_hrg_device::cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+void cbm2_hrg_device::control_w(uint8_t data)
 {
-	if (!csbank3)
-	{
-		if (offset < 0x7f80)
-		{
-			data = m_bank3->base()[offset & 0x1fff];
-		}
-		else if (offset == 0x7f90)
-		{
-			/*
+	/*
 
-			    bit     description
+	    bit     description
 
-			    0       light pen
-			    1
-			    2
-			    3
-			    4
-			    5
-			    6
-			    7
+	    0       hard copy (0=active)
+	    1       operating page select (version B)
+	    2
+	    3       read-modify-write (1=active)
+	    4       display switch (1=graphic)
+	    5       display page select (version B)
+	    6
+	    7
 
-			*/
-		}
-		else if (offset == 0x7fb0)
-		{
-			// hard copy
-		}
-		else if (offset >= 0x7ff0)
-		{
-			data = m_gdc->data_r(offset & 0x0f);
-		}
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  cbm2_bd_w - cartridge data write
-//-------------------------------------------------
-
-void cbm2_hrg_device::cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
-{
-	if (!csbank3)
-	{
-		if (offset == 0x7f80)
-		{
-			/*
-
-			    bit     description
-
-			    0       hard copy (0=active)
-			    1       operating page select (version B)
-			    2
-			    3       read-modify-write (1=active)
-			    4       display switch (1=graphic)
-			    5       display page select (version B)
-			    6
-			    7
-
-			*/
-		}
-		else if (offset >= 0x7ff0)
-		{
-			m_gdc->data_w(offset & 0x0f, data);
-		}
-	}
+	*/
 }

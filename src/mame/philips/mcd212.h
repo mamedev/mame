@@ -285,8 +285,9 @@ protected:
 
 	template <int Path> void set_display_parameters(uint8_t value);
 
-	template <int Path> void process_ica();
 	template <int Path> void process_dca();
+	void process_ica();
+	template <int Path> bool process_ica_command(uint32_t &addr);
 
 	template <int Path> uint8_t get_transparency_control();
 	template <int Path> uint8_t get_icm();

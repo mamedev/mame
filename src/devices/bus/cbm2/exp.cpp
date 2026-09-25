@@ -9,16 +9,6 @@
 #include "emu.h"
 #include "exp.h"
 
-#include <tuple>
-
-
-
-//**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
 
 
 //**************************************************************************
@@ -66,8 +56,37 @@ cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mco
 	device_t(mconfig, CBM2_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cbm2_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
-	m_card(nullptr)
+	device_memory_interface(mconfig, *this),
+	m_card(nullptr),
+	m_space_config("cart", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor(FUNC(cbm2_expansion_slot_device::cart_map), this)),
+	m_bank1(0x2000),
+	m_bank2(0x4000),
+	m_bank3(0x6000),
+	m_data(0xff)
 {
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector cbm2_expansion_slot_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+
+//-------------------------------------------------
+//  cart_map -
+//-------------------------------------------------
+
+void cbm2_expansion_slot_device::cart_map(address_map &map)
+{
+	map(0x0000, 0x7fff).lr8(NAME([this] () { return m_data; })).nopw();
 }
 
 
@@ -78,6 +97,9 @@ cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mco
 void cbm2_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
+
+	for (cbm2_expansion_window *window : { &m_bank1, &m_bank2, &m_bank3 })
+		window->m_space = &space(0);
 }
 
 
@@ -87,50 +109,56 @@ void cbm2_expansion_slot_device::device_start()
 
 std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_load()
 {
-	std::error_condition err;
+	if (!m_card || loaded_through_softlist())
+		return {};
 
-	if (m_card)
+	static char const *const banks[] = { "bank1", "bank2", "bank3" };
+
+	for (char const *bank : banks)
+		machine().memory().region_free(subtag(bank));
+
+	int first;
+	if (is_filetype("20"))
+		first = 0;
+	else if (is_filetype("40"))
+		first = 1;
+	else if (is_filetype("60"))
+		first = 2;
+	else
+		return { image_error::INVALIDIMAGE, std::string() };
+
+	util::random_read &file = image_core_file();
+	size_t const size = length();
+
+	if (!size || (size > (3 - first) * 0x2000))
+		return { image_error::INVALIDLENGTH, std::string() };
+
+	for (size_t offset = 0; offset < size; offset += 0x2000)
 	{
-		if (!loaded_through_softlist())
-		{
-			util::read_stream &file = image_core_file();
-			size_t const size = length();
-
-			if (is_filetype("20"))
-			{
-				size_t actual;
-				std::tie(err, m_card->m_bank1, actual) = util::read(file, size);
-				if (!err && (actual != size))
-					err = std::errc::io_error;
-			}
-			else if (is_filetype("40"))
-			{
-				size_t actual;
-				std::tie(err, m_card->m_bank2, actual) = util::read(file, size);
-				if (!err && (actual != size))
-					err = std::errc::io_error;
-			}
-			else if (is_filetype("60"))
-			{
-				size_t actual;
-				std::tie(err, m_card->m_bank3, actual) = util::read(file, size);
-				if (!err && (actual != size))
-					err = std::errc::io_error;
-			}
-			else
-			{
-				err = image_error::INVALIDIMAGE;
-			}
-		}
-		else
-		{
-			load_software_region("bank1", m_card->m_bank1);
-			load_software_region("bank2", m_card->m_bank2);
-			load_software_region("bank3", m_card->m_bank3);
-		}
+		size_t const block = std::min<size_t>(size - offset, 0x2000);
+		auto const [err, actual] = util::read(file, alloc_region(banks[first + offset / 0x2000]), block);
+		if (err)
+			return { err, std::string() };
+		if (actual != block)
+			return { std::errc::io_error, std::string() };
 	}
 
-	return std::make_pair(err, std::string());
+	return {};
+}
+
+
+//-------------------------------------------------
+//  alloc_region - allocate a ROM block region
+//  named like the software list data area
+//-------------------------------------------------
+
+uint8_t *cbm2_expansion_slot_device::alloc_region(const char *tag)
+{
+	machine().memory().region_free(subtag(tag));
+	memory_region *const region = machine().memory().region_alloc(subtag(tag), 0x2000, 1, ENDIANNESS_LITTLE);
+	std::fill_n(region->base(), region->bytes(), 0);
+
+	return region->base();
 }
 
 
@@ -150,12 +178,14 @@ std::string cbm2_expansion_slot_device::get_default_card_software(get_default_ca
 
 uint8_t cbm2_expansion_slot_device::read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
-	if (m_card != nullptr)
-	{
-		data = m_card->cbm2_bd_r(offset, data, csbank1, csbank2, csbank3);
-	}
+	int const bank = !csbank1 ? 1 : !csbank2 ? 2 : !csbank3 ? 3 : 0;
 
-	return data;
+	if (!bank)
+		return data;
+
+	m_data = data;
+
+	return space(0).read_byte((bank << 13) | (offset & 0x1fff));
 }
 
 
@@ -165,10 +195,10 @@ uint8_t cbm2_expansion_slot_device::read(offs_t offset, uint8_t data, int csbank
 
 void cbm2_expansion_slot_device::write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
-	if (m_card != nullptr)
-	{
-		m_card->cbm2_bd_w(offset, data, csbank1, csbank2, csbank3);
-	}
+	int const bank = !csbank1 ? 1 : !csbank2 ? 2 : !csbank3 ? 3 : 0;
+
+	if (bank)
+		space(0).write_byte((bank << 13) | (offset & 0x1fff), data);
 }
 
 
