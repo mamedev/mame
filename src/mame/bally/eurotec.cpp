@@ -10,9 +10,26 @@ The predecessor is the Technik 2000 system.
 The CPU board has the CPU, RTC, RAM and ROM
 
 CPU: Motorola MC68EC000
-RAM: Samsung K6T4016C3C 256Kx16 bit Low Power CMOS Static RAM
 RTC: Epson RTC72421
 
+1 ROM module:
+001.601.00
+ _________________________________
+|                                 |
+| ||  74HC14    XTAL  74HC02 LM311|
+| ||  74HC32 74HC08       BATT    |
+| || 74HC137  _______    RTC72421 |
+| ||         |68EC000|            |
+| || 74HC245 |       |     RAM    |
+| || 74HC245 |_______|            |
+| ||     IC10              RAM    |
+|_________________________________|
+
+IC10 is a 27C4002 EPROM
+RAM are K6T0808C1D
+
+2 ROM module:
+004.601.00
  _________________________________
 |                                 |
 | ||  74HC14    XTAL  74HC02 LM311|
@@ -23,6 +40,9 @@ RTC: Epson RTC72421
 | || 74HC245 |_______|            |
 | ||     IC15            IC10     |
 |_________________________________|
+
+IC10 and IC15 are 27C4001 EPROMs
+RAM is K6T4016C3C
 
 The right half is usually covered by a plastic shield and locked with a lead seal.
 It sits on a main board that has a PLCC84 labeled
@@ -81,9 +101,10 @@ private:
 
 void ballyw_state::mem_map(address_map &map)
 {
+	// IC5 74HC139
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x17ffff).ram().share("nvram");
-	map(0x800000, 0x8fffff).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
+	map(0x800000, 0x80003f).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
 	map(0x900000, 0x9000ff).noprw();
 	map(0x900100, 0x9001ff).noprw();
 	map(0x900200, 0x9002ff).noprw();
