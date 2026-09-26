@@ -1947,3 +1947,16 @@ if VIDEOS["ZR36110"] then
 		MAME_DIR .. "src/devices/video/zr36110.h",
 	}
 end
+
+
+--------------------------------------------------
+--
+--@src/devices/video/ssd1306.h,VIDEOS["SSD1306"] = true
+--------------------------------------------------
+
+if VIDEOS["SSD1306"] then
+	files {
+		MAME_DIR .. "src/devices/video/ssd1306.cpp",
+		MAME_DIR .. "src/devices/video/ssd1306.h",
+	}
+end

@@ -21160,6 +21160,9 @@ mbs1
 @source:homebrew/68ksbc.cpp
 68ksbc
 
+@source:homebrew/arduboy.cpp
+arduboy
+
 @source:homebrew/chaos.cpp
 chaos
 

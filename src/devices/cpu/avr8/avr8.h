@@ -524,6 +524,53 @@ protected:
 		ATMEGA644_INT_SPM_RDY
 	};
 
+	enum : uint8_t
+	{
+		ATMEGA32U4_INT_RESET = 0,
+		ATMEGA32U4_INT_INT0,
+		ATMEGA32U4_INT_INT1,
+		ATMEGA32U4_INT_INT2,
+		ATMEGA32U4_INT_INT3,
+		ATMEGA32U4_INT_RESERVED_0,
+		ATMEGA32U4_INT_RESERVED_1,
+		ATMEGA32U4_INT_INT6,
+		ATMEGA32U4_INT_RESERVED_2,
+		ATMEGA32U4_INT_PCINT0,
+		ATMEGA32U4_INT_USB_GENERAL,
+		ATMEGA32U4_INT_USB_ENDPOINT,
+		ATMEGA32U4_INT_WDT,
+		ATMEGA32U4_INT_RESERVED_3,
+		ATMEGA32U4_INT_RESERVED_4,
+		ATMEGA32U4_INT_RESERVED_5,
+		ATMEGA32U4_INT_T1CAPT,
+		ATMEGA32U4_INT_T1COMPA,
+		ATMEGA32U4_INT_T1COMPB,
+		ATMEGA32U4_INT_T1COMPC,
+		ATMEGA32U4_INT_T1OVF,
+		ATMEGA32U4_INT_T0COMPA,
+		ATMEGA32U4_INT_T0COMPB,
+		ATMEGA32U4_INT_T0OVF,
+		ATMEGA32U4_INT_SPI_STC,
+		ATMEGA32U4_INT_USART_RX,
+		ATMEGA32U4_INT_USART_UDRE,
+		ATMEGA32U4_INT_USART_TX,
+		ATMEGA32U4_INT_ANALOG_COMP,
+		ATMEGA32U4_INT_ADC,
+		ATMEGA32U4_INT_EE_RDY,
+		ATMEGA32U4_INT_T3CAPT,
+		ATMEGA32U4_INT_T3COMPA,
+		ATMEGA32U4_INT_T3COMPB,
+		ATMEGA32U4_INT_T3COMPC,
+		ATMEGA32U4_INT_T3OVF,
+		ATMEGA32U4_INT_TWI,
+		ATMEGA32U4_INT_SPM_RDY,
+		ATMEGA32U4_INT_T4COMPA,
+		ATMEGA32U4_INT_T4COMPB,
+		ATMEGA32U4_INT_T4COMPD,
+		ATMEGA32U4_INT_T4OVF,
+		ATMEGA32U4_INT_T4FPF,
+	};
+
 	// lock bit masks
 	enum : uint8_t
 	{
@@ -624,6 +671,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_shift_flag_cache;
 
 	// device-level overrides
+	void common_reset();
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -785,6 +833,7 @@ protected:
 
 	static const interrupt_condition s_int_conditions[INTIDX_COUNT];
 	static const interrupt_condition s_mega644_int_conditions[INTIDX_COUNT];
+	static const interrupt_condition s_mega32u4_int_conditions[INTIDX_COUNT];
 };
 
 // ======================> avr8_device
@@ -826,6 +875,7 @@ protected:
 	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map);
 
 	typedef delegate<void (void)> timer_func;
+
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -1145,6 +1195,7 @@ protected:
 DECLARE_DEVICE_TYPE(ATMEGA88,   atmega88_device)
 DECLARE_DEVICE_TYPE(ATMEGA168,  atmega168_device)
 DECLARE_DEVICE_TYPE(ATMEGA328,  atmega328_device)
+DECLARE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device)
 DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
 DECLARE_DEVICE_TYPE(ATMEGA1284, atmega1284_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
@@ -1192,6 +1243,28 @@ public:
 
 protected:
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
+};
+
+// ======================> atmega32u4_device
+
+class atmega32u4_device : public avr8_device<4>
+{
+public:
+	// construction/destruction
+	atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void update_interrupt(int source) override;
+	void atmega32u4_internal_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
+	{
+		sck_mask  = 0x02; // PB1
+		mosi_mask = 0x04; // PB2
+		miso_mask = 0x08; // PB3
+	}
 	virtual uint8_t eearh_mask() const override { return 0x03; } // 1024-byte EEPROM
 };
 
