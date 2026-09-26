@@ -14,10 +14,10 @@ function dat.check(set, softlist)
 	end
 	local lines = {}
 	data = data:gsub('MAMESCORE records : ([^\n]+)', 'MAMESCORE records :\t\n%1', 1)
-	for rawline in data:gmatch('[^\n]*') do
-		if (rawline ~= '') or ((#lines ~= 0) and (lines[#lines] ~= '')) then
-			local line = rawline:gsub('^(.-)_+([0-9.]+)$', '%1\t%2')
-			table.insert(lines, line)
+	for line in data:gmatch('[^\n]*') do
+		if (line ~= '') or ((#lines ~= 0) and (lines[#lines] ~= '')) then
+			local reformatted = line:gsub('^(.-)_+([0-9.]+)$', '%1\t%2')
+			table.insert(lines, reformatted)
 		end
 	end
 	info = '#j2\n' .. table.concat(lines, '\n')
