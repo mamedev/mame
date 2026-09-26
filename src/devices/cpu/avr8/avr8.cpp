@@ -1164,7 +1164,7 @@ void avr8_device<NumTimers>::device_start()
 //  device_reset - reset the device
 //-------------------------------------------------
 
-void avr8_base_device::common_reset()
+void avr8_base_device::device_reset()
 {
 	logerror("AVR low fuse bits: 0x%02X\n", m_lfuses);
 	logerror("AVR high fuse bits: 0x%02X\n", m_hfuses);
@@ -1215,15 +1215,10 @@ void avr8_base_device::common_reset()
 	m_sleeping = false;
 }
 
-void avr8_base_device::device_reset()
-{
-	common_reset();
-}
-
 template <int NumTimers>
 void avr8_device<NumTimers>::device_reset()
 {
-	common_reset();
+	avr8_base_device::device_reset();
 
 	m_adc_sample = 0;
 	m_adc_result = 0;

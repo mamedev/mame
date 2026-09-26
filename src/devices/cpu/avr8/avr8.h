@@ -674,10 +674,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// common path for device_reset() and the
-	// templatified avr_device<NumTimers>::device_reset()
-	void common_reset();
-
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
