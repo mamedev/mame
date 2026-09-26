@@ -26,12 +26,12 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	void pcega(machine_config &config);
-	void pcvga(machine_config &config);
-	void pccga(machine_config &config);
-	void pcherc(machine_config &config);
-	void pcmda(machine_config &config);
-	void pcv20(machine_config &config);
+	void pcega(machine_config &config) ATTR_COLD;
+	void pcvga(machine_config &config) ATTR_COLD;
+	void pccga(machine_config &config) ATTR_COLD;
+	void pcherc(machine_config &config) ATTR_COLD;
+	void pcmda(machine_config &config) ATTR_COLD;
+	void pcv20(machine_config &config) ATTR_COLD;
 	void pc8_io(address_map &map) ATTR_COLD;
 	void pc8_map(address_map &map) ATTR_COLD;
 

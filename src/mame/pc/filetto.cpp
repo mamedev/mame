@@ -98,7 +98,7 @@ public:
 		, m_samples(*this, "samples")
 	{ }
 
-	void filetto(machine_config &config);
+	void filetto(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
