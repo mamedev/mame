@@ -42,7 +42,8 @@
 
   * dayto2pe - works
   * daytona2 - works
-    spikeout/spikeofe - works, severe texture glitches (mip mapping?)
+    spikeout/spikeofe - works, severe texture glitches (mip mapping?),
+	                    throws "invalid config detected" when exiting service mode
  ** dirtdvls/dirtdvlau/dirtdvlj/dirtdvlu - works
     swtrilgy - works, black screen in service mode
     swtrilga - doesn't pass "Wait Setup the Feedback Leaver"
@@ -1364,8 +1365,13 @@ void model3_state::model3_init(int step)
 
 	m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 
-	membank("bank4")->set_base(memregion("samples")->base() + 0x200000);
-	membank("bank5")->set_base(memregion("samples")->base() + 0x600000);
+	auto const samples_region = memregion("samples");
+	assert(samples_region);
+	auto const samples_bytes = samples_region->bytes();
+	if (!samples_bytes || (samples_bytes % 0x800000))
+		throw emu_fatalerror("samples region size must be a multiple of 8 MiB");
+	for (unsigned i = 0; i < 2; ++i)
+		m_sound_bank->configure_entry(i, samples_region->base() + ((i * 0x800000) % samples_bytes));
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base(), 16);
@@ -6247,23 +6253,12 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-void model3_state::model3snd_ctrl(uint16_t data)
+// TODO: bits 3-0 also used here
+// cfr. spikeout/spikeofe sound test
+// (hint: use p1 inputs ignore Sega wacky instructions)
+void model3_state::sound_control_w(uint8_t data)
 {
-	// handle sample banking
-	if (memregion("samples")->bytes() > 0x800000)
-	{
-		uint8_t *snd = memregion("samples")->base();
-		if (data & 0x20)
-		{
-			membank("bank4")->set_base(snd + 0x200000);
-			membank("bank5")->set_base(snd + 0x600000);
-		}
-		else
-		{
-			membank("bank4")->set_base(snd + 0x800000);
-			membank("bank5")->set_base(snd + 0xa00000);
-		}
-	}
+	m_sound_bank->set_entry(BIT(data, 4));
 }
 
 // We assume using the same waitstate weights as Saturn, applied to SCSP area only
@@ -6273,11 +6268,9 @@ void model3_state::model3_snd(address_map &map)
 	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp1, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x200000, 0x27ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram2");
 	map(0x300000, 0x300fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x400000, 0x400001).w(FUNC(model3_state::model3snd_ctrl));
+	map(0x400001, 0x400001).w(FUNC(model3_state::sound_control_w));
 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
-	map(0x800000, 0x9fffff).rom().region("samples", 0);
-	map(0xa00000, 0xdfffff).bankr("bank4");
-	map(0xe00000, 0xffffff).bankr("bank5");
+	map(0x800000, 0xffffff).bankr(m_sound_bank);
 }
 
 void model3_state::scsp1_map(address_map &map)
@@ -6319,6 +6312,8 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 void model3_state::dsb2_config(machine_config &config)
 {
 	DSB2(config, m_dsb2);
+	// TODO: should be chained with SCSP EXTS not being direct
+	// spikeout/spikeofe sounds ugly mixing wise
 	m_dsb2->add_route(0, "speaker", 1.0, 0);
 	m_dsb2->add_route(1, "speaker", 1.0, 1);
 
@@ -6880,22 +6875,12 @@ void model3_state::init_dayto2pe()
 
 void model3_state::init_spikeout()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
-
-	// HACK: sound dies often without these patches, investigate
-	rom[(0x6059cc^4)/4] = 0x60000000;
-	rom[(0x6059ec^4)/4] = 0x60000000;
 }
 
 void model3_state::init_spikeofe()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
-
-	// HACK: as above
-	rom[(0x6059cc^4)/4] = 0x60000000;
-	rom[(0x6059ec^4)/4] = 0x60000000;
 }
 
 void model3_state::init_eca()

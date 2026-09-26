@@ -706,4 +706,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

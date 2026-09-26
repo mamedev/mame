@@ -1468,21 +1468,34 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
 		m_core->mmu603_key = (segreg >> (29 + transpriv)) & 1;   // SRR1[KEY]: SR[Ks] for a supervisor access, SR[Kp] for a user access
 
-		// Entries loaded by tlbld/tlbli carry per-mode permissions derived from the PTE's PP bits and the segment key
+		// Entries loaded by tlbld/tlbli carry per-mode permissions derived from the PTE's PP bits and the segment key.
+		// The 603 has separate instruction and data TLBs that software reloads independently (and possibly from
+		// different page tables), so an entry only answers for the TLB that loaded it: a page held by the other
+		// TLB alone still takes the miss exception so the software table search can run.
 		if ((entry & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID))
 		{
-			if (entry & (1 << (intention & (TR_TYPE | TR_USER))))
+			if (entry & ((transtype == TR_FETCH) ? VTLB_603_ITLB : VTLB_603_DTLB))
+			{
+				if (entry & (1 << (intention & (TR_TYPE | TR_USER))))
+				{
+					address = (entry & 0xfffff000) | (address & 0x00000fff);
+					return 0x001;
+				}
+
+				// A store to a page whose C bit is clear takes the TLB miss on store exception so the handler
+				// can check protection and set C (603e User's Manual Table 5-4).
+				// Anything else the hardware refuses on a TLB hit is a page protection violation (Table 5-3)
+				if (transtype == TR_WRITE && !(entry & VTLB_603_CHANGED))
+					return DSISR_NOT_FOUND | DSISR_STORE;
+				return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
+			}
+
+			// let the debugger see through the other TLB's translation
+			if (debug)
 			{
 				address = (entry & 0xfffff000) | (address & 0x00000fff);
 				return 0x001;
 			}
-
-			// A store to a page whose C bit is clear takes the TLB miss on store exception so the handler
-			// can check protection and set C (603e User's Manual Table 5-4).
-			// Anything else the hardware refuses on a TLB hit is a page protection violation (Table 5-3)
-			if (transtype == TR_WRITE && !(entry & VTLB_603_CHANGED))
-				return DSISR_NOT_FOUND | DSISR_STORE;
-			return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 		}
 		return DSISR_NOT_FOUND | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 	}
@@ -1870,28 +1883,58 @@ void ppc_device::ppccom_execute_tlbl()
 	uint8_t const ks = (segreg >> 30) & 1;
 	uint8_t const kp = (segreg >> 29) & 1;
 
+	// tlbli only fills the instruction TLB and tlbld only the data TLB, so an entry grants just the
+	// accesses its own TLB is asked about.
 	vtlb_entry flags = FLAG_VALID;
-	if (page_access_allowed(TR_READ, ks, pp))
+	if (isitlb)
 	{
-		flags |= READ_ALLOWED | FETCH_ALLOWED;
+		flags |= VTLB_603_ITLB;
+		if (page_access_allowed(TR_READ, ks, pp))
+		{
+			flags |= FETCH_ALLOWED;
+		}
+		if (page_access_allowed(TR_READ, kp, pp))
+		{
+			flags |= USER_FETCH_ALLOWED;
+		}
 	}
-	if (page_access_allowed(TR_READ, kp, pp))
+	else
 	{
-		flags |= USER_READ_ALLOWED | USER_FETCH_ALLOWED;
+		flags |= VTLB_603_DTLB;
+		if (page_access_allowed(TR_READ, ks, pp))
+		{
+			flags |= READ_ALLOWED;
+		}
+		if (page_access_allowed(TR_READ, kp, pp))
+		{
+			flags |= USER_READ_ALLOWED;
+		}
+
+		// A store to a page with C = 0 must take the TLB miss on store exception so the handler can set C.
+		if (rpa & 0x80)
+		{
+			flags |= VTLB_603_CHANGED;
+			if (page_access_allowed(TR_WRITE, ks, pp))
+			{
+				flags |= WRITE_ALLOWED;
+			}
+			if (page_access_allowed(TR_WRITE, kp, pp))
+			{
+				flags |= USER_WRITE_ALLOWED;
+			}
+		}
 	}
 
-	// A store to a page with C = 0 must take the TLB miss on store exception so the handler can set C.
-	if (rpa & 0x80)
+	// The VTLB has a single entry per effective page, so the instruction and data TLB entries for a page
+	// share it.  Keep the other TLB's permissions when it already maps the page to the same physical page;
+	// otherwise the new translation takes over and the other TLB simply misses again.
+	vtlb_entry const old = vtlb_table()[address >> 12];
+	if (((old & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID)) && (((old ^ rpa) & 0xfffff000) == 0))
 	{
-		flags |= VTLB_603_CHANGED;
-		if (page_access_allowed(TR_WRITE, ks, pp))
-		{
-			flags |= WRITE_ALLOWED;
-		}
-		if (page_access_allowed(TR_WRITE, kp, pp))
-		{
-			flags |= USER_WRITE_ALLOWED;
-		}
+		vtlb_entry const other = isitlb
+				? (VTLB_603_DTLB | VTLB_603_CHANGED | READ_ALLOWED | WRITE_ALLOWED | USER_READ_ALLOWED | USER_WRITE_ALLOWED)
+				: (VTLB_603_ITLB | FETCH_ALLOWED | USER_FETCH_ALLOWED);
+		flags |= old & other;
 	}
 
 	// load the entry
