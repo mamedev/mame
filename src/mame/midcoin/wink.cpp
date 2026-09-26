@@ -10,7 +10,7 @@ TODO:
 - hookup knocker;
 
 non-JAMMA pinout at:
-https://github.com/angelosa/hw_docs/blob/main/intel_x86/wink_pinout.md
+https://github.com/angelosa/hw_docs/blob/main/arcade_prejamma/wink_pinout.md
 
 */
 
