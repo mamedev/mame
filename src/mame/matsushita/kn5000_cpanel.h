@@ -8,7 +8,7 @@
     Since no ROM dumps are available, this uses High Level Emulation based
     on reverse engineering of the main CPU firmware protocol.
 
-    Protocol documentation: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
+    Protocol documentation: https://arqueologiadigital.github.io/technics-docs/control-panel-protocol/
 
 ***************************************************************************/
 
