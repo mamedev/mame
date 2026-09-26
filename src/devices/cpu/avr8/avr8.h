@@ -671,9 +671,12 @@ protected:
 	std::unique_ptr<uint8_t[]> m_shift_flag_cache;
 
 	// device-level overrides
-	void common_reset();
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	// common path for device_reset() and the
+	// templatified avr_device<NumTimers>::device_reset()
+	void common_reset(); 
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }

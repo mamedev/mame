@@ -1446,9 +1446,6 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_con
 	{ ATMEGA32U4_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
 	{ ATMEGA32U4_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
 	{ ATMEGA32U4_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
-	// { ATMEGA32U4_INT_T2COMPB, TIMSK2, TIMSK2_OCIE2B_MASK, TIFR2,   TIFR2_OCF2B_MASK },
-	// { ATMEGA32U4_INT_T2COMPA, TIMSK2, TIMSK2_OCIE2A_MASK, TIFR2,   TIFR2_OCF2A_MASK },
-	// { ATMEGA32U4_INT_T2OVF,   TIMSK2, TIMSK2_TOIE2_MASK,  TIFR2,   TIFR2_TOV2_MASK },
 	{ ATMEGA32U4_INT_PCINT0,  PCICR,  PCICR_PCIE0_MASK,   PCIFR,   PCIFR_PCIF0_MASK },
 	{ ATMEGA32U4_INT_INT0,    EIMSK,  EIMSK_INT0_MASK,    EIFR,    EIFR_INTF0_MASK },
 	{ ATMEGA32U4_INT_INT1,    EIMSK,  EIMSK_INT1_MASK,    EIFR,    EIFR_INTF1_MASK }
@@ -1736,7 +1733,8 @@ void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 		// TODO: set 0C0B
 	}
 
-	if (m_r[TCNT0] == 0xFF) {
+	if (m_r[TCNT0] == 0xFF)
+	{
 		m_r[TIFR0] |= TIFR0_TOV0_MASK;
 		update_interrupt(INTIDX_TOV0);		
 		
@@ -3808,7 +3806,6 @@ void avr8_device<NumTimers>::execute_run()
 {
 	while (m_icount > 0)
 	{
-	
 		if (m_sleeping)
 		{
 			debugger_wait_hook();
@@ -3818,6 +3815,7 @@ void avr8_device<NumTimers>::execute_run()
 		{
 			m_pc &= m_addr_mask;
 			debugger_instruction_hook(m_pc);
+
 			const uint16_t op = (uint32_t)m_program->read_word(m_pc);
 			m_opcycles = m_op_cycles[op];
 			((this)->*(m_op_funcs[op]))(op);
