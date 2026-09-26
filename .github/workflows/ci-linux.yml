@@ -73,4 +73,7 @@ jobs:
           ${{ matrix.executable }}
           chdman
           unidasm
+          libmame_srcdbg_shared.so.1.0
+          libmame_srcdbg_static.a
+
         if-no-files-found: error

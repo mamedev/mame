@@ -11,6 +11,7 @@
 
 #include "debuggerprefs.h"
 #include "debugviewinfo.h"
+#include "sourceviewinfo.h"
 #include "uimetrics.h"
 
 // devices
@@ -213,7 +214,8 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	disasmbasewin_info(debugger, true, VIEW_IDX_DISASM, "Debug", nullptr),
 	m_current_cpu(nullptr),
-	m_devices_menu(nullptr)
+	m_devices_menu(nullptr),
+	m_filecombownd(nullptr)
 {
 	if (!window() || !m_views[VIEW_IDX_DISASM])
 		goto cleanup;
@@ -225,6 +227,16 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	m_views[VIEW_IDX_CONSOLE].reset(new debugview_info(debugger, *this, window(), DVT_CONSOLE));
 	if (!m_views[VIEW_IDX_CONSOLE]->is_valid())
 		goto cleanup;
+	m_views[VIEW_IDX_SOURCE].reset(new sourceview_info(debugger, *this, window()));
+	if (!m_views[VIEW_IDX_SOURCE]->is_valid())
+		goto cleanup;
+
+	// Allow debug_view_sourcecode to init its reference to the visible device_state_interface
+	m_views[VIEW_IDX_SOURCE]->set_source_for_visible_cpu();
+
+	// Create source-debugging source-file selector combo box
+	m_filecombownd = downcast<sourceview_info *>(m_views[VIEW_IDX_SOURCE].get())->
+		create_source_file_combobox(window(), (LONG_PTR)this);
 
 	{
 		// add image menu only if image devices exist
@@ -251,6 +263,11 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		AppendMenu(settingsmenu, MF_ENABLED, ID_LIGHT_BACKGROUND, TEXT("Light Background"));
 		AppendMenu(settingsmenu, MF_ENABLED, ID_DARK_BACKGROUND, TEXT("Dark Background"));
 		AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)settingsmenu, TEXT("Settings"));
+
+		// Add source-debugging commands to options menu
+		AppendMenu(m_optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
+		AppendMenu(m_optionsmenu, MF_ENABLED, ID_SHOW_SOURCE, TEXT("Show source\tCtrl+U"));
+		AppendMenu(m_optionsmenu, MF_ENABLED, ID_SHOW_DISASM, TEXT("Show disassembly\tCtrl+Shift+U"));
 
 		// adjust the min/max sizes for the window style
 		adjust_minmax();
@@ -288,17 +305,34 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 
 	// mark the edit box as the default focus and set it
 	editwin_info::set_default_focus();
+
+	// Show disassembly view on startup
+	hide_src_window();
+
 	return;
 
 cleanup:
 	m_views[VIEW_IDX_CONSOLE].reset();
 	m_views[VIEW_IDX_STATE].reset();
 	m_views[VIEW_IDX_DISASM].reset();
+	m_views[VIEW_IDX_SOURCE].reset();
 }
 
 
 consolewin_info::~consolewin_info()
 {
+}
+
+
+// When routing messages, calculating sizes, etc., use the view that's
+// visible (disassembly vs. source)
+int consolewin_info::expression_view_index() const
+{
+	return
+	(
+		m_views[VIEW_IDX_SOURCE] != nullptr &&
+		m_views[VIEW_IDX_SOURCE]->is_visible()
+	) ? VIEW_IDX_SOURCE : VIEW_IDX_DISASM;
 }
 
 void consolewin_info::set_cpu(device_t &device)
@@ -309,6 +343,7 @@ void consolewin_info::set_cpu(device_t &device)
 		m_current_cpu = &device;
 
 		// first set all the views to the new cpu number
+		m_views[VIEW_IDX_SOURCE]->set_source_for_device(device);
 		m_views[VIEW_IDX_DISASM]->set_source_for_device(device);
 		m_views[VIEW_IDX_STATE]->set_source_for_device(device);
 
@@ -364,7 +399,23 @@ void consolewin_info::recompute_children()
 	conrect.left = regrect.right + (EDGE_WIDTH * 2);
 	conrect.right = parent.right - EDGE_WIDTH;
 
+	// Source-level debugging occupies same space as disassembly.
+	// Source file combo box gets full width
+	RECT comborect;
+	comborect.top = disrect.top + EDGE_WIDTH;
+	comborect.bottom = comborect.top + metrics().debug_font_height() + 4;
+	comborect.left = disrect.left;
+	comborect.right = disrect.right;
+	// source file contents gets the rest
+	RECT srcrect;
+	srcrect.top = comborect.bottom + (2 * EDGE_WIDTH);
+	srcrect.bottom = disrect.bottom - EDGE_WIDTH;
+	srcrect.left = disrect.left;
+	srcrect.right = disrect.right;
+	
 	// set the bounds of things
+	smart_set_window_bounds(m_filecombownd, window(), comborect);
+	m_views[VIEW_IDX_SOURCE]->set_bounds(srcrect);
 	m_views[VIEW_IDX_DISASM]->set_bounds(disrect);
 	m_views[VIEW_IDX_STATE]->set_bounds(regrect);
 	m_views[VIEW_IDX_CONSOLE]->set_bounds(conrect);
@@ -375,6 +426,7 @@ void consolewin_info::recompute_children()
 void consolewin_info::update_menu()
 {
 	disasmbasewin_info::update_menu();
+	enable_disasm_menu_options(m_views[VIEW_IDX_DISASM]->is_visible());
 
 	if (m_devices_menu)
 	{
@@ -469,12 +521,36 @@ void consolewin_info::update_menu()
 	CheckMenuItem(menu, ID_GROUP_WINDOWS, MF_BYCOMMAND | (debugger().get_group_windows_setting() ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_LIGHT_BACKGROUND, MF_BYCOMMAND | ((debugger_preferences::THEME_LIGHT_BACKGROUND == prefs.get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_DARK_BACKGROUND, MF_BYCOMMAND | ((debugger_preferences::THEME_DARK_BACKGROUND == prefs.get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_SHOW_SOURCE, MF_BYCOMMAND | (m_views[VIEW_IDX_SOURCE]->is_visible() ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_SHOW_DISASM, MF_BYCOMMAND | (m_views[VIEW_IDX_DISASM]->is_visible() ? MF_CHECKED : MF_UNCHECKED));
+}
+
+
+bool consolewin_info::handle_key(WPARAM wparam, LPARAM lparam)
+{
+	if (GetAsyncKeyState(VK_CONTROL) & 0x8000 && wparam == 'U')
+	{
+		if (GetAsyncKeyState(VK_SHIFT))
+		{
+			SendMessage(window(), WM_COMMAND, ID_SHOW_DISASM, 0);
+		}
+		else
+		{
+			SendMessage(window(), WM_COMMAND, ID_SHOW_SOURCE, 0);
+
+		}
+		return true;
+	}
+
+	return disasmbasewin_info::handle_key(wparam, lparam);
 }
 
 
 bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
-	if (HIWORD(wparam) == 0)
+	switch (HIWORD(wparam))
+	{
+	case 0:
 	{
 		if (LOWORD(wparam) >= ID_DEVICE_OPTIONS)
 		{
@@ -545,9 +621,59 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_DARK_BACKGROUND:
 			debugger().set_color_theme(debugger_preferences::THEME_DARK_BACKGROUND);
 			return true;
+		case ID_SHOW_SOURCE:
+			show_src_window();
+			m_views[VIEW_IDX_DISASM]->hide();
+			machine().debug_view().update_all(DVT_SOURCE);
+			return true;
+		case ID_SHOW_DISASM:
+			hide_src_window();
+			m_views[VIEW_IDX_DISASM]->show();
+			machine().debug_view().update_all(DVT_DISASSEMBLY);
+			return true;
 		}
+		break;
+	}
+	case CBN_SELCHANGE:
+	{
+		// Source file combo box selection changed
+		int const sel = SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
+		if (sel == CB_ERR)
+			break;
+
+		LRESULT src_index = SendMessage((HWND)lparam, CB_GETITEMDATA, (WPARAM) sel, 0);
+		if (src_index == CB_ERR)
+			break;
+
+		downcast<sourceview_info *>(m_views[VIEW_IDX_SOURCE].get())->set_src_index(u16(src_index));
+
+		// reset the focus
+		set_default_focus();
+		return true;
+	}
 	}
 	return disasmbasewin_info::handle_command(wparam, lparam);
+}
+
+bool consolewin_info::source_stepping_active()
+{
+	return (machine().debugger().get_srcdbg_info() != nullptr) &&
+		m_views[VIEW_IDX_SOURCE]->is_visible();
+}
+
+void consolewin_info::show_src_window()
+{
+	m_views[VIEW_IDX_SOURCE]->show();
+	if (machine().debugger().get_srcdbg_info() != nullptr)
+	{
+		smart_show_window(m_filecombownd, true);
+	}
+}
+
+void consolewin_info::hide_src_window()
+{
+	m_views[VIEW_IDX_SOURCE]->hide();
+	smart_show_window(m_filecombownd, false);
 }
 
 
