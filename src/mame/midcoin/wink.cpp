@@ -2,14 +2,16 @@
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli
 // thanks-to:HIGHWAYMAN
 /*
-    Wink    -   (c) 1985 Midcoin
+Wink    -   (c) 1985 Midcoin
 
-    TODO:
-    - better interrupts?
-    - finish sound
-    - protection was reverse engineered by AI from schematics. Needs verifying
-    - better handling of nvram? it loses the default values
-    - I need a better comparison screenshot to be sure about the colors.
+TODO:
+- verify refresh rate, interrupts, sound and colors;
+- protection was reverse engineered by AI from schematics. Needs verifying;
+- hookup knocker;
+
+non-JAMMA pinout at:
+https://github.com/angelosa/hw_docs/blob/main/intel_x86/wink_pinout.md
+
 */
 
 #include "emu.h"
@@ -79,14 +81,14 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(wink_sound);
+	INTERRUPT_GEN_MEMBER(sound_irq_cb);
 
-	void wink_io(address_map &map) ATTR_COLD;
-	void wink_map(address_map &map) ATTR_COLD;
-	void wink_sound_io(address_map &map) ATTR_COLD;
-	void wink_sound_map(address_map &map) ATTR_COLD;
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -109,7 +111,7 @@ void wink_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wink_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wink_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -159,14 +161,14 @@ void wink_state::sound_irq_w(uint8_t data)
 	// machine().scheduler().synchronize();
 }
 
-void wink_state::wink_map(address_map &map)
+// game checksum NVRAM at $9xxx, but uses it at $8xxx
+// This holds true particularly for cold boots.
+void wink_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x97ff).ram().share("nvram");
+	map(0x8000, 0x87ff).mirror(0x1000).ram().share("nvram");
 	map(0xa000, 0xa3ff).ram().w(FUNC(wink_state::bgram_w)).share(m_videoram);
 }
-
 
 uint8_t wink_state::prot_key_r(offs_t offset)
 {
@@ -193,7 +195,7 @@ void wink_state::vidxor_w(uint8_t data)
 }
 
 
-void wink_state::wink_io(address_map &map)
+void wink_state::main_io(address_map &map)
 {
 	map(0x0000, 0x001f).mirror(0xff00).ram().w("palette", FUNC(palette_device::write8)).share("palette"); // 0x10-0x1f is likely to be something else
 	map(0x0020, 0x0027).mirror(0xff00).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -201,23 +203,23 @@ void wink_state::wink_io(address_map &map)
 	map(0x0060, 0x0060).mirror(0xff00).w(FUNC(wink_state::sound_irq_w));
 	map(0x0080, 0x0080).mirror(0xff00).portr("DIAL1");
 	map(0x00a0, 0x00a0).mirror(0xff00).portr("INPUTS1");
-	map(0x00a4, 0x00a4).mirror(0xff00).portr("DSW1");   // dipswitch bank2
-	map(0x00a8, 0x00a8).mirror(0xff00).portr("DSW2");   // dipswitch bank1
+	map(0x00a4, 0x00a4).mirror(0xff00).portr("DSW2");   // dipswitch bank2
+	map(0x00a8, 0x00a8).mirror(0xff00).portr("DSW1");   // dipswitch bank1
 	map(0x00ac, 0x00af).mirror(0xff00).w(FUNC(wink_state::vidxor_w)); // protection - loads video xor unit (written only once at startup)
-	map(0x00b0, 0x00b0).mirror(0xff00).portr("DSW3");   // unused inputs
-	map(0x00b4, 0x00b4).mirror(0xff00).portr("DSW4");   // dipswitch bank3
+	map(0x00b0, 0x00b0).mirror(0xff00).lr8(NAME([] () { return 0xff; }));   // unused inputs
+	map(0x00b4, 0x00b4).mirror(0xff00).portr("DSW3");   // dipswitch bank3
 	map(0x00c0, 0x00df).select(0xff00).rw(FUNC(wink_state::prot_key_r), FUNC(wink_state::prot_key_w));
 	map(0x00e0, 0x00ff).select(0xff00).r(FUNC(wink_state::prot_math_r));
 }
 
-void wink_state::wink_sound_map(address_map &map)
+void wink_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
-void wink_state::wink_sound_io(address_map &map)
+void wink_state::sound_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
@@ -236,15 +238,45 @@ static INPUT_PORTS_START( wink )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )    // slam
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Slam Tilt")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x11, 0x10, DEF_STR( Bonus_Life ) )
+	// TODO: following two needs verifying
+	// "number of times the ball hits the barrier before knocking off a slice
+	// (first level only)"
+	// SW7   SW8
+	// off | off | 1 hit
+	// off | on  | 2 hits
+	// on  | off | 4 hits
+	// on  | on  | no barrier
+	PORT_DIPNAME( 0x11, 0x11, "Ball Save Barrier" ) PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPSETTING(    0x00, "Yes" )
+	PORT_DIPSETTING(    0x11, "No" )
+	// "number of green balls when hitting the powerup" (looks stuck at 3)
+	PORT_DIPNAME( 0x02, 0x02, "Green Balls Bonus" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x04, 0x04, "1 Credit Award" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPNAME( 0x88, 0x80, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:2,1")
+	PORT_DIPSETTING(    0x88, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x60, 0x40, "Timer Speed" ) PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x60, "Fast" )
+	PORT_DIPSETTING(    0x20, "Very Fast" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x11, 0x10, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:8,7")
 	PORT_DIPSETTING(    0x10, "60k/120k/240k/480k" )
 	PORT_DIPSETTING(    0x01, "80k/160k/320k/640k" )
 	PORT_DIPSETTING(    0x00, "100k/200k/400k/800k" )
 	PORT_DIPSETTING(    0x11, DEF_STR( None ) )
-	PORT_DIPNAME( 0x26, 0x26, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x26, 0x26, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:6,5,4")
 	PORT_DIPSETTING(    0x26, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x24, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
@@ -253,7 +285,7 @@ static INPUT_PORTS_START( wink )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_5C ) )
-	PORT_DIPNAME( 0xc8, 0xc8, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xc8, 0xc8, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:3,2,1")
 	PORT_DIPSETTING(    0xc8, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x88, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_3C ) )
@@ -263,73 +295,27 @@ static INPUT_PORTS_START( wink )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_5C ) )
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x11, 0x11, "Ball Save Barrier" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x11, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "1 Credit Award" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x88, 0x80, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x88, "2" )
-	PORT_DIPSETTING(    0x80, "3" )
-	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x60, 0x40, "Timer Speed" )
-	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x60, "Fast" )
-	PORT_DIPSETTING(    0x20, "Very Fast" )
-
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "Summary" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "Summary" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x44, 0x44, "Credit Payout" )
+	// 1st, 2nd and 4th spins are fixed: 10, 19 and 136 respectively
+	PORT_DIPNAME( 0x22, 0x22, "Number of lip hits at 3rd spin" ) PORT_DIPLOCATION("SW3:6,5")
+	PORT_DIPSETTING(    0x22, "73" )
+	PORT_DIPSETTING(    0x20, "46" )
+	PORT_DIPSETTING(    0x02, "37" )
+	PORT_DIPSETTING(    0x00, "28" )
+	PORT_DIPNAME( 0x44, 0x44, "Credit Payout" ) PORT_DIPLOCATION("SW3:4,3")
 	PORT_DIPSETTING(    0x44, "2.5%" )
 	PORT_DIPSETTING(    0x40, "5%" )
 	PORT_DIPSETTING(    0x04, "10%" )
 	PORT_DIPSETTING(    0x00, "20%" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Reset Summary Stats" )
+	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW3:7" )
+	// Enable in Summary screen then flip this
+	PORT_DIPNAME( 0x80, 0x80, "Reset Summary Stats" ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -346,7 +332,7 @@ uint8_t wink_state::sound_r()
 }
 
 // AY portA is fed by an input clock at 15625 Hz
-INTERRUPT_GEN_MEMBER(wink_state::wink_sound)
+INTERRUPT_GEN_MEMBER(wink_state::sound_irq_cb)
 {
 	m_sound_flag ^= 0x80;
 }
@@ -368,8 +354,8 @@ void wink_state::wink(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &wink_state::wink_map);
-	m_maincpu->set_addrmap(AS_IO, &wink_state::wink_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wink_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &wink_state::main_io);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(wink_state::nmi_enable_w));
@@ -382,19 +368,21 @@ void wink_state::wink(machine_config &config)
 	mainlatch.q_out_cb<7>().set(FUNC(wink_state::coin_counter_w<2>));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &wink_state::wink_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &wink_state::wink_sound_io);
-	m_audiocpu->set_periodic_int(FUNC(wink_state::wink_sound), attotime::from_hz(15625));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wink_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &wink_state::sound_io);
+	m_audiocpu->set_periodic_int(FUNC(wink_state::sound_irq_cb), attotime::from_hz(15625));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
+	// composite video sync, assume PAL refresh rate with 256 vertical
+	// with overscan to compensate for a 4:3 display (TBD)
+	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(wink_state::screen_update_wink));
+	screen.set_screen_update(FUNC(wink_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(wink_state::nmi_clock_w));
 
@@ -488,7 +476,6 @@ void wink_state::init_wink()
 } // anonymous namespace
 
 
-GAME( 1985, wink,   0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (newer)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, winkob, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (older, bugfixed)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, winko,  wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (older)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-
+GAME( 1985, wink,   0,    wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (newer)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winkob, wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (older, bugfixed)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, winko,  wink, wink, wink, wink_state, init_wink, ROT0, "Midcoin", "Wink (older)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
