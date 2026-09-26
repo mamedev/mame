@@ -42,6 +42,49 @@ public:
 		, m_dsw(*this, "DSW%u", 1)
 	{ }
 
+	void birdiy(machine_config &config) ATTR_COLD;
+	void cannonbp(machine_config &config) ATTR_COLD;
+	void rocktrv2(machine_config &config) ATTR_COLD;
+	void mspacman(machine_config &config) ATTR_COLD;
+	void dremshpr(machine_config &config) ATTR_COLD;
+	void mspacii(machine_config &config) ATTR_COLD;
+	void nmouse(machine_config &config) ATTR_COLD;
+	void vanvan(machine_config &config) ATTR_COLD;
+	void s2650games(machine_config &config) ATTR_COLD;
+	void woodpek(machine_config &config) ATTR_COLD;
+	void woodpek_rbg(machine_config &config) ATTR_COLD;
+	void crushs(machine_config &config) ATTR_COLD;
+	void superabc(machine_config &config) ATTR_COLD;
+	void numcrash(machine_config &config) ATTR_COLD;
+	void crush4(machine_config &config) ATTR_COLD;
+	void bigbucks(machine_config &config) ATTR_COLD;
+	void porky(machine_config &config) ATTR_COLD;
+	void pacman(machine_config &config) ATTR_COLD;
+	void _8bpm(machine_config &config) ATTR_COLD;
+	void crush2(machine_config &config) ATTR_COLD;
+	void korosuke(machine_config &config) ATTR_COLD;
+	void drivfrcp(machine_config &config) ATTR_COLD;
+	void pengojpm(machine_config &config) ATTR_COLD;
+	void piranha(machine_config &config) ATTR_COLD;
+
+	void init_maketrax() ATTR_COLD;
+	void init_drivfrcp() ATTR_COLD;
+	void init_mspacmbe() ATTR_COLD;
+	void init_mspackpls() ATTR_COLD;
+	void init_ponpoko() ATTR_COLD;
+	void init_eyes() ATTR_COLD;
+	void init_woodpek() ATTR_COLD;
+	void init_jumpshot() ATTR_COLD;
+	void init_mspacii() ATTR_COLD;
+	void init_pacplus() ATTR_COLD;
+	void init_rocktrv2() ATTR_COLD;
+	void init_superabc() ATTR_COLD;
+	void init_8bpm() ATTR_COLD;
+	void init_porky() ATTR_COLD;
+	void init_mspacman() ATTR_COLD;
+	void init_mbrush() ATTR_COLD;
+	void init_pengomc1() ATTR_COLD;
+
 protected:
 	void _8bpm_portmap(address_map &map) ATTR_COLD;
 	void bigbucks_map(address_map &map) ATTR_COLD;
@@ -155,26 +198,6 @@ protected:
 	void jrpacman_bgpriority_w(int state);
 	void superabc_bank_w(uint8_t data);
 
-public:
-	void init_maketrax();
-	void init_drivfrcp();
-	void init_mspacmbe();
-	void init_mspackpls();
-	void init_ponpoko();
-	void init_eyes();
-	void init_woodpek();
-	void init_jumpshot();
-	void init_mspacii();
-	void init_pacplus();
-	void init_rocktrv2();
-	void init_superabc();
-	void init_8bpm();
-	void init_porky();
-	void init_mspacman();
-	void init_mbrush();
-	void init_pengomc1();
-
-protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
@@ -202,41 +225,6 @@ private:
 	void jrpacman_mark_tile_dirty( int offset );
 	void eyes_decode(uint8_t *data);
 	void mspacman_install_patches(uint8_t *ROM);
-
-public:
-	void birdiy(machine_config &config);
-	void cannonbp(machine_config &config);
-	void rocktrv2(machine_config &config);
-	void mspacman(machine_config &config);
-	void dremshpr(machine_config &config);
-	void mspacii(machine_config &config);
-	void nmouse(machine_config &config);
-	void vanvan(machine_config &config);
-	void s2650games(machine_config &config);
-	void woodpek(machine_config &config);
-	void woodpek_rbg(machine_config &config);
-	void crushs(machine_config &config);
-	void superabc(machine_config &config);
-	void numcrash(machine_config &config);
-	void crush4(machine_config &config);
-	void bigbucks(machine_config &config);
-	void porky(machine_config &config);
-	void pacman(machine_config &config);
-	void _8bpm(machine_config &config);
-	void crush2(machine_config &config);
-	void korosuke(machine_config &config);
-	void drivfrcp(machine_config &config);
-	void pengojpm(machine_config &config);
-	void piranha(machine_config &config);
-
-private:
-	// pacplus.cpp
-	uint8_t pacplus_decrypt(int addr, uint8_t e);
-	void pacplus_decode();
-
-	// jumpshot.cpp
-	uint8_t jumpshot_decrypt(int addr, uint8_t e);
-	void jumpshot_decode();
 };
 
 
@@ -247,9 +235,9 @@ public:
 		: pacman_state(mconfig, type, tag)
 	{ }
 
-	void alibaba(machine_config &config);
+	void alibaba(machine_config &config) ATTR_COLD;
 
-	void init_alibaba();
+	void init_alibaba() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -278,11 +266,11 @@ public:
 		: pacman_state(mconfig, type, tag)
 	{ }
 
-	void acitya(machine_config &config);
-	void theglobp(machine_config &config);
-	void eeekkp(machine_config &config);
+	void acitya(machine_config &config) ATTR_COLD;
+	void theglobp(machine_config &config) ATTR_COLD;
+	void eeekkp(machine_config &config) ATTR_COLD;
 
-	void init_sprglobp2();
+	void init_sprglobp2() ATTR_COLD;
 
 private:
 	uint8_t epos_decryption_w(offs_t offset);
@@ -306,11 +294,11 @@ public:
 		, m_players(*this, "P%u", 1)
 	{ }
 
-	void clubpacm(machine_config &config);
+	void clubpacm(machine_config &config) ATTR_COLD;
 
 	ioport_value clubpacm_input_r();
 
-	void init_clubpacma();
+	void init_clubpacma() ATTR_COLD;
 
 protected:
 	void clubpacm_map(address_map &map) ATTR_COLD;
@@ -328,9 +316,9 @@ public:
 		, m_decrypted_opcodes_high(*this, "decrypted_opcodes_high")
 	{ }
 
-	void mspactwin(machine_config &config);
+	void mspactwin(machine_config &config) ATTR_COLD;
 
-	void init_mspactwin();
+	void init_mspactwin() ATTR_COLD;
 
 	void flipscreen_w(int state);
 
@@ -351,7 +339,7 @@ public:
 		: pacman_state(mconfig, type, tag)
 	{ }
 
-	void mschamp(machine_config &config);
+	void mschamp(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

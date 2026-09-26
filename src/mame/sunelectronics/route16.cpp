@@ -314,7 +314,7 @@ void route16_state::init_route16a()
 {
 	init_route16c();
 
-	// hack out the protection
+	// HACK: patch out the protection
 	u8 *rom = memregion("cpu1")->base();
 	rom[0x105] = 0; // remove jp nz,4109
 	rom[0x106] = 0;
@@ -327,7 +327,7 @@ void route16_state::init_route16a()
 
 void route16_state::init_route16()
 {
-	// hack out the protection
+	// HACK: patch out the protection
 	u8 *rom = memregion("cpu1")->base();
 	rom[0x105] = 0; // remove jp nz,4109
 	rom[0x106] = 0;
@@ -346,7 +346,7 @@ void route16_state::init_route16()
 
 void route16_state::init_route16c()
 {
-	// hack out the protection
+	// HACK: patch out the protection
 	u8 *rom = memregion("cpu1")->base();
 	rom[0x0e9] = 0x3a; // remove call 2CD8
 
@@ -357,7 +357,7 @@ void route16_state::init_route16c()
 
 void route16_state::init_route16d()
 {
-	// hack out the protection
+	// HACK: patch out the protection
 	u8 *rom = memregion("cpu1")->base();
 
 	rom[0x0e9] = 0x3a; // remove call 2CCD

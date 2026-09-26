@@ -378,6 +378,7 @@ ROM_END
 
 void xorworld_state::init_xorworld()
 {
+	// HACK: protection not understood
 	/*  patch some strange protection (without this, strange characters appear
 	    after level 5 and some pieces don't rotate properly some times) */
 

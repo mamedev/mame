@@ -37,13 +37,39 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> cbm2_expansion_window
+
+class cbm2_expansion_window
+{
+public:
+	cbm2_expansion_window(offs_t start) : m_space(nullptr), m_start(start) { }
+
+	void install_rom(offs_t start, offs_t end, void *baseptr) { m_space->install_rom(m_start + start, m_start + end, baseptr); }
+	void install_ram(offs_t start, offs_t end, void *baseptr) { m_space->install_ram(m_start + start, m_start + end, baseptr); }
+
+	template <typename R> void install_read_handler(offs_t start, offs_t end, R &&rhandler)
+	{ m_space->install_read_handler(m_start + start, m_start + end, std::forward<R>(rhandler)); }
+	template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler)
+	{ m_space->install_write_handler(m_start + start, m_start + end, std::forward<W>(whandler)); }
+	template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, R &&rhandler, W &&whandler)
+	{ m_space->install_readwrite_handler(m_start + start, m_start + end, std::forward<R>(rhandler), std::forward<W>(whandler)); }
+
+private:
+	friend class cbm2_expansion_slot_device;
+
+	address_space *m_space;
+	offs_t const m_start;
+};
+
+
 // ======================> cbm2_expansion_slot_device
 
 class device_cbm2_expansion_card_interface;
 
 class cbm2_expansion_slot_device : public device_t,
 									public device_single_card_slot_interface<device_cbm2_expansion_card_interface>,
-									public device_cartrom_image_interface
+									public device_cartrom_image_interface,
+									public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -60,11 +86,18 @@ public:
 	void write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
 
 	// cartridge interface
+	cbm2_expansion_window &bank1() { return m_bank1; }
+	cbm2_expansion_window &bank2() { return m_bank2; }
+	cbm2_expansion_window &bank3() { return m_bank3; }
+
 	int phi2() { return clock(); }
 
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -76,7 +109,20 @@ protected:
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
+	uint8_t *alloc_region(const char *tag);
+
 	device_cbm2_expansion_card_interface *m_card;
+
+private:
+	void cart_map(address_map &map) ATTR_COLD;
+
+	address_space_config const m_space_config;
+
+	cbm2_expansion_window m_bank1;
+	cbm2_expansion_window m_bank2;
+	cbm2_expansion_window m_bank3;
+
+	uint8_t m_data;
 };
 
 
@@ -90,15 +136,8 @@ public:
 	// construction/destruction
 	virtual ~device_cbm2_expansion_card_interface();
 
-	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; }
-	virtual void cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { }
-
 protected:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
-
-	std::unique_ptr<uint8_t[]> m_bank1;
-	std::unique_ptr<uint8_t[]> m_bank2;
-	std::unique_ptr<uint8_t[]> m_bank3;
 
 	cbm2_expansion_slot_device *m_slot;
 };

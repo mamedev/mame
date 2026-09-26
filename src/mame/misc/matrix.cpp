@@ -151,13 +151,13 @@ ROM_START( matrix )
 ROM_END
 
 
-void matrix_state::init_decryption() // at least enough to see strings from various programs like DOS-C, PMODE/W, UPX, etc
+void matrix_state::init_decryption()
 {
+	// at least enough to see strings from various programs like DOS-C, PMODE/W, UPX, etc
 	uint8_t *rom = memregion("unsorted")->base();
 	std::vector<uint8_t> buffer(0x300000);
 
 	memcpy(&buffer[0], rom, 0x300000);
-
 
 	for (int i = 0; i < 0x300000; i++)
 	{

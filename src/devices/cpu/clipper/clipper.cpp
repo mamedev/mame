@@ -115,13 +115,13 @@ void clipper_device::device_start()
 
 	// integer regsters
 	for (int i = 0; i < get_ireg_count(); i++)
-		state_add(CLIPPER_UREG + i, util::string_format("ur%d", i).c_str(), m_ru[i]);
+		state_add(CLIPPER_UREG + i, util::string_format("ur%d", i), m_ru[i]);
 	for (int i = 0; i < get_ireg_count(); i++)
-		state_add(CLIPPER_SREG + i, util::string_format("sr%d", i).c_str(), m_rs[i]);
+		state_add(CLIPPER_SREG + i, util::string_format("sr%d", i), m_rs[i]);
 
 	// floating point registers
 	for (int i = 0; i < get_freg_count(); i++)
-		state_add(CLIPPER_FREG + i, util::string_format("f%d", i).c_str(), m_f[i]);
+		state_add(CLIPPER_FREG + i, util::string_format("f%d", i), m_f[i]);
 }
 
 void clipper_c400_device::device_start()

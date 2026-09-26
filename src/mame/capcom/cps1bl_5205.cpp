@@ -596,7 +596,7 @@ void cps1bl_5205_state::init_captcommb2()
 
 	init_mtwinsb();
 
-	// patch - fix invisible test screen at start
+	// HACK: patch invisible test screen at start
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x65c] = 0x68;
 	rom[0x7b0] = 0x68;

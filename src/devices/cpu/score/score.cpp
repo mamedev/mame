@@ -87,13 +87,13 @@ void score7_cpu_device::device_start()
 	state_add(SCORE_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<0x20; i++)
-		state_add(SCORE_GPR + i, string_format("r%d", i).c_str(), m_gpr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_GPR + i, string_format("r%d", i), m_gpr[i]).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<0x20; i++)
-		state_add(SCORE_CR + i, string_format("cr%d", i).c_str(), m_cr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_CR + i, string_format("cr%d", i), m_cr[i]).callimport().callexport().formatstr("%08X");
 
 	for(int i=0; i<3; i++)
-		state_add(SCORE_SR + i, string_format("sr%d", i).c_str(), m_sr[i]).callimport().callexport().formatstr("%08X");
+		state_add(SCORE_SR + i, string_format("sr%d", i), m_sr[i]).callimport().callexport().formatstr("%08X");
 
 	state_add(SCORE_CEH, "ceh", REG_CEH).callimport().callexport().formatstr("%08X");
 	state_add(SCORE_CEL, "cel", REG_CEL).callimport().callexport().formatstr("%08X");

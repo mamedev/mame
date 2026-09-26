@@ -200,7 +200,7 @@ void sapphire_state::init_chesstea()
 	// 0F90: 4000      bt      h'0f92
 	// 0F92: 38DB      mov.b   r0l, @h'ffdb ; write TDR
 
-	// swap SCI0 SSR/TDR write order
+	// HACK: swap SCI0 SSR/TDR write order
 	rom[0x0f8c/2] = rom[0x0f8a/2];
 	rom[0x0f8a/2] = rom[0x0f88/2];
 	rom[0x0f88/2] = rom[0x0f92/2];

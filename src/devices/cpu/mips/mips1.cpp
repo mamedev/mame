@@ -301,7 +301,7 @@ void mips1core_device_base::device_start()
 	state_add(MIPS1_COP0 + COP0_Status,   "SR",        m_cop0[COP0_Status]);
 
 	for (unsigned i = 0; i < std::size(m_r); i++)
-		state_add(MIPS1_R0 + i, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(MIPS1_R0 + i, util::string_format("R%d", i), m_r[i]);
 
 	state_add(MIPS1_HI, "HI", m_hi);
 	state_add(MIPS1_LO, "LO", m_lo);
@@ -1339,7 +1339,7 @@ void mips1_device_base::device_start()
 	{
 		state_add(MIPS1_FCR31, "FCSR", m_fcr31);
 		for (unsigned i = 0; i < std::size(m_f); i++)
-			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
+			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2), m_f[i]);
 	}
 
 	save_item(NAME(m_reset_time));

@@ -423,4 +423,22 @@ inline const device_state_entry *device_state_interface::state_find_entry(int in
 	return nullptr;
 }
 
+
+//**************************************************************************
+//  EXTERNAL TEMPLATES
+//**************************************************************************
+
+extern template class device_state_register<u8>;
+extern template class device_state_register<u16>;
+extern template class device_state_register<u32>;
+extern template class device_state_register<u64>;
+extern template class device_latched_functional_state_register<u8>;
+extern template class device_latched_functional_state_register<u16>;
+extern template class device_latched_functional_state_register<u32>;
+extern template class device_latched_functional_state_register<u64>;
+extern template class device_functional_state_register<u8>;
+extern template class device_functional_state_register<u16>;
+extern template class device_functional_state_register<u32>;
+extern template class device_functional_state_register<u64>;
+
 #endif // MAME_EMU_DISTATE_H

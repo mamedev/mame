@@ -1306,7 +1306,7 @@ int k056832_device::update_linemap(int page)
 }
 
 template<class BitmapClass>
-void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority)
+void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
 	u32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -1581,7 +1581,7 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 				if (last_dx == dx)
 				{
 					if (last_visible)
-						tmap->draw(screen, bitmap, drawrect, flags, priority);
+						tmap->draw(screen, bitmap, drawrect, flags, priority, priority_mask);
 					continue;
 				}
 				last_dx = dx;
@@ -1637,7 +1637,7 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 					drawrect.max_x = cliprect.max_x;
 
 				tmap->set_scrollx(0, dx);
-				tmap->draw(screen, bitmap, drawrect, flags, priority);
+				tmap->draw(screen, bitmap, drawrect, flags, priority, priority_mask);
 
 			} // end of line loop
 		} // end of column loop
@@ -1646,14 +1646,14 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 	m_active_layer = last_active;
 }
 
-void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority)
+void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
-	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority);
+	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority, priority_mask);
 }
 
-void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority)
+void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
-	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority);
+	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority, priority_mask);
 }
 
 

@@ -36,7 +36,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="msdos disk.d80" size="533248" crc="0cb75b48" sha1="5c2bcb6b84ede6ad991cca19a98a3a2998c79531" />
+				<rom name="msdos disk.d80" size="533248" crc="cae7da98" sha1="64deb408447adaad7beb5bd3a20ffb1dcf7b0085" />
 			</dataarea>
 		</part>
 	</software>

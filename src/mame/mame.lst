@@ -3052,34 +3052,54 @@ arcon
 atlntis6
 b18plus
 b493
+barons5
 bbust
+bclubs4
 belamis3
 bheroe
 bjagas17
 boss
+briscs5
+briscs6
 bullys11
 caipis7
+carats5
+coloss3
 daxxs4
 daxxs8
+diakp2
+diaks5
 duo
 elevens3
 endsp9
 fgames11
 figame3
 foxxs5
+gigas5
 glriasl4
 glriasl5
 graffity
 hardrock
+heroldp5
 hslots5
 hxntanz
+jetsets5
 jjacksl
 kingcs2
 kingcs3
+kingpp5
+kingrp1
+lanzes5
 limbos3
+lordp5
+lords2
+lords5
 luxxpro
 m200s5
 machmehr
+mnrchp1
+mnrchp5
+mnrchs6
 neons12
 neons13
 oxigens7
@@ -3089,7 +3109,14 @@ pratngs5
 ptimes11
 qriscs4
 rexe
+rexsp5
+roys4
+rrunp1
+scoots2
+sfires5
 skys6
+sjumpe6
+smacs5
 snfairx2
 spdruns3
 spdruns4
@@ -3098,7 +3125,9 @@ tgnias11
 trpcals3
 tscool
 ttanpro
+twstiis3
 victoria
+winds2
 winplay
 xcross
 
@@ -26075,6 +26104,7 @@ chusenoh
 ddboy
 ddboya
 fuusenpn
+imohorip
 mariorou
 shuriboy
 slimekun
@@ -34274,6 +34304,14 @@ baraduke
 metrocrs
 metrocrsa
 
+@source:namco/bosco.cpp
+bosco
+bosco1
+bosco1o
+bosco3
+boscomd
+boscomdo
+
 @source:namco/cgang.cpp
 cgang
 
@@ -34284,6 +34322,14 @@ cswat
 bellybmbr
 dangbar
 sspanic
+
+@source:namco/digdug.cpp
+digdug
+digdug1
+digdugat
+digdugat1
+digsid
+dzigzag
 
 @source:namco/dkmb.cpp
 dkmb
@@ -34305,18 +34351,6 @@ funcube5
 gal3
 
 @source:namco/galaga.cpp
-bosco
-bosco1
-bosco1o
-bosco3
-boscomd
-boscomdo
-digdug
-digdug1
-digdugat
-digdugat1
-digsid
-dzigzag
 galaga
 galagamf
 galagamk
@@ -40120,6 +40154,12 @@ psion3c_de
 psion3mx
 psion3mx_fr
 psion3mx_nl
+
+@source:psion/psion5.cpp
+psion5
+psion5_de
+psion5_it
+psion5_nl
 
 @source:psion/psion5mx.cpp
 conan
@@ -50055,6 +50095,7 @@ paradise
 paradisea
 paradisee
 paradlx
+paradlxa
 penky
 penkyi
 tgtbal96

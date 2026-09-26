@@ -1195,23 +1195,9 @@ void sh7604_device::dvdnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: this is really a separate register that happens to be shared with DVDNTL
 	COMBINE_DATA(&m_dvdntl);
-	int32_t a = m_dvdntl;
-	int32_t b = m_dvsr;
-	LOG("SH2 div32+mod %d/%d\n", a, b);
-	if (b)
-	{
-		m_dvdntl = a / b;
-		m_dvdnth = a % b;
-		// TODO: 40 cycles
-	}
-	else
-	{
-		m_divu_ovf = true;
-		m_dvdntl = 0x7fffffff;
-		m_dvdnth = 0x7fffffff;
-		sh2_recalc_irq();
-		// TODO: 8 cycles
-	}
+	LOG("SH2 div32+mod %d/%d\n", int32_t(m_dvdntl), int32_t(m_dvsr));
+	// the dividend is sign-extended into DVDNTH, so this is a 64-bit division of a 32-bit value
+	divu_start(int32_t(m_dvdntl));
 }
 
 uint32_t sh7604_device::dvdnth_r()
@@ -1232,35 +1218,46 @@ void sh7604_device::dvdnth_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void sh7604_device::dvdntl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dvdntl);
-	int64_t a = m_dvdntl | ((uint64_t)m_dvdnth << 32);
-	int64_t b = (int32_t)m_dvsr;
-	LOG("SH2 div64+mod %d/%d\n", a, b);
-	if (b)
+	const int64_t dividend = int64_t((uint64_t(m_dvdnth) << 32) | m_dvdntl);
+	LOG("SH2 div64+mod %d/%d\n", dividend, int32_t(m_dvsr));
+	divu_start(dividend);
+}
+
+void sh7604_device::divu_start(int64_t dividend)
+{
+	const int32_t divisor = m_dvsr;
+	if (divisor && ((dividend != std::numeric_limits<int64_t>::min()) || (divisor != -1)))
 	{
-		int64_t q = a / b;
-		if (q != (int32_t)q)
+		const int64_t quotient = dividend / divisor;
+		if (quotient == int32_t(quotient))
 		{
-			m_divu_ovf = true;
-			m_dvdntl = 0x7fffffff;
-			m_dvdnth = 0x7fffffff;
-			sh2_recalc_irq();
-			// TODO: 6 cycles, plenty of these in saturn:vkyoute2
-		}
-		else
-		{
-			m_dvdntl = q;
-			m_dvdnth = a % b;
+			m_dvdntl = uint32_t(quotient);
+			m_dvdnth = uint32_t(dividend % divisor);
 			// TODO: 39 cycles
+			return;
 		}
 	}
-	else
+
+	// Overflow (zero divisor, or a quotient outside the signed 32-bit range): the operation
+	// ends after three steps of division, leaving the partial remainder in DVDNTH. With OVFIE
+	// clear, DVDNTL is set to the maximum value when a positive quotient overflows and to the
+	// minimum value when a negative one does (SH7604 manual 10.3.3 and table 10.2).
+	int64_t remainder = dividend >> 32;
+	uint32_t quotient = uint32_t(dividend);
+	for (int i = 0; i < 3; i++)
 	{
-		m_divu_ovf = true;
-		m_dvdntl = 0x7fffffff;
-		m_dvdnth = 0x7fffffff;
-		sh2_recalc_irq();
-		// TODO: 6 cycles
+		const bool subtract = (remainder < 0) == (divisor < 0);
+		remainder = (remainder << 1) | BIT(quotient, 31);
+		quotient <<= 1;
+		remainder += subtract ? -int64_t(divisor) : int64_t(divisor);
+		quotient |= ((remainder < 0) == (divisor < 0)) ? 1 : 0;
 	}
+	const bool negative = (dividend < 0) != (divisor < 0);
+	m_dvdnth = uint32_t(remainder);
+	m_dvdntl = m_divu_ovfie ? quotient : negative ? 0x80000000 : 0x7fffffff;
+	m_divu_ovf = true;
+	sh2_recalc_irq();
+	// TODO: 6 cycles
 }
 
 /*

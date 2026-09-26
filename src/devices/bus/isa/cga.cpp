@@ -2147,3 +2147,45 @@ isa8_cga_chameleon_device::isa8_cga_chameleon_device(const machine_config &mconf
 	m_charram(0x1000)
 {
 }
+
+
+/* Applied Engineering PC Transporter
+ *
+ * The card's CGA is a second screen in an Apple II, and the PC Transporter's own software
+ * programs the CRTC with a horizontal total of 127 (80 column) or 63 (40 column) characters
+ * rather than the IBM card's 114/57.
+ */
+
+DEFINE_DEVICE_TYPE(ISA8_CGA_PCXPORT, isa8_cga_pcxport_device, "cga_pcxport", "Applied Engineering PC Transporter CGA")
+
+isa8_cga_pcxport_device::isa8_cga_pcxport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, ISA8_CGA_PCXPORT, tag, owner, clock)
+{
+}
+
+void isa8_cga_pcxport_device::device_add_mconfig(machine_config &config)
+{
+	isa8_cga_device::device_add_mconfig(config);
+
+	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_pcxport_device::reconfigure));
+}
+
+MC6845_RECONFIGURE( isa8_cga_pcxport_device::reconfigure )
+{
+	// The vertical visible area stays put: CGA graphics modes always show 200 lines
+	// regardless of what the CRTC's row count says.  The totals and the frame period do
+	// have to follow the CRTC, though - the card draws incrementally off the CRTC's
+	// hsync (see hsync_changed), so if the CRTC's line rate and the screen's line rate
+	// disagree the two walk away from each other and rows land in the wrong places.
+	rectangle curvisarea = m_screen->visible_area();
+	m_screen->configure(width, height, rectangle(visarea.min_x, visarea.max_x, curvisarea.min_y, curvisarea.max_y), frame_period);
+}
+
+MC6845_UPDATE_ROW( isa8_cga_pcxport_device::crtc_update_row )
+{
+	// The row goes where the screen asked for it, not where this card's own count of HSYNCs
+	// since VSYNC says.  Those numbers disagree when there is more than one screen in the system.
+	m_y = y;
+
+	isa8_cga_device::crtc_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+}

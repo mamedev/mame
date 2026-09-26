@@ -2451,6 +2451,9 @@ void model2_state::sound_ready_w(int state)
 
 /* Model 2 sound board emulation */
 
+// TODO: modernize, checkout if it's actually same as Model 3
+// also none of the Model 2 games actually has more than 0x800000 (wtf),
+// so this will actually never trigger ...
 void model2_state::model2snd_ctrl(u16 data)
 {
 	// handle sample banking
@@ -3105,6 +3108,7 @@ void model2c_state::topskatr(machine_config &config)
 	io.an_port_callback<1>().set_ioport("SLIDE");
 
 	DSB2(config, m_dsb2);
+	// TODO: should be chained with SCSP EXTS not being direct
 	m_dsb2->add_route(0, "speaker", 1.0, 0);
 	m_dsb2->add_route(1, "speaker", 1.0, 1);
 

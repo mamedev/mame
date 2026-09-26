@@ -850,12 +850,12 @@ void m68hc05_device::add_port_state(std::array<bool, PORT_COUNT> const &ddr)
 	for (unsigned i = 0; PORT_COUNT > i; ++i)
 	{
 		if (m_port_bits[i])
-			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i).c_str(), m_port_latch[i]).mask(m_port_bits[i]);
+			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i), m_port_latch[i]).mask(m_port_bits[i]);
 	}
 	for (unsigned i = 0; PORT_COUNT > i; ++i)
 	{
 		if (ddr[i] && m_port_bits[i])
-			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i).c_str(), m_port_ddr[i]).mask(m_port_bits[i]);
+			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i), m_port_ddr[i]).mask(m_port_bits[i]);
 	}
 }
 

@@ -130,7 +130,6 @@ void pega1a_device::device_start()
 
 	ega_save_state();
 
-	save_item(NAME(m_misc_output));
 	save_item(NAME(m_ext_mode_color));
 	save_item(NAME(m_ext_mode_mono));
 	save_item(NAME(m_herc_control));

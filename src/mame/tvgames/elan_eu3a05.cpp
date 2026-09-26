@@ -926,7 +926,8 @@ ROM_END
 
 void elan_eu3a13_state::init_sudelan3()
 {
-	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
+	// HACK: skip infinite loop
+	// why is this needed? does it think we've soft shutdown?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x0fcc] = 0xea;
 	ROM[0x0fcd] = 0xea;
@@ -935,7 +936,8 @@ void elan_eu3a13_state::init_sudelan3()
 
 void elan_eu3a13_state::init_sudelan()
 {
-	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown?)
+	// HACK: avoid jump to infinite loop
+	// why is this needed? does it think we've soft shutdown?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0xd0f] = 0xea;
 	ROM[0xd10] = 0xea;
@@ -944,7 +946,8 @@ void elan_eu3a13_state::init_sudelan()
 
 void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 {
-	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown? or I/O failure?)
+	// HACK: avoid jump to infinite loop
+	// why is this needed? does it think we've soft shutdown? or I/O failure?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x1f8d92] = 0xea;
 	ROM[0x1f8d93] = 0xea;

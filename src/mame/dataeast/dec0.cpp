@@ -2254,7 +2254,7 @@ void slyspy_state::slyspy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &slyspy_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(slyspy_state::irq6_line_hold)); /* VBL, apparently it auto-acks */
 
-	// TODO: both games doesn't like /3 here, MT #06740
+	// TODO: both games doesn't like /3 here, MT06740
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(12'000'000)/2/2)); /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
 	audiocpu.set_addrmap(AS_PROGRAM, &slyspy_state::sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
