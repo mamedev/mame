@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:wurthless-elektroniks
 /****************************************************************************
 
     Arduboy hardware
@@ -78,6 +80,9 @@
     Games based off the Arduboy2 library can work and are somewhat playable.
     This may be because they use the sleep opcode instead of relying on
     specific timer values.
+
+    MACHINE_IMPERFECT_GRAPHICS should be set until SSD1306 features are
+    fully implemented. There are many modes that Arduboy games don't use.
 
 ****************************************************************************/
 
@@ -517,11 +522,17 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 //////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( arduboy )
+    // games will work without the bootloader, but it would be ideal
+    // in the long term to include a loader here and run it.
+    // that won't work as long as there are AVR8 limitations however.
+
     ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )
 ROM_END
 
+// for documentation purposes: the Arduboy FX bootloader.
+// CRC(4c49b0f5) SHA1(66a7411c46c04a8089a7ddfb5ffd9809dd08a21f)
+
 } // anonymous namespace
 
-
 //   YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY    FULLNAME
-CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy",    MACHINE_NOT_WORKING)
+CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING)

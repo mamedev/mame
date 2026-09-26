@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:wurthless-elektroniks
 /****************************************************************************
 
     Solomon Systech SSD1306 OLED display driver
@@ -75,7 +77,6 @@ static const int SCROLL_FRAME_FREQUENCY_COUNT[8] =
     25,   // 0b110
     2     // 0b111
 };
-
 
 DEFINE_DEVICE_TYPE(SSD1306, ssd1306_device, "ssd1306", "Solomon Systech SSD1306 OLED display driver")
 
@@ -445,8 +446,7 @@ void ssd1306_device::exec_command(uint8_t data)
             if (m_command_fifo[0] == 0x8D)
             {
                 COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
-                // charge pump setting, which amazingly isn't grouped
-                // in with the rest of the commands...
+                // charge pump setting; don't really need to implement it here
                 return;
             }
 
@@ -539,12 +539,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
     // left to right 
 
     int address = (m_page_address_pointer * 128) + m_column_address_pointer;
-    // logerror("%s: write data %02x -> %04x (in addressing mode %d)\n",
-    //          tag(),
-    //          data,
-    //          address,
-    //          m_addressing_mode);
-
+    
     m_gddram[address] = data;
 
     switch(m_addressing_mode)

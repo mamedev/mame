@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:wurthless-elektroniks
 
 #ifndef MAME_VIDEO_SSD1306_H
 #define MAME_VIDEO_SSD1306_H
