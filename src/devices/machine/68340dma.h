@@ -49,7 +49,7 @@ private:
 		uint8_t done_out;
 	};
 
-	channel_state m_channel[2];
+	channel_state m_channel[2]{};
 	m68340_cpu_device *m_cpu;
 	devcb_write_line::array<2> m_dack_out_cb;
 	devcb_write_line::array<2> m_done_out_cb;

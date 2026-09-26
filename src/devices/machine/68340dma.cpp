@@ -371,6 +371,7 @@ void mc68340_dma_module_device::device_reset()
 		channel.done_out = 1;
 	}
 	restore_outputs();
+	m_cpu->update_ipl();
 }
 
 
@@ -385,6 +386,7 @@ void mc68340_dma_module_device::module_reset()
 		set_dack(channel_number, 1);
 		set_done_output(channel_number, 1);
 	}
+	m_cpu->update_ipl();
 }
 
 
