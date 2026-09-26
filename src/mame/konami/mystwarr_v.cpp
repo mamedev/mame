@@ -57,14 +57,11 @@ void mystwarr_state::decode_tiles()
 
 
 // Mystic Warriors requires tile based blending.
+// The tile's mix code bits become its category, which konamigx_state::gx_draw_basic_tilemaps
+// resolves against the K055555's V INMIX ON when it draws.
 K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 {
-	const uint8_t mix_code = attr >> 2 & 0b11;
-	if (mix_code)
-	{
-		priority = 1;
-		m_last_alpha_tile_mix_code = mix_code;
-	}
+	priority = attr >> 2 & 0b11;
 
 	color = m_layer_colorbase[layer] | (color >> 1 & 0x0f);
 }
@@ -72,12 +69,7 @@ K056832_CB_MEMBER(mystwarr_state::mystwarr_tile_callback)
 K056832_CB_MEMBER(mystwarr_state::viostorm_tile_callback)
 {
 	// metamrph either uses bits 0-1 or 4-5, not sure which
-	const uint8_t mix_code = attr & 0b11;
-	if (mix_code)
-	{
-		priority = 1;
-		m_last_alpha_tile_mix_code = mix_code;
-	}
+	priority = attr & 0b11;
 
 	color = m_layer_colorbase[layer] | (color >> 2 & 0x0f);
 }
@@ -280,8 +272,7 @@ uint32_t mystwarr_state::screen_update_mystwarr(screen_device &screen, bitmap_rg
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4) << 5;
 
-	int mixerflags = m_last_alpha_tile_mix_code << 30;
-	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, mixerflags, nullptr, 0);
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, 0, nullptr, 0, 0, nullptr, 0);
 	return 0;
 }
 
@@ -296,8 +287,7 @@ uint32_t mystwarr_state::screen_update_metamrph(screen_device &screen, bitmap_rg
 
 	m_sprite_colorbase = m_k055555->K055555_get_palette_index(4) << 4;
 
-	int mixerflags = m_last_alpha_tile_mix_code << 30;
-	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, mixerflags, nullptr, 0);
+	konamigx_mixer(screen, bitmap, cliprect, nullptr, GXSUB_K053250 | GXSUB_4BPP, nullptr, 0, 0, nullptr, 0);
 	return 0;
 }
 

@@ -797,21 +797,25 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 	// its priority code, or 0xff like the back color when SHD ON keeps shadows off it
 	const u8 topmost = BIT(m_k055555->K055555_read_register(K55_SHD_ON), layer) ? pri : 0xff;
 
-	// Category 0 is the tiles with no mix code of their own: they blend with
-	// the layer's internal code (V INMIX where V INMIX ON routes it).
-	// Categories 1-3 are the tiles whose colour bits 5:4 carry a mix code
-	// (the tile callback, K055555 p.62 7.2.6): each is drawn with that code's
-	// K054338 level. Every tile blends with its own code, rather than all of
-	// them with the code of whichever tile the callback saw last.
+	// A tile's category is assigned via the mix code bits from the tile callback.
+	// V INMIX ON selects, per bit, whether the mix code comes from the tile or
+	// from V INMIX, so each category is drawn with the '338 level of the code
+	// that results. Every tile blends with its own code, and resolving it here
+	// keeps cached tiles right when a game rewrites V INMIX or V INMIX ON.
+	const u8 von = m_vmixon >> layer2 & 3;
+	const u8 internal = m_vinmix >> layer2 & von;
+
+	if (j == GXMIX_BLEND_FORCE || von == 3)
+	{
+		// every tile blends with the same code
+		const int mix = (j == GXMIX_BLEND_FORCE) ? (mixerflags >> (layer2 + 16) & 3) : internal;
+		gx_draw_tilemap_category(screen, bitmap, cliprect, layer, 0, flags | TILEMAP_DRAW_ALL_CATEGORIES, m_k054338->set_alpha_level(mix), topmost);
+		return;
+	}
+
 	for (u8 cat = 0; cat < 4; cat++)
 	{
-		int mix;
-		if (j == GXMIX_BLEND_FORCE)
-			mix = mixerflags >> (layer2 + 16) & 3;
-		else if (cat == 0)
-			mix = (m_vinmix >> layer2 & 3) & (m_vmixon >> layer2 & 3);
-		else
-			mix = cat;
+		const int mix = (cat & ~von) | internal;
 		gx_draw_tilemap_category(screen, bitmap, cliprect, layer, cat, flags, m_k054338->set_alpha_level(mix), topmost);
 	}
 }
@@ -855,8 +859,8 @@ void konamigx_state::gx_draw_tilemap_category(screen_device &screen, bitmap_rgb3
 			if (src[x] == 0xffff) continue;
 			const u32 s = pens[src[x]];
 			const u32 scaled = ((((s >> 16) & 0xff) * mul >> 8) << 16)
-			                 | ((((s >> 8) & 0xff) * mul >> 8) << 8)
-			                 | ((s & 0xff) * mul >> 8);
+							 | ((((s >> 8) & 0xff) * mul >> 8) << 8)
+							 | ((s & 0xff) * mul >> 8);
 			dst[x] = add_blend_r32(dst[x], scaled);
 		}
 	}
@@ -1112,13 +1116,11 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 
 	code = (m_gx_tilebanks[(d & 0xe000) >> 13] << 13) + (d & 0x1fff);
 
-	// The tile's own mix code (K055555 p.62 7.2.6): its colour bits 5:4 where
-	// V INMIX ON does not route them to the palette, V INMIX's where it does.
-	// It becomes the tile's category, and gx_draw_basic_tilemaps draws each
-	// category with that code's K054338 level. -1 (V INMIX ON = 3, no bits
-	// from the tile) is category 0, the layer's internal code.
-	const int emx = K055555GX_decode_vmixcolor(layer, color);
-	priority = emx > 0 ? emx : 0;
+	// The tile's mix code bits are its colour bits 5:4 (K055555 p.62 7.2.6).
+	// They become the tile's category, and gx_draw_basic_tilemaps resolves
+	// them against V INMIX ON when it draws.
+	priority = color >> 4 & 3;
+	K055555GX_decode_vmixcolor(layer, color);
 }
 
 // The mix code was read from attr bits 5:4 (salmndr2) and 7:6 (alpha) here
