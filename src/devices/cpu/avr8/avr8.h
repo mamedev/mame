@@ -676,7 +676,7 @@ protected:
 
 	// common path for device_reset() and the
 	// templatified avr_device<NumTimers>::device_reset()
-	void common_reset(); 
+	void common_reset();
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }

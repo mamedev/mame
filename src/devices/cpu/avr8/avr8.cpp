@@ -1736,8 +1736,8 @@ void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 	if (m_r[TCNT0] == 0xFF)
 	{
 		m_r[TIFR0] |= TIFR0_TOV0_MASK;
-		update_interrupt(INTIDX_TOV0);		
-		
+		update_interrupt(INTIDX_TOV0);
+
 		m_r[TCNT0] = 0;
 
 		// TODO: clear both OC0x values here
@@ -3821,7 +3821,7 @@ void avr8_device<NumTimers>::execute_run()
 			((this)->*(m_op_funcs[op]))(op);
 			m_pc += 2;
 		}
-		
+
 		// pin_w() may have latched a PCIFR/EIFR flag from an arbitrary (possibly mid-instruction)
 		// external context; only take the actual interrupt here, at a safe instruction boundary
 		if (m_r[PCIFR])
