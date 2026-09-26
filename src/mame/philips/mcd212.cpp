@@ -250,7 +250,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			if (Path == 0)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 0: Weight Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_weight_factor[0][0] = (uint8_t)value;
+				m_weight_factor[0][0] = value & 0x3f;
 				update_matte_arrays();
 			}
 			break;
@@ -258,7 +258,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			if (Path == 1)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Path 1: Weight Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_weight_factor[1][0] = (uint8_t)value;
+				m_weight_factor[1][0] = value & 0x3f;
 				update_matte_arrays();
 			}
 			break;
@@ -325,10 +325,10 @@ uint32_t mcd212_device::get_backdrop_plane(int x, int y)
 		uint32_t argb = 0;
 		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
 			return argb;
-		return s_4bpp_color[0];
+		return s_4bpp_display_color[0];
 	}
 	else
-		return s_4bpp_color[m_backdrop_color];
+		return s_4bpp_display_color[m_backdrop_color];
 }
 
 void mcd212_device::process_ica()
@@ -659,6 +659,12 @@ const uint32_t mcd212_device::s_4bpp_color[16] =
 	0xff101010, 0xff1010e6, 0xff10e610, 0xff10e6e6, 0xffe61010, 0xffe610e6, 0xffe6e610, 0xffe6e6e6
 };
 
+const uint32_t mcd212_device::s_4bpp_display_color[16] =
+{
+	0xff000000, 0xff00007b, 0xff007b00, 0xff007b7b, 0xff7b0000, 0xff7b007b, 0xff7b7b00, 0xff7b7b7b,
+	0xff000000, 0xff0000f9, 0xff00f900, 0xff00f9f9, 0xfff90000, 0xfff900f9, 0xfff9f900, 0xfff9f9f9
+};
+
 template <bool MosaicA, bool MosaicB, bool OrderAB>
 void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out)
 {
@@ -681,9 +687,11 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	// If PAL and 'Standard' bit set, insert a 24px border on the left/right
 	if (border_width)
 	{
-		std::fill_n(out, border_width, s_4bpp_color[0]);
+		std::fill_n(out, border_width, s_4bpp_display_color[0]);
 		out += border_width;
 	}
+
+	const uint32_t *limit = m_dyuv_limit_lut + 0x100;
 
 	for (int x = 0; x < width; x++)
 	{
@@ -728,15 +736,19 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 		const int32_t weighted_b_g = ((plane_b_g - 16) * weight_b[x]) >> 6;
 		const int32_t weighted_b_b = ((plane_b_b - 16) * weight_b[x]) >> 6;
 
-		const uint8_t out_r = std::clamp(weighted_a_r + weighted_b_r + 16, 0, 255);
-		const uint8_t out_g = std::clamp(weighted_a_g + weighted_b_g + 16, 0, 255);
-		const uint8_t out_b = std::clamp(weighted_a_b + weighted_b_b + 16, 0, 255);
+		const uint32_t mixed_r = limit[weighted_a_r + weighted_b_r + 16];
+		const uint32_t mixed_g = limit[weighted_a_g + weighted_b_g + 16];
+		const uint32_t mixed_b = limit[weighted_a_b + weighted_b_b + 16];
+
+		const uint32_t out_r = limit[((int32_t(mixed_r) - 16) * 298 + 128) >> 8];
+		const uint32_t out_g = limit[((int32_t(mixed_g) - 16) * 298 + 128) >> 8];
+		const uint32_t out_b = limit[((int32_t(mixed_b) - 16) * 298 + 128) >> 8];
 		out[x] = 0xff000000 | (out_r << 16) | (out_g << 8) | out_b;
 	}
 
 	if (border_width)
 	{
-		std::fill_n(&out[width], border_width, s_4bpp_color[0]);
+		std::fill_n(&out[width], border_width, s_4bpp_display_color[0]);
 	}
 }
 
@@ -762,7 +774,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 
 	if ((0 <= y) && (y < 16))
 	{
-		const uint32_t color = s_4bpp_color[color_index];
+		const uint32_t color = s_4bpp_display_color[color_index];
 		const uint8_t resolution = (m_cursor_control & CURCNT_CUW) ? 1 : 2;
 		for (int x = 0; x < 16; x++)
 		{
@@ -1024,7 +1036,7 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			// If PAL and 'Standard' bit set, insert a 20-line border on the top/bottom
 			if ((scanline - m_ica_height < 20) || (scanline >= (m_total_height - 20)))
 			{
-				std::fill_n(out, 768, s_4bpp_color[0]);
+				std::fill_n(out, 768, s_4bpp_display_color[0]);
 				draw_line = false;
 			}
 		}
