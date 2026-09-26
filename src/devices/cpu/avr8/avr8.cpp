@@ -659,10 +659,10 @@ void atmega328_device::atmega328_internal_map(address_map &map)
 
 void atmega32u4_device::atmega32u4_internal_map(address_map &map)
 {
-
 	avr8_device::base_internal_map(map);
-	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
 
+	// fake USB PLL lock so that code that reads it is satisfied
+	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
 }
 
 void atmega644_device::atmega644_internal_map(address_map &map)
