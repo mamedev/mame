@@ -73,6 +73,8 @@ active-high (active == true).
 
 #include "emu.h"
 
+#include "matrixsynth_kbd.h"
+
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
@@ -1208,6 +1210,7 @@ private:
 	required_shared_ptr_array<u8, 2> m_voiceram;
 	memory_view m_mem_view;
 	memory_view m_voiceram_view;
+	required_device<matrix12_kbd_device> m_kbd;
 	required_ioport_array<2> m_pedal_io;
 
 	bool m_bsel;  // Bank select.
@@ -1219,6 +1222,7 @@ matrix12_state::matrix12_state(const machine_config &mconfig, device_type type, 
 	, m_voiceram(*this, "voiceboard_%u:voiceram", 0U)
 	, m_mem_view(*this, "mem_view")
 	, m_voiceram_view(*this, "voiceram_view")
+	, m_kbd(*this, "kbd")
 	, m_pedal_io(*this, "pedal_%u", 1U)
 	, m_bsel(false)
 {
@@ -1268,7 +1272,7 @@ u8 matrix12_state::datain_r()  // U50 (74LS367, processor board)
 	const u8 d2 = 1;  // TODO: implement.
 
 	// D7 - DOR*
-	const u8 d7 = 1;  // TODO: implement.
+	const u8 d7 = m_kbd->dor_neg_r();
 
 	// Buffer inputs for D3 and D4 not connected. Will likely resolve to 1.
 	// D5 and D6 not connected to buffer. Data bus pulled high.
@@ -1354,7 +1358,8 @@ void matrix12_state::maincpu_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram01");  // U40A-O[0-1]: BRAM0*, BRAM1*
 
 	// U40A-02: I/O* -> U40B (74LS139) when A12=0.
-	map(0x4000, 0x4fff).nopr();  // U40B-O[0, 1]: KBD0*, KBD1*  // TODO: implement.
+	map(0x4000, 0x4001).mirror(0x0ffc).r(m_kbd, FUNC(matrix12_kbd_device::kbd0_r));  // U40B-O0: KBD0*
+	map(0x4002, 0x4003).mirror(0x0ffc).r(m_kbd, FUNC(matrix12_kbd_device::kbd1_r));  // U40B-O1: KBD1*
 
 	// U40A-02: I/O* -> U41 (74LS138) when A12=1.
 	map(0x5000, 0x51ff).w(FUNC(matrix12_state::display_w)); // U41-O0: DISP* and DISPCLR*
@@ -1417,6 +1422,8 @@ void matrix12_state::matrix12(machine_config &config)
 	pit.set_clk<2>(16_MHz_XTAL / 8);  // 2 MHz
 	pit.out_handler<2>().set(FUNC(matrix12_state::pit_out2_changed));
 
+	MATRIX12_KBD(config, m_kbd, 16_MHz_XTAL / 16);  // 1 MHz
+
 	for (int i = 0; i < m_voiceboard.size(); ++i)
 	{
 		XPANDER_VOICEBOARD(config, m_voiceboard[i]);
@@ -1428,7 +1435,7 @@ void matrix12_state::matrix12(machine_config &config)
 	haltset.bit_handler<0>().set(m_voiceboard[0], FUNC(xpander_voiceboard_device::haltreq_w)).invert();  // HALTREQ0*
 	haltset.bit_handler<1>().set(m_voiceboard[1], FUNC(xpander_voiceboard_device::haltreq_w)).invert();  // HALTREQ1*
 	// Bit 2 not connected.
-	haltset.bit_handler<3>().set_output("kbdclr");  // KBDCLR
+	haltset.bit_handler<3>().set(m_kbd, FUNC(matrix12_kbd_device::kbdclr_w));  // KBDCLR
 	haltset.bit_handler<4>().set(FUNC(matrix12_state::voiceboard_reset_w)).invert();  // RES*
 	haltset.bit_handler<5>().set_output("cassmute").invert();  // CASSMUTE*
 	haltset.bit_handler<6>().set(FUNC(matrix12_state::banksel_w)).invert();  // BSEL*
@@ -1658,8 +1665,6 @@ INPUT_PORTS_START(matrix12)
 	PORT_BIT(0xff, 50, IPT_PADDLE_V) PORT_NAME("LEVER 1") PORT_MINMAX(0, 100)
 		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
 		PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
-
-	// TODO: add keyboard
 INPUT_PORTS_END
 
 ROM_START(xpander)
