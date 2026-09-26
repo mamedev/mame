@@ -710,7 +710,7 @@ void madam_device::vdlp_continue_w(int state)
 	if (m_vdlp.video_dma)
 	{
 		u32 y_base = (m_vdlp.y_src & ~1) * (m_vdlp.modulo);
-		u8 shift = ((m_vdlp.y_src & 1) ^ 1) * 16;
+		u8 shift = (~m_vdlp.y_src & 1) * 16;
 		for (int x = 0; x < m_display_hclocks; x++)
 		{
 			const u32 dot = m_dma32_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
@@ -1373,7 +1373,7 @@ u16 madam_device::get_fb_pixel(int xpos, int ypos)
 	fb_address += (xpos << 2);
 
 	u32 dst_data = m_dma32_read_cb(fb_address);
-	u8 dst_shift = ((ypos ^ 1) & 1) * 16;
+	u8 dst_shift = (~ypos & 1) * 16;
 	return (dst_data >> dst_shift) & 0x7fff;
 }
 
@@ -1386,7 +1386,7 @@ void madam_device::set_fb_pixel(int xpos, int ypos, u16 pix_data)
 	dst_address += (xpos << 2);
 
 	u32 dst_data = m_dma32_read_cb(dst_address);
-	u8 dst_shift = ((ypos ^ 1) & 1) * 16;
+	u8 dst_shift = (~ypos & 1) * 16;
 	dst_data &= dst_shift ? 0xffff : 0xffff0000;
 
 	m_dma32_write_cb(dst_address, (pix_data << dst_shift) | dst_data);

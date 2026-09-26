@@ -1073,7 +1073,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0x000000, 0x01ffff).rom(); // BIOS ROM
 	map(0x200000, 0x3fffff).rom(); // main program ROM
 	map(0x400000, 0x7fffff).rom(); // data ROM
-	map(0xc00000, 0xc1ffff).ram().share("workram");
+	map(0xc00000, 0xc1ffff).ram().share(m_workram);
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
 	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -1103,13 +1103,13 @@ void konamigx_state::gx_type1_map(address_map &map)
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
 	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
 	map(0xe00000, 0xe0001f).rw(m_type1_roz, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
-	map(0xe20000, 0xe2000f).writeonly().share("type1_psac4_ctrl"); // 056540 registers (partially understood)
+	map(0xe20000, 0xe2000f).writeonly().share(m_type1_psac4_ctrl); // 056540 registers (partially understood)
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type1_bank_w)); // ROM and palette lookup banks
 	map(0xe80000, 0xe81fff).rw(m_type1_roz, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // chips 21L+19L / S
 	map(0xec0000, 0xedffff).ram().w(FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
 	map(0xf00000, 0xf3ffff).r(FUNC(konamigx_state::type1_roz_r1));  // ROM readback
 	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
-	map(0xf80000, 0xf80fff).ram().share("type1_psac4_lram"); // chip 21Q / S, 056540 line parameters
+	map(0xf80000, 0xf80fff).ram().share(m_type1_psac4_lram); // chip 21Q / S, 056540 line parameters
 	map(0xfc0000, 0xfc00ff).rw(FUNC(konamigx_state::type1_lookup_r), FUNC(konamigx_state::type1_lookup_w)).umask32(0xff00ff00); // chip 22N / S
 }
 
@@ -1132,10 +1132,10 @@ void konamigx_state::gx_type3_map(address_map &map)
 	gx_base_memmap(map);
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
+	map(0xe00000, 0xe0001f).ram().share(m_k053936_0_ctrl);
 	//map(0xe20000, 0xe20003).nopw();
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
-	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");
+	map(0xe60000, 0xe60fff).ram().share(m_k053936_0_linectrl);
 	map(0xe80000, 0xe83fff).ram().share("paletteram");  // main monitor palette
 	map(0xea0000, 0xea3fff).ram().share("subpaletteram");
 	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));
@@ -1147,10 +1147,10 @@ void konamigx_state::gx_type4_map(address_map &map)
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xd90000, 0xd97fff).ram();
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
+	map(0xe00000, 0xe0001f).ram().share(m_k053936_0_ctrl);
 	map(0xe20000, 0xe20003).nopw();
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
-	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");  // 29C & 29G (PSAC2 line control)
+	map(0xe60000, 0xe60fff).ram().share(m_k053936_0_linectrl);  // 29C & 29G (PSAC2 line control)
 	map(0xe80000, 0xe87fff).ram().share("paletteram"); // 11G/13G/15G (main screen palette RAM)
 	map(0xea0000, 0xea7fff).ram().share("subpaletteram"); // 5G/7G/9G (sub screen palette RAM)
 	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
@@ -1163,7 +1163,7 @@ void konamigx_state::sexyparoebl_map(address_map &map) // TODO: verify everythin
 	map(0x000000, 0x01ffff).rom(); // BIOS ROM
 	map(0x200000, 0x3fffff).rom(); // main program ROM
 	map(0x400000, 0x7fffff).rom(); // data ROM
-	map(0xc00000, 0xc1ffff).ram().share("workram");
+	map(0xc00000, 0xc1ffff).ram().share(m_workram);
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
 	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));

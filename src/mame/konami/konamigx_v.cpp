@@ -783,7 +783,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 {
 	const u8 disp = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
-	if (!(disp & (1 << layer))) return;
+	if (!BIT(disp, layer)) return;
 
 	set_brightness(layer);
 
@@ -791,7 +791,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 	const u8 j = mixerflags >> layer2 & 3;
 
 	u32 flags = 0;
-	if (mixerflags & 1 << (layer + 12)) flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
+	if (BIT(mixerflags, layer + 12)) flags |= K056382_DRAW_FLAG_FORCE_XYSCROLL;
 
 	// what the layer records as the topmost screen for gx_draw_deferred_shadows:
 	// its priority code, or 0xff like the back color when SHD ON keeps shadows off it
@@ -843,16 +843,16 @@ void konamigx_state::gx_draw_tilemap_category(screen_device &screen, bitmap_rgb3
 	// what is under it, per channel and clamped, so black adds nothing and
 	// stays transparent. tilemap.cpp has no additive draw, so the
 	// category goes through an indexed scratch bitmap first.
-	if (!m_gx_tile_scratch || m_gx_tile_scratch->width() < bitmap.width() || m_gx_tile_scratch->height() < bitmap.height())
-		m_gx_tile_scratch = std::make_unique<bitmap_ind16>(bitmap.width(), bitmap.height());
-	m_gx_tile_scratch->fill(0xffff, cliprect);
-	m_k056832->tilemap_draw(screen, *m_gx_tile_scratch, cliprect, layer, flags, top_pri, top_mask);
+	if (m_gx_tile_scratch.width() < bitmap.width() || m_gx_tile_scratch.height() < bitmap.height())
+		m_gx_tile_scratch.resize(bitmap.width(), bitmap.height());
+	m_gx_tile_scratch.fill(0xffff, cliprect);
+	m_k056832->tilemap_draw(screen, m_gx_tile_scratch, cliprect, layer, flags, top_pri, top_mask);
 
 	pen_t const *const pens = m_palette->pens();
 	const u32 mul = u32(alpha) + 1;   // 255 is a full add
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u16 const *const src = &m_gx_tile_scratch->pix(y);
+		u16 const *const src = &m_gx_tile_scratch.pix(y);
 		u32 *const dst = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
