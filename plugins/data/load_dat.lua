@@ -157,11 +157,11 @@ function datfile.open(file, vertag, fixupcb)
 		return iter
 	end
 
-	for info, data in gmatchpos() do
+	for rawinfo, rawdata in gmatchpos() do
 		local tags = {}
 		local infotype
-		info = info:gsub(utf8.char(0xfeff), '') -- remove byte order marks
-		data = data:gsub(utf8.char(0xfeff), '')
+		local info = rawinfo:gsub(utf8.char(0xfeff), '') -- remove byte order marks
+		local data = rawdata:gsub(utf8.char(0xfeff), '')
 		for s in info:gmatch('[\n\r]$([^\n\r]*)') do
 			if s:find('=', 1, true) then
 				local m1, m2 = s:match('([^=]*)=(.*)')
