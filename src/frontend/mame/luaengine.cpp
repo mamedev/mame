@@ -114,34 +114,44 @@ public:
 		if (m_busy)
 			return false;
 
-		sol::load_result res = m_state.load(scr);
-		if (!res.valid())
+		// res pops m_state's stack when destroyed, so it has to be gone before the worker starts
+		sol::protected_function func;
 		{
-			sol::error err = res;
-			luaL_error(s, err.what());
-			return false; // unreachable - luaL_error throws
+			sol::load_result res = m_state.load(scr);
+			if (!res.valid())
+			{
+				sol::error err = res;
+				luaL_error(s, err.what());
+				return false; // unreachable - luaL_error throws
+			}
+			func = res.get<sol::protected_function>();
 		}
 
 		std::thread th(
-				[this, func = res.get<sol::protected_function>()] ()
+				[this, func = std::move(func)] () mutable
 				{
-					auto ret = func();
-					std::unique_lock<std::mutex> result_lock(m_guard);
-					if (ret.valid())
+					// ret and func touch m_state when released, so both go under the lock and before m_busy clears
+					std::unique_lock<std::mutex> result_lock(m_guard, std::defer_lock);
 					{
-						auto result = ret.get<std::optional<char const *> >();
-						if (!result)
-							osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
-						else if (!*result)
-							m_result.clear();
+						auto ret = func();
+						result_lock.lock();
+						if (ret.valid())
+						{
+							auto result = ret.get<std::optional<char const *> >();
+							if (!result)
+								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
+							else if (!*result)
+								m_result.clear();
+							else
+								m_result = *result;
+						}
 						else
-							m_result = *result;
+						{
+							sol::error err = ret;
+							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
+						}
 					}
-					else
-					{
-						sol::error err = ret;
-						osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
-					}
+					func = sol::protected_function();
 					m_busy = false;
 				});
 		m_busy = true;
