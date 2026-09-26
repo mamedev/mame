@@ -89,7 +89,12 @@ void ms32_state::video_start()
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	m_brt[0] = m_brt[1] = 0xffff;
+	m_brt1_r = m_brt1_g = m_brt1_b = 0x100;
 	m_sprite_ctrl[0x10/4] = 0x8000;
+
+	m_screen->register_screen_bitmap(m_layer_tx);
+	m_screen->register_screen_bitmap(m_layer_bg);
+	m_screen->register_screen_bitmap(m_layer_roz);
 
 	save_pointer(NAME(m_sprram_buffer), m_objectram_size);
 	save_item(NAME(m_temp_bitmap_tilemaps));
@@ -100,6 +105,12 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_r));
 	save_item(NAME(m_brt_g));
 	save_item(NAME(m_brt_b));
+	save_item(NAME(m_brt1_r));
+	save_item(NAME(m_brt1_g));
+	save_item(NAME(m_brt1_b));
+	save_item(NAME(m_layer_tx));
+	save_item(NAME(m_layer_bg));
+	save_item(NAME(m_layer_roz));
 }
 
 tilemap_t &ms32_state::create_tx_tilemap()
@@ -129,10 +140,7 @@ void ms32_f1superbattle_state::video_start()
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
 	m_extra_tilemap->set_transparent_pen(0);
 
-	m_screen->register_screen_bitmap(m_layer_tx);
-	m_screen->register_screen_bitmap(m_layer_bg);
 	m_screen->register_screen_bitmap(m_layer_road);
-	m_screen->register_screen_bitmap(m_layer_roz);
 
 	m_txram_latch.assign(m_txram.length(), 0);
 	save_item(NAME(m_txram_latch));
@@ -245,39 +253,19 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 /********** PALETTE WRITES **********/
 
 
-// TODO: fix p47aces brightness
-// intro text should actually appear one line at a time instead of fading-in altogether,
-// see https://youtu.be/PQsefFtqAwA
+// Brightness notes (applied at mix time, not here):
+// bnstars gameplay: 0x0000 0x0000 0x8080 0x0080
+// desertwr ranking: 0x8080 0xff80 0x0000 0x0000
+// gametngk: sets upper words of first two regs as 0x0100xxxx (discarded?)
+//          gameplay:0x0000 0x0000 0x2020 0x0020
+//          continue:0x5050 0x0050 0x2020 0x0020
+// hayaosi3 title:   0x7070 0x0070 0x0000 0x0000
+// p47aces: bomb on stage clear fade out (untested, tbd)
 void ms32_state::update_color(int color)
 {
-	// anything above text layer is unaffected (maybe a priority setting?)
-	// that means this must happen at mixing time rather than here ...
-	// bnstars gameplay: 0x0000 0x0000 0x8080 0x0080
-	// desertwr ranking: 0x8080 0xff80 0x0000 0x0000
-	// gametngk: sets upper words of first two regs as 0x0100xxxx (discarded?)
-	//          gameplay:0x0000 0x0000 0x2020 0x0020
-	//          continue:0x5050 0x0050 0x2020 0x0020
-	// hayaosi3 title:   0x7070 0x0070 0x0000 0x0000
-	// p47aces: bomb on stage clear fade out (untested, tbd)
-
-	int r,g,b;
-
-	/* I'm not sure how the brightness should be applied, currently I'm only
-	   affecting bg & sprites, not fg.
-	   The second brightness control might apply to shadows, see gametngk.
-	 */
-	if (~color & 0x4000)
-	{
-		r = ((m_palram[color*2] & 0xff00) >> 8) * m_brt_r / 0x100;
-		g = ((m_palram[color*2] & 0x00ff) >> 0) * m_brt_g / 0x100;
-		b = ((m_palram[color*2+1] & 0x00ff) >> 0) * m_brt_b / 0x100;
-	}
-	else
-	{
-		r = ((m_palram[color*2] & 0xff00) >> 8);
-		g = ((m_palram[color*2] & 0x00ff) >> 0);
-		b = ((m_palram[color*2+1] & 0x00ff) >> 0);
-	}
+	const int r = ((m_palram[color*2] & 0xff00) >> 8);
+	const int g = ((m_palram[color*2] & 0x00ff) >> 0);
+	const int b = ((m_palram[color*2+1] & 0x00ff) >> 0);
 
 	m_palette->set_pen_color(color,rgb_t(r,g,b));
 }
@@ -287,22 +275,17 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 	const u32 oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
 
-
 	if (m_brt[offset] != oldword)
 	{
-		// TODO: bank "1" is for sprite colors
-		const u32 bank = ((offset & 2) >> 1) * 0x4000;
-		//int i;
-
-		if (bank == 0)
-		{
-			m_brt_r = 0x100 - ((m_brt[0] & 0xff00) >> 8);
-			m_brt_g = 0x100 - ((m_brt[0] & 0x00ff) >> 0);
-			m_brt_b = 0x100 - ((m_brt[1] & 0x00ff) >> 0);
-
-		//  for (i = 0;i < 0x3000;i++)  // colors 0x3000-0x3fff are not used
-		//      update_color(machine(), i);
-		}
+		// two brightness banks, selected per-pixel by priram output bits 1-0:
+		//   bits 1:0 = 11 -> bank 0 (brt[0]/brt[1])
+		//   bits 1:0 = 00 -> bank 1 (brt[2]/brt[3])
+		m_brt_r = 0x100 - ((m_brt[0] & 0xff00) >> 8);
+		m_brt_g = 0x100 - ((m_brt[0] & 0x00ff) >> 0);
+		m_brt_b = 0x100 - ((m_brt[1] & 0x00ff) >> 0);
+		m_brt1_r = 0x100 - ((m_brt[2] & 0xff00) >> 8);
+		m_brt1_g = 0x100 - ((m_brt[2] & 0x00ff) >> 0);
+		m_brt1_b = 0x100 - ((m_brt[3] & 0x00ff) >> 0);
 	}
 }
 
@@ -508,331 +491,165 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get());
+	draw_sprites(m_temp_bitmap_sprites, screen.priority(), cliprect, m_sprram_buffer.get());
 
 	draw_tile_layers(screen, cliprect);
 
 	mix_layers(screen, bitmap, cliprect);
+
+	apply_sprite_effects(screen, bitmap, cliprect);
 
 	return 0;
 }
 
 void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &cliprect)
 {
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
+	m_layer_tx.fill(0xffff, cliprect);
+	m_layer_bg.fill(0xffff, cliprect);
+	m_layer_roz.fill(0xffff, cliprect);
 
-	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)
-	asc_pri = scr_pri = rot_pri = 0;
+	m_tx_tilemap->draw(screen, m_layer_tx, cliprect, 0, 0);
+	bg_layer_tilemap()->draw(screen, m_layer_bg, cliprect, 0, 0);
+	draw_roz(screen, m_layer_roz, cliprect, 0);
+}
 
-	if((m_priram[0x2b00 / 2] & 0x00ff) == 0x0034)
-		asc_pri++;
-	else
-		rot_pri++;
+/*
+    Per-pixel lookup in priority RAM, index layout:
+    bit 12     sprite transparent
+    bit 11     text transparent
+    bit 10     unknown, always 1 on the games checked
+    bit 9      ROZ transparent
+    bit 8      road plane transparent (always 1 on games without it)
+    bit 7      BG transparent
+    bits 6-3   sprite priority (attribute bits 7-4)
+    bits 2-0   line depth, colour bits 6-4 of the ROZ line
 
-	if((m_priram[0x2e00 / 2] & 0x00ff) == 0x0034)
-		asc_pri++;
-	else
-		scr_pri++;
+    Output: bits 5-3 select the layer (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text), bit 6 selects the backdrop.
+    TODO: bit 2 clear is approximated as half brightness, bits 1-0 are ignored
+*/
+void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	pen_t const *const paldata = m_palette->pens();
 
-	// Suchiepai 2 title & Gratia gameplay intermissions uses 0x0f
-	// hayaosi3 uses 0x09 during flames screen on attract (text should go above the rest)
-	// this is otherwise 0x17 most of the time except for 0x15 in hayaosi3, tetris plus 2 & world pk soccer 2
-	// kirarast flips between 0x16 in gameplay and 0x17 otherwise
-	if(m_priram[0x3a00 / 2] == 0x09)
-		asc_pri = 3;
-	if((m_priram[0x3a00 / 2] & 0x0030) == 0x00)
-		scr_pri++;
-	else
-		rot_pri++;
-
-	//popmessage("%02x %02x %02x %d %d %d",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2], asc_pri, scr_pri, rot_pri);
-
-	// tile-tile mixing
-	for(int prin=0;prin<4;prin++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		if(rot_pri == prin)
-			draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
-		else if (scr_pri == prin)
+		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
+		u16 const *const tx  = &m_layer_tx.pix(y);
+		u16 const *const bg  = &m_layer_bg.pix(y);
+		u16 const *const roz = &m_layer_roz.pix(y);
+		u32 *const dst = &bitmap.pix(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (m_tilemaplayoutcontrol&1)
+			bool const s_op = (spr[x] & 0xff) != 0;
+			u16 const pri = s_op ? (spr[x] >> 12) : 0;
+			// TODO: derive depth from ROZ line colour bits 6-4 in super mode
+			u16 const depth = 0;
+
+			u16 const idx = (!s_op << 12)
+					| ((tx[x] == 0xffff) << 11)
+					| (1 << 10)
+					| ((roz[x] == 0xffff) << 9)
+					| (1 << 8) // road always transparent for non-f1superb
+					| ((bg[x] == 0xffff) << 7)
+					| (pri << 3)
+					| depth;
+			u8 const code = m_priram[idx];
+			u8 const layer = (code >> 3) & 7;
+
+			u16 pen = 0;
+			if (!BIT(code, 6))
 			{
-				m_bg_tilemap_alt->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+				switch (layer)
+				{
+				case 0: pen = spr[x] & 0x0fff; break;
+				case 1: pen = bg[x]; break;
+				case 2: pen = roz[x]; break;
+				case 6: pen = tx[x]; break;
+				default: pen = 0; break;
+				}
+				if (pen == 0xffff)
+					pen = 0;
 			}
-			else
+
+			rgb_t c = paldata[pen & 0x7fff];
+			// TX text is unaffected by the second brightness bank. In gametngk,
+			// the 30 Hz pulse belongs to sprite priority output 0x02 (cabinet glow).
+			if ((code & 3) == 3)
+				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
+			else if (((code & 3) == 0 && layer != 6) || ((code & 3) == 2 && layer == 0))
+				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
+			if (!BIT(code, 2))
 			{
-				m_bg_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 0);
+				if (layer == 0)  // sprite → glow
+					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				else  // BG, ROZ, TX → shadow
+					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 			}
+			dst[x] = c;
 		}
-		else if(asc_pri == prin)
-			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 	}
 }
 
-void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// tile-sprite mixing
-	// TODO: spaghetti code
-	// TODO: complete guesswork and missing many spots
-	// TODO: move to a reusable function
-	/* it should be using ALL the data in the priority ram, probably for
-	   per-pixel / pen mixing, or more levels than are supported here..
-	   I don't know, it will need hw tests I think */
+	m_temp_bitmap_sprites_pri.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
+
+	const size_t sprite_tail = m_objectram_size - 8;
+	u16 *source = m_sprram_buffer.get();
+	u16 *finish = m_sprram_buffer.get() + sprite_tail;
+	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
+	if (reverseorder) { source = m_sprram_buffer.get() + sprite_tail; finish = m_sprram_buffer.get(); }
+	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
 	{
-		pen_t const *const paldata = m_palette->pens();
-		bitmap.fill(0, cliprect);
+		bool disable; u8 pri; bool flipx, flipy; u32 code, color;
+		u8 tx, ty; u16 xsize, ysize; s32 sx, sy; u16 xzoom, yzoom;
+		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
+		if (disable || !xzoom || !yzoom) continue;
+		m_sprite->prio_zoom_transpen_raw(m_temp_bitmap_sprites_pri,cliprect,
+				code, (1 + pri) << 8, flipx, flipy, sx, sy,
+				tx, ty, xsize, ysize, xzoom, yzoom,
+				screen.priority(), 0, 0xffff);
+	}
 
-		for (int yy = cliprect.min_y; yy <= cliprect.max_y; yy++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
+		u16 const *const cov = &m_temp_bitmap_sprites_pri.pix(y);
+		u16 const *const tx_row = &m_layer_tx.pix(y);
+		u16 const *const bg_row = &m_layer_bg.pix(y);
+		u16 const *const roz_row = &m_layer_roz.pix(y);
+		u32 *const dst = &bitmap.pix(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u16 const *const srcptr_tile =     &m_temp_bitmap_tilemaps.pix(yy);
-			u8 const *const  srcptr_tilepri =  &screen.priority().pix(yy);
-			u16 const *const srcptr_spri =     &m_temp_bitmap_sprites.pix(yy);
-			//u8 const *const  srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix(yy);
-			u32 *const       dstptr_bitmap  =  &bitmap.pix(yy);
+			if (cov[x] == 0) continue;
+			if (spr[x] & 0xff) continue;
 
-			for (int xx = cliprect.min_x; xx <= cliprect.max_x; xx++)
+			u16 const cov_pri = ((cov[x] >> 8) - 1) & 0xf;
+			u16 const idx_with = (0 << 12)
+					| ((tx_row[x] == 0xffff) << 11)
+					| (1 << 10)
+					| ((roz_row[x] == 0xffff) << 9)
+					| (1 << 8)
+					| ((bg_row[x] == 0xffff) << 7)
+					| (cov_pri << 3);
+			u8 const code_with = m_priram[idx_with];
+
+			if (!BIT(code_with, 2))
 			{
-				u16 src_tile  = srcptr_tile[xx];
-				u8 src_tilepri = srcptr_tilepri[xx];
-				u16 src_spri = srcptr_spri[xx];
-				//u8 src_spripri;// = srcptr_spripri[xx];
-				u16 spridat = (src_spri & 0x0fff);
-				u8  spritepri = ((src_spri & 0xf000) >> 8);
-				int primask = 0;
-
-				// get sprite priority value back out of bitmap/colour data (this is done in draw_sprite for standalone hw)
-				if (m_priram[(spritepri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
-				if (m_priram[(spritepri | 0x0a00 | 0x1400) / 2] & 0x38) primask |= 1 << 1;
-				if (m_priram[(spritepri | 0x0a00 | 0x1100) / 2] & 0x38) primask |= 1 << 2;
-				if (m_priram[(spritepri | 0x0a00 | 0x1000) / 2] & 0x38) primask |= 1 << 3;
-				if (m_priram[(spritepri | 0x0a00 | 0x0500) / 2] & 0x38) primask |= 1 << 4;
-				if (m_priram[(spritepri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
-				if (m_priram[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
-				if (m_priram[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
-
-				if (primask == 0x00)
+				u8 const layer = (code_with >> 3) & 7;
+				rgb_t c(dst[x]);
+				if (layer == 0)
 				{
-					if (src_tilepri==0x00)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing title
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x01)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing title
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x02)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x03)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // best bout boxing
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x04)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat];
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x05)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat];
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x06)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat];
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x07)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // desert war radar?
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-
-
-				}
-				else if (primask == 0xc0)
-				{
-					dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
-					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
-				}
-				else if (primask == 0xcc)
-				{
-					// hayaosi3 final round ($00 normal, $02 mesh, $03/$05/$07 zoomed in)
-					// TODO: may have some blending, hard to say without ref video
-					if (src_tilepri & 0x02)
-						dstptr_bitmap[xx] = paldata[src_tile];
-					else
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat];
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-				}
-				else if (primask == 0xf0)
-				{
-//                  dstptr_bitmap[xx] = paldata[spridat];
-					if (src_tilepri==0x00)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // clouds at top gametngk intro
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x01)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // clouds gametngk intro
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x02)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // mode select gametngk
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x03)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // title gametngk
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x04)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin text on girl gametngk intro
-					}
-					else if (src_tilepri==0x05)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin gametngk intro
-					}
-					else if (src_tilepri==0x06)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin gametngk intro
-					}
-					else if (src_tilepri==0x07)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // insert coin gametngk intro
-					}
-				}
-				else if (primask == 0xfc)
-				{
-					if (src_tilepri==0x00)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // tetrisp intro text
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x01)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // tetrisp intro text
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x02)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // tetrisp story
-					}
-					else if (src_tilepri==0x03)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // tetrisp fader to game after story
-					}
-					else if (src_tilepri==0x04)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // credit text tetrisp mode select
-					}
-					else if (src_tilepri==0x05)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // credit text tetrisp intro
-					}
-					else if (src_tilepri==0x06)
-					{
-						//dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
-						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
-					}
-					else if (src_tilepri==0x07)
-					{
-						//dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
-						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
-					}
-				}
-				else if (primask == 0xfe)
-				{
-					if (src_tilepri==0x00)
-					{
-						if (spridat & 0xff)
-							dstptr_bitmap[xx] = paldata[spridat]; // screens in gametngk intro
-						else
-							dstptr_bitmap[xx] = paldata[src_tile];
-					}
-					else if (src_tilepri==0x01)
-					{
-						dstptr_bitmap[xx] = alpha_blend_r32( paldata[src_tile], 0x00000000, 128); // shadow, gametngk title
-					}
-					else if (src_tilepri==0x02)
-					{
-						dstptr_bitmap[xx] = alpha_blend_r32( paldata[src_tile], 0x00000000, 128); // shadow, gametngk mode select
-					}
-					else if (src_tilepri==0x03)
-					{
-						dstptr_bitmap[xx] = alpha_blend_r32( paldata[src_tile], 0x00000000, 128); // shadow, gametngk title
-					}
-					else if (src_tilepri==0x04)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // credit text gametngk intro
-					}
-					else if (src_tilepri==0x05)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // credit text near shadow, gametngk title
-					}
-					else if (src_tilepri==0x06)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // credit gametngk highscores
-					}
-					else if (src_tilepri==0x07)
-					{
-						dstptr_bitmap[xx] = paldata[src_tile]; // assumed
-					}
-				}
-				else if(primask == 0xf8) // gratia ending
-				{
-					if (spridat & 0xff && src_tilepri == 0x02)
-						dstptr_bitmap[xx] = paldata[spridat];
-					else
-						dstptr_bitmap[xx] = paldata[src_tile];
+					if ((code_with & 3) == 2)
+						c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
+					c = alpha_blend_r32(c, 0x00ffffff, 128);
 				}
 				else
-				{
-					// $fa actually used on hayaosi3 second champ transition, unknown purpose
-					dstptr_bitmap[xx] = 0;
-					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
-				}
+					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+				dst[x] = c;
 			}
 		}
 	}
