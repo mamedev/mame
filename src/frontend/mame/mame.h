@@ -13,6 +13,8 @@
 
 #include "main.h"
 
+#include <string_view>
+
 
 namespace sol {
 
@@ -44,6 +46,7 @@ public:
 
 	plugin_options &plugins() const { return *m_plugins; }
 	lua_engine *lua() { return m_lua.get(); }
+	std::string execute_lua(std::string_view code);
 
 	virtual void update_machine() override;
 
