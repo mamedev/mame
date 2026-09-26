@@ -135,6 +135,9 @@ public:
 	void mix_w(uint8_t data);
 	void overall_volume_w(uint8_t data);
 
+	template <typename... T> void set_oki1_tag(T &&... args) { m_oki1_region.set_tag(std::forward<T>(args)...); }
+	template <typename... T> void set_oki2_tag(T &&... args) { m_oki2_region.set_tag(std::forward<T>(args)...); }
+
 protected:
 	// device level overrides
 	virtual void device_start() override ATTR_COLD;

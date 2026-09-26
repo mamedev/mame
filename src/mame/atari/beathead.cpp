@@ -610,6 +610,7 @@ void beathead_state::beathead(machine_config &config)
 	ATARI_JSA_III(config, m_jsa);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
+	m_jsa->set_oki1_tag("jsa:oki");
 }
 
 
@@ -634,7 +635,7 @@ ROM_START( beathead )
 	ROM_LOAD32_BYTE( "bhpics2.bin", 0x200002, 0x80000, CRC(00b96481) SHA1(39daa46321c1d4f8bce8c25d0450b97f1f19dedb) )
 	ROM_LOAD32_BYTE( "bhpics3.bin", 0x200003, 0x80000, CRC(99c4f1db) SHA1(aba4440c5cdf413f970a0c65457e2d1b37caf2d6) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 ) // ADPCM
+	ROM_REGION( 0x80000, "jsa:oki", 0 ) // ADPCM
 	ROM_LOAD( "bhpcm0.bin",  0x00000, 0x20000, CRC(609ca626) SHA1(9bfc913fc4c3453b132595f8553245376bce3a51) )
 	ROM_LOAD( "bhpcm1.bin",  0x20000, 0x20000, CRC(35511509) SHA1(41294b81e253db5d2f30f8589dd59729a31bb2bb) )
 	ROM_LOAD( "bhpcm2.bin",  0x40000, 0x20000, CRC(f71a840a) SHA1(09d045552704cd1434307f9a36ce03c5c06a8ff6) )
