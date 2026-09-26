@@ -99,6 +99,7 @@ public:
 		uint32_t pgsubsize;     /* size of subchannel data in each sector of the pregap */
 		uint32_t control_flags; /* metadata flags associated with each track */
 		uint32_t session;       /* session number */
+		int32_t idx[MAX_INDEX + 1]; /* index positions relative to the track */
 
 		/* fields used in CHDMAN only */
 		uint32_t padframes;   /* number of frames of padding to add to the end of the track; needed for GDI */
@@ -285,6 +286,7 @@ private:
 	inline uint32_t physical_to_chd_lba(uint32_t physlba, uint32_t &tracknum) const;
 	inline uint32_t logical_to_chd_lba(uint32_t physlba, uint32_t &tracknum) const;
 
+	static void reset_toc(toc &toc);
 	static void get_info_from_type_string(const char *typestring, uint32_t *trktype, uint32_t *datasize);
 	static uint8_t ecc_source_byte(const uint8_t *sector, uint32_t offset);
 	static void ecc_compute_bytes(const uint8_t *sector, const uint16_t *row, int rowlen, uint8_t &val1, uint8_t &val2);
