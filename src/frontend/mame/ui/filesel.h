@@ -97,6 +97,8 @@ private:
 	std::vector<file_selector_entry>    m_entrylist;
 	std::string                         m_filename;
 	std::pair<size_t, size_t>           m_clicked_directory;
+	std::string                         m_file_extensions;          // comma-separated, e.g. "tap,tzx,wav"
+	bool                                m_filter_extensions = true;
 
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
@@ -109,6 +111,8 @@ private:
 	void select_item(const file_selector_entry &entry);
 	void update_search();
 	std::pair<size_t, size_t> get_directory_range(float x, float y);
+	bool extension_matches(std::string_view filename) const;
+	static bool is_archive(std::string_view filename);
 };
 
 
