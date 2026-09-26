@@ -1696,7 +1696,13 @@ s32 swp30_device::volume_apply(s32 level, s32 sample)
 	s32 e = level >> 10;
 	s32 m = level & 0x3ff;
 	s64 mul = (0x4000000 - (m << 15)) >> e;
-	return (sample * mul) >> 26;
+
+	// The chip does not keep the fractional bits of the product: the
+	// result is truncated towards zero to a multiple of 256 in 16.6
+	// (the two lowest integer bits go too).  Deeply attenuated voices
+	// fade to exactly zero instead of ringing on at a low level.
+	const s64 r = (sample * mul) >> 26;
+	return s32(r / 256 * 256);
 }
 
 void swp30_device::awm2_step(std::array<s32, 0x40> &samples_per_chan)
