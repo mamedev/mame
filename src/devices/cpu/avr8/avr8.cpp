@@ -1726,8 +1726,29 @@ void avr8_device<NumTimers>::timer0_tick_ctc_set()
 template <int NumTimers>
 void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 {
-	LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
-	m_r[TCNT0]++;
+	// FIXME: OC0x values are supposed to be latched when TCNT0 is zero.
+	if (m_r[TCNT0] == m_r[OCR0A] - 1)
+	{
+		// TODO: set 0C0A
+	}
+	else if (m_r[TCNT0] == m_r[OCR0B] - 1)
+	{
+		// TODO: set 0C0B
+	}
+
+	if (m_r[TCNT0] == 0xFF) {
+		m_r[TIFR0] |= TIFR0_TOV0_MASK;
+		update_interrupt(INTIDX_TOV0);		
+		
+		m_r[TCNT0] = 0;
+
+		// TODO: clear both OC0x values here
+	}
+	else
+	{
+		m_r[TCNT0]++;
+	}
+
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
 }
 

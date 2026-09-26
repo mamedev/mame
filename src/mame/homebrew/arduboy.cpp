@@ -1,24 +1,12 @@
 /****************************************************************************
 
-    Arduboy / Arduboy FX hardware
+    Arduboy hardware
 
     This is a homebrew ATMega handheld system, based around the ATMega32u4,
     which provides us with an excellent AVR emulation test case.
 
     The vanilla Arduboy expects you to upload or flash software to it. Such software is
     virtually always in Intel HEX format, so we have to support that.
-
-    The Arduboy FX has a 16 mbyte flash chip on board that can store multiple games.
-    However, since the ATMega can only execute from its own internal 32kbyte flash,
-    the games must be copied there every time.
-
-    Some FX games support reading data from the 16 mbyte flash. Those games are
-    distributed as .arduboy files, which are standard ZIP files containing a
-    JSON manifest, the main game code as a .hex, and the game resources as
-    .bin files. These are currently not supported as that would be a gigantic
-    chore to support within the MAME framework. For those games, you should
-    create your own flashcart with the game installed, then feed that
-    into the ardbyfx driver.
 
     Basic hardware:
     - MCU: ATMega32U4
@@ -67,6 +55,29 @@
         - F.6 right
         - F.7 up
     
+    About the Arduboy FX:
+    -----------------------------
+    The Arduboy FX has a 16 mbyte flash chip on board that can store multiple games.
+    However, since the ATMega can only execute from its own internal 32kbyte flash,
+    the games must be copied there every time.
+
+    Some FX games support reading data from the 16 mbyte flash. Those games are
+    distributed as .arduboy files, which are standard ZIP files containing a
+    JSON manifest, the main game code as a .hex, and the game resources as
+    .bin files.
+
+    Driver status:
+    -----------------------------
+    Preliminary (MACHINE_NOT_WORKING).
+    
+    The AVR8 core is missing a lot of features that the Arduboy platform
+    as a whole needs. In particular, the Arudino APIs like delay() do not
+    work like they're supposed to, so software basically runs "1988 DOS game on a
+    Pentium 4" levels of fast, or bootloops.
+
+    Games based off the Arduboy2 library can work and are somewhat playable.
+    This may be because they use the sleep opcode instead of relying on
+    specific timer values.
 
 ****************************************************************************/
 
@@ -94,14 +105,12 @@ public:
 		  m_speaker(*this, "speaker"),
           m_ssd1306(*this, "ssd1306"),
           m_cart(*this, "cart"),
-          m_spicart(*this, "spicart"),
           m_spi_flash(*this, "spi_flash")
 	{ }
 
     void arduboy_base(machine_config &config);
 
     void arduboy(machine_config &config);
-	void ardbyfx(machine_config &config);
 
 
     void prg_map(address_map &map) ATTR_COLD;
@@ -117,12 +126,10 @@ private:
     required_device<speaker_sound_device> m_speaker;
     required_device<ssd1306_device> m_ssd1306;
 
-
     optional_device<generic_slot_device> m_cart;            // required for arduboy, not for ardbyfx
-    optional_device<generic_slot_device> m_spicart;         // required for ardbyfx, not present on arduboy
 
+    // this is stubbed in for the Arduboy FX; do nullpointer checks before accessing it
     optional_device<generic_spi_flash_device> m_spi_flash;
-
 
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
@@ -138,8 +145,6 @@ private:
     uint8_t intflash_r(offs_t offset);
 
     DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameprg_load);
-    DECLARE_DEVICE_IMAGE_LOAD_MEMBER(spiflash_load);
-
 
     bool m_rx_led;
     bool m_tx_led;
@@ -148,21 +153,25 @@ private:
     bool m_rgbled_b;
     
     uint8_t m_internal_flash[0x7800];
-
-    
 };
 
 void arduboy_state::machine_start()
 {
+    // internal ATMega flash memory persists past a reboot on real hardware,
+    // so replicate that here.
+    // it also gives us the bonus of saving .hex contents to the nvram folder,
+    // which can be fed into a disassembler later.
     subdevice<nvram_device>("intflash")->set_base(&m_internal_flash[0], 0x7800);
-
-
 }
 
 void arduboy_state::machine_reset()
 {
     if (m_cart)
     {
+        // actual behavior on real hardware:
+        // - running a .hex flash will only affect the bytes written by the .hex
+        // - the Arduboy FX flashcart menu/loader overwrites 0...n bytes
+        //   containing the game; all others up until 0x7800 persist.
         memcpy(m_internal_flash, m_cart->get_rom_base(), m_cart->get_rom_size());
     }
 }
@@ -181,7 +190,7 @@ void arduboy_state::port_b_w(uint8_t data)
     int spi_sck  = data & (1 << 1);
     int spi_mosi = data & (1 << 2);
     // B.3 = MISO
-    // B.4 = button B
+    // B.4 = button B 
     m_rgbled_r   = data & (1 << 5);
     m_rgbled_g   = data & (1 << 6);
     m_rgbled_b   = data & (1 << 7);
@@ -196,6 +205,7 @@ void arduboy_state::port_b_w(uint8_t data)
 
 uint8_t arduboy_state::port_c_r()
 {
+    logerror("%s: read from write-only port c\n", tag());
     return 0;
 }
 
@@ -203,26 +213,23 @@ void arduboy_state::port_c_w(uint8_t data)
 {
     int speaker_positive  = (data & (1<<6));
     int speaker_negative  = (data & (1<<7));
-    m_speaker->level_w((speaker_positive && !speaker_negative) ? 2 :
-                       (!speaker_positive && speaker_negative) ? 0 : 1);
+    m_speaker->level_w( (speaker_positive ^ speaker_negative) ? 1 : 0 );
 }
 
 uint8_t arduboy_state::port_d_r()
 {
-    // all outputs on this port
+    logerror("%s: read from write-only port d\n", tag());
     return 0;
 }
 
 void arduboy_state::port_d_w(uint8_t data)
 {
-
     if (m_spi_flash) m_spi_flash->cs_w(data & (1 << 3));
     m_ssd1306->dc_w(data & (1 << 4));
     m_tx_led = data & (1 << 5);
     m_ssd1306->spi_cs_w(data & (1 << 6));
     m_ssd1306->rst_w(data & (1 << 7));
 }
-
 
 uint8_t arduboy_state::port_e_r()
 {
@@ -231,9 +238,8 @@ uint8_t arduboy_state::port_e_r()
 
 void arduboy_state::port_e_w(uint8_t data)
 {
-    // inputs only on this port
+    logerror("%s: write to read-only port e\n", tag());
 }
-
 
 uint8_t arduboy_state::port_f_r()
 {
@@ -242,9 +248,8 @@ uint8_t arduboy_state::port_f_r()
 
 void arduboy_state::port_f_w(uint8_t data)
 {
-    // inputs only on this port
+    logerror("%s: write to read-only port f\n", tag());
 }
-
 
 uint8_t arduboy_state::intflash_r(offs_t offset)
 {
@@ -254,19 +259,17 @@ uint8_t arduboy_state::intflash_r(offs_t offset)
 void arduboy_state::prg_map(address_map &map)
 {
     map(0x0000, 0x77ff).r(FUNC(arduboy_state::intflash_r));
-    map(0x7800, 0x7fff).rom().region("loader", 0);
+    
+    // bootloader sits at 0x7800-0x7fff.
+    // note though that very old bootloaders are 3k
 }
 
 void arduboy_state::data_map(address_map &map)
 {
-    // TODO: 32u4 flash registers. the FX needs it
-
-    // PLLCSR: pretend that USB PLL is locked so games boot
-    map(0x0049, 0x0049).lr8(NAME([] { return 0x13; }));
+    // TODO: 32u4 flash registers. the Arduboy FX needs it
 
     map(0x0100, 0x0aff).ram(); // on-chip 2.5kbytes RAM
 }
-
 
 static INPUT_PORTS_START( arduboy )
     PORT_START("PORTB")
@@ -290,7 +293,7 @@ void arduboy_state::arduboy_base(machine_config &config)
 
 	m_maincpu->set_eeprom_tag("eeprom");
     m_maincpu->set_low_fuses(0xFF);
-    m_maincpu->set_high_fuses(0xD3);
+    m_maincpu->set_high_fuses(0xD3); // actually 0xD2, but games will run without the bootloader
     m_maincpu->set_extended_fuses(0xC2);
 
     m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
@@ -330,44 +333,6 @@ void arduboy_state::arduboy(machine_config &config)
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gameprg", "bin,hex");
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(arduboy_state::gameprg_load));
-}
-
-void arduboy_state::ardbyfx(machine_config &config)
-{
-    arduboy_base(config);
-
-    GENERIC_SPI_FLASH(config, m_spi_flash);
-	m_spi_flash->set_rom_ptr(memregion("spi")->base());
-	m_spi_flash->set_rom_size(memregion("spi")->bytes());
-
-    GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "gameprg", "bin,hex");
-	m_cart->set_must_be_loaded(false);
-	m_cart->set_device_load(FUNC(arduboy_state::gameprg_load));
-
-    GENERIC_CARTSLOT(config, m_spicart, generic_plain_slot, "spiflash", "bin");
-	m_spicart->set_must_be_loaded(true);
-	m_spicart->set_device_load(FUNC(arduboy_state::spiflash_load));
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-
-DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::spiflash_load)
-{
-    if (!image.is_filetype("bin"))
-    {
-        return std::make_pair(image_error::BADSOFTWARE, "spiflash dump must be a .bin");
-    }
-
-    memory_region* spimem = memregion("spi");
-    if (image.length() > spimem->length())
-    {
-        return std::make_pair(image_error::BADSOFTWARE, "spiflash dump too large!");
-    }
-
-    image.fseek(0, SEEK_SET);
-    image.fread(spimem->base(), image.length());
-
-    return std::make_pair(std::error_condition(), std::string());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -531,6 +496,11 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
                 image.fseek(-1, SEEK_CUR);
                 break;
             }
+
+            if (!(buf[0] == 0x0D || buf[0] == 0x0A))
+            {
+                return std::make_pair(image_error::BADSOFTWARE, "hit bad newline character");
+            }
         }
 
         // ... continue loop from top ...
@@ -547,32 +517,11 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 //////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( arduboy )
-    // Arduboy FX loader
-    ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
-    ROM_LOAD("arduboy_boot.bin", 0x000, 0x800, CRC(d5b6f377) SHA1(a9d2e41a31c50df65b8e728b340be69e48cd800b))
-
-
     ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )
-    
-    // generic Cathy2k loader
-    // from https://github.com/MrBlinky/Arduboy/blob/master/cathy/hexfiles/arduboy-bootloader.hex
-    // keeping only the actual bootloader segment (0x7800-0x7FFF)
-	// ROM_REGION(0x800, "loader", ROMREGION_ERASEFF)
-    // ROM_LOAD("arduboy-bootloader.bin", 0x000, 0x800, CRC(12345678) SHA1(garbagegarbagegarbage))
 ROM_END
-
-// ROM_START( ardbyfx )
-//     // bootloader dumped from an Arduboy FX
-// 	ROM_REGION( 0x800, "loader", ROMREGION_ERASEFF)
-//     ROM_LOAD("ardbyfx_boot.bin", 0x000, 0x800, CRC(d5b6f377) SHA1(a9d2e41a31c50df65b8e728b340be69e48cd800b))
-
-//     // Arduboy FX has a 16mbyte chip on board, so honor that.
-//     // note though that various clones and mods can support larger flash sizes.
-//     ROM_REGION(0x01000000, "spi", ROMREGION_ERASEFF)
 
 } // anonymous namespace
 
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY    FULLNAME
 CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy",    MACHINE_NOT_WORKING)
-// CONS(2021, ardbyfx, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy FX", MACHINE_NOT_WORKING)

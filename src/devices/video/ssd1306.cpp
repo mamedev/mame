@@ -176,16 +176,14 @@ void ssd1306_device::set_base_rowscan_invert(bool base_rowscan_invert)
     { \
         return; \
     } \
-    m_command_pointer = 0; \
-    logerror("%s: command %02x (multi-byte)\n", tag(), m_command_fifo[0]);
+    m_command_pointer = 0;
 
 /**
  * Indicates a single-byte command. The FIFO pointer is reset,
  * and execution falls through to the code below.
  */
 #define COMMAND_IS_SINGLE_BYTE \
-    m_command_pointer = 0; \
-    logerror("%s: command %02x\n", tag(), m_command_fifo[0]);
+    m_command_pointer = 0;
 
 /**
  * Indicates this command is invalid. The FIFO pointer is reset and an error is logged.
@@ -197,9 +195,8 @@ void ssd1306_device::set_base_rowscan_invert(bool base_rowscan_invert)
 #define DUMMY_BYTE_CHECK(fifopos, expected) \
     if (m_command_fifo[fifopos] != expected) \
     { \
-        logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", tag(), fifopos, m_command_fifo[fifopos]); \
-    }; \
-    logerror("%s: command %02x (multi-byte)\n", tag(), m_command_fifo[0]);
+        logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", tag(), fifopos, expected, m_command_fifo[fifopos]); \
+    };
 
 void ssd1306_device::exec_command_2x(uint8_t data)
 {
@@ -657,7 +654,7 @@ void ssd1306_device::dc_w(int dc)
 
     if (m_current_interface_mode == I2C)
     {
-        // changes I2C slave address
+        // changes I2C slave address, probably only at reset
         return;
     }
 }
@@ -779,7 +776,14 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
     rgb_t on_pixel  = !m_inverting_pixels ? white_pen() : black_pen();
     rgb_t off_pixel = !m_inverting_pixels ? black_pen() : white_pen();
  
+
     // very simple rendering code for the time being...
+    //
+    // TODO: scrolling (horizontal = left/right, vertical = up).
+    // many Arduboy games do not use scrolling and instead draw everything in an internal
+    // framebuffer that is then uploaded to the screen.
+    //
+    // advanced remapping modes may also need to be implemented...
     for (int y = 0; y < 64; y++)
     {
         for (int x = 0; x < 128; x++)
