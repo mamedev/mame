@@ -1275,6 +1275,16 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_pendingUnd));
 	save_item(NAME(m_pendingSwi));
 	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_exclusive_address));
+	save_item(NAME(m_exclusive_size));
+	save_item(NAME(m_exclusive_valid));
+	if (m_archRev >= 6)
+		m_exclusive_tap = m_program->install_write_tap(0, 0xffffffff, "exclusive_monitor",
+			[this](offs_t address, u32 &data, u32 mem_mask)
+			{
+				if ((address & ~7U) == (m_exclusive_address & ~7U) && mem_mask)
+					m_exclusive_valid = false;
+			});
 	save_item(NAME(m_control));
 	save_item(NAME(m_tlbBase));
 	save_item(NAME(m_tlb_base_mask));
@@ -1424,6 +1434,7 @@ void arm7_cpu_device::device_reset()
 	m_pendingUnd = false;
 	m_pendingSwi = false;
 	m_pending_interrupt = false;
+	m_exclusive_valid = false;
 	m_control = m_reset_control;
 	m_tlbBase = 0;
 	m_tlb_base_mask = 0;
@@ -1475,11 +1486,6 @@ void arm7_cpu_device::device_reset()
 	std::fill(std::begin(m_itlb_entry_index), std::end(m_itlb_entry_index), 0);
 }
 
-void arm1176jzf_s_cpu_device::device_reset()
-{
-	arm7_cpu_device::device_reset();
-	m_control = 0x00050078;
-}
 
 void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 {
@@ -1778,6 +1784,7 @@ void arm7_cpu_device::execute_run()
 
 			if (!insn_fetch_thumb(raddr, insn))
 			{
+				prefetch_abort(raddr);
 				m_pendingAbtP = true;
 				update_irq_state();
 				goto skip_exec;
@@ -1799,6 +1806,7 @@ void arm7_cpu_device::execute_run()
 					print_ce_kernel_address(raddr - 0xf0000000);
 				}
 #endif
+				prefetch_abort(raddr);
 				m_pendingAbtP = true;
 				update_irq_state();
 				goto skip_exec;
@@ -1925,6 +1933,7 @@ void arm7_cpu_device::set_irq(int state)
 {
 	assert((machine().scheduler().currently_executing() == static_cast<device_execute_interface *>(this)) || !machine().scheduler().currently_executing());
 	m_pendingIrq = state != 0;
+	if (state) signal_interrupt_trigger();
 	update_irq_state();
 	arm7_check_irq_state();
 }
@@ -1934,6 +1943,7 @@ void arm7_cpu_device::set_fiq(int state)
 {
 	assert((machine().scheduler().currently_executing() == static_cast<device_execute_interface *>(this)) || !machine().scheduler().currently_executing());
 	m_pendingFiq = state != 0;
+	if (state) signal_interrupt_trigger();
 	update_irq_state();
 	arm7_check_irq_state();
 }
@@ -2730,44 +2740,7 @@ void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 	}
 }
 
-uint32_t arm1176jzf_s_cpu_device::arm7_rt_r_callback(offs_t offset)
-{
-	uint32_t opcode = offset;
-	uint8_t crn = (opcode & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
-	uint8_t op1 = (opcode & INSN_COPRO_OP1) >> INSN_COPRO_OP1_SHIFT;
-	uint8_t op2 = (opcode & INSN_COPRO_OP2)  >> INSN_COPRO_OP2_SHIFT;
-	uint8_t crm =  opcode & INSN_COPRO_OP3;
-	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
-	uint32_t data = 0;
-
-//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
-
-	if (cpnum == 15)
-	{
-		if(crn == 0 && op1 == 0 && crm == 0 && op2 == 0) data = 0x410FB767; //ARM1176JZF-S Main ID.
-		if(crn == 1 && op1 == 0 && crm == 0 && op2 == 0) data = m_control;
-	}
-
-	return data;
-}
-
-void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
-{
-	uint32_t opcode = offset;
-	uint8_t crn = (opcode & INSN_COPRO_CREG) >> INSN_COPRO_CREG_SHIFT;
-	uint8_t op1 = (opcode & INSN_COPRO_OP1) >> INSN_COPRO_OP1_SHIFT;
-	uint8_t op2 = (opcode & INSN_COPRO_OP2)  >> INSN_COPRO_OP2_SHIFT;
-	uint8_t crm =  opcode & INSN_COPRO_OP3;
-	uint8_t cpnum = (opcode & INSN_COPRO_CPNUM) >> INSN_COPRO_CPNUM_SHIFT;
-
-//  printf("arm7946: copro %d write %x to cReg %d op2 %d op3 %d (mask %08x)\n", cpnum, data, cReg, op2, op3, mem_mask);
-
-	if (cpnum == 15)
-	{
-		LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback: CP15 CRn %02x Op1 %02x CRm %02x Op2 %02x data %08x\n", crn, op1, crm, op2, data);
-		if(crn == 1 && op1 == 0 && crm == 0 && op2 == 0) m_control = data;
-	}
-}
+#include "arm1176.hxx"
 
 /***************************************************************************
  * Default Memory Handlers

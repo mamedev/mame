@@ -37,8 +37,18 @@ end
 
 	files {
 		MAME_DIR .. "src/lib/util/abi.h",
+		MAME_DIR .. "src/lib/util/aes128cbc.cpp",
+		MAME_DIR .. "src/lib/util/aes128cbc.h",
+		MAME_DIR .. "src/lib/util/aes128ecb.cpp",
+		MAME_DIR .. "src/lib/util/aes128ecb.h",
+		MAME_DIR .. "src/lib/util/aes192cbc.cpp",
+		MAME_DIR .. "src/lib/util/aes192cbc.h",
+		MAME_DIR .. "src/lib/util/aes192ecb.cpp",
+		MAME_DIR .. "src/lib/util/aes192ecb.h",
 		MAME_DIR .. "src/lib/util/aes256cbc.cpp",
 		MAME_DIR .. "src/lib/util/aes256cbc.h",
+		MAME_DIR .. "src/lib/util/aes256ecb.cpp",
+		MAME_DIR .. "src/lib/util/aes256ecb.h",
 		MAME_DIR .. "src/lib/util/archiver.cpp",
 		MAME_DIR .. "src/lib/util/archiver.h",
 		MAME_DIR .. "src/lib/util/avhuff.cpp",
