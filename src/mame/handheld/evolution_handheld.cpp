@@ -287,26 +287,26 @@ void evolution_handheldgame_state::init_yuleyuan()
 } // anonymous namespace
 
 
-CONS( 2006, evolhh,      0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Kidz Delight", "Evolution Max", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
+CONS( 2006, evolhh,   0, 0, evolhh,   evolhh, evolution_handheldgame_state, empty_init,    "Kidz Delight", "Evolution Max", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a pink 'for girls' unit, exists in other colours, software likely the same
 
-CONS( 2018, smkatsum,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "San-X / Tomy", "Sumikko Gurashi - Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2018, smkatsum, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Atsume (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // おしりたんてい ププッとかいけつゲーム
-CONS( 2020, buttdtct,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2020, buttdtct, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", "Oshiri Tantei: Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2015, pokexyqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", u8"Pokémon Encyclopedia Z Pokémon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokexyqz, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", u8"Pokémon Encyclopedia Z Pokémon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ロトム図鑑 サン＆ムーン ポケモン クイズ
-CONS( 2015, pokesmqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", u8"Rotom Zukan Sun & Moon Pokémon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokesmqz, 0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", u8"Rotom Zukan Sun & Moon Pokémon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 201?, tomyspt,     0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, tomyspt,  0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ほっぺちゃん スイ☆コレ　ホワイト
-CONS( 201?, hoppech,     0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, hoppech,  0, 0, smkatsum, evolhh, evolution_handheldgame_state, empty_init,    "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 星座电子宠物机 (virtual pet by 育乐元)
-CONS( 2022, yuleyuan,    0,       0,      yuleyuan, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
+CONS( 2022, yuleyuan, 0, 0, yuleyuan, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model
 
 // this uses TV output, rather than being a handheld
 // SONIX SNT110FG SoC, test mode shows '4941' as checksum
-CONS( 201?, udrive,     0,       0,       udrive, evolhh, evolution_handheldgame_state, empty_init, "MGA", "Little Tikes Cozy Coupe U-Drive", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, udrive,   0, 0, udrive,   evolhh, evolution_handheldgame_state, empty_init,    "MGA", "Little Tikes Cozy Coupe U-Drive", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

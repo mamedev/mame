@@ -705,86 +705,86 @@ void generalplus_gpl951xx_game_state::init_pink218()
 
 } // anonymous namespace
 
-CONS(2017, fixitflx, 0, 0, fixitflx, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Fix It Felix Jr. (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, wiwcs,    0, 0, wiwcs,    bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Where in the World Is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, bfpacman, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2017, bfmpac,   0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Ms. Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2017, bfgalaga, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Galaga (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, bfdigdug, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2019, bfspyhnt, 0, 0, fixitflx, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2020, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2017, fixitflx, 0, 0, fixitflx, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Fix It Felix Jr. (mini arcade)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2018, wiwcs,    0, 0, wiwcs,    bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Where in the World Is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2018, bfpacman, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Pac-Man (mini arcade)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2017, bfmpac,   0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Ms. Pac-Man (mini arcade)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2017, bfgalaga, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Galaga (mini arcade)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2018, bfdigdug, 0, 0, bfpacman, bfmpac,   generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2019, bfspyhnt, 0, 0, fixitflx, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2020, bftetris, 0, 0, bftetris, bfspyhnt, generalplus_gpl951xx_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // games below use GPL95101 series chips, which might be different but are definitely unSP2.0 chips that run from SPI directly
 
 // unclear if colour matches, but there are multiple generations of these at least
 // uses PUNIRUNZU_MAIN_V3 pcb
-CONS(2021, punirune,  0,        0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// TODO: Determine if punirune and punirunea use the Tomy name, the Takara Tomy name, or another company's name once they are able to boot up
+CONS(2021, punirune,  0,        0, puni, puni,     generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V3, pastel blue, Europe)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // looks similar to above, but has HXR-1 instead of the usual markings on the PCB
-CONS(2021, punirunea, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (HXR-1 PCB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punirunea, punirune, 0, puni, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (HXR-1 PCB)",                                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-// the case on these looks like the European release, including English title logo.  CPU is a glob, PUNIRUNZU_MAIN_DICE_V1 on PCB
-CONS(2021, punij1m,  punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint/pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, punij1pu, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, purple, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// the case on these looks like the European release, including English title logo. CPU is a glob, PUNIRUNZU_MAIN_DICE_V1 on PCB
+CONS(2021, punij1m,   punirune, 0, puni, puni,     generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, mint/pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2021, punij1pu,  punirune, 0, puni, puni,     generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_DICE_V1, purple, Japan)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // the case on these is similar to the above, but the text is in Japanese, uses PUNIRUNZU_MAIN_V2 on pcb
-CONS(2021, punij2pk, punirune, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V2, pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punij2pk,  punirune, 0, puni, puni,     generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes (PUNIRUNZU_MAIN_V2, pink, Japan)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // has a link feature
-CONS(2021, punifrnd, 0,        0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punifrnd, 0, 0, puni, puni, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2021, punistar, 0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, punistar, 0, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2020, pixlstar, 0,        0, pixlstar, base, generalplus_gpl951xx_game_state, empty_init, "Skyrocket Toys", "Pixel Stars Dreamhouse", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2020, pixlstar, 0, 0, pixlstar, base, generalplus_gpl951xx_game_state, empty_init, "Skyrocket Toys", "Pixel Stars Dreamhouse", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2022, kenshino, 0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Kenshi No Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2022, kenshino, 0, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Kenshi No Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2021, tamasmrt,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Tamagotchi Smart (Japan, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, tamasmrta, tamasmrt, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Tamagotchi Smart (Japan, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, tamasmrt,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Tamagotchi Smart (Japan, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2021, tamasmrta, tamasmrt, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Tamagotchi Smart (Japan, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS(2021, teriermn,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Terriermon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
+CONS(2021, teriermn, 0, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Terriermon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 'Poo' emoji shaped item, comes in multiple colours, has a solder pad which might change between units
 // this was dumped from the 'Lavender' unit
-CONS(2021, flufflav, 0,        0, flufflav, bubltea, generalplus_gpl951xx_game_state, empty_init, "Happinet", "Fuwatcho Uncho Fuwa Fuwa (lavender, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, flufflav, 0, 0, flufflav, bubltea, generalplus_gpl951xx_game_state, empty_init, "Happinet", "Fuwatcho Uncho Fuwa Fuwa (lavender, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // available in 2 colours, ROM confirmed to be the same on both
-CONS(2021, pockrmsr,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Pocket Room - Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pockrmsr, 0, 0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Pocket Room: Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
-CONS(2021, pokgoget, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pokgoget, 0, 0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // ガチッとゲットだぜ! モンスターボール
-CONS(2021, pokebala, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pokebala, 0, 0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // ポケモンといっしょ！モンスターボール
-CONS(2021, pokeissh, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", u8"Pokémon to Issho! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pokeissh, 0, 0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", u8"Pokémon to Issho! Monster Ball (Japan)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // めちゃナゲ! モンスターボール
-CONS(2021, pokemech, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Mecha Nage! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pokemech, 0, 0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Mecha Nage! Monster Ball (Japan)",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
-CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init, "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
 
 // is there a subtitle for this one? it's different to the others
-CONS( 201?, smkguras,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 201?, smkgurasa, smkguras, 0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkguras,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init, "San-X / Takara Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, smkgurasa, smkguras, 0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init, "San-X / Takara Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2021, smkgacha,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkgacha, 0, 0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init, "San-X / Takara Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // there seem to be different versions of this available, is the software the same?
-CONS( 201?, dsgnpal, 0, 0, dsgnpal, dsgnpal, generalplus_gpl951xx_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | ROT270 )
+CONS( 201?, dsgnpal, 0, 0, dsgnpal, dsgnpal, generalplus_gpl951xx_game_state, empty_init,  "Takara Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | ROT270 )
 
 // these have different version numbers (coming from the user/config area?) correlating to the colour of the device, even if the code the same
-CONS( 2018, segapet1,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2018, segapet1a, segapet1, 0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B Y)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2018, segapet1,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2018, segapet1a, segapet1, 0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B Y)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // DX version of the first game, 2020 on box, updated fabric cover, still has 2018 on case, newer code revision
-CONS( 2020, segaptdx,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu DX (190313A P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2020, segaptdx, 0, 0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu DX (190313A P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // also もっちりペット もっちまるず
-CONS( 2019, segapet2,  0,        0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, purple)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS( 2019, segapet2a, segapet2, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, orange)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2019, segapet2,  0,        0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, purple)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2019, segapet2a, segapet2, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (2019 version, orange)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // these ones have motors in the ears and a more fluffy cover
 // もっちふわペット もっちまるず
@@ -793,12 +793,12 @@ CONS( 2020, segapet3a, segapet3, 0, puni, base, generalplus_gpl951xx_game_state,
 
 
 // まぜまぜミックス！ぷにタピちゃん
-CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 201?, bubltea, 0, 0, bubltea, bubltea, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // this one has 2 checksums in service mode (like the generalplus_gp3x_unknown.cpp sets) but one is 00000000 and there is only a single ROM
 // BL-519-V1.2 20220822 on PCB
-CONS( 2022, pink218,      0,       0,      pink218,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2022, pink218, 0, 0, pink218, bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2022, smkfrnd, 0, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 2022, chiikawa,     0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Chiikawa to Issho (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2022, chiikawa, 0, 0, puni, segapet2, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Chiikawa to Issho (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
