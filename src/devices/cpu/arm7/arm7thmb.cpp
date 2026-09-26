@@ -1270,7 +1270,18 @@ void arm7_cpu_device::tg0b_1(uint32_t pc, uint32_t op)
 
 void arm7_cpu_device::tg0b_2(uint32_t pc, uint32_t op)
 {
-	thumb_undefined(pc, op);
+	if (m_archRev < 6) { thumb_undefined(pc, op); return; }
+	const uint32_t value = GetRegister((op >> 3) & 7);
+	uint32_t result;
+	switch ((op >> 6) & 3)
+	{
+	case 0: result = uint32_t(int32_t(int16_t(value))); break;
+	case 1: result = uint32_t(int32_t(int8_t(value))); break;
+	case 2: result = value & 0xffff; break;
+	default: result = value & 0xff; break;
+	}
+	SetRegister(op & 7, result);
+	R15 += 2;
 }
 
 void arm7_cpu_device::tg0b_3(uint32_t pc, uint32_t op)
@@ -1313,7 +1324,13 @@ void arm7_cpu_device::tg0b_5(uint32_t pc, uint32_t op) /* PUSH {Rlist}{LR} */
 
 void arm7_cpu_device::tg0b_6(uint32_t pc, uint32_t op)
 {
-	thumb_undefined(pc, op);
+	if (m_archRev < 6) { thumb_undefined(pc, op); return; }
+	if ((op & 0xfff7) == 0xb650) // SETEND
+		set_cpsr((GET_CPSR & ~0x200U) | ((op & 8) << 6));
+	else if ((op & 0xffe8) == 0xb660) // CPS
+		armv6_cps(0xf1080000 | ((op & 0x10) << 14) | ((op & 7) << 6));
+	else { thumb_undefined(pc, op); return; }
+	R15 += 2;
 }
 
 void arm7_cpu_device::tg0b_7(uint32_t pc, uint32_t op)
@@ -1333,7 +1350,13 @@ void arm7_cpu_device::tg0b_9(uint32_t pc, uint32_t op)
 
 void arm7_cpu_device::tg0b_a(uint32_t pc, uint32_t op)
 {
-	thumb_undefined(pc, op);
+	if (m_archRev < 6 || ((op >> 6) & 3) == 2) { thumb_undefined(pc, op); return; }
+	const uint32_t value = GetRegister((op >> 3) & 7);
+	uint32_t result = ((value & 0x00ff00ff) << 8) | ((value & 0xff00ff00) >> 8);
+	if (((op >> 6) & 3) == 0) result = std::rotl(result, 16);
+	if (((op >> 6) & 3) == 3) result = uint32_t(int32_t(int16_t(result)));
+	SetRegister(op & 7, result);
+	R15 += 2;
 }
 
 void arm7_cpu_device::tg0b_b(uint32_t pc, uint32_t op)
