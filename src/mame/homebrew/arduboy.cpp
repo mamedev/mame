@@ -109,7 +109,7 @@ public:
 		  m_screen(*this, "screen"),
 		  m_speaker(*this, "speaker"),
           m_ssd1306(*this, "ssd1306"),
-          m_cart(*this, "cart"),
+          m_cart(*this, "gameprg"),
           m_spi_flash(*this, "spi_flash")
 	{ }
 
