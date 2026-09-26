@@ -8,7 +8,10 @@ Note: This list is for multicart games "CART-AM" only, to be run with stvbios -c
 It has no right to *repeat* all the games present in sega/stv.cpp, we also don't have a
 slot system for anything diverging from the regular 2 sticks N buttons setup.
 
-Also note IC13 based games *needs* the memory to be 1-filled, this is particularly important
+For QA, use supported flag only for issues in the context of multi-cart setups,
+there's no need to repeat stuff already present in saturn.xml and base drivers.
+
+IC13 based games *needs* the memory to be 1-filled, this is particularly important
 in Multi Cart mode.
 
 -->

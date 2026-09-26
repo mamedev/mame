@@ -27,6 +27,7 @@ TODO (BIOS programs):
 TODO (Arcade variants):
 - The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
   for enumerating p2 then p1);
+- orbatak, sht3do: occasional Projector CEL gap stretches;
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
@@ -34,8 +35,9 @@ References:
 - 3dodev wiki;
 
 Notes:
-- To calibrate in ALG lightgun games: go in service mode -> gun aiming and hit the center of the
-  target *twice*.
+- crime3do/md23do: to calibrate, go in service mode -> gun aiming and hit the center of the
+  target *twice*;
+- sht3do has its own calibration scheme, just follow on-screen instructions;
 
 ===================================================================================================
 
@@ -291,6 +293,7 @@ std::pair<u32, u8> alg_gun_state::gun_counter_r(u8 which)
 	counter += in_y;
 
 	// out of screen check (top and bottom edges)
+	// unchecked by sht3do (relies on holster alone)
 	if (counter <= 5970 || counter >= 308716)
 		line_trigger = 0;
 
@@ -854,9 +857,9 @@ GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0
 GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
 
 // MACHINE_IMPERFECT_TIMING doesn't really matter for the gun games, they are pure FMV based.
-GAME( 1995, crime3do,alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Crime Patrol (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.0
-GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.1
-GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.05
+GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_IMPERFECT_GRAPHICS ) // v1.05, no WDUD present in attract unlike other ALG games
+GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (USA, 3DO hardware)", MACHINE_IMPERFECT_GRAPHICS ) // v1.1
+GAME( 1995, crime3do,alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Crime Patrol (USA, 3DO hardware)", MACHINE_IMPERFECT_GRAPHICS ) // v1.0
 
 // Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
 // (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)

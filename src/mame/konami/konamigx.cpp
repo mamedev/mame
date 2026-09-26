@@ -1378,14 +1378,14 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Unused ) ) // ???
 	PORT_DIPSETTING(          0x00000000, "Upright (Stereo)" )
 	PORT_DIPNAME( 0xe0000000, 0xe0000000, "Car Number & Color" ) PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red)" )
-	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue)" )
-	PORT_DIPSETTING(          0xa0000000, "No. 3 (Yellow)" )
-	PORT_DIPSETTING(          0x80000000, "No. 4 (Green)" )
-	PORT_DIPSETTING(          0x60000000, "No. 5 (Red)" )
-	PORT_DIPSETTING(          0x40000000, "No. 6 (Blue)" )
-	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow)" )
-	PORT_DIPSETTING(          0x00000000, "No. 8 (Green)" )
+	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red/White)" )
+	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue/White)" )
+	PORT_DIPSETTING(          0xa0000000, "No. 3 (White/Yellow)" )
+	PORT_DIPSETTING(          0x80000000, "No. 4 (Green/White)" )
+	PORT_DIPSETTING(          0x60000000, "No. 5 (White/Red)" )
+	PORT_DIPSETTING(          0x40000000, "No. 6 (White/Blue)" )
+	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow/White)" )
+	PORT_DIPSETTING(          0x00000000, "No. 8 (White/Green)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( opengolf )
@@ -4207,8 +4207,8 @@ GAME( 1994, konamigx,  0,        konamigx_bios, common,   konamigx_state, init_k
    needs the ROZ layer to be playable
    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAMEL( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN, layout_racinfrc )
-GAMEL( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN, layout_racinfrc )
+GAMEL( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_racinfrc )
+GAMEL( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_racinfrc )
 
 GAME( 1994, opengolf,  konamigx, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 GAME( 1994, opengolf2, opengolf, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
