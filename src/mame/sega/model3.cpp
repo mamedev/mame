@@ -42,7 +42,8 @@
 
   * dayto2pe - works
   * daytona2 - works
-    spikeout/spikeofe - works, severe texture glitches (mip mapping?)
+    spikeout/spikeofe - works, severe texture glitches (mip mapping?),
+	                    throws "invalid config detected" when exiting service mode
  ** dirtdvls/dirtdvlau/dirtdvlj/dirtdvlu - works
     swtrilgy - works, black screen in service mode
     swtrilga - doesn't pass "Wait Setup the Feedback Leaver"
@@ -1364,8 +1365,7 @@ void model3_state::model3_init(int step)
 
 	m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
 
-	membank("bank4")->set_base(memregion("samples")->base() + 0x200000);
-	membank("bank5")->set_base(memregion("samples")->base() + 0x600000);
+	m_sound_bank->configure_entries(0, 2, memregion("samples")->base(), 0x800000);
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base(), 16);
@@ -2058,9 +2058,10 @@ ROM_START( lemans24 )   /* step 1.5, Sega game ID# is 833-13159, ROM board ID# 8
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19891.21", 0x000000, 0x080000, CRC(c3ecd448) SHA1(875ee429872f3a851fa0239e5c781870fa3f4323) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19869.22", 0x000000, 0x400000, CRC(ea1ef1cc) SHA1(399c43659d83673f83b551b30b3b1410a75d8f8c) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19870.24", 0x400000, 0x400000, CRC(49c70296) SHA1(9bf88a63c38d318006a9c6c6b7b4452439df876c) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2121,9 +2122,10 @@ ROM_START( scud )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19692.21", 0x000000, 0x080000, CRC(a94f5521) SHA1(22b6a17d44fec8bf796e1790bcabc41f34c89baf) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19671.24", 0x400000, 0x400000, CRC(8e8526ab) SHA1(3d2cbb09bd185660feea4dd80bee5af2e2a19aa6) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
@@ -2190,9 +2192,10 @@ ROM_START( scuddx )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 1293
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19611a.21", 0x000000, 0x040000, CRC(9d4a34f6) SHA1(6de2cde8fd4caae51d48fe5d5c89d01e0e63e258) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19601.22", 0x000000, 0x400000, CRC(ba350fcc) SHA1(b85a9d45e06e048c3e777cbb190d20b5ef72d1b3) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19602.24", 0x400000, 0x400000, CRC(a92231c1) SHA1(9ecf97dce0a2184dc31906c6090c27494188384c) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
@@ -2259,9 +2262,10 @@ ROM_START( scuddxo )  /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 833
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19611.21", 0x000000, 0x040000, CRC(8888bf36) SHA1(33dfed490fb0f244e076e3854aba7a6473f56844) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19601.22", 0x000000, 0x400000, CRC(ba350fcc) SHA1(b85a9d45e06e048c3e777cbb190d20b5ef72d1b3) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19602.24", 0x400000, 0x400000, CRC(a92231c1) SHA1(9ecf97dce0a2184dc31906c6090c27494188384c) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
@@ -2330,9 +2334,10 @@ ROM_START( scudau )   /* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19692.21", 0x000000, 0x080000,  CRC(a94f5521) SHA1(22b6a17d44fec8bf796e1790bcabc41f34c89baf) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19670.22", 0x000000, 0x400000, CRC(bd31cc06) SHA1(d1c85d0cf79b92de5bcbe20dfb8b626ad72de019) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19671.24", 0x400000, 0x400000, CRC(8e8526ab) SHA1(3d2cbb09bd185660feea4dd80bee5af2e2a19aa6) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsbz80:mpegcpu", 0 ) /* Z80 code */
 	ROM_LOAD( "epr-19612.2", 0x000000,  0x20000,  CRC(13978fd4) SHA1(bb597914a34308376239afab6e04fc231e39e379) )
@@ -2555,9 +2560,10 @@ ROM_START( vf3 )    /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-1
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19231.21", 0x000000, 0x080000, CRC(b416fe96) SHA1(b508eb6802072a8d4f8fdc7ca4fba6c6a4aaadae) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19209.22", 0x000000, 0x400000, CRC(3715e38c) SHA1(b11dbf8a5840990e9697c53b4796cd70ad91f6a1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19210.24", 0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2624,9 +2630,10 @@ ROM_START( vf3c )    /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19231.21", 0x000000, 0x080000, CRC(b416fe96) SHA1(b508eb6802072a8d4f8fdc7ca4fba6c6a4aaadae) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19209.22", 0x000000, 0x400000, CRC(3715e38c) SHA1(b11dbf8a5840990e9697c53b4796cd70ad91f6a1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19210.24", 0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2693,9 +2700,10 @@ ROM_START( vf3a )   /* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-1
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19231.21", 0x000000, 0x080000, CRC(b416fe96) SHA1(b508eb6802072a8d4f8fdc7ca4fba6c6a4aaadae) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19209.22", 0x000000, 0x400000, CRC(3715e38c) SHA1(b11dbf8a5840990e9697c53b4796cd70ad91f6a1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19210.24", 0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2762,9 +2770,10 @@ ROM_START( vf3tb )  /* step 1.0?, Sega game ID# is 833-13279 VIRTUA FIGHTER 3TB,
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19231.21", 0x000000, 0x080000, CRC(b416fe96) SHA1(b508eb6802072a8d4f8fdc7ca4fba6c6a4aaadae) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19209.22", 0x000000, 0x400000, CRC(3715e38c) SHA1(b11dbf8a5840990e9697c53b4796cd70ad91f6a1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19210.24", 0x400000, 0x400000, CRC(c03d6502) SHA1(4ca49fe5dd5105ca5f78f4740477beb64137d4be) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2825,9 +2834,10 @@ ROM_START( bassdx )   /* step 1.0, Sega game ID# is 833-13452 BSS DX, ROM board 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20313.21", 0x000000, 0x080000, CRC(863a7857) SHA1(72384dc6d7613806ab6bb84d935a3b0497e9e9d2) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20268.22", 0x000000, 0x400000, CRC(3631e93e) SHA1(3991d6cf03e4f39733d467c483857eac874505d1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20269.24", 0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2888,9 +2898,10 @@ ROM_START( getbassdx ) /* step 1.0, Sega game ID# is 833-13476 BSS DX JPN, ROM b
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20313.21", 0x000000, 0x080000, CRC(863a7857) SHA1(72384dc6d7613806ab6bb84d935a3b0497e9e9d2) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20268.22", 0x000000, 0x400000, CRC(3631e93e) SHA1(3991d6cf03e4f39733d467c483857eac874505d1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20269.24", 0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -2951,9 +2962,10 @@ ROM_START( getbassur )   /* step 1.0, Sega game ID# is 833-13317, ROM board ID# 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20313.21", 0x000000, 0x080000, CRC(863a7857) SHA1(72384dc6d7613806ab6bb84d935a3b0497e9e9d2) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20268.22", 0x000000, 0x400000, CRC(3631e93e) SHA1(3991d6cf03e4f39733d467c483857eac874505d1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20269.24", 0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3039,9 +3051,10 @@ ROM_START( getbass )    /* step 1.0, Sega game ID# is 833-13416 GET BASS STD, RO
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20313.21", 0x000000, 0x080000, CRC(863a7857) SHA1(72384dc6d7613806ab6bb84d935a3b0497e9e9d2) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20268.22", 0x000000, 0x400000, CRC(3631e93e) SHA1(3991d6cf03e4f39733d467c483857eac874505d1) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20269.24", 0x400000, 0x400000, CRC(105a3181) SHA1(022cbce1d01366461a584ff6225ded40bcb9000b) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3116,9 +3129,10 @@ ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19940.21", 0x000000, 0x080000, CRC(b06ffe5f) SHA1(1b49c2fbc3f188168828daf7f7f56a04c394e832) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19934.22", 0x000000, 0x400000, CRC(c7d8e194) SHA1(1d6a864a6f242219d13d5f96086a7d59c0e96e31) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19935.24", 0x400000, 0x400000, CRC(91c1b618) SHA1(36573304e9a7f19e17b31a69de9b25d9893bc2dc) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3190,9 +3204,10 @@ ROM_START( lostwsgp )   /* Step 1.5, build 1997/06/24, location test or preview 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ic21.21", 0x000000, 0x080000, CRC(78af6bee) SHA1(c4b395d8d3155c49b3b99f46f504103dd75690f3) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19934.22", 0x000000, 0x400000, CRC(c7d8e194) SHA1(1d6a864a6f242219d13d5f96086a7d59c0e96e31) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19935.24", 0x400000, 0x400000, CRC(91c1b618) SHA1(36573304e9a7f19e17b31a69de9b25d9893bc2dc) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3259,9 +3274,10 @@ ROM_START( vs2 )    /* Step 2.0 */
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19807.21", 0x000000, 0x080000, CRC(9641cbaf) SHA1(aaffde7678b40bc940be04fb107efc4d0d416ea1) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19785.22", 0x000000, 0x400000, CRC(e7d190e3) SHA1(f263af149e303429f469a3ab601b87461256aaa7) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19786.24", 0x400000, 0x400000, CRC(b08d889b) SHA1(790b5b2d62a28c39d43aeec9ffb365ccd9dc93af) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3328,9 +3344,10 @@ ROM_START( vs215 )  /* Step 1.5, Sega game ID# is 833-13089-02, ROM board ID# 83
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19807.21", 0x000000, 0x080000, CRC(9641cbaf) SHA1(aaffde7678b40bc940be04fb107efc4d0d416ea1) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19785.22", 0x000000, 0x400000, CRC(e7d190e3) SHA1(f263af149e303429f469a3ab601b87461256aaa7) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19786.24", 0x400000, 0x400000, CRC(b08d889b) SHA1(790b5b2d62a28c39d43aeec9ffb365ccd9dc93af) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3397,9 +3414,10 @@ ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-19807.21", 0x000000, 0x080000, CRC(9641cbaf) SHA1(aaffde7678b40bc940be04fb107efc4d0d416ea1) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-19785.22", 0x000000, 0x400000, CRC(e7d190e3) SHA1(f263af149e303429f469a3ab601b87461256aaa7) )
 	ROM_LOAD16_WORD_SWAP( "mpr-19786.24", 0x400000, 0x400000, CRC(b08d889b) SHA1(790b5b2d62a28c39d43aeec9ffb365ccd9dc93af) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3466,9 +3484,10 @@ ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20921.21", 0x000000, 0x080000, CRC(30f032a7) SHA1(d29c9631bd50fabe3d86343f44c37ee535db14a0) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20903.22", 0x000000, 0x400000, CRC(e343e131) SHA1(cb144516e8c6f1e68bcb774a26cdc494383d3e1b) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20904.24", 0x400000, 0x400000, CRC(21a91b84) SHA1(cd2d7231b8652ff38376b672c47127ce054d1f32) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3538,9 +3557,10 @@ ROM_START( vs29815 )    /* Step 1.5, Sega game ID# is 833-13494, ROM board ID# 8
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20921.21", 0x000000, 0x080000, CRC(30f032a7) SHA1(d29c9631bd50fabe3d86343f44c37ee535db14a0) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20903.22", 0x000000, 0x400000, CRC(e343e131) SHA1(cb144516e8c6f1e68bcb774a26cdc494383d3e1b) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20904.24", 0x400000, 0x400000, CRC(21a91b84) SHA1(cd2d7231b8652ff38376b672c47127ce054d1f32) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3607,9 +3627,10 @@ ROM_START( vs2v991 )    /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 8
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3679,9 +3700,10 @@ ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3751,9 +3773,10 @@ ROM_START( vs299 )  /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3823,9 +3846,10 @@ ROM_START( vs299j ) /* Step 2.0, Sega game ID# is 833-13688-01, ROM board ID# 83
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3895,9 +3919,10 @@ ROM_START( vs29915 )  /* Step 1.5, Sega game ID# is 833-13686-02 VS2 VER99 STEP 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -3964,9 +3989,10 @@ ROM_START( vs29915a )  /* Step 1.5, Sega game ID# is 833-13686-02 VS2 VER99 STEP
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -4033,9 +4059,10 @@ ROM_START( vs29915j )  /* Step 1.5, Sega game ID# is 833-13687-01 VS2 VER99 STEP
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21539a.21", 0x000000, 0x080000, CRC(a1d3e00e) SHA1(e03bb31967929a12de9ae21923914e0e3bd96aaa) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21513.22", 0x000000, 0x400000, CRC(cca1cc00) SHA1(ba1fa3b8ef3bff7e116901a0a4bd80d2ae4018bf) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21514.24", 0x400000, 0x400000, CRC(6cedd292) SHA1(c1f44715697a8bac9d39926bcd6558ec9a9b2319) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
@@ -4445,9 +4472,10 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21383.21", 0x000000, 0x080000, CRC(544d1e28) SHA1(8b4c99cf9ad0cf15d2d3da578bbc08705bafb829) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21355.22", 0x000000, 0x400000, CRC(c1b2d326) SHA1(118d9e02cdb9f500bd677b1de8331b29c57ca02f) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21357.24", 0x400000, 0x400000, CRC(02703fab) SHA1(c312f3d7967229660a7fb81b4fcd16c204d671cd) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "epr-21384.2", 0x000000, 0x20000, CRC(12fa4780) SHA1(a10ce82d81045cc49efcfba490693d06aeced3ae) )
@@ -4515,9 +4543,10 @@ ROM_START( swtrilgya )  /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-21383.21", 0x000000, 0x080000, CRC(544d1e28) SHA1(8b4c99cf9ad0cf15d2d3da578bbc08705bafb829) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21355.22", 0x000000, 0x400000, CRC(c1b2d326) SHA1(118d9e02cdb9f500bd677b1de8331b29c57ca02f) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21357.24", 0x400000, 0x400000, CRC(02703fab) SHA1(c312f3d7967229660a7fb81b4fcd16c204d671cd) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "epr-21384.2", 0x000000, 0x20000, CRC(12fa4780) SHA1(a10ce82d81045cc49efcfba490693d06aeced3ae) )
@@ -4575,9 +4604,10 @@ ROM_START( swtrilgyp )  // Step 2.1, Sega game ID# is 833-13586-T, ROM board ID#
 	ROM_REGION( 0x080000, "audiocpu", 0 )   // 68000 code
 	ROM_LOAD16_WORD_SWAP( "epr-srom0.21", 0x000000, 0x080000, CRC(2bb06489) SHA1(be7bbef4862fbc727a3b660790bf97b2132cb357) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    // SCSP samples, flash modules
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    // SCSP samples, flash modules
 	ROM_LOAD16_WORD_SWAP( "epr-srom1.22", 0x000000, 0x400000, CRC(0e52e2ec) SHA1(7d17781fced1a06a0dc7ca590e7bef83a70e149e) )
 	ROM_LOAD16_WORD_SWAP( "epr-srom3.24", 0x400000, 0x400000, CRC(841ed823) SHA1(450b255184b503351f17ffb3b5776634ec4f02e6) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	// prototype DSB is missing, we use ROMs from final ver
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
@@ -5099,9 +5129,10 @@ ROM_START( srally2 )    /* Step 2.0, Sega game ID# is 833-13373, ROM board ID# 8
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20636.21", 0x000000, 0x080000, CRC(7139ebf8) SHA1(3e06e8aa5c3eaf371073caa51e5fc5b42826f015) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20614.22", 0x000000, 0x400000, CRC(a3930e4a) SHA1(6a34f5b7817db8304454235997eaa453528bc655) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20615.24", 0x400000, 0x400000, CRC(62e8a94a) SHA1(abed71b1c6eb2563fe58e6598c10dd266340e5e0) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "epr-20641.2", 0x000000, 0x020000, CRC(c9b82035) SHA1(1e438f8104f79c2956bb1aeb710b01b6dc59101e) )
@@ -5165,9 +5196,10 @@ ROM_START( srally2p ) // prototype 1997/12/29
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ic21.21", 0x000000, 0x080000, CRC(82a4eb2e) SHA1(03eb4eb02c64f9b10aa8c8c802ddc4560db2831b) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20614.22", 0x000000, 0x400000, CRC(a3930e4a) SHA1(6a34f5b7817db8304454235997eaa453528bc655) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20615.24", 0x400000, 0x400000, CRC(62e8a94a) SHA1(abed71b1c6eb2563fe58e6598c10dd266340e5e0) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic2.2", 0x000000, 0x020000, CRC(61c3f8bc) SHA1(b6d04e286f96206d22a711b5f13cfa01f5c163ac) )
@@ -5231,9 +5263,10 @@ ROM_START( srally2pa ) // prototype 1997/12/08
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ic21.21", 0x000000, 0x080000, CRC(82a4eb2e) SHA1(03eb4eb02c64f9b10aa8c8c802ddc4560db2831b) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20614.22", 0x000000, 0x400000, CRC(a3930e4a) SHA1(6a34f5b7817db8304454235997eaa453528bc655) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20615.24", 0x400000, 0x400000, CRC(62e8a94a) SHA1(abed71b1c6eb2563fe58e6598c10dd266340e5e0) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic2.2", 0x000000, 0x020000, CRC(61c3f8bc) SHA1(b6d04e286f96206d22a711b5f13cfa01f5c163ac) )
@@ -5297,9 +5330,10 @@ ROM_START( srally2dx )   /* Step 2.0, Sega game ID# is 833-13371, ROM board ID# 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "epr-20506.21", 0x000000, 0x080000, CRC(855af67b) SHA1(a0359b8329c9c0746bc996b9272b7a1f2db07368) )
 
-	ROM_REGION16_BE( 0x800000, "samples", 0 )    /* SCSP samples */
+	ROM_REGION16_BE( 0x1000000, "samples", 0 )    /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-20484.22", 0x000000, 0x400000, CRC(8ac3fbc4) SHA1(8b7624506ff00256a745bb4b7393cf17a081faa4) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20485.24", 0x400000, 0x400000, CRC(cfd8c19b) SHA1(3b8cc045cb02b93f9d35b81a48085d4d480d6bff) )
+	ROM_COPY( "samples", 0, 0x800000, 0x800000 )
 
 	// TODO: missing dump?
 	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
@@ -6247,23 +6281,12 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-void model3_state::model3snd_ctrl(uint16_t data)
+// TODO: bits 3-0 also used here
+// cfr. spikeout/spikeofe sound test
+// (hint: use p1 inputs ignore Sega wacky instructions)
+void model3_state::sound_control_w(uint8_t data)
 {
-	// handle sample banking
-	if (memregion("samples")->bytes() > 0x800000)
-	{
-		uint8_t *snd = memregion("samples")->base();
-		if (data & 0x20)
-		{
-			membank("bank4")->set_base(snd + 0x200000);
-			membank("bank5")->set_base(snd + 0x600000);
-		}
-		else
-		{
-			membank("bank4")->set_base(snd + 0x800000);
-			membank("bank5")->set_base(snd + 0xa00000);
-		}
-	}
+	m_sound_bank->set_entry(BIT(data, 4));
 }
 
 // We assume using the same waitstate weights as Saturn, applied to SCSP area only
@@ -6273,11 +6296,9 @@ void model3_state::model3_snd(address_map &map)
 	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp1, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x200000, 0x27ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram2");
 	map(0x300000, 0x300fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	map(0x400000, 0x400001).w(FUNC(model3_state::model3snd_ctrl));
+	map(0x400001, 0x400001).w(FUNC(model3_state::sound_control_w));
 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
-	map(0x800000, 0x9fffff).rom().region("samples", 0);
-	map(0xa00000, 0xdfffff).bankr("bank4");
-	map(0xe00000, 0xffffff).bankr("bank5");
+	map(0x800000, 0xffffff).bankr(m_sound_bank);
 }
 
 void model3_state::scsp1_map(address_map &map)
@@ -6319,6 +6340,8 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 void model3_state::dsb2_config(machine_config &config)
 {
 	DSB2(config, m_dsb2);
+	// TODO: should be chained with SCSP EXTS not being direct
+	// spikeout/spikeofe sounds ugly mixing wise
 	m_dsb2->add_route(0, "speaker", 1.0, 0);
 	m_dsb2->add_route(1, "speaker", 1.0, 1);
 
@@ -6880,22 +6903,12 @@ void model3_state::init_dayto2pe()
 
 void model3_state::init_spikeout()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
-
-	// HACK: sound dies often without these patches, investigate
-	rom[(0x6059cc^4)/4] = 0x60000000;
-	rom[(0x6059ec^4)/4] = 0x60000000;
 }
 
 void model3_state::init_spikeofe()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
-
-	// HACK: as above
-	rom[(0x6059cc^4)/4] = 0x60000000;
-	rom[(0x6059ec^4)/4] = 0x60000000;
 }
 
 void model3_state::init_eca()
