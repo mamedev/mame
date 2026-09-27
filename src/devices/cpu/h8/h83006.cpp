@@ -61,11 +61,11 @@ void h83006_device::map(address_map &map)
 	map(base | 0xee016, base | 0xee016).rw(m_intc, FUNC(h8h_intc_device::isr_r), FUNC(h8h_intc_device::isr_w));
 	map(base | 0xee018, base | 0xee019).rw(m_intc, FUNC(h8h_intc_device::icr_r), FUNC(h8h_intc_device::icr_w));
 
-	map(base | 0xee03e, base | 0xee03e).rw(m_port4, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
-
 	map(base | 0xee028, base | 0xee028).rw(m_refresh, FUNC(h8_refresh_device::rtmcsr_r), FUNC(h8_refresh_device::rtmcsr_w));
 	map(base | 0xee029, base | 0xee029).rw(m_refresh, FUNC(h8_refresh_device::rtcnt_r), FUNC(h8_refresh_device::rtcnt_w));
 	map(base | 0xee02a, base | 0xee02a).rw(m_refresh, FUNC(h8_refresh_device::rtcor_r), FUNC(h8_refresh_device::rtcor_w));
+
+	map(base | 0xee03e, base | 0xee03e).rw(m_port4, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 
 	map(base | m_ram_start, base | 0xfff1f).ram();
 
