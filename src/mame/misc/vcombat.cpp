@@ -592,6 +592,7 @@ void vcombat_state::init_vcombat()
 	m_i860_framebuffer[1][0] = std::make_unique<uint16_t[]>(0x8000);
 	m_i860_framebuffer[1][1] = std::make_unique<uint16_t[]>(0x8000);
 
+	// HACK: get rid of this
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
 	   I think what is happening here is that M0 snags the first time
 	   it hits this point based on a counter test just above this

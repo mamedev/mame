@@ -6713,6 +6713,7 @@ void norautp_state::init_enc()
 
 void norautp_state::init_unka()
 {
+	// HACK: what are these for?
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x0000] = 0x00;
 	ROM[0x0001] = 0xf3;

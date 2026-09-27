@@ -409,11 +409,11 @@ void cm32p_state::machine_start()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// TODO: The IC8 gate array has an "LCD INT" line that needs to be emulated. Then, the hack can be removed.
-	// Note: The hack is not necessary when *not* using test mode.
+	// HACK: The IC8 gate array has an "LCD INT" line that needs to be emulated.
+	// NOTE: The hack is not necessary when *not* using test mode.
 	rom[0xbb2d] = 0x03; // hack to make test mode not freeze when displaying the LCD text
 
-	// TODO: remove this hack
+	// HACK: remove this hack
 	rom[0x7d80] = 0x00; // hack to exit some loop waiting for interrupt #8
 }
 

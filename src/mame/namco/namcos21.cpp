@@ -1088,6 +1088,7 @@ ROM_END
 } // Anonymous namespace
 
 
+// HACK: work around this race condition for winrungp/winrun91 service mode
 /*
 
 Both winrungp and winrun91 have a bug in service mode, which will cause the GPU to lock

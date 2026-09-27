@@ -65,7 +65,7 @@ void ie15_cpu_device::device_start()
 	state_add(IE15_A,        "A",        m_A);
 
 	for (int ireg = 0; ireg < 32; ireg++)
-		state_add(IE15_R0 + ireg, string_format("R%d", ireg).c_str(), m_REGS[ireg]);
+		state_add(IE15_R0 + ireg, string_format("R%d", ireg), m_REGS[ireg]);
 }
 
 //-------------------------------------------------

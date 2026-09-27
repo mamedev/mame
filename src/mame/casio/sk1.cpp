@@ -39,8 +39,8 @@ public:
 	{
 	}
 
-	void sk1(machine_config &config);
-	void sk5(machine_config &config);
+	void sk1(machine_config &config) ATTR_COLD;
+	void sk5(machine_config &config) ATTR_COLD;
 
 	// make slide switches usable on a keyboard
 	template <ioport_value V> DECLARE_INPUT_CHANGED_MEMBER(sw_function);
@@ -52,7 +52,7 @@ public:
 private:
 	void sk1_memory(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 	ioport_value    m_sw_function = 0xfe;
 	ioport_value    m_sw_mode = 0xfe;
@@ -79,7 +79,7 @@ template <ioport_value V> INPUT_CHANGED_MEMBER(sk1_state::sw_mode)
 }
 
 
-void sk1_state::driver_start()
+void sk1_state::machine_start()
 {
 	save_item(NAME(m_sw_function));
 	save_item(NAME(m_sw_mode));

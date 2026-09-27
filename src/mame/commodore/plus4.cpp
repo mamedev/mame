@@ -4,7 +4,6 @@
 
     TODO:
 
-    - c16 function ROM test fails
     - clean up TED
     - T6721 speech chip
 
@@ -15,6 +14,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "bus/pet/c2n.h"
 #include "bus/pet/cass.h"
 #include "bus/pet/diag264_lb_tape.h"
@@ -29,7 +30,6 @@
 #include "machine/mos6551.h"
 #include "machine/mos8706.h"
 #include "machine/pla.h"
-#include "machine/ram.h"
 #include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
@@ -54,7 +54,6 @@ public:
 	plus4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "u2"),
-		m_pla(*this, PLA_TAG),
 		m_ted(*this, MOS7360_TAG),
 		m_acia(*this, MOS6551_TAG),
 		m_spi_user(*this, MOS6529_USER_TAG),
@@ -65,11 +64,17 @@ public:
 		m_joy2(*this, CONTROL2_TAG),
 		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
-		m_ram(*this, RAM_TAG),
+		m_ram(*this, "ram"),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_kernal(*this, "kernal"),
 		m_function(*this, "function"),
+		m_function_lo(*this, "function_lo"),
+		m_function_hi(*this, "function_hi"),
 		m_c2(*this, "c2"),
+		m_lo(*this, "lo"),
+		m_hi(*this, "hi"),
+		m_video_lo(*this, "video_lo"),
+		m_video_hi(*this, "video_hi"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_portswap(*this, "JOYSWAP"),
@@ -79,12 +84,12 @@ public:
 	void plus4(machine_config &config);
 	void plus4p(machine_config &config);
 	void plus4n(machine_config &config);
+	void c264(machine_config &config);
 
 	void cpu_w(uint8_t data);
 
 protected:
 	required_device<m7501_device> m_maincpu;
-	required_device<pla_device> m_pla;
 	required_device<mos7360_device> m_ted;
 	optional_device<mos6551_device> m_acia;
 	optional_device<mos6529_device> m_spi_user;
@@ -95,24 +100,41 @@ protected:
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<plus4_expansion_slot_device> m_exp;
 	optional_device<pet_user_port_device> m_user;
-	required_device<ram_device> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_memory_region m_kernal;
 	optional_memory_region m_function;
+	optional_device<generic_slot_device> m_function_lo;
+	optional_device<generic_slot_device> m_function_hi;
 	optional_memory_region m_c2;
+	memory_view m_lo;
+	memory_view m_hi;
+	memory_view m_video_lo;
+	memory_view m_video_hi;
 	required_ioport_array<8> m_row;
 	required_ioport m_lock;
 	optional_ioport m_portswap;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
-	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
-	uint8_t read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
+	void install_lo_rom(address_space_installer &space, offs_t base, uint8_t *rom);
+	void install_hi_rom(address_space_installer &space, offs_t base, uint8_t *rom);
+	void install_lo_view(memory_view &view, offs_t base);
+	void install_hi_view(memory_view &view, offs_t base);
+	uint8_t *socket_rom(generic_slot_device *socket, offs_t offset);
+	void install_views();
+	void update_banks();
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
-	uint8_t ted_videoram_r(offs_t offset);
+	uint8_t acia_r(offs_t offset);
+	void acia_w(offs_t offset, uint8_t data);
+	uint8_t user_r();
+	void user_w(uint8_t data);
+	uint8_t vslsi_r(offs_t offset);
+	void vslsi_w(offs_t offset, uint8_t data);
+	void addr_w(offs_t offset, uint8_t data);
+	void ted_rom_w(offs_t offset, uint8_t data);
 
 	uint8_t cpu_r();
 
@@ -137,28 +159,23 @@ protected:
 
 	enum
 	{
-		CS0_BASIC = 0,
-		CS0_FUNCTION_LO,
-		CS0_C1_LOW,
-		CS0_C2_LOW
-	};
-
-	enum
-	{
-		CS1_KERNAL = 0,
-		CS1_FUNCTION_HI,
-		CS1_C1_HIGH,
-		CS1_C2_HIGH
+		VIEW_RAM = 0,
+		VIEW_INTERNAL,
+		VIEW_FUNCTION,
+		VIEW_C1,
+		VIEW_C2
 	};
 
 	// memory state
 	uint8_t m_addr;
+	std::unique_ptr<uint8_t[]> m_socket_rom;
+	uint8_t *m_function_rom[2];
 
 	// keyboard state
 	uint8_t m_kb;
 
-	void plus4_mem(address_map &map) ATTR_COLD;
-	void ted_videoram_map(address_map &map) ATTR_COLD;
+	template <offs_t RamSize> void plus4_mem(address_map &map) ATTR_COLD;
+	template <offs_t RamSize> void ted_videoram_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -181,221 +198,236 @@ private:
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define BA15 BIT(offset, 15)
-#define BA14 BIT(offset, 14)
-#define BA13 BIT(offset, 13)
-#define BA12 BIT(offset, 12)
-#define BA11 BIT(offset, 11)
-#define BA10 BIT(offset, 10)
-#define BA9 BIT(offset, 9)
-#define BA8 BIT(offset, 8)
-#define BA7 BIT(offset, 7)
-#define BA6 BIT(offset, 6)
-#define BA5 BIT(offset, 5)
-#define BA4 BIT(offset, 4)
-
-
-//**************************************************************************
 //  MEMORY MANAGEMENT
 //**************************************************************************
 
-void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal)
-{
-	uint16_t i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
-	uint8_t data = m_pla->read(i);
+//-------------------------------------------------
+//  install_lo_rom -
+//-------------------------------------------------
 
-	*scs = BIT(data, 0);
-	*phi2 = BIT(data, 1);
-	*user = BIT(data, 2);
-	*_6551 = BIT(data, 3);
-	*addr_clk = BIT(data, 4);
-	*keyport = BIT(data, 5);
-	*kernal = BIT(data, 6);
+void plus4_state::install_lo_rom(address_space_installer &space, offs_t base, uint8_t *rom)
+{
+	if (rom)
+		space.install_rom(base, base + 0x3fff, rom);
+	else
+		space.install_read_handler(base, base + 0x3fff, emu::rw_delegate(*m_ted, FUNC(mos7360_device::bus_r)));
 }
 
 
 //-------------------------------------------------
-//  read_memory -
+//  install_hi_rom -
 //-------------------------------------------------
 
-uint8_t plus4_state::read_memory(offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
+void plus4_state::install_hi_rom(address_space_installer &space, offs_t base, uint8_t *rom)
 {
-	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
-	uint8_t data = m_ted->read(offset, cs0, cs1);
-
-	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
-
-	if (!scs && m_vslsi)
+	if (rom)
 	{
-		data = m_vslsi->read(offset & 0x03);
+		space.install_rom(base, base + 0x3bff, rom);
+		space.install_rom(base + 0x3f20, base + 0x3fff, rom + 0x3f20);
 	}
-	else if (!user)
+	else
 	{
-		if (m_spi_user)
-		{
-			data = m_spi_user->read();
-		}
-
-		data &= ~0x04;
-		data |= m_cassette->sense_r() << 2;
-	}
-	else if (!_6551 && m_acia)
-	{
-		data = m_acia->read(offset & 0x03);
-	}
-	else if (!keyport)
-	{
-		data = m_spi_kb->read();
-	}
-	else if (!cs0)
-	{
-		switch (m_addr & 0x03)
-		{
-		case CS0_BASIC:
-			data = m_kernal->base()[offset & 0x7fff];
-			break;
-
-		case CS0_FUNCTION_LO:
-			if (m_function != nullptr)
-			{
-				data = m_function->base()[offset & 0x7fff];
-			}
-			break;
-
-		case CS0_C1_LOW:
-			c1l = 0;
-			break;
-
-		case CS0_C2_LOW:
-			c2l = 0;
-
-			if (m_c2 != nullptr)
-			{
-				data = m_c2->base()[offset & 0x7fff];
-			}
-			break;
-		}
-	}
-	else if (!cs1)
-	{
-		if (kernal)
-		{
-			data = m_kernal->base()[offset & 0x7fff];
-		}
-		else
-		{
-			switch ((m_addr >> 2) & 0x03)
-			{
-			case CS1_KERNAL:
-				data = m_kernal->base()[offset & 0x7fff];
-				break;
-
-			case CS1_FUNCTION_HI:
-				if (m_function != nullptr)
-				{
-					data = m_function->base()[offset & 0x7fff];
-				}
-				break;
-
-			case CS1_C1_HIGH:
-				c1h = 0;
-				break;
-
-			case CS1_C2_HIGH:
-				c2h = 0;
-
-				if (m_c2 != nullptr)
-				{
-					data = m_c2->base()[offset & 0x7fff];
-				}
-				break;
-			}
-		}
-	}
-	else if (offset < 0xfd00 || offset >= 0xff20)
-	{
-		data = m_ram->pointer()[offset & m_ram->mask()];
+		space.install_read_handler(base, base + 0x3bff, emu::rw_delegate(*m_ted, FUNC(mos7360_device::bus_r)));
+		space.install_read_handler(base + 0x3f20, base + 0x3fff, emu::rw_delegate(*m_ted, FUNC(mos7360_device::bus_r)));
 	}
 
-	return m_exp->cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	space.install_rom(base + 0x3c00, base + 0x3cff, m_kernal->base() + 0x7c00);
 }
 
 
 //-------------------------------------------------
-//  read -
+//  install_lo_view -
 //-------------------------------------------------
 
-uint8_t plus4_state::read(offs_t offset)
+void plus4_state::install_lo_view(memory_view &view, offs_t base)
 {
-	int phi0 = 1, mux = 0, ras = 0, ba = 1;
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
-
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
-
-	return read_memory(offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
+	install_lo_rom(view[VIEW_INTERNAL], base, m_kernal->base());
+	install_lo_rom(view[VIEW_FUNCTION], base, m_function_rom[0]);
+	install_lo_rom(view[VIEW_C1], base, nullptr);
+	install_lo_rom(view[VIEW_C2], base, m_c2 ? m_c2->base() : nullptr);
 }
 
 
 //-------------------------------------------------
-//  write -
+//  install_hi_view -
 //-------------------------------------------------
 
-void plus4_state::write(offs_t offset, uint8_t data)
+void plus4_state::install_hi_view(memory_view &view, offs_t base)
 {
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
-	int phi0 = 1, mux = 0, ras = 0, ba = 1;
-	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
+	install_hi_rom(view[VIEW_INTERNAL], base, m_kernal->base() + 0x4000);
+	install_hi_rom(view[VIEW_FUNCTION], base, m_function_rom[1]);
+	install_hi_rom(view[VIEW_C1], base, nullptr);
+	install_hi_rom(view[VIEW_C2], base, m_c2 ? m_c2->base() + 0x4000 : nullptr);
+}
 
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	m_ted->write(offset, data, cs0, cs1);
+//-------------------------------------------------
+//  socket_rom - mirror a function ROM socket
+//  into a 16K bank
+//-------------------------------------------------
 
-	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
+uint8_t *plus4_state::socket_rom(generic_slot_device *socket, offs_t offset)
+{
+	if (!socket || !socket->exists() || !socket->get_rom_size())
+		return nullptr;
 
-	if (!scs && m_vslsi)
+	if (!m_socket_rom)
+		m_socket_rom = std::make_unique<uint8_t[]>(0x8000);
+
+	uint8_t *const rom = socket->get_rom_base();
+	uint32_t const size = socket->get_rom_size();
+
+	for (offs_t i = 0; i < 0x4000; i++)
+		m_socket_rom[offset + i] = rom[i % size];
+
+	return &m_socket_rom[offset];
+}
+
+
+//-------------------------------------------------
+//  install_views -
+//-------------------------------------------------
+
+void plus4_state::install_views()
+{
+	if (m_function)
 	{
-		m_vslsi->write(offset & 0x03, data);
+		m_function_rom[0] = m_function->base();
+		m_function_rom[1] = m_function->base() + 0x4000;
 	}
-	else if (!user && m_spi_user)
+	else
 	{
+		m_function_rom[0] = socket_rom(m_function_lo, 0x0000);
+		m_function_rom[1] = socket_rom(m_function_hi, 0x4000);
+	}
+
+	m_lo[VIEW_RAM];
+	m_hi[VIEW_RAM];
+	install_lo_view(m_lo, 0x8000);
+	install_hi_view(m_hi, 0xc000);
+	install_lo_view(m_video_lo, 0x18000);
+	install_hi_view(m_video_hi, 0x1c000);
+
+	m_exp->c1l().install_views(m_lo[VIEW_C1], &m_video_lo[VIEW_C1]);
+	m_exp->c1h().install_views(m_hi[VIEW_C1], &m_video_hi[VIEW_C1]);
+	m_exp->c2l().install_views(m_lo[VIEW_C2], &m_video_lo[VIEW_C2]);
+	m_exp->c2h().install_views(m_hi[VIEW_C2], &m_video_hi[VIEW_C2]);
+	m_exp->io().install_views(m_maincpu->space(AS_PROGRAM));
+}
+
+
+//-------------------------------------------------
+//  update_banks -
+//-------------------------------------------------
+
+void plus4_state::update_banks()
+{
+	int const lo = VIEW_INTERNAL + (m_addr & 0x03);
+	int const hi = VIEW_INTERNAL + ((m_addr >> 2) & 0x03);
+
+	if (m_ted->rom())
+	{
+		m_lo.select(lo);
+		m_hi.select(hi);
+	}
+	else
+	{
+		m_lo.select(VIEW_RAM);
+		m_hi.select(VIEW_RAM);
+	}
+
+	m_video_lo.select(lo);
+	m_video_hi.select(hi);
+}
+
+
+//-------------------------------------------------
+//  acia_r -
+//-------------------------------------------------
+
+uint8_t plus4_state::acia_r(offs_t offset)
+{
+	return m_acia ? m_acia->read(offset) : m_ted->bus_r();
+}
+
+
+//-------------------------------------------------
+//  acia_w -
+//-------------------------------------------------
+
+void plus4_state::acia_w(offs_t offset, uint8_t data)
+{
+	if (m_acia)
+		m_acia->write(offset, data);
+}
+
+
+//-------------------------------------------------
+//  user_r -
+//-------------------------------------------------
+
+uint8_t plus4_state::user_r()
+{
+	if (m_spi_user)
+		return m_spi_user->read() & ~(!m_cassette->sense_r() << 2);
+
+	return (m_ted->bus_r() & ~0x04) | (m_cassette->sense_r() << 2);
+}
+
+
+//-------------------------------------------------
+//  user_w -
+//-------------------------------------------------
+
+void plus4_state::user_w(uint8_t data)
+{
+	if (m_spi_user)
 		m_spi_user->write(data);
-	}
-	else if (!_6551 && m_acia)
-	{
-		m_acia->write(offset & 0x03, data);
-	}
-	else if (!addr_clk)
-	{
-		m_addr = offset & 0x0f;
-	}
-	else if (!keyport)
-	{
-		m_spi_kb->write(data);
-	}
-	else if (offset < 0xfd00 || offset >= 0xff20)
-	{
-		m_ram->pointer()[offset & m_ram->mask()] = data;
-	}
-
-	m_exp->cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
 //-------------------------------------------------
-//  ted_videoram_r -
+//  vslsi_r -
 //-------------------------------------------------
 
-uint8_t plus4_state::ted_videoram_r(offs_t offset)
+uint8_t plus4_state::vslsi_r(offs_t offset)
 {
-	int phi0 = 1, mux = 0, ras = 1, ba = 0;
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
+	return m_vslsi ? m_vslsi->read(offset) : m_ted->bus_r();
+}
 
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
+//-------------------------------------------------
+//  vslsi_w -
+//-------------------------------------------------
+
+void plus4_state::vslsi_w(offs_t offset, uint8_t data)
+{
+	if (m_vslsi)
+		m_vslsi->write(offset, data);
+}
+
+
+//-------------------------------------------------
+//  addr_w -
+//-------------------------------------------------
+
+void plus4_state::addr_w(offs_t offset, uint8_t data)
+{
+	m_addr = offset & 0x0f;
+
+	update_banks();
+}
+
+
+//-------------------------------------------------
+//  ted_rom_w -
+//-------------------------------------------------
+
+void plus4_state::ted_rom_w(offs_t offset, uint8_t data)
+{
+	m_ted->write(0x3e + offset, data);
+
+	update_banks();
 }
 
 
@@ -408,9 +440,21 @@ uint8_t plus4_state::ted_videoram_r(offs_t offset)
 //  ADDRESS_MAP( plus4_mem )
 //-------------------------------------------------
 
+template <offs_t RamSize>
 void plus4_state::plus4_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(plus4_state::read), FUNC(plus4_state::write));
+	map(0x0000, RamSize - 1).mirror(0xffff & ~(RamSize - 1)).ram().share(m_ram);
+	map(0xfd00, 0xff1f).r(m_ted, FUNC(mos7360_device::bus_r)).nopw();
+	map(0xfd00, 0xfd03).mirror(0x0c).rw(FUNC(plus4_state::acia_r), FUNC(plus4_state::acia_w));
+	map(0xfd10, 0xfd1f).rw(FUNC(plus4_state::user_r), FUNC(plus4_state::user_w));
+	map(0xfd20, 0xfd23).mirror(0x0c).rw(FUNC(plus4_state::vslsi_r), FUNC(plus4_state::vslsi_w));
+	map(0xfd30, 0xfd3f).rw(m_spi_kb, FUNC(mos6529_device::read), FUNC(mos6529_device::write));
+	map(0xfdd0, 0xfddf).w(FUNC(plus4_state::addr_w));
+	map(0xff00, 0xff1f).rw(m_ted, FUNC(mos7360_device::read), FUNC(mos7360_device::write));
+	map(0xff3e, 0xff3f).w(FUNC(plus4_state::ted_rom_w));
+	map(0x8000, 0xbfff).view(m_lo);
+	map(0xc000, 0xffff).view(m_hi);
+	m_hi[VIEW_RAM](0xff3e, 0xff3f).lr8(NAME([] () { return 0xff; }));
 }
 
 
@@ -418,9 +462,12 @@ void plus4_state::plus4_mem(address_map &map)
 //  ADDRESS_MAP( ted_videoram_map )
 //-------------------------------------------------
 
+template <offs_t RamSize>
 void plus4_state::ted_videoram_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(plus4_state::ted_videoram_r));
+	map(0x00000, RamSize - 1).mirror(0x1ffff & ~(RamSize - 1)).ram().share(m_ram);
+	map(0x18000, 0x1bfff).view(m_video_lo);
+	map(0x1c000, 0x1ffff).view(m_video_hi);
 }
 
 
@@ -571,7 +618,7 @@ uint8_t plus4_state::cpu_r()
 	    4       CST RD
 	    5
 	    6       IEC CLK IN
-	    7       IEC DATA IN, CST SENSE
+	    7       IEC DATA IN
 
 	*/
 
@@ -583,8 +630,8 @@ uint8_t plus4_state::cpu_r()
 	// serial clock
 	data |= m_iec->clk_r() << 6;
 
-	// serial data, cassette sense
-	data |= (m_iec->data_r() && m_cassette->sense_r()) << 7;
+	// serial data
+	data |= m_iec->data_r() << 7;
 
 	return data;
 }
@@ -749,11 +796,16 @@ void plus4_state::machine_start()
 	// initialize memory
 	uint8_t data = 0xff;
 
-	for (offs_t offset = 0; offset < m_ram->size(); offset++)
+	for (offs_t offset = 0; offset < m_ram.bytes(); offset++)
 	{
-		m_ram->pointer()[offset] = data;
+		m_ram[offset] = data;
 		if (!(offset % 64)) data ^= 0xff;
 	}
+
+	if (!strcmp(machine().system().name, "c264") && (m_kernal->base()[0x5831] == 0x0d))
+		m_kernal->base()[0x5831] = 0x0f;
+
+	install_views();
 
 	// state saving
 	save_item(NAME(m_addr));
@@ -784,6 +836,14 @@ void plus4_state::machine_reset()
 	}
 
 	m_addr = 0;
+
+	update_banks();
+}
+
+
+void plus4_state::device_post_load()
+{
+	update_banks();
 }
 
 
@@ -800,7 +860,7 @@ void plus4_state::plus4(machine_config &config)
 {
 	// basic machine hardware
 	M7501(config, m_maincpu, 0); // derived configurations will set clock frequency
-	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem<0x10000>);
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
 	config.set_perfect_quantum(m_maincpu);
@@ -811,22 +871,22 @@ void plus4_state::plus4(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(mos7360_device::PAL_VRETRACERATE);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(336, 216);
-	screen.set_visarea(0, 336 - 1, 0, 216 - 1);
+	screen.set_size(384, 288);
+	screen.set_visarea(0, 384 - 1, 0, 288 - 1);
 	screen.set_screen_update(MOS7360_TAG, FUNC(mos7360_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();
 
 	MOS7360(config, m_ted);
 	m_ted->set_cpu_tag(m_maincpu);
-	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map);
+	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map<0x10000>);
 	m_ted->set_screen(SCREEN_TAG);
 	m_ted->write_irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_ted->read_k_callback().set(FUNC(plus4_state::ted_k_r));
 	m_ted->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	PLS100(config, m_pla);
+	PLS100(config, PLA_TAG);
 
 	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
 	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
@@ -881,16 +941,11 @@ void plus4_state::plus4(machine_config &config)
 
 	PLUS4_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/16, plus4_expansion_cards, "c1551");
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
-	m_exp->cd_rd_callback().set(FUNC(plus4_state::read));
-	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
 	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg", attotime::from_msec(100)));
 	quickload.set_load_callback(FUNC(plus4_state::quickload));
 	quickload.set_interface("cbm_quik");
-
-	// internal ram
-	RAM(config, m_ram).set_default_size("64K");
 }
 
 
@@ -928,6 +983,11 @@ void plus4_state::plus4n(machine_config &config)
 	m_maincpu->set_clock(XTAL(14'318'181)/16);
 	m_ted->set_clock(XTAL(14'318'181));
 
+	screen_device &screen(*subdevice<screen_device>(SCREEN_TAG));
+	screen.set_refresh_hz(mos7360_device::NTSC_VRETRACERATE);
+	screen.set_size(384, 240);
+	screen.set_visarea(0, 384 - 1, 0, 240 - 1);
+
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("plus4_cass");
@@ -939,6 +999,19 @@ void plus4_state::plus4n(machine_config &config)
 	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
 	subdevice<software_list_device>("quik_list")->set_filter("NTSC");
 	subdevice<software_list_device>("sdcard_list")->set_filter("NTSC");
+}
+
+
+//-------------------------------------------------
+//  machine_config( c264 )
+//-------------------------------------------------
+
+void plus4_state::c264(machine_config &config)
+{
+	plus4n(config);
+
+	GENERIC_SOCKET(config, m_function_lo, generic_plain_slot, "c264_rom", "bin,rom");
+	GENERIC_SOCKET(config, m_function_hi, generic_plain_slot, "c264_rom", "bin,rom");
 }
 
 
@@ -958,7 +1031,8 @@ void c16_state::c16n(machine_config &config)
 
 	m_iec->atn_callback().set_nop();
 
-	m_ram->set_default_size("16K").set_extra_options("64K");
+	m_maincpu->set_addrmap(AS_PROGRAM, &c16_state::plus4_mem<0x4000>);
+	m_ted->set_addrmap(0, &c16_state::ted_videoram_map<0x4000>);
 }
 
 
@@ -978,14 +1052,20 @@ void c16_state::c16p(machine_config &config)
 
 	m_iec->atn_callback().set_nop();
 
-	m_ram->set_default_size("16K").set_extra_options("64K");
+	m_maincpu->set_addrmap(AS_PROGRAM, &c16_state::plus4_mem<0x4000>);
+	m_ted->set_addrmap(0, &c16_state::ted_videoram_map<0x4000>);
 }
 
 
 void c16_state::c232(machine_config &config)
 {
 	c16p(config);
-	m_ram->set_default_size("32K");
+
+	GENERIC_SOCKET(config, m_function_lo, generic_plain_slot, "c264_rom", "bin,rom");
+	GENERIC_SOCKET(config, m_function_hi, generic_plain_slot, "c264_rom", "bin,rom");
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &c16_state::plus4_mem<0x8000>);
+	m_ted->set_addrmap(0, &c16_state::ted_videoram_map<0x8000>);
 }
 
 
@@ -1014,10 +1094,7 @@ void c16_state::v364(machine_config &config)
 ROM_START( c264 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "basic-264.bin", 0x0000, 0x4000, CRC(6a2fc8e3) SHA1(473fce23afa07000cdca899fbcffd6961b36a8a0) )
-	ROM_LOAD( "kernal-264.bin", 0x4000, 0x4000, CRC(8f32abe7) SHA1(d481faf5fcbb331878dc7851c642d04f26a32873) )
-
-	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
-	// TODO: add cart slots to mount EPROMs here
+	ROM_LOAD( "kernal-264.bin", 0x4000, 0x4000, CRC(c57d5dfd) SHA1(dfaec5b2a03c25e5626b5539f936b5f2688e657c) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
@@ -1032,9 +1109,6 @@ ROM_START( c232 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "318006-01.u4", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "318004-01.u5", 0x4000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
-
-	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
-	// TODO: add cart slots to mount EPROMs here
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u7", 0x00, 0xf5, CRC(328538af) SHA1(ccda76572e6c164c31454c8ce083e161e1ddfe0a) )
@@ -1205,9 +1279,9 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                        FULLNAME                      FLAGS
-COMP( 1984, c264,   0,      0,      plus4n,  plus4, plus4_state, empty_init, "Commodore Business Machines", "Commodore 264 (Prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, c264,   0,      0,      c264,    plus4, plus4_state, empty_init, "Commodore Business Machines", "Commodore 264 (Prototype)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1984, c232,   c264,   0,      c232,    plus4, c16_state,   empty_init, "Commodore Business Machines", "Commodore 232 (Prototype)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, v364,   c264,   0,      v364,    plus4, c16_state,   empty_init, "Commodore Business Machines", "Commodore V364 (Prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, v364,   c264,   0,      v364,    plus4, c16_state,   empty_init, "Commodore Business Machines", "Commodore V364 (Prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, plus4,  c264,   0,      plus4n,  plus4, plus4_state, empty_init, "Commodore Business Machines", "Plus/4 (NTSC)",              MACHINE_SUPPORTS_SAVE )
 COMP( 1984, plus4p, c264,   0,      plus4p,  plus4, plus4_state, empty_init, "Commodore Business Machines", "Plus/4 (PAL)",               MACHINE_SUPPORTS_SAVE )
 COMP( 1984, c16,    c264,   0,      c16n,    c16,   c16_state,   empty_init, "Commodore Business Machines", "Commodore 16 (NTSC)",        MACHINE_SUPPORTS_SAVE )

@@ -98,49 +98,18 @@ void plus4_sid_cartridge_device::device_start()
 void plus4_sid_cartridge_device::device_reset()
 {
 	m_sid->reset();
+
+	m_slot->io().install_readwrite_handler(0x040, 0x05f, emu::rw_delegate(*m_sid, FUNC(mos6581_device::read)), emu::rw_delegate(*m_sid, FUNC(mos6581_device::write)));
+	m_slot->io().install_readwrite_handler(0x180, 0x19f, emu::rw_delegate(*m_sid, FUNC(mos6581_device::read)), emu::rw_delegate(*m_sid, FUNC(mos6581_device::write)));
+	m_slot->io().install_read_handler(0x080, 0x08f, emu::rw_delegate(*this, FUNC(plus4_sid_cartridge_device::joy_r)));
 }
 
 
 //-------------------------------------------------
-//  plus4_cd_r - cartridge data read
+//  joy_r - joystick read
 //-------------------------------------------------
 
-uint8_t plus4_sid_cartridge_device::plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t plus4_sid_cartridge_device::joy_r()
 {
-	if ((offset >= 0xfe80 && offset < 0xfea0) || (offset >= 0xfd40 && offset < 0xfd60))
-	{
-		data = m_sid->read(offset & 0x1f);
-	}
-	else if (offset >= 0xfd80 && offset < 0xfd90)
-	{
-		data = m_joy->read_joy();
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  plus4_cd_w - cartridge data write
-//-------------------------------------------------
-
-void plus4_sid_cartridge_device::plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
-{
-	if ((offset >= 0xfe80 && offset < 0xfea0) || (offset >= 0xfd40 && offset < 0xfd60))
-	{
-		m_sid->write(offset & 0x1f, data);
-	}
-}
-
-
-//-------------------------------------------------
-//  plus4_breset_w - buffered reset write
-//-------------------------------------------------
-
-void plus4_sid_cartridge_device::plus4_breset_w(int state)
-{
-	if (state == ASSERT_LINE)
-	{
-		device_reset();
-	}
+	return m_joy->read_joy();
 }

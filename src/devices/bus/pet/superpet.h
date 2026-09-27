@@ -64,6 +64,7 @@ private:
 	required_ioport m_io_sw2;
 
 	inline void update_cpu();
+	inline bool is_6809_active();
 	inline bool is_ram_writable();
 
 	uint8_t m_system;
@@ -71,8 +72,7 @@ private:
 	uint8_t m_sw1;
 	uint8_t m_sw2;
 	int m_sel9_rom;
-	int m_pet_irq;
-	int m_acia_irq;
+	bool m_6809_active;
 };
 
 

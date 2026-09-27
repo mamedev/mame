@@ -280,7 +280,7 @@ private:
 	void gz70sp_map(address_map &map) ATTR_COLD;
 	void ctk601_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 	required_device<gt913_device> m_maincpu;
 	optional_device<pwm_display_device> m_pwm;
@@ -455,7 +455,7 @@ void ctk551_state::ctk601_map(address_map& map)
 	map(0x380003, 0x380003).mirror(0x07fffc).rw(FUNC(ctk551_state::dsp_port_r), FUNC(ctk551_state::dsp_port_w));
 }
 
-void ctk551_state::driver_start()
+void ctk551_state::machine_start()
 {
 	m_nmi_timer = timer_alloc(FUNC(ctk551_state::nmi_clear), this);
 

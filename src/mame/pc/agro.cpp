@@ -43,7 +43,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void agro(machine_config &config);
+	void agro(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

@@ -674,7 +674,7 @@ void vampire_state::init_vampire()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// hack interrupt vectors
+	// HACK: patch interrupt vectors
 	rom[0xfff6] = rom[0xffe0];
 	rom[0xfff7] = rom[0xffe1];
 	rom[0xfff8] = rom[0xffe2];

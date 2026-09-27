@@ -128,6 +128,7 @@ static const rgb_t PALETTE_MOS[] =
 	} while (0)
 
 #define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
+#define IS_6566                 (m_variant == TYPE_6566)
 #define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
 #define FAST_MODE               (IS_VICIIE && BIT(m_reg[REGISTER_FAST], 0))
 
@@ -173,13 +174,13 @@ static const rgb_t PALETTE_MOS[] =
 #define MULTICOLOR2             (m_reg[0x23] & 0x0f)
 #define FOREGROUNDCOLOR         (m_reg[0x24] & 0x0f)
 
-#define VIC2_LINES              (IS_PAL ? VIC6569_LINES : VIC6567_LINES)
-#define VIC2_CYCLESPERLINE      (IS_PAL ? VIC6569_CYCLESPERLINE : VIC6567_CYCLESPERLINE)
+#define VIC2_LINES              (IS_PAL ? VIC6569_LINES : IS_6566 ? VIC6566_LINES : VIC6567_LINES)
+#define VIC2_CYCLESPERLINE      (IS_PAL ? VIC6569_CYCLESPERLINE : IS_6566 ? VIC6566_CYCLESPERLINE : VIC6567_CYCLESPERLINE)
 #define VIC2_FIRST_DMA_LINE     (IS_PAL ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
 #define VIC2_LAST_DMA_LINE      (IS_PAL ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
 #define VIC2_FIRST_DISP_LINE    (IS_PAL ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
 #define VIC2_LAST_DISP_LINE     (IS_PAL ? VIC6569_LAST_DISP_LINE : VIC6567_LAST_DISP_LINE)
-#define VIC2_RASTER_2_EMU(a)    (IS_PAL ? VIC6569_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
+#define VIC2_RASTER_2_EMU(a)    (IS_PAL ? VIC6569_RASTER_2_EMU(a) : IS_6566 ? VIC6566_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
 #define VIC2_FIRSTCOLUMN        (IS_PAL ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
 #define VIC2_X_2_EMU(a)         (IS_PAL ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
 
@@ -1288,6 +1289,14 @@ void mos6566_device::execute_run()
 			display_if_bad_line();
 
 			m_cycle++;
+
+			if (IS_6566)
+			{
+				draw_background();
+				sample_border();
+
+				m_cycle++;
+			}
 			break;
 
 		// for NTSC 6567R8
@@ -1415,7 +1424,10 @@ void mos6566_device::execute_run()
 			m_cycle = 1;
 		}
 
-		spr_ba(cycle, 57);
+		if (IS_6566)
+			spr_ba((cycle > 59) ? (cycle - 1) : cycle, 56);
+		else
+			spr_ba(cycle, 57);
 
 		m_phi0 = 1;
 		set_aec(BIT(m_aec_delay, 2));

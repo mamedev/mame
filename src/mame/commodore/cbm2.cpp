@@ -1,14 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - 8088 board
-    - CIA timers fail in burn-in test
-    - cbm620hu charom banking?
-
-*/
 
 #include "emu.h"
 
@@ -106,10 +97,12 @@ public:
 		m_pa(*this, "PA%u", 0),
 		m_pb(*this, "PB%u", 0),
 		m_lock(*this, "LOCK"),
+		m_charset(*this, "CHARSET"),
 		m_dramon(1),
 		m_video_ram_size(0x800),
 		m_graphics(1),
 		m_todclk(0),
+		m_refresh_cycle(0),
 		m_tpi2_pa(0),
 		m_tpi2_pb(0)
 	{ }
@@ -145,6 +138,7 @@ public:
 	required_ioport_array<8> m_pa;
 	required_ioport_array<8> m_pb;
 	required_ioport m_lock;
+	optional_ioport m_charset;
 
 	TIMER_CALLBACK_MEMBER( tod_tick );
 
@@ -165,6 +159,7 @@ public:
 
 	uint8_t read_keyboard();
 	void set_busy2(int state);
+	void cpu_sync_w(int state);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -196,6 +191,8 @@ public:
 	void ext_cia_irq_w(int state);
 	uint8_t ext_cia_pb_r();
 	void ext_cia_pb_w(uint8_t data);
+	uint8_t ext_cia_pa_out() const { return m_ext_cia_port[0] | ~m_ext_cia_port[2]; }
+	uint8_t ext_cia_pb_out() const { return m_ext_cia_port[1] | ~m_ext_cia_port[3]; }
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -213,13 +210,18 @@ public:
 	// interrupt state
 	int m_todclk;
 
+	// DRAM refresh state
+	uint64_t m_refresh_cycle;
+
 	// keyboard state;
 	uint8_t m_tpi2_pa;
 	uint8_t m_tpi2_pb;
 	uint8_t m_cia_pa;
 
-	uint8_t m_ext_cia_pb;
+	uint8_t m_ext_cia_port[4];
+	uint8_t m_ext_tpi_pa;
 	uint8_t m_ext_tpi_pb;
+	uint8_t m_ext_tpi_pc;
 
 	// timers
 	emu_timer *m_todclk_timer;
@@ -635,7 +637,13 @@ void cbm2_state::write(offs_t offset, uint8_t data)
 		}
 		if (!extprtcs && m_ext_cia)
 		{
+			if ((offset & 0x0f) < 4)
+				m_ext_cia_port[offset & 0x03] = data;
+
 			m_ext_cia->write(offset & 0x0f, data);
+
+			if ((offset & 0x0d) == 0x01)
+				ext_cia_pb_w(ext_cia_pb_out());
 		}
 		if (!ciacs)
 		{
@@ -665,32 +673,8 @@ void cbm2_state::write(offs_t offset, uint8_t data)
 
 uint8_t cbm2_state::ext_read(offs_t offset)
 {
-#ifdef USE_PLA_DECODE
-	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
-	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
-
-	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
-	uint8_t data = 0xff;
-
-	if (!casseg1)
-	{
-		data = m_ram->pointer()[offset & 0xffff];
-	}
-	if (!casseg2)
-	{
-		data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
-	}
-	if (!casseg3 && (m_ram->size() > 0x20000))
-	{
-		data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
-	}
-	if (!casseg4 && (m_ram->size() > 0x30000))
-	{
-		data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
-	}
-
-	return data;
-#endif
+	if (m_busy2)
+		return memregion(EXT_I8088_TAG)->base()[offset & 0xfff];
 
 	uint8_t data = 0;
 	if (offset < 0x40000) data = m_ram->pointer()[offset];
@@ -704,31 +688,7 @@ uint8_t cbm2_state::ext_read(offs_t offset)
 
 void cbm2_state::ext_write(offs_t offset, uint8_t data)
 {
-#ifdef USE_PLA_DECODE
-	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
-	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
-
-	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
-
-	if (!casseg1)
-	{
-		m_ram->pointer()[offset & 0xffff] = data;
-	}
-	if (!casseg2)
-	{
-		m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
-	}
-	if (!casseg3 && (m_ram->size() > 0x20000))
-	{
-		m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
-	}
-	if (!casseg4 && (m_ram->size() > 0x30000))
-	{
-		m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
-	}
-#endif
-
-	if (offset < 0x40000) m_ram->pointer()[offset] = data;
+	if (!m_busy2 && offset < 0x40000) m_ram->pointer()[offset] = data;
 }
 
 
@@ -1378,6 +1338,61 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cbm2_de )
 	PORT_INCLUDE(cbm2)
+
+	PORT_MODIFY("PB1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('y') PORT_CHAR('Y')
+
+	PORT_MODIFY("PB2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
+
+	PORT_MODIFY("PB3")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR(U'§')
+
+	PORT_MODIFY("PB5")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('z') PORT_CHAR('Z')
+
+	PORT_MODIFY("PB6")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('/')
+
+	PORT_MODIFY("PB7")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR(':')
+
+	PORT_MODIFY("PA0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('-') PORT_CHAR('_')
+
+	PORT_MODIFY("PA1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(U'ß') PORT_CHAR('?')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(U'ä') PORT_CHAR(U'Ä')
+
+	PORT_MODIFY("PA2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR(U'´') PORT_CHAR('`')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('[')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('#') PORT_CHAR('\'')
+
+	PORT_MODIFY("PA3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('>') PORT_CHAR(']')
+
+	PORT_MODIFY("PA4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS/DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+
+	PORT_MODIFY("PA5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLR/HOME") PORT_CODE(KEYCODE_HOME)
+
+	PORT_MODIFY("PA6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("OFF/RVS") PORT_CODE(KEYCODE_END)
+
+	PORT_START("CHARSET")
+	PORT_CONFNAME( 0x01, 0x00, "Character Set" )
+	PORT_CONFSETTING( 0x00, "German" )
+	PORT_CONFSETTING( 0x01, "Standard" )
 INPUT_PORTS_END
 
 
@@ -1387,6 +1402,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cbm2_hu )
 	PORT_INCLUDE(cbm2)
+
+	PORT_MODIFY("PA1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(U'é') PORT_CHAR(U'É')
+
+	PORT_MODIFY("PA2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE) PORT_CHAR(U'ö') PORT_CHAR(U'Ö')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(U'ü') PORT_CHAR(U'Ü')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(U'á') PORT_CHAR(U'Á')
+
+	PORT_START("CHARSET")
+	PORT_CONFNAME( 0x01, 0x00, "Character Set" )
+	PORT_CONFSETTING( 0x00, "Hungarian" )
+	PORT_CONFSETTING( 0x01, "Standard" )
 INPUT_PORTS_END
 
 
@@ -1423,14 +1451,15 @@ INPUT_PORTS_END
 MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 {
 	pen_t const *const pen = m_palette->pens();
+	offs_t const charset = m_charset.read_safe(0) << 12;
 
 	int x = 0;
 
 	for (int column = 0; column < x_count; column++)
 	{
 		uint8_t code = m_video_ram[(ma + column) & 0x7ff];
-		offs_t char_rom_addr = (ma & 0x1000) | (m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
-		uint8_t data = m_charom->base()[char_rom_addr & 0xfff];
+		offs_t char_rom_addr = charset | (m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
+		uint8_t data = m_charom->base()[char_rom_addr & (m_charom->bytes() - 1)];
 
 		for (int bit = 0; bit < 9; bit++)
 		{
@@ -1461,7 +1490,9 @@ uint8_t cbm2_state::sid_potx_r()
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
+			const unsigned pot1 = m_joy1->read_pot_x();
+			const unsigned pot2 = m_joy2->read_pot_x();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (m_joy1->has_pot_x())
 		{
@@ -1488,7 +1519,9 @@ uint8_t cbm2_state::sid_poty_r()
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
+			const unsigned pot1 = m_joy1->read_pot_y();
+			const unsigned pot2 = m_joy2->read_pot_y();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (m_joy1->has_pot_y())
 		{
@@ -1742,8 +1775,8 @@ uint8_t p500_state::tpi2_pc_r()
 	    3       COLUMN 3
 	    4       COLUMN 4
 	    5       COLUMN 5
-	    6       0
-	    7       0
+	    6       VICBNKSEL0
+	    7       VICBNKSEL1
 
 	*/
 
@@ -1911,7 +1944,7 @@ uint8_t cbm2_state::ext_tpi_pb_r()
 	data |= m_busy2 << 1;
 
 	// CIA
-	data |= m_ext_tpi_pb & m_ext_cia_pb & 0x3c;
+	data |= m_ext_tpi_pb & ext_cia_pb_out() & 0x3c;
 
 	return data;
 }
@@ -1935,12 +1968,6 @@ void cbm2_state::ext_tpi_pb_w(uint8_t data)
 
 	m_ext_tpi_pb = data;
 
-	// _BUSY2
-	if (!BIT(data, 1))
-	{
-		set_busy2(0);
-	}
-
 	// FLAG
 	m_ext_cia->flag_w(BIT(data, 6));
 }
@@ -1962,11 +1989,13 @@ void cbm2_state::ext_tpi_pc_w(uint8_t data)
 
 	*/
 
-	// _BUSY2
-	if (BIT(data, 5))
+	// BSYCLK
+	if (BIT(data, 5) && !BIT(m_ext_tpi_pc, 5) && BIT(ext_cia_pb_out(), 6))
 	{
 		set_busy2(1);
 	}
+
+	m_ext_tpi_pc = data;
 }
 
 //-------------------------------------------------
@@ -2004,7 +2033,7 @@ uint8_t cbm2_state::ext_cia_pb_r()
 	data |= m_busy2 << 1;
 
 	// TPI
-	data |= m_ext_tpi_pb & m_ext_cia_pb & 0x3c;
+	data |= m_ext_tpi_pb & ext_cia_pb_out() & 0x3c;
 
 	return data;
 }
@@ -2025,14 +2054,6 @@ void cbm2_state::ext_cia_pb_w(uint8_t data)
 	    7       _INT2
 
 	*/
-
-	m_ext_cia_pb = data;
-
-	// _BUSY2
-	if (!BIT(data, 1))
-	{
-		set_busy2(0);
-	}
 
 	if (!BIT(data, 6))
 	{
@@ -2064,6 +2085,21 @@ TIMER_CALLBACK_MEMBER(cbm2_state::tod_tick)
 
 
 //-------------------------------------------------
+//  cpu_sync_w - DRAM refresh halts the CPU with
+//  RDY for one opcode fetch every 20 cycles
+//-------------------------------------------------
+
+void cbm2_state::cpu_sync_w(int state)
+{
+	if (state && m_busy2 && (m_maincpu->total_cycles() - m_refresh_cycle) >= 20)
+	{
+		m_maincpu->adjust_icount(-1);
+		m_refresh_cycle = m_maincpu->total_cycles();
+	}
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( cbm2 )
 //-------------------------------------------------
 
@@ -2082,6 +2118,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	save_item(NAME(m_graphics));
 	save_item(NAME(m_ntsc));
 	save_item(NAME(m_todclk));
+	save_item(NAME(m_refresh_cycle));
 	save_item(NAME(m_tpi2_pa));
 	save_item(NAME(m_tpi2_pb));
 	save_item(NAME(m_cia_pa));
@@ -2119,6 +2156,11 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 {
 	MACHINE_START_CALL_MEMBER(cbm2_ntsc);
+
+	save_item(NAME(m_ext_cia_port));
+	save_item(NAME(m_ext_tpi_pa));
+	save_item(NAME(m_ext_tpi_pb));
+	save_item(NAME(m_ext_tpi_pc));
 }
 
 
@@ -2129,6 +2171,11 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 {
 	MACHINE_START_CALL_MEMBER(cbm2_pal);
+
+	save_item(NAME(m_ext_cia_port));
+	save_item(NAME(m_ext_tpi_pa));
+	save_item(NAME(m_ext_tpi_pb));
+	save_item(NAME(m_ext_tpi_pc));
 }
 
 
@@ -2180,27 +2227,16 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 	m_busy2 = 1;
 	m_graphics = 1;
 
-m_ext_tpi_pb = 0xff;
-m_ext_cia_pb = 0xff;
-
-	m_maincpu->reset();
-
-	if (m_crtc) m_crtc->reset();
-	m_sid->reset();
-	m_tpi1->reset();
-	m_tpi2->reset();
-	m_acia->reset();
-	m_cia->reset();
-
-	m_ieee->reset();
+	std::fill(std::begin(m_ext_cia_port), std::end(m_ext_cia_port), 0);
+	m_ext_tpi_pa = 0xff;
+	m_ext_tpi_pb = 0xff;
+	m_ext_tpi_pc = 0xff;
 }
 
 
 MACHINE_RESET_MEMBER( p500_state, p500 )
 {
 	MACHINE_RESET_CALL_MEMBER(cbm2);
-
-	m_vic->reset();
 
 	m_statvid = 1;
 	m_vicdotsel = 1;
@@ -2275,11 +2311,11 @@ void p500_state::p500_ntsc(machine_config &config)
 	PLS100(config, m_pla2);
 
 	TPI6525(config, m_tpi1);
-	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
 	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
-	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_pb_cb().set(FUNC(cbm2_state::tpi1_pb_w));
 	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
 	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
 
@@ -2289,7 +2325,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	m_tpi2->in_pc_cb().set(FUNC(p500_state::tpi2_pc_r));
 	m_tpi2->out_pc_cb().set(FUNC(p500_state::tpi2_pc_w));
 
-	MOS6551(config, m_acia, VIC6567_CLOCK);
+	MOS6551(config, m_acia);
 	m_acia->set_xtal(XTAL(1'843'200));
 	m_acia->irq_handler().set(m_tpi1, FUNC(tpi6525_device::pc4_w));
 	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
@@ -2344,7 +2380,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	CBM2_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/14, cbm2_expansion_cards, nullptr);
 
 	CBM2_USER_PORT(config, m_user, cbm2_user_port_cards, nullptr);
-	m_user->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_user->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_user->sp_callback().set(MOS6526_TAG, FUNC(mos6526_device::sp_w));
 	m_user->cnt_callback().set(MOS6526_TAG, FUNC(mos6526_device::cnt_w));
 	m_user->flag_callback().set(MOS6526_TAG, FUNC(mos6526_device::flag_w));
@@ -2412,7 +2448,7 @@ void p500_state::p500_pal(machine_config &config)
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
 	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
-	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_pb_cb().set(FUNC(cbm2_state::tpi1_pb_w));
 	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
 	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
 
@@ -2508,6 +2544,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(18'000'000)/9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm2_state::cbm2_mem);
+	m_maincpu->sync_cb().set(FUNC(cbm2_state::cpu_sync_w));
 	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
@@ -2720,7 +2757,7 @@ void cbm2hp_state::bx256hp(machine_config &config)
 	b256hp(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
-	I8088(config, m_ext_cpu, XTAL(12'000'000));
+	I8088(config, m_ext_cpu, XTAL(15'000'000)/3);
 	m_ext_cpu->set_addrmap(AS_PROGRAM, &cbm2hp_state::ext_mem);
 	m_ext_cpu->set_addrmap(AS_IO, &cbm2hp_state::ext_io);
 	m_ext_cpu->set_irq_acknowledge_callback(EXT_I8259A_TAG, FUNC(pic8259_device::inta_cb));
@@ -2729,7 +2766,8 @@ void cbm2hp_state::bx256hp(machine_config &config)
 	m_ext_pic->out_int_callback().set_inputline(m_ext_cpu, INPUT_LINE_IRQ0);
 
 	TPI6525(config, m_ext_tpi);
-	m_ext_tpi->in_pa_cb().set(m_ext_cia, FUNC(mos6526_device::pa_r));
+	m_ext_tpi->in_pa_cb().set([this] () { return uint8_t(m_ext_tpi_pa & ext_cia_pa_out()); });
+	m_ext_tpi->out_pa_cb().set([this] (uint8_t data) { m_ext_tpi_pa = data; });
 	m_ext_tpi->in_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_r));
 	m_ext_tpi->out_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_w));
 	m_ext_tpi->out_pc_cb().set(FUNC(cbm2_state::ext_tpi_pc_w));
@@ -2737,9 +2775,8 @@ void cbm2hp_state::bx256hp(machine_config &config)
 	MOS6526(config, m_ext_cia, XTAL(18'000'000)/9);
 	m_ext_cia->set_tod_clock(60);
 	m_ext_cia->irq_wr_callback().set(FUNC(cbm2_state::ext_cia_irq_w));
-	m_ext_cia->pa_rd_callback().set(m_ext_tpi, FUNC(tpi6525_device::pa_r));
+	m_ext_cia->pa_rd_callback().set([this] () { return uint8_t(m_ext_tpi_pa & ext_cia_pa_out()); });
 	m_ext_cia->pb_rd_callback().set(FUNC(cbm2_state::ext_cia_pb_r));
-	m_ext_cia->pb_wr_callback().set(FUNC(cbm2_state::ext_cia_pb_w));
 
 	SOFTWARE_LIST(config, "flop_list2").set_original("bx256hp_flop");
 }
@@ -2791,7 +2828,7 @@ void cbm2hp_state::cbm730(machine_config &config)
 	cbm720(config);
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
-	I8088(config, m_ext_cpu, XTAL(12'000'000));
+	I8088(config, m_ext_cpu, XTAL(15'000'000)/3);
 	m_ext_cpu->set_addrmap(AS_PROGRAM, &cbm2hp_state::ext_mem);
 	m_ext_cpu->set_addrmap(AS_IO, &cbm2hp_state::ext_io);
 	m_ext_cpu->set_irq_acknowledge_callback(EXT_I8259A_TAG, FUNC(pic8259_device::inta_cb));
@@ -2800,7 +2837,8 @@ void cbm2hp_state::cbm730(machine_config &config)
 	m_ext_pic->out_int_callback().set_inputline(m_ext_cpu, INPUT_LINE_IRQ0);
 
 	TPI6525(config, m_ext_tpi);
-	m_ext_tpi->in_pa_cb().set(EXT_MOS6526_TAG, FUNC(mos6526_device::pa_r));
+	m_ext_tpi->in_pa_cb().set([this] () { return uint8_t(m_ext_tpi_pa & ext_cia_pa_out()); });
+	m_ext_tpi->out_pa_cb().set([this] (uint8_t data) { m_ext_tpi_pa = data; });
 	m_ext_tpi->in_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_r));
 	m_ext_tpi->out_pb_cb().set(FUNC(cbm2_state::ext_tpi_pb_w));
 	m_ext_tpi->out_pc_cb().set(FUNC(cbm2_state::ext_tpi_pc_w));
@@ -2808,9 +2846,8 @@ void cbm2hp_state::cbm730(machine_config &config)
 	MOS6526(config, m_ext_cia, XTAL(18'000'000)/9);
 	m_ext_cia->set_tod_clock(50);
 	m_ext_cia->irq_wr_callback().set(FUNC(cbm2_state::ext_cia_irq_w));
-	m_ext_cia->pa_rd_callback().set(m_ext_tpi, FUNC(tpi6525_device::pa_r));
+	m_ext_cia->pa_rd_callback().set([this] () { return uint8_t(m_ext_tpi_pa & ext_cia_pa_out()); });
 	m_ext_cia->pb_rd_callback().set(FUNC(cbm2_state::ext_cia_pb_r));
-	m_ext_cia->pb_wr_callback().set(FUNC(cbm2_state::ext_cia_pb_w));
 
 	SOFTWARE_LIST(config, "flop_list2").set_original("bx256hp_flop");
 }
@@ -3042,8 +3079,8 @@ ROM_START( cbm720_de )
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_LOAD( "324866-03a.u61", 0x0000, 0x2000, CRC(554b008d) SHA1(1483a46924308d86f4c7f9cb71c34851c510fcf4) )
 
-	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "324867-02.u25", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "324867-02.u25", 0x0000, 0x2000, CRC(35843faa) SHA1(00c5cfa15a64a5985f39b6f8520d576fb2a46295) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
@@ -3076,7 +3113,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY                         FULLNAME                    FLAGS
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY                         FULLNAME                        FLAGS
 COMP( 1983, p500,      0,      0,      p500_ntsc, cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
 COMP( 1983, p500p,     p500,   0,      p500_pal,  cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
 COMP( 1983, b500,      0,      0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )
@@ -3087,9 +3124,9 @@ COMP( 1983, cbm620,    b500,   0,      cbm620,    cbm2,    cbm2_state,   empty_i
 COMP( 1983, cbm620_hu, b500,   0,      cbm620,    cbm2_hu, cbm2_state,   empty_init, "Commodore Business Machines",  "CBM 620 (Hungary)",        MACHINE_SUPPORTS_SAVE )
 COMP( 1983, b128hp,    0,      0,      b128hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B128-80HP",                MACHINE_SUPPORTS_SAVE )
 COMP( 1983, b256hp,    b128hp, 0,      b256hp,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "B256-80HP",                MACHINE_SUPPORTS_SAVE )
-COMP( 1983, bx256hp,   b128hp, 0,      bx256hp,   cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "BX256-80HP",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, bx256hp,   b128hp, 0,      bx256hp,   cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "BX256-80HP",               MACHINE_SUPPORTS_SAVE )
 COMP( 1983, cbm710,    b128hp, 0,      cbm710,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 710",                  MACHINE_SUPPORTS_SAVE )
 COMP( 1983, cbm720,    b128hp, 0,      cbm720,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm720_de, b128hp, 0,      cbm720,    cbm2_de, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cbm720_de, b128hp, 0,      cbm720,    cbm2_de, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Germany)",        MACHINE_SUPPORTS_SAVE )
 COMP( 1983, cbm720_se, b128hp, 0,      cbm720,    cbm2_se, cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, cbm730,    b128hp, 0,      cbm730,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 730",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm730,    b128hp, 0,      cbm730,    cbm2,    cbm2hp_state, empty_init, "Commodore Business Machines",  "CBM 730",                  MACHINE_SUPPORTS_SAVE )

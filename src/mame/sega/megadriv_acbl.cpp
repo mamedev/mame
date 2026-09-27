@@ -1382,7 +1382,7 @@ void md_boot_6button_state::init_mk3mdb()
 		}
 	}
 
-	// boot vectors don't seem to be valid, so they are patched...
+	// HACK: boot vectors don't seem to be valid, so they are patched.
 	rom[0x01] = 0x01;
 	rom[0x00] = 0x00;
 	rom[0x03] = 0x00;
@@ -1411,7 +1411,7 @@ void md_boot_state::init_srmdb()
 		rom[x] = bitswap<8>(rom[x] ^ 0x00, 2,6,1,5,0,7,3,4);
 	}
 
-	// boot vectors don't seem to be valid, so they are patched...
+	// HACK: boot vectors don't seem to be valid, so they are patched.
 	rom[0x01] = 0x01;
 	rom[0x00] = 0x00;
 	rom[0x03] = 0x00;
@@ -1553,7 +1553,7 @@ void md_sonic3bl_state::init_sonic3mb()
 
 void md_boot_state::init_twinktmb()
 {
-	// boot vectors don't seem to be valid, so they are patched...
+	// HACK: boot vectors don't seem to be valid, so they are patched.
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x01] = 0x00;
 
@@ -1576,7 +1576,7 @@ void md_boot_state::init_biohzdmb()
 	for (int x = 0x80001; x < 0x100000; x += 2)
 		rom[x] = bitswap<8>(rom[x], 6, 4, 0, 5, 1, 3, 2, 7);
 
-	// boot vectors don't seem to be valid, so they are patched...
+	// HACK: boot vectors don't seem to be valid, so they are patched.
 	rom[0x04] = 0x00;
 	rom[0x05] = 0x00;
 	rom[0x06] = 0x04;

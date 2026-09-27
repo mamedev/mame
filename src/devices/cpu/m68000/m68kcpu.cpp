@@ -2019,10 +2019,10 @@ void m68000_musashi_device::define_state(void)
 		state_add(M68K_ISP,    "SSP",       m_iotemp).callimport().callexport();
 
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_D0 + regnum, string_format("D%d", regnum).c_str(), m_dar[regnum]);
+		state_add(M68K_D0 + regnum, string_format("D%d", regnum), m_dar[regnum]);
 	}
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_A0 + regnum, string_format("A%d", regnum).c_str(), m_dar[8 + regnum]);
+		state_add(M68K_A0 + regnum, string_format("A%d", regnum), m_dar[8 + regnum]);
 	}
 
 	state_add(M68K_IR,         "IR",        m_ir);
@@ -2045,7 +2045,7 @@ void m68000_musashi_device::define_state(void)
 	if (m_cpu_type & MASK_020_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
-			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum).c_str(), m_iotemp).callimport().callexport().formatstr("%10s");
+			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum), m_iotemp).callimport().callexport().formatstr("%10s");
 		}
 		state_add(M68K_FPSR, "FPSR", m_fpsr);
 		state_add(M68K_FPCR, "FPCR", m_fpcr);

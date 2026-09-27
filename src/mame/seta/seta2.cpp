@@ -249,8 +249,7 @@ public:
 
 	void staraudi(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void driver_start() override ATTR_COLD;
+	void init_staraudi() ATTR_COLD;
 
 private:
 	void camera_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -3312,11 +3311,9 @@ ROM_START( staraudi )
 	ROM_LOAD( "su1_snd.u32", 0x000000, 0x400000, BAD_DUMP CRC(d5376010) SHA1(89fab1fbb45c7cf8acb63c31ecafdeb3482c2fec) ) // BAD, inconsistent reads: FIXED BITS (xxxxxxxx00000000)
 ROM_END
 
-void staraudi_state::driver_start()
+void staraudi_state::init_staraudi()
 {
-	seta2_state::driver_start();
-
-	// bad sound rom: replace the missing (zero) sample with the previous one
+	// bad sound ROM: replace the missing (zero) sample with the previous one
 	uint8_t *samples = memregion("x1snd")->base();
 	for (int i = 0; i < 0x400000; i += 2)
 		samples[i + 1] = samples[i];
@@ -3931,7 +3928,7 @@ GAME( 1999, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,
 GAME( 1999, endrichsa, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",                     "Endless Riches (Ver 1.20)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, endrichsb, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",                     "Endless Riches (Ver 1.10)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                         "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
+GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, init_staraudi, ROT0,   "Namco",                         "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
 
 GAME( 1999, pzlbowl,   0,        pzlbowl,  pzlbowl,  seta2_state,    empty_init,    ROT0,   "Nihon System / MOSS",           "Puzzle De Bowling (Japan)",                           MACHINE_NO_COCKTAIL )
 

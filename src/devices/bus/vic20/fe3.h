@@ -38,10 +38,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	// device_vic20_expansion_card_interface overrides
-	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
-	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
-
 private:
 	enum
 	{
@@ -72,12 +68,30 @@ private:
 		REG2_IO3  = 0x80
 	};
 
+	enum
+	{
+		TARGET_NONE,
+		TARGET_RAM,
+		TARGET_FLASH
+	};
+
 	required_device<amd_29f040_device> m_flash_rom;
 	memory_share_creator<uint8_t> m_ram;
 
 	offs_t get_address(int bank, int block, offs_t offset);
 	uint8_t read_register(offs_t offset);
 	void write_register(offs_t offset, uint8_t data);
+
+	std::pair<int, int> read_target(int block) const;
+	std::pair<int, int> write_target(int block) const;
+	void set_lockbit(int state);
+	void update_map();
+	void update_loram(vic20_expansion_window &window, offs_t offset);
+	void update_block(vic20_expansion_window &window, int block);
+	void update_blk5();
+	void update_io3();
+	uint8_t blk5_r(offs_t offset);
+	void blk5_w(offs_t offset, uint8_t data);
 
 	uint8_t m_reg1;
 	uint8_t m_reg2;

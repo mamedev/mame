@@ -209,7 +209,7 @@ private:
 	} m_cel;
 
 	struct {
-		u16 fb_pitch[2]; // regctl0 helper
+		u16 fb_pitch[2]; // regctl0 helper (0: read pitch 1: write pitch)
 		u16 xclip, yclip; // regctl1 helper
 	} m_regis;
 
@@ -262,9 +262,13 @@ private:
 	std::tuple<u32, u32> get_coded_16bpp(u32 ptr, u8 frac);
 	std::tuple<u32, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
 
+	bool check_y_clip_normal(int ypos);
+	bool check_x_clip_normal(int xpos);
+	u16 get_fb_pixel(int xpos, int ypos);
+	void set_fb_pixel(int xpos, int ypos, u16 pix_data);
+
 	std::tuple<u8, u8, u8> convert_cel_primary_source(u32 cel_data, bool p_mode);
 	std::tuple<u8, u8, u8> convert_secondary_source(u16 pix_data, bool p_mode);
-	u16 get_fb_pixel(int xpos, int ypos);
 	std::tuple<u8, u8, u8> convert_fb_primary_source(u16 fb_data, u32 cel_data, bool p_mode);
 
 	typedef std::tuple<u8, u8, u8, u8> (madam_device::*pixc_ms_func)(u32 cel_data, bool p_mode);

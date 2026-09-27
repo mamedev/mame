@@ -1051,7 +1051,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 				if ( reg.state_name != nullptr )
 				{
 					for ( const auto &entry: m_state->state_entries() )
-						if ( strcmp(entry->symbol(), reg.state_name) == 0 )
+						if ( entry->symbol() == reg.state_name )
 						{
 							entry_found = entry.get();
 							break;

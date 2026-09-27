@@ -255,7 +255,7 @@ void h6280_device::device_start()
 	state_add(H6280_IRQ2_STATE, "IRQ2",        m_irq_state[1]).mask(0xf);
 	state_add(H6280_IRQT_STATE, "IRQT",        m_irq_state[2]).mask(0xf);
 	for (int i = 0; i < 8; i++)
-		state_add(H6280_MPR0 + i, util::string_format("MPR%d", i).c_str(), m_mmr[i]).mask(0xff);
+		state_add(H6280_MPR0 + i, util::string_format("MPR%d", i), m_mmr[i]).mask(0xff);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));

@@ -1668,9 +1668,9 @@ void hyperstone_device::device_start()
 	state_add(E132XS_G30,     "G30", m_core->global_regs[30]).mask(0xffffffff);
 	state_add(E132XS_G31,     "G31", m_core->global_regs[31]).mask(0xffffffff);
 	for (int i = 0; i < 16; i++)
-		state_add(E132XS_CL0 + i, util::string_format("L%d", i).c_str(), m_debug_local_regs[i]).mask(0xffffffff).callimport().callexport();
+		state_add(E132XS_CL0 + i, util::string_format("L%d", i), m_debug_local_regs[i]).mask(0xffffffff).callimport().callexport();
 	for (int i = 0; i < 64; i++)
-		state_add(E132XS_L0 + i, util::string_format("S%d", i).c_str(), m_core->local_regs[i]).mask(0xffffffff);
+		state_add(E132XS_L0 + i, util::string_format("S%d", i), m_core->local_regs[i]).mask(0xffffffff);
 
 	save_item(NAME(m_core->global_regs));
 	save_item(NAME(m_core->local_regs));

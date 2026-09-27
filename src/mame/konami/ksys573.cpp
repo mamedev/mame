@@ -664,7 +664,6 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void driver_start() override;
 
 	void gx700pwfbf_init(gx700pwfbf_output_delegate &&output_callback_func);
 
@@ -1225,7 +1224,7 @@ int ksys573_state::pccard_cd_r()
 	return m_pccard_cd[N];
 }
 
-void ksys573_state::driver_start()
+void ksys573_state::machine_start()
 {
 	m_atapi_timer = timer_alloc( FUNC( ksys573_state::atapi_xfer_end ), this );
 	m_atapi_timer->adjust( attotime::never );
@@ -1235,10 +1234,6 @@ void ksys573_state::driver_start()
 	save_item( NAME( m_pccard_cd ) );
 
 	m_h8_index = 0;
-}
-
-void ksys573_state::machine_start()
-{
 }
 
 void ksys573_state::machine_reset()

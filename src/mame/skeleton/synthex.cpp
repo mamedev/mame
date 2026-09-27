@@ -30,7 +30,9 @@ public:
 	{
 	}
 
-	void synthex(machine_config &config);
+	void synthex(machine_config &config) ATTR_COLD;
+
+	void init_synthex() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -52,8 +54,6 @@ private:
 
 	u8 seq_exts3_r();
 	u8 seq_extkyb_r(offs_t offset);
-
-	virtual void driver_start() override;
 
 	void mem_map(address_map &map) ATTR_COLD;
 
@@ -211,7 +211,7 @@ void synthex_state::synthex(machine_config &config)
 	MIDI_PORT(config, "midiout", midiout_slot, nullptr);
 }
 
-void synthex_state::driver_start()
+void synthex_state::init_synthex()
 {
 	u8 *program = memregion("program")->base();
 	std::vector<u8> romdata(&program[0x0000], &program[0x3000]);
@@ -234,4 +234,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1981, synthex, 0, 0, synthex, synthex, synthex_state, empty_init, "Elka", "Synthex", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1981, synthex, 0, 0, synthex, synthex, synthex_state, init_synthex, "Elka", "Synthex", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

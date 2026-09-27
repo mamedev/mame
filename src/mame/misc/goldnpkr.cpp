@@ -14554,176 +14554,177 @@ ROM_END
 
 void goldnpkr_state::init_vkdlsa()
 {
-	// $e097-e098, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e097-e098, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe097] = 0xea;
 	ROM[0xe098] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsb()
 {
-	// $e87b-e87c, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e87b-e87c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe87b] = 0xea;
 	ROM[0xe87c] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsc()
 {
-	// $453a-453b, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $453a-453b, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0x453a] = 0xea;
 	ROM[0x453b] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsww()
 {
-	// $f2c9-f2ca, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $f2c9-f2ca, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xf2c9] = 0xea;
 	ROM[0xf2ca] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwa()
 {
-	// $df80-df81, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $df80-df81, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xdf80] = 0xea;
 	ROM[0xdf81] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwc()
 {
-	// $e42f-e430, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e42f-e430, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe42f] = 0xea;
 	ROM[0xe430] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwd()
 {
-	// $e442-e443, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e442-e443, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe442] = 0xea;
 	ROM[0xe443] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwh()
 {
-	// $e4d5-e4d6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e4d5-e4d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe4d5] = 0xea;
 	ROM[0xe4d6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwl()
 {
-	// $e87c-e87d, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e87c-e87d, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe87c] = 0xea;
 	ROM[0xe87d] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwo()
 {
-	// $e7d5-e7d6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7d5-e7d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7d5] = 0xea;
 	ROM[0xe7d6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwp()
 {
-	// $e7d9-e7da, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7d9-e7da, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7d9] = 0xea;
 	ROM[0xe7da] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwr()
 {
-	// $e7f7-e7f8, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7f7-e7f8, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7f7] = 0xea;
 	ROM[0xe7f8] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswws()
 {
-	// $e8a5-e8a6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e8a5-e8a6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe8a5] = 0xea;
 	ROM[0xe8a6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwt()
 {
-	// $e955-e956, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e955-e956, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe955] = 0xea;
 	ROM[0xe956] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwu()
 {
-	// $ee6b-ee6c, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $ee6b-ee6c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xee6b] = 0xea;
 	ROM[0xee6c] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwv()
 {
-	// $f052-f053, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $f052-f053, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xf052] = 0xea;
 	ROM[0xf053] = 0xea;
 }

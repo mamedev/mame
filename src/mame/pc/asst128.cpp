@@ -51,7 +51,7 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	void asst128(machine_config &config);
+	void asst128(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

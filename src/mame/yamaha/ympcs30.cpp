@@ -33,13 +33,13 @@ public:
 		, m_led(*this, "led%u", 0U)
 	{ }
 
-	void pcs30(machine_config &config);
+	void pcs30(machine_config &config) ATTR_COLD;
 
 	template <int Num> DECLARE_INPUT_CHANGED_MEMBER(switch_w);
 	template <int Num> ioport_value switch_r() { return m_switch[Num]; }
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	void pcs30_map(address_map &map) ATTR_COLD;
 
@@ -56,7 +56,7 @@ private:
 	u8 m_led_num[2];
 };
 
-void pcs30_state::driver_start()
+void pcs30_state::machine_start()
 {
 	m_switch[0] = m_switch[1] = 1;
 	m_key_sel = 0;

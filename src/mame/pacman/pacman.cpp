@@ -338,10 +338,7 @@ Boards:
 ****************************************************************************/
 
 #include "emu.h"
-
 #include "pacman.h"
-#include "jumpshot.h"
-#include "pacplus.h"
 
 #include "cpu/s2650/s2650.h"
 #include "cpu/z80/z80.h"
@@ -8719,7 +8716,7 @@ void pacman_state::init_mspacman()
 		DROM[0xb000+i] = ROM[0x3000+i]; // mirror of pacman.6j
 	}
 
-	// install patches into decrypted bank
+	// HACK: install patches into decrypted bank
 	mspacman_install_patches(DROM);
 
 	// mirror Pac-Man ROMs into upper addresses of normal bank
@@ -8764,14 +8761,66 @@ void alibaba_state::init_alibaba()
 	}
 }
 
+inline uint8_t pacplus_decrypt(const uint8_t (&swap_xor_table)[6][9], const int (&picktable)[32], int addr, uint8_t e)
+{
+	/* pick method from bits 0 2 5 7 9 of the address */
+	uint32_t method = picktable[bitswap<5>(addr, 9, 7, 5, 2, 0)];
+
+	/* switch method if bit 11 of the address is set */
+	method ^= BIT(addr, 11);
+
+	auto &tbl = swap_xor_table[method];
+	return bitswap<8>(e,tbl[0],tbl[1],tbl[2],tbl[3],tbl[4],tbl[5],tbl[6],tbl[7]) ^ tbl[8];
+}
+
 void pacman_state::init_pacplus()
 {
-	pacplus_decode();
+	static const uint8_t swap_xor_table[6][9] =
+	{
+		{ 7,6,5,4,3,2,1,0, 0x00 },
+		{ 7,6,5,4,3,2,1,0, 0x28 },
+		{ 6,1,3,2,5,7,0,4, 0x96 },
+		{ 6,1,5,2,3,7,0,4, 0xbe },
+		{ 0,3,7,6,4,2,1,5, 0xd5 },
+		{ 0,3,4,6,7,2,1,5, 0xdd }
+	};
+	static const int picktable[32] =
+	{
+		0,2,4,2,4,0,4,2,2,0,2,2,4,0,4,2,
+		2,2,4,0,4,2,4,0,0,4,0,4,4,2,4,2
+	};
+
+	/* CPU ROMs */
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x4000; i++)
+	{
+		ROM[i] = pacplus_decrypt(swap_xor_table, picktable, i, ROM[i]);
+	}
 }
 
 void pacman_state::init_jumpshot()
 {
-	jumpshot_decode();
+	static const uint8_t swap_xor_table[6][9] =
+	{
+		{ 7,6,5,4,3,2,1,0, 0x00 },
+		{ 7,6,3,4,5,2,1,0, 0x20 },
+		{ 5,0,4,3,7,1,2,6, 0xa4 },
+		{ 5,0,4,3,7,1,2,6, 0x8c },
+		{ 2,3,1,7,4,6,0,5, 0x6e },
+		{ 2,3,4,7,1,6,0,5, 0x4e }
+	};
+	static const int picktable[32] =
+	{
+		0,2,4,4,4,2,0,2,2,0,2,4,4,2,0,2,
+		5,3,5,1,5,3,5,3,1,5,1,5,5,3,5,3
+	};
+
+	/* CPU ROMs */
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x4000; i++)
+	{
+		ROM[i] = pacplus_decrypt(swap_xor_table, picktable, i, ROM[i]);
+	}
 }
 
 void pacman_state::init_drivfrcp()
@@ -8820,7 +8869,7 @@ void pacman_state::init_porky()
 
 void pacman_state::init_rocktrv2()
 {
-	// hack to pass the rom check for the bad rom
+	// HACK: patches to pass the rom check for the bad ROM
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;

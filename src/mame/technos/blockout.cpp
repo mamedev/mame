@@ -564,6 +564,7 @@ ROM_END
 
 void blockout_state::init_agress()
 {
+	// HACK: understand why following is a thing
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
 	 * But actually mirroring this VRAM makes display to be offset

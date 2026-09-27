@@ -44,27 +44,24 @@ void plus4_standard_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  plus4_cd_r - cartridge data read
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-uint8_t plus4_standard_cartridge_device::plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+void plus4_standard_cartridge_device::device_reset()
 {
-	if (!c1l && m_c1l)
-	{
-		data = m_c1l[offset & (m_c1l_size - 1)];
-	}
-	else if (!c1h && m_c1h)
-	{
-		data = m_c1h[offset & (m_c1h_size - 1)];
-	}
-	else if (!c2l && m_c2l)
-	{
-		data = m_c2l[offset & (m_c2l_size - 1)];
-	}
-	else if (!c2h && m_c2h)
-	{
-		data = m_c2h[offset & (m_c2h_size - 1)];
-	}
+	install_rom(m_slot->c1l(), m_slot->memregion("c1l"));
+	install_rom(m_slot->c1h(), m_slot->memregion("c1h"));
+	install_rom(m_slot->c2l(), m_slot->memregion("c2l"));
+	install_rom(m_slot->c2h(), m_slot->memregion("c2h"));
+}
 
-	return data;
+
+//-------------------------------------------------
+//  install_rom -
+//-------------------------------------------------
+
+void plus4_standard_cartridge_device::install_rom(plus4_expansion_window &window, memory_region *region)
+{
+	if (region)
+		window.install_rom(0x0000, region->bytes() - 1, 0x3fff & ~(region->bytes() - 1), region->base());
 }

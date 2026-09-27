@@ -719,6 +719,16 @@ void saturn_state::vdp1_set_framebuffer_config()
 
 void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// PTM = 01 starts drawing immediately, while 00/10 only change the plot trigger mode at the
+	// next frame buffer change, so a 01 write leaves the mode from the last 00/10 write in effect.
+	// - doom and exhumed set 10 then draw with 01, and hang unless the next change draws again (CEF)
+	if (offset == 0x04/2 && ACCESSING_BITS_0_7 && (data & 3) == 1)
+	{
+		if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
+		vdp1_process_list();
+		return;
+	}
+
 	COMBINE_DATA(&m_vdp1_regs[offset]);
 
 	switch(offset)
@@ -735,9 +745,6 @@ void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 		case 0x04/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
-			if ( VDP1_PTMR == 1 )
-				vdp1_process_list();
-
 			break;
 		case 0x06/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase data set %08X\n", data );
@@ -6284,6 +6291,7 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 	int drawypos, drawxpos;
 
 	int tilecodemin = 0x10000000, tilecodemax = 0;
+	int palmin = 0x10000000, palmax = 0;
 
 	if ( current_tilemap.incx == 0 || current_tilemap.incy == 0 ) return;
 
@@ -6571,6 +6579,15 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 
 			pal += current_tilemap.colour_ram_address_offset<< 4; // bios uses this ..
 
+			if ( pal < palmin )
+			{
+				palmin = pal;
+			}
+			if ( pal > palmax )
+			{
+				palmax = pal;
+			}
+
 			/*Enable fading bit*/
 			if(current_tilemap.fade_control & 1)
 			{
@@ -6650,11 +6667,11 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 				{
 					if ( current_tilemap.colour_depth == 4 )
 					{
-						/* normal */
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
+						/* normal, an 8x8 RGB888 cell takes 8 character number units (32 bytes each) */
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos, drawypos,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos+8,drawypos,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
 					}
 					else if ( current_tilemap.colour_depth == 3 )
 					{
@@ -6748,6 +6765,32 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 
 		vdp2_layer_data.tile_offset_min = tilecodemin * 0x20 / 4;
 		vdp2_layer_data.tile_offset_max = (tilecodemax + 1) * 0x20 / 4;
+
+		// store the colours used as well, the RBG cache has them baked in
+		switch ( current_tilemap.colour_depth )
+		{
+			case 0:
+				vdp2_layer_data.pen_min = palmin * 16;
+				vdp2_layer_data.pen_max = (palmax + 1) * 16;
+				break;
+			case 1:
+				vdp2_layer_data.pen_min = (palmin & ~0xf) * 16;
+				vdp2_layer_data.pen_max = ((palmax & ~0xf) + 0x10) * 16;
+				break;
+			case 2:
+				vdp2_layer_data.pen_min = 0;
+				vdp2_layer_data.pen_max = 0x800;
+				break;
+			default:
+				// RGB, no palette
+				vdp2_layer_data.pen_min = 0;
+				vdp2_layer_data.pen_max = 0;
+				break;
+		}
+		if ( palmin > palmax )
+		{
+			vdp2_layer_data.pen_min = vdp2_layer_data.pen_max = 0;
+		}
 	}
 
 }
@@ -8161,6 +8204,33 @@ void saturn_state::vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectang
 			{
 				m_vdp2_legacy.roz_bitmap[iRP-1].fill(m_palette->black_pen(), roz_clip_rect );
 				vdp2_check_tilemap(m_vdp2_legacy.roz_bitmap[iRP-1], roz_clip_rect);
+				if ( current_tilemap.bitmap_enable )
+				{
+					// a bitmap is read straight out of VRAM, so the tilemap path didn't set up the ranges to watch
+					// - vkyoute2 water kept stale contents
+					static const int bits_per_dot[8] = { 4, 8, 16, 16, 32, 32, 32, 32 };
+					const uint32_t dots = ((current_tilemap.bitmap_size & 2) ? 1024 : 512) * ((current_tilemap.bitmap_size & 1) ? 512 : 256);
+					const uint32_t start = (current_tilemap.bitmap_map * 0x20000 / 4) & 0x1ffff;
+					const uint32_t end = start + dots * bits_per_dot[current_tilemap.colour_depth & 7] / 32;
+
+					// watch all of VRAM if the bitmap wraps around its end
+					vdp2_layer_data.map_offset_min = (end > 0x20000) ? 0 : start;
+					vdp2_layer_data.map_offset_max = (end > 0x20000) ? 0x20000 : end;
+					vdp2_layer_data.tile_offset_min = 0;
+					vdp2_layer_data.tile_offset_max = 0;
+
+					// same palette selection as the draw_*_bitmap functions, fading is off while caching
+					static const uint32_t colours[8] = { 16, 256, 0x800, 0, 0, 0, 0, 0 };
+					const uint32_t pal_bank = (current_tilemap.colour_depth == 2) ? 0 : (((current_tilemap.bitmap_palette_number + current_tilemap.colour_ram_address_offset) & 7) << 8);
+					vdp2_layer_data.pen_min = pal_bank;
+					vdp2_layer_data.pen_max = pal_bank + colours[current_tilemap.colour_depth & 7];
+				}
+				// the colour RAM address wraps, watch all of it if the range goes past its end
+				if ( vdp2_layer_data.pen_max > 0x800 )
+				{
+					vdp2_layer_data.pen_min = 0;
+					vdp2_layer_data.pen_max = 0x800;
+				}
 				// prepare cache data
 				RBG0_cache_data.watch_vdp2_vram_writes |= iRP;
 				RBG0_cache_data.is_cache_dirty &= ~iRP;
@@ -8169,6 +8239,8 @@ void saturn_state::vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectang
 				RBG0_cache_data.map_offset_max[iRP-1] = vdp2_layer_data.map_offset_max;
 				RBG0_cache_data.tile_offset_min[iRP-1] = vdp2_layer_data.tile_offset_min;
 				RBG0_cache_data.tile_offset_max[iRP-1] = vdp2_layer_data.tile_offset_max;
+				RBG0_cache_data.pen_min[iRP-1] = vdp2_layer_data.pen_min;
+				RBG0_cache_data.pen_max[iRP-1] = vdp2_layer_data.pen_max;
 				LOGMASKED(LOG_VDP2, "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", RBG0_cache_data.map_offset_min[iRP-1],
 					RBG0_cache_data.map_offset_max[iRP-1], RBG0_cache_data.tile_offset_min[iRP-1], RBG0_cache_data.tile_offset_max[iRP-1]);
 			}
@@ -8427,7 +8499,26 @@ void saturn_state::vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	cmode0 = (VDP2_CRMD & 3) == 0;
 
 	offset &= (0xfff) >> (2);
+	const uint32_t old_data = m_vdp2_cram[offset];
 	COMBINE_DATA(&m_vdp2_cram[offset]);
+
+	// the RBG0 cache holds rendered colours, so changing one it used makes it stale
+	// (colour RAM mode 0 mirrors the palette at 0x400, so check both halves)
+	if (m_vdp2_cram[offset] != old_data)
+	{
+		const uint32_t pen = ((VDP2_CRMD & 2) ? offset : (offset * 2)) & 0x3ff;
+		const uint32_t count = (VDP2_CRMD & 2) ? 1 : 2;
+		for (int i = 0; i < 2; i++)
+		{
+			for (const uint32_t p : { pen, pen | 0x400 })
+			{
+				if ((p < RBG0_cache_data.pen_max[i]) && ((p + count) > RBG0_cache_data.pen_min[i]))
+				{
+					RBG0_cache_data.is_cache_dirty |= 1 << i;
+				}
+			}
+		}
+	}
 
 	switch( VDP2_CRMD )
 	{
@@ -8473,6 +8564,8 @@ void saturn_state::refresh_palette_data()
 	int r,g,b;
 	int c_i;
 	uint8_t bank;
+
+	RBG0_cache_data.is_cache_dirty |= 3;
 
 	switch( VDP2_CRMD )
 	{

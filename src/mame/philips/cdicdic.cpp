@@ -782,6 +782,9 @@ void cdicdic_device::process_disc_sector()
 		buffer[10], buffer[11], buffer[12], buffer[13], buffer[14], buffer[15], buffer[16], buffer[17], buffer[18], buffer[19],
 		buffer[20], buffer[21], buffer[22], buffer[23]);
 
+	uint8_t raw_subcode[96];
+	const uint8_t *cdg = nullptr;
+
 	if (buffer[SECTOR_MODE] == 2 && m_disc_mode == DISC_MODE2)
 	{
 		// First, filter whether we want to process this sector at all.
@@ -802,6 +805,9 @@ void cdicdic_device::process_disc_sector()
 	}
 	else if (m_disc_mode == DISC_CDDA)
 	{
+		if (m_cdrom->read_subcode(m_curr_lba, raw_subcode))
+			cdg = raw_subcode;
+
 		m_audio_sector_counter = 2;
 		m_decoding_audio_map = false;
 
@@ -821,7 +827,7 @@ void cdicdic_device::process_disc_sector()
 			play_cdda_sector(buffer);
 		}
 
-		if (frac != 0)
+		if (frac != 0 && cdg == nullptr)
 		{
 			return;
 		}
@@ -976,10 +982,10 @@ void cdicdic_device::process_disc_sector()
 	subcode_buffer[SUBCODE_Q_CRC0] = (uint8_t)(crc_accum >> 8);
 	subcode_buffer[SUBCODE_Q_CRC1] = (uint8_t)crc_accum;
 
-	process_sector_data(buffer, subcode_buffer);
+	process_sector_data(buffer, subcode_buffer, cdg);
 }
 
-void cdicdic_device::process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer)
+void cdicdic_device::process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer, const uint8_t *raw_subcode)
 {
 	m_data_buffer ^= 0x0001;
 	m_data_buffer &= ~0x0004;
@@ -1000,6 +1006,13 @@ void cdicdic_device::process_sector_data(const uint8_t *buffer, const uint8_t *s
 
 	for (int i = SUBCODE_Q_CONTROL; i <= SUBCODE_Q_CRC1; i++)
 		*dev_buffer++ = subcode_buffer[i];
+
+	if (m_disc_mode == DISC_CDDA && raw_subcode != nullptr)
+	{
+		uint16_t *frames = (uint16_t *)&m_ram[(m_data_buffer & 0x0005) * 0xa00];
+		for (int i = 0; i < 96; i++)
+			*frames++ = raw_subcode[i] & 0x3f;
+	}
 
 	m_x_buffer |= 0x8000;
 	m_data_buffer |= 0x4000;

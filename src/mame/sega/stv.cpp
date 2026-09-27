@@ -344,6 +344,7 @@ void stv_state::hop_ioga_w(offs_t offset, uint8_t data)
 *
 *************************************/
 
+// TODO: handle this as A-Bus slot option
 uint32_t stv_state::common_prot_r(offs_t offset)
 {
 	uint32_t *ROM = (uint32_t *)memregion("abus")->base();

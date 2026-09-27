@@ -113,12 +113,12 @@ void msm665xx_device::device_start()
 	// NOTE: This assumes internal RAM is large enough (≥2KB) to provide all 256 register banks.
 	// While most nX-8/500S MCUs have that much internal RAM, ML66514 has only 1KB.
 	for (int n = 0; n < 4; n++)
-		state_add<u16>(MSM665XX_ER0 + n, util::string_format("ER%d", n).c_str(),
+		state_add<u16>(MSM665XX_ER0 + n, util::string_format("ER%d", n),
 			[this, fixed, n]() { return fixed[(m_lrb & 0x00ff) << 2 | n]; },
 			[this, fixed, n](u16 data) { fixed[(m_lrb & 0x00ff) << 2 | n] = data; }
 		);
 	for (int n = 0; n < 8; n++)
-		state_add<u8>(MSM665XX_R0 + n, util::string_format("R%d", n).c_str(),
+		state_add<u8>(MSM665XX_R0 + n, util::string_format("R%d", n),
 			[this, fixed, n]() { return util::little_endian_cast<const u8>(fixed)[(m_lrb & 0x00ff) << 3 | n]; },
 			[this, fixed, n](u8 data) { util::little_endian_cast<u8>(fixed)[(m_lrb & 0x00ff) << 3 | n] = data; }
 		).noshow();

@@ -76,6 +76,7 @@ protected:
 	// set by configure(); read on the hot path
 	int m_width;
 	uint32_t m_vram_mask[VRAM_REGION_COUNT];
+	uint32_t m_text_tile_limit;         // text BG tile data at or past this is transparent
 
 private:
 	uint32_t vram_read32(int region, uint32_t addr) const;

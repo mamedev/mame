@@ -35,12 +35,12 @@ public:
 		, m_buttons(*this, "BTN%u", 0U)
 	{ }
 
-	void psr260(machine_config& config);
+	void psr260(machine_config& config) ATTR_COLD;
 
 	void lcd_w(u8 data);
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 	void palette_init(palette_device& palette);
@@ -55,7 +55,7 @@ private:
 	ioport_value m_btn_sel{};
 };
 
-void psr260_state::driver_start()
+void psr260_state::machine_start()
 {
 	save_item(NAME(m_key_sel));
 	save_item(NAME(m_btn_sel));

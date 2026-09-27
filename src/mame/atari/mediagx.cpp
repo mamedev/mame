@@ -859,6 +859,7 @@ void mediagx_state::machine_start()
 
 void mediagx_state::machine_reset()
 {
+	// HACK: pretend shadow RAM doesn't exist in a x86 BIOS ...
 	uint8_t *rom = memregion("bios")->base();
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
