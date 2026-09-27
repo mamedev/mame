@@ -1448,6 +1448,7 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 	m_pc = m_io_pc & 0xffffff;
 	// JTRM warns against changing PC while GPU/DSP is running
 	// - speedst2 does it anyway on DSP side
+	// - other stuff (cfr. hash file), verify them if not red herring
 	if (m_go == true)
 	{
 		logerror("%s: inflight PC write %08x\n", this->tag(), m_pc);
@@ -1480,7 +1481,7 @@ void jaguardsp_cpu_device::dsp_endian_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
-		// bretth sets 0x7e06 after dyna cam logo
+		// bretth sets 0x7e06 after dyna cam logo (fluke out of crashing?)
 		if ((m_io_end & 0x5) != 0x5)
 			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 	}

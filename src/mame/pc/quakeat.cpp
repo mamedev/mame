@@ -110,8 +110,8 @@ public:
 		, m_voodoo(*this, PCI_AGP_ID)
 	{ }
 
-	void ga6la7(machine_config &config);
-	void quake(machine_config &config);
+	void ga6la7(machine_config &config) ATTR_COLD;
+	void quake(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<pentium2_device> m_maincpu;

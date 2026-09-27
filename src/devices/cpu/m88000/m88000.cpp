@@ -236,7 +236,7 @@ void mc88100_device::device_start()
 	state_add(36 + SR3, "sr3", m_cr[SR3]);
 
 	for (int i = 0; i < 32; i++)
-		state_add(i, string_format("r%d", i).c_str(), m_r[i]);
+		state_add(i, string_format("r%d", i), m_r[i]);
 
 	save_item(NAME(m_xip));
 	save_item(NAME(m_nip));

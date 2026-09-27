@@ -305,6 +305,7 @@ private:
 		void lfo_step();
 		u32 get_lfo(int lfo);
 		u32 resolve_address(u16 pc, s32 offset);
+		int map_bank(u16 pc) const;
 
 		static u16 revram_encode(u32 v);
 		static u32 revram_decode(u16 v);

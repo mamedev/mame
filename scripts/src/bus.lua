@@ -3016,6 +3016,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/p1_rom.h",
 		MAME_DIR .. "src/devices/bus/isa/p1_sound.cpp",
 		MAME_DIR .. "src/devices/bus/isa/p1_sound.h",
+		MAME_DIR .. "src/devices/bus/isa/pega1a.cpp",
+		MAME_DIR .. "src/devices/bus/isa/pega1a.h",
 		MAME_DIR .. "src/devices/bus/isa/pc1640_iga.cpp",
 		MAME_DIR .. "src/devices/bus/isa/pc1640_iga.h",
 		MAME_DIR .. "src/devices/bus/isa/pcat512me.cpp",
@@ -6201,6 +6203,8 @@ end
 
 if BUSES["VIC10"] then
 	files {
+		MAME_DIR .. "src/devices/bus/vic10/basic.cpp",
+		MAME_DIR .. "src/devices/bus/vic10/basic.h",
 		MAME_DIR .. "src/devices/bus/vic10/exp.cpp",
 		MAME_DIR .. "src/devices/bus/vic10/exp.h",
 		MAME_DIR .. "src/devices/bus/vic10/multimax.cpp",
@@ -6227,6 +6231,8 @@ if BUSES["VIC20"] then
 		MAME_DIR .. "src/devices/bus/vic20/megacart.h",
 		MAME_DIR .. "src/devices/bus/vic20/std.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/std.h",
+		MAME_DIR .. "src/devices/bus/vic20/vfp.cpp",
+		MAME_DIR .. "src/devices/bus/vic20/vfp.h",
 		MAME_DIR .. "src/devices/bus/vic20/vic1010.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/vic1010.h",
 		MAME_DIR .. "src/devices/bus/vic20/vic1110.cpp",

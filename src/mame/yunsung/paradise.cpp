@@ -132,16 +132,16 @@ public:
 		m_prgbank(*this, "prgbank")
 	{ }
 
-	void penkyi(machine_config &config);
-	void tgtball(machine_config &config);
-	void paradise(machine_config &config);
-	void madball(machine_config &config);
-	void torus(machine_config &config);
-	void penky(machine_config &config);
+	void penkyi(machine_config &config) ATTR_COLD;
+	void tgtball(machine_config &config) ATTR_COLD;
+	void paradise(machine_config &config) ATTR_COLD;
+	void madball(machine_config &config) ATTR_COLD;
+	void torus(machine_config &config) ATTR_COLD;
+	void penky(machine_config &config) ATTR_COLD;
 
-	void init_torus();
-	void init_paradise();
-	void init_tgtball();
+	void init_torus() ATTR_COLD;
+	void init_paradise() ATTR_COLD;
+	void init_tgtball() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1243,18 +1243,18 @@ ROM_START( paradise )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "u128", 0x00000, 0x40000, CRC(8e5b5a24) SHA1(a4e559d9329f8a7a9d12cd90d98d0525958085d8) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
 	ROM_LOAD( "u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
 
-	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
 	ROM_LOAD( "u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
 
-	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT)  // 8x8x8
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8
 	ROM_LOAD( "u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
 	ROM_LOAD( "u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
 
@@ -1269,18 +1269,18 @@ ROM_START( paradisea )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "a-19.u128", 0x00000, 0x40000, CRC(d47ecb7e) SHA1(74e7a33f2fc4c7c830c53c50541c3d0efd152e98) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "a-19.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
 	ROM_LOAD( "a-19.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
 
-	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "a-19.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "a-19.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
 	ROM_LOAD( "a-19.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
 
-	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT)  // 8x8x8
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8
 	ROM_LOAD( "a-19.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
 	ROM_LOAD( "a-19.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
 
@@ -1295,18 +1295,18 @@ ROM_START( paradisee ) // YS-1600 PCB. All labels are simply labeled "Escape"
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "escape.u128", 0x00000, 0x40000, CRC(19b4e854) SHA1(7d7292017df67b7ed3a3e0059334866890c58b83) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "escape.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
 	ROM_LOAD( "escape.u115", 0x40000, 0x40000, CRC(0d517bbb) SHA1(5bf7c5036f3d660901e26f14baaea1a3c0327dfe) )
 
-	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "escape.u94", 0x00000, 0x20000, CRC(e3a99209) SHA1(5db79dc1a38d93b458b043499a58516285c65aa8) )
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "escape.u92", 0x00000, 0x80000, CRC(633d24f0) SHA1(26b25ec1014fba1a3d0d2bdba0c867c57034647d) )
 	ROM_LOAD( "escape.u93", 0x80000, 0x80000, CRC(bbf5c632) SHA1(9d31e136f014c2dd7dd988c3aee0adfcfea91bc9) )
 
-	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT)  // 8x8x8
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8
 	ROM_LOAD( "escape.u110", 0x00000, 0x20000, CRC(9807a7e6) SHA1(30e2a741a93954cfe672c61c93a990d0c3b25145) )
 	ROM_LOAD( "escape.u111", 0x20000, 0x20000, CRC(bc9f93f0) SHA1(dd4cfc849a0c0f918ac0dfeb7f00a67aae5a1c13) )
 
@@ -1317,22 +1317,22 @@ ROM_START( paradisee ) // YS-1600 PCB. All labels are simply labeled "Escape"
 	ROM_LOAD( "escape.u113", 0x00000, 0x80000, CRC(53de6025) SHA1(c94b3778b57ff7f46ce4cff661841019fb187d5d) )
 ROM_END
 
-ROM_START( paradlx )
+ROM_START( paradlx ) // has various "941007\ESOURCE\" strings, so probably a 1994 build
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "8.u128", 0x00000, 0x40000, CRC(3a45ac9e) SHA1(24e1b508ef582c8429e09929fea387f3a137f0e3) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "6.u114", 0x00000, 0x40000, CRC(d0341838) SHA1(fa400486968bd6b5a805fb79a970bb280ee24662) )
 	ROM_LOAD( "7.u115", 0x40000, 0x40000, CRC(a6231efd) SHA1(2f484ce2081c692b48dbfd98e152b7a74de9c414) )
 
-	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "5.u94", 0x00000, 0x40000, CRC(70560945) SHA1(f5f1f1779178cb3d1bb4789a135cd49a0d0fd99b) )
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "3.u92", 0x00000, 0x80000, CRC(c61aa37b) SHA1(8f4235a6ff47209b5982aa1c143f3c877bfd1bae) )
 	ROM_LOAD( "4.u93", 0x80000, 0x80000, CRC(658f855d) SHA1(73a9377633b53869c47c443898914b70238b591a) )
 
-	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT)  // 8x8x8
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8
 	ROM_LOAD( "1.u110", 0x00000, 0x20000, CRC(6b7f9bb9) SHA1(fd150c8e5a560bff49c993b0b703d84f775ea0b0) )
 	ROM_LOAD( "2.u111", 0x20000, 0x20000, CRC(eb291f96) SHA1(096f09894f4a319c30daa7a3051798902d4fd1eb) )
 
@@ -1343,22 +1343,48 @@ ROM_START( paradlx )
 	ROM_LOAD( "9.u113", 0x00000, 0x80000, CRC(9c5337f0) SHA1(4d7a8069be4551aad9d7d32d835dcf91be079359) )
 ROM_END
 
+ROM_START( paradlxa ) // all labels are blank
+	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code, completely different build
+	ROM_LOAD( "u128", 0x00000, 0x40000, CRC(de00d6cc) SHA1(3dcb1c67e7991158b156dff2e5b544d61be0355f) )
+
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8, same as the parent
+	ROM_LOAD( "u114", 0x00000, 0x40000, CRC(d0341838) SHA1(fa400486968bd6b5a805fb79a970bb280ee24662) )
+	ROM_LOAD( "u115", 0x40000, 0x40000, CRC(a6231efd) SHA1(2f484ce2081c692b48dbfd98e152b7a74de9c414) )
+
+	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
+	ROM_LOAD( "u94", 0x00000, 0x20000, CRC(d72b922a) SHA1(9632e2528fe38d327ae422265eb3efb75ddd4c68) ) // half size, no obvious issue?
+
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
+	ROM_LOAD( "u92", 0x00000, 0x80000, CRC(d388f1f7) SHA1(c54eef435489942d2e59d420ba6a0904bbd40e06) )
+	ROM_LOAD( "u93", 0x80000, 0x80000, CRC(db73d9f9) SHA1(d1288b5e39a23f185a41291e5bb0f034ea6eb79c) )
+
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8, same as the parent
+	ROM_LOAD( "u110", 0x00000, 0x20000, CRC(6b7f9bb9) SHA1(fd150c8e5a560bff49c993b0b703d84f775ea0b0) )
+	ROM_LOAD( "u111", 0x20000, 0x20000, CRC(eb291f96) SHA1(096f09894f4a319c30daa7a3051798902d4fd1eb) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) // 3 bytes differ from the original, always bit 4. Which one is correct?
+	ROM_LOAD( "u85", 0x00000, 0x40000, CRC(03e34b3d) SHA1(bb47214928ba6c22ad082d85dfc61dbcb3a458c5) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )    // banked, same as the parent
+	ROM_LOAD( "u113", 0x00000, 0x80000, CRC(9c5337f0) SHA1(4d7a8069be4551aad9d7d32d835dcf91be079359) )
+ROM_END
+
 ROM_START( para2dx )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "pdx2_u128.bin", 0x00000, 0x40000, CRC(4cbd22e1) SHA1(ad69663109d3127f6472797ec8763097da94b7d4) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "pdx2_u114.bin", 0x00000, 0x40000, CRC(3634b086) SHA1(6d079efb7be4fbe51d95d1f6b2c44dafdacb6016) )
 	ROM_LOAD( "pdx2_u115.bin", 0x40000, 0x40000, CRC(404409f4) SHA1(0763da81a1eb57037edd816e49a56dc8609fa502) )
 
-	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x40000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "pdx2_u094.bin", 0x00000, 0x40000,  CRC(87c4521b) SHA1(3ebd1e475e6125e9361b21160736103471c7aa2b) )
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "pdx2_u092.bin", 0x00000, 0x80000, CRC(d6797812) SHA1(b2d463b5932501382abcbbd911c492b6671c3cf7) )
 	ROM_LOAD( "pdx2_u093.bin", 0x80000, 0x80000, CRC(7644b8e9) SHA1(5f570c565523748afddc37f9ddd276c83f6b7d19) )
 
-	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT)  // 8x8x8
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8
 	ROM_LOAD( "pdx2_u110.bin", 0x00000, 0x20000, CRC(59e828d1) SHA1(fd76c5a74e1be22bde52bcfbce179dc73591bec3) )
 	ROM_LOAD( "pdx2_u111.bin", 0x20000, 0x20000, CRC(619dd972) SHA1(c64d256d21da5821e27b1cd55351ad2a9b141f47) )
 
@@ -1417,18 +1443,18 @@ ROM_START( tgtbal96 ) // mainly a title screen hack?? But original Yun Sung PCB 
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "bc7.u128", 0x00000, 0x40000, CRC(3ae07ee5) SHA1(830890e5fe93fa85f306df06c5b84c7f2aa266c8) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
 	ROM_LOAD( "yunsung.u115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
 
 	ROM_REGION( 0x20000, "bgtiles", ROMREGION_ERASEFF) // 8x8x4
 	// not for this game?
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "bc10.u92", 0x00000, 0x80000, CRC(2f511f93) SHA1(4d4b543e981855fdd42b9902c8d85a56dc2bb8a6) ) // Slide show reveals the title screen added a newer copyright and the '96
 	ROM_LOAD( "bc11.u93", 0x80000, 0x80000, CRC(c5acf1e0) SHA1(6306a231cfe6fb5ebc86ea7adf122331b8b830ca) ) // otherwise the graphics appear to be the same as the tgtballn below
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "bc8.u110", 0x00000, 0x80000,  CRC(f97d754e) SHA1(0fb32d77d79ee0f438bafbfb09836278b587acca) )
 	ROM_LOAD( "bc9.u111", 0x80000, 0x80000,  CRC(ee0728c0) SHA1(6a2a782f744c7d9318a63acc060046de01fc9ee5) )
 
@@ -1443,18 +1469,18 @@ ROM_START( tgtballn )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "rom7.u128", 0x00000, 0x40000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
 	ROM_LOAD( "yunsung.u115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
 
 	ROM_REGION( 0x20000, "bgtiles", ROMREGION_ERASEFF) // 8x8x4
 	// not for this game?
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "rom2.u92", 0x00000, 0x80000, CRC(fe4004ec) SHA1(fde782665445ad465b8f8fb95df5f60cd24016ad) )
 	ROM_LOAD( "rom1.u93", 0x80000, 0x80000, CRC(aef17762) SHA1(3dd8924695b67eec0f25549dbe2461b927268b8f) )
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "rom4.u110", 0x00000, 0x80000,  CRC(0a5abf62) SHA1(6900d598764300c81c90f5a7efb294639178bee6) )
 	ROM_LOAD( "rom3.u111", 0x80000, 0x80000,  CRC(94822bbf) SHA1(9fa6595eb819f163b58181926c276346cfa5c332) )
 
@@ -1469,18 +1495,18 @@ ROM_START( tgtball )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "yunsung.u128", 0x00000, 0x40000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
 	ROM_LOAD( "yunsung.u115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
 
 	ROM_REGION( 0x20000, "bgtiles", ROMREGION_ERASEFF) // 8x8x4
 	// not for this game?
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "yunsung.u92", 0x00000, 0x80000, CRC(bcf206a9) SHA1(0db2cee21c025b7b8d2d5b898c7231c77e36904d) )
 	ROM_LOAD( "yunsung.u93", 0x80000, 0x80000, CRC(64edb93c) SHA1(94f8d4fd159c682d952d6a4c38dc50f2c0c0824d) )
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "yunsung.u110", 0x00000, 0x80000, CRC(c209201e) SHA1(ba1cb3a204f689f9a3636834628d2265927e34f7) )
 	ROM_LOAD( "yunsung.u111", 0x80000, 0x80000, CRC(82334337) SHA1(4b2a07196027b190366131cd7b8eca87a1bd0b1c) )
 
@@ -1534,18 +1560,18 @@ ROM_START( penky )
 	ROM_REGION( 0x40000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "yunsung.u128", 0x00000, 0x40000, CRC(57baeada) SHA1(360fd2d352b201e57436ed9c9f0510a052452738) )
 
-	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT) // 16x16x8
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT ) // 16x16x8
 	ROM_LOAD( "yunsung.u114", 0x00000, 0x80000, CRC(cb6b1cfd) SHA1(22406f70fc2ad839d5ca4d00d503a2857b295cf5) )
 	ROM_LOAD( "yunsung.u115", 0x80000, 0x80000, CRC(55c5ff90) SHA1(f68a22628b9da77c3e301fa57bf673c572760869) )
 
-	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "yunsung.u94", 0x00000, 0x20000, CRC(58b31c0e) SHA1(eea9a0c17737ce071895f818499edee7790d98f7) )
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "yunsung.u92", 0x00000, 0x80000, CRC(31993a6c) SHA1(8cdcae52472768f40dc7cbefaa459982d008deaa) )
 	ROM_LOAD( "yunsung.u93", 0x80000, 0x80000, CRC(b570dc0c) SHA1(1f55681412db144e2d5cbb7a89783edc5059add7) )
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "yunsung.u110", 0x00000, 0x80000, CRC(ba3173a1) SHA1(6667bced70eb6be9853239feb69d4b30daf2d0c1) )
 	ROM_LOAD( "yunsung.u111", 0x80000, 0x80000, CRC(9223ef85) SHA1(f8da8fc5c8178165e8142eb52889b4ef1c710e24) )
 
@@ -1560,18 +1586,18 @@ ROM_START( penkyi )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "u128", 0x00000, 0x80000, CRC(17c8c97c) SHA1(8f5a88670f64ae5591b4ac1b6ddd7aa7db60e042) ) // 27C040, but 1st and 2nd half identical
 
-	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT) // 16x16x8
+	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT ) // 16x16x8
 	ROM_LOAD( "u114", 0x00000, 0x80000, CRC(593e7b15) SHA1(bf2719e86bb23b2f149b6721fd3e8131b388ceca) ) // 27C040
 	ROM_LOAD( "u115", 0x80000, 0x80000, CRC(29449fa2) SHA1(6aae7967952d3ed1a95201b4f467f3b73e8df4f6) ) // 27C040
 
-	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT)  // 8x8x4
+	ROM_REGION( 0x20000, "bgtiles", ROMREGION_INVERT )  // 8x8x4
 	ROM_LOAD( "u94", 0x00000, 0x10000, CRC(d45bac24) SHA1(fc869647873f29bb44f4d58333fdb023d99028de) ) // 27C512, half size of the one in the penky set, mostly 0 filled anyway
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "u92", 0x00000, 0x80000, CRC(31993a6c) SHA1(8cdcae52472768f40dc7cbefaa459982d008deaa) ) // 27C040
 	ROM_LOAD( "u93", 0x80000, 0x80000, CRC(b570dc0c) SHA1(1f55681412db144e2d5cbb7a89783edc5059add7) ) // 27C040
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "u110", 0x00000, 0x80000, CRC(c6501e3a) SHA1(f6fa7925a395a226714c4f5536866bc87c1bf0ca) ) // 27C040
 	ROM_LOAD( "u111", 0x80000, 0x80000, CRC(de405c6f) SHA1(715e111438d4cbecc435a519ae370842f5531163) ) // 27C040
 
@@ -1633,18 +1659,18 @@ ROM_START( torus )
 	ROM_REGION( 0x10000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "yunsung.u1", 0x00000, 0x10000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "yunsung.u67", 0x00000, 0x40000, CRC(5b60ce9f) SHA1(d5c091145e0bae7cd776e642ea17895d086ed2b0) )
 	ROM_LOAD( "yunsung.u66", 0x40000, 0x40000, CRC(4caa0c50) SHA1(a971b6e87cd1162cf370d39cfeafefbb1557e14e) )
 
 	ROM_REGION( 0x20000, "bgtiles", ROMREGION_ERASEFF) // 8x8x4
 	// not for this game
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "yunsung.u105", 0x00000, 0x80000, CRC(67c5ba1a) SHA1(0e39752ddc5ee9469647140a3fc9e6bb69d6afa1) )
 	ROM_LOAD( "yunsung.u106", 0x80000, 0x80000, CRC(efb105e9) SHA1(7bfe6ff64b25797dd524a7077def5669f25f16ec) )
 
-	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT)  // 8x8x8
+	ROM_REGION( 0x40000, "fgtiles", ROMREGION_INVERT )  // 8x8x8
 	ROM_LOAD( "yunsung.u93", 0x00000, 0x20000, CRC(ee914caf) SHA1(42f3d760a4c14658ac2eb0ba7f54fb9916368b50) )
 	ROM_LOAD( "yunsung.u92", 0x20000, 0x20000, CRC(aff1dab9) SHA1(ae488abd605c1e78b8b73452a2c1391cc0fe6b00) )
 
@@ -1723,18 +1749,18 @@ ROM_START( madball ) // Models in swimsuits only, no nudity
 	ROM_REGION( 0x20000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "p.u1", 0x00000, 0x20000, CRC(73008425) SHA1(6eded60fd5c637a63783247c858d999d5974d378) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "2.u67", 0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
 	ROM_LOAD( "1.u66", 0x40000, 0x40000, CRC(8637c7b4) SHA1(e0026e48f0e8f3554a5b448e0d1f9d1c5551dbfb) )
 
 	ROM_REGION( 0x20000, "bgtiles", ROMREGION_ERASEFF) // 8x8x4
 	// not for this game
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "5.u105", 0x00000, 0x80000, CRC(f26aac1e) SHA1(50ad34ee70bf45fa4e1dc9281b83bcdd7c7db3f8) )
 	ROM_LOAD( "6.u106", 0x80000, 0x80000, CRC(27b78907) SHA1(ab6645457adc0d17b141e366aac7e00e8ce4296b) )
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "4.u93", 0x80000, 0x80000, CRC(c3be56ad) SHA1(9cfa0b38c60798deccca74dc6b0ce0826ff7f467) )
 	ROM_LOAD( "3.u92", 0x00000, 0x80000, CRC(846019a6) SHA1(571bfa299e13b96ca263bd7e62c760bdbe3438bd) )
 
@@ -1746,18 +1772,18 @@ ROM_START( madballn ) // Even numbered stages show topless models.  Is nudity co
 	ROM_REGION( 0x20000, "maincpu", 0 )     // Z80 Code
 	ROM_LOAD( "u1.bin", 0x00000, 0x20000, CRC(531fa919) SHA1(0eafc663b9ad50d0dfc5491fe96c9bcf30483991) )
 
-	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT)  // 16x16x8
+	ROM_REGION( 0x80000, "sprites", ROMREGION_INVERT )  // 16x16x8
 	ROM_LOAD( "2.u67", 0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
 	ROM_LOAD( "1.u66", 0x40000, 0x40000, CRC(8637c7b4) SHA1(e0026e48f0e8f3554a5b448e0d1f9d1c5551dbfb) )
 
 	ROM_REGION( 0x20000, "bgtiles", ROMREGION_ERASEFF) // 8x8x4
 	// not for this game
 
-	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "mgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "u105.bin", 0x00000, 0x80000, CRC(d75faa62) SHA1(95badf932e8a8084e67aa7df8d6cb2cb2917d5fc) )
 	ROM_LOAD( "u106.bin", 0x80000, 0x80000, CRC(04b8f7a5) SHA1(97555880f200d0ecc521f8c76bcaa4a0f0eb1aa9) )
 
-	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT) // 8x8x8
+	ROM_REGION( 0x100000, "fgtiles", ROMREGION_INVERT ) // 8x8x8
 	ROM_LOAD( "u93.bin", 0x80000, 0x80000, CRC(f07a5fe6) SHA1(0b1117d8ff0f2a6c953ab1988065b75a33e2c949) )
 	ROM_LOAD( "u92.bin", 0x00000, 0x80000, CRC(7ed233ab) SHA1(8a4bc31741b4e6e1c03974f9b00f747a29c78ebf) )
 
@@ -1793,16 +1819,17 @@ void paradise_state::init_torus()
 
 ***************************************************************************/
 
-GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung (Escape license)",     "Paradise (Escape)",           MACHINE_SUPPORTS_SAVE )
-GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise Deluxe",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise 2 Deluxe",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 1996,  tgtbal96, 0,         tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball '96",             MACHINE_SUPPORTS_SAVE ) // With nudity
-GAME( 1995,  tgtball,  tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball (with nudity)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Penky",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, init_tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, init_torus,    ROT90, "Yun Sung",                      "Torus",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0, with nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradise,  0,        paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung (Escape license)",     "Paradise (Escape)",            MACHINE_SUPPORTS_SAVE )
+GAME( 199?,  paradlx,   0,        paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise Deluxe (set 1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 199?,  paradlxa,  paradlx,  paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise Deluxe (set 2)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 199?,  para2dx,   0,        paradise, para2dx,  paradise_state, init_paradise, ROT90, "Yun Sung",                      "Paradise 2 Deluxe",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 1996,  tgtbal96,  0,        tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball '96",              MACHINE_SUPPORTS_SAVE ) // With nudity
+GAME( 1995,  tgtball,   tgtbal96, tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  tgtballn,  tgtbal96, tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Target Ball (with nudity)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penky,     0,        penky,    penky,    paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Penky",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penkyi,    penky,    penkyi,   penkyi,   paradise_state, init_tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  torus,     0,        torus,    torus,    paradise_state, init_torus,    ROT90, "Yun Sung",                      "Torus",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  madball,   0,        madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  madballn,  madball,  madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung",                      "Mad Ball (V2.0, with nudity)", MACHINE_SUPPORTS_SAVE )

@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include "machine/6522via.h"
-#include "sound/dac.h"
-#include "sound/ay8910.h"
-#include "vector.h"
-
-#include "bus/vectrex/slot.h"
 #include "bus/vectrex/rom.h"
+#include "bus/vectrex/slot.h"
+#include "machine/6522via.h"
+#include "sound/ay8910.h"
+#include "sound/dac.h"
+
+#include "vector.h"
 
 #define NVECT 10000
 
@@ -42,7 +42,7 @@ protected:
 	void psg_port_w(uint8_t data);
 	uint8_t via_r(offs_t offset);
 	void via_w(offs_t offset, uint8_t data);
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	void vector_update(vector_device &vector);
 	TIMER_CALLBACK_MEMBER(imager_change_color);
@@ -151,7 +151,7 @@ public:
 		vectrex_base_state(mconfig, type, tag)
 	{ }
 
-	void vectrex(machine_config &config);
+	void vectrex(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -170,7 +170,7 @@ public:
 		m_io_coin(*this, "COIN")
 	{ }
 
-	void raaspec(machine_config &config);
+	void raaspec(machine_config &config) ATTR_COLD;
 
 private:
 	void raaspec_led_w(uint8_t data);

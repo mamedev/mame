@@ -12,7 +12,6 @@
 #include "machine/bankdev.h"
 #include "machine/cr560b.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 
 #include "screen.h"
@@ -20,7 +19,6 @@
 #include "3do_amy.h"
 #include "3do_clio.h"
 #include "3do_madam.h"
-#include "3do_portfolio.h"
 
 class _3do_state : public driver_device
 {
@@ -167,9 +165,14 @@ class alg_gun_state : public _3do_state
 public:
 	alg_gun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: _3do_state(mconfig, type, tag)
+		, m_gun_r(*this, {"P1_GUNX", "P1_GUNY", "P2_GUNX", "P2_GUNY"})
 	{ }
 
 	void alg_gun(machine_config &config) ATTR_COLD;
+private:
+	required_ioport_array<4> m_gun_r;
+
+	std::pair<u32, u8> gun_counter_r(u8 which);
 };
 
 #endif // MAME_MISC_3DO_H

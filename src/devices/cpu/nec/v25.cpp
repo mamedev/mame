@@ -8,8 +8,13 @@
 
     TODO:
 
-    Using V20/V30 cycle counts for now. V25/V35 cycle counts
-    vary based on whether internal RAM access is enabled (RAMEN).
+    The V25 carries the clock counts of its own data sheet (section 2.9); the
+    V35 is still on the V30's, and section 2.10 has its own.  Those counts are
+    given as a base plus EA plus a multiple of the wait states: EA is taken as
+    three, its value for every addressing mode but the one with a sixteen bit
+    displacement, and the wait states as none, this core having no model of the
+    READY pin.  The figures are the ones for internal RAM access enabled, which
+    costs two clocks more for each memory write than disabled does.
 
     BTCLR and STOP instructions not implemented.
 
@@ -86,7 +91,7 @@ v25_common_device::v25_common_device(const machine_config &mconfig, device_type 
 
 
 v25_device::v25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v25_common_device(mconfig, V25, tag, owner, clock, false, 4, 4, V20_TYPE)
+	: v25_common_device(mconfig, V25, tag, owner, clock, false, 6, 2, V25_TYPE)
 {
 }
 
@@ -498,6 +503,7 @@ void v25_common_device::nec_bankswitch(unsigned bank_num)
 {
 	int tmp = CompressFlags();
 
+	m_rep_params = 0;
 	m_TF = m_IF = 0;
 	m_MF = m_mode_state;
 

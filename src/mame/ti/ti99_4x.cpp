@@ -106,23 +106,25 @@ public:
 	{ }
 
 	// Configurations
-	void ti99_4_common(machine_config &config);
-	void ti99_4(machine_config &config);
-	void ti99_4_50hz(machine_config &config);
-	void ti99_4ev_60hz(machine_config &config);
-	void ti99_4qi(machine_config &config);
-	void ti99_4qi_60hz(machine_config &config);
-	void ti99_4a_50hz(machine_config &config);
-	void ti99_4a_60hz(machine_config &config);
-	void ti99_4a(machine_config &config);
-	void ti99_4_60hz(machine_config &config);
-
-	// Lifecycle
-	void driver_start() override;
-	void driver_reset() override;
+	void ti99_4_50hz(machine_config &config) ATTR_COLD;
+	void ti99_4ev_60hz(machine_config &config) ATTR_COLD;
+	void ti99_4qi_60hz(machine_config &config) ATTR_COLD;
+	void ti99_4a_50hz(machine_config &config) ATTR_COLD;
+	void ti99_4a_60hz(machine_config &config) ATTR_COLD;
+	void ti99_4_60hz(machine_config &config) ATTR_COLD;
 
 	// Interrupt triggers
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
+protected:
+	// Lifecycle
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+
+	void ti99_4_common(machine_config &config) ATTR_COLD;
+	void ti99_4(machine_config &config) ATTR_COLD;
+	void ti99_4a(machine_config &config) ATTR_COLD;
+	void ti99_4qi(machine_config &config) ATTR_COLD;
 
 private:
 	// Processor connections with the main board
@@ -863,7 +865,7 @@ void ti99_4x_state::notconnected(int state)
     Machine definitions
 ******************************************************************************/
 
-void ti99_4x_state::driver_start()
+void ti99_4x_state::machine_start()
 {
 	m_nready_combined = 0;
 	// Removing the TMS9928a requires to add a replacement for the GROMCLK.
@@ -881,7 +883,7 @@ void ti99_4x_state::driver_start()
 	save_item(NAME(m_int12));
 }
 
-void ti99_4x_state::driver_reset()
+void ti99_4x_state::machine_reset()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);

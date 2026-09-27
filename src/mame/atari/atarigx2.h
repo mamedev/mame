@@ -53,9 +53,7 @@ private:
 	uint8_t a2d_data_r(offs_t offset);
 	void latch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void mo_command_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void atarigx2_protection_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t atarigx2_protection_r(offs_t offset, uint32_t mem_mask = ~0);
-	uint32_t rrreveng_prot_r();
+
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
@@ -86,11 +84,6 @@ private:
 	uint8_t           m_playfield_color_bank = 0U;
 	uint16_t          m_playfield_xscroll = 0U;
 	uint16_t          m_playfield_yscroll = 0U;
-
-	// LEGACY PROTECTION
-	uint16_t          m_last_write = 0U;
-	uint16_t          m_last_write_offset = 0U;
-	uint32_t          m_protection_ram[0x1000]{};
 };
 
 #endif // MAME_ATARI_ATARIGX2_H

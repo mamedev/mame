@@ -43,13 +43,13 @@ public:
 		, m_microtouch(*this, "microtouch")
 	{ }
 
-	void champ2(machine_config &config);
-	void init_at();
+	void champ2(machine_config &config) ATTR_COLD;
+	void init_at() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	void init_at_common(int xmsbase);
+	void init_at_common(int xmsbase) ATTR_COLD;
 
 private:
 	required_device<i386_device> m_maincpu;

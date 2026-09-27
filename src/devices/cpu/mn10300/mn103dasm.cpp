@@ -339,7 +339,7 @@ offs_t mn10300_disassembler::disassemble_f4(std::ostream &stream, offs_t pc, con
 		util::stream_format(stream, "d%d, (d%d, a%d)", BIT(op2, 4, 2), BIT(op2, 2, 2), BIT(op2, 0, 2));
 	else
 		util::stream_format(stream, "(d%d, a%d), d%d", BIT(op2, 2, 2), BIT(op2, 0, 2), BIT(op2, 4, 2));
-	return 1 | SUPPORTED;
+	return 2 | SUPPORTED;
 }
 
 offs_t mn10300_disassembler::disassemble_f5(std::ostream &stream, offs_t pc, const mn10300_disassembler::data_buffer &opcodes) const

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood,Paul Priest, Luca Elia
+// copyright-holders:David Haywood,Paul Priest, Luca Elia, Andrea Bogazzi
 /* Jaleco MegaSystem 32 Video Hardware */
 
 /* The Video Hardware is Similar to the Non-MS32 Version of Tetris Plus 2 */
@@ -44,6 +44,14 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	tileinfo.set(1,tileno,colour,0);
 }
 
+TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_latched_tx_tile_info)
+{
+	const int tileno = m_txram_latch[tile_index *2]   & 0xffff;
+	const int colour = m_txram_latch[tile_index *2+1] & 0x000f;
+
+	tileinfo.set(2,tileno,colour,0);
+}
+
 TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 {
 	const int tileno = m_road_vram[tile_index *2]   & 0xffff;
@@ -56,11 +64,11 @@ TILE_GET_INFO_MEMBER(ms32_f1superbattle_state::get_ms32_extra_tile_info)
 
 void ms32_state::video_start()
 {
-	m_tx_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_tx_tile_info)),  TILEMAP_SCAN_ROWS,  8, 8,  64, 64);
+	m_tx_tilemap     = &create_tx_tilemap();
 	m_bg_tilemap     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16,  64, 64);
 	// alt layout, controller by register
 	m_bg_tilemap_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 256, 16);
-	m_roz_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,128);
+	m_roz_tilemap    = &create_roz_tilemap();
 
 	m_objectram_size = m_sprram.length();
 	m_sprram_buffer = make_unique_clear<u16[]>(m_objectram_size);
@@ -94,11 +102,144 @@ void ms32_state::video_start()
 	save_item(NAME(m_brt_b));
 }
 
+tilemap_t &ms32_state::create_tx_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+}
+
+tilemap_t &ms32_state::create_roz_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+}
+
+tilemap_t &ms32_f1superbattle_state::create_tx_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_latched_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+}
+
+tilemap_t &ms32_f1superbattle_state::create_roz_tilemap()
+{
+	return machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_roz_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+}
+
 void ms32_f1superbattle_state::video_start()
 {
 	ms32_state::video_start();
 
 	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ms32_f1superbattle_state::get_ms32_extra_tile_info)), TILEMAP_SCAN_ROWS, 2048, 1, 1, 0x400);
+	m_extra_tilemap->set_transparent_pen(0);
+
+	m_screen->register_screen_bitmap(m_layer_tx);
+	m_screen->register_screen_bitmap(m_layer_bg);
+	m_screen->register_screen_bitmap(m_layer_road);
+	m_screen->register_screen_bitmap(m_layer_roz);
+
+	m_txram_latch.assign(m_txram.length(), 0);
+	save_item(NAME(m_txram_latch));
+}
+
+void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, u16 const *vram, u16 const *lineram, u32 const *ctrl, bool wrap, u16 *line_colour)
+{
+	int const startx = util::sext((ctrl[0x00/4] & 0xffff) | ((ctrl[0x04/4] & 3) << 16), 18);
+	int const starty = util::sext((ctrl[0x08/4] & 0xffff) | ((ctrl[0x0c/4] & 3) << 16), 18);
+	int const offsx = ctrl[0x30/4] + (ctrl[0x38/4] & 1) * 0x400;
+	int const offsy = ctrl[0x34/4] + (ctrl[0x3c/4] & 1) * 0x400;
+
+	rectangle clip = cliprect;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const line = &lineram[8 * (y & 0xff)];
+		int const start2x = util::sext((line[0] & 0xffff) | ((line[1] & 3) << 16), 18);
+		int const start2y = util::sext((line[2] & 0xffff) | ((line[3] & 3) << 16), 18);
+		int const incxx = util::sext((line[4] & 0xffff) | ((line[5] & 1) << 16), 17);
+		int const incxy = util::sext((line[6] & 0xffff) | ((line[7] & 1) << 16), 17);
+
+		int const row = (start2y + starty + offsy) & 0x3ff;
+		line_colour[y & 0xff] = 0;
+		if (!vram[row * 2])
+			continue;
+		line_colour[y & 0xff] = vram[row * 2 + 1];
+
+		clip.min_y = clip.max_y = y;
+		tilemap->draw_roz(screen, bitmap, clip,
+				u32(start2x + startx + offsx) << 16, u32(start2y + starty + offsy) << 16,
+				incxx * 0x100, incxy * 0x100, 0, 0,
+				wrap,
+				0, 0);
+	}
+}
+
+/*
+    Per-pixel lookup in priority RAM, index layout matching the other MS32 games' tables:
+    bit 12     sprite transparent
+    bit 11     text transparent
+    bit 10     unknown, always 1 on the games checked
+    bit 9      ROZ transparent
+    bit 8      road plane transparent (always 1 on games without it)
+    bit 7      BG transparent
+    bits 6-3   sprite priority (attribute bits 7-4)
+    bits 2-0   line depth, colour bits 6-4 of the ROZ line, or of the road plane line where ROZ is transparent
+
+    Output: bits 5-3 select the layer (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text), bit 6 selects the backdrop.
+    TODO: bit 2 clear is approximated as half brightness, bits 1-0 are ignored
+*/
+void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_layer_tx.fill(0xffff, cliprect);
+	m_layer_bg.fill(0xffff, cliprect);
+	m_layer_road.fill(0xffff, cliprect);
+	m_layer_roz.fill(0xffff, cliprect);
+
+	tx_tilemap()->draw(screen, m_layer_tx, cliprect, 0, 0);
+	bg_layer_tilemap()->draw(screen, m_layer_bg, cliprect, 0, 0);
+	u16 road_line_colour[256] = { };
+	u16 roz_line_colour[256] = { };
+	draw_line_plane(screen, m_layer_road, cliprect, m_extra_tilemap, &m_road_vram[0], &m_road_lineram[0], &m_road_ctrl[0], true, road_line_colour);
+	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), &m_rozram[0], &m_lineram[0], &m_roz_ctrl[0], false, roz_line_colour);
+
+	pen_t const *const paldata = m_palette->pens();
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
+		u16 const *const tx = &m_layer_tx.pix(y);
+		u16 const *const bg = &m_layer_bg.pix(y);
+		u16 const *const road = &m_layer_road.pix(y);
+		u16 const *const roz = &m_layer_roz.pix(y);
+		u32 *const dst = &bitmap.pix(y);
+		u16 const road_depth = (road_line_colour[y & 0xff] >> 4) & 7;
+		u16 const roz_depth = (roz_line_colour[y & 0xff] >> 4) & 7;
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			bool const s_op = (spr[x] & 0xff) != 0;
+			u16 const pri = s_op ? (spr[x] >> 12) : 0;
+			u16 const depth = (roz[x] != 0xffff) ? roz_depth : road_depth;
+
+			u16 const idx = (!s_op << 12) | ((tx[x] == 0xffff) << 11) | (1 << 10) | ((roz[x] == 0xffff) << 9) | ((road[x] == 0xffff) << 8) | ((bg[x] == 0xffff) << 7) | (pri << 3) | depth;
+			u8 const code = m_priram[idx];
+
+			u16 pen = 0;
+			if (!BIT(code, 6))
+			{
+				switch ((code >> 3) & 7)
+				{
+				case 0: pen = spr[x] & 0x0fff; break;
+				case 1: pen = bg[x]; break;
+				case 2: pen = roz[x]; break;
+				case 4: pen = road[x]; break;
+				case 6: pen = tx[x]; break;
+				default: pen = 0; break;
+				}
+				if (pen == 0xffff)
+					pen = 0;
+			}
+
+			rgb_t c = paldata[pen & 0x7fff];
+			if (!BIT(code, 2))
+				c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+			dst[x] = c;
+		}
+	}
 }
 
 /********** PALETTE WRITES **********/
@@ -309,9 +450,6 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int scrollx,scrolly;
-	int asc_pri;
-	int scr_pri;
-	int rot_pri;
 
 	/*
 	    sprite control regs
@@ -363,8 +501,7 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	screen.priority().fill(0, cliprect);
 
-	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
-	   top and bottom of the screen becomes black on black) */
+	/* TODO: 0 is correct for gametngk */
 	m_temp_bitmap_tilemaps.fill(0, cliprect);   /* bg color */
 
 	/* clear our sprite bitmaps */
@@ -372,6 +509,19 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
 	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_buffer.get());
+
+	draw_tile_layers(screen, cliprect);
+
+	mix_layers(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &cliprect)
+{
+	int asc_pri;
+	int scr_pri;
+	int rot_pri;
 
 	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)
 	asc_pri = scr_pri = rot_pri = 0;
@@ -418,7 +568,10 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		else if(asc_pri == prin)
 			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 	}
+}
 
+void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 	// tile-sprite mixing
 	// TODO: spaghetti code
 	// TODO: complete guesswork and missing many spots
@@ -683,8 +836,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			}
 		}
 	}
-
-	return 0;
 }
 
 void ms32_state::screen_vblank(int state)

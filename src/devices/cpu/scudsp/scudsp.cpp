@@ -181,7 +181,10 @@ void scudsp_cpu_device::set_dest_mem_reg( uint32_t mode, uint32_t value )
 			m_ct3 &= 0x3f;
 			break;
 		case 0x4:   /* RX */
+			// the multiplier works on whatever is in RX, however it got there
+			// - vkyoute2 loads RX with MVI #$10000 for the translation column of its transform
 			m_rx.ui = value;
+			m_update_mul = 1;
 			break;
 		case 0x5:   /* PL */
 			m_pl.ui = value;
@@ -417,6 +420,9 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 	switch( (opcode & 0x3c000000) >> 26 )
 	{
 		case 0x0:   /* NOP */
+			// the ALU output follows the A register when no operation is selected, flags don't change
+			// - madden98 loads LOP/RA0/WA0 from data RAM with MOV MCx,A followed by MOV ALL,[d]
+			m_alu = (uint64_t(m_ach.ui) << 32) | m_acl.ui;
 			break;
 
 		case 0x1:   /* AND */

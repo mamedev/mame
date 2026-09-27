@@ -194,7 +194,7 @@ void mcs40_cpu_device_base::device_start()
 	}
 	state_add(I4004_SP, "SP", m_stack_ptr).mask(m_stack_ptr_mask);
 	for (unsigned i = 0; m_stack_ptr_mask >= i; ++i)
-		state_add(I4004_ADDR0 + i, string_format("ADDR%d", i).c_str(), m_addr_stack[i]).mask(0x0fff);
+		state_add(I4004_ADDR0 + i, string_format("ADDR%d", i), m_addr_stack[i]).mask(0x0fff);
 	state_add(I4004_CR, "CR", m_cr).mask(m_cr_mask);
 	state_add(I4004_RC, "RC", m_latched_rc);
 	state_add(I4004_RCN, "RC'", m_new_rc);

@@ -4697,9 +4697,9 @@ void igs_m027_state::init_gonefsh2()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
-	// bypass IGS025 'version' check
+	// HACK: bypass IGS025 'version' check
 	m_external_rom[0x1f894/4] ^= 0x00000100;
-	// bypass external ROM checksum
+	// HACK: bypass external ROM checksum
 	u32 *ROM2 = &memregion("maincpu")->as_u32();
 	ROM2[(0x168/4)] ^= 0x10000000;
 }
@@ -4804,9 +4804,9 @@ void igs_m027_state::init_chessc2()
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 
-	// bypass IGS025 'version' check
+	// HACK: bypass IGS025 'version' check
 	m_external_rom[0x207d8/4] ^= 0x00000100;
-	// bypass external ROM checksum
+	// HACK: bypass external ROM checksum
 	u32 *ROM2 = &memregion("maincpu")->as_u32();
 	ROM2[(0x168/4)] ^= 0x10000000;
 }

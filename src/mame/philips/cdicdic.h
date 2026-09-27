@@ -208,7 +208,7 @@ private:
 	bool is_mode2_audio_selected(const uint8_t *buffer);
 
 	void process_disc_sector();
-	void process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer);
+	void process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer, const uint8_t *raw_subcode);
 	void init_disc_read(uint8_t disc_mode);
 	void cancel_disc_read();
 	void handle_cdic_command();

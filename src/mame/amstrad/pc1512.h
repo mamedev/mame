@@ -236,6 +236,7 @@ public:
 
 	int m_opt;
 	void pc1640hd(machine_config &config);
+	void pc1640hd30(machine_config &config);
 	void pc1640(machine_config &config);
 	void pc1640dd(machine_config &config);
 	void pc1640_io(address_map &map) ATTR_COLD;

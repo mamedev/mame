@@ -4,6 +4,8 @@
 Cai System LICO 立可遊戲教學系統
 (Lìkě Yóuxì Jiàoxué Xìtǒng - "LICO" is an alternate transliteration of "立可")
 
+TODO: Is "Cai System" part of the system name or a brand name?
+
 Educational system, TV Paint style with touchpad and tool/palette selection area
 also has a controller featuring
 circular D-Pad
@@ -487,4 +489,4 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1992?, licocai, 0, 0, licocai, licocai, licocai_state, empty_init, "Cai System / C&E", "LICO", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1992?, licocai, 0, 0, licocai, licocai, licocai_state, empty_init, "Socrates Co. / C&E Inc.", "LICO", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

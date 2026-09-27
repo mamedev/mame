@@ -498,6 +498,9 @@ public:
 	void tekken2(machine_config &config) ATTR_COLD;
 	void fambowl(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void rom8_w(offs_t offset, uint16_t data);
 	void rom8_64_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -516,8 +519,6 @@ private:
 	void ptblank2ua_map(address_map &map) ATTR_COLD;
 	void rom8_64_map(address_map &map) ATTR_COLD;
 	void rom8_map(address_map &map) ATTR_COLD;
-
-	virtual void driver_start() override;
 
 	required_shared_ptr<uint16_t> m_sharedram;
 	required_device<psxcpu_device> m_maincpu;
@@ -701,7 +702,7 @@ void namcos11_state::c76_speedup_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	COMBINE_DATA(&m_su_83);
 }
 
-void namcos11_state::driver_start()
+void namcos11_state::machine_start()
 {
 	// C76 idle skipping, large speedboost
 	if (C76_SPEEDUP)

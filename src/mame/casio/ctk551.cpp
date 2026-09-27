@@ -280,7 +280,7 @@ private:
 	void gz70sp_map(address_map &map) ATTR_COLD;
 	void ctk601_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void machine_start() override;
 
 	required_device<gt913_device> m_maincpu;
 	optional_device<pwm_display_device> m_pwm;
@@ -455,7 +455,7 @@ void ctk551_state::ctk601_map(address_map& map)
 	map(0x380003, 0x380003).mirror(0x07fffc).rw(FUNC(ctk551_state::dsp_port_r), FUNC(ctk551_state::dsp_port_w));
 }
 
-void ctk551_state::driver_start()
+void ctk551_state::machine_start()
 {
 	m_nmi_timer = timer_alloc(FUNC(ctk551_state::nmi_clear), this);
 
@@ -1370,6 +1370,6 @@ void ctk551_state::init_gz70sp()
 SYST( 1995, ap10,    0,      0,      ap10,    ap10,   ctk551_state, init_ap10,   "Casio", "Celviano AP-10", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 1995, ctk530,  0,      0,      ctk530,  ctk530, ctk551_state, init_ctk530, "Casio", "CTK-530",        MACHINE_SUPPORTS_SAVE )
 SYST( 1995, ctk630,  0,      0,      ctk630,  ctk630, ctk551_state, init_ap10,   "Casio", "CTK-630",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-SYST( 1996, gz70sp,  0,      0,      gz70sp,  gz70sp, ctk551_state, init_gz70sp, "Casio", "GZ-70SP",        MACHINE_SUPPORTS_SAVE )
+SYST( 1996, gz70sp,  0,      0,      gz70sp,  gz70sp, ctk551_state, init_gz70sp, "Casio", "GZ-70SP GM Sound Speaker System", MACHINE_SUPPORTS_SAVE )
 SYST( 1997, ctk601,  0,      0,      ctk601,  ctk601, ctk551_state, empty_init,  "Casio", "CTK-601",        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 SYST( 2000, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init,  "Casio", "CTK-551",        MACHINE_SUPPORTS_SAVE )

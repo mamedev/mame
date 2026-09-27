@@ -318,72 +318,84 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
-uint32_t mcd212_device::get_backdrop_plane()
+uint32_t mcd212_device::get_backdrop_plane(int x, int y)
 {
 	if (BIT(m_image_coding_method, ICM_EV_BIT))
-		return 0; // External Video Background. Default to Black since there is no DVC.
+	{
+		uint32_t argb = 0;
+		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
+			return argb;
+		return s_4bpp_color[0];
+	}
 	else
 		return s_4bpp_color[m_backdrop_color];
 }
 
-template <int Path>
 void mcd212_device::process_ica()
 {
-	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
 	const int max_to_process = m_ica_height * 120;
 	// LCT depends on the current frame parity
-	uint32_t addr = !BIT(m_csrr[0], CSR1R_PA_BIT) ? 0x200 : 0x202;
+	uint32_t addr[2];
+	addr[0] = addr[1] = !BIT(m_csrr[0], CSR1R_PA_BIT) ? 0x200 : 0x202;
+	bool active[2] = { bool(BIT(m_dcr[0], DCR_ICA_BIT)), bool(BIT(m_dcr[1], DCR_ICA_BIT)) };
 
-	for (int i = 0; i < max_to_process; i++)
+	for (int i = 0; i < max_to_process && (active[0] | active[1]); i++)
 	{
-		uint32_t cmd = ica[addr++] << 16;
-		cmd |= ica[addr++];
-		switch ((cmd & 0xff000000) >> 24)
-		{
-			case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: // STOP
-			case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: STOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
-				return;
-			case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: // NOP
-			case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: NOP\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
-				break;
-			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
-			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
-				set_dcp<Path>(cmd & 0x003ffffc);
-				break;
-			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
-			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
-				set_dcp<Path>(cmd & 0x003ffffc);
-				return;
-			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR (ICA)
-			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
-				addr = (cmd & 0x0007ffff) / 2;
-				break;
-			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
-			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
-				set_vsr<Path>(cmd & 0x003fffff);
-				return;
-			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
-			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: INTERRUPT\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
-				m_csrr[1] |= 1 << (2 - Path);
-				if (m_csrr[1] & (CSR2R_IT1 | CSR2R_IT2))
-					m_int_callback(ASSERT_LINE);
-				break;
-			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
+		if (active[1])
+			active[1] = process_ica_command<1>(addr[1]);
+		if (active[0])
+			active[0] = process_ica_command<0>(addr[0]);
+	}
+}
+
+template <int Path>
+bool mcd212_device::process_ica_command(uint32_t &addr)
+{
+	uint16_t *ica = Path ? m_planeb.target() : m_planea.target();
+	static const char *const s_ica_names[7] = { "STOP", "NOP", "DCP", "DCP and STOP", "VSR", "VSR and STOP", "INTERRUPT" };
+
+	uint32_t cmd = ica[addr++] << 16;
+	cmd |= ica[addr++];
+	
+	const uint8_t op = cmd >> 24;
+	if ((op >> 4) < 7)
+		LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: %s: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, s_ica_names[op >> 4], cmd & 0x003fffff);
+	// Return false to issue a STOP.
+	switch (op >> 4)
+	{
+		case 0x0: // STOP
+			return false;
+		case 0x1:// NOP
+			return true;
+		case 0x2: // RELOAD DCP
+			set_dcp<Path>(cmd & 0x003ffffc);
+			return true;
+		case 0x3: // RELOAD DCP and STOP
+			set_dcp<Path>(cmd & 0x003ffffc);
+			return false;
+		case 0x4: // RELOAD VSR (ICA)
+			addr = (cmd & 0x0007ffff) / 2;
+			return true;
+		case 0x5: // RELOAD VSR and STOP
+			set_vsr<Path>(cmd & 0x003fffff);
+			return false;
+		case 0x6: // INTERRUPT
+			m_csrr[1] |= 1 << (2 - Path);
+			if (m_csrr[1] & (CSR2R_IT1 | CSR2R_IT2))
+				m_int_callback(ASSERT_LINE);
+			return true;
+		case 0x7:
+			if (op & 0x8) // RELOAD DISPLAY PARAMETERS
+			{
 				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DISPLAY PARAMETERS\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path);
 				set_display_parameters<Path>(cmd & 0x1f);
-				break;
-			default:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: SET REGISTER %02x = %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd >> 24, cmd & 0x00ffffff);
-				set_register<Path>(cmd >> 24, cmd & 0x00ffffff);
-				break;
-		}
+				return true;
+			}
+			[[fallthrough]];
+		default:
+			LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: SET REGISTER %02x = %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, op, cmd & 0x00ffffff);
+			set_register<Path>(op, cmd & 0x00ffffff);
+			return true;
 	}
 }
 
@@ -677,7 +689,7 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = get_backdrop_plane();
+			out[x] = get_backdrop_plane(x + border_width, m_display_line);
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -806,6 +818,27 @@ void mcd212_device::dcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_MAIN_REG_WRITES, "%s: Display Command Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_dcr[0]);
+	update_frame_geometry(false);
+}
+
+// The frame follows DCR1's frame duration bit, per table 5-6 of the MCD212
+// documentation: 312 lines with 280 displayed at 50 Hz, 262 with 240 at
+// 60 Hz.  Always drawing the 50 Hz frame left 40 lines of stale memory below
+// an NTSC picture.
+void mcd212_device::update_frame_geometry(bool force)
+{
+	const bool ntsc = BIT(m_dcr[0], DCR_FD_BIT);
+	const int total = ntsc ? 262 : 312;
+	if (!force && total == m_total_height)
+		return;
+
+	m_total_height = total;
+	m_ica_height = ntsc ? 22 : 32;
+
+	// the screen runs at twice the line count, for interlace
+	const rectangle visarea(0, 767, m_ica_height * 2, total * 2 - 1);
+	screen().configure(screen().width(), total * 2, visarea,
+			screen().pixel_period() * screen().width() * total * 2);
 }
 
 uint16_t mcd212_device::vsr1_r(offs_t offset, uint16_t mem_mask)
@@ -920,10 +953,7 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 	m_csrr[0] &= ~CSR1R_DA;
 
 	// Process ICA
-	if (BIT(m_dcr[0], DCR_ICA_BIT))
-		process_ica<0>();
-	if (BIT(m_dcr[1], DCR_ICA_BIT))
-		process_ica<1>();
+	process_ica();
 
 	if (BIT(m_dcr[0], DCR_DCA_BIT))
 		m_dca[0] = get_dcp<0>();
@@ -951,10 +981,10 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 {
 	// Process DCA
-	if (BIT(m_dcr[0], DCR_DCA_BIT))
-		process_dca<0>();
 	if (BIT(m_dcr[1], DCR_DCA_BIT))
 		process_dca<1>();
+	if (BIT(m_dcr[0], DCR_DCA_BIT))
+		process_dca<0>();
 
 	int scanline = screen().vpos() / 2;
 	if (scanline == m_total_height - 1)
@@ -976,6 +1006,9 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	// FIXME this should use the clipping rectangle to determine which lines need drawing
 	int scanline = screen.vpos() / 2;
+
+	// line number within active video, for the external video source
+	m_display_line = scanline - m_ica_height;
 
 	// Process VSR and mix if we're in the visible region
 	if (scanline >= m_ica_height)
@@ -1135,6 +1168,7 @@ void mcd212_device::device_reset()
 
 	m_ica_height = 32;
 	m_total_height = 312;
+	update_frame_geometry(true);
 	m_blink_time = 0;
 	for (int i = 0; i < m_total_height; i++)
 	{
@@ -1163,6 +1197,11 @@ mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
+
+void mcd212_device::device_post_load()
+{
+	update_frame_geometry(true);
+}
 
 void mcd212_device::device_start()
 {

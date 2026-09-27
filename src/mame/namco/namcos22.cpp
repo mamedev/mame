@@ -27,7 +27,6 @@ TODO:
 - ridgera2 title screen scrolls horizontally on some video footage, C139 related?
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
 - global offset is wrong in non-super22 testmode video test
-- acedrive/victlap testmode video test flickers
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
 - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
@@ -840,7 +839,7 @@ SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
   |               |-----| |-----| |-----| |-----|  |         |  |  |
   |   |---------|                                  |  C399   |  |--|
   |   |         |         |-----| |-----| |-----|  |         |   |
-  |   |  C387   |         |C400 | |C400 | |C400 |  |         |   |
+  |   |  C397   |         |C400 | |C400 | |C400 |  |         |   |
   |   |         |         |-----| |-----| |-----|  |---------|  |--|
 |--|  |         |                    |-----|            N341256 |  |
 |  |  |---------|                    |C406 |  |-----|   N341256 |  |
@@ -868,13 +867,11 @@ Notes:
       C361         : Namco custom C361 (QFP120)
       C374         : Namco custom C374 (QFP160)
       C381         : Namco custom C381 (x2, QFP144)
-      C387         : Namco custom C387 (QFP160)
       C395         : Namco custom C395 (QFP168)
+      C397         : Namco custom C397 (QFP160)
       C399         : Namco custom C399 (QFP160)
       C400         : Namco custom C400 (x4, QFP100)
-                     - x3 on 1st Revision
       C401         : Namco custom C401 (x4, QFP64)
-                     - x5 on 1st Revision
       C404         : Namco custom C404 (QFP208)
       C406         : Namco custom C406 (TQFP120)
       C407         : Namco custom C407 (QFP64) NOTE! On Revision A & B, this position is populated by an
@@ -1843,7 +1840,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	/**
 	 * Tilemap Memory (64 x 64)
 	 * Mounted position: VIDEO  2K
-	 * Known chip type: HM511664 (64k x 16bit SRAM)
+	 * Known chip type: HM511664 (64k x 16bit DRAM)
 	 * Note: Self test: 90084000 - 9009ffff
 	 */
 	map(0x9009e000, 0x9009ffff).ram().w(FUNC(namcos22_state::namcos22_textram_w)).share(m_textram);
@@ -3794,6 +3791,10 @@ void namcos22_state::namcos22(machine_config &config)
 	m_iomcu->p4_in_cb().set(FUNC(namcos22_state::iomcu_port4_s22_r));
 	m_iomcu->set_disable(); // not emulated yet
 
+	// high quantum is needed for main CPU => master DSP comms (acedrive, victlap video test)
+	// and erratic inputs otherwise in ss22 games, probably mcu vs maincpu shareram
+	config.set_maximum_quantum(attotime::from_hz(40000));
+
 	EEPROM_2864(config, "eeprom").write_time(attotime::zero);
 
 	// video hardware
@@ -3846,7 +3847,6 @@ void namcos22s_state::namcos22s(machine_config &config)
 	m_mcu->an2_cb().set(FUNC(namcos22s_state::mcu_adc_r<2>));
 	m_mcu->an3_cb().set(FUNC(namcos22s_state::mcu_adc_r<3>));
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22s_state::mcu_irq), "screen", 0, 240);
-	config.set_maximum_quantum(attotime::from_hz(9000)); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	config.device_remove("iomcu");
 
@@ -6320,7 +6320,7 @@ void propcycl_state::init_propcycl()
 {
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
-	// patch out strange routine (uninitialized-eeprom related?)
+	// HACK: patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation
 	ROM[0x1992c/4] = 0x4e754e75;
 
@@ -6342,7 +6342,7 @@ void propcycl_state::init_propcycl()
 
 void propcycl_state::init_propcyclj()
 {
-	// see init_propcycl for notes
+	// HACK: see init_propcycl for notes
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	ROM[0x1990a/4] = 0x4e754e75;

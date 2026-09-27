@@ -4,10 +4,6 @@
 
     Epson PX-8
 
-    12/05/2009 Skeleton driver.
-
-    Seems to be a CP/M computer.
-
 ***************************************************************************/
 
 /*
@@ -16,11 +12,8 @@
 
     - dumps of the internal ROMs
     - uPD7508 CPU core
-    - keyboard
     - cassette
-    - display
     - jumpers
-    - ROM capsule
     - uPD7001 (controlled by uPD7508)
     - RAM disk (64K/128K RAM, Z80, 4K ROM)
     - modem (82C55)
@@ -34,6 +27,7 @@
 
 #include "machine/rescap.h"
 #include "machine/upd7001.h"
+#include "video/sed1330.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -49,14 +43,6 @@
 
 #define XTAL_CR1        XTAL(9'830'400)
 #define XTAL_CR2        XTAL(32'768)
-
-/* interrupt sources */
-#define INT0_7508       0x01
-#define INT1_SERIAL     0x02
-#define INT2_RS232      0x04
-#define INT3_BARCODE    0x08
-#define INT4_FRC        0x10
-#define INT5_OPTION     0x20
 
 enum
 {
@@ -129,6 +115,8 @@ void px8_state::bankswitch()
 
 uint8_t px8_state::gah40m_r(offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	switch (offset)
 	{
 	case GAH40M_ICRL_C:
@@ -146,6 +134,9 @@ uint8_t px8_state::gah40m_r(offs_t offset)
 		    7       ICR7
 
 		*/
+
+		m_icr = (machine().time() - m_frc_start).as_ticks(XTAL_CR1 / 16);
+		data = m_icr & 0xff;
 		break;
 
 	case GAH40M_ICRH_C:
@@ -163,6 +154,8 @@ uint8_t px8_state::gah40m_r(offs_t offset)
 		    7       ICR15
 
 		*/
+
+		data = m_icr >> 8;
 		break;
 
 	case GAH40M_ICRL_B:
@@ -214,6 +207,8 @@ uint8_t px8_state::gah40m_r(offs_t offset)
 		    7
 
 		*/
+
+		data = m_isr;
 		break;
 
 	case GAH40M_STR:
@@ -231,6 +226,8 @@ uint8_t px8_state::gah40m_r(offs_t offset)
 		    7
 
 		*/
+
+		data = (m_rdysio ? 0x08 : 0) | (m_bank0 ? 0x01 : 0);
 		break;
 
 	case GAH40M_SIOR:
@@ -248,6 +245,8 @@ uint8_t px8_state::gah40m_r(offs_t offset)
 		    7       SIO7
 
 		*/
+
+		data = m_sio;
 		break;
 
 	case GAH40M_IVR:
@@ -268,7 +267,7 @@ uint8_t px8_state::gah40m_r(offs_t offset)
 		break;
 	}
 
-	return 0xff;
+	return data;
 }
 
 /*-------------------------------------------------
@@ -314,6 +313,21 @@ void px8_state::gah40m_w(offs_t offset, uint8_t data)
 		    7
 
 		*/
+
+		if (BIT(data, 0))
+			m_rdysio = true;
+
+		if (BIT(data, 1))
+		{
+			m_rdysio = false;
+			sub_handshake();
+		}
+
+		if (BIT(data, 2))
+		{
+			m_isr &= ~INT4_FRC;
+			update_interrupt();
+		}
 		break;
 
 	case GAH40M_CTLR2:
@@ -353,6 +367,7 @@ void px8_state::gah40m_w(offs_t offset, uint8_t data)
 		*/
 
 		m_ier = data;
+		update_interrupt();
 		break;
 
 	case GAH40M_SIOR:
@@ -506,6 +521,39 @@ void px8_state::ksc_w(uint8_t data)
 	m_ksc = data;
 }
 
+/*-------------------------------------------------
+    update_interrupt - update Z80 interrupt line
+-------------------------------------------------*/
+
+void px8_state::update_interrupt()
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_isr & m_ier & 0x3f) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+/*-------------------------------------------------
+    irq_ack - interrupt acknowledge
+-------------------------------------------------*/
+
+int px8_state::irq_ack(device_t &device, int irqline)
+{
+	uint8_t pending = m_isr & m_ier & 0x3f;
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (BIT(pending, i))
+			return 0xf0 | (i << 1);
+	}
+
+	return 0xff;
+}
+
+TIMER_CALLBACK_MEMBER(px8_state::frc_tick)
+{
+	m_frc_start = machine().time();
+	m_isr |= INT4_FRC;
+	update_interrupt();
+}
+
 /***************************************************************************
     MEMORY MAPS
 ***************************************************************************/
@@ -531,8 +579,8 @@ void px8_state::px8_io(address_map &map)
 	map.global_mask(0x0f);
 	map(0x00, 0x07).rw(FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
 	map(0x0c, 0x0d).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
-//  map(0x0e, 0x0e).rw(SED1320_TAG, FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
-//  map(0x0f, 0x0f).rw(SED1320_TAG, FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));
+	map(0x0e, 0x0e).rw(FUNC(px8_state::slave_status_r), FUNC(px8_state::slave_data_w));
+	map(0x0f, 0x0f).rw(FUNC(px8_state::slave_data_r), FUNC(px8_state::slave_cmd_w));
 }
 
 /*-------------------------------------------------
@@ -545,7 +593,7 @@ void px8_state::px8_slave_mem(address_map &map)
 	map(0x0020, 0x0023).rw(FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
 //  map(0x0024, 0x0027).rw(SED1320_TAG, FUNC(sed1330_device::), FUNC(sed1330_device::));
 	map(0x0028, 0x0028).w(FUNC(px8_state::gah40s_ier_w));
-	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x8000, 0x97ff).ram();
 	map(0x9800, 0xefff).noprw();
 	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */
 }
@@ -675,11 +723,6 @@ void px8_state::px8_palette(palette_device &palette) const
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
 }
 
-uint32_t px8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 /*-------------------------------------------------
     gfx_layout px8_charlayout
 -------------------------------------------------*/
@@ -702,7 +745,7 @@ static const gfx_layout px8_charlayout =
 -------------------------------------------------*/
 
 static GFXDECODE_START( gfx_px8 )
-	GFXDECODE_ENTRY( SED1320_TAG, 0x0000, px8_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "font", 0x0000, px8_charlayout, 0, 1 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -723,9 +766,29 @@ void px8_state::machine_start()
 	save_item(NAME(m_sio));
 	save_item(NAME(m_ksc));
 
-	// not used yet
-	(void)m_icr;
-	(void)m_frc;
+	m_sram = std::make_unique<uint8_t[]>(0x10000);
+	std::fill_n(m_sram.get(), 0x10000, 0);
+	std::fill(std::begin(m_key_state), std::end(m_key_state), 0xff);
+	std::fill(std::begin(m_alarm), std::end(m_alarm), 0);
+
+	system_time systime;
+	machine().base_datetime(systime);
+	m_rtc[0] = systime.local_time.year % 100;
+	m_rtc[1] = systime.local_time.month + 1;
+	m_rtc[2] = systime.local_time.mday;
+	m_rtc[3] = systime.local_time.hour;
+	m_rtc[4] = systime.local_time.minute;
+	m_rtc[5] = systime.local_time.second;
+	m_rtc[6] = systime.local_time.weekday;
+
+	sub_init();
+
+	m_frc_timer = timer_alloc(FUNC(px8_state::frc_tick), this);
+	m_sub_second_timer = timer_alloc(FUNC(px8_state::sub_second_tick), this);
+	m_sub_keyboard_timer = timer_alloc(FUNC(px8_state::sub_keyboard_scan), this);
+
+	m_sub_second_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
+	m_sub_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
 void px8_state::machine_reset()
@@ -734,6 +797,42 @@ void px8_state::machine_reset()
 	m_bk2 = 1;
 
 	bankswitch();
+
+	m_isr = 0;
+	m_ier = 0;
+	update_interrupt();
+
+	attotime period = attotime::from_ticks(0x10000, XTAL_CR1 / 16);
+	m_frc_start = machine().time();
+	m_frc_timer->adjust(period, 0, period);
+
+	m_rdysio = true;
+	m_sub_cmd.clear();
+	m_sub_rsp.clear();
+	m_sub_status = m_sub_cold ? 0x08 : 0x10;
+	m_sub_cold = false;
+
+	m_slave_buf.clear();
+	m_slave_rsp.clear();
+	m_gudc.clear();
+	m_cs_addr = 0x8100;
+	m_gs_addr = 0x8380;
+	m_scr_ptr = m_cs_addr;
+	m_udc_start = 0xe0;
+	m_lcd_on = true;
+	m_char_mode = true;
+	m_seven_lines = false;
+	m_curs_mode = 0;
+	m_curs_x = 0;
+	m_curs_y = 0;
+	m_wnd_x = 0;
+	m_wnd_y = 0;
+	m_flash = 0;
+	m_mct_protect = false;
+	m_mct_counter = 0;
+	m_prom_power = false;
+
+	lcdc_init();
 }
 
 /***************************************************************************
@@ -746,6 +845,7 @@ void px8_state::px8(machine_config &config)
 	Z80(config, m_maincpu, XTAL_CR1 / 4); /* 2.45 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &px8_state::px8_mem);
 	m_maincpu->set_addrmap(AS_IO, &px8_state::px8_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(px8_state::irq_ack));
 
 	/* slave cpu (HD6303CA) */
 	hd6301_cpu_device &slave(HD6301V1(config, HD6303_TAG, XTAL_CR1 / 4)); /* 614 kHz */
@@ -760,12 +860,16 @@ void px8_state::px8(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_px8);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
-	screen.set_refresh_hz(72);
-	screen.set_screen_update(FUNC(px8_state::screen_update));
-	screen.set_size(480, 64);
-	screen.set_visarea(0, 479, 0, 63);
-	screen.set_palette("palette");
+	SCREEN(config, m_screen).set_lcd();
+	m_screen->set_refresh_hz(72);
+	m_screen->set_screen_update(m_lcdc, FUNC(sed1330_device::screen_update));
+	m_screen->set_size(480, 64);
+	m_screen->set_visarea(0, 479, 0, 63);
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(px8_state::lcdc_update));
+
+	SED1330(config, m_lcdc, XTAL_CR1 / 4);
+	m_lcdc->set_screen(m_screen);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_px8);
 	PALETTE(config, "palette", FUNC(px8_state::px8_palette), 2);
@@ -807,7 +911,7 @@ ROM_START( px8 )
 	ROM_SYSTEM_BIOS( 1, "052884", "5/28/84" )
 	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(1) )
 
-	ROM_REGION( 0x0800, SED1320_TAG, 0 )
+	ROM_REGION( 0x0800, "font", 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )
 
 	ROM_REGION( 0x1000, HD6303_TAG, 0 )
@@ -826,4 +930,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
-COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING )
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_SUPPORTS_SAVE )

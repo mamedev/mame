@@ -323,7 +323,7 @@ void ht1130_device::init_common()
 	state_add(HT1130_ACC, "ACC", m_acc);
 
 	for (int i = 0; i < 5; i++)
-		state_add(HT1130_R0 + i, string_format("R%d", i).c_str(), m_regs[i]);
+		state_add(HT1130_R0 + i, string_format("R%d", i), m_regs[i]);
 
 	state_add(HT1130_TIMER_EN, "TIMER_EN", m_timer_en);
 	state_add(HT1130_TIMER, "TIMER", m_timer);

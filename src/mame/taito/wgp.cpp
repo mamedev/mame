@@ -2005,7 +2005,7 @@ void wgp_state::init_wgp()
 
 void wgp_state::init_wgp2()
 {
-	// Code patches to prevent failure in memory checks
+	// HACK: Code patches to prevent failure in memory checks
 	u16 *ROM = (u16 *)memregion("sub")->base();
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood, Phil Stroffolino
 /******************************************************************************
 
-    Namco C169 (ROZ - Rotate and Zoom)
+  Namco C169 (ROZ - Rotate and Zoom)
 
   Advanced rotate-zoom chip manages two layers.
   Each layer uses a designated subset of a master 256x256 tile tilemap (4096x4096 pixels).
@@ -164,7 +164,7 @@ void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters 
 	if (scanline_inc && m_scanline_layer == 0)
 	{
 		const uint32_t period = uint32_t(source[0]) >> 3;
-		if (period == 0xC00)
+		if (period == 0xc00)
 			params.wrap_y = period;
 	}
 
@@ -298,8 +298,8 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 				}
 				else
 				{
-					const uint32_t wx = uint32_t((cx >> 16) & int32_t(size_mask));
-					const uint32_t wy = uint32_t((cy >> 16) & int32_t(size_mask));
+					const uint32_t wx = uint32_t((cx >> 16) & size_mask);
+					const uint32_t wy = uint32_t((cy >> 16) & size_mask);
 					xpos = (wx + params.left) & 0xfff;
 					ypos = (wy + params.top) & 0xfff;
 				}

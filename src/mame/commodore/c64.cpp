@@ -1,14 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - floating bus writes to peripheral registers in m6502.c
-    - sort out kernals between PAL/NTSC
-    - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
-
-*/
 
 #include "emu.h"
 #include "screen.h"
@@ -110,6 +101,7 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
+	void cpu_mem_w(offs_t offset, uint8_t data);
 
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
@@ -131,6 +123,8 @@ public:
 	void write_restore(int state);
 	void exp_dma_w(int state);
 	void exp_reset_w(int state);
+	void vic_ba_w(int state);
+	void update_rdy();
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c64);
 
@@ -162,6 +156,7 @@ public:
 
 	// interrupt state
 	int m_exp_dma;
+	int m_vic_ba;
 	int m_cass_rd;
 	int m_iec_srq;
 
@@ -232,6 +227,7 @@ public:
 };
 
 
+// C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
 class clipper_state : public c64_state
 {
 public:
@@ -498,12 +494,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 
 	int plaout = read_pla(offset, va, rw, !aec, ba);
 
-	uint8_t data = 0xff;
-
-	if (!aec)
-	{
-		data = m_vic->bus_r();
-	}
+	uint8_t data = m_vic->bus_r();
 
 	if (!BIT(plaout, PLA_OUT_CASRAM))
 	{
@@ -550,7 +541,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 		case 0x9:
 		case 0xa:
 		case 0xb: // COLOR
-			data = m_color_ram[offset & 0x3ff] & 0x0f;
+			data = (data & 0xf0) | (m_color_ram[offset & 0x3ff] & 0x0f);
 			break;
 
 		case 0xc: // CIA1
@@ -592,7 +583,6 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 
 	if (offset < 0x0002)
 	{
-		// write to internal CPU register
 		data = m_vic->bus_r();
 	}
 
@@ -655,7 +645,7 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 
 uint8_t c64_state::read(offs_t offset)
 {
-	int aec = 1, ba = 1;
+	int aec = 1, ba = m_vic->ba_r();
 
 	// VIC address bus is floating
 	offs_t va = 0x3fff;
@@ -670,9 +660,22 @@ uint8_t c64_state::read(offs_t offset)
 
 void c64_state::write(offs_t offset, uint8_t data)
 {
-	int aec = 1, ba = 1;
+	int aec = 1, ba = m_vic->ba_r();
 
 	write_memory(offset, data, aec, ba);
+}
+
+
+//-------------------------------------------------
+//  cpu_mem_w -
+//-------------------------------------------------
+
+void c64_state::cpu_mem_w(offs_t offset, uint8_t data)
+{
+	if (m_exp_dma)
+		return;
+
+	write(offset, data);
 }
 
 
@@ -698,19 +701,16 @@ uint8_t c64_state::vic_videoram_r(offs_t offset)
 
 uint8_t c64_state::vic_colorram_r(offs_t offset)
 {
-	uint8_t data;
-
 	if (m_vic->aec_r())
 	{
-		// TODO low nibble of last opcode
-		data = 0x0f;
-	}
-	else
-	{
-		data = m_color_ram[offset] & 0x0f;
+		// the CPU is halted by RDY on its next read, so the bus carries the byte at the address it
+		// presents rather than a latched opcode; that address is the internal PC for opcode and operand
+		// fetches (pcbase() is still the previous instruction, as the VIC runs its cycle first)
+		auto dis = machine().disable_side_effects();
+		return read(m_maincpu->get_internal_pc()) & 0x0f;
 	}
 
-	return data;
+	return m_color_ram[offset] & 0x0f;
 }
 
 
@@ -725,7 +725,7 @@ uint8_t c64_state::vic_colorram_r(offs_t offset)
 
 void c64_state::c64_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(c64_state::read), FUNC(c64_state::write));
+	map(0x0000, 0xffff).rw(FUNC(c64_state::read), FUNC(c64_state::cpu_mem_w));
 }
 
 
@@ -1406,12 +1406,21 @@ void c64gs_state::cpu_w(uint8_t data)
 
 void c64_state::exp_dma_w(int state)
 {
-	if (m_exp_dma != state)
-	{
-		m_exp_dma = state;
+	m_exp_dma = state;
 
-		m_maincpu->set_input_line(INPUT_LINE_HALT, m_exp_dma);
-	}
+	update_rdy();
+}
+
+void c64_state::vic_ba_w(int state)
+{
+	m_vic_ba = state;
+
+	update_rdy();
+}
+
+void c64_state::update_rdy()
+{
+	m_maincpu->set_input_line(m6510_device::RDY_LINE, (m_vic_ba && !m_exp_dma) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void c64_state::exp_reset_w(int state)
@@ -1445,6 +1454,9 @@ void sx1541_iec_devices(device_slot_interface &device)
 void c64_state::machine_start()
 {
 	m_iec_sync_timer = timer_alloc(FUNC(c64_state::iec_sync_tick), this);
+
+	m_exp_dma = CLEAR_LINE;
+	m_vic_ba = ASSERT_LINE;
 
 	// get pointers to ROMs
 	if (memregion("basic") != nullptr)
@@ -1481,6 +1493,7 @@ void c64_state::machine_start()
 	save_item(NAME(m_va14));
 	save_item(NAME(m_va15));
 	save_item(NAME(m_exp_dma));
+	save_item(NAME(m_vic_ba));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_user_pa2));
@@ -1503,9 +1516,6 @@ void c64_state::machine_reset()
 //-------------------------------------------------
 //  cia_config - wire up the two CIAs
 //-------------------------------------------------
-
-//  Split out from the machine configs so the 64C, which fits a later CIA, can
-//  swap the devices and keep one copy of the wiring.
 
 void c64_state::cia_config(machine_config &config, int tod_clock)
 {
@@ -1542,6 +1552,7 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
+	m_maincpu->set_floating_falloff(0xc0, 350000);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1555,7 +1566,7 @@ void c64_state::ntsc(machine_config &config)
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
 	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos6567.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
+	mos6567.ba_callback().set(FUNC(c64_state::vic_ba_w));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
@@ -1661,7 +1672,8 @@ void sx64_state::ntsc_sx(machine_config &config)
 	// basic hardware
 	m_maincpu->read_callback().set(FUNC(sx64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(sx64_state::cpu_w));
-	m_maincpu->set_pulls(0x07, 0xc0);
+	m_maincpu->set_pulls(0x07, 0xf8);
+	m_maincpu->set_floating_falloff(0x38, 1500000);
 
 	// devices
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
@@ -1688,6 +1700,7 @@ void sx64_state::ntsc_dx(machine_config &config)
 void c64c_state::ntsc_c(machine_config &config)
 {
 	ntsc(config);
+	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
 	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
 	cia_config(config, 60);
@@ -1710,6 +1723,7 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
+	m_maincpu->set_floating_falloff(0xc0, 350000);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
@@ -1723,7 +1737,7 @@ void c64_state::pal(machine_config &config)
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
 	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos6569.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
+	mos6569.ba_callback().set(FUNC(c64_state::vic_ba_w));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
@@ -1818,7 +1832,8 @@ void sx64_state::pal_sx(machine_config &config)
 	// basic hardware
 	m_maincpu->read_callback().set(FUNC(sx64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(sx64_state::cpu_w));
-	m_maincpu->set_pulls(0x07, 0xc0);
+	m_maincpu->set_pulls(0x07, 0xf8);
+	m_maincpu->set_floating_falloff(0x38, 1500000);
 
 	// devices
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
@@ -1832,6 +1847,7 @@ void sx64_state::pal_sx(machine_config &config)
 void c64c_state::pal_c(machine_config &config)
 {
 	pal(config);
+	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
 	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
 	cia_config(config, 50);
@@ -1848,113 +1864,37 @@ void c64c_state::pal_c(machine_config &config)
 
 void c64gs_state::pal_gs(machine_config &config)
 {
+	pal_c(config);
+
 	// basic hardware
-	M6510(config, m_maincpu, XTAL(17'734'472)/18);
-	m_maincpu->set_addrmap(AS_PROGRAM, &c64gs_state::c64_mem);
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
-	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.set_perfect_quantum(m_maincpu);
-
-	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
-	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
-
-	INPUT_MERGER_ANY_HIGH(config, m_nmi);
-	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
 
 	// video hardware
-	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
+	mos8565_device &mos8565(MOS8565(config.replace(), MOS6569_TAG, XTAL(17'734'472)/18));
 	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos8565.ba_callback().set_inputline(m_maincpu, m6510_device::RDY_LINE);
+	mos8565.ba_callback().set(FUNC(c64_state::vic_ba_w));
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
 	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(VIC6569_VRETRACERATE);
-	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
-	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
-	screen.set_screen_update(MOS6569_TAG, FUNC(mos8565_device::screen_update));
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	MOS8580(config, m_sid, XTAL(17'734'472)/18);
-	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
-	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
-
 	// devices
-	PLS100(config, m_pla);
-
-	MOS8521(config, m_cia1, XTAL(17'734'472)/18);
-	m_cia1->set_tod_clock(50);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
-	m_cia1->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_4));
-	m_cia1->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_5));
 	m_cia1->pa_rd_callback().set(FUNC(c64gs_state::cia1_pa_r));
-	m_cia1->pa_wr_callback().set(FUNC(c64_state::cia1_pa_w));
 	m_cia1->pb_rd_callback().set(FUNC(c64gs_state::cia1_pb_r));
-	m_cia1->pb_wr_callback().set(FUNC(c64_state::cia1_pb_w));
 
-	MOS8521(config, m_cia2, XTAL(17'734'472)/18);
-	m_cia2->set_tod_clock(50);
-	m_cia2->irq_wr_callback().set(m_nmi, FUNC(input_merger_device::in_w<0>));
-	m_cia2->cnt_wr_callback().set(m_user, FUNC(pet_user_port_device::write_6));
-	m_cia2->sp_wr_callback().set(m_user, FUNC(pet_user_port_device::write_7));
-	m_cia2->pa_rd_callback().set(FUNC(c64_state::cia2_pa_r));
-	m_cia2->pa_wr_callback().set(FUNC(c64_state::cia2_pa_w));
-	m_cia2->pb_rd_callback().set(FUNC(c64_state::cia2_pb_r));
-	m_cia2->pb_wr_callback().set(FUNC(c64_state::cia2_pb_w));
-	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
+	config.device_remove(PET_DATASSETTE_PORT_TAG);
 
-	cbm_iec_slot_device::add(config, m_iec, nullptr);
-	m_iec->srq_callback().set(m_cia1, FUNC(mos6526_device::flag_w));
-	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
-
-	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6569_device::lp_w));
-	m_joy1->set_screen_tag(SCREEN_TAG);
-	m_joy1->set_lightpen_time_callback(m_vic, FUNC(mos6566_device::time_until_lightpen_pos));
-	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
-
-	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, c64_expansion_cards, nullptr);
-	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
-	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
-	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
-	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
-
-	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
-	m_user->p3_handler().set(FUNC(c64_state::exp_reset_w));
-	m_user->p4_handler().set(m_cia1, FUNC(mos6526_device::cnt_w));
-	m_user->p5_handler().set(m_cia1, FUNC(mos6526_device::sp_w));
-	m_user->p6_handler().set(m_cia2, FUNC(mos6526_device::cnt_w));
-	m_user->p7_handler().set(m_cia2, FUNC(mos6526_device::sp_w));
-	m_user->p9_handler().set(m_iec, FUNC(cbm_iec_device::host_atn_w));
-	m_user->pb_handler().set(m_cia2, FUNC(mos6526_device::flag_w));
-	m_user->pc_handler().set(FUNC(c64_state::write_user_pb0));
-	m_user->pd_handler().set(FUNC(c64_state::write_user_pb1));
-	m_user->pe_handler().set(FUNC(c64_state::write_user_pb2));
-	m_user->pf_handler().set(FUNC(c64_state::write_user_pb3));
-	m_user->ph_handler().set(FUNC(c64_state::write_user_pb4));
-	m_user->pj_handler().set(FUNC(c64_state::write_user_pb5));
-	m_user->pk_handler().set(FUNC(c64_state::write_user_pb6));
-	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
-	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
-
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
-	quickload.set_load_callback(FUNC(c64_state::quickload_c64));
-	quickload.set_interface("cbm_quik");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, cbm_iec_devices, nullptr);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("PAL");
-
-	// internal ram
-	RAM(config, RAM_TAG).set_default_size("64K");
+	config.device_remove("cass_list");
+	config.device_remove("flop525_orig");
+	config.device_remove("flop525_misc");
+	config.device_remove("quik_list");
+	config.device_remove("hdd_list");
+	config.device_remove("sdcard_list");
 }
 
 
@@ -1988,7 +1928,7 @@ ROM_START( c64 )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_DEFAULT_BIOS("r3")
-	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" )
+	ROM_SYSTEM_BIOS(0, "r1", "Kernal rev. 1" ) // NTSC-only
 	ROMX_LOAD( "901227-01.u4", 0x0000, 0x2000, CRC(dce782fa) SHA1(87cc04d61fc748b82df09856847bb5c2754a2033), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "r2", "Kernal rev. 2" )
 	ROMX_LOAD( "901227-02.u4", 0x0000, 0x2000, CRC(a5c687b3) SHA1(0e2e4ee3f2d41f00bed72f9ab588b83e306fdb13), ROM_BIOS(1) )
@@ -2189,8 +2129,19 @@ ROM_END
 //  ROM( dx64 )
 //-------------------------------------------------
 
-// ROM_LOAD( "dx64kern.bin", 0x0000, 0x2000, CRC(58065128) ) TODO where is this illusive ROM?
-#define rom_dx64    rom_sx64
+ROM_START( dx64 )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901226-01.ud4", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "dx64kern.ud3", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901225-01.ud1", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "906114-01.ue4", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
+ROM_END
 
 
 //-------------------------------------------------
@@ -2338,8 +2289,8 @@ COMP( 1983, edu64,    c64,    0,      pet64,   c64,     c64_state,     empty_ini
 COMP( 1984, sx64,     c64,    0,      ntsc_sx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",             MACHINE_SUPPORTS_SAVE )
 COMP( 1984, sx64p,    c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",              MACHINE_SUPPORTS_SAVE )
 COMP( 1984, vip64,    c64,    0,      pal_sx,  c64sw,   sx64_state,    empty_init, "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "DX-64 (NTSC)",                            MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "DX-64 (Prototype)",                       MACHINE_NOT_WORKING )
+COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_NOT_WORKING )
 COMP( 1984, clipper,  c64,    0,      clipper, clipper, clipper_state, empty_init, "Professional Data Computer",  "Clipper",                                 MACHINE_NOT_WORKING )
 COMP( 1986, c64c,     c64,    0,      ntsc_c,  c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (NTSC)",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c64cp,    c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (PAL)",                     MACHINE_SUPPORTS_SAVE )
@@ -2347,4 +2298,3 @@ COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_ini
 COMP( 1986, c64c_se,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",          MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c64g,     c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64G (PAL)",                     MACHINE_SUPPORTS_SAVE )
 CONS( 1990, c64gs,    c64,    0,      pal_gs,  c64gs,   c64gs_state,   empty_init, "Commodore Business Machines", "Commodore 64 Games System (PAL)",         MACHINE_SUPPORTS_SAVE )
-

@@ -860,7 +860,6 @@ void mos6526_device::synchronize()
 
 	clock_ta();
 
-	serial_receive();
 	serial_output();
 
 	clock_tb();
@@ -868,6 +867,8 @@ void mos6526_device::synchronize()
 	update_pb();
 
 	update_interrupt();
+
+	serial_receive();
 
 	clock_pipeline();
 }

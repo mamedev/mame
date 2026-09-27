@@ -703,7 +703,7 @@ void ns32081_device::state_add(device_state_interface &parent, int &index)
 	ns32081_device_base::state_add(parent, index);
 
 	for (unsigned i = 0; i < 8; i++)
-		parent.state_add(index++, util::string_format("F%d", i).c_str(), m_f[i]).formatstr("%08X");
+		parent.state_add(index++, util::string_format("F%d", i), m_f[i]).formatstr("%08X");
 }
 
 void ns32081_device::reg_get(unsigned const op_size, u64 &op_value, unsigned const reg) const
@@ -769,7 +769,7 @@ void ns32381_device::state_add(device_state_interface &parent, int &index)
 	ns32081_device_base::state_add(parent, index);
 
 	for (unsigned i = 0; i < 8; i++)
-		parent.state_add(index++, util::string_format("L%d", i).c_str(), m_l[i]).formatstr("%016X");
+		parent.state_add(index++, util::string_format("L%d", i), m_l[i]).formatstr("%016X");
 }
 
 void ns32381_device::reg_get(unsigned const op_size, u64 &op_value, unsigned const reg) const

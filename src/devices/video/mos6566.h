@@ -97,9 +97,11 @@
 #define VIC6567_DOTCLOCK        (VIC6567_CLOCK * 8) // 8181818
 #define VIC6569_DOTCLOCK        (VIC6569_CLOCK * 8) // 7881988
 
+#define VIC6566_CYCLESPERLINE   64
 #define VIC6567_CYCLESPERLINE   65
 #define VIC6569_CYCLESPERLINE   63
 
+#define VIC6566_LINES       262
 #define VIC6567_LINES       263
 #define VIC6569_LINES       312
 
@@ -123,6 +125,7 @@
 #define VIC6567_LAST_DISP_LINE  (VIC6567_FIRST_DISP_LINE + VIC6567_VISIBLELINES - 1)
 #define VIC6569_LAST_DISP_LINE  (VIC6569_FIRST_DISP_LINE + VIC6569_VISIBLELINES - 1)
 
+#define VIC6566_RASTER_2_EMU(a) ((a >= VIC6567_FIRST_DISP_LINE) ? (a - VIC6567_FIRST_DISP_LINE) : (a + 221))
 #define VIC6567_RASTER_2_EMU(a) ((a >= VIC6567_FIRST_DISP_LINE) ? (a - VIC6567_FIRST_DISP_LINE) : (a + 222))
 #define VIC6569_RASTER_2_EMU(a) (a - VIC6569_FIRST_DISP_LINE)
 
@@ -180,6 +183,8 @@ public:
 
 	uint8_t bus_r() { return m_last_data; }
 
+	void cpu_access(int ioacc);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -205,6 +210,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
+	TIMER_CALLBACK_MEMBER(fast_changed);
+
 	inline void set_interrupt( int mask );
 	inline void clear_interrupt( int mask );
 	inline void set_ba(int state);
@@ -213,7 +220,7 @@ protected:
 	inline uint8_t read_videoram(offs_t offset);
 	inline uint8_t read_colorram(offs_t offset);
 	inline void idle_access();
-	inline void spr_ba(int num);
+	inline void spr_ba(int cycle, int first);
 	inline void spr_ptr_access( int num );
 	inline void spr_data_access( int num, int bytenum );
 	inline void display_if_bad_line();
@@ -245,6 +252,8 @@ protected:
 	devcb_write8           m_write_k;
 
 	required_device<cpu_device> m_cpu;
+
+	emu_timer *m_fast_timer;
 
 	int m_phi0;
 	int m_ba;

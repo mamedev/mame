@@ -187,11 +187,11 @@ void st9_device::device_start()
 	state_add(ST9_PPR, "PPR", m_ppr).mask(0xfc);
 	state_add(ST9_MODER, "MODER", m_moder);
 	for (int i = 0; i < 16; i++)
-		state_add<u8>(ST9_R0 + i, util::string_format("r%d", i).c_str(),
+		state_add<u8>(ST9_R0 + i, util::string_format("r%d", i),
 						std::bind(&st9_device::debug_register_r, this, i),
 						std::bind(&st9_device::debug_register_w, this, i, _1));
 	for (int i = 0; i < 16; i += 2)
-		state_add<u16>(ST9_RR0 + i / 2, util::string_format("rr%d", i).c_str(),
+		state_add<u16>(ST9_RR0 + i / 2, util::string_format("rr%d", i),
 						std::bind(&st9_device::debug_rpair_r, this, i),
 						std::bind(&st9_device::debug_rpair_w, this, i, _1)).noshow();
 

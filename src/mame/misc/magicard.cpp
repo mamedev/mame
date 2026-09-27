@@ -2461,8 +2461,7 @@ ROM_END
 
 void magicard_state::init_dallaspk()
 {
-//  Dallas Poker...
-//  NOP'ing to avoid the 68070 UART stuck...
+	// HACK: NOP'ing to avoid the 68070 UART stuck...
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x00482e] = 0x18;

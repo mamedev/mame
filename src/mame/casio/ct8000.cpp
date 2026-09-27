@@ -94,8 +94,8 @@ protected:
 	void ct8000_map(address_map &map) ATTR_COLD;
 	void ct8000_io_map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override ATTR_COLD;
-	virtual void driver_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void p1_w(u8 data);
 	u8 p1_r();
@@ -285,7 +285,7 @@ void ct8000_state::ctfk1(machine_config &config)
 }
 
 //**************************************************************************
-void ct8000_state::driver_start()
+void ct8000_state::machine_start()
 {
 	if (m_bbd)
 		m_bbd_timer = timer_alloc(FUNC(ct8000_state::bbd_tick), this);
@@ -312,7 +312,7 @@ void ct8000_state::driver_start()
 	save_item(NAME(m_clock_div));
 }
 
-void ct8000_state::driver_reset()
+void ct8000_state::machine_reset()
 {
 	if (m_bbd)
 		bbd_setup_next_tick();

@@ -18,28 +18,30 @@ void m68000_musashi_device::xf000_1111_071234fc()
 void m68000_musashi_device::xf200_fpgen_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u16 w2 = OPER_I_16();
-		switch((w2 >> 13) & 0x7)
-		{
-			case 0x0:   // FPU ALU FP, FP
-			case 0x2:   // FPU ALU ea, FP
-				fpgen_rm_reg(w2);
-				break;
-			case 0x3:   // FMOVE FP, ea
-				fmove_reg_mem(w2);
-				break;
-			case 0x4:   // FMOVEM ea, FPCR
-			case 0x5:   // FMOVEM FPCR, ea
-				fmove_fpcr(w2);
-				break;
-			case 0x6:   // FMOVEM ea, list
-			case 0x7:   // FMOVEM list, ea
-				fmovem(w2);
-				break;
-			default:
-				m68ki_exception_1111();
-				break;
+		switch((w2 >> 13) & 0x7) {
+		case 0x0:   // FPU ALU FP, FP
+		case 0x2:   // FPU ALU ea, FP
+			fpgen_rm_reg(w2);
+			break;
+		case 0x3:   // FMOVE FP, ea
+			fmove_reg_mem(w2);
+			break;
+		case 0x4:   // FMOVEM ea, FPCR
+		case 0x5:   // FMOVEM FPCR, ea
+			fmove_fpcr(w2);
+			break;
+		case 0x6:   // FMOVEM ea, list
+		case 0x7:   // FMOVEM list, ea
+			fmovem(w2);
+			break;
+		default:
+			m68ki_exception_1111();
+			break;
 		}
 	} else {
 		m68ki_exception_1111();
@@ -50,6 +52,9 @@ void m68000_musashi_device::xf200_fpgen_l_234f()
 void m68000_musashi_device::xf240_fscc_d_b_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u32 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		DY() = (DY() & 0xffffff00) | v;
@@ -62,6 +67,9 @@ void m68000_musashi_device::xf240_fscc_d_b_234f()
 void m68000_musashi_device::xf250_fscc_b_ai_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_AI_8(), v);
@@ -74,6 +82,9 @@ void m68000_musashi_device::xf250_fscc_b_ai_234f()
 void m68000_musashi_device::xf258_fscc_b_pi_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_PI_8(), v);
@@ -86,6 +97,9 @@ void m68000_musashi_device::xf258_fscc_b_pi_234f()
 void m68000_musashi_device::xf25f_fscc_b_pi7_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_A7_PI_8(), v);
@@ -98,6 +112,9 @@ void m68000_musashi_device::xf25f_fscc_b_pi7_234f()
 void m68000_musashi_device::xf260_fscc_b_pd_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_PD_8(), v);
@@ -110,6 +127,9 @@ void m68000_musashi_device::xf260_fscc_b_pd_234f()
 void m68000_musashi_device::xf267_fscc_b_pd7_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_A7_PD_8(), v);
@@ -122,6 +142,9 @@ void m68000_musashi_device::xf267_fscc_b_pd7_234f()
 void m68000_musashi_device::xf268_fscc_b_di_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_DI_8(), v);
@@ -134,6 +157,9 @@ void m68000_musashi_device::xf268_fscc_b_di_234f()
 void m68000_musashi_device::xf270_fscc_b_ix_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_IX_8(), v);
@@ -146,6 +172,9 @@ void m68000_musashi_device::xf270_fscc_b_ix_234f()
 void m68000_musashi_device::xf278_fscc_b_aw_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AW_8(), v);
@@ -158,6 +187,9 @@ void m68000_musashi_device::xf278_fscc_b_aw_234f()
 void m68000_musashi_device::xf279_fscc_b_al_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AL_8(), v);
@@ -170,6 +202,9 @@ void m68000_musashi_device::xf279_fscc_b_al_234f()
 void m68000_musashi_device::xf248_fdbcc_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fdbcc();
 	} else {
 		m68ki_exception_1111();
@@ -180,6 +215,9 @@ void m68000_musashi_device::xf248_fdbcc_l_234f()
 void m68000_musashi_device::xf27a_ftrap_w_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -190,6 +228,9 @@ void m68000_musashi_device::xf27a_ftrap_w_l_234f()
 void m68000_musashi_device::xf27b_ftrap_l_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -200,6 +241,9 @@ void m68000_musashi_device::xf27b_ftrap_l_l_234f()
 void m68000_musashi_device::xf27c_ftrap_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -210,6 +254,9 @@ void m68000_musashi_device::xf27c_ftrap_l_234f()
 void m68000_musashi_device::xf280_fbcc_w_w_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fbcc16();
 	} else {
 		m68ki_exception_1111();
@@ -220,6 +267,9 @@ void m68000_musashi_device::xf280_fbcc_w_w_234f()
 void m68000_musashi_device::xf2c0_fbcc_l_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fbcc32();
 	} else {
 		m68ki_exception_1111();
@@ -9593,7 +9643,7 @@ void m68000_musashi_device::x00fa_chk2cmp2_b_234fc()
 	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9621,7 +9671,7 @@ void m68000_musashi_device::x00fb_chk2cmp2_b_234fc()
 	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9649,7 +9699,7 @@ void m68000_musashi_device::x00d0_chk2cmp2_b_ai_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9677,7 +9727,7 @@ void m68000_musashi_device::x00e8_chk2cmp2_b_di_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9705,7 +9755,7 @@ void m68000_musashi_device::x00f0_chk2cmp2_b_ix_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9733,7 +9783,7 @@ void m68000_musashi_device::x00f8_chk2cmp2_b_aw_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9761,7 +9811,7 @@ void m68000_musashi_device::x00f9_chk2cmp2_b_al_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9789,7 +9839,7 @@ void m68000_musashi_device::x02fa_chk2cmp2_w_234fc()
 	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9817,7 +9867,7 @@ void m68000_musashi_device::x02fb_chk2cmp2_w_234fc()
 	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9845,7 +9895,7 @@ void m68000_musashi_device::x02d0_chk2cmp2_w_ai_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9873,7 +9923,7 @@ void m68000_musashi_device::x02e8_chk2cmp2_w_di_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9901,7 +9951,7 @@ void m68000_musashi_device::x02f0_chk2cmp2_w_ix_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9929,7 +9979,7 @@ void m68000_musashi_device::x02f8_chk2cmp2_w_aw_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9957,7 +10007,7 @@ void m68000_musashi_device::x02f9_chk2cmp2_w_al_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9982,7 +10032,7 @@ void m68000_musashi_device::x04fa_chk2cmp2_l_234fc()
 	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10005,7 +10055,7 @@ void m68000_musashi_device::x04fb_chk2cmp2_l_234fc()
 	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10028,7 +10078,7 @@ void m68000_musashi_device::x04d0_chk2cmp2_l_ai_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10051,7 +10101,7 @@ void m68000_musashi_device::x04e8_chk2cmp2_l_di_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10074,7 +10124,7 @@ void m68000_musashi_device::x04f0_chk2cmp2_l_ix_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10097,7 +10147,7 @@ void m68000_musashi_device::x04f8_chk2cmp2_l_aw_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10120,7 +10170,7 @@ void m68000_musashi_device::x04f9_chk2cmp2_l_al_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -20284,30 +20334,28 @@ void m68000_musashi_device::x4e7a_movec_l_1()
 			REG_DA()[(word2 >> 12) & 15] = m_vbr;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20352,30 +20400,28 @@ void m68000_musashi_device::x4e7a_movec_l_23f()
 			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20445,30 +20491,28 @@ void m68000_musashi_device::x4e7a_movec_l_4()
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_srp_aptr;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20525,30 +20569,28 @@ void m68000_musashi_device::x4e7a_movec_l_c()
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr3;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20567,7 +20609,7 @@ void m68000_musashi_device::x4e7b_movec_l_1()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20581,30 +20623,28 @@ void m68000_musashi_device::x4e7b_movec_l_1()
 			m_vbr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20623,7 +20663,7 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20634,7 +20674,7 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 			/* 68030 can write all bits except 5-7, 040 can write all */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -20665,30 +20705,29 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 			}
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			if(m_cpu_type == CPU_TYPE_COLDFIRE)
 			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20707,7 +20746,7 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20719,7 +20758,7 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 			   writable; bits 5-7 and 14-31 are reserved and must read back as 0. */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x3f1f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -20749,30 +20788,29 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 			}
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			if(m_cpu_type == CPU_TYPE_COLDFIRE)
 			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20791,7 +20829,7 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20829,12 +20867,9 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 		case 0x003:         /* TC */
 			m_mmu_tc = REG_DA()[(word2 >> 12) & 15];
 
-			if (m_mmu_tc & 0x8000)
-			{
+			if(m_mmu_tc & 0x8000) {
 				m_pmmu_enabled = 1;
-			}
-			else
-			{
+			} else {
 				m_pmmu_enabled = 0;
 			}
 			m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
@@ -20861,30 +20896,28 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 			m_mmu_srp_aptr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20903,7 +20936,7 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20914,7 +20947,7 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 			/* 68030 can write all bits except 5-7, 040 can write all */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -20956,30 +20989,28 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 			m_mmu_acr3 = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -26110,12 +26141,9 @@ void m68000_musashi_device::xf510_pflushan_l_4fc()
 void m68000_musashi_device::xf000_pmmu_l_23fc()
 {
 	// 68851/68030 MMU instructions; all of these are F-line exceptions on the 68040
-	if (m_has_pmmu)
-	{
+	if(m_has_pmmu) {
 		m68851_mmu_ops();
-	}
-	else
-	{
+	} else {
 		m68ki_exception_1111();
 	}
 
@@ -26125,17 +26153,12 @@ void m68000_musashi_device::xf548_ptest_l_4()
 {
 	if(m_has_pmmu)
 	{
-		if(m_s_flag)
-		{
+		if(m_s_flag) {
 			m68040_ptest();
-		}
-		else
-		{
+		} else {
 			m68ki_exception_privilege_violation();
 		}
-	}
-	else
-	{
+	} else {
 		m68ki_exception_1111();
 	}
 
@@ -27235,8 +27258,7 @@ void m68000_musashi_device::x4e73_rte_l_71()
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
-			{
+			if(format_word == 0x8) { /* 68010 - type 1000 stack frame */
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
 				m68ki_fake_pull_16();  /* format word */
@@ -27257,9 +27279,7 @@ void m68000_musashi_device::x4e73_rte_l_71()
 				m68ki_set_sr(new_sr);
 				m_instr_mode = INSTRUCTION_YES;
 				m_run_mode = RUN_MODE_NORMAL;
-			}
-			else
-			{
+			} else {
 				m_instr_mode = INSTRUCTION_YES;
 				m_run_mode = RUN_MODE_NORMAL;
 				/* Not handling bus fault (9) */
@@ -31862,7 +31882,7 @@ void m68000_musashi_device::xf400_cinv_l_4()
 	u8 cache = (ir >> 6) & 3;
 	//  u8 scope = (ir >> 3) & 3;
 	//  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
-	switch (cache) {
+	switch(cache) {
 	case 1:
 		// TODO: data cache
 		break;

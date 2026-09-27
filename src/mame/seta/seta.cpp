@@ -11289,7 +11289,7 @@ void seta_state::init_wiggie()
 
 void inttoote_state::init_inttoote()
 {
-	// code patches due to unemulated protection (to be removed...)
+	// HACK: code patches due to unemulated protection
 	u16 *ROM = (u16 *)memregion( "maincpu" )->base();
 
 	ROM[0x4de0/2] = 0x4e71; // hardware test errors

@@ -182,7 +182,7 @@ void hd61700_cpu_device::device_start()
 
 	for (int ireg=0; ireg<32; ireg++)
 	{
-		state_add(HD61700_MAINREG + ireg, string_format("R%d", ireg).c_str(), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
+		state_add(HD61700_MAINREG + ireg, string_format("R%d", ireg), m_regmain[ireg]).callimport().callexport().formatstr("%02X");
 	}
 
 	state_add(STATE_GENPC, "GENPC", m_curpc).formatstr("%8s").noshow();

@@ -68,6 +68,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Conan (Revo Bluetooth) -->
+
+	<software name="conan_01">
+		<description>Conan V0.01(22)</description>
+		<year>2001</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="CONAN"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="12263424">
+				<rom name="conan_s2_2201.engbuild.img" size="12263424" crc="4f0e785c" sha1="c001566c5a6a7f27db06e36224a3267020c31e44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conan_10">
+		<description>Conan V0.10(17)</description>
+		<year>2001</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="CONAN"/>
+		<part name="quik" interface="psion_quik">
+			<dataarea name="rom" size="15777792">
+				<rom name="conan_s2_1710.engbuild.img" size="15777792" crc="b95750b0" sha1="94d06200607417013435f0a944eb70631b64a047"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- MalayBook -->
 
 	<software name="mb_281uk">

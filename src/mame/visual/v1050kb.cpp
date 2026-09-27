@@ -6,6 +6,14 @@
 
 *********************************************************************/
 
+/*
+
+    TODO:
+
+    - keyboard ROM dump
+
+*/
+
 #include "emu.h"
 #include "v1050kb.h"
 
@@ -63,7 +71,7 @@ static const discrete_555_desc v1050_ne555 =
 
 static DISCRETE_SOUND_START( v1050kb_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(68) /* can't read on schematic */ , (int) RES_K(3), (int) CAP_N(10), &v1050_ne555)
+	DISCRETE_555_ASTABLE(NODE_02, NODE_01, (int) RES_K(6.8), (int) RES_K(3), (int) CAP_U(0.1), &v1050_ne555)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 

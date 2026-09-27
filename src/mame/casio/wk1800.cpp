@@ -82,7 +82,7 @@ public:
 	void apo_w(int state);
 
 protected:
-	virtual void driver_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void common_map(address_map &map) ATTR_COLD;
 
@@ -248,7 +248,7 @@ void wk1800_state::wk1800_map(address_map &map)
 
 
 /**************************************************************************/
-void wk1600_state::driver_start()
+void wk1600_state::machine_start()
 {
 	m_nmi_timer = timer_alloc(FUNC(wk1600_state::nmi_clear), this);
 

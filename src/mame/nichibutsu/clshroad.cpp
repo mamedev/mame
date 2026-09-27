@@ -1017,7 +1017,7 @@ ROM_END
 
 void firebatl_state::init_firebatl()
 {
-	// cfr. notes at top
+	// HACK: cfr. notes at top
 	u8 *rom = memregion("maincpu")->base();
 
 	rom[0x6124] = 0x02;

@@ -710,7 +710,7 @@ void mpeg_audio::build_next_segments(int step)
 		band++;
 	}
 
-	while(band < m_joint_bands) {
+	while(band < m_total_bands) {
 		read_band_value_triplet(0, band);
 		m_bdata[1][0][band] = m_bdata[0][0][band];
 		m_bdata[1][1][band] = m_bdata[0][1][band];

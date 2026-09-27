@@ -33,6 +33,7 @@ public:
 
 	template <int Bit> auto gpio_out() { return m_gpio_w[Bit].bind(); }
 	template <int Bit> void gpio_in(int state);
+	template <int Line> void irq_in(int state) { set_irq_line(1u << Line, state); }
 
 	void map(address_map &map) ATTR_COLD;
 
@@ -362,6 +363,8 @@ protected:
 		LCCR1_PPL    = 0x000003ff,
 
 		LCCR2_LPP    = 0x000003ff,
+
+		LCCR3_BPP    = 0x07000000,
 
 		LCSR_LDD     = 1u <<  0,
 		LCSR_SOF     = 1u <<  1,

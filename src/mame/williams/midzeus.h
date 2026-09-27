@@ -55,7 +55,7 @@ public:
 	void render_poly_solid_fixedz(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
 
 	void zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, bool logit);
-	void zeus_draw_debug_quad(const rectangle& rect, const vertex_t* vert);
+	void zeus_draw_solid_quad(const rectangle& rect, const vertex_t* vert);
 
 private:
 	midzeus_state& m_state;

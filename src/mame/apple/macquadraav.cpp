@@ -39,6 +39,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/dsp32/dsp32.h"
 #include "cpu/m68000/m68040.h"
+#include "machine/am79c940.h"
 #include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
@@ -61,13 +62,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ymca(*this, "ymca"),
 		m_psc(*this, "psc"),
+		m_mace(*this, "mace"),
 		m_civic(*this, "civic"),
 		m_adbbus(*this, "adb"),
 		m_cuda(*this, "cuda"),
 		m_scc(*this, "scc"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
-		m_ncr(*this, "ncr53c94")
+		m_ncr(*this, "ncr53c94"),
+		m_enet_prom{},
+		m_enet_prom_initialized(false)
 	{
 	}
 
@@ -80,6 +84,7 @@ private:
 	required_device<m68040_device> m_maincpu;
 	required_device<ymca_device> m_ymca;
 	required_device<psc_device> m_psc;
+	required_device<am79c940_device> m_mace;
 	required_device<civic_device> m_civic;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<cuda_device> m_cuda;
@@ -87,21 +92,47 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_ncr;
+	std::array<u8, 8> m_enet_prom;
+	bool m_enet_prom_initialized;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_reset() override;
 
 	u16 scc_r(offs_t offset);
 	void scc_w(offs_t offset, u16 data);
 	void cuda_reset_w(int state);
 	u8 scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, u8 data);
+	u8 enet_prom_r(offs_t offset);
 };
 
 void quadraav_state::machine_start()
 {
 	m_ymca->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 	m_psc->set_scsi_device(m_ncr);
+	// Use the same Apple OUI convention as the NuBus Ethernet cards.  The
+	// configuration manager persists this address and allows user overrides.
+	const u32 suffix = machine().rand();
+	const u8 mac[6] = { 0x00, 0x00, 0x1b, u8(suffix >> 16), u8(suffix >> 8), u8(suffix) };
+	m_mace->set_mac(mac);
+	save_item(NAME(m_enet_prom));
+	save_item(NAME(m_enet_prom_initialized));
+}
+
+void quadraav_state::device_reset()
+{
+	if (!m_enet_prom_initialized)
+	{
+		// Configuration MAC overrides have been applied by the first reset.
+		// Capture before child reset: MACE then publishes its uninitialised PADR.
+		// The board PROM remains independent of subsequent PADR writes.
+		std::copy(m_mace->get_mac().begin(), m_mace->get_mac().end(), m_enet_prom.begin());
+		m_enet_prom[7] = 0xff;
+		for (unsigned i = 0; i < 6; ++i)
+			m_enet_prom[7] ^= m_enet_prom[i];
+		m_enet_prom_initialized = true;
+	}
 }
 
 void quadraav_state::machine_reset()
@@ -138,6 +169,13 @@ void quadraav_state::scsi_w(offs_t offset, u8 data)
 	m_ncr->write(offset >> 4, data);
 }
 
+u8 quadraav_state::enet_prom_r(offs_t offset)
+{
+	// Eight bit-reversed bytes, 16 bytes apart; the decoded bytes XOR to FF.
+	const unsigned index = (offset >> 4) & 7;
+	return bitswap<8>(m_enet_prom[index], 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -148,7 +186,11 @@ void quadraav_state::quadraav_map(address_map &map)
 	map(0x5000'0000, 0x5fff'ffff).m(m_civic, FUNC(civic_device::map));
 
 	map(0x50f04000, 0x50f05fff).rw(FUNC(quadraav_state::scc_r), FUNC(quadraav_state::scc_w));
+	map(0x50f08000, 0x50f0807f).r(FUNC(quadraav_state::enet_prom_r));
 	map(0x50f18000, 0x50f180ff).rw(FUNC(quadraav_state::scsi_r), FUNC(quadraav_state::scsi_w));
+	map(0x50f1c000, 0x50f1c1ff).lrw8(
+		NAME([this](offs_t offset) { return m_mace->read(offset >> 4); }),
+		NAME([this](offs_t offset, u8 data) { m_mace->write(offset >> 4, data); }));
 }
 
 /***************************************************************************
@@ -177,6 +219,12 @@ void quadraav_state::macqd840(machine_config &config)
 	PSC(config, m_psc, 25_MHz_XTAL);
 	m_psc->set_maincpu_tag("maincpu");
 	m_psc->set_space("maincpu", AS_PROGRAM);
+	m_psc->set_mace_tag("mace");
+
+	AM79C940(config, m_mace, 0);
+	m_mace->irq_out().set(m_psc, FUNC(psc_device::enet_irq_w));
+	m_mace->tx_drq_out().set(m_psc, FUNC(psc_device::enet_tx_drq_w));
+	m_mace->rx_drq_out().set(m_psc, FUNC(psc_device::enet_rx_drq_w));
 
 	CIVIC(config, m_civic, 40_MHz_XTAL);
 	m_civic->vblank_irq().set(m_psc, FUNC(psc_device::vbl_irq_w));
