@@ -10,7 +10,7 @@ Used by:
 - igs/igs_m027_023vid.cpp
 
 TODO:
-- Interrupt handling and background scaling are not implemented
+- Background scaling is not implemented
 - Is video register area mirrored?
 
 */
@@ -45,6 +45,8 @@ const gfx_layout pgm32_charlayout =
 
 constexpr bool get_flipy(u8 flip) { return BIT(flip, 1); }
 constexpr bool get_flipx(u8 flip) { return BIT(flip, 0); }
+
+constexpr u16 SPRITE_RAM_MASK[5] = { 0xffff, 0xfbff, 0x7fff, 0xffff, 0xffff };
 
 } // anonymous namespace
 
@@ -83,6 +85,9 @@ igs023_video_device::igs023_video_device(const machine_config &mconfig, const ch
 	, m_spritebuffer(*this, "spritebuffer", 0x1000, ENDIANNESS_BIG)
 	, m_zoomram(*this, "zoomram", 0x40, ENDIANNESS_BIG)
 	, m_readspriteram_cb(*this, 0)
+	, m_irq4_cb(*this)
+	, m_irq6_cb(*this)
+	, m_dma_cb(*this)
 	, m_sprite_ptr_pre(nullptr)
 	, m_bg_tilemap(nullptr)
 	, m_tx_tilemap(nullptr)
@@ -242,8 +247,38 @@ void igs023_video_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	    * Unmarked bits are can be set but unknown and/or unused
 	*/
 	COMBINE_DATA(&m_ctrl);
+	// Interrupts remain asserted until their enable bits are cleared.
+	if (!BIT(m_ctrl, 2))
+		m_irq4_pending = false;
+	if (!BIT(m_ctrl, 3))
+		m_irq6_pending = false;
+	update_irqs();
 	if ((prev ^ m_ctrl) & 0xc7f2)
 		LOGUNK("%s: Unknown ctrl_w write %04x & %04x", machine().describe_context(), data, mem_mask);
+}
+
+void igs023_video_device::update_irqs()
+{
+	m_irq4_cb(m_irq4_pending ? ASSERT_LINE : CLEAR_LINE);
+	m_irq6_cb(m_irq6_pending ? ASSERT_LINE : CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(igs023_video_device::irq4_tick)
+{
+	if (BIT(m_ctrl, 2))
+	{
+		m_irq4_pending = true;
+		update_irqs();
+	}
+}
+
+void igs023_video_device::vblank(int state)
+{
+	if (state && BIT(m_ctrl, 3))
+	{
+		m_irq6_pending = true;
+		update_irqs();
+	}
 }
 
 
@@ -639,7 +674,7 @@ void igs023_video_device::draw_sprites(bitmap_ind16& spritebitmap, const rectang
 */
 void igs023_video_device::get_sprites()
 {
-	if (!sprite_dma())
+	if (!clock() && !sprite_dma())
 		return;
 
 	m_sprite_ptr_pre = m_spritelist.get();
@@ -736,6 +771,10 @@ TILE_GET_INFO_MEMBER(igs023_video_device::get_bg_tile_info)
 
 void igs023_video_device::device_start()
 {
+	m_irq4_timer = timer_alloc(FUNC(igs023_video_device::irq4_tick), this);
+	m_dma_start_timer = timer_alloc(FUNC(igs023_video_device::dma_start), this);
+	m_dma_timer = timer_alloc(FUNC(igs023_video_device::dma_tick), this);
+
 	// assumes it can make an address mask with .length() - 1 on these
 	assert(!(m_adata.length() & (m_adata.length() - 1)));
 	assert(!(m_bdata.length() & (m_bdata.length() - 1)));
@@ -760,10 +799,35 @@ void igs023_video_device::device_start()
 	save_item(NAME(m_tx_yscroll));
 	save_item(NAME(m_tx_xscroll));
 	save_item(NAME(m_ctrl));
+	save_item(NAME(m_irq4_pending));
+	save_item(NAME(m_irq6_pending));
+	save_item(NAME(m_dma_words));
+	save_item(NAME(m_dma_active));
+	save_item(NAME(m_dma_finishing));
+	machine().save().register_postload(save_prepost_delegate(FUNC(igs023_video_device::update_irqs), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(igs023_video_device::restore_dma), this));
 }
 
 void igs023_video_device::device_reset()
 {
+	m_ctrl &= ~0x000c;
+	m_irq4_pending = false;
+	m_irq6_pending = false;
+	update_irqs();
+	// The divider runs continuously, including while disabled and across vblank.
+	const attotime period = screen().scan_period() * 62;
+	m_irq4_timer->adjust(period, 0, period);
+	m_dma_words = 0;
+	m_dma_active = false;
+	m_dma_finishing = false;
+	m_dma_timer->adjust(attotime::never);
+	m_dma_cb(CLEAR_LINE);
+	if (clock())
+	{
+		// FPGA: HSYNC at hcnt=63 with line counter=221 precedes visible line 221.
+		// With visible pixels starting at hcnt=192, MAME's position is (220, 511).
+		m_dma_start_timer->adjust(screen().time_until_pos(220, 448 + 63));
+	}
 }
 
 
@@ -794,7 +858,6 @@ u32 igs023_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 bool igs023_video_device::sprite_dma()
 {
 	// verified on hardware
-	constexpr u16 ram_mask[5] = { 0xffff, 0xfbff, 0x7fff, 0xffff, 0xffff };
 	if (BIT(~m_ctrl, 0))
 		return false;
 
@@ -802,10 +865,48 @@ bool igs023_video_device::sprite_dma()
 	{
 		for (int src = 0; src < 5; src++)
 		{
-			m_spritebuffer[dst + src] = m_readspriteram_cb(offs++) & ram_mask[src];
+			m_spritebuffer[dst + src] = m_readspriteram_cb(offs++) & SPRITE_RAM_MASK[src];
 		}
 		if ((m_spritebuffer[dst + 4] & 0x7fff) == 0)
 			return true;
 	}
 	return true;
+}
+
+void igs023_video_device::restore_dma()
+{
+	m_dma_cb(m_dma_active ? ASSERT_LINE : CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(igs023_video_device::dma_start)
+{
+	m_dma_start_timer->adjust(screen().time_until_pos(220, 448 + 63));
+	if (!BIT(m_ctrl, 0) || m_dma_active)
+		return;
+
+	m_dma_words = 0;
+	m_dma_active = true;
+	m_dma_finishing = false;
+	m_dma_cb(ASSERT_LINE);
+	m_dma_timer->adjust(clocks_to_attotime(4));
+}
+
+TIMER_CALLBACK_MEMBER(igs023_video_device::dma_tick)
+{
+	if (m_dma_finishing)
+	{
+		m_dma_active = false;
+		m_dma_finishing = false;
+		m_dma_cb(CLEAR_LINE);
+		return;
+	}
+
+	const unsigned component = m_dma_words % 5;
+	const unsigned sprite = m_dma_words / 5;
+	const u16 data = m_readspriteram_cb(m_dma_words++) & SPRITE_RAM_MASK[component];
+	m_spritebuffer[sprite * 8 + component] = data;
+
+	// Four clocks per word; the final bus release takes one additional clock.
+	m_dma_finishing = (component == 4) && (!(data & 0x7fff) || sprite == 255);
+	m_dma_timer->adjust(clocks_to_attotime(m_dma_finishing ? 1 : 4));
 }
