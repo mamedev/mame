@@ -58,8 +58,10 @@
 	Hidden Region Selection:
 
 	Much like Fixeight, The region (title, notice screen and license text) come
-	from byte 2 of the EEPROM and can be rewritten on real hardware with a hidden
-	operator combo.
+	from byte 2 of the EEPROM and can be rewritten with a hidden operator combo.
+	Only the factory default EEPROM is supported; the game initializes a blank
+	EEPROM to region 0 (Korea).  To change the region use the combo, exactly as
+	on real hardware:
 
 	in the CONFIGURATION page of service mode
 
@@ -612,72 +614,53 @@ void dt7_state::screen_vblank(int state)
 
 
 
-// All sets share the single dumped ROM set; the region (and with it the title,
-// notice screen and license text) comes from EEPROM settings byte 2, so each set
-// below only provides a different EEPROM default.
-#define ROMS_DT7 \
-	ROM_REGION( 0x080000, "maincpu", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "main.11", 0x000000, 0x080000, CRC(01646c22) SHA1(4b87f00dc99e1206b3b9eaee425fc05e1a033bee) ) \
-	ROM_REGION( 0x080000, "subcpu", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "2.21", 0x000000, 0x080000, CRC(a08e25ed) SHA1(db10c64ce305477442b35e7624052aae9fb6e412) ) \
-	ROM_REGION( 0x400000, "gp9001_0", 0 ) \
-	ROM_LOAD( "3a.49", 0x000000, 0x080000, CRC(ba8e378c) SHA1(d5eb4a839d6b3c2b9bf0bd87f06859a01a2c0cbf) ) \
-	ROM_LOAD( "3b.50", 0x080000, 0x080000, CRC(a9e4c6c7) SHA1(4058b1b887f41494a70b0b09e581ef5e3a444a1c) ) \
-	ROM_LOAD( "3c.51", 0x100000, 0x080000, CRC(ffc6fa95) SHA1(87d18520fae7eec9336fc8cfb1adc2923ea10f8d) ) \
-	ROM_LOAD( "3d.52", 0x180000, 0x080000, CRC(3faaa3e7) SHA1(ec3e6e8d16a8095c857ff270d2bd48c04664b62f) ) \
-	ROM_LOAD( "4a.30", 0x200000, 0x080000, CRC(53627ea6) SHA1(02f9cc223427a2b78e60bc866fd6c73df07b438d) ) \
-	ROM_LOAD( "4b.31", 0x280000, 0x080000, CRC(a7e20eb4) SHA1(73da86764a93350224ada21b3178dde0a34cc657) ) \
-	ROM_LOAD( "4c.32", 0x300000, 0x080000, CRC(ad0fc76a) SHA1(112e934a2cab13f994d1873aaaec40d38d2c2deb) ) \
-	ROM_LOAD( "4d.33", 0x380000, 0x080000, CRC(280f97af) SHA1(9fe74c67440d7c952f091fb77905b7515852e0fb) ) \
-	ROM_REGION( 0x08000, "text_0", 0 ) \
-	ROM_LOAD( "7text.115", 0x000000, 0x08000,  CRC(7fb47a44) SHA1(1b5401967f33dc232187bf9f2a402b71286c5fc2) ) \
-	ROM_REGION( 0x400000, "gp9001_1", 0 ) \
-	ROM_LOAD( "3a.68", 0x000000, 0x080000, CRC(ba8e378c) SHA1(d5eb4a839d6b3c2b9bf0bd87f06859a01a2c0cbf) ) \
-	ROM_LOAD( "3b.69", 0x080000, 0x080000, CRC(a9e4c6c7) SHA1(4058b1b887f41494a70b0b09e581ef5e3a444a1c) ) \
-	ROM_LOAD( "3c.70", 0x100000, 0x080000, CRC(ffc6fa95) SHA1(87d18520fae7eec9336fc8cfb1adc2923ea10f8d) ) \
-	ROM_LOAD( "3d.71", 0x180000, 0x080000, CRC(3faaa3e7) SHA1(ec3e6e8d16a8095c857ff270d2bd48c04664b62f) ) \
-	ROM_LOAD( "4a.87", 0x200000, 0x080000, CRC(53627ea6) SHA1(02f9cc223427a2b78e60bc866fd6c73df07b438d) ) \
-	ROM_LOAD( "4b.88", 0x280000, 0x080000, CRC(a7e20eb4) SHA1(73da86764a93350224ada21b3178dde0a34cc657) ) \
-	ROM_LOAD( "4c.89", 0x300000, 0x080000, CRC(ad0fc76a) SHA1(112e934a2cab13f994d1873aaaec40d38d2c2deb) ) \
-	ROM_LOAD( "4d.90", 0x380000, 0x080000, CRC(280f97af) SHA1(9fe74c67440d7c952f091fb77905b7515852e0fb) ) \
-	ROM_REGION( 0x08000, "text_1", 0 ) \
-	ROM_LOAD( "7text.152", 0x000000, 0x08000,  CRC(7fb47a44) SHA1(1b5401967f33dc232187bf9f2a402b71286c5fc2) ) \
-	ROM_REGION( 0x40000, "oki1", 0 ) \
-	ROM_LOAD( "7adpcm.37", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) ) \
-	ROM_REGION( 0x40000, "oki2", 0 ) \
-	ROM_LOAD( "7adpcm.43", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) ) \
-
 ROM_START( dt7 )
-	ROMS_DT7
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "main.11", 0x000000, 0x080000, CRC(01646c22) SHA1(4b87f00dc99e1206b3b9eaee425fc05e1a033bee) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
-	// defaulted to 'Discount Continue' so that the regular coin slots work
-	ROM_LOAD16_WORD_SWAP( "eeprom_usa", 0x000, 0x200, CRC(4c546ede) SHA1(7892b54dafe5782d4900063377b956e3bf7bca07) )
-ROM_END
+	ROM_REGION( 0x080000, "subcpu", 0 )            /* Sub 68K code */
+	ROM_LOAD16_WORD_SWAP( "2.21", 0x000000, 0x080000, CRC(a08e25ed) SHA1(db10c64ce305477442b35e7624052aae9fb6e412) )
 
-ROM_START( dt7j )
-	ROMS_DT7
+	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
+	/* It's a NEC V25 (PLCC94) (encrypted program uploaded by main CPU) */
+	/* Note, same markings as other games found in toaplan/toaplan2.cpp, but table is different! */
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "eeprom_japan", 0x000, 0x200, CRC(e8af8958) SHA1(4284ba45323bbd3679b8e4e7b96fa8cf37b939c0) )
-ROM_END
+	ROM_REGION( 0x400000, "gp9001_0", 0 )
+	ROM_LOAD( "3a.49", 0x000000, 0x080000, CRC(ba8e378c) SHA1(d5eb4a839d6b3c2b9bf0bd87f06859a01a2c0cbf) )
+	ROM_LOAD( "3b.50", 0x080000, 0x080000, CRC(a9e4c6c7) SHA1(4058b1b887f41494a70b0b09e581ef5e3a444a1c) )
+	ROM_LOAD( "3c.51", 0x100000, 0x080000, CRC(ffc6fa95) SHA1(87d18520fae7eec9336fc8cfb1adc2923ea10f8d) )
+	ROM_LOAD( "3d.52", 0x180000, 0x080000, CRC(3faaa3e7) SHA1(ec3e6e8d16a8095c857ff270d2bd48c04664b62f) )
+	ROM_LOAD( "4a.30", 0x200000, 0x080000, CRC(53627ea6) SHA1(02f9cc223427a2b78e60bc866fd6c73df07b438d) )
+	ROM_LOAD( "4b.31", 0x280000, 0x080000, CRC(a7e20eb4) SHA1(73da86764a93350224ada21b3178dde0a34cc657) )
+	ROM_LOAD( "4c.32", 0x300000, 0x080000, CRC(ad0fc76a) SHA1(112e934a2cab13f994d1873aaaec40d38d2c2deb) )
+	ROM_LOAD( "4d.33", 0x380000, 0x080000, CRC(280f97af) SHA1(9fe74c67440d7c952f091fb77905b7515852e0fb) )
 
-ROM_START( dt7k )
-	ROMS_DT7
+	ROM_REGION( 0x08000, "text_0", 0 )
+	ROM_LOAD( "7text.115", 0x000000, 0x08000,  CRC(7fb47a44) SHA1(1b5401967f33dc232187bf9f2a402b71286c5fc2) )
+	// some dumps contain an empty '1M' ROM located next to each 'text' ROM on the PCB?
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "eeprom_korea", 0x000, 0x200, CRC(910b4058) SHA1(ca52306ed5a6b12b5c8fc92f9cc36e7639e5570a) )
+	ROM_REGION( 0x400000, "gp9001_1", 0 )
+	ROM_LOAD( "3a.68", 0x000000, 0x080000, CRC(ba8e378c) SHA1(d5eb4a839d6b3c2b9bf0bd87f06859a01a2c0cbf) )
+	ROM_LOAD( "3b.69", 0x080000, 0x080000, CRC(a9e4c6c7) SHA1(4058b1b887f41494a70b0b09e581ef5e3a444a1c) )
+	ROM_LOAD( "3c.70", 0x100000, 0x080000, CRC(ffc6fa95) SHA1(87d18520fae7eec9336fc8cfb1adc2923ea10f8d) )
+	ROM_LOAD( "3d.71", 0x180000, 0x080000, CRC(3faaa3e7) SHA1(ec3e6e8d16a8095c857ff270d2bd48c04664b62f) )
+	ROM_LOAD( "4a.87", 0x200000, 0x080000, CRC(53627ea6) SHA1(02f9cc223427a2b78e60bc866fd6c73df07b438d) )
+	ROM_LOAD( "4b.88", 0x280000, 0x080000, CRC(a7e20eb4) SHA1(73da86764a93350224ada21b3178dde0a34cc657) )
+	ROM_LOAD( "4c.89", 0x300000, 0x080000, CRC(ad0fc76a) SHA1(112e934a2cab13f994d1873aaaec40d38d2c2deb) )
+	ROM_LOAD( "4d.90", 0x380000, 0x080000, CRC(280f97af) SHA1(9fe74c67440d7c952f091fb77905b7515852e0fb) )
+
+	ROM_REGION( 0x08000, "text_1", 0 )
+	ROM_LOAD( "7text.152", 0x000000, 0x08000,  CRC(7fb47a44) SHA1(1b5401967f33dc232187bf9f2a402b71286c5fc2) )
+	// some dumps contain an empty '1M' ROM located next to each 'text' ROM on the PCB?
+
+	ROM_REGION( 0x40000, "oki1", 0 )     /* ADPCM Samples */
+	ROM_LOAD( "7adpcm.37", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )     /* ADPCM Samples */
+	ROM_LOAD( "7adpcm.43", 0x00000, 0x40000, CRC(aefce555) SHA1(0d47190287957122fefdae17ccf6bcfaef8cd430) )
 ROM_END
 
 } // anonymous namespace
 
-// The flyer shows "Survival Battle Dynamic Trial 7"; the Korean sets title as "Car Fighting"
-
-// While the EEPROM can provide more regions than this, these ones have been selected for
-// the following resaons
-// The USA region can have working coin slots and English langauge
-// The Japanese region has Japanese language
-// The Korean region has a unique title screen
-GAME( 1993, dt7,    0,   dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "DT7 (USA) (prototype)",            MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dt7j,   dt7, dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "DT7 (Japan) (prototype)",          MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dt7k,   dt7, dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "Car Fighting (Korea) (prototype)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
+// The flyer shows "Survival Battle Dynamic Trial 7"; the Korean region titles it "Car Fighting"
+GAME( 1993, dt7,    0,   dt7, dt7,         dt7_state, empty_init, ROT270, "Toaplan", "DT7 (prototype)",            MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_GRAPHICS )
