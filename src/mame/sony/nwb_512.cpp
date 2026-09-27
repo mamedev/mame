@@ -20,9 +20,11 @@
  *  - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
- *   - Framebuffer read-only operations
- *   - Cycle-accurate timing
  *   - Convert to NEWS I/O Bus slot device instead of regular device
+ *   - Cycle-accurate timing
+ *   - The service manual for the 1500 series describes in detail how the raster operations generally work. However,
+ *     while the newer framebuffers use the same raster engine (using the WSC-SBLT that is the equivalent of 2 CXD1029s),
+ *     the surrounding details are different, and I might not have captured all of those differences accurately yet.
  */
 
 #include "emu.h"
@@ -40,7 +42,7 @@ DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome 
 
 namespace
 {
-	// Total memory region is 2048x2048 pixels (512KiB)
+	// Total memory region is 2048 x 2048 pixels (512KiB)
 	constexpr uint16_t X_MAX = 2048;
 	constexpr uint16_t Y_MAX = 2048;
 
@@ -164,9 +166,12 @@ void nwb_512_device::reset_state()
 
 void nwb_512_device::check_operation_start(offs_t offset)
 {
+	// The later framebuffers implement the ability to read out framebuffer data back to the I/O bus.
+	// I have not found any way to trigger this yet, so this might not be possible on the NWB-512.
+	// The NEWS-OS 4 framebuffer driver does not expose any ioctls for reading from the framebuffer.
 	if (m_state.fb_read && !m_state.fb_write)
 	{
-		fatalerror("nwb512: fb read only not implemented yet!");
+		fatalerror("nwb512: fb read only not implemented!");
 	}
 
 	logerror("op arm: %-7s func=0x%x %s %s src=(0x%x,0x%x) dst=(0x%x,0x%x) lim=(0x%x,0x%x)\n",
@@ -232,23 +237,21 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
 		m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
 
-		// TODO: This executes copies at once, faster than real hardware. Needs more work to be cycle-accurate.
+		// TODO: This executes copies immediately, faster than real hardware. Needs more work to be cycle-accurate.
 		// TODO: make m_state.fb_read only work
 		if (m_state.fb_read && m_state.fb_write)
 		{
 			uint16_t source_x = m_state.source_x;
 			uint16_t source_y = m_state.source_y;
 
-			unsigned panic = 0;
-			while (m_state.busy && panic < 0xf0000)
+			while (m_state.busy)
 			{
 				const uint32_t byte_offset = coordinate_to_byte_offset_aligned(source_x, source_y);
 				const uint16_t data = (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
 
 				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source
-				LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x panic = 0x%x\n", source_x, source_y, byte_offset, data, panic);
+				LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x\n", source_x, source_y, byte_offset, data);
 				rop_cycle(data); // When the ROP is done, this function will clear m_state.busy
-				++panic;
 
 				if (m_state.destination_y != destination_y_snapshot)
 				{
@@ -260,15 +263,6 @@ void nwb_512_device::check_operation_start(offs_t offset)
 					source_x += m_state.x_direction ? 16 : -16;
 				}
 			}
-			if (panic >= 0xf0000)
-			{
-				fatalerror("yikes bro");
-				// machine().debug_break();
-			}
-		}
-		else if (m_state.fb_read && !m_state.fb_write)
-		{
-			fatalerror("nwb_512: fb read only not implemented");
 		}
 	}
 }
@@ -286,9 +280,6 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 		m_state.shift = (m_state.destination_x - m_state.source_x) & 15;
 		LOG("destination_w: Calculated shift: 0x%x - 0x%x & 15 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
 	}
-
-	// Compute first mask
-	// m_state.mask1 = ~(0xffff >> (m_state.destination_x % 16)); // determine first mask based on bit offset in first word TODO: direction?
 
 	LOG("Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
 	check_operation_start(offset);
@@ -383,11 +374,9 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 		// `m_state.limit_y`, `m_state.dest_words_left`, `m_state.source_words_left`, `m_state.destination_y`,
 		// and a running count of `fifo_w`
 		LOG("IOP tried to reconfigure while op was in progress\n");
-		LOG("limit_y = 0x%x dest_words_left = 0x%x source_words_left = 0x%x destination_y = 0x%x fifo write count = 0x%x\n", m_state.limit_y, m_state.dest_words_left, m_state.source_words_left, m_state.destination_y, m_debug.fifo_call_count);
+		LOG("limit_y = 0x%x dest_words_left = 0x%x source_words_left = 0x%x destination_y = 0x%x\n", m_state.limit_y, m_state.dest_words_left, m_state.source_words_left, m_state.destination_y);
 		// fatalerror("IOP tried to reconfigure while op was in progress!");
 	}
-
-	m_debug = {}; // clear any leftover debug data
 }
 
 void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -415,7 +404,7 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
 {
 	uint16_t result;
-	[[maybe_unused]] std::string op; // Unused when tracing is disabled
+	[[maybe_unused]] std::string op;
 
 	switch (opcode)
 	{
@@ -607,19 +596,15 @@ void nwb_512_device::rop_cycle(uint16_t data)
 
 void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x), push #%d\n", machine().describe_context(), offset, data, mem_mask, m_debug.fifo_call_count);
+	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
 	if (m_state.pixel_mode)
 	{
 		fatalerror("word write in pixel mode");
 	}
 
-	++m_debug.fifo_call_count;
-
 	if (!m_state.busy)
 	{
-		// LOG("fb_fifo_w: IOP tried to push data without starting an op!\n");
-		// machine().debug_break();
 		fatalerror("IOP tried to push data without starting an op!");
 	}
 

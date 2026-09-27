@@ -79,11 +79,6 @@ private:
 		bool prime_pending = false;
 	} m_state;
 
-	struct debug_info
-	{
-		unsigned fifo_call_count = 0;
-	} m_debug;
-
 	// TODO: split by what is mapped and what is a helper
 	void reset_state();
 	void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
