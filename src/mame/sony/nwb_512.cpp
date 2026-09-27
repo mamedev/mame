@@ -214,12 +214,9 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		m_state.dest_words_left = m_state.dest_words_per_row;
 		LOG("Source words per row: %d, Destination words per row: %d\n", m_state.source_words_per_row, m_state.dest_words_per_row);
 
-		if (m_state.fb_read && m_state.fb_write &&
-			m_state.dest_words_per_row != m_state.source_words_per_row &&
-			m_state.dest_words_per_row != m_state.source_words_per_row + 1 &&
-			m_state.dest_words_per_row != m_state.source_words_per_row - 1)
+		if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
 		{
-			fatalerror("nwb512: fb->fb copy set but source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
+			fatalerror("nwb512: source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
 		}
 
 		// Update masks to preserve framebuffer contents that shouldn't be modified
@@ -237,8 +234,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
 		m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
 
-		// TODO: This executes copies immediately, faster than real hardware. Needs more work to be cycle-accurate.
-		// TODO: make m_state.fb_read only work
+		// TODO: This executes copies immediately, faster than real hardware.
 		if (m_state.fb_read && m_state.fb_write)
 		{
 			uint16_t source_x = m_state.source_x;
@@ -246,12 +242,11 @@ void nwb_512_device::check_operation_start(offs_t offset)
 
 			while (m_state.busy)
 			{
-				const uint32_t byte_offset = coordinate_to_byte_offset_aligned(source_x, source_y);
-				const uint16_t data = (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
+				const uint16_t source_data = coordinate_to_data(source_x, source_y);
 
-				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source
-				LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x byte_offset = 0x%x data = 0x%x\n", source_x, source_y, byte_offset, data);
-				rop_cycle(data); // When the ROP is done, this function will clear m_state.busy
+				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source - TODO: should this be in end_row?
+				LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x data = 0x%x\n", source_x, source_y, source_data);
+				rop_cycle(source_data); // When the ROP is done, this function will clear m_state.busy
 
 				if (m_state.destination_y != destination_y_snapshot)
 				{
@@ -504,10 +499,8 @@ uint16_t nwb_512_device::shift(uint16_t data)
 
 void nwb_512_device::rop(uint16_t source)
 {
-	// Get destination data
-	// Graphics ops are always word-aligned. However, mask1 and mask2 make non-aligned access work as expected.
-	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(m_state.current_x, m_state.destination_y);
-	const uint16_t destination = m_vram->read(byte_offset) << 8 | m_vram->read(byte_offset + 1);
+	const offs_t byte_offset = coordinate_to_byte_offset_aligned(m_state.current_x, m_state.destination_y);
+	const uint16_t destination = coordinate_to_data(m_state.current_x, m_state.destination_y);
 
 	// Execute raster operation with the appropriate source and destination data
 	uint16_t result = execute_rop(m_state.rop_function, source, destination);
@@ -667,6 +660,12 @@ void nwb_512_device::ctrl_w(uint8_t data) // confirmed 8-bit write
 void nwb_512_device::planemask_w(uint8_t data)
 {
 	LOG("Write plane mask = 0x%x\n", data);
+}
+
+uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
+{
+	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(x, y);
+	return (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
 }
 
 ROM_START(nwb_512)

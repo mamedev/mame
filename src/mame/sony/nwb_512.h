@@ -98,6 +98,7 @@ private:
 	uint8_t status_r();
 	void ctrl_w(uint8_t data);
 	void planemask_w(uint8_t data);
+	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
 	void check_enabled() const
 	{
 		if (!(m_state.ctrl & 0x1))
