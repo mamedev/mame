@@ -413,15 +413,17 @@ void ssd1306_device::exec_command(uint8_t data)
 	{
 		case 0x00:
 		case 0x10:
-			COMMAND_IS_SINGLE_BYTE;
+			{
+				COMMAND_IS_SINGLE_BYTE;
 
-			uint8_t low4        = m_command_fifo[0] & 0xF;
-			uint8_t keep_mask   = m_command_fifo[0] & 0x10 ? 0x0F : 0xF0;
-			uint8_t shift_value = m_command_fifo[0] & 0x10 ? 4    : 0;
+				uint8_t low4        = m_command_fifo[0] & 0xF;
+				uint8_t keep_mask   = m_command_fifo[0] & 0x10 ? 0x0F : 0xF0;
+				uint8_t shift_value = m_command_fifo[0] & 0x10 ? 4    : 0;
 
-			m_pagemode_column_start_address =
-				(m_pagemode_column_start_address & keep_mask) |
-				(low4 << shift_value);
+				m_pagemode_column_start_address =
+					(m_pagemode_column_start_address & keep_mask) |
+					(low4 << shift_value);
+			}
 			break;
 
 		case 0x20:
@@ -437,6 +439,12 @@ void ssd1306_device::exec_command(uint8_t data)
 			break;
 
 		case 0x80:
+			if (m_command_fifo[0] == 0x81)
+			{
+				COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+				m_contrast = m_command_fifo[1];
+				return;
+			}
 			if (m_command_fifo[0] == 0x8D)
 			{
 				COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
@@ -444,14 +452,7 @@ void ssd1306_device::exec_command(uint8_t data)
 				return;
 			}
 
-			if (m_command_fifo[0] != 0x81)
-			{
-				COMMAND_IS_INVALID;
-				return;
-			}
-
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
-			m_contrast = m_command_fifo[1];
+			COMMAND_IS_INVALID;
 			break;
 
 		case 0xA0:
@@ -460,26 +461,25 @@ void ssd1306_device::exec_command(uint8_t data)
 
 		case 0xB0:
 			// page addressing mode: set page start address
-			if (!(0xB0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xB7))
+			if (0xB0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xB7)
 			{
-				COMMAND_IS_INVALID;
+				COMMAND_IS_SINGLE_BYTE;
+				m_pagemode_page_start_address = m_command_fifo[0] & 7;
 				return;
 			}
 
-			COMMAND_IS_SINGLE_BYTE;
-			m_pagemode_page_start_address = m_command_fifo[0] & 7;
+			COMMAND_IS_INVALID;
 			break;
 
 		case 0xC0:
 			// COM (row) scan direction: $C0 normal, $C8 reverse
-			if (!(m_command_fifo[0] == 0xC0 || m_command_fifo[0] == 0xC8))
+			if (m_command_fifo[0] == 0xC0 || m_command_fifo[0] == 0xC8)
 			{
-				COMMAND_IS_INVALID;
+				COMMAND_IS_SINGLE_BYTE;
+				m_row_scan_direction_inverse = (m_command_fifo[0] & 8);	
 				return;
 			}
-
-			COMMAND_IS_SINGLE_BYTE;
-			m_row_scan_direction_inverse = (m_command_fifo[0] & 8);
+			COMMAND_IS_INVALID;
 			break;
 
 		case 0xD0:
@@ -487,13 +487,15 @@ void ssd1306_device::exec_command(uint8_t data)
 			break;
 
 		default:
-			if (m_command_fifo[0] != 0xE3)
+			if (m_command_fifo[0] == 0xE3)
 			{
-				COMMAND_IS_INVALID;
+				// explicit NOP
+				COMMAND_IS_SINGLE_BYTE;
 				return;
 			}
 
-			COMMAND_IS_SINGLE_BYTE;
+
+			COMMAND_IS_INVALID;
 			break;
 	}
 }
