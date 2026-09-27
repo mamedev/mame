@@ -6253,7 +6253,7 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-// TODO: bits 3-0 also used here
+// TODO: bits 3-0 also used here, akin to model2.cpp and flashbeats.cpp
 // cfr. spikeout/spikeofe sound test
 // (hint: use p1 inputs ignore Sega wacky instructions)
 void model3_state::sound_control_w(uint8_t data)

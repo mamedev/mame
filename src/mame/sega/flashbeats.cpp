@@ -14,6 +14,11 @@
         - 5 display tubes containing an unknown number of RGB LEDs behind
           a diffuser
 
+    TODO:
+    - investigate and fix audio routing:
+      cabinet sports 2 front speakers + 1 subwoofer *per player side*,
+      splitted and amplified thru an unknown middleman device.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -254,6 +259,7 @@ private:
 	uint16_t adc1_r() { return m_spectrum->adc_r(spectrum_band(), 1); }
 	uint8_t spectrum_mux_r();
 	void spectrum_mux_w(uint8_t data);
+	void sound_control_w(offs_t offset, uint8_t data);
 	void update_lanes();
 	void update_dmd();
 	TIMER_DEVICE_CALLBACK_MEMBER(lane_update_timer);
@@ -443,22 +449,21 @@ void flashbeats_state::flashbeats_map(address_map &map)
 	map(0xa18000, 0xa18001).rw(FUNC(flashbeats_state::spectrum_mux_r), FUNC(flashbeats_state::spectrum_mux_w)).umask16(0xff00);
 }
 
+// NOTE: sound handling is virtually same as model2.cpp and model3.cpp
+void flashbeats_state::sound_control_w(offs_t offset, uint8_t data)
+{
+	// TODO: bits 3-0 used, again
+}
+
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
+// Game looks dependant on this, would hiccup BGM beat at coin-in
 void flashbeats_state::main_scsp_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("sound_ram");
-	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	// The sound 68000 writes a status/handshake nibble here (values 0x08/0x0c/
-	// 0x0e/0x0f/0x0d... from PC 0x6001b0/0x6005e0) very early in init; it was
-	// hitting unmapped space and faulting. Back it with RAM so init proceeds.
-	map(0x400000, 0x400001).ram();
+	map(0x000000, 0x0fffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("sound_ram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x400001, 0x400001).w(FUNC(flashbeats_state::sound_control_w));
 	map(0x600000, 0x67ffff).rom().region("scspcpu", 0);
-	// Sample ROM (rom3) exposed to the sound-68000, Model 2 style (see model2_snd:
-	// 0x800000-0x9fffff = "samples"). rom3 lives at offset 0x80000 in the "scspcpu"
-	// region (after rom4's 0x80000 of code). The firmware stages PCM from here into
-	// sound_ram (the SCSP wave/DSP DRAM) itself; the SCSP then plays it from RAM, so
-	// the DSP keeps its writable work area (mapping rom3 straight into scsp_mem as
-	// ROM droned because the DSP read/writes that same space).
-	map(0x800000, 0x9fffff).rom().region("scspcpu", 0x80000);
+	map(0x800000, 0x9fffff).rom().region("samples", 0);
 }
 
 void flashbeats_state::scsp_mem(address_map &map)
@@ -691,9 +696,11 @@ ROM_START( flsbeats )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21609_rom1.ic18", 0x000000, 0x080000, CRC(130a0a62) SHA1(400f24304959547b188ed874653ae2e1e77092fe) )
 
-	ROM_REGION(0x280000, "scspcpu", 0)
+	ROM_REGION(0x080000, "scspcpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21610_rom4.ic14", 0x000000, 0x080000, CRC(c877e0e6) SHA1(595f143fb3789852a4af9d2920cbaefabecfa45c) )
-	ROM_LOAD16_WORD_SWAP( "epr-21611_rom3.ic4", 0x080000, 0x200000, CRC(2f5dc574) SHA1(f0b8d076b0fc8e94582de0ca17ecd5c8b90bedc4) )
+
+	ROM_REGION16_BE( 0x200000, "samples", 0)
+	ROM_LOAD16_WORD_SWAP( "epr-21611_rom3.ic4", 0x000000, 0x200000, CRC(2f5dc574) SHA1(f0b8d076b0fc8e94582de0ca17ecd5c8b90bedc4) )
 
 	ROM_REGION(0x20000, "dsb2:mpegcpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21612.ic2", 0x000000, 0x020000, CRC(6912e1cb) SHA1(3497d6ae0b9be00116a3278f46d738c4c6f26d20) )
@@ -713,4 +720,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  MACHINE     INPUT       CLASS             INIT        MONITOR  COMPANY  FULLNAME       FLAGS
-GAME( 1998, flsbeats, 0,      flashbeats, flashbeats, flashbeats_state, empty_init, ROT0,    "Sega",  "Flash Beats", 0 )
+GAME( 1998, flsbeats, 0,      flashbeats, flashbeats, flashbeats_state, empty_init, ROT0,    "Sega",  "Flash Beats (Japan)", MACHINE_IMPERFECT_SOUND ) // cabinet mixing

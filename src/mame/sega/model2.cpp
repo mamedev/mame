@@ -2451,9 +2451,10 @@ void model2_state::sound_ready_w(int state)
 
 /* Model 2 sound board emulation */
 
-// TODO: modernize, checkout if it's actually same as Model 3
-// also none of the Model 2 games actually has more than 0x800000 (wtf),
-// so this will actually never trigger ...
+// TODO: modernize, bit 3-0 same as model3.cpp and flashbeats.cpp
+// - bit 4 looks always high in at least vstriker, which rules out being banking related
+// - none of the Model 2 games actually has more than 0x800000 of sample data (wtf),
+//   so this will actually never trigger ...
 void model2_state::model2snd_ctrl(u16 data)
 {
 	// handle sample banking
