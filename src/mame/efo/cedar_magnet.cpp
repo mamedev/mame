@@ -1132,27 +1132,27 @@ ROM_START( mag_coco )
 ROM_END
 
 /*
-    "DD TEST  15/6/88": read 1 has independently corroborated shared graphics.
-    The inconsistent late sector at 0xea000 remains unresolved: retain BAD_DUMP.
+	"DD EC": complete read 1 with graphics sector 0x5ec00 reconstructed.
+	Read 2 physical 0x5d400 restores the phase-damaged tail (read 3 corroborates).
+	The sole unresolved byte at logical 0x5ece4 uses DD TEST read 1: 0x05.
+	The cross-revision pixel inference requires BAD_DUMP; program bytes are unchanged.
 */
 ROM_START( mag_ddrg )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "mag_ddrg.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(58eb41fc) SHA1(6042074f161e35b3a26067cab9255b760b8e6962) )
+	ROM_LOAD( "mag_ddrg.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(89408920) SHA1(408a2f8d9f5c595f32416ab0c63f4ae9227fc198) )
 ROM_END
 
 /*
-    "DD EC": complete read 1 with graphics sector 0x5ec00 reconstructed.
-    Read 2 physical 0x5d400 restores the phase-damaged tail (read 3 corroborates).
-    The sole unresolved byte at logical 0x5ece4 uses DD TEST read 1: 0x05.
-    The cross-revision pixel inference requires BAD_DUMP; program bytes are unchanged.
+	"DD TEST  15/6/88": read 1 has independently corroborated shared graphics.
+	The inconsistent late sector at 0xea000 remains unresolved: retain BAD_DUMP.
 */
-ROM_START( mag_ddrgec )
+ROM_START( mag_ddrgdd )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
-	ROM_LOAD( "mag_ddrgec.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(89408920) SHA1(408a2f8d9f5c595f32416ab0c63f4ae9227fc198) )
+	ROM_LOAD( "mag_ddrgdd.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(58eb41fc) SHA1(6042074f161e35b3a26067cab9255b760b8e6962) )
 ROM_END
 
 // Owner-confirmed working capture; disk header: "db ce".
@@ -1219,7 +1219,7 @@ ROM_END
 
 /*
     A later revision, identified by the disk header as "EX 2.0".
-    Inverted video, confirmed on original hardware.
+    Inverted video because flip screen dip switch, but left inverted because is how the floppy was found.
 */
 ROM_START( mag_exzi2 )
 	BIOS_ROM
@@ -1264,6 +1264,15 @@ ROM_START( mag_sconcc )
 	ROM_LOAD( "mag_sconcc.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(bc61c042) SHA1(bcba915d13633fe50c5ac5b3486fd8cf08c395b4) )
 ROM_END
 
+// Easier, less enemies
+ROM_START( mag_sconce )
+	BIOS_ROM
+
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+
+	ROM_LOAD( "mag_sconce.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(bc61c042) SHA1(bcba915d13633fe50c5ac5b3486fd8cf08c395b4) )
+ROM_END
+
 ROM_START( mag_time )
 	BIOS_ROM
 
@@ -1305,21 +1314,22 @@ ROM_END
 
 
 GAME( 1987, cedmag,     0,        cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Magnet System",                                  MACHINE_IS_BIOS_ROOT )
-GAME( 1987, mag_boob,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (version 4.1, Magnet System)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
-GAME( 1987, mag_boobcc, mag_boob, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (version CC, Magnet System)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
+GAME( 1987, mag_boob,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (4.1, Magnet System)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
+GAME( 1987, mag_boobcc, mag_boob, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Booby Kids (CC, Magnet System)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game (Kid no Hore Hore Daisakusen) by Nichibutsu
 GAME( 1987, mag_burn,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "The Burning Cavern (31/03/87)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
-GAME( 198?, mag_coco,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Cocomania (version CC, Magnet System)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_coco,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Cocomania (CC, Magnet System)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, mag_day,    cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "A Day In Space (31/03/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label
-GAME( 1988, mag_ddrg,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Double Dragon (DD TEST 15/6/88, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 198?, mag_ddrgec, mag_ddrg, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Double Dragon (EC, Magnet System)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_ddrg,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Double Dragon (EC, Magnet System)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, mag_ddrgdd, mag_ddrg, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Double Dragon (DD TEST 15/6/88, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 198?, mag_dodg,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Dodge Ball (CE, Magnet System)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, mag_drac,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Dracula's Castle (Magnet System)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, mag_exzi,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Taito
 GAME( 198?, mag_exzi2,  mag_exzi, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT180, "EFO SA / Cedar", "Exzisus (EX 2.0, Magnet System)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Taito
 GAME( 198?, mag_fsha,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Flying Shark (4.0, Magnet System)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, mag_pdak,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,   "EFO SA / Cedar", "Paris Dakar (31/03/87, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date on label, has unemulated 'handlebar' option that can be enabled in service mode
-GAME( 198?, mag_scon,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (Magnet System)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 198?, mag_sconcc, mag_scon, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (SC cc, Magnet System)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_scon,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (SB 'slow', Magnet System)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_sconcc, mag_scon, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (CC, Magnet System)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, mag_sconce, mag_scon, cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Super Contra (CE, Magnet System)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1987, mag_time,   cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Original game by Sega
 GAME( 1987, mag_war,    cedmag,   cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "War Mission (WM 04/06/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Date in program
 GAME( 1987, mag_wara,   mag_war,  cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT90,  "EFO SA / Cedar", "War Mission (WM 09/04/87)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // The '9' was handwritten over a printed letter on disk label, date not in program

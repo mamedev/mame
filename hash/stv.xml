@@ -8,7 +8,10 @@ Note: This list is for multicart games "CART-AM" only, to be run with stvbios -c
 It has no right to *repeat* all the games present in sega/stv.cpp, we also don't have a
 slot system for anything diverging from the regular 2 sticks N buttons setup.
 
-Also note IC13 based games *needs* the memory to be 1-filled, this is particularly important
+For QA, use supported flag only for issues in the context of multi-cart setups,
+there's no need to repeat stuff already present in saturn.xml and base drivers.
+
+IC13 based games *needs* the memory to be 1-filled, this is particularly important
 in Multi Cart mode.
 
 -->
@@ -246,7 +249,7 @@ Unstable in multicart, may hang after Atlus logo
 		</part>
 	</software>
 
-	<!-- Game: Puzzle &amp; Action: Sand-R -->
+	<!-- Game: Puzzle & Action: Sand-R -->
 	<software name="sandr">
 		<description>Puzzle &amp; Action: Sand-R (J 951114 V1.000)</description>
 		<year>1995</year>
@@ -265,6 +268,46 @@ Unstable in multicart, may hang after Atlus logo
 				<rom size="0x400000" offset="0xc00000" loadflag="reload"/>
 				<rom name="mpr18638.11" size="0x400000" crc="caab531b" sha1="a77bdcc27d183896c0ed576eeebcc1785d93669e" offset="0x2800000" loadflag="load16_word_swap"/>
 				<rom size="0x400000" offset="0x1000000" loadflag="reload"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game: Puzzle & Action: BoMulEul Chajara -->
+	<software name="thuntk" cloneof="sandr">
+		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
+		<year>1997</year>
+		<publisher>Sega / Deniam</publisher>
+		<part name="cart" interface="stv_cart">
+			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
+				<rom name="2.ic13_2"      size="0x080000" crc="6cae2926" sha1="e8d5745b4228de24672da5017cb3dab58344f59f" offset="0x200000" loadflag="load16_byte"/>
+				<rom name="1.ic13_1"      size="0x080000" crc="460727c8" sha1="da7171b65734264e10692e3408ac93beb374c65e" offset="0x200001" loadflag="load16_byte"/>
+				<rom name="bom210-10.ic2" size="0x400000" crc="f59d0827" sha1="2bed4b2c78e9b4e9332f576e1b264a6343f4cfff" offset="0x1c00000"/>
+				<rom size="0x400000" offset="0x400000" loadflag="reload"/>
+				<rom name="bom210-11.ic3" size="0x400000" crc="44e5a13e" sha1="aee3c06662a1d083f3bd01292cf2694132f63533" offset="0x2000000"/>
+				<rom size="0x400000" offset="0x800000" loadflag="reload"/>
+				<rom name="bom210-12.ic4" size="0x400000" crc="deabc701" sha1="cb313ae9bf6f115682fc76647a999e12c98f6120" offset="0x2400000"/>
+				<rom size="0x400000" offset="0xc00000" loadflag="reload"/>
+				<rom name="bom210-13.ic5" size="0x400000" crc="5ece1d5c" sha1="6d88f71b485bf2b3c164fa22f1c7ecaba4b3f5b1" offset="0x2800000"/>
+				<rom size="0x400000" offset="0x1000000" loadflag="reload"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Game: Puzzle & Action: Treasure Hunt -->
+	<software name="thunt" cloneof="sandr">
+		<description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="stv_cart">
+			<dataarea name="rom" size="0x3000000">
+				<rom value="0xff" size="0x200000" loadflag="fill" />
+				<rom name="th-ic7_2.stv" size="0x080000" crc="c4e993de" sha1="7aa433bc2623cb19a09d4ef4c8233a2d29901020" offset="0x200000" loadflag="load16_byte"/>
+				<rom name="th-ic7_1.stv" size="0x080000" crc="1355cc18" sha1="a9b731228a807b2b01f933fe0f7dcdbadaf89b7e" offset="0x200001" loadflag="load16_byte"/>
+				<rom name="th-e-2.ic2" size="0x400000" crc="47315694" sha1="4a7cc195b98dbca146f5efe3b5b35be0f13b2f4a" offset="0x400000" loadflag="load16_word_swap"/>
+				<rom name="th-e-3.ic3" size="0x400000" crc="c9290b44" sha1="4e51e667edf330cc20e600cf1500f332cc533e20" offset="0x800000" loadflag="load16_word_swap"/>
+				<rom name="th-e-4.ic4" size="0x400000" crc="c672e40b" sha1="4ba189de7b8fb5ca45fb15c89cdaf0f860831d52" offset="0xc00000" loadflag="load16_word_swap"/>
+				<rom name="th-e-5.ic5" size="0x400000" crc="3914b805" sha1="1331ce82ba0bdfc76fe3456a5252e69c00e2cf1f" offset="0x1000000" loadflag="load16_word_swap"/>
 			</dataarea>
 		</part>
 	</software>
@@ -351,46 +394,6 @@ Is this game really CART-AM as the header says?
 				<rom name="mpr17835.1" size="0x400000" crc="77f5cb43" sha1="a4f54bc08d73a56caee5b26bea06360568655bd7" offset="0x1800000" loadflag="load16_word_swap"/>
 				<rom name="mpr17841.8" size="0x400000" crc="f48beffc" sha1="92f1730a206f4a0abf7fb0ee1210e083a464ad70" offset="0x1c00000" loadflag="load16_word_swap"/>
 				<rom name="mpr17842.9" size="0x400000" crc="ac8deed7" sha1="370eb2216b8080d3ddadbd32804db63c4ebac76f" offset="0x2000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Game: Puzzle &amp; Action: Treasure Hunt -->
-	<software name="thunt" cloneof="sandr" supported="no">
-		<description>Puzzle &amp; Action: Treasure Hunt (JUET 970901 V2.00E)</description>
-		<year>1997</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="stv_cart">
-			<dataarea name="rom" size="0x3000000">
-				<rom value="0xff" size="0x200000" loadflag="fill" />
-				<rom name="th-ic7_2.stv" size="0x080000" crc="c4e993de" sha1="7aa433bc2623cb19a09d4ef4c8233a2d29901020" offset="0x200000" loadflag="load16_byte"/>
-				<rom name="th-ic7_1.stv" size="0x080000" crc="1355cc18" sha1="a9b731228a807b2b01f933fe0f7dcdbadaf89b7e" offset="0x200001" loadflag="load16_byte"/>
-				<rom name="th-e-2.ic2" size="0x400000" crc="47315694" sha1="4a7cc195b98dbca146f5efe3b5b35be0f13b2f4a" offset="0x400000" loadflag="load16_word_swap"/>
-				<rom name="th-e-3.ic3" size="0x400000" crc="c9290b44" sha1="4e51e667edf330cc20e600cf1500f332cc533e20" offset="0x800000" loadflag="load16_word_swap"/>
-				<rom name="th-e-4.ic4" size="0x400000" crc="c672e40b" sha1="4ba189de7b8fb5ca45fb15c89cdaf0f860831d52" offset="0xc00000" loadflag="load16_word_swap"/>
-				<rom name="th-e-5.ic5" size="0x400000" crc="3914b805" sha1="1331ce82ba0bdfc76fe3456a5252e69c00e2cf1f" offset="0x1000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Game: Puzzle &amp; Action: BoMulEul Chajara -->
-	<software name="thuntk" cloneof="sandr" supported="no">
-		<description>Puzzle &amp; Action: BoMulEul Chajara (JUET 970125 V2.00K)</description>
-		<year>1997</year>
-		<publisher>Sega / Deniam</publisher>
-		<part name="cart" interface="stv_cart">
-			<dataarea name="rom" size="0x3000000">
-				<rom value="0xff" size="0x200000" loadflag="fill" />
-				<rom name="2.ic13_2"      size="0x080000" crc="6cae2926" sha1="e8d5745b4228de24672da5017cb3dab58344f59f" offset="0x200000" loadflag="load16_byte"/>
-				<rom name="1.ic13_1"      size="0x080000" crc="460727c8" sha1="da7171b65734264e10692e3408ac93beb374c65e" offset="0x200001" loadflag="load16_byte"/>
-				<rom name="bom210-10.ic2" size="0x400000" crc="f59d0827" sha1="2bed4b2c78e9b4e9332f576e1b264a6343f4cfff" offset="0x1c00000"/>
-				<rom size="0x400000" offset="0x400000" loadflag="reload"/>
-				<rom name="bom210-11.ic3" size="0x400000" crc="44e5a13e" sha1="aee3c06662a1d083f3bd01292cf2694132f63533" offset="0x2000000"/>
-				<rom size="0x400000" offset="0x800000" loadflag="reload"/>
-				<rom name="bom210-12.ic4" size="0x400000" crc="deabc701" sha1="cb313ae9bf6f115682fc76647a999e12c98f6120" offset="0x2400000"/>
-				<rom size="0x400000" offset="0xc00000" loadflag="reload"/>
-				<rom name="bom210-13.ic5" size="0x400000" crc="5ece1d5c" sha1="6d88f71b485bf2b3c164fa22f1c7ecaba4b3f5b1" offset="0x2800000"/>
-				<rom size="0x400000" offset="0x1000000" loadflag="reload"/>
 			</dataarea>
 		</part>
 	</software>

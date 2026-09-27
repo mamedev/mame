@@ -327,7 +327,7 @@ void siena_state::siena_us(machine_config &config)
 	// 01 - Swedish
 	// 02 - USA
 	// 03 - Spanish
-	m_asic9->port_cd_r().set([]() { return 0x02; });
+	m_asic9->port_cd_r().set_constant(0x02); // USA
 }
 
 
@@ -335,18 +335,16 @@ ROM_START(siena)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "420f", "V4.20F/ENG")
 	ROMX_LOAD("vine_v4.20f_eng.bin", 0x00000, 0x100000, CRC(641f8e7c) SHA1(fe0e46540e0aac5aabb2dd1b96689da41e8f55fb), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "408f", "V4.08F/ENG")
+	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(1))
 ROM_END
+
+#define rom_siena_us rom_siena
 
 ROM_START(siena_fr)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "421f", "V4.21F/FRN")
 	ROMX_LOAD("vine_v4.21f_frn.bin", 0x00000, 0x100000, CRC(104691d6) SHA1(d1e12b305cd2de7dbf6b1a342adb7bf196d7abcb), ROM_BIOS(0))
-ROM_END
-
-ROM_START(siena_us)
-	ROM_REGION16_LE(0x100000, "rom", 0)
-	ROM_SYSTEM_BIOS(0, "408f", "V4.08F/ENG")
-	ROMX_LOAD("vine_v4.08f_eng.bin", 0x00000, 0x100000, CRC(222a7fd4) SHA1(250f43d327fbd5eea0b6ac4a7d7f514072b738f4), ROM_BIOS(0))
 ROM_END
 
 } // anonymous namespace

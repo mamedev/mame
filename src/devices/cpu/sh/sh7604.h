@@ -119,6 +119,7 @@ private:
 
 	uint32_t dvcr_r();
 	void dvcr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void divu_start(int64_t dividend);
 
 	// UBC
 	uint16_t barah_r();

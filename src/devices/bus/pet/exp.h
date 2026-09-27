@@ -40,6 +40,9 @@ public:
 
 	auto dma_read_callback() { return m_read_dma.bind(); }
 	auto dma_write_callback() { return m_write_dma.bind(); }
+	auto halt_callback() { return m_write_halt.bind(); }
+	auto reset_callback() { return m_write_reset.bind(); }
+	auto irq_callback() { return m_write_irq.bind(); }
 
 	// computer interface
 	int norom_r(offs_t offset, int sel);
@@ -51,6 +54,9 @@ public:
 	// cartridge interface
 	uint8_t dma_bd_r(offs_t offset);
 	void dma_bd_w(offs_t offset, uint8_t data);
+	void halt_w(int state) { m_write_halt(state); }
+	void reset_w(int state) { m_write_reset(state); }
+	void card_irq_w(int state) { m_write_irq(state); }
 	int phi2();
 
 	enum
@@ -82,6 +88,9 @@ protected:
 
 	devcb_read8  m_read_dma;
 	devcb_write8 m_write_dma;
+	devcb_write_line m_write_halt;
+	devcb_write_line m_write_reset;
+	devcb_write_line m_write_irq;
 };
 
 

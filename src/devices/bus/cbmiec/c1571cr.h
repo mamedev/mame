@@ -28,13 +28,21 @@ public:
 	c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual void update_iec() override;
+
 private:
 	void via0_pa_w(uint8_t data);
-	void via0_pb_w(uint8_t data);
+
+	void c1571cr_mem(address_map &map) ATTR_COLD;
+
+	required_device<mos5710_device> m_5710;
 };
 
 
