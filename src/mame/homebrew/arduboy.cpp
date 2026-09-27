@@ -42,7 +42,7 @@
         - C.7 speaker negative
 
     - Port D
-        - D.3 flash /CS
+        - D.1 flash /CS
         - D.4 OLED D/C#
         - D.5 tx LED
         - D.6 OLED /CS
@@ -229,7 +229,7 @@ uint8_t arduboy_state::port_d_r()
 
 void arduboy_state::port_d_w(uint8_t data)
 {
-	if (m_spi_flash) m_spi_flash->cs_w(data & (1 << 3));
+	if (m_spi_flash) m_spi_flash->cs_w(data & (1 << 1));
 	m_ssd1306->dc_w(data & (1 << 4));
 	m_tx_led = data & (1 << 5);
 	m_ssd1306->spi_cs_w(data & (1 << 6));
