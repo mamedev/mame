@@ -88,7 +88,8 @@ void ms32_state::video_start()
 	m_roz_tilemap->set_transparent_pen(0);
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
-	m_brt[0] = m_brt[1] = 0xffff;
+	m_brt[0] = m_brt[1] = m_brt[2] = m_brt[3] = 0;
+	m_brt_r = m_brt_g = m_brt_b = 0x100;
 	m_brt1_r = m_brt1_g = m_brt1_b = 0x100;
 	m_sprite_ctrl[0x10/4] = 0x8000;
 
@@ -183,13 +184,24 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
     bit 11     text transparent
     bit 10     unknown, always 1 on the games checked
     bit 9      ROZ transparent
-    bit 8      road plane transparent (always 1 on games without it)
+    bit 8      road plane transparent
     bit 7      BG transparent
     bits 6-3   sprite priority (attribute bits 7-4)
     bits 2-0   line depth, colour bits 6-4 of the ROZ line, or of the road plane line where ROZ is transparent
 
-    Output: bits 5-3 select the layer (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text), bit 6 selects the backdrop.
-    TODO: bit 2 clear is approximated as half brightness, bits 1-0 are ignored
+    Output byte:
+    bit 6      backdrop (pen 0, no effects applied)
+    bits 5-3   layer select (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text)
+    bit 2      shadow/glow disable (1 = normal, 0 = half-brightness shadow)
+    bits 1-0   brightness bank select:
+                 0 = none (used by TX text layer)
+                 1 = bank 0 only (brt[0]/brt[1]), no shadow/glow
+                 2 = bank 1 only (brt[2]/brt[3]), shadow/glow active if bit 2 clear;
+                     sprites with brt=2 get glow (white blend) instead of shadow
+                 3 = bank 0 only (brt[0]/brt[1]), shadow/glow active if bit 2 clear
+
+    Shadow/glow requires bit 1 of the brightness field to be set (brt=2 or brt=3).
+    When brt=0 or brt=1, bit 2 has no visible effect regardless of its value.
 */
 void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -226,10 +238,18 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 			u16 const idx = (!s_op << 12) | ((tx[x] == 0xffff) << 11) | (1 << 10) | ((roz[x] == 0xffff) << 9) | ((road[x] == 0xffff) << 8) | ((bg[x] == 0xffff) << 7) | (pri << 3) | depth;
 			u8 const code = m_priram[idx];
 
+			if (code == 0x00)
+			{
+				dst[x] = paldata[0];
+				continue;
+			}
+
+			u8 const layer = (code >> 3) & 7;
+
 			u16 pen = 0;
 			if (!BIT(code, 6))
 			{
-				switch ((code >> 3) & 7)
+				switch (layer)
 				{
 				case 0: pen = spr[x] & 0x0fff; break;
 				case 1: pen = bg[x]; break;
@@ -243,12 +263,17 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
-			if ((code & 3) == 3)
-				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			else if ((code & 3) == 0)
+			if ((code & 3) == 2)
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
-			if (!BIT(code, 2))
-				c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+			else if (code & 1)
+				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
+			if (!BIT(code, 2) && BIT(code, 1) && !BIT(code, 6))
+			{
+				if (layer == 0 && (code & 3) == 2)
+					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				else
+					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+			}
 			dst[x] = c;
 		}
 	}
@@ -257,14 +282,23 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 /********** PALETTE WRITES **********/
 
 
-// Brightness notes (applied at mix time, not here):
-// bnstars gameplay: 0x0000 0x0000 0x8080 0x0080
-// desertwr ranking: 0x8080 0xff80 0x0000 0x0000
-// gametngk: sets upper words of first two regs as 0x0100xxxx (discarded?)
-//          gameplay:0x0000 0x0000 0x2020 0x0020
-//          continue:0x5050 0x0050 0x2020 0x0020
-// hayaosi3 title:   0x7070 0x0070 0x0000 0x0000
-// p47aces: bomb on stage clear fade out (untested, tbd)
+/*
+    Brightness system: four 32-bit registers at 0xFCE00280, forming two RGB banks.
+    Each register's low 16 bits encode R (high byte) and G or B (low byte).
+    The brightness multiplier is 0x100 minus the register value, so 0x00 = full
+    brightness (1.0) and 0xFF = nearly black (1/256).
+
+    Bank 0: brt[0] (R,G) and brt[1] (B) - selected by priram brt=1 or brt=3
+    Bank 1: brt[2] (R,G) and brt[3] (B) - selected by priram brt=2
+
+    Observed register values:
+    bnstars gameplay:  0x0000 0x0000 0x8080 0x0080  (bank 1 dims non-TX layers)
+    desertwr ranking:  0x8080 0xff80 0x0000 0x0000  (bank 0 fades to dark)
+    gametngk gameplay: 0x0000 0x0000 0x2020 0x0020  (bank 1 pulses at 30 Hz for glow)
+    gametngk continue: 0x5050 0x0050 0x2020 0x0020  (both banks dim independently)
+    hayaosi3 title:    0x7070 0x0070 0x0000 0x0000  (bank 0 fades for title)
+    p47aces: bomb on stage clear fade out (untested, tbd)
+*/
 void ms32_state::update_color(int color)
 {
 	const int r = ((m_palram[color*2] & 0xff00) >> 8);
@@ -282,8 +316,7 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 	if (m_brt[offset] != oldword)
 	{
 		// two brightness banks, selected per-pixel by priram output bits 1-0:
-		//   bits 1:0 = 11 -> bank 0 (brt[0]/brt[1])
-		//   bits 1:0 = 00 -> bank 1 (brt[2]/brt[3])
+		//   0 = none (TX text), 1 or 3 = bank 0 (brt[0]/brt[1]), 2 = bank 1 (brt[2]/brt[3])
 		m_brt_r = 0x100 - ((m_brt[0] & 0xff00) >> 8);
 		m_brt_g = 0x100 - ((m_brt[0] & 0x00ff) >> 0);
 		m_brt_b = 0x100 - ((m_brt[1] & 0x00ff) >> 0);
@@ -528,8 +561,19 @@ void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &clipre
     bits 6-3   sprite priority (attribute bits 7-4)
     bits 2-0   line depth, colour bits 6-4 of the ROZ line
 
-    Output: bits 5-3 select the layer (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text), bit 6 selects the backdrop.
-    TODO: bit 2 clear is approximated as half brightness, bits 1-0 are ignored
+    Output byte:
+    bit 6      backdrop (pen 0, no effects applied)
+    bits 5-3   layer select (0 sprite, 1 BG, 2 ROZ, 4 road plane, 6 text)
+    bit 2      shadow/glow disable (1 = normal, 0 = half-brightness shadow)
+    bits 1-0   brightness bank select:
+                 0 = none (used by TX text layer)
+                 1 = bank 0 only (brt[0]/brt[1]), no shadow/glow
+                 2 = bank 1 only (brt[2]/brt[3]), shadow/glow active if bit 2 clear;
+                     sprites with brt=2 get glow (white blend) instead of shadow
+                 3 = bank 0 only (brt[0]/brt[1]), shadow/glow active if bit 2 clear
+
+    Shadow/glow requires bit 1 of the brightness field to be set (brt=2 or brt=3).
+    When brt=0 or brt=1, bit 2 has no visible effect regardless of its value.
 */
 void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -559,6 +603,14 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 					| (pri << 3)
 					| depth;
 			u8 const code = m_priram[idx];
+
+			// code 0x00 = priram not yet written by the game, treat as backdrop
+			if (code == 0x00)
+			{
+				dst[x] = paldata[0];
+				continue;
+			}
+
 			u8 const layer = (code >> 3) & 7;
 
 			u16 pen = 0;
@@ -577,17 +629,18 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
-			// TX text is unaffected by the second brightness bank. In gametngk,
-			// the 30 Hz pulse belongs to sprite priority output 0x02 (cabinet glow).
-			if ((code & 3) == 3)
-				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			else if (((code & 3) == 0 && layer != 6) || ((code & 3) == 2 && layer == 0))
+			// priram output bits 1:0 select brightness bank:
+			//   0 = none, 1 or 3 = bank 0, 2 = bank 1
+			if ((code & 3) == 2)
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
-			if (!BIT(code, 2))
+			else if (code & 1)
+				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
+			// !BIT(2) = half-brightness shadow/glow, only active when brt bit 1 is set
+			if (!BIT(code, 2) && BIT(code, 1) && !BIT(code, 6))
 			{
-				if (layer == 0)  // sprite → glow
+				if (layer == 0 && (code & 3) == 2)
 					c = alpha_blend_r32(c, 0x00ffffff, 128);
-				else  // BG, ROZ, TX → shadow
+				else
 					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 			}
 			dst[x] = c;
@@ -641,18 +694,12 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 					| (cov_pri << 3);
 			u8 const code_with = m_priram[idx_with];
 
-			if (!BIT(code_with, 2))
+			if (!BIT(code_with, 2) && BIT(code_with, 1))
 			{
-				u8 const layer = (code_with >> 3) & 7;
 				rgb_t c(dst[x]);
-				if (layer == 0)
-				{
-					if ((code_with & 3) == 2)
-						c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
-					c = alpha_blend_r32(c, 0x00ffffff, 128);
-				}
-				else
-					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+				if ((code_with & 3) == 2)
+					c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
+				c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 				dst[x] = c;
 			}
 		}
