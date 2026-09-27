@@ -35,15 +35,6 @@
 // For now, we treat it as a constant 50.
 #define BANK0_PULSE_WIDTH 50
 
-#define KEEP_LOW_NIBBLE(x)  x & 0x0F
-#define KEEP_HIGH_NIBBLE(x) x & 0xF0
-
-#define LOW4_AS_HIGH_NIBBLE(x) (x & 0x0F) << 4
-#define LOW4_AS_LOW_NIBBLE(x) (x & 0x0F)
-
-#define SET_LOW_NIBBLE_FROM_LOW4(reg, val)  reg = KEEP_HIGH_NIBBLE(reg) | LOW4_AS_LOW_NIBBLE(val);
-#define SET_HIGH_NIBBLE_FROM_LOW4(reg, val) reg = KEEP_LOW_NIBBLE(reg) | LOW4_AS_HIGH_NIBBLE(val);
-
 // It isn't really possible to get the exact frequencies because the chip
 // is usually embedded into the display panel itself.
 static const int INTERNAL_OSCILLATOR_FREQUENCIES[] =
@@ -421,13 +412,16 @@ void ssd1306_device::exec_command(uint8_t data)
 	switch(m_command_fifo[0] & 0xF0)
 	{
 		case 0x00:
-			COMMAND_IS_SINGLE_BYTE;
-			SET_LOW_NIBBLE_FROM_LOW4(m_pagemode_column_start_address, m_command_fifo[0]);
-			break;
-
 		case 0x10:
 			COMMAND_IS_SINGLE_BYTE;
-			SET_HIGH_NIBBLE_FROM_LOW4(m_pagemode_column_start_address, m_command_fifo[0]);
+
+			uint8_t low4        = m_command_fifo[0] & 0xF;
+			uint8_t keep_mask   = m_command_fifo[0] & 0x10 ? 0x0F : 0xF0;
+			uint8_t shift_value = m_command_fifo[0] & 0x10 ? 4    : 0;
+
+			m_pagemode_column_start_address =
+				(m_pagemode_column_start_address & keep_mask) |
+				(low4 << shift_value);
 			break;
 
 		case 0x20:
