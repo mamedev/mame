@@ -1255,6 +1255,7 @@ ROM_END
     A fourth, mislabeled SC cc capture corroborates 0x1800, 0x1c00, 0x2400 and
     0x2800, but cannot recover the remaining six damaged boot sectors. Other
     SC cc data is preserved; the damaged originals are archived separately.
+	Harder set, with more enemies.
 */
 ROM_START( mag_sconcc )
 	BIOS_ROM
@@ -1264,13 +1265,12 @@ ROM_START( mag_sconcc )
 	ROM_LOAD( "mag_sconcc.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(bc61c042) SHA1(bcba915d13633fe50c5ac5b3486fd8cf08c395b4) )
 ROM_END
 
-// Easier, less enemies
 ROM_START( mag_sconce )
 	BIOS_ROM
 
 	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
 
-	ROM_LOAD( "mag_sconce.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(bc61c042) SHA1(bcba915d13633fe50c5ac5b3486fd8cf08c395b4) )
+	ROM_LOAD( "mag_sconce.dsk", 0x00000, 0xf0000, BAD_DUMP CRC(65ca1ba7) SHA1(bd9e7c48e64d0b6ecb9094845ca98702a0a45620) )
 ROM_END
 
 ROM_START( mag_time )
