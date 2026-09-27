@@ -272,7 +272,7 @@ protected:
 
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
-	std::unique_ptr<bitmap_ind16> m_gx_tile_scratch;   // additive tilemap categories, gx_draw_tilemap_category
+	bitmap_ind16 m_gx_tile_scratch;   // additive tilemap categories, gx_draw_tilemap_category
 
 	// mirrored K054338 settings
 	s32 *m_K054338_shdRGB = nullptr;

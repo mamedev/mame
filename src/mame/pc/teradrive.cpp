@@ -409,8 +409,8 @@ public:
 		, m_md_ioports(*this, "md_ioport%u", 1U)
 	{ }
 
-	void teradrive(machine_config &config);
-	void at_softlists(machine_config &config);
+	void teradrive(machine_config &config) ATTR_COLD;
+	void at_softlists(machine_config &config) ATTR_COLD;
 
 protected:
 	void machine_start() override ATTR_COLD;

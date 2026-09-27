@@ -41,8 +41,8 @@ public:
 		m_speaker(*this, "speaker")
 	{ }
 
-	void megapcpl(machine_config &config);
-	void megapc(machine_config &config);
+	void megapcpl(machine_config &config) ATTR_COLD;
+	void megapc(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

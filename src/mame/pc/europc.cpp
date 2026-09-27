@@ -111,11 +111,11 @@ public:
 		m_jim_state(0)
 	{ }
 
-	void europc(machine_config &config);
-	void europc2(machine_config &config);
-	void euroxt(machine_config &config);
+	void europc(machine_config &config) ATTR_COLD;
+	void europc2(machine_config &config) ATTR_COLD;
+	void euroxt(machine_config &config) ATTR_COLD;
 
-	void init_europc();
+	void init_europc() ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

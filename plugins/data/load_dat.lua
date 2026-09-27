@@ -9,21 +9,28 @@ local function readret(file, tablename)
 				FROM "%s_idx" AS fi LEFT JOIN "%s" AS f ON fi.data = f.rowid
 				WHERE fi.type = ? AND fi.val = ? AND fi.romset = ?;]],
 			tablename, tablename))
+	local db_row = db.ROW
+	local db_done = db.DONE
+	local db_busy = db.BUSY
+	local query_bind = query.bind_values
+	local query_step = query.step
+	local query_get = query.get_value
+	local query_reset = query.reset
 	local function read(tag, val, set)
-		query:bind_values(tag, val, set)
+		query_bind(query, tag, val, set)
 		local data
 		while not data do
-			local status = query:step()
-			if status == db.ROW then
-				data = query:get_value(0)
-			elseif status == db.DONE then
+			local status = query_step(query)
+			if status == db_row then
+				data = query_get(query, 0)
+			elseif status == db_done then
 				break
-			elseif status ~= db.BUSY then
+			elseif status ~= db_busy then
 				db.check(string.format('reading %s data', file))
 				break
 			end
 		end
-		query:reset()
+		query_reset(query)
 		return data
 	end
 	return read
@@ -45,11 +52,19 @@ function datfile.open(file, vertag, fixupcb)
 		end
 	end
 
+	local str_find = string.find
+	local str_match = string.match
+	local str_gmatch = string.gmatch
+	local str_sub = string.sub
+	local str_gsub = string.gsub
+	local str_format = string.format
+	local table_ins = table.insert
+
 	local ver
 	if vertag then
 		-- scan file for version
 		for line in fh:lines() do
-			local match = line:match(vertag .. '%s*(%S+)')
+			local match = str_match(line, vertag .. '%s*(%S+)')
 			if match then
 				ver = match
 				break
@@ -67,25 +82,25 @@ function datfile.open(file, vertag, fixupcb)
 
 	if not dbver then
 		db.exec(
-			string.format(
+			str_format(
 				[[CREATE TABLE "%s_idx" (
 					type VARCHAR NOT NULL,
 					val VARCHAR NOT NULL,
 					romset VARCHAR NOT NULL,
 					data INTEGER NOT NULL);]],
 				tablename))
-		db.check(string.format('creating %s index table', file))
-		db.exec(string.format([[CREATE TABLE "%s" (data CLOB NOT NULL);]], tablename))
-		db.check(string.format('creating %s data table', file))
+		db.check(str_format('creating %s index table', file))
+		db.exec(str_format([[CREATE TABLE "%s" (data CLOB NOT NULL);]], tablename))
+		db.check(str_format('creating %s data table', file))
 		db.exec(
-			string.format(
+			str_format(
 				[[CREATE INDEX "typeval_%s" ON "%s_idx" (type, val, romset);]],
 				tablename, tablename))
-		db.check(string.format('creating %s type/value index', file))
+		db.check(str_format('creating %s type/value index', file))
 	end
 
 	db.exec([[BEGIN TRANSACTION;]])
-	if not db.check(string.format('starting %s transaction', file)) then
+	if not db.check(str_format('starting %s transaction', file)) then
 		fh:close()
 		if dbver then
 			return readret(file, tablename), dbver
@@ -96,21 +111,21 @@ function datfile.open(file, vertag, fixupcb)
 
 	-- clean out previous data and update the version
 	if dbver then
-		db.exec(string.format([[DELETE FROM "%s";]], tablename))
-		if not db.check(string.format('deleting previous %s data', file)) then
+		db.exec(str_format([[DELETE FROM "%s";]], tablename))
+		if not db.check(str_format('deleting previous %s data', file)) then
 			db.exec([[ROLLBACK TRANSACTION;]])
 			fh:close()
 			return readret(file, tablename), dbver
 		end
-		db.exec(string.format([[DELETE FROM "%s_idx";]], tablename))
-		if not db.check(string.format('deleting previous %s data', file)) then
+		db.exec(str_format([[DELETE FROM "%s_idx";]], tablename))
+		if not db.check(str_format('deleting previous %s data', file)) then
 			db.exec([[ROLLBACK TRANSACTION;]])
 			fh:close()
 			return readret(file, tablename), dbver
 		end
 	end
 	db.set_version(file, ver)
-	if not db.check(string.format('updating %s version', file)) then
+	if not db.check(str_format('updating %s version', file)) then
 		db.exec([[ROLLBACK TRANSACTION;]])
 		fh:close()
 		if dbver then
@@ -121,9 +136,9 @@ function datfile.open(file, vertag, fixupcb)
 	end
 
 	local dataquery = db.prepare(
-		string.format([[INSERT INTO "%s" (data) VALUES (?);]], tablename))
+		str_format([[INSERT INTO "%s" (data) VALUES (?);]], tablename))
 	local indexquery = db.prepare(
-		string.format(
+		str_format(
 			[[INSERT INTO "%s_idx" (type, val, romset, data) VALUES (?, ?, ?, ?)]],
 			tablename))
 
@@ -136,20 +151,20 @@ function datfile.open(file, vertag, fixupcb)
 			local tags, data
 			while not data do
 				local npos
-				local spos, epos = buffer:find('[\n\r]$[^=\n\r]*=[^\n\r]*', pos)
+				local spos, epos = str_find(buffer, '[\n\r]$[^=\n\r]*=[^\n\r]*', pos)
 				if not spos then
 					return nil
 				end
-				npos, epos = buffer:find('[\n\r]$%w+%s*[\n\r]+', epos)
+				npos, epos = str_find(buffer, '[\n\r]$%w+%s*[\n\r]+', epos)
 				if not npos then
 					return nil
 				end
-				tags = buffer:sub(spos, epos)
-				spos, npos = buffer:find('[\n\r]$[^=\n\r]*=[^\n\r]*', epos)
+				tags = str_sub(buffer, spos, epos)
+				spos, npos = str_find(buffer, '[\n\r]$[^=\n\r]*=[^\n\r]*', epos)
 				if not spos then
 					return nil
 				end
-				data = buffer:sub(epos, spos)
+				data = str_sub(buffer, epos, spos)
 				pos = spos
 			end
 			return tags, data
@@ -157,17 +172,17 @@ function datfile.open(file, vertag, fixupcb)
 		return iter
 	end
 
-	for info, data in gmatchpos() do
+	for rawinfo, rawdata in gmatchpos() do
 		local tags = {}
 		local infotype
-		info = info:gsub(utf8.char(0xfeff), '') -- remove byte order marks
-		data = data:gsub(utf8.char(0xfeff), '')
-		for s in info:gmatch('[\n\r]$([^\n\r]*)') do
-			if s:find('=', 1, true) then
-				local m1, m2 = s:match('([^=]*)=(.*)')
-				for tag in m1:gmatch('[^,]+') do
-					for set in m2:gmatch('[^,]+') do
-						table.insert(tags, { tag = tag, set = set })
+		local info = str_gsub(rawinfo, utf8.char(0xfeff), '') -- remove byte order marks
+		local data = str_gsub(rawdata, utf8.char(0xfeff), '')
+		for s in str_gmatch(info, '[\n\r]$([^\n\r]*)') do
+			if str_find(s, '=', 1, true) then
+				local m1, m2 = str_match(s, '([^=]*)=(.*)')
+				for tag in str_gmatch(m1, '[^,]+') do
+					for set in str_gmatch(m2, '[^,]+') do
+						table_ins(tags, { tag = tag, set = set })
 					end
 				end
 			else
@@ -176,25 +191,31 @@ function datfile.open(file, vertag, fixupcb)
 			end
 		end
 
-		data = data:gsub('[\n\r]$end%s*[\n\r]$%w+%s*[\n\r]', '\n')
-		data = data:gsub('[\n\r]$end%s*[\n\r].-[\n\r]$%w+%s*[\n\r]', '\n')
-		data = data:gsub('[\n\r]$end%s*[\n\r].*', '')
+		data = str_gsub(data, '[\n\r]$end%s*[\n\r]$%w+%s*[\n\r]', '\n')
+		data = str_gsub(data, '[\n\r]$end%s*[\n\r].-[\n\r]$%w+%s*[\n\r]', '\n')
+		data = str_gsub(data, '[\n\r]$end%s*[\n\r].*', '')
 
 		if (#tags > 0) and infotype then
-			data = data:gsub('\r', '') -- strip carriage returns
+			data = str_gsub(data, '\r', '') -- strip carriage returns
 			if fixupcb then
 				data = fixupcb(data)
 			end
 
-			dataquery:bind_values(data)
+			local db_done = db.DONE
+			local db_busy = db.BUSY
+			local db_row = db.ROW
+			local query_bind = dataquery.bind_values
+			local query_step = dataquery.step
+			local query_reset = dataquery.reset
+			query_bind(dataquery, data)
 			local row
 			while true do
-				local status = dataquery:step()
-				if status == db.DONE then
+				local status = query_step(dataquery)
+				if status == db_done then
 					row = dataquery:last_insert_rowid();
 					break
-				elseif status == db.BUSY then
-					emu.print_error(string.format('Database busy: inserting %s data', file))
+				elseif status == db_busy then
+					emu.print_error(str_format('Database busy: inserting %s data', file))
 					dataquery:finalize()
 					indexquery:finalize()
 					db.exec([[ROLLBACK TRANSACTION;]])
@@ -204,22 +225,25 @@ function datfile.open(file, vertag, fixupcb)
 					else
 						return nil
 					end
-				elseif result ~= db.ROW then
-					db.check(string.format('inserting %s data', file))
+				elseif result ~= db_row then
+					db.check(str_format('inserting %s data', file))
 					break
 				end
 			end
-			dataquery:reset()
+			query_reset(dataquery)
 
 			if row then
+				query_bind = indexquery.bind_values
+				query_step = indexquery.step
+				query_reset = indexquery.reset
 				for num, tag in pairs(tags) do
-					indexquery:bind_values(infotype, tag.tag, tag.set, row)
+					query_bind(indexquery, infotype, tag.tag, tag.set, row)
 					while true do
-						local status = indexquery:step()
-						if status == db.DONE then
+						local status = query_step(indexquery)
+						if status == db_done then
 							break
-						elseif status == db.BUSY then
-							emu.print_error(string.format('Database busy: inserting %s data', file))
+						elseif status == db_busy then
+							emu.print_error(str_format('Database busy: inserting %s data', file))
 							dataquery:finalize()
 							indexquery:finalize()
 							db.exec([[ROLLBACK TRANSACTION;]])
@@ -229,12 +253,12 @@ function datfile.open(file, vertag, fixupcb)
 							else
 								return nil
 							end
-						elseif result ~= db.ROW then
-							db.check(string.format('inserting %s data', file))
+						elseif result ~= db_row then
+							db.check(str_format('inserting %s data', file))
 							break
 						end
 					end
-					indexquery:reset()
+					query_reset(indexquery)
 				end
 			end
 		end
@@ -245,7 +269,7 @@ function datfile.open(file, vertag, fixupcb)
 
 	fh:close()
 	db.exec([[COMMIT TRANSACTION;]])
-	if not db.check(string.format('committing %s transaction', file)) then
+	if not db.check(str_format('committing %s transaction', file)) then
 		db.exec([[ROLLBACK TRANSACTION;]])
 		if dbver then
 			return readret(file, tablename), dbver
