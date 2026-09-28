@@ -278,7 +278,7 @@ u32 vrender0soc_device::inten_r()
 void vrender0soc_device::inten_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_inten);
-	// P'S Attack has a timer 0 irq service with no call to intvec_w but just this
+	// psattack has a timer 0 irq service with no call to intvec_w but just this
 	m_intst &= m_inten;
 	if (!m_intst)
 		m_int_cb(CLEAR_LINE);
@@ -297,6 +297,7 @@ void vrender0soc_device::intst_w(u32 data)
 
 void vrender0soc_device::int_req(int num)
 {
+	// TODO: this doesn't look right, it should still plonk in pending state even if irq masked
 	if (m_inten & (1 << num))
 	{
 		m_intst |= (1 << num);
@@ -307,6 +308,7 @@ void vrender0soc_device::int_req(int num)
 
 u8 vrender0soc_device::irq_callback()
 {
+	// NOTE: the highest irq source would be b26
 	for (int i = 0; i < 32; ++i)
 	{
 		if (BIT(m_intst, i))
@@ -314,7 +316,8 @@ u8 vrender0soc_device::irq_callback()
 			return (m_int_high << 5) | i;
 		}
 	}
-	return 0;       //This should never happen
+	// This should never happen
+	return 0;
 }
 
 
@@ -322,7 +325,7 @@ void vrender0soc_device::soundirq_cb(int state)
 {
 	if (state)
 	{
-		int_req(2);
+		int_req(IRQ_WAVE_SYNTH);
 	}
 }
 
@@ -348,7 +351,7 @@ void vrender0soc_device::timer_start(int which)
 template<int Which>
 TIMER_CALLBACK_MEMBER(vrender0soc_device::timer_cb)
 {
-	static const int num[] = { 0, 1, 9, 10 };
+	static const int num[] = { IRQ_TIMER0, IRQ_TIMER1, IRQ_TIMER2, IRQ_TIMER3 };
 	vr0_timer &tmr = m_timer[Which];
 
 	if (BIT(tmr.control, 1))
@@ -490,7 +493,7 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 		data &= ~(1 << 10);
 		// TODO: insta-DMA
 		dma.size = 0;
-		int_req(7 + Which);
+		int_req(IRQ_DMA0 + Which);
 	}
 	COMBINE_DATA(&dma.ctrl);
 }
@@ -740,7 +743,7 @@ void vrender0soc_device::screen_vblank(int state)
 	{
 		if (crt_active_vblank_irq() == true)
 		{
-			int_req(24);      //VRender0 VBlank
+			int_req(IRQ_VBLANK);
 			m_vr0vid->execute_flipping();
 		}
 	}

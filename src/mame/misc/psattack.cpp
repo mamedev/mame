@@ -242,7 +242,7 @@ static INPUT_PORTS_START( psattack )
 	// gun triggers
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably guns are here
+	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably guns are here
 
 	PORT_START("IN1")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?

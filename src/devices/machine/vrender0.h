@@ -133,6 +133,38 @@ private:
 	u8 m_int_high = 0;
 	u32 m_intst = 0;
 
+	// bare numbers indicate <reserved> IRQSs
+	enum {
+		IRQ_TIMER0 = 0,
+		IRQ_TIMER1,
+		IRQ_WAVE_SYNTH,
+		IRQ_SIO,
+		IRQ_4,
+		IRQ_EXTINT0,
+		IRQ_EXTINT1,
+		IRQ_DMA0,
+		IRQ_DMA1,
+		IRQ_TIMER2,
+		IRQ_TIMER3,
+		IRQ_EXTINT2,
+		IRQ_EXTINT3,
+		IRQ_UART0_ERROR,
+		IRQ_UART0_RX,
+		IRQ_UART0_TX,
+		IRQ_UART1_ERROR,
+		IRQ_UART1_RX,
+		IRQ_UART1_TX,
+		IRQ_19,
+		IRQ_20,
+		IRQ_21,
+		IRQ_22,
+		// NOTE: <reserved> with blue text, like Wave Synthesizer interrupt
+		IRQ_23,
+		IRQ_VBLANK,
+		IRQ_25,
+		IRQ_PWM
+	};
+
 	struct vr0_timer
 	{
 		u32 control = 0;
