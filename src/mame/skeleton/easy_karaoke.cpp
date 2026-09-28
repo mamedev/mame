@@ -132,8 +132,9 @@ public:
 		, m_codec_clock(*this, "codec_clock")
 	{ }
 
-	void ivl_karaoke_base(machine_config &config);
-	void ivl_karaoke_nand(machine_config &config);
+	void ivl_karaoke_base(machine_config &config) ATTR_COLD;
+	void ivl_karaoke_base_pal(machine_config &config) ATTR_COLD;
+	void ivl_karaoke_nand(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -194,12 +195,15 @@ public:
 		, m_cart_region(nullptr)
 	{ }
 
-	void easy_karaoke(machine_config &config);
+	void ivl_karaoke_rom_pal(machine_config &config) ATTR_COLD;
+	void ivl_karaoke_rom_ntsc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void add_cart_slot(machine_config &config) ATTR_COLD;
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
@@ -542,7 +546,6 @@ void ivl_karaoke_state::nand_map(address_map &map)
 	map(0x0e400002, 0x0e400002).w(m_nand, FUNC(nand_device::address_w));
 }
 
-
 void ivl_karaoke_state::ivl_karaoke_base(machine_config &config)
 {
 	ARM720T(config, m_maincpu, 72000000);
@@ -562,14 +565,12 @@ void ivl_karaoke_state::ivl_karaoke_base(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 }
 
-void easy_karaoke_cartslot_state::easy_karaoke(machine_config &config)
+void ivl_karaoke_state::ivl_karaoke_base_pal(machine_config &config)
 {
 	ivl_karaoke_base(config);
-
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "easy_karaoke_cart");
-	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(easy_karaoke_cartslot_state::cart_load));
-	SOFTWARE_LIST(config, "cart_list").set_original("easy_karaoke_cart");
+	m_screen->set_refresh_hz(50);
+	m_screen->set_size(720, 600);
+	m_screen->set_visarea(0, 719, 0, 511);
 }
 
 void ivl_karaoke_state::ivl_karaoke_nand(machine_config &config)
@@ -578,6 +579,27 @@ void ivl_karaoke_state::ivl_karaoke_nand(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ivl_karaoke_state::nand_map);
 	TOSHIBA_TC58V64BFT(config, m_nand);
 }
+
+void easy_karaoke_cartslot_state::add_cart_slot(machine_config &config)
+{
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "easy_karaoke_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(easy_karaoke_cartslot_state::cart_load));
+	SOFTWARE_LIST(config, "cart_list").set_original("easy_karaoke_cart");
+}
+
+void easy_karaoke_cartslot_state::ivl_karaoke_rom_pal(machine_config &config)
+{
+	ivl_karaoke_base_pal(config);
+	add_cart_slot(config);
+}
+
+void easy_karaoke_cartslot_state::ivl_karaoke_rom_ntsc(machine_config &config)
+{
+	ivl_karaoke_base(config);
+	add_cart_slot(config);
+}
+
 
 /*
 The 'karatvst' set has the following 50 songs built in, there don't appear to be any downloaded songs in this NAND dump
@@ -1156,10 +1178,11 @@ CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke
 CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / Sammy license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // The European releases take cartridges rather than relying on a download service
-CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, easykara,      0,              0,      ivl_karaoke_rom_pal, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2003, karamsg,       0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
+CONS( 2003, karams,        0,              0,      ivl_karaoke_rom_pal, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, karamsg,       0,              0,      ivl_karaoke_rom_pal, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
 
-CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2003, dks7000p,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// US Disney releases take cartridges
+CONS( 2003, dks7000c,      0,              0,      ivl_karaoke_rom_ntsc, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, dks7000p,      0,              0,      ivl_karaoke_rom_ntsc, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
