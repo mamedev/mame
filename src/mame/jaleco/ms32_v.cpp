@@ -200,8 +200,9 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
                      sprites with brt=2 get glow (white blend) instead of shadow
                  3 = bank 0 only (brt[0]/brt[1]), shadow/glow active if bit 2 clear
 
-    Shadow/glow requires bit 1 of the brightness field to be set (brt=2 or brt=3).
-    When brt=0 or brt=1, bit 2 has no visible effect regardless of its value.
+    Shadow (bit 2 clear) darkens non-sprite layers by half.
+    Sprites are unaffected by shadow except when brt=2, which triggers a glow
+    (white blend) effect instead.
 */
 void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -267,10 +268,13 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 			else if (code & 1)
 				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			if (!BIT(code, 2) && BIT(code, 1) && !BIT(code, 6))
+			if (!BIT(code, 2) && !BIT(code, 6))
 			{
-				if (layer == 0 && (code & 3) == 2)
-					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				if (layer == 0)
+				{
+					if ((code & 3) == 2)
+						c = alpha_blend_r32(c, 0x00ffffff, 128);
+				}
 				else
 					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 			}
@@ -572,8 +576,9 @@ void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &clipre
                      sprites with brt=2 get glow (white blend) instead of shadow
                  3 = bank 0 only (brt[0]/brt[1]), shadow/glow active if bit 2 clear
 
-    Shadow/glow requires bit 1 of the brightness field to be set (brt=2 or brt=3).
-    When brt=0 or brt=1, bit 2 has no visible effect regardless of its value.
+    Shadow (bit 2 clear) darkens non-sprite layers by half.
+    Sprites are unaffected by shadow except when brt=2, which triggers a glow
+    (white blend) effect instead.
 */
 void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -635,11 +640,16 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 			else if (code & 1)
 				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			// !BIT(2) = half-brightness shadow/glow, only active when brt bit 1 is set
-			if (!BIT(code, 2) && BIT(code, 1) && !BIT(code, 6))
+			// !BIT(2) = half-brightness shadow/glow
+			// sprites: only brt==2 triggers glow (white blend), otherwise unaffected
+			// BG/ROZ/TX: shadow (darken by half)
+			if (!BIT(code, 2) && !BIT(code, 6))
 			{
-				if (layer == 0 && (code & 3) == 2)
-					c = alpha_blend_r32(c, 0x00ffffff, 128);
+				if (layer == 0)
+				{
+					if ((code & 3) == 2)
+						c = alpha_blend_r32(c, 0x00ffffff, 128);
+				}
 				else
 					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
 			}
@@ -694,7 +704,7 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 					| (cov_pri << 3);
 			u8 const code_with = m_priram[idx_with];
 
-			if (!BIT(code_with, 2) && BIT(code_with, 1))
+			if (!BIT(code_with, 2))
 			{
 				rgb_t c(dst[x]);
 				if ((code_with & 3) == 2)
