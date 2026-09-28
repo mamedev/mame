@@ -112,6 +112,13 @@ mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
+void mc6845_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x1, 0x1).rw(FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
+
+
 void mc6845_device::device_post_load()
 {
 	recompute_parameters(true);

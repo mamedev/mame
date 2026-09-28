@@ -17,7 +17,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="demo1">
+	<software name="calcres" supported="no">
+		<description>Calc Result</description>
+		<year>198?</year>
+		<publisher>Handic Software</publisher>
+		<notes><![CDATA[
+Requires disk
+]]></notes>
+		
+		<dataarea name="bank1" size="0x2000">
+			<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
+		</dataarea>
+	</software>
+
+	<software name="demo1" supported="no">
 		<description>Demo 1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26,14 +39,10 @@ license:CC0-1.0
 			<dataarea name="bank1" size="0x2000">
 				<rom name="cbm610-cart1-red-left.bin" size="0x2000" crc="be426f3d" sha1="da6f1099fd09165f8ee454e2e517cfc523deb8b7"/>
 			</dataarea>
-
-			<dataarea name="bank2" size="0x2000">
-				<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
-			</dataarea>
 		</part>
 	</software>
 
-	<software name="demo2">
+	<software name="demo2" supported="no">
 		<description>Demo 2</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -42,10 +51,6 @@ license:CC0-1.0
 			<dataarea name="bank1" size="0x2000">
 				<rom name="cbm610-cart2-white-left.bin" size="0x2000" crc="aeb6881c" sha1="4bdabbd7d6d642f916b5a91155396c98fce591a3"/>
 			</dataarea>
-
-			<dataarea name="bank2" size="0x2000">
-				<rom name="cbm610-cart2-green-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
-			</dataarea>
 		</part>
 	</software>
 
@@ -53,6 +58,7 @@ license:CC0-1.0
 		<description>Moni 610</description>
 		<year>1988</year>
 		<publisher>Ullrich von Bassewitz</publisher>
+		<info name="usage" value="SYS 16384" />
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank2" size="0x2000">
@@ -62,7 +68,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="vt52">
-		<description>VT52 Emulator (Hun)</description>
+		<description>VT52 Emulator (Hungary)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Press 'ESC-?' to run" />
@@ -70,6 +76,33 @@ license:CC0-1.0
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank2" size="0x2000">
 				<rom name="vt52emu.bin" size="0x2000" crc="b3b6173a" sha1="dd4a412a1a6ce4272b02d731364dd6dc96a4570b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbm2diag">
+		<description>Commodore CBM 600/700 Diagnostic</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<notes><![CDATA[
+No cassette test 
+]]></notes>
+
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="cbm2_diag_2000.bin" size="0x2000" crc="5ba26a70" sha1="c0733941e6cb00a3299713cceef3d1bbcf830236"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbm2diaga" cloneof="cbm2diag">
+		<description>Commodore CBM 600/700 Diagnostic (alt)</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="324835-01.bin" size="0x2000" crc="a4808500" sha1="28c2a74a8050437aa21057ee18ddc47df26a143d"/>
 			</dataarea>
 		</part>
 	</software>
