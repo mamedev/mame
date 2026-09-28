@@ -45,6 +45,7 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 	m_vr0snd(*this, "vr0snd"),
 	m_uart(*this, "uart%u", 0),
 	m_crtcregs(*this, "crtcregs"),
+	m_light_pen_cb(*this, 0),
 	m_host_space(*this, finder_base::DUMMY_TAG, -1, 32),
 	m_textureram(*this, "textureram", 0x800000, ENDIANNESS_LITTLE),
 	m_frameram(*this, "frameram", 0x800000, ENDIANNESS_LITTLE),
@@ -53,6 +54,7 @@ vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char
 {
 }
 
+// base +$0180'0000
 void vrender0soc_device::regs_map(address_map &map)
 {
 //  map(0x00000, 0x003ff)                            // System/General
@@ -94,7 +96,17 @@ void vrender0soc_device::regs_map(address_map &map)
 //  map(0x02400, 0x027ff)                            // Peripheral Chip Select
 //  map(0x02800, 0x02bff)                            // SIO
 //  map(0x03400, 0x037ff)                            // CRT Controller
-	map(0x03400, 0x037ff).rw(FUNC(vrender0soc_device::crtc_r), FUNC(vrender0soc_device::crtc_w)).share(m_crtcregs);
+	map(0x03400, 0x03437).rw(FUNC(vrender0soc_device::crtc_r), FUNC(vrender0soc_device::crtc_w)).share(m_crtcregs);
+	// LIGHT0X / LIGHT0Y / LIGHT1X / LIGHT1Y
+	map(0x03438, 0x03447).lr32(NAME([this] (offs_t offset, u32 mem_mask) { return m_light_pen_cb[offset](0, mem_mask) & mem_mask; }));
+	// LIGHTC: Light Pen Input Control
+	map(0x03448, 0x0344b).lrw32(
+		NAME([this] () { return m_lightc; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_7)
+				m_lightc = data & 3;
+		})
+	);
 //  map(0x04000, 0x043ff)                            // RAMDAC & PLL
 //  map(0x04000, 0x04003)                            // PLL control register
 //  map(0x04004, 0x04007)                            // PLL Program register
@@ -151,6 +163,12 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_vr0snd->add_route(1, *this, 1.0, 1);
 }
 
+void vrender0soc_device::write_line_tx(int port, u8 value)
+{
+	//logerror("callback %d %02x\n", port, value);
+	m_write_tx[port & 1](value);
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -183,15 +201,10 @@ void vrender0soc_device::device_start()
 	save_item(STRUCT_MEMBER(m_dma, dst));
 	save_item(STRUCT_MEMBER(m_dma, size));
 	save_item(STRUCT_MEMBER(m_dma, ctrl));
+
+	// TODO: register CRTC
+	save_item(NAME(m_lightc));
 }
-
-void vrender0soc_device::write_line_tx(int port, u8 value)
-{
-	//logerror("callback %d %02x\n", port, value);
-	m_write_tx[port & 1](value);
-}
-
-
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -581,21 +594,7 @@ void vrender0soc_device::crtc_w(offs_t offset, u32 data, u32 mem_mask)
 		case 0x30: // CRT Display Start Address 1 Register (STAD1)
 			mem_mask &= ~0xffff8000; // Bit 31-15 Reserved
 			break;
-		case 0x38: // Light Pen 0 X Register (LIGHT0X)
-			mem_mask &= ~0xfffff800; // Bit 31-11 Reserved
-			break;
-		case 0x3c: // Light Pen 0 Y Register (LIGHT0Y)
-			mem_mask &= ~0xfffffe00; // Bit 31-9 Reserved
-			break;
-		case 0x40: // Light Pen 1 X Register (LIGHT1X)
-			mem_mask &= ~0xfffff800; // Bit 31-11 Reserved
-			break;
-		case 0x44: // Light Pen 1 Y Register (LIGHT1Y)
-			mem_mask &= ~0xfffffe00; // Bit 31-9 Reserved
-			break;
-		case 0x48: // Light Pen Input Control Register (LIGHTC)
-			mem_mask &= ~0xfffffffc; // Bit 31-2 Reserved
-			break;
+		// TODO: register 0x34 TCOL (video overlay color)
 		default:
 			return;
 	}

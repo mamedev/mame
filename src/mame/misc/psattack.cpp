@@ -7,11 +7,13 @@ P's Attack (c) 2004 Uniana
 based off original crystal.cpp by ElSemi
 
 TODO:
-- Guns;
+- Has serious popup/missing renders during gameplay
+  Old note: Requires timed based FIFO renderer, loops until both rear and front are equal;
+- Enables wavetable IRQ, has sound hiccups;
+- Refine gun positioning, and hookup out of screen behaviour properly;
 - Lamps;
 - Determine what the PIC does beyond the initial handshake;
-- Requires timed based FIFO renderer, loops until both rear and front are equal;
-- Enables wavetable IRQ, even if so far no channel enables the submask.
+- Not extensively tested;
 
 ===================================================================================================
 
@@ -242,8 +244,12 @@ static INPUT_PORTS_START( psattack )
 	// gun triggers
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNKNOWN ) // probably guns are here
+	// out-of-screen triggers
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xfffffff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// TODO: looks a mirror of above
 	PORT_START("IN1")
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // unused?
 
@@ -274,6 +280,7 @@ static INPUT_PORTS_START( psattack )
 	PORT_DIPNAME( 0x00000080, 0x00000080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(          0x00000080, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+	PORT_BIT(     0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(     0x00010000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(     0x00020000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(     0x00040000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
@@ -283,6 +290,18 @@ static INPUT_PORTS_START( psattack )
 	PORT_BIT(     0x00400000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00800000, IP_ACTIVE_LOW ) // can also be used in test mode to move between entries
 	PORT_BIT(     0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1_GUNX")
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_MINMAX(0xef, 0x3ff - 0xdf)
+
+	PORT_START("P1_GUNY")
+	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_MINMAX(0, 0x1e0)
+
+	PORT_START("P2_GUNX")
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2) PORT_MINMAX(0xef, 0x3ff - 0xdf)
+
+	PORT_START("P2_GUNY")
+	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2) PORT_MINMAX(0, 0x1e0)
 INPUT_PORTS_END
 
 
@@ -300,6 +319,10 @@ void psattack_state::psattack(machine_config &config)
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
 	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 	m_vr0soc->set_external_vclk(XTAL(25'175'000)); // assumed from the only available XTal on PCB
+	m_vr0soc->light_pen_cb<0>().set_ioport("P1_GUNX");
+	m_vr0soc->light_pen_cb<1>().set_ioport("P1_GUNY");
+	m_vr0soc->light_pen_cb<2>().set_ioport("P2_GUNX");
+	m_vr0soc->light_pen_cb<3>().set_ioport("P2_GUNY");
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "cf", nullptr, true);
 

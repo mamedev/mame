@@ -94,6 +94,9 @@ public:
 	void set_uart_external_clock(const XTAL uclk) { m_uart_uclk = uclk.value(); }
 	template <int Port> void rx_w(int state) { m_uart[Port]->rx_w((u8)state); }
 
+	// psattack
+	template <unsigned N> auto light_pen_cb() { return m_light_pen_cb[N].bind(); }
+
 	// handlers
 	bool crt_is_blanked() { return BIT(m_crtcregs[0], 9); }
 	bool crt_active_vblank_irq();
@@ -122,6 +125,7 @@ private:
 	required_device<vr0sound_device> m_vr0snd;
 	required_device_array<vr0uart_device, 2> m_uart;
 	required_shared_ptr<u32> m_crtcregs;
+	devcb_read16::array<4> m_light_pen_cb;
 	required_address_space m_host_space;
 	memory_share_creator<u16> m_textureram;
 	memory_share_creator<u16> m_frameram;
@@ -221,6 +225,7 @@ private:
 	void crtc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void crtc_update();
 	inline bool crt_is_interlaced();
+	u8 m_lightc;
 
 	// Misc
 	u32 sysid_r();
