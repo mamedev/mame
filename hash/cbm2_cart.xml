@@ -25,9 +25,11 @@ license:CC0-1.0
 Requires disk
 ]]></notes>
 		
-		<dataarea name="bank1" size="0x2000">
-			<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
-		</dataarea>
+		<part name="cart" interface="cbm2_cart">
+			<dataarea name="bank1" size="0x2000">
+				<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="demo1" supported="no">
