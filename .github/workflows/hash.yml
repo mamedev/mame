@@ -7,12 +7,16 @@ on:
     - 'ctrlr/*'
     - 'hash/*'
     - 'plugins/**'
+    - 'scripts/build/check_pinviz.py'
+    - 'src/mame/layout/*.lay'
   pull_request:
     paths:
     - '.github/workflows/**'
     - 'ctrlr/*'
     - 'hash/*'
     - 'plugins/**'
+    - 'scripts/build/check_pinviz.py'
+    - 'src/mame/layout/*.lay'
 
 permissions:
   contents: read
@@ -36,3 +40,7 @@ jobs:
       run: for x in hash/*.xml ; do xmllint --noout --valid "$x" ; done
     - name: Validate (plugin properties)
       run: for x in plugins/*/plugin.json ; do jsonschema -i "$x" plugins/plugin.schema ; done
+    - name: Validate (layouts)
+      run: for x in src/mame/layout/*.lay ; do xmllint --noout "$x" ; done
+    - name: Validate (pinviz tables against layouts)
+      run: python3 scripts/build/check_pinviz.py

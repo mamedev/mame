@@ -39,7 +39,6 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
-#include "input.h" // FIXME: use inputs properly and remove this, reading keyboard directly is bad pracice
 
 #include "by17.lh"
 #include "by17_pwerplay.lh"
@@ -80,9 +79,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	template <int Param> int outhole_x0();
-	template <int Param> int saucer_x3();
-	template <int Param> int drop_target_x2();
+	DECLARE_INPUT_CHANGED_MEMBER(hold_switch);
 
 	void by17(machine_config &config) ATTR_COLD;
 
@@ -315,8 +312,7 @@ static INPUT_PORTS_START( by17 )
 	// standard
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-//  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::outhole_x0<0x07>))  //  PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x07)
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -400,17 +396,17 @@ static INPUT_PORTS_START( matahari )
 	PORT_DIPSETTING(    0x80, "Replay")
 
 	PORT_MODIFY("X2")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x20>))  // PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x21>))  // PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x22>))  // PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x23>))  // PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x24>))  // PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x25>))  // PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x26>))  // PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x27>))  // PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 1") PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x20)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 2") PORT_CODE(KEYCODE_J) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x21)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 3") PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x22)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 4") PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x23)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 5") PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x24)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 6") PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x25)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 7") PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x26)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 8") PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x27)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::saucer_x3<0x37>))   // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Saucer") PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x37)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pwerplay )
@@ -452,86 +448,28 @@ static INPUT_PORTS_START( pwerplay )
 	PORT_DIPSETTING(    0xc0, "Extra Ball / Replay")
 
 	PORT_MODIFY("X2")   /* Drop Target switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x20>))  // PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x21>))  // PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x22>))  // PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x23>))  // PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x24>))  // PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x25>))  // PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x26>))  // PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::drop_target_x2<0x27>))  // PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 1") PORT_CODE(KEYCODE_K) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x20)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 2") PORT_CODE(KEYCODE_J) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x21)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 3") PORT_CODE(KEYCODE_H) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x22)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 4") PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x23)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 5") PORT_CODE(KEYCODE_F) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x24)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 6") PORT_CODE(KEYCODE_D) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x25)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 7") PORT_CODE(KEYCODE_S) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x26)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Drop Target 8") PORT_CODE(KEYCODE_A) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x27)
 
 	PORT_MODIFY("X3")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(by17_state::saucer_x3<0x37>))   // PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Saucer") PORT_CODE(KEYCODE_Q) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(by17_state::hold_switch), 0x37)
 INPUT_PORTS_END
 
 
-template <int Param>
-int by17_state::outhole_x0()
+INPUT_CHANGED_MEMBER( by17_state::hold_switch )
 {
-	int bit_shift = (Param & 0x07);
-	int port = ((Param >> 4) & 0x07);
-
-	/* Here we simulate the ball sitting in the Outhole so the Outhole Solenoid can release it */
-
-	if (machine().input().code_pressed_once(KEYCODE_BACKSPACE))
-		m_io_hold_x[port] |= (1 << bit_shift);
-
-	return ((m_io_hold_x[port] >> bit_shift) & 1);
+	// A switch that stays closed once the ball reaches it, or once a drop target
+	// falls, until the solenoid that clears it fires; see the solenoid feature
+	// tables. Param is (strobe << 4) | return bit.
+	if (newval)
+		m_io_hold_x[(param >> 4) & 0x07] |= 1 << (param & 0x07);
 }
-
-template <int Param>
-int by17_state::saucer_x3()
-{
-	int bit_shift = (Param & 0x07);
-	int port = ((Param >> 4) & 0x07);
-
-	/* Here we simulate the ball sitting in a Saucer so the Saucer Solenoid can release it */
-
-	if (machine().input().code_pressed_once(KEYCODE_Q))
-		m_io_hold_x[port] |= (1 << bit_shift);
-
-	return ((m_io_hold_x[port] >> bit_shift) & 1);
-}
-
-template <int Param>
-int by17_state::drop_target_x2()
-{
-	/* Here we simulate fallen Drop Targets so the Drop Target Reset Solenoids can release the switches */
-
-	int bit_shift = (Param & 0x07);
-	int port = ((Param >> 4) & 0x07);
-
-	switch (bit_shift)
-	{
-		case 0: if (machine().input().code_pressed_once(KEYCODE_K))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 1: if (machine().input().code_pressed_once(KEYCODE_J))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 2: if (machine().input().code_pressed_once(KEYCODE_H))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 3: if (machine().input().code_pressed_once(KEYCODE_G))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 4: if (machine().input().code_pressed_once(KEYCODE_F))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 5: if (machine().input().code_pressed_once(KEYCODE_D))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 6: if (machine().input().code_pressed_once(KEYCODE_S))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-		case 7: if (machine().input().code_pressed_once(KEYCODE_A))
-						m_io_hold_x[port] |= (1 << bit_shift);
-					break;
-	}
-	return ((m_io_hold_x[port] >> bit_shift) & 1);
-}
-
 
 uint8_t by17_state::nibble_nvram_r(offs_t offset)
 {
@@ -640,20 +578,21 @@ uint8_t by17_state::u10_b_r()
 {
 	uint8_t data = 0;
 
+	// Switch returns, plus any switches the simulation is holding closed
 	if (BIT(m_u10a, 0))
-		data |= m_io_x0->read();
+		data |= m_io_x0->read() | m_io_hold_x[0];
 
 	if (BIT(m_u10a, 1))
-		data |= m_io_x1->read();
+		data |= m_io_x1->read() | m_io_hold_x[1];
 
 	if (BIT(m_u10a, 2))
-		data |= m_io_x2->read();
+		data |= m_io_x2->read() | m_io_hold_x[2];
 
 	if (BIT(m_u10a, 3))
-		data |= m_io_x3->read();
+		data |= m_io_x3->read() | m_io_hold_x[3];
 
 	if (BIT(m_u10a, 4))
-		data |= m_io_x4->read();
+		data |= m_io_x4->read() | m_io_hold_x[4];
 
 	if (BIT(m_u10a, 5))
 		data |= m_io_dsw0->read();

@@ -47,6 +47,17 @@ void bbd_device_base::tick()
 	m_curpos = nextpos;
 }
 
+sound_stream::sample_t bbd_device_base::clock_sample(sound_stream::sample_t in)
+{
+	u32 nextpos = m_curpos + 1;
+	if(nextpos == m_buffer.size())
+		nextpos = 0;
+	sound_stream::sample_t const out = m_buffer[nextpos];
+	m_buffer[m_curpos] = in;
+	m_curpos = nextpos;
+	return out;
+}
+
 void bbd_device_base::sound_stream_update(sound_stream &stream)
 {
 	u32 nextpos = m_curpos + 1;
@@ -124,4 +135,20 @@ mn3207_device::mn3207_device(const machine_config &mconfig, const char *tag, dev
 	bbd_device_base(mconfig, tag, owner, clock, MN3207)
 {
 	set_bucket_count(1024);
+}
+
+
+//**************************************************************************
+//  SAD4096
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(SAD4096, sad4096_device, "sad4096", "SAD4096 BBD")
+
+sad4096_device::sad4096_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	bbd_device_base(mconfig, tag, owner, clock, SAD4096)
+{
+	// 2048 buckets, despite the name: the Reticon part carries 4096 half sample
+	// buckets clocked on opposite edges, which is one sample period per pair
+	set_bucket_count(2048);
 }

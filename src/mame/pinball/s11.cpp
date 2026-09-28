@@ -44,6 +44,7 @@ ToDo:
 #include "speaker.h"
 
 #include "s11.lh"
+#include "s11_hs.lh"
 
 /*
 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00 RW MEMPROT
@@ -765,7 +766,7 @@ ROM_END
 GAME( 1986, grand_l4, 0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-4)",                                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, grand_l3, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-3)",                                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, grand_l1, grand_l4, s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "Grand Lizard (L-1)",                                             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, hs_l4,    0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAMEL(1986, hs_l4,    0,        s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-4)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_s11_hs )
 GAME( 1986, hs_l3,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams", "High Speed (L-3)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, hs_uc,    hs_l4,    s11_bgs, s11, s11_state, init_s11, ROT0, "Williams (Unidesa / Cirsa license)", "High Speed (Unidesa / Cirsa license)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rdkng_l4, 0,        s11_bgm, s11, s11_state, init_s11, ROT0, "Williams", "Road Kings (L-4)",                                               MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
