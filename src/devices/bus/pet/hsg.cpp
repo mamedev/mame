@@ -166,6 +166,16 @@ void cbm8000_hsg_device::device_reset()
 	m_gdc->reset();
 
 	m_mode = 0;
+
+	auto &view = m_slot->window()[0];
+	view.install_rom(0x9000, 0x9fff, m_9000->base());
+	view.install_rom(0xa000, 0xaeff, m_a000->base());
+	view.nop_readwrite(0xaf00, 0xafff);
+	view.install_write_handler(0xaf00, 0xaf00, write8smo_delegate(*this, FUNC(cbm8000_hsg_device::mode_w)));
+	view.install_readwrite_handler(0xaf70, 0xaf7f,
+		read8sm_delegate(*m_gdc, FUNC(ef9365_device::data_r)),
+		write8sm_delegate(*m_gdc, FUNC(ef9365_device::data_w)));
+	m_slot->window().select(0);
 }
 
 
@@ -212,92 +222,7 @@ void cbm8000_hsg_b_device::vram_w(offs_t offset, uint8_t data)
 }
 
 
-//-------------------------------------------------
-//  pet_norom_r - NO ROM read
-//-------------------------------------------------
-
-int cbm8000_hsg_device::pet_norom_r(offs_t offset, int sel)
+void cbm8000_hsg_device::mode_w(uint8_t data)
 {
-	return !(offset >= 0x9000 && offset < 0xb000);
-}
-
-
-//-------------------------------------------------
-//  pet_bd_r - buffered data read
-//-------------------------------------------------
-
-uint8_t cbm8000_hsg_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
-{
-	switch (sel)
-	{
-	case pet_expansion_slot_device::SEL9:
-		data = m_9000->base()[offset & 0xfff];
-		break;
-
-	case pet_expansion_slot_device::SELA:
-		if (offset < 0xaf00)
-		{
-			data = m_a000->base()[offset & 0xfff];
-		}
-		else if (offset == 0xaf10)
-		{
-			/*
-
-			    bit     description
-
-			    0       light pen
-			    1
-			    2
-			    3
-			    4
-			    5
-			    6
-			    7
-
-			*/
-		}
-		else if (offset == 0xaf30)
-		{
-			// hard copy
-		}
-		else if (offset >= 0xaf70 && offset < 0xaf80)
-		{
-			data = m_gdc->data_r(offset & 0x0f);
-		}
-		break;
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  pet_bd_w - buffered data write
-//-------------------------------------------------
-
-void cbm8000_hsg_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
-{
-	if (offset == 0xaf00)
-	{
-		/*
-
-		    bit     description
-
-		    0       hard copy (0=active)
-		    1       operating page select (version B)
-		    2       read-modify-write (1=active)
-		    3       display switch (1=graphic)
-		    4       display page select (version B)
-		    5
-		    6
-		    7
-
-		*/
-
-		m_mode = data;
-	}
-	else if (offset >= 0xaf70 && offset < 0xaf80)
-	{
-		m_gdc->data_w(offset & 0x0f, data);
-	}
+	m_mode = data;
 }
