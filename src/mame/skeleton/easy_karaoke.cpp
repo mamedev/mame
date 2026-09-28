@@ -320,7 +320,8 @@ static INPUT_PORTS_START( ivl_karaoke )
 	PORT_BIT(0xbf, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("GPIO_EXT")
-	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xfdff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ivl_karaoke_nand )
@@ -410,7 +411,11 @@ void ivl_karaoke_state::vblank_w(int state)
 
 u16 ivl_karaoke_state::peripheral_status_r()
 {
-	u16 status = m_nand->is_busy() ? 0 : 4;
+	u16 status = 0;
+
+	if (m_nand)
+		status = m_nand->is_busy() ? 0 : 4;
+
 	// The loader synchronises to a codec frame edge before enabling DMA.
 	if (BIT(m_peripheral_enable, 0) && (m_codec_control[12] & 3))
 		status |= m_codec_clock->signal_r();
@@ -543,10 +548,15 @@ void ivl_karaoke_state::ivl_karaoke_base(machine_config &config)
 	ARM720T(config, m_maincpu, 72000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ivl_karaoke_state::arm_map);
 
+	// Provisional nominal voice-codec rate; Clarity's divider/format fields need decoding.
+	CLOCK(config, m_codec_clock, 8000);
+
 	SCREEN(config, m_screen);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(320, 262);
-	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_refresh_hz(60'000.0 / 1001);
+	m_screen->set_size(720, 480);
+	m_screen->set_visarea(0, 719, 0, 479);
+	m_screen->set_physical_aspect(4, 3);
+	m_screen->screen_vblank().set(FUNC(ivl_karaoke_state::vblank_w));
 	m_screen->set_screen_update(FUNC(ivl_karaoke_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
@@ -567,13 +577,6 @@ void ivl_karaoke_state::ivl_karaoke_nand(machine_config &config)
 	ivl_karaoke_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ivl_karaoke_state::nand_map);
 	TOSHIBA_TC58V64BFT(config, m_nand);
-	// Provisional nominal voice-codec rate; Clarity's divider/format fields need decoding.
-	CLOCK(config, m_codec_clock, 8000);
-	m_screen->set_refresh_hz(60'000.0 / 1001);
-	m_screen->set_size(720, 480);
-	m_screen->set_visarea(0, 719, 0, 479);
-	m_screen->set_physical_aspect(4, 3);
-	m_screen->screen_vblank().set(FUNC(ivl_karaoke_state::vblank_w));
 }
 
 /*
