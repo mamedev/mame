@@ -32,6 +32,7 @@
 #define LOG_ALL         (LOG_SETUP|LOG_PARAMS|LOG_CALC)
 
 //#define VERBOSE         (LOG_SETUP)
+#define VERBOSE         (LOG_SETUP|LOG_PARAMS|LOG_CALC)
 #include "logmacro.h"
 
 // device type definition
@@ -162,6 +163,7 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lphp_calc(biq
 	r.fc = 1.0 / (2 * std::numbers::pi * sqrt(r1 * r2 * c1 * c2));
 	if (type == biquad_type::LOWPASS)
 		r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r2 * c2) + ((r1 * c1) * (1.0 - r.gain)));
+	// r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r2 * c2) + ((r2 * c1) * (1.0 - r.gain))); // not sure if this or the code before is correct
 	else if (type == biquad_type::HIGHPASS)
 		r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r1 * c1) + ((r2 * c2) * (1.0 - r.gain)));
 	else
@@ -244,6 +246,58 @@ void filter_biquad_device::opamp_sk_highpass_modify(double r1, double r2, double
 
 // TODO when needed: Sallen-Key band-pass (there are several versions of this in the 1955 Sallen-Key paper)
 
+/* Setup a biquad filter structure based on a single op-amp Sallen-Key band-pass filter circuit.
+ * Note that there is another Sallen-Key band-pass filter with a somewhat
+ * different schematic to this one that appears in literature as well, and
+ * the other filter does not have the same equations as this one does!
+ *                    ,--------------------------.
+ *                    |                          |
+ *                    Z r3                       |
+ *                    Z                          |
+ *                    Z                   |\     |
+ *           r1       |   c2              | \    |
+ *   In >---ZZZZ--+---+---||---+----------|+ \   |
+ *                |            |          |   >--+---> out
+ *               --- c1        Z r2    ,--|- /   |
+ *               ---           Z       |  | /    |
+ *                |            Z       |  |/     |
+ *                |            |       |         |
+ *               gnd          gnd      |   r5    |
+ *                                     +--ZZZZ---'
+ *                                     |
+ *                                     Z r4
+ *                                     Z
+ *                                     Z
+ *                                     |
+ *                                    gnd
+ */
+/*
+filter_biquad_device& filter_biquad_device::opamp_sk_bandpass_setup(double r1, double r2, double r3, double r4, double r5, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_sk_bandpass_calc(r1, r2, r3, r4, r5, c1, c2);
+	return setup(p);
+}
+
+void filter_biquad_device::opamp_sk_bandpass_modify(double r1, double r2, double r3, double r4, double r5, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_sk_bandpass_calc(r1, r2, r3, r4, r5, c1, c2);
+	modify(p);
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_bandpass_calc(double r1, double r2, double r3, double r4, double r5, double c1, double c2)
+{
+	filter_biquad_device::biquad_params r;
+	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (r4 == 0) || (r5 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::opamp_sk_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, r5: %f c1: %f, c2: %f", r1, r2, r3, r4, r5, c1, c2); // Filter can not be setup.  Undefined results.
+	}
+	r.type = biquad_type::BANDPASS;
+	r.gain = 1.0 + (r5 / r4); // == (r4 + r5) / r4
+	r.fc = (1.0 / (2 * std::numbers::pi)) * sqrt((r3 + r1) / (c1 * c2 * r1 * r2 * r3));
+	r.q = sqrt((r1 + r3) * r1 * r2 * r3 * c1 * c2) / (((r1 * r3) * (c1 + c2)) + ((r2 * c2) * (r3 + ((1.0 - r.gain) * r1))));
+	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_sk_bandpass_calc(%f, %f, %f, %f, %f, %f, %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, r3, r4, r5, c1*1000000, c2*1000000, r.fc, r.q, r.gain);
+	return r;
+}*/
 
 // Multiple-Feedback filters
 
@@ -437,6 +491,51 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_ca
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_diff_bandpass_calc(%f, %f, %f, %f) yields:\n\ttype = %d, fc = %f (f1 = %f, f2 = %f), Q = %f, gain = %f\n", r1, r2, c1*1000000, c2*1000000, static_cast<int>(r.type), r.fc, f1, f2, r.q, r.gain);
 	return r;
 }
+
+// Inverting first-order low-pass filter
+
+/* Setup a biquad filter structure based on a single op-amp Inverting first-order low-pass filter circuit.
+ *
+ *                ,-------+---------.
+ *                |       |         |
+ *               --- c1   Z r2      |
+ *               ---      Z         |
+ *                |       Z         |
+ *           r1   |       |  |\     |
+ *   In >---ZZZZ--+-------+  | \    |
+ *                        `--|- \   |
+ *                           |   >--+---> out
+ *                        ,--|+ /
+ *                        |  | /
+ *                vRef >--'  |/
+ *
+ *
+filter_biquad_device& filter_biquad_device::opamp_inv_lowpass_setup(double r1, double r2, double c1)
+{
+	filter_biquad_device::biquad_params p = opamp_inv_lowpass_calc(r1, r2, c1);
+	return setup(p);
+}
+
+void filter_biquad_device::opamp_inv_lowpass_modify(double r1, double r2, double c1)
+{
+	filter_biquad_device::biquad_params p = opamp_inv_lowpass_calc(r1, r2, c1);
+	modify(p);
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::opamp_inv_lowpass_calc(double r1, double r2, double c1)
+{
+	filter_biquad_device::biquad_params r;
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0))
+	{
+		fatalerror("filter_biquad_device::opamp_inv_lowpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f\n", r1, r2, c1); // Filter can not be setup.  Undefined results. *
+	}
+	r.gain = -r2 / r1;
+	r.fc = 1.0 / (2 * std::numbers::pi * r2 * c1);
+	r.q = (M_SQRT2 / 2.0);
+	r.type = biquad_type::LOWPASS1P;
+	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_inv_lowpass_calc(%f, %f, %f) yields:\n\ttype = %d, fc = %f, Q = %f, gain = %f\n", r1, r2, c1*1000000, static_cast<int>(r.type), r.fc, r.q, r.gain);
+	return r;
+} */
 
 
 /* RC-based band-pass filters:
