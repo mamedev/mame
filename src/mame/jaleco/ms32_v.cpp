@@ -634,13 +634,13 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
-			// priram output bits 1:0 select brightness bank:
+			// priram output bits 1:0 select brightness bank (always applied):
 			//   0 = none, 1 or 3 = bank 0, 2 = bank 1
 			if ((code & 3) == 2)
 				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
 			else if (code & 1)
 				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			// !BIT(2) = half-brightness shadow/glow
+			// !BIT(2) = shadow/glow effect (independent of brightness)
 			// sprites: only brt==2 triggers glow (white blend), otherwise unaffected
 			// BG/ROZ/TX: shadow (darken by half)
 			if (!BIT(code, 2) && !BIT(code, 6))
