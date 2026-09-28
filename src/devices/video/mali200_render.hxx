@@ -253,7 +253,12 @@ bool mali200_device::pp_primitive(pp_tile &tile, u32 state_address, u32 vertex_a
 		}
 	auto edge = [](float const *a, float const *b, float x, float y)
 	{
-		return (b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]);
+		// Evaluate the determinant before rounding back to the interpolation
+		// precision. Float cancellation can make a shared edge zero in one
+		// direction and negative in the other, leaving a pixel uncovered by
+		// both triangles despite the top-left ownership rule.
+		double const dx = double(b[0]) - a[0], dy = double(b[1]) - a[1];
+		return float(dx * (double(y) - a[1]) - dy * (double(x) - a[0]));
 	};
 	float const area = edge(vertex[0], vertex[1], vertex[2][0], vertex[2][1]);
 	if (!std::isfinite(area) || area == 0)
