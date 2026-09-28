@@ -6,17 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    http://www.6502.org/users/sjgray/computer/hsg/index.html
-
-    - version A (EF9365, 512x512 interlaced, 1 page)
-    - version B (EF9366, 512x256 non-interlaced, 2 pages)
-
-*/
-
 #include "emu.h"
 #include "hsg.h"
 
