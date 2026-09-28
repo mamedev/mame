@@ -733,7 +733,10 @@ void ssd1306_device::update_scan_rate()
 
 uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(rgb_t::black(), cliprect);
+	screen.palette().set_pen_color(0, rgb_t::black());
+	screen.palette().set_pen_color(1, m_contrast, m_contrast, m_contrast);
+	
+	bitmap.fill(screen.palette().pen(0), cliprect);
 	if (!m_display_enabled)
 	{
 		return 0;
@@ -741,12 +744,12 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	if (m_display_blanking)
 	{
-		bitmap.fill(rgb_t::white(), cliprect);
+		bitmap.fill(screen.palette().pen(1), cliprect);
 		return 0;
 	}
 
-	rgb_t on_pixel  = !m_inverting_pixels ? white_pen() : black_pen();
-	rgb_t off_pixel = !m_inverting_pixels ? black_pen() : white_pen();
+	rgb_t on_pixel  = screen.palette().pen(!m_inverting_pixels ? 1 : 0);
+	rgb_t off_pixel = screen.palette().pen(!m_inverting_pixels ? 0 : 1);
 
 
 	// very simple rendering code for the time being...
