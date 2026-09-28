@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Felipe Sanches
+// copyright-holders:Felipe Sanches, Leonardo Roman da Rosa
 /***************************************************************************
 
     VET 3000, "The Video Effects Titler"
@@ -23,14 +23,24 @@
     input is currently not supported.
 
         ------------------------------------------------------------
-    There's also a 36-pin (2*18) pcb edge rear connector labeled
-    "interface" but the purpose of this is not know yet and so
-    it is currently not documented in this driver.
+    There's also a 36-pin (2*18) pcb edge rear connector (CN1) labeled
+    "interface". It carries the CPU bus (D0-D7, A0-A13, R/W, IRQ, HALT)
+    and a 16 KiB select for $4000-$7FFF. At boot the ROM looks for the
+    signature "OBJECT" at $4000 and then $6000; when found it runs
+    LDX [base+6] / JSR base,X (the word at base+6 points to a word that
+    holds the entry offset). It also looks for "FONT" cartridges that
+    replace the character sets.
+
+        ------------------------------------------------------------
+    The TMS9128 is clocked at 10.738635 MHz (60 Hz NTSC timing); the
+    MC6809 runs at 3.579545 MHz / 4 = 894.886 kHz.
 
 ***************************************************************************/
 
 #include "emu.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
 #include "video/tms9928a.h"
@@ -46,6 +56,7 @@ public:
 	vet3000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_cart(*this, "cartslot")
 		, m_row(*this, "ROW%u", 1U)
 		, m_scan(0xff)
 	{ }
@@ -62,6 +73,7 @@ private:
 	void keyboard_w(u8 data);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<generic_slot_device> m_cart;
 	required_ioport_array<7> m_row;
 
 	u8 m_scan;
@@ -93,6 +105,7 @@ u8 vet3000_state::keyboard_r()
 void vet3000_state::program_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x4000, 0x7fff).r(m_cart, FUNC(generic_slot_device::read_rom)); // CN1 "interface" connector
 	map(0x8000, 0x8001).rw("tms9128", FUNC(tms9128_device::read), FUNC(tms9128_device::write));
 	map(0x8002, 0x8002).rw(FUNC(vet3000_state::keyboard_r), FUNC(vet3000_state::keyboard_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0);
@@ -175,19 +188,22 @@ INPUT_PORTS_END
 void vet3000_state::vet3000(machine_config &config)
 {
 	constexpr XTAL MAIN_CLOCK = 3.579545_MHz_XTAL;
+	constexpr XTAL VDP_CLOCK = 10.738635_MHz_XTAL;
 
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vet3000_state::program_map);
 
 	/* video hardware */
-	tms9128_device &vdp(TMS9128(config, "tms9128", MAIN_CLOCK)); /* TMS9128NL on the board */
+	tms9128_device &vdp(TMS9128(config, "tms9128", VDP_CLOCK)); /* TMS9128NL on the board */
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	SCREEN(config, "screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vet3000_cart", "bin,rom");
 
 	config.set_default_layout(layout_vet3000);
 }
