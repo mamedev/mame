@@ -8,6 +8,7 @@
 #include "cpu/jalfpu/jalfpu.h"
 #include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "jaleco_ms32_sysctrl.h"
 #include "ms32_sprite.h"
@@ -66,6 +67,7 @@ public:
 	ms32_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ms32_base_state(mconfig, type, tag)
 		, m_sysctrl(*this, "sysctrl")
+		, m_nvram_dev(*this, "nvram")
 		, m_screen(*this, "screen")
 		, m_sprite(*this, "sprite")
 		, m_palette(*this, "palette")
@@ -97,6 +99,7 @@ public:
 
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
+	required_device<nvram_device> m_nvram_dev;
 	required_device<screen_device> m_screen;
 	required_device<ms32_sprite_device> m_sprite;
 	required_device<palette_device> m_palette;
