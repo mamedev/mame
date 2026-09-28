@@ -222,7 +222,7 @@ void arduboy_state::port_b_w(uint8_t data)
 
 uint8_t arduboy_state::port_c_r()
 {
-	logerror("%s: read from write-only port c\n", tag());
+	logerror("%s: read from write-only port c\n", machine().describe_context());
 	return 0;
 }
 
@@ -235,7 +235,7 @@ void arduboy_state::port_c_w(uint8_t data)
 
 uint8_t arduboy_state::port_d_r()
 {
-	logerror("%s: read from write-only port d\n", tag());
+	logerror("%s: read from write-only port d\n", machine().describe_context());
 	return 0;
 }
 
@@ -255,7 +255,7 @@ uint8_t arduboy_state::port_e_r()
 
 void arduboy_state::port_e_w(uint8_t data)
 {
-	logerror("%s: write to read-only port e\n", tag());
+	logerror("%s: write to read-only port e\n", machine().describe_context());
 }
 
 uint8_t arduboy_state::port_f_r()
@@ -265,7 +265,7 @@ uint8_t arduboy_state::port_f_r()
 
 void arduboy_state::port_f_w(uint8_t data)
 {
-	logerror("%s: write to read-only port f\n", tag());
+	logerror("%s: write to read-only port f\n", machine().describe_context());
 }
 
 uint8_t arduboy_state::intflash_r(offs_t offset)
@@ -309,9 +309,9 @@ void arduboy_state::arduboy_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &arduboy_state::data_map);
 
 	m_maincpu->set_eeprom_tag("eeprom");
-	m_maincpu->set_low_fuses(0xFF);
-	m_maincpu->set_high_fuses(0xD3); // actually 0xD2, but games will run without the bootloader
-	m_maincpu->set_extended_fuses(0xC2);
+	m_maincpu->set_low_fuses(0xff);
+	m_maincpu->set_high_fuses(0xd3); // actually d2, but games will run without the bootloader
+	m_maincpu->set_extended_fuses(0xc2);
 
 	m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
 	m_maincpu->gpio_in<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_r));
@@ -362,8 +362,14 @@ void arduboy_state::apply_delay_sleep_hack()
 {
 	const uint8_t delay_pattern[] = 
 	{
-		0x8F, 0x92, 0x9F, 0x92, 0xAF, 0x92, 0xBF, 0x92,
-		0xCF, 0x92, 0xDF, 0x92, 0xEF, 0x92, 0xFF, 0x92,
+		0x8f, 0x92, // push r8
+		0x9f, 0x92, // push r9
+		0xaf, 0x92, // push r10
+		0xbf, 0x92, // push r11
+		0xcf, 0x92, // push r12
+		0xdf, 0x92, // push r13
+		0xef, 0x92, // push r14
+		0xff, 0x92, // push r15
 	};
 
 	// compiled from the C++:
@@ -407,8 +413,10 @@ void arduboy_state::apply_delay_sleep_hack()
 
 	for (int i = 0; i < 0x6000-sizeof(delay_pattern); i++)
 	{
+		// searching for pushes to r8-r15, then a couple of instructions later,
+		// the call to micros()
 		if (!memcmp(m_internal_flash + i, delay_pattern, sizeof(delay_pattern)) &&
-			m_internal_flash[i+sizeof(delay_pattern)+4] == 0x0E)
+			m_internal_flash[i+sizeof(delay_pattern)+4] == 0x0e)
 		{
 			logerror("applying delay() hack at %04x\n", i);
 			memcpy(m_internal_flash + i, delay_replacement, sizeof(delay_replacement));
@@ -418,7 +426,6 @@ void arduboy_state::apply_delay_sleep_hack()
 
 	logerror("delay() hack NOT applied.\n");
 }
-
 #endif
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -434,7 +441,7 @@ void arduboy_state::apply_delay_sleep_hack()
 	}   \
 	else if ('A' <= xin && xin <= 'F')  \
 	{   \
-		xout = (xin - 'A') + 0x0A;  \
+		xout = (xin - 'A') + 0x0a;  \
 	}   \
 	else  \
 	{   \
@@ -583,7 +590,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 				break;
 			}
 
-			if (!(buf[0] == 0x0D || buf[0] == 0x0A))
+			if (!(buf[0] == 0x0d || buf[0] == 0x0a))
 			{
 				return std::make_pair(image_error::BADSOFTWARE, "hit bad newline character");
 			}

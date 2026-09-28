@@ -133,7 +133,6 @@ void ssd1306_device::set_external_oscillator(bool using_external_oscillator)
 	m_using_external_oscillator = using_external_oscillator;
 }
 
-
 void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
 {
 	// should be tied to VCC or ground
@@ -152,50 +151,36 @@ void ssd1306_device::set_base_rowscan_invert(bool base_rowscan_invert)
 	m_base_rowscan_invert = base_rowscan_invert;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// Command processing
-//
-///////////////////////////////////////////////////////////////////////////////////////////
+bool inline ssd1306_device::populate_fifo_until_n_bytes(uint8_t data, int num_bytes)
+{
+	m_command_fifo[m_command_pointer++] = data;
+	if (m_command_pointer < num_bytes)
+	{
+		return false;
+	}
 
-/**
- * Indicates a multi-byte command. Keep buffering the fifo until n bytes have been read,
- * then reset the FIFO pointer and fall through to the actual command handler.
- */
-#define COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, n) \
-	m_command_fifo[m_command_pointer++] = data; \
-	if (m_command_pointer < n) \
-	{ \
-		return; \
-	} \
 	m_command_pointer = 0;
+	return true;
+}
 
-/**
- * Indicates a single-byte command. The FIFO pointer is reset,
- * and execution falls through to the code below.
- */
-#define COMMAND_IS_SINGLE_BYTE \
+void inline ssd1306_device::handle_invalid_command()
+{
 	m_command_pointer = 0;
-
-/**
- * Indicates this command is invalid. The FIFO pointer is reset and an error is logged.
- */
-#define COMMAND_IS_INVALID \
-	COMMAND_IS_SINGLE_BYTE; \
-	logerror("%s: invalid/unimplemented command %02x\n", tag(), m_command_fifo[0]);
+	logerror("%s: invalid/unimplemented command %02x\n", machine().describe_context(), m_command_fifo[0]);
+}
 
 #define DUMMY_BYTE_CHECK(fifopos, expected) \
 	if (m_command_fifo[fifopos] != expected) \
 	{ \
-		logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", tag(), fifopos, expected, m_command_fifo[fifopos]); \
+		logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", machine().describe_context(), fifopos, expected, m_command_fifo[fifopos]); \
 	};
 
 void ssd1306_device::exec_command_2x(uint8_t data)
 {
 	switch(m_command_fifo[0])
 	{
-		case 0x20:
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+		case 0x20: // set addressing mode
+			if (!populate_fifo_until_n_bytes(data, 2)) return;
 			m_addressing_mode = static_cast<ssd1306_addressing_mode_t>(m_command_fifo[1] & 3);
 			switch(m_addressing_mode)
 			{
@@ -211,12 +196,11 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 				default:
 					break;
 			}
-
 			break;
 
-		case 0x21:
-			// h/v addressing mode: set column start/end address
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
+		case 0x21: // h/v addressing mode: set column start/end address
+			if (!populate_fifo_until_n_bytes(data, 3)) return;
+
 			m_hvmode_column_start_address = m_command_fifo[1] & 0x7f;
 			m_hvmode_column_end_address   = m_command_fifo[2] & 0x7f;
 
@@ -226,9 +210,9 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			}
 			break;
 
-		case 0x22:
-			// h/v addressing mode: set page start/end address
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
+		case 0x22: // h/v addressing mode: set page start/end address
+			if (!populate_fifo_until_n_bytes(data, 3)) return;
+
 			m_hvmode_page_start_address = m_command_fifo[1] & 7;
 			m_hvmode_page_end_address = m_command_fifo[2] & 7;
 
@@ -239,20 +223,22 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			break;
 
 		case 0x26:
-		case 0x27:
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 7);
+		case 0x27: // init left/right horizontal scroll
+			if (!populate_fifo_until_n_bytes(data, 7)) return;
+
 			m_horizontal_scroll_pending = m_command_fifo[0] & 1;
 			DUMMY_BYTE_CHECK(1, 0);
 			m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
 			m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
 			m_horizontal_scroll_page_end_address_pending = m_command_fifo[4] & 7;
 			DUMMY_BYTE_CHECK(5, 0);
-			DUMMY_BYTE_CHECK(6, 0xFF);
+			DUMMY_BYTE_CHECK(6, 0xff);
 			break;
 
 		case 0x29:
-		case 0x2A:
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 6);
+		case 0x2a: // init left/right horizontal scroll + upward vertical scroll
+			if (!populate_fifo_until_n_bytes(data, 6)) return;
+
 			m_horizontal_scroll_pending = m_command_fifo[0] & 1;
 			DUMMY_BYTE_CHECK(1, 0);
 			m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
@@ -261,20 +247,18 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			m_vertical_scroll_offset_pending = m_command_fifo[5] & 0x3f;
 			break;
 
-		case 0x2E:
-			COMMAND_IS_SINGLE_BYTE;
+		case 0x2e: // scroll disable
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			// scroll disable
 			m_horizontal_scroll_enabled = false;
 			m_vertical_scroll_enabled   = false;
 			m_horizontal_scroll_pending = false;
 			m_vertical_scroll_pending   = false;
 			break;
 
-		case 0x2F:
-			COMMAND_IS_SINGLE_BYTE;
+		case 0x2f: // scroll enable
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			// scroll enable
 			m_horizontal_scroll_enabled = m_horizontal_scroll_pending;
 			m_vertical_scroll_enabled = m_vertical_scroll_pending;
 			m_horizontal_scrolling_left = m_horizontal_scrolling_left_pending;
@@ -285,7 +269,7 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			break;
 
 		default:
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			return;
 	}
 }
@@ -294,36 +278,36 @@ void ssd1306_device::exec_command_ax(uint8_t data)
 {
 	switch(m_command_fifo[0])
 	{
-		case 0xA0:
-		case 0xA1:
-			// remap SEG0 column: false = SEG0 is 0, true = SEG0 is 127
-			COMMAND_IS_SINGLE_BYTE;
+		case 0xa0:
+		case 0xa1: // remap SEG0 column: false = SEG0 is 0, true = SEG0 is 127
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 			m_seg0_column_remapped = m_command_fifo[0] & 1;
 			break;
 
-		case 0xA3:
-			// vertical scroll parameters
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 3);
+		case 0xa3: // vertical scroll parameters
+			if (!populate_fifo_until_n_bytes(data, 3)) return;
+
 			m_vertical_scroll_top_fixed_rows        = m_command_fifo[1] & 0x3f;
 			m_vertical_scroll_bottom_scrolled_rows  = m_command_fifo[2] & 0x7f;
 			break;
 
-		case 0xA4:
-		case 0xA5:
-			COMMAND_IS_SINGLE_BYTE;
+		case 0xa4:
+		case 0xa5: // draw GDDRAM contents, or blank display
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 			m_display_blanking = m_command_fifo[0] & 1;
 			break;
 
-		case 0xA6:
-		case 0xA7:
-			COMMAND_IS_SINGLE_BYTE;
+		case 0xa6:
+		case 0xa7: // normal/inverted pixels
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 			m_inverting_pixels = m_command_fifo[0] & 1;
 			break;
 
-		case 0xA8:
-			// mux ratio, i.e., total number of lines in framebuffer.
-			// any line in the framebuffer past this point won't be drawn.
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+		case 0xa8: // mux ratio (max lines to draw)
+			if (!populate_fifo_until_n_bytes(data, 3)) return;
 
 			m_command_fifo[1] &= 0x3f;
 
@@ -336,14 +320,15 @@ void ssd1306_device::exec_command_ax(uint8_t data)
 			m_mux_ratio = m_command_fifo[1];
 			break;
 
-		case 0xAE:
-		case 0xAF:
-			COMMAND_IS_SINGLE_BYTE;
+		case 0xae:
+		case 0xaf: // enable/disable display completely
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 			m_display_enabled = m_command_fifo[0] & 1;
 			break;
 
 		default:
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			return;
 	}
 }
@@ -352,51 +337,50 @@ void ssd1306_device::exec_command_dx(uint8_t data)
 {
 	switch(m_command_fifo[0])
 	{
-		case 0xD3:
-			// display offset (shifts image down by n lines vertically)
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+		case 0xd3: // display offset (shifts image down by n lines vertically)
+			if (!populate_fifo_until_n_bytes(data, 2)) return;
 			m_display_offset = m_command_fifo[1] & 0x3f;
 			break;
 
-		case 0xD5:
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+		case 0xd5: // clock divider and internal oscillator frequency select
+			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
 			m_clk_div  = m_command_fifo[1] & 0xf;
 			m_osc_freq = m_command_fifo[1] >> 4;
 			break;
 
-
-		case 0xD9:
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+		case 0xd9: // precharge phase 1/2 control (affects scan rate)
+			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
 			m_phase_1_period = m_command_fifo[1] & 0xf;
 			m_phase_2_period = m_command_fifo[1] >> 4;
 			break;
 
-		case 0xDA:
-			// COM pin scan direction
-			COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+		case 0xda: // COM pin (row) scan direction and mode
+			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
 			if (!(m_command_fifo[1] & 2))
 			{
-				// bit should be set
+				logerror("%s: command da, byte 1: bit 1 should have been set, but wasn't.\n",
+						machine().describe_context());
 			}
-
 			m_row_scan_interleaved  = (m_command_fifo[1] & 0x10);
 			m_row_scan_split_invert = (m_command_fifo[1] & 0x20);
 			break;
 
-		case 0xDB:
+		case 0xdb: // VcomH deselect level (only hardware needs this)
+			if (!populate_fifo_until_n_bytes(data, 2)) return;
+
 			if (m_command_fifo[1] & ~0x70)
 			{
-				// other bits should be zero
+				logerror("%s: command db, byte 1: bits other than 4-7 were set.\n",
+						machine().describe_context());
 			}
-
 			m_vcomh_deselect_level = m_command_fifo[1] & 0x70;
 			break;
 
 		default:
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			return;
 	}
 }
@@ -409,20 +393,25 @@ void ssd1306_device::exec_command(uint8_t data)
 		m_command_fifo[0] = data;
 	}
 
-	switch(m_command_fifo[0] & 0xF0)
+	switch(m_command_fifo[0] & 0xf0)
 	{
 		case 0x00:
-		case 0x10:
+		case 0x10: // page mode column start address
 			{
-				COMMAND_IS_SINGLE_BYTE;
+				if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-				uint8_t low4        = m_command_fifo[0] & 0xF;
-				uint8_t keep_mask   = m_command_fifo[0] & 0x10 ? 0x0F : 0xF0;
+				uint8_t low4        = m_command_fifo[0] & 0xf;
+				uint8_t keep_mask   = m_command_fifo[0] & 0x10 ? 0x0f : 0xf0;
 				uint8_t shift_value = m_command_fifo[0] & 0x10 ? 4    : 0;
 
 				m_pagemode_column_start_address =
 					(m_pagemode_column_start_address & keep_mask) |
 					(low4 << shift_value);
+
+				if (m_addressing_mode == PAGE)
+				{
+					m_column_address_pointer = m_pagemode_column_start_address;
+				}
 			}
 			break;
 
@@ -434,77 +423,79 @@ void ssd1306_device::exec_command(uint8_t data)
 		case 0x50:
 		case 0x60:
 		case 0x70:
-			COMMAND_IS_SINGLE_BYTE;
+			if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 			m_display_start_line = m_command_fifo[0] & 0x3f;
 			break;
 
 		case 0x80:
 			if (m_command_fifo[0] == 0x81)
 			{
-				COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+				if (!populate_fifo_until_n_bytes(data, 2)) return;
+
 				m_contrast = m_command_fifo[1];
 				return;
 			}
-			if (m_command_fifo[0] == 0x8D)
+			if (m_command_fifo[0] == 0x8d)
 			{
-				COMMAND_BUFFER_FIFO_UNTIL_N_BYTES(data, 2);
+				if (!populate_fifo_until_n_bytes(data, 2)) return;
+
 				// charge pump setting; don't really need to implement it here
 				return;
 			}
 
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			break;
 
-		case 0xA0:
+		case 0xa0:
 			exec_command_ax(data);
 			break;
 
-		case 0xB0:
+		case 0xb0:
 			// page addressing mode: set page start address
-			if (0xB0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xB7)
+			if (0xb0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xb7)
 			{
-				COMMAND_IS_SINGLE_BYTE;
+				if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 				m_pagemode_page_start_address = m_command_fifo[0] & 7;
+
+				if (m_addressing_mode == PAGE)
+				{
+					m_page_address_pointer = m_pagemode_page_start_address;
+				}
 				return;
 			}
 
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			break;
 
-		case 0xC0:
-			// COM (row) scan direction: $C0 normal, $C8 reverse
-			if (m_command_fifo[0] == 0xC0 || m_command_fifo[0] == 0xC8)
+		case 0xc0: // COM (row) scan direction: $C0 normal, $C8 reverse
+			if (m_command_fifo[0] == 0xc0 || m_command_fifo[0] == 0xc8)
 			{
-				COMMAND_IS_SINGLE_BYTE;
+				if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 				m_row_scan_direction_inverse = (m_command_fifo[0] & 8);	
 				return;
 			}
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			break;
 
-		case 0xD0:
+		case 0xd0:
 			exec_command_dx(data);
 			break;
 
 		default:
-			if (m_command_fifo[0] == 0xE3)
+			if (m_command_fifo[0] == 0xe3)
 			{
+				if (!populate_fifo_until_n_bytes(data, 1)) return;
+
 				// explicit NOP
-				COMMAND_IS_SINGLE_BYTE;
 				return;
 			}
-
-
-			COMMAND_IS_INVALID;
+			handle_invalid_command();
 			break;
 	}
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// I/O handling
-//
-///////////////////////////////////////////////////////////////////////////////////////////
 
 void ssd1306_device::raw_write(int dc_line, uint8_t data)
 {
@@ -581,9 +572,8 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 
 }
 
-u8 ssd1306_device::raw_read(int dc_line)
+uint8_t ssd1306_device::raw_read(int dc_line)
 {
-
 	if (!dc_line)
 	{
 		// TODO: status register
@@ -594,14 +584,12 @@ u8 ssd1306_device::raw_read(int dc_line)
 	return 0;
 }
 
-
-
 void ssd1306_device::write(offs_t offset, uint8_t data)
 {
 	if (!(m_current_interface_mode == PARALLEL_6800 ||
 		  m_current_interface_mode == PARALLEL_8080))
 	{
-		logerror("%s: write() called when not in parallel mode!\n", tag());
+		logerror("%s: write() called when not in parallel mode\n", machine().describe_context());
 		return;
 	}
 
@@ -613,7 +601,7 @@ uint8_t ssd1306_device::read(offs_t offset)
 	if (!(m_current_interface_mode == PARALLEL_6800 ||
 		  m_current_interface_mode == PARALLEL_8080))
 	{
-		logerror("%s: read() called when not in parallel mode!\n", tag());
+		logerror("%s: read() called when not in parallel mode\n", machine().describe_context());
 		return 0;
 	}
 
@@ -639,7 +627,7 @@ void ssd1306_device::dc_w(int dc)
 	if (m_current_interface_mode == SPI_3WIRE)
 	{
 		// must be connected to ground in this mode
-		logerror("%s: D/C pin changed in 3-wire mode\n", tag());
+		logerror("%s: D/C pin changed in 3-wire mode\n", machine().describe_context());
 		return;
 	}
 
@@ -650,13 +638,12 @@ void ssd1306_device::dc_w(int dc)
 	}
 }
 
-
 void ssd1306_device::spi_cs_w(int state)
 {
 	if (!(m_current_interface_mode == SPI_3WIRE ||
 		  m_current_interface_mode == SPI_4WIRE))
 	{
-		logerror("%s: spi_cs_w called when not in SPI mode\n", tag());
+		logerror("%s: spi_cs_w called when not in SPI mode\n", machine().describe_context());
 		return;
 	}
 	m_spi_cs_asserted = !state;
@@ -667,7 +654,7 @@ void ssd1306_device::spi_si_w(int state)
 	if (!(m_current_interface_mode == SPI_3WIRE ||
 		  m_current_interface_mode == SPI_4WIRE))
 	{
-		logerror("%s: spi_si_w called when not in SPI mode\n", tag());
+		logerror("%s: spi_si_w called when not in SPI mode\n", machine().describe_context());
 		return;
 	}
 
@@ -685,16 +672,16 @@ void ssd1306_device::spi_sck_w(int state)
 	if (!(m_current_interface_mode == SPI_3WIRE ||
 		  m_current_interface_mode == SPI_4WIRE))
 	{
-		logerror("%s: spi_clk_w called when not in SPI mode\n", tag());
+		logerror("%s: spi_clk_w called when not in SPI mode\n", machine().describe_context());
 		return;
 	}
 
+	// only take action on rising edge of SCK
 	if (m_spi_sck_asserted || !state)
 	{
 		m_spi_sck_asserted = state != 0;
 		return;
 	}
-
 	m_spi_sck_asserted = true;
 
 	if (m_spi_bits_left == 0)
@@ -725,13 +712,7 @@ void ssd1306_device::spi_sck_w(int state)
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//
-// Screen interface code
-//
-///////////////////////////////////////////////////////////////////////////////////////////
-
-u32 ssd1306_device::palette_entries() const noexcept
+uint32_t ssd1306_device::palette_entries() const noexcept
 {
 	return 2; // monochrome
 }
