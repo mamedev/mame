@@ -8,25 +8,6 @@
 
 #include "screen.h"
 
-// see datasheet, Table 7-1. bits are in order BS2..BS0
-typedef enum
-{
-	SPI_4WIRE       = 0b000,
-	SPI_3WIRE       = 0b001,
-	I2C             = 0b010,
-	PARALLEL_6800   = 0b100,
-	PARALLEL_8080   = 0b110,
-} ssd1306_interface_mode_t;
-
-typedef enum
-{
-	HORIZONTAL = 0b00,
-	VERTICAL   = 0b01,
-	PAGE       = 0b10,
-	INVALID    = 0b11
-} ssd1306_addressing_mode_t;
-
-
 DECLARE_DEVICE_TYPE(SSD1306,  ssd1306_device)
 
 class ssd1306_device :  public device_t,
@@ -34,12 +15,31 @@ class ssd1306_device :  public device_t,
 						public device_palette_interface
 {
 public:
+
+	// see datasheet, Table 7-1. bits are in order BS2..BS0
+	enum : uint8_t
+	{
+		SSD1306_INTERFACE_MODE_SPI_4WIRE     = 0b000,
+		SSD1306_INTERFACE_MODE_SPI_3WIRE     = 0b001,
+		SSD1306_INTERFACE_MODE_I2C           = 0b010,
+		SSD1306_INTERFACE_MODE_PARALLEL_6800 = 0b100,
+		SSD1306_INTERFACE_MODE_PARALLEL_8080 = 0b110,
+	};
+
+	enum : uint8_t
+	{
+		SSD1306_ADDRESSING_MODE_HORIZONTAL = 0b00,
+		SSD1306_ADDRESSING_MODE_VERTICAL   = 0b01,
+		SSD1306_ADDRESSING_MODE_PAGE       = 0b10,
+		SSD1306_ADDRESSING_MODE_INVALID    = 0b11
+	};
+
 	ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint32_t palette_entries() const noexcept override;
 
 	void set_external_oscillator(bool use_external_oscillator);
-	void set_intf_mode(ssd1306_interface_mode_t mode);
+	void set_intf_mode(uint8_t mode);
 	void set_base_rowscan_invert(bool base_rowscan_invert);
 
 	void spi_cs_w(int state);
@@ -94,7 +94,7 @@ private:
 	bool m_spi_si;
 	bool m_spi_sck_asserted;
 	bool m_using_external_oscillator;
-	ssd1306_interface_mode_t  m_pending_interface_mode;
+	uint8_t m_pending_interface_mode;
 	bool m_dc_internal_state; // last latched D/C# value
 	
 	// ... the following are all set or affected by commands ...
@@ -103,7 +103,7 @@ private:
 	uint8_t m_pagemode_column_start_address;
 
 	// Command 0x20
-	ssd1306_addressing_mode_t m_addressing_mode;
+	uint8_t m_addressing_mode;
 
 	// Command 0x21
 	uint8_t m_hvmode_column_start_address;
@@ -186,7 +186,7 @@ private:
 	uint8_t m_horizontal_scroll_page_end_address;
 	uint8_t m_vertical_scroll_offset;
 
-	ssd1306_interface_mode_t  m_current_interface_mode;
+	uint8_t m_current_interface_mode;
 
 	uint8_t m_spi_shift;
 	int m_spi_bits_left;

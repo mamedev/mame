@@ -101,7 +101,7 @@ void ssd1306_device::device_reset()
 	m_vertical_scroll_top_fixed_rows = 0;
 	m_vertical_scroll_bottom_scrolled_rows = 64;
 
-	m_addressing_mode = PAGE;
+	m_addressing_mode = SSD1306_ADDRESSING_MODE_PAGE;
 	m_pagemode_column_start_address = 0;
 	m_hvmode_column_start_address = 0;
 	m_hvmode_column_end_address = 127;
@@ -133,7 +133,7 @@ void ssd1306_device::set_external_oscillator(bool using_external_oscillator)
 	m_using_external_oscillator = using_external_oscillator;
 }
 
-void ssd1306_device::set_intf_mode(ssd1306_interface_mode_t mode)
+void ssd1306_device::set_intf_mode(uint8_t mode)
 {
 	// should be tied to VCC or ground
 	// behavior when toggled between resets is undefined,
@@ -181,15 +181,15 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 	{
 		case 0x20: // set addressing mode
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
-			m_addressing_mode = static_cast<ssd1306_addressing_mode_t>(m_command_fifo[1] & 3);
+			m_addressing_mode = m_command_fifo[1] & 3;
 			switch(m_addressing_mode)
 			{
-				case PAGE:
+				case SSD1306_ADDRESSING_MODE_PAGE:
 					m_page_address_pointer = m_pagemode_page_start_address;
 					m_column_address_pointer = m_pagemode_column_start_address;
 					break;
-				case HORIZONTAL:
-				case VERTICAL:
+				case SSD1306_ADDRESSING_MODE_HORIZONTAL:
+				case SSD1306_ADDRESSING_MODE_VERTICAL:
 					m_page_address_pointer = m_hvmode_page_start_address;
 					m_column_address_pointer = m_hvmode_column_start_address;
 					break;
@@ -204,7 +204,8 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			m_hvmode_column_start_address = m_command_fifo[1] & 0x7f;
 			m_hvmode_column_end_address   = m_command_fifo[2] & 0x7f;
 
-			if (m_addressing_mode == HORIZONTAL || m_addressing_mode == VERTICAL)
+			if (m_addressing_mode == SSD1306_ADDRESSING_MODE_HORIZONTAL ||
+				m_addressing_mode == SSD1306_ADDRESSING_MODE_VERTICAL)
 			{
 				m_column_address_pointer = m_hvmode_column_start_address;
 			}
@@ -216,7 +217,8 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			m_hvmode_page_start_address = m_command_fifo[1] & 7;
 			m_hvmode_page_end_address = m_command_fifo[2] & 7;
 
-			if (m_addressing_mode == HORIZONTAL || m_addressing_mode == VERTICAL)
+			if (m_addressing_mode == SSD1306_ADDRESSING_MODE_HORIZONTAL ||
+				m_addressing_mode == SSD1306_ADDRESSING_MODE_VERTICAL)
 			{
 				m_page_address_pointer = m_hvmode_page_start_address;
 			}
@@ -226,7 +228,8 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 		case 0x27: // init left/right horizontal scroll
 			if (!populate_fifo_until_n_bytes(data, 7)) return;
 
-			m_horizontal_scroll_pending = m_command_fifo[0] & 1;
+			m_horizontal_scroll_pending = true;
+			m_horizontal_scrolling_left_pending = m_command_fifo[0] & 1;
 			DUMMY_BYTE_CHECK(1, 0);
 			m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
 			m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
@@ -239,7 +242,9 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 		case 0x2a: // init left/right horizontal scroll + upward vertical scroll
 			if (!populate_fifo_until_n_bytes(data, 6)) return;
 
-			m_horizontal_scroll_pending = m_command_fifo[0] & 1;
+			m_horizontal_scroll_pending = true;
+			m_vertical_scroll_pending = true;
+			m_horizontal_scrolling_left_pending = m_command_fifo[0] & 1;
 			DUMMY_BYTE_CHECK(1, 0);
 			m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
 			m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
@@ -408,7 +413,7 @@ void ssd1306_device::exec_command(uint8_t data)
 					(m_pagemode_column_start_address & keep_mask) |
 					(low4 << shift_value);
 
-				if (m_addressing_mode == PAGE)
+				if (m_addressing_mode == SSD1306_ADDRESSING_MODE_PAGE)
 				{
 					m_column_address_pointer = m_pagemode_column_start_address;
 				}
@@ -459,7 +464,7 @@ void ssd1306_device::exec_command(uint8_t data)
 
 				m_pagemode_page_start_address = m_command_fifo[0] & 7;
 
-				if (m_addressing_mode == PAGE)
+				if (m_addressing_mode == SSD1306_ADDRESSING_MODE_PAGE)
 				{
 					m_page_address_pointer = m_pagemode_page_start_address;
 				}
@@ -531,7 +536,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 
 	switch(m_addressing_mode)
 	{
-		case PAGE:
+		case SSD1306_ADDRESSING_MODE_PAGE:
 			m_column_address_pointer ++;
 			if (m_column_address_pointer >= 128)  // m_pagemode_column_end_address)
 			{
@@ -539,7 +544,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 			}
 			break;
 
-		case HORIZONTAL:
+		case SSD1306_ADDRESSING_MODE_HORIZONTAL:
 			m_column_address_pointer ++;
 			if (m_column_address_pointer > std::min((int)m_hvmode_column_end_address, 127))
 			{
@@ -553,7 +558,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 			}
 			break;
 
-		case VERTICAL:
+		case SSD1306_ADDRESSING_MODE_VERTICAL:
 			m_page_address_pointer ++;
 			if (m_page_address_pointer > std::min((int)m_hvmode_page_end_address, 7))
 			{
@@ -586,8 +591,8 @@ uint8_t ssd1306_device::raw_read(int dc_line)
 
 void ssd1306_device::write(offs_t offset, uint8_t data)
 {
-	if (!(m_current_interface_mode == PARALLEL_6800 ||
-		  m_current_interface_mode == PARALLEL_8080))
+	if (!(m_current_interface_mode == SSD1306_INTERFACE_MODE_PARALLEL_6800 ||
+		  m_current_interface_mode == SSD1306_INTERFACE_MODE_PARALLEL_8080))
 	{
 		logerror("%s: write() called when not in parallel mode\n", machine().describe_context());
 		return;
@@ -598,8 +603,8 @@ void ssd1306_device::write(offs_t offset, uint8_t data)
 
 uint8_t ssd1306_device::read(offs_t offset)
 {
-	if (!(m_current_interface_mode == PARALLEL_6800 ||
-		  m_current_interface_mode == PARALLEL_8080))
+	if (!(m_current_interface_mode == SSD1306_INTERFACE_MODE_PARALLEL_6800 ||
+		  m_current_interface_mode == SSD1306_INTERFACE_MODE_PARALLEL_8080))
 	{
 		logerror("%s: read() called when not in parallel mode\n", machine().describe_context());
 		return 0;
@@ -624,14 +629,14 @@ void ssd1306_device::dc_w(int dc)
 	// store the state, but don't sample it yet.
 	m_dc_line = dc != 0;
 
-	if (m_current_interface_mode == SPI_3WIRE)
+	if (m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_3WIRE)
 	{
 		// must be connected to ground in this mode
 		logerror("%s: D/C pin changed in 3-wire mode\n", machine().describe_context());
 		return;
 	}
 
-	if (m_current_interface_mode == I2C)
+	if (m_current_interface_mode == SSD1306_INTERFACE_MODE_I2C)
 	{
 		// changes I2C slave address, probably only at reset
 		return;
@@ -640,8 +645,8 @@ void ssd1306_device::dc_w(int dc)
 
 void ssd1306_device::spi_cs_w(int state)
 {
-	if (!(m_current_interface_mode == SPI_3WIRE ||
-		  m_current_interface_mode == SPI_4WIRE))
+	if (!(m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_3WIRE ||
+		  m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_4WIRE))
 	{
 		logerror("%s: spi_cs_w called when not in SPI mode\n", machine().describe_context());
 		return;
@@ -651,8 +656,8 @@ void ssd1306_device::spi_cs_w(int state)
 
 void ssd1306_device::spi_si_w(int state)
 {
-	if (!(m_current_interface_mode == SPI_3WIRE ||
-		  m_current_interface_mode == SPI_4WIRE))
+	if (!(m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_3WIRE ||
+		  m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_4WIRE))
 	{
 		logerror("%s: spi_si_w called when not in SPI mode\n", machine().describe_context());
 		return;
@@ -669,8 +674,8 @@ void ssd1306_device::spi_sck_w(int state)
 		return;
 	}
 
-	if (!(m_current_interface_mode == SPI_3WIRE ||
-		  m_current_interface_mode == SPI_4WIRE))
+	if (!(m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_3WIRE ||
+		  m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_4WIRE))
 	{
 		logerror("%s: spi_clk_w called when not in SPI mode\n", machine().describe_context());
 		return;
@@ -689,7 +694,7 @@ void ssd1306_device::spi_sck_w(int state)
 		m_spi_shift = 0;
 
 		// the D/C# line is sampled only at the start of a field
-		if (m_current_interface_mode == SPI_3WIRE)
+		if (m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_3WIRE)
 		{
 			m_dc_internal_state = m_spi_si ? 1 : 0;
 			m_spi_bits_left = 8;
