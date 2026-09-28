@@ -433,6 +433,13 @@ public:
 	arm710t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class arm720t_cpu_device : public arm7_cpu_device
+{
+public:
+	// construction/destruction
+	arm720t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class arm9_cpu_device : public arm7_cpu_device
 {
 public:
@@ -674,6 +681,7 @@ DECLARE_DEVICE_TYPE(ARM610_BE,    arm610_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710A_BE,   arm710a_be_cpu_device)
 DECLARE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device)
+DECLARE_DEVICE_TYPE(ARM720T,      arm720t_cpu_device)
 DECLARE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device)
 DECLARE_DEVICE_TYPE(ARM9,         arm9_cpu_device)
 DECLARE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device)
