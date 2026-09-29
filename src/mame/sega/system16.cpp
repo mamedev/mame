@@ -1980,7 +1980,7 @@ static INPUT_PORTS_START( iqpipe )
 	PORT_DIPSETTING(    0x03, "1 Coin/13 Credits")
 	PORT_DIPSETTING(    0x02, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x01, "1 Coin/15 Credits")
-	PORT_DIPSETTING(    0x00, "Free Play")
+	PORT_DIPSETTING(    0x00, DEF_STR(Free_Play))
 	// the coinage code seems buggy, the coinage will never be
 	// any less than value set in this dip, lower values default to this
 	PORT_DIPNAME( 0xf0, 0xf0, "Minimum Coinage" ) PORT_DIPLOCATION("SW1:5,6,7,8")
@@ -1999,7 +1999,7 @@ static INPUT_PORTS_START( iqpipe )
 	PORT_DIPSETTING(    0x30, "1 Coin/13 Credits")
 	PORT_DIPSETTING(    0x20, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x10, "1 Coin/15 Credits")
-	PORT_DIPSETTING(    0x00, "Free Play")
+	PORT_DIPSETTING(    0x00, DEF_STR(Free_Play))
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
