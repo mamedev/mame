@@ -46,8 +46,8 @@ public:
 	void spi_si_w(int state);
 	void spi_sck_w(int state);
 
-	void write(offs_t offset, uint8_t data);
-	u8   read(offs_t offset);
+	void    write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
 
 	/**
 	 * Set the state of the D/C# pin.

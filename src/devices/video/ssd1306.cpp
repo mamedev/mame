@@ -151,7 +151,7 @@ void ssd1306_device::set_base_rowscan_invert(bool base_rowscan_invert)
 	m_base_rowscan_invert = base_rowscan_invert;
 }
 
-bool inline ssd1306_device::populate_fifo_until_n_bytes(uint8_t data, int num_bytes)
+inline bool ssd1306_device::populate_fifo_until_n_bytes(uint8_t data, int num_bytes)
 {
 	m_command_fifo[m_command_pointer++] = data;
 	if (m_command_pointer < num_bytes)
@@ -163,7 +163,7 @@ bool inline ssd1306_device::populate_fifo_until_n_bytes(uint8_t data, int num_by
 	return true;
 }
 
-void inline ssd1306_device::handle_invalid_command()
+inline void ssd1306_device::handle_invalid_command()
 {
 	m_command_pointer = 0;
 	logerror("%s: invalid/unimplemented command %02x\n", machine().describe_context(), m_command_fifo[0]);
@@ -177,12 +177,13 @@ void inline ssd1306_device::handle_invalid_command()
 
 void ssd1306_device::exec_command_2x(uint8_t data)
 {
-	switch(m_command_fifo[0])
+	switch (m_command_fifo[0])
 	{
 		case 0x20: // set addressing mode
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
+
 			m_addressing_mode = m_command_fifo[1] & 3;
-			switch(m_addressing_mode)
+			switch (m_addressing_mode)
 			{
 				case SSD1306_ADDRESSING_MODE_PAGE:
 					m_page_address_pointer = m_pagemode_page_start_address;
@@ -281,7 +282,7 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 
 void ssd1306_device::exec_command_ax(uint8_t data)
 {
-	switch(m_command_fifo[0])
+	switch (m_command_fifo[0])
 	{
 		case 0xa0:
 		case 0xa1: // remap SEG0 column: false = SEG0 is 0, true = SEG0 is 127
@@ -340,10 +341,11 @@ void ssd1306_device::exec_command_ax(uint8_t data)
 
 void ssd1306_device::exec_command_dx(uint8_t data)
 {
-	switch(m_command_fifo[0])
+	switch (m_command_fifo[0])
 	{
 		case 0xd3: // display offset (shifts image down by n lines vertically)
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
+
 			m_display_offset = m_command_fifo[1] & 0x3f;
 			break;
 
@@ -390,7 +392,6 @@ void ssd1306_device::exec_command_dx(uint8_t data)
 	}
 }
 
-
 void ssd1306_device::exec_command(uint8_t data)
 {
 	if (m_command_pointer == 0)
@@ -398,7 +399,7 @@ void ssd1306_device::exec_command(uint8_t data)
 		m_command_fifo[0] = data;
 	}
 
-	switch(m_command_fifo[0] & 0xf0)
+	switch (m_command_fifo[0] & 0xf0)
 	{
 		case 0x00:
 		case 0x10: // page mode column start address
@@ -510,7 +511,8 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 		return;
 	}
 
-	// otherwise, display data is inbound. cancel any previous command
+	// if D/C line is high, then data's inbound, and we should cancel
+	// whatever command was being written
 	m_command_pointer    = 0;
 
 	if (m_horizontal_scroll_enabled || m_vertical_scroll_enabled)
@@ -529,16 +531,19 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 	//
 	// "Vertical addressing" mode = write pixels top to bottom,
 	// left to right
-
+	// 
+	// The Adafruit SSD1306 driver and most Arduboy games seem to use
+	// horizontal mode exclusively; drawing to a framebuffer on the
+	// ATMega chip, then copying it over to the display in one shot.
 	int address = (m_page_address_pointer * 128) + m_column_address_pointer;
 
 	m_gddram[address] = data;
 
-	switch(m_addressing_mode)
+	switch (m_addressing_mode)
 	{
 		case SSD1306_ADDRESSING_MODE_PAGE:
 			m_column_address_pointer ++;
-			if (m_column_address_pointer >= 128)  // m_pagemode_column_end_address)
+			if (m_column_address_pointer >= 128)
 			{
 				m_column_address_pointer = m_pagemode_column_start_address;
 			}
@@ -574,7 +579,6 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 		default:
 			break;
 	}
-
 }
 
 uint8_t ssd1306_device::raw_read(int dc_line)
@@ -612,7 +616,6 @@ uint8_t ssd1306_device::read(offs_t offset)
 
 	return raw_read(m_dc_internal_state);
 }
-
 
 void ssd1306_device::rst_w(int rst)
 {
@@ -681,12 +684,13 @@ void ssd1306_device::spi_sck_w(int state)
 		return;
 	}
 
-	// only take action on rising edge of SCK
 	if (m_spi_sck_asserted || !state)
 	{
 		m_spi_sck_asserted = state != 0;
 		return;
 	}
+
+	// only take action on rising edge of SCK
 	m_spi_sck_asserted = true;
 
 	if (m_spi_bits_left == 0)
@@ -755,7 +759,6 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	rgb_t on_pixel  = screen.palette().pen(!m_inverting_pixels ? 1 : 0);
 	rgb_t off_pixel = screen.palette().pen(!m_inverting_pixels ? 0 : 1);
-
 
 	// very simple rendering code for the time being...
 	//

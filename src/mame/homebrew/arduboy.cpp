@@ -102,7 +102,6 @@
 // enabling this for production could cause confusion with other
 // Arduino-based systems, which will have the incorrect delay() behavior.
 #define DELAY_HACK_ENABLE (0)
-
 namespace {
 
 class arduboy_state : public driver_device
@@ -119,9 +118,7 @@ public:
 	{ }
 
 	void arduboy_base(machine_config &config);
-
 	void arduboy(machine_config &config);
-
 
 	void prg_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -136,7 +133,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ssd1306_device> m_ssd1306;
 
-	optional_device<generic_slot_device> m_cart;            // required for arduboy, not for ardbyfx
+	optional_device<generic_slot_device> m_cart; // required for arduboy, not for ardbyfx
 
 	// this is stubbed in for the Arduboy FX; do nullpointer checks before accessing it
 	optional_device<generic_spi_flash_device> m_spi_flash;
@@ -428,12 +425,6 @@ void arduboy_state::apply_delay_sleep_hack()
 }
 #endif
 
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// Game (Intel binhex) loader code
-//
-//////////////////////////////////////////////////////////////////////////////////////
-
 #define PARSE_HEX(xin, xout) { \
 	if ('0' <= xin && xin <= '9') \
 	{   \
@@ -452,7 +443,9 @@ void arduboy_state::apply_delay_sleep_hack()
 
 #define FREAD_BOUNDSCHECK(img, bufptr, count) \
 	if (img.fread(bufptr,count) != count) \
-		return std::make_pair(image_error::BADSOFTWARE, "file read error or premature EOF");
+	{ \
+		return std::make_pair(image_error::BADSOFTWARE, "file read error or premature EOF"); \
+	}
 
 DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 {
@@ -543,7 +536,6 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 		}
 
 		uint8_t actual_checksum = (~checksum + 1) & 0xff;
-
 		if (actual_checksum != expected_checksum)
 		{
 			return std::make_pair(image_error::BADSOFTWARE, "checksum mismatch");
@@ -602,12 +594,6 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 	// we shouldn't end up here as EOF checks in the while loop should catch this for us
 	return std::make_pair(image_error::BADSOFTWARE, "hexdump hit premature EOF");
 }
-
-//////////////////////////////////////////////////////////////////////////////////////
-//
-// ROM and machine declarations
-//
-//////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( arduboy )
 	// games will work without the bootloader, but it would be ideal
