@@ -678,36 +678,6 @@ uint16_t atari_136094_0004a_device::key_offset(offs_t index)
 	return bitswap<11>(index, 10, 9, 8, 6, 7, 1, 0, 4, 2, 5, 3) ^ 0x096;
 }
 
-void atari_136094_0004a_device::set_character(uint16_t data)
-{
-	// the game writes one of these before each query (ROM table at 0xEB0C0,
-	// indexed by character); how the chip derives the taps from the word is
-	// not known, so only the five observed values are handled
-	static const struct { uint16_t word, taps; } char_taps[5] =
-	{
-		{ 0x2694, 0xbcc8 }, // Sauron, Diablo
-		{ 0x6ee0, 0xaed5 }, // Blizzard, Talon
-		{ 0x34f7, 0x9d79 }, // Chaos
-		{ 0x32b9, 0xfd10 }, // Vertigo
-		{ 0x4d5a, 0x82a3 }  // Armadon
-	};
-
-	for (auto const &ct : char_taps)
-	{
-		if (ct.word == data)
-		{
-			LOGMASKED(LOG_QUERY, "%s: character word %04X -> taps %04X\n", machine().describe_context(), data, ct.taps);
-			m_taps = ct.taps;
-			return;
-		}
-	}
-
-	// the player 1 path follows the character word with 0x8016, the
-	// 136094-0072's feedback mask; its effect is unknown
-	if (data != 0x8016)
-		logerror("%s: unknown character word %04X\n", machine().describe_context(), data);
-}
-
 uint16_t atari_136094_0004a_device::decipher(offs_t index, uint16_t c) const
 {
 	uint8_t const key = m_ram[key_offset(index)];
@@ -748,8 +718,13 @@ void atari_136094_0004a_device::write16(offs_t offset, uint16_t data)
 		}
 	}
 
+	// extra protection?
 	if (offset == PR_CHAR0 || offset == PR_CHAR1 || offset == PR_CHAR2)
-		set_character(data);
+	{
+		// Preserve the existing handling of the trailing configuration word.
+	   if (data != 0x8016)
+			m_taps = bitswap<16>(data, 15, 10, 9, 14, 13, 8, 11, 12, 0, 3, 1, 5, 2, 4, 7, 6) ^ 0xd4c6;
+	}
 }
 
 bool atari_136094_0004a_device::read16(offs_t offset, uint16_t &data)
