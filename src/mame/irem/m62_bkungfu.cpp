@@ -31,13 +31,11 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	void mcu_vram_w(offs_t offset, uint8_t data);
 	void mcu_level_vram_w(offs_t offset, uint8_t data);
+	void bkungfu_blitter_tilemap_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
-
-	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
 
 	required_device<bkungfu_mcu_device> m_mcu;
 
@@ -74,7 +72,7 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
     Blitter
 *******************************************************************************/
 
-void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
+void m62_bkungfu_state::bkungfu_blitter_tilemap_w(offs_t offset, uint8_t data)
 {
 	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
 	// however the blitter commands seem to only have enough co-ordinates for the current 64 tile page
@@ -94,11 +92,6 @@ void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 		m_bkungfu_tileram[realoffset] = data;
 		m_bg_tilemap->mark_tile_dirty(realoffset >> 1);
 	}
-}
-
-void m62_bkungfu_state::mcu_vram_w(offs_t offset, uint8_t data)
-{
-	bkungfu_blitter_tilemap_w(offset & 0x0fff, data);
 }
 
 void m62_bkungfu_state::mcu_level_vram_w(offs_t offset, uint8_t data)
@@ -145,7 +138,7 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	m_maincpu->set_addrmap(AS_IO, &m62_bkungfu_state::io_map);
 
 	BKUNG_MCU(config, m_mcu, 0);
-	m_mcu->vram_w().set(FUNC(m62_bkungfu_state::mcu_vram_w));
+	m_mcu->vram_w().set(FUNC(m62_bkungfu_state::bkungfu_blitter_tilemap_w));
 	m_mcu->level_vram_w().set(FUNC(m62_bkungfu_state::mcu_level_vram_w));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
